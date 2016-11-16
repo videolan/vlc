@@ -22,8 +22,8 @@
 #endif
 
 #include "mp4.h"
-
 #include "id3genres.h"                             /* for ATOM_gnre */
+#include "languages.h"
 
 #include <vlc_meta.h>
 #include <vlc_charset.h>
@@ -240,6 +240,78 @@ static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, MP4_Box_t
     return true;
 }
 
+static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
+{
+    if( *(uint8_t*)&p_box->i_type != 0xa9 || MP4_BoxGet( p_box, "data" ) )
+        return false;
+
+    if( p_box->data.p_string == NULL )
+        return false;
+
+    vlc_meta_type_t const* meta_type;
+    char const* meta_key;
+
+    if( AtomXA9ToMeta( p_box->i_type, &meta_type, &meta_key ) == false )
+        return false;
+
+    vlc_meta_t* p_meta_intl = vlc_meta_New();
+
+    if( unlikely( !p_meta_intl ) )
+        return false;
+
+    char const* p_peek = p_box->data.p_string->psz_text;
+    uint64_t i_read = p_box->data.p_string->i_length;
+
+    while( i_read )
+    {
+        uint16_t i_len, i_lang;
+
+        MP4_GET2BYTES( i_len );
+        MP4_GET2BYTES( i_lang );
+
+        if( i_len > i_read )
+            break;
+
+        char charset[15] = "MACINTOSH//";
+
+        decodeQtLanguageCode( i_lang, charset+11, &(bool){0} );
+
+        if( i_lang >= 0x400 && i_lang != 0x7fff )
+        {
+            strcpy( charset, i_len < 2 || memcmp( p_peek, "\xFE\xFF", 2 )
+                ? "UTF-8" : "UTF-16BE" );
+        }
+
+        char* data = FromCharset( charset, p_peek, i_len );
+        if( meta_type )
+        {
+            vlc_meta_Set( p_meta_intl, *meta_type, data );
+
+            meta_key = vlc_meta_TypeToLocalizedString( *meta_type );
+            meta_type = NULL;
+        }
+        else
+        {
+            char* key;
+            if( asprintf( &key, "%s (%s)", meta_key, charset+11 ) != -1 )
+            {
+                vlc_meta_AddExtra( p_meta_intl, key, data );
+                free( key );
+            }
+        }
+        free( data );
+
+        p_peek += i_len;
+        i_read -= i_len;
+    }
+
+    if( i_read == 0 )
+        vlc_meta_Merge( p_meta, p_meta_intl );
+
+    vlc_meta_Delete( p_meta_intl );
+    return i_read == 0;
+}
+
 static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 {
     bool b_matched = true;
@@ -339,7 +411,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
         break;
     }
 
-    if ( !b_matched )
+    if ( !b_matched && !ExtractIntlStrings( p_meta, p_box ) )
         SetMeta( p_meta, p_box->i_type, NULL, p_box );
 }
 
