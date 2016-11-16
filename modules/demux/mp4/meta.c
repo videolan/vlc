@@ -311,14 +311,16 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 
 static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 {
-    bool b_matched = true;
     const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
+    if( p_data == NULL || !BOXDATA(p_data) )
+        return;
+
     /* XXX Becarefull p_udta can have box that are not 0xa9xx */
     switch( p_box->i_type )
     {
     case ATOM_atID:
     {
-        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
+        if ( BOXDATA(p_data)->i_blob >= 4 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_BE_SIGNED )
         {
             char psz_utf[11];
@@ -330,7 +332,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
     case ATOM_cnID:
     {
-        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
+        if ( BOXDATA(p_data)->i_blob >= 4 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_BE_SIGNED )
         {
             char psz_utf[11];
@@ -342,7 +344,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
     case ATOM_disk:
     {
-        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 6 &&
+        if ( BOXDATA(p_data)->i_blob >= 6 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
             char psz_number[5];
@@ -355,7 +357,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
     case ATOM_gnre:
     {
-        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 2 &&
+        if ( BOXDATA(p_data)->i_blob >= 2 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
             const uint16_t i_genre = GetWBE(BOXDATA(p_data)->p_blob);
@@ -366,7 +368,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
     case ATOM_rtng:
     {
-        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 1 )
+        if ( BOXDATA(p_data)->i_blob >= 1 )
         {
             const char *psz_rating;
             switch( *BOXDATA(p_data)->p_blob )
@@ -388,7 +390,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
     case ATOM_trkn:
     {
-        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
+        if ( BOXDATA(p_data)->i_blob >= 4 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
             char psz_trck[6];
@@ -404,12 +406,11 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
 
     default:
-        b_matched = false;
+        if ( !ExtractIntlStrings( p_meta, p_box ) )
+             SetMeta( p_meta, p_box->i_type, NULL, p_box );
         break;
     }
 
-    if ( !b_matched && !ExtractIntlStrings( p_meta, p_box ) )
-        SetMeta( p_meta, p_box->i_type, NULL, p_box );
 }
 
 static void SetupmdtaMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box, MP4_Box_t *p_keys )
