@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 #ifndef VLC_MEMSTREAM_H
-# define VLC_MEMSREAM_H 1
+# define VLC_MEMSTREAM_H 1
 
 # include <stdarg.h>
 # include <stdio.h>
