@@ -621,10 +621,12 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
 static int vlc_sd_probe_Open( vlc_object_t *obj )
 {
     vlc_dictionary_t name_d;
-    vlc_dictionary_init( &name_d, 32 );
 
     char **ppsz_dir_list;
-    vlclua_dir_list( "sd", &ppsz_dir_list );
+    if( vlclua_dir_list( "sd", &ppsz_dir_list ) )
+        return VLC_ENOMEM;
+
+    vlc_dictionary_init( &name_d, 32 );
     for( char **ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
         char **ppsz_filelist;
