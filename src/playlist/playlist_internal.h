@@ -119,9 +119,6 @@ int playlist_MLDump( playlist_t *p_playlist );
 void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item,
                              bool b_signal );
 
-playlist_item_t * playlist_NodeAddInput( playlist_t *, input_item_t *,
-        playlist_item_t *,int , int, bool );
-
 int playlist_InsertInputItemTree ( playlist_t *,
         playlist_item_t *, input_item_node_t *, int, bool );
 
