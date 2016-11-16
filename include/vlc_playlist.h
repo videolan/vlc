@@ -95,8 +95,7 @@ struct intf_thread_t;
  * You can create nodes with playlist_NodeCreate and can create items from
  * existing input items to be placed under any node with playlist_NodeAddInput.
  *
- * To delete an item, use playlist_DeleteFromInput( p_item ) which will
- * remove all occurrences of the input.
+ * To delete an item, use playlist_NodeDelete( p_item ).
  *
  *
  * The playlist defines the following event variables:
@@ -328,9 +327,6 @@ VLC_API int playlist_ServicesDiscoveryControl( playlist_t *, const char *, int, 
 /********************************************************
  * Item management
  ********************************************************/
-
-/*************************** Item deletion **************************/
-VLC_API int playlist_DeleteFromInput( playlist_t *, input_item_t *, bool );
 
 /******************** Item addition ********************/
 VLC_API int playlist_Add( playlist_t *, const char *, const char *, int, int, bool );

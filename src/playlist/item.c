@@ -314,36 +314,6 @@ void playlist_ItemRelease( playlist_item_t *p_item )
 }
 
 /**
- * Delete from input
- *
- * Search anywhere in playlist for an an input item and delete it
- * \param p_playlist playlist object
- * \param p_input the input to delete
- * \param b_locked TRUE if the playlist is locked
- * \return VLC_SUCCESS or VLC_ENOITEM
- */
-int playlist_DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
-                              bool b_locked )
-{
-    playlist_item_t *p_item;
-    int i_ret;
-
-    PL_LOCK_IF( !b_locked );
-    p_item = playlist_ItemFindFromInputAndRoot( p_playlist, p_input,
-                                                p_playlist->p_root );
-    if( p_item != NULL )
-    {
-        playlist_NodeDelete( p_playlist, p_item, false );
-        i_ret = VLC_SUCCESS;
-    }
-    else
-        i_ret = VLC_ENOITEM;
-    PL_UNLOCK_IF( !b_locked );
-
-    return i_ret;
-}
-
-/**
  * Clear the playlist
  *
  * \param p_playlist playlist object
