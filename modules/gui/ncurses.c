@@ -1345,7 +1345,7 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
         if (item->i_children == -1)
             playlist_DeleteFromInput(p_playlist, item->p_input, pl_Locked);
         else
-            playlist_NodeDelete(p_playlist, item, true , false);
+            playlist_NodeDelete(p_playlist, item, false);
         PL_UNLOCK;
         vlc_mutex_lock(&sys->pl_lock);
         if (sys->box_idx >= sys->box_lines_total - 1)

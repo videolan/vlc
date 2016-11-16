@@ -267,7 +267,7 @@ DBUS_METHOD( RemoveTrack )
 
         if( item->i_id == i_id )
         {
-            playlist_NodeDelete( p_playlist, item, true, false );
+            playlist_NodeDelete( p_playlist, item, false );
             break;
         }
     }

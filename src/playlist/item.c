@@ -110,7 +110,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
         }
         assert( i < p_parent->i_children );
 
-        playlist_NodeDelete( p_playlist, p_item, true, false );
+        playlist_NodeDelete( p_playlist, p_item, false );
 
         /* If there is a pending request referring to the item we just deleted
          * it needs to be updated so that we do not try to play an entity that
@@ -329,7 +329,7 @@ static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
     playlist_item_t *p_item = playlist_ItemFindFromInputAndRoot(
         p_playlist, p_input, p_root, false );
     if( !p_item ) return VLC_EGENERIC;
-    playlist_NodeDelete( p_playlist, p_item, true, false );
+    playlist_NodeDelete( p_playlist, p_item, false );
     return VLC_SUCCESS;
 }
 
@@ -401,7 +401,7 @@ int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
     PL_ASSERT_LOCKED;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( !p_item ) return VLC_EGENERIC;
-    playlist_NodeDelete( p_playlist, p_item, true, false );
+    playlist_NodeDelete( p_playlist, p_item, false );
     return VLC_SUCCESS;
 }
 
