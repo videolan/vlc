@@ -334,27 +334,6 @@ static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
 }
 
 /**
- * Delete input item
- *
- * Remove an input item when it appears from a root playlist item
- * \param p_playlist playlist object
- * \param p_input the input to delete
- * \param p_root root playlist item
- * \param b_locked TRUE if the playlist is locked
- * \return VLC_SUCCESS or VLC_EGENERIC
- */
-int playlist_DeleteFromInputInParent( playlist_t *p_playlist,
-                                      input_item_t *p_item,
-                                      playlist_item_t *p_root, bool b_locked )
-{
-    int i_ret;
-    PL_LOCK_IF( !b_locked );
-    i_ret = DeleteFromInput( p_playlist, p_item, p_root );
-    PL_UNLOCK_IF( !b_locked );
-    return i_ret;
-}
-
-/**
  * Delete from input
  *
  * Search anywhere in playlist for an an input item and delete it
