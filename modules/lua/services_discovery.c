@@ -108,7 +108,8 @@ int Open_LuaSD( vlc_object_t *p_this )
     if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
         return VLC_ENOMEM;
 
-    if( !strcmp( p_sd->psz_name, "lua" ) )
+    if( !strcmp( p_sd->psz_name, "lua" ) ||
+        !strcmp( p_sd->psz_name, "luasd" ) )
     {
         // We want to load the module name "lua"
         // This module can be used to load lua script not registered
