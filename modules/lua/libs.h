@@ -49,4 +49,6 @@ void luaopen_equalizer( lua_State *L );
 void luaopen_win( lua_State *L );
 #endif
 
+int vlclua_url_parse( lua_State *L );
+
 #endif
