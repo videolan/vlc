@@ -42,9 +42,8 @@ static int Control( services_discovery_t *p_sd, int i_command, va_list args );
 
 // When successful, the returned string is stored on top of the lua
 // stack and remains valid as long as it is kept in the stack.
-#undef vlclua_sd_description
-const char *vlclua_sd_description( vlc_object_t *obj, lua_State *L,
-                                   const char *filename )
+static const char *vlclua_sd_description( vlc_object_t *obj, lua_State *L,
+                                          const char *filename )
 {
     lua_getglobal( L, "descriptor" );
     if( !lua_isfunction( L, -1 ) )
@@ -74,7 +73,62 @@ const char *vlclua_sd_description( vlc_object_t *obj, lua_State *L,
 
     return lua_tostring( L, -1 );
 }
-#define vlclua_sd_description(a, b, c) vlclua_sd_description(VLC_OBJECT(a), b, c)
+
+int vlclua_probe_sd( vlc_object_t *obj, const char *name )
+{
+    vlc_probe_t *probe = (vlc_probe_t *)obj;
+
+    char *filename = vlclua_find_file( "sd", name );
+    if( filename == NULL )
+    {
+        // File suddenly disappeared - maybe a race condition, no problem
+        msg_Err( probe, "Couldn't probe lua services discovery script \"%s\".",
+                 name );
+        return VLC_PROBE_CONTINUE;
+    }
+
+    lua_State *L = luaL_newstate();
+    if( !L )
+    {
+        msg_Err( probe, "Could not create new Lua State" );
+        free( filename );
+        return VLC_ENOMEM;
+    }
+    luaL_openlibs( L );
+    if( vlclua_add_modules_path( L, filename ) )
+    {
+        msg_Err( probe, "Error while setting the module search path for %s",
+                 filename );
+        lua_close( L );
+        free( filename );
+        return VLC_ENOMEM;
+    }
+    if( vlclua_dofile( obj, L, filename ) )
+    {
+        msg_Err( probe, "Error loading script %s: %s", filename,
+                 lua_tostring( L, -1 ) );
+        lua_close( L );
+        free( filename );
+        return VLC_PROBE_CONTINUE;
+    }
+    const char *description = vlclua_sd_description( obj, L, filename );
+    if( description == NULL )
+        description = name;
+
+    int r = VLC_ENOMEM;
+    char *name_esc = config_StringEscape( name );
+    char *chain;
+    if( asprintf( &chain, "lua{sd='%s'}", name_esc ) != -1 )
+    {
+        r = vlc_sd_probe_Add( probe, chain, description, SD_CAT_INTERNET );
+        free( chain );
+    }
+    free( name_esc );
+
+    lua_close( L );
+    free( filename );
+    return r;
+}
 
 static const char * const ppsz_sd_options[] = { "sd", NULL };
 
@@ -169,7 +223,8 @@ int Open_LuaSD( vlc_object_t *p_this )
     }
 
     // No strdup(), just don't remove the string from the lua stack
-    p_sd->description = vlclua_sd_description( p_sd, L, p_sys->psz_filename );
+    p_sd->description = vlclua_sd_description( VLC_OBJECT(p_sd), L,
+                                               p_sys->psz_filename );
     if( p_sd->description == NULL )
         p_sd->description = p_sd->psz_name;
 
