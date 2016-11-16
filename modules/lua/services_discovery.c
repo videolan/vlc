@@ -74,6 +74,7 @@ const char *vlclua_sd_description( vlc_object_t *obj, lua_State *L,
 
     return lua_tostring( L, -1 );
 }
+#define vlclua_sd_description(a, b, c) vlclua_sd_description(VLC_OBJECT(a), b, c)
 
 static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 
@@ -117,15 +118,6 @@ int Open_LuaSD( vlc_object_t *p_this )
         // We are loading a builtin lua sd module.
         psz_name = strdup(p_sd->psz_name);
     }
-
-    p_sd->description = p_sd->psz_name;
-
-    for( const config_chain_t *cc = p_sd->p_cfg; cc != NULL; cc = cc->p_next )
-        if( strcmp( cc->psz_name, "longname" ) == 0 )
-        {
-            p_sd->description = cc->psz_value;
-            break;
-        }
 
     if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
     {
@@ -176,6 +168,12 @@ int Open_LuaSD( vlc_object_t *p_this )
         lua_pop( L, 1 );
         goto error;
     }
+
+    // No strdup(), just don't remove the string from the lua stack
+    p_sd->description = vlclua_sd_description( p_sd, L, p_sys->psz_filename );
+    if( p_sd->description == NULL )
+        p_sd->description = p_sd->psz_name;
+
     p_sys->L = L;
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->cond );
