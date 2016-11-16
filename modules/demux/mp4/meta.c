@@ -178,43 +178,6 @@ static char * ExtractString( MP4_Box_t *p_box )
         return NULL;
 }
 
-static bool MatchXA9Type( vlc_meta_t *p_meta, uint32_t i_type, MP4_Box_t *p_box )
-{
-    bool b_matched = false;
-
-    for( unsigned i = 0; !b_matched && xa9typetometa[i].xa9_type; i++ )
-    {
-        if( i_type == xa9typetometa[i].xa9_type )
-        {
-            b_matched = true;
-            char *psz_utf = ExtractString( p_box );
-            if( psz_utf )
-            {
-                 vlc_meta_Set( p_meta, xa9typetometa[i].meta_type, psz_utf );
-                 free( psz_utf );
-            }
-            break;
-        }
-    }
-
-    for( unsigned i = 0; !b_matched && xa9typetoextrameta[i].xa9_type; i++ )
-    {
-        if( i_type == xa9typetoextrameta[i].xa9_type )
-        {
-            b_matched = true;
-            char *psz_utf = ExtractString( p_box );
-            if( psz_utf )
-            {
-                 vlc_meta_AddExtra( p_meta, _(xa9typetoextrameta[i].metadata), psz_utf );
-                 free( psz_utf );
-            }
-            break;
-        }
-    }
-
-    return b_matched;
-}
-
 static bool AppleNameToMeta( char const* name,
     vlc_meta_type_t const** meta_type, char const** meta_key )
 {
@@ -275,43 +238,6 @@ static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, MP4_Box_t
     }
 
     return true;
-}
-
-static bool Matchcom_apple_quicktime( vlc_meta_t *p_meta, const char *psz_naming, MP4_Box_t *p_box )
-{
-    bool b_matched = false;
-
-    for( unsigned i = 0; !b_matched && com_apple_quicktime_tometa[i].psz_naming; i++ )
-    {
-        if( !strcmp( psz_naming, com_apple_quicktime_tometa[i].psz_naming ) )
-        {
-            b_matched = true;
-            char *psz_utf = ExtractString( p_box );
-            if( psz_utf )
-            {
-                 vlc_meta_Set( p_meta, com_apple_quicktime_tometa[i].meta_type, psz_utf );
-                 free( psz_utf );
-            }
-            break;
-        }
-    }
-
-    for( unsigned i = 0; !b_matched && com_apple_quicktime_toextrameta[i].psz_naming; i++ )
-    {
-        if( !strcmp( psz_naming, com_apple_quicktime_toextrameta[i].psz_naming ) )
-        {
-            b_matched = true;
-            char *psz_utf = ExtractString( p_box );
-            if( psz_utf )
-            {
-                 vlc_meta_AddExtra( p_meta, _(com_apple_quicktime_toextrameta[i].psz_metadata), psz_utf );
-                 free( psz_utf );
-            }
-            break;
-        }
-    }
-
-    return b_matched;
 }
 
 static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
@@ -414,7 +340,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
 
     if ( !b_matched )
-        MatchXA9Type( p_meta, p_box->i_type, p_box );
+        SetMeta( p_meta, p_box->i_type, NULL, p_box );
 }
 
 static void SetupmdtaMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box, MP4_Box_t *p_keys )
@@ -430,9 +356,7 @@ static void SetupmdtaMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box, MP4_Box_t *p_ke
     if( i_namespace == HANDLER_mdta )
     {
         if ( !strncmp( "com.apple.quicktime.", psz_naming, 20 ) )
-        {
-            Matchcom_apple_quicktime( p_meta, psz_naming + 20, p_box );
-        }
+            SetMeta( p_meta, 0, psz_naming + 20, p_box );
     }
     else if ( i_namespace == ATOM_udta )
     {
@@ -442,9 +366,9 @@ static void SetupmdtaMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box, MP4_Box_t *p_ke
         {
             if ( strlen(psz_utf) == 4 )
             {
-                MatchXA9Type( p_meta,
-                              VLC_FOURCC(psz_utf[0],psz_utf[1],psz_utf[2],psz_utf[3]),
-                              p_box );
+                SetMeta( p_meta,
+                         VLC_FOURCC(psz_utf[0],psz_utf[1],psz_utf[2],psz_utf[3]),
+                         NULL, p_box );
             }
             free( psz_utf );
         }
