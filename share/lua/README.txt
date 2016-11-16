@@ -163,9 +163,8 @@ Net
 /!\ NB: this namespace is ONLY usable for interfaces and extensions.
 ---
 ----------------------------------------------------------------
-net.url_parse( url ): Parse URL. Returns a table with
-  fields "protocol", "username", "password", "host", "port", path" and
-  "option".
+net.url_parse( url ): Deprecated alias for strings.url_parse().
+  Will be removed in VLC 4.x.
 net.listen_tcp( host, port ): Listen to TCP connections. This returns an
   object with an accept and an fds method. accept is blocking (Poll on the
   fds with the net.POLLIN flag if you want to be non blocking).
@@ -375,6 +374,9 @@ strings.decode_uri( [uri1, [uri2, [...]]] ): Decode a list of URIs. This
 strings.encode_uri_component( [uri1, [uri2, [...]]] ): Encode a list of URI
   components. This function returns as many variables as it had arguments.
 strings.make_uri( path, [scheme] ): Convert a file path to a URI.
+strings.url_parse( url ): Parse URL. Returns a table with
+  fields "protocol", "username", "password", "host", "port", path" and
+  "option".
 strings.resolve_xml_special_chars( [str1, [str2, [...]]] ): Resolve XML
   special characters in a list of strings. This function returns as many
   variables as it had arguments.

@@ -253,7 +253,7 @@ function host()
             if url == "*console" then
                 h:listen_stdio()
             else
-                u = vlc.net.url_parse( url )
+                u = vlc.strings.url_parse( url )
                 h:listen_tcp( u.host, u.port, (u.protocol == "telnet") )
             end
         end

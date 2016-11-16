@@ -21,21 +21,21 @@ vlc.msg.info('configdir: ' .. vlc.config.configdir())
 vlc.msg.info('cachedir: ' .. vlc.config.cachedir())
 
 vlc.msg.info('---- Testing net functions ----')
-vlc.msg.info(' * testing vlc.net.url_parse')
+vlc.msg.info(' * testing vlc.strings.url_parse')
 vlc.msg.info('    "filename.ext"')
-assert_url(vlc.net.url_parse('file:///filename.ext'), 'file', nil, nil,
+assert_url(vlc.strings.url_parse('file:///filename.ext'), 'file', nil, nil,
            nil, 0, '/filename.ext')
 vlc.msg.info('    "http://server.org/path/file.ext"')
-assert_url(vlc.net.url_parse('http://server.org/path/file.ext'),
+assert_url(vlc.strings.url_parse('http://server.org/path/file.ext'),
            'http', nil, nil, 'server.org', 0, '/path/file.ext')
 vlc.msg.info('    "rtmp://server.org:4212/bla.ext"')
-assert_url(vlc.net.url_parse('rtmp://server.org:4212/bla.ext'),
+assert_url(vlc.strings.url_parse('rtmp://server.org:4212/bla.ext'),
            'rtmp', nil, nil, 'server.org', 4212, '/bla.ext')
 vlc.msg.info('    "ftp://userbla@server.org:4567/bla.ext"')
-assert_url(vlc.net.url_parse('rtmp://userbla@server.org:4567/bla.ext'),
+assert_url(vlc.strings.url_parse('rtmp://userbla@server.org:4567/bla.ext'),
            'rtmp', 'userbla', nil, 'server.org', 4567, '/bla.ext')
 vlc.msg.info('    "sftp://userbla:Passw0rd@server.org/bla.ext"')
-assert_url(vlc.net.url_parse('sftp://userbla:Passw0rd@server.org/bla.ext'),
+assert_url(vlc.strings.url_parse('sftp://userbla:Passw0rd@server.org/bla.ext'),
            'sftp', 'userbla', 'Passw0rd', 'server.org', 0, '/bla.ext')
 vlc.msg.info("")
 

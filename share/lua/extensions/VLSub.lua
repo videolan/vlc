@@ -1374,7 +1374,7 @@ openSub = {
       file.uri = nil;
     else
       vlc.msg.dbg("[VLSub] Video URI: "..item:uri())
-      local parsed_uri = vlc.net.url_parse(item:uri())
+      local parsed_uri = vlc.strings.url_parse(item:uri())
       file.uri = item:uri()
       file.protocol = parsed_uri["protocol"]
       file.path = parsed_uri["path"]
@@ -1937,7 +1937,7 @@ function parse_header(data)
 end 
 
 function parse_url(url)
-  local url_parsed = vlc.net.url_parse(url)
+  local url_parsed = vlc.strings.url_parse(url)
   return  url_parsed["host"], 
     url_parsed["path"],
     url_parsed["option"]
