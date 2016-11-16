@@ -47,6 +47,16 @@ static void *Run( void * );
 static const char * const ppsz_intf_options[] = { "intf", "config", NULL };
 
 /*****************************************************************************
+ * Local structures
+ *****************************************************************************/
+struct intf_sys_t
+{
+    char *psz_filename;
+    lua_State *L;
+    vlc_thread_t thread;
+    vlclua_dtable_t dtable;
+};
+/*****************************************************************************
  *
  *****************************************************************************/
 static inline void luaL_register_submodule( lua_State *L, const char *psz_name,

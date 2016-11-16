@@ -204,16 +204,5 @@ void vlclua_fd_interrupt( vlclua_dtable_t * );
 void vlclua_fd_cleanup( vlclua_dtable_t * );
 struct vlc_interrupt *vlclua_set_interrupt( lua_State *L );
 
-/**
- * Per-interface private state
- */
-struct intf_sys_t
-{
-    char *psz_filename;
-    lua_State *L;
-    vlc_thread_t thread;
-    vlclua_dtable_t dtable;
-};
-
 #endif /* VLC_LUA_H */
 
