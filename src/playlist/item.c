@@ -383,7 +383,7 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
 void playlist_Clear( playlist_t * p_playlist, bool b_locked )
 {
     PL_LOCK_IF( !b_locked );
-    playlist_NodeEmpty( p_playlist, p_playlist->p_playing, true );
+    playlist_NodeEmpty( p_playlist, p_playlist->p_playing );
     PL_UNLOCK_IF( !b_locked );
 }
 

@@ -96,10 +96,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
  *
  * \param p_playlist the playlist
  * \param p_root the node
- * \param b_delete_items do we have to delete the children items ?
  */
-void playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
-                        bool b_delete_items )
+void playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root )
 {
     PL_ASSERT_LOCKED;
 
@@ -112,9 +110,9 @@ void playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
         if( p_root->pp_children[i]->i_children > -1 )
         {
             playlist_NodeDelete( p_playlist, p_root->pp_children[i],
-                                 b_delete_items , false );
+                                 true, false );
         }
-        else if( b_delete_items )
+        else
         {
             /* Delete the item here */
             playlist_DeleteFromItemId( p_playlist,
