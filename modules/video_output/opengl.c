@@ -211,6 +211,7 @@ struct vout_display_opengl_t {
     float f_roll;
     float f_fov;
     float f_zoom;
+    float f_zoom_min;
 };
 
 static inline int GetAlignedSize(unsigned size)
@@ -447,6 +448,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         free(vgl);
         return NULL;
     }
+
+    vgl->f_fov = -1.f; /* In order to init vgl->f_zoom_min */
 
     const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
 #if !USE_OPENGL_ES
@@ -792,11 +795,27 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     float f_fov = RAD(p_vp->fov);
     if (f_fov > (float) M_PI -0.001f || f_fov < 0.001f)
         return VLC_EBADVAR;
+    if (p_vp->zoom > 1.f || p_vp->zoom < -1.f)
+        return VLC_EBADVAR;
     vgl->f_teta = RAD(p_vp->yaw) - (float) M_PI / 2;
     vgl->f_phi  = RAD(p_vp->pitch);
     vgl->f_roll = RAD(p_vp->roll);
-    vgl->f_fov  = RAD(p_vp->fov);
-    vgl->f_zoom = p_vp->zoom;
+
+    if (fabsf(f_fov - vgl->f_fov) >= 0.001f)
+    {
+        /* The fov changed, do trigonometry to calculate the minimal zoom value
+         * that will allow us to zoom out without seeing the outside of the
+         * sphere (black borders). */
+        float sar = (float) vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
+        float fovx = 2 * atanf(tanf(f_fov / 2) * sar);
+        float tan_fovx_2 = tanf(fovx / 2);
+        float tan_fovy_2 = tanf(f_fov / 2 );
+        vgl->f_zoom_min = SPHERE_RADIUS / sinf(atanf(sqrtf(
+                          tan_fovx_2 * tan_fovx_2 + tan_fovy_2 * tan_fovy_2)));
+    }
+
+    vgl->f_fov  = f_fov;
+    vgl->f_zoom = p_vp->zoom * (p_vp->zoom >= 0 ? 0.5 : vgl->f_zoom_min);
 
     return VLC_SUCCESS;
 #undef RAD
