@@ -1182,8 +1182,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t *p_blob;
-    uint32_t i_blob;
+    void  *p_blob;
+    size_t i_blob;
 } MP4_Box_data_binary_t;
 
 typedef struct
@@ -1652,7 +1652,6 @@ typedef union MP4_Box_data_s
     MP4_Box_data_360_t  *p_360;
 
     /* for generic handlers */
-    MP4_Box_data_string_t *p_string;
     MP4_Box_data_binary_t *p_binary;
     MP4_Box_data_data_t *p_data;
 

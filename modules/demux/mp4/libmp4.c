@@ -3315,33 +3315,6 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
     return 1;
 }
 
-static void MP4_FreeBox_String( MP4_Box_t *p_box )
-{
-    FREENULL( p_box->data.p_string->psz_text );
-}
-
-static int MP4_ReadBox_String( stream_t *p_stream, MP4_Box_t *p_box )
-{
-    MP4_READBOX_ENTER( MP4_Box_data_string_t, MP4_FreeBox_String );
-
-    if( p_box->i_size < 8 || p_box->i_size > SIZE_MAX )
-        MP4_READBOX_EXIT( 0 );
-
-    p_box->data.p_string->i_length = i_read;
-    p_box->data.p_string->psz_text = malloc( p_box->i_size + 1 - 8 ); /* +\0, -name, -size */
-    if( p_box->data.p_string->psz_text == NULL )
-        MP4_READBOX_EXIT( 0 );
-
-    memcpy( p_box->data.p_string->psz_text, p_peek, p_box->i_size - 8 );
-    p_box->data.p_string->psz_text[p_box->i_size - 8] = '\0';
-
-#ifdef MP4_VERBOSE
-        msg_Dbg( p_stream, "read box: \"%4.4s\" text=`%s'", (char *) & p_box->i_type,
-                 p_box->data.p_string->psz_text );
-#endif
-    MP4_READBOX_EXIT( 1 );
-}
-
 static void MP4_FreeBox_Binary( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_binary->p_blob );
@@ -4358,62 +4331,62 @@ static const struct
     { ATOM_gstd,    MP4_ReadBox_Metadata,    ATOM_ilst },
 
     /* udta */
-    { ATOM_0x40PRM, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0x40PRQ, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9ART, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9alb, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9ard, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9arg, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9aut, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9cak, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9cmt, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9con, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9com, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9cpy, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9day, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9des, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9dir, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9dis, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9dsa, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9fmt, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9gen, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9grp, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9hst, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9inf, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9isr, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9lab, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9lal, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9lnt, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9lyr, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9mak, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9mal, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9mod, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9nam, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9ope, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9phg, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9PRD, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9prd, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9prf, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9pub, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9req, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9sne, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9snm, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9sol, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9src, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9st3, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9swr, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9thx, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9too, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9trk, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9url, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9wrn, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9xpd, MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_0xa9xyz, MP4_ReadBox_String,    ATOM_udta },
+    { ATOM_0x40PRM, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0x40PRQ, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9ART, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9alb, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9ard, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9arg, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9aut, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9cak, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9cmt, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9con, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9com, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9cpy, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9day, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9des, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9dir, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9dis, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9dsa, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9fmt, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9gen, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9grp, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9hst, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9inf, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9isr, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9lab, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9lal, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9lnt, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9lyr, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9mak, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9mal, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9mod, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9nam, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9ope, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9phg, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9PRD, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9prd, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9prf, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9pub, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9req, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9sne, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9snm, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9sol, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9src, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9st3, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9swr, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9thx, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9too, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9trk, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9url, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9wrn, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9xpd, MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_0xa9xyz, MP4_ReadBox_Binary,    ATOM_udta },
     { ATOM_chpl,    MP4_ReadBox_chpl,      ATOM_udta }, /* nero unlabeled chapters list */
-    { ATOM_MCPS,    MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_name,    MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_vndr,    MP4_ReadBox_String,    ATOM_udta },
-    { ATOM_SDLN,    MP4_ReadBox_String,    ATOM_udta },
+    { ATOM_MCPS,    MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_name,    MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_vndr,    MP4_ReadBox_Binary,    ATOM_udta },
+    { ATOM_SDLN,    MP4_ReadBox_Binary,    ATOM_udta },
     { ATOM_HMMT,    MP4_ReadBox_HMMT,      ATOM_udta }, /* GoPro HiLight tags */
 
     /* udta, non meta */

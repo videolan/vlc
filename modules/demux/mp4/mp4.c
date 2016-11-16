@@ -3126,7 +3126,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                 case ATOM_0xa9nam:
                 case ATOM_name:
                     p_track->fmt.psz_description =
-                        strdup( p_box_iter->data.p_string->psz_text );
+                        strndup( p_box_iter->data.p_binary->p_blob,
+                                 p_box_iter->data.p_binary->i_blob );
                 default:
                     break;
             }

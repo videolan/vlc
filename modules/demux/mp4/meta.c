@@ -167,9 +167,10 @@ static char * ExtractString( MP4_Box_t *p_box )
     MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
     if ( p_data )
         return StringConvert( BOXDATA(p_data) );
-    else if ( p_box->data.p_string && p_box->data.p_string->psz_text )
+    else if ( p_box->data.p_binary && p_box->data.p_binary->p_blob )
     {
-        char *psz_utf = strdup( p_box->data.p_string->psz_text );
+        char *psz_utf = strndup( p_box->data.p_binary->p_blob,
+                                 p_box->data.p_binary->i_blob );
         if (likely( psz_utf ))
             EnsureUTF8( psz_utf );
         return psz_utf;
@@ -245,7 +246,7 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     if( *(uint8_t*)&p_box->i_type != 0xa9 || MP4_BoxGet( p_box, "data" ) )
         return false;
 
-    if( p_box->data.p_string == NULL )
+    if( p_box->data.p_binary->p_blob == NULL )
         return false;
 
     vlc_meta_type_t const* meta_type;
@@ -259,8 +260,8 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     if( unlikely( !p_meta_intl ) )
         return false;
 
-    char const* p_peek = p_box->data.p_string->psz_text;
-    uint64_t i_read = p_box->data.p_string->i_length;
+    char const* p_peek = p_box->data.p_binary->p_blob;
+    uint64_t i_read = p_box->data.p_binary->i_blob;
 
     while( i_read )
     {
