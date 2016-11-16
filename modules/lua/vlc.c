@@ -678,7 +678,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                 lua_close( L );
                 continue;
             }
-            char *psz_longname;
+            const char *psz_longname;
             char *temp = strchr( *ppsz_file, '.' );
             if( temp )
                 *temp = '\0';
@@ -687,21 +687,17 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             {
                 msg_Warn( probe, "No 'descriptor' function in '%s'", psz_filename );
                 lua_pop( L, 1 );
-                if( !( psz_longname = strdup( *ppsz_file ) ) )
-                {
-                    free( psz_filename );
-                    goto error;
-                }
+                psz_longname = *ppsz_file;
             }
             else
             {
                 lua_getfield( L, -1, "title" );
-                if( !lua_isstring( L, -1 ) ||
-                    !( psz_longname = strdup( lua_tostring( L, -1 ) ) ) )
+                if( !lua_isstring( L, -1 ) )
                 {
                     free( psz_filename );
                     goto error;
                 }
+                psz_longname = lua_tostring( L, -1 );
             }
 
             char *psz_file_esc = config_StringEscape( *ppsz_file );
@@ -712,14 +708,12 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                 free( psz_file_esc );
                 free( psz_longname_esc );
                 free( psz_filename );
-                free( psz_longname );
                 goto error;
             }
             free( psz_file_esc );
             free( psz_longname_esc );
             vlc_sd_probe_Add( probe, psz_name, psz_longname, SD_CAT_INTERNET );
             free( psz_name );
-            free( psz_longname );
             free( psz_filename );
             lua_close( L );
         }
