@@ -131,8 +131,7 @@ int playlist_NodeInsert(playlist_t *, playlist_item_t*, playlist_item_t *,
                         int);
 
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
-                                input_item_t *p_input, playlist_item_t *p_root,
-                                bool );
+                              input_item_t *p_input, playlist_item_t *p_root );
 
 int playlist_DeleteFromItemId( playlist_t*, int );
 void playlist_ItemRelease( playlist_item_t * );

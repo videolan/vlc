@@ -196,8 +196,7 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
 
     PL_LOCK;
     playlist_item_t *p_item =
-        playlist_ItemFindFromInputAndRoot( p_playlist, p_input,
-                                           p_sd_node, false );
+        playlist_ItemFindFromInputAndRoot( p_playlist, p_input, p_sd_node );
     if( !p_item )
     {
         PL_UNLOCK; return;
