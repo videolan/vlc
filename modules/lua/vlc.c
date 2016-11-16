@@ -678,25 +678,12 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                 lua_close( L );
                 continue;
             }
-            const char *psz_longname;
             char *temp = strchr( *ppsz_file, '.' );
             if( temp )
                 *temp = '\0';
-            lua_getglobal( L, "descriptor" );
-            if( !lua_isfunction( L, lua_gettop( L ) ) || lua_pcall( L, 0, 1, 0 ) )
-            {
-                msg_Warn( probe, "No 'descriptor' function in '%s'", psz_filename );
-                lua_pop( L, 1 );
+            const char *psz_longname = vlclua_sd_description( probe, L, psz_filename );
+            if( psz_longname == NULL )
                 psz_longname = *ppsz_file;
-            }
-            else
-            {
-                lua_getfield( L, -1, "title" );
-                if( lua_isstring( L, -1 ) )
-                    psz_longname = lua_tostring( L, -1 );
-                else
-                    psz_longname = *ppsz_file;
-            }
 
             char *psz_file_esc = config_StringEscape( *ppsz_file );
             char *psz_longname_esc = config_StringEscape( psz_longname );

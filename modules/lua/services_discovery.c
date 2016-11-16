@@ -40,6 +40,41 @@ static int DoSearch( services_discovery_t *p_sd, const char *psz_query );
 static int FillDescriptor( services_discovery_t *, services_discovery_descriptor_t * );
 static int Control( services_discovery_t *p_sd, int i_command, va_list args );
 
+// When successful, the returned string is stored on top of the lua
+// stack and remains valid as long as it is kept in the stack.
+#undef vlclua_sd_description
+const char *vlclua_sd_description( vlc_object_t *obj, lua_State *L,
+                                   const char *filename )
+{
+    lua_getglobal( L, "descriptor" );
+    if( !lua_isfunction( L, -1 ) )
+    {
+        msg_Warn( obj, "No 'descriptor' function in '%s'", filename );
+        lua_pop( L, 1 );
+        return NULL;
+    }
+
+    if( lua_pcall( L, 0, 1, 0 ) )
+    {
+        msg_Warn( obj, "Error while running script %s, "
+                  "function descriptor(): %s", filename,
+                  lua_tostring( L, -1 ) );
+        lua_pop( L, 1 );
+        return NULL;
+    }
+
+    lua_getfield( L, -1, "title" );
+    if ( !lua_isstring( L, -1 ) )
+    {
+        msg_Warn( obj, "'descriptor' function in '%s' returned no title",
+                  filename );
+        lua_pop( L, 2 );
+        return NULL;
+    }
+
+    return lua_tostring( L, -1 );
+}
+
 static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 
 /*****************************************************************************

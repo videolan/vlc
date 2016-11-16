@@ -91,6 +91,10 @@ void Close_Extension( vlc_object_t * );
 int Open_LuaSD( vlc_object_t * );
 void Close_LuaSD( vlc_object_t * );
 
+// Helper
+const char *vlclua_sd_description( vlc_object_t *, lua_State *, const char * );
+#define vlclua_sd_description(a, b, c) vlclua_sd_description(VLC_OBJECT(a), b, c)
+
 /*****************************************************************************
  * Lua debug
  *****************************************************************************/
