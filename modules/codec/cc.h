@@ -32,7 +32,7 @@
 
 /* CC have a maximum rate of 9600 bit/s (per field?) */
 #define CC_MAX_DATA_SIZE (2 * 3*600)
-enum
+enum cc_payload_type_e
 {
     CC_PAYLOAD_NONE,
     CC_PAYLOAD_GA94,
@@ -49,7 +49,7 @@ typedef struct
     bool b_reorder;
 
     /* */
-    int i_payload_type;
+    enum cc_payload_type_e i_payload_type;
     int i_payload_other_count;
 
     /* CC data per field
