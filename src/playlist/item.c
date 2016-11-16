@@ -314,26 +314,6 @@ void playlist_ItemRelease( playlist_item_t *p_item )
 }
 
 /**
- * Delete input item
- *
- * Remove an input item when it appears from a root playlist item
- * \param p_playlist playlist object
- * \param p_input the input to delete
- * \param p_root root playlist item
- * \return VLC_SUCCESS or VLC_EGENERIC
-*/
-static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
-                            playlist_item_t *p_root )
-{
-    PL_ASSERT_LOCKED;
-    playlist_item_t *p_item = playlist_ItemFindFromInputAndRoot(
-        p_playlist, p_input, p_root, false );
-    if( !p_item ) return VLC_EGENERIC;
-    playlist_NodeDelete( p_playlist, p_item, false );
-    return VLC_SUCCESS;
-}
-
-/**
  * Delete from input
  *
  * Search anywhere in playlist for an an input item and delete it
@@ -345,11 +325,22 @@ static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
 int playlist_DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
                               bool b_locked )
 {
+    playlist_item_t *p_item;
     int i_ret;
+
     PL_LOCK_IF( !b_locked );
-    i_ret = DeleteFromInput( p_playlist, p_input, p_playlist->p_root );
+    p_item = playlist_ItemFindFromInputAndRoot( p_playlist, p_input,
+                                                p_playlist->p_root, false );
+    if( p_item != NULL )
+    {
+        playlist_NodeDelete( p_playlist, p_item, false );
+        i_ret = VLC_SUCCESS;
+    }
+    else
+        i_ret = VLC_ENOITEM;
     PL_UNLOCK_IF( !b_locked );
-    return ( i_ret == VLC_SUCCESS ? VLC_SUCCESS : VLC_ENOITEM );
+
+    return i_ret;
 }
 
 /**
