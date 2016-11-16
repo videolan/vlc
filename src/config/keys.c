@@ -370,6 +370,8 @@ static const struct action actions[] =
     { "unzoom", ACTIONID_UNZOOM, },
     { "viewpoint-fov-in", ACTIONID_VIEWPOINT_FOV_IN, },
     { "viewpoint-fov-out", ACTIONID_VIEWPOINT_FOV_OUT, },
+    { "viewpoint-zoom-in", ACTIONID_VIEWPOINT_ZOOM_IN, },
+    { "viewpoint-zoom-out", ACTIONID_VIEWPOINT_ZOOM_OUT, },
     { "vol-down", ACTIONID_VOL_DOWN, },
     { "vol-mute", ACTIONID_VOL_MUTE, },
     { "vol-up", ACTIONID_VOL_UP, },

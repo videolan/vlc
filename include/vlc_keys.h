@@ -230,6 +230,8 @@ typedef enum vlc_action {
     /* Viewpoint */
     ACTIONID_VIEWPOINT_FOV_IN,
     ACTIONID_VIEWPOINT_FOV_OUT,
+    ACTIONID_VIEWPOINT_ZOOM_IN,
+    ACTIONID_VIEWPOINT_ZOOM_OUT,
 
 } vlc_action_t;
 
