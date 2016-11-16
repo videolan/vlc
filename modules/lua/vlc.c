@@ -692,12 +692,10 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             else
             {
                 lua_getfield( L, -1, "title" );
-                if( !lua_isstring( L, -1 ) )
-                {
-                    free( psz_filename );
-                    goto error;
-                }
-                psz_longname = lua_tostring( L, -1 );
+                if( lua_isstring( L, -1 ) )
+                    psz_longname = lua_tostring( L, -1 );
+                else
+                    psz_longname = *ppsz_file;
             }
 
             char *psz_file_esc = config_StringEscape( *ppsz_file );
