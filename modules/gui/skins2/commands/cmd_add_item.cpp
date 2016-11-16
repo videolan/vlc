@@ -47,5 +47,5 @@ void CmdAddItem::execute()
     }
     playlist_Add( pPlaylist, m_name.c_str(), NULL,
                   m_playNow ? PLAYLIST_APPEND | PLAYLIST_GO : PLAYLIST_APPEND,
-                  PLAYLIST_END, true, false );
+                  PLAYLIST_END, true );
 }

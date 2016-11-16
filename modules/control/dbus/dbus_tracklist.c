@@ -124,7 +124,7 @@ invalidTrackID:
     }
 
     i_mode |= ( TRUE == b_play ) ? PLAYLIST_GO : 0;
-    playlist_Add( PL, psz_mrl, NULL, i_mode, i_pos, true, false );
+    playlist_Add( PL, psz_mrl, NULL, i_mode, i_pos, true );
 
     REPLY_SEND;
 }
