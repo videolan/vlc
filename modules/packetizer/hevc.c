@@ -695,7 +695,13 @@ static bool ParseSEICallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sei_data->i_type == HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35 )
-        cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.p_cc, p_sei_data->itu_t35.i_cc );
+    {
+        if( p_sei_data->itu_t35.type == HXXX_ITU_T35_TYPE_CC )
+        {
+            cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.u.cc.p_data,
+                                                   p_sei_data->itu_t35.u.cc.i_data );
+        }
+    }
 
     return true;
 }

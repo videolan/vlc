@@ -28,6 +28,11 @@ enum hxxx_sei_type_e
     HXXX_SEI_RECOVERY_POINT = 6
 };
 
+enum hxxx_sei_t35_type_e
+{
+    HXXX_ITU_T35_TYPE_CC,
+};
+
 typedef struct
 {
     unsigned i_type;
@@ -36,8 +41,15 @@ typedef struct
         bs_t *p_bs; /* for raw/unhandled in common code callbacks */
         struct
         {
-            const uint8_t *p_cc;
-            size_t i_cc;
+            enum hxxx_sei_t35_type_e type;
+            union
+            {
+                struct
+                {
+                    const uint8_t *p_data;
+                    size_t i_data;
+                } cc;
+            } u;
         } itu_t35;
         struct
         {

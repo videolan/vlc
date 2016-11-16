@@ -957,7 +957,11 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
             /* Look for user_data_registered_itu_t_t35 */
         case HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35:
         {
-            cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.p_cc, p_sei_data->itu_t35.i_cc );
+            if( p_sei_data->itu_t35.type == HXXX_ITU_T35_TYPE_CC )
+            {
+                cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.u.cc.p_data,
+                                                       p_sei_data->itu_t35.u.cc.i_data );
+            }
         } break;
 
             /* Look for SEI recovery point */
