@@ -97,6 +97,8 @@
 #   define SUPPORTS_FIXED_PIPELINE
 #endif
 
+#define SPHERE_RADIUS 1.f
+
 typedef struct {
     GLuint   texture;
     unsigned format;
@@ -1252,7 +1254,6 @@ static int BuildSphere(unsigned nbPlanes,
                         GLushort **indices, unsigned *nbIndices,
                         float *left, float *top, float *right, float *bottom)
 {
-    float radius = 1;
     unsigned nbLatBands = 128;
     unsigned nbLonBands = 128;
 
@@ -1293,9 +1294,9 @@ static int BuildSphere(unsigned nbPlanes,
             float z = sinPhi * sinTheta;
 
             unsigned off1 = (lat * (nbLonBands + 1) + lon) * 3;
-            (*vertexCoord)[off1] = radius * x;
-            (*vertexCoord)[off1 + 1] = radius * y;
-            (*vertexCoord)[off1 + 2] = radius * z;
+            (*vertexCoord)[off1] = SPHERE_RADIUS * x;
+            (*vertexCoord)[off1 + 1] = SPHERE_RADIUS * y;
+            (*vertexCoord)[off1 + 2] = SPHERE_RADIUS * z;
 
             for (unsigned p = 0; p < nbPlanes; ++p)
             {
