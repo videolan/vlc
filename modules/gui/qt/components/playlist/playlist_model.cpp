@@ -757,10 +757,13 @@ void PLModel::doDelete( QModelIndexList selected )
             recurseDelete( item->children, &selected );
 
         PL_LOCK;
-        int i_ret = playlist_DeleteFromInput( p_playlist, item->inputItem(), pl_Locked );
+        playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
+                                                        item->id() );
+        if( p_root != NULL )
+            playlist_NodeDelete( p_playlist, p_root, false );
         PL_UNLOCK;
 
-        if( i_ret == VLC_SUCCESS )
+        if( p_root != NULL )
             removeItem( item );
     }
 }

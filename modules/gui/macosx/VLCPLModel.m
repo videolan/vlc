@@ -207,7 +207,11 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
             return;
 
         // model deletion is done via callback
-        playlist_DeleteFromInput(p_playlist, [item input], pl_Unlocked);
+        PL_LOCK;
+        playlist_item_t *p_root = playlist_ItemGetById(p_playlist, [item plItemId]);
+        if( p_root != NULL )
+            playlist_NodeDelete(p_playlist, p_root, false);
+        PL_UNLOCK;
     }];
 }
 
