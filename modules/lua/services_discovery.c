@@ -105,6 +105,9 @@ int Open_LuaSD( vlc_object_t *p_this )
     lua_State *L = NULL;
     char *psz_name;
 
+    if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
+        return VLC_ENOMEM;
+
     if( !strcmp( p_sd->psz_name, "lua" ) )
     {
         // We want to load the module name "lua"
@@ -119,11 +122,6 @@ int Open_LuaSD( vlc_object_t *p_this )
         psz_name = strdup(p_sd->psz_name);
     }
 
-    if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
-    {
-        free( psz_name );
-        return VLC_ENOMEM;
-    }
     p_sd->p_sys = p_sys;
     p_sd->pf_control = Control;
     p_sys->psz_filename = vlclua_find_file( "sd", psz_name );
