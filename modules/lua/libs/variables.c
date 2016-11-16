@@ -42,16 +42,10 @@
 /*****************************************************************************
  * Variables handling
  *****************************************************************************/
-static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val, bool b_error_void )
+static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
 {
     switch( i_type & VLC_VAR_CLASS )
     {
-        case VLC_VAR_VOID:
-            if( b_error_void )
-                vlclua_error( L );
-            else
-                lua_pushnil( L );
-            break;
         case VLC_VAR_BOOL:
             lua_pushboolean( L, val.b_bool );
             break;
@@ -67,6 +61,7 @@ static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val, bool b_e
         case VLC_VAR_ADDRESS:
             vlclua_error( L );
             break;
+        case VLC_VAR_VOID:
         default:
             vlclua_error( L );
     }
@@ -81,7 +76,7 @@ static int vlclua_pushlist( lua_State *L, vlc_list_t *p_list )
     for( int i = 0; i < i_count; i++ )
     {
         lua_pushinteger( L, i+1 );
-        if( !vlclua_pushvalue( L, p_list->i_type, p_list->p_values[i], true ) )
+        if( !vlclua_pushvalue( L, p_list->i_type, p_list->p_values[i] ) )
              lua_pushnil( L );
         lua_settable( L, -3 );
     }
@@ -133,7 +128,7 @@ static int vlclua_var_inherit( lua_State *L )
         return 0;
 
     lua_pop( L, 2 );
-    return vlclua_pushvalue( L, i_type, val, true );
+    return vlclua_pushvalue( L, i_type, val );
 }
 
 static int vlclua_var_get( lua_State *L )
@@ -147,7 +142,7 @@ static int vlclua_var_get( lua_State *L )
         return 0;
 
     lua_pop( L, 2 );
-    return vlclua_pushvalue( L, i_type, val, true );
+    return vlclua_pushvalue( L, i_type, val );
 }
 
 static int vlclua_var_set( lua_State *L )
