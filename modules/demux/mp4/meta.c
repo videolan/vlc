@@ -215,6 +215,68 @@ static bool MatchXA9Type( vlc_meta_t *p_meta, uint32_t i_type, MP4_Box_t *p_box 
     return b_matched;
 }
 
+static bool AppleNameToMeta( char const* name,
+    vlc_meta_type_t const** meta_type, char const** meta_key )
+{
+    *meta_type = NULL;
+    *meta_key = NULL;
+
+    for( size_t i = 0; *meta_type == NULL &&
+                       i < ARRAY_SIZE( com_apple_quicktime_tometa ); ++i )
+    {
+        if( !strcmp( name, com_apple_quicktime_tometa[i].psz_naming ) )
+            *meta_type = &com_apple_quicktime_tometa[i].meta_type;
+    }
+
+    for( size_t i = 0; *meta_key == NULL &&
+                       i < ARRAY_SIZE( com_apple_quicktime_toextrameta ); ++i )
+    {
+        if( !strcmp( name, com_apple_quicktime_toextrameta[i].psz_naming ) )
+            *meta_key = com_apple_quicktime_toextrameta[i].psz_metadata;
+    }
+
+    return *meta_type || *meta_key;
+}
+
+static bool AtomXA9ToMeta( uint32_t i_type,
+    vlc_meta_type_t const** meta_type, char const** meta_key )
+{
+    *meta_type = NULL;
+    *meta_key = NULL;
+
+    for( size_t i = 0; !*meta_type && i < ARRAY_SIZE( xa9typetometa ); ++i )
+        if( xa9typetometa[i].xa9_type == i_type )
+            *meta_type = &xa9typetometa[i].meta_type;
+
+    for( size_t i = 0; !*meta_key && i < ARRAY_SIZE( xa9typetoextrameta ); ++i )
+        if( xa9typetoextrameta[i].xa9_type == i_type )
+            *meta_key = xa9typetoextrameta[i].metadata;
+
+    return *meta_type || *meta_key;
+}
+
+static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, MP4_Box_t* p_box )
+{
+    vlc_meta_type_t const* type;
+    char const* key;
+
+    if( ( name && !AppleNameToMeta( name, &type, &key ) ) ||
+                  !AtomXA9ToMeta( i_type, &type, &key ) )
+        return false;
+
+    char* psz_utf = ExtractString( p_box );
+
+    if( psz_utf )
+    {
+        if( type ) vlc_meta_Set( p_meta, *type, psz_utf );
+        else       vlc_meta_AddExtra( p_meta, key, psz_utf );
+
+        free( psz_utf );
+    }
+
+    return true;
+}
+
 static bool Matchcom_apple_quicktime( vlc_meta_t *p_meta, const char *psz_naming, MP4_Box_t *p_box )
 {
     bool b_matched = false;
