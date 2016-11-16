@@ -239,8 +239,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
                   PLAYLIST_END,
                   -1,
                   i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
-                  b_playlist,
-                  pl_Unlocked );
+                  b_playlist );
 
     /* Add to recent items, only if played */
     if( i_ret == VLC_SUCCESS && b_start && b_playlist )

@@ -384,7 +384,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
                   bool b_playlist )
 {
     return playlist_AddExt( p_playlist, psz_uri, psz_name,
-                            i_mode, i_pos, -1, 0, NULL, 0, b_playlist, false );
+                            i_mode, i_pos, -1, 0, NULL, 0, b_playlist );
 }
 
 /**
@@ -402,7 +402,6 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  * \param ppsz_options an array of options
  * \param i_option_flags options flags
  * \param b_playlist TRUE for playlist, FALSE for media library
- * \param b_locked TRUE if the playlist is locked
  * \return VLC_SUCCESS or a VLC error code
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
@@ -410,7 +409,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      mtime_t i_duration,
                      int i_options, const char *const *ppsz_options,
                      unsigned i_option_flags,
-                     bool b_playlist, bool b_locked )
+                     bool b_playlist )
 {
     int i_ret;
     input_item_t *p_input;
@@ -420,8 +419,8 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     if( p_input == NULL )
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
-    i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist,
-                               b_locked );
+    i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos,
+                               b_playlist, false );
     vlc_gc_decref( p_input );
     return i_ret;
 }

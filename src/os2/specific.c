@@ -106,7 +106,7 @@ static void IPCHelperThread( void *arg )
                                      ( i_options ? &ppsz_argv[ i_opt + 1 ] :
                                                    NULL ),
                                  VLC_INPUT_OPTION_TRUSTED,
-                                 true, pl_Unlocked );
+                                 true );
             }
 
             for( ; i_options >= 0; i_options-- )
