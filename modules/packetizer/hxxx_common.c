@@ -68,7 +68,7 @@ void cc_storage_reset( cc_storage_t *p_ccs )
 void cc_storage_append( cc_storage_t *p_ccs, bool b_top_field_first,
                                       const uint8_t *p_buf, size_t i_buf )
 {
-    cc_Extract( &p_ccs->next, b_top_field_first, p_buf, i_buf );
+    cc_ProbeAndExtract( &p_ccs->next, b_top_field_first, p_buf, i_buf );
 }
 
 void cc_storage_commit( cc_storage_t *p_ccs, block_t *p_pic )

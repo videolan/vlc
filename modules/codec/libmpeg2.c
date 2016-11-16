@@ -442,14 +442,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( p_sys->i_gop_user_data > 2 )
                 {
                     /* We now have picture info for any cached user_data out of the gop */
-                    cc_Extract( &p_sys->cc, b_top_field_first,
+                    cc_ProbeAndExtract( &p_sys->cc, b_top_field_first,
                                 &p_sys->p_gop_user_data[0], p_sys->i_gop_user_data );
                     p_sys->i_gop_user_data = 0;
                 }
 
                 /* Extract the CC from the user_data of the picture */
                 if( p_info->user_data_len > 2 )
-                    cc_Extract( &p_sys->cc, b_top_field_first,
+                    cc_ProbeAndExtract( &p_sys->cc, b_top_field_first,
                                 &p_info->user_data[0], p_info->user_data_len );
             }
         }

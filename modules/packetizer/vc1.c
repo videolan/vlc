@@ -717,7 +717,7 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
             if( i_data >= sizeof(p_DVB1_user_identifier) &&
                 !memcmp( p_data, p_DVB1_user_identifier, sizeof(p_DVB1_user_identifier) ) )
             {
-                cc_Extract( &p_sys->cc_next, true, p_data, i_data );
+                cc_ProbeAndExtract( &p_sys->cc_next, true, p_data, i_data );
             }
 
             free( p_data );
