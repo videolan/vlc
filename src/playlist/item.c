@@ -444,24 +444,15 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
                        int i_mode, int i_pos, bool b_playlist,
                        bool b_locked )
 {
-    playlist_item_t *p_item;
+    playlist_item_t *item;
 
     PL_LOCK_IF( !b_locked );
+    item = b_playlist ? p_playlist->p_playing
+                      : p_playlist->p_media_library;
 
-    p_item = playlist_ItemNewFromInput( p_playlist, p_input );
-    if( p_item == NULL )
-    {
-        PL_UNLOCK_IF( !b_locked );
-        return VLC_ENOMEM;
-    }
-    AddItem( p_playlist, p_item,
-             b_playlist ? p_playlist->p_playing :
-                          p_playlist->p_media_library , i_mode, i_pos );
-
-    GoAndPreparse( p_playlist, i_mode, p_item );
-
+    item = playlist_NodeAddInput( p_playlist, p_input, item, i_mode, i_pos );
     PL_UNLOCK_IF( !b_locked );
-    return VLC_SUCCESS;
+    return (item != NULL) ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
 /**
