@@ -558,8 +558,6 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     const vlc_viewpoint_t *p_viewpoint = var_InheritAddress(vout, "viewpoint");
     if (p_viewpoint != NULL)
         cfg->viewpoint = *p_viewpoint;
-    else
-        vlc_viewpoint_init(&cfg->viewpoint);
     cfg->display.title = title;
     const int display_width = var_CreateGetInteger(vout, "width");
     const int display_height = var_CreateGetInteger(vout, "height");
@@ -1468,6 +1466,16 @@ static int ThreadReinit(vout_thread_t *vout,
     if (state.cfg.zoom.num <= 0 || state.cfg.zoom.den <= 0) {
         state.cfg.zoom.num = 1;
         state.cfg.zoom.den = 1;
+    }
+
+    if (original.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
+        || original.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+    {
+        state.cfg.viewpoint.yaw = original.f_pose_yaw_degrees;
+        state.cfg.viewpoint.pitch = original.f_pose_pitch_degrees;
+        state.cfg.viewpoint.roll = original.f_pose_roll_degrees;
+        state.cfg.viewpoint.fov = original.f_pose_fov_degrees;
+        state.cfg.viewpoint.zoom = 0.f;
     }
 
     vout->p->original = original;
