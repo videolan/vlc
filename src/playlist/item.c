@@ -357,24 +357,6 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
     PL_UNLOCK_IF( !b_locked );
 }
 
-/**
- * Delete playlist item
- *
- * Remove a playlist item from the playlist, given its id
- * This function is to be used only by the playlist
- * \param p_playlist playlist object
- * \param i_id id of the item do delete
- * \return VLC_SUCCESS or an error
- */
-int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
-{
-    PL_ASSERT_LOCKED;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
-    if( !p_item ) return VLC_EGENERIC;
-    playlist_NodeDelete( p_playlist, p_item, false );
-    return VLC_SUCCESS;
-}
-
 /***************************************************************************
  * Playlist item addition
  ***************************************************************************/

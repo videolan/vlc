@@ -103,18 +103,7 @@ void playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root )
 
     /* Delete the children */
     for( int i = p_root->i_children-1 ; i >= 0 ;i-- )
-    {
-        if( p_root->pp_children[i]->i_children > -1 )
-        {
-            playlist_NodeDelete( p_playlist, p_root->pp_children[i], false );
-        }
-        else
-        {
-            /* Delete the item here */
-            playlist_DeleteFromItemId( p_playlist,
-                                       p_root->pp_children[i]->i_id );
-        }
-    }
+        playlist_NodeDelete( p_playlist, p_root->pp_children[i], false );
 }
 
 /**
