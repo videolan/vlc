@@ -54,7 +54,6 @@ static const struct
     { ATOM_0xa9dir, vlc_meta_Director },
     { ATOM_MCPS,    vlc_meta_EncodedBy }, /* Cleaner Pro */
     { ATOM_aART,    vlc_meta_AlbumArtist },
-    { 0, 0 },
 };
 
 static const struct
@@ -105,7 +104,6 @@ static const struct
     { ATOM_gssd,    N_("YouTube Source Data") },
     { ATOM_gsst,    N_("YouTube Start Time") },
     { ATOM_gstd,    N_("YouTube Track Duration") },
-    { 0, "" },
 };
 
 static const struct
@@ -125,7 +123,6 @@ static const struct
     { "director",        vlc_meta_Director },
     { "genre",           vlc_meta_Genre },
     { "publisher",       vlc_meta_Publisher },
-    { NULL,              0 },
 };
 
 static const struct
@@ -136,7 +133,6 @@ static const struct
     { "information",     N_("Information") },
     { "keywords",        N_("Keywords") },
     { "make",            N_("Vendor") },
-    { NULL,              NULL },
 };
 
 inline static char * StringConvert( const MP4_Box_data_data_t *p_data )
