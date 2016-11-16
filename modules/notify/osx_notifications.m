@@ -206,7 +206,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         input_item_t *p_item = input_GetItem( p_input );
         if( p_sys->current_item != p_item )
         {
-            input_item_Release( p_sys->current_item );
+            if( p_sys->current_item != NULL )
+                input_item_Release( p_sys->current_item );
             p_sys->current_item = input_item_Hold( p_item );
             p_sys->i_item_changes = 0;
         }
