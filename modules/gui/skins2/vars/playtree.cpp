@@ -351,7 +351,7 @@ void Playtree::insertItems( VarTree& elem, const std::list<std::string>& files, 
             i_mode |= PLAYLIST_GO;
 
         playlist_NodeAddInput( m_pPlaylist, pItem, p_node,
-                               i_mode, i_pos, pl_Locked );
+                               i_mode, i_pos );
     }
 
 fin:

@@ -474,31 +474,24 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of its size
- * \param b_locked TRUE if the playlist is locked
  * \return the new playlist item
  */
 playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
                                          input_item_t *p_input,
                                          playlist_item_t *p_parent,
-                                         int i_mode, int i_pos,
-                                         bool b_locked )
+                                         int i_mode, int i_pos )
 {
-    playlist_item_t *p_item;
+    PL_ASSERT_LOCKED;
+
     assert( p_input );
     assert( p_parent && p_parent->i_children != -1 );
 
-    PL_LOCK_IF( !b_locked );
-
-    p_item = playlist_ItemNewFromInput( p_playlist, p_input );
-    if( p_item == NULL )
-        goto end;
-    AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
-
-    GoAndPreparse( p_playlist, i_mode, p_item );
-
-end:
-    PL_UNLOCK_IF( !b_locked );
-
+    playlist_item_t *p_item = playlist_ItemNewFromInput( p_playlist, p_input );
+    if( likely(p_item != NULL) )
+    {
+        AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
+        GoAndPreparse( p_playlist, i_mode, p_item );
+    }
     return p_item;
 }
 
@@ -819,10 +812,9 @@ static int RecursiveAddIntoParent (
         if( !(b_flat && b_children) )
         {
             p_new_item = playlist_NodeAddInput( p_playlist,
-                    p_child_node->p_item,
-                    p_parent,
-                    PLAYLIST_INSERT, i_pos,
-                    pl_Locked );
+                                                p_child_node->p_item,
+                                                p_parent,
+                                                PLAYLIST_INSERT, i_pos );
             if( !p_new_item ) return i_pos;
 
             i_pos++;
@@ -872,7 +864,7 @@ static int RecursiveInsertCopy (
             {
                 p_new_item = playlist_NodeAddInput( p_playlist, p_new_input,
                                                     p_parent, PLAYLIST_INSERT,
-                                                    i_pos, pl_Locked );
+                                                    i_pos );
                 vlc_gc_decref( p_new_input );
             }
         }
