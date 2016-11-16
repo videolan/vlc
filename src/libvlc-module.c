@@ -1423,10 +1423,8 @@ static const char *const mouse_wheel_texts[] = {
 #define UNCROP_RIGHT_KEY_LONGTEXT N_("Uncrop one pixel from the right of the video")
 
 /* 360° Viewpoint */
-#define VIEWPOINT_FOV_IN_KEY_TEXT N_("Shrink field of view")
-#define VIEWPOINT_FOV_IN_KEY_LONGTEXT N_("Shrink the viewpoint field of view")
-#define VIEWPOINT_FOV_OUT_KEY_TEXT N_("Expand field of view")
-#define VIEWPOINT_FOV_OUT_KEY_LONGTEXT N_("Expand the viewpoint field of view")
+#define VIEWPOINT_FOV_IN_KEY_TEXT N_("Shrink the viewpoint field of view (360°)")
+#define VIEWPOINT_FOV_OUT_KEY_TEXT N_("Expand the viewpoint field of view (360°)")
 
 #define WALLPAPER_KEY_TEXT N_("Toggle wallpaper mode in video output")
 #define WALLPAPER_KEY_LONGTEXT N_( \
@@ -2577,9 +2575,9 @@ vlc_module_begin ()
              LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, false )
 
     add_key( "key-viewpoint-fov-in", KEY_VIEWPOINT_FOV_IN,
-             VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_LONGTEXT, true )
+             VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_TEXT, true )
     add_key( "key-viewpoint-fov-out", KEY_VIEWPOINT_FOV_OUT,
-             VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_LONGTEXT, true )
+             VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_TEXT, true )
 
     set_section ( N_("Zoom" ), NULL )
     add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER,
