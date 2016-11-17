@@ -1425,6 +1425,8 @@ static const char *const mouse_wheel_texts[] = {
 /* 360° Viewpoint */
 #define VIEWPOINT_FOV_IN_KEY_TEXT N_("Shrink the viewpoint field of view (360°)")
 #define VIEWPOINT_FOV_OUT_KEY_TEXT N_("Expand the viewpoint field of view (360°)")
+#define VIEWPOINT_ZOOM_IN_KEY_TEXT N_("Increase the viewpoint zoom (360°)")
+#define VIEWPOINT_ZOOM_OUT_KEY_TEXT N_("Decrease the viewpoint zoom (360°)")
 
 #define WALLPAPER_KEY_TEXT N_("Toggle wallpaper mode in video output")
 #define WALLPAPER_KEY_LONGTEXT N_( \
@@ -2231,8 +2233,8 @@ vlc_module_begin ()
 #   define KEY_UNCROP_RIGHT       "Alt+Shift+l"
 
 /* 360° Viewpoint */
-#   define KEY_VIEWPOINT_FOV_IN   "Page Up"
-#   define KEY_VIEWPOINT_FOV_OUT  "Page Down"
+#   define KEY_VIEWPOINT_ZOOM_IN  "Page Up"
+#   define KEY_VIEWPOINT_ZOOM_OUT "Page Down"
 
 /* the macosx-interface already has bindings */
 #   define KEY_ZOOM_QUARTER       NULL
@@ -2378,8 +2380,8 @@ vlc_module_begin ()
 #   define KEY_UNCROP_RIGHT       "Alt+Shift+f"
 
 /* 360° Viewpoint */
-#   define KEY_VIEWPOINT_FOV_IN   "Page Up"
-#   define KEY_VIEWPOINT_FOV_OUT  "Page Down"
+#   define KEY_VIEWPOINT_ZOOM_IN  "Page Up"
+#   define KEY_VIEWPOINT_ZOOM_OUT "Page Down"
 
 /* Zooming */
 #   define KEY_ZOOM_QUARTER       "Alt+1"
@@ -2574,10 +2576,14 @@ vlc_module_begin ()
     add_key( "key-loop", KEY_LOOP,
              LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, false )
 
-    add_key( "key-viewpoint-fov-in", KEY_VIEWPOINT_FOV_IN,
+    add_key( "key-viewpoint-fov-in", NULL,
              VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_TEXT, true )
-    add_key( "key-viewpoint-fov-out", KEY_VIEWPOINT_FOV_OUT,
+    add_key( "key-viewpoint-fov-out", NULL,
              VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_TEXT, true )
+    add_key( "key-viewpoint-zoom-in", KEY_VIEWPOINT_ZOOM_IN,
+             VIEWPOINT_ZOOM_IN_KEY_TEXT, VIEWPOINT_ZOOM_IN_KEY_TEXT, true )
+    add_key( "key-viewpoint-zoom-out", KEY_VIEWPOINT_ZOOM_OUT,
+             VIEWPOINT_ZOOM_OUT_KEY_TEXT, VIEWPOINT_ZOOM_OUT_KEY_TEXT, true )
 
     set_section ( N_("Zoom" ), NULL )
     add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER,
