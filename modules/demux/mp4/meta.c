@@ -314,8 +314,15 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 {
     const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
+
     if( p_data == NULL || !BOXDATA(p_data) )
+    {
+        if( ExtractIntlStrings( p_meta, p_box ) )
+            return;
+
+        SetMeta( p_meta, p_box->i_type, NULL, p_box );
         return;
+    }
 
     /* XXX Becarefull p_udta can have box that are not 0xa9xx */
     switch( p_box->i_type )
@@ -406,13 +413,10 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
         }
         break;
     }
-
     default:
-        if ( !ExtractIntlStrings( p_meta, p_box ) )
-             SetMeta( p_meta, p_box->i_type, NULL, p_box );
+        SetMeta( p_meta, p_box->i_type, NULL, p_box );
         break;
     }
-
 }
 
 static void SetupmdtaMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box, MP4_Box_t *p_keys )
