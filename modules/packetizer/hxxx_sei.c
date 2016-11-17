@@ -92,20 +92,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
             /* Look for user_data_registered_itu_t_t35 */
             case HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35:
             {
-                /* TS 101 154 Auxiliary Data and H264/AVC video */
-                static const uint8_t p_DVB1_data_start_code[] = {
-                    0xb5, /* United States */
-                    0x00, 0x31, /* US provider code */
-                    0x47, 0x41, 0x39, 0x34 /* user identifier */
-                };
-
-                static const uint8_t p_DIRECTV_data_start_code[] = {
-                    0xb5, /* United States */
-                    0x00, 0x2f, /* US provider code */
-                    0x03  /* Captions */
-                };
-
-                unsigned i_t35;
+                size_t i_t35;
                 uint8_t *p_t35 = malloc( i_size );
                 if( !p_t35 )
                     break;
@@ -113,16 +100,36 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                 for( i_t35 = 0; i_t35<i_size && bs_remain( &s ) >= 8; i_t35++ )
                     p_t35[i_t35] = bs_read( &s, 8 );
 
-                /* Check for we have DVB1_data() */
-                if( ( i_t35 >= sizeof(p_DVB1_data_start_code) &&
-                         !memcmp( p_t35, p_DVB1_data_start_code, sizeof(p_DVB1_data_start_code) ) ) ||
-                    ( i_t35 >= sizeof(p_DIRECTV_data_start_code) &&
-                         !memcmp( p_t35, p_DIRECTV_data_start_code, sizeof(p_DIRECTV_data_start_code) ) ) )
+                /* TS 101 154 Auxiliary Data and H264/AVC video */
+                if( i_t35 > 4 && p_t35[0] == 0xb5 /* United States */ )
                 {
-                    sei_data.itu_t35.type = HXXX_ITU_T35_TYPE_CC;
-                    sei_data.itu_t35.u.cc.i_data = i_t35 - 3;
-                    sei_data.itu_t35.u.cc.p_data = &p_t35[3];
-                    b_continue = pf_callback( &sei_data, cbdata );
+                    if( p_t35[1] == 0x00 && p_t35[2] == 0x31 && /* US provider code for ATSC / DVB1 */
+                        i_t35 > 7 )
+                    {
+                        switch( VLC_FOURCC(p_t35[3],p_t35[4],p_t35[5],p_t35[6]) )
+                        {
+                            case VLC_FOURCC('G', 'A', '9', '4'):
+                                if( p_t35[7] == 0x03 )
+                                {
+                                    sei_data.itu_t35.type = HXXX_ITU_T35_TYPE_CC;
+                                    sei_data.itu_t35.u.cc.i_data = i_t35 - 8;
+                                    sei_data.itu_t35.u.cc.p_data = &p_t35[8];
+                                    b_continue = pf_callback( &sei_data, cbdata );
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else if( p_t35[1] == 0x00 && p_t35[2] == 0x2f && /* US provider code for DirecTV */
+                             p_t35[3] == 0x03 )
+                    {
+                        /* DirecTV does not use GA94 user_data identifier */
+                        sei_data.itu_t35.type = HXXX_ITU_T35_TYPE_CC;
+                        sei_data.itu_t35.u.cc.i_data = i_t35 - 4;
+                        sei_data.itu_t35.u.cc.p_data = &p_t35[4];
+                        b_continue = pf_callback( &sei_data, cbdata );
+                    }
                 }
 
                 free( p_t35 );
