@@ -68,6 +68,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
 
     p_new_input = input_item_NewExt( NULL, psz_name, -1, ITEM_TYPE_NODE,
                                      ITEM_NET_UNKNOWN );
+    if( !p_new_input )
+        return NULL;
     p_item = playlist_ItemNewFromInput( p_playlist, p_new_input );
     vlc_gc_decref( p_new_input );
 
