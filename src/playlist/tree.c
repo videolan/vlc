@@ -129,9 +129,11 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         set_current_status_item( p_playlist, NULL );
     }
 
-    ARRAY_BSEARCH( p_playlist->current,->i_id, int, p_root->i_id, i );
-    if( i != -1 )
-        ARRAY_REMOVE( p_playlist->current, i );
+    for( i = 0; i < p_playlist->current.i_size; i++ )
+        if( p_playlist->current.p_elems[i] == p_root )
+            ARRAY_REMOVE( p_playlist->current, i );
+    for( i = 0; i < p_playlist->current.i_size; i++ )
+        assert( p_playlist->current.p_elems[i] != p_root );
 
     PL_DEBUG( "deleting item `%s'", p_root->p_input->psz_name );
 
