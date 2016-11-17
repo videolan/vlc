@@ -791,13 +791,13 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
                                      const vlc_viewpoint_t *p_vp)
 {
-#define RAD(d) ((float) (d * M_PI / 180.f))
+#define RAD(d) ((float) ((d) * M_PI / 180.f))
     float f_fov = RAD(p_vp->fov);
     if (f_fov > (float) M_PI -0.001f || f_fov < 0.001f)
         return VLC_EBADVAR;
     if (p_vp->zoom > 1.f || p_vp->zoom < -1.f)
         return VLC_EBADVAR;
-    vgl->f_teta = RAD(p_vp->yaw) - (float) M_PI / 2;
+    vgl->f_teta = RAD(p_vp->yaw) - (float) M_PI_2;
     vgl->f_phi  = RAD(p_vp->pitch);
     vgl->f_roll = RAD(p_vp->roll);
 
