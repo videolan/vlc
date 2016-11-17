@@ -815,7 +815,7 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     }
 
     vgl->f_fov  = f_fov;
-    vgl->f_zoom = p_vp->zoom * (p_vp->zoom >= 0 ? 0.5 : vgl->f_zoom_min);
+    vgl->f_zoom = p_vp->zoom * (p_vp->zoom >= 0 ? 0.5 * SPHERE_RADIUS : vgl->f_zoom_min);
 
     return VLC_SUCCESS;
 #undef RAD
