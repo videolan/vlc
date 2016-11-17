@@ -425,7 +425,7 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
                     continue;
                 }
 
-                if(p_selected == NULL)
+                if(p_selected == NULL && forcedmode == bmdDisplayModeNotSupported)
                 {
                     if(i_width >> i_div == p_mode->GetWidth() >> i_div &&
                        i_height >> i_div == p_mode->GetHeight() >> i_div)
