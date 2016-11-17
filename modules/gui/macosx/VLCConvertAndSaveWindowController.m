@@ -287,7 +287,7 @@
         input_item_AddOption(p_input, [[NSString stringWithFormat:@"ttl=%@", [_streamTTLField stringValue]] UTF8String], VLC_INPUT_OPTION_TRUSTED);
 
     int returnValue;
-    returnValue = playlist_AddInput(p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true, pl_Unlocked);
+    returnValue = playlist_AddInput(p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END, true );
 
     if (returnValue == VLC_SUCCESS) {
         /* let's "play" */
