@@ -129,8 +129,6 @@ static void input_item_subitem_tree_added( const vlc_event_t * p_event,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    input_item_t *p_input;
-
     char *psz_datadir = config_GetUserDir( VLC_DATA_DIR );
     if( !psz_datadir ) /* XXX: This should never happen */
     {
@@ -158,20 +156,13 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( psz_uri == NULL )
         return VLC_ENOMEM;
 
-    p_input = input_item_New( psz_uri, _("Media Library") );
+    input_item_t *p_input = input_item_New( psz_uri, _("Media Library") );
     free( psz_uri );
     if( p_input == NULL )
         return VLC_EGENERIC;
 
-    PL_LOCK;
-    if( p_playlist->p_media_library->p_input )
-        vlc_gc_decref( p_playlist->p_media_library->p_input );
-
-    p_playlist->p_media_library->p_input = p_input;
-
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
                         input_item_subitem_tree_added, p_playlist );
-    PL_UNLOCK;
 
     vlc_object_t *dummy = vlc_object_create( p_playlist, sizeof (*dummy) );
     var_Create( dummy, "meta-file", VLC_VAR_VOID );
@@ -180,6 +171,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
                         input_item_subitem_tree_added, p_playlist );
+    vlc_gc_decref( p_input );
 
     return VLC_SUCCESS;
 }
