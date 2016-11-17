@@ -288,7 +288,6 @@ playlist.get( [what, [tree]] ): Get the playlist.
           .skip
           .disabled
           .ro
-          .expanded
       .name:
       .path:
       .duration: (-1 if unknown)
