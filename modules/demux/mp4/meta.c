@@ -241,10 +241,7 @@ static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, MP4_Box_t
 
 static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 {
-    if( *(uint8_t*)&p_box->i_type != 0xa9 || MP4_BoxGet( p_box, "data" ) )
-        return false;
-
-    if( p_box->data.p_binary->p_blob == NULL )
+    if( MP4_BoxGet( p_box, "data" ) )
         return false;
 
     vlc_meta_type_t const* meta_type;
@@ -252,6 +249,14 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 
     if( AtomXA9ToMeta( p_box->i_type, &meta_type, &meta_key ) == false )
         return false;
+
+    if( p_box->p_father == NULL              ||
+        p_box->p_father->i_type != ATOM_udta ||
+        p_box->data.p_binary == NULL         ||
+        p_box->data.p_binary->p_blob == NULL )
+    {
+        return false;
+    }
 
     vlc_meta_t* p_meta_intl = vlc_meta_New();
 
