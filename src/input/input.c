@@ -287,15 +287,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     input_thread_t *p_input = &priv->input;
 
-    /* Construct a nice name for the input timer */
-    char psz_timer_name[255];
     char * psz_name = input_item_GetName( p_item );
-    snprintf( psz_timer_name, sizeof(psz_timer_name),
-              "input launching for '%s'", psz_name );
-
     msg_Dbg( p_input, "Creating an input for %s'%s'",
              b_preparsing ? "preparsing " : "", psz_name);
-
     free( psz_name );
 
     /* Parse input options */
