@@ -452,8 +452,8 @@ static void vlc_AddWheelMapping (void **map, uint32_t kmore, uint32_t kless,
     switch (mode)
     {
         case 0: /* volume up/down */
-            amore = ACTIONID_VOL_UP;
-            aless = ACTIONID_VOL_DOWN;
+            amore = ACTIONID_COMBO_VOL_ZOOM_UP;
+            aless = ACTIONID_COMBO_VOL_ZOOM_DOWN;
             break;
         case 2: /* position latter/earlier */
             amore = ACTIONID_JUMP_FORWARD_EXTRASHORT;
