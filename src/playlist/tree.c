@@ -99,8 +99,7 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
 
     /* Delete the children */
     for( int i = p_root->i_children - 1 ; i >= 0; i-- )
-        if( p_root->pp_children[i]->i_children >= 0 )
-            playlist_NodeDelete( p_playlist, p_root->pp_children[i], b_force );
+        playlist_NodeDelete( p_playlist, p_root->pp_children[i], b_force );
 
     /* Delete the node */
     if( p_root->i_flags & PLAYLIST_RO_FLAG && !b_force )
