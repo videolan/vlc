@@ -60,6 +60,13 @@ struct intf_sys_t
         int64_t i_time_subtitle;
         int64_t i_time_audio;
     } subtitle_delaybookmarks;
+
+    struct
+    {
+        bool b_can_change;
+        bool b_button_pressed;
+        int x, y;
+    } vrnav;
 };
 
 /*****************************************************************************
@@ -99,23 +106,103 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
+static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_data;
+    intf_sys_t    *p_sys = p_intf->p_sys;
+
+    (void) p_this; (void) psz_var; (void) oldval;
+
+    if( p_sys->vrnav.b_button_pressed )
+    {
+#define RAD(d) ((float) ((d) * M_PI / 180.f))
+        int i_horizontal = newval.coords.x - p_sys->vrnav.x;
+        int i_vertical   = newval.coords.y - p_sys->vrnav.y;
+
+        vlc_viewpoint_t viewpoint = {
+            .yaw   = RAD(-i_horizontal * 2.5f),
+            .pitch = RAD(-i_vertical   * 2.5f),
+        };
+
+        input_UpdateViewpoint( p_sys->p_input, &viewpoint, false );
+
+        p_sys->vrnav.x = newval.coords.x;
+        p_sys->vrnav.y = newval.coords.y;
+#undef RAD
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = p_data;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    (void) psz_var; (void) oldval;
+
+    if( newval.i_int & 0x01 )
+    {
+        if( !p_sys->vrnav.b_button_pressed )
+        {
+            p_sys->vrnav.b_button_pressed = true;
+            var_GetCoords( p_this, "mouse-moved",
+                           &p_sys->vrnav.x, &p_sys->vrnav.y );
+        }
+    }
+    else
+        p_sys->vrnav.b_button_pressed = false;
+
+    return VLC_SUCCESS;
+}
+
 static void ChangeVout( intf_thread_t *p_intf, vout_thread_t *p_vout )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
 
     int slider_chan;
+    bool b_vrnav_can_change;
     if( p_vout != NULL )
+    {
         slider_chan = vout_RegisterSubpictureChannel( p_vout );
+        b_vrnav_can_change = var_GetBool( p_vout, "viewpoint-changeable" );
+    }
 
     vlc_mutex_lock( &p_sys->lock );
     vout_thread_t *p_old_vout = p_sys->p_vout;
+    bool b_vrnav_could_change = p_sys->vrnav.b_can_change;
     p_sys->p_vout = p_vout;
     if( p_vout != NULL )
+    {
         p_sys->slider_chan = slider_chan;
+        p_sys->vrnav.b_can_change = b_vrnav_can_change;
+    }
+    else
+        p_sys->vrnav.b_can_change = false;
     vlc_mutex_unlock( &p_sys->lock );
 
     if( p_old_vout != NULL )
+    {
+        if( b_vrnav_could_change )
+        {
+            var_DelCallback( p_old_vout, "mouse-moved", MovedEvent,
+                             p_intf );
+            var_DelCallback( p_old_vout, "mouse-button-down", ButtonEvent,
+                             p_intf );
+        }
         vlc_object_release( p_old_vout );
+    }
+
+    if( p_sys->vrnav.b_can_change )
+    {
+        assert( p_sys->p_vout != NULL );
+        var_AddCallback( p_sys->p_vout, "mouse-moved", MovedEvent,
+                         p_intf );
+        var_AddCallback( p_sys->p_vout, "mouse-button-down", ButtonEvent,
+                         p_intf );
+    }
 }
 
 static int InputEvent( vlc_object_t *p_this, char const *psz_var,
@@ -137,18 +224,30 @@ static void ChangeInput( intf_thread_t *p_intf, input_thread_t *p_input )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     input_thread_t *p_old_input = p_sys->p_input;
+    vout_thread_t *p_old_vout = NULL;
     if( p_old_input != NULL )
     {
         /* First, remove callbacks from previous input. It's safe to access it
          * unlocked, since it's written from this thread */
         var_DelCallback( p_old_input, "intf-event", InputEvent, p_intf );
+
+        p_old_vout = p_sys->p_vout;
+        /* Remove mouse events before setting new input, since callbacks may
+         * access it */
+        if( p_old_vout != NULL && p_sys->vrnav.b_can_change )
+        {
+            var_DelCallback( p_old_vout, "mouse-moved", MovedEvent,
+                             p_intf );
+            var_DelCallback( p_old_vout, "mouse-button-down", ButtonEvent,
+                             p_intf );
+        }
     }
 
     /* Replace input and vout locked */
     vlc_mutex_lock( &p_sys->lock );
-    vout_thread_t *p_old_vout = p_sys->p_vout;
     p_sys->p_input = p_input ? vlc_object_hold( p_input ) : NULL;
     p_sys->p_vout = NULL;
+    p_sys->vrnav.b_can_change = false;
     vlc_mutex_unlock( &p_sys->lock );
 
     /* Release old input and vout objects unlocked */
@@ -191,6 +290,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_vout = NULL;
     p_sys->p_input = NULL;
+    p_sys->vrnav.b_can_change = false;
+    p_sys->vrnav.b_button_pressed = false;
     p_sys->subtitle_delaybookmarks.i_time_audio = 0;
     p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
 
@@ -224,7 +325,8 @@ static void Close( vlc_object_t *p_this )
 }
 
 static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
-                      vout_thread_t *p_vout, int slider_chan, int i_action )
+                      vout_thread_t *p_vout, int slider_chan, bool b_vrnav,
+                      int i_action )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     playlist_t *p_playlist = pl_Get( p_intf );
@@ -1289,9 +1391,11 @@ static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
     vout_thread_t *p_vout = p_sys->p_vout ? vlc_object_hold( p_sys->p_vout )
                                           : NULL;
     int slider_chan = p_sys->slider_chan;
+    bool b_vrnav = p_sys->vrnav.b_can_change;
     vlc_mutex_unlock( &p_intf->p_sys->lock );
 
-    int i_ret = PutAction( p_intf, p_input, p_vout, slider_chan, newval.i_int );
+    int i_ret = PutAction( p_intf, p_input, p_vout, slider_chan, b_vrnav,
+                           newval.i_int );
 
     if( p_input != NULL )
         vlc_object_release( p_input );
