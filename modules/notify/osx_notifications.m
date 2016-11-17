@@ -102,8 +102,6 @@
 struct intf_sys_t
 {
     VLCGrowlDelegate *o_growl_delegate;
-    input_item_t *current_item;
-    int             i_item_changes;
 };
 
 /*****************************************************************************
@@ -112,13 +110,12 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-static int ItemChange( vlc_object_t *, const char *,
+static int InputCurrent( vlc_object_t *, const char *,
                       vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
  ****************************************************************************/
-
 vlc_module_begin ()
 set_category( CAT_INTERFACE )
 set_subcategory( SUBCAT_INTERFACE_CONTROL )
@@ -135,10 +132,9 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    playlist_t *p_playlist;
-    intf_sys_t    *p_sys;
+    playlist_t *p_playlist = pl_Get( p_intf );
+    intf_sys_t *p_sys = p_intf->p_sys = calloc( 1, sizeof(intf_sys_t) );
 
-    p_sys = p_intf->p_sys = calloc( 1, sizeof(intf_sys_t) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -149,11 +145,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    p_sys->current_item = NULL;
-
-    p_playlist = pl_Get( p_intf );
-    var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_AddCallback( p_playlist, "input-current", ItemChange, p_intf );
+    var_AddCallback( p_playlist, "input-current", InputCurrent, p_intf );
 
     [p_sys->o_growl_delegate registerToGrowl];
     return VLC_SUCCESS;
@@ -168,11 +160,7 @@ static void Close( vlc_object_t *p_this )
     playlist_t *p_playlist = pl_Get( p_intf );
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_DelCallback( p_playlist, "input-current", ItemChange, p_intf );
-
-    if( p_sys->current_item != NULL )
-        input_item_Release( p_sys->current_item );
+    var_DelCallback( p_playlist, "input-current", InputCurrent, p_intf );
 
     [GrowlApplicationBridge setGrowlDelegate:nil];
     [p_sys->o_growl_delegate release];
@@ -180,93 +168,51 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * ItemChange: Playlist item change callback
+ * InputCurrent: Current playlist item changed callback
  *****************************************************************************/
-static int ItemChange( vlc_object_t *p_this, const char *psz_var,
-                      vlc_value_t oldval, vlc_value_t newval, void *param )
+static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     VLC_UNUSED(oldval);
 
     intf_thread_t *p_intf = (intf_thread_t *)param;
     intf_sys_t *p_sys = p_intf->p_sys;
-    char *psz_tmp           = NULL;
-    char *psz_title         = NULL;
-    char *psz_artist        = NULL;
-    char *psz_album         = NULL;
+    input_thread_t *p_input = newval.p_address;
+    char *psz_title = NULL;
+    char *psz_artist = NULL;
+    char *psz_album = NULL;
+    char *psz_arturl = NULL;
 
-    bool b_is_item_current = !strcmp( "input-current", psz_var );
-
-    /* Don't update each time an item has been preparsed */
-    if( b_is_item_current )
-    { /* stores the current input item id */
-        input_thread_t *p_input = newval.p_address;
-        if( !p_input )
-            return VLC_SUCCESS;
-
-        input_item_t *p_item = input_GetItem( p_input );
-        if( p_sys->current_item != p_item )
-        {
-            if( p_sys->current_item != NULL )
-                input_item_Release( p_sys->current_item );
-            p_sys->current_item = input_item_Hold( p_item );
-            p_sys->i_item_changes = 0;
-        }
-
-        return VLC_SUCCESS;
-    }
-
-    input_item_t *p_item = newval.p_address;
-
-    /* ignore items which weren't pre-parsed yet */
-    if( !input_item_IsPreparsed(p_item) )
+    if( !p_input )
         return VLC_SUCCESS;
 
-    /* "item-change" */
-    if( p_sys->current_item != p_item )
+    input_item_t *p_item = input_GetItem( p_input );
+    if( !p_item )
         return VLC_SUCCESS;
 
-    /* Some variable bitrate inputs call "item-change" callbacks each time
-     * their length is updated, that is several times per second.
-     * We'll limit the number of changes to 1 per input. */
-    if( p_sys->i_item_changes > 0 )
-        return VLC_SUCCESS;
-
-    p_sys->i_item_changes++;
-
-    /* Playing something ... */
-    if( input_item_GetNowPlayingFb( p_item ) )
-        psz_title = input_item_GetNowPlayingFb( p_item );
-    else
+    /* Get title */
+    psz_title = input_item_GetNowPlayingFb( p_item );
+    if( !psz_title )
         psz_title = input_item_GetTitleFbName( p_item );
+
     if( EMPTY_STR( psz_title ) )
     {
         free( psz_title );
         return VLC_SUCCESS;
     }
 
+    /* Get Artist name */
     psz_artist = input_item_GetArtist( p_item );
-    if( EMPTY_STR( psz_artist ) ) FREENULL( psz_artist );
+    if( EMPTY_STR( psz_artist ) )
+        FREENULL( psz_artist );
+
+    /* Get Album name */
     psz_album = input_item_GetAlbum( p_item ) ;
-    if( EMPTY_STR( psz_album ) ) FREENULL( psz_album );
+    if( EMPTY_STR( psz_album ) )
+        FREENULL( psz_album );
 
-    int i_ret;
-    if( psz_artist && psz_album )
-        i_ret = asprintf( &psz_tmp, "%s\n%s [%s]",
-                         psz_title, psz_artist, psz_album );
-    else if( psz_artist )
-        i_ret = asprintf( &psz_tmp, "%s\n%s", psz_title, psz_artist );
-    else
-        i_ret = asprintf(&psz_tmp, "%s", psz_title );
-
-    if( i_ret == -1 )
-    {
-        free( psz_title );
-        free( psz_artist );
-        free( psz_album );
-        return VLC_ENOMEM;
-    }
-
-    char *psz_arturl = input_item_GetArtURL( p_item );
+    /* Get Art path */
+    psz_arturl = input_item_GetArtURL( p_item );
     if( psz_arturl )
     {
         char *psz = vlc_uri2path( psz_arturl );
@@ -274,17 +220,15 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         psz_arturl = psz;
     }
 
-    [p_intf->p_sys->o_growl_delegate notifyWithTitle:psz_title
-                                              artist:psz_artist
-                                               album:psz_album
-                                           andArtUrl:psz_arturl];
+    [p_sys->o_growl_delegate notifyWithTitle:psz_title
+                                      artist:psz_artist
+                                       album:psz_album
+                                   andArtUrl:psz_arturl];
 
     free( psz_title );
     free( psz_artist );
     free( psz_album );
     free( psz_arturl );
-    free( psz_tmp );
-
     return VLC_SUCCESS;
 }
 
