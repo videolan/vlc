@@ -324,17 +324,14 @@ void playlist_Destroy( playlist_t *p_playlist )
     set_current_status_node( p_playlist, NULL );
     /* Release the current item */
     set_current_status_item( p_playlist, NULL );
+
+    /* Remove all remaining items */
+    playlist_NodeDelete( p_playlist, p_playlist->p_root, true );
     PL_UNLOCK;
 
     vlc_cond_destroy( &p_sys->signal );
     vlc_mutex_destroy( &p_sys->lock );
 
-    /* Remove all remaining items */
-    FOREACH_ARRAY( playlist_item_t *p_del, p_sys->all_items )
-        free( p_del->pp_children );
-        vlc_gc_decref( p_del->p_input );
-        free( p_del );
-    FOREACH_END();
     ARRAY_RESET( p_sys->all_items );
 
     ARRAY_RESET( p_playlist->items );
