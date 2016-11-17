@@ -1271,7 +1271,8 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
 static int BuildSphere(unsigned nbPlanes,
                         GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
                         GLushort **indices, unsigned *nbIndices,
-                        float *left, float *top, float *right, float *bottom)
+                        const float *left, const float *top,
+                        const float *right, const float *bottom)
 {
     unsigned nbLatBands = 128;
     unsigned nbLonBands = 128;
@@ -1356,7 +1357,8 @@ static int BuildCube(unsigned nbPlanes,
                      float padW, float padH,
                      GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
                      GLushort **indices, unsigned *nbIndices,
-                     float *left, float *top, float *right, float *bottom)
+                     const float *left, const float *top,
+                     const float *right, const float *bottom)
 {
     *nbVertices = 4 * 6;
     *nbIndices = 6 * 6;
@@ -1479,7 +1481,8 @@ static int BuildCube(unsigned nbPlanes,
 static int BuildRectangle(unsigned nbPlanes,
                           GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
                           GLushort **indices, unsigned *nbIndices,
-                          float *left, float *top, float *right, float *bottom)
+                          const float *left, const float *top,
+                          const float *right, const float *bottom)
 {
     *nbVertices = 4;
     *nbIndices = 6;
@@ -1534,7 +1537,8 @@ static int BuildRectangle(unsigned nbPlanes,
 }
 
 static void DrawWithShaders(vout_display_opengl_t *vgl,
-                            float *left, float *top, float *right, float *bottom,
+                            const float *left, const float *top,
+                            const float *right, const float *bottom,
                             int program)
 {
     vgl->UseProgram(vgl->program[program]);
