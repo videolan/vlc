@@ -881,9 +881,9 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
     {
         OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
     }
-    else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS1" ) ||
-             PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS2" ) ||
-             PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS3" ) ||
+    else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS1" ) || /* 512 Bpf */
+             PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS2" ) || /* 1024 Bpf */
+             PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS3" ) || /* 2048 Bpf */
              PMTEsFindDescriptor( p_dvbpsies, 0x73 ) )
     {
         /*registration descriptor(ETSI TS 101 154 Annex F)*/
