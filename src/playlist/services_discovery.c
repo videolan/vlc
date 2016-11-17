@@ -255,7 +255,7 @@ static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
     /* Remove the sd playlist node if it exists */
     playlist_Lock(playlist);
     if (sds->node != NULL)
-        playlist_NodeDelete(playlist, sds->node, false);
+        playlist_NodeDelete(playlist, sds->node, true);
     playlist_Unlock(playlist);
 
     free(sds);
