@@ -261,7 +261,7 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     char const* p_peek = p_box->data.p_binary->p_blob;
     uint64_t i_read = p_box->data.p_binary->i_blob;
 
-    while( i_read )
+    while( i_read >= 4 )
     {
         uint16_t i_len, i_lang;
 
