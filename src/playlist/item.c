@@ -58,7 +58,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
                                           void * user_data )
 {
     input_item_t *p_input = p_event->p_obj;
-    playlist_t *p_playlist = (( playlist_item_t* ) user_data)->p_playlist;
+    playlist_t *p_playlist = user_data;
     playlist_private_t *p_sys = pl_priv( p_playlist );
     input_item_node_t *p_new_root = p_event->u.input_item_subitem_tree_added.p_root;
 
@@ -226,46 +226,9 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
 static void input_item_changed( const vlc_event_t * p_event,
                                 void * user_data )
 {
-    playlist_item_t *p_item = user_data;
-    VLC_UNUSED( p_event );
-    var_SetAddress( p_item->p_playlist, "item-change", p_item->p_input );
-}
+    playlist_t *p_playlist = user_data;
 
-/*****************************************************************************
- * Listen to vlc_InputItemAddSubItem event
- *****************************************************************************/
-static void install_input_item_observer( playlist_item_t * p_item )
-{
-    vlc_event_manager_t * p_em = &p_item->p_input->event_manager;
-    vlc_event_attach( p_em, vlc_InputItemSubItemTreeAdded,
-                      input_item_add_subitem_tree, p_item );
-    vlc_event_attach( p_em, vlc_InputItemDurationChanged,
-                      input_item_changed, p_item );
-    vlc_event_attach( p_em, vlc_InputItemMetaChanged,
-                      input_item_changed, p_item );
-    vlc_event_attach( p_em, vlc_InputItemNameChanged,
-                      input_item_changed, p_item );
-    vlc_event_attach( p_em, vlc_InputItemInfoChanged,
-                      input_item_changed, p_item );
-    vlc_event_attach( p_em, vlc_InputItemErrorWhenReadingChanged,
-                      input_item_changed, p_item );
-}
-
-static void uninstall_input_item_observer( playlist_item_t * p_item )
-{
-    vlc_event_manager_t * p_em = &p_item->p_input->event_manager;
-    vlc_event_detach( p_em, vlc_InputItemSubItemTreeAdded,
-                      input_item_add_subitem_tree, p_item );
-    vlc_event_detach( p_em, vlc_InputItemMetaChanged,
-                      input_item_changed, p_item );
-    vlc_event_detach( p_em, vlc_InputItemDurationChanged,
-                      input_item_changed, p_item );
-    vlc_event_detach( p_em, vlc_InputItemNameChanged,
-                      input_item_changed, p_item );
-    vlc_event_detach( p_em, vlc_InputItemInfoChanged,
-                      input_item_changed, p_item );
-    vlc_event_detach( p_em, vlc_InputItemErrorWhenReadingChanged,
-                      input_item_changed, p_item );
+    var_SetAddress( p_playlist, "item-change", p_event->p_obj );
 }
 
 static int playlist_ItemCmpId( const void *a, const void *b )
@@ -342,7 +305,22 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
 
     p->i_last_playlist_id = p_item->i_id;
     vlc_gc_incref( p_item->p_input );
-    install_input_item_observer( p_item );
+
+    vlc_event_manager_t *p_em = &p_item->p_input->event_manager;
+
+    vlc_event_attach( p_em, vlc_InputItemSubItemTreeAdded,
+                      input_item_add_subitem_tree, p_playlist );
+    vlc_event_attach( p_em, vlc_InputItemDurationChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_attach( p_em, vlc_InputItemMetaChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_attach( p_em, vlc_InputItemNameChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_attach( p_em, vlc_InputItemInfoChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_attach( p_em, vlc_InputItemErrorWhenReadingChanged,
+                      input_item_changed, p_playlist );
+
     return p_item;
 
 error:
@@ -365,7 +343,21 @@ void playlist_ItemRelease( playlist_t *p_playlist, playlist_item_t *p_item )
 
     PL_ASSERT_LOCKED;
 
-    uninstall_input_item_observer( p_item );
+    vlc_event_manager_t *p_em = &p_item->p_input->event_manager;
+
+    vlc_event_detach( p_em, vlc_InputItemSubItemTreeAdded,
+                      input_item_add_subitem_tree, p_playlist );
+    vlc_event_detach( p_em, vlc_InputItemMetaChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_detach( p_em, vlc_InputItemDurationChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_detach( p_em, vlc_InputItemNameChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_detach( p_em, vlc_InputItemInfoChanged,
+                      input_item_changed, p_playlist );
+    vlc_event_detach( p_em, vlc_InputItemErrorWhenReadingChanged,
+                      input_item_changed, p_playlist );
+
     vlc_gc_decref( p_item->p_input );
 
     tdelete( p_item, &p->input_tree, playlist_ItemCmpInput );
