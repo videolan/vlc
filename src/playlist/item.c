@@ -25,8 +25,13 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
 #include <assert.h>
+#include <limits.h>
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
+
+#include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_rand.h>
 #include "playlist_internal.h"
@@ -263,23 +268,41 @@ static void uninstall_input_item_observer( playlist_item_t * p_item )
                       input_item_changed, p_item );
 }
 
+static int playlist_ItemCmpId( const void *a, const void *b )
+{
+    const playlist_item_t *pa = a, *pb = b;
+
+    /* ID are between 1 and INT_MAX, this cannot overflow. */
+    return pa->i_id - pb->i_id;
+}
+
+static int playlist_ItemCmpInput( const void *a, const void *b )
+{
+    const playlist_item_t *pa = a, *pb = b;
+
+    if( pa->p_input == pb->p_input )
+        return 0;
+    return (((uintptr_t)pa->p_input) > ((uintptr_t)pb->p_input))
+        ? +1 : -1;
+}
+
 /*****************************************************************************
  * Playlist item creation
  *****************************************************************************/
 playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
                                               input_item_t *p_input )
 {
-    playlist_item_t* p_item = malloc( sizeof( playlist_item_t ) );
-    if( !p_item )
+    playlist_private_t *p = pl_priv(p_playlist);
+    playlist_item_t **pp, *p_item;
+
+    p_item = malloc( sizeof( playlist_item_t ) );
+    if( unlikely(p_item == NULL) )
         return NULL;
 
     assert( p_input );
 
     p_item->p_input = p_input;
-    vlc_gc_incref( p_item->p_input );
-
-    p_item->i_id = ++pl_priv(p_playlist)->i_last_playlist_id;
-
+    p_item->i_id = p->i_last_playlist_id;
     p_item->p_parent = NULL;
     p_item->i_children = -1;
     p_item->pp_children = NULL;
@@ -287,9 +310,44 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     p_item->i_flags = 0;
     p_item->p_playlist = p_playlist;
 
-    install_input_item_observer( p_item );
+    PL_ASSERT_LOCKED;
 
+    do  /* Find an unused ID for the item */
+    {
+        if( unlikely(p_item->i_id == INT_MAX) )
+            p_item->i_id = 0;
+       
+        p_item->i_id++;
+
+        if( unlikely(p_item->i_id == p->i_last_playlist_id) )
+            goto error; /* All IDs taken */
+ 
+        pp = tsearch( p_item, &p->id_tree, playlist_ItemCmpId );
+        if( unlikely(pp == NULL) )
+            goto error;
+
+        assert( (*pp)->i_id == p_item->i_id );
+        assert( (*pp) == p_item || (*pp)->p_input != p_input );
+    }
+    while( p_item != *pp );
+
+    pp = tsearch( p_item, &p->input_tree, playlist_ItemCmpInput );
+    if( unlikely(pp == NULL) )
+    {
+        tdelete( p_item, &p->id_tree, playlist_ItemCmpId );
+        goto error;
+    }
+    /* Same input item cannot be inserted twice. */
+    assert( p_item == *pp );
+
+    p->i_last_playlist_id = p_item->i_id;
+    vlc_gc_incref( p_item->p_input );
+    install_input_item_observer( p_item );
     return p_item;
+
+error:
+    free( p_item );
+    return NULL;
 }
 
 /***************************************************************************
@@ -301,16 +359,72 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
  *
  * \param p_item item to delete
 */
-void playlist_ItemRelease( playlist_item_t *p_item )
+void playlist_ItemRelease( playlist_t *p_playlist, playlist_item_t *p_item )
 {
-    /* For the assert */
-    playlist_t *p_playlist = p_item->p_playlist;
+    playlist_private_t *p = pl_priv(p_playlist);
+
     PL_ASSERT_LOCKED;
 
     uninstall_input_item_observer( p_item );
-    free( p_item->pp_children );
     vlc_gc_decref( p_item->p_input );
+
+    tdelete( p_item, &p->input_tree, playlist_ItemCmpInput );
+    tdelete( p_item, &p->id_tree, playlist_ItemCmpId );
+    free( p_item->pp_children );
     free( p_item );
+}
+
+/**
+ * Finds a playlist item by ID.
+ *
+ * Searches for a playlist item with the given ID.
+ *
+ * \note The playlist must be locked, and the result is only valid until the
+ * playlist is unlocked.
+ *
+ * \warning If an item with the given ID is deleted, it is unlikely but
+ * possible that another item will get the same ID. This can result in
+ * mismatches.
+ * Where holding a reference to an input item is a viable option, then
+ * playlist_ItemGetByInput() should be used instead - to avoid this issue.
+ *
+ * @param p_playlist the playlist
+ * @param id ID to look for
+ * @return the matching item or NULL if not found
+ */
+playlist_item_t *playlist_ItemGetById( playlist_t *p_playlist , int id )
+{
+    playlist_private_t *p = pl_priv(p_playlist);
+    playlist_item_t key, **pp;
+
+    PL_ASSERT_LOCKED;
+    key.i_id = id;
+    pp = tfind( &key, &p->id_tree, playlist_ItemCmpId );
+    return (pp != NULL) ? *pp : NULL;
+}
+
+/**
+ * Finds a playlist item by input item.
+ *
+ * Searches for a playlist item for the given input item.
+ *
+ * \note The playlist must be locked, and the result is only valid until the
+ * playlist is unlocked.
+ *
+ * \param p_playlist the playlist
+ * \param item input item to look for
+ * \return the playlist item or NULL on failure
+ */
+playlist_item_t *playlist_ItemGetByInput( playlist_t * p_playlist,
+                                          const input_item_t *item )
+{
+    playlist_private_t *p = pl_priv(p_playlist);
+    playlist_item_t key, **pp;
+
+    PL_ASSERT_LOCKED;
+    key.p_input = (input_item_t *)item;
+    pp = tfind( &key, &p->input_tree, playlist_ItemCmpInput );
+    return (pp != NULL) ? *pp : NULL;
 }
 
 /**
@@ -719,7 +833,6 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 {
     PL_ASSERT_LOCKED;
     ARRAY_APPEND(p_playlist->items, p_item);
-    ARRAY_APPEND(pl_priv(p_playlist)->all_items, p_item);
 
     playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
     playlist_SendAddNotify( p_playlist, p_item,

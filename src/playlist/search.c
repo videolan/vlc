@@ -34,52 +34,6 @@
  * Item search functions
  ***************************************************************************/
 
-/**
- * Search a playlist item by its playlist_item id.
- * The playlist have to be locked
- * @param p_playlist: the playlist
- * @param i_id: the id to find
- * @return the item or NULL on failure
- */
-playlist_item_t* playlist_ItemGetById( playlist_t * p_playlist , int i_id )
-{
-    int i;
-    PL_ASSERT_LOCKED;
-    ARRAY_BSEARCH( pl_priv(p_playlist)->all_items,->i_id, int, i_id, i );
-    if( i != -1 )
-        return ARRAY_VAL( pl_priv(p_playlist)->all_items, i );
-    else
-        return NULL;
-}
-
-/**
- * Search an item by its input_item_t
- * The playlist have to be locked
- * @param p_playlist: the playlist
- * @param p_item: the input_item_t to find
- * @return the item, or NULL on failure
- */
-playlist_item_t* playlist_ItemGetByInput( playlist_t * p_playlist,
-                                          const input_item_t *p_item )
-{
-    PL_ASSERT_LOCKED;
-    if( get_current_status_item( p_playlist ) &&
-        get_current_status_item( p_playlist )->p_input == p_item )
-    {
-        return get_current_status_item( p_playlist );
-    }
-    /** \todo Check if this is always incremental and whether we can bsearch */
-    for( int i =  0 ; i < pl_priv(p_playlist)->all_items.i_size; i++ )
-    {
-        if( ARRAY_VAL(pl_priv(p_playlist)->all_items, i)->p_input == p_item )
-        {
-            return ARRAY_VAL(pl_priv(p_playlist)->all_items, i);
-        }
-    }
-    return NULL;
-}
-
-
 /***************************************************************************
  * Live search handling
  ***************************************************************************/

@@ -74,8 +74,6 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     if( p_item == NULL )  return NULL;
     p_item->i_children = 0;
 
-    ARRAY_APPEND(pl_priv(p_playlist)->all_items, p_item);
-
     if( p_parent != NULL )
         playlist_NodeInsert( p_playlist, p_item, p_parent, i_pos );
     playlist_SendAddNotify( p_playlist, p_item,
@@ -109,9 +107,6 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
 
     int i;
     var_SetAddress( p_playlist, "playlist-item-deleted", p_root );
-    ARRAY_BSEARCH( pl_priv(p_playlist)->all_items, ->i_id, int, p_root->i_id, i );
-    if( i != -1 )
-        ARRAY_REMOVE( pl_priv(p_playlist)->all_items, i );
 
     if( p_root->i_children == -1 ) {
         ARRAY_BSEARCH( p_playlist->items,->i_id, int, p_root->i_id, i );
@@ -151,7 +146,7 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         }
     }
 
-    playlist_ItemRelease( p_root );
+    playlist_ItemRelease( p_playlist, p_root );
 }
 
 int playlist_NodeInsert( playlist_t *p_playlist,

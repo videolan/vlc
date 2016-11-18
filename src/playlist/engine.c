@@ -209,6 +209,10 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
 
     assert( offsetof( playlist_private_t, public_data ) == 0 );
     p_playlist = &p->public_data;
+
+    p->input_tree = NULL;
+    p->id_tree = NULL;
+
     TAB_INIT( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds );
 
     VariablesInit( p_playlist );
@@ -221,7 +225,6 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->p_input = NULL;
 
     ARRAY_INIT( p_playlist->items );
-    ARRAY_INIT( p->all_items );
     ARRAY_INIT( p_playlist->current );
 
     p_playlist->i_current_index = 0;
@@ -331,8 +334,6 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     vlc_cond_destroy( &p_sys->signal );
     vlc_mutex_destroy( &p_sys->lock );
-
-    ARRAY_RESET( p_sys->all_items );
 
     ARRAY_RESET( p_playlist->items );
     ARRAY_RESET( p_playlist->current );

@@ -49,7 +49,9 @@ typedef struct playlist_private_t
     playlist_t           public_data;
     struct intf_thread_t *interface; /**< Linked-list of interfaces */
 
-    playlist_item_array_t all_items; /**< Array of items and nodes */
+    void *input_tree; /**< Search tree for input item
+                           to playlist item mapping */
+    void *id_tree; /**< Search tree for item ID to item mapping */
 
     vlc_sd_internal_t   **pp_sds;
     int                   i_sds;   /**< Number of service discovery modules */
@@ -129,7 +131,7 @@ int playlist_NodeInsert(playlist_t *, playlist_item_t*, playlist_item_t *,
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
                               input_item_t *p_input, playlist_item_t *p_root );
 
-void playlist_ItemRelease( playlist_item_t * );
+void playlist_ItemRelease( playlist_t *, playlist_item_t * );
 
 void ResetCurrentlyPlaying( playlist_t *p_playlist, playlist_item_t *p_cur );
 void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur );
