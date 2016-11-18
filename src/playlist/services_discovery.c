@@ -189,8 +189,8 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
                                      input_item_t *p_input)
 {
     vlc_sd_internal_t *sds = sd->owner.sys;
+    playlist_t *p_playlist = (playlist_t *)sd->obj.parent;
     playlist_item_t *p_sd_node = sds->node;
-    playlist_t *p_playlist = p_sd_node->p_playlist;
 
     PL_LOCK;
     playlist_item_t *p_item =

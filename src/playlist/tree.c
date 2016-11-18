@@ -176,6 +176,9 @@ int playlist_NodeInsert( playlist_t *p_playlist,
 /**
  * Search a child of a node by its name
  *
+ * \note The playlist must be locked, and the result is only valid until the
+ * playlist is unlocked.
+ *
  * \param p_node the node
  * \param psz_search the name of the child to search
  * \return the child item or NULL if not found or error
@@ -183,8 +186,6 @@ int playlist_NodeInsert( playlist_t *p_playlist,
 playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
                                            const char *psz_search )
 {
-    playlist_t * p_playlist = p_node->p_playlist; /* For assert_locked */
-    PL_ASSERT_LOCKED;
     int i;
 
     if( p_node->i_children < 0 )

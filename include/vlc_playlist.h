@@ -139,8 +139,6 @@ struct playlist_item_t
 
     int                    i_id;        /**< Playlist item specific id */
     uint8_t                i_flags;     /**< Flags \see playlist_item_flags_e */
-
-    playlist_t            *p_playlist;  /**< Parent playlist */
 };
 
 typedef enum {

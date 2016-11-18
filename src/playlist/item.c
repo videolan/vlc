@@ -271,7 +271,6 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     p_item->pp_children = NULL;
     p_item->i_nb_played = 0;
     p_item->i_flags = 0;
-    p_item->p_playlist = p_playlist;
 
     PL_ASSERT_LOCKED;
 
@@ -766,10 +765,6 @@ void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item,
  */
 mtime_t playlist_GetNodeDuration( playlist_item_t* node )
 {
-    /* For the assert */
-    playlist_t *p_playlist = node->p_playlist;
-    PL_ASSERT_LOCKED;
-
     mtime_t mt_duration = 0;
 
     if( node->i_children != -1 )
