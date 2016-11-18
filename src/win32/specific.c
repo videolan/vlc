@@ -65,16 +65,13 @@ void system_Init(void)
         fputs("Error: cannot initialize Winsocks\n", stderr);
 
 #if !VLC_WINSTORE_APP
-    typedef BOOL (WINAPI *SetDefaultDllDirectoriesFunc)( DWORD DirectoryFlags);
-    SetDefaultDllDirectoriesFunc pf_SetDefDllDir = (SetDefaultDllDirectoriesFunc)
-        GetProcAddress( GetModuleHandleW(TEXT("kernel32.dll")), "SetDefaultDllDirectories");
-
-    if( pf_SetDefDllDir ) {
-        pf_SetDefDllDir( LOAD_LIBRARY_SEARCH_SYSTEM32 );
+# if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+    if (GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+                                       "SetDefaultDllDirectories") != NULL)
+# endif /* FIXME: not reentrant */
         LoadLibraryFlags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
                            LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
                            LOAD_LIBRARY_SEARCH_SYSTEM32;
-    }
 #endif
 }
 
