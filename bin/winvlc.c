@@ -102,8 +102,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
     /* SetProcessDEPPolicy */
-    HINSTANCE h_Kernel32 = LoadLibraryW(L"kernel32.dll");
-    if(h_Kernel32)
+    HINSTANCE h_Kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+    if (h_Kernel32 != NULL)
     {
         BOOL (WINAPI * mySetProcessDEPPolicy)( DWORD dwFlags);
         BOOL (WINAPI * mySetDllDirectoryA)(const char* lpPathName);
@@ -119,8 +119,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                             GetProcAddress(h_Kernel32, "SetDllDirectoryA");
         if(mySetDllDirectoryA)
             mySetDllDirectoryA("");
-
-        FreeLibrary(h_Kernel32);
     }
 
     SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
