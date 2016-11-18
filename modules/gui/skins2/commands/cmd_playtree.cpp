@@ -36,7 +36,7 @@ void CmdPlaytreeSort::execute()
 {
     /// \todo Choose sort method/order - Need more commands
     /// \todo Choose the correct view
-    playlist_t *p_playlist = getIntf()->p_sys->p_playlist;
+    playlist_t *p_playlist = getPL();
     PL_LOCK;
     playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root,
                                 SORT_TITLE, ORDER_NORMAL );

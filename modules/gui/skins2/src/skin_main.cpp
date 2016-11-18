@@ -83,7 +83,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_intf->p_sys->p_input = NULL;
-    p_intf->p_sys->p_playlist = pl_Get( p_intf );
 
     // Initialize "singleton" objects
     p_intf->p_sys->p_logger = NULL;
@@ -150,7 +149,7 @@ static void Close( vlc_object_t *p_this )
     msg_Dbg( p_intf, "closing skins2 module" );
 
     /* Terminate input to ensure that our window provider is released. */
-    playlist_Deactivate( p_intf->p_sys->p_playlist );
+    playlist_Deactivate( pl_Get(p_intf) );
 
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = NULL;

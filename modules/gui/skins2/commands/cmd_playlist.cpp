@@ -34,75 +34,59 @@ void CmdPlaylistDel::execute()
 
 void CmdPlaylistNext::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
-        playlist_Next( pPlaylist );
+    playlist_Next( getPL() );
 }
 
 
 void CmdPlaylistPrevious::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
-        playlist_Prev( pPlaylist );
+    playlist_Prev( getPL() );
 }
 
 
 void CmdPlaylistRandom::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
-        var_SetBool( pPlaylist , "random", m_value );
+    var_SetBool( getPL(), "random", m_value );
 }
 
 
 void CmdPlaylistLoop::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
-        var_SetBool( pPlaylist , "loop", m_value );
+    var_SetBool( getPL(), "loop", m_value );
 }
 
 
 void CmdPlaylistRepeat::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
-        var_SetBool( pPlaylist , "repeat", m_value );
+    var_SetBool( getPL(), "repeat", m_value );
 }
 
 
 void CmdPlaylistLoad::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
-        playlist_Import( pPlaylist, m_file.c_str() );
+    playlist_Import( getPL(), m_file.c_str() );
 }
 
 
 void CmdPlaylistSave::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
+    const char *psz_module;
+    if( m_file.find( ".xsp", 0 ) != std::string::npos )
+        psz_module = "export-xspf";
+    else if( m_file.find( "m3u", 0 ) != std::string::npos )
+        psz_module = "export-m3u";
+    else if( m_file.find( "html", 0 ) != std::string::npos )
+        psz_module = "export-html";
+    else
     {
-        const char *psz_module;
-        if( m_file.find( ".xsp", 0 ) != std::string::npos )
-            psz_module = "export-xspf";
-        else if( m_file.find( "m3u", 0 ) != std::string::npos )
-            psz_module = "export-m3u";
-        else if( m_file.find( "html", 0 ) != std::string::npos )
-            psz_module = "export-html";
-        else
-        {
-            msg_Err(getIntf(),"Did not recognise playlist export file type");
-            return;
-        }
-
-        playlist_Export( pPlaylist, m_file.c_str(), true, psz_module );
+        msg_Err(getIntf(),"Did not recognise playlist export file type");
+        return;
     }
+
+    playlist_Export( getPL(), m_file.c_str(), true, psz_module );
 }
 
 void CmdPlaylistFirst::execute()
 {
-    playlist_Control(getIntf()->p_sys->p_playlist,PLAYLIST_PLAY,pl_Unlocked);
+    playlist_Control(getPL(), PLAYLIST_PLAY, pl_Unlocked);
 }

@@ -33,9 +33,7 @@
 
 void CmdAddItem::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( !pPlaylist )
-        return;
+    playlist_t *pPlaylist = getPL();
 
     if( strstr( m_name.c_str(), "://" ) == NULL )
     {

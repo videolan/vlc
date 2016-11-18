@@ -39,8 +39,7 @@ Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
              / (float)AOUT_VOLUME_MAX;
 
     // set current volume from the playlist
-    playlist_t* pPlaylist = pIntf->p_sys->p_playlist;
-    setVolume( var_GetFloat( pPlaylist, "volume" ), false );
+    setVolume( var_GetFloat( getPL(), "volume" ), false );
 }
 
 
@@ -49,8 +48,7 @@ void Volume::set( float percentage, bool updateVLC )
     VarPercent::set( percentage );
     if( updateVLC )
     {
-        playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
-        playlist_VolumeSet( pPlaylist, getVolume() );
+        playlist_VolumeSet( getPL(), getVolume() );
     }
 }
 

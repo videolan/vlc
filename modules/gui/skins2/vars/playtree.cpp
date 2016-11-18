@@ -36,7 +36,7 @@
 #include "../utils/ustring.hpp"
 
 Playtree::Playtree( intf_thread_t *pIntf )
-    : VarTree( pIntf ), m_pPlaylist( pIntf->p_sys->p_playlist )
+    : VarTree( pIntf ), m_pPlaylist( pl_Get(pIntf) )
 {
     getPositionVar().addObserver( this );
     buildTree();

@@ -34,7 +34,7 @@ void CmdItemUpdate::execute()
         return;
 
     // update playtree
-    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
+    playlist_t* pPlaylist = getPL();
     playlist_Lock( pPlaylist );
     playlist_item_t* p_plItem = playlist_ItemGetByInput( pPlaylist, m_pItem );
     int id = p_plItem ? p_plItem->i_id : 0;

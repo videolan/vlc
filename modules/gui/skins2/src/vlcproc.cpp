@@ -154,29 +154,25 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 #define ADD_CALLBACK( p_object, var ) \
     var_AddCallback( p_object, var, onGenericCallback, this );
 
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume" )
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "mute" )
+    ADD_CALLBACK( getPL(), "volume" )
+    ADD_CALLBACK( getPL(), "mute" )
     ADD_CALLBACK( pIntf->obj.libvlc, "intf-toggle-fscontrol" )
 
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "random" )
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "loop" )
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "repeat" )
+    ADD_CALLBACK( getPL(), "random" )
+    ADD_CALLBACK( getPL(), "loop" )
+    ADD_CALLBACK( getPL(), "repeat" )
 
 #undef ADD_CALLBACK
 
     // Called when a playlist item is added
-    var_AddCallback( pIntf->p_sys->p_playlist, "playlist-item-append",
-                     onItemAppend, this );
+    var_AddCallback( getPL(), "playlist-item-append", onItemAppend, this );
     // Called when a playlist item is deleted
     // TODO: properly handle item-deleted
-    var_AddCallback( pIntf->p_sys->p_playlist, "playlist-item-deleted",
-                     onItemDelete, this );
+    var_AddCallback( getPL(), "playlist-item-deleted", onItemDelete, this );
     // Called when the current input changes
-    var_AddCallback( pIntf->p_sys->p_playlist, "input-current",
-                     onInputNew, this );
+    var_AddCallback( getPL(), "input-current", onInputNew, this );
     // Called when a playlist item changed
-    var_AddCallback( pIntf->p_sys->p_playlist, "item-change",
-                     onItemChange, this );
+    var_AddCallback( getPL(), "item-change", onItemChange, this );
 
     // Called when we have an interaction dialog to display
     var_Create( pIntf, "interaction", VLC_VAR_ADDRESS );
@@ -195,29 +191,20 @@ VlcProc::~VlcProc()
         m_pVout = NULL;
     }
 
-    var_DelCallback( getIntf()->p_sys->p_playlist, "volume",
-                     onGenericCallback, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "mute",
-                     onGenericCallback, this );
+    var_DelCallback( getPL(), "volume", onGenericCallback, this );
+    var_DelCallback( getPL(), "mute",onGenericCallback, this );
     var_DelCallback( getIntf()->obj.libvlc, "intf-toggle-fscontrol",
                      onGenericCallback, this );
 
-    var_DelCallback( getIntf()->p_sys->p_playlist, "random",
-                     onGenericCallback, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "loop",
-                     onGenericCallback, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "repeat",
-                     onGenericCallback, this );
+    var_DelCallback( getPL(), "random", onGenericCallback, this );
+    var_DelCallback( getPL(), "loop", onGenericCallback, this );
+    var_DelCallback( getPL(), "repeat", onGenericCallback, this );
 
-    var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-append",
-                     onItemAppend, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-deleted",
-                     onItemDelete, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "input-current",
-                     onInputNew, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "item-change",
-                     onItemChange, this );
-    var_DelCallback( getIntf(), "interaction", onInteraction, this );
+    var_DelCallback( getPL(), "playlist-item-append", onItemAppend, this );
+    var_DelCallback( getPL(), "playlist-item-deleted", onItemDelete, this );
+    var_DelCallback( getPL(), "input-current", onInputNew, this );
+    var_DelCallback( getPL(), "item-change", onItemChange, this );
+    var_DelCallback( getPL(), "interaction", onInteraction, this );
 }
 
 int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
@@ -620,9 +607,8 @@ void VlcProc::on_repeat_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
     (void)p_obj; (void)newVal;
-    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
 
-    SET_VOLUME( m_cVarVolume, var_GetFloat( pPlaylist, "volume" ), false );
+    SET_VOLUME( m_cVarVolume, var_GetFloat( getPL(), "volume" ), false );
 }
 
 void VlcProc::on_mute_changed( vlc_object_t* p_obj, vlc_value_t newVal )
@@ -715,7 +701,7 @@ void VlcProc::reset_input()
 
 void VlcProc::init_variables()
 {
-    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
+    playlist_t* pPlaylist = getPL();
 
     SET_BOOL( m_cVarRandom, var_GetBool( pPlaylist, "random" ) );
     SET_BOOL( m_cVarLoop, var_GetBool( pPlaylist, "loop" ) );
@@ -769,8 +755,7 @@ void VlcProc::update_current_input()
 
 void VlcProc::init_equalizer()
 {
-    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
-    audio_output_t* pAout = playlist_GetAout( pPlaylist );
+    audio_output_t* pAout = playlist_GetAout( getPL() );
     if( pAout )
     {
         if( !var_Type( pAout, "equalizer-bands" ) )

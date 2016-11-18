@@ -94,9 +94,6 @@ struct intf_sys_t
     /// The input thread
     input_thread_t *p_input;
 
-    /// The playlist thread
-    playlist_t *p_playlist;
-
     // "Singleton" objects: MUST be initialized to NULL !
     /// Logger
     Logger *p_logger;
@@ -143,6 +140,7 @@ public:
     /// Getter (public because it is used in C callbacks in the win32
     /// interface)
     intf_thread_t *getIntf() const { return m_pIntf; }
+    playlist_t *getPL() const { return pl_Get(m_pIntf); }
 
 private:
     intf_thread_t *m_pIntf;

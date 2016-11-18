@@ -84,8 +84,7 @@ VariablePtr EqualizerBands::getBand( int band )
 void EqualizerBands::onUpdate( Subject<VarPercent> &rBand, void *arg )
 {
     (void)rBand; (void)arg;
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    audio_output_t *pAout = playlist_GetAout( pPlaylist );
+    audio_output_t *pAout = playlist_GetAout( getPL() );
 
     // Make sure we are not called from set()
     if (!m_isUpdating)
@@ -128,8 +127,7 @@ EqualizerPreamp::EqualizerPreamp( intf_thread_t *pIntf ): VarPercent( pIntf )
 
 void EqualizerPreamp::set( float percentage, bool updateVLC )
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    audio_output_t *pAout = playlist_GetAout( pPlaylist );
+    audio_output_t *pAout = playlist_GetAout( getPL() );
 
     VarPercent::set( percentage );
 
