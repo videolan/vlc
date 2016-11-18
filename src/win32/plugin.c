@@ -49,9 +49,10 @@ static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
     if (SetThreadErrorModeReal != NULL)
         return SetThreadErrorModeReal(mode, oldmode);
 
-# if (_WIN32_WINNT >= 0x600)
-    DWORD curmode = GetErrorMode();
-# else
+# if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
+    /* As per libvlc_new() documentation, the calling process is responsible
+     * for setting a proper error mode on Windows 2008 and earlier versions.
+     * This is only a sanity check. */
     UINT WINAPI (*GetErrorModeReal)(void);
     DWORD curmode = 0;
 
@@ -59,14 +60,9 @@ static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
     if (GetErrorModeReal != NULL)
         curmode = GetErrorModeReal();
     else
-    {
-        /* We are on XP, 2003, 2003/R2 or some special versions of Vista:
-           No SetThreadErrorMode, no GetErrorMode.
-           We will set the mode for the whole process, which is quite bad,
-           but is our only solution */
-        SetErrorMode( mode );
-        return TRUE;
-    }
+        curmode = SEM_FAILCRITICALERRORS;
+# else
+    DWORD curmode = GetErrorMode();
 # endif
     /* Extra flags should be OK. Missing flags are NOT OK. */
     if ((mode & curmode) != mode)
