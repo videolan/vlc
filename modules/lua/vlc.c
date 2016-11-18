@@ -654,12 +654,16 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
     char **names = vlc_dictionary_all_keys( &name_d );
     if( names != NULL )
     {
-        for( char **name = names; *name != NULL; name++ )
+        for( char **name = names; *name; ++name )
         {
             r = vlclua_probe_sd( obj, *name );
             if( r != VLC_PROBE_CONTINUE )
                 break;
         }
+
+        for( char **name = names; *name; ++name )
+            free( *name );
+
         free( names );
     }
     vlc_dictionary_clear( &name_d, NULL, NULL );
