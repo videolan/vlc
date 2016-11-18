@@ -328,15 +328,16 @@ void playlist_Destroy( playlist_t *p_playlist )
     /* Release the current item */
     set_current_status_item( p_playlist, NULL );
 
+    /* Destroy arrays completely - faster than one item at a time */
+    ARRAY_RESET( p_playlist->items );
+    ARRAY_RESET( p_playlist->current );
+
     /* Remove all remaining items */
     playlist_NodeDelete( p_playlist, p_playlist->p_root, true );
     PL_UNLOCK;
 
     vlc_cond_destroy( &p_sys->signal );
     vlc_mutex_destroy( &p_sys->lock );
-
-    ARRAY_RESET( p_playlist->items );
-    ARRAY_RESET( p_playlist->current );
 
     vlc_http_cookie_jar_t *cookies = var_GetAddress( p_playlist, "http-cookies" );
     if ( cookies )
