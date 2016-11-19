@@ -39,27 +39,6 @@
 #include "dbus_tracklist.h"
 #include "dbus_common.h"
 
-/**
- * Retrieves the position of an input item in the playlist, given its id
- *
- * This function must be called with the playlist locked
- *
- * @param playlist playlist
- * @param id playlist item ID
- *
- * @return The position of the input item or -1
- */
-static int getInputPosition( playlist_t* playlist, int id )
-{
-    assert( playlist != NULL );
-
-    for( int i = 0; i < playlist->current.i_size; i++ )
-        if( playlist->current.p_elems[i]->i_id == id )
-            return i;
-
-    return -1;
-}
-
 DBUS_METHOD( AddTrack )
 {
     REPLY_INIT;
@@ -68,12 +47,10 @@ DBUS_METHOD( AddTrack )
     dbus_error_init( &error );
 
     char *psz_mrl, *psz_aftertrack;
-    playlist_t *p_playlist = PL;
     dbus_bool_t b_play;
 
     int i_input_id = -1;
-    int i_mode = 0;
-    int i_pos  = PLAYLIST_END;
+    int i_pos = PLAYLIST_END;
 
     size_t i_append_len  = sizeof( DBUS_MPRIS_APPEND );
     size_t i_notrack_len = sizeof( DBUS_MPRIS_NOTRACK );
@@ -94,36 +71,49 @@ DBUS_METHOD( AddTrack )
     }
 
     if( !strncmp( DBUS_MPRIS_APPEND, psz_aftertrack, i_append_len ) )
-    {
-        i_pos  = PLAYLIST_END;
-    }
+        ;
     else if( !strncmp( DBUS_MPRIS_NOTRACK, psz_aftertrack, i_notrack_len ) )
-    {
-        i_pos  = 0;
-    }
+        i_pos = 0;
     else if( 1 == sscanf( psz_aftertrack, MPRIS_TRACKID_FORMAT, &i_input_id ) )
-    {
-        PL_LOCK;
-        int i_res = getInputPosition( p_playlist, i_input_id );
-        PL_UNLOCK;
-
-        if( i_res < 0 )
-            goto invalidTrackID;
-
-        i_pos  = i_res + 1;
-    }
+        ;
     else
     {
-invalidTrackID:
         msg_Warn( (vlc_object_t *) p_this,
                 "AfterTrack: Invalid track ID \"%s\", appending instead",
                 psz_aftertrack );
+        i_pos = PLAYLIST_END;
     }
 
-    if( b_play == TRUE )
-        i_mode |= PLAYLIST_GO;
+    input_item_t *item = input_item_New( psz_mrl, NULL );
+    if( unlikely(item == NULL) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    playlist_Add( PL, psz_mrl, NULL, i_mode, i_pos, true );
+    playlist_t *p_playlist = PL;
+    playlist_item_t *node;
+
+    PL_LOCK;
+    node = p_playlist->p_playing;
+
+    if( i_input_id != -1 )
+    {
+        playlist_item_t *prev = playlist_ItemGetById( p_playlist, i_input_id );
+        if( prev != NULL )
+        {
+            node = prev->p_parent;
+            for( i_pos = 0; i_pos < node->i_children; i_pos++ )
+                if( node->pp_children[i_pos] == prev )
+                {
+                    i_pos++;
+                    break;
+                }
+        }
+    }
+
+    playlist_NodeAddInput( p_playlist, item, node,
+                           (b_play == TRUE) ? PLAYLIST_GO : 0, i_pos );
+    PL_UNLOCK;
+
+    input_item_Release( item );
 
     REPLY_SEND;
 }
