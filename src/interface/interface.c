@@ -154,15 +154,32 @@ static playlist_t *intf_GetPlaylist(libvlc_int_t *libvlc)
 }
 
 /**
- * Inserts an item in the playlist used by interfaces.
+ * Inserts an item in the playlist.
+ *
+ * This function is used during initialization. Unlike playlist_Add() and
+ * variants, it inserts an item to the beginning of the playlist. That is
+ * meant to compensate for the reverse parsing order of the command line.
+ *
  * @note This function may <b>not</b> be called at the same time as
  * intf_DestroyAll().
  */
-void intf_InsertItem(libvlc_int_t *libvlc, const char *mrl, unsigned optc,
-                     const char *const *optv, unsigned flags)
+int intf_InsertItem(libvlc_int_t *libvlc, const char *mrl, unsigned optc,
+                    const char *const *optv, unsigned flags)
 {
-    playlist_AddExt(intf_GetPlaylist(libvlc), mrl, NULL, 0,
-                    0, optc, optv, flags, true);
+    playlist_t *playlist = intf_GetPlaylist(libvlc);
+    input_item_t *item = input_item_New(mrl, NULL);
+
+    if (unlikely(item == NULL))
+        return -1;
+
+    int ret = -1;
+
+    if (input_item_AddOptions(item, optc, optv, flags) == VLC_SUCCESS
+     && playlist_AddInput(playlist, item, 0, 0, true) == VLC_SUCCESS)
+        ret = 0;
+
+    input_item_Release(item);
+    return ret;
 }
 
 void libvlc_InternalPlay(libvlc_int_t *libvlc)
