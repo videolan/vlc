@@ -1348,9 +1348,11 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
     /* Playlist sort */
     case 'o':
     case 'O':
+        playlist_Lock(p_playlist);
         playlist_RecursiveNodeSort(p_playlist, p_playlist->p_root,
-                                    SORT_TITLE_NODES_FIRST,
-                                    (key == 'o')? ORDER_NORMAL : ORDER_REVERSE);
+                                   SORT_TITLE_NODES_FIRST,
+                                   (key == 'o')? ORDER_NORMAL : ORDER_REVERSE);
+        playlist_Unlock(p_playlist);
         vlc_mutex_lock(&sys->pl_lock);
         sys->need_update = true;
         vlc_mutex_unlock(&sys->pl_lock);
