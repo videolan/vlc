@@ -342,6 +342,10 @@ else
 	TVOSOPTIONS="--enable-neon"
 fi
 
+# Available but not authorized
+export ac_cv_func_daemon=no
+export ac_cv_func_fork=no
+
 # Run configure only upon changes.
 if [ "${VLCROOT}/configure" -nt config.log -o \
      "${THIS_SCRIPT_PATH}" -nt config.log ]; then
