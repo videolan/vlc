@@ -76,8 +76,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
 
     if( p_parent != NULL )
         playlist_NodeInsert( p_playlist, p_item, p_parent, i_pos );
-    playlist_SendAddNotify( p_playlist, p_item,
-                            !( i_flags & PLAYLIST_NO_REBUILD ));
+    playlist_SendAddNotify( p_playlist, p_item, true );
 
     p_item->i_flags |= i_flags;
 

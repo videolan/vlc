@@ -208,7 +208,6 @@ enum
 
 /* Used by playlist_Import */
 #define PLAYLIST_GO              0x0004
-#define PLAYLIST_NO_REBUILD      0x0020
 
 #define PLAYLIST_END           -1
 

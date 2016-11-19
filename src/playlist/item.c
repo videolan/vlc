@@ -822,8 +822,7 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     ARRAY_APPEND(p_playlist->items, p_item);
 
     playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
-    playlist_SendAddNotify( p_playlist, p_item,
-                            !( i_mode & PLAYLIST_NO_REBUILD ) );
+    playlist_SendAddNotify( p_playlist, p_item, true );
 }
 
 /* Actually convert an item to a node */
