@@ -49,13 +49,14 @@ void playlist_AssertLocked( playlist_t *pl )
     vlc_assert_locked( &pl_priv(pl)->lock );
 }
 
-static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list args )
+static void playlist_vaControl( playlist_t *p_playlist, int i_query,
+                                bool locked, va_list args )
 {
-    PL_ASSERT_LOCKED;
+    PL_LOCK_IF( !locked );
 
     if( pl_priv(p_playlist)->killed )
-        return;
-
+        ;
+    else
     switch( i_query )
     {
     case PLAYLIST_STOP:
@@ -70,6 +71,8 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
     {
         playlist_item_t *p_node = va_arg( args, playlist_item_t * );
         playlist_item_t *p_item = va_arg( args, playlist_item_t * );
+
+        assert( locked || (p_item == NULL && p_node == NULL) );
 
         if ( p_node == NULL )
         {
@@ -121,26 +124,25 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
 
     case PLAYLIST_PAUSE:
         if( pl_priv(p_playlist)->p_input == NULL )
-            return;
+            break;
         var_SetInteger( pl_priv(p_playlist)->p_input, "state", PAUSE_S );
         break;
 
     case PLAYLIST_RESUME:
         if( pl_priv(p_playlist)->p_input == NULL )
-            return;
+            break;
         var_SetInteger( pl_priv(p_playlist)->p_input, "state", PLAYING_S );
         break;
     }
     vlc_cond_signal( &pl_priv(p_playlist)->signal );
+    PL_UNLOCK_IF( !locked );
 }
 
 void playlist_Control( playlist_t *p_playlist, int query, bool locked, ... )
 {
     va_list args;
 
-    PL_LOCK_IF( !locked );
     va_start( args, locked );
-    playlist_vaControl( p_playlist, query, args );
+    playlist_vaControl( p_playlist, query, locked, args );
     va_end( args );
-    PL_UNLOCK_IF( !locked );
 }
