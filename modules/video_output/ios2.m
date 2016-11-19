@@ -119,7 +119,7 @@ static NSString *const vertexShaderString = @" \
 \
  void main() \
  { \
-    gl_Position = position * transformMatrix; \
+    gl_Position = transformMatrix * position; \
     texCoordVarying = texCoord; \
  } \
 ";
