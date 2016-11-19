@@ -1293,6 +1293,38 @@ static void PlayPause(intf_thread_t *intf, input_thread_t *p_input)
         playlist_Play(pl_Get(intf));
 }
 
+static void AddItem(intf_thread_t *intf, const char *path)
+{
+    char *uri = vlc_path2uri(path, NULL);
+    if (uri == NULL)
+        return;
+
+    input_item_t *item = input_item_New(uri, NULL);
+    free(uri);
+    if (unlikely(item == NULL))
+        return;
+
+    playlist_t *playlist = pl_Get(intf);
+    playlist_item_t *node;
+
+    playlist_Lock(playlist);
+    node = playlist_CurrentPlayingItem(playlist);
+
+    while (node != NULL) {
+        if (node == playlist->p_playing || node == playlist->p_media_library)
+            break;
+        node = node->p_parent;
+    }
+
+    if (node == NULL)
+        node = playlist->p_playing;
+
+    playlist_NodeAddInput(playlist, item, node, 0, PLAYLIST_END);
+    playlist_Unlock(playlist);
+
+    input_item_Release(item);
+}
+
 static inline void BoxSwitch(intf_sys_t *sys, int box)
 {
     sys->box_type = (sys->box_type == box) ? BOX_NONE : box;
@@ -1421,34 +1453,9 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
             return true;
         }
 
-        char *uri = vlc_path2uri(path, "file");
+        AddItem(intf, path);
         free(path);
-        if (uri == NULL)
-            return true;
-
-        playlist_t *p_playlist = pl_Get(intf);
-        vlc_mutex_lock(&sys->pl_lock);
-        playlist_item_t *p_parent = sys->node;
-        vlc_mutex_unlock(&sys->pl_lock);
-        if (!p_parent) {
-            playlist_item_t *item;
-            PL_LOCK;
-            item = playlist_CurrentPlayingItem(p_playlist);
-            p_parent = item ? item->p_parent : NULL;
-            PL_UNLOCK;
-            if (!p_parent)
-                p_parent = p_playlist->p_playing;
-        }
-
-        while (p_parent->p_parent && p_parent->p_parent->p_parent)
-            p_parent = p_parent->p_parent;
-
-        input_item_t *p_input = p_playlist->p_playing->p_input;
-        playlist_Add(p_playlist, uri, NULL, 0,
-                     p_parent->p_input == p_input);
-
         BoxSwitch(sys, BOX_PLAYLIST);
-        free(uri);
         return true;
     }
 
@@ -1458,33 +1465,9 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
 static void OpenSelection(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    char *uri = vlc_path2uri(sys->open_chain, NULL);
-    if (uri == NULL)
-        return;
 
-    playlist_t *p_playlist = pl_Get(intf);
-    vlc_mutex_lock(&sys->pl_lock);
-    playlist_item_t *p_parent = sys->node;
-    vlc_mutex_unlock(&sys->pl_lock);
-
-    PL_LOCK;
-    if (!p_parent) {
-        playlist_item_t *current;
-        current= playlist_CurrentPlayingItem(p_playlist);
-        p_parent = current ? current->p_parent : NULL;
-        if (!p_parent)
-            p_parent = p_playlist->p_playing;
-    }
-
-    while (p_parent->p_parent && p_parent->p_parent->p_parent)
-        p_parent = p_parent->p_parent;
-    PL_UNLOCK;
-
-    playlist_Add(p_playlist, uri, NULL, PLAYLIST_GO,
-                 p_parent->p_input == p_playlist->p_playing->p_input);
-
+    AddItem(intf, sys->open_chain);
     sys->plidx_follow = true;
-    free(uri);
 }
 
 static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
