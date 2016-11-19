@@ -53,9 +53,8 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
 {
     PL_ASSERT_LOCKED;
 
-    if( i_query != PLAYLIST_STOP )
-        if( pl_priv(p_playlist)->killed || playlist_IsEmpty( p_playlist ) )
-            return;
+    if( pl_priv(p_playlist)->killed )
+        return;
 
     switch( i_query )
     {
