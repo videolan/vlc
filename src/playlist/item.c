@@ -37,7 +37,7 @@
 #include "playlist_internal.h"
 
 static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-                     playlist_item_t *p_node, int i_mode, int i_pos );
+                     playlist_item_t *p_node, int i_pos );
 static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
                            playlist_item_t * );
 static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
@@ -551,7 +551,7 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     playlist_item_t *p_item = playlist_ItemNewFromInput( p_playlist, p_input );
     if( likely(p_item != NULL) )
     {
-        AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
+        AddItem( p_playlist, p_item, p_parent, i_pos );
         GoAndPreparse( p_playlist, i_mode, p_item );
     }
     return p_item;
@@ -744,18 +744,15 @@ int playlist_TreeMoveMany( playlist_t *p_playlist,
  * \param p_playlist the playlist object
  * \param i_item_id id of the item added
  * \param i_node_id id of the node in which the item was added
- * \param b_signal TRUE if the function must send a signal
  * \return nothing
  */
-void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item,
-                             bool b_signal )
+void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     PL_ASSERT_LOCKED;
 
     p_sys->b_reset_currently_playing = true;
-    if( b_signal )
-        vlc_cond_signal( &p_sys->signal );
+    vlc_cond_signal( &p_sys->signal );
 
     var_SetAddress( p_playlist, "playlist-item-append", item );
 }
@@ -816,13 +813,13 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
 
 /* Add the playlist item to the requested node and fire a notification */
 static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-                     playlist_item_t *p_node, int i_mode, int i_pos )
+                     playlist_item_t *p_node, int i_pos )
 {
     PL_ASSERT_LOCKED;
     ARRAY_APPEND(p_playlist->items, p_item);
 
     playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
-    playlist_SendAddNotify( p_playlist, p_item, true );
+    playlist_SendAddNotify( p_playlist, p_item );
 }
 
 /* Actually convert an item to a node */

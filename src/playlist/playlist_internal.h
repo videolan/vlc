@@ -118,8 +118,7 @@ int playlist_MLDump( playlist_t *p_playlist );
  * Item management
  **********************************************************************/
 
-void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item,
-                             bool b_signal );
+void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item );
 
 int playlist_InsertInputItemTree ( playlist_t *,
         playlist_item_t *, input_item_node_t *, int, bool );
