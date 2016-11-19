@@ -98,7 +98,6 @@ static void IPCHelperThread( void *arg )
             if( p_playlist )
             {
                 playlist_AddExt( p_playlist, ppsz_argv[ i_opt ], NULL,
-                                 PLAYLIST_APPEND |
                                  (( i_opt || ulCmd == IPC_CMD_ENQUEUE ) ?
                                      0 : PLAYLIST_GO ),
                                  PLAYLIST_END, -1, i_options,

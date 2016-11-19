@@ -870,8 +870,7 @@ static int RecursiveAddIntoParent (
         {
             p_new_item = playlist_NodeAddInput( p_playlist,
                                                 p_child_node->p_item,
-                                                p_parent,
-                                                PLAYLIST_INSERT, i_pos );
+                                                p_parent, 0, i_pos );
             if( !p_new_item ) return i_pos;
 
             i_pos++;
@@ -920,8 +919,7 @@ static int RecursiveInsertCopy (
             if( likely(p_new_input != NULL) )
             {
                 p_new_item = playlist_NodeAddInput( p_playlist, p_new_input,
-                                                    p_parent, PLAYLIST_INSERT,
-                                                    i_pos );
+                                                    p_parent, 0, i_pos );
                 vlc_gc_decref( p_new_input );
             }
         }

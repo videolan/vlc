@@ -207,8 +207,6 @@ enum
 };
 
 /* Used by playlist_Import */
-#define PLAYLIST_INSERT          0x0001
-#define PLAYLIST_APPEND          0x0002
 #define PLAYLIST_GO              0x0004
 #define PLAYLIST_NO_REBUILD      0x0020
 

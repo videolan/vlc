@@ -338,7 +338,7 @@ void Playtree::insertItems( VarTree& elem, const std::list<std::string>& files, 
         if( pItem == NULL)
             continue;
 
-        int i_mode = PLAYLIST_APPEND;
+        int i_mode = 0;
         if( first && start )
             i_mode |= PLAYLIST_GO;
 

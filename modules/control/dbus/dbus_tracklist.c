@@ -72,7 +72,7 @@ DBUS_METHOD( AddTrack )
     dbus_bool_t b_play;
 
     int i_input_id = -1;
-    int i_mode = PLAYLIST_APPEND;
+    int i_mode = 0;
     int i_pos  = PLAYLIST_END;
 
     size_t i_append_len  = sizeof( DBUS_MPRIS_APPEND );
@@ -95,12 +95,10 @@ DBUS_METHOD( AddTrack )
 
     if( !strncmp( DBUS_MPRIS_APPEND, psz_aftertrack, i_append_len ) )
     {
-        i_mode = PLAYLIST_APPEND;
         i_pos  = PLAYLIST_END;
     }
     else if( !strncmp( DBUS_MPRIS_NOTRACK, psz_aftertrack, i_notrack_len ) )
     {
-        i_mode = PLAYLIST_INSERT;
         i_pos  = 0;
     }
     else if( 1 == sscanf( psz_aftertrack, MPRIS_TRACKID_FORMAT, &i_input_id ) )
@@ -112,7 +110,6 @@ DBUS_METHOD( AddTrack )
         if( i_res < 0 )
             goto invalidTrackID;
 
-        i_mode = PLAYLIST_INSERT;
         i_pos  = i_res + 1;
     }
     else
@@ -123,7 +120,9 @@ invalidTrackID:
                 psz_aftertrack );
     }
 
-    i_mode |= ( TRUE == b_play ) ? PLAYLIST_GO : 0;
+    if( b_play == TRUE )
+        i_mode |= PLAYLIST_GO;
+
     playlist_Add( PL, psz_mrl, NULL, i_mode, i_pos, true );
 
     REPLY_SEND;

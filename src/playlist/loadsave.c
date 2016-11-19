@@ -99,8 +99,7 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
     p_input = input_item_New( psz_uri, psz_file );
     free( psz_uri );
 
-    playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
-                       true );
+    playlist_AddInput( p_playlist, p_input, 0, PLAYLIST_END, true );
 
     vlc_object_t *dummy = vlc_object_create( p_playlist, sizeof (*dummy) );
     var_Create( dummy, "meta-file", VLC_VAR_VOID );

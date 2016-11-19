@@ -170,7 +170,7 @@ playlist_item_t *RecentsMRL::toPlaylist(int length)
     for (int i = 0; i < length; i++)
     {
         input_item_t *p_input = input_item_New(qtu(recents.at(i)), NULL);
-        playlist_NodeAddInput(THEPL, p_input, p_node_recent, PLAYLIST_APPEND, PLAYLIST_END);
+        playlist_NodeAddInput(THEPL, p_input, p_node_recent, 0, PLAYLIST_END);
     }
 
     /* locker goes out of scope and node is invalidated here */
@@ -235,7 +235,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
     /* Add to playlist */
     int i_ret = playlist_AddExt( THEPL,
                   qtu(mrl), title,
-                  PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : 0),
+                  (b_start ? PLAYLIST_GO : 0),
                   PLAYLIST_END,
                   -1,
                   i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,

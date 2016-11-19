@@ -1444,7 +1444,7 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
             p_parent = p_parent->p_parent;
 
         input_item_t *p_input = p_playlist->p_playing->p_input;
-        playlist_Add(p_playlist, uri, NULL, PLAYLIST_APPEND,
+        playlist_Add(p_playlist, uri, NULL, 0,
                      PLAYLIST_END, p_parent->p_input == p_input);
 
         BoxSwitch(sys, BOX_PLAYLIST);
@@ -1480,8 +1480,7 @@ static void OpenSelection(intf_thread_t *intf)
         p_parent = p_parent->p_parent;
     PL_UNLOCK;
 
-    playlist_Add(p_playlist, uri, NULL,
-                 PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
+    playlist_Add(p_playlist, uri, NULL, PLAYLIST_GO, PLAYLIST_END,
                  p_parent->p_input == p_playlist->p_playing->p_input);
 
     sys->plidx_follow = true;

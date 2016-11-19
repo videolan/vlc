@@ -100,7 +100,7 @@ static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
                     psz_URI = vlc_path2uri( ppsz_argv[i_opt], NULL );
                 playlist_AddExt( pl_Get(intf),
                         (psz_URI != NULL) ? psz_URI : ppsz_argv[i_opt],
-                        NULL, PLAYLIST_APPEND |
+                        NULL,
                         ( ( i_opt || p_data->enqueue ) ? 0 : PLAYLIST_GO ),
                         PLAYLIST_END, -1,
                         i_options,

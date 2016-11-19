@@ -179,8 +179,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
                                          PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
     }
 
-    playlist_NodeAddInput(playlist, p_input, parent,
-                          PLAYLIST_APPEND, PLAYLIST_END);
+    playlist_NodeAddInput(playlist, p_input, parent, 0, PLAYLIST_END);
     playlist_Unlock(playlist);
 }
 
