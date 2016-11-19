@@ -233,8 +233,6 @@ static VLCMain *sharedInstance = nil;
 
         _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
 
-        var_Create(p_intf, "intf-change", VLC_VAR_BOOL);
-
         var_AddCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
         var_AddCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);
 

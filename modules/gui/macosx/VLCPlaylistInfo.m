@@ -378,7 +378,6 @@ FREENULL( psz_##foo );
     playlist_t *p_playlist = pl_Get(getIntf());
     input_item_WriteMeta(VLC_OBJECT(p_playlist), p_item);
 
-    var_SetBool(p_playlist, "intf-change", true);
     [self updatePanelWithItem: p_item];
 
     [_saveMetaDataButton setEnabled: NO];

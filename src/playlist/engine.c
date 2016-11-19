@@ -412,9 +412,6 @@ void set_current_status_node( playlist_t * p_playlist,
 static void VariablesInit( playlist_t *p_playlist )
 {
     /* These variables control updates */
-    var_Create( p_playlist, "intf-change", VLC_VAR_BOOL );
-    var_SetBool( p_playlist, "intf-change", true );
-
     var_Create( p_playlist, "item-change", VLC_VAR_ADDRESS );
     var_Create( p_playlist, "leaf-to-parent", VLC_VAR_INTEGER );
 

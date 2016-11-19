@@ -236,7 +236,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_playlist = p_playlist;
 
     var_AddCallback( p_playlist, "input-current", AllCallback, p_intf );
-    var_AddCallback( p_playlist, "intf-change", AllCallback, p_intf );
     var_AddCallback( p_playlist, "volume", AllCallback, p_intf );
     var_AddCallback( p_playlist, "mute", AllCallback, p_intf );
     var_AddCallback( p_playlist, "playlist-item-append", AllCallback, p_intf );
@@ -298,7 +297,6 @@ static void Close   ( vlc_object_t *p_this )
     vlc_join( p_sys->thread, NULL );
 
     var_DelCallback( p_playlist, "input-current", AllCallback, p_intf );
-    var_DelCallback( p_playlist, "intf-change", AllCallback, p_intf );
     var_DelCallback( p_playlist, "volume", AllCallback, p_intf );
     var_DelCallback( p_playlist, "mute", AllCallback, p_intf );
     var_DelCallback( p_playlist, "playlist-item-append", AllCallback, p_intf );
@@ -553,7 +551,6 @@ static void ProcessEvents( intf_thread_t *p_intf,
 
             vlc_dictionary_insert( &player_properties, "Metadata", NULL );
             break;
-        case SIGNAL_INTF_CHANGE:
         case SIGNAL_PLAYLIST_ITEM_APPEND:
         case SIGNAL_PLAYLIST_ITEM_DELETED:
         {
@@ -979,8 +976,6 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
         if( oldval.b_bool != newval.b_bool )
             info.signal = SIGNAL_VOLUME_MUTED;
     }
-    else if( !strcmp( "intf-change", psz_var ) )
-        info.signal = SIGNAL_INTF_CHANGE;
     else if( !strcmp( "playlist-item-append", psz_var ) )
         info.signal = SIGNAL_PLAYLIST_ITEM_APPEND;
     else if( !strcmp( "playlist-item-deleted", psz_var ) )
