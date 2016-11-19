@@ -235,7 +235,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
     /* Add to playlist */
     int i_ret = playlist_AddExt( THEPL,
                   qtu(mrl), title,
-                  PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE),
+                  PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : 0),
                   PLAYLIST_END,
                   -1,
                   i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,

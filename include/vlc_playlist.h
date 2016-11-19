@@ -210,8 +210,6 @@ enum
 #define PLAYLIST_INSERT          0x0001
 #define PLAYLIST_APPEND          0x0002
 #define PLAYLIST_GO              0x0004
-#define PLAYLIST_PREPARSE        0x0008
-#define PLAYLIST_SPREPARSE       0x0010
 #define PLAYLIST_NO_REBUILD      0x0020
 
 #define PLAYLIST_END           -1
