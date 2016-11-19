@@ -237,7 +237,6 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
                   qtu(mrl), title,
                   (b_start ? PLAYLIST_GO : 0),
                   PLAYLIST_END,
-                  -1,
                   i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
                   b_playlist );
 

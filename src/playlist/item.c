@@ -459,7 +459,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
                   bool b_playlist )
 {
     return playlist_AddExt( p_playlist, psz_uri, psz_name,
-                            i_mode, i_pos, -1, 0, NULL, 0, b_playlist );
+                            i_mode, i_pos, 0, NULL, 0, b_playlist );
 }
 
 /**
@@ -472,7 +472,6 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of its size
- * \param i_duration length of the item in milliseconds.
  * \param i_options the number of options
  * \param ppsz_options an array of options
  * \param i_option_flags options flags
@@ -481,7 +480,6 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, int i_mode, int i_pos,
-                     mtime_t i_duration,
                      int i_options, const char *const *ppsz_options,
                      unsigned i_option_flags,
                      bool b_playlist )
@@ -489,8 +487,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     int i_ret;
     input_item_t *p_input;
 
-    p_input = input_item_NewExt( psz_uri, psz_name, i_duration,
-                                 ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
+    p_input = input_item_New( psz_uri, psz_name );
     if( p_input == NULL )
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
