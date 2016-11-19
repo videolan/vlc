@@ -63,7 +63,7 @@ static uint32_t cpu_flags;
 
 #if defined (__i386__) || defined (__x86_64__) || defined (__powerpc__) \
  || defined (__ppc__) || defined (__ppc64__) || defined (__powerpc64__)
-# if !defined (_WIN32) && !defined (__OS2__)
+# if defined (HAVE_FORK)
 static bool vlc_CPU_check (const char *name, void (*func) (void))
 {
     pid_t pid = fork();
