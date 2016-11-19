@@ -174,10 +174,14 @@ int intf_InsertItem(libvlc_int_t *libvlc, const char *mrl, unsigned optc,
 
     int ret = -1;
 
-    if (input_item_AddOptions(item, optc, optv, flags) == VLC_SUCCESS
-     && playlist_AddInput(playlist, item, 0, 0, true) == VLC_SUCCESS)
-        ret = 0;
-
+    if (input_item_AddOptions(item, optc, optv, flags) == VLC_SUCCESS)
+    {
+        playlist_Lock(playlist);
+        if (playlist_NodeAddInput(playlist, item, playlist->p_playing, 0,
+                                  0) != NULL)
+            ret = 0;
+        playlist_Unlock(playlist);
+    }
     input_item_Release(item);
     return ret;
 }

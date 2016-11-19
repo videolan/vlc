@@ -448,18 +448,14 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
  * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
  * \param i_mode the mode used when adding
- * \param i_pos the position in the playlist where to add. If this is
- *        PLAYLIST_END the item will be added at the end of the playlist
- *        regardless of its size
  * \param b_playlist TRUE for playlist, FALSE for media library
  * \return VLC_SUCCESS or a VLC error code
  */
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
-                  const char *psz_name, int i_mode, int i_pos,
-                  bool b_playlist )
+                  const char *psz_name, int i_mode, bool b_playlist )
 {
     return playlist_AddExt( p_playlist, psz_uri, psz_name,
-                            i_mode, i_pos, 0, NULL, 0, b_playlist );
+                            i_mode, 0, NULL, 0, b_playlist );
 }
 
 /**
@@ -469,9 +465,6 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
  * \param i_mode the mode used when adding
- * \param i_pos the position in the playlist where to add. If this is
- *        PLAYLIST_END the item will be added at the end of the playlist
- *        regardless of its size
  * \param i_options the number of options
  * \param ppsz_options an array of options
  * \param i_option_flags options flags
@@ -479,7 +472,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  * \return VLC_SUCCESS or a VLC error code
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
-                     const char *psz_name, int i_mode, int i_pos,
+                     const char *psz_name, int i_mode,
                      int i_options, const char *const *ppsz_options,
                      unsigned i_option_flags,
                      bool b_playlist )
@@ -491,8 +484,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     if( p_input == NULL )
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
-    i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos,
-                               b_playlist );
+    i_ret = playlist_AddInput( p_playlist, p_input, i_mode, b_playlist );
     vlc_gc_decref( p_input );
     return i_ret;
 }
@@ -503,14 +495,11 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
  * \param p_playlist the playlist to add into
  * \param p_input the input item to add
  * \param i_mode the mode used when adding
- * \param i_pos the position in the playlist where to add. If this is
- *        PLAYLIST_END the item will be added at the end of the playlist
- *        regardless of its size
  * \param b_playlist TRUE for playlist, FALSE for media library
  * \return VLC_SUCCESS or VLC_ENOMEM or VLC_EGENERIC
 */
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
-                       int i_mode, int i_pos, bool b_playlist )
+                       int i_mode, bool b_playlist )
 {
     playlist_item_t *item;
 
@@ -518,7 +507,8 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
     item = b_playlist ? p_playlist->p_playing
                       : p_playlist->p_media_library;
 
-    item = playlist_NodeAddInput( p_playlist, p_input, item, i_mode, i_pos );
+    item = playlist_NodeAddInput( p_playlist, p_input, item, i_mode,
+                                  PLAYLIST_END );
     PL_UNLOCK;
     return (item != NULL) ? VLC_SUCCESS : VLC_ENOMEM;
 }

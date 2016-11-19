@@ -579,7 +579,7 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                         /* FIXME: playlist_AddInput() can fail */
                         playlist_AddInput( p_playlist, p_input,
                                            ( b_play ? PLAYLIST_GO : 0 ),
-                                           PLAYLIST_END, true );
+                                           true );
                     i_count ++; /* increment counter */
                     vlc_gc_decref( p_input );
                     while( i_options > 0 )
