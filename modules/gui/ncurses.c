@@ -183,7 +183,6 @@ struct intf_sys_t
     vlc_thread_t    thread;
 
     bool            color;
-    bool            exit;
 
     /* rgb values for the color yellow */
     short           yellow_r;
@@ -425,10 +424,10 @@ static void PlaylistRebuild(intf_thread_t *intf)
 static int ItemChanged(vlc_object_t *p_this, const char *variable,
                             vlc_value_t oval, vlc_value_t nval, void *param)
 {
+    intf_sys_t *sys = param;
+
     VLC_UNUSED(p_this); VLC_UNUSED(variable);
     VLC_UNUSED(oval); VLC_UNUSED(nval);
-
-    intf_sys_t *sys = ((intf_thread_t *)param)->p_sys;
 
     vlc_mutex_lock(&sys->pl_lock);
     sys->need_update = true;
@@ -1586,7 +1585,6 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
     case 'Q':
     case KEY_EXIT:
         libvlc_Quit(intf->obj.libvlc);
-        sys->exit = true;           // terminate the main loop
         return;
 
     case 'h':
@@ -1774,38 +1772,27 @@ static void MsgCallback(void *data, int type, const vlc_log_t *msg,
     vlc_mutex_unlock(&sys->msg_lock);
 }
 
-static void cleanup_run(void *data)
-{
-    intf_thread_t *intf = data;
-    playlist_t *p_playlist = pl_Get(intf);
-    var_DelCallback(p_playlist, "item-change", ItemChanged, intf);
-    var_DelCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
-}
-
 /*****************************************************************************
  * Run: ncurses thread
  *****************************************************************************/
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
-    intf_sys_t    *sys = intf->p_sys;
     playlist_t    *p_playlist = pl_Get(intf);
 
-    var_AddCallback(p_playlist, "item-change", ItemChanged, intf);
-    var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
+    for (;;) {
+        vlc_testcancel();
 
-    vlc_cleanup_push(cleanup_run, data);
-    while (!sys->exit) {
+        int canc = vlc_savecancel();
         input_thread_t *input = playlist_CurrentInput(p_playlist);
 
         Redraw(intf, input);
         HandleKey(intf, input);
         if (input)
             vlc_object_release(input);
+        vlc_restorecancel(canc);
     }
-    vlc_cleanup_pop();
-
-    return NULL;
+    vlc_assert_unreachable();
 }
 
 /*****************************************************************************
@@ -1856,6 +1843,9 @@ static int Open(vlc_object_t *p_this)
     PlaylistRebuild(intf),
     PL_UNLOCK;
 
+    var_AddCallback(p_playlist, "item-change", ItemChanged, sys);
+    var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
+
     if (vlc_clone(&sys->thread, Run, intf, VLC_THREAD_PRIORITY_LOW))
         abort(); /* TODO */
 
@@ -1867,10 +1857,15 @@ static int Open(vlc_object_t *p_this)
  *****************************************************************************/
 static void Close(vlc_object_t *p_this)
 {
-    intf_sys_t *sys = ((intf_thread_t*)p_this)->p_sys;
+    intf_thread_t *intf = (intf_thread_t *)p_this;
+    intf_sys_t *sys = intf->p_sys;
+    playlist_t *playlist = pl_Get(intf);
 
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
+
+    var_DelCallback(playlist, "playlist-item-append", PlaylistChanged, intf);
+    var_DelCallback(playlist, "item-change", ItemChanged, sys);
 
     PlaylistDestroy(sys);
     DirsDestroy(sys);
