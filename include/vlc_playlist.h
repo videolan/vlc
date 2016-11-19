@@ -321,7 +321,7 @@ VLC_API int playlist_ServicesDiscoveryControl( playlist_t *, const char *, int, 
  ********************************************************/
 
 /******************** Item addition ********************/
-VLC_API int playlist_Add( playlist_t *, const char *, const char *, int, bool );
+VLC_API int playlist_Add( playlist_t *, const char *, const char *, int );
 VLC_API int playlist_AddExt( playlist_t *, const char *, const char *, int, int, const char *const *, unsigned, bool );
 VLC_API int playlist_AddInput( playlist_t *, input_item_t *, int, bool );
 VLC_API playlist_item_t * playlist_NodeAddInput( playlist_t *, input_item_t *, playlist_item_t *, int, int );

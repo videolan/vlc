@@ -44,5 +44,5 @@ void CmdAddItem::execute()
         free( psz_uri );
     }
     playlist_Add( pPlaylist, m_name.c_str(), NULL,
-                  m_playNow ? PLAYLIST_GO : 0, true );
+                  m_playNow ? PLAYLIST_GO : 0 );
 }

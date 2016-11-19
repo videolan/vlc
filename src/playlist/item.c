@@ -448,14 +448,13 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
  * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
  * \param i_mode the mode used when adding
- * \param b_playlist TRUE for playlist, FALSE for media library
  * \return VLC_SUCCESS or a VLC error code
  */
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
-                  const char *psz_name, int i_mode, bool b_playlist )
+                  const char *psz_name, int i_mode )
 {
     return playlist_AddExt( p_playlist, psz_uri, psz_name,
-                            i_mode, 0, NULL, 0, b_playlist );
+                            i_mode, 0, NULL, 0, true );
 }
 
 /**
