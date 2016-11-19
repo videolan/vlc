@@ -223,8 +223,7 @@ struct intf_sys_t
     int             plist_entries;
     bool            need_update;
     bool            plidx_follow;
-    playlist_item_t *node;        /* current node */
-
+    input_item_t    *node;        /* current node */
 };
 
 /*****************************************************************************
@@ -439,14 +438,18 @@ static int ItemChanged(vlc_object_t *p_this, const char *variable,
 static int PlaylistChanged(vlc_object_t *p_this, const char *variable,
                             vlc_value_t oval, vlc_value_t nval, void *param)
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(variable);
+    playlist_t *playlist = (playlist_t *)p_this;
+    intf_sys_t *sys = param;
+    playlist_item_t *node = playlist_CurrentPlayingItem(playlist);
+
+    VLC_UNUSED(variable);
     VLC_UNUSED(oval); VLC_UNUSED(nval);
-    intf_thread_t *intf   = (intf_thread_t *)param;
-    intf_sys_t *sys       = intf->p_sys;
-    playlist_item_t *node = playlist_CurrentPlayingItem(pl_Get(intf));
 
     sys->need_update = true;
-    sys->node = node ? node->p_parent : NULL;
+
+    if (sys->node != NULL)
+        input_item_Release(sys->node);
+    sys->node = (node != NULL) ? input_item_Hold(node->p_input) : NULL;
 
     return VLC_SUCCESS;
 }
@@ -484,14 +487,14 @@ static void SearchPlaylist(intf_sys_t *sys)
 
 static inline bool IsIndex(intf_sys_t *sys, playlist_t *p_playlist, int i)
 {
+    PL_ASSERT_LOCKED;
+
     input_item_t *input = sys->plist[i]->item;
     playlist_item_t *item = playlist_ItemGetByInput(p_playlist, input);
     if (unlikely(item == NULL))
         return false;
 
-    PL_ASSERT_LOCKED;
-
-    if (item->i_children == 0 && item == sys->node)
+    if (item->i_children == 0 && input == sys->node)
         return true;
 
     playlist_item_t *p_played_item = playlist_CurrentPlayingItem(p_playlist);
@@ -977,12 +980,10 @@ static int DrawPlaylist(intf_thread_t *intf, input_thread_t *input)
         input_item_t *input = sys->plist[i]->item;
 
         PL_LOCK;
-        playlist_item_t *node = sys->node;
-
         current = playlist_CurrentPlayingItem(p_playlist);
 
-        if ((node && input == node->p_input) ||
-            (!node && current != NULL && input == current->p_input))
+        if ((sys->node != NULL && input == sys->node) ||
+            (sys->node == NULL && current != NULL && input == current->p_input))
             c = '*';
         else if (current != NULL && current->p_input == input)
             c = '>';
@@ -1395,7 +1396,10 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
                 while (parent->p_parent != NULL)
                     parent = parent->p_parent;
             } else {
-                sys->node = parent;
+                if (sys->node != NULL)
+                    input_item_Release(sys->node);
+                sys->node = parent->p_input ? input_item_Hold(parent->p_input)
+                                            : NULL;
                 item = NULL;
             }
 
@@ -1403,7 +1407,10 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
                              parent, item);
         } else {   /* We only want to set the current node */
             playlist_Control(p_playlist, PLAYLIST_STOP, true);
-            sys->node = item;
+            if (sys->node != NULL)
+                input_item_Release(sys->node);
+            sys->node = p_pl_item->item ? input_item_Hold(p_pl_item->item)
+                                        : NULL;
         }
         playlist_Unlock(p_playlist);
 
@@ -1826,7 +1833,7 @@ static int Open(vlc_object_t *p_this)
     PL_UNLOCK;
 
     var_AddCallback(p_playlist, "item-change", ItemChanged, sys);
-    var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
+    var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, sys);
 
     if (vlc_clone(&sys->thread, Run, intf, VLC_THREAD_PRIORITY_LOW))
         abort(); /* TODO */
@@ -1846,7 +1853,7 @@ static void Close(vlc_object_t *p_this)
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
-    var_DelCallback(playlist, "playlist-item-append", PlaylistChanged, intf);
+    var_DelCallback(playlist, "playlist-item-append", PlaylistChanged, sys);
     var_DelCallback(playlist, "item-change", ItemChanged, sys);
 
     PlaylistDestroy(sys);
