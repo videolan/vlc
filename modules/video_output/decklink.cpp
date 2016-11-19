@@ -224,7 +224,7 @@ vlc_module_begin()
                 change_string_list(ppsz_videoconns, ppsz_videoconns_text)
     add_string(VIDEO_CFG_PREFIX "mode", "",
                 MODE_TEXT, MODE_LONGTEXT, true)
-    add_bool(VIDEO_CFG_PREFIX "tenbits", false,
+    add_bool(VIDEO_CFG_PREFIX "tenbits", true,
                 VIDEO_TENBITS_TEXT, VIDEO_TENBITS_LONGTEXT, true)
     add_integer(VIDEO_CFG_PREFIX "nosignal-delay", 5,
                 NOSIGNAL_INDEX_TEXT, NOSIGNAL_INDEX_LONGTEXT, true)
