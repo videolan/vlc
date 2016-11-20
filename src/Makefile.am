@@ -253,6 +253,7 @@ libvlccore_la_SOURCES = \
 	input/vlm_event.h \
 	input/resource.h \
 	input/resource.c \
+	input/services_discovery.c \
 	input/stats.c \
 	input/stream.c \
 	input/stream_fifo.c \

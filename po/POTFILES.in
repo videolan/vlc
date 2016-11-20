@@ -138,7 +138,6 @@ src/playlist/item.c
 src/playlist/loadsave.c
 src/playlist/playlist_internal.h
 src/playlist/search.c
-src/playlist/services_discovery.c
 src/playlist/sort.c
 src/playlist/thread.c
 src/playlist/tree.c
