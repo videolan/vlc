@@ -195,6 +195,21 @@ static int ftp_SendCommand( vlc_object_t *obj, access_sys_t *sys,
     return val;
 }
 
+static char *ftp_GetLine( vlc_object_t *obj, access_sys_t *sys )
+{
+    char *resp;
+
+    if( sys->cmd.p_tls != NULL )
+        resp = vlc_tls_GetLine( sys->cmd.p_tls );
+    else
+        resp = net_Gets( obj, sys->cmd.fd );
+
+    if( resp == NULL )
+        msg_Err( obj, "response failure" );
+
+    return resp;
+}
+
 /* TODO support this s**t :
  RFC 959 allows the client to send certain TELNET strings at any moment,
  even in the middle of a request:
@@ -219,16 +234,9 @@ static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
     if( strp != NULL )
         *strp = NULL;
 
-    char *resp;
-    if( sys->cmd.p_tls != NULL )
-        resp = vlc_tls_GetLine( sys->cmd.p_tls );
-    else
-        resp = net_Gets( obj, sys->cmd.fd );
+    char *resp = ftp_GetLine( obj, sys );
     if( resp == NULL )
-    {
-        msg_Err( obj, "response failure" );
         goto error;
-    }
 
     char *end;
     unsigned code = strtoul( resp, &end, 10 );
@@ -246,16 +254,9 @@ static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
         *end = ' ';
         do
         {
-            char *line;
-            if( sys->cmd.p_tls != NULL )
-                line = vlc_tls_GetLine( sys->cmd.p_tls );
-            else
-                line = net_Gets( obj, sys->cmd.fd );
+            char *line = ftp_GetLine( obj, sys );
             if( line == NULL )
-            {
-                msg_Err( obj, "response failure" );
                 goto error;
-            }
 
             done = !strncmp( resp, line, 4 );
             if( !done )
