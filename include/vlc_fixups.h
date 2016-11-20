@@ -122,7 +122,6 @@ int asprintf (char **, const char *, ...);
 
 #ifndef HAVE_FLOCKFILE
 void flockfile (FILE *);
-int ftrylockfile (FILE *);
 void funlockfile (FILE *);
 int getc_unlocked (FILE *);
 int getchar_unlocked (void);

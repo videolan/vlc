@@ -40,12 +40,6 @@ void flockfile (FILE *stream)
     _lock_file (stream);
 }
 
-int ftrylockfile (FILE *stream)
-{
-    flockfile (stream); /* Move along people, there is nothing to see here. */
-    return 0;
-}
-
 void funlockfile (FILE *stream)
 {
     _unlock_file (stream);
