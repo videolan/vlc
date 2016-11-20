@@ -85,9 +85,6 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
     CONNECT( menusUpdateMapper, mapped(QObject *),
              this, menuUpdateAction( QObject *) );
 
-    SDMapper = new QSignalMapper();
-    CONNECT( SDMapper, mapped (QString), this, SDMenuAction( QString ) );
-
     new DialogHandler (p_intf, this );
 }
 
@@ -106,7 +103,6 @@ DialogsProvider::~DialogsProvider()
 
     delete menusMapper;
     delete menusUpdateMapper;
-    delete SDMapper;
 
     delete popupMenu;
     delete videoPopupMenu;
@@ -820,14 +816,6 @@ void DialogsProvider::menuUpdateAction( QObject *data )
     MenuFunc *func = qobject_cast<MenuFunc *>(data);
     assert( func );
     func->doFunc( p_intf );
-}
-
-void DialogsProvider::SDMenuAction( const QString& data )
-{
-    if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( data ) ) )
-        playlist_ServicesDiscoveryAdd( THEPL, qtu( data ) );
-    else
-        playlist_ServicesDiscoveryRemove( THEPL, qtu( data ) );
 }
 
 void DialogsProvider::sendKey( int key )

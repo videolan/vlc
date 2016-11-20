@@ -95,7 +95,6 @@ public:
 protected:
     QSignalMapper *menusMapper;
     QSignalMapper *menusUpdateMapper;
-    QSignalMapper *SDMapper;
     void customEvent( QEvent *);
 
 private:
@@ -175,7 +174,6 @@ public slots:
 private slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject * );
-    void SDMenuAction( const QString& );
 signals:
     void  toolBarConfUpdated();
 };
