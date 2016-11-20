@@ -299,8 +299,8 @@ static int vlclua_playlist_search( lua_State *L )
     const char *psz_string = luaL_optstring( L, 1, "" );
     PL_LOCK;
     playlist_LiveSearchUpdate( p_playlist, p_playlist->p_root, psz_string, true );
-    PL_UNLOCK;
     push_playlist_item( L, p_playlist->p_root );
+    PL_UNLOCK;
     return 1;
 }
 
