@@ -225,18 +225,13 @@ static char *ftp_GetLine( vlc_object_t *obj, access_sys_t *sys )
 
  These strings are not part of the requests, except in the case \377\377,
  where the request contains one \377. */
-static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
-                           int *restrict codep, char **restrict strp,
-                           void (*cb)(void *, const char *), void *opaque )
+static int ftp_RecvReply( vlc_object_t *obj, access_sys_t *sys,
+                          char **restrict strp,
+                          void (*cb)(void *, const char *), void *opaque )
 {
-    if( codep != NULL )
-        *codep = 500;
-    if( strp != NULL )
-        *strp = NULL;
-
     char *resp = ftp_GetLine( obj, sys );
     if( resp == NULL )
-        goto error;
+        return -1;
 
     char *end;
     unsigned code = strtoul( resp, &end, 10 );
@@ -266,16 +261,46 @@ static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
         while( !done );
     }
 
-    if( codep != NULL )
-        *codep = code;
     if( strp != NULL )
         *strp = resp;
     else
         free( resp );
-    return code / 100;
+    return code;
 error:
     free( resp );
     return -1;
+}
+
+static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
+                           int *restrict codep, char **restrict strp,
+                           void (*cb)(void *, const char *), void *opaque )
+{
+    char *str;
+    int val = ftp_RecvReply( obj, sys, &str, cb, opaque );
+    if( (val / 100) == 1 )
+    {   /* There can be zero or one preliminary reply per command */
+        free( str );
+        val = ftp_RecvReply( obj, sys, &str, cb, opaque );
+    }
+
+    if( val >= 0 )
+    {
+        if( codep != NULL )
+            *codep = val;
+        if( strp != NULL )
+            *strp = str;
+        else
+            free( str );
+        val /= 100;
+    }
+    else
+    {
+        if( codep != NULL )
+            *codep = 500;
+        if( strp != NULL )
+            *strp = NULL;
+    }
+    return val;
 }
 
 static void DummyLine( void *data, const char *str )
