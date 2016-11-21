@@ -1217,7 +1217,6 @@ input_item_node_t *input_item_node_Create( input_item_t *p_input )
     p_node->p_parent = NULL;
     p_node->i_children = 0;
     p_node->pp_children = NULL;
-    p_node->b_can_loop = false;
 
     return p_node;
 }

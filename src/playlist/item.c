@@ -185,22 +185,6 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
             }
             else
             {
-                /* Don't Play a directory if it can loop into a parent */
-                if( p_new_root->b_can_loop )
-                {
-                    /* Play the first regular file */
-                    for( ; pos < last_pos; pos++ )
-                    {
-                        if( p_item->pp_children[pos]->p_input->i_type != ITEM_TYPE_DIRECTORY )
-                            break;
-                    }
-                    if( last_pos == pos )
-                    {
-                        PL_UNLOCK;
-                        playlist_Stop( p_playlist );
-                        return;
-                    }
-                }
                 p_play_item = p_item->pp_children[pos];
                 /* NOTE: this is a work around the general bug:
                 if node-to-be-played contains sub-nodes, then second instead
