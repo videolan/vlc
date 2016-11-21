@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_memstream.h>
 #include <vlc_arrays.h>
+#include <vlc_url.h>
 
 /**
  * \defgroup mrl_helpers MRL helpers
@@ -89,6 +90,67 @@ mrl_EscapeFragmentIdentifier( char** out, char const* payload )
 
     *out = mstream.ptr;
     return VLC_SUCCESS;
+}
+
+/**
+ * Split an \link mrl_technical_fragment MRL-fragment\endlink into identifiers
+ *
+ * Function used to split the fragment-data (also referred to as
+ * anchor-data) into an array containing each of the files specified.
+ *
+ * See the \link mrl MRL-specification\endlink for detailed
+ * information regarding how `payload` will be interpreted.
+ *
+ * \param[out] out_items `*out_items` contains the individual entries on success
+ * \param[out] out_extra `*out_extra` will point to any remaining data (if any)
+ * \param[in] payload the data to parse
+ * \return VLC_SUCCESS on success, an error-code on failure
+ **/
+static inline int
+mrl_FragmentSplit( vlc_array_t** out_items,
+                   char const** out_extra,
+                   char const* payload )
+{
+    vlc_array_t* items = vlc_array_new();
+    char const* extra = NULL;
+
+    if( unlikely( !items ) )
+        return VLC_ENOMEM;
+
+    while( strncmp( payload, "!/", 2 ) == 0 )
+    {
+        payload += 2;
+
+        int len = strcspn( payload, "!?" );
+        char* decoded = strndup( payload, len );
+
+        if( unlikely( !decoded ) || !vlc_uri_decode( decoded ) )
+            goto error;
+
+        vlc_array_append( items, decoded );
+        payload += len;
+    }
+
+    if( *payload )
+    {
+        if( *payload == '!' )
+            goto error;
+
+        if( *payload == '?' && vlc_array_count( items ) )
+            ++payload;
+
+        extra = payload;
+    }
+
+    *out_items = items;
+    *out_extra = extra;
+    return VLC_SUCCESS;
+
+error:
+    for( int i = 0; i < vlc_array_count( items ); ++i )
+        free( vlc_array_item_at_index( items, i ) );
+    vlc_array_destroy( items );
+    return VLC_EGENERIC;;
 }
 
 /*
