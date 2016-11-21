@@ -406,7 +406,7 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
                                 (char*)&modenl, psz_mode_name,
                                 p_mode->GetWidth(), p_mode->GetHeight(),
                                 (char *)&field,
-                                double(timescale / frameduration),
+                                double(timescale) / frameduration,
                                 timescale, frameduration);
                     }
                 }
