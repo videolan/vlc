@@ -87,6 +87,33 @@ struct stream_extractor_t {
 typedef struct stream_extractor_t stream_extractor_t;
 
 /**
+ * Construct a new stream_extractor-based stream
+ *
+ * This function is used to attach a stream to an already existing
+ * stream, where the underlying, attached, stream is a
+ * stream_extractor.
+ *
+ * If \p identifier is `NULL`, `*stream` is guaranteed to refer to a
+ * directory, otherwise \p identifier denotes the specific subentry
+ * that one would like to access within the stream.
+ *
+ * If \p identifier is not NULL, `*stream` will refer to data for the
+ * entity in question.
+ *
+ * \param[out] stream a pointer-to-pointer to stream, `*stream` will
+ *             refer to the attached stream on success, and left
+ *             untouched on failure.
+ * \param identifier NULL or a c-style string referring to the desired entity
+ * \param module_name NULL or an explicit stream-extractor module name
+ *
+ * \return VLC_SUCCESS if a stream-extractor was successfully
+ *         attached, an error-code on failure.
+ **/
+
+VLC_API int vlc_stream_extractor_Attach( stream_t** source,
+                                         char const* identifier,
+                                         char const* module_name );
+/**
  * @}
  */
 

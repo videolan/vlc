@@ -189,6 +189,36 @@ se_InitStream( struct stream_extractor_private* priv, stream_t* source )
     return VLC_SUCCESS;
 }
 
+int
+vlc_stream_extractor_Attach( stream_t** source, char const* identifier,
+                             char const* module_name )
+{
+    struct stream_extractor_private* priv = vlc_custom_create(
+        (*source)->obj.parent, sizeof( *priv ), "stream_extractor" );
+
+    if( unlikely( !priv ) )
+        return VLC_ENOMEM;
+
+    priv->public.identifier = identifier ? strdup( identifier ) : NULL;
+
+    if( unlikely( identifier && !priv->public.identifier ) )
+        goto error;
+
+    priv->public.source = *source;
+    priv->module = module_need( &priv->public, "stream_extractor",
+                                module_name, true );
+
+    if( !priv->module || se_InitStream( priv, *source ) )
+        goto error;
+
+    *source = priv->stream;
+    return VLC_SUCCESS;
+
+error:
+    se_Release( priv );
+    return VLC_EGENERIC;
+}
+
 /**
  * @}
  **/

@@ -395,6 +395,7 @@ spu_ChangeFilters
 spu_Render
 spu_RegisterChannel
 spu_ClearChannel
+vlc_stream_extractor_Attach
 vlc_stream_Block
 vlc_stream_CommonNew
 vlc_stream_Delete
