@@ -572,7 +572,7 @@ static int ParseMRL( access_t *p_access )
                 val.i_int = 18;
             else
             {
-                msg_Err( p_access, "illegal polarization %c", *psz_parser );
+                msg_Warn( p_access, "illegal polarization %c", *psz_parser );
                 free( psz_dup );
                 return VLC_EGENERIC;
             }
@@ -580,7 +580,7 @@ static int ParseMRL( access_t *p_access )
         }
         else
         {
-            msg_Err( p_access, "unknown option (%s)", psz_parser );
+            msg_Warn( p_access, "unknown option (%s)", psz_parser );
             free( psz_dup );
             return VLC_EGENERIC;
         }
