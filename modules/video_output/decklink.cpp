@@ -401,9 +401,11 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
                     BMDDisplayMode modenl = htonl(mode_id);
                     if(i==0)
                     {
-                        msg_Dbg(vd, "Found mode '%4.4s': %s (%ldx%ld, %.3f fps, scale %ld dur %ld)",
+                        BMDFieldDominance field = htonl(p_mode->GetFieldDominance());
+                        msg_Dbg(vd, "Found mode '%4.4s': %s (%ldx%ld, %.3f fps, %4.4s, scale %ld dur %ld)",
                                 (char*)&modenl, psz_mode_name,
                                 p_mode->GetWidth(), p_mode->GetHeight(),
+                                (char *)&field,
                                 double(timescale / frameduration),
                                 timescale, frameduration);
                     }
