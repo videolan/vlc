@@ -527,9 +527,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         video_format_t fmt_in, fmt_out;
         picture_t *p_converted;
 
-        memset( &fmt_in, 0, sizeof( video_format_t ) );
-        memset( &fmt_out, 0, sizeof( video_format_t ) );
-
         if ( p_es->b_empty )
             continue;
 
@@ -585,6 +582,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows;
         i_col = i_real_index % p_sys->i_cols ;
 
+        video_format_Init( &fmt_in, 0 );
+        video_format_Init( &fmt_out, 0 );
+
         if ( !p_sys->b_keep )
         {
             /* Convert the images */
@@ -624,6 +624,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             {
                 msg_Warn( p_filter,
                            "image resizing and chroma conversion failed" );
+                video_format_Clean( &fmt_in );
+                video_format_Clean( &fmt_out );
                 continue;
             }
         }
@@ -646,6 +648,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
         if( !p_region )
         {
+            video_format_Clean( &fmt_in );
+            video_format_Clean( &fmt_out );
             msg_Err( p_filter, "cannot allocate SPU region" );
             subpicture_Delete( p_spu );
             vlc_global_unlock( VLC_MOSAIC_MUTEX );
@@ -712,6 +716,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         {
             p_region_prev->p_next = p_region;
         }
+
+        video_format_Clean( &fmt_in );
+        video_format_Clean( &fmt_out );
 
         p_region_prev = p_region;
     }
