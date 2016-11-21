@@ -169,7 +169,7 @@ typedef HRESULT(WINAPI *PFN_CREATE_DXGI_FACTORY)(REFIID riid, void **ppFactory);
 #endif
 
 /* TODO: Move to a direct3d11_shaders header */
-static const char* globVertexShaderDefault = "\
+static const char* globVertexShaderFlat = "\
   struct VS_INPUT\
   {\
     float4 Position   : POSITION;\
@@ -1720,7 +1720,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     ID3DBlob* pVSBlob = NULL;
     /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    hr = D3DCompile(globVertexShaderDefault, strlen(globVertexShaderDefault),
+    hr = D3DCompile(globVertexShaderFlat, strlen(globVertexShaderFlat),
                     NULL, NULL, NULL, "VS", "vs_4_0_level_9_1", 0, 0, &pVSBlob, NULL);
 
     if( FAILED(hr)) {
