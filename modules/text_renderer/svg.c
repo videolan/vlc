@@ -265,7 +265,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     i_height = gdk_pixbuf_get_height( p_svg->p_rendition );
 
     /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof( video_format_t ) );
+    video_format_Init( &fmt, VLC_CODEC_YUVA );
     fmt.i_chroma = VLC_CODEC_YUVA;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
@@ -275,7 +275,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
     p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
+    {
+        video_format_Clean( &fmt );
         return VLC_EGENERIC;
+    }
     p_region->fmt = fmt;
 
     p_region->i_x = p_region->i_y = 0;
