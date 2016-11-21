@@ -951,7 +951,6 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
     ID3D11DeviceContext_IASetIndexBuffer(sys->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
     ID3D11DeviceContext_VSSetShader(sys->d3dcontext, quad->d3dvertexShader, NULL, 0);
-    ID3D11DeviceContext_IASetInputLayout(sys->d3dcontext, quad->pVertexLayout);
 
     /* pixel shader */
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, quad->d3dpixelShader, NULL, 0);
@@ -1519,6 +1518,43 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
+    ID3DBlob* pVSBlob = NULL;
+    /* TODO : Match the version to the D3D_FEATURE_LEVEL */
+    hr = D3DCompile(globVertexShaderFlat, strlen(globVertexShaderFlat),
+                    NULL, NULL, NULL, "VS", "vs_4_0_level_9_1", 0, 0, &pVSBlob, NULL);
+
+    if( FAILED(hr)) {
+      msg_Err(vd, "The flat Vertex Shader is invalid. (hr=0x%lX)", hr);
+      return VLC_EGENERIC;
+    }
+
+    hr = ID3D11Device_CreateVertexShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
+                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->flatVSShader);
+
+    if(FAILED(hr)) {
+      ID3D11Device_Release(pVSBlob);
+      msg_Err(vd, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
+      return VLC_EGENERIC;
+    }
+
+    D3D11_INPUT_ELEMENT_DESC layout[] = {
+    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    };
+
+    ID3D11InputLayout* pVertexLayout = NULL;
+    hr = ID3D11Device_CreateInputLayout(sys->d3ddevice, layout, 2, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
+                                        ID3D10Blob_GetBufferSize(pVSBlob), &pVertexLayout);
+
+    ID3D10Blob_Release(pVSBlob);
+
+    if(FAILED(hr)) {
+      msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
+      return VLC_EGENERIC;
+    }
+    ID3D11DeviceContext_IASetInputLayout(sys->d3dcontext, pVertexLayout);
+    ID3D11InputLayout_Release(pVertexLayout);
+    
     ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     ID3DBlob* pPSBlob = NULL;
@@ -1712,44 +1748,12 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
     };
 
+    quad->d3dvertexShader = sys->flatVSShader;
+
     hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &quadDesc, NULL, &quad->pIndexBuffer);
     if(FAILED(hr)) {
         msg_Err(vd, "Could not create the quad indices. (hr=0x%lX)", hr);
         goto error;
-    }
-
-    ID3DBlob* pVSBlob = NULL;
-    /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    hr = D3DCompile(globVertexShaderFlat, strlen(globVertexShaderFlat),
-                    NULL, NULL, NULL, "VS", "vs_4_0_level_9_1", 0, 0, &pVSBlob, NULL);
-
-    if( FAILED(hr)) {
-      msg_Err(vd, "The Vertex Shader is invalid. (hr=0x%lX)", hr);
-      goto error;
-    }
-
-    D3D11_INPUT_ELEMENT_DESC layout[] = {
-    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    };
-
-    hr = ID3D11Device_CreateInputLayout(sys->d3ddevice, layout, 2, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), &quad->pVertexLayout);
-
-    ID3D10Blob_Release(pVSBlob);
-
-    if(FAILED(hr)) {
-      msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
-      goto error;
-    }
-
-    hr = ID3D11Device_CreateVertexShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &quad->d3dvertexShader);
-
-    if(FAILED(hr)) {
-      ID3D11Device_Release(pVSBlob);
-      msg_Err(vd, "Failed to create the vertex shader. (hr=0x%lX)", hr);
-      goto error;
     }
 
     D3D11_TEXTURE2D_DESC texDesc;
@@ -1909,16 +1913,7 @@ static void ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pVertexBuffer);
         quad->pVertexBuffer = NULL;
     }
-    if (quad->d3dvertexShader)
-    {
-        ID3D11VertexShader_Release(quad->d3dvertexShader);
-        quad->d3dvertexShader = NULL;
-    }
-    if (quad->pVertexLayout)
-    {
-        ID3D11SamplerState_Release(quad->pVertexLayout);
-        quad->pVertexLayout = NULL;
-    }
+    quad->d3dvertexShader = NULL;
     if (quad->pIndexBuffer)
     {
         ID3D11Buffer_Release(quad->pIndexBuffer);
@@ -1958,6 +1953,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
     sys->d3dregion_count = 0;
 
+    if (sys->flatVSShader)
+    {
+        ID3D11VertexShader_Release(sys->flatVSShader);
+        sys->flatVSShader = NULL;
+    }
     if (sys->d3drenderTargetView)
     {
         ID3D11RenderTargetView_Release(sys->d3drenderTargetView);

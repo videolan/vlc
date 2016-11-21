@@ -63,7 +63,6 @@ typedef struct
     ID3D11Buffer              *pVertexBuffer;
     UINT                      vertexCount;
     ID3D11VertexShader        *d3dvertexShader;
-    ID3D11InputLayout         *pVertexLayout;
     ID3D11Buffer              *pIndexBuffer;
     UINT                      indexCount;
     ID3D11Texture2D           *pTexture;
@@ -207,6 +206,8 @@ struct vout_display_sys_t
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
     const char               *d3dPxShader;
+
+    ID3D11VertexShader        *flatVSShader;
 
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2];
