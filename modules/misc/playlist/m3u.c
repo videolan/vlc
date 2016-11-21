@@ -104,13 +104,6 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root,
         }
         vlc_mutex_unlock( &p_current->p_input->lock );
 
-        /* Stupid third party players don't understand file: URIs. */
-        char *psz_path = vlc_uri2path( psz_uri );
-        if( psz_path != NULL )
-        {
-            free( psz_uri );
-            psz_uri = psz_path;
-        }
         fprintf( p_export->p_file, "%s\n", psz_uri );
         free( psz_uri );
     }
