@@ -423,11 +423,11 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
     VLC_UNUSED( i_len );
 
     /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_TEXT;
+    video_format_Init( &fmt, VLC_CODEC_TEXT );
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     p_text_region = subpicture_region_New( &fmt );
+    video_format_Clean( &fmt );
 
     if( p_text_region != NULL )
     {
