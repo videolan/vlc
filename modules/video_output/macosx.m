@@ -421,6 +421,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                     sys->place = place;
                 }
 
+                vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+
                 /* For resize, we call glViewport in reshape and not here.
                  This has the positive side effect that we avoid erratic sizing as we animate every resize. */
                 if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)

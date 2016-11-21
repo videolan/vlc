@@ -235,6 +235,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vout_display_PlacePicture (&place, source, cfg, false);
 
         vlc_gl_MakeCurrent (sys->gl);
+        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
         glViewport (place.x, place.y, place.width, place.height);
         vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;

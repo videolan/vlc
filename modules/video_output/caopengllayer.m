@@ -389,6 +389,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             vout_display_place_t place;
             vout_display_PlacePicture (&place, source, &cfg_tmp, false);
+            vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
             sys->place = place;
 
             return VLC_SUCCESS;

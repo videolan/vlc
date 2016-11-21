@@ -311,6 +311,7 @@ static void Manage (vout_display_t *vd)
 
     const int width  = sys->rect_dest.right  - sys->rect_dest.left;
     const int height = sys->rect_dest.bottom - sys->rect_dest.top;
+    vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
     glViewport(0, 0, width, height);
 }
 
