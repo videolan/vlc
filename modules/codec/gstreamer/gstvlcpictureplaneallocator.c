@@ -327,17 +327,23 @@ bool gst_vlc_picture_plane_allocator_query_format(
     picture_t *p_pic_info = &p_allocator->pic_info;
 
     /* Back up the original format; as this is just a query  */
-    memcpy( &v_fmt, &p_dec->fmt_out.video, sizeof( video_format_t ));
+    v_fmt = p_dec->fmt_out.video;
+    video_format_Init( &p_dec->fmt_out.video, 0 );
 
-    if( !gst_vlc_video_info_from_vout( p_info, p_align, p_caps, p_dec,
+    bool b_ret =
+        gst_vlc_video_info_from_vout( p_info, p_align, p_caps, p_dec,
                 p_pic_info ))
+
+    video_format_Clean( &p_dec->fmt_out.video );
+
+    /* Restore the original format; as this was just a query  */
+    p_dec->fmt_out.video = v_fmt;
+
+    if( !b_ret )
     {
         msg_Err( p_allocator->p_dec, "failed to get the vout info" );
         return false;
     }
-
-    /* Restore the original format; as this was just a query  */
-    memcpy( &p_dec->fmt_out.video, &v_fmt, sizeof( video_format_t ));
 
     return true;
 }
