@@ -163,15 +163,12 @@ struct input_item_slave
     char                psz_uri[];  /**< Slave mrl */
 };
 
-typedef int (*input_item_compar_cb)( input_item_t *, input_item_t * );
-
 struct input_item_node_t
 {
     input_item_t *         p_item;
     int                    i_children;
     input_item_node_t      **pp_children;
     input_item_node_t      *p_parent;
-    input_item_compar_cb   compar_cb;
 };
 
 VLC_API void input_item_CopyOptions( input_item_t *p_child, input_item_t *p_parent );
@@ -205,12 +202,6 @@ VLC_API input_item_node_t * input_item_node_AppendItem( input_item_node_t *p_nod
  * Add an already created node to children of this parent node.
  */
 VLC_API void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t *p_child );
-
-/**
- * Sort all p_item children of the node recursively.
- */
-VLC_API void input_item_node_Sort( input_item_node_t *p_node,
-                                   input_item_compar_cb compar_cb );
 
 /**
  * Delete a node created with input_item_node_Create() and all its children.

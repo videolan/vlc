@@ -1276,52 +1276,6 @@ void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t 
     p_child->p_parent = p_parent;
 }
 
-static int compar_node( const void *p1, const void *p2 )
-{
-    input_item_node_t *p_node1 = *((input_item_node_t **) p1);
-    input_item_node_t *p_node2 = *((input_item_node_t **) p2);
-
-    assert( p_node1->p_parent && p_node1->p_parent == p_node2->p_parent &&
-            p_node1->p_parent->compar_cb );
-
-    input_item_compar_cb compar_cb = p_node1->p_parent->compar_cb;
-    return compar_cb( p_node1->p_item, p_node2->p_item );
-}
-
-static void sort_subitems( input_item_node_t *p_node,
-                           input_item_compar_cb compar_cb )
-{
-    if( p_node->i_children <= 0 || !compar_cb )
-        return;
-
-    p_node->compar_cb = compar_cb;
-
-    /* Lock first all children. This avoids to lock/unlock them from each
-     * compar callback call */
-    for( int i = 0; i < p_node->i_children; i++ )
-        vlc_mutex_lock( &p_node->pp_children[i]->p_item->lock );
-
-    /* Sort current node */
-    qsort( p_node->pp_children, p_node->i_children,
-           sizeof(input_item_node_t *), compar_node );
-
-    /* Unlock all children */
-    for( int i = 0; i < p_node->i_children; i++ )
-        vlc_mutex_unlock( &p_node->pp_children[i]->p_item->lock );
-
-    p_node->compar_cb = NULL;
-
-    /* Sort all children */
-    for( int i = 0; i < p_node->i_children; i++ )
-        sort_subitems( p_node->pp_children[i], compar_cb );
-}
-
-void input_item_node_Sort( input_item_node_t *p_node,
-                           input_item_compar_cb compar_cb )
-{
-    sort_subitems( p_node, compar_cb );
-}
-
 void input_item_node_PostAndDelete( input_item_node_t *p_root )
 {
     post_subitems( p_root );

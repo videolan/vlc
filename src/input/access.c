@@ -332,34 +332,64 @@ static int compar_type(input_item_t *p1, input_item_t *p2)
     return 0;
 }
 
-static int compar_collate(input_item_t *p1, input_item_t *p2)
+/* Some code duplication between comparison functions.
+ * GNU qsort_r() would be needed to solve this. */
+static int compar_collate(const void *a, const void *b)
 {
-    int i_ret = compar_type(p1, p2);
+    input_item_node_t *const *na = a, *const *nb = b;
+    input_item_t *ia = (*na)->p_item, *ib = (*nb)->p_item;
 
+    int i_ret = compar_type(ia, ib);
     if (i_ret != 0)
         return i_ret;
 
 #ifdef HAVE_STRCOLL
     /* The program's LOCAL defines if case is ignored */
-    return strcoll(p1->psz_name, p2->psz_name);
+    return strcoll(ia->psz_name, ib->psz_name);
 #else
-    return strcasecmp(p1->psz_name, p2->psz_name);
+    return strcasecmp(ia->psz_name, ib->psz_name);
 #endif
 }
 
-static int compar_version(input_item_t *p1, input_item_t *p2)
+static int compar_version(const void *a, const void *b)
 {
-    int i_ret = compar_type(p1, p2);
+    input_item_node_t *const *na = a, *const *nb = b;
+    input_item_t *ia = (*na)->p_item, *ib = (*nb)->p_item;
 
+    int i_ret = compar_type(ia, ib);
     if (i_ret != 0)
         return i_ret;
 
-    return strverscmp(p1->psz_name, p2->psz_name);
+    return strverscmp(ia->psz_name, ib->psz_name);
+}
+
+static void fsdir_sort_sub(input_item_node_t *p_node,
+                           int (*compar)(const void *, const void *))
+{
+    if (p_node->i_children <= 0)
+        return;
+
+    /* Lock first all children. This avoids to lock/unlock them from each
+     * compar callback call */
+    for (int i = 0; i < p_node->i_children; i++)
+        vlc_mutex_lock(&p_node->pp_children[i]->p_item->lock);
+
+    /* Sort current node */
+    qsort(p_node->pp_children, p_node->i_children,
+          sizeof(input_item_node_t *), compar);
+
+    /* Unlock all children */
+    for (int i = 0; i < p_node->i_children; i++)
+        vlc_mutex_unlock(&p_node->pp_children[i]->p_item->lock);
+
+    /* Sort all children */
+    for (int i = 0; i < p_node->i_children; i++)
+        fsdir_sort_sub(p_node->pp_children[i], compar);
 }
 
 static void fsdir_sort(struct access_fsdir *p_fsdir)
 {
-    input_item_compar_cb pf_compar = NULL;
+    int (*pf_compar)(const void *, const void *) = NULL;
 
     if (p_fsdir->psz_sort != NULL)
     {
@@ -369,7 +399,7 @@ static void fsdir_sort(struct access_fsdir *p_fsdir)
             pf_compar = compar_collate;
 
         if (pf_compar != NULL)
-            input_item_node_Sort(p_fsdir->p_node, pf_compar);
+            fsdir_sort_sub(p_fsdir->p_node, pf_compar);
     }
 }
 
