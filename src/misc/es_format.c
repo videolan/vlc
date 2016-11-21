@@ -451,7 +451,7 @@ void es_format_Init( es_format_t *fmt,
 
     memset( &fmt->audio, 0, sizeof(audio_format_t) );
     memset( &fmt->audio_replay_gain, 0, sizeof(audio_replay_gain_t) );
-    memset( &fmt->video, 0, sizeof(video_format_t) );
+    video_format_Init( &fmt->video, 0 );
     memset( &fmt->subs, 0, sizeof(subs_format_t) );
 
     fmt->b_packetized           = true;
