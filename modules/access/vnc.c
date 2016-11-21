@@ -167,8 +167,7 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     if ( i_chroma != VLC_CODEC_RGB8 ) /* Palette based, no mask */
     {
         video_format_t videofmt;
-        memset( &videofmt, 0, sizeof(video_format_t) );
-        videofmt.i_chroma = i_chroma;
+        video_format_Init( &videofmt, i_chroma );
         video_format_FixRgb( &videofmt );
 
         p_client->format.redShift = videofmt.i_lrshift;
@@ -177,6 +176,7 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
         p_client->format.redMax = videofmt.i_rmask >> videofmt.i_lrshift;
         p_client->format.greenMax = videofmt.i_gmask >> videofmt.i_lgshift;
         p_client->format.blueMax = videofmt.i_bmask >> videofmt.i_lbshift;
+        video_format_Clean( &videofmt );
     }
 
     /* Set up framebuffer */
