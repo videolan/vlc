@@ -511,8 +511,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_spu->b_ephemer = true;
 
     /* Create new SPU region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_YUVP;
+    video_format_Init( &fmt, VLC_CODEC_YUVP );
     fmt.i_sar_num = 1;
     fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_sys->i_width;
@@ -529,6 +528,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     }
 
     p_region = subpicture_region_New( &fmt );
+    video_format_Clean( &fmt );
     if( !p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
