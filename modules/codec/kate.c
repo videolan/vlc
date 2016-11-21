@@ -1240,8 +1240,6 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     p_spu->i_original_picture_height = p_sys->ki.original_canvas_height;
 
     /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-
     if (p_sys->b_formatted)
     {
         i_ret = kate_tracker_init( &kin, &p_sys->ki, ev );
@@ -1270,8 +1268,7 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     if (ev->bitmap && ev->bitmap->type==kate_bitmap_type_paletted && ev->palette) {
 
         /* create a separate region for the bitmap */
-        memset( &fmt, 0, sizeof(video_format_t) );
-        fmt.i_chroma = VLC_CODEC_YUVP;
+        video_format_Init( &fmt, VLC_CODEC_YUVP );
         fmt.i_width = fmt.i_visible_width = ev->bitmap->width;
         fmt.i_height = fmt.i_visible_height = ev->bitmap->height;
         fmt.i_x_offset = fmt.i_y_offset = 0;
@@ -1279,6 +1276,7 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
         CreateKatePalette( fmt.p_palette, ev->palette );
 
         p_bitmap_region = subpicture_region_New( &fmt );
+        video_format_Clean( &fmt );
         if( !p_bitmap_region )
         {
             msg_Err( p_dec, "cannot allocate SPU region" );
@@ -1293,12 +1291,13 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     }
 
     /* text region */
-    fmt.i_chroma = VLC_CODEC_TEXT;
+    video_format_Init( &fmt, VLC_CODEC_TEXT );
     fmt.i_sar_num = 0;
     fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     p_spu->p_region = subpicture_region_New( &fmt );
+    video_format_Clean( &fmt );
     if( !p_spu->p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
