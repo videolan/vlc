@@ -764,7 +764,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         if( p_sps->vui.b_fixed_frame_rate && !p_dec->fmt_out.video.i_frame_rate_base )
         {
             p_dec->fmt_out.video.i_frame_rate_base = p_sps->vui.i_num_units_in_tick;
-            p_dec->fmt_out.video.i_frame_rate = p_sps->vui.i_time_scale;
+            p_dec->fmt_out.video.i_frame_rate = p_sps->vui.i_time_scale >> 1 /* num_clock_ts == 2 */;
         }
         p_dec->fmt_out.video.primaries =
             hxxx_colour_primaries_to_vlc( p_sps->vui.colour.i_colour_primaries );
