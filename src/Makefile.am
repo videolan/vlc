@@ -247,6 +247,7 @@ libvlccore_la_SOURCES = \
 	input/es_out_timeshift.h \
 	input/event.h \
 	input/item.h \
+	input/mrl_helpers.h \
 	input/stream.h \
 	input/input_internal.h \
 	input/input_interface.h \

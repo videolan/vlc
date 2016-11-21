@@ -35,6 +35,7 @@
 #include <assert.h>
 
 #include "stream.h"
+#include "mrl_helpers.h"
 
 /**
  * \defgroup stream_extractor_Private Stream Extractor Private
@@ -166,7 +167,8 @@ se_InitStream( struct stream_extractor_private* priv, stream_t* source )
         else                              s->pf_block = se_StreamBlock;
 
         s->pf_seek = se_StreamSeek;
-        s->psz_url = NULL;
+        s->psz_url = vlc_stream_extractor_CreateMRL( &priv->public,
+                                                      priv->public.identifier );
     }
     else
     {
@@ -217,6 +219,33 @@ vlc_stream_extractor_Attach( stream_t** source, char const* identifier,
 error:
     se_Release( priv );
     return VLC_EGENERIC;
+}
+
+char*
+vlc_stream_extractor_CreateMRL( stream_extractor_t* extractor,
+                                char const* subentry )
+{
+    struct vlc_memstream buffer;
+    char* escaped;
+
+    if( mrl_EscapeFragmentIdentifier( &escaped, subentry ) )
+        return NULL;
+
+    if( vlc_memstream_open( &buffer ) )
+    {
+        free( escaped );
+        return NULL;
+    }
+
+    vlc_memstream_puts( &buffer, extractor->source->psz_url );
+
+    if( !strstr( extractor->source->psz_url, "#" ) )
+        vlc_memstream_putc( &buffer, '#' );
+
+    vlc_memstream_printf( &buffer, "!/%s", escaped );
+
+    free( escaped );
+    return vlc_memstream_close( &buffer ) ? NULL : buffer.ptr;
 }
 
 /**

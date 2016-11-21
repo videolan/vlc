@@ -87,11 +87,28 @@ struct stream_extractor_t {
 typedef struct stream_extractor_t stream_extractor_t;
 
 /**
+ * Create a relative MRL for the associated entity
+ *
+ * This function shall be used by stream_extractor_t's in order to
+ * generate a MRL that refers to an entity within the stream. Normally
+ * this function will only be invoked within `pf_readdir` in order to
+ * get the virtual path of the listed items.
+ *
+ * \warning the returned value is to be freed by the caller
+ *
+ * \param extractor the stream_extractor_t in which the entity belongs
+ * \param subentry the name of the entity in question
+ *
+ * \return a pointer to the resulting MRL on success, NULL on failure
+ **/
+VLC_API char* vlc_stream_extractor_CreateMRL( stream_extractor_t*,
+                                              char const* subentry );
+
+/**
  * Construct a new stream_extractor-based stream
  *
- * This function is used to attach a stream to an already existing
- * stream, where the underlying, attached, stream is a
- * stream_extractor.
+ * This function is used to attach a stream extractor to an already
+ * existing stream.
  *
  * If \p identifier is `NULL`, `*stream` is guaranteed to refer to a
  * directory, otherwise \p identifier denotes the specific subentry
