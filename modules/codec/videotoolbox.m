@@ -1125,6 +1125,8 @@ skip:
 
         if (imageBuffer != NULL) {
             if (CVPixelBufferGetDataSize(imageBuffer) > 0) {
+                if (decoder_UpdateVideoFormat(p_dec) == NULL)
+                    return NULL;
                 p_pic = decoder_NewPicture(p_dec);
 
                 if (!p_pic)
