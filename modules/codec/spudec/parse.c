@@ -692,8 +692,7 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     video_palette_t palette;
 
     /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_YUVP;
+    video_format_Init( &fmt, VLC_CODEC_YUVP );
     fmt.i_sar_num = 0; /* 0 means use aspect ratio of background video */
     fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_spu_properties->i_width;
@@ -711,6 +710,8 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     }
 
     p_spu->p_region = subpicture_region_New( &fmt );
+    fmt.p_palette = NULL;
+    video_format_Clean( &fmt );
     if( !p_spu->p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
