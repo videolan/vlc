@@ -67,6 +67,7 @@ typedef struct
     ID3D11Buffer              *pIndexBuffer;
     UINT                      indexCount;
     ID3D11Texture2D           *pTexture;
+    ID3D11Buffer              *pPixelShaderConstants;
     ID3D11ShaderResourceView  *d3dresViewY;
     ID3D11ShaderResourceView  *d3dresViewUV;
     ID3D11PixelShader         *d3dpixelShader;

@@ -117,8 +117,12 @@ typedef struct d3d_vertex_t {
         FLOAT x;
         FLOAT y;
     } texture;
-    FLOAT       opacity;
 } d3d_vertex_t;
+
+typedef struct {
+    FLOAT Opacity;
+    FLOAT padding[3];
+} PS_CONSTANT_BUFFER;
 
 #define RECTWidth(r)   (int)((r).right - (r).left)
 #define RECTHeight(r)  (int)((r).bottom - (r).top)
@@ -170,14 +174,12 @@ static const char* globVertexShaderDefault = "\
   {\
     float4 Position   : POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   struct VS_OUTPUT\
   {\
     float4 Position   : SV_POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   VS_OUTPUT VS( VS_INPUT In )\
@@ -185,12 +187,18 @@ static const char* globVertexShaderDefault = "\
     VS_OUTPUT Output;\
     Output.Position = In.Position;\
     Output.Texture = In.Texture;\
-    Output.Opacity = In.Opacity;\
     return Output;\
   }\
 ";
 
 static const char* globPixelShaderDefault = "\
+  cbuffer PS_CONSTANT_BUFFER : register(b0)\
+  {\
+    float Opacity;\
+    float ignoreA;\
+    float ignoreB;\
+    float ignoreC;\
+  };\
   Texture2D shaderTexture;\
   SamplerState SampleType;\
   \
@@ -198,7 +206,6 @@ static const char* globPixelShaderDefault = "\
   {\
     float4 Position   : SV_POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
@@ -206,12 +213,19 @@ static const char* globPixelShaderDefault = "\
     float4 rgba; \
     \
     rgba = shaderTexture.Sample(SampleType, In.Texture);\
-    rgba.a = rgba.a * In.Opacity;\
+    rgba.a = rgba.a * Opacity;\
     return rgba; \
   }\
 ";
 
 static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
+  cbuffer PS_CONSTANT_BUFFER : register(b0)\
+  {\
+    float Opacity;\
+    float ignoreA;\
+    float ignoreB;\
+    float ignoreC;\
+  };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
   SamplerState SampleType;\
@@ -220,7 +234,6 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
   {\
     float4 Position   : SV_POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
@@ -235,12 +248,19 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
     rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
-    rgba.a = In.Opacity;\
+    rgba.a = Opacity;\
     return rgba;\
   }\
 ";
 
 static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
+  cbuffer PS_CONSTANT_BUFFER : register(b0)\
+  {\
+    float Opacity;\
+    float ignoreA;\
+    float ignoreB;\
+    float ignoreC;\
+  };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
   SamplerState SampleType;\
@@ -249,7 +269,6 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
   {\
     float4 Position   : SV_POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
@@ -264,13 +283,20 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
     rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
-    rgba.a = In.Opacity;\
+    rgba.a = Opacity;\
     return rgba;\
   }\
 ";
 
 /* RGB-709 to RGB-2020 based on https://www.researchgate.net/publication/258434326_Beyond_BT709 */
 static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
+  cbuffer PS_CONSTANT_BUFFER : register(b0)\
+  {\
+    float Opacity;\
+    float ignoreA;\
+    float ignoreB;\
+    float ignoreC;\
+  };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
   SamplerState SampleType;\
@@ -279,7 +305,6 @@ static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
   {\
     float4 Position   : SV_POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
@@ -297,12 +322,19 @@ static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
     rgba.x = saturate( 1.661 * rgba.x - 0.588 * rgba.y - 0.073 * rgba.z);\
     rgba.y = saturate(-0.125 * rgba.x + 1.133 * rgba.y - 0.008 * rgba.z);\
     rgba.z = saturate(-0.018 * rgba.x - 0.101 * rgba.y + 1.119 * rgba.z);\
-    rgba.a = In.Opacity;\
+    rgba.a = Opacity;\
     return rgba;\
   }\
 ";
 
 static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
+  cbuffer PS_CONSTANT_BUFFER : register(b0)\
+  {\
+    float Opacity;\
+    float ignoreA;\
+    float ignoreB;\
+    float ignoreC;\
+  };\
   Texture2D shaderTextureYUYV;\
   SamplerState SampleType;\
   \
@@ -310,7 +342,6 @@ static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
   {\
     float4 Position   : SV_POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
@@ -326,12 +357,19 @@ static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
     rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
-    rgba.a = In.Opacity;\
+    rgba.a = Opacity;\
     return rgba;\
   }\
 ";
 
 static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
+  cbuffer PS_CONSTANT_BUFFER : register(b0)\
+  {\
+    float Opacity;\
+    float ignoreA;\
+    float ignoreB;\
+    float ignoreC;\
+  };\
   Texture2D shaderTextureYUYV;\
   SamplerState SampleType;\
   \
@@ -339,7 +377,6 @@ static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
   {\
     float4 Position   : SV_POSITION;\
     float2 Texture    : TEXCOORD0;\
-    float  Opacity    : OPACITY;\
   };\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
@@ -355,7 +392,7 @@ static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
     rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
-    rgba.a = In.Opacity;\
+    rgba.a = Opacity;\
     return rgba;\
   }\
 ";
@@ -918,6 +955,8 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
 
     /* pixel shader */
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, quad->d3dpixelShader, NULL, 0);
+
+    ID3D11DeviceContext_PSSetConstantBuffers(sys->d3dcontext, 0, 1, &quad->pPixelShaderConstants);
     ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 1, &quad->d3dresViewY);
     if( quad->d3dresViewUV )
         ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 1, 1, &quad->d3dresViewUV);
@@ -1647,6 +1686,24 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
       goto error;
     }
 
+    /* pixel shader constant buffer */
+    PS_CONSTANT_BUFFER defaultConstants = {
+      .Opacity = 1,
+    };
+    static_assert((sizeof(defaultConstants)%16)==0,"Constant buffers require 16-byte alignment");
+    D3D11_BUFFER_DESC constantDesc = {
+        .Usage = D3D11_USAGE_DYNAMIC,
+        .ByteWidth = sizeof(defaultConstants),
+        .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
+        .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
+    };
+    D3D11_SUBRESOURCE_DATA constantInit = { .pSysMem = &defaultConstants };
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, &constantInit, &quad->pPixelShaderConstants);
+    if(FAILED(hr)) {
+        msg_Err(vd, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
+        goto error;
+    }
+
     /* create the index of the vertices */
     D3D11_BUFFER_DESC quadDesc = {
         .Usage = D3D11_USAGE_DYNAMIC,
@@ -1672,12 +1729,11 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     }
 
     D3D11_INPUT_ELEMENT_DESC layout[] = {
-    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    { "OPACITY",  0, DXGI_FORMAT_R32_FLOAT,       0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
 
-    hr = ID3D11Device_CreateInputLayout(sys->d3ddevice, layout, 3, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
+    hr = ID3D11Device_CreateInputLayout(sys->d3ddevice, layout, 2, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
                                         ID3D10Blob_GetBufferSize(pVSBlob), &quad->pVertexLayout);
 
     ID3D10Blob_Release(pVSBlob);
@@ -1786,7 +1842,6 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
             dst_data[0].position.z = 0.0f;
             dst_data[0].texture.x = 0.0f;
             dst_data[0].texture.y = 1.0f;
-            dst_data[0].opacity = 1.0f;
 
             // bottom right
             dst_data[1].position.x = right;
@@ -1794,7 +1849,6 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
             dst_data[1].position.z = 0.0f;
             dst_data[1].texture.x = 1.0f;
             dst_data[1].texture.y = 1.0f;
-            dst_data[1].opacity = 1.0f;
 
             // top right
             dst_data[2].position.x = right;
@@ -1802,7 +1856,6 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
             dst_data[2].position.z = 0.0f;
             dst_data[2].texture.x = 1.0f;
             dst_data[2].texture.y = 0.0f;
-            dst_data[2].opacity = 1.0f;
 
             // top left
             dst_data[3].position.x = left;
@@ -1810,7 +1863,6 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
             dst_data[3].position.z = 0.0f;
             dst_data[3].texture.x = 0.0f;
             dst_data[3].texture.y = 0.0f;
-            dst_data[3].opacity = 1.0f;
 
             ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
         }
@@ -1847,6 +1899,11 @@ error:
 
 static void ReleaseQuad(d3d_quad_t *quad)
 {
+    if (quad->pPixelShaderConstants)
+    {
+        ID3D11Buffer_Release(quad->pPixelShaderConstants);
+        quad->pPixelShaderConstants = NULL;
+    }
     if (quad->pVertexBuffer)
     {
         ID3D11Buffer_Release(quad->pVertexBuffer);
@@ -1971,14 +2028,11 @@ static void UpdateQuadOpacity(vout_display_t *vd, const d3d_quad_t *quad, float 
     vout_display_sys_t *sys = vd->sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-    HRESULT hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
+    HRESULT hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
     if (SUCCEEDED(hr)) {
-        d3d_vertex_t *dst_data = mappedResource.pData;
-
-        for (size_t i=0; i<quad->vertexCount; ++i)
-            dst_data[i].opacity = opacity;
-
-        ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
+        FLOAT *dst_data = mappedResource.pData;
+        *dst_data = opacity;
+        ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants, 0);
     }
     else {
         msg_Err(vd, "Failed to lock the subpicture vertex buffer (hr=0x%lX)", hr);
