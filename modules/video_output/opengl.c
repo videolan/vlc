@@ -212,6 +212,8 @@ struct vout_display_opengl_t {
     float f_fov;
     float f_zoom;
     float f_zoom_min;
+    float f_zoom_unscaled;
+    float f_sar;
 };
 
 static inline int GetAlignedSize(unsigned size)
@@ -788,6 +790,26 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     free(vgl);
 }
 
+static void UpdateZoom(vout_display_opengl_t *vgl)
+{
+    const float f_zoom_max = 0.5f * SPHERE_RADIUS;
+    vgl->f_zoom = vgl->f_zoom_unscaled
+                * (vgl->f_zoom_unscaled >= 0 ? f_zoom_max : vgl->f_zoom_min);
+}
+
+static void CalculateZoomMin(vout_display_opengl_t *vgl)
+{
+    /* Do trigonometry to calculate the minimal zoom value
+     * that will allow us to zoom out without seeing the outside of the
+     * sphere (black borders). */
+    float sar = vgl->f_sar;
+    float fovx = 2 * atanf(tanf(vgl->f_fov / 2) * sar);
+    float tan_fovx_2 = tanf(fovx / 2);
+    float tan_fovy_2 = tanf(vgl->f_fov / 2 );
+    vgl->f_zoom_min = SPHERE_RADIUS / sinf(atanf(sqrtf(
+                      tan_fovx_2 * tan_fovx_2 + tan_fovy_2 * tan_fovy_2)));
+}
+
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
                                      const vlc_viewpoint_t *p_vp)
 {
@@ -803,23 +825,29 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
 
     if (fabsf(f_fov - vgl->f_fov) >= 0.001f)
     {
-        /* The fov changed, do trigonometry to calculate the minimal zoom value
-         * that will allow us to zoom out without seeing the outside of the
-         * sphere (black borders). */
-        float sar = (float) vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
-        float fovx = 2 * atanf(tanf(f_fov / 2) * sar);
-        float tan_fovx_2 = tanf(fovx / 2);
-        float tan_fovy_2 = tanf(f_fov / 2 );
-        vgl->f_zoom_min = SPHERE_RADIUS / sinf(atanf(sqrtf(
-                          tan_fovx_2 * tan_fovx_2 + tan_fovy_2 * tan_fovy_2)));
+        vgl->f_fov = f_fov;
+        CalculateZoomMin(vgl);
     }
 
-    vgl->f_fov  = f_fov;
-    vgl->f_zoom = p_vp->zoom * (p_vp->zoom >= 0 ? 0.5 * SPHERE_RADIUS : vgl->f_zoom_min);
+    vgl->f_zoom_unscaled = p_vp->zoom;
+    UpdateZoom(vgl);
 
     return VLC_SUCCESS;
 #undef RAD
 }
+
+
+void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
+                                              float f_sar)
+{
+    /* Each time the window size changes, we must recompute the minimum zoom
+     * since the aspect ration changes.
+     * We must also set the new current zoom value. */
+    vgl->f_sar = f_sar;
+    CalculateZoomMin(vgl);
+    UpdateZoom(vgl);
+}
+
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
 {
@@ -1601,7 +1629,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
-        float sar = (float) vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
+        float sar = (float) vgl->f_sar;
         getProjectionMatrix(sar, vgl->f_fov, projectionMatrix);
         getYRotMatrix(vgl->f_teta, yRotMatrix);
         getXRotMatrix(vgl->f_phi, xRotMatrix);

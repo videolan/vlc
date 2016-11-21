@@ -99,6 +99,9 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl, const vlc_viewpoint_t*);
 
+void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
+                                              float f_sar);
+
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture);
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
