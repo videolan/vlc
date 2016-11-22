@@ -72,7 +72,6 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
     {
         free(frame);
         free(field);
-        vdp_video_surface_destroy(vdp, surface);
         return NULL;
     }
 
