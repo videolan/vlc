@@ -332,7 +332,7 @@ bool gst_vlc_picture_plane_allocator_query_format(
 
     bool b_ret =
         gst_vlc_video_info_from_vout( p_info, p_align, p_caps, p_dec,
-                p_pic_info ))
+                p_pic_info );
 
     video_format_Clean( &p_dec->fmt_out.video );
 
