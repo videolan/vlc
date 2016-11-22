@@ -219,7 +219,7 @@ void UpdateRects(vout_display_t *vd,
 #endif
 
     /* Destination image position and dimensions */
-#if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)) && !VLC_WINSTORE_APP
+#if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)) && !VLC_WINSTORE_APP
     rect_dest.left = 0;
     rect_dest.right = place.width;
     rect_dest.top = 0;
@@ -298,7 +298,7 @@ void UpdateRects(vout_display_t *vd,
     /* Apply overlay hardware constraints */
     if (sys->use_overlay)
         AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
-#elif defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)
+#elif defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
     /* Needed at least with YUV content */
     rect_src_clipped.left &= ~1;
     rect_src_clipped.right &= ~1;

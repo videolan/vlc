@@ -38,9 +38,6 @@
 #if defined(MODULE_NAME_IS_glwin32) || defined(MODULE_NAME_IS_wgl)
 # include "../opengl.h"
 #endif
-#ifdef MODULE_NAME_IS_direct2d
-# include <d2d1.h>
-#endif
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
 # include <dxgidebug.h>
 #endif
@@ -171,13 +168,6 @@ struct vout_display_sys_t
     vout_display_opengl_t *vgl;
 # endif
     HDC                   affinityHDC; // DC for the selected GPU
-#endif
-
-#ifdef MODULE_NAME_IS_direct2d
-    HINSTANCE              d2_dll;            /* handle of the opened d2d1 dll */
-    ID2D1Factory           *d2_factory;                         /* D2D factory */
-    ID2D1HwndRenderTarget  *d2_render_target;          /* D2D rendering target */
-    ID2D1Bitmap            *d2_bitmap;                            /* D2 bitmap */
 #endif
 
 #ifdef MODULE_NAME_IS_direct3d11

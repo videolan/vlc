@@ -160,19 +160,6 @@ endif
 
 
 ### Win32 ###
-libdirect2d_plugin_la_SOURCES = video_output/win32/direct2d.c \
-	video_output/win32/common.c video_output/win32/common.h \
-	video_output/win32/events.c video_output/win32/events.h \
-	video_output/win32/win32touch.c video_output/win32/win32touch.h
-libdirect2d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-DMODULE_NAME_IS_direct2d
-libdirect2d_plugin_la_LIBADD = -lgdi32 $(LIBCOM) -luuid
-libdirect2d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += $(LTLIBdirect2d)
-EXTRA_LTLIBRARIES += libdirect2d_plugin.la
-endif
-
 libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \

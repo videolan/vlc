@@ -106,7 +106,6 @@ $Id$
  * demux_stl: EBU STL subtitles demuxer
  * demuxdump: Pseudo-demuxer that dumps the stream
  * diracsys: BBC Dirac demuxer
- * direct2d: video output module using the Direct2D API
  * direct3d11: video output module using the Direct3D11 API
  * direct3d9: video output module using the Direct3D9 API
  * directdraw: video output module using the DirectDraw API

@@ -1162,7 +1162,6 @@ modules/video_output/glx.c
 modules/video_output/ios2.m
 modules/video_output/kva.c
 modules/video_output/macosx.m
-modules/video_output/win32/direct2d.c
 modules/video_output/win32/direct3d9.c
 modules/video_output/win32/direct3d11.c
 modules/video_output/win32/directdraw.c
