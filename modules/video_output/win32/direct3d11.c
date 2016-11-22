@@ -2162,7 +2162,11 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     {
         if (!AllocQuadVertices(vd, quad, projection))
             goto error;
-        quad->d3dvertexShader = sys->flatVSShader;
+
+        if (projection == PROJECTION_MODE_RECTANGULAR)
+            quad->d3dvertexShader = sys->flatVSShader;
+        else
+            quad->d3dvertexShader = sys->projectionVSShader;
 
         quad->d3dpixelShader = d3dpixelShader;
         ID3D11PixelShader_AddRef(quad->d3dpixelShader);
