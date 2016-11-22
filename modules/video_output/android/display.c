@@ -105,6 +105,7 @@ struct buffer_bounds
 
 struct vout_display_sys_t
 {
+    vout_window_t *embed;
     picture_pool_t *pool;
 
     int i_display_width;
@@ -655,21 +656,23 @@ static int Open(vlc_object_t *p_this)
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
 
-    if (vout_display_IsWindowed(vd))
+    vout_window_t *embed =
+        vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_ANDROID_NATIVE);
+
+    if (embed == NULL)
         return VLC_EGENERIC;
+    assert(embed->handle.anativewindow);
 
     /* Allocate structure */
     vd->sys = sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
     if (!sys)
-        return VLC_ENOMEM;
-
-    sys->p_awh = AWindowHandler_new(p_this);
-    if (!sys->p_awh)
     {
-        free(sys);
-        msg_Err(vd, "AWindowHandler_new failed");
-        return VLC_EGENERIC;
+        vout_display_DeleteWindow(vd, embed);
+        return VLC_ENOMEM;
     }
+
+    sys->embed = embed;
+    sys->p_awh = embed->handle.anativewindow;
     sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
 
 #ifdef USE_ANWP
@@ -751,16 +754,13 @@ static int Open(vlc_object_t *p_this)
 
 error:
     Close(p_this);
-    return VLC_ENOMEM;
+    return VLC_EGENERIC;
 }
 
 static void Close(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys = vd->sys;
-
-    if (!sys)
-        return;
 
     /* Check if SPU regions have been properly cleared, and clear them if they
      * were not. */
@@ -784,8 +784,8 @@ static void Close(vlc_object_t *p_this)
     if (sys->p_sub_window)
         AndroidWindow_Destroy(vd, sys->p_sub_window, false);
 
-    if (sys->p_awh)
-        AWindowHandler_destroy(sys->p_awh);
+    if (sys->embed)
+        vout_display_DeleteWindow(vd, sys->embed);
 
     free(sys);
 }
