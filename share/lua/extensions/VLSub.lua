@@ -1191,7 +1191,7 @@ openSub = {
     local request = "<?xml version='1.0'?>"..dump_xml(reqTable)
     local host, path = parse_url(openSub.conf.url)		
     local header = {
-      "POST "..path.." HTTP/1.1", 
+      "POST "..path.." HTTP/1.0", 
       "Host: "..host, 
       "User-Agent: "..openSub.conf.userAgentHTTP, 
       "Content-Type: text/xml", 
@@ -1847,7 +1847,7 @@ end
 function get(url)
   local host, path = parse_url(url)
   local header = {
-    "GET "..path.." HTTP/1.1", 
+    "GET "..path.." HTTP/1.0", 
     "Host: "..host, 
     "User-Agent: "..openSub.conf.userAgentHTTP,
     "",
