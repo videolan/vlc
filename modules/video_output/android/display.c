@@ -92,8 +92,8 @@ struct android_window
     bool b_opaque;
 
     enum AWindow_ID id;
-    ANativeWindow *p_handle;
-    native_window_priv *p_handle_priv;
+    ANativeWindow *p_surface;
+    native_window_priv *p_surface_priv;
 };
 
 typedef struct buffer_bounds buffer_bounds;
@@ -331,23 +331,23 @@ static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
                                             android_window *p_window,
                                             bool b_clear)
 {
-    if (p_window->p_handle_priv) {
-        sys->anwp->disconnect(p_window->p_handle_priv);
-        p_window->p_handle_priv = NULL;
+    if (p_window->p_surface_priv) {
+        sys->anwp->disconnect(p_window->p_surface_priv);
+        p_window->p_surface_priv = NULL;
     }
-    if (p_window->p_handle) {
+    if (p_window->p_surface) {
         AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id, b_clear);
-        p_window->p_handle = NULL;
+        p_window->p_surface = NULL;
     }
 }
 
 static int AndroidWindow_ConnectSurface(vout_display_sys_t *sys,
                                         android_window *p_window)
 {
-    if (!p_window->p_handle && !p_window->b_opaque) {
-        p_window->p_handle = AWindowHandler_getANativeWindow(sys->p_awh,
-                                                             p_window->id);
-        if (!p_window->p_handle)
+    if (!p_window->p_surface && !p_window->b_opaque) {
+        p_window->p_surface = AWindowHandler_getANativeWindow(sys->p_awh,
+                                                              p_window->id);
+        if (!p_window->p_surface)
             return -1;
     }
 
@@ -421,10 +421,10 @@ static void AndroidWindow_Destroy(vout_display_t *vd,
 static int AndroidWindow_UpdateCrop(vout_display_sys_t *sys,
                                     android_window *p_window)
 {
-    if (!p_window->p_handle_priv)
+    if (!p_window->p_surface_priv)
         return -1;
 
-    return sys->anwp->setCrop(p_window->p_handle_priv,
+    return sys->anwp->setCrop(p_window->p_surface_priv,
                               p_window->fmt.i_x_offset,
                               p_window->fmt.i_y_offset,
                               p_window->fmt.i_visible_width,
@@ -437,37 +437,37 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
 {
     unsigned int i_max_buffer_count = 0;
 
-    if (!p_window->p_handle_priv)
-        p_window->p_handle_priv = sys->anwp->connect(p_window->p_handle);
+    if (!p_window->p_surface_priv)
+        p_window->p_surface_priv = sys->anwp->connect(p_window->p_surface);
 
-    if (!p_window->p_handle_priv)
+    if (!p_window->p_surface_priv)
         goto error;
 
-    if (sys->anwp->setUsage(p_window->p_handle_priv, false, 0) != 0)
+    if (sys->anwp->setUsage(p_window->p_surface_priv, false, 0) != 0)
         goto error;
 
     if (!b_java_configured
-        && sys->anwp->setBuffersGeometry(p_window->p_handle_priv,
+        && sys->anwp->setBuffersGeometry(p_window->p_surface_priv,
                                          p_window->fmt.i_width,
                                          p_window->fmt.i_height,
                                          p_window->i_android_hal) != 0)
         goto error;
 
-    sys->anwp->getMinUndequeued(p_window->p_handle_priv,
+    sys->anwp->getMinUndequeued(p_window->p_surface_priv,
                                 &p_window->i_min_undequeued);
 
-    sys->anwp->getMaxBufferCount(p_window->p_handle_priv, &i_max_buffer_count);
+    sys->anwp->getMaxBufferCount(p_window->p_surface_priv, &i_max_buffer_count);
 
     if ((p_window->i_min_undequeued + p_window->i_pic_count) >
          i_max_buffer_count)
         p_window->i_pic_count = i_max_buffer_count - p_window->i_min_undequeued;
 
-    if (sys->anwp->setBufferCount(p_window->p_handle_priv,
+    if (sys->anwp->setBufferCount(p_window->p_surface_priv,
                                   p_window->i_pic_count +
                                   p_window->i_min_undequeued) != 0)
         goto error;
 
-    if (sys->anwp->setOrientation(p_window->p_handle_priv,
+    if (sys->anwp->setOrientation(p_window->p_surface_priv,
                                   p_window->i_angle) != 0)
         goto error;
 
@@ -475,9 +475,9 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
 
     return 0;
 error:
-    if (p_window->p_handle_priv) {
-        sys->anwp->disconnect(p_window->p_handle_priv);
-        p_window->p_handle_priv = NULL;
+    if (p_window->p_surface_priv) {
+        sys->anwp->disconnect(p_window->p_surface_priv);
+        p_window->p_surface_priv = NULL;
     }
     p_window->b_use_priv = false;
     if (p_window->i_angle != 0)
@@ -518,7 +518,7 @@ static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
     p_window->i_min_undequeued = 0;
 
     if (!b_java_configured && sys->anw->setBuffersGeometry)
-        return sys->anw->setBuffersGeometry(p_window->p_handle,
+        return sys->anw->setBuffersGeometry(p_window->p_surface,
                                             p_window->fmt.i_width,
                                             p_window->fmt.i_height,
                                             p_window->i_android_hal);
@@ -575,9 +575,9 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
         if (p_handle == NULL)
             return;
 
-        sys->anwp->unlockData(p_window->p_handle_priv, p_handle, b_render);
+        sys->anwp->unlockData(p_window->p_surface_priv, p_handle, b_render);
     } else
-        sys->anw->unlockAndPost(p_window->p_handle);
+        sys->anw->unlockAndPost(p_window->p_surface);
 }
 
 static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
@@ -590,14 +590,13 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
         void *p_handle;
         int err;
 
-        err = sys->anwp->lockData(p_window->p_handle_priv,
-                                  &p_handle,
-                                  &p_picsys->priv.sw.buf);
+        err = sys->anwp->lockData(p_window->p_surface_priv,
+                                  &p_handle, &p_picsys->priv.sw.buf);
         if (err != 0)
             return -1;
         p_picsys->priv.sw.p_handle = p_handle;
     } else {
-        if (sys->anw->winLock(p_window->p_handle,
+        if (sys->anw->winLock(p_window->p_surface,
                               &p_picsys->priv.sw.buf, NULL) != 0)
             return -1;
     }
