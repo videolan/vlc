@@ -152,7 +152,8 @@ static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
 static int AllocQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
-                     d3d_quad_cfg_t *, ID3D11PixelShader *, bool b_visible);
+                     d3d_quad_cfg_t *, ID3D11PixelShader *, bool b_visible,
+                     video_projection_mode_t);
 static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 static void UpdateQuadOpacity(vout_display_t *, const d3d_quad_t *, float);
@@ -1364,7 +1365,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     if ( fmt->i_height != fmt->i_visible_height || fmt->i_width != fmt->i_visible_width )
     {
         msg_Dbg( vd, "use a staging texture to crop to visible size" );
-        AllocQuad( vd, fmt, &sys->stagingQuad, &sys->picQuadConfig, NULL, false );
+        AllocQuad( vd, fmt, &sys->stagingQuad, &sys->picQuadConfig, NULL, false,
+                   PROJECTION_MODE_RECTANGULAR );
     }
 
     video_format_t core_source;
@@ -1602,7 +1604,8 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         }
     }
 
-    if (AllocQuad( vd, fmt, &sys->picQuad, &sys->picQuadConfig, pPicQuadShader, true) != VLC_SUCCESS) {
+    if (AllocQuad( vd, fmt, &sys->picQuad, &sys->picQuadConfig, pPicQuadShader,
+                   true, vd->fmt.projection_mode) != VLC_SUCCESS) {
         ID3D11PixelShader_Release(pPicQuadShader);
         msg_Err(vd, "Could not Create the main quad picture. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
@@ -1744,14 +1747,74 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, WORD *triangle_pos)
     triangle_pos[5] = 3;
 }
 
-static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad)
+#define SPHERE_SLICES 128
+#define nbLatBands SPHERE_SLICES
+#define nbLonBands SPHERE_SLICES
+
+static void SetupQuadSphere(d3d_vertex_t *dst_data, WORD *triangle_pos)
+{
+    for (unsigned lat = 0; lat <= nbLatBands; lat++) {
+        float theta = lat * (float) M_PI / nbLatBands;
+        float sinTheta, cosTheta;
+
+        sincosf(theta, &sinTheta, &cosTheta);
+
+        for (unsigned lon = 0; lon <= nbLonBands; lon++) {
+            float phi = lon * 2 * (float) M_PI / nbLonBands;
+            float sinPhi, cosPhi;
+
+            sincosf(phi, &sinPhi, &cosPhi);
+
+            float x = cosPhi * sinTheta;
+            float y = cosTheta;
+            float z = sinPhi * sinTheta;
+
+            unsigned off1 = lat * (nbLonBands + 1) + lon;
+            dst_data[off1].position.x = SPHERE_RADIUS * x;
+            dst_data[off1].position.y = SPHERE_RADIUS * y;
+            dst_data[off1].position.z = SPHERE_RADIUS * z;
+
+            dst_data[off1].texture.x = lon / (float) nbLonBands; // 0(left) to 1(right)
+            dst_data[off1].texture.y = lat / (float) nbLatBands; // 0(top) to 1 (bottom)
+        }
+    }
+
+    for (unsigned lat = 0; lat < nbLatBands; lat++) {
+        for (unsigned lon = 0; lon < nbLonBands; lon++) {
+            unsigned first = (lat * (nbLonBands + 1)) + lon;
+            unsigned second = first + nbLonBands + 1;
+
+            unsigned off = (lat * nbLatBands + lon) * 3 * 2;
+
+            triangle_pos[off] = first;
+            triangle_pos[off + 1] = second;
+            triangle_pos[off + 2] = first + 1;
+
+            triangle_pos[off + 3] = second;
+            triangle_pos[off + 4] = second + 1;
+            triangle_pos[off + 5] = first + 1;
+        }
+    }
+}
+
+static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, video_projection_mode_t projection)
 {
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     vout_display_sys_t *sys = vd->sys;
 
-    quad->vertexCount = 4;
-    quad->indexCount = 2 * 3;
+    if (projection == PROJECTION_MODE_RECTANGULAR)
+    {
+        quad->vertexCount = 4;
+        quad->indexCount = 2 * 3;
+    }
+    else if (projection == PROJECTION_MODE_EQUIRECTANGULAR)
+    {
+        quad->vertexCount = (SPHERE_SLICES+1) * (SPHERE_SLICES+1);
+        quad->indexCount = nbLatBands * nbLonBands * 2 * 3;
+    }
+    else
+        return false;
 
     D3D11_BUFFER_DESC bd;
     memset(&bd, 0, sizeof(bd));
@@ -1797,7 +1860,10 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad)
     }
     WORD *triangle_pos = mappedResource.pData;
 
-    SetupQuadFlat(dst_data, triangle_pos);
+    if ( projection == PROJECTION_MODE_RECTANGULAR )
+        SetupQuadFlat(dst_data, triangle_pos);
+    else
+        SetupQuadSphere(dst_data, triangle_pos);
 
     ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
     ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
@@ -1806,7 +1872,8 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad)
 }
 
 static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
-                     d3d_quad_cfg_t *cfg, ID3D11PixelShader *d3dpixelShader, bool b_visible)
+                     d3d_quad_cfg_t *cfg, ID3D11PixelShader *d3dpixelShader, bool b_visible,
+                     video_projection_mode_t projection)
 {
     vout_display_sys_t *sys = vd->sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1903,7 +1970,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     if ( d3dpixelShader != NULL )
     {
-        if ( !AllocQuadVertices( vd, quad ) )
+        if (!AllocQuadVertices(vd, quad, projection))
             goto error;
         quad->d3dvertexShader = sys->flatVSShader;
 
@@ -2103,7 +2170,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 .textureFormat      = sys->d3dregion_format,
                 .resourceFormatYRGB = sys->d3dregion_format,
             };
-            err = AllocQuad(vd, &r->fmt, d3dquad, &rgbaCfg, sys->pSPUPixelShader, false);
+            err = AllocQuad( vd, &r->fmt, d3dquad, &rgbaCfg, sys->pSPUPixelShader,
+                             false, PROJECTION_MODE_RECTANGULAR );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to create %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
