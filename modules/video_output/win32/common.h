@@ -65,6 +65,7 @@ typedef struct
     ID3D11VertexShader        *d3dvertexShader;
     ID3D11Buffer              *pIndexBuffer;
     UINT                      indexCount;
+    ID3D11Buffer              *pVertexShaderConstants;
     ID3D11Texture2D           *pTexture;
     ID3D11Buffer              *pPixelShaderConstants;
     ID3D11ShaderResourceView  *d3dresViewY;
@@ -208,6 +209,7 @@ struct vout_display_sys_t
     const char               *d3dPxShader;
 
     ID3D11VertexShader        *flatVSShader;
+    ID3D11VertexShader        *projectionVSShader;
 
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2];

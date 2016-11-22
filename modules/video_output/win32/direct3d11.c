@@ -124,6 +124,16 @@ typedef struct {
     FLOAT padding[3];
 } PS_CONSTANT_BUFFER;
 
+typedef struct {
+    FLOAT RotX[16];
+    FLOAT RotY[16];
+    FLOAT RotZ[16];
+    FLOAT View[16];
+    FLOAT Projection[16];
+} VS_PROJECTION_CONST;
+
+#define SPHERE_RADIUS 1.f
+
 #define RECTWidth(r)   (int)((r).right - (r).left)
 #define RECTHeight(r)  (int)((r).bottom - (r).top)
 
@@ -185,8 +195,41 @@ static const char* globVertexShaderFlat = "\
   \
   VS_OUTPUT VS( VS_INPUT In )\
   {\
+    return In;\
+  }\
+";
+
+static const char* globVertexShaderProjection = "\
+  cbuffer VS_PROJECTION_CONST : register(b0)\
+  {\
+     float4x4 RotX;\
+     float4x4 RotY;\
+     float4x4 RotZ;\
+     float4x4 View;\
+     float4x4 Projection;\
+  };\
+  struct VS_INPUT\
+  {\
+    float4 Position   : POSITION;\
+    float2 Texture    : TEXCOORD0;\
+  };\
+  \
+  struct VS_OUTPUT\
+  {\
+    float4 Position   : SV_POSITION;\
+    float2 Texture    : TEXCOORD0;\
+  };\
+  \
+  VS_OUTPUT VS( VS_INPUT In )\
+  {\
     VS_OUTPUT Output;\
-    Output.Position = In.Position;\
+    float4 pos = In.Position;\
+    pos = mul(RotY, pos);\
+    pos = mul(RotX, pos);\
+    pos = mul(RotZ, pos);\
+    pos = mul(View, pos);\
+    pos = mul(Projection, pos);\
+    Output.Position = pos;\
     Output.Texture = In.Texture;\
     return Output;\
   }\
@@ -950,6 +993,8 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
     /* vertex shader */
     ID3D11DeviceContext_IASetVertexBuffers(sys->d3dcontext, 0, 1, &quad->pVertexBuffer, &stride, &offset);
     ID3D11DeviceContext_IASetIndexBuffer(sys->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    if ( quad->pVertexShaderConstants )
+        ID3D11DeviceContext_VSSetConstantBuffers(sys->d3dcontext, 0, 1, &quad->pVertexShaderConstants);
 
     ID3D11DeviceContext_VSSetShader(sys->d3dcontext, quad->d3dvertexShader, NULL, 0);
 
@@ -1557,6 +1602,24 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3D11DeviceContext_IASetInputLayout(sys->d3dcontext, pVertexLayout);
     ID3D11InputLayout_Release(pVertexLayout);
     
+    hr = D3DCompile(globVertexShaderProjection, strlen(globVertexShaderProjection),
+                    NULL, NULL, NULL, "VS", "vs_4_0_level_9_1", 0, 0, &pVSBlob, NULL);
+
+    if( FAILED(hr)) {
+      msg_Err(vd, "The projection Vertex Shader is invalid. (hr=0x%lX)", hr);
+      return VLC_EGENERIC;
+    }
+
+    hr = ID3D11Device_CreateVertexShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
+                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->projectionVSShader);
+
+    if(FAILED(hr)) {
+      ID3D11Device_Release(pVSBlob);
+      msg_Err(vd, "Failed to create the projection vertex shader. (hr=0x%lX)", hr);
+      return VLC_EGENERIC;
+    }
+    ID3D10Blob_Release(pVSBlob);
+
     ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     ID3DBlob* pPSBlob = NULL;
@@ -1897,6 +1960,15 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
     }
 
+    /* vertex shader constant buffer */
+    constantDesc.ByteWidth = sizeof(VS_PROJECTION_CONST);
+    static_assert((sizeof(VS_PROJECTION_CONST)%16)==0,"Constant buffers require 16-byte alignment");
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, NULL, &quad->pVertexShaderConstants);
+    if(FAILED(hr)) {
+        msg_Err(vd, "Could not create the vertex shader constant buffer. (hr=0x%lX)", hr);
+        goto error;
+    }
+
     D3D11_TEXTURE2D_DESC texDesc;
     memset(&texDesc, 0, sizeof(texDesc));
     texDesc.Width  = b_visible ? fmt->i_visible_width  : fmt->i_width;
@@ -2003,6 +2075,11 @@ static void ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pIndexBuffer);
         quad->pIndexBuffer = NULL;
     }
+    if (quad->pVertexShaderConstants)
+    {
+        ID3D11Buffer_Release(quad->pVertexShaderConstants);
+        quad->pVertexShaderConstants = NULL;
+    }
     if (quad->pTexture)
     {
         ID3D11Texture2D_Release(quad->pTexture);
@@ -2041,6 +2118,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     {
         ID3D11VertexShader_Release(sys->flatVSShader);
         sys->flatVSShader = NULL;
+    }
+    if (sys->projectionVSShader)
+    {
+        ID3D11VertexShader_Release(sys->projectionVSShader);
+        sys->projectionVSShader = NULL;
     }
     if (sys->d3drenderTargetView)
     {
