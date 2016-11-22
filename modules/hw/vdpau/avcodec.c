@@ -49,24 +49,6 @@ struct vlc_va_sys_t
     vlc_vdp_video_field_t *pool[6];
 };
 
-#if !LIBAVCODEC_VERSION_CHECK(56, 10, 0, 19, 100)
-static int av_vdpau_get_surface_parameters(AVCodecContext *avctx,
-                                           VdpChromaType *type,
-                                           uint32_t *width, uint32_t *height)
-{
-    if (type != NULL)
-        *type = VDP_CHROMA_TYPE_420;
-    if (width != NULL)
-        *width = (avctx->coded_width + 1) & ~1;
-    if (height != NULL)
-        *height = (avctx->coded_height + 3) & ~3;
-    return 0;
-}
-#endif
-#if !LIBAVCODEC_VERSION_CHECK(56, 9, 0, 18, 100)
-# define AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH (0)
-#endif
-
 static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -150,35 +132,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     (void) p_sys;
     void *func;
     VdpStatus err;
-#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
-    VdpDecoderProfile profile;
-    int level = avctx->level;
-
-    if (av_vdpau_get_profile(avctx, &profile))
-    {
-        msg_Err(va, "unsupported codec %d or profile %d", avctx->codec_id,
-                avctx->profile);
-        return VLC_EGENERIC;
-    }
-
-    switch (avctx->codec_id)
-    {
-        case AV_CODEC_ID_MPEG1VIDEO:
-            level = VDP_DECODER_LEVEL_MPEG1_NA;
-            break;
-        case AV_CODEC_ID_MPEG2VIDEO:
-            level = VDP_DECODER_LEVEL_MPEG2_HL;
-            break;
-        case AV_CODEC_ID_H263:
-            level = VDP_DECODER_LEVEL_MPEG4_PART2_ASP_L5;
-            break;
-        case AV_CODEC_ID_H264:
-            if ((avctx->profile & FF_PROFILE_H264_INTRA) && level == 11)
-                level = VDP_DECODER_LEVEL_H264_1b;
-        default:
-            break;
-    }
-#endif
     VdpChromaType type;
     uint32_t width, height;
 
@@ -218,7 +171,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
         return VLC_EGENERIC;
     }
 
-#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(56, 2, 0))
     unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;
 
     err = vdp_get_proc_address(sys->vdp, sys->device,
@@ -228,68 +180,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
 
     if (av_vdpau_bind_context(avctx, sys->device, func, flags))
         goto error;
-#else
-    AVVDPAUContext *hwctx = av_vdpau_alloc_context();
-    if (unlikely(hwctx == NULL))
-        goto error;
-
-    hwctx->decoder = VDP_INVALID_HANDLE;
-    avctx->hwaccel_context = hwctx;
-
-    err = vdp_get_proc_address(sys->vdp, sys->device,
-                               VDP_FUNC_ID_DECODER_RENDER, &func);
-    if (err != VDP_STATUS_OK)
-        goto error;
-
-    hwctx->render = func;
-
-    /* Check capabilities */
-    VdpBool support;
-    uint32_t l, mb, w, h;
-
-    if (vdp_video_surface_query_capabilities(sys->vdp, sys->device,
-              VDP_CHROMA_TYPE_420, &support, &w, &h) != VDP_STATUS_OK)
-        support = VDP_FALSE;
-    if (!support)
-    {
-        msg_Err(va, "video surface format not supported: %s", "YUV 4:2:0");
-        goto error;
-    }
-    msg_Dbg(va, "video surface limits: %"PRIu32"x%"PRIu32, w, h);
-    if (w < avctx->coded_width || h < avctx->coded_height)
-    {
-        msg_Err(va, "video surface above limits: %dx%d",
-                avctx->coded_width, avctx->coded_height);
-        goto error;
-    }
-
-    if (vdp_decoder_query_capabilities(sys->vdp, sys->device, profile,
-                                   &support, &l, &mb, &w, &h) != VDP_STATUS_OK)
-        support = VDP_FALSE;
-    if (!support)
-    {
-        msg_Err(va, "decoder profile not supported: %u", profile);
-        goto error;
-    }
-    msg_Dbg(va, "decoder profile limits: level %"PRIu32" mb %"PRIu32" "
-            "%"PRIu32"x%"PRIu32, l, mb, w, h);
-    if ((int)l < level || w < avctx->coded_width || h < avctx->coded_height)
-    {
-        msg_Err(va, "decoder profile above limits: level %d %dx%d",
-                level, avctx->coded_width, avctx->coded_height);
-        goto error;
-    }
-
-    err = vdp_decoder_create(sys->vdp, sys->device, profile, width, height,
-                             avctx->refs, &hwctx->decoder);
-    if (err != VDP_STATUS_OK)
-    {
-        hwctx->decoder = VDP_INVALID_HANDLE;
-        msg_Err(va, "%s creation failure: %s", "decoder",
-                vdp_get_error_string(sys->vdp, err));
-        goto error;
-    }
-#endif
     va->sys = sys;
 
     int i = 0;
@@ -321,14 +211,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     return VLC_SUCCESS;
 
 error:
-#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
-    if (hwctx != NULL)
-    {
-        if (hwctx->decoder != VDP_INVALID_HANDLE)
-            vdp_decoder_destroy(sys->vdp, hwctx->decoder);
-        av_freep(&avctx->hwaccel_context);
-    }
-#endif
     vdp_release_x11(sys->vdp);
     free(sys);
     return VLC_EGENERIC;
@@ -337,11 +219,6 @@ error:
 static void Close(vlc_va_t *va, AVCodecContext *avctx)
 {
     vlc_va_sys_t *sys = va->sys;
-#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
-    AVVDPAUContext *hwctx = avctx->hwaccel_context;
-
-    vdp_decoder_destroy(sys->vdp, hwctx->decoder);
-#endif
 
     for (unsigned i = 0; sys->pool[i] != NULL; i++)
         DestroySurface(sys->pool[i]);
