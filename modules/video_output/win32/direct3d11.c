@@ -2077,15 +2077,18 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     }
 
     /* vertex shader constant buffer */
-    constantDesc.ByteWidth = sizeof(VS_PROJECTION_CONST);
-    static_assert((sizeof(VS_PROJECTION_CONST)%16)==0,"Constant buffers require 16-byte alignment");
-    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, NULL, &quad->pVertexShaderConstants);
-    if(FAILED(hr)) {
-        msg_Err(vd, "Could not create the vertex shader constant buffer. (hr=0x%lX)", hr);
-        goto error;
-    }
+    if ( projection == PROJECTION_MODE_EQUIRECTANGULAR )
+    {
+        constantDesc.ByteWidth = sizeof(VS_PROJECTION_CONST);
+        static_assert((sizeof(VS_PROJECTION_CONST)%16)==0,"Constant buffers require 16-byte alignment");
+        hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, NULL, &quad->pVertexShaderConstants);
+        if(FAILED(hr)) {
+            msg_Err(vd, "Could not create the vertex shader constant buffer. (hr=0x%lX)", hr);
+            goto error;
+        }
 
-    SetQuadVSProjection( vd, quad, &vd->cfg->viewpoint );
+        SetQuadVSProjection( vd, quad, &vd->cfg->viewpoint );
+    }
 
     D3D11_TEXTURE2D_DESC texDesc;
     memset(&texDesc, 0, sizeof(texDesc));
