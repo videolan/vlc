@@ -281,8 +281,6 @@ typedef struct vlc_vdp_video_field
 
 /**
  * Attaches a VDPAU video surface as context of a VLC picture.
- * @note In case of error, the surface is destroyed immediately. Otherwise,
- * it will be destroyed at the same time as the picture it was attached to.
  */
 VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, picture_t *);
 
