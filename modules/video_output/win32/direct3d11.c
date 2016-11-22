@@ -35,6 +35,7 @@
 #include <vlc_vout_display.h>
 
 #include <assert.h>
+#include <math.h>
 
 #define COBJMACROS
 #define INITGUID
@@ -847,6 +848,110 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     return S_OK;
 }
 
+/* rotation around the Z axis */
+static void getZRotMatrix(float theta, FLOAT matrix[static 16])
+{
+    float st, ct;
+
+    sincosf(theta, &st, &ct);
+
+    const FLOAT m[] = {
+    /*  x    y    z    w */
+        ct,  -st, 0.f, 0.f,
+        st,  ct,  0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+/* rotation around the Y axis */
+static void getYRotMatrix(float theta, FLOAT matrix[static 16])
+{
+    float st, ct;
+
+    sincosf(theta, &st, &ct);
+
+    const FLOAT m[] = {
+    /*  x    y    z    w */
+        ct,  0.f, -st, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        st,  0.f, ct,  0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+/* rotation around the X axis */
+static void getXRotMatrix(float phi, FLOAT matrix[static 16])
+{
+    float sp, cp;
+
+    sincosf(phi, &sp, &cp);
+
+    const FLOAT m[] = {
+    /*  x    y    z    w */
+        1.f, 0.f, 0.f, 0.f,
+        0.f, cp,  sp,  0.f,
+        0.f, -sp, cp,  0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+static void getZoomMatrix(float zoom, FLOAT matrix[static 16]) {
+
+    const FLOAT m[] = {
+        /* x   y     z     w */
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, zoom, 1.0f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+/* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
+static void getProjectionMatrix(float sar, float fovy, FLOAT matrix[static 16]) {
+
+    float zFar  = 1000;
+    float zNear = 0.01;
+
+    float f = 1.f / tanf(fovy / 2.f);
+
+    const FLOAT m[] = {
+        f / sar, 0.f,                   0.f,                0.f,
+        0.f,     f,                     0.f,                0.f,
+        0.f,     0.f,    -(zNear + zFar) / (zNear - zFar),  1.f,
+        0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
+
+     memcpy(matrix, m, sizeof(m));
+}
+
+static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_viewpoint_t *p_vp)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    if (SUCCEEDED(hr)) {
+        VS_PROJECTION_CONST *dst_data = mapped.pData;
+#define RAD(d) ((float) ((d) * M_PI / 180.f))
+        getXRotMatrix(-RAD(p_vp->pitch), dst_data->RotX);
+        getYRotMatrix(-RAD(p_vp->yaw),   dst_data->RotY);
+        getZRotMatrix(-RAD(p_vp->roll),  dst_data->RotZ);
+        getZoomMatrix(SPHERE_RADIUS * p_vp->zoom, dst_data->View);
+        float sar = (float) vd->cfg->display.width / vd->cfg->display.height;
+        getProjectionMatrix(sar, RAD(p_vp->fov), dst_data->Projection);
+#undef RAD
+    }
+    ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
+}
+
 static void CropStagingFormat(vout_display_t *vd, video_format_t *backup_fmt)
 {
     if ( vd->sys->stagingQuad.pTexture == NULL )
@@ -872,6 +977,17 @@ static int Control(vout_display_t *vd, int query, va_list args)
     video_format_t core_source;
     CropStagingFormat( vd, &core_source );
     int res = CommonControl( vd, query, args );
+
+    if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
+    {
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t*);
+        if ( vd->sys->picQuad.pVertexShaderConstants )
+        {
+            SetQuadVSProjection( vd, &vd->sys->picQuad, &cfg->viewpoint );
+            res = VLC_SUCCESS;
+        }
+    }
+
     UncropStagingFormat( vd, &core_source );
     return res;
 }
@@ -1968,6 +2084,8 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         msg_Err(vd, "Could not create the vertex shader constant buffer. (hr=0x%lX)", hr);
         goto error;
     }
+
+    SetQuadVSProjection( vd, quad, &vd->cfg->viewpoint );
 
     D3D11_TEXTURE2D_DESC texDesc;
     memset(&texDesc, 0, sizeof(texDesc));
