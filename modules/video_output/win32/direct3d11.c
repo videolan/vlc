@@ -79,7 +79,6 @@ vlc_module_begin ()
     add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
 
 #if VLC_WINSTORE_APP
-    add_integer("winrt-d3ddevice",     0x0, NULL, NULL, true); /* ID3D11Device*        */
     add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true); /* ID3D11DeviceContext* */
     add_integer("winrt-swapchain",     0x0, NULL, NULL, true); /* IDXGISwapChain1*     */
 #endif
@@ -531,11 +530,12 @@ static int OpenCoreW(vout_display_t *vd)
     IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
     if (!dxgiswapChain)
         return VLC_EGENERIC;
-    ID3D11Device* d3ddevice         = var_InheritInteger(vd, "winrt-d3ddevice");
-    if (!d3ddevice)
-        return VLC_EGENERIC;
     ID3D11DeviceContext* d3dcontext = var_InheritInteger(vd, "winrt-d3dcontext");
     if (!d3dcontext)
+        return VLC_EGENERIC;
+    ID3D11Device* d3ddevice = NULL;
+    ID3D11DeviceContext_GetDevice(d3dcontext, &d3ddevice);
+    if (!d3ddevice)
         return VLC_EGENERIC;
 
     vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
