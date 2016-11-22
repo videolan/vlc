@@ -1700,12 +1700,56 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
     sys->pool = NULL;
 }
 
-static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
-                     d3d_quad_cfg_t *cfg, ID3D11PixelShader *d3dpixelShader, bool b_visible)
+static void SetupQuadFlat(d3d_vertex_t *dst_data, WORD *triangle_pos)
 {
-    vout_display_sys_t *sys = vd->sys;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    float right = 1.0f;
+    float left = -1.0f;
+    float top = 1.0f;
+    float bottom = -1.0f;
+
+    // bottom left
+    dst_data[0].position.x = left;
+    dst_data[0].position.y = bottom;
+    dst_data[0].position.z = 0.0f;
+    dst_data[0].texture.x = 0.0f;
+    dst_data[0].texture.y = 1.0f;
+
+    // bottom right
+    dst_data[1].position.x = right;
+    dst_data[1].position.y = bottom;
+    dst_data[1].position.z = 0.0f;
+    dst_data[1].texture.x = 1.0f;
+    dst_data[1].texture.y = 1.0f;
+
+    // top right
+    dst_data[2].position.x = right;
+    dst_data[2].position.y = top;
+    dst_data[2].position.z = 0.0f;
+    dst_data[2].texture.x = 1.0f;
+    dst_data[2].texture.y = 0.0f;
+
+    // top left
+    dst_data[3].position.x = left;
+    dst_data[3].position.y = top;
+    dst_data[3].position.z = 0.0f;
+    dst_data[3].texture.x = 0.0f;
+    dst_data[3].texture.y = 0.0f;
+
+    triangle_pos[0] = 3;
+    triangle_pos[1] = 1;
+    triangle_pos[2] = 0;
+
+    triangle_pos[3] = 2;
+    triangle_pos[4] = 1;
+    triangle_pos[5] = 3;
+}
+
+static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad)
+{
     HRESULT hr;
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    vout_display_sys_t *sys = vd->sys;
+
     quad->vertexCount = 4;
     quad->indexCount = 2 * 3;
 
@@ -1719,8 +1763,54 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &bd, NULL, &quad->pVertexBuffer);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create vertex buffer. (hr=%lX)", hr);
-      goto error;
+      return false;
     }
+
+    /* create the index of the vertices */
+    D3D11_BUFFER_DESC quadDesc = {
+        .Usage = D3D11_USAGE_DYNAMIC,
+        .ByteWidth = sizeof(WORD) * quad->indexCount,
+        .BindFlags = D3D11_BIND_INDEX_BUFFER,
+        .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
+    };
+
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &quadDesc, NULL, &quad->pIndexBuffer);
+    if(FAILED(hr)) {
+        msg_Err(vd, "Could not create the quad indices. (hr=0x%lX)", hr);
+        return false;
+    }
+
+    /* create the vertices */
+    hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Failed to lock the vertex buffer (hr=0x%lX)", hr);
+        return false;
+    }
+    d3d_vertex_t *dst_data = mappedResource.pData;
+
+    /* create the vertex indices */
+    hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Failed to lock the index buffer (hr=0x%lX)", hr);
+        ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
+        return false;
+    }
+    WORD *triangle_pos = mappedResource.pData;
+
+    SetupQuadFlat(dst_data, triangle_pos);
+
+    ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
+    ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
+
+    return true;
+}
+
+static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
+                     d3d_quad_cfg_t *cfg, ID3D11PixelShader *d3dpixelShader, bool b_visible)
+{
+    vout_display_sys_t *sys = vd->sys;
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    HRESULT hr;
 
     /* pixel shader constant buffer */
     PS_CONSTANT_BUFFER defaultConstants = {
@@ -1737,22 +1827,6 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, &constantInit, &quad->pPixelShaderConstants);
     if(FAILED(hr)) {
         msg_Err(vd, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
-        goto error;
-    }
-
-    /* create the index of the vertices */
-    D3D11_BUFFER_DESC quadDesc = {
-        .Usage = D3D11_USAGE_DYNAMIC,
-        .ByteWidth = sizeof(WORD) * quad->indexCount,
-        .BindFlags = D3D11_BIND_INDEX_BUFFER,
-        .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
-    };
-
-    quad->d3dvertexShader = sys->flatVSShader;
-
-    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &quadDesc, NULL, &quad->pIndexBuffer);
-    if(FAILED(hr)) {
-        msg_Err(vd, "Could not create the quad indices. (hr=0x%lX)", hr);
         goto error;
     }
 
@@ -1804,6 +1878,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
     }
 
+    /* map texture planes to resource views */
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
     memset(&resviewDesc, 0, sizeof(resviewDesc));
     resviewDesc.Format = cfg->resourceFormatYRGB;
@@ -1828,70 +1903,12 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     if ( d3dpixelShader != NULL )
     {
+        if ( !AllocQuadVertices( vd, quad ) )
+            goto error;
+        quad->d3dvertexShader = sys->flatVSShader;
+
         quad->d3dpixelShader = d3dpixelShader;
         ID3D11PixelShader_AddRef(quad->d3dpixelShader);
-
-        float right = 1.0f;
-        float left = -1.0f;
-        float top = 1.0f;
-        float bottom = -1.0f;
-
-        hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-        if (SUCCEEDED(hr)) {
-            d3d_vertex_t *dst_data = mappedResource.pData;
-
-            // bottom left
-            dst_data[0].position.x = left;
-            dst_data[0].position.y = bottom;
-            dst_data[0].position.z = 0.0f;
-            dst_data[0].texture.x = 0.0f;
-            dst_data[0].texture.y = 1.0f;
-
-            // bottom right
-            dst_data[1].position.x = right;
-            dst_data[1].position.y = bottom;
-            dst_data[1].position.z = 0.0f;
-            dst_data[1].texture.x = 1.0f;
-            dst_data[1].texture.y = 1.0f;
-
-            // top right
-            dst_data[2].position.x = right;
-            dst_data[2].position.y = top;
-            dst_data[2].position.z = 0.0f;
-            dst_data[2].texture.x = 1.0f;
-            dst_data[2].texture.y = 0.0f;
-
-            // top left
-            dst_data[3].position.x = left;
-            dst_data[3].position.y = top;
-            dst_data[3].position.z = 0.0f;
-            dst_data[3].texture.x = 0.0f;
-            dst_data[3].texture.y = 0.0f;
-
-            ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
-        }
-        else {
-            msg_Err(vd, "Failed to lock the subpicture vertex buffer (hr=0x%lX)", hr);
-        }
-
-        /* create the vertex indices */
-        hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-        if (SUCCEEDED(hr)) {
-            WORD *dst_data = mappedResource.pData;
-
-            dst_data[0] = 3;
-            dst_data[1] = 1;
-            dst_data[2] = 0;
-
-            dst_data[3] = 2;
-            dst_data[4] = 1;
-            dst_data[5] = 3;
-
-            ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
-        }
-        else {
-            msg_Err(vd, "Failed to lock the index buffer (hr=0x%lX)", hr);
-        }
     }
 
     return VLC_SUCCESS;
