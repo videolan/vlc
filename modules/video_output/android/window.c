@@ -66,8 +66,6 @@ struct vout_window_sys_t
  */
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    ANativeWindow *p_anw;
-
     if (cfg->type != VOUT_WINDOW_TYPE_INVALID
      && cfg->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
         return VLC_EGENERIC;
@@ -79,12 +77,9 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     p_sys->p_awh = AWindowHandler_new(VLC_OBJECT(wnd));
     if (!p_sys->p_awh)
         goto error;
-    p_anw = AWindowHandler_getANativeWindow(p_sys->p_awh, AWindow_Video);
-    if (!p_anw)
-        goto error;
 
     wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
-    wnd->handle.anativewindow = p_anw;
+    wnd->handle.anativewindow = p_sys->p_awh;
     wnd->control = Control;
     wnd->sys = p_sys;
 

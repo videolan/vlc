@@ -39,6 +39,9 @@
 #ifdef USE_PLATFORM_WAYLAND
 # include <wayland-egl.h>
 #endif
+#if defined (USE_PLATFORM_ANDROID)
+# include "android/utils.h"
+#endif
 
 typedef struct vlc_gl_sys_t
 {
@@ -188,6 +191,10 @@ static void Close (vlc_object_t *obj)
     if (sys->window != NULL)
         wl_egl_window_destroy(sys->window);
 #endif
+#ifdef USE_PLATFORM_ANDROID
+    AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
+                                        AWindow_Video, false);
+#endif
     free (sys);
 }
 
@@ -284,7 +291,12 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     if (wnd->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
         goto error;
 
-    window = &wnd->handle.anativewindow;
+    ANativeWindow *anw =
+        AWindowHandler_getANativeWindow(wnd->handle.anativewindow,
+                                        AWindow_Video);
+    if (anw == NULL)
+        goto error;
+    window = &anw,
 # if defined (__ANDROID__) || defined (ANDROID)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 # endif
