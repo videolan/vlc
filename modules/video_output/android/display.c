@@ -113,7 +113,8 @@ struct vout_display_sys_t
 
     AWindowHandler *p_awh;
     native_window_api_t *anw;
-    native_window_priv_api_t *anwp;
+    native_window_priv_api_t anwp;
+    bool b_has_anwp;
 
     android_window *p_window;
     android_window *p_sub_window;
@@ -332,7 +333,7 @@ static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
                                             bool b_clear)
 {
     if (p_window->p_surface_priv) {
-        sys->anwp->disconnect(p_window->p_surface_priv);
+        sys->anwp.disconnect(p_window->p_surface_priv);
         p_window->p_surface_priv = NULL;
     }
     if (p_window->p_surface) {
@@ -369,7 +370,7 @@ static android_window *AndroidWindow_New(vout_display_t *vd,
     p_window->id = id;
     p_window->b_opaque = p_fmt->i_chroma == VLC_CODEC_ANDROID_OPAQUE;
     if (!p_window->b_opaque) {
-        p_window->b_use_priv = sys->anwp && b_use_priv;
+        p_window->b_use_priv = sys->b_has_anwp && b_use_priv;
 
         p_window->i_android_hal = ChromaToAndroidHal(p_fmt->i_chroma);
         if (p_window->i_android_hal == -1)
@@ -424,11 +425,11 @@ static int AndroidWindow_UpdateCrop(vout_display_sys_t *sys,
     if (!p_window->p_surface_priv)
         return -1;
 
-    return sys->anwp->setCrop(p_window->p_surface_priv,
-                              p_window->fmt.i_x_offset,
-                              p_window->fmt.i_y_offset,
-                              p_window->fmt.i_visible_width,
-                              p_window->fmt.i_visible_height);
+    return sys->anwp.setCrop(p_window->p_surface_priv,
+                             p_window->fmt.i_x_offset,
+                             p_window->fmt.i_y_offset,
+                             p_window->fmt.i_visible_width,
+                             p_window->fmt.i_visible_height);
 }
 
 static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
@@ -438,37 +439,37 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     unsigned int i_max_buffer_count = 0;
 
     if (!p_window->p_surface_priv)
-        p_window->p_surface_priv = sys->anwp->connect(p_window->p_surface);
+        p_window->p_surface_priv = sys->anwp.connect(p_window->p_surface);
 
     if (!p_window->p_surface_priv)
         goto error;
 
-    if (sys->anwp->setUsage(p_window->p_surface_priv, false, 0) != 0)
+    if (sys->anwp.setUsage(p_window->p_surface_priv, false, 0) != 0)
         goto error;
 
     if (!b_java_configured
-        && sys->anwp->setBuffersGeometry(p_window->p_surface_priv,
-                                         p_window->fmt.i_width,
-                                         p_window->fmt.i_height,
-                                         p_window->i_android_hal) != 0)
+        && sys->anwp.setBuffersGeometry(p_window->p_surface_priv,
+                                        p_window->fmt.i_width,
+                                        p_window->fmt.i_height,
+                                        p_window->i_android_hal) != 0)
         goto error;
 
-    sys->anwp->getMinUndequeued(p_window->p_surface_priv,
-                                &p_window->i_min_undequeued);
+    sys->anwp.getMinUndequeued(p_window->p_surface_priv,
+                               &p_window->i_min_undequeued);
 
-    sys->anwp->getMaxBufferCount(p_window->p_surface_priv, &i_max_buffer_count);
+    sys->anwp.getMaxBufferCount(p_window->p_surface_priv, &i_max_buffer_count);
 
     if ((p_window->i_min_undequeued + p_window->i_pic_count) >
          i_max_buffer_count)
         p_window->i_pic_count = i_max_buffer_count - p_window->i_min_undequeued;
 
-    if (sys->anwp->setBufferCount(p_window->p_surface_priv,
-                                  p_window->i_pic_count +
-                                  p_window->i_min_undequeued) != 0)
+    if (sys->anwp.setBufferCount(p_window->p_surface_priv,
+                                 p_window->i_pic_count +
+                                 p_window->i_min_undequeued) != 0)
         goto error;
 
-    if (sys->anwp->setOrientation(p_window->p_surface_priv,
-                                  p_window->i_angle) != 0)
+    if (sys->anwp.setOrientation(p_window->p_surface_priv,
+                                 p_window->i_angle) != 0)
         goto error;
 
     AndroidWindow_UpdateCrop(sys, p_window);
@@ -476,7 +477,7 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     return 0;
 error:
     if (p_window->p_surface_priv) {
-        sys->anwp->disconnect(p_window->p_surface_priv);
+        sys->anwp.disconnect(p_window->p_surface_priv);
         p_window->p_surface_priv = NULL;
     }
     p_window->b_use_priv = false;
@@ -575,7 +576,7 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
         if (p_handle == NULL)
             return;
 
-        sys->anwp->unlockData(p_window->p_surface_priv, p_handle, b_render);
+        sys->anwp.unlockData(p_window->p_surface_priv, p_handle, b_render);
     } else
         sys->anw->unlockAndPost(p_window->p_surface);
 }
@@ -590,8 +591,8 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
         void *p_handle;
         int err;
 
-        err = sys->anwp->lockData(p_window->p_surface_priv,
-                                  &p_handle, &p_picsys->priv.sw.buf);
+        err = sys->anwp.lockData(p_window->p_surface_priv,
+                                 &p_handle, &p_picsys->priv.sw.buf);
         if (err != 0)
             return -1;
         p_picsys->priv.sw.p_handle = p_handle;
@@ -675,8 +676,8 @@ static int Open(vlc_object_t *p_this)
     sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
 
 #ifdef USE_ANWP
-    sys->anwp = AWindowHandler_getANativeWindowPrivAPI(sys->p_awh);
-    if (!sys->anwp)
+    sys->b_has_anwp = android_loadNativeWindowPrivApi(&sys->anwp) == 0;
+    if (!sys->b_has_anwp)
         msg_Warn(vd, "Could not initialize NativeWindow Priv API.");
 #endif
 

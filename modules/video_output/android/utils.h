@@ -97,6 +97,14 @@ typedef struct
 } native_window_priv_api_t;
 
 /**
+ * This function load a native_window_priv_api_t that can be used to access
+ * the private ANativeWindow API.
+ * \param api doesn't need to be released
+ * \return 0 on success, -1 on error.
+ */
+int android_loadNativeWindowPrivApi(native_window_priv_api_t *api);
+
+/**
  * This function returns a JNIEnv* created from the android JavaVM attached to
  * the VLC object var. it doesn't need to be released.
  */
@@ -115,12 +123,6 @@ void AWindowHandler_destroy(AWindowHandler *p_awh);
  * public ANativeWindow API. It can't be NULL and shouldn't be released
  */
 native_window_api_t *AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh);
-
-/**
- * This function returns a native_window_priv_api_t that can be used to access
- * the private ANativeWindow API. It can be NULL and shouldn't be released
- */
-native_window_priv_api_t *AWindowHandler_getANativeWindowPrivAPI(AWindowHandler *p_awh);
 
 /**
  * This function retrieves the mouse coordinates sent by the Android

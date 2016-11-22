@@ -283,8 +283,8 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
  * Android private NativeWindow (post android 2.3)
  */
 
-static int
-LoadNativeWindowPrivAPI(native_window_priv_api_t *native)
+int
+android_loadNativeWindowPrivApi(native_window_priv_api_t *native)
 {
 #define LOAD(symbol) do { \
 if ((native->symbol = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_" #symbol)) == NULL) \
@@ -514,7 +514,7 @@ AWindowHandler_releaseANativeWindowEnv(AWindowHandler *p_awh, JNIEnv *p_env,
          * Don't do it earlier because MediaCodec may not be able to connect to
          * the surface anymore. */
         if (b_clear && p_awh->anw_api.setBuffersGeometry
-         && AWindowHandler_getANativeWindowPrivAPI(p_awh) == NULL)
+         && dlsym(RTLD_DEFAULT, "ANativeWindowPriv_connect") == NULL)
         {
             /* Clear the surface by displaying a 1x1 black RGB buffer */
             ANativeWindow *p_anw = p_awh->views[id].p_anw;
@@ -567,15 +567,6 @@ native_window_api_t *
 AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh)
 {
     return &p_awh->anw_api;
-}
-
-native_window_priv_api_t *
-AWindowHandler_getANativeWindowPrivAPI(AWindowHandler *p_awh)
-{
-    if (LoadNativeWindowPrivAPI(&p_awh->anwpriv_api) != 0)
-        return NULL;
-    else
-        return &p_awh->anwpriv_api;
 }
 
 static int

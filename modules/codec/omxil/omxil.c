@@ -2083,10 +2083,9 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
         msg_Warn( p_dec, "AWindowHandler_new failed" );
         goto error;
     }
-    p_port->p_hwbuf->anwpriv = AWindowHandler_getANativeWindowPrivAPI( p_port->p_hwbuf->p_awh );
-    if( !p_port->p_hwbuf->anwpriv )
+    if( android_loadNativeWindowPrivApi( &p_port->p_hwbuf->anwpriv ) )
     {
-        msg_Warn( p_dec, "AWindowHandler_getANativeWindowPrivAPI failed" );
+        msg_Warn( p_dec, "android_loadNativeWindowPrivApi failed" );
         goto error;
     }
     p_anw = AWindowHandler_getANativeWindow( p_port->p_hwbuf->p_awh,
@@ -2097,7 +2096,7 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
         goto error;
     }
 
-    p_port->p_hwbuf->window_priv = p_port->p_hwbuf->anwpriv->connect( p_anw );
+    p_port->p_hwbuf->window_priv = p_port->p_hwbuf->anwpriv.connect( p_anw );
     if( !p_port->p_hwbuf->window_priv ) {
         msg_Warn( p_dec, "connect failed" );
         goto error;
@@ -2134,7 +2133,7 @@ static void HwBuffer_Destroy( decoder_t *p_dec, OmxPort *p_port )
             HwBuffer_Stop( p_dec, p_port );
             HwBuffer_FreeBuffers( p_dec, p_port );
             HwBuffer_Join( p_dec, p_port );
-            p_port->p_hwbuf->anwpriv->disconnect( p_port->p_hwbuf->window_priv );
+            p_port->p_hwbuf->anwpriv.disconnect( p_port->p_hwbuf->window_priv );
             pf_enable_graphic_buffers( p_port->omx_handle,
                                        p_port->i_port_index, OMX_FALSE );
         }
@@ -2201,17 +2200,17 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
             default:
                 i_angle = 0;
         }
-        p_port->p_hwbuf->anwpriv->setOrientation( p_port->p_hwbuf->window_priv,
+        p_port->p_hwbuf->anwpriv.setOrientation( p_port->p_hwbuf->window_priv,
                                                  i_angle );
     }
 
-    if( p_port->p_hwbuf->anwpriv->setUsage( p_port->p_hwbuf->window_priv,
+    if( p_port->p_hwbuf->anwpriv.setUsage( p_port->p_hwbuf->window_priv,
                                            true, (int) i_hw_usage ) != 0 )
     {
         msg_Err( p_dec, "can't set usage" );
         goto error;
     }
-    if( p_port->p_hwbuf->anwpriv->setBuffersGeometry( p_port->p_hwbuf->window_priv,
+    if( p_port->p_hwbuf->anwpriv.setBuffersGeometry( p_port->p_hwbuf->window_priv,
                                                      def->format.video.nFrameWidth,
                                                      def->format.video.nFrameHeight,
                                                      colorFormat ) != 0 )
@@ -2220,7 +2219,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
         goto error;
     }
 
-    if( p_port->p_hwbuf->anwpriv->getMinUndequeued( p_port->p_hwbuf->window_priv,
+    if( p_port->p_hwbuf->anwpriv.getMinUndequeued( p_port->p_hwbuf->window_priv,
                                                    &min_undequeued ) != 0 )
     {
         msg_Err( p_dec, "can't get min_undequeued" );
@@ -2242,7 +2241,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
                      omx_error, ErrorToString(omx_error) );
     }
 
-    if( p_port->p_hwbuf->anwpriv->setBufferCount( p_port->p_hwbuf->window_priv,
+    if( p_port->p_hwbuf->anwpriv.setBufferCount( p_port->p_hwbuf->window_priv,
                                                  def->nBufferCountActual ) != 0 )
     {
         msg_Err( p_dec, "can't set buffer_count" );
@@ -2270,7 +2269,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
     {
         void *p_handle = NULL;
 
-        if( p_port->p_hwbuf->anwpriv->dequeue( p_port->p_hwbuf->window_priv,
+        if( p_port->p_hwbuf->anwpriv.dequeue( p_port->p_hwbuf->window_priv,
                                               &p_handle ) != 0 )
         {
             msg_Err( p_dec, "OMXHWBuffer_dequeue Fail" );
@@ -2283,7 +2282,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
     for(; i < p_port->p_hwbuf->i_buffers; i++)
     {
         OMX_DBG( "canceling buffer(%d)", i );
-        p_port->p_hwbuf->anwpriv->cancel( p_port->p_hwbuf->window_priv,
+        p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv,
                                          p_port->p_hwbuf->pp_handles[i] );
     }
 
@@ -2314,7 +2313,7 @@ static int HwBuffer_FreeBuffers( decoder_t *p_dec, OmxPort *p_port )
 
             if( p_handle && p_port->p_hwbuf->i_states[i] == BUF_STATE_OWNED )
             {
-                p_port->p_hwbuf->anwpriv->cancel( p_port->p_hwbuf->window_priv, p_handle );
+                p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
                 HwBuffer_ChangeState( p_dec, p_port, i, BUF_STATE_NOT_OWNED );
             }
         }
@@ -2354,7 +2353,7 @@ static int HwBuffer_Start( decoder_t *p_dec, OmxPort *p_port )
 
         if( p_header && p_port->p_hwbuf->i_states[i] == BUF_STATE_OWNED )
         {
-            if( p_port->p_hwbuf->anwpriv->lock( p_port->p_hwbuf->window_priv,
+            if( p_port->p_hwbuf->anwpriv.lock( p_port->p_hwbuf->window_priv,
                                                p_header->pBuffer ) != 0 )
             {
                 msg_Err( p_dec, "lock failed" );
@@ -2487,7 +2486,7 @@ static void HwBuffer_SetCrop( decoder_t *p_dec, OmxPort *p_port,
 {
     VLC_UNUSED( p_dec );
 
-    p_port->p_hwbuf->anwpriv->setCrop( p_port->p_hwbuf->window_priv,
+    p_port->p_hwbuf->anwpriv.setCrop( p_port->p_hwbuf->window_priv,
                                       p_rect->nLeft, p_rect->nTop,
                                       p_rect->nWidth, p_rect->nHeight );
 }
@@ -2522,9 +2521,9 @@ static void *DequeueThread( void *data )
         /* The thread can be stuck here. It shouldn't happen since we make sure
          * we call the dequeue function if there is at least one buffer
          * available. */
-        err = p_port->p_hwbuf->anwpriv->dequeue( p_port->p_hwbuf->window_priv, &p_handle );
+        err = p_port->p_hwbuf->anwpriv.dequeue( p_port->p_hwbuf->window_priv, &p_handle );
         if( err == 0 )
-            err = p_port->p_hwbuf->anwpriv->lock( p_port->p_hwbuf->window_priv, p_handle );
+            err = p_port->p_hwbuf->anwpriv.lock( p_port->p_hwbuf->window_priv, p_handle );
 
         HWBUFFER_LOCK( p_port );
 
@@ -2536,7 +2535,7 @@ static void *DequeueThread( void *data )
 
         if( !p_port->p_hwbuf->b_run )
         {
-            p_port->p_hwbuf->anwpriv->cancel( p_port->p_hwbuf->window_priv, p_handle );
+            p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
             continue;
         }
 
@@ -2551,7 +2550,7 @@ static void *DequeueThread( void *data )
         }
         if( i_index == -1 )
         {
-            msg_Err( p_dec, "p_port->p_hwbuf->anwpriv->dequeue returned unknown handle" );
+            msg_Err( p_dec, "p_port->p_hwbuf->anwpriv.dequeue returned unknown handle" );
             continue;
         }
 
@@ -2591,9 +2590,9 @@ static void ReleasePicture( decoder_t *p_dec, unsigned int i_index,
     }
 
     if( b_render )
-        p_port->p_hwbuf->anwpriv->queue( p_port->p_hwbuf->window_priv, p_handle );
+        p_port->p_hwbuf->anwpriv.queue( p_port->p_hwbuf->window_priv, p_handle );
     else
-        p_port->p_hwbuf->anwpriv->cancel( p_port->p_hwbuf->window_priv, p_handle );
+        p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
 
     HwBuffer_ChangeState( p_dec, p_port, i_index, BUF_STATE_NOT_OWNED );
     HWBUFFER_BROADCAST( p_port );

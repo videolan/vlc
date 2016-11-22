@@ -77,7 +77,7 @@ typedef struct HwBuffer
 
 #if defined(USE_IOMX)
     AWindowHandler *p_awh;
-    native_window_priv_api_t *anwpriv;
+    native_window_priv_api_t anwpriv;
     native_window_priv *window_priv;
 #endif
 
