@@ -2051,8 +2051,8 @@ static void HwBuffer_ChangeState( decoder_t *p_dec, OmxPort *p_port,
 static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
 {
     VLC_UNUSED( p_dec );
-    ANativeWindow *p_anw;
     OMX_ERRORTYPE omx_error;
+    picture_t *p_dummy_hwpic = NULL;
 
     if( !p_port->b_direct || p_port->definition.eDir != OMX_DirOutput ||
         p_port->p_fmt->i_cat != VIDEO_ES )
@@ -2069,6 +2069,17 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
         goto error;
     }
 
+    p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
+    if (decoder_UpdateVideoFormat(p_dec) != 0
+     || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
+    {
+        msg_Err(p_dec, "Opaque Vout request failed");
+        goto error;
+    }
+    ANativeWindow *p_anw = p_dummy_hwpic->p_sys->priv.hw.p_surface;
+    if( !p_anw )
+        goto error;
+
     p_port->p_hwbuf = calloc(1, sizeof(HwBuffer));
     if( !p_port->p_hwbuf )
     {
@@ -2077,22 +2088,9 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
     vlc_mutex_init (&p_port->p_hwbuf->lock);
     vlc_cond_init (&p_port->p_hwbuf->wait);
 
-    p_port->p_hwbuf->p_awh = AWindowHandler_new( VLC_OBJECT( p_dec ) );
-    if( !p_port->p_hwbuf->p_awh )
-    {
-        msg_Warn( p_dec, "AWindowHandler_new failed" );
-        goto error;
-    }
     if( android_loadNativeWindowPrivApi( &p_port->p_hwbuf->anwpriv ) )
     {
         msg_Warn( p_dec, "android_loadNativeWindowPrivApi failed" );
-        goto error;
-    }
-    p_anw = AWindowHandler_getANativeWindow( p_port->p_hwbuf->p_awh,
-                                             AWindow_Video );
-    if( !p_anw )
-    {
-        msg_Warn( p_dec, "AWindowHandler_getVideoANativeWindow failed" );
         goto error;
     }
 
@@ -2115,8 +2113,12 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
 
 
     msg_Dbg( p_dec, "direct output port enabled" );
+    if (p_dummy_hwpic != NULL)
+        picture_Release(p_dummy_hwpic);
     return;
 error:
+    if (p_dummy_hwpic != NULL)
+        picture_Release(p_dummy_hwpic);
     /* if HwBuffer_Init fails, we can fall back to non direct buffers */
     HwBuffer_Destroy( p_dec, p_port );
 }
@@ -2136,11 +2138,6 @@ static void HwBuffer_Destroy( decoder_t *p_dec, OmxPort *p_port )
             p_port->p_hwbuf->anwpriv.disconnect( p_port->p_hwbuf->window_priv );
             pf_enable_graphic_buffers( p_port->omx_handle,
                                        p_port->i_port_index, OMX_FALSE );
-        }
-        if( p_port->p_hwbuf->p_awh )
-        {
-            AWindowHandler_destroy( p_port->p_hwbuf->p_awh );
-            p_port->p_hwbuf->p_awh = NULL;
         }
 
         vlc_cond_destroy( &p_port->p_hwbuf->wait );

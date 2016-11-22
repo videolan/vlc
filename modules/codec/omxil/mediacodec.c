@@ -115,7 +115,6 @@ struct decoder_sys_t
     {
         struct
         {
-            AWindowHandler *p_awh;
             unsigned int i_stride, i_slice_height, i_width, i_height;
             int i_pixel_format;
             uint8_t i_nal_length_size;
@@ -486,6 +485,7 @@ static int ParseVideoExtra(decoder_t *p_dec)
 static int StartMediaCodec(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    picture_t *p_dummy_hwpic = NULL;
     union mc_api_args args;
 
     if (((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->pp_csd))
@@ -535,30 +535,29 @@ static int StartMediaCodec(decoder_t *p_dec)
             }
         }
 
-        if (!p_sys->u.video.p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
+        if (var_InheritBool(p_dec, CFG_PREFIX "dr"))
         {
-            if ((p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec))))
-            {
-                /* Direct rendering:
-                 * The surface must be released by the Vout before calling
-                 * start. Request a valid OPAQUE Vout to release any non-OPAQUE
-                 * Vout that will release the surface.
-                 */
-                p_dec->fmt_out.video.i_width = p_sys->u.video.i_width;
-                p_dec->fmt_out.video.i_height = p_sys->u.video.i_height;
-                p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
-                if (decoder_UpdateVideoFormat(p_dec) != 0)
-                {
-                    msg_Err(p_dec, "Opaque Vout request failed: "
-                                   "fallback to non opaque");
-
-                    AWindowHandler_destroy(p_sys->u.video.p_awh);
-                    p_sys->u.video.p_awh = NULL;
-                }
-            }
+            /* Direct rendering: Request a valid OPAQUE Vout in order to get
+             * the surface attached to it */
+            p_dec->fmt_out.video.i_width = p_sys->u.video.i_width;
+            p_dec->fmt_out.video.i_height = p_sys->u.video.i_height;
+            p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
+            if (decoder_UpdateVideoFormat(p_dec) != 0
+             || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
+                msg_Err(p_dec, "Opaque Vout request failed: "
+                               "fallback to non opaque");
         }
-        args.video.p_awh = p_sys->u.video.p_awh;
-        args.video.b_tunneled_playback = args.video.p_awh ?
+        if (p_dummy_hwpic)
+        {
+            assert(p_dummy_hwpic->p_sys);
+            assert(p_dummy_hwpic->p_sys->priv.hw.p_surface);
+            assert(p_dummy_hwpic->p_sys->priv.hw.p_jsurface);
+            args.video.p_surface = p_dummy_hwpic->p_sys->priv.hw.p_surface;
+            args.video.p_jsurface = p_dummy_hwpic->p_sys->priv.hw.p_jsurface;
+        }
+        else
+            args.video.p_surface = args.video.p_jsurface = NULL;
+        args.video.b_tunneled_playback = args.video.p_surface ?
                 var_InheritBool(p_dec, CFG_PREFIX "tunneled-playback") : false;
     }
     else
@@ -569,7 +568,10 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.audio.i_channel_count  = p_dec->p_sys->u.audio.i_channels;
     }
 
-    return p_sys->api->start(p_sys->api, &args);
+    int i_ret = p_sys->api->start(p_sys->api, &args);
+    if (p_dummy_hwpic != NULL)
+        picture_Release(p_dummy_hwpic);
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -585,9 +587,6 @@ static void StopMediaCodec(decoder_t *p_dec)
         RemoveInflightPictures(p_dec);
 
     p_sys->api->stop(p_sys->api);
-    if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
-        AWindowHandler_releaseANativeWindow(p_sys->u.video.p_awh, AWindow_Video,
-                                            true);
 }
 
 /*****************************************************************************
@@ -867,8 +866,6 @@ static void CleanDecoder(decoder_t *p_dec)
     {
         if (p_sys->u.video.timestamp_fifo)
             timestamp_FifoRelease(p_sys->u.video.timestamp_fifo);
-        if (p_sys->u.video.p_awh)
-            AWindowHandler_destroy(p_sys->u.video.p_awh);
     }
     free(p_sys->api);
     free(p_sys);

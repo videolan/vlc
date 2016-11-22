@@ -332,11 +332,10 @@ static int Start(mc_api *api, union mc_api_args *p_args)
         syms.AMediaFormat.setInt32(p_sys->p_format, "width", p_args->video.i_width);
         syms.AMediaFormat.setInt32(p_sys->p_format, "height", p_args->video.i_height);
         syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", p_args->video.i_angle);
-        if (p_args->video.p_awh)
+        if (p_args->video.p_surface)
         {
-            p_anw = AWindowHandler_getANativeWindow(p_args->video.p_awh,
-                                                    AWindow_Video);
-            if( p_anw )
+            p_anw = p_args->video.p_surface;
+            if (p_args->video.b_tunneled_playback)
                 syms.AMediaFormat.setInt32(p_sys->p_format,
                                            "feature-tunneled-playback",
                                            p_args->video.b_tunneled_playback);

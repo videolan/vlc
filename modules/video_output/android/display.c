@@ -93,6 +93,7 @@ struct android_window
 
     enum AWindow_ID id;
     ANativeWindow *p_surface;
+    jobject       *p_jsurface;
     native_window_priv *p_surface_priv;
 };
 
@@ -214,6 +215,8 @@ static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt,
 
     if (b_opaque)
     {
+        p_picsys->priv.hw.p_surface = sys->p_window->p_surface;
+        p_picsys->priv.hw.p_jsurface =  sys->p_window->p_jsurface;
         p_picsys->priv.hw.i_index = -1;
         vlc_mutex_init(&p_picsys->priv.hw.lock);
         rsc.pf_destroy = AndroidOpaquePicture_DetachVout;
@@ -345,11 +348,14 @@ static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
 static int AndroidWindow_ConnectSurface(vout_display_sys_t *sys,
                                         android_window *p_window)
 {
-    if (!p_window->p_surface && !p_window->b_opaque) {
+    if (!p_window->p_surface) {
         p_window->p_surface = AWindowHandler_getANativeWindow(sys->p_awh,
                                                               p_window->id);
         if (!p_window->p_surface)
             return -1;
+        if (p_window->b_opaque)
+            p_window->p_jsurface = AWindowHandler_getSurface(sys->p_awh,
+                                                             p_window->id);
     }
 
     return 0;

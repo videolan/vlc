@@ -87,7 +87,8 @@ union mc_api_args
 {
     struct
     {
-        AWindowHandler *p_awh;
+        void *p_surface;
+        void *p_jsurface;
         int i_width;
         int i_height;
         int i_angle;

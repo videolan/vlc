@@ -42,6 +42,9 @@ struct picture_sys_t
 
     union {
         struct {
+            void *p_surface;
+            void *p_jsurface;
+
             vlc_mutex_t lock;
             decoder_t *p_dec;
             int i_index;

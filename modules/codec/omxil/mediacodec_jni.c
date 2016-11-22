@@ -536,9 +536,7 @@ static int Start(mc_api *api, union mc_api_args *p_args)
                                                  jmime,
                                                  p_args->video.i_width,
                                                  p_args->video.i_height);
-        if (p_args->video.p_awh)
-            jsurface = AWindowHandler_getSurface(p_args->video.p_awh,
-                                                 AWindow_Video);
+        jsurface = p_args->video.p_jsurface;
         b_direct_rendering = !!jsurface;
 
         /* There is no way to rotate the video using direct rendering (and
