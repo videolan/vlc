@@ -83,10 +83,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->control = Control;
     wnd->sys = p_sys;
 
-    // Set the Java surface size.
-    AWindowHandler_setWindowLayout(p_sys->p_awh, cfg->width, cfg->height,
-                                   cfg->width, cfg->height, 1, 1);
-
     return VLC_SUCCESS;
 
 error:
@@ -113,22 +109,7 @@ static void Close(vout_window_t *wnd)
  */
 static int Control(vout_window_t *wnd, int cmd, va_list ap)
 {
-    switch (cmd)
-    {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned width = va_arg(ap, unsigned);
-            unsigned height = va_arg(ap, unsigned);
-            AWindowHandler_setWindowLayout(wnd->sys->p_awh, width, height,
-                                           width, height, 1, 1);
-            break;
-        }
-        case VOUT_WINDOW_SET_STATE:
-        case VOUT_WINDOW_SET_FULLSCREEN:
-            return VLC_EGENERIC;
-        default:
-            msg_Err (wnd, "request %d not implemented", cmd);
-            return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    (void) ap;
+    msg_Err (wnd, "request %d not implemented", cmd);
+    return VLC_EGENERIC;
 }
