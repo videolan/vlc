@@ -193,14 +193,14 @@ static int OpenDecoder( vlc_object_t *p_this )
 #ifdef USE_DL_OPENING
 #  define DLL_NAME "bcmDIL.dll"
 #  define PATHS_NB 3
-    static const char *psz_paths[PATHS_NB] = {
-    DLL_NAME,
-    "C:\\Program Files\\Broadcom\\Broadcom CrystalHD Decoder\\" DLL_NAME,
-    "C:\\Program Files (x86)\\Broadcom\\Broadcom CrystalHD Decoder\\" DLL_NAME,
+    static const TCHAR *psz_paths[PATHS_NB] = {
+        TEXT(DLL_NAME),
+        TEXT("C:\\Program Files\\Broadcom\\Broadcom CrystalHD Decoder\\" DLL_NAME),
+        TEXT("C:\\Program Files (x86)\\Broadcom\\Broadcom CrystalHD Decoder\\" DLL_NAME),
     };
     for( int i = 0; i < PATHS_NB; i++ )
     {
-        HINSTANCE p_bcm_dll = LoadLibraryA( psz_paths[i] );
+        HINSTANCE p_bcm_dll = LoadLibrary( psz_paths[i] );
         if( p_bcm_dll )
         {
             p_sys->p_bcm_dll = p_bcm_dll;
