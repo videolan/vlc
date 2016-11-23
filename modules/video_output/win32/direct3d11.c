@@ -284,17 +284,18 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
   {\
-    float3 yuv;\
+    float4 yuv;\
     float4 rgba;\
     yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
     yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
+    yuv.a  = Opacity;\
     yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
     yuv.y  = yuv.y - 0.5;\
     yuv.z  = yuv.z - 0.5;\
     rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
-    rgba.a = Opacity;\
+    rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
 ";
@@ -317,17 +318,18 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
   {\
-    float3 yuv;\
+    float4 yuv;\
     float4 rgba;\
     yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
     yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
+    yuv.a  = Opacity;\
     yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
     yuv.y  = yuv.y - 0.5;\
     yuv.z  = yuv.z - 0.5;\
     rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
-    rgba.a = Opacity;\
+    rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
 ";
@@ -351,10 +353,11 @@ static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
   {\
-    float3 yuv;\
+    float4 yuv;\
     float4 rgba;\
     yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
     yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
+    yuv.a = Opacity;\
     yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
     yuv.y  = yuv.y - 0.5;\
     yuv.z  = yuv.z - 0.5;\
@@ -364,7 +367,7 @@ static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
     rgba.x = saturate( 1.661 * rgba.x - 0.588 * rgba.y - 0.073 * rgba.z);\
     rgba.y = saturate(-0.125 * rgba.x + 1.133 * rgba.y - 0.008 * rgba.z);\
     rgba.z = saturate(-0.018 * rgba.x - 0.101 * rgba.y + 1.119 * rgba.z);\
-    rgba.a = Opacity;\
+    rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
 ";
@@ -386,18 +389,19 @@ static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
   {\
-    float3 yuv;\
+    float4 yuv;\
     float4 rgba;\
     yuv.x  = shaderTextureYUYV.Sample(SampleType, In.Texture).x;\
     yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
     yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
+    yuv.a  = Opacity;\
     yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
     yuv.y  = yuv.y - 0.5;\
     yuv.z  = yuv.z - 0.5;\
     rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
-    rgba.a = Opacity;\
+    rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
 ";
@@ -419,18 +423,19 @@ static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
   \
   float4 PS( PS_INPUT In ) : SV_TARGET\
   {\
-    float3 yuv;\
+    float4 yuv;\
     float4 rgba;\
     yuv.x  = shaderTextureYUYV.Sample(SampleType, In.Texture).x;\
     yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
     yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
+    yuv.a  = Opacity;\
     yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
     yuv.y  = yuv.y - 0.5;\
     yuv.z  = yuv.z - 0.5;\
     rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
     rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
     rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
-    rgba.a = Opacity;\
+    rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
 ";
