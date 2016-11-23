@@ -97,66 +97,84 @@ typedef struct
 } native_window_priv_api_t;
 
 /**
- * This function load a native_window_priv_api_t that can be used to access
- * the private ANativeWindow API.
+ * Load a private native window API
+ *
+ * This can be used to access the private ANativeWindow API.
  * \param api doesn't need to be released
  * \return 0 on success, -1 on error.
  */
 int android_loadNativeWindowPrivApi(native_window_priv_api_t *api);
 
 /**
- * This function returns a JNIEnv* created from the android JavaVM attached to
- * the VLC object var. it doesn't need to be released.
+ * Attach or get a JNIEnv*
+ *
+ * The returned JNIEnv* is created from the android JavaVM attached to the VLC
+ * object var.
+ * \return a valid JNIEnv * or NULL. It doesn't need to be released.
  */
 JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
 
 /**
- * This function return a new AWindowHandler created from a
- * IAWindowNativeHandler jobject attached to the VLC object var. It must be
- * released with AWindowHandler_destroy.
+ * Create new AWindowHandler
+ *
+ * This handle allow to access IAWindowNativeHandler jobject attached to the
+ * VLC object var.
+ * \return a valid AWindowHandler * or NULL. It must be released with
+ * AWindowHandler_destroy.
  */
 AWindowHandler *AWindowHandler_new(vlc_object_t *p_obj);
 void AWindowHandler_destroy(AWindowHandler *p_awh);
 
 /**
- * This functions returns a native_window_api_t that can be used to access the
- * public ANativeWindow API. It can't be NULL and shouldn't be released
+ * Get the public native window API
+ *
+ * Used to access the public ANativeWindow API.
+ * \return a valid native_window_api_t. It doesn't need to be released.
  */
 native_window_api_t *AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh);
 
 /**
- * This function retrieves the mouse coordinates sent by the Android
- * MediaPlayer. It returns true if the coordinates are valid.
+ * Retrieves the mouse coordinates
+ *
+ * \return true if the coordinates are valid.
  */
 bool AWindowHandler_getMouseCoordinates(AWindowHandler *p_awh,
                                         int *p_action, int *p_button,
                                         int *p_x, int *p_y);
 
 /**
- * This function retrieves the window size sent by the Android MediaPlayer.  It
- * returns true if the size is valid.
+ * Retrieves the window size
+ *
+ * \return true if the size is valid.
  */
 bool AWindowHandler_getWindowSize(AWindowHandler *p_awh,
                                   int *p_width, int *p_height);
 
 /**
- * This function returns the Video or the Subtitles Android Surface attached to
- * the MediaPlayer. It can be released with AWindowHandler_releaseANativeWindow
- * or by AWindowHandler_destroy.
+ * Get the Video or the Subtitles Android Surface
+ *
+ * \return the surface in a jobject, or NULL. It should be released with
+ * AWindowHandler_releaseANativeWindow() or AWindowHandler_destroy().
  */
 jobject AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id);
 
 /**
- * This function returns the Video or the Subtitles ANativeWindow attached to
- * the Android Surface. It can be released with
- * AWindowHandler_releaseANativeWindow, AWindowHandler_releaseSurface or by
- * AWindowHandler_destroy.
+ * Get the Video or the Subtitles ANativeWindow
+ *
+ * \return a valid ANativeWindow or NULL.It should be released with
+ * AWindowHandler_releaseANativeWindow() or AWindowHandler_destroy.()
  */
 ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
                                                enum AWindow_ID id);
+
+/**
+ * Release the Video/Subtitles Surface/ANativeWindow
+ */
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
                                          enum AWindow_ID id, bool b_clear);
 /**
+ * Pre-ICS hack of ANativeWindow_setBuffersGeometry
+ *
  * This function is a fix up of ANativeWindow_setBuffersGeometry that doesn't
  * work before Android ICS. It configures the Surface from the Android
  * MainThread via a SurfaceHolder. It returns VLC_SUCCESS if the Surface was
@@ -166,7 +184,7 @@ int AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
                                       int i_width, int i_height, int i_format);
 
 /**
- * This function set the window layout.
+ * Set the window layout
  */
 int AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
                                    int i_width, int i_height,
