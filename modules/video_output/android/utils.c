@@ -255,16 +255,11 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
         return;
     }
 
-    p_awh->pf_winFromSurface =
-        (ptr_ANativeWindow_fromSurface)(dlsym(p_library, "ANativeWindow_fromSurface"));
-    p_awh->pf_winRelease =
-        (ptr_ANativeWindow_release)(dlsym(p_library, "ANativeWindow_release"));
-    p_awh->anw_api.winLock =
-        (ptr_ANativeWindow_lock)(dlsym(p_library, "ANativeWindow_lock"));
-    p_awh->anw_api.unlockAndPost =
-        (ptr_ANativeWindow_unlockAndPost)(dlsym(p_library, "ANativeWindow_unlockAndPost"));
-    p_awh->anw_api.setBuffersGeometry =
-        (ptr_ANativeWindow_setBuffersGeometry)(dlsym(p_library, "ANativeWindow_setBuffersGeometry"));
+    p_awh->pf_winFromSurface = dlsym(p_library, "ANativeWindow_fromSurface");
+    p_awh->pf_winRelease = dlsym(p_library, "ANativeWindow_release");
+    p_awh->anw_api.winLock = dlsym(p_library, "ANativeWindow_lock");
+    p_awh->anw_api.unlockAndPost = dlsym(p_library, "ANativeWindow_unlockAndPost");
+    p_awh->anw_api.setBuffersGeometry = dlsym(p_library, "ANativeWindow_setBuffersGeometry");
 
     if (p_awh->pf_winFromSurface && p_awh->pf_winRelease
      && p_awh->anw_api.winLock && p_awh->anw_api.unlockAndPost

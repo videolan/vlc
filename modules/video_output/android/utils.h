@@ -44,56 +44,34 @@ enum AWindow_ID {
 /**
  * native_window_api_t. See android/native_window.h in NDK
  */
-
-typedef int32_t (*ptr_ANativeWindow_lock)(ANativeWindow*, ANativeWindow_Buffer*, ARect*);
-typedef void (*ptr_ANativeWindow_unlockAndPost)(ANativeWindow*);
-typedef int32_t (*ptr_ANativeWindow_setBuffersGeometry)(ANativeWindow*, int32_t, int32_t, int32_t);
-
 typedef struct
 {
-    ptr_ANativeWindow_lock winLock;
-    ptr_ANativeWindow_unlockAndPost unlockAndPost;
-    ptr_ANativeWindow_setBuffersGeometry setBuffersGeometry; /* can be NULL */
+    int32_t (*winLock)(ANativeWindow*, ANativeWindow_Buffer*, ARect*);
+    void (*unlockAndPost)(ANativeWindow*);
+    int32_t (*setBuffersGeometry)(ANativeWindow*, int32_t, int32_t, int32_t); /* can be NULL */
 } native_window_api_t;
 
 /**
  * native_window_priv_api_t. See system/core/include/system/window.h in AOSP.
  */
-
 typedef struct native_window_priv native_window_priv;
-typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (ANativeWindow *);
-typedef int (*ptr_ANativeWindowPriv_disconnect) (native_window_priv *);
-typedef int (*ptr_ANativeWindowPriv_setUsage) (native_window_priv *, bool, int );
-typedef int (*ptr_ANativeWindowPriv_setBuffersGeometry) (native_window_priv *, int, int, int );
-typedef int (*ptr_ANativeWindowPriv_getMinUndequeued) (native_window_priv *, unsigned int *);
-typedef int (*ptr_ANativeWindowPriv_getMaxBufferCount) (native_window_priv *, unsigned int *);
-typedef int (*ptr_ANativeWindowPriv_setBufferCount) (native_window_priv *, unsigned int );
-typedef int (*ptr_ANativeWindowPriv_setCrop) (native_window_priv *, int, int, int, int);
-typedef int (*ptr_ANativeWindowPriv_dequeue) (native_window_priv *, void **);
-typedef int (*ptr_ANativeWindowPriv_lock) (native_window_priv *, void *);
-typedef int (*ptr_ANativeWindowPriv_queue) (native_window_priv *, void *);
-typedef int (*ptr_ANativeWindowPriv_cancel) (native_window_priv *, void *);
-typedef int (*ptr_ANativeWindowPriv_lockData) (native_window_priv *, void **, ANativeWindow_Buffer *);
-typedef int (*ptr_ANativeWindowPriv_unlockData) (native_window_priv *, void *, bool b_render);
-typedef int (*ptr_ANativeWindowPriv_setOrientation) (native_window_priv *, int);
-
 typedef struct
 {
-    ptr_ANativeWindowPriv_connect connect;
-    ptr_ANativeWindowPriv_disconnect disconnect;
-    ptr_ANativeWindowPriv_setUsage setUsage;
-    ptr_ANativeWindowPriv_setBuffersGeometry setBuffersGeometry;
-    ptr_ANativeWindowPriv_getMinUndequeued getMinUndequeued;
-    ptr_ANativeWindowPriv_getMaxBufferCount getMaxBufferCount;
-    ptr_ANativeWindowPriv_setBufferCount setBufferCount;
-    ptr_ANativeWindowPriv_setCrop setCrop;
-    ptr_ANativeWindowPriv_dequeue dequeue;
-    ptr_ANativeWindowPriv_lock lock;
-    ptr_ANativeWindowPriv_lockData lockData;
-    ptr_ANativeWindowPriv_unlockData unlockData;
-    ptr_ANativeWindowPriv_queue queue;
-    ptr_ANativeWindowPriv_cancel cancel;
-    ptr_ANativeWindowPriv_setOrientation setOrientation;
+    native_window_priv *(*connect)(ANativeWindow *);
+    int (*disconnect) (native_window_priv *);
+    int (*setUsage) (native_window_priv *, bool, int );
+    int (*setBuffersGeometry) (native_window_priv *, int, int, int );
+    int (*getMinUndequeued) (native_window_priv *, unsigned int *);
+    int (*getMaxBufferCount) (native_window_priv *, unsigned int *);
+    int (*setBufferCount) (native_window_priv *, unsigned int );
+    int (*setCrop) (native_window_priv *, int, int, int, int);
+    int (*dequeue) (native_window_priv *, void **);
+    int (*lock) (native_window_priv *, void *);
+    int (*queue) (native_window_priv *, void *);
+    int (*cancel) (native_window_priv *, void *);
+    int (*lockData) (native_window_priv *, void **, ANativeWindow_Buffer *);
+    int (*unlockData) (native_window_priv *, void *, bool b_render);
+    int (*setOrientation) (native_window_priv *, int);
 } native_window_priv_api_t;
 
 /**
