@@ -125,6 +125,12 @@ typedef struct {
 } PS_CONSTANT_BUFFER;
 
 typedef struct {
+    FLOAT WhitePoint[3];
+    FLOAT whitePadding;
+    FLOAT Colorspace[4*4];
+} PS_COLOR_TRANSFORM;
+
+typedef struct {
     FLOAT RotX[4*4];
     FLOAT RotY[4*4];
     FLOAT RotZ[4*4];
@@ -1105,7 +1111,7 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
     /* pixel shader */
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, quad->d3dpixelShader, NULL, 0);
 
-    ID3D11DeviceContext_PSSetConstantBuffers(sys->d3dcontext, 0, 1, &quad->pPixelShaderConstants);
+    ID3D11DeviceContext_PSSetConstantBuffers(sys->d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
     ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 1, &quad->d3dresViewY);
     if( quad->d3dresViewUV )
         ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 1, 1, &quad->d3dresViewUV);
@@ -2050,19 +2056,28 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     PS_CONSTANT_BUFFER defaultConstants = {
       .Opacity = 1,
     };
-    static_assert((sizeof(defaultConstants)%16)==0,"Constant buffers require 16-byte alignment");
+    static_assert((sizeof(PS_CONSTANT_BUFFER)%16)==0,"Constant buffers require 16-byte alignment");
     D3D11_BUFFER_DESC constantDesc = {
         .Usage = D3D11_USAGE_DYNAMIC,
-        .ByteWidth = sizeof(defaultConstants),
+        .ByteWidth = sizeof(PS_CONSTANT_BUFFER),
         .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
         .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
     };
     D3D11_SUBRESOURCE_DATA constantInit = { .pSysMem = &defaultConstants };
-    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, &constantInit, &quad->pPixelShaderConstants);
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, &constantInit, &quad->pPixelShaderConstants[0]);
     if(FAILED(hr)) {
         msg_Err(vd, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
         goto error;
     }
+
+    static_assert((sizeof(PS_COLOR_TRANSFORM)%16)==0,"Constant buffers require 16-byte alignment");
+    constantDesc.ByteWidth = sizeof(PS_COLOR_TRANSFORM);
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, NULL, &quad->pPixelShaderConstants[1]);
+    if(FAILED(hr)) {
+        msg_Err(vd, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
+        goto error;
+    }
+    quad->PSConstantsCount = 2;
 
     /* vertex shader constant buffer */
     if ( projection == PROJECTION_MODE_EQUIRECTANGULAR )
@@ -2172,10 +2187,15 @@ error:
 
 static void ReleaseQuad(d3d_quad_t *quad)
 {
-    if (quad->pPixelShaderConstants)
+    if (quad->pPixelShaderConstants[0])
     {
-        ID3D11Buffer_Release(quad->pPixelShaderConstants);
-        quad->pPixelShaderConstants = NULL;
+        ID3D11Buffer_Release(quad->pPixelShaderConstants[0]);
+        quad->pPixelShaderConstants[0] = NULL;
+    }
+    if (quad->pPixelShaderConstants[1])
+    {
+        ID3D11Buffer_Release(quad->pPixelShaderConstants[1]);
+        quad->pPixelShaderConstants[1] = NULL;
     }
     if (quad->pVertexBuffer)
     {
@@ -2307,11 +2327,11 @@ static void UpdateQuadOpacity(vout_display_t *vd, const d3d_quad_t *quad, float 
     vout_display_sys_t *sys = vd->sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-    HRESULT hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
+    HRESULT hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
     if (SUCCEEDED(hr)) {
         FLOAT *dst_data = mappedResource.pData;
         *dst_data = opacity;
-        ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants, 0);
+        ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[0], 0);
     }
     else {
         msg_Err(vd, "Failed to lock the subpicture vertex buffer (hr=0x%lX)", hr);
