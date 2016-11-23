@@ -364,7 +364,9 @@ static int vlclua_playlist_status( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     PL_LOCK;
-    switch( playlist_Status( p_playlist ) )
+    int status = playlist_Status( p_playlist );
+    PL_UNLOCK;
+    switch( status )
     {
         case PLAYLIST_STOPPED:
             lua_pushliteral( L, "stopped" );
@@ -379,7 +381,6 @@ static int vlclua_playlist_status( lua_State *L )
             lua_pushliteral( L, "unknown" );
             break;
     }
-    PL_UNLOCK;
     return 1;
 }
 
