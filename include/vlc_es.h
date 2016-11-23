@@ -283,6 +283,8 @@ typedef enum video_chroma_location_t
 } video_chroma_location_t;
 
 #define FIELD_OF_VIEW_DEGREES_DEFAULT  80.f
+#define FIELD_OF_VIEW_DEGREES_MAX 150.f
+#define FIELD_OF_VIEW_DEGREES_MIN 20.f
 
 /**
  * video format description
