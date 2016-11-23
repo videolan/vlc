@@ -104,8 +104,8 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
      * SetSocketMediaStreamingMode is present in win 8 and later, so we set
      * receive buffer if that isn't present
      */
-#if _WIN32_WINNT < 0x602
-    HINSTANCE h_Network = LoadLibraryW(L"Windows.Networking.dll");
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+    HINSTANCE h_Network = LoadLibrary(TEXT("Windows.Networking.dll"));
     if( (h_Network == NULL) ||
         (GetProcAddress( h_Network, "SetSocketMediaStreamingMode" ) == NULL ) )
     {
