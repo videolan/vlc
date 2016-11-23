@@ -3070,13 +3070,13 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                    _(c_loc_names[fmt->video.projection_mode]) );
 
            info_category_AddInfo( p_cat, _("Yaw"), "%.2f",
-                                  fmt->video.f_pose_yaw_degrees );
+                                  fmt->video.pose.f_yaw_degrees );
            info_category_AddInfo( p_cat, _("Pitch"), "%.2f",
-                                  fmt->video.f_pose_pitch_degrees );
+                                  fmt->video.pose.f_pitch_degrees );
            info_category_AddInfo( p_cat, _("Roll"), "%.2f",
-                                  fmt->video.f_pose_roll_degrees );
+                                  fmt->video.pose.f_roll_degrees );
            info_category_AddInfo( p_cat, _("Field of view"), "%.2f",
-                                  fmt->video.f_pose_fov_degrees );
+                                  fmt->video.pose.f_fov_degrees );
        }
        break;
 

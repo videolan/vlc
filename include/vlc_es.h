@@ -321,10 +321,12 @@ struct video_format_t
     video_multiview_mode_t multiview_mode;        /** Multiview mode, 2D, 3D */
 
     video_projection_mode_t projection_mode;            /**< projection mode */
-    float f_pose_yaw_degrees;      /**< view point yaw in degrees ]-180;180] */
-    float f_pose_pitch_degrees;    /**< view point pitch in degrees ]-90;90] */
-    float f_pose_roll_degrees;    /**< view point roll in degrees ]-180;180] */
-    float f_pose_fov_degrees;         /**< view point fov in degrees ]0;180[ */
+    struct {
+        float f_yaw_degrees;       /**< view point yaw in degrees ]-180;180] */
+        float f_pitch_degrees;     /**< view point pitch in degrees ]-90;90] */
+        float f_roll_degrees;     /**< view point roll in degrees ]-180;180] */
+        float f_fov_degrees;          /**< view point fov in degrees ]0;180[ */
+    } pose;
     uint32_t i_cubemap_padding; /**< padding in pixels of the cube map faces */
 };
 
@@ -338,7 +340,7 @@ static inline void video_format_Init( video_format_t *p_src, vlc_fourcc_t i_chro
     memset( p_src, 0, sizeof( video_format_t ) );
     p_src->i_chroma = i_chroma;
     p_src->i_sar_num = p_src->i_sar_den = 1;
-    p_src->f_pose_fov_degrees = DEFAULT_FIELD_OF_VIEW_DEGREES;
+    p_src->pose.f_fov_degrees = DEFAULT_FIELD_OF_VIEW_DEGREES;
 }
 
 /**

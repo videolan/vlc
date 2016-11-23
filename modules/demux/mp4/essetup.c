@@ -379,11 +379,11 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     const MP4_Box_t *p_prhd = MP4_BoxGet( p_sample, "sv3d/proj/prhd" );
     if (p_prhd && BOXDATA(p_prhd))
     {
-        p_track->fmt.video.f_pose_yaw_degrees
+        p_track->fmt.video.pose.f_yaw_degrees
                 = BOXDATA(p_prhd)->f_pose_yaw_degrees;
-        p_track->fmt.video.f_pose_pitch_degrees
+        p_track->fmt.video.pose.f_pitch_degrees
                 = BOXDATA(p_prhd)->f_pose_pitch_degrees;
-        p_track->fmt.video.f_pose_roll_degrees
+        p_track->fmt.video.pose.f_roll_degrees
                 = BOXDATA(p_prhd)->f_pose_roll_degrees;
     }
 

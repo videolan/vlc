@@ -560,10 +560,10 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
         cfg->viewpoint = *p_viewpoint;
     else
     {
-        cfg->viewpoint.yaw = vout->p->original.f_pose_yaw_degrees;
-        cfg->viewpoint.pitch = vout->p->original.f_pose_pitch_degrees;
-        cfg->viewpoint.roll = vout->p->original.f_pose_roll_degrees;
-        cfg->viewpoint.fov = vout->p->original.f_pose_fov_degrees;
+        cfg->viewpoint.yaw   = vout->p->original.pose.f_yaw_degrees;
+        cfg->viewpoint.pitch = vout->p->original.pose.f_pitch_degrees;
+        cfg->viewpoint.roll  = vout->p->original.pose.f_roll_degrees;
+        cfg->viewpoint.fov   = vout->p->original.pose.f_fov_degrees;
         cfg->viewpoint.zoom = 0.f;
     }
     cfg->display.title = title;
