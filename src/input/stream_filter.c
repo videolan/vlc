@@ -70,7 +70,8 @@ error:
 /* Add automatic stream filter */
 stream_t *stream_FilterAutoNew( stream_t *p_source )
 {
-    for( ;; )
+    /* Limit number of entries to avoid infinite recursion. */
+    for( unsigned i = 0; i < 16; i++ )
     {
         stream_t *p_filter = vlc_stream_FilterNew( p_source, NULL );
         if( p_filter == NULL )
