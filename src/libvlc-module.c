@@ -2235,8 +2235,8 @@ vlc_module_begin ()
 #   define KEY_UNCROP_RIGHT       "Alt+Shift+l"
 
 /* 360° Viewpoint */
-#   define KEY_VIEWPOINT_ZOOM_IN  "Page Up"
-#   define KEY_VIEWPOINT_ZOOM_OUT "Page Down"
+#   define KEY_VIEWPOINT_FOV_IN   "Page Up"
+#   define KEY_VIEWPOINT_FOV_OUT  "Page Down"
 
 /* the macosx-interface already has bindings */
 #   define KEY_ZOOM_QUARTER       NULL
@@ -2382,8 +2382,8 @@ vlc_module_begin ()
 #   define KEY_UNCROP_RIGHT       "Alt+Shift+f"
 
 /* 360° Viewpoint */
-#   define KEY_VIEWPOINT_ZOOM_IN  "Page Up"
-#   define KEY_VIEWPOINT_ZOOM_OUT "Page Down"
+#   define KEY_VIEWPOINT_FOV_IN   "Page Up"
+#   define KEY_VIEWPOINT_FOV_OUT  "Page Down"
 
 /* Zooming */
 #   define KEY_ZOOM_QUARTER       "Alt+1"
@@ -2578,9 +2578,9 @@ vlc_module_begin ()
     add_key( "key-loop", KEY_LOOP,
              LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, false )
 
-    add_key( "key-viewpoint-fov-in", NULL,
+    add_key( "key-viewpoint-fov-in", KEY_VIEWPOINT_FOV_IN,
              VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_TEXT, true )
-    add_key( "key-viewpoint-fov-out", NULL,
+    add_key( "key-viewpoint-fov-out", KEY_VIEWPOINT_FOV_OUT,
              VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_TEXT, true )
     add_key( "key-viewpoint-zoom-in", KEY_VIEWPOINT_ZOOM_IN,
              VIEWPOINT_ZOOM_IN_KEY_TEXT, VIEWPOINT_ZOOM_IN_KEY_TEXT, true )

@@ -1369,15 +1369,15 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 DisplayPosition( p_vout, slider_chan, p_input );
             break;
 
-        case ACTIONID_COMBO_VOL_ZOOM_UP:
+        case ACTIONID_COMBO_VOL_FOV_UP:
             if( b_vrnav )
-                DO_ACTION( ACTIONID_VIEWPOINT_ZOOM_IN );
+                DO_ACTION( ACTIONID_VIEWPOINT_FOV_IN );
             else
                 DO_ACTION( ACTIONID_VOL_UP );
             break;
-        case ACTIONID_COMBO_VOL_ZOOM_DOWN:
+        case ACTIONID_COMBO_VOL_FOV_DOWN:
             if( b_vrnav )
-                DO_ACTION( ACTIONID_VIEWPOINT_ZOOM_OUT );
+                DO_ACTION( ACTIONID_VIEWPOINT_FOV_OUT );
             else
                 DO_ACTION( ACTIONID_VOL_DOWN );
             break;
