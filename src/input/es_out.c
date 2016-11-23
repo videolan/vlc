@@ -174,7 +174,6 @@ struct es_out_sys_t
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, const es_format_t * );
-static es_out_id_t *EsOutAddSlave( es_out_t *, const es_format_t *, es_out_id_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
@@ -1457,19 +1456,6 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
     /* TODO handle sout meta ? */
 }
 
-/* EsOutAdd:
- *  Add an es_out
- */
-static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
-{
-#ifndef NDEBUG
-    if( fmt->i_cat == SPU_ES )
-        for( int i=0; i<4; i++ )
-            assert( fmt->i_codec != EsOutFourccClosedCaptions[i] );
-#endif
-    return EsOutAddSlave( out, fmt, NULL );
-}
-
 static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out_id_t *p_master )
 {
     es_out_sys_t      *p_sys = out->p_sys;
@@ -1592,6 +1578,14 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     vlc_mutex_unlock( &p_sys->lock );
 
     return es;
+}
+
+/* EsOutAdd:
+ *  Add an es_out
+ */
+static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
+{
+    return EsOutAddSlave( out, fmt, NULL );
 }
 
 static bool EsIsSelected( es_out_id_t *es )
