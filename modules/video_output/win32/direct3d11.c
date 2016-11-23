@@ -266,7 +266,7 @@ static const char* globPixelShaderDefault = "\
   }\
 ";
 
-static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
+static const char *globPixelShaderBiplanarYUV_2RGB = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
@@ -305,131 +305,7 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
   }\
 ";
 
-static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
-  cbuffer PS_CONSTANT_BUFFER : register(b0)\
-  {\
-    float Opacity;\
-    float opacityPadding[3];\
-  };\
-  cbuffer PS_COLOR_TRANSFORM : register(b1)\
-  {\
-    float WhitePointX;\
-    float WhitePointY;\
-    float WhitePointZ;\
-    float whitePadding;\
-    float4x4 Colorspace;\
-  };\
-  Texture2D shaderTextureY;\
-  Texture2D shaderTextureUV;\
-  SamplerState SampleType;\
-  \
-  struct PS_INPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float2 Texture    : TEXCOORD0;\
-  };\
-  \
-  float4 PS( PS_INPUT In ) : SV_TARGET\
-  {\
-    float4 yuv;\
-    float4 rgba;\
-    yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
-    yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
-    yuv.a  = Opacity;\
-    yuv.x  += WhitePointX;\
-    yuv.y  += WhitePointY;\
-    yuv.z  += WhitePointZ;\
-    rgba = saturate(mul(yuv, Colorspace));\
-    return rgba;\
-  }\
-";
-
-/* RGB-709 to RGB-2020 based on https://www.researchgate.net/publication/258434326_Beyond_BT709 */
-static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
-  cbuffer PS_CONSTANT_BUFFER : register(b0)\
-  {\
-    float Opacity;\
-    float opacityPadding[3];\
-  };\
-  cbuffer PS_COLOR_TRANSFORM : register(b1)\
-  {\
-    float WhitePointX;\
-    float WhitePointY;\
-    float WhitePointZ;\
-    float whitePadding;\
-    float4x4 Colorspace;\
-  };\
-  Texture2D shaderTextureY;\
-  Texture2D shaderTextureUV;\
-  SamplerState SampleType;\
-  \
-  struct PS_INPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float2 Texture    : TEXCOORD0;\
-  };\
-  \
-  float4 PS( PS_INPUT In ) : SV_TARGET\
-  {\
-    float4 yuv;\
-    float4 rgba;\
-    yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
-    yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
-    yuv.a = Opacity;\
-    yuv.x  += WhitePointX;\
-    yuv.y  += WhitePointY;\
-    yuv.z  += WhitePointZ;\
-    rgba.x = 1.164383561643836 * yuv.x + 1.792741071428571 * yuv.z;\
-    rgba.y = 1.164383561643836 * yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y;\
-    rgba.z = 1.164383561643836 * yuv.x + 2.112401785714286 * yuv.y;\
-    rgba.x = saturate( 1.661 * rgba.x - 0.588 * rgba.y - 0.073 * rgba.z);\
-    rgba.y = saturate(-0.125 * rgba.x + 1.133 * rgba.y - 0.008 * rgba.z);\
-    rgba.z = saturate(-0.018 * rgba.x - 0.101 * rgba.y + 1.119 * rgba.z);\
-    rgba.a = saturate(1.0 * yuv.a);\
-    return rgba;\
-  }\
-";
-
-static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
-  cbuffer PS_CONSTANT_BUFFER : register(b0)\
-  {\
-    float Opacity;\
-    float opacityPadding[3];\
-  };\
-  cbuffer PS_COLOR_TRANSFORM : register(b1)\
-  {\
-    float WhitePointX;\
-    float WhitePointY;\
-    float WhitePointZ;\
-    float whitePadding;\
-    float4x4 Colorspace;\
-  };\
-  Texture2D shaderTextureYUYV;\
-  SamplerState SampleType;\
-  \
-  struct PS_INPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float2 Texture    : TEXCOORD0;\
-  };\
-  \
-  float4 PS( PS_INPUT In ) : SV_TARGET\
-  {\
-    float4 yuv;\
-    float4 rgba;\
-    yuv.x  = shaderTextureYUYV.Sample(SampleType, In.Texture).x;\
-    yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
-    yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
-    yuv.a  = Opacity;\
-    yuv.x  += WhitePointX;\
-    yuv.y  += WhitePointY;\
-    yuv.z  += WhitePointZ;\
-    rgba = saturate(mul(yuv, Colorspace));\
-    return rgba;\
-  }\
-";
-
-static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
+static const char *globPixelShaderBiplanarYUYV_2RGB = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
@@ -1522,26 +1398,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 
     if (sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R8_UNORM ||
         sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R16_UNORM)
-    {
-        if (vd->fmt.space == COLOR_SPACE_BT2020)
-            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT2020_2RGB;
-        else if (vd->fmt.space == COLOR_SPACE_BT709)
-            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
-        else if (vd->fmt.space == COLOR_SPACE_BT601)
-            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
-        else if( fmt->i_height > 576 )
-            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
-        else
-            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
-    }
+        sys->d3dPxShader = globPixelShaderBiplanarYUV_2RGB;
     else
     if (fmt->i_chroma == VLC_CODEC_YUYV)
-    {
-        if( fmt->i_height > 576 )
-            sys->d3dPxShader = globPixelShaderBiplanarYUYV_BT709_2RGB;
-        else
-            sys->d3dPxShader = globPixelShaderBiplanarYUYV_BT601_2RGB;
-    }
+        sys->d3dPxShader = globPixelShaderBiplanarYUYV_2RGB;
     else
         sys->d3dPxShader = globPixelShaderDefault;
 
