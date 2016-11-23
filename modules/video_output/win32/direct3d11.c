@@ -121,15 +121,15 @@ typedef struct d3d_vertex_t {
 
 typedef struct {
     FLOAT Opacity;
-    FLOAT padding[3];
+    FLOAT opacityPadding[3];
 } PS_CONSTANT_BUFFER;
 
 typedef struct {
-    FLOAT RotX[16];
-    FLOAT RotY[16];
-    FLOAT RotZ[16];
-    FLOAT View[16];
-    FLOAT Projection[16];
+    FLOAT RotX[4*4];
+    FLOAT RotY[4*4];
+    FLOAT RotZ[4*4];
+    FLOAT View[4*4];
+    FLOAT Projection[4*4];
 } VS_PROJECTION_CONST;
 
 #define SPHERE_RADIUS 1.f
@@ -239,9 +239,7 @@ static const char* globPixelShaderDefault = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
-    float ignoreA;\
-    float ignoreB;\
-    float ignoreC;\
+    float opacityPadding[3];\
   };\
   Texture2D shaderTexture;\
   SamplerState SampleType;\
@@ -266,9 +264,7 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
-    float ignoreA;\
-    float ignoreB;\
-    float ignoreC;\
+    float opacityPadding[3];\
   };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
@@ -301,9 +297,7 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
-    float ignoreA;\
-    float ignoreB;\
-    float ignoreC;\
+    float opacityPadding[3];\
   };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
@@ -337,9 +331,7 @@ static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
-    float ignoreA;\
-    float ignoreB;\
-    float ignoreC;\
+    float opacityPadding[3];\
   };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
@@ -375,9 +367,7 @@ static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
-    float ignoreA;\
-    float ignoreB;\
-    float ignoreC;\
+    float opacityPadding[3];\
   };\
   Texture2D shaderTextureYUYV;\
   SamplerState SampleType;\
@@ -410,9 +400,7 @@ static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\
   {\
     float Opacity;\
-    float ignoreA;\
-    float ignoreB;\
-    float ignoreC;\
+    float opacityPadding[3];\
   };\
   Texture2D shaderTextureYUYV;\
   SamplerState SampleType;\
