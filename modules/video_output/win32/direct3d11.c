@@ -272,6 +272,14 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
     float Opacity;\
     float opacityPadding[3];\
   };\
+  cbuffer PS_COLOR_TRANSFORM : register(b1)\
+  {\
+    float WhitePointX;\
+    float WhitePointY;\
+    float WhitePointZ;\
+    float whitePadding;\
+    float4x4 Colorspace;\
+  };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
   SamplerState SampleType;\
@@ -289,12 +297,12 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
     yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
     yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
     yuv.a  = Opacity;\
-    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
-    yuv.y  = yuv.y - 0.5;\
-    yuv.z  = yuv.z - 0.5;\
-    rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
-    rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
-    rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
+    yuv.x  += WhitePointX;\
+    yuv.y  += WhitePointY;\
+    yuv.z  += WhitePointZ;\
+    rgba.x = saturate(1.164383561643836 * yuv.x + 1.596026785714286 * yuv.z);\
+    rgba.y = saturate(1.164383561643836 * yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
+    rgba.z = saturate(1.164383561643836 * yuv.x + 2.017232142857142 * yuv.y);\
     rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
@@ -306,6 +314,14 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
     float Opacity;\
     float opacityPadding[3];\
   };\
+  cbuffer PS_COLOR_TRANSFORM : register(b1)\
+  {\
+    float WhitePointX;\
+    float WhitePointY;\
+    float WhitePointZ;\
+    float whitePadding;\
+    float4x4 Colorspace;\
+  };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
   SamplerState SampleType;\
@@ -323,12 +339,12 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
     yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
     yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
     yuv.a  = Opacity;\
-    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
-    yuv.y  = yuv.y - 0.5;\
-    yuv.z  = yuv.z - 0.5;\
-    rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
-    rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
-    rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
+    yuv.x  += WhitePointX;\
+    yuv.y  += WhitePointY;\
+    yuv.z  += WhitePointZ;\
+    rgba.x = saturate(1.164383561643836 * yuv.x + 1.792741071428571 * yuv.z);\
+    rgba.y = saturate(1.164383561643836 * yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
+    rgba.z = saturate(1.164383561643836 * yuv.x + 2.112401785714286 * yuv.y);\
     rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
@@ -340,6 +356,14 @@ static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
   {\
     float Opacity;\
     float opacityPadding[3];\
+  };\
+  cbuffer PS_COLOR_TRANSFORM : register(b1)\
+  {\
+    float WhitePointX;\
+    float WhitePointY;\
+    float WhitePointZ;\
+    float whitePadding;\
+    float4x4 Colorspace;\
   };\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
@@ -358,12 +382,12 @@ static const char *globPixelShaderBiplanarYUV_BT2020_2RGB = "\
     yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
     yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
     yuv.a = Opacity;\
-    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
-    yuv.y  = yuv.y - 0.5;\
-    yuv.z  = yuv.z - 0.5;\
-    rgba.x = yuv.x + 1.792741071428571 * yuv.z;\
-    rgba.y = yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y;\
-    rgba.z = yuv.x + 2.112401785714286 * yuv.y;\
+    yuv.x  += WhitePointX;\
+    yuv.y  += WhitePointY;\
+    yuv.z  += WhitePointZ;\
+    rgba.x = 1.164383561643836 * yuv.x + 1.792741071428571 * yuv.z;\
+    rgba.y = 1.164383561643836 * yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y;\
+    rgba.z = 1.164383561643836 * yuv.x + 2.112401785714286 * yuv.y;\
     rgba.x = saturate( 1.661 * rgba.x - 0.588 * rgba.y - 0.073 * rgba.z);\
     rgba.y = saturate(-0.125 * rgba.x + 1.133 * rgba.y - 0.008 * rgba.z);\
     rgba.z = saturate(-0.018 * rgba.x - 0.101 * rgba.y + 1.119 * rgba.z);\
@@ -378,6 +402,14 @@ static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
     float Opacity;\
     float opacityPadding[3];\
   };\
+  cbuffer PS_COLOR_TRANSFORM : register(b1)\
+  {\
+    float WhitePointX;\
+    float WhitePointY;\
+    float WhitePointZ;\
+    float whitePadding;\
+    float4x4 Colorspace;\
+  };\
   Texture2D shaderTextureYUYV;\
   SamplerState SampleType;\
   \
@@ -395,12 +427,12 @@ static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
     yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
     yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
     yuv.a  = Opacity;\
-    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
-    yuv.y  = yuv.y - 0.5;\
-    yuv.z  = yuv.z - 0.5;\
-    rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
-    rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
-    rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
+    yuv.x  += WhitePointX;\
+    yuv.y  += WhitePointY;\
+    yuv.z  += WhitePointZ;\
+    rgba.x = saturate(1.164383561643836 * yuv.x + 1.792741071428571 * yuv.z);\
+    rgba.y = saturate(1.164383561643836 * yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
+    rgba.z = saturate(1.164383561643836 * yuv.x + 2.112401785714286 * yuv.y);\
     rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
@@ -412,6 +444,14 @@ static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
     float Opacity;\
     float opacityPadding[3];\
   };\
+  cbuffer PS_COLOR_TRANSFORM : register(b1)\
+  {\
+    float WhitePointX;\
+    float WhitePointY;\
+    float WhitePointZ;\
+    float whitePadding;\
+    float4x4 Colorspace;\
+  };\
   Texture2D shaderTextureYUYV;\
   SamplerState SampleType;\
   \
@@ -429,12 +469,12 @@ static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
     yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
     yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
     yuv.a  = Opacity;\
-    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
-    yuv.y  = yuv.y - 0.5;\
-    yuv.z  = yuv.z - 0.5;\
-    rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
-    rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
-    rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
+    yuv.x  += WhitePointX;\
+    yuv.y  += WhitePointY;\
+    yuv.z  += WhitePointZ;\
+    rgba.x = saturate(1.164383561643836 * yuv.x + 1.596026785714286 * yuv.z);\
+    rgba.y = saturate(1.164383561643836 * yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
+    rgba.z = saturate(1.164383561643836 * yuv.x + 2.017232142857142 * yuv.y);\
     rgba.a = saturate(1.0 * yuv.a);\
     return rgba;\
   }\
@@ -2075,9 +2115,14 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
     }
 
+    static const FLOAT WHITE_POINT_D65[4] = { -0.0625f, -0.5f, -0.5f, 1.f };
+
+    memcpy(colorspace.WhitePoint, WHITE_POINT_D65, sizeof(colorspace.WhitePoint));
+    constantInit.pSysMem = &colorspace;
+
     static_assert((sizeof(PS_COLOR_TRANSFORM)%16)==0,"Constant buffers require 16-byte alignment");
     constantDesc.ByteWidth = sizeof(PS_COLOR_TRANSFORM);
-    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, NULL, &quad->pPixelShaderConstants[1]);
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &constantDesc, &constantInit, &quad->pPixelShaderConstants[1]);
     if(FAILED(hr)) {
         msg_Err(vd, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
         goto error;
