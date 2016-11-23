@@ -300,10 +300,7 @@ static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
     yuv.x  += WhitePointX;\
     yuv.y  += WhitePointY;\
     yuv.z  += WhitePointZ;\
-    rgba.x = saturate(1.164383561643836 * yuv.x + 1.596026785714286 * yuv.z);\
-    rgba.y = saturate(1.164383561643836 * yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
-    rgba.z = saturate(1.164383561643836 * yuv.x + 2.017232142857142 * yuv.y);\
-    rgba.a = saturate(1.0 * yuv.a);\
+    rgba = saturate(mul(yuv, Colorspace));\
     return rgba;\
   }\
 ";
@@ -342,10 +339,7 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
     yuv.x  += WhitePointX;\
     yuv.y  += WhitePointY;\
     yuv.z  += WhitePointZ;\
-    rgba.x = saturate(1.164383561643836 * yuv.x + 1.792741071428571 * yuv.z);\
-    rgba.y = saturate(1.164383561643836 * yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
-    rgba.z = saturate(1.164383561643836 * yuv.x + 2.112401785714286 * yuv.y);\
-    rgba.a = saturate(1.0 * yuv.a);\
+    rgba = saturate(mul(yuv, Colorspace));\
     return rgba;\
   }\
 ";
@@ -430,10 +424,7 @@ static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
     yuv.x  += WhitePointX;\
     yuv.y  += WhitePointY;\
     yuv.z  += WhitePointZ;\
-    rgba.x = saturate(1.164383561643836 * yuv.x + 1.792741071428571 * yuv.z);\
-    rgba.y = saturate(1.164383561643836 * yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
-    rgba.z = saturate(1.164383561643836 * yuv.x + 2.112401785714286 * yuv.y);\
-    rgba.a = saturate(1.0 * yuv.a);\
+    rgba = saturate(mul(yuv, Colorspace));\
     return rgba;\
   }\
 ";
@@ -472,10 +463,7 @@ static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
     yuv.x  += WhitePointX;\
     yuv.y  += WhitePointY;\
     yuv.z  += WhitePointZ;\
-    rgba.x = saturate(1.164383561643836 * yuv.x + 1.596026785714286 * yuv.z);\
-    rgba.y = saturate(1.164383561643836 * yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
-    rgba.z = saturate(1.164383561643836 * yuv.x + 2.017232142857142 * yuv.y);\
-    rgba.a = saturate(1.0 * yuv.a);\
+    rgba = saturate(mul(yuv, Colorspace));\
     return rgba;\
   }\
 ";
@@ -2117,6 +2105,46 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     static const FLOAT WHITE_POINT_D65[4] = { -0.0625f, -0.5f, -0.5f, 1.f };
 
+    static const FLOAT COLORSPACE_BT601_TO_FULL[4*4] = {
+        1.164383561643836f,                 0.f,  1.596026785714286f, 0.f,
+        1.164383561643836f, -0.391762290094914f, -0.812967647237771f, 0.f,
+        1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
+                       0.f,                 0.f,                 0.f, 1.f,
+    };
+    static const FLOAT COLORSPACE_BT709_TO_FULL[4*4] = {
+        1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
+        1.164383561643836f, -0.213248614273730f, -0.532909328559444f, 0.f,
+        1.164383561643836f,  2.112401785714286f,                 0.f, 0.f,
+                       0.f,                 0.f,                 0.f, 1.f,
+    };
+    /* RGB-709 to RGB-2020 based on https://www.researchgate.net/publication/258434326_Beyond_BT709 */
+    static const FLOAT COLORSPACE_BT2020_TO_FULL[4*4] = {
+        1.163746465f, -0.028815145f,  2.823537589f, 0.f,
+        1.164383561f, -0.258509894f,  0.379693635f, 0.f,
+        1.164383561f,  2.385315708f,  0.021554502f, 0.f,
+                 0.f,           0.f,           0.f, 1.f,
+    };
+
+    PS_COLOR_TRANSFORM colorspace;
+    const FLOAT *ppColorspace;
+    switch (fmt->space){
+        case COLOR_SPACE_BT709:
+            ppColorspace = COLORSPACE_BT709_TO_FULL;
+            break;
+        case COLOR_SPACE_BT2020:
+            ppColorspace = COLORSPACE_BT2020_TO_FULL;
+            break;
+        case COLOR_SPACE_BT601:
+            ppColorspace = COLORSPACE_BT601_TO_FULL;
+            break;
+        case COLOR_SPACE_UNDEF:
+            if( fmt->i_height > 576 )
+                ppColorspace = COLORSPACE_BT709_TO_FULL;
+            else
+                ppColorspace = COLORSPACE_BT601_TO_FULL;
+            break;
+    }
+    memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
     memcpy(colorspace.WhitePoint, WHITE_POINT_D65, sizeof(colorspace.WhitePoint));
     constantInit.pSysMem = &colorspace;
 
