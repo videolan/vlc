@@ -46,13 +46,11 @@ struct intf_thread_t;
  *
  * The base structure for all playlist operations is the input_item_t. This
  * contains all information needed to play a stream and get info, ie, mostly,
- * mrl and metadata. This structure contains a unique i_id field. ids are
- * not recycled when an item is destroyed.
+ * mrl and metadata.
  *
  * Input items are not used directly, but through playlist items.
  * The playlist items are themselves in a tree structure. They only contain
- * a link to the input item, a unique id and a few flags. the playlist
- * item id is NOT the same as the input item id.
+ * a link to the input item, a unique id and a few flags.
  * Several playlist items can be attached to a single input item. The input
  * item is refcounted and is automatically destroyed when it is not used
  * anymore.
@@ -100,9 +98,8 @@ struct intf_thread_t;
  *
  * The playlist defines the following event variables:
  *
- * - "item-change": It will contain the input_item_t->i_id of a changed input
- * item monitored by the playlist.
- * item being played.
+ * - "item-change": It will contain a pointer to the input_item_t of a
+ * changed input item monitored by the playlist.
  *
  * - "playlist-item-append": It will contain a pointer to a playlist_item_t.
  * - "playlist-item-deleted": It will contain a pointer to the playlist_item_t
@@ -113,9 +110,6 @@ struct intf_thread_t;
  *
  * The playlist contains rate-variable which is propagated to current input if available
  * also rate-slower/rate-faster is in use
- *
- * \warning Be really careful, playlist_item_t->i_id and input_item_t->i_id
- * are not the same. Yes, the situation is pretty bad.
  */
 
 /** Helper structure to export to file part of the playlist */
