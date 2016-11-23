@@ -69,9 +69,7 @@
 /* Win32 */
 #ifdef _WIN32
 # undef HAVE_FONTCONFIG
-# if !VLC_WINSTORE_APP
-#  define HAVE_FONT_FALLBACK
-# endif
+# define HAVE_FONT_FALLBACK
 #endif
 
 /* FontConfig */

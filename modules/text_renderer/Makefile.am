@@ -13,8 +13,14 @@ libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
 libfreetype_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(FREETYPE_LDFLAGS) -rpath '$(textdir)'
 
 if HAVE_WIN32_DESKTOP
-libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/win32.c
-libfreetype_plugin_la_LIBADD += -liconv -lz -lgdi32 -lusp10
+libfreetype_plugin_la_SOURCES += \
+	text_renderer/freetype/fonts/win32.c text_renderer/freetype/fonts/dwrite.cpp
+libfreetype_plugin_la_LIBADD += -liconv -lz -lgdi32 -lusp10 -luuid
+endif
+if HAVE_WINSTORE
+libfreetype_plugin_la_SOURCES += \
+	text_renderer/freetype/fonts/dwrite.cpp
+libfreetype_plugin_la_LIBADD += -ldwrite
 endif
 if HAVE_FONTCONFIG
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/fontconfig.c

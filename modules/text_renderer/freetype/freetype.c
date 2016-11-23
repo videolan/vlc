@@ -52,9 +52,7 @@
 /* Win32 */
 #ifdef _WIN32
 # undef HAVE_FONTCONFIG
-# if !VLC_WINSTORE_APP
-#  define HAVE_GET_FONT_BY_FAMILY_NAME
-# endif
+# define HAVE_GET_FONT_BY_FAMILY_NAME
 #endif
 
 /* FontConfig */
@@ -1265,14 +1263,29 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_select = Generic_Select;
     p_sys->pf_get_family = CoreText_GetFamily;
     p_sys->pf_get_fallbacks = CoreText_GetFallbacks;
-#elif defined( _WIN32 ) && defined( HAVE_GET_FONT_BY_FAMILY_NAME )
-    const char *const ppsz_win32_default[] =
-        { "Tahoma", "FangSong", "SimHei", "KaiTi" };
-    p_sys->pf_get_family = Win32_GetFamily;
-    p_sys->pf_get_fallbacks = Win32_GetFallbacks;
-    p_sys->pf_select = Generic_Select;
-    InitDefaultList( p_filter, ppsz_win32_default,
-                     sizeof( ppsz_win32_default ) / sizeof( *ppsz_win32_default ) );
+#elif defined( _WIN32 )
+    if( InitDWrite( p_filter ) == VLC_SUCCESS )
+    {
+        p_sys->pf_get_family = DWrite_GetFamily;
+        p_sys->pf_get_fallbacks = DWrite_GetFallbacks;
+        p_sys->pf_select = Generic_Select;
+    }
+    else
+    {
+#if VLC_WINSTORE_APP
+        msg_Err( p_filter, "Error initializing DirectWrite" );
+        goto error;
+#else
+        msg_Warn( p_filter, "DirectWrite initialization failed. Falling back to GDI/Uniscribe" );
+        const char *const ppsz_win32_default[] =
+            { "Tahoma", "FangSong", "SimHei", "KaiTi" };
+        p_sys->pf_get_family = Win32_GetFamily;
+        p_sys->pf_get_fallbacks = Win32_GetFallbacks;
+        p_sys->pf_select = Generic_Select;
+        InitDefaultList( p_filter, ppsz_win32_default,
+                         sizeof( ppsz_win32_default ) / sizeof( *ppsz_win32_default ) );
+#endif
+    }
 #elif defined( __ANDROID__ )
     p_sys->pf_get_family = Android_GetFamily;
     p_sys->pf_get_fallbacks = Android_GetFallbacks;
@@ -1324,15 +1337,6 @@ static void Destroy( vlc_object_t *p_this )
     DumpDictionary( p_filter, &p_sys->fallback_map, true, -1 );
 #endif
 
-    /* Attachments */
-    if( p_sys->pp_font_attachments )
-    {
-        for( int k = 0; k < p_sys->i_font_attachments; k++ )
-            vlc_input_attachment_Delete( p_sys->pp_font_attachments[k] );
-
-        free( p_sys->pp_font_attachments );
-    }
-
     /* Text styles */
     text_style_Delete( p_sys->p_default_style );
     text_style_Delete( p_sys->p_forced_style );
@@ -1343,6 +1347,20 @@ static void Destroy( vlc_object_t *p_this )
     vlc_dictionary_clear( &p_sys->family_map, NULL, NULL );
     if( p_sys->p_families )
         FreeFamiliesAndFonts( p_sys->p_families );
+
+    /* Attachments */
+    if( p_sys->pp_font_attachments )
+    {
+        for( int k = 0; k < p_sys->i_font_attachments; k++ )
+            vlc_input_attachment_Delete( p_sys->pp_font_attachments[k] );
+
+        free( p_sys->pp_font_attachments );
+    }
+
+#if defined( _WIN32 )
+    if( p_sys->pf_get_family == DWrite_GetFamily )
+        ReleaseDWrite( p_filter );
+#endif
 
     /* Freetype */
     if( p_sys->p_stroker )

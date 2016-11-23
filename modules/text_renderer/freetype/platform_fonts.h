@@ -47,6 +47,10 @@
 
 #include "freetype.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Default fonts */
 #ifdef __APPLE__
 # define SYSTEM_DEFAULT_FONT_FILE "/System/Library/Fonts/HelveticaNeue.dfont"
@@ -143,11 +147,19 @@ const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_fa
 int FontConfig_Prepare( filter_t *p_filter );
 #endif /* FONTCONFIG */
 
-#if defined( _WIN32 ) && !VLC_WINSTORE_APP
+#if defined( _WIN32 )
+const vlc_family_t *DWrite_GetFamily( filter_t *p_filter, const char *psz_family );
+vlc_family_t *DWrite_GetFallbacks( filter_t *p_filter, const char *psz_family,
+                                  uni_char_t codepoint );
+int InitDWrite( filter_t *p_filter );
+int ReleaseDWrite( filter_t *p_filter );
+int DWrite_GetFontStream( filter_t *p_filter, int i_index, FT_Stream *pp_stream );
+#if !VLC_WINSTORE_APP
 vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
                                   uni_char_t codepoint );
 
 const vlc_family_t *Win32_GetFamily( filter_t *p_filter, const char *psz_family );
+#endif /* !VLC_WINSTORE_APP */
 #endif /* _WIN32 */
 
 #ifdef __APPLE__
@@ -274,5 +286,9 @@ int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 vlc_family_t *SearchFallbacks( filter_t *p_filter, vlc_family_t *p_fallbacks,
                                       uni_char_t codepoint );
 FT_Face GetFace( filter_t *p_filter, vlc_font_t *p_font );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //PLATFORM_FONTS_H

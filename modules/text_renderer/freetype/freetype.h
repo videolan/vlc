@@ -137,6 +137,10 @@ struct filter_sys_t
      */
     vlc_family_t * (*pf_get_fallbacks) ( filter_t *p_filter, const char *psz_family,
                                          uni_char_t codepoint );
+
+#if defined( _WIN32 )
+    void *p_dw_sys;
+#endif
 };
 
 /**
