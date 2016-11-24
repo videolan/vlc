@@ -79,12 +79,13 @@
 #if USE_OPENGL_ES
 #   define GLSL_VERSION "100"
 #   define VLCGL_TEXTURE_COUNT 1
-#   define VLCGL_PICTURE_MAX 1
 #   define PRECISION "precision highp float;"
 #if USE_OPENGL_ES == 2
+#   define VLCGL_PICTURE_MAX 128
 #   define SUPPORTS_SHADERS
 #   define glClientActiveTexture(x)
 #else
+#   define VLCGL_PICTURE_MAX 1
 #   define SUPPORTS_FIXED_PIPELINE
 #   define GL_MAX_TEXTURE_IMAGE_UNITS GL_MAX_TEXTURE_UNITS
 #endif
