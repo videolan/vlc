@@ -95,7 +95,7 @@ namespace adaptive
                 SwitchPolicy switchpolicy;
 
             public:
-                void setSegmentList(SegmentList *);
+                void appendSegmentList(SegmentList *, bool = false);
                 void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(MediaSegmentTemplate *);
                 void setSwitchPolicy(SwitchPolicy);

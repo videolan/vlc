@@ -206,7 +206,7 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
                 initSegment->setSourceUrl("forged://");
                 segmentList->initialisationSegment.Set(initSegment);
             }
-            rep->setSegmentList(segmentList);
+            rep->appendSegmentList(segmentList);
 
             adaptSet->addRepresentation(rep);
         }

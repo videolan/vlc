@@ -71,17 +71,31 @@ void SegmentList::addSegment(ISegment *seg)
     segments.push_back(seg);
 }
 
-void SegmentList::mergeWith(SegmentList *updated)
+void SegmentList::mergeWith(SegmentList *updated, bool b_restamp)
 {
     const ISegment * lastSegment = (segments.empty()) ? NULL : segments.back();
+    const ISegment * prevSegment = lastSegment;
 
     std::vector<ISegment *>::iterator it;
     for(it = updated->segments.begin(); it != updated->segments.end(); ++it)
     {
-        if( !lastSegment || lastSegment->compare( *it ) < 0 )
-            addSegment(*it);
+        ISegment *cur = *it;
+        if(!lastSegment || lastSegment->compare(cur) < 0)
+        {
+            if(b_restamp && prevSegment)
+            {
+                stime_t starttime = prevSegment->startTime.Get() + prevSegment->duration.Get();
+                if(starttime != cur->startTime.Get() && !cur->discontinuity)
+                {
+                    cur->startTime.Set(starttime);
+                }
+
+                prevSegment = cur;
+            }
+            addSegment(cur);
+        }
         else
-            delete *it;
+            delete cur;
     }
     updated->segments.clear();
 }

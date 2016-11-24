@@ -500,11 +500,11 @@ mtime_t SegmentInformation::getPeriodStart() const
         return 0;
 }
 
-void SegmentInformation::setSegmentList(SegmentList *list)
+void SegmentInformation::appendSegmentList(SegmentList *list, bool restamp)
 {
     if(segmentList)
     {
-        segmentList->mergeWith(list);
+        segmentList->mergeWith(list, restamp);
         delete list;
     }
     else

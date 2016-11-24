@@ -409,7 +409,7 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
                 total++;
             }
 
-            info->setSegmentList(list);
+            info->appendSegmentList(list, true);
         }
     }
     return total;
