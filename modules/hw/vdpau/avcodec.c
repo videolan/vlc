@@ -46,7 +46,7 @@ struct vlc_va_sys_t
     VdpChromaType type;
     uint32_t width;
     uint32_t height;
-    vlc_vdp_video_field_t *pool[6];
+    vlc_vdp_video_field_t *pool[];
 };
 
 static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
@@ -156,7 +156,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     }
 
     vlc_va_sys_t *sys = malloc(sizeof (*sys)
-                               + avctx->refs * sizeof (sys->pool[0]));
+                               + (avctx->refs + 6) * sizeof (sys->pool[0]));
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
