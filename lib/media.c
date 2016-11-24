@@ -117,6 +117,12 @@ static_assert(
     ORIENT_RIGHT_BOTTOM == (int) libvlc_video_orient_right_bottom,
     "Mismatch between libvlc_video_orient_t and video_orientation_t" );
 
+static_assert(
+    PROJECTION_MODE_RECTANGULAR             == (int) libvlc_video_projection_rectangular &&
+    PROJECTION_MODE_EQUIRECTANGULAR         == (int) libvlc_video_projection_equirectangular &&
+    PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD == (int) libvlc_video_projection_cubemap_layout_standard,
+    "Mismatch between libvlc_video_projection_t and video_projection_mode_t" );
+
 static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
                                                 bool b_create )
 {
@@ -1010,6 +1016,15 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
                     p_es->video.orientation <= ORIENT_RIGHT_BOTTOM );
             p_mes->video->i_orientation = (int) p_es->video.orientation;
 
+            assert( ( p_es->video.projection_mode >= PROJECTION_MODE_RECTANGULAR &&
+                    p_es->video.projection_mode <= PROJECTION_MODE_EQUIRECTANGULAR ) ||
+                    ( p_es->video.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD ) );
+            p_mes->video->i_projection = (int) p_es->video.projection_mode;
+
+            p_mes->video->pose.f_yaw_degrees = p_es->video.pose.f_yaw_degrees;
+            p_mes->video->pose.f_pitch_degrees = p_es->video.pose.f_pitch_degrees;
+            p_mes->video->pose.f_roll_degrees = p_es->video.pose.f_roll_degrees;
+            p_mes->video->pose.f_fov_degrees = p_es->video.pose.f_fov_degrees;
             break;
         case AUDIO_ES:
             p_mes->i_type = libvlc_track_audio;
