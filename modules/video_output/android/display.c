@@ -648,6 +648,9 @@ static int Open(vlc_object_t *p_this)
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
 
+    if (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR)
+        return VLC_EGENERIC;
+
     vout_window_t *embed =
         vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_ANDROID_NATIVE);
 
