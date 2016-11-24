@@ -92,9 +92,7 @@ static vlc_vdp_video_field_t *GetSurface(vlc_va_t *va)
             return field;
         }
     }
-
-    /* All pictures in the pool are referenced. Try to make a new one. */
-    return CreateSurface(va);
+    return NULL;
 }
 
 static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
@@ -106,7 +104,7 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     {
         if (--tries == 0)
             return VLC_ENOMEM;
-        /* Out of video RAM, wait for some time as in src/input/decoder.c.
+        /* Pool empty. Wait for some time as in src/input/decoder.c.
          * XXX: Both this and the core should use a semaphore or a CV. */
         msleep(VOUT_OUTMEM_SLEEP);
     }
@@ -155,8 +153,9 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
         return VLC_EGENERIC;
     }
 
+    unsigned refs = avctx->refs + avctx->thread_count + 5;
     vlc_va_sys_t *sys = malloc(sizeof (*sys)
-                               + (avctx->refs + 6) * sizeof (sys->pool[0]));
+                               + (refs + 1) * sizeof (sys->pool[0]));
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
@@ -182,8 +181,8 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
         goto error;
     va->sys = sys;
 
-    int i = 0;
-    while (i < avctx->refs + 5)
+    unsigned i = 0;
+    while (i < refs)
     {
         sys->pool[i] = CreateSurface(va);
         if (sys->pool[i] == NULL)
@@ -192,7 +191,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     }
     sys->pool[i] = NULL;
 
-    if (i < avctx->refs + 3)
+    if (i < avctx->refs + 3u)
     {
         msg_Err(va, "not enough video RAM");
         while (i > 0)
