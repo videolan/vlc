@@ -172,6 +172,18 @@ typedef struct libvlc_audio_track_t
     unsigned    i_rate;
 } libvlc_audio_track_t;
 
+typedef enum libvlc_video_orient_t
+{
+    libvlc_video_orient_top_left,       /**< Normal. Top line represents top, left column left. */
+    libvlc_video_orient_top_right,      /**< Flipped horizontally */
+    libvlc_video_orient_bottom_left,    /**< Flipped vertically */
+    libvlc_video_orient_bottom_right,   /**< Rotated 180 degrees */
+    libvlc_video_orient_left_top,       /**< Transposed */
+    libvlc_video_orient_left_bottom,    /**< Rotated 90 degrees clockwise (or 270 anti-clockwise) */
+    libvlc_video_orient_right_top,      /**< Rotated 90 degrees anti-clockwise */
+    libvlc_video_orient_right_bottom    /**< Anti-transposed */
+} libvlc_video_orient_t;
+
 typedef struct libvlc_video_track_t
 {
     unsigned    i_height;
@@ -180,6 +192,8 @@ typedef struct libvlc_video_track_t
     unsigned    i_sar_den;
     unsigned    i_frame_rate_num;
     unsigned    i_frame_rate_den;
+
+    libvlc_video_orient_t       i_orientation;
 } libvlc_video_track_t;
 
 typedef struct libvlc_subtitle_track_t

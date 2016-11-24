@@ -106,6 +106,17 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_DiscTotal]    = libvlc_meta_DiscTotal
 };
 
+static_assert(
+    ORIENT_TOP_LEFT     == (int) libvlc_video_orient_top_left &&
+    ORIENT_TOP_RIGHT    == (int) libvlc_video_orient_top_right &&
+    ORIENT_BOTTOM_LEFT  == (int) libvlc_video_orient_bottom_left &&
+    ORIENT_BOTTOM_RIGHT == (int) libvlc_video_orient_bottom_right &&
+    ORIENT_LEFT_TOP     == (int) libvlc_video_orient_left_top &&
+    ORIENT_LEFT_BOTTOM  == (int) libvlc_video_orient_left_bottom &&
+    ORIENT_RIGHT_TOP    == (int) libvlc_video_orient_right_top &&
+    ORIENT_RIGHT_BOTTOM == (int) libvlc_video_orient_right_bottom,
+    "Mismatch between libvlc_video_orient_t and video_orientation_t" );
+
 static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
                                                 bool b_create )
 {
@@ -994,6 +1005,11 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
             p_mes->video->i_sar_den = p_es->video.i_sar_den;
             p_mes->video->i_frame_rate_num = p_es->video.i_frame_rate;
             p_mes->video->i_frame_rate_den = p_es->video.i_frame_rate_base;
+
+            assert( p_es->video.orientation >= ORIENT_TOP_LEFT &&
+                    p_es->video.orientation <= ORIENT_RIGHT_BOTTOM );
+            p_mes->video->i_orientation = (int) p_es->video.orientation;
+
             break;
         case AUDIO_ES:
             p_mes->i_type = libvlc_track_audio;
