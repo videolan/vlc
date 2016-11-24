@@ -77,7 +77,6 @@ static const vlc_fourcc_t subpicture_chromas[] =
 static picture_pool_t   *Pool  (vout_display_t *, unsigned);
 static void             Prepare(vout_display_t *, picture_t *, subpicture_t *);
 static void             Display(vout_display_t *, picture_t *, subpicture_t *);
-static void             Manage(vout_display_t *vd);
 static int              Control(vout_display_t *, int, va_list);
 
 typedef struct android_window android_window;
@@ -643,19 +642,6 @@ static void SetRGBMask(video_format_t *p_fmt)
     }
 }
 
-static void SendEventDisplaySize(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    int i_display_width, i_display_height;
-
-    if (AWindowHandler_getWindowSize(sys->p_awh, &i_display_width, &i_display_height)
-        && i_display_width != 0 && i_display_height != 0
-        && (i_display_width != sys->i_display_width
-         || i_display_height != sys->i_display_height))
-        vout_display_SendEventDisplaySize(vd, i_display_width,
-                                              i_display_height);
-}
-
 static int Open(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t*)p_this;
@@ -750,11 +736,11 @@ static int Open(vlc_object_t *p_this)
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
+    vd->manage  = NULL;
+    vd->info.has_event_thread = true;
 
     /* Fix initial state */
     vout_display_SendEventFullscreen(vd, true);
-    SendEventDisplaySize(vd);
 
     return VLC_SUCCESS;
 
@@ -1011,8 +997,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-    SendEventDisplaySize(vd);
-
     if (subpicture && sys->p_sub_window) {
         if (sys->b_sub_invalid) {
             sys->b_sub_invalid = false;
@@ -1140,26 +1124,3 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_EGENERIC;
     }
 }
-
-static void Manage(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    int x, y, button, action;
-
-    if (AWindowHandler_getMouseCoordinates(sys->p_awh,
-                                           &action, &button, &x, &y))
-    {
-        switch( action )
-        {
-            case AMOTION_EVENT_ACTION_DOWN:
-                vout_display_SendEventMouseMoved(vd, x, y);
-                vout_display_SendEventMousePressed(vd, button); break;
-            case AMOTION_EVENT_ACTION_UP:
-                vout_display_SendEventMouseMoved(vd, x, y);
-                vout_display_SendEventMouseReleased(vd, button); break;
-            case AMOTION_EVENT_ACTION_MOVE:
-                vout_display_SendEventMouseMoved(vd, x, y); break;
-        }
-    }
-}
-

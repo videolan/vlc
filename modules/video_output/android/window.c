@@ -61,6 +61,29 @@ struct vout_window_sys_t
     AWindowHandler *p_awh;
 };
 
+static void OnNewWindowSize(vout_window_t *wnd,
+                            unsigned i_width, unsigned i_height)
+{
+    vout_window_ReportSize(wnd, i_width, i_height);
+}
+
+static void OnNewMouseCoords(vout_window_t *wnd,
+                             const struct awh_mouse_coords *coords)
+{
+    vout_window_ReportMouseMoved(wnd, coords->i_x, coords->i_y);
+    switch (coords->i_action)
+    {
+        case AMOTION_EVENT_ACTION_DOWN:
+            vout_window_ReportMousePressed(wnd, coords->i_button);
+            break;
+        case AMOTION_EVENT_ACTION_UP:
+            vout_window_ReportMouseReleased(wnd, coords->i_button);
+            break;
+        case AMOTION_EVENT_ACTION_MOVE:
+            break;
+    }
+}
+
 /**
  * Create an Android native window.
  */
@@ -73,22 +96,21 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     vout_window_sys_t *p_sys = malloc(sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
+    wnd->sys = p_sys;
 
-    p_sys->p_awh = AWindowHandler_new(VLC_OBJECT(wnd));
+    p_sys->p_awh = AWindowHandler_new(wnd,
+        &(awh_events_t) { OnNewWindowSize, OnNewMouseCoords });
     if (!p_sys->p_awh)
         goto error;
 
     wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
     wnd->handle.anativewindow = p_sys->p_awh;
     wnd->control = Control;
-    wnd->sys = p_sys;
 
     return VLC_SUCCESS;
 
 error:
-    if (p_sys->p_awh)
-        AWindowHandler_destroy(p_sys->p_awh);
-    free(p_sys);
+    Close(wnd);
     return VLC_EGENERIC;
 }
 
@@ -99,7 +121,8 @@ error:
 static void Close(vout_window_t *wnd)
 {
     vout_window_sys_t *p_sys = wnd->sys;
-    AWindowHandler_destroy(p_sys->p_awh);
+    if (p_sys->p_awh)
+        AWindowHandler_destroy(p_sys->p_awh);
     free (p_sys);
 }
 

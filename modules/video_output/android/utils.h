@@ -74,6 +74,22 @@ typedef struct
     int (*setOrientation) (native_window_priv *, int);
 } native_window_priv_api_t;
 
+struct awh_mouse_coords
+{
+    int i_action;
+    int i_button;
+    int i_x;
+    int i_y;
+};
+
+typedef struct
+{
+    void (*on_new_window_size)(vout_window_t *wnd, unsigned i_width,
+                               unsigned i_height);
+    void (*on_new_mouse_coords)(vout_window_t *wnd,
+                                const struct awh_mouse_coords *coords);
+} awh_events_t;
+
 /**
  * Load a private native window API
  *
@@ -100,7 +116,7 @@ JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
  * \return a valid AWindowHandler * or NULL. It must be released with
  * AWindowHandler_destroy.
  */
-AWindowHandler *AWindowHandler_new(vlc_object_t *p_obj);
+AWindowHandler *AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events);
 void AWindowHandler_destroy(AWindowHandler *p_awh);
 
 /**
@@ -110,23 +126,6 @@ void AWindowHandler_destroy(AWindowHandler *p_awh);
  * \return a valid native_window_api_t. It doesn't need to be released.
  */
 native_window_api_t *AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh);
-
-/**
- * Retrieves the mouse coordinates
- *
- * \return true if the coordinates are valid.
- */
-bool AWindowHandler_getMouseCoordinates(AWindowHandler *p_awh,
-                                        int *p_action, int *p_button,
-                                        int *p_x, int *p_y);
-
-/**
- * Retrieves the window size
- *
- * \return true if the size is valid.
- */
-bool AWindowHandler_getWindowSize(AWindowHandler *p_awh,
-                                  int *p_width, int *p_height);
 
 /**
  * Get the Video or the Subtitles Android Surface
