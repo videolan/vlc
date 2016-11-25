@@ -1086,35 +1086,30 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    {
+        msg_Dbg(vd, "change source crop/aspect");
+        const video_format_t *source = va_arg(args, const video_format_t *);
+
+        if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
+            video_format_CopyCrop(&sys->p_window->fmt, source);
+            AndroidWindow_UpdateCrop(sys, sys->p_window);
+        } else
+            CopySourceAspect(&sys->p_window->fmt, source);
+
+        UpdateWindowSize(sys, &sys->p_window->fmt,
+                         sys->p_window->b_use_priv);
+        FixSubtitleFormat(sys);
+        return VLC_SUCCESS;
+    }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
-        if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
-         || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-            const video_format_t *source;
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
 
-            msg_Dbg(vd, "change source crop/aspect");
-            source = va_arg(args, const video_format_t *);
-
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-                video_format_CopyCrop(&sys->p_window->fmt, source);
-                AndroidWindow_UpdateCrop(sys, sys->p_window);
-            } else
-                CopySourceAspect(&sys->p_window->fmt, source);
-
-            UpdateWindowSize(sys, &sys->p_window->fmt,
-                             sys->p_window->b_use_priv);
-        } else {
-            const vout_display_cfg_t *cfg;
-
-            cfg = va_arg(args, const vout_display_cfg_t *);
-
-            sys->i_display_width = cfg->display.width;
-            sys->i_display_height = cfg->display.height;
-            msg_Dbg(vd, "change display size: %dx%d", sys->i_display_width,
-                                                      sys->i_display_height);
-        }
+        sys->i_display_width = cfg->display.width;
+        sys->i_display_height = cfg->display.height;
+        msg_Dbg(vd, "change display size: %dx%d", sys->i_display_width,
+                                                  sys->i_display_height);
         FixSubtitleFormat(sys);
-
         return VLC_SUCCESS;
     }
     default:
