@@ -25,6 +25,8 @@
 #ifndef LIBVLC_VOUT_CONTROL_H
 #define LIBVLC_VOUT_CONTROL_H 1
 
+typedef struct vout_window_mouse_event_t vout_window_mouse_event_t;
+
 /**
  * This function will (un)pause the display of pictures.
  * It is thread safe
@@ -68,6 +70,9 @@ void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );
  * This function will ask the display of the input title
  */
 void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title );
+
+void vout_WindowMouseEvent( vout_thread_t *p_vout,
+                            const vout_window_mouse_event_t *mouse );
 
 /**
  * This function will return true if no more pictures are to be displayed.

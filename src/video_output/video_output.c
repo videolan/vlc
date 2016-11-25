@@ -363,6 +363,17 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_OSD_TITLE, title);
 }
 
+void vout_WindowMouseEvent(vout_thread_t *vout,
+                           const vout_window_mouse_event_t *mouse)
+{
+    assert(mouse);
+    vout_control_cmd_t cmd;
+    vout_control_cmd_Init(&cmd, VOUT_CONTROL_WINDOW_MOUSE);
+    cmd.u.window_mouse = *mouse;
+
+    vout_control_Push(&vout->p->control, &cmd);
+}
+
 void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 {
     vout_control_cmd_t cmd;
@@ -1261,6 +1272,48 @@ static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
 #endif
 }
 
+static void ThreadChangeWindowMouse(vout_thread_t *vout,
+                                    const vout_window_mouse_event_t *mouse)
+{
+    vout_display_t *vd = vout->p->display.vd;
+    switch (mouse->type)
+    {
+        case VOUT_WINDOW_MOUSE_STATE:
+        case VOUT_WINDOW_MOUSE_MOVED:
+        {
+            vout_display_place_t place;
+            vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+
+            if (place.width <= 0 || place.height <= 0)
+                return;
+
+            const int x = vd->source.i_x_offset +
+                (int64_t)(mouse->x - place.x) *
+                vd->source.i_visible_width / place.width;
+            const int y = vd->source.i_y_offset +
+                (int64_t)(mouse->y - place.y) *
+                vd->source.i_visible_height/ place.height;
+
+            if (mouse->type == VOUT_WINDOW_MOUSE_STATE)
+                vout_display_SendEventMouseState(vd, x, y, mouse->button_mask);
+            else
+                vout_display_SendEventMouseMoved(vd, x, y);
+            break;
+        }
+        case VOUT_WINDOW_MOUSE_PRESSED:
+            vout_display_SendEventMousePressed(vd, mouse->button_mask);
+            break;
+        case VOUT_WINDOW_MOUSE_RELEASED:
+            vout_display_SendEventMouseReleased(vd, mouse->button_mask);
+            break;
+        case VOUT_WINDOW_MOUSE_DOUBLE_CLICK:
+            vout_display_SendEventMouseDoubleClick(vd);
+            break;
+        default: vlc_assert_unreachable();
+            break;
+    }
+}
+
 static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 {
     vout_SetDisplayFilled(vout->p->display.vd, is_filled);
@@ -1550,6 +1603,9 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_WINDOW_STATE:
         ThreadChangeWindowState(vout, cmd.u.integer);
+        break;
+    case VOUT_CONTROL_WINDOW_MOUSE:
+        ThreadChangeWindowMouse(vout, &cmd.u.window_mouse);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
         ThreadChangeDisplayFilled(vout, cmd.u.boolean);

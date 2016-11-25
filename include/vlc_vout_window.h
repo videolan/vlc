@@ -64,6 +64,28 @@ enum {
     VOUT_WINDOW_SET_FULLSCREEN, /* int b_fullscreen */
 };
 
+/**
+ * Window mouse event type for vout_window_mouse_event_t
+ */
+enum vout_window_mouse_event_type {
+    VOUT_WINDOW_MOUSE_STATE,
+    VOUT_WINDOW_MOUSE_MOVED,
+    VOUT_WINDOW_MOUSE_PRESSED,
+    VOUT_WINDOW_MOUSE_RELEASED,
+    VOUT_WINDOW_MOUSE_DOUBLE_CLICK,
+};
+
+/**
+ * Window mouse event
+ */
+typedef struct vout_window_mouse_event_t
+{
+    enum vout_window_mouse_event_type type;
+    int x;
+    int y;
+    int button_mask;
+} vout_window_mouse_event_t;
+
 typedef struct vout_window_cfg_t {
     /* Window handle type */
     unsigned type;
@@ -88,6 +110,7 @@ typedef struct vout_window_owner {
     void *sys;
     void (*resized)(vout_window_t *, unsigned width, unsigned height);
     void (*closed)(vout_window_t *);
+    void (*mouse_event)(vout_window_t *, const vout_window_mouse_event_t *mouse);
 } vout_window_owner_t;
 
 /**
@@ -209,6 +232,77 @@ static inline void vout_window_ReportClose(vout_window_t *window)
 {
     if (window->owner.closed != NULL)
         window->owner.closed(window);
+}
+
+static inline void vout_window_SendMouseEvent(vout_window_t *window,
+                                              const vout_window_mouse_event_t *mouse)
+{
+    if (window->owner.mouse_event != NULL)
+        window->owner.mouse_event(window, mouse);
+}
+
+/**
+ * Send a full mouse state
+ *
+ * The mouse position must be expressed against window unit. You can use this
+ * function of others vout_window_ReportMouse*() functions.
+ */
+static inline void vout_window_ReportMouseState(vout_window_t *window,
+                                                int x, int y, int button_mask)
+{
+    const vout_window_mouse_event_t mouse = {
+        VOUT_WINDOW_MOUSE_STATE, x, y, button_mask
+    };
+    vout_window_SendMouseEvent(window, &mouse);
+}
+
+/**
+ * Send a mouse movement
+ *
+ * The mouse position must be expressed against window unit.
+ */
+static inline void vout_window_ReportMouseMoved(vout_window_t *window,
+                                                int x, int y)
+{
+    const vout_window_mouse_event_t mouse = {
+        VOUT_WINDOW_MOUSE_MOVED, x, y, 0
+    };
+    vout_window_SendMouseEvent(window, &mouse);
+}
+
+/**
+ * Send a mouse pressed event
+ */
+static inline void vout_window_ReportMousePressed(vout_window_t *window,
+                                                  int button)
+{
+    const vout_window_mouse_event_t mouse = {
+        VOUT_WINDOW_MOUSE_PRESSED, 0, 0, button,
+    };
+    vout_window_SendMouseEvent(window, &mouse);
+}
+
+/**
+ * Send a mouse released event
+ */
+static inline void vout_window_ReportMouseReleased(vout_window_t *window,
+                                                  int button)
+{
+    const vout_window_mouse_event_t mouse = {
+        VOUT_WINDOW_MOUSE_RELEASED, 0, 0, button,
+    };
+    vout_window_SendMouseEvent(window, &mouse);
+}
+
+/**
+ * Send a mouse double click event
+ */
+static inline void vout_window_ReportMouseDoubleClick(vout_window_t *window)
+{
+    const vout_window_mouse_event_t mouse = {
+        VOUT_WINDOW_MOUSE_DOUBLE_CLICK, 0, 0, 0,
+    };
+    vout_window_SendMouseEvent(window, &mouse);
 }
 
 /** @} */
