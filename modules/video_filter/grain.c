@@ -35,7 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_cpu.h>
-
+#include <vlc_picture.h>
 #include <vlc_rand.h>
 
 /*****************************************************************************

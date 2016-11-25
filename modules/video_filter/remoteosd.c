@@ -52,10 +52,10 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
 #include <vlc_filter.h>
+#include <vlc_mouse.h>
+#include <vlc_subpicture.h>
 #include <vlc_keys.h>                  /* KEY_MODIFIER_CTRL */
-
 #include <vlc_network.h>               /* net_*, htonl */
 #include <gcrypt.h>                    /* to encrypt password */
 #include <vlc_gcrypt.h>

@@ -29,14 +29,14 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-
 #include <math.h>
 #include <limits.h> /* INT_MAX */
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_image.h>
+#include <vlc_subpicture.h>
 
 #include "mosaic.h"
 

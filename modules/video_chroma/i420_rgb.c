@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_picture.h>
 #include <vlc_cpu.h>
 
 #include "i420_rgb.h"

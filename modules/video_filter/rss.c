@@ -35,19 +35,17 @@
 # include "config.h"
 #endif
 
+#include <time.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
 #include <vlc_filter.h>
+#include <vlc_subpicture.h>
 #include <vlc_block.h>
-
 #include <vlc_stream.h>
 #include <vlc_xml.h>
 #include <vlc_charset.h>
-
 #include <vlc_image.h>
-
-#include <time.h>
 
 /*****************************************************************************
  * Local prototypes

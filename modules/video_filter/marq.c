@@ -39,6 +39,7 @@
 #include <vlc_block.h>
 #include <vlc_fs.h>
 #include <vlc_strings.h>
+#include <vlc_subpicture.h>
 
 /*****************************************************************************
  * Local prototypes

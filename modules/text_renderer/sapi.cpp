@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_charset.h>
+#include <vlc_subpicture.h>
 
 #define INITGUID
 

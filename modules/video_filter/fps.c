@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_picture.h>
 
 static int Open( vlc_object_t *p_this);
 static void Close( vlc_object_t *p_this);

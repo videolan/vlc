@@ -71,8 +71,11 @@ struct filter_sys_t {
     point_t **ps_bezier_pts_H;
 };
 
+struct vlc_mouse_t;
+
 picture_t *Filter( filter_t *, picture_t * );
 int puzzle_Callback( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
-int puzzle_mouse( filter_t *, vlc_mouse_t *, const vlc_mouse_t *, const vlc_mouse_t * );
+int puzzle_mouse( filter_t *, struct vlc_mouse_t *, const struct vlc_mouse_t *,
+                  const struct vlc_mouse_t * );
 
 #endif

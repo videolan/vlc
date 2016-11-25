@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_fs.h>
 #include <vlc_filter.h>
+#include <vlc_subpicture.h>
 
 #include <sys/types.h>
 #include <unistd.h>

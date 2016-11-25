@@ -34,8 +34,9 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_mouse.h>
+#include <vlc_subpicture.h>
 #include <vlc_url.h>
-
 #include <vlc_image.h>
 
 #ifdef LoadImage

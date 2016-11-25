@@ -33,8 +33,8 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_image.h>
-
 #include <vlc_filter.h>
+#include <vlc_picture.h>
 #include <vlc_url.h>
 #include "filter_picture.h"
 

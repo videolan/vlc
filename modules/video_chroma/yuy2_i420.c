@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_picture.h>
 
 #define SRC_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #define DEST_FOURCC  "I420"

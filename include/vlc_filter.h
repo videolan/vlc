@@ -26,9 +26,6 @@
 #define VLC_FILTER_H 1
 
 #include <vlc_es.h>
-#include <vlc_picture.h>
-#include <vlc_subpicture.h>
-#include <vlc_mouse.h>
 
 /**
  * \defgroup filter Filters
@@ -58,6 +55,7 @@ typedef struct filter_owner_t
     };
 } filter_owner_t;
 
+struct vlc_mouse_t;
 
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of
@@ -127,12 +125,12 @@ struct filter_t
          * - Otherwise, the mouse change is not propagated.
          * If NULL, the mouse state is considered unchanged and will be
          * propagated. */
-        int (*pf_video_mouse)( filter_t *, vlc_mouse_t *,
-                               const vlc_mouse_t *p_old,
-                               const vlc_mouse_t *p_new );
-        int (*pf_sub_mouse)( filter_t *, const vlc_mouse_t *p_old,
-                              const vlc_mouse_t *p_new,
-                                             const video_format_t * );
+        int (*pf_video_mouse)( filter_t *, struct vlc_mouse_t *,
+                               const struct vlc_mouse_t *p_old,
+                               const struct vlc_mouse_t *p_new );
+        int (*pf_sub_mouse)( filter_t *, const struct vlc_mouse_t *p_old,
+                             const struct vlc_mouse_t *p_new,
+                             const video_format_t * );
     };
 
     /* Input attachments
@@ -412,14 +410,17 @@ VLC_API subpicture_t *filter_chain_SubFilter(filter_chain_t *chain,
  *
  * The vlc_mouse_t* pointers may be the same.
  */
-VLC_API int filter_chain_MouseFilter( filter_chain_t *, vlc_mouse_t *, const vlc_mouse_t * );
+VLC_API int filter_chain_MouseFilter( filter_chain_t *, struct vlc_mouse_t *,
+                                      const struct vlc_mouse_t * );
 
 /**
  * Inform the filter chain of mouse state.
  *
  * It makes sense only for a sub source chain.
  */
-VLC_API int filter_chain_MouseEvent( filter_chain_t *, const vlc_mouse_t *, const video_format_t * );
+VLC_API int filter_chain_MouseEvent( filter_chain_t *,
+                                     const struct vlc_mouse_t *,
+                                     const video_format_t * );
 
 int filter_chain_ForEach( filter_chain_t *chain,
                           int (*cb)( filter_t *, void * ), void *opaque );

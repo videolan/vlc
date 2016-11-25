@@ -34,7 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
-
+#include <vlc_subpicture.h>
 #include <vlc_image.h>
 
 /*****************************************************************************
