@@ -41,7 +41,7 @@
 #include <vlc_filter.h>
 #include <vlc_modules.h>
 
-#include "../video_filter/mosaic.h"
+#include "../spu/mosaic.h"
 
 /*****************************************************************************
  * Local structures

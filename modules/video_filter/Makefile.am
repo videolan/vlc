@@ -130,16 +130,6 @@ libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM64
 endif
 video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 
-libdynamicoverlay_plugin_la_SOURCES = \
-	video_filter/dynamicoverlay/dynamicoverlay_buffer.c \
-	video_filter/dynamicoverlay/dynamicoverlay_queue.c \
-	video_filter/dynamicoverlay/dynamicoverlay_list.c \
-	video_filter/dynamicoverlay/dynamicoverlay_commands.c \
-	video_filter/dynamicoverlay/dynamicoverlay.c video_filter/dynamicoverlay/dynamicoverlay.h
-if !HAVE_WIN32
-video_filter_LTLIBRARIES += libdynamicoverlay_plugin.la
-endif
-
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c
 libopencv_wrapper_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_wrapper_plugin_la_LIBADD = $(OPENCV_LIBS)
@@ -153,33 +143,6 @@ libpostproc_plugin_la_LIBADD = $(LIBM) $(POSTPROC_LIBS) $(AVUTIL_LIBS)
 libpostproc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBpostproc)
 EXTRA_LTLIBRARIES += libpostproc_plugin.la
-
-# sub filters
-libsubsdelay_plugin_la_SOURCES = video_filter/subsdelay.c
-video_filter_LTLIBRARIES += libsubsdelay_plugin.la
-
-# sub sources
-libaudiobargraph_v_plugin_la_SOURCES = video_filter/audiobargraph_v.c
-libaudiobargraph_v_plugin_la_LIBADD = $(LIBM)
-liblogo_plugin_la_SOURCES = video_filter/logo.c
-libmarq_plugin_la_SOURCES = video_filter/marq.c
-libmosaic_plugin_la_SOURCES = video_filter/mosaic.c video_filter/mosaic.h
-libmosaic_plugin_la_LIBADD = $(LIBM)
-librss_plugin_la_SOURCES = video_filter/rss.c
-
-video_filter_LTLIBRARIES += \
-	libaudiobargraph_v_plugin.la \
-	liblogo_plugin.la \
-	libmarq_plugin.la \
-	libmosaic_plugin.la \
-	librss_plugin.la
-
-libremoteosd_plugin_la_SOURCES = video_filter/remoteosd.c video_filter/remoteosd_rfbproto.h
-libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(SOCKET_LIBS) $(LIBPTHREAD)
-if HAVE_GCRYPT
-video_filter_LTLIBRARIES += libremoteosd_plugin.la
-endif
 
 # misc
 libblend_plugin_la_SOURCES = video_filter/blend.cpp
