@@ -77,7 +77,7 @@ typedef struct {
     bool b_finished;
     bool b_overlap;
 
-    int8_t i_actual_angle;                   /* 0 = 0°, 1 = 90°... rotation center = top-left corner            */
+    int8_t i_actual_angle;                   /* 0 = 0Â°, 1 = 90Â°... rotation center = top-left corner            */
     int32_t i_actual_mirror;                 /* +1 = without mirror ; -1 = with mirror                          */
     int32_t i_step_x_x, i_step_x_y, i_step_y_y, i_step_y_x;
     int32_t i_ORx, i_OTy, i_OLx, i_OBy;      /* location of original piece's edges                              */

@@ -291,7 +291,7 @@ void puzzle_rotate_pce( filter_t *p_filter, int32_t i_piece, int8_t i_rotate_mir
     for ( uint8_t i=0; i < abs( i_rotate_mirror ); i++) {
         int32_t i_tempx, i_tempy;
 
-        /* piece has to be rotated by 90° */
+        /* piece has to be rotated by 90Â° */
         if ( i_rotate_mirror > 0 ) {
             ps_piece->i_actual_angle++;
             ps_piece->i_actual_angle &= 0x03;
