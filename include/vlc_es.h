@@ -282,7 +282,7 @@ typedef enum video_chroma_location_t
     CHROMA_LOCATION_BOTTOM_CENTER,
 } video_chroma_location_t;
 
-#define DEFAULT_FIELD_OF_VIEW_DEGREES  80.f
+#define FIELD_OF_VIEW_DEGREES_DEFAULT  80.f
 
 /**
  * video format description
@@ -340,7 +340,7 @@ static inline void video_format_Init( video_format_t *p_src, vlc_fourcc_t i_chro
     memset( p_src, 0, sizeof( video_format_t ) );
     p_src->i_chroma = i_chroma;
     p_src->i_sar_num = p_src->i_sar_den = 1;
-    p_src->pose.f_fov_degrees = DEFAULT_FIELD_OF_VIEW_DEGREES;
+    p_src->pose.f_fov_degrees = FIELD_OF_VIEW_DEGREES_DEFAULT;
 }
 
 /**

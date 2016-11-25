@@ -96,7 +96,7 @@ struct vlc_viewpoint_t {
 static inline void vlc_viewpoint_init( vlc_viewpoint_t *p_vp )
 {
     p_vp->yaw = p_vp->pitch = p_vp->roll = p_vp->zoom = 0.0f;
-    p_vp->fov = DEFAULT_FIELD_OF_VIEW_DEGREES;
+    p_vp->fov = FIELD_OF_VIEW_DEGREES_DEFAULT;
 }
 
 /*****************************************************************************
