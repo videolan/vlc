@@ -1115,19 +1115,6 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                                        false );
             break;
 
-        case ACTIONID_VIEWPOINT_ZOOM_IN:
-            if( p_vout )
-                input_UpdateViewpoint( p_input,
-                                       &(vlc_viewpoint_t) { .zoom = 0.01f },
-                                       false );
-            break;
-        case ACTIONID_VIEWPOINT_ZOOM_OUT:
-            if( p_vout )
-                input_UpdateViewpoint( p_input,
-                                       &(vlc_viewpoint_t) { .zoom = -0.01f },
-                                       false );
-            break;
-
         case ACTIONID_VIEWPOINT_ROLL_CLOCK:
             if( p_vout )
                 input_UpdateViewpoint( p_input,

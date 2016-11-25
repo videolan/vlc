@@ -944,7 +944,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
         getXRotMatrix(-RAD(p_vp->pitch), dst_data->RotX);
         getYRotMatrix(-RAD(p_vp->yaw),   dst_data->RotY);
         getZRotMatrix(-RAD(p_vp->roll),  dst_data->RotZ);
-        getZoomMatrix(SPHERE_RADIUS * p_vp->zoom, dst_data->View);
+        getZoomMatrix(SPHERE_RADIUS, dst_data->View); /* FIXME */
         float sar = (float) vd->cfg->display.width / vd->cfg->display.height;
         getProjectionMatrix(sar, RAD(p_vp->fov), dst_data->Projection);
 #undef RAD

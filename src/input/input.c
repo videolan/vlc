@@ -1942,7 +1942,6 @@ static bool Control( input_thread_t *p_input,
                 priv->viewpoint.pitch += p_vp->pitch;
                 priv->viewpoint.roll  += p_vp->roll;
                 priv->viewpoint.fov   += p_vp->fov;
-                priv->viewpoint.zoom  += p_vp->zoom;
             }
 
             priv->viewpoint.yaw = fmodf( priv->viewpoint.yaw, 360.f );
@@ -1951,7 +1950,6 @@ static bool Control( input_thread_t *p_input,
             priv->viewpoint.fov = VLC_CLIP( priv->viewpoint.fov,
                                             FIELD_OF_VIEW_DEGREES_MIN,
                                             FIELD_OF_VIEW_DEGREES_MAX );
-            priv->viewpoint.zoom = VLC_CLIP( priv->viewpoint.zoom, -1.f, 1.f );
 
             vout_thread_t **pp_vout;
             size_t i_vout;

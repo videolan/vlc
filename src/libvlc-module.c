@@ -1425,8 +1425,6 @@ static const char *const mouse_wheel_texts[] = {
 /* 360° Viewpoint */
 #define VIEWPOINT_FOV_IN_KEY_TEXT N_("Shrink the viewpoint field of view (360°)")
 #define VIEWPOINT_FOV_OUT_KEY_TEXT N_("Expand the viewpoint field of view (360°)")
-#define VIEWPOINT_ZOOM_IN_KEY_TEXT N_("Increase the viewpoint zoom (360°)")
-#define VIEWPOINT_ZOOM_OUT_KEY_TEXT N_("Decrease the viewpoint zoom (360°)")
 #define VIEWPOINT_ROLL_CLOCK_KEY_TEXT N_("Roll the viewpoint clockwise (360°)")
 #define VIEWPOINT_ROLL_ANTICLOCK_KEY_TEXT N_("Roll the viewpoint anti-clockwise (360°)")
 
@@ -2582,10 +2580,6 @@ vlc_module_begin ()
              VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_TEXT, true )
     add_key( "key-viewpoint-fov-out", KEY_VIEWPOINT_FOV_OUT,
              VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_TEXT, true )
-    add_key( "key-viewpoint-zoom-in", KEY_VIEWPOINT_ZOOM_IN,
-             VIEWPOINT_ZOOM_IN_KEY_TEXT, VIEWPOINT_ZOOM_IN_KEY_TEXT, true )
-    add_key( "key-viewpoint-zoom-out", KEY_VIEWPOINT_ZOOM_OUT,
-             VIEWPOINT_ZOOM_OUT_KEY_TEXT, VIEWPOINT_ZOOM_OUT_KEY_TEXT, true )
     add_key( "key-viewpoint-roll-clock", NULL,
              VIEWPOINT_ROLL_CLOCK_KEY_TEXT, VIEWPOINT_ROLL_CLOCK_KEY_TEXT, true )
     add_key( "key-viewpoint-roll-anticlock", NULL,

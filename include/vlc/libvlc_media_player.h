@@ -1177,7 +1177,6 @@ typedef struct libvlc_video_viewpoint_t
     float f_pitch;         /**< view point pitch in degrees */
     float f_roll;          /**< view point roll in degrees */
     float f_field_of_view; /**< field of view in degrees (default 80.0f) */
-    float f_zoom;          /**< zoom factor, [-1.f, 1.f] range, default to 0.f */
 } libvlc_video_viewpoint_t;
 
 /**

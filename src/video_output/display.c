@@ -1224,7 +1224,6 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
     if (osys->viewpoint.yaw   != p_viewpoint->yaw ||
         osys->viewpoint.pitch != p_viewpoint->pitch ||
         osys->viewpoint.roll  != p_viewpoint->roll ||
-        osys->viewpoint.zoom  != p_viewpoint->zoom ||
         osys->viewpoint.fov   != p_viewpoint->fov) {
         osys->viewpoint = *p_viewpoint;
 

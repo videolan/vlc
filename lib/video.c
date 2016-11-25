@@ -287,8 +287,7 @@ libvlc_video_viewpoint_t *libvlc_video_new_viewpoint(void)
     libvlc_video_viewpoint_t *p_vp = malloc(sizeof *p_vp);
     if (unlikely(p_vp == NULL))
         return NULL;
-    p_vp->f_yaw = p_vp->f_pitch = p_vp->f_roll = p_vp->f_field_of_view =
-    p_vp->f_zoom = 0.0f;
+    p_vp->f_yaw = p_vp->f_pitch = p_vp->f_roll = p_vp->f_field_of_view = 0.0f;
     return p_vp;
 }
 
@@ -301,7 +300,6 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
         .pitch = p_viewpoint->f_pitch,
         .roll  = p_viewpoint->f_roll,
         .fov   = p_viewpoint->f_field_of_view,
-        .zoom  = p_viewpoint->f_zoom,
     };
 
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
@@ -323,7 +321,6 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
         p_mi->viewpoint.pitch += p_mi->viewpoint.pitch;
         p_mi->viewpoint.roll += p_mi->viewpoint.roll;
         p_mi->viewpoint.fov += p_mi->viewpoint.fov;
-        p_mi->viewpoint.zoom += p_mi->viewpoint.zoom;
     }
     else
         p_mi->viewpoint = update;
