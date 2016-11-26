@@ -273,7 +273,7 @@ char *directx_va_GetDecoderName(const GUID *guid)
 int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
 {
     int surface_alignment = 16;
-    int surface_count = 4;
+    int surface_count = 2;
 
     if (dx_sys->width == avctx->coded_width && dx_sys->height == avctx->coded_height
      && dx_sys->decoder != NULL)
