@@ -182,9 +182,6 @@ struct decklink_sys_t
     //int i_channels;
     int i_rate;
 
-    int i_width;
-    int i_height;
-
     BMDTimeScale timescale;
     BMDTimeValue frameduration;
 
@@ -581,9 +578,7 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
             goto error;
         }
 
-        decklink_sys->i_width = p_display_mode->GetWidth();
-        decklink_sys->i_height = p_display_mode->GetHeight();
-        if (decklink_sys->i_width <= 0 || decklink_sys->i_width & 1)
+        if (p_display_mode->GetWidth() <= 0 || p_display_mode->GetWidth() & 1)
         {
              msg_Err(vd, "Unknown video mode specified.");
              goto error;
@@ -595,6 +590,14 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
 
         result = decklink_sys->p_output->EnableVideoOutput(mode_id, flags);
         CHECK("Could not enable video output");
+
+        fmt->i_width = fmt->i_visible_width = p_display_mode->GetWidth();
+        fmt->i_height = fmt->i_visible_height = p_display_mode->GetHeight();
+        fmt->i_x_offset = 0;
+        fmt->i_y_offset = 0;
+        fmt->i_sar_num = 0;
+        fmt->i_sar_den = 0;
+        fmt->i_chroma = !sys->tenbits ? VLC_CODEC_UYVY : VLC_CODEC_I422_10L; /* we will convert to v210 */
     }
 
     if (/*decklink_sys->i_channels > 0 &&*/ decklink_sys->i_rate > 0)
@@ -814,8 +817,8 @@ static void DisplayVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
 
     HRESULT result;
     int w, h, stride, length;
-    w = decklink_sys->i_width;
-    h = decklink_sys->i_height;
+    w = vd->fmt.i_width;
+    h = vd->fmt.i_height;
 
     IDeckLinkMutableVideoFrame *pDLVideoFrame;
     result = decklink_sys->p_output->CreateVideoFrame(w, h, w*3,
@@ -932,14 +935,6 @@ static int OpenVideo(vlc_object_t *p_this)
     }
 
     sys->pool = NULL;
-
-    fmt->i_chroma = sys->tenbits
-        ? VLC_CODEC_I422_10L /* we will convert to v210 */
-        : VLC_CODEC_UYVY;
-    //video_format_FixRgb(fmt);
-
-    fmt->i_width = decklink_sys->i_width;
-    fmt->i_height = decklink_sys->i_height;
 
     char *pic_file = var_InheritString(p_this, VIDEO_CFG_PREFIX "nosignal-image");
     if (pic_file) {
