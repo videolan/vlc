@@ -44,25 +44,25 @@ struct intf_thread_t;
  * The VLC playlist system has a tree structure. This allows advanced
  * categorization, like for SAP streams (which are grouped by "sap groups").
  *
- * The base structure for all playlist operations is the input_item_t. This
- * contains all information needed to play a stream and get info, ie, mostly,
- * mrl and metadata.
+ * The base structure for all playlist operations is the playlist_item_t.
+ * This is essentially a node within the playlist tree. Each playlist item
+ * references an input_item_t which contain the input stream infos, such as
+ * location, name and meta-data.
  *
- * Input items are not used directly, but through playlist items.
- * The playlist items are themselves in a tree structure. They only contain
- * a link to the input item, a unique id and a few flags.
- * Several playlist items can be attached to a single input item. The input
- * item is refcounted and is automatically destroyed when it is not used
- * anymore.
+ * A playlist item is uniquely identified by its input item:
+ * \ref playlist_ItemGetByInput(). A single input item cannot be used by more
+ * than one playlist item at a time; if necessary, a copy of the input item can
+ * be made instead.
  *
- * The top-level items are the main media sources and include:
- * playlist, media library, SAP, Shoutcast, devices, ...
+ * The same playlist tree is visible to all user interfaces. To arbitrate
+ * access, a lock is used, see \ref playlist_Lock() and \ref playlist_Unlock().
  *
- * It is envisioned that a third tree will appear: VLM, but it's not done yet
- *
- * The playlist also stores, for utility purposes, an array of all input
- * items, an array of all playlist items and an array of all playlist items
- * and nodes (both are represented by the same structure).
+ * The under the playlist root item node, the top-level items are the main
+ * media sources and include:
+ * - the actual playlist,
+ * - the media library,
+ * - the service discovery root node, whose children are services discovery
+ *   module instances.
  *
  * So, here is an example:
  * \verbatim
@@ -79,22 +79,22 @@ struct intf_thread_t;
  * \endverbatim
  *
  * Sometimes, an item creates subitems. This happens for the directory access
- * for example. In that case, if the item is under the "playlist" top-level item
- * and playlist is configured to be flat then the item will be deleted and
+ * for example. In that case, if the item is under the "playlist" top-level
+ * item and playlist is configured to be flat then the item will be deleted and
  * replaced with new subitems. If the item is under another top-level item, it
  * will be transformed to a node and removed from the list of all items without
  * nodes.
  *
- * For "standard" item addition, you can use playlist_Add, playlist_AddExt
- * (more options) or playlist_AddInput if you already created your input
+ * For "standard" item addition, you can use playlist_Add(), playlist_AddExt()
+ * (more options) or playlist_AddInput() if you already created your input
  * item. This will add the item at the root of "Playlist" or of "Media library"
  * in each of the two trees.
  *
- * You can create nodes with playlist_NodeCreate and can create items from
- * existing input items to be placed under any node with playlist_NodeAddInput.
+ * You can create nodes with playlist_NodeCreate() and can create items from
+ * existing input items to be placed under any node with
+ * playlist_NodeAddInput().
  *
  * To delete an item, use playlist_NodeDelete( p_item ).
- *
  *
  * The playlist defines the following event variables:
  *
@@ -108,8 +108,8 @@ struct intf_thread_t;
  * - "leaf-to-parent": It will contain the playlist_item_t->i_id of an item that is transformed
  *   into a node.
  *
- * The playlist contains rate-variable which is propagated to current input if available
- * also rate-slower/rate-faster is in use
+ * The playlist contains rate-variable which is propagated to current input if
+ * available also rate-slower/rate-faster is in use.
  */
 
 /** Helper structure to export to file part of the playlist */
@@ -244,8 +244,54 @@ enum {
 #define playlist_Resume(p) \
         playlist_Control(p, PLAYLIST_RESUME, pl_Unlocked)
 
+/**
+ * Locks the playlist.
+ *
+ * This function locks the playlist. While the playlist is locked, no other
+ * thread can modify the playlist tree layout or current playing item and node.
+ *
+ * Locking the playlist is necessary before accessing, either for reading or
+ * writing, any playlist item.
+ *
+ * \note Because of the potential for lock inversion / deadlocks, locking the
+ * playlist shall not be attemped while holding an input item lock. An input
+ * item lock can be acquired while holding the playlist lock.
+ *
+ * While holding the playlist lock, a thread shall not attempt to:
+ * - probe, initialize or deinitialize a module or a plugin,
+ * - install or deinstall a variable or event callback,
+ * - set a variable or trigger a variable callback, with the sole exception
+ *   of the playlist core triggerting add/remove/leaf item callbacks,
+ * - invoke a module/plugin callback other than:
+ *   - playlist export,
+ *   - logger message callback.
+ */
 VLC_API void playlist_Lock( playlist_t * );
+
+/**
+ * Unlocks the playlist.
+ *
+ * This function unlocks the playlist, allowing other threads to lock it. The
+ * calling thread must have called playlist_Lock() before.
+ *
+ * This function invalidates all or any playlist item pointers.
+ * There are no ways to ensure that playlist item are not modified or deleted
+ * by another thread past this function call.
+ *
+ * To retain a reference to a playlist item while not holding the playlist
+ * lock, a thread should take a reference to the input item within the
+ * playlist item before unlocking. If this is not practical, then the thread
+ * can store the playlist item ID (i_id) before unlocking.
+ * Either way, this will not ensure that the playlist item is not deleted, so
+ * the thread must be ready to handle that case later when calling
+ * playlist_ItemGetByInput() or playlist_ItemGetById().
+ *
+ * Furthermore, if ID is used, then the playlist item might be deleted, and
+ * another item could be assigned the same ID. To avoid that problem, use
+ * the input item instead of the ID.
+ */
 VLC_API void playlist_Unlock( playlist_t * );
+
 VLC_API void playlist_AssertLocked( playlist_t * );
 VLC_API void playlist_Deactivate( playlist_t * );
 
