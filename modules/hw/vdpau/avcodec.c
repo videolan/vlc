@@ -73,7 +73,7 @@ static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
 static void DestroySurface(vlc_vdp_video_field_t *field)
 {
     assert(field != NULL);
-    field->destroy(field);
+    field->context.destroy(&field->context);
 }
 
 static vlc_vdp_video_field_t *GetSurface(vlc_va_t *va)
@@ -109,7 +109,7 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
         msleep(VOUT_OUTMEM_SLEEP);
     }
 
-    pic->context = field;
+    pic->context = &field->context;
     *data = (void *)(uintptr_t)field->frame->surface;
     return VLC_SUCCESS;
 }

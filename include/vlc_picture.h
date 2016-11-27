@@ -56,6 +56,11 @@ typedef struct plane_t
  */
 #define PICTURE_PLANE_MAX (VOUT_MAX_PLANES)
 
+typedef struct picture_context_t
+{
+    void (*destroy)(struct picture_context_t *);
+} picture_context_t;
+
 /**
  * Video picture
  */
@@ -84,8 +89,7 @@ struct picture_t
     bool            b_progressive;          /**< is it a progressive frame ? */
     bool            b_top_field_first;             /**< which field is first */
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
-    void          * context;          /**< video format-specific data pointer,
-             * must point to a (void (*)(void*)) pointer to free the context */
+    picture_context_t *context;      /**< video format-specific data pointer */
     /**@}*/
 
     /** Private data - the video output plugin might want to put stuff here to

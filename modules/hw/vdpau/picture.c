@@ -32,9 +32,12 @@
 
 #pragma GCC visibility push(default)
 
-static void SurfaceDestroy(void *opaque)
+static_assert(offsetof (vlc_vdp_video_field_t, context) == 0,
+              "Cast assumption failure");
+
+static void SurfaceDestroy(struct picture_context_t *ctx)
 {
-    vlc_vdp_video_field_t *field = opaque;
+    vlc_vdp_video_field_t *field = (vlc_vdp_video_field_t *)ctx;
     vlc_vdp_video_frame_t *frame = field->frame;
     VdpStatus err;
 
@@ -75,7 +78,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
         return NULL;
     }
 
-    field->destroy = SurfaceDestroy;
+    field->context.destroy = SurfaceDestroy;
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
     field->procamp = procamp_default;
@@ -99,7 +102,7 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
         || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_444);
     assert(!picture_IsReferenced(pic));
     assert(pic->context == NULL);
-    pic->context = field;
+    pic->context = &field->context;
     return VDP_STATUS_OK;
 }
 
@@ -110,7 +113,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_copy(vlc_vdp_video_field_t *fold)
     if (unlikely(fnew == NULL))
         return NULL;
 
-    fnew->destroy = SurfaceDestroy;
+    fnew->context.destroy = SurfaceDestroy;
     fnew->frame = frame;
     fnew->structure = fold->structure;
     fnew->procamp = fold->procamp;

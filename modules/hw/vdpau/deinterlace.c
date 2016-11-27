@@ -43,7 +43,7 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
 
     sys->last_pts = src->date;
 
-    vlc_vdp_video_field_t *f1 = src->context;
+    vlc_vdp_video_field_t *f1 = (vlc_vdp_video_field_t *)src->context;
     if (unlikely(f1 == NULL))
         return src;
     if (f1->structure != VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME)
@@ -65,7 +65,7 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     }
 
     picture_CopyProperties(dst, src);
-    dst->context = f2;
+    dst->context = &f2->context;
 
     if (last_pts != VLC_TS_INVALID)
         dst->date = (3 * src->date - last_pts) / 2;

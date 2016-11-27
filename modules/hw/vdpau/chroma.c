@@ -290,7 +290,8 @@ static void Flush(filter_t *filter)
     for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
         if (sys->history[i].field != NULL)
         {
-            sys->history[i].field->destroy(sys->history[i].field);
+            sys->history[i].field->context.destroy(
+                &sys->history[i].field->context);
             sys->history[i].field = NULL;
         }
 }
@@ -299,7 +300,7 @@ static void Flush(filter_t *filter)
 static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = filter->p_sys;
-    vlc_vdp_video_field_t *field = src->context;
+    vlc_vdp_video_field_t *field = (vlc_vdp_video_field_t *)src->context;
     vlc_vdp_video_frame_t *psys = field->frame;
     VdpStatus err;
     VdpVideoSurface surface = psys->surface;
@@ -446,7 +447,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     }
 
     /* Corner case: different VDPAU instances decoding and rendering */
-    vlc_vdp_video_field_t *field = src->context;
+    vlc_vdp_video_field_t *field = (vlc_vdp_video_field_t *)src->context;
     if (field->frame->vdp != sys->vdp)
     {
         video_format_t fmt = src->format;
@@ -478,7 +479,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     if (likely(src != NULL))
     {
         sys->history[MAX_PAST + MAX_FUTURE].field =
-                                              vlc_vdp_video_copy(src->context);
+            vlc_vdp_video_copy((vlc_vdp_video_field_t *)src->context);
         sys->history[MAX_PAST + MAX_FUTURE].date = src->date;
         sys->history[MAX_PAST + MAX_FUTURE].force = src->b_force;
         picture_Release(src);
@@ -502,7 +503,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
         {
             f = sys->history[0].field;
             if (f != NULL)
-                f->destroy(f);
+                f->context.destroy(&f->context);
 
             memmove(sys->history, sys->history + 1,
                     sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
@@ -679,7 +680,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
 skip:
     f = sys->history[0].field;
     if (f != NULL)
-        f->destroy(f); /* Release oldest field */
+        f->context.destroy(&f->context); /* Release oldest field */
     memmove(sys->history, sys->history + 1, /* Advance history */
             sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
 

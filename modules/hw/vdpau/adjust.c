@@ -108,7 +108,7 @@ static int HueCallback(vlc_object_t *obj, const char *varname,
 static picture_t *Adjust(filter_t *filter, picture_t *pic)
 {
     filter_sys_t *sys = filter->p_sys;
-    vlc_vdp_video_field_t *f = pic->context;
+    vlc_vdp_video_field_t *f = (vlc_vdp_video_field_t *)pic->context;
 
     if (unlikely(f == NULL))
         return pic;

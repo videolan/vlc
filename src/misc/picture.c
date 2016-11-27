@@ -86,11 +86,10 @@ static int AllocatePicture( picture_t *p_pic )
 
 static void PictureDestroyContext( picture_t *p_picture )
 {
-    void (**context)( void * ) = p_picture->context;
-    if( context != NULL )
+    picture_context_t *ctx = p_picture->context;
+    if (ctx != NULL)
     {
-        void (*context_destroy)( void * ) = *context;
-        context_destroy( context );
+        ctx->destroy(ctx);
         p_picture->context = NULL;
     }
 }

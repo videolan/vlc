@@ -208,6 +208,7 @@ void vdp_release_x11(vdp_t *);
 # include <vlc_common.h>
 # include <vlc_fourcc.h>
 # include <vlc_atomic.h>
+# include <vlc_picture.h>
 
 /** Converts VLC YUV format to VDPAU chroma type and YCbCr format */
 static inline
@@ -272,7 +273,7 @@ typedef struct vlc_vdp_video_frame
 
 typedef struct vlc_vdp_video_field
 {
-    void (*destroy)(void *); /* must be first @ref picture_Release() */
+    picture_context_t context;
     vlc_vdp_video_frame_t *frame;
     VdpVideoMixerPictureStructure structure;
     VdpProcamp procamp;
