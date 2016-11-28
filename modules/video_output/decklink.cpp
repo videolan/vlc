@@ -254,7 +254,7 @@ vlc_module_end ()
 /* Protects decklink_sys_t creation/deletion */
 static vlc_mutex_t sys_lock = VLC_STATIC_MUTEX;
 
-static struct decklink_sys_t *GetDLSys(vlc_object_t *obj)
+static struct decklink_sys_t *GetDLSys(vlc_object_t *obj, bool b_hold = false)
 {
     vlc_object_t *libvlc = VLC_OBJECT(obj->obj.libvlc);
     struct decklink_sys_t *sys;
@@ -278,6 +278,9 @@ static struct decklink_sys_t *GetDLSys(vlc_object_t *obj)
             var_SetAddress(libvlc, "decklink-sys", (void*)sys);
         }
     }
+
+    if(sys && b_hold)
+        sys->users++;
 
     vlc_mutex_unlock(&sys_lock);
     return sys;
@@ -452,7 +455,7 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
     return p_selected;
 }
 
-static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
+static struct decklink_sys_t *OpenDecklink(vout_display_t *vd, struct decklink_sys_t *)
 {
     vout_display_sys_t *sys = vd->sys;
     video_format_t *fmt = &vd->fmt;
@@ -475,9 +478,8 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
     IDeckLink *p_card = NULL;
     BMDDisplayMode wanted_mode_id = bmdDisplayModeNotSupported;
 
-    struct decklink_sys_t *decklink_sys = GetDLSys(VLC_OBJECT(vd));
+    struct decklink_sys_t *decklink_sys = GetDLSys(VLC_OBJECT(vd), true);
     vlc_mutex_lock(&decklink_sys->lock);
-    decklink_sys->users++;
 
     /* wait until aout is ready */
     msg_Info(vd, "Waiting for DeckLink audio input module to start");
@@ -932,7 +934,7 @@ static int OpenVideo(vlc_object_t *p_this)
     sys->ar = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "ar");
     sys->pic_nosignal = NULL;
 
-    decklink_sys = OpenDecklink(vd);
+    decklink_sys = OpenDecklink(vd, decklink_sys);
     if (!decklink_sys) {
         if (sys->pic_nosignal)
             picture_Release(sys->pic_nosignal);
@@ -1074,12 +1076,11 @@ static void PlayAudio(audio_output_t *aout, block_t *audio)
 static int OpenAudio(vlc_object_t *p_this)
 {
     audio_output_t *aout = (audio_output_t *)p_this;
-    struct decklink_sys_t *decklink_sys = GetDLSys(VLC_OBJECT(aout));
+    struct decklink_sys_t *decklink_sys = GetDLSys(VLC_OBJECT(aout), true);
 
     vlc_mutex_lock(&decklink_sys->lock);
     //decklink_sys->i_channels = var_InheritInteger(vd, AUDIO_CFG_PREFIX "audio-channels");
     decklink_sys->i_rate = var_InheritInteger(aout, AUDIO_CFG_PREFIX "audio-rate");
-    decklink_sys->users++;
     vlc_cond_signal(&decklink_sys->cond);
     vlc_mutex_unlock(&decklink_sys->lock);
 
