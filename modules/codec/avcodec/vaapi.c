@@ -328,6 +328,19 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             return VLC_EGENERIC;
         count = 18;
         break;
+    case AV_CODEC_ID_VP8:
+        i_profile = VAProfileVP8Version0_3;
+        count = 5;
+        break;
+    case AV_CODEC_ID_VP9:
+        if (ctx->profile == FF_PROFILE_VP9_0)
+            i_profile = VAProfileVP9Profile0;
+        else if (ctx->profile == FF_PROFILE_VP9_2)
+            i_profile = VAProfileVP9Profile2;
+        else
+            return VLC_EGENERIC;
+        count = 10;
+        break;
     default:
         return VLC_EGENERIC;
     }
