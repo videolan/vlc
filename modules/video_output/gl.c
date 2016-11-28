@@ -69,10 +69,10 @@ vlc_module_begin ()
 # define API VLC_OPENGL
 # define MODULE_VARNAME "gl"
     set_shortname (N_("OpenGL"))
-    set_description (N_("OpenGL video output (experimental)"))
+    set_description (N_("OpenGL video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", /*270*/0)
+    set_capability ("vout display", 270)
     set_callbacks (Open, Close)
     add_shortcut ("opengl", "gl")
     add_module ("gl", "opengl", NULL,
