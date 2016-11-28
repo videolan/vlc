@@ -468,7 +468,6 @@ static int Open(vlc_object_t *obj)
     vd->fmt.i_chroma = VLC_CODEC_RGB32;
 
     vd->info.has_pictures_invalid = sys->viewport == NULL;
-    vd->info.has_event_thread = true;
 
     vd->pool = Pool;
     vd->prepare = Prepare;

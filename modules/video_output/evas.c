@@ -912,8 +912,6 @@ Open( vlc_object_t *p_this )
     vd->control = Control;
     vd->manage  = Manage;
 
-    vd->info.has_event_thread = true;
-
     /* Fix initial state */
     vout_display_SendEventFullscreen( vd, true );
 

@@ -185,12 +185,9 @@ static int Open(vlc_object_t *object)
         fmt.i_bmask = 0x000000ff;
     }
 
-    /* TODO */
-    vout_display_info_t info = vd->info;
-
     /* Setup vout_display now that everything is fine */
     vd->fmt = fmt;
-    vd->info = info;
+    vd->info.needs_event_thread = true;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;

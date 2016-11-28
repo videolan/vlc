@@ -177,6 +177,8 @@ static int Open(vlc_object_t *object)
     /* */
     vout_display_info_t info = vd->info;
 
+    info.needs_event_thread = true;
+
     /* Set main window's size */
     int display_width;
     int display_height;

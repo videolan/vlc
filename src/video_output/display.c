@@ -93,7 +93,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     vd->info.has_double_click = false;
     vd->info.has_hide_mouse = false;
     vd->info.has_pictures_invalid = false;
-    vd->info.has_event_thread = false;
+    vd->info.needs_event_thread = false;
     vd->info.subpicture_chromas = NULL;
 
     vd->cfg = cfg;
@@ -654,10 +654,10 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     case VOUT_DISPLAY_EVENT_KEY: {
         const int key = (int)va_arg(args, int);
         msg_Dbg(vd, "VoutDisplayEvent 'key' 0x%2.2x", key);
-        if (vd->info.has_event_thread)
-            vout_SendEventKey(osys->vout, key);
-        else
+        if (vd->info.needs_event_thread)
             VoutDisplayEventKey(vd, key);
+        else
+            vout_SendEventKey(osys->vout, key);
         break;
     }
     case VOUT_DISPLAY_EVENT_MOUSE_STATE:

@@ -654,7 +654,6 @@ static int Open(vlc_object_t *obj)
     /* */
     vd->sys = sys;
     vd->info.has_pictures_invalid = true;
-    vd->info.has_event_thread = true;
     vd->info.subpicture_chromas = spu_chromas;
     vd->fmt = fmt;
 

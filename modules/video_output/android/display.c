@@ -740,7 +740,6 @@ static int Open(vlc_object_t *p_this)
     vd->display = Display;
     vd->control = Control;
     vd->manage  = NULL;
-    vd->info.has_event_thread = true;
     vd->info.is_slow = !sys->p_window->b_opaque;
 
     /* Fix initial state */

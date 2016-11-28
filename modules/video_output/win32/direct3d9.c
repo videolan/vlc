@@ -218,7 +218,6 @@ static int Open(vlc_object_t *object)
     info.has_double_click = true;
     info.has_hide_mouse = false;
     info.has_pictures_invalid = !is_d3d9_opaque(fmt.i_chroma);
-    info.has_event_thread = true;
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
         sys->d3dregion_format != D3DFMT_UNKNOWN &&
         (sys->d3dcaps.SrcBlendCaps  & D3DPBLENDCAPS_SRCALPHA) &&

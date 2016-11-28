@@ -301,7 +301,6 @@ found_format:;
 
     /* Setup vout_display_t once everything is fine */
     vd->info.has_pictures_invalid = true;
-    vd->info.has_event_thread = true;
 
     vd->fmt = fmt_pic;
     vd->pool = Pool;

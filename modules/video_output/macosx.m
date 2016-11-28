@@ -271,7 +271,6 @@ static int Open (vlc_object_t *this)
         /* */
         vout_display_info_t info = vd->info;
         info.has_pictures_invalid = false;
-        info.has_event_thread = true;
         info.subpicture_chromas = subpicture_chromas;
         info.has_hide_mouse = true;
 

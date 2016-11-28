@@ -122,13 +122,10 @@ static int Open(vlc_object_t *object)
     fmt.i_visible_width = fmt.i_width;
     fmt.i_visible_height = fmt.i_height;
 
-    /* */
-    vout_display_info_t info = vd->info;
-    info.has_pictures_invalid = true;
-
     /* Setup vout_display now that everything is fine */
     vd->fmt = fmt;
-    vd->info = info;
+    vd->info.has_pictures_invalid = true;
+    vd->info.needs_event_thread = true;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
