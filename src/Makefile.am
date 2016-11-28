@@ -87,6 +87,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_sout.h \
 	../include/vlc_spu.h \
 	../include/vlc_stream.h \
+	../include/vlc_stream_extractor.h \
 	../include/vlc_strings.h \
 	../include/vlc_subpicture.h \
 	../include/vlc_text_style.h \
@@ -257,6 +258,7 @@ libvlccore_la_SOURCES = \
 	input/stats.c \
 	input/stream.c \
 	input/stream_fifo.c \
+	input/stream_extractor.c \
 	input/stream_filter.c \
 	input/stream_memory.c \
 	input/subtitles.c \

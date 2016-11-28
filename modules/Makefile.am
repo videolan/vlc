@@ -42,6 +42,7 @@ include packetizer/Makefile.am
 include services_discovery/Makefile.am
 include spu/Makefile.am
 include stream_filter/Makefile.am
+include stream_extractor/Makefile.am
 include text_renderer/Makefile.am
 include video_chroma/Makefile.am
 include video_filter/Makefile.am

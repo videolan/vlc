@@ -1,0 +1,96 @@
+/*****************************************************************************
+ * vlc_stream_extractor.h
+ *****************************************************************************
+ * Copyright (C) 2016 VLC authors and VideoLAN
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifndef VLC_STREAM_EXTRACTOR_H
+#define VLC_STREAM_EXTRACTOR_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * \defgroup stream_extractor Stream Extractor
+ * \ingroup input
+ *
+ * If a stream can be viewed as a directory, such as when opening a
+ * compressed archive, a \em stream-extractor is used to get access to
+ * the entities inside said stream.
+ *
+ * A \em stream-extractor can do one of two things;
+ *
+ *  - either it lists the logical entries within a stream, or;
+ *  - it extracts the data associated with one of those entries based
+ *    on a unique identifier.
+ *
+ * @{
+ *
+ **/
+struct stream_extractor_t {
+    VLC_COMMON_MEMBERS;
+
+    union {
+        /**
+         * Callbacks for entity extraction
+         *
+         * The following callbacks shall be populated if the stream_extractor is
+         * used to extract a specific entity from the source-stream. Each
+         * callback shall behave as those, with the same name, specified in \ref
+         * stream_t.
+         *
+         **/
+        struct {
+            ssize_t  (*pf_read)(struct stream_extractor_t *, void *buf, size_t len);
+            block_t* (*pf_block)(struct stream_extractor_t *, bool *eof);
+            int      (*pf_seek)(struct stream_extractor_t *, uint64_t);
+            int      (*pf_control)(struct stream_extractor_t *, int i_query, va_list);
+
+        } stream;
+
+        /**
+         * Callbacks for stream directory listing
+         *
+         * These callbacks are used when a stream is to be treated as a
+         * directory, it shall behave as those, with the same name, specified
+         * in \ref stream_t.
+         *
+         **/
+        struct {
+            int (*pf_readdir)(struct stream_extractor_t *, input_item_node_t *);
+
+        } directory;
+
+    };
+
+    void* p_sys; /**< Private data pointer */
+    stream_t* source; /**< The source stream */
+    char* identifier; /**< name of requested entity to extract, or NULL
+                       **  when requested to list directories */
+};
+
+typedef struct stream_extractor_t stream_extractor_t;
+
+/**
+ * @}
+ */
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+#endif /* include-guard */
