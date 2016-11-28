@@ -1166,7 +1166,6 @@ modules/video_output/vdummy.c
 modules/video_output/vmem.c
 modules/video_output/wayland/shell_surface.c
 modules/video_output/wayland/shm.c
-modules/video_output/xcb/glx.c
 modules/video_output/xcb/window.c
 modules/video_output/xcb/x11.c
 modules/video_output/xcb/xvideo.c

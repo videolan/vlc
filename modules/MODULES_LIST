@@ -467,7 +467,6 @@ $Id$
  * x265: H265 video encoder using x265
  * xa: XA demuxer
  * xcb_apps: List the application windows using XCB
- * xcb_glx: a opengl provider using XCB OpenGL
  * xcb_hotkeys: module to catch hotkeys when application doesn't have the focus
  * xcb_screen: input module that takes screenshots of the primary monitor
  * xcb_window: XCB window provider

@@ -84,14 +84,6 @@ libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libxcb_xv_plugin_la_LIBADD = libvlc_xcb_events.la \
 	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS)
 
-libxcb_glx_plugin_la_SOURCES = \
-	video_output/opengl.c video_output/opengl.h \
-	video_output/xcb/glx.c
-libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS) $(GL_CFLAGS)
-libxcb_glx_plugin_la_LIBADD = libvlc_xcb_events.la \
-	$(XCB_LIBS) $(GL_LIBS) $(LIBM)
-
 libxcb_window_plugin_la_SOURCES =  \
 	video_output/xcb/keys.c \
 	video_output/xcb/keysym.h video_output/xcb/xcb_keysym.h \
@@ -123,7 +115,7 @@ if HAVE_EGL
 vout_LTLIBRARIES += libegl_x11_plugin.la
 endif
 if HAVE_GL
-vout_LTLIBRARIES += libxcb_glx_plugin.la libglx_plugin.la
+vout_LTLIBRARIES += libglx_plugin.la
 endif
 endif
 
