@@ -317,7 +317,16 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     case AV_CODEC_ID_H264:
         i_profile = VAProfileH264High;
         count = 18;
-        break;;
+        break;
+    case AV_CODEC_ID_HEVC:
+        if (ctx->profile == FF_PROFILE_HEVC_MAIN)
+            i_profile = VAProfileHEVCMain;
+        else if (ctx->profile == FF_PROFILE_HEVC_MAIN_10)
+            i_profile = VAProfileHEVCMain10;
+        else
+            return VLC_EGENERIC;
+        count = 18;
+        break;
     default:
         return VLC_EGENERIC;
     }
