@@ -165,6 +165,7 @@ static const char * const rgsz_afd_text[] = {
     "14: 16:9 (with shoot and protect 14:9 centre)",
     "15: 16:9 (with shoot and protect  4:3 centre)",
 };
+static_assert(ARRAY_SIZE(rgi_afd_values) == ARRAY_SIZE(rgsz_afd_text), "afd arrays messed up");
 
 static const int rgi_ar_values[] = {
     0, 1,
@@ -173,6 +174,7 @@ static const char * const rgsz_ar_text[] = {
     "0:   4:3",
     "1:  16:9",
 };
+static_assert(ARRAY_SIZE(rgi_ar_values) == ARRAY_SIZE(rgsz_ar_text), "afd arrays messed up");
 
 struct vout_display_sys_t
 {
