@@ -394,6 +394,11 @@ static picture_t * CreateNoSignalPicture(vlc_object_t *p_this, const video_forma
         video_format_Init(&dummy, 0);
         video_format_Copy(&dummy, fmt);
         p_pic = image_Convert(img, png, &in, &dummy);
+        if(!video_format_IsSimilar(&dummy, fmt))
+        {
+            picture_Release(p_pic);
+            p_pic = NULL;
+        }
         picture_Release(png);
     }
     image_HandlerDelete(img);
