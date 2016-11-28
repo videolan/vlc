@@ -369,6 +369,40 @@ static const char * lookup_error_string(long i_code)
     return NULL;
 }
 
+static picture_t * CreateNoSignalPicture(vlc_object_t *p_this, const video_format_t *fmt,
+                                         const char *psz_file)
+{
+    picture_t *p_pic = NULL;
+    image_handler_t *img = image_HandlerCreate(p_this);
+    if (!img)
+    {
+        msg_Err(p_this, "Could not create image converter");
+        return NULL;
+    }
+
+    video_format_t in, dummy;
+    video_format_Init(&dummy, 0);
+    video_format_Init(&in, 0);
+    video_format_Setup(&in, 0,
+                       fmt->i_width, fmt->i_height,
+                       fmt->i_width, fmt->i_height, 1, 1);
+
+    picture_t *png = image_ReadUrl(img, psz_file, &dummy, &in);
+    if (png)
+    {
+        video_format_Clean(&dummy);
+        video_format_Init(&dummy, 0);
+        video_format_Copy(&dummy, fmt);
+        p_pic = image_Convert(img, png, &in, &dummy);
+        picture_Release(png);
+    }
+    image_HandlerDelete(img);
+    video_format_Clean(&in);
+    video_format_Clean(&dummy);
+
+    return p_pic;
+}
+
 static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
                                                IDeckLinkOutput *output,
                                                const video_format_t *fmt,
@@ -945,35 +979,12 @@ static int OpenVideo(vlc_object_t *p_this)
     }
 
     char *pic_file = var_InheritString(p_this, VIDEO_CFG_PREFIX "nosignal-image");
-    if (pic_file) {
-        image_handler_t *img = image_HandlerCreate(p_this);
-        if (!img) {
-            msg_Err(p_this, "Could not create image converter");
-        } else {
-            video_format_t in, dummy;
-
-            video_format_Init(&in, 0);
-            video_format_Setup(&in, 0, fmt->i_width, fmt->i_height,
-                               fmt->i_width, fmt->i_height, 1, 1);
-
-            video_format_Init(&dummy, 0);
-
-            picture_t *png = image_ReadUrl(img, pic_file, &dummy, &in);
-            if (png) {
-                msg_Err(p_this, "Converting");
-                sys->pic_nosignal = image_Convert(img, png, &in, fmt);
-                picture_Release(png);
-            }
-
-            image_HandlerDelete(img);
-        }
-
-        free(pic_file);
-        if (!sys->pic_nosignal) {
-            CloseVideo(p_this);
+    if (pic_file)
+    {
+        sys->pic_nosignal = CreateNoSignalPicture(p_this, &vd->fmt, pic_file);
+        if (!sys->pic_nosignal)
             msg_Err(p_this, "Could not create no signal picture");
-            return VLC_EGENERIC;
-        }
+        free(pic_file);
     }
     vd->info.has_hide_mouse = true;
     vd->pool    = PoolVideo;
