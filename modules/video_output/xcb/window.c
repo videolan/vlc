@@ -64,6 +64,28 @@ static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
 
     switch (ev->response_type & 0x7f)
     {
+        /* Note a direct mapping of buttons from XCB to VLC is assumed. */
+        case XCB_BUTTON_PRESS:
+        {
+            xcb_button_release_event_t *bpe = (void *)ev;
+            vout_window_ReportMousePressed(wnd, bpe->detail - 1);
+            break;
+        }
+
+        case XCB_BUTTON_RELEASE:
+        {
+            xcb_button_release_event_t *bre = (void *)ev;
+            vout_window_ReportMouseReleased(wnd, bre->detail - 1);
+            break;
+        }
+
+        case XCB_MOTION_NOTIFY:
+        {
+            xcb_motion_notify_event_t *mne = (void *)ev;
+            vout_window_ReportMouseMoved(wnd, mne->event_x, mne->event_y);
+            break;
+        }
+
         case XCB_CONFIGURE_NOTIFY:
         {
             xcb_configure_notify_event_t *cne = (void *)ev;
@@ -344,8 +366,13 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         /* XCB_CW_BACK_PIXEL */
         scr->black_pixel,
         /* XCB_CW_EVENT_MASK */
-        XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_STRUCTURE_NOTIFY,
+        XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_POINTER_MOTION |
+        XCB_EVENT_MASK_STRUCTURE_NOTIFY,
     };
+
+    if (var_InheritBool(wnd, "mouse-events"))
+        values[1] |= XCB_EVENT_MASK_BUTTON_PRESS
+                   | XCB_EVENT_MASK_BUTTON_RELEASE;
 
     xcb_window_t window = xcb_generate_id (conn);
     ck = xcb_create_window_checked (conn, scr->root_depth, window, scr->root,
@@ -583,7 +610,9 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     /* Subscribe to window events (_before_ the geometry is queried) */
     uint32_t mask = XCB_CW_EVENT_MASK;
-    uint32_t value = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+    const uint32_t ovalue = XCB_EVENT_MASK_POINTER_MOTION
+                          | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+    uint32_t value = ovalue;
 
     xcb_change_window_attributes (conn, window, mask, &value);
 
@@ -598,7 +627,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     vout_window_ReportSize(wnd, geo->width, geo->height);
     free (geo);
 
-    /* Try to subscribe to keyboard events (only one X11 client can
+    /* Try to subscribe to keyboard and mouse events (only one X11 client can
      * subscribe to input events, so this can fail). */
     if (var_InheritBool (wnd, "keyboard-events"))
     {
@@ -609,7 +638,10 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     else
         p_sys->keys = NULL;
 
-    if (value & ~XCB_EVENT_MASK_STRUCTURE_NOTIFY)
+    if (var_InheritBool(wnd, "mouse-events"))
+        value |= XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
+
+    if (value != ovalue)
         xcb_change_window_attributes (conn, window, mask, &value);
 
     CacheAtoms (p_sys);
