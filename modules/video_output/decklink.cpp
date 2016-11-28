@@ -120,14 +120,34 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
 #define VIDEO_CFG_PREFIX "decklink-vout-"
 #define AUDIO_CFG_PREFIX "decklink-aout-"
 
-
-
+/* Video Connections */
 static const char *const ppsz_videoconns[] = {
-    "sdi", "hdmi", "opticalsdi", "component", "composite", "svideo"
+    "sdi",
+    "hdmi",
+    "opticalsdi",
+    "component",
+    "composite",
+    "svideo"
 };
 static const char *const ppsz_videoconns_text[] = {
-    N_("SDI"), N_("HDMI"), N_("Optical SDI"), N_("Component"), N_("Composite"), N_("S-video")
+    "SDI",
+    "HDMI",
+    "Optical SDI",
+    "Component",
+    "Composite",
+    "S-video",
 };
+static const BMDVideoConnection rgbmd_videoconns[] =
+{
+    bmdVideoConnectionSDI,
+    bmdVideoConnectionHDMI,
+    bmdVideoConnectionOpticalSDI,
+    bmdVideoConnectionComponent,
+    bmdVideoConnectionComposite,
+    bmdVideoConnectionSVideo,
+};
+static_assert(ARRAY_SIZE(rgbmd_videoconns) == ARRAY_SIZE(ppsz_videoconns), "videoconn arrays messed up");
+static_assert(ARRAY_SIZE(rgbmd_videoconns) == ARRAY_SIZE(ppsz_videoconns_text), "videoconn arrays messed up");
 
 static const int rgi_afd_values[] = {
     0, 2, 3, 4, 8, 9, 10, 11, 13, 14, 15,
@@ -313,28 +333,27 @@ static void ReleaseDLSys(vlc_object_t *obj)
     vlc_mutex_unlock(&sys_lock);
 }
 
-static BMDVideoConnection getVConn(vout_display_t *vd)
+static BMDVideoConnection getVConn(vout_display_t *vd, BMDVideoConnection mask)
 {
-    BMDVideoConnection conn = bmdVideoConnectionSDI;
+    BMDVideoConnection conn = 0;
     char *psz = var_InheritString(vd, VIDEO_CFG_PREFIX "video-connection");
-    if (!psz)
-        goto end;
-
-         if (!strcmp(psz, "sdi"))
-        conn = bmdVideoConnectionSDI;
-    else if (!strcmp(psz, "hdmi"))
-        conn = bmdVideoConnectionHDMI;
-    else if (!strcmp(psz, "opticalsdi"))
-        conn = bmdVideoConnectionOpticalSDI;
-    else if (!strcmp(psz, "component"))
-        conn = bmdVideoConnectionComponent;
-    else if (!strcmp(psz, "composite"))
-        conn = bmdVideoConnectionComposite;
-    else if (!strcmp(psz, "svideo"))
-        conn = bmdVideoConnectionSVideo;
-
-end:
-    free(psz);
+    if (psz)
+    {
+        for(size_t i=0; i<ARRAY_SIZE(rgbmd_videoconns); i++)
+        {
+            if (!strcmp(psz, ppsz_videoconns[i]) && (mask & rgbmd_videoconns[i]))
+            {
+                conn = rgbmd_videoconns[i];
+                break;
+            }
+        }
+        free(psz);
+    }
+    else /* Pick one as default connection */
+    {
+        conn = ctz(mask);
+        conn = conn ? ( 1 << conn ) : bmdVideoConnectionSDI;
+    }
     return conn;
 }
 
@@ -514,6 +533,7 @@ static int OpenDecklink(vout_display_t *vd, struct decklink_sys_t *decklink_sys)
     IDeckLinkIterator *decklink_iterator = NULL;
     IDeckLinkDisplayMode *p_display_mode = NULL;
     IDeckLinkConfiguration *p_config = NULL;
+    IDeckLinkAttributes *p_attributes = NULL;
     IDeckLink *p_card = NULL;
     BMDDisplayMode wanted_mode_id = bmdDisplayModeNotSupported;
 
@@ -525,8 +545,8 @@ static int OpenDecklink(vout_display_t *vd, struct decklink_sys_t *decklink_sys)
         vlc_cond_wait(&decklink_sys->cond, &decklink_sys->lock);
 
     int i_card_index = var_InheritInteger(vd, CFG_PREFIX "card-index");
-    BMDVideoConnection vconn = getVConn(vd);
     char *mode = var_InheritString(vd, VIDEO_CFG_PREFIX "mode");
+
     if(mode)
     {
         size_t len = strlen(mode);
@@ -569,6 +589,15 @@ static int OpenDecklink(vout_display_t *vd, struct decklink_sys_t *decklink_sys)
 
     msg_Dbg(vd, "Opened DeckLink PCI card %s", psz_model_name);
 
+    /* Read attributes */
+
+    result = p_card->QueryInterface(IID_IDeckLinkAttributes, (void**)&p_attributes);
+    CHECK("Could not get IDeckLinkAttributes");
+
+    int64_t vconn;
+    result = p_attributes->GetInt(BMDDeckLinkVideoOutputConnections, &vconn); /* reads mask */
+    CHECK("Could not get BMDDeckLinkVideoOutputConnections");
+
     result = p_card->QueryInterface(IID_IDeckLinkOutput,
         (void**)&decklink_sys->p_output);
     CHECK("No outputs");
@@ -577,12 +606,17 @@ static int OpenDecklink(vout_display_t *vd, struct decklink_sys_t *decklink_sys)
         (void**)&p_config);
     CHECK("Could not get config interface");
 
-    if (vconn)
+    /* Now configure card */
+
+    vconn = getVConn(vd, (BMDVideoConnection) vconn);
+    if (vconn == 0)
     {
-        result = p_config->SetInt(
-            bmdDeckLinkConfigVideoOutputConnection, vconn);
-        CHECK("Could not set video output connection");
+        msg_Err(vd, "Invalid video connection specified");
+        goto error;
     }
+
+    result = p_config->SetInt(bmdDeckLinkConfigVideoOutputConnection, (BMDVideoConnection) vconn);
+    CHECK("Could not set video output connection");
 
     p_display_mode = MatchDisplayMode(vd, decklink_sys->p_output,
                                           fmt, wanted_mode_id);
@@ -660,6 +694,7 @@ static int OpenDecklink(vout_display_t *vd, struct decklink_sys_t *decklink_sys)
     p_config->Release();
     p_display_mode->Release();
     p_card->Release();
+    p_attributes->Release();
     decklink_iterator->Release();
 
     vlc_mutex_unlock(&decklink_sys->lock);
@@ -677,6 +712,8 @@ error:
         p_card->Release();
     if (p_config)
         p_config->Release();
+    if (p_attributes)
+        p_attributes->Release();
     if (decklink_iterator)
         decklink_iterator->Release();
     if (p_display_mode)
