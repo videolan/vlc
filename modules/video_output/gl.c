@@ -209,7 +209,8 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
     vlc_gl_ReleaseCurrent (sys->gl);
 
     picture_Release (pic);
-    (void) subpicture;
+    if (subpicture != NULL)
+        subpicture_Delete(subpicture);
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)
