@@ -356,14 +356,23 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->hw_ctx.display = vaGetDisplay(sys->p_display_x11);
 #endif
 #ifdef VLC_VA_BACKEND_DRM
-    sys->drm_fd = vlc_open("/dev/dri/card0", O_RDWR);
-    if( sys->drm_fd == -1 )
-    {
-        msg_Err( va, "Could not access rendering device: %m" );
-        goto error;
-    }
+    static const char const *drm_device_paths[] = {
+        "/dev/dri/renderD128",
+        "/dev/dri/card0"
+    };
 
-    sys->hw_ctx.display = vaGetDisplayDRM(sys->drm_fd);
+    for (int i = 0; ARRAY_SIZE(drm_device_paths); i++) {
+        sys->drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
+        if (sys->drm_fd < 0)
+            continue;
+
+        sys->hw_ctx.display = vaGetDisplayDRM(sys->drm_fd);
+        if (sys->hw_ctx.display)
+            break;
+
+        vlc_close(sys->drm_fd);
+        sys->drm_fd = -1;
+    }
 #endif
     if (sys->hw_ctx.display == NULL)
     {
