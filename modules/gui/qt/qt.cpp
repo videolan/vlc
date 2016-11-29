@@ -378,15 +378,15 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
     /* Allocations of p_sys */
     intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
-    p_intf->p_sys->b_isDialogProvider = isDialogProvider;
+    p_sys->b_isDialogProvider = isDialogProvider;
     p_sys->p_mi = NULL;
     p_sys->pl_model = NULL;
 
     /* set up the playlist to work on */
     if( isDialogProvider )
-        p_intf->p_sys->p_playlist = pl_Get( (intf_thread_t *)p_intf->obj.parent );
+        p_sys->p_playlist = pl_Get( (intf_thread_t *)p_intf->obj.parent );
     else
-        p_intf->p_sys->p_playlist = pl_Get( p_intf );
+        p_sys->p_playlist = pl_Get( p_intf );
 
     /* */
     vlc_sem_init (&ready, 0);
@@ -461,7 +461,7 @@ static void Close( vlc_object_t *p_this )
 static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
-    MainInterface *p_mi;
+    intf_sys_t *p_sys = p_intf->p_sys;
     char vlc_name[] = "vlc"; /* for WM_CLASS */
 #ifdef QT5_HAS_X11
     char platform_parm[] = "-platform";
@@ -489,7 +489,7 @@ static void *Thread( void *obj )
      * necessary for  RTL locales */
     app.setLayoutDirection(QLocale().textDirection());
 
-    p_intf->p_sys->p_app = &app;
+    p_sys->p_app = &app;
 
 
     /* All the settings are in the .conf/.ini style */
@@ -502,7 +502,7 @@ static void *Thread( void *obj )
     QSettings::setPath( QSettings::IniFormat, QSettings::UserScope, configDir );
 #endif
 
-    p_intf->p_sys->mainSettings = new QSettings(
+    p_sys->mainSettings = new QSettings(
 #ifdef _WIN32
             QSettings::IniFormat,
 #else
@@ -540,35 +540,35 @@ static void *Thread( void *obj )
 #endif
 
     /* Create the normal interface in non-DP mode */
-    if( !p_intf->p_sys->b_isDialogProvider )
+    MainInterface *p_mi = NULL;
+
+    if( !p_sys->b_isDialogProvider )
     {
         p_mi = new MainInterface( p_intf );
-        p_intf->p_sys->p_mi = p_mi;
+        p_sys->p_mi = p_mi;
     }
-    else
-        p_mi = NULL;
 
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
     /* Check window type from the Qt platform back-end */
-    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
+    p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
 #if HAS_QT5 || defined (Q_WS_QPA)
     QString platform = app.platformName();
     if( platform == qfu("xcb") )
-        p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+        p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
     else if( platform == qfu("windows") )
-        p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+        p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
     else if( platform == qfu("cocoa" ) )
-        p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+        p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
     else
         msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
 #elif defined (Q_WS_X11)
-    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+    p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
 #elif defined (Q_WS_WIN) || defined (Q_WS_PM)
-    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+    p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
 #elif defined (Q_WS_MAC)
-    p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+    p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
 #endif
 
     /* Tell the main LibVLC thread we are ready */
@@ -576,7 +576,7 @@ static void *Thread( void *obj )
 
 #ifdef Q_OS_MAC
     /* We took over main thread, register and start here */
-    if( !p_intf->p_sys->b_isDialogProvider )
+    if( !p_sys->b_isDialogProvider )
     {
         RegisterIntf( p_intf );
         playlist_Play( THEPL );
@@ -587,7 +587,7 @@ static void *Thread( void *obj )
     app.setQuitOnLastWindowClosed( false );
 
     /* Retrieve last known path used in file browsing */
-    p_intf->p_sys->filepath =
+    p_sys->filepath =
          getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
 
     /* Loads and tries to apply the preferred QStyle */
@@ -604,7 +604,7 @@ static void *Thread( void *obj )
         QMutexLocker locker (&lock);
         active = false;
 
-        p_intf->p_sys->p_mi = NULL;
+        p_sys->p_mi = NULL;
         /* Destroy first the main interface because it is connected to some
            slots in the MainInputManager */
         delete p_mi;
@@ -626,18 +626,18 @@ static void *Thread( void *obj )
 
     /* Save the path or delete if recent play are disabled */
     if( var_InheritBool( p_intf, "qt-recentplay" ) )
-        getSettings()->setValue( "filedialog-path", p_intf->p_sys->filepath );
+        getSettings()->setValue( "filedialog-path", p_sys->filepath );
     else
         getSettings()->remove( "filedialog-path" );
 
     /* */
-    delete p_intf->p_sys->pl_model;
+    delete p_sys->pl_model;
 
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
     /* Delete the configuration. Application has to be deleted after that. */
-    delete p_intf->p_sys->mainSettings;
+    delete p_sys->mainSettings;
 
     /* Delete the application automatically */
     return NULL;
