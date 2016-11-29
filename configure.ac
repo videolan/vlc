@@ -3753,11 +3753,11 @@ AC_ARG_ENABLE(qt, [
     enable_qt="no"
   ])
 ])
+have_qt5_x11="no"
 AS_IF([test "${enable_qt}" != "no"], [
   PKG_CHECK_MODULES([QT], [Qt5Core >= 5.2.0 Qt5Widgets Qt5Gui], [
-      PKG_CHECK_MODULES([QTX11], [Qt5X11Extras], [
-          VLC_ADD_LIBS([qt],[${QTX11_LIBS}])
-          VLC_ADD_CXXFLAGS([qt],[${QTX11_CFLAGS} -DQT5_HAS_X11])
+      PKG_CHECK_MODULES([QT5_X11], [Qt5X11Extras], [
+          have_qt5_x11="yes"
       ],[
           AC_MSG_WARN([Not building Qt Interface with X11 helpers.])
       ])
@@ -3786,6 +3786,7 @@ AS_IF([test "${enable_qt}" != "no"], [
   ALIASES="${ALIASES} qvlc"
 ])
 AM_CONDITIONAL(ENABLE_QT, [test "$enable_qt" != "no"])
+AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
