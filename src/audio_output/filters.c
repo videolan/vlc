@@ -327,6 +327,13 @@ static void aout_FiltersPipelineFlush(filter_t *const *filters,
         filter_Flush (filters[i]);
 }
 
+static void aout_FiltersPipelineChangeViewpoint(filter_t *const *filters,
+                                                unsigned count,
+                                                const vlc_viewpoint_t *vp)
+{
+    for (unsigned i = 0; i < count; i++)
+        filter_ChangeViewpoint (filters[i], vp);
+}
 
 #define AOUT_MAX_FILTERS 10
 
@@ -759,4 +766,10 @@ void aout_FiltersFlush (aout_filters_t *filters)
 
     if (filters->resampler != NULL)
         aout_FiltersPipelineFlush (&filters->resampler, 1);
+}
+
+void aout_FiltersChangeViewpoint (aout_filters_t *filters,
+                                  const vlc_viewpoint_t *vp)
+{
+    aout_FiltersPipelineChangeViewpoint (filters->tab, filters->count, vp);
 }

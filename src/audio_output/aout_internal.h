@@ -25,6 +25,7 @@
 # define LIBVLC_AOUT_INTERNAL_H 1
 
 # include <vlc_atomic.h>
+# include <vlc_vout.h> /* for vlc_viewpoint_t */
 
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)
@@ -66,6 +67,13 @@ typedef struct
         aout_dev_t *list;
         unsigned count;
     } dev;
+
+    struct
+    {
+        atomic_bool update;
+        vlc_mutex_t lock;
+        vlc_viewpoint_t value;
+    } vp;
 
     struct
     {
@@ -169,5 +177,8 @@ static inline void aout_SetWavePhysicalChannels(audio_sample_format_t *fmt)
 
 /* From filters.c */
 bool aout_FiltersCanResample (aout_filters_t *filters);
+
+void aout_ChangeViewpoint(audio_output_t *aout,
+                          const vlc_viewpoint_t *p_viewpoint);
 
 #endif /* !LIBVLC_AOUT_INTERNAL_H */

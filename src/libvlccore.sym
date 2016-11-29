@@ -23,6 +23,7 @@ aout_DeviceGet
 aout_DeviceSet
 aout_DevicesList
 aout_FiltersNew
+aout_FiltersChangeViewpoint
 aout_FiltersDelete
 aout_FiltersDrain
 aout_FiltersFlush

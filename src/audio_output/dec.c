@@ -112,6 +112,7 @@ error:
 
     atomic_init (&owner->buffers_lost, 0);
     atomic_init (&owner->buffers_played, 0);
+    atomic_init (&owner->vp.update, false);
     return 0;
 }
 
@@ -384,6 +385,13 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
         owner->sync.discontinuity = true;
 
+    if (atomic_exchange(&owner->vp.update, false))
+    {
+        vlc_mutex_lock (&owner->vp.lock);
+        aout_FiltersChangeViewpoint (owner->filters, &owner->vp.value);
+        vlc_mutex_unlock (&owner->vp.lock);
+    }
+
     block = aout_FiltersPlay (owner->filters, block, input_rate);
     if (block == NULL)
         goto lost;
@@ -455,4 +463,15 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
         aout_OutputFlush (aout, wait);
     }
     aout_OutputUnlock (aout);
+}
+
+void aout_ChangeViewpoint(audio_output_t *aout,
+                          const vlc_viewpoint_t *p_viewpoint)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_mutex_lock (&owner->vp.lock);
+    owner->vp.value = *p_viewpoint;
+    atomic_store(&owner->vp.update, true);
+    vlc_mutex_unlock (&owner->vp.lock);
 }
