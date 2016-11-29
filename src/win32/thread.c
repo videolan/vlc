@@ -699,7 +699,7 @@ static union
         BOOL (*query) (PULONGLONG);
     } interrupt;
 #endif
-#if (_WIN32_WINNT < 0x0600)
+#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
     struct
     {
         ULONGLONG (*get) (void);
@@ -731,7 +731,7 @@ static mtime_t mdate_interrupt (void)
 
 static mtime_t mdate_tick (void)
 {
-#if (_WIN32_WINNT >= 0x0600)
+#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
     ULONGLONG ts = GetTickCount64 ();
 #else
     ULONGLONG ts = clk.tick.get ();
@@ -868,7 +868,7 @@ static void SelectClockSource (vlc_object_t *obj)
     if (!strcmp (name, "tick"))
     {
         msg_Dbg (obj, "using Windows time as clock source");
-#if (_WIN32_WINNT < 0x0600)
+#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
         HANDLE h = GetModuleHandle (_T("kernel32.dll"));
         if (unlikely(h == NULL))
             abort ();
@@ -940,7 +940,7 @@ size_t EnumClockSource (vlc_object_t *obj, const char *var,
         names[n] = xstrdup ("Interrupt time");
         n++;
     }
-#if (_WIN32_WINNT < 0x0600)
+#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
     if (version >= 0x0600)
 #endif
     {
