@@ -192,6 +192,8 @@ typedef struct decklink_sys_t
     vlc_mutex_t lock;
     vlc_cond_t cond;
     uint8_t users;
+    bool    b_videomodule;
+    bool    b_recycling;
 
     //int i_channels;
     int i_rate;
@@ -207,6 +209,7 @@ typedef struct decklink_sys_t
     /* single video module exclusive */
     struct
     {
+        video_format_t currentfmt;
         picture_pool_t *pool;
         bool tenbits;
         uint8_t afd, ar;
@@ -280,21 +283,38 @@ vlc_module_end ()
 /* Protects decklink_sys_t creation/deletion */
 static vlc_mutex_t sys_lock = VLC_STATIC_MUTEX;
 
-static struct decklink_sys_t *GetDLSys(vlc_object_t *obj, bool b_hold = false)
+static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
 {
     vlc_object_t *libvlc = VLC_OBJECT(obj->obj.libvlc);
-    struct decklink_sys_t *sys;
+    decklink_sys_t *sys;
 
     vlc_mutex_lock(&sys_lock);
 
     if (var_Type(libvlc, "decklink-sys") == VLC_VAR_ADDRESS)
-        sys = (struct decklink_sys_t*)var_GetAddress(libvlc, "decklink-sys");
-    else {
-        sys = (struct decklink_sys_t*)malloc(sizeof(*sys));
+    {
+        sys = (decklink_sys_t*)var_GetAddress(libvlc, "decklink-sys");
+        sys->users++;
+
+        if(i_cat == VIDEO_ES)
+        {
+            while(sys->b_videomodule)
+            {
+                vlc_mutex_unlock(&sys_lock);
+                msg_Info(obj, "Waiting for previous vout module to exit");
+                msleep(CLOCK_FREQ / 10);
+                vlc_mutex_lock(&sys_lock);
+            }
+        }
+    }
+    else
+    {
+        sys = (decklink_sys_t*)malloc(sizeof(*sys));
         if (sys) {
             sys->p_output = NULL;
             sys->offset = 0;
-            sys->users = 0;
+            sys->users = 1;
+            sys->b_videomodule = (i_cat == VIDEO_ES);
+            sys->b_recycling = false;
             sys->i_rate = var_InheritInteger(obj, AUDIO_CFG_PREFIX "audio-rate");
             if(sys->i_rate > 0)
                 sys->i_rate = -1;
@@ -305,14 +325,11 @@ static struct decklink_sys_t *GetDLSys(vlc_object_t *obj, bool b_hold = false)
         }
     }
 
-    if(sys && b_hold)
-        sys->users++;
-
     vlc_mutex_unlock(&sys_lock);
     return sys;
 }
 
-static void ReleaseDLSys(vlc_object_t *obj)
+static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
 {
     vlc_object_t *libvlc = VLC_OBJECT(obj->obj.libvlc);
 
@@ -332,8 +349,20 @@ static void ReleaseDLSys(vlc_object_t *obj)
             sys->p_output->Release();
         }
 
+        /* Clean video specific */
+        if (sys->video.pool)
+            picture_pool_Release(sys->video.pool);
+        if (sys->video.pic_nosignal)
+            picture_Release(sys->video.pic_nosignal);
+        video_format_Clean(&sys->video.currentfmt);
+
         free(sys);
         var_Destroy(libvlc, "decklink-sys");
+    }
+    else if (i_cat == VIDEO_ES)
+    {
+        sys->b_videomodule = false;
+        sys->b_recycling = true;
     }
 
     vlc_mutex_unlock(&sys_lock);
@@ -521,7 +550,6 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
 
 static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
 {
-    video_format_t *fmt = &vd->fmt;
 #define CHECK(message) do { \
     if (result != S_OK) \
     { \
@@ -624,7 +652,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
     CHECK("Could not set video output connection");
 
     p_display_mode = MatchDisplayMode(vd, sys->p_output,
-                                          fmt, wanted_mode_id);
+                                          &vd->fmt, wanted_mode_id);
     if(p_display_mode == NULL)
     {
         msg_Err(vd, "Could not negociate a compatible display mode");
@@ -670,6 +698,8 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
         result = sys->p_output->EnableVideoOutput(mode_id, flags);
         CHECK("Could not enable video output");
 
+        video_format_t *fmt = &sys->video.currentfmt;
+        video_format_Copy(fmt, &vd->fmt);
         fmt->i_width = fmt->i_visible_width = p_display_mode->GetWidth();
         fmt->i_height = fmt->i_visible_height = p_display_mode->GetHeight();
         fmt->i_x_offset = 0;
@@ -869,8 +899,6 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
     if (!picture)
         return;
 
-    picture_t *orig_picture = picture;
-
     if (now - picture->date > sys->video.nosignal_delay * CLOCK_FREQ) {
         msg_Dbg(vd, "no signal");
         if (sys->video.pic_nosignal) {
@@ -998,33 +1026,47 @@ static int ControlVideo(vout_display_t *vd, int query, va_list args)
 static int OpenVideo(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
-    decklink_sys_t *sys = GetDLSys(p_this, true);
+    decklink_sys_t *sys = HoldDLSys(p_this, VIDEO_ES);
     if(!sys)
         return VLC_ENOMEM;
 
     vd->sys = (vout_display_sys_t*) sys;
 
-    sys->video.tenbits = var_InheritBool(p_this, VIDEO_CFG_PREFIX "tenbits");
-    sys->video.nosignal_delay = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "nosignal-delay");
-    sys->video.afd = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "afd");
-    sys->video.ar = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "ar");
-    sys->video.pic_nosignal = NULL;
-    sys->video.pool = NULL;
+    bool b_init;
+    vlc_mutex_lock(&sys->lock);
+    b_init = !sys->b_recycling;
+    vlc_mutex_unlock(&sys->lock);
 
-    if (OpenDecklink(vd, sys) != VLC_SUCCESS)
+    if( b_init )
     {
-        CloseVideo(p_this);
-        return VLC_EGENERIC;
+        sys->video.tenbits = var_InheritBool(p_this, VIDEO_CFG_PREFIX "tenbits");
+        sys->video.nosignal_delay = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "nosignal-delay");
+        sys->video.afd = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "afd");
+        sys->video.ar = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "ar");
+        sys->video.pic_nosignal = NULL;
+        sys->video.pool = NULL;
+        video_format_Init( &sys->video.currentfmt, 0 );
+
+        if (OpenDecklink(vd, sys) != VLC_SUCCESS)
+        {
+            CloseVideo(p_this);
+            return VLC_EGENERIC;
+        }
+
+        char *pic_file = var_InheritString(p_this, VIDEO_CFG_PREFIX "nosignal-image");
+        if (pic_file)
+        {
+            sys->video.pic_nosignal = CreateNoSignalPicture(p_this, &vd->fmt, pic_file);
+            if (!sys->video.pic_nosignal)
+                msg_Err(p_this, "Could not create no signal picture");
+            free(pic_file);
+        }
     }
 
-    char *pic_file = var_InheritString(p_this, VIDEO_CFG_PREFIX "nosignal-image");
-    if (pic_file)
-    {
-        sys->video.pic_nosignal = CreateNoSignalPicture(p_this, &vd->fmt, pic_file);
-        if (!sys->video.pic_nosignal)
-            msg_Err(p_this, "Could not create no signal picture");
-        free(pic_file);
-    }
+    /* vout must adapt */
+    video_format_Clean( &vd->fmt );
+    video_format_Copy( &vd->fmt, &sys->video.currentfmt );
+
     vd->info.has_hide_mouse = true;
     vd->pool    = PoolVideo;
     vd->prepare = PrepareVideo;
@@ -1038,22 +1080,7 @@ static int OpenVideo(vlc_object_t *p_this)
 
 static void CloseVideo(vlc_object_t *p_this)
 {
-    vout_display_t *vd = (vout_display_t *)p_this;
-    decklink_sys_t *sys = (decklink_sys_t *) vd->sys;
-
-    if (sys->video.pool)
-    {
-        picture_pool_Release(sys->video.pool);
-        sys->video.pool = NULL;
-    }
-
-    if (sys->video.pic_nosignal)
-    {
-        picture_Release(sys->video.pic_nosignal);
-        sys->video.pic_nosignal = NULL;
-    }
-
-    ReleaseDLSys(p_this);
+    ReleaseDLSys(p_this, VIDEO_ES);
 }
 
 /*****************************************************************************
@@ -1129,7 +1156,7 @@ static void PlayAudio(audio_output_t *aout, block_t *audio)
 static int OpenAudio(vlc_object_t *p_this)
 {
     audio_output_t *aout = (audio_output_t *)p_this;
-    decklink_sys_t *sys = GetDLSys(p_this, true);
+    decklink_sys_t *sys = HoldDLSys(p_this, AUDIO_ES);
     if(!sys)
         return VLC_ENOMEM;
 
@@ -1159,5 +1186,5 @@ static void CloseAudio(vlc_object_t *p_this)
     decklink_sys_t *sys = (decklink_sys_t *) ((audio_output_t *)p_this)->sys;
     vlc_mutex_lock(&sys->lock);
     vlc_mutex_unlock(&sys->lock);
-    ReleaseDLSys(p_this);
+    ReleaseDLSys(p_this, AUDIO_ES);
 }
