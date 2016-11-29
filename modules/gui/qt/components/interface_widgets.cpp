@@ -130,7 +130,7 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
        management */
     /* This is currently disabled on X11 as it does not seem to improve
      * performance, but causes the video widget to be transparent... */
-#if !defined (Q_WS_X11) && !defined (Q_WS_QPA)
+#if !defined (QT5_HAS_X11) && !defined (Q_WS_X11) && !defined (Q_WS_QPA)
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 #endif
 
