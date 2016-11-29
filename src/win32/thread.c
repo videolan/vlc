@@ -693,7 +693,7 @@ void vlc_control_cancel (int cmd, ...)
 /*** Clock ***/
 static union
 {
-#if (_WIN32_WINNT < 0x0601)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
     struct
     {
         BOOL (*query) (PULONGLONG);
@@ -716,7 +716,7 @@ static mtime_t mdate_interrupt (void)
     ULONGLONG ts;
     BOOL ret;
 
-#if (_WIN32_WINNT >= 0x0601)
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN7)
     ret = QueryUnbiasedInterruptTime (&ts);
 #else
     ret = clk.interrupt.query (&ts);
@@ -853,7 +853,7 @@ static void SelectClockSource (vlc_object_t *obj)
     if (!strcmp (name, "interrupt"))
     {
         msg_Dbg (obj, "using interrupt time as clock source");
-#if (_WIN32_WINNT < 0x0601)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
         HANDLE h = GetModuleHandle (_T("kernel32.dll"));
         if (unlikely(h == NULL))
             abort ();
@@ -924,7 +924,7 @@ size_t EnumClockSource (vlc_object_t *obj, const char *var,
     char **names = xmalloc (sizeof (*names) * max);
     size_t n = 0;
 
-#if (_WIN32_WINNT < 0x0601)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
     DWORD version = LOWORD(GetVersion());
     version = (LOBYTE(version) << 8) | (HIBYTE(version) << 0);
 #endif
@@ -932,7 +932,7 @@ size_t EnumClockSource (vlc_object_t *obj, const char *var,
     values[n] = xstrdup ("");
     names[n] = xstrdup (_("Auto"));
     n++;
-#if (_WIN32_WINNT < 0x0601)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
     if (version >= 0x0601)
 #endif
     {

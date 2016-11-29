@@ -35,7 +35,7 @@
 
 extern DWORD LoadLibraryFlags;
 
-#if (_WIN32_WINNT < 0x601)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
 static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
 {
     /* TODO: cache the pointer */
