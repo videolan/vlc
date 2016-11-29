@@ -167,8 +167,9 @@ static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
     return VLC_SUCCESS;
 }
 
-static void Release( void *opaque )
+static void Release( void *opaque, uint8_t *data )
 {
+    (void) data;
     picture_t *pic = opaque;
     VASurfaceID *surface = pic->context;
     vlc_va_sys_t *sys = (void *)((((uintptr_t)surface)

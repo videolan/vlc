@@ -166,9 +166,10 @@ static int Get( vlc_va_t *va, picture_t *p_picture, uint8_t **data )
 }
 
 // Never called
-static void Release( void *opaque )
+static void Release( void *opaque, uint8_t *data )
 {
     VLC_UNUSED(opaque);
+    VLC_UNUSED(data);
 }
 
 static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )

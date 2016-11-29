@@ -41,7 +41,7 @@ struct vlc_va_t {
     void (*setup)(vlc_va_t *, vlc_fourcc_t *output);
 #endif
     int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **data);
-    void (*release)(void *pic);
+    void (*release)(void *pic, uint8_t *data);
     int  (*extract)(vlc_va_t *, picture_t *pic, uint8_t *data);
 };
 
@@ -95,7 +95,7 @@ static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
  */
 static inline void vlc_va_Release(vlc_va_t *va, picture_t *pic)
 {
-    va->release(pic);
+    va->release(pic, NULL);
 }
 
 /**
