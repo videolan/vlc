@@ -369,8 +369,12 @@ enum libvlc_log_level
 typedef struct vlc_log_t libvlc_log_t;
 
 /**
- * Gets debugging information about a log message: the name of the VLC module
- * emitting the message and the message location within the source code.
+ * Gets log message debug infos.
+ *
+ * This function retrieves self-debug information about a log message:
+ * - the name of the VLC module emitting the message,
+ * - the name of the source code module (i.e. file) and
+ * - the line number within the source code module.
  *
  * The returned module name and file name will be NULL if unknown.
  * The returned line number will similarly be zero if unknown.
@@ -388,10 +392,14 @@ LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx,
                        const char **module, const char **file, unsigned *line);
 
 /**
- * Gets VLC object information about a log message: the type name of the VLC
- * object emitting the message, the object header if any and a temporaly-unique
- * object identifier. This information is mainly meant for <b>manual</b>
- * troubleshooting.
+ * Gets log message info.
+ *
+ * This function retrieves meta-information about a log message:
+ * - the type name of the VLC object emitting the message,
+ * - the object header if any, and
+ * - a temporaly-unique object identifier.
+ *
+ * This information is mainly meant for <b>manual</b> troubleshooting.
  *
  * The returned type name may be "generic" if unknown, but it cannot be NULL.
  * The returned header will be NULL if unset; in current versions, the header
@@ -413,6 +421,7 @@ LIBVLC_API void libvlc_log_get_object(const libvlc_log_t *ctx,
 
 /**
  * Callback prototype for LibVLC log message handler.
+ *
  * \param data data pointer as given to libvlc_log_set()
  * \param level message level (@ref libvlc_log_level)
  * \param ctx message context (meta-information about the message)
@@ -426,10 +435,14 @@ typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx,
                               const char *fmt, va_list args);
 
 /**
- * Unsets the logging callback for a LibVLC instance. This is rarely needed:
- * the callback is implicitly unset when the instance is destroyed.
- * This function will wait for any pending callbacks invocation to complete
- * (causing a deadlock if called from within the callback).
+ * Unsets the logging callback.
+ *
+ * This function deregisters the logging callback for a LibVLC instance.
+ * This is rarely needed as the callback is implicitly unset when the instance
+ * is destroyed.
+ *
+ * \note This function will wait for any pending callbacks invocation to
+ * complete (causing a deadlock if called from within the callback).
  *
  * \param p_instance libvlc instance
  * \version LibVLC 2.1.0 or later
@@ -438,6 +451,7 @@ LIBVLC_API void libvlc_log_unset( libvlc_instance_t * );
 
 /**
  * Sets the logging callback for a LibVLC instance.
+ *
  * This function is thread-safe: it will wait for any pending callbacks
  * invocation to complete.
  *
