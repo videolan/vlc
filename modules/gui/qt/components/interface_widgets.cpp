@@ -51,8 +51,8 @@
 #include <QUrl>
 
 #if defined (QT5_HAS_X11) || defined (Q_WS_X11)
-#   include <X11/Xlib.h>
-#   include <qx11info_x11.h>
+# include <X11/Xlib.h>
+# include <QX11Info>
 #endif
 
 #include <math.h>
