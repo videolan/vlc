@@ -49,7 +49,7 @@ static int Open( vlc_va_t *, AVCodecContext *, enum PixelFormat,
 static void Close( vlc_va_t * , AVCodecContext *);
 static int Get( vlc_va_t *, picture_t *, uint8_t ** );
 static int Extract( vlc_va_t *, picture_t *, uint8_t * );
-static void Release( void *opaque );
+static void Release( void *opaque, uint8_t *data );
 
 static void copy420YpCbCr8Planar(picture_t *p_pic,
                                  CVPixelBufferRef buffer,
