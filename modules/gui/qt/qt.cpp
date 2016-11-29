@@ -44,10 +44,6 @@
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "components/playlist/playlist_model.hpp" /* for ~PLModel() */
 
-#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
- #include <vlc_xlib.h>
-#endif
-
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
@@ -75,7 +71,6 @@ static int  Open         ( vlc_object_t *, bool );
 static void Close        ( vlc_object_t * );
 static int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
 static void WindowClose  ( vout_window_t * );
-static void *Thread      ( void * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 /*****************************************************************************
@@ -333,12 +328,62 @@ static bool active = false;
  * Module callbacks
  *****************************************************************************/
 
+static void *ThreadPlatform( void *, char * );
+
+static void *Thread( void *data )
+{
+    return ThreadPlatform( data, NULL );
+}
+
 #ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
 #include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
 static void Abort( void *obj )
 {
     QVLCApp::triggerQuit();
+}
+#endif
+
+#if defined (QT5_HAS_X11)
+# include <vlc_xlib.h>
+
+static void *ThreadXCB( void *data )
+{
+    char platform_name[] = "xcb";
+    return ThreadPlatform( data, platform_name );
+}
+
+static bool HasX11( vlc_object_t *obj )
+{
+    if( !vlc_xlib_init( obj ) )
+        return false;
+
+    Display *dpy = XOpenDisplay( NULL );
+    if( dpy == NULL )
+        return false;
+
+    XCloseDisplay( dpy );
+    return true;
+}
+#endif
+
+#ifdef QT5_HAS_WAYLAND
+# include <wayland-client.h>
+
+static void *ThreadWayland( void *data )
+{
+    char platform_name[] = "wayland";
+    return ThreadPlatform( data, platform_name );
+}
+
+static bool HasWayland( void )
+{
+    struct wl_display *dpy = wl_display_connect( NULL );
+    if( dpy == NULL )
+        return false;
+
+    wl_display_disconnect( dpy );
+    return true;
 }
 #endif
 
@@ -355,18 +400,24 @@ static void RegisterIntf( intf_thread_t *p_this )
 static int Open( vlc_object_t *p_this, bool isDialogProvider )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    void *(*thread)(void *) = Thread;
 
-#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
-    if( !vlc_xlib_init( p_this ) )
+#ifdef QT5_HAS_WAYLAND
+    if( HasWayland() )
+        thread = ThreadWayland;
+    else
+#endif
+#ifdef QT5_HAS_X11
+    if( HasX11( p_this ) )
+        thread = ThreadXCB;
+    else
+#endif
+#if defined (QT5_HAS_X11) || defined (QT5_HAS_WAYLAND)
         return VLC_EGENERIC;
-
-    Display *p_display = XOpenDisplay( NULL );
-    if( !p_display )
-    {
-        msg_Err( p_intf, "Could not connect to X server" );
+#endif
+#ifdef Q_WS_X11
+    if( !HasX11( p_this ) )
         return VLC_EGENERIC;
-    }
-    XCloseDisplay( p_display );
 #endif
 
     QMutexLocker locker (&lock);
@@ -393,9 +444,9 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 #ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
     libvlc_SetExitHandler( p_intf->obj.libvlc, Abort, p_intf );
-    Thread( (void *)p_intf );
+    thread( (void *)p_intf );
 #else
-    if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         delete p_sys;
         return VLC_ENOMEM;
@@ -458,23 +509,22 @@ static void Close( vlc_object_t *p_this )
     busy = false;
 }
 
-static void *Thread( void *obj )
+static void *ThreadPlatform( void *obj, char *platform_name )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     intf_sys_t *p_sys = p_intf->p_sys;
     char vlc_name[] = "vlc"; /* for WM_CLASS */
-#ifdef QT5_HAS_X11
     char platform_parm[] = "-platform";
-    char platform_value[] = "xcb";
-#endif
-    char *argv[] = {
-        vlc_name,
-#ifdef QT5_HAS_X11
-        platform_parm, platform_value,
-#endif
-        NULL,
-    };
-    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    char *argv[4];
+    int argc = 0;
+
+    argv[argc++] = vlc_name;
+    if( platform_name != NULL )
+    {
+        argv[argc++] = platform_parm;
+        argv[argc++] = platform_name;
+    }
+    argv[argc] = NULL;
 
     Q_INIT_RESOURCE( vlc );
 

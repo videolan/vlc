@@ -24,6 +24,10 @@ if HAVE_QT5_X11
 libqt_plugin_la_CXXFLAGS += $(QT5_X11_CFLAGS) -DQT5_HAS_X11
 libqt_plugin_la_LIBADD += $(QT5_X11_LIBS)
 endif
+if HAVE_WAYLAND
+libqt_plugin_la_CXXFLAGS += $(WAYLAND_CLIENT_CFLAGS) -DQT5_HAS_WAYLAND
+libqt_plugin_la_LIBADD += $(WAYLAND_CLIENT_LIBS)
+endif
 if HAVE_WIN32
 libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid
 else
