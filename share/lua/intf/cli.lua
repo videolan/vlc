@@ -290,15 +290,10 @@ function services_discovery(name,client,arg)
         local sd = vlc.sd.get_services_names()
         client:append("+----[ Services discovery ]")
         for n,ln in pairs(sd) do
-            local status
-            if vlc.sd.is_loaded(n) then
-                status = "enabled"
-            else
-                status = "disabled"
-            end
-            client:append("| "..n..": " .. ln .. " (" .. status .. ")")
+            client:append("| "..n..": " .. ln)
         end
         client:append("+----[ End of services discovery ]")
+        client:append("Enabled services discovery sources appear in the playlist.")
     end
 end
 
