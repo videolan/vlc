@@ -1126,6 +1126,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
         picture_Release(pic);
         return -1;
     }
+    assert(frame->data[0] != NULL);
     /* data[0] must be non-NULL for libavcodec internal checks.
      * data[3] actually contains the format-specific surface handle. */
     frame->data[3] = frame->data[0];
@@ -1142,7 +1143,6 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     }
 
     frame->opaque = pic;
-    assert(frame->data[0] != NULL);
     return 0;
 }
 
