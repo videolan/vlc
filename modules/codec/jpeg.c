@@ -256,11 +256,23 @@ static bool getRDFFloat(const char *psz_rdf, float *out, const char *psz_var)
         return false;
 
     size_t varlen = strlen(psz_var);
-    char *p_end = strchr(p_start + varlen, '"');
+    p_start += varlen;
+    char *p_end = NULL;
+    /* XML style */
+    if (p_start[0] == '>')
+    {
+        p_start += 1;
+        p_end = strchr(p_start, '<');
+    }
+    else if (p_start[0] == '=' && p_start[1] == '"')
+    {
+        p_start += 2;
+        p_end = strchr(p_start, '"');
+    }
     if (unlikely(p_end == NULL || p_end == p_start + 1))
         return false;
 
-    *out = us_strtof(p_start + varlen, NULL);
+    *out = us_strtof(p_start, NULL);
     return true;
 }
 
@@ -296,31 +308,32 @@ static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
 
     /* Try to find the string "GSpherical:Spherical" because the v1
         spherical video spec says the tag must be there. */
-    if (strcasestr(psz_rdf, "ProjectionType=\"equirectangular\""))
+    if (strcasestr(psz_rdf, "ProjectionType=\"equirectangular\"") ||
+        strcasestr(psz_rdf, "ProjectionType>equirectangular"))
         fmt->projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
 
     /* pose handling */
     float value;
-    if (getRDFFloat(psz_rdf, &value, "PoseHeadingDegrees=\""))
+    if (getRDFFloat(psz_rdf, &value, "PoseHeadingDegrees"))
         fmt->pose.f_yaw_degrees = value;
 
-    if (getRDFFloat(psz_rdf, &value, "PosePitchDegrees=\""))
+    if (getRDFFloat(psz_rdf, &value, "PosePitchDegrees"))
         fmt->pose.f_pitch_degrees = value;
 
-    if (getRDFFloat(psz_rdf, &value, "PoseRollDegrees=\""))
+    if (getRDFFloat(psz_rdf, &value, "PoseRollDegrees"))
         fmt->pose.f_roll_degrees = value;
 
     /* initial view */
-    if (getRDFFloat(psz_rdf, &value, "InitialViewHeadingDegrees=\""))
+    if (getRDFFloat(psz_rdf, &value, "InitialViewHeadingDegrees"))
         fmt->pose.f_yaw_degrees = value;
 
-    if (getRDFFloat(psz_rdf, &value, "InitialViewPitchDegrees=\""))
+    if (getRDFFloat(psz_rdf, &value, "InitialViewPitchDegrees"))
         fmt->pose.f_pitch_degrees = value;
 
-    if (getRDFFloat(psz_rdf, &value, "InitialViewRollDegrees=\""))
+    if (getRDFFloat(psz_rdf, &value, "InitialViewRollDegrees"))
         fmt->pose.f_roll_degrees = value;
 
-    if (getRDFFloat(psz_rdf, &value, "InitialHorizontalFOVDegrees=\""))
+    if (getRDFFloat(psz_rdf, &value, "InitialHorizontalFOVDegrees"))
         fmt->pose.f_fov_degrees = value;
 
     free(psz_rdf);
