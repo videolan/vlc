@@ -50,11 +50,7 @@
 #include <QBitmap>
 #include <QUrl>
 
-#ifdef QT5_HAS_X11
-# define Q_WS_X11
-#endif
-
-#ifdef Q_WS_X11
+#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
 #   include <X11/Xlib.h>
 #   include <qx11info_x11.h>
 #endif
@@ -92,7 +88,7 @@ VideoWidget::~VideoWidget()
 
 void VideoWidget::sync( void )
 {
-#ifdef Q_WS_X11
+#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
     /* Make sure the X server has processed all requests.
      * This protects other threads using distinct connections from getting
      * the video widget window in an inconsistent states. */
