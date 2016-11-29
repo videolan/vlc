@@ -387,15 +387,6 @@ static bool HasWayland( void )
 }
 #endif
 
-static void RegisterIntf( intf_thread_t *p_this )
-{
-    playlist_t *pl = p_this->p_sys->p_playlist;
-    var_Create (pl, "qt4-iface", VLC_VAR_ADDRESS);
-    var_SetAddress (pl, "qt4-iface", p_this);
-    var_Create (pl, "window", VLC_VAR_STRING);
-    var_SetString (pl, "window", "qt,any");
-}
-
 /* Open Interface */
 static int Open( vlc_object_t *p_this, bool isDialogProvider )
 {
@@ -460,11 +451,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     vlc_sem_destroy (&ready);
     busy = active = true;
 
-#ifndef Q_OS_MAC
-    if( !isDialogProvider )
-        RegisterIntf( p_intf );
-#endif
-
     return VLC_SUCCESS;
 }
 
@@ -489,8 +475,6 @@ static void Close( vlc_object_t *p_this )
     {
         playlist_t *pl = THEPL;
 
-        var_Destroy (pl, "window");
-        var_Destroy (pl, "qt4-iface");
         playlist_Deactivate (pl); /* release window provider if needed */
     }
 
@@ -596,30 +580,36 @@ static void *ThreadPlatform( void *obj, char *platform_name )
     {
         p_mi = new MainInterface( p_intf );
         p_sys->p_mi = p_mi;
+
+        /* Check window type from the Qt platform back-end */
+        p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
+#if HAS_QT5 || defined (Q_WS_QPA)
+        QString platform = app.platformName();
+        if( platform == qfu("xcb") )
+            p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+        else if( platform == qfu("windows") )
+            p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+        else if( platform == qfu("cocoa" ) )
+            p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+        else
+            msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
+#elif defined (Q_WS_X11)
+        p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
+        p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+#elif defined (Q_WS_MAC)
+        p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+#endif
+
+        var_Create( THEPL, "qt4-iface", VLC_VAR_ADDRESS );
+        var_SetAddress( THEPL, "qt4-iface", p_intf );
+        var_Create( THEPL, "window", VLC_VAR_STRING );
+        if( p_sys->voutWindowType != VOUT_WINDOW_TYPE_INVALID )
+            var_SetString( THEPL, "window", "qt,any" );
     }
 
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
-
-    /* Check window type from the Qt platform back-end */
-    p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
-#if HAS_QT5 || defined (Q_WS_QPA)
-    QString platform = app.platformName();
-    if( platform == qfu("xcb") )
-        p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
-    else if( platform == qfu("windows") )
-        p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
-    else if( platform == qfu("cocoa" ) )
-        p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
-    else
-        msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
-#elif defined (Q_WS_X11)
-    p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
-#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
-    p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
-#elif defined (Q_WS_MAC)
-    p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
-#endif
 
     /* Tell the main LibVLC thread we are ready */
     vlc_sem_post (&ready);
@@ -627,10 +617,7 @@ static void *ThreadPlatform( void *obj, char *platform_name )
 #ifdef Q_OS_MAC
     /* We took over main thread, register and start here */
     if( !p_sys->b_isDialogProvider )
-    {
-        RegisterIntf( p_intf );
         playlist_Play( THEPL );
-    }
 #endif
 
     /* Last settings */
@@ -651,6 +638,9 @@ static void *ThreadPlatform( void *obj, char *platform_name )
     msg_Dbg( p_intf, "QApp exec() finished" );
     if (p_mi != NULL)
     {
+        var_Destroy( THEPL, "window" );
+        var_Destroy( THEPL, "qt4-iface" );
+
         QMutexLocker locker (&lock);
         active = false;
 
