@@ -46,7 +46,7 @@ struct intf_thread_t;
  *
  * The base structure for all playlist operations is the playlist_item_t.
  * This is essentially a node within the playlist tree. Each playlist item
- * references an input_item_t which contain the input stream infos, such as
+ * references an input_item_t which contains the input stream info, such as
  * location, name and meta-data.
  *
  * A playlist item is uniquely identified by its input item:
@@ -57,7 +57,7 @@ struct intf_thread_t;
  * The same playlist tree is visible to all user interfaces. To arbitrate
  * access, a lock is used, see \ref playlist_Lock() and \ref playlist_Unlock().
  *
- * The under the playlist root item node, the top-level items are the main
+ * Under the playlist root item node, the top-level items are the main
  * media sources and include:
  * - the actual playlist,
  * - the media library,
@@ -261,7 +261,7 @@ enum {
  * - probe, initialize or deinitialize a module or a plugin,
  * - install or deinstall a variable or event callback,
  * - set a variable or trigger a variable callback, with the sole exception
- *   of the playlist core triggerting add/remove/leaf item callbacks,
+ *   of the playlist core triggering add/remove/leaf item callbacks,
  * - invoke a module/plugin callback other than:
  *   - playlist export,
  *   - logger message callback.
@@ -275,7 +275,7 @@ VLC_API void playlist_Lock( playlist_t * );
  * calling thread must have called playlist_Lock() before.
  *
  * This function invalidates all or any playlist item pointers.
- * There are no ways to ensure that playlist item are not modified or deleted
+ * There are no ways to ensure that playlist items are not modified or deleted
  * by another thread past this function call.
  *
  * To retain a reference to a playlist item while not holding the playlist
