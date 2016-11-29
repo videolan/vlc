@@ -56,9 +56,6 @@
 
 #ifdef Q_WS_X11
 #   include <X11/Xlib.h>
-#   ifdef HAVE_XI
-#       include <X11/extensions/XInput2.h>
-#   endif
 #   include <qx11info_x11.h>
 #endif
 
@@ -153,25 +150,7 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
 
     XGetWindowAttributes( dpy, w, &attr );
     attr.your_event_mask &= ~(ButtonPressMask|ButtonReleaseMask);
-    attr.your_event_mask &= ~PointerMotionMask;
     XSelectInput( dpy, w, attr.your_event_mask );
-# ifdef HAVE_XI
-    int n;
-    XIEventMask *xi_masks = XIGetSelectedEvents( dpy, w, &n );
-    if( xi_masks != NULL )
-    {
-        for( int i = 0; i < n; i++ )
-            if( xi_masks[i].mask_len >= 1 )
-            {
-                xi_masks[i].mask[0] &= ~XI_ButtonPressMask;
-                xi_masks[i].mask[0] &= ~XI_ButtonReleaseMask;
-                xi_masks[i].mask[0] &= ~XI_MotionMask;
-            }
-
-        XISelectEvents( dpy, w, xi_masks, n );
-        XFree( xi_masks );
-    }
-# endif
 #endif
     sync();
     p_window = p_wnd;

@@ -3758,16 +3758,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       PKG_CHECK_MODULES([QTX11], [Qt5X11Extras], [
           VLC_ADD_LIBS([qt],[${QTX11_LIBS}])
           VLC_ADD_CXXFLAGS([qt],[${QTX11_CFLAGS} -DQT5_HAS_X11])
-          PKG_CHECK_MODULES([XI], [xi], [
-            VLC_ADD_LIBS([qt], [${XI_LIBS}])
-            VLC_ADD_CXXFLAGS([qt], [${XI_CFLAGS} -DHAVE_XI])
-          ], [
-            PKG_CHECK_EXISTS([Qt5Gui >= 5.5], [
-              AC_MSG_ERROR([${XI_PKG_ERRORS}.])
-            ], [
-              AC_MSG_WARN([${XI_PKG_ERRORS}.])
-            ])
-          ])
       ],[
           AC_MSG_WARN([Not building Qt Interface with X11 helpers.])
       ])
