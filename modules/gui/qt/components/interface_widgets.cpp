@@ -88,10 +88,14 @@ VideoWidget::~VideoWidget()
 
 void VideoWidget::sync( void )
 {
-#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
     /* Make sure the X server has processed all requests.
      * This protects other threads using distinct connections from getting
      * the video widget window in an inconsistent states. */
+#ifdef QT5_HAS_X11
+    if( QX11Info::isPlatformX11() )
+        XSync( QX11Info::display(), False );
+#endif
+#ifdef Q_WS_X11
     XSync( QX11Info::display(), False );
 #endif
 }
