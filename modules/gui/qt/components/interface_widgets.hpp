@@ -82,7 +82,6 @@ private:
 
     QWidget *stable;
     QLayout *layout;
-    bool b_mouse_events;
 signals:
     void sizeChanged( int, int );
 

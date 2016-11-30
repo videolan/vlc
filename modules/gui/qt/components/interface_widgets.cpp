@@ -189,7 +189,7 @@ void VideoWidget::resizeEvent( QResizeEvent *event )
 
 int VideoWidget::qtMouseButton2VLC( Qt::MouseButton qtButton )
 {
-    if( !b_mouse_events || p_window == NULL )
+    if( p_window == NULL )
         return -1;
     switch( qtButton )
     {
@@ -230,7 +230,7 @@ void VideoWidget::mousePressEvent( QMouseEvent* event )
 
 void VideoWidget::mouseMoveEvent( QMouseEvent *event )
 {
-    if( b_mouse_events && p_window != NULL )
+    if( p_window != NULL )
     {
         vout_window_ReportMouseMoved( p_window, event->x(), event->y() );
         event->accept();
