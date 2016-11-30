@@ -140,22 +140,19 @@ static int Open( vlc_object_t *p_this)
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
 
-    unsigned frame_rate = p_filter->fmt_out.video.i_frame_rate, frame_rate_base = p_filter->fmt_out.video.i_frame_rate_base;
-
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
+    video_format_Clean( &p_filter->fmt_out.video );
+    video_format_Copy( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
+
     /* If we don't have fps option, use filter output values */
-    if( var_InheritURational( p_filter, &frame_rate, &frame_rate_base, CFG_PREFIX "fps" ) )
+    if( var_InheritURational( p_filter, &p_filter->fmt_out.video.i_frame_rate,
+                                        &p_filter->fmt_out.video.i_frame_rate_base, CFG_PREFIX "fps" ) )
     {
-        frame_rate = p_filter->fmt_out.video.i_frame_rate;
-        frame_rate_base = p_filter->fmt_out.video.i_frame_rate_base;
+        p_filter->fmt_out.video.i_frame_rate = p_filter->fmt_in.video.i_frame_rate;
+        p_filter->fmt_out.video.i_frame_rate_base = p_filter->fmt_in.video.i_frame_rate_base;
     }
-
-
-    memcpy( &p_filter->fmt_out.video, &p_filter->fmt_in.video, sizeof(video_format_t));
-    p_filter->fmt_out.video.i_frame_rate = frame_rate;
-    p_filter->fmt_out.video.i_frame_rate_base = frame_rate_base;
 
     msg_Dbg( p_filter, "Converting fps from %d/%d -> %d/%d",
             p_filter->fmt_in.video.i_frame_rate, p_filter->fmt_in.video.i_frame_rate_base,
