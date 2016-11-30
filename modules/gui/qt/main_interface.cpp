@@ -204,8 +204,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(WId*,struct vout_window_t*,unsigned*,unsigned *, bool)),
-             this, SLOT(getVideoSlot(WId*,struct vout_window_t*,unsigned*,unsigned*, bool)),
+    connect( this, SIGNAL(askGetVideo(WId*,struct vout_window_t*,unsigned*,unsigned *, bool, bool)),
+             this, SLOT(getVideoSlot(WId*,struct vout_window_t*,unsigned*,unsigned*, bool, bool)),
              Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
@@ -224,6 +224,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
         CONNECT( this, askVideoSetFullScreen( bool ),
                  this, setVideoFullScreen( bool ) );
+        CONNECT( this, askHideMouse( bool ),
+                 this, setHideMouse( bool ) );
     }
 
     CONNECT( THEDP, toolBarConfUpdated(), this, toolBarConfUpdated() );
@@ -710,7 +712,7 @@ void MainInterface::toggleFSC()
  */
 WId MainInterface::getVideo( struct vout_window_t *p_wnd,
                              unsigned int *pi_width, unsigned int *pi_height,
-                             bool fullscreen )
+                             bool fullscreen, bool mouse_events )
 {
     if( !videoWidget )
         return 0;
@@ -718,20 +720,21 @@ WId MainInterface::getVideo( struct vout_window_t *p_wnd,
     /* This is a blocking call signal. Results are returned through pointers.
      * Beware of deadlocks! */
     WId id;
-    emit askGetVideo( &id, p_wnd, pi_width, pi_height, fullscreen );
+    emit askGetVideo( &id, p_wnd, pi_width, pi_height, fullscreen, mouse_events );
     return id;
 }
 
 void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
                                   unsigned *pi_width, unsigned *pi_height,
-                                  bool fullscreen )
+                                  bool fullscreen, bool b_mouse_events )
 {
     /* Hidden or minimized, activate */
     if( isHidden() || isMinimized() )
         toggleUpdateSystrayMenu();
 
     /* Request the videoWidget */
-    WId ret = videoWidget->request( p_wnd, pi_width, pi_height, !b_autoresize );
+    WId ret = videoWidget->request( p_wnd, pi_width, pi_height, !b_autoresize,
+                                    b_mouse_events );
     *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {
@@ -867,6 +870,11 @@ void MainInterface::setVideoFullScreen( bool fs )
     videoWidget->sync();
 }
 
+void MainInterface::setHideMouse( bool hide )
+{
+    videoWidget->setCursor( hide ? Qt::BlankCursor : Qt::ArrowCursor );
+}
+
 /* Slot to change the video always-on-top flag.
  * Emit askVideoOnTop() to invoke this from other thread. */
 void MainInterface::setVideoOnTop( bool on_top )
@@ -911,6 +919,13 @@ int MainInterface::controlVideo( int i_query, va_list args )
         bool b_fs = va_arg( args, int );
 
         emit askVideoSetFullScreen( b_fs );
+        return VLC_SUCCESS;
+    }
+    case VOUT_WINDOW_HIDE_MOUSE:
+    {
+        bool b_hide = va_arg( args, int );
+
+        emit askHideMouse( b_hide );
         return VLC_SUCCESS;
     }
     default:

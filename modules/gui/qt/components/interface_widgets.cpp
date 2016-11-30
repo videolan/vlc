@@ -104,7 +104,8 @@ void VideoWidget::sync( void )
  * Request the video to avoid the conflicts
  **/
 WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
-                          unsigned int *pi_height, bool b_keep_size )
+                          unsigned int *pi_height, bool b_keep_size,
+                          bool b_mouse_events )
 {
     if( stable )
     {
@@ -137,6 +138,11 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
 #if !defined (QT5_HAS_X11) && !defined (Q_WS_X11) && !defined (Q_WS_QPA)
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 #endif
+    if( b_mouse_events )
+    {
+        stable->setMouseTracking( true );
+        setMouseTracking( true );
+    }
 
     layout->addWidget( stable );
 
@@ -180,6 +186,70 @@ void VideoWidget::resizeEvent( QResizeEvent *event )
 
     QWidget::resizeEvent( event );
 }
+
+int VideoWidget::qtMouseButton2VLC( Qt::MouseButton qtButton )
+{
+    if( !b_mouse_events || p_window == NULL )
+        return -1;
+    switch( qtButton )
+    {
+        case Qt::LeftButton:
+            return 0;
+        case Qt::RightButton:
+            return 2;
+        case Qt::MiddleButton:
+            return 1;
+        default:
+            return -1;
+    }
+}
+
+void VideoWidget::mouseReleaseEvent( QMouseEvent *event )
+{
+    int vlc_button = qtMouseButton2VLC( event->button() );
+    if( vlc_button >= 0 )
+    {
+        vout_window_ReportMouseReleased( p_window, vlc_button );
+        event->accept();
+    }
+    else
+        event->ignore();
+}
+
+void VideoWidget::mousePressEvent( QMouseEvent* event )
+{
+    int vlc_button = qtMouseButton2VLC( event->button() );
+    if( vlc_button >= 0 )
+    {
+        vout_window_ReportMousePressed( p_window, vlc_button );
+        event->accept();
+    }
+    else
+        event->ignore();
+}
+
+void VideoWidget::mouseMoveEvent( QMouseEvent *event )
+{
+    if( b_mouse_events && p_window != NULL )
+    {
+        vout_window_ReportMouseMoved( p_window, event->x(), event->y() );
+        event->accept();
+    }
+    else
+        event->ignore();
+}
+
+void VideoWidget::mouseDoubleClickEvent( QMouseEvent *event )
+{
+    if( qtMouseButton2VLC( event->button() ) == 0 )
+    {
+        vout_window_ReportMouseDoubleClick( p_window );
+        event->accept();
+    }
+    else
+        event->ignore();
+}
+
 
 void VideoWidget::release( void )
 {

@@ -59,7 +59,7 @@ public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
-    WId request( struct vout_window_t *, unsigned int *, unsigned int *, bool );
+    WId request( struct vout_window_t *, unsigned int *, unsigned int *, bool, bool );
     void  release( void );
     void  sync( void );
 
@@ -70,13 +70,19 @@ protected:
     }
 
     virtual void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *) Q_DECL_OVERRIDE;
+    void mouseMoveEvent(QMouseEvent *) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent(QMouseEvent *) Q_DECL_OVERRIDE;
+    void mouseDoubleClickEvent(QMouseEvent *) Q_DECL_OVERRIDE;
 
 private:
+    int qtMouseButton2VLC( Qt::MouseButton );
     intf_thread_t *p_intf;
     vout_window_t *p_window;
 
     QWidget *stable;
     QLayout *layout;
+    bool b_mouse_events;
 signals:
     void sizeChanged( int, int );
 
