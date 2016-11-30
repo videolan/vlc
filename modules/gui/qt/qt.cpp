@@ -406,10 +406,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 #if defined (QT5_HAS_X11) || defined (QT5_HAS_WAYLAND)
         return VLC_EGENERIC;
 #endif
-#ifdef Q_WS_X11
-    if( !HasX11( p_this ) )
-        return VLC_EGENERIC;
-#endif
 
     QMutexLocker locker (&lock);
     if (busy)
@@ -583,7 +579,7 @@ static void *ThreadPlatform( void *obj, char *platform_name )
 
         /* Check window type from the Qt platform back-end */
         p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
-#if HAS_QT5 || defined (Q_WS_QPA)
+#if HAS_QT5
         QString platform = app.platformName();
         if( platform == qfu("xcb") )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
@@ -593,8 +589,6 @@ static void *ThreadPlatform( void *obj, char *platform_name )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
         else
             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
-#elif defined (Q_WS_X11)
-        p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
 #elif defined (Q_WS_WIN) || defined (Q_WS_PM)
         p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
 #elif defined (Q_WS_MAC)

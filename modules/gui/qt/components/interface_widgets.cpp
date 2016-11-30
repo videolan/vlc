@@ -50,7 +50,7 @@
 #include <QBitmap>
 #include <QUrl>
 
-#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
+#if defined (QT5_HAS_X11)
 # include <X11/Xlib.h>
 # include <QX11Info>
 #endif
@@ -95,9 +95,6 @@ void VideoWidget::sync( void )
     if( QX11Info::isPlatformX11() )
         XSync( QX11Info::display(), False );
 #endif
-#ifdef Q_WS_X11
-    XSync( QX11Info::display(), False );
-#endif
 }
 
 /**
@@ -134,7 +131,7 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
        management */
     /* This is currently disabled on X11 as it does not seem to improve
      * performance, but causes the video widget to be transparent... */
-#if !defined (QT5_HAS_X11) && !defined (Q_WS_X11) && !defined (Q_WS_QPA)
+#if !defined (QT5_HAS_X11)
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 #else
     stable->setMouseTracking( true );
