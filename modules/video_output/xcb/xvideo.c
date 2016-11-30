@@ -100,7 +100,6 @@ struct vout_display_sys_t
 static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void Display (vout_display_t *, picture_t *, subpicture_t *subpicture);
 static int Control (vout_display_t *, int, va_list);
-static void Manage (vout_display_t *);
 
 /**
  * Check that the X server supports the XVideo extension.
@@ -567,7 +566,7 @@ static int Open (vlc_object_t *obj)
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage = Manage;
+    vd->manage = NULL;
 
     return VLC_SUCCESS;
 
@@ -675,6 +674,8 @@ static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpictur
     xcb_void_cookie_t ck;
     video_format_t fmt;
 
+    vlc_xcb_Manage(vd, p_sys->conn, &p_sys->visible);
+
     if (!p_sys->visible)
         goto out;
 
@@ -761,13 +762,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;
     }
-}
-
-static void Manage (vout_display_t *vd)
-{
-    vout_display_sys_t *p_sys = vd->sys;
-
-    vlc_xcb_Manage(vd, p_sys->conn, &p_sys->visible);
 }
 
 static int EnumAdaptors (vlc_object_t *obj, const char *var,
