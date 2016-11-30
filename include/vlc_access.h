@@ -102,7 +102,6 @@ struct access_fsdir
     int i_sub_autodetect_fuzzy;
     bool b_show_hiddenfiles;
     char *psz_ignored_exts;
-    char *psz_sort;
 };
 
 /**
@@ -117,8 +116,7 @@ VLC_API void access_fsdir_init(struct access_fsdir *p_fsdir,
 /**
  * Finish adding items to the node
  *
- * \param b_success if true, items of the node will be sorted according
- * "directory-sort" option.
+ * \param b_success if true, items of the node will be sorted.
  */
 VLC_API void access_fsdir_finish(struct access_fsdir *p_fsdir, bool b_success);
 

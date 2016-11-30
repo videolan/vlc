@@ -29,6 +29,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef HAVE_STRCOLL
+# define strcoll strcasecmp
+#endif
 
 #include <vlc_common.h>
 #include <vlc_url.h>
@@ -332,9 +335,7 @@ static int compar_type(input_item_t *p1, input_item_t *p2)
     return 0;
 }
 
-/* Some code duplication between comparison functions.
- * GNU qsort_r() would be needed to solve this. */
-static int compar_collate(const void *a, const void *b)
+static int compar_filename(const void *a, const void *b)
 {
     input_item_node_t *const *na = a, *const *nb = b;
     input_item_t *ia = (*na)->p_item, *ib = (*nb)->p_item;
@@ -343,28 +344,40 @@ static int compar_collate(const void *a, const void *b)
     if (i_ret != 0)
         return i_ret;
 
-#ifdef HAVE_STRCOLL
-    /* The program's LOCAL defines if case is ignored */
-    return strcoll(ia->psz_name, ib->psz_name);
-#else
-    return strcasecmp(ia->psz_name, ib->psz_name);
-#endif
+    size_t i;
+    char c;
+
+    /* Attempt to guess if the sorting algorithm should be alphabetic
+     * (i.e. collation) or numeric:
+     * - If the first mismatching characters are not both digits,
+     *   then collation is the only option.
+     * - If one of the first mismatching characters is 0 and the other is also
+     *   a digit, the comparands are probably left-padded numerical values.
+     *   It does not matter which algorithm is used: the zero will be smaller
+     *   than non-zero either way.
+     * - Otherwise, the comparands are numerical values, and might not be
+     *   aligned (i.e. not same order of magnitude). If so, collation would
+     *   fail. So numerical comparison is performed. */
+    for (i = 0; (c = ia->psz_name[i]) == ib->psz_name[i]; i++)
+        if (c == '\0')
+            return 0; /* strings are exactly identical */
+
+    if ((unsigned)(c - '0') > 9)
+        return strcoll(ia->psz_name, ib->psz_name);
+
+    unsigned long long ua = strtoull(ia->psz_name + i, NULL, 10);
+    unsigned long long ub = strtoull(ib->psz_name + i, NULL, 10);
+
+    /* The number may be identical in two cases:
+     * - leading zero (e.g. "012" and "12")
+     * - overflow on both sides (#ULLONG_MAX) */
+    if (ua == ub)
+        return strcoll(ia->psz_name, ib->psz_name);
+
+    return (ua > ub) ? +1 : -1;
 }
 
-static int compar_version(const void *a, const void *b)
-{
-    input_item_node_t *const *na = a, *const *nb = b;
-    input_item_t *ia = (*na)->p_item, *ib = (*nb)->p_item;
-
-    int i_ret = compar_type(ia, ib);
-    if (i_ret != 0)
-        return i_ret;
-
-    return strverscmp(ia->psz_name, ib->psz_name);
-}
-
-static void fsdir_sort_sub(input_item_node_t *p_node,
-                           int (*compar)(const void *, const void *))
+static void fsdir_sort(input_item_node_t *p_node)
 {
     if (p_node->i_children <= 0)
         return;
@@ -376,7 +389,7 @@ static void fsdir_sort_sub(input_item_node_t *p_node,
 
     /* Sort current node */
     qsort(p_node->pp_children, p_node->i_children,
-          sizeof(input_item_node_t *), compar);
+          sizeof(input_item_node_t *), compar_filename);
 
     /* Unlock all children */
     for (int i = 0; i < p_node->i_children; i++)
@@ -384,23 +397,7 @@ static void fsdir_sort_sub(input_item_node_t *p_node,
 
     /* Sort all children */
     for (int i = 0; i < p_node->i_children; i++)
-        fsdir_sort_sub(p_node->pp_children[i], compar);
-}
-
-static void fsdir_sort(struct access_fsdir *p_fsdir)
-{
-    int (*pf_compar)(const void *, const void *) = NULL;
-
-    if (p_fsdir->psz_sort != NULL)
-    {
-        if (!strcasecmp(p_fsdir->psz_sort, "version"))
-            pf_compar = compar_version;
-        else if(strcasecmp(p_fsdir->psz_sort, "none"))
-            pf_compar = compar_collate;
-
-        if (pf_compar != NULL)
-            fsdir_sort_sub(p_fsdir->p_node, pf_compar);
-    }
+        fsdir_sort(p_node->pp_children[i]);
 }
 
 /**
@@ -636,7 +633,6 @@ void access_fsdir_init(struct access_fsdir *p_fsdir,
     p_fsdir->p_node = p_node;
     p_fsdir->b_show_hiddenfiles = var_InheritBool(p_access, "show-hiddenfiles");
     p_fsdir->psz_ignored_exts = var_InheritString(p_access, "ignore-filetypes");
-    p_fsdir->psz_sort = var_InheritString(p_access, "directory-sort");
     bool b_autodetect = var_InheritBool(p_access, "sub-autodetect-file");
     p_fsdir->i_sub_autodetect_fuzzy = !b_autodetect ? 0 :
         var_InheritInteger(p_access, "sub-autodetect-fuzzy");
@@ -648,10 +644,9 @@ void access_fsdir_finish(struct access_fsdir *p_fsdir, bool b_success)
     if (b_success)
     {
         fsdir_attach_slaves(p_fsdir);
-        fsdir_sort(p_fsdir);
+        fsdir_sort(p_fsdir->p_node);
     }
     free(p_fsdir->psz_ignored_exts);
-    free(p_fsdir->psz_sort);
 
     /* Remove unmatched slaves */
     for (unsigned int i = 0; i < p_fsdir->i_slaves; i++)

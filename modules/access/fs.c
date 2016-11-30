@@ -52,4 +52,5 @@ vlc_module_begin ()
 
     add_bool("list-special-files", false, N_("List special files"),
              N_("Include devices and pipes when listing directories"), true)
+    add_obsolete_string("directory-sort") /* since 3.0.0 */
 vlc_module_end ()

@@ -62,16 +62,6 @@ static const char *const psz_recursive_list_text[] = {
         "collapse: subdirectories appear but are expanded on first play.\n" \
         "expand: all subdirectories are expanded.\n" )
 
-static const char *const psz_sort_list[] = { "collate", "version", "none" };
-static const char *const psz_sort_list_text[] = {
-    N_("Sort alphabetically according to the current language's collation rules."),
-    N_("Sort items in a natural order (for example: 1.ogg 2.ogg 10.ogg). This method does not take the current language's collation rules into account."),
-    N_("Do not sort the items.") };
-
-#define SORT_TEXT N_("Directory sort order")
-#define SORT_LONGTEXT N_( \
-    "Define the sort algorithm used when adding items from a directory." )
-
 #define IGNORE_TEXT N_("Ignored extensions")
 #define IGNORE_LONGTEXT N_( \
         "Files with these extensions will not be added to playlist when " \
@@ -182,8 +172,6 @@ vlc_module_begin ()
           change_string_list( psz_recursive_list, psz_recursive_list_text )
         add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
                     IGNORE_TEXT, IGNORE_LONGTEXT, false )
-        add_string( "directory-sort", "collate", SORT_TEXT, SORT_LONGTEXT, false )
-          change_string_list( psz_sort_list, psz_sort_list_text )
         add_bool( "show-hiddenfiles", false,
                    SHOW_HIDDENFILES_TEXT, SHOW_HIDDENFILES_LONGTEXT, false )
 vlc_module_end ()
