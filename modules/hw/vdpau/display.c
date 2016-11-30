@@ -60,7 +60,6 @@ struct vout_display_sys_t
     picture_t *current; /**< Currently visible picture */
 
     xcb_window_t window; /**< target window (owned by VDPAU back-end) */
-    xcb_cursor_t cursor; /**< blank cursor */
     VdpDevice device; /**< VDPAU device handle */
     VdpPresentationQueueTarget target; /**< VDPAU presentation queue target */
     VdpPresentationQueue queue; /**< VDPAU presentation queue */
@@ -329,9 +328,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     switch (query)
     {
     case VOUT_DISPLAY_HIDE_MOUSE:
-        xcb_change_window_attributes(sys->conn, sys->embed->handle.xid,
-                                    XCB_CW_CURSOR, &(uint32_t){ sys->cursor });
-        break;
+        return VLC_EGENERIC;
     case VOUT_DISPLAY_RESET_PICTURES:
     {
         msg_Dbg(vd, "resetting pictures");
@@ -648,7 +645,6 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    sys->cursor = vlc_xcb_cursor_Create(sys->conn, screen);
     sys->pool = NULL;
 
     /* */
@@ -678,9 +674,6 @@ static void Close(vlc_object_t *obj)
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
 
-    /* Restore cursor explicitly (parent window connection will survive) */
-    xcb_change_window_attributes(sys->conn, sys->embed->handle.xid,
-                               XCB_CW_CURSOR, &(uint32_t) { XCB_CURSOR_NONE });
     xcb_flush(sys->conn);
 
     vdp_presentation_queue_destroy(sys->vdp, sys->queue);

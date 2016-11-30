@@ -49,20 +49,6 @@ int vlc_xcb_error_Check(vout_display_t *, xcb_connection_t *conn,
 struct vout_window_t *vlc_xcb_parent_Create(vout_display_t *obj,
                                             xcb_connection_t **connp,
                                             const xcb_screen_t **screenp);
-
-/**
- * Creates a blank cursor.
- *
- * \note Pixmaps are leaked until disconnection from the X server. Hence, this
- * function should be called no more than once per X connection.
- *
- * @param conn XCB connection
- * @param scr target XCB screen
- * @return cursor XID
- */
-xcb_cursor_t vlc_xcb_cursor_Create(xcb_connection_t *conn,
-                                   const xcb_screen_t *scr);
-
 /**
  * Processes XCB events.
  */

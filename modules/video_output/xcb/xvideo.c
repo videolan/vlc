@@ -82,7 +82,6 @@ struct vout_display_sys_t
     xcb_connection_t *conn;
     vout_window_t *embed;/* VLC window */
 
-    xcb_cursor_t cursor; /* blank cursor */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc;   /* context to put images */
     xcb_xv_port_t port;  /* XVideo port */
@@ -549,9 +548,6 @@ static int Open (vlc_object_t *obj)
         free(r);
     }
 
-    /* Create cursor */
-    p_sys->cursor = vlc_xcb_cursor_Create(conn, screen);
-
     p_sys->shm = XCB_shm_Check (obj, conn);
     p_sys->visible = false;
 
@@ -592,9 +588,6 @@ static void Close (vlc_object_t *obj)
     if (p_sys->pool)
         picture_pool_Release (p_sys->pool);
 
-    /* show the default cursor */
-    xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid, XCB_CW_CURSOR,
-                                  &(uint32_t) { XCB_CURSOR_NONE });
     xcb_flush (p_sys->conn);
 
     free (p_sys->att);
@@ -762,13 +755,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         return VLC_SUCCESS;
     }
 
-    /* Hide the mouse. It will be send when
-     * vout_display_t::info.b_hide_mouse is false */
     case VOUT_DISPLAY_HIDE_MOUSE:
-        xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
-                                  XCB_CW_CURSOR, &(uint32_t){ p_sys->cursor });
-        xcb_flush (p_sys->conn);
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     case VOUT_DISPLAY_RESET_PICTURES:
         vlc_assert_unreachable();
     default:

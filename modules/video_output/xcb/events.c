@@ -142,17 +142,6 @@ error:
     return NULL;
 }
 
-xcb_cursor_t vlc_xcb_cursor_Create(xcb_connection_t *conn,
-                                   const xcb_screen_t *scr)
-{
-    xcb_cursor_t cur = xcb_generate_id (conn);
-    xcb_pixmap_t pix = xcb_generate_id (conn);
-
-    xcb_create_pixmap (conn, 1, pix, scr->root, 1, 1);
-    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 0, 0, 0, 1, 1);
-    return cur;
-}
-
 /* NOTE: we assume no other thread will be _setting_ our video output events
  * variables. Afterall, only this plugin is supposed to know when these occur.
   * Otherwise, we'd var_OrInteger() and var_NandInteger() functions...
