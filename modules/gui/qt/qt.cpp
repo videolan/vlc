@@ -735,15 +735,8 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
     unsigned i_width = cfg->width;
     unsigned i_height = cfg->height;
-#ifndef _WIN32
-    const bool b_mouse_support = var_InheritBool( p_wnd, "mouse-events" );
-#else
-    /* FIXME: rework win32/events.c to dispatch events to QT */
-    const bool b_mouse_support = false;
-#endif
 
-    WId wid = p_mi->getVideo( p_wnd, &i_width, &i_height, cfg->is_fullscreen,
-                              b_mouse_support );
+    WId wid = p_mi->getVideo( p_wnd, &i_width, &i_height, cfg->is_fullscreen );
     if( !wid )
         return VLC_EGENERIC;
 

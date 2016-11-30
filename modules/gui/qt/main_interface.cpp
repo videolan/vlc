@@ -204,8 +204,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(WId*,struct vout_window_t*,unsigned*,unsigned *, bool, bool)),
-             this, SLOT(getVideoSlot(WId*,struct vout_window_t*,unsigned*,unsigned*, bool, bool)),
+    connect( this, SIGNAL(askGetVideo(WId*,struct vout_window_t*,unsigned*,unsigned *, bool)),
+             this, SLOT(getVideoSlot(WId*,struct vout_window_t*,unsigned*,unsigned*, bool)),
              Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
@@ -712,7 +712,7 @@ void MainInterface::toggleFSC()
  */
 WId MainInterface::getVideo( struct vout_window_t *p_wnd,
                              unsigned int *pi_width, unsigned int *pi_height,
-                             bool fullscreen, bool mouse_events )
+                             bool fullscreen )
 {
     if( !videoWidget )
         return 0;
@@ -720,21 +720,20 @@ WId MainInterface::getVideo( struct vout_window_t *p_wnd,
     /* This is a blocking call signal. Results are returned through pointers.
      * Beware of deadlocks! */
     WId id;
-    emit askGetVideo( &id, p_wnd, pi_width, pi_height, fullscreen, mouse_events );
+    emit askGetVideo( &id, p_wnd, pi_width, pi_height, fullscreen );
     return id;
 }
 
 void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
                                   unsigned *pi_width, unsigned *pi_height,
-                                  bool fullscreen, bool b_mouse_events )
+                                  bool fullscreen )
 {
     /* Hidden or minimized, activate */
     if( isHidden() || isMinimized() )
         toggleUpdateSystrayMenu();
 
     /* Request the videoWidget */
-    WId ret = videoWidget->request( p_wnd, pi_width, pi_height, !b_autoresize,
-                                    b_mouse_events );
+    WId ret = videoWidget->request( p_wnd, pi_width, pi_height, !b_autoresize );
     *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {

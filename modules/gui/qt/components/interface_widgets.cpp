@@ -104,8 +104,7 @@ void VideoWidget::sync( void )
  * Request the video to avoid the conflicts
  **/
 WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
-                          unsigned int *pi_height, bool b_keep_size,
-                          bool b_mouse_events )
+                          unsigned int *pi_height, bool b_keep_size )
 {
     if( stable )
     {
@@ -137,13 +136,10 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
      * performance, but causes the video widget to be transparent... */
 #if !defined (QT5_HAS_X11) && !defined (Q_WS_X11) && !defined (Q_WS_QPA)
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
+#else
+    stable->setMouseTracking( true );
+    setMouseTracking( true );
 #endif
-    if( b_mouse_events )
-    {
-        stable->setMouseTracking( true );
-        setMouseTracking( true );
-    }
-
     layout->addWidget( stable );
 
     sync();
