@@ -588,8 +588,6 @@ static void Close (vlc_object_t *obj)
     if (p_sys->pool)
         picture_pool_Release (p_sys->pool);
 
-    xcb_flush (p_sys->conn);
-
     free (p_sys->att);
     xcb_disconnect (p_sys->conn);
     vout_display_DeleteWindow (vd, p_sys->embed);
