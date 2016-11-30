@@ -80,6 +80,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
         return NULL;
     }
 
+    p_picture->format.i_frame_rate = p_filter->fmt_out.video.i_frame_rate;
+    p_picture->format.i_frame_rate_base = p_filter->fmt_out.video.i_frame_rate_base;
+
     /* First time we get some valid timestamp, we'll take it as base for output
         later on we retake new timestamp if it has jumped too much */
     if( unlikely( ( date_Get( &p_sys->next_output_pts ) == VLC_TS_INVALID ) ||
@@ -114,7 +117,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     while( unlikely( (date_Get( &p_sys->next_output_pts ) + p_sys->i_output_frame_interval ) < p_picture->date ) )
     {
         picture_t *p_tmp = NULL;
-        p_tmp = picture_NewFromFormat( &p_filter->fmt_in.video );
+        p_tmp = picture_NewFromFormat( &p_filter->fmt_out.video );
 
         picture_Copy( p_tmp, p_sys->p_previous_pic);
         p_tmp->date = date_Get( &p_sys->next_output_pts );
