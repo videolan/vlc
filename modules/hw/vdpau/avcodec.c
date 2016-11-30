@@ -153,7 +153,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
         return VLC_EGENERIC;
     }
 
-    unsigned refs = avctx->refs + avctx->thread_count + 5;
+    unsigned refs = avctx->refs + 2 * avctx->thread_count + 5;
     vlc_va_sys_t *sys = malloc(sizeof (*sys)
                                + (refs + 1) * sizeof (sys->pool[0]));
     if (unlikely(sys == NULL))
@@ -198,6 +198,10 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
             DestroySurface(sys->pool[--i]);
         goto error;
     }
+
+    if (i < refs)
+        msg_Warn(va, "video RAM low (allocated %u of %u buffers)",
+                 i, refs);
 
     const char *infos;
     if (vdp_get_information_string(sys->vdp, &infos) != VDP_STATUS_OK)
