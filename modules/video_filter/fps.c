@@ -91,7 +91,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
         if( p_sys->p_previous_pic )
             picture_Release( p_sys->p_previous_pic );
         p_sys->p_previous_pic = picture_Hold( p_picture );
-        date_Increment( &p_sys->next_output_pts, p_filter->fmt_out.video.i_frame_rate_base );
+        date_Increment( &p_sys->next_output_pts, 1 );
         return p_picture;
     }
 
@@ -106,7 +106,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     }
 
     p_sys->p_previous_pic->date = date_Get( &p_sys->next_output_pts );
-    date_Increment( &p_sys->next_output_pts, p_filter->fmt_out.video.i_frame_rate_base );
+    date_Increment( &p_sys->next_output_pts, 1 );
 
     picture_t *last_pic = p_sys->p_previous_pic;
     /* Duplicating pictures are not that effective and framerate increase
@@ -122,7 +122,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
 
         last_pic->p_next = p_tmp;
         last_pic = p_tmp;
-        date_Increment( &p_sys->next_output_pts, p_filter->fmt_out.video.i_frame_rate_base );
+        date_Increment( &p_sys->next_output_pts, 1 );
     }
 
     last_pic = p_sys->p_previous_pic;
@@ -161,7 +161,7 @@ static int Open( vlc_object_t *p_this)
     p_sys->i_output_frame_interval = p_filter->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / p_filter->fmt_out.video.i_frame_rate;
 
     date_Init( &p_sys->next_output_pts,
-               p_filter->fmt_out.video.i_frame_rate, 1);
+               p_filter->fmt_out.video.i_frame_rate, p_filter->fmt_out.video.i_frame_rate_base );
 
     date_Set( &p_sys->next_output_pts, VLC_TS_INVALID );
     p_sys->p_previous_pic = NULL;
