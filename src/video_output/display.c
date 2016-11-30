@@ -808,16 +808,18 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         osys->mouse.last_moved + osys->mouse.hide_timeout < date) {
         osys->mouse.is_hidden = hide_mouse = true;
     } else if (osys->mouse.ch_activity) {
+        if (osys->mouse.is_hidden)
+            vout_HideWindowMouse(osys->vout, false);
         osys->mouse.is_hidden = false;
     }
     osys->mouse.ch_activity = false;
     vlc_mutex_unlock(&osys->lock);
 
     if (hide_mouse) {
-        if (!vd->info.has_hide_mouse) {
-            msg_Dbg(vd, "auto hiding mouse cursor");
+        msg_Dbg(vd, "auto hiding mouse cursor");
+        if (vout_HideWindowMouse(osys->vout, true) != VLC_SUCCESS
+         && !vd->info.has_hide_mouse)
             vout_display_Control(vd, VOUT_DISPLAY_HIDE_MOUSE);
-        }
         vout_SendEventMouseHidden(osys->vout);
     }
 

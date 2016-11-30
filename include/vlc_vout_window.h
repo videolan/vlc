@@ -62,6 +62,7 @@ enum {
     VOUT_WINDOW_SET_STATE, /* unsigned state */
     VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
     VOUT_WINDOW_SET_FULLSCREEN, /* int b_fullscreen */
+    VOUT_WINDOW_HIDE_MOUSE, /* bool b_hide */
 };
 
 /**
@@ -219,6 +220,14 @@ static inline int vout_window_SetSize(vout_window_t *window,
 static inline int vout_window_SetFullScreen(vout_window_t *window, bool full)
 {
     return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN, full);
+}
+
+/**
+ * Hide the mouse cursor
+ */
+static inline int vout_window_HideMouse(vout_window_t *window, bool hide)
+{
+    return vout_window_Control(window, VOUT_WINDOW_HIDE_MOUSE, hide);
 }
 
 static inline void vout_window_ReportSize(vout_window_t *window,
