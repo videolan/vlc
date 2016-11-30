@@ -523,10 +523,6 @@ static void Close (vout_window_t *wnd)
     if (p_sys->keys != NULL)
         XCB_keyHandler_Destroy (p_sys->keys);
 
-    /* show the default cursor */
-    xcb_change_window_attributes (p_sys->conn, wnd->handle.xid, XCB_CW_CURSOR,
-                                  &(uint32_t) { XCB_CURSOR_NONE });
-
     xcb_disconnect (conn);
     free (wnd->display.x11);
     free (p_sys);
