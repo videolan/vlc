@@ -325,8 +325,6 @@ static void Close (vlc_object_t *obj)
 
     ResetPictures (vd);
 
-    xcb_flush (sys->conn);
-
     /* colormap, window and context are garbage-collected by X */
     xcb_disconnect (sys->conn);
     vout_display_DeleteWindow (vd, sys->embed);
