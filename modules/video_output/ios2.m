@@ -418,7 +418,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                     sys->place = place;
                 }
 
-                vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+                if (sys->gl.sys != NULL)
+                    vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
 
                 // x / y are top left corner, but we need the lower left one
                 if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
@@ -428,8 +429,11 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         }
 
         case VOUT_DISPLAY_CHANGE_VIEWPOINT:
-            return vout_display_opengl_SetViewpoint(sys->vgl,
-                &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
+            if (sys->gl.sys != NULL)
+                return vout_display_opengl_SetViewpoint(sys->vgl,
+                    &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
+            else
+                return VLC_EGENERIC;
 
         case VOUT_DISPLAY_RESET_PICTURES:
             vlc_assert_unreachable ();
