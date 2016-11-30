@@ -115,10 +115,6 @@ vout_window_t *vlc_xcb_parent_Create(vout_display_t *vd,
         goto error;
     *pconn = conn;
 
-    uint32_t value = XCB_EVENT_MASK_POINTER_MOTION;
-    xcb_change_window_attributes (conn, wnd->handle.xid,
-                                  XCB_CW_EVENT_MASK, &value);
-
     xcb_get_geometry_reply_t *geo =
         xcb_get_geometry_reply (conn, xcb_get_geometry (conn, wnd->handle.xid),
                                 NULL);
@@ -157,21 +153,11 @@ static void HandleVisibilityNotify (vout_display_t *vd, bool *visible,
 /**
  * Process an X11 event.
  */
-static int ProcessEvent (vout_display_t *vd, xcb_connection_t *conn,
+static int ProcessEvent (vout_display_t *vd,
                          bool *visible, xcb_generic_event_t *ev)
 {
     switch (ev->response_type & 0x7f)
     {
-        case XCB_MOTION_NOTIFY:
-        {
-            const xcb_motion_notify_event_t *mne = (void *)ev;
-            /* show the default cursor */
-            xcb_change_window_attributes (conn, mne->event, XCB_CW_CURSOR,
-                                          &(uint32_t) { XCB_CURSOR_NONE });
-            xcb_flush (conn);
-            break;
-        }
-
         case XCB_VISIBILITY_NOTIFY:
             HandleVisibilityNotify (vd, visible,
                                     (xcb_visibility_notify_event_t *)ev);
@@ -193,7 +179,7 @@ int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn, bool *visible)
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (conn)) != NULL)
-        ProcessEvent (vd, conn, visible, ev);
+        ProcessEvent (vd, visible, ev);
 
     if (xcb_connection_has_error (conn))
     {
