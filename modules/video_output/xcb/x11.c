@@ -78,7 +78,6 @@ struct vout_display_sys_t
 static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void Display (vout_display_t *, picture_t *, subpicture_t *subpicture);
 static int Control (vout_display_t *, int, va_list);
-static void Manage (vout_display_t *);
 
 static void ResetPictures (vout_display_t *);
 
@@ -305,7 +304,7 @@ found_format:;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage = Manage;
+    vd->manage = NULL;
 
     return VLC_SUCCESS;
 
@@ -403,6 +402,8 @@ static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpictur
     vout_display_sys_t *sys = vd->sys;
     xcb_shm_seg_t segment = XCB_picture_GetSegment(pic);
     xcb_void_cookie_t ck;
+
+    vlc_xcb_Manage(vd, sys->conn, &sys->visible);
 
     if (!sys->visible)
         goto out;
@@ -511,13 +512,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;
     }
-}
-
-static void Manage (vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    vlc_xcb_Manage(vd, sys->conn, &sys->visible);
 }
 
 static void ResetPictures (vout_display_t *vd)
