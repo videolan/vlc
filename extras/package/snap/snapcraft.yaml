@@ -20,6 +20,9 @@ apps:
       - mount-observe
       - optical-drive
       - camera
+      - removable-media
+      - screen-inhibit-control
+      - x11
     slots:
       - mpris
 
