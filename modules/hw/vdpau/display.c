@@ -674,8 +674,6 @@ static void Close(vlc_object_t *obj)
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
 
-    xcb_flush(sys->conn);
-
     vdp_presentation_queue_destroy(sys->vdp, sys->queue);
     vdp_presentation_queue_target_destroy(sys->vdp, sys->target);
 
