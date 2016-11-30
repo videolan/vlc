@@ -319,6 +319,12 @@ out:
        delete at this point */
     if (subpicture)
         subpicture_Delete(subpicture);
+
+    /* Drain the event queue. TODO: remove sys->conn completely */
+    xcb_generic_event_t *ev;
+
+    while ((ev = xcb_poll_for_event(sys->conn)) != NULL)
+        free(ev);
 }
 
 static int Control(vout_display_t *vd, int query, va_list ap)
@@ -392,14 +398,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     }
     xcb_flush (sys->conn);
     return VLC_SUCCESS;
-}
-
-static void Manage(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    bool visible;
-
-    vlc_xcb_Manage(vd, sys->conn, &visible);
 }
 
 static int xcb_screen_num(xcb_connection_t *conn, const xcb_screen_t *screen)
@@ -657,7 +655,7 @@ static int Open(vlc_object_t *obj)
     vd->prepare = Queue;
     vd->display = Wait;
     vd->control = Control;
-    vd->manage = Manage;
+    vd->manage = NULL;
 
     return VLC_SUCCESS;
 
