@@ -648,8 +648,13 @@ static int Open(vlc_object_t *p_this)
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
 
-    if (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR)
+    /* Fallback to normal projection in case of soft decoding/display (the
+     * openGL vout, with a higher priority, should be used when the projection
+     * need to be handled). */
+    if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE
+     && vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR)
         return VLC_EGENERIC;
+    vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
 
     vout_window_t *embed =
         vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_ANDROID_NATIVE);
