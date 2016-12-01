@@ -98,6 +98,13 @@
 #   define SUPPORTS_FIXED_PIPELINE
 #endif
 
+#ifndef GL_RED
+#define GL_RED 0
+#endif
+#ifndef GL_R16
+#define GL_R16 0
+#endif
+
 #define SPHERE_RADIUS 1.f
 
 typedef struct {
@@ -225,20 +232,31 @@ static inline int GetAlignedSize(unsigned size)
 }
 
 #if !USE_OPENGL_ES
-static bool IsLuminance16Supported(int target)
+static int GetTexFormatSize(int target, int tex_format, int tex_internal,
+                            int tex_type)
 {
+    GLint tex_param_size;
+    switch (tex_format)
+    {
+        case GL_RED:
+            tex_param_size = GL_TEXTURE_RED_SIZE;
+            break;
+        case GL_LUMINANCE:
+            tex_param_size = GL_TEXTURE_LUMINANCE_SIZE;
+            break;
+        default:
+            return -1;
+    }
     GLuint texture;
 
     glGenTextures(1, &texture);
     glBindTexture(target, texture);
-    glTexImage2D(target, 0, GL_LUMINANCE16,
-                 64, 64, 0, GL_LUMINANCE, GL_UNSIGNED_SHORT, NULL);
+    glTexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
     GLint size = 0;
-    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_LUMINANCE_SIZE, &size);
+    glGetTexLevelParameteriv(target, 0, tex_param_size, &size);
 
     glDeleteTextures(1, &texture);
-
-    return size == 16;
+    return size;
 }
 #endif
 
@@ -315,9 +333,17 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
 
         "void main(void) {"
         " vec4 x,y,z,result;"
-        " x  = texture2D(Texture0, TexCoord0.st);"
-        " %c = texture2D(Texture1, TexCoord1.st);"
-        " %c = texture2D(Texture2, TexCoord2.st);"
+
+        /* The texture format can be GL_RED: vec4(R,0,0,1) or GL_LUMINANCE:
+         * vec4(L,L,L,1). The following transform a vec4(x, y, z, w) into a
+         * vec4(x, x, x, 1) (we may want to use texture swizzling starting
+         * OpenGL 3.3). */
+        " float val0 = texture2D(Texture0, TexCoord0.st).x;"
+        " float val1 = texture2D(Texture1, TexCoord1.st).x;"
+        " float val2 = texture2D(Texture2, TexCoord2.st).x;"
+        " x  = vec4(val0, val0, val0, 1);"
+        " %c = vec4(val1, val1, val1, 1);"
+        " %c = vec4(val2, val2, val2, 1);"
 
         " result = x * Coefficient[0] + Coefficient[3];"
         " result = (y * Coefficient[1]) + result;"
@@ -456,8 +482,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #if !USE_OPENGL_ES
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
+    const bool oglv3 = strverscmp((const char *)ogl_version, "3.0") >= 0;
+    const int yuv_plane_texformat = oglv3 ? GL_RED : GL_LUMINANCE;
+    const int yuv_plane_texformat_16 = oglv3 ? GL_R16 : GL_LUMINANCE16;
 #else
     bool supports_shaders = false;
+    const int yuv_plane_texformat = GL_LUMINANCE;
 #endif
 
 #if USE_OPENGL_ES == 2
@@ -585,19 +615,22 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 need_fs_yuv       = true;
                 vgl->fmt          = *fmt;
                 vgl->fmt.i_chroma = *list;
-                vgl->tex_format   = GL_LUMINANCE;
-                vgl->tex_internal = GL_LUMINANCE;
+                vgl->tex_format   = yuv_plane_texformat;
+                vgl->tex_internal = yuv_plane_texformat;
                 vgl->tex_type     = GL_UNSIGNED_BYTE;
                 yuv_range_correction = 1.0;
                 break;
 #if !USE_OPENGL_ES
             } else if (dsc && dsc->plane_count == 3 && dsc->pixel_size == 2 &&
-                       IsLuminance16Supported(vgl->tex_target)) {
+                       GetTexFormatSize(vgl->tex_target,
+                                        yuv_plane_texformat,
+                                        yuv_plane_texformat_16,
+                                        GL_UNSIGNED_SHORT) == 16) {
                 need_fs_yuv       = true;
                 vgl->fmt          = *fmt;
                 vgl->fmt.i_chroma = *list;
-                vgl->tex_format   = GL_LUMINANCE;
-                vgl->tex_internal = GL_LUMINANCE16;
+                vgl->tex_format   = yuv_plane_texformat;
+                vgl->tex_internal = yuv_plane_texformat_16;
                 vgl->tex_type     = GL_UNSIGNED_SHORT;
                 yuv_range_correction = (float)((1 << 16) - 1) / ((1 << dsc->pixel_bits) - 1);
                 break;
