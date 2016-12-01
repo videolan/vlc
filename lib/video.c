@@ -312,15 +312,16 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
             return -1;
         }
         vlc_object_release( p_input_thread );
+        return 0;
     }
 
     /* Save the viewpoint in case the input is not created yet */
     if( !b_absolute )
     {
-        p_mi->viewpoint.yaw += p_mi->viewpoint.yaw;
-        p_mi->viewpoint.pitch += p_mi->viewpoint.pitch;
-        p_mi->viewpoint.roll += p_mi->viewpoint.roll;
-        p_mi->viewpoint.fov += p_mi->viewpoint.fov;
+        p_mi->viewpoint.yaw += update.yaw;
+        p_mi->viewpoint.pitch += update.pitch;
+        p_mi->viewpoint.roll += update.roll;
+        p_mi->viewpoint.fov += update.fov;
     }
     else
         p_mi->viewpoint = update;
