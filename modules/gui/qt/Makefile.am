@@ -30,10 +30,6 @@ libqt_plugin_la_LIBADD += $(WAYLAND_CLIENT_LIBS)
 endif
 if HAVE_WIN32
 libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid
-else
-if !HAVE_OS2
-libqt_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIB) -lX11
-endif
 endif
 
 gui_LTLIBRARIES =  $(LTLIBqt)
