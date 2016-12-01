@@ -979,6 +979,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_pic->date = p_out->u.buf.i_ts;
         else
             p_pic->date = forced_ts;
+        p_pic->b_progressive = true;
 
         if (p_sys->api->b_direct_rendering)
         {
