@@ -1,5 +1,5 @@
 /*****************************************************************************
- * d3d11_surface.c : DXGI helper calls
+ * dxgi_fmt.h : DXGI helper calls
  *****************************************************************************
  * Copyright © 2015 VLC authors, VideoLAN and VideoLabs
  *

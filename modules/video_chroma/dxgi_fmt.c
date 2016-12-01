@@ -1,5 +1,5 @@
 /*****************************************************************************
- * d3d11_surface.c : D3D11 GPU surface conversion module for vlc
+ * dxgi_fmt.c : DXGI GPU surface conversion module for vlc
  *****************************************************************************
  * Copyright © 2015 VLC authors, VideoLAN and VideoLabs
  *
