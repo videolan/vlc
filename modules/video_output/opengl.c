@@ -357,7 +357,7 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
     if (asprintf(&code, template_glsl_yuv,
                  swap_uv ? 'z' : 'y',
                  swap_uv ? 'y' : 'z') < 0)
-        code = NULL;
+        return;
 
     for (int i = 0; i < 4; i++) {
         float correction = i < 3 ? yuv_range_correction : 1.f;
