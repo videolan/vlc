@@ -106,7 +106,7 @@ if [ "$VERBOSE" = "yes" ]; then
    out="/dev/stdout"
 fi
 
-TARGET="${ARCH}-apple-darwin11"
+TARGET="${ARCH}-apple-darwin15"
 
 # apple doesn't call AArch64 that way, but arm64 (a contrario to all libraries)
 # so we need to translate it..
