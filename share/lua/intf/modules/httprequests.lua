@@ -456,7 +456,6 @@ getstatus = function (includecategories)
     s.volume=vlc.volume.get()
 
     if input then
-        s.length=math.floor(vlc.var.get(input,"length") / 1000000)
         s.time=math.floor(vlc.var.get(input,"time") / 1000000)
         s.position=vlc.var.get(input,"position")
         s.currentplid=vlc.playlist.current()
@@ -464,13 +463,18 @@ getstatus = function (includecategories)
         s.rate=vlc.var.get(input,"rate")
         s.subtitledelay=vlc.var.get(input,"spu-delay") / 1000000
     else
-        s.length=0
         s.time=0
         s.position=0
         s.currentplid=-1
         s.audiodelay=0
         s.rate=1
         s.subtitledelay=0
+    end
+
+    if item then
+        s.length=math.floor(item:duration())
+    else
+        s.length=0
     end
 
     if vout then
