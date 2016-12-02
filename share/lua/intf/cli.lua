@@ -212,10 +212,11 @@ function playlist_is_tree( client )
 end
 
 function playlist(name,client,arg)
+    local current = vlc.playlist.current()
     function playlist0(item,prefix)
         local prefix = prefix or ""
         if not item.flags.disabled then
-            local marker = ( item.id == vlc.playlist.current() ) and "*" or " "
+            local marker = ( item.id == current ) and "*" or " "
             local str = "|"..prefix..marker..tostring(item.id).." - "..
                             ( item.name or item.path )
             if item.duration > 0 then
