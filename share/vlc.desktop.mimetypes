@@ -5,9 +5,11 @@
 application/ogg                  # IANA-registered
 application/x-ogg
 audio/ogg                        # IANA-registered
+audio/vorbis                     # IANA-registered
 audio/x-vorbis
 audio/x-vorbis+ogg
 video/ogg                        # IANA-registered
+video/x-ogm
 video/x-ogm+ogg
 video/x-theora+ogg
 video/x-theora
@@ -38,6 +40,7 @@ audio/x-pn-windows-acm
 video/divx
 video/msvideo
 video/vnd.divx
+video/avi
 video/x-avi
 
 # Real audio and video
@@ -101,8 +104,6 @@ audio/3gpp                       # IANA-registered
 audio/3gpp2                      # IANA-registered
 audio/AMR                        # IANA-registered
 audio/AMR-WB                     # IANA-registered
-audio/amr
-audio/amr-wb
 video/3gp
 video/3gpp
 video/3gpp2
@@ -117,6 +118,7 @@ x-scheme-handler/icy    # Icecast
 x-scheme-handler/icyx   # Icecast
 
 # Linux desktop environment hooks for ISOs etc.
+application/x-cd-image
 x-content/video-vcd
 x-content/video-svcd
 x-content/video-dvd
@@ -163,6 +165,7 @@ audio/wav
 audio/x-pn-au
 audio/x-pn-wav
 audio/x-wav
+audio/x-adpcm                 # Same as IANA registered audio/32KADPCM?
 
 # Raw audio
 audio/ac3               # IANA AC3
@@ -223,3 +226,4 @@ application/mxf                 # IANA-registered
 #audio/x-pn-windows-pcm
 #video/x-ms-afs
 #video/x-ms-wvxvideo
+
