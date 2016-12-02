@@ -430,6 +430,15 @@ function get_title(name,client)
     end
 end
 
+function get_length(name,client)
+    local item = vlc.input.item()
+    if item then
+        client:append(math.floor(item:duration()))
+    else
+        client:append("")
+    end
+end
+
 function ret_print(foo,start,stop)
     local start = start or ""
     local stop = stop or ""
@@ -590,7 +599,7 @@ commands_ordered = {
     { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
     { "get_title"; { func = get_title; help = "the title of the current stream" } };
-    { "get_length"; { func = get_time("length"); help = "the length of the current stream" } };
+    { "get_length"; { func = get_length; help = "the length of the current stream" } };
     { "" };
     { "volume"; { func = volume; args = "[X]"; help = "set/get audio volume" } };
     { "volup"; { func = ret_print(vlc.volume.up,"( audio volume: "," )"); args = "[X]"; help = "raise audio volume X steps" } };
