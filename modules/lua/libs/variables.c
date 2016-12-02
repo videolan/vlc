@@ -32,6 +32,8 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+
 #include <vlc_common.h>
 
 #include "../vlc.h"
@@ -50,7 +52,20 @@ static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
             lua_pushboolean( L, val.b_bool );
             break;
         case VLC_VAR_INTEGER:
-            lua_pushinteger( L, val.i_int );
+            /* Lua may only support 32-bit integers. If so, and the
+             * value requires a higher range, push it as a float. We
+             * lose some precision, but object variables are not a
+             * recommended API for lua scripts: functionality requiring
+             * high precision should be provided with a dedicated lua
+             * binding instead of object variables.
+             */
+            // TODO: check using LUA_MININTEGER and LUA_MAXINTEGER macros
+            // if and when we require lua >= 5.3
+            if( sizeof( lua_Integer ) < sizeof( val.i_int ) &&
+                ( val.i_int < INT32_MIN || INT32_MAX < val.i_int ) )
+                lua_pushnumber( L, (lua_Number)val.i_int );
+            else
+                lua_pushinteger( L, val.i_int );
             break;
         case VLC_VAR_STRING:
             lua_pushstring( L, val.psz_string );
@@ -93,7 +108,23 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
             val->b_bool = luaL_checkboolean( L, -1 );
             break;
         case VLC_VAR_INTEGER:
-            val->i_int = luaL_checkinteger( L, -1 );
+            /* Lua may only support 32-bit integers. If so, we need to
+             * get the value as a float instead so we can even know if
+             * there would be an overflow.
+             */
+            // TODO: check using LUA_MININTEGER and LUA_MAXINTEGER macros
+            // if and when we require lua >= 5.3
+            if( sizeof( lua_Integer ) < sizeof( val->i_int ) )
+            {
+                lua_Number f = luaL_checknumber( L, -1 );
+                // Calling vlc.var.set() on integer object variables with
+                // an out-of-range float value is not handled.
+                val->i_int = (int64_t)llround( f );
+                if( INT32_MIN < val->i_int && val->i_int < INT32_MAX )
+                    val->i_int = luaL_checkinteger( L, -1 );
+            }
+            else
+                val->i_int = luaL_checkinteger( L, -1 );
             break;
         case VLC_VAR_STRING:
             val->psz_string = (char*)luaL_checkstring( L, -1 ); /* XXX: Beware, this only stays valid as long as (L,-1) stays in the stack */
