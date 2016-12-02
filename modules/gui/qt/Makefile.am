@@ -22,7 +22,7 @@ libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
 endif
 if HAVE_QT5_X11
 libqt_plugin_la_CXXFLAGS += $(QT5_X11_CFLAGS) -DQT5_HAS_X11
-libqt_plugin_la_LIBADD += $(QT5_X11_LIBS)
+libqt_plugin_la_LIBADD += $(QT5_X11_LIBS) $(X_LIBS) $(X_PRE_LIB) -lX11
 endif
 if HAVE_WAYLAND
 libqt_plugin_la_CXXFLAGS += $(WAYLAND_CLIENT_CFLAGS) -DQT5_HAS_WAYLAND
