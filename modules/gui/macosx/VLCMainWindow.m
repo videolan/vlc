@@ -954,7 +954,7 @@ static const float f_min_window_height = 307.;
     if (root == ROOT_TYPE_PLAYLIST)
         [_categoryLabel setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_playing]]];
     else if (root == ROOT_TYPE_MEDIALIBRARY)
-        [_categoryLabel setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_playing]]];
+        [_categoryLabel setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_media_library]]];
 
     PL_UNLOCK;
 }
