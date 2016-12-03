@@ -221,8 +221,10 @@ static void updateProgressCallback(void *p_data,
 
     NSString *username = authenticationLoginTextField.stringValue;
     NSString *password = authenticationPasswordTextField.stringValue;
-
-    vlc_dialog_id_post_login([dialogData[0] pointerValue],
+    if (returnValue == 0)
+        vlc_dialog_id_dismiss([dialogData[0] pointerValue]);
+    else
+        vlc_dialog_id_post_login([dialogData[0] pointerValue],
                              username ? [username UTF8String] : NULL,
                              password ? [password UTF8String] : NULL,
                              authenticationStorePasswordCheckbox.state == NSOnState);
