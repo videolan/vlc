@@ -43,9 +43,9 @@
  * Module descriptor
  *****************************************************************************/
 #define USE_ANWP
-#define CHROMA_TEXT N_("Chroma used")
-#define CHROMA_LONGTEXT N_(\
-    "Force use of a specific chroma for output. Default is RGB32.")
+#define CHROMA_TEXT "Chroma used"
+#define CHROMA_LONGTEXT \
+    "Force use of a specific chroma for output. Default is RGB32."
 
 #define CFG_PREFIX "android-display-"
 static int  Open (vlc_object_t *);
@@ -55,7 +55,7 @@ static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture);
 vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_description(N_("Android video output"))
+    set_description("Android video output")
     set_capability("vout display", 260)
     add_shortcut("android-display")
     add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
