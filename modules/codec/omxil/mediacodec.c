@@ -167,9 +167,9 @@ static void RemoveInflightPictures(decoder_t *);
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define DIRECTRENDERING_TEXT N_("Android direct rendering")
-#define DIRECTRENDERING_LONGTEXT N_(\
-        "Enable Android direct rendering using opaque buffers.")
+#define DIRECTRENDERING_TEXT "Android direct rendering"
+#define DIRECTRENDERING_LONGTEXT \
+    "Enable Android direct rendering using opaque buffers."
 
 #define MEDIACODEC_AUDIO_TEXT "Use MediaCodec for audio decoding"
 #define MEDIACODEC_AUDIO_LONGTEXT "Still experimental."
@@ -179,10 +179,10 @@ static void RemoveInflightPictures(decoder_t *);
 #define CFG_PREFIX "mediacodec-"
 
 vlc_module_begin ()
-    set_description( N_("Video decoder using Android MediaCodec via NDK") )
+    set_description( "Video decoder using Android MediaCodec via NDK" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
-    set_section( N_("Decoding") , NULL )
+    set_section( N_("Decoding"), NULL )
     set_capability( "decoder", 0 ) /* Only enabled via commandline arguments */
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
@@ -193,7 +193,7 @@ vlc_module_begin ()
     set_callbacks( OpenDecoderNdk, CloseDecoder )
     add_shortcut( "mediacodec_ndk" )
     add_submodule ()
-        set_description( N_("Video decoder using Android MediaCodec via JNI") )
+        set_description( "Video decoder using Android MediaCodec via JNI")
         set_capability( "decoder", 0 )
         set_callbacks( OpenDecoderJni, CloseDecoder )
         add_shortcut( "mediacodec_jni" )
