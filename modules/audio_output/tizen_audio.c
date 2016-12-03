@@ -62,7 +62,7 @@ struct aout_sys_t {
 
 vlc_module_begin ()
     set_shortname( "Tizen audio" )
-    set_description( N_( "Tizen audio output" ) )
+    set_description( "Tizen audio output" )
     set_capability( "audio output", 180 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
