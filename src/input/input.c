@@ -37,6 +37,7 @@
 #include <sys/stat.h>
 
 #include "input_internal.h"
+#include "mrl_helpers.h"
 #include "event.h"
 #include "es_out.h"
 #include "es_out_timeshift.h"
@@ -52,6 +53,7 @@
 #include <vlc_strings.h>
 #include <vlc_modules.h>
 #include <vlc_stream.h>
+#include <vlc_stream_extractor.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -2249,6 +2251,59 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
     InitTitle( p_input );
 }
 
+static int
+InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
+                         char const *anchor )
+{
+    vlc_array_t* identifiers = NULL;
+    char const* extra;
+
+    if( mrl_FragmentSplit( &identifiers, &extra, anchor ) )
+    {
+        msg_Err( source, "unable to parse MRL-fragment: %s", anchor );
+        goto error;
+    }
+
+    MRLSections( extra ? extra : "",
+        &source->i_title_start, &source->i_title_end,
+        &source->i_seekpoint_start, &source->i_seekpoint_end );
+
+    while( vlc_array_count( identifiers ) )
+    {
+        char* id = vlc_array_item_at_index( identifiers, 0 );
+
+        if( vlc_stream_extractor_Attach( stream, id, NULL ) )
+        {
+            msg_Err( source, "unable to locate entity '%s' within stream", id );
+            break;
+        }
+        else
+            msg_Dbg( source, "successfully located entity '%s' within stream", id );
+
+        vlc_array_remove( identifiers, 0 );
+        free( id );
+    }
+
+    int remaining = vlc_array_count( identifiers );
+
+    for( int i = 0; i < remaining; ++i )
+        free( vlc_array_item_at_index( identifiers, i ) );
+
+    vlc_array_destroy( identifiers );
+
+    if( remaining == 0 )
+    {
+        if( vlc_stream_extractor_Attach( stream, NULL, NULL ) )
+            msg_Dbg( source, "attach of directory extractor failed" );
+
+        return VLC_SUCCESS;
+    }
+
+error:
+    return VLC_EGENERIC;
+
+}
+
 static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source,
                                const char *psz_access, const char *psz_demux,
                                const char *psz_path, const char *psz_anchor )
@@ -2293,9 +2348,8 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
     FREENULL( psz_filters );
 
     /* handle anchors */
-    MRLSections( psz_anchor,
-        &p_source->i_title_start, &p_source->i_title_end,
-        &p_source->i_seekpoint_start, &p_source->i_seekpoint_end );
+    if( InputStreamHandleAnchor( p_source, &p_stream, psz_anchor ) )
+        return NULL;
 
     /* attach conditional record stream-filter */
     if( var_InheritBool( p_source, "input-record-native" ) )
