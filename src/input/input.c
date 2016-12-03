@@ -51,6 +51,7 @@
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_modules.h>
+#include <vlc_stream.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -2248,82 +2249,74 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
     InitTitle( p_input );
 }
 
-static demux_t *InputDemuxNew( vlc_object_t *obj, const char *access_name,
-                               const char *demux_name, const char *path,
-                               es_out_t *out, bool preparsing, input_thread_t *input )
+static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source,
+                               const char *psz_access, const char *psz_demux,
+                               const char *psz_path, const char *psz_anchor )
 {
-    assert( access_name != NULL );
-    assert( demux_name != NULL );
-    assert( path != NULL );
+    input_thread_private_t *priv = input_priv(p_input );
+    demux_t *p_demux = NULL;
 
-    demux_t *demux = NULL;
-
-    if( preparsing )
+    /* first, try to create an access demux */
+    p_demux = demux_NewAdvanced( VLC_OBJECT( p_source ), p_input,
+                                 psz_access, psz_demux, psz_path,
+                                 NULL, priv->p_es_out, priv->b_preparsing );
+    if( p_demux )
     {
-        if( strcasecmp( demux_name, "any" ) )
-            goto out;
+        MRLSections( psz_anchor,
+            &p_source->i_title_start, &p_source->i_title_end,
+            &p_source->i_seekpoint_start, &p_source->i_seekpoint_end );
 
-        msg_Dbg( obj, "preparsing %s://%s", access_name, path );
+        return p_demux;
     }
-    else /* Try access_demux first */
-        demux = demux_NewAdvanced( obj, input, access_name, demux_name, path,
-                                   NULL, out, false );
 
-    if( demux == NULL )
-    {   /* Then try a real access,stream,demux chain */
-        /* Create the stream_t */
-        stream_t *stream = NULL;
-        char *url;
+    /* not an access-demux: create the underlying access stream */
+    char *psz_base_mrl;
 
-        if( likely(asprintf( &url, "%s://%s", access_name, path) >= 0) )
-        {
-            stream = stream_AccessNew( obj, input, preparsing, url );
-            free( url );
-        }
+    if( asprintf( &psz_base_mrl, "%s://%s", psz_access, psz_path ) < 0 )
+        return NULL;
 
-        if( stream == NULL )
-        {
-            msg_Err( obj, "cannot access %s://%s", access_name, path );
-            goto out;
-        }
+    char *psz_filters = var_InheritString( p_source, "stream-filter" );
+    stream_t* p_stream = stream_AccessNew( VLC_OBJECT( p_source ), p_input,
+                                           priv->b_preparsing,
+                                           psz_base_mrl );
+    FREENULL( psz_base_mrl );
 
-        /* Add stream filters */
-        stream = stream_FilterAutoNew( stream );
+    if( p_stream == NULL )
+        goto error;
 
-        char *filters = var_InheritString( obj, "stream-filter" );
-        if( filters != NULL )
-        {
-            stream = stream_FilterChainNew( stream, filters );
-            free( filters );
-        }
+    p_stream = stream_FilterAutoNew( p_stream );
 
-        if( var_InheritBool( obj, "input-record-native" ) )
-            stream = stream_FilterChainNew( stream, "record" );
+    /* attach explicit stream filters to stream */
+    if( psz_filters )
+        p_stream = stream_FilterChainNew( p_stream, psz_filters );
 
-        /* FIXME: Hysterical raisins. Access is not updated according to any
-         * redirect but path is. This does not make much sense. Probably the
-         * URL should be passed as a whole and demux_t.psz_access removed. */
-        if( stream->psz_url != NULL )
-        {
-            path = strstr( stream->psz_url, "://" );
-            if( path == NULL )
-            {
-                vlc_stream_Delete( stream );
-                goto out;
-            }
-            path += 3;
-        }
+    FREENULL( psz_filters );
 
-        demux = demux_NewAdvanced( obj, input, access_name, demux_name, path,
-                                   stream, out, preparsing );
-        if( demux == NULL )
-        {
-            msg_Err( obj, "cannot parse %s://%s", access_name, path );
-            vlc_stream_Delete( stream );
-        }
-    }
-out:
-    return demux;
+    /* handle anchors */
+    MRLSections( psz_anchor,
+        &p_source->i_title_start, &p_source->i_title_end,
+        &p_source->i_seekpoint_start, &p_source->i_seekpoint_end );
+
+    /* attach conditional record stream-filter */
+    if( var_InheritBool( p_source, "input-record-native" ) )
+        p_stream = stream_FilterChainNew( p_stream, "record" );
+
+    /* create a regular demux with the access stream created */
+    p_demux = demux_NewAdvanced( VLC_OBJECT( p_source ), p_input,
+                                 psz_access, psz_demux, psz_path,
+                                 p_stream, priv->p_es_out,
+                                 priv->b_preparsing );
+    if( p_demux )
+        return p_demux;
+
+error:
+    free( psz_base_mrl );
+    free( psz_filters );
+
+    if( p_stream )
+        vlc_stream_Delete( p_stream );
+
+    return NULL;
 }
 
 /*****************************************************************************
@@ -2365,10 +2358,6 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
-
-    /* Find optional titles and seekpoints */
-    MRLSections( psz_anchor, &in->i_title_start, &in->i_title_end,
-                 &in->i_seekpoint_start, &in->i_seekpoint_end );
 
     if( input_priv(p_input)->master == NULL /* XXX ugly */)
     {   /* On master stream only, use input-list */
@@ -2423,9 +2412,9 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         TAB_CLEAN( count, tab );
     }
 
-    in->p_demux = InputDemuxNew( VLC_OBJECT(in), psz_access, psz_demux,
-                                 psz_path, input_priv(p_input)->p_es_out,
-                                 input_priv(p_input)->b_preparsing, p_input );
+    in->p_demux = InputDemuxNew( p_input, in, psz_access, psz_demux,
+                                 psz_path, psz_anchor );
+
     free( psz_demux_var );
     free( psz_dup );
 
