@@ -147,7 +147,7 @@ static void ZeroCopyDisplay(vout_display_t *, picture_t *, subpicture_t *);
  */
 vlc_module_begin ()
     set_shortname("iOS vout")
-    set_description(N_("iOS OpenGL video output"))
+    set_description("iOS OpenGL video output")
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout display", 300)
