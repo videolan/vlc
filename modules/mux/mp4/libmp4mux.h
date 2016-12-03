@@ -74,7 +74,7 @@ typedef struct
 
 } mp4mux_trackinfo_t;
 
-bool mp4mux_trackinfo_Init( mp4mux_trackinfo_t * );
+bool mp4mux_trackinfo_Init( mp4mux_trackinfo_t *, unsigned, uint32_t );
 void mp4mux_trackinfo_Clear( mp4mux_trackinfo_t * );
 
 bo_t *box_new     (const char *fcc);

@@ -36,35 +36,22 @@
 #include <assert.h>
 #include <time.h>
 
-bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream)
+bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream, unsigned i_id,
+                           uint32_t i_timescale)
 {
-    p_stream->i_track_id = 1;
+    memset(p_stream, 0, sizeof(*p_stream));
+    p_stream->i_track_id = i_id;
+
+    p_stream->i_timescale   = i_timescale;
+    p_stream->i_entry_count = 0;
+    p_stream->i_entry_max   = 1000;
+
+    p_stream->entry         = calloc(p_stream->i_entry_max, sizeof(mp4mux_entry_t));
+    if(!p_stream->entry)
+        return false;
 
     es_format_Init(&p_stream->fmt, 0, 0);
 
-    p_stream->i_entry_count = 0;
-    p_stream->i_entry_max   = 1000;
-    p_stream->entry         = calloc(p_stream->i_entry_max, sizeof(mp4mux_entry_t));
-    if(!p_stream->entry)
-    {
-        es_format_Clean(&p_stream->fmt);
-        return false;
-    }
-
-    p_stream->a52_frame       = NULL;
-
-    p_stream->i_read_duration = 0;
-    p_stream->i_timescale     = CLOCK_FREQ;
-    p_stream->i_firstdts     = 0;
-    p_stream->b_hasbframes    = false;
-
-    p_stream->i_stco_pos = 0;
-
-    p_stream->i_trex_default_length = 0;
-    p_stream->i_trex_default_size = 0;
-
-    p_stream->i_edits_count = 0;
-    p_stream->p_edits = NULL;
     return true;
 }
 

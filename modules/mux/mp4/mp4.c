@@ -403,14 +403,14 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     }
 
     p_stream = malloc(sizeof(mp4_stream_t));
-    if (!p_stream || !mp4mux_trackinfo_Init(&p_stream->mux))
+    if (!p_stream ||
+        !mp4mux_trackinfo_Init(&p_stream->mux, p_sys->i_nb_streams + 1, CLOCK_FREQ))
     {
         free(p_stream);
         return VLC_ENOMEM;
     }
 
     es_format_Copy(&p_stream->mux.fmt, p_input->p_fmt);
-    p_stream->mux.i_track_id    = p_sys->i_nb_streams + 1;
     p_stream->i_length_neg  = 0;
     p_stream->i_first_dts   = VLC_TS_INVALID;
     switch( p_stream->mux.fmt.i_cat )
