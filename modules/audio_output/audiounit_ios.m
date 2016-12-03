@@ -94,7 +94,7 @@ static OSStatus RenderCallback    (vlc_object_t *, AudioUnitRenderActionFlags *,
 
 vlc_module_begin ()
     set_shortname("audiounit_ios")
-    set_description(N_("AudioUnit output for iOS"))
+    set_description("AudioUnit output for iOS")
     set_capability("audio output", 101)
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
