@@ -2248,6 +2248,98 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
     InitTitle( p_input );
 }
 
+static demux_t *InputDemuxNew( vlc_object_t *obj, const char *access_name,
+                               const char *demux_name, const char *path,
+                               es_out_t *out, bool preparsing, input_thread_t *input )
+{
+    char *demux_var = NULL;
+
+    assert( access_name != NULL );
+    assert( demux_name != NULL );
+    assert( path != NULL );
+
+    if( demux_name[0] == '\0' )
+    {
+        demux_var = var_InheritString( obj, "demux" );
+        if( demux_var != NULL )
+        {
+            demux_name = demux_var;
+            msg_Dbg( obj, "specified demux: %s", demux_name );
+        }
+        else
+            demux_name = "any";
+    }
+
+    demux_t *demux = NULL;
+
+    if( preparsing )
+    {
+        if( strcasecmp( demux_name, "any" ) )
+            goto out;
+
+        msg_Dbg( obj, "preparsing %s://%s", access_name, path );
+    }
+    else /* Try access_demux first */
+        demux = demux_NewAdvanced( obj, input, access_name, demux_name, path,
+                                   NULL, out, false );
+
+    if( demux == NULL )
+    {   /* Then try a real access,stream,demux chain */
+        /* Create the stream_t */
+        stream_t *stream = NULL;
+        char *url;
+
+        if( likely(asprintf( &url, "%s://%s", access_name, path) >= 0) )
+        {
+            stream = stream_AccessNew( obj, input, preparsing, url );
+            free( url );
+        }
+
+        if( stream == NULL )
+        {
+            msg_Err( obj, "cannot access %s://%s", access_name, path );
+            goto out;
+        }
+
+        /* Add stream filters */
+        stream = stream_FilterAutoNew( stream );
+
+        char *filters = var_InheritString( obj, "stream-filter" );
+        if( filters != NULL )
+        {
+            stream = stream_FilterChainNew( stream, filters );
+            free( filters );
+        }
+
+        if( var_InheritBool( obj, "input-record-native" ) )
+            stream = stream_FilterChainNew( stream, "record" );
+
+        /* FIXME: Hysterical raisins. Access is not updated according to any
+         * redirect but path is. This does not make much sense. Probably the
+         * URL should be passed as a whole and demux_t.psz_access removed. */
+        if( stream->psz_url != NULL )
+        {
+            path = strstr( stream->psz_url, "://" );
+            if( path == NULL )
+            {
+                vlc_stream_Delete( stream );
+                goto out;
+            }
+            path += 3;
+        }
+
+        demux = demux_NewAdvanced( obj, input, access_name, demux_name, path,
+                                   stream, out, preparsing );
+        if( demux == NULL )
+        {
+            msg_Err( obj, "cannot parse %s://%s", access_name, path );
+            vlc_stream_Delete( stream );
+        }
+    }
+out:
+    free( demux_var );
+    return demux;
+}
 
 /*****************************************************************************
  * InputSourceNew:
@@ -2339,9 +2431,9 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         TAB_CLEAN( count, tab );
     }
 
-    in->p_demux = input_DemuxNew( VLC_OBJECT(in), psz_access, psz_demux,
-                                  psz_path, input_priv(p_input)->p_es_out,
-                                  input_priv(p_input)->b_preparsing, p_input );
+    in->p_demux = InputDemuxNew( VLC_OBJECT(in), psz_access, psz_demux,
+                                 psz_path, input_priv(p_input)->p_es_out,
+                                 input_priv(p_input)->b_preparsing, p_input );
     free( psz_dup );
 
     if( in->p_demux == NULL )
