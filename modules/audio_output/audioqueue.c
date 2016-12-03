@@ -63,7 +63,7 @@ static void Stop(audio_output_t *);
 static int VolumeSet(audio_output_t *, float );
 vlc_module_begin ()
 set_shortname("AudioQueue")
-set_description(N_("AudioQueue (iOS / Mac OS) audio output"))
+set_description("AudioQueue (iOS / Mac OS) audio output")
 set_capability("audio output", 40)
 set_category(CAT_AUDIO)
 set_subcategory(SUBCAT_AUDIO_AOUT)
