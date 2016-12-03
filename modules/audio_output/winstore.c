@@ -318,7 +318,7 @@ static void Close(vlc_object_t *obj)
 
 vlc_module_begin()
     set_shortname("winstore")
-    set_description(N_("Windows Store audio output"))
+    set_description("Windows Store audio output")
     set_capability("audio output", 0)
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
