@@ -116,20 +116,18 @@ static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
 
     if( p_sys->vrnav.b_button_pressed )
     {
-#define RAD(d) ((float) ((d) * M_PI / 180.f))
         int i_horizontal = newval.coords.x - p_sys->vrnav.x;
         int i_vertical   = newval.coords.y - p_sys->vrnav.y;
 
         vlc_viewpoint_t viewpoint = {
-            .yaw   = RAD(-i_horizontal * 2.5f),
-            .pitch = RAD(-i_vertical   * 2.5f),
+            .yaw   = -i_horizontal * 0.05f,
+            .pitch = -i_vertical   * 0.05f,
         };
 
         input_UpdateViewpoint( p_sys->p_input, &viewpoint, false );
 
         p_sys->vrnav.x = newval.coords.x;
         p_sys->vrnav.y = newval.coords.y;
-#undef RAD
     }
 
     return VLC_SUCCESS;
