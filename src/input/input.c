@@ -2252,23 +2252,9 @@ static demux_t *InputDemuxNew( vlc_object_t *obj, const char *access_name,
                                const char *demux_name, const char *path,
                                es_out_t *out, bool preparsing, input_thread_t *input )
 {
-    char *demux_var = NULL;
-
     assert( access_name != NULL );
     assert( demux_name != NULL );
     assert( path != NULL );
-
-    if( demux_name[0] == '\0' )
-    {
-        demux_var = var_InheritString( obj, "demux" );
-        if( demux_var != NULL )
-        {
-            demux_name = demux_var;
-            msg_Dbg( obj, "specified demux: %s", demux_name );
-        }
-        else
-            demux_name = "any";
-    }
 
     demux_t *demux = NULL;
 
@@ -2337,7 +2323,6 @@ static demux_t *InputDemuxNew( vlc_object_t *obj, const char *access_name,
         }
     }
 out:
-    free( demux_var );
     return demux;
 }
 
@@ -2358,6 +2343,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 
     assert( psz_mrl );
     char *psz_dup = strdup( psz_mrl );
+    char *psz_demux_var = NULL;
 
     if( psz_dup == NULL )
     {
@@ -2368,8 +2354,14 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
 
+    if( psz_demux == NULL || psz_demux[0] == '\0' )
+        psz_demux = psz_demux_var = var_InheritString( in, "demux" );
+
     if( psz_forced_demux != NULL )
         psz_demux = psz_forced_demux;
+
+    if( psz_demux == NULL )
+        psz_demux = "any";
 
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
@@ -2434,6 +2426,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     in->p_demux = InputDemuxNew( VLC_OBJECT(in), psz_access, psz_demux,
                                  psz_path, input_priv(p_input)->p_es_out,
                                  input_priv(p_input)->b_preparsing, p_input );
+    free( psz_demux_var );
     free( psz_dup );
 
     if( in->p_demux == NULL )
