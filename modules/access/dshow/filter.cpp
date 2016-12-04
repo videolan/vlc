@@ -206,11 +206,11 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
  ****************************************************************************/
 
 CapturePin::CapturePin( vlc_object_t *_p_input, access_sys_t *_p_sys,
-                        CaptureFilter *_p_filter,
+                        CaptureFilter* _p_filter,
                         AM_MEDIA_TYPE *mt, size_t mt_count )
   : p_input( _p_input ), p_sys( _p_sys ), p_filter( _p_filter ),
     p_connected_pin( NULL ),  media_types(mt), media_type_count(mt_count),
-    i_ref( 1 )
+    i_ref( 0 )
 {
     cx_media_type.majortype = mt[0].majortype;
     cx_media_type.subtype   = GUID_NULL;
@@ -354,7 +354,7 @@ STDMETHODIMP CapturePin::Connect( IPin *,
     }
 
     if( !pmt ) return S_OK;
- 
+
     if( GUID_NULL != pmt->majortype &&
         media_types[0].majortype != pmt->majortype )
     {
@@ -414,7 +414,6 @@ STDMETHODIMP CapturePin::ReceiveConnection( IPin * pConnector,
     msg_Dbg( p_input, "CapturePin::ReceiveConnection [OK]" );
 
     p_connected_pin = pConnector;
-    p_connected_pin->AddRef();
 
     FreeMediaType( cx_media_type );
     return CopyMediaType( &cx_media_type, pmt );
@@ -431,8 +430,7 @@ STDMETHODIMP CapturePin::Disconnect()
 
     /* samples_queue was already flushed in EndFlush() */
 
-    p_connected_pin->Release();
-    p_connected_pin = NULL;
+    p_connected_pin.Reset();
     //FreeMediaType( cx_media_type );
     //cx_media_type.subtype = GUID_NULL;
 
@@ -446,8 +444,7 @@ STDMETHODIMP CapturePin::ConnectedTo( IPin **pPin )
         return VFW_E_NOT_CONNECTED;
     }
 
-    p_connected_pin->AddRef();
-    *pPin = p_connected_pin;
+    p_connected_pin.CopyTo( pPin );
 
     msg_Dbg( p_input, "CapturePin::ConnectedTo [OK]" );
 
@@ -470,7 +467,7 @@ STDMETHODIMP CapturePin::QueryPinInfo( PIN_INFO * pInfo )
 #endif
 
     pInfo->pFilter = p_filter;
-    if( p_filter ) p_filter->AddRef();
+    p_filter->AddRef();
 
     memcpy(pInfo->achName, PIN_NAME, sizeof(PIN_NAME));
     pInfo->dir = PINDIR_INPUT;
@@ -597,14 +594,10 @@ STDMETHODIMP CapturePin::EndFlush( void )
     msg_Dbg( p_input, "CapturePin::EndFlush" );
 #endif
 
-    VLCMediaSample vlc_sample;
-
     vlc_mutex_lock( &p_sys->lock );
     while( !samples_queue.empty() )
     {
-        vlc_sample = samples_queue.back();
         samples_queue.pop_back();
-        vlc_sample.p_sample->Release();
     }
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -649,7 +642,6 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
     msg_Dbg( p_input, "CapturePin::Receive" );
 #endif
 
-    pSample->AddRef();
     mtime_t i_timestamp = mdate() * 10;
     VLCMediaSample vlc_sample = {pSample, i_timestamp};
 
@@ -659,10 +651,8 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
     /* Make sure we don't cache too many samples */
     if( samples_queue.size() > 10 )
     {
-        vlc_sample = samples_queue.back();
         samples_queue.pop_back();
         msg_Dbg( p_input, "CapturePin::Receive trashing late input sample" );
-        vlc_sample.p_sample->Release();
     }
 
     vlc_cond_signal( &p_sys->wait );
@@ -701,7 +691,7 @@ CaptureFilter::CaptureFilter( vlc_object_t *_p_input, access_sys_t *p_sys,
                               AM_MEDIA_TYPE *mt, size_t mt_count )
   : p_input( _p_input ),
     p_pin( new CapturePin( _p_input, p_sys, this, mt, mt_count ) ),
-    state( State_Stopped ), i_ref( 1 )
+    state( State_Stopped ), i_ref( 0 )
 {
 }
 
@@ -710,7 +700,6 @@ CaptureFilter::~CaptureFilter()
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::~CaptureFilter" );
 #endif
-    p_pin->Release();
 }
 
 /* IUnknown methods */
@@ -853,7 +842,9 @@ STDMETHODIMP CaptureFilter::EnumPins( IEnumPins ** ppEnum )
 
     /* Create a new ref counted enumerator */
     *ppEnum = new (std::nothrow) CaptureEnumPins( p_input, this, NULL );
-    return *ppEnum == NULL ? E_OUTOFMEMORY : NOERROR;
+    if ( *ppEnum == NULL ) return E_OUTOFMEMORY;
+    (*ppEnum)->AddRef();
+    return NOERROR;
 };
 STDMETHODIMP CaptureFilter::FindPin( LPCWSTR, IPin ** )
 {
@@ -870,8 +861,7 @@ STDMETHODIMP CaptureFilter::QueryFilterInfo( FILTER_INFO * pInfo )
 
     memcpy(pInfo->achName, FILTER_NAME, sizeof(FILTER_NAME));
 
-    pInfo->pGraph = p_graph;
-    if( p_graph ) p_graph->AddRef();
+    p_graph.CopyTo( &pInfo->pGraph );
 
     return NOERROR;
 };
@@ -895,7 +885,7 @@ STDMETHODIMP CaptureFilter::QueryVendorInfo( LPWSTR* )
 };
 
 /* Custom methods */
-CapturePin *CaptureFilter::CustomGetPin()
+ComPtr<CapturePin>& CaptureFilter::CustomGetPin()
 {
     return p_pin;
 }
@@ -905,13 +895,10 @@ CapturePin *CaptureFilter::CustomGetPin()
  ****************************************************************************/
 
 CaptureEnumPins::CaptureEnumPins( vlc_object_t *_p_input,
-                                  CaptureFilter *_p_filter,
-                                  CaptureEnumPins *pEnumPins )
-  : p_input( _p_input ), p_filter( _p_filter ), i_ref( 1 )
+                                  ComPtr<CaptureFilter> _p_filter,
+                                  ComPtr<CaptureEnumPins> pEnumPins )
+  : p_input( _p_input ), p_filter( _p_filter ), i_ref( 0 )
 {
-    /* Hold a reference count on our filter */
-    p_filter->AddRef();
-
     /* Are we creating a new enumerator */
 
     if( pEnumPins == NULL )
@@ -929,7 +916,6 @@ CaptureEnumPins::~CaptureEnumPins()
 #ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::~CaptureEnumPins" );
 #endif
-    p_filter->Release();
 }
 
 /* IUnknown methods */
@@ -983,9 +969,8 @@ STDMETHODIMP CaptureEnumPins::Next( ULONG cPins, IPin ** ppPins,
 
     if( i_position < 1 && cPins > 0 )
     {
-        IPin *pPin = p_filter->CustomGetPin();
-        *ppPins = pPin;
-        pPin->AddRef();
+        ComPtr<CapturePin> pPin = p_filter->CustomGetPin();
+        pPin.CopyTo( ppPins );
         i_fetched = 1;
         i_position++;
     }
@@ -1026,7 +1011,7 @@ STDMETHODIMP CaptureEnumPins::Clone( IEnumPins **ppEnum )
 
     *ppEnum = new (std::nothrow) CaptureEnumPins( p_input, p_filter, this );
     if( *ppEnum == NULL ) return E_OUTOFMEMORY;
-
+    (*ppEnum)->AddRef();
     return NOERROR;
 };
 
@@ -1034,12 +1019,9 @@ STDMETHODIMP CaptureEnumPins::Clone( IEnumPins **ppEnum )
  * Implementation of our dummy directshow enummediatypes class
  ****************************************************************************/
 CaptureEnumMediaTypes::CaptureEnumMediaTypes( vlc_object_t *_p_input,
-    CapturePin *_p_pin, CaptureEnumMediaTypes *pEnumMediaTypes )
+    ComPtr<CapturePin> _p_pin, CaptureEnumMediaTypes *pEnumMediaTypes )
   : p_input( _p_input ), p_pin( _p_pin ), i_ref( 1 )
 {
-    /* Hold a reference count on our filter */
-    p_pin->AddRef();
-
     /* Are we creating a new enumerator */
     if( pEnumMediaTypes == NULL )
     {
@@ -1059,7 +1041,6 @@ CaptureEnumMediaTypes::~CaptureEnumMediaTypes()
     msg_Dbg( p_input, "CaptureEnumMediaTypes::~CaptureEnumMediaTypes" );
 #endif
     FreeMediaType(cx_media_type);
-    p_pin->Release();
 }
 
 /* IUnknown methods */

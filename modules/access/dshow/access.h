@@ -28,6 +28,9 @@
 
 #include <dshow.h>
 
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
+
 typedef struct dshow_stream_t dshow_stream_t;
 
 /****************************************************************************
@@ -37,7 +40,7 @@ typedef struct dshow_stream_t dshow_stream_t;
 
 typedef struct CrossbarRouteRec
 {
-    IAMCrossbar *pXbar;
+    ComPtr<IAMCrossbar> pXbar;
     LONG        VideoInputIndex;
     LONG        VideoOutputIndex;
     LONG        AudioInputIndex;
@@ -58,9 +61,9 @@ struct access_sys_t
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
-    IFilterGraph           *p_graph;
-    ICaptureGraphBuilder2  *p_capture_graph_builder2;
-    IMediaControl          *p_control;
+    ComPtr<IFilterGraph>            p_graph;
+    ComPtr<ICaptureGraphBuilder2>   p_capture_graph_builder2;
+    ComPtr<IMediaControl>           p_control;
 
     int                     i_crossbar_route_depth;
     CrossbarRoute           crossbar_routes[MAX_CROSSBAR_DEPTH];
