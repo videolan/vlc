@@ -31,7 +31,7 @@ VLC-tmp:
 	done
 	rm -Rf "$(top_builddir)/tmp" "$@"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
-	cd $(srcdir)/extras/package/macosx; cp -R Resources README.MacOSX.rtf $(abs_top_builddir)/tmp/extras/package/macosx/
+	cd $(srcdir)/extras/package/macosx; cp -R Resources $(abs_top_builddir)/tmp/extras/package/macosx/
 	mkdir -p $(abs_top_builddir)/tmp/extras/package/macosx/vlc.xcodeproj/
 	sed -e s,../../../contrib,$(CONTRIB_DIR),g $(srcdir)/extras/package/macosx/vlc.xcodeproj/project.pbxproj \
         > $(abs_top_builddir)/tmp/extras/package/macosx/vlc.xcodeproj/project.pbxproj
@@ -71,7 +71,6 @@ package-macosx: VLC.app
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/Goodies/"
 	cp -R "$(top_builddir)/VLC.app" "$(top_builddir)/vlc-$(VERSION)/VLC.app"
 	cd $(srcdir); cp AUTHORS COPYING README THANKS NEWS $(abs_top_builddir)/vlc-$(VERSION)/Goodies/
-	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	$(LN_S) -f /Applications $(top_builddir)/vlc-$(VERSION)/
 	rm -f "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
 	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -scrub -format UDRW
@@ -91,7 +90,6 @@ package-macosx-zip: VLC.app
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
 	cp -R $(top_builddir)/VLC.app $(top_builddir)/vlc-$(VERSION)/VLC.app
 	cd $(srcdir); cp -R AUTHORS COPYING README THANKS NEWS $(abs_top_builddir)/vlc-$(VERSION)/Goodies/
-	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
 	rm -rf "$(top_builddir)/vlc-$(VERSION)"
 
@@ -139,7 +137,6 @@ EXTRA_DIST += \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/vlc_status_icon.svg \
 	extras/package/macosx/Info.plist.in \
-	extras/package/macosx/README.MacOSX.rtf \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/English.lproj/About.xib \
 	extras/package/macosx/Resources/English.lproj/AddonManager.xib \
