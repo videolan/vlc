@@ -13,7 +13,7 @@ endif
 ifdef HAVE_ANDROID
 WITH_FONTCONFIG = 0
 else
-ifdef HAVE_IOS
+ifdef HAVE_DARWIN_OS
 WITH_FONTCONFIG = 0
 else
 ifdef HAVE_WIN32
