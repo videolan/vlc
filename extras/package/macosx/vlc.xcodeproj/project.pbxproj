@@ -631,7 +631,6 @@
 		CC402EB80E00ABBB006A4BA4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F69B0CA602E24F6401A80112 /* InfoPlist.strings */; };
 		CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */; };
 		CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */; };
-		CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */; };
 		CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */ = {isa = PBXBuildFile; fileRef = CC1C41D00D9BAD7F002728FA /* noart.png */; };
 		CC402F410E00ABBB006A4BA4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		CC402F420E00ABBB006A4BA4 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */; };
@@ -1214,7 +1213,6 @@
 		8ED6C28403E2EB1C0059A3A7 /* VLCPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCPlaylist.m; path = ../../../modules/gui/macosx/VLCPlaylist.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prefs.h; path = ../../../modules/gui/macosx/prefs.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = ../../../modules/gui/macosx/prefs.m; sourceTree = SOURCE_ROOT; };
-		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
 		CC017A0B14A4C8AF00C09A4F /* VLCMainWindowTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainWindowTitleView.h; path = ../../../modules/gui/macosx/VLCMainWindowTitleView.h; sourceTree = SOURCE_ROOT; };
 		CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCMainWindowTitleView.m; path = ../../../modules/gui/macosx/VLCMainWindowTitleView.m; sourceTree = SOURCE_ROOT; };
 		CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons_dark.png"; sourceTree = "<group>"; };
@@ -1659,7 +1657,6 @@
 				CC1C41D00D9BAD7F002728FA /* noart.png */,
 				CC0B71E00D54F0DD00448E00 /* simple prefs (taken from qt4) */,
 				8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */,
-				8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -2858,7 +2855,6 @@
 				CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */,
 				CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */,
 				6BBBB8B81D12AF72001BD9BA /* VLCRendererDialog.xib in Resources */,
-				CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */,
 				7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */,
 				1C88BBFD19DC7C8100645190 /* ys-forward-3btns-dark.png in Resources */,
 				CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */,
