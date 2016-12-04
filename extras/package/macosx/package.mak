@@ -759,7 +759,6 @@ EXTRA_DIST += \
    	extras/package/macosx/Resources/Button-Icons/VLCVolumeOffTemplate.pdf \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
-	extras/package/macosx/ub.sh \
 	extras/package/macosx/VLC.entitlements \
 	extras/package/macosx/vlc.xcodeproj/project.pbxproj
 
