@@ -80,7 +80,7 @@ struct mc_api_out
                 int sample_rate;
             } audio;
         } conf;
-    } u;
+    };
 };
 
 union mc_api_args

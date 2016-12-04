@@ -789,8 +789,8 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
     if (i_index >= 0)
     {
         p_out->type = MC_OUT_TYPE_BUF;
-        p_out->u.buf.i_index = i_index;
-        p_out->u.buf.i_ts = (*env)->GetLongField(env, p_sys->buffer_info,
+        p_out->buf.i_index = i_index;
+        p_out->buf.i_ts = (*env)->GetLongField(env, p_sys->buffer_info,
                                                  jfields.pts_field);
 
         int flags = (*env)->GetIntField(env, p_sys->buffer_info,
@@ -799,8 +799,8 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
 
         if (api->b_direct_rendering)
         {
-            p_out->u.buf.p_ptr = NULL;
-            p_out->u.buf.i_size = 0;
+            p_out->buf.p_ptr = NULL;
+            p_out->buf.i_size = 0;
         }
         else
         {
@@ -831,8 +831,8 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
                 offset = (*env)->GetIntField(env, p_sys->buffer_info,
                                              jfields.offset_field);
             }
-            p_out->u.buf.p_ptr = ptr + offset;
-            p_out->u.buf.i_size = (*env)->GetIntField(env, p_sys->buffer_info,
+            p_out->buf.p_ptr = ptr + offset;
+            p_out->buf.i_size = (*env)->GetIntField(env, p_sys->buffer_info,
                                                        jfields.size_field);
             (*env)->DeleteLocalRef(env, buf);
         }
@@ -864,21 +864,21 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
         p_out->b_eos = false;
         if (api->i_cat == VIDEO_ES)
         {
-            p_out->u.conf.video.width         = GET_INTEGER(format, "width");
-            p_out->u.conf.video.height        = GET_INTEGER(format, "height");
-            p_out->u.conf.video.stride        = GET_INTEGER(format, "stride");
-            p_out->u.conf.video.slice_height  = GET_INTEGER(format, "slice-height");
-            p_out->u.conf.video.pixel_format  = GET_INTEGER(format, "color-format");
-            p_out->u.conf.video.crop_left     = GET_INTEGER(format, "crop-left");
-            p_out->u.conf.video.crop_top      = GET_INTEGER(format, "crop-top");
-            p_out->u.conf.video.crop_right    = GET_INTEGER(format, "crop-right");
-            p_out->u.conf.video.crop_bottom   = GET_INTEGER(format, "crop-bottom");
+            p_out->conf.video.width         = GET_INTEGER(format, "width");
+            p_out->conf.video.height        = GET_INTEGER(format, "height");
+            p_out->conf.video.stride        = GET_INTEGER(format, "stride");
+            p_out->conf.video.slice_height  = GET_INTEGER(format, "slice-height");
+            p_out->conf.video.pixel_format  = GET_INTEGER(format, "color-format");
+            p_out->conf.video.crop_left     = GET_INTEGER(format, "crop-left");
+            p_out->conf.video.crop_top      = GET_INTEGER(format, "crop-top");
+            p_out->conf.video.crop_right    = GET_INTEGER(format, "crop-right");
+            p_out->conf.video.crop_bottom   = GET_INTEGER(format, "crop-bottom");
         }
         else
         {
-            p_out->u.conf.audio.channel_count = GET_INTEGER(format, "channel-count");
-            p_out->u.conf.audio.channel_mask = GET_INTEGER(format, "channel-mask");
-            p_out->u.conf.audio.sample_rate = GET_INTEGER(format, "sample-rate");
+            p_out->conf.audio.channel_count = GET_INTEGER(format, "channel-count");
+            p_out->conf.audio.channel_mask = GET_INTEGER(format, "channel-mask");
+            p_out->conf.audio.sample_rate = GET_INTEGER(format, "sample-rate");
         }
 
         (*env)->DeleteLocalRef(env, format);

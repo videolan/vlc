@@ -479,15 +479,15 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
     if (i_index >= 0)
     {
         p_out->type = MC_OUT_TYPE_BUF;
-        p_out->u.buf.i_index = i_index;
+        p_out->buf.i_index = i_index;
 
-        p_out->u.buf.i_ts = p_sys->info.presentationTimeUs;
+        p_out->buf.i_ts = p_sys->info.presentationTimeUs;
         p_out->b_eos = p_sys->info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM;
 
         if (api->b_direct_rendering)
         {
-            p_out->u.buf.p_ptr = NULL;
-            p_out->u.buf.i_size = 0;
+            p_out->buf.p_ptr = NULL;
+            p_out->buf.i_size = 0;
         }
         else
         {
@@ -501,8 +501,8 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
                 msg_Err(api->p_obj, "AMediaCodec.getOutputBuffer failed");
                 return MC_API_ERROR;
             }
-            p_out->u.buf.p_ptr = p_mc_buf + p_sys->info.offset;
-            p_out->u.buf.i_size = p_sys->info.size;
+            p_out->buf.p_ptr = p_mc_buf + p_sys->info.offset;
+            p_out->buf.i_size = p_sys->info.size;
         }
         return 1;
     }
@@ -514,21 +514,21 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
         p_out->b_eos = false;
         if (api->i_cat == VIDEO_ES)
         {
-            p_out->u.conf.video.width         = GetFormatInteger(format, "width");
-            p_out->u.conf.video.height        = GetFormatInteger(format, "height");
-            p_out->u.conf.video.stride        = GetFormatInteger(format, "stride");
-            p_out->u.conf.video.slice_height  = GetFormatInteger(format, "slice-height");
-            p_out->u.conf.video.pixel_format  = GetFormatInteger(format, "color-format");
-            p_out->u.conf.video.crop_left     = GetFormatInteger(format, "crop-left");
-            p_out->u.conf.video.crop_top      = GetFormatInteger(format, "crop-top");
-            p_out->u.conf.video.crop_right    = GetFormatInteger(format, "crop-right");
-            p_out->u.conf.video.crop_bottom   = GetFormatInteger(format, "crop-bottom");
+            p_out->conf.video.width         = GetFormatInteger(format, "width");
+            p_out->conf.video.height        = GetFormatInteger(format, "height");
+            p_out->conf.video.stride        = GetFormatInteger(format, "stride");
+            p_out->conf.video.slice_height  = GetFormatInteger(format, "slice-height");
+            p_out->conf.video.pixel_format  = GetFormatInteger(format, "color-format");
+            p_out->conf.video.crop_left     = GetFormatInteger(format, "crop-left");
+            p_out->conf.video.crop_top      = GetFormatInteger(format, "crop-top");
+            p_out->conf.video.crop_right    = GetFormatInteger(format, "crop-right");
+            p_out->conf.video.crop_bottom   = GetFormatInteger(format, "crop-bottom");
         }
         else
         {
-            p_out->u.conf.audio.channel_count = GetFormatInteger(format, "channel-count");
-            p_out->u.conf.audio.channel_mask  = GetFormatInteger(format, "channel-mask");
-            p_out->u.conf.audio.sample_rate   = GetFormatInteger(format, "sample-rate");
+            p_out->conf.audio.channel_count = GetFormatInteger(format, "channel-count");
+            p_out->conf.audio.channel_mask  = GetFormatInteger(format, "channel-mask");
+            p_out->conf.audio.sample_rate   = GetFormatInteger(format, "sample-rate");
         }
         return 1;
     }

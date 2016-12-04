@@ -132,7 +132,7 @@ struct decoder_sys_t
             bool b_need_channels;
             int pi_extraction[AOUT_CHAN_MAX];
         } audio;
-    } u;
+    };
 };
 
 /*****************************************************************************
@@ -325,11 +325,11 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
             }
 
             if (p_size_changed)
-                *p_size_changed = (vsize[0] != p_sys->u.video.i_width
-                                || vsize[1] != p_sys->u.video.i_height);
+                *p_size_changed = (vsize[0] != p_sys->video.i_width
+                                || vsize[1] != p_sys->video.i_height);
 
-            p_sys->u.video.i_width = vsize[0];
-            p_sys->u.video.i_height = vsize[1];
+            p_sys->video.i_width = vsize[0];
+            p_sys->video.i_height = vsize[1];
 
             h264_release_sps( p_sps );
 
@@ -350,7 +350,7 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     {
         size_t i_size = 0;
         uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_size,
-                                                 &p_sys->u.video.i_nal_length_size);
+                                                 &p_sys->video.i_nal_length_size);
 
         /* XXX h264_AVC_to_AnnexB() works only with a i_nal_length_size of 4.
          * If nal_length_size is smaller than 4, fallback to SW decoding. I
@@ -358,7 +358,7 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
          * a smaller nal_length_size. Indeed, this case will happen only with
          * very small resolutions, where MediaCodec is not that useful.
          * -Thomas */
-        if (!p_buf || p_sys->u.video.i_nal_length_size != 4)
+        if (!p_buf || p_sys->video.i_nal_length_size != 4)
         {
             msg_Dbg(p_dec, "h264_avcC_to_AnnexB_NAL failed%s",
                     p_buf ? ": nal_length_size too small" : "");
@@ -382,7 +382,7 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     {
         struct csd csd;
         uint8_t *p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &csd.i_size,
-                                                 &p_sys->u.video.i_nal_length_size);
+                                                 &p_sys->video.i_nal_length_size);
         if (p_buf)
         {
             csd.p_buf = p_buf;
@@ -497,14 +497,14 @@ static int StartMediaCodec(decoder_t *p_dec)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        if (!p_sys->u.video.i_width || !p_sys->u.video.i_height)
+        if (!p_sys->video.i_width || !p_sys->video.i_height)
         {
             msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
                      (const char *)&p_dec->fmt_in.i_codec);
             return VLC_ENOOBJ;
         }
-        args.video.i_width = p_sys->u.video.i_width;
-        args.video.i_height = p_sys->u.video.i_height;
+        args.video.i_width = p_sys->video.i_width;
+        args.video.i_height = p_sys->video.i_height;
 
         switch (p_dec->fmt_in.video.orientation)
         {
@@ -523,14 +523,14 @@ static int StartMediaCodec(decoder_t *p_dec)
 
         /* Configure again if h264 profile changed */
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
-         && !p_sys->u.video.i_h264_profile)
+         && !p_sys->video.i_h264_profile)
         {
             uint8_t i_profile;
             if(h264_get_profile_level(&p_dec->fmt_in, &i_profile, NULL, NULL))
             {
-                p_sys->u.video.i_h264_profile = i_profile;
+                p_sys->video.i_h264_profile = i_profile;
                 if (p_sys->api->configure(p_sys->api,
-                                          p_sys->u.video.i_h264_profile) != 0 )
+                                          p_sys->video.i_h264_profile) != 0 )
                     return VLC_EGENERIC;
             }
         }
@@ -539,8 +539,8 @@ static int StartMediaCodec(decoder_t *p_dec)
         {
             /* Direct rendering: Request a valid OPAQUE Vout in order to get
              * the surface attached to it */
-            p_dec->fmt_out.video.i_width = p_sys->u.video.i_width;
-            p_dec->fmt_out.video.i_height = p_sys->u.video.i_height;
+            p_dec->fmt_out.video.i_width = p_sys->video.i_width;
+            p_dec->fmt_out.video.i_height = p_sys->video.i_height;
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
             if (decoder_UpdateVideoFormat(p_dec) != 0
              || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
@@ -562,10 +562,10 @@ static int StartMediaCodec(decoder_t *p_dec)
     }
     else
     {
-        date_Set(&p_sys->u.audio.i_end_date, VLC_TS_INVALID);
+        date_Set(&p_sys->audio.i_end_date, VLC_TS_INVALID);
 
         args.audio.i_sample_rate    = p_dec->fmt_in.audio.i_rate;
-        args.audio.i_channel_count  = p_dec->p_sys->u.audio.i_channels;
+        args.audio.i_channel_count  = p_dec->p_sys->audio.i_channels;
     }
 
     int i_ret = p_sys->api->start(p_sys->api, &args);
@@ -750,26 +750,26 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         }
         p_sys->pf_on_flush = Video_OnFlush;
         p_sys->pf_process_output = Video_ProcessOutput;
-        p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
-        p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
-        p_sys->u.video.i_h264_profile = i_h264_profile;
+        p_sys->video.i_width = p_dec->fmt_in.video.i_width;
+        p_sys->video.i_height = p_dec->fmt_in.video.i_height;
+        p_sys->video.i_h264_profile = i_h264_profile;
 
-        p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
-        if (!p_sys->u.video.timestamp_fifo)
+        p_sys->video.timestamp_fifo = timestamp_FifoNew(32);
+        if (!p_sys->video.timestamp_fifo)
             goto bailout;
 
-        TAB_INIT( p_sys->u.video.i_inflight_pictures,
-                  p_sys->u.video.pp_inflight_pictures );
+        TAB_INIT( p_sys->video.i_inflight_pictures,
+                  p_sys->video.pp_inflight_pictures );
     }
     else
     {
         p_sys->pf_on_new_block = Audio_OnNewBlock;
         p_sys->pf_on_flush = Audio_OnFlush;
         p_sys->pf_process_output = Audio_ProcessOutput;
-        p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
+        p_sys->audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
         if ((p_sys->api->i_quirks & MC_API_AUDIO_QUIRKS_NEED_CHANNELS)
-         && !p_sys->u.audio.i_channels)
+         && !p_sys->audio.i_channels)
         {
             msg_Warn(p_dec, "codec need a valid channel count");
             goto bailout;
@@ -864,8 +864,8 @@ static void CleanDecoder(decoder_t *p_dec)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        if (p_sys->u.video.timestamp_fifo)
-            timestamp_FifoRelease(p_sys->u.video.timestamp_fifo);
+        if (p_sys->video.timestamp_fifo)
+            timestamp_FifoRelease(p_sys->video.timestamp_fifo);
     }
     free(p_sys->api);
     free(p_sys);
@@ -905,8 +905,8 @@ static void InvalidateAllPictures(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    for (unsigned int i = 0; i < p_sys->u.video.i_inflight_pictures; ++i)
-        AndroidOpaquePicture_Release(p_sys->u.video.pp_inflight_pictures[i],
+    for (unsigned int i = 0; i < p_sys->video.i_inflight_pictures; ++i)
+        AndroidOpaquePicture_Release(p_sys->video.pp_inflight_pictures[i],
                                      false);
 }
 
@@ -919,8 +919,8 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_sys_t *p_picsys)
         p_picsys->priv.hw.p_dec = p_dec;
         p_picsys->priv.hw.pf_release = ReleasePicture;
         TAB_APPEND_CAST((picture_sys_t **),
-                        p_sys->u.video.i_inflight_pictures,
-                        p_sys->u.video.pp_inflight_pictures,
+                        p_sys->video.i_inflight_pictures,
+                        p_sys->video.pp_inflight_pictures,
                         p_picsys);
     } /* else already attached */
     return 0;
@@ -930,10 +930,10 @@ static void RemoveInflightPictures(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    for (unsigned int i = 0; i < p_sys->u.video.i_inflight_pictures; ++i)
-        AndroidOpaquePicture_DetachDecoder(p_sys->u.video.pp_inflight_pictures[i]);
-    TAB_CLEAN(p_sys->u.video.i_inflight_pictures,
-              p_sys->u.video.pp_inflight_pictures);
+    for (unsigned int i = 0; i < p_sys->video.i_inflight_pictures; ++i)
+        AndroidOpaquePicture_DetachDecoder(p_sys->video.pp_inflight_pictures[i]);
+    TAB_CLEAN(p_sys->video.i_inflight_pictures,
+              p_sys->video.pp_inflight_pictures);
 }
 
 static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
@@ -952,38 +952,38 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
          * overwrite it with the corresponding dts. Call FifoGet
          * first in order to avoid a gap if buffers are released
          * due to an invalid format or a preroll */
-        int64_t forced_ts = timestamp_FifoGet(p_sys->u.video.timestamp_fifo);
+        int64_t forced_ts = timestamp_FifoGet(p_sys->video.timestamp_fifo);
 
         if (!p_sys->b_has_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
+            return p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false);
         }
 
-        if (p_out->u.buf.i_ts <= p_sys->i_preroll_end)
-            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
+        if (p_out->buf.i_ts <= p_sys->i_preroll_end)
+            return p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false);
 
-        if (!p_sys->api->b_direct_rendering && p_out->u.buf.p_ptr == NULL)
+        if (!p_sys->api->b_direct_rendering && p_out->buf.p_ptr == NULL)
         {
             /* This can happen when receiving an EOS buffer */
             msg_Warn(p_dec, "Invalid buffer, dropping frame");
-            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
+            return p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false);
         }
 
         p_pic = decoder_NewPicture(p_dec);
         if (!p_pic) {
             msg_Warn(p_dec, "NewPicture failed");
-            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
+            return p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false);
         }
 
         if (forced_ts == VLC_TS_INVALID)
-            p_pic->date = p_out->u.buf.i_ts;
+            p_pic->date = p_out->buf.i_ts;
         else
             p_pic->date = forced_ts;
         p_pic->b_progressive = true;
 
         if (p_sys->api->b_direct_rendering)
         {
-            p_pic->p_sys->priv.hw.i_index = p_out->u.buf.i_index;
+            p_pic->p_sys->priv.hw.i_index = p_out->buf.i_index;
             InsertInflightPicture(p_dec, p_pic->p_sys);
         } else {
             unsigned int chroma_div;
@@ -991,11 +991,11 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
                               p_dec->fmt_out.video.i_width,
                               p_dec->fmt_out.video.i_height,
                               NULL, NULL, &chroma_div);
-            CopyOmxPicture(p_sys->u.video.i_pixel_format, p_pic,
-                           p_sys->u.video.i_slice_height, p_sys->u.video.i_stride,
-                           (uint8_t *)p_out->u.buf.p_ptr, chroma_div, NULL);
+            CopyOmxPicture(p_sys->video.i_pixel_format, p_pic,
+                           p_sys->video.i_slice_height, p_sys->video.i_stride,
+                           (uint8_t *)p_out->buf.p_ptr, chroma_div, NULL);
 
-            if (p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false))
+            if (p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false))
             {
                 picture_Release(p_pic);
                 return -1;
@@ -1006,14 +1006,14 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         return 1;
     } else {
         assert(p_out->type == MC_OUT_TYPE_CONF);
-        p_sys->u.video.i_pixel_format = p_out->u.conf.video.pixel_format;
+        p_sys->video.i_pixel_format = p_out->conf.video.pixel_format;
 
         const char *name = "unknown";
         if (p_sys->api->b_direct_rendering)
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
         else
         {
-            if (!GetVlcChromaFormat(p_sys->u.video.i_pixel_format,
+            if (!GetVlcChromaFormat(p_sys->video.i_pixel_format,
                                     &p_dec->fmt_out.i_codec, &name)) {
                 msg_Err(p_dec, "color-format not recognized");
                 return -1;
@@ -1021,34 +1021,34 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         }
 
         msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
-                p_sys->u.video.i_pixel_format, name, p_out->u.conf.video.width, p_out->u.conf.video.height,
-                p_out->u.conf.video.stride, p_out->u.conf.video.slice_height,
-                p_out->u.conf.video.crop_left, p_out->u.conf.video.crop_top,
-                p_out->u.conf.video.crop_right, p_out->u.conf.video.crop_bottom);
+                p_sys->video.i_pixel_format, name, p_out->conf.video.width, p_out->conf.video.height,
+                p_out->conf.video.stride, p_out->conf.video.slice_height,
+                p_out->conf.video.crop_left, p_out->conf.video.crop_top,
+                p_out->conf.video.crop_right, p_out->conf.video.crop_bottom);
 
-        p_dec->fmt_out.video.i_width = p_out->u.conf.video.crop_right + 1 - p_out->u.conf.video.crop_left;
-        p_dec->fmt_out.video.i_height = p_out->u.conf.video.crop_bottom + 1 - p_out->u.conf.video.crop_top;
+        p_dec->fmt_out.video.i_width = p_out->conf.video.crop_right + 1 - p_out->conf.video.crop_left;
+        p_dec->fmt_out.video.i_height = p_out->conf.video.crop_bottom + 1 - p_out->conf.video.crop_top;
         if (p_dec->fmt_out.video.i_width <= 1
             || p_dec->fmt_out.video.i_height <= 1) {
-            p_dec->fmt_out.video.i_width = p_out->u.conf.video.width;
-            p_dec->fmt_out.video.i_height = p_out->u.conf.video.height;
+            p_dec->fmt_out.video.i_width = p_out->conf.video.width;
+            p_dec->fmt_out.video.i_height = p_out->conf.video.height;
         }
         p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
-        p_sys->u.video.i_stride = p_out->u.conf.video.stride;
-        p_sys->u.video.i_slice_height = p_out->u.conf.video.slice_height;
-        if (p_sys->u.video.i_stride <= 0)
-            p_sys->u.video.i_stride = p_out->u.conf.video.width;
-        if (p_sys->u.video.i_slice_height <= 0)
-            p_sys->u.video.i_slice_height = p_out->u.conf.video.height;
+        p_sys->video.i_stride = p_out->conf.video.stride;
+        p_sys->video.i_slice_height = p_out->conf.video.slice_height;
+        if (p_sys->video.i_stride <= 0)
+            p_sys->video.i_stride = p_out->conf.video.width;
+        if (p_sys->video.i_slice_height <= 0)
+            p_sys->video.i_slice_height = p_out->conf.video.height;
 
-        if (p_sys->u.video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
-            p_sys->u.video.i_slice_height -= p_out->u.conf.video.crop_top/2;
+        if (p_sys->video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
+            p_sys->video.i_slice_height -= p_out->conf.video.crop_top/2;
         if ((p_sys->api->i_quirks & MC_API_VIDEO_QUIRKS_IGNORE_PADDING))
         {
-            p_sys->u.video.i_slice_height = 0;
-            p_sys->u.video.i_stride = p_dec->fmt_out.video.i_width;
+            p_sys->video.i_slice_height = 0;
+            p_sys->video.i_stride = p_dec->fmt_out.video.i_width;
         }
 
         if (decoder_UpdateVideoFormat(p_dec) != 0)
@@ -1080,44 +1080,44 @@ static int Audio_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
     if (p_out->type == MC_OUT_TYPE_BUF)
     {
         block_t *p_block = NULL;
-        if (p_out->u.buf.p_ptr == NULL)
+        if (p_out->buf.p_ptr == NULL)
         {
             /* This can happen when receiving an EOS buffer */
             msg_Warn(p_dec, "Invalid buffer, dropping frame");
-            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
+            return p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false);
         }
 
         if (!p_sys->b_has_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
+            return p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false);
         }
 
-        p_block = block_Alloc(p_out->u.buf.i_size);
+        p_block = block_Alloc(p_out->buf.i_size);
         if (!p_block)
             return -1;
-        p_block->i_nb_samples = p_out->u.buf.i_size
+        p_block->i_nb_samples = p_out->buf.i_size
                               / p_dec->fmt_out.audio.i_bytes_per_frame;
 
-        if (p_sys->u.audio.b_extract)
+        if (p_sys->audio.b_extract)
         {
             aout_ChannelExtract(p_block->p_buffer,
                                 p_dec->fmt_out.audio.i_channels,
-                                p_out->u.buf.p_ptr, p_sys->u.audio.i_channels,
-                                p_block->i_nb_samples, p_sys->u.audio.pi_extraction,
+                                p_out->buf.p_ptr, p_sys->audio.i_channels,
+                                p_block->i_nb_samples, p_sys->audio.pi_extraction,
                                 p_dec->fmt_out.audio.i_bitspersample);
         }
         else
-            memcpy(p_block->p_buffer, p_out->u.buf.p_ptr, p_out->u.buf.i_size);
+            memcpy(p_block->p_buffer, p_out->buf.p_ptr, p_out->buf.i_size);
 
-        if (p_out->u.buf.i_ts != 0 && p_out->u.buf.i_ts != date_Get(&p_sys->u.audio.i_end_date))
-            date_Set(&p_sys->u.audio.i_end_date, p_out->u.buf.i_ts);
+        if (p_out->buf.i_ts != 0 && p_out->buf.i_ts != date_Get(&p_sys->audio.i_end_date))
+            date_Set(&p_sys->audio.i_end_date, p_out->buf.i_ts);
 
-        p_block->i_pts = date_Get(&p_sys->u.audio.i_end_date);
-        p_block->i_length = date_Increment(&p_sys->u.audio.i_end_date,
+        p_block->i_pts = date_Get(&p_sys->audio.i_end_date);
+        p_block->i_length = date_Increment(&p_sys->audio.i_end_date,
                                            p_block->i_nb_samples)
                           - p_block->i_pts;
 
-        if (p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false))
+        if (p_sys->api->release_out(p_sys->api, p_out->buf.i_index, false))
         {
             block_Release(p_block);
             return -1;
@@ -1130,36 +1130,36 @@ static int Audio_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         assert(p_out->type == MC_OUT_TYPE_CONF);
 
-        if (p_out->u.conf.audio.channel_count <= 0
-         || p_out->u.conf.audio.channel_count > 8
-         || p_out->u.conf.audio.sample_rate <= 0)
+        if (p_out->conf.audio.channel_count <= 0
+         || p_out->conf.audio.channel_count > 8
+         || p_out->conf.audio.sample_rate <= 0)
         {
             msg_Warn( p_dec, "invalid audio properties channels count %d, sample rate %d",
-                      p_out->u.conf.audio.channel_count,
-                      p_out->u.conf.audio.sample_rate);
+                      p_out->conf.audio.channel_count,
+                      p_out->conf.audio.sample_rate);
             return -1;
         }
 
         msg_Err(p_dec, "output: channel_count: %d, channel_mask: 0x%X, rate: %d",
-                p_out->u.conf.audio.channel_count, p_out->u.conf.audio.channel_mask,
-                p_out->u.conf.audio.sample_rate);
+                p_out->conf.audio.channel_count, p_out->conf.audio.channel_mask,
+                p_out->conf.audio.sample_rate);
 
         p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
 
-        p_dec->fmt_out.audio.i_rate = p_out->u.conf.audio.sample_rate;
-        date_Init(&p_sys->u.audio.i_end_date, p_out->u.conf.audio.sample_rate, 1 );
+        p_dec->fmt_out.audio.i_rate = p_out->conf.audio.sample_rate;
+        date_Init(&p_sys->audio.i_end_date, p_out->conf.audio.sample_rate, 1 );
 
-        p_sys->u.audio.i_channels = p_out->u.conf.audio.channel_count;
-        p_sys->u.audio.b_extract =
-            aout_CheckChannelExtraction(p_sys->u.audio.pi_extraction,
+        p_sys->audio.i_channels = p_out->conf.audio.channel_count;
+        p_sys->audio.b_extract =
+            aout_CheckChannelExtraction(p_sys->audio.pi_extraction,
                                         &i_layout_dst, &i_channels_dst,
                                         NULL, pi_audio_order_src,
-                                        p_sys->u.audio.i_channels);
+                                        p_sys->audio.i_channels);
 
-        if (p_sys->u.audio.b_extract)
+        if (p_sys->audio.b_extract)
             msg_Warn(p_dec, "need channel extraction: %d -> %d",
-                     p_sys->u.audio.i_channels, i_channels_dst);
+                     p_sys->audio.i_channels, i_channels_dst);
 
         p_dec->fmt_out.audio.i_original_channels =
         p_dec->fmt_out.audio.i_physical_channels = i_layout_dst;
@@ -1568,7 +1568,7 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
         && !p_sys->api->b_support_interlaced)
         return -1;
 
-    timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
+    timestamp_FifoPut(p_sys->video.timestamp_fifo,
                       p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
 
     return 1;
@@ -1583,10 +1583,10 @@ static int VideoH264_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
 
-    if (p_sys->u.video.i_nal_length_size)
+    if (p_sys->video.i_nal_length_size)
     {
         h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_length_size);
+                               p_sys->video.i_nal_length_size);
     } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
                           &b_size_changed) == VLC_SUCCESS)
     {
@@ -1614,10 +1614,10 @@ static int VideoHEVC_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && p_block);
 
-    if (p_sys->u.video.i_nal_length_size)
+    if (p_sys->video.i_nal_length_size)
     {
         h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_length_size);
+                               p_sys->video.i_nal_length_size);
     }
 
     return Video_OnNewBlock(p_dec, pp_block, p_flags);
@@ -1644,7 +1644,7 @@ static void Video_OnFlush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    timestamp_FifoEmpty(p_sys->u.video.timestamp_fifo);
+    timestamp_FifoEmpty(p_sys->video.timestamp_fifo);
     /* Invalidate all pictures that are currently in flight
      * since flushing make all previous indices returned by
      * MediaCodec invalid. */
@@ -1665,11 +1665,11 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
     VLC_UNUSED(p_flags);
 
     /* We've just started the stream, wait for the first PTS. */
-    if (!date_Get(&p_sys->u.audio.i_end_date))
+    if (!date_Get(&p_sys->audio.i_end_date))
     {
         if (p_block->i_pts <= VLC_TS_INVALID)
             return 0;
-        date_Set(&p_sys->u.audio.i_end_date, p_block->i_pts);
+        date_Set(&p_sys->audio.i_end_date, p_block->i_pts);
     }
 
     return 1;
@@ -1679,7 +1679,7 @@ static void Audio_OnFlush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set(&p_sys->u.audio.i_end_date, VLC_TS_INVALID);
+    date_Set(&p_sys->audio.i_end_date, VLC_TS_INVALID);
 }
 
 static block_t *DecodeAudio(decoder_t *p_dec, block_t **pp_block)
