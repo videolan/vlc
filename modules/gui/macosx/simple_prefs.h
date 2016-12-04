@@ -41,7 +41,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *audio_lastpwdLabel;
 @property (readwrite, weak) IBOutlet NSTextField *audio_lastuserTextField;
 @property (readwrite, weak) IBOutlet NSTextField *audio_lastuserLabel;
-@property (readwrite, weak) IBOutlet NSButton *audio_spdifCheckbox;
 @property (readwrite, weak) IBOutlet NSView *audioView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *audio_visualPopup;
 @property (readwrite, weak) IBOutlet NSTextField *audio_visualLabel;

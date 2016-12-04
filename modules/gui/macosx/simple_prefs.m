@@ -324,7 +324,6 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_audio_lastCheckbox setTitle: _NS("Enable Last.fm submissions")];
     [_audio_lastpwdLabel setStringValue: _NS("Password")];
     [_audio_lastuserLabel setStringValue: _NS("Username")];
-    [_audio_spdifCheckbox setTitle: _NS("Use S/PDIF when available")];
     [_audio_visualLabel setStringValue: _NS("Visualization")];
     [_audio_autosavevol_yesButtonCell setTitle: _NS("Keep audio level between sessions")];
     [_audio_autosavevol_noButtonCell setTitle: _NS("Always reset audio start level to:")];
@@ -642,8 +641,6 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [_audio_volSlider setIntValue: i];
         [_audio_volTextField setIntValue: i];
     }
-
-    [self setupButton:_audio_spdifCheckbox forBoolValue: "spdif"];
 
     [self setupButton:_audio_dolbyPopup forIntList: "force-dolby-surround"];
     [self setupField:_audio_langTextField forOption: "audio-language"];
@@ -971,7 +968,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt(p_intf, "audio", [_audio_enableCheckbox state]);
         config_PutInt(p_intf, "volume-save", [_audio_autosavevol_yesButtonCell state]);
         var_SetBool(p_intf, "volume-save", [_audio_autosavevol_yesButtonCell state]);
-        config_PutInt(p_intf, "spdif", [_audio_spdifCheckbox state]);
         if ([_audio_volTextField isEnabled])
             config_PutInt(p_intf, "auhal-volume", ([_audio_volTextField intValue] * AOUT_VOLUME_MAX) / 200);
 
