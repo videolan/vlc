@@ -831,8 +831,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
     p_region->fmt = fmt;
 
     /* Initialize the picture background */
-    uint8_t i_a = var_InheritInteger( p_filter, "freetype-background-opacity" );
-    i_a = VLC_CLIP( i_a, 0, 255 );
+    const text_style_t *p_style = p_filter->p_sys->p_default_style;
     uint8_t i_x, i_y, i_z;
 
     if (p_region->b_noregionbg) {
@@ -840,10 +839,8 @@ static inline int RenderAXYZ( filter_t *p_filter,
         FillPicture( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00 );
     } else {
         /* Render background under entire subpicture block */
-        int i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
-        i_background_color = VLC_CLIP( i_background_color, 0, 0xFFFFFF );
-        ExtractComponents( i_background_color, &i_x, &i_y, &i_z );
-        FillPicture( p_picture, i_a, i_x, i_y, i_z );
+        ExtractComponents( p_style->i_background_color, &i_x, &i_y, &i_z );
+        FillPicture( p_picture, p_style->i_background_alpha, i_x, i_y, i_z );
     }
     /* Render text's background (from decoder) if any */
     RenderBackground(p_region, p_line_head, p_bbox, i_margin, p_picture, i_text_width,
@@ -876,7 +873,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                 if( !p_glyph )
                     continue;
 
-                i_a = ch->p_style->i_font_alpha;
+                uint8_t i_a = ch->p_style->i_font_alpha;
 
                 uint32_t i_color;
                 switch (g) {/* Apply font alpha ratio to shadow/outline alpha */
