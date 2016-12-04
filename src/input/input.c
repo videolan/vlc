@@ -2347,7 +2347,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 
     if( psz_dup == NULL )
     {
-        free( in );
+        vlc_object_release( in );
         return NULL;
     }
 
