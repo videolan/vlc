@@ -264,6 +264,7 @@ Removed modules
  * QuickTime decoder module (use native codecs)
  * BD access module (use libbluray)
  * Direct2D module (use Direct3D11)
+ * EyeTV access module
 
 
 Changes between 2.2.0 and 2.2.1:

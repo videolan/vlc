@@ -1992,16 +1992,6 @@ if test "${enable_realrtsp}" = "yes"; then
 fi
 
 dnl
-dnl MacOS eyeTV
-AC_ARG_ENABLE(macosx-eyetv,
-  [  --enable-macosx-eyetv   Mac OS X EyeTV (TNT Tuner) module (default enabled on Mac OS X)])
-if test "x${enable_macosx_eyetv}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_eyetv}" = "yes")
-then
-  VLC_ADD_PLUGIN([access_eyetv])
-fi
-
-dnl
 dnl QTKit
 AC_ARG_ENABLE(macosx-qtkit,
   [  --enable-macosx-qtkit Mac OS X qtsound (audio) module (default enabled on Mac OS X <= v10.11)])

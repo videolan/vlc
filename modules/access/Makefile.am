@@ -340,13 +340,6 @@ libdvb_plugin_la_LIBADD = $(DVBPSI_LIBS)
 endif
 endif
 
-libaccess_eyetv_plugin_la_SOURCES = access/eyetv.m
-libaccess_eyetv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' \
-	-Wl,-framework,Foundation
-access_LTLIBRARIES += $(LTLIBaccess_eyetv)
-EXTRA_LTLIBRARIES += libaccess_eyetv_plugin.la
-
-
 ### Network streams ###
 
 libftp_plugin_la_SOURCES = access/ftp.c

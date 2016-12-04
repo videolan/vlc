@@ -125,15 +125,6 @@ EXTRA_DIST += \
 	extras/package/macosx/codesign.sh \
 	extras/package/macosx/configure.sh \
 	extras/package/macosx/dmg_setup.scpt \
-	extras/package/macosx/eyetvplugin/English.lproj/InfoPlist.strings \
-	extras/package/macosx/eyetvplugin/EyeTV_Plugin_Installer.pmdoc/01vlc-contents.xml \
-	extras/package/macosx/eyetvplugin/EyeTV_Plugin_Installer.pmdoc/01vlc.xml \
-	extras/package/macosx/eyetvplugin/EyeTV_Plugin_Installer.pmdoc/index.xml \
-	extras/package/macosx/eyetvplugin/eyetvplugin.c \
-	extras/package/macosx/eyetvplugin/eyetvplugin.h \
-	extras/package/macosx/eyetvplugin/eyetvplugin.xcodeproj/project.pbxproj \
-	extras/package/macosx/eyetvplugin/EyeTVPluginDefs.h \
-	extras/package/macosx/eyetvplugin/Info.plist \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/vlc_status_icon.svg \
 	extras/package/macosx/Info.plist.in \
