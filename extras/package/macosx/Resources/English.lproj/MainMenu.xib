@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1108" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment version="1070" identifier="macosx"/>
+        <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainMenu">
@@ -104,7 +104,6 @@
                 <outlet property="rate_sld" destination="4597" id="HsT-Rx-eia"/>
                 <outlet property="rate_slowerLabel" destination="4600" id="vRN-S8-MSb"/>
                 <outlet property="rate_view" destination="4596" id="MPC-hG-6bj"/>
-                <outlet property="readme" destination="1136" id="QoP-Va-kF5"/>
                 <outlet property="record" destination="5137" id="Ka3-jl-auY"/>
                 <outlet property="renderer" destination="Rf6-Uj-7Ja" id="Nzc-Qb-SnK"/>
                 <outlet property="repeat" destination="5143" id="ulG-wD-gtG"/>
@@ -801,12 +800,6 @@
                                     <action selector="showHelp:" target="-2" id="Tuw-ca-6xj"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="ReadMe / FAQ..." keyEquivalent="?" id="1136">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                <connections>
-                                    <action selector="openReadMe:" target="-2" id="jdq-YH-NRX"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Licence" id="2834">
                                 <connections>
                                     <action selector="showLicense:" target="-2" id="RZ4-f2-Smi"/>
@@ -977,14 +970,11 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <box horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="4601">
+                <box horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="4601">
                     <rect key="frame" x="156" y="11" width="5" height="8"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="8" id="3TW-kT-FcC"/>
                     </constraints>
-                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    <font key="titleFont" metaFont="system"/>
                 </box>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4615">
                     <rect key="frame" x="19" y="35" width="108" height="18"/>

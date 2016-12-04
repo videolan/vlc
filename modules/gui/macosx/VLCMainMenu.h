@@ -177,7 +177,6 @@
 
 @property (readwrite, weak) IBOutlet NSMenu *helpMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *help;
-@property (readwrite, weak) IBOutlet NSMenuItem *readme;
 @property (readwrite, weak) IBOutlet NSMenuItem *documentation;
 @property (readwrite, weak) IBOutlet NSMenuItem *license;
 @property (readwrite, weak) IBOutlet NSMenuItem *website;
@@ -275,7 +274,6 @@
 - (IBAction)showLicense:(id)sender;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)showHelp:(id)sender;
-- (IBAction)openReadMe:(id)sender;
 - (IBAction)openDocumentation:(id)sender;
 - (IBAction)openWebsite:(id)sender;
 - (IBAction)openForum:(id)sender;

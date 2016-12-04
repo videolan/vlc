@@ -451,7 +451,6 @@
 
     [_helpMenu setTitle: _NS("Help")];
     [_help setTitle: _NS("VLC media player Help...")];
-    [_readme setTitle: _NS("ReadMe / FAQ...")];
     [_license setTitle: _NS("License")];
     [_documentation setTitle: _NS("Online Documentation...")];
     [_website setTitle: _NS("VideoLAN Website...")];
@@ -1252,13 +1251,6 @@
         _rendererDialog = [[VLCRendererDialog alloc] init];
 
     [_rendererDialog showWindow:self];
-}
-
-- (IBAction)openReadMe:(id)sender
-{
-    NSString *path = [[NSBundle mainBundle] pathForResource: @"README.MacOSX" ofType: @"rtf"];
-
-    [[NSWorkspace sharedWorkspace] openFile: path withApplication: @"TextEdit"];
 }
 
 - (IBAction)openDocumentation:(id)sender
