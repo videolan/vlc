@@ -27,7 +27,6 @@ OPTIONS="
         --enable-twolame
         --enable-realrtsp
         --enable-libass
-        --enable-macosx-eyetv
         --enable-macosx-qtkit
         --enable-macosx-avfoundation
         --disable-skins2
