@@ -274,10 +274,10 @@ CLEAN_FILE += .ant
 
 # Protobuf Protoc
 
-protobuf-$(PROTOBUF_VERSION).tar.bz2:
+protobuf-$(PROTOBUF_VERSION).tar.gz:
 	$(call download_pkg,$(PROTOBUF_URL),protobuf)
 
-protobuf: protobuf-$(PROTOBUF_VERSION).tar.bz2
+protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
@@ -287,7 +287,7 @@ protobuf: protobuf-$(PROTOBUF_VERSION).tar.bz2
 	touch $@
 
 CLEAN_PKG += protobuf
-DISTCLEAN_PKG += protobuf-$(PROTOBUF_VERSION).tar.bz2
+DISTCLEAN_PKG += protobuf-$(PROTOBUF_VERSION).tar.gz
 CLEAN_FILE += .protoc
 
 #
