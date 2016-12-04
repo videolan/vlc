@@ -169,7 +169,7 @@ static inline bool check_exception(JNIEnv *env)
     else
         return false;
 }
-#define CHECK_EXCEPTION() check_exception( env )
+#define CHECK_EXCEPTION() check_exception(env)
 #define GET_ENV() if (!(env = android_getEnv(api->p_obj, THREAD_NAME))) return MC_API_ERROR;
 
 static inline jstring jni_new_string(JNIEnv *env, const char *psz_string)
@@ -218,9 +218,9 @@ InitJNIFields (vlc_object_t *p_obj, JNIEnv *env)
     static int i_init_state = -1;
     bool ret;
 
-    vlc_mutex_lock( &lock );
+    vlc_mutex_lock(&lock);
 
-    if( i_init_state != -1 )
+    if (i_init_state != -1)
         goto end;
 
     i_init_state = 0;
@@ -287,10 +287,10 @@ InitJNIFields (vlc_object_t *p_obj, JNIEnv *env)
     i_init_state = 1;
 end:
     ret = i_init_state == 1;
-    if( !ret )
+    if (!ret)
         msg_Err(p_obj, "MediaCodec jni init failed");
 
-    vlc_mutex_unlock( &lock );
+    vlc_mutex_unlock(&lock);
     return ret;
 }
 
@@ -349,7 +349,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
         name_len = (*env)->GetStringUTFLength(env, name);
         name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
 
-        if (OMXCodec_IsBlacklisted( name_ptr, name_len))
+        if (OMXCodec_IsBlacklisted(name_ptr, name_len))
             goto loopclean;
 
         if ((*env)->CallBooleanMethod(env, info, jfields.is_encoder))
