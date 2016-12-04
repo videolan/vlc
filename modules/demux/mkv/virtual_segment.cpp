@@ -599,9 +599,7 @@ int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chap
             p_chapter->b_display_seekpoint = true;
     }
 
-    if ( ( p_chapter && p_chapter->b_display_seekpoint &&
-         ( ( sub_vchapters.size() > 0 && i_mk_virtual_start_time != sub_vchapters[0]->i_mk_virtual_start_time) ||
-           sub_vchapters.size() == 0 ) ) )
+    if ( p_chapter && p_chapter->b_display_seekpoint )
     {
         if( p_chapter->b_user_display )
         {
@@ -636,7 +634,6 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
         vchapters[0]->i_mk_virtual_start_time && p_edition )
     {
         seekpoint_t *sk = vlc_seekpoint_New();
-
         sk->i_time_offset = 0;
         sk->psz_name = strdup( p_edition->psz_name.c_str() );
 
