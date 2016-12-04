@@ -75,7 +75,6 @@ libmacosx_plugin_la_SOURCES = \
 	VLCBookmarksWindowController.h VLCBookmarksWindowController.m \
 	VLCCoreDialogProvider.h VLCCoreDialogProvider.m \
 	VLCDebugMessageWindowController.h VLCDebugMessageWindowController.m \
-	VLCEyeTvController.h VLCEyeTvController.m \
 	VLCHUDSliderCell.h VLCHUDSliderCell.m \
 	VLCHUDButtonCell.h VLCHUDButtonCell.m \
 	VLCHUDCheckboxCell.h VLCHUDCheckboxCell.m \

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCMain.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2015 VLC authors and VideoLAN
+ * Copyright (C) 2002-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
@@ -254,13 +254,6 @@ static VLCMain *sharedInstance = nil;
             if (dayOfYear >= 354)
                 [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"vlc-xmas"]];
         }
-
-        /* announce our launch to a potential eyetv plugin */
-        [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"VLCOSXGUIInit"
-                                                                       object: @"VLCEyeTVSupport"
-                                                                     userInfo: NULL
-                                                           deliverImmediately: YES];
-
     }
 
     return self;

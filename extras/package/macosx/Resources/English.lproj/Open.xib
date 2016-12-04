@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1108" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <deployment identifier="macosx"/>
+        <development version="7000" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -47,18 +48,6 @@
                 <outlet property="discVCDTitleTextField" destination="3241" id="zTk-hy-VrR"/>
                 <outlet property="discVCDVideoTSButton" destination="3237" id="0Uh-rC-7Ho"/>
                 <outlet property="discVCDView" destination="3233" id="Sv2-dO-K19"/>
-                <outlet property="eyeTVChannelProgressBar" destination="2313" id="jF9-DH-aLc"/>
-                <outlet property="eyeTVChannelStatusLabel" destination="2314" id="nK9-P1-ai5"/>
-                <outlet property="eyeTVchannelsPopup" destination="2308" id="Xfy-qx-pim"/>
-                <outlet property="eyeTVcurrentChannelLabel" destination="2307" id="LaM-Lq-8eo"/>
-                <outlet property="eyeTVgetPluginButton" destination="2366" id="Ctg-Hb-A41"/>
-                <outlet property="eyeTVlaunchEyeTVButton" destination="2300" id="Wv7-cY-UgG"/>
-                <outlet property="eyeTVnextProgramButton" destination="2306" id="dd6-bh-Jak"/>
-                <outlet property="eyeTVnoInstanceLabel" destination="2298" id="guC-09-gbT"/>
-                <outlet property="eyeTVnoInstanceLongLabel" destination="2299" id="ZFf-jf-GLF"/>
-                <outlet property="eyeTVnotLaunchedView" destination="2297" id="rkJ-LS-3Re"/>
-                <outlet property="eyeTVpreviousProgramButton" destination="2305" id="zdn-6d-Ufc"/>
-                <outlet property="eyeTVrunningView" destination="2304" id="aI9-hD-69n"/>
                 <outlet property="fileBrowseButton" destination="686" id="kVF-QN-bSe"/>
                 <outlet property="fileCustomTimingCheckbox" destination="3485" id="cfA-oe-tE9"/>
                 <outlet property="fileIconWell" destination="3326" id="vKh-ut-K7F"/>
@@ -213,7 +202,7 @@ Gw
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3487">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3487">
                                             <rect key="frame" x="1" y="-1" width="526" height="47"/>
                                             <view key="contentView" id="7Lj-Zt-bjd">
                                                 <rect key="frame" x="1" y="1" width="524" height="45"/>
@@ -281,8 +270,6 @@ Gw
                                                     <constraint firstItem="3478" firstAttribute="leading" secondItem="3473" secondAttribute="trailing" constant="7" id="uVS-I1-xUH"/>
                                                 </constraints>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3342">
                                             <rect key="frame" x="54" y="193" width="96" height="17"/>
@@ -542,13 +529,12 @@ Gw
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="155" id="SUI-dB-tFE"/>
                                             </constraints>
-                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="2889">
+                                            <popUpButtonCell key="cell" type="push" title="Screen" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2330" id="2889">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="menu"/>
                                                 <menu key="menu" title="OtherViews" id="2328">
                                                     <items>
-                                                        <menuItem title="EyeTV" id="2329"/>
-                                                        <menuItem title="Screen" id="2330"/>
+                                                        <menuItem title="Screen" state="on" id="2330"/>
                                                         <menuItem title="iSight Capture" id="2331"/>
                                                     </items>
                                                 </menu>
@@ -750,8 +736,6 @@ Gw
                         <constraints>
                             <constraint firstAttribute="height" constant="107" id="sLk-Hd-c1V"/>
                         </constraints>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <font key="titleFont" metaFont="system"/>
                     </box>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1304">
@@ -859,8 +843,6 @@ DQ
                         <constraints>
                             <constraint firstAttribute="height" constant="129" id="K9x-6g-WdU"/>
                         </constraints>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <font key="titleFont" metaFont="system"/>
                     </box>
                 </subviews>
@@ -878,68 +860,6 @@ DQ
             </view>
             <point key="canvasLocation" x="-421.5" y="467"/>
         </window>
-        <customView id="2297" userLabel="EyeTV Not Launched">
-            <rect key="frame" x="0.0" y="0.0" width="528" height="222"/>
-            <autoresizingMask key="autoresizingMask"/>
-            <subviews>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2366">
-                    <rect key="frame" x="110" y="61" width="154" height="32"/>
-                    <buttonCell key="cell" type="push" title="Download Plugin" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2950">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="eyetvGetPlugin:" target="-2" id="a6w-ZJ-RpU"/>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2300">
-                    <rect key="frame" x="264" y="61" width="154" height="32"/>
-                    <buttonCell key="cell" type="push" title="Launch EyeTV now" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2949">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="eyetvLaunch:" target="-2" id="qRw-jO-t7J"/>
-                    </connections>
-                </button>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2299">
-                    <rect key="frame" x="133" y="109" width="263" height="28"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2948">
-                        <font key="font" metaFont="smallSystem"/>
-                        <string key="title">VLC could not connect to EyeTV. 
-Make sure that you installed VLC's EyeTV plugin.</string>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2298">
-                    <rect key="frame" x="189" y="151" width="150" height="17"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="EyeTV is not launched" id="2947">
-                        <font key="font" metaFont="systemBold"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="2pv-QY-HcC">
-                    <rect key="frame" x="260" y="68" width="9" height="21"/>
-                </customView>
-            </subviews>
-            <constraints>
-                <constraint firstItem="2300" firstAttribute="leading" secondItem="2366" secondAttribute="trailing" constant="12" id="7CY-uc-VRm"/>
-                <constraint firstItem="2300" firstAttribute="top" secondItem="2299" secondAttribute="bottom" constant="20" id="7Ir-1n-Vvn"/>
-                <constraint firstItem="2298" firstAttribute="top" secondItem="2297" secondAttribute="top" constant="54" id="Ep9-tm-F0G"/>
-                <constraint firstItem="2298" firstAttribute="centerX" secondItem="2297" secondAttribute="centerX" id="JBV-qo-mKk"/>
-                <constraint firstItem="2pv-QY-HcC" firstAttribute="leading" secondItem="2366" secondAttribute="trailing" constant="2" id="LrZ-rI-HR0"/>
-                <constraint firstItem="2pv-QY-HcC" firstAttribute="centerX" secondItem="2299" secondAttribute="centerX" id="R4r-KI-YHU"/>
-                <constraint firstItem="2299" firstAttribute="top" secondItem="2298" secondAttribute="bottom" constant="14" id="V3B-zW-0GZ"/>
-                <constraint firstItem="2pv-QY-HcC" firstAttribute="centerY" secondItem="2300" secondAttribute="centerY" id="ZMQ-iy-KXo"/>
-                <constraint firstItem="2300" firstAttribute="leading" secondItem="2pv-QY-HcC" secondAttribute="trailing" constant="1" id="bfC-a2-oFK"/>
-                <constraint firstItem="2366" firstAttribute="centerY" secondItem="2pv-QY-HcC" secondAttribute="centerY" id="lV6-cX-u0F"/>
-                <constraint firstItem="2299" firstAttribute="centerX" secondItem="2297" secondAttribute="centerX" id="lgp-Hn-KQ0"/>
-                <constraint firstItem="2366" firstAttribute="width" secondItem="2300" secondAttribute="width" id="r2z-dD-dn8"/>
-                <constraint firstItem="2pv-QY-HcC" firstAttribute="height" secondItem="2300" secondAttribute="height" id="rsB-eh-Tth"/>
-            </constraints>
-        </customView>
         <customView id="2301" userLabel="Capture Text Messaging">
             <rect key="frame" x="0.0" y="0.0" width="528" height="222"/>
             <autoresizingMask key="autoresizingMask"/>
@@ -971,93 +891,6 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                 <constraint firstItem="2302" firstAttribute="centerX" secondItem="2301" secondAttribute="centerX" id="Jo8-M5-mAD"/>
                 <constraint firstItem="2302" firstAttribute="top" secondItem="2301" secondAttribute="top" constant="57" id="Ocl-0r-7UD"/>
                 <constraint firstItem="2303" firstAttribute="centerX" secondItem="2302" secondAttribute="centerX" id="aIP-lb-Lz5"/>
-            </constraints>
-        </customView>
-        <customView id="2304" userLabel="EyeTV Running">
-            <rect key="frame" x="0.0" y="0.0" width="527" height="222"/>
-            <autoresizingMask key="autoresizingMask"/>
-            <subviews>
-                <textField hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2314">
-                    <rect key="frame" x="37" y="57" width="115" height="11"/>
-                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" title="Retrieving Channel Info..." id="2957">
-                        <font key="font" metaFont="miniSystem"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="2313">
-                    <rect key="frame" x="16" y="54" width="16" height="16"/>
-                </progressIndicator>
-                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2308">
-                    <rect key="frame" x="268" y="148" width="139" height="26"/>
-                    <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2311" id="2956">
-                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="menu"/>
-                        <menu key="menu" title="OtherViews" id="2309">
-                            <items>
-                                <menuItem title="Item1" state="on" id="2311"/>
-                                <menuItem title="Item2" id="2310"/>
-                                <menuItem title="Item3" id="2312"/>
-                            </items>
-                        </menu>
-                    </popUpButtonCell>
-                    <connections>
-                        <action selector="eyetvSwitchChannel:" target="-2" id="bhE-fT-qZB"/>
-                    </connections>
-                </popUpButton>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2307">
-                    <rect key="frame" x="161" y="153" width="105" height="17"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Current channel:" id="2955">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2306">
-                    <rect key="frame" x="264" y="94" width="146" height="32"/>
-                    <buttonCell key="cell" type="push" title="Next Channel" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2954">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="eyetvSwitchChannel:" target="-2" id="KdG-xP-TJl"/>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2305">
-                    <rect key="frame" x="118" y="94" width="146" height="32"/>
-                    <buttonCell key="cell" type="push" title="Previous Channel" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2953">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="eyetvSwitchChannel:" target="-2" id="mXj-8p-Ud6"/>
-                    </connections>
-                </button>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="2Qc-5v-vFs">
-                    <rect key="frame" x="254" y="101" width="20" height="21"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="20" id="qMv-kG-yG6"/>
-                    </constraints>
-                </customView>
-            </subviews>
-            <constraints>
-                <constraint firstItem="2308" firstAttribute="width" secondItem="2306" secondAttribute="width" id="9R2-oo-bZ8"/>
-                <constraint firstItem="2314" firstAttribute="leading" secondItem="2313" secondAttribute="trailing" constant="7" id="9bs-G1-S1U"/>
-                <constraint firstItem="2Qc-5v-vFs" firstAttribute="centerY" secondItem="2306" secondAttribute="centerY" id="BOO-Ob-wPl"/>
-                <constraint firstItem="2Qc-5v-vFs" firstAttribute="height" secondItem="2306" secondAttribute="height" id="BWv-nH-GMa"/>
-                <constraint firstItem="2308" firstAttribute="leading" secondItem="2307" secondAttribute="trailing" constant="6" id="Lpc-hb-wHl"/>
-                <constraint firstAttribute="bottom" secondItem="2313" secondAttribute="bottom" constant="54" id="OmM-jI-NEV"/>
-                <constraint firstItem="2306" firstAttribute="leading" secondItem="2Qc-5v-vFs" secondAttribute="trailing" constant="-4" id="Pel-8q-NFA"/>
-                <constraint firstItem="2Qc-5v-vFs" firstAttribute="centerX" secondItem="2304" secondAttribute="centerX" id="XkZ-Um-nm6"/>
-                <constraint firstItem="2313" firstAttribute="leading" secondItem="2304" secondAttribute="leading" constant="16" id="Ypl-Eu-eRK"/>
-                <constraint firstItem="2306" firstAttribute="centerY" secondItem="2305" secondAttribute="centerY" id="YvO-ir-Zzf"/>
-                <constraint firstItem="2306" firstAttribute="centerY" secondItem="2304" secondAttribute="centerY" id="Z56-BG-V8K"/>
-                <constraint firstItem="2306" firstAttribute="width" secondItem="2305" secondAttribute="width" id="asK-9H-AVL"/>
-                <constraint firstItem="2307" firstAttribute="centerY" secondItem="2308" secondAttribute="centerY" id="eEI-pT-46M"/>
-                <constraint firstItem="2308" firstAttribute="leading" secondItem="2306" secondAttribute="leading" id="k9Q-c4-thd"/>
-                <constraint firstItem="2306" firstAttribute="top" secondItem="2308" secondAttribute="bottom" constant="29" id="rZ8-08-dRZ"/>
-                <constraint firstItem="2Qc-5v-vFs" firstAttribute="leading" secondItem="2305" secondAttribute="trailing" constant="-4" id="vfy-0j-xgW"/>
-                <constraint firstItem="2313" firstAttribute="centerY" secondItem="2314" secondAttribute="centerY" id="zJu-Dt-wpT"/>
             </constraints>
         </customView>
         <customView id="2346" userLabel="Screen">
@@ -1284,8 +1117,6 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                             <constraint firstItem="3506" firstAttribute="centerY" secondItem="xDE-mO-H1Z" secondAttribute="centerY" id="nz0-P6-yCd"/>
                         </constraints>
                     </view>
-                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
             </subviews>
             <constraints>
@@ -1385,8 +1216,6 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                     <constraints>
                         <constraint firstAttribute="height" constant="111" id="Ve3-XM-YC4"/>
                     </constraints>
-                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
                 <box ambiguous="YES" misplaced="YES" title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3429">
                     <rect key="frame" x="18" y="16" width="492" height="71"/>
@@ -1435,8 +1264,6 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                     <constraints>
                         <constraint firstAttribute="height" constant="65" id="C9z-13-Q15"/>
                     </constraints>
-                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
             </subviews>
             <constraints>
@@ -1714,8 +1541,6 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraints>
                         <constraint firstAttribute="height" constant="39" id="ObB-cH-JCA"/>
                     </constraints>
-                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <font key="titleFont" metaFont="system"/>
                 </box>
             </subviews>

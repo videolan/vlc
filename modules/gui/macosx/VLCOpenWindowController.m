@@ -40,7 +40,6 @@
 #import "VLCPlaylist.h"
 #import "VLCOpenWindowController.h"
 #import "VLCOutput.h"
-#import "VLCEyeTvController.h"
 #import "misc.h"
 
 #import <vlc_url.h>
@@ -73,7 +72,6 @@ struct display_info_t
     NSString *_subPath;
     NSString *_MRL;
     NSMutableArray *_displayInfos;
-    VLCEyeTVController *_eyeTVController;
 }
 
 @property (readwrite, assign) NSString *MRL;
@@ -114,7 +112,7 @@ struct display_info_t
     [_cancelButton setTitle: _NS("Cancel")];
 
     [[_tabView tabViewItemAtIndex: 0] setLabel: _NS("File")];
-    [_tabView accessibilitySetOverrideValue:_NS("4 Tabs to choose between media input. Select 'File' for files, 'Disc' for optical media such as DVDs, Audio CDs or BRs, 'Network' for network streams or 'Capture' for Input Devices such as microphones or cameras, the current screen or TV streams if the EyeTV application is installed.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [_tabView accessibilitySetOverrideValue:_NS("4 Tabs to choose between media input. Select 'File' for files, 'Disc' for optical media such as DVDs, Audio CDs or BRs, 'Network' for network streams or 'Capture' for Input Devices such as microphones or cameras.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[_tabView tabViewItemAtIndex: 1] setLabel: _NS("Disc")];
     [[_tabView tabViewItemAtIndex: 2] setLabel: _NS("Network")];
     [[_tabView tabViewItemAtIndex: 3] setLabel: _NS("Capture")];
@@ -179,12 +177,9 @@ struct display_info_t
     [_netUDPPortTextField setIntValue: config_GetInt(getIntf(), "server-port")];
     [_netUDPPortStepper setIntValue: config_GetInt(getIntf(), "server-port")];
 
-    [_eyeTVChannelProgressBar setUsesThreadedAnimation: YES];
-
     [_captureModePopup removeAllItems];
     [_captureModePopup addItemWithTitle: _NS("Input Devices")];
     [_captureModePopup addItemWithTitle: _NS("Screen")];
-    [_captureModePopup addItemWithTitle: @"EyeTV"];
     [_screenlongLabel setStringValue: _NS("This input allows you to save, stream or display your current screen contents.")];
     [_screenFPSLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Frames per Second")]];
     [_screenLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Screen")]];
@@ -194,14 +189,6 @@ struct display_info_t
     [_screenHeightLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen Height")]];
     [_screenFollowMouseCheckbox setTitle: _NS("Follow the mouse")];
     [_screenqtkAudioCheckbox setTitle: _NS("Capture Audio")];
-    [_eyeTVcurrentChannelLabel setStringValue: _NS("Current channel:")];
-    [_eyeTVpreviousProgramButton setTitle: _NS("Previous Channel")];
-    [_eyeTVnextProgramButton setTitle: _NS("Next Channel")];
-    [_eyeTVChannelStatusLabel setStringValue: _NS("Retrieving Channel Info...")];
-    [_eyeTVnoInstanceLabel setStringValue: _NS("EyeTV is not launched")];
-    [_eyeTVnoInstanceLongLabel setStringValue: _NS("VLC could not connect to EyeTV.\nMake sure that you installed VLC's EyeTV plugin.")];
-    [_eyeTVlaunchEyeTVButton setTitle: _NS("Launch EyeTV now")];
-    [_eyeTVgetPluginButton setTitle: _NS("Download Plugin")];
 
     // setup start / stop time fields
     [_fileStartTimeTextField setFormatter:[[PositionFormatter alloc] init]];
@@ -277,12 +264,6 @@ struct display_info_t
                                              selector: @selector(openNetInfoChanged:)
                                                  name: NSControlTextDidChangeNotification
                                                object: _netHTTPURLTextField];
-
-    [[NSDistributedNotificationCenter defaultCenter] addObserver: self
-                                                        selector: @selector(eyetvChanged:)
-                                                            name: NULL
-                                                          object: @"VLCEyeTVSupport"
-                                              suspensionBehavior: NSNotificationSuspensionBehaviorDeliverImmediately];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(screenFPSfieldChanged:)
@@ -401,7 +382,6 @@ struct display_info_t
     // load window
     [self window];
 
-    _eyeTVController = [[VLCEyeTVController alloc] init];
     int i_result;
 
     [_tabView selectTabViewItemAtIndex: i_type];
@@ -500,7 +480,6 @@ struct display_info_t
 
         [[[VLCMain sharedInstance] playlist] addPlaylistItems:[NSArray arrayWithObject:itemOptionsDictionary]];
     }
-    _eyeTVController = nil;
 }
 
 - (IBAction)screenChanged:(id)sender
@@ -1162,20 +1141,7 @@ struct display_info_t
 {
     intf_thread_t * p_intf = getIntf();
 
-    if ([[[_captureModePopup selectedItem] title] isEqualToString: @"EyeTV"]) {
-        if ([_eyeTVController eyeTVRunning] == YES) {
-            if ([_eyeTVController deviceConnected] == YES) {
-                [self showCaptureView: _eyeTVrunningView];
-                [self setupChannelInfo];
-            }
-            else
-                [self setEyeTVUnconnected];
-        }
-        else
-            [self showCaptureView: _eyeTVnotLaunchedView];
-        [self setMRL: @""];
-    }
-    else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
+    if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
         [self showCaptureView: _screenView];
         [self setMRL: @"screen://"];
         [_screenHeightTextField setIntValue: config_GetInt(p_intf, "screen-height")];
@@ -1244,102 +1210,6 @@ struct display_info_t
     if ([[_screenFPSTextField stringValue] isEqualToString: @""])
         [_screenFPSTextField setFloatValue: 1.0];
     [self setMRL: @"screen://"];
-}
-
-- (IBAction)eyetvSwitchChannel:(id)sender
-{
-    if (sender == _eyeTVnextProgramButton) {
-        int chanNum = [_eyeTVController switchChannelUp: YES];
-        [_eyeTVchannelsPopup selectItemWithTag:chanNum];
-        [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
-    } else if (sender == _eyeTVpreviousProgramButton) {
-        int chanNum = [_eyeTVController switchChannelUp: NO];
-        [_eyeTVchannelsPopup selectItemWithTag:chanNum];
-        [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
-    } else if (sender == _eyeTVchannelsPopup) {
-        int chanNum = [[sender selectedItem] tag];
-        [_eyeTVController setChannel:chanNum];
-        [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
-    } else
-        msg_Err(getIntf(), "eyetvSwitchChannel sent by unknown object");
-}
-
-- (IBAction)eyetvLaunch:(id)sender
-{
-    [_eyeTVController launchEyeTV];
-}
-
-- (IBAction)eyetvGetPlugin:(id)sender
-{
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: @"http://www.videolan.org/vlc/eyetv"]];
-}
-
-- (void)eyetvChanged:(NSNotification *)notification
-{
-    if ([[notification name] isEqualToString: @"DeviceAdded"]) {
-        msg_Dbg(getIntf(), "eyetv device was added");
-        [self showCaptureView: _eyeTVrunningView];
-        [self setupChannelInfo];
-    } else if ([[notification name] isEqualToString: @"DeviceRemoved"]) {
-        /* leave the channel selection like that,
-         * switch to our "no device" tab */
-        msg_Dbg(getIntf(), "eyetv device was removed");
-        [self setEyeTVUnconnected];
-    } else if ([[notification name] isEqualToString: @"PluginQuit"]) {
-        /* switch to the "launch eyetv" tab */
-        msg_Dbg(getIntf(), "eyetv was terminated");
-        [self showCaptureView: _eyeTVnotLaunchedView];
-    } else if ([[notification name] isEqualToString: @"PluginInit"]) {
-        /* we got no device yet */
-        msg_Dbg(getIntf(), "eyetv was launched, no device yet");
-        [self setEyeTVUnconnected];
-    }
-}
-
-- (void)setEyeTVUnconnected
-{
-    [_captureLabel setStringValue: _NS("No device is selected")];
-    [_captureLongLabel setStringValue: _NS("No device is selected.\n\nChoose available device in above pull-down menu.\n")];
-    [_captureLabel displayIfNeeded];
-    [_captureLongLabel displayIfNeeded];
-    [self showCaptureView: _captureView];
-}
-
-/* little helper method, since this code needs to be run by multiple objects */
-- (void)setupChannelInfo
-{
-    /* set up channel selection */
-    [_eyeTVchannelsPopup removeAllItems];
-    [_eyeTVChannelProgressBar setHidden: NO];
-    [_eyeTVChannelProgressBar startAnimation:self];
-    [_eyeTVChannelStatusLabel setStringValue: _NS("Retrieving Channel Info...")];
-    [_eyeTVChannelStatusLabel setHidden: NO];
-
-    /* retrieve info */
-    NSEnumerator *channels = [_eyeTVController allChannels];
-    int x = -2;
-    [[[_eyeTVchannelsPopup menu] addItemWithTitle: _NS("Composite input")
-                                           action: nil
-                                    keyEquivalent: @""] setTag:x++];
-    [[[_eyeTVchannelsPopup menu] addItemWithTitle: _NS("S-Video input")
-                                           action: nil
-                                    keyEquivalent: @""] setTag:x++];
-    if (channels) {
-        NSString *channel;
-        [[_eyeTVchannelsPopup menu] addItem: [NSMenuItem separatorItem]];
-        while ((channel = [channels nextObject]) != nil)
-        /* we have to add items this way, because we accept duplicates
-         * additionally, we save a bit of time */
-            [[[_eyeTVchannelsPopup menu] addItemWithTitle: channel action: nil keyEquivalent: @""] setTag:++x];
-
-        /* make Tuner the default */
-        [_eyeTVchannelsPopup selectItemWithTag:[_eyeTVController channel]];
-    }
-
-    /* clean up GUI */
-    [_eyeTVChannelProgressBar stopAnimation:self];
-    [_eyeTVChannelProgressBar setHidden: YES];
-    [_eyeTVChannelStatusLabel setHidden: YES];
 }
 
 #pragma mark -

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCOpenWindowController.h: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2015 VLC authors and VideoLAN
+ * Copyright (C) 2002-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -157,20 +157,6 @@
 @property (readwrite, weak) IBOutlet NSPopUpButton *captureModePopup;
 @property (readwrite, weak) IBOutlet NSView *captureView;
 
-/* eyetv support */
-@property (readwrite, weak) IBOutlet NSView *eyeTVnotLaunchedView;
-@property (readwrite, weak) IBOutlet NSView *eyeTVrunningView;
-@property (readwrite, weak) IBOutlet NSPopUpButton *eyeTVchannelsPopup;
-@property (readwrite, weak) IBOutlet NSTextField *eyeTVcurrentChannelLabel;
-@property (readwrite, weak) IBOutlet NSTextField *eyeTVChannelStatusLabel;
-@property (readwrite, weak) IBOutlet NSProgressIndicator *eyeTVChannelProgressBar;
-@property (readwrite, weak) IBOutlet NSButton *eyeTVlaunchEyeTVButton;
-@property (readwrite, weak) IBOutlet NSButton *eyeTVgetPluginButton;
-@property (readwrite, weak) IBOutlet NSButton *eyeTVnextProgramButton;
-@property (readwrite, weak) IBOutlet NSTextField *eyeTVnoInstanceLabel;
-@property (readwrite, weak) IBOutlet NSTextField *eyeTVnoInstanceLongLabel;
-@property (readwrite, weak) IBOutlet NSButton *eyeTVpreviousProgramButton;
-
 /* screen support */
 @property (readwrite, weak) IBOutlet NSView *screenView;
 @property (readwrite, weak) IBOutlet NSTextField *screenlongLabel;
@@ -236,9 +222,6 @@
 - (IBAction)qtkAudioChanged:(id)sender;
 - (IBAction)qtkToggleUIElements:(id)sender;
 - (IBAction)screenChanged:(id)sender;
-- (IBAction)eyetvSwitchChannel:(id)sender;
-- (IBAction)eyetvLaunch:(id)sender;
-- (IBAction)eyetvGetPlugin:(id)sender;
 
 - (IBAction)subsChanged:(id)sender;
 - (IBAction)subSettings:(id)sender;
