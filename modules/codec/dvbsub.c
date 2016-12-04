@@ -1619,6 +1619,7 @@ static subpicture_t *render( decoder_t *p_dec )
         }
 
         p_spu_region = subpicture_region_New( &fmt );
+        fmt.p_palette = NULL; /* was stack var */
         video_format_Clean( &fmt );
         if( !p_spu_region )
         {
