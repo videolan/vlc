@@ -25,6 +25,8 @@
  * Preamble
  *****************************************************************************/
 
+#define OS_OBJECT_USE_OBJC 0
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
