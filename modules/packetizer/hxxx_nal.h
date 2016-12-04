@@ -112,6 +112,9 @@ hxxx_transfer_characteristics_to_vlc( enum hxxx_transfer_characteristics i_trans
     case HXXX_TRANSFER_BT2020_V15:
         return TRANSFER_FUNC_BT709;
 
+    case HXXX_TRANSFER_SMPTE_ST_2084:
+        return TRANSFER_FUNC_SMPTE_ST2084;
+
     case HXXX_TRANSFER_RESERVED0:
     case HXXX_TRANSFER_UNSPECIFIED:
     case HXXX_TRANSFER_RESERVED3:
@@ -122,7 +125,6 @@ hxxx_transfer_characteristics_to_vlc( enum hxxx_transfer_characteristics i_trans
     case HXXX_TRANSFER_IEC61966_2_4:
     case HXXX_TRANSFER_BT1361:
     case HXXX_TRANSFER_IEC61966_2_1:
-    case HXXX_TRANSFER_SMPTE_ST_2084:
     case HXXX_TRANSFER_SMPTE_ST_428:
     default:
         return TRANSFER_FUNC_UNDEF;
