@@ -194,7 +194,6 @@ modules/access/dtv/access.c
 modules/access/dv.c
 modules/access/dvdnav.c
 modules/access/dvdread.c
-modules/access/eyetv.m
 modules/access/file.c
 modules/access/fs.c
 modules/access/ftp.c
