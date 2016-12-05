@@ -62,41 +62,35 @@
                                                                    xRadius:2
                                                                    yRadius:2];
 
-    // Draw border and background
-    [NSColor.whiteColor setStroke];
-    [backgroundPath setLineWidth:1];
-    [backgroundPath stroke];
-
+    // Draw background and stroke
     if([self isEnabled]) {
-        [_normalGradient drawInBezierPath:backgroundPath angle:90.0];
+        if ([self isHighlighted]) {
+            [_highlightGradient drawInBezierPath:backgroundPath angle:90.0];
+        } else {
+            [_normalGradient drawInBezierPath:backgroundPath angle:90.0];
+        }
+        [[NSColor whiteColor] setStroke];
     } else {
-        [[NSColor lightGrayColor] setFill];
-        NSRectFill(backgroundFrame);
+        [[NSColor colorWithCalibratedWhite:0.25 alpha:1.0] setStroke];
     }
 
-    // Drawing inner contents
-    //NSRect fillFrame = NSInsetRect(frame, 4, 4);
-    if([self isHighlighted]) {
-
-        //[[NSColor colorWithCalibratedWhite:0.9f alpha:1.0f] setFill];
-    } else {
-        //[[NSColor colorWithCalibratedWhite:0.8f alpha:1.0f] setFill];
-    }
-    //NSRectFill(fillFrame);
+    [backgroundPath setLineWidth:1.0];
+    [backgroundPath stroke];
 
     // Now drawing tick
     if ([self intValue]) {
+        NSBezierPath* bezierPath = [NSBezierPath bezierPath];
+        [bezierPath moveToPoint: NSMakePoint(NSMinX(frame) + 3.0, NSMidY(frame) - 2.0)];
+        [bezierPath lineToPoint: NSMakePoint(NSMidX(frame), NSMidY(frame) + 2.0)];
+        [bezierPath lineToPoint: NSMakePoint((NSMinX(frame) + NSWidth(frame) - 1), NSMinY(frame) - 2.0)];
+        [bezierPath setLineWidth: 1.5];
+
         if([self isEnabled]) {
-            NSBezierPath* bezierPath = [NSBezierPath bezierPath];
-            [bezierPath moveToPoint: NSMakePoint(NSMinX(frame) + 3.0, NSMidY(frame) - 2.0)];
-            [bezierPath lineToPoint: NSMakePoint(NSMidX(frame), NSMidY(frame) + 2.0)];
-            [bezierPath lineToPoint: NSMakePoint((NSMinX(frame) + NSWidth(frame) - 1), NSMinY(frame) - 2.0)];
-            [bezierPath setLineWidth: 1.5];
-            [bezierPath stroke];
+            [[NSColor whiteColor] setStroke];
         } else {
-            //[[NSColor blackColor] setFill];
+            [[NSColor colorWithCalibratedWhite:0.25 alpha:1.0] setStroke];
         }
-        //NSRectFill(NSInsetRect(frame, 6, 6));
+        [bezierPath stroke];
     }
 }
 
