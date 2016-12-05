@@ -57,7 +57,7 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 {
     NSBezierPath *path = [NSBezierPath bezierPath];
     // Inset rect to have enough room for the stroke
-    smallRect = NSInsetRect(smallRect, 0.5, 0.5);
+    smallRect = NSInsetRect(smallRect, 1.0, 1.0);
 
     // Get min/max/mid coords for shape calculations
     CGFloat minX = NSMinX(smallRect);
