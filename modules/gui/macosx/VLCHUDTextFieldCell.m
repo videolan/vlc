@@ -85,7 +85,7 @@
         [self setBezeled:YES];
         [self setDrawsBackground:NO];
     } else {
-        [self setBordered:NO];
+        [self setBordered:YES];
         [self setBezeled:NO];
         [self setDrawsBackground:NO];
     }
