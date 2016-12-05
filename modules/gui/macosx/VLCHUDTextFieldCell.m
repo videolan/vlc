@@ -23,10 +23,14 @@
 
 #import "VLCHUDTextFieldCell.h"
 
-@implementation VLCHUDTextFieldCell {
+@interface VLCHUDTextFieldCell () {
     BOOL myCustomDrawsBackground;
     BOOL myCustomDrawsBorder;
 }
+
+@end
+
+@implementation VLCHUDTextFieldCell
 
 - (instancetype) initWithCoder:(NSCoder *)coder
 {
