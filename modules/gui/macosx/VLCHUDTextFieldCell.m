@@ -62,8 +62,8 @@
 {
     myCustomDrawsBorder = self.bordered || self.bezeled;
     myCustomDrawsBackground = self.drawsBackground;
-    _enabledTextColor  = [NSColor greenColor];
-    _disabledTextColor = [NSColor blueColor];
+    _enabledTextColor  = [NSColor whiteColor];
+    _disabledTextColor = [NSColor grayColor];
     _enabledBorderColor = [NSColor yellowColor];
     _disabledBorderColor = [NSColor greenColor];
     _enabledBackgroundColor = [NSColor purpleColor];
