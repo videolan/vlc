@@ -44,6 +44,7 @@
 - (void)dealloc
 {
     vlc_renderer_item_release(_rendererItem);
+    _rendererItem = nil;
 }
 
 - (NSString*)name

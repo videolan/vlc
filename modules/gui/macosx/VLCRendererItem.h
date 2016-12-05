@@ -42,7 +42,7 @@
 /**
  The underlying \c vlc_renderer_item_t item
  */
-@property (readonly) vlc_renderer_item_t* rendererItem;
+@property (readonly, assign) vlc_renderer_item_t* rendererItem;
 
 /**
  The name of the renderer item
