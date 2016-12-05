@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11761" systemVersion="16B2657" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <development version="7000" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11761"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -112,127 +113,127 @@
                                             <rect key="frame" x="-3" y="-3" width="404" height="186"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField verticalHuggingPriority="750" id="90" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="90">
                                                     <rect key="frame" x="32" y="130" width="48" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="+20 dB" id="158">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="+20 dB" id="158" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="91" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="91">
                                                     <rect key="frame" x="32" y="85" width="48" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" continuous="YES" sendsActionOnEndEditing="YES" alignment="right" title="0 dB" id="157">
+                                                    <textFieldCell key="cell" controlSize="mini" continuous="YES" sendsActionOnEndEditing="YES" alignment="right" title="0 dB" id="157" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="92" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="92">
                                                     <rect key="frame" x="32" y="41" width="48" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="-20 dB" id="156">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="-20 dB" id="156" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="93" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="93">
                                                     <rect key="frame" x="17" y="22" width="81" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Preamp" id="155">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Preamp" id="155" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="95" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="95">
                                                     <rect key="frame" x="109" y="22" width="22" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="60" id="153">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="60" id="153" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="96" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="96">
                                                     <rect key="frame" x="135" y="22" width="29" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="170" id="152">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="170" id="152" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="100" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="100">
                                                     <rect key="frame" x="193" y="22" width="29" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="600" id="148">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="600" id="148" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="101" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="101">
                                                     <rect key="frame" x="164" y="22" width="29" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="310" id="147">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="310" id="147" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="102" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="102">
                                                     <rect key="frame" x="225" y="22" width="23" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="1K" id="146">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="1K" id="146" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="104" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="104">
                                                     <rect key="frame" x="308" y="22" width="30" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="12K" id="144">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="12K" id="144" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="107" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="107">
                                                     <rect key="frame" x="254" y="22" width="23" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="3K" id="141">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="3K" id="141" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="109" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="109">
                                                     <rect key="frame" x="283" y="22" width="23" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="6K" id="139">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="6K" id="139" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="110" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="110">
                                                     <rect key="frame" x="337" y="22" width="30" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="14K" id="138">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="14K" id="138" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="111" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="111">
                                                     <rect key="frame" x="366" y="22" width="30" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="16K" id="137">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="16K" id="137" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -434,10 +435,10 @@
                                             <rect key="frame" x="-3" y="-3" width="410" height="186"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <subviews>
-                                                <textField verticalHuggingPriority="750" id="220" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="220">
                                                     <rect key="frame" x="24" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="223">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="223" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -451,10 +452,10 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="scd-cx-Z2t"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="224" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="224">
                                                     <rect key="frame" x="76" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="24.9 ms" id="227">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="24.9 ms" id="227" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -468,10 +469,10 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="TSd-Vu-uAC"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="228" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="228">
                                                     <rect key="frame" x="128" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="800.0 ms" id="231">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="800.0 ms" id="231" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -485,10 +486,10 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="tJL-Vg-pRk"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="232" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="232">
                                                     <rect key="frame" x="180" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="-11.0 dB" id="235">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="-11.0 dB" id="235" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -502,10 +503,10 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Otq-ED-0CI"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="236" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="236">
                                                     <rect key="frame" x="232" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="8.0:1" id="239">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="8.0:1" id="239" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -519,10 +520,10 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Vee-cn-Xep"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="240" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="240">
                                                     <rect key="frame" x="284" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.5 dB" id="243">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.5 dB" id="243" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -536,73 +537,73 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="gaI-my-uOm"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="244" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="244">
                                                     <rect key="frame" x="336" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="7.0 dB" id="247">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="7.0 dB" id="247" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="248" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="248">
                                                     <rect key="frame" x="25" y="9" width="50" height="22"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="RMS/peak" id="261">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="RMS/peak" id="261" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="249" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="249">
                                                     <rect key="frame" x="76" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Attack" id="260">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Attack" id="260" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="250" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="250">
                                                     <rect key="frame" x="128" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Release" id="259">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Release" id="259" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="251" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="251">
                                                     <rect key="frame" x="180" y="14" width="52" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Threshold" id="258">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Threshold" id="258" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="252" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="252">
                                                     <rect key="frame" x="232" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Ratio" id="257">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Ratio" id="257" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="253" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="253">
                                                     <rect key="frame" x="284" y="9" width="50" height="22"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Knee radius" id="256">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Knee radius" id="256" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="254" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="254">
                                                     <rect key="frame" x="336" y="9" width="50" height="22"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Makeup gain" id="255">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Makeup gain" id="255" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -619,7 +620,7 @@
                                                 <button verticalHuggingPriority="750" id="621">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="9B33308E-D9B3-480C-BC58-0B776FDB6290" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="C59B0B11-FDE2-465D-A6F0-044ED7678EA4" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -655,7 +656,7 @@
                                                 <button verticalHuggingPriority="750" id="618">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="A4069BBB-2117-4542-9BBE-3082B4161FD5" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="8A662FAB-BAE7-46D0-B836-382044D38A71" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -663,10 +664,10 @@
                                                         <action selector="resetSpatializerValues:" target="-2" id="LeL-eG-qna"/>
                                                     </connections>
                                                 </button>
-                                                <textField verticalHuggingPriority="750" id="265" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="265">
                                                     <rect key="frame" x="76" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="302">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="302" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -680,10 +681,10 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="TzD-ul-6Gx"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="267" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="267">
                                                     <rect key="frame" x="128" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="300">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="300" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -697,10 +698,10 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="smf-XD-GHV"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="269" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="269">
                                                     <rect key="frame" x="180" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="298">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="298" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -714,10 +715,10 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="bnX-CW-h45"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="271" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="271">
                                                     <rect key="frame" x="232" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="296">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="296" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -731,10 +732,10 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="wM1-xe-t5e"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="273" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="273">
                                                     <rect key="frame" x="284" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="294">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="294" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -748,46 +749,46 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="CoP-xd-gur"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="277" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="277">
                                                     <rect key="frame" x="76" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Size" id="290">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Size" id="290" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="278" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="278">
                                                     <rect key="frame" x="128" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Width" id="289">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Width" id="289" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="279" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="279">
                                                     <rect key="frame" x="180" y="14" width="52" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Wet" id="288">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Wet" id="288" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="280" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="280">
                                                     <rect key="frame" x="232" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dry" id="287">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dry" id="287" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="281" customClass="BGHUDLabel">
+                                                <textField verticalHuggingPriority="750" id="281">
                                                     <rect key="frame" x="284" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dump" id="286">
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dump" id="286" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -836,17 +837,17 @@
                                                 <action selector="filterEnableKaraoke:" target="-2" id="xdG-5Z-pQZ"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" id="727">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" id="727">
                                             <rect key="frame" x="6" y="116" width="392" height="43"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="eB4-KX-Qdy">
                                                 <rect key="frame" x="1" y="1" width="390" height="41"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" id="341" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" id="341">
                                                         <rect key="frame" x="15" y="14" width="101" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Maximum level" id="348">
+                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Maximum level" id="348" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -862,8 +863,6 @@
                                                     </slider>
                                                 </subviews>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -897,7 +896,7 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="9B33308E-D9B3-480C-BC58-0B776FDB6290" width="1" height="1">
+        <image name="8A662FAB-BAE7-46D0-B836-382044D38A71" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -938,7 +937,7 @@ B04HVwdcB2QHZwdsB3sHfweGB44HmwegB6IHpAepB7EHtAe5B8EHxAfWB9kH3gAAAAAAAAIBAAAAAAAA
 AEEAAAAAAAAAAAAAAAAAAAfgA
 </mutableData>
         </image>
-        <image name="A4069BBB-2117-4542-9BBE-3082B4161FD5" width="1" height="1">
+        <image name="C59B0B11-FDE2-465D-A6F0-044ED7678EA4" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
