@@ -1254,8 +1254,6 @@ static int Create( vlc_object_t *p_this )
      *
      */
 
-    double f_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
-    f_outline_thickness        = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
     float f_shadow_angle       = var_InheritFloat( p_filter, "freetype-shadow-angle" );
     float f_shadow_distance    = var_InheritFloat( p_filter, "freetype-shadow-distance" );
     f_shadow_distance          = VLC_CLIP( f_shadow_distance, 0, 1 );
