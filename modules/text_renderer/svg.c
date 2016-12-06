@@ -267,12 +267,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Create a new subpicture region */
     video_format_Init( &fmt, VLC_CODEC_YUVA );
-    fmt.i_chroma = VLC_CODEC_YUVA;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
 
     p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
@@ -280,7 +276,9 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
         video_format_Clean( &fmt );
         return VLC_EGENERIC;
     }
-    p_region->fmt = fmt;
+    video_format_Clean( &p_region->fmt );
+    video_format_Init( &p_region->fmt, 0 );
+    video_format_Copy( &p_region->fmt, &fmt );
 
     p_region->i_x = p_region->i_y = 0;
     p_y = p_region->p_picture->Y_PIXELS;
