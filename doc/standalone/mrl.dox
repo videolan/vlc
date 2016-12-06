@@ -17,7 +17,7 @@
  * demux is to be unconditionally used for a specific resource, such as in the
  * below (forcing usage of \em demuxdump).
  *
- * \verbatim http/demuxdump,none://example.com/path/to/media\endverbatim
+ * \verbatim http/demuxdump://example.com/path/to/media\endverbatim
  *
  * There is also the possibility of specifying attributes related to the
  * playback behavior of the referred to resource, such as what range of titles
@@ -44,18 +44,9 @@
  *
  *     mrl-scheme   = *( %x20-7E )
  *     mrl-demux    = *( %x20-2B / %x2D-7E )
- *     mrl-demuxers = mrl-demux *( "," mrl-demux )
- *     scheme       =/ ( mrl-scheme [ "/" mrl-demuxers ] )
+ *     scheme       =/ ( mrl-scheme [ "/" mrl-demux ] )
  *
- *  - `mrl-demuxers` is a \em comma-delimited list of individual \ref
- *    demux that will be tried in order of appearance when the
- *    resource requires a \ref demux to be created.
- *
- *  - If the currently processed `mrl-demux` is `"any"`
- *    (case-insensitive), than any \ref demux is allowed to be probed
- *    (and potentially used) at that stage.
- *
- *  - If no specified \ref demux specified in `mrl-demuxers` can
+ *  - If the specified \ref demux specified in `mrl-demuxer` can't
  *    handle the resource, the media shall fail to open.
  *
  * \subsection mrl_technical_fragment 3.5. Fragment
