@@ -489,7 +489,8 @@ check_PROGRAMS = \
 	test_url \
 	test_utf8 \
 	test_xmlent \
-	test_headers
+	test_headers \
+	test_mrl_helpers
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -508,6 +509,7 @@ test_url_SOURCES = test/url.c
 test_utf8_SOURCES = test/utf8.c
 test_xmlent_SOURCES = test/xmlent.c
 test_headers_SOURCES = test/headers.c
+test_mrl_helpers_SOURCES = test/mrl_helpers.c
 
 AM_LDFLAGS = -no-install
 LDADD = libvlccore.la \
