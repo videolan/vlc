@@ -347,44 +347,37 @@ static void xiph_ParseCueSheet( unsigned *pi_flags, vlc_meta_t *p_meta,
 }
 
 void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
-        const uint8_t *p_data, int i_data,
+        const uint8_t *p_data, size_t i_data,
         int *i_attachments, input_attachment_t ***attachments,
         int *i_cover_score, int *i_cover_idx,
         int *i_seekpoint, seekpoint_t ***ppp_seekpoint,
         float (* ppf_replay_gain)[AUDIO_REPLAY_GAIN_MAX],
         float (* ppf_replay_peak)[AUDIO_REPLAY_GAIN_MAX] )
 {
-    int n;
-    int i_comment;
-
     if( i_data < 8 )
         return;
 
-    n = GetDWLE(p_data); RM(4);
-    if( n < 0 || n > i_data )
-        return;
-#if 0
-    if( n > 0 )
-    {
-        /* TODO report vendor string ? */
-        char *psz_vendor = psz_vendor = strndup( p_data, n );
-        free( psz_vendor );
-    }
-#endif
-    RM(n);
+    uint32_t vendor_length = GetDWLE(p_data); RM(4);
+
+    if( vendor_length > i_data )
+        return; /* invalid length */
+
+    RM(vendor_length); /* TODO: handle vendor payload */
 
     if( i_data < 4 )
         return;
 
-    i_comment = GetDWLE(p_data); RM(4);
-    if( i_comment <= 0 )
-        return;
+    uint32_t i_comment = GetDWLE(p_data); RM(4);
+
+    if( i_comment > i_data || i_comment == 0 )
+        return; /* invalid length */
 
     /* */
     vlc_meta_t *p_meta = *pp_meta;
     if( !p_meta )
         *pp_meta = p_meta = vlc_meta_New();
-    if( !p_meta )
+
+    if( unlikely( !p_meta ) )
         return;
 
     /* */
@@ -392,19 +385,19 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
 
     chapters_array_t chapters_array = { 0, NULL };
 
-    for( ; i_comment > 0; i_comment-- )
+    for( ; i_comment > 0 && i_data >= 4; i_comment-- )
     {
-        char *psz_comment;
-        if( i_data < 4 )
+        uint32_t comment_size = GetDWLE(p_data); RM(4);
+
+        if( comment_size > i_data )
             break;
-        n = GetDWLE(p_data); RM(4);
-        if( n > i_data )
-            break;
-        if( n <= 0 )
+
+        if( comment_size == 0 )
             continue;
 
-        psz_comment = strndup( (const char*)p_data, n );
-        RM(n);
+        char* psz_comment = strndup( (const char*)p_data, comment_size );
+
+        RM(comment_size);
 
         EnsureUTF8( psz_comment );
 
@@ -549,7 +542,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         }
         else if( !strncasecmp(psz_comment, "cuesheet=", 9) )
         {
-            xiph_ParseCueSheet( &hasMetaFlags, p_meta, &psz_comment[9], n - 9,
+            xiph_ParseCueSheet( &hasMetaFlags, p_meta, &psz_comment[9], comment_size - 9,
                                 i_seekpoint, ppp_seekpoint );
         }
         else if( strchr( psz_comment, '=' ) )
