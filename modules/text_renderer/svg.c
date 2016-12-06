@@ -265,6 +265,14 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     i_width = gdk_pixbuf_get_width( p_svg->p_rendition );
     i_height = gdk_pixbuf_get_height( p_svg->p_rendition );
 
+    if( gdk_pixbuf_get_colorspace( p_svg->p_rendition ) != GDK_COLORSPACE_RGB )
+    {
+        g_object_unref( p_svg->p_rendition );
+        p_svg->p_rendition = NULL;
+        msg_Err( p_filter, "Unsupported colorspace" );
+        return VLC_EGENERIC;
+    }
+
     /* Create a new subpicture region */
     video_format_Init( &fmt, VLC_CODEC_YUVA );
     fmt.i_width = fmt.i_visible_width = i_width;
