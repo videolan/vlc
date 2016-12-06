@@ -939,6 +939,28 @@ static void FillDefaultStyles( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    /* Set default psz_fontname */
+    if( !p_sys->p_default_style->psz_fontname || !*p_sys->p_default_style->psz_fontname )
+    {
+        free( p_sys->p_default_style->psz_fontname );
+#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
+        p_sys->p_default_style->psz_fontname = strdup( DEFAULT_FAMILY );
+#else
+        p_sys->p_default_style->psz_fontname = File_Select( DEFAULT_FONT_FILE );
+#endif
+    }
+
+    /* set default psz_monofontname */
+    if( !p_sys->p_default_style->psz_monofontname || !*p_sys->p_default_style->psz_monofontname )
+    {
+        free( p_sys->p_default_style->psz_monofontname );
+#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
+        p_sys->p_default_style->psz_monofontname = strdup( DEFAULT_MONOSPACE_FAMILY );
+#else
+        p_sys->p_default_style->psz_monofontname = File_Select( DEFAULT_MONOSPACE_FONT_FILE );
+#endif
+    }
+
     UpdateDefaultLiveStyles( p_filter );
 
     p_sys->p_default_style->psz_fontname = var_InheritString( p_filter, "freetype-font" );
@@ -1239,28 +1261,6 @@ static int Create( vlc_object_t *p_this )
     f_shadow_distance          = VLC_CLIP( f_shadow_distance, 0, 1 );
     p_sys->f_shadow_vector_x   = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
     p_sys->f_shadow_vector_y   = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
-
-    /* Set default psz_fontname */
-    if( !p_sys->p_default_style->psz_fontname || !*p_sys->p_default_style->psz_fontname )
-    {
-        free( p_sys->p_default_style->psz_fontname );
-#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
-        p_sys->p_default_style->psz_fontname = strdup( DEFAULT_FAMILY );
-#else
-        p_sys->p_default_style->psz_fontname = File_Select( DEFAULT_FONT_FILE );
-#endif
-    }
-
-    /* set default psz_monofontname */
-    if( !p_sys->p_default_style->psz_monofontname || !*p_sys->p_default_style->psz_monofontname )
-    {
-        free( p_sys->p_default_style->psz_monofontname );
-#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
-        p_sys->p_default_style->psz_monofontname = strdup( DEFAULT_MONOSPACE_FAMILY );
-#else
-        p_sys->p_default_style->psz_monofontname = File_Select( DEFAULT_MONOSPACE_FONT_FILE );
-#endif
-    }
 
     if( LoadFontsFromAttachments( p_filter ) == VLC_ENOMEM )
         goto error;
