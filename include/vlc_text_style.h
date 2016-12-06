@@ -100,7 +100,7 @@ typedef struct
 #define STYLE_MONOSPACED        (1 << 8)
 
 #define STYLE_DEFAULT_FONT_SIZE 20
-#define STYLE_DEFAULT_REL_FONT_SIZE 5.0
+#define STYLE_DEFAULT_REL_FONT_SIZE 6.25
 
 
 typedef struct text_segment_t text_segment_t;
