@@ -246,6 +246,9 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
             break;
     }
 
+    dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
+    dec->fmt_out.video.pose = dec->fmt_in.video.pose;
+
     if (decoder_UpdateVideoFormat(dec))
         return NULL;
     picture_t *pic = decoder_NewPicture(dec);
