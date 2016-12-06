@@ -187,6 +187,7 @@ vlc_module_begin ()
     add_rgb( "freetype-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_integer_range( 0x000000, 0xFFFFFF )
         change_safe()
 
     add_bool( "freetype-bold", false, BOLD_TEXT, NULL, false )
@@ -198,6 +199,7 @@ vlc_module_begin ()
     add_rgb( "freetype-background-color", 0x00000000, BG_COLOR_TEXT,
              NULL, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_integer_range( 0x000000, 0xFFFFFF )
         change_safe()
 
     add_integer_with_range( "freetype-outline-opacity", 255, 0, 255,
@@ -206,6 +208,7 @@ vlc_module_begin ()
     add_rgb( "freetype-outline-color", 0x00000000, OUTLINE_COLOR_TEXT,
              NULL, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_integer_range( 0x000000, 0xFFFFFF )
         change_safe()
     add_integer_with_range( "freetype-outline-thickness", 4, 0, 50, OUTLINE_THICKNESS_TEXT,
              NULL, false )
@@ -218,6 +221,7 @@ vlc_module_begin ()
     add_rgb( "freetype-shadow-color", 0x00000000, SHADOW_COLOR_TEXT,
              NULL, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_integer_range( 0x000000, 0xFFFFFF )
         change_safe()
     add_float_with_range( "freetype-shadow-angle", -45, -360, 360,
                           SHADOW_ANGLE_TEXT, NULL, false )
