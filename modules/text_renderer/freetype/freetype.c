@@ -925,15 +925,26 @@ static inline int RenderAXYZ( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
+static void UpdateDefaultLiveStyles( filter_t *p_filter )
+{
+    text_style_t *p_style = p_filter->p_sys->p_default_style;
+
+    p_style->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
+
+    p_style->i_background_alpha = var_InheritInteger( p_filter, "freetype-background-opacity" );
+    p_style->i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
+}
+
 static void FillDefaultStyles( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    UpdateDefaultLiveStyles( p_filter );
+
     p_sys->p_default_style->psz_fontname = var_InheritString( p_filter, "freetype-font" );
     p_sys->p_default_style->psz_monofontname = var_InheritString( p_filter, "freetype-monofont" );
 
-    p_sys->p_default_style->i_font_alpha = var_InheritInteger( p_filter,"freetype-opacity" );
-    p_sys->p_default_style->i_font_color = var_InheritInteger( p_filter,"freetype-color" );
+    p_sys->p_default_style->i_font_alpha = var_InheritInteger( p_filter, "freetype-opacity" );
 
     p_sys->p_default_style->i_outline_alpha = var_InheritInteger( p_filter, "freetype-outline-opacity" );
     p_sys->p_default_style->i_outline_color = var_InheritInteger( p_filter, "freetype-outline-color" );
@@ -1061,6 +1072,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     filter_sys_t *p_sys = p_filter->p_sys;
     bool b_grid = p_region_in->b_gridmode;
     p_sys->i_scale = ( b_grid ) ? 100 : var_InheritInteger( p_filter, "sub-text-scale");
+
+    UpdateDefaultLiveStyles( p_filter );
 
     /*
      * Update the default face to reflect changes in video size or text scaling
