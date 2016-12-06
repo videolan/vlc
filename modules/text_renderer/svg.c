@@ -478,8 +478,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         }
         snprintf( p_svg->psz_text, length, psz_template, psz_string );
     }
-    p_svg->i_width = p_sys->i_width;
-    p_svg->i_height = p_sys->i_height;
+    p_svg->i_width = p_sys->i_width = p_filter->fmt_out.video.i_width;
+    p_svg->i_height = p_sys->i_height = p_filter->fmt_out.video.i_height;
     p_svg->i_chroma = VLC_CODEC_YUVA;
 
     /* Render the SVG.
