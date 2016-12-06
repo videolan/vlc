@@ -28,12 +28,11 @@
 
 #include <deque>
 
-typedef struct VLCMediaSample
+struct VLCMediaSample
 {
     ComPtr<IMediaSample> p_sample;
     mtime_t i_timestamp;
-
-} VLCMediaSample;
+};
 
 /* */
 void WINAPI FreeMediaType( AM_MEDIA_TYPE& mt );

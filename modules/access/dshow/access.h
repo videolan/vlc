@@ -33,22 +33,19 @@
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
-typedef struct dshow_stream_t dshow_stream_t;
-
 /****************************************************************************
  * Crossbar stuff
  ****************************************************************************/
 #define MAX_CROSSBAR_DEPTH 10
 
-typedef struct CrossbarRouteRec
+struct CrossbarRoute
 {
     ComPtr<IAMCrossbar> pXbar;
     LONG        VideoInputIndex;
     LONG        VideoOutputIndex;
     LONG        AudioInputIndex;
     LONG        AudioOutputIndex;
-
-} CrossbarRoute;
+};
 
 void DeleteCrossbarRoutes( access_sys_t * );
 HRESULT FindCrossbarRoutes( vlc_object_t *, access_sys_t *,
@@ -71,7 +68,7 @@ struct access_sys_t
     CrossbarRoute           crossbar_routes[MAX_CROSSBAR_DEPTH];
 
     /* list of elementary streams */
-    std::vector<dshow_stream_t*> pp_streams;
+    std::vector<struct dshow_stream_t*> pp_streams;
     int            i_current_stream;
 
     /* misc properties */

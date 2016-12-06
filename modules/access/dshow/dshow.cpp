@@ -303,7 +303,7 @@ vlc_module_end ()
 /*****************************************************************************
  * DirectShow elementary stream descriptor
  *****************************************************************************/
-typedef struct dshow_stream_t
+struct dshow_stream_t
 {
     std::string           devicename;
     ComPtr<IBaseFilter>   p_device_filter;
@@ -323,7 +323,7 @@ typedef struct dshow_stream_t
     bool      b_pts;
 
     std::deque<VLCMediaSample> samples_queue;
-} dshow_stream_t;
+};
 
 /*****************************************************************************
  * DirectShow utility functions

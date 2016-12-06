@@ -226,11 +226,11 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
             {
                 // remember connector type
                 physicalType = inputPinPhysicalType;
- 
+
                 msg_Dbg( p_this, "found existing route for output %ld (type %s) to input %ld (type %s)",
                          outputPinIndex, GetPhysicalPinName( outputPinPhysicalType ),
                          inputPinIndex, GetPhysicalPinName( inputPinPhysicalType ) );
- 
+
                 // fall through to for loop, note 'inputPinIndex' is set to the pin we are looking for
                 // hence, loop iteration should not wind back
 
@@ -241,7 +241,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
             inputPinIndex = 0;
         }
     }
- 
+
     //
     // for all input pins
     //
