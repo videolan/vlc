@@ -166,8 +166,6 @@ vlc_module_begin ()
     add_loadfile( "freetype-monofont", DEFAULT_MONOSPACE_FONT_FILE, MONOSPACE_FONT_TEXT, FONT_LONGTEXT, false )
 #endif
 
-#define FREETYPE_DEFAULT_FONT_SIZE 12
-
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
         change_integer_range( 0, 4096)
