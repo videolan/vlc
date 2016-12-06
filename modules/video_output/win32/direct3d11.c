@@ -828,30 +828,75 @@ static void getProjectionMatrix(float sar, float fovy, FLOAT matrix[static 16]) 
     const FLOAT m[] = {
         f / sar, 0.f,                   0.f,                0.f,
         0.f,     f,                     0.f,                0.f,
-        0.f,     0.f,    -(zNear + zFar) / (zNear - zFar),  1.f,
+        0.f,     0.f,     (zNear + zFar) / (zNear - zFar), -1.f,
         0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
 
      memcpy(matrix, m, sizeof(m));
 }
 
+static float UpdateFOVy(float f_fovx, float f_sar)
+{
+    return 2 * atanf(tanf(f_fovx / 2) / f_sar);
+}
+
+static float UpdateZ(float f_fovx, float f_fovy)
+{
+    /* Do trigonometry to calculate the minimal z value
+     * that will allow us to zoom out without seeing the outside of the
+     * sphere (black borders). */
+    float tan_fovx_2 = tanf(f_fovx / 2);
+    float tan_fovy_2 = tanf(f_fovy / 2);
+    float z_min = - SPHERE_RADIUS / sinf(atanf(sqrtf(
+                    tan_fovx_2 * tan_fovx_2 + tan_fovy_2 * tan_fovy_2)));
+
+    /* The FOV value above which z is dynamically calculated. */
+    const float z_thresh = 90.f;
+
+    float f_z;
+    if (f_fovx <= z_thresh * M_PI / 180)
+        f_z = 0;
+    else
+    {
+        float f = z_min / ((FIELD_OF_VIEW_DEGREES_MAX - z_thresh) * M_PI / 180);
+        f_z = f * f_fovx - f * z_thresh * M_PI / 180;
+        if (f_z < z_min)
+            f_z = z_min;
+    }
+    return f_z;
+}
+
 static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_viewpoint_t *p_vp)
 {
+    if (!quad->pVertexShaderConstants)
+        return;
+
+#define RAD(d) ((float) ((d) * M_PI / 180.f))
+    float f_fovx = RAD(p_vp->fov);
+    if ( f_fovx > FIELD_OF_VIEW_DEGREES_MAX * M_PI / 180 + 0.001f ||
+         f_fovx < -0.001f )
+        return;
+
+    float f_sar = (float) vd->cfg->display.width / vd->cfg->display.height;
+    float f_teta = RAD(p_vp->yaw) - (float) M_PI_2;
+    float f_phi  = RAD(p_vp->pitch);
+    float f_roll = RAD(p_vp->roll);
+    float f_fovy = UpdateFOVy(f_fovx, f_sar);
+    float f_z = UpdateZ(f_fovx, f_fovy);
+
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mapped;
     hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     if (SUCCEEDED(hr)) {
         VS_PROJECTION_CONST *dst_data = mapped.pData;
-#define RAD(d) ((float) ((d) * M_PI / 180.f))
-        getXRotMatrix(-RAD(p_vp->pitch), dst_data->RotX);
-        getYRotMatrix(-RAD(p_vp->yaw),   dst_data->RotY);
-        getZRotMatrix(-RAD(p_vp->roll),  dst_data->RotZ);
-        getZoomMatrix(SPHERE_RADIUS, dst_data->View); /* FIXME */
-        float sar = (float) vd->cfg->display.width / vd->cfg->display.height;
-        getProjectionMatrix(sar, RAD(p_vp->fov), dst_data->Projection);
-#undef RAD
+        getXRotMatrix(f_phi, dst_data->RotX);
+        getYRotMatrix(f_teta,   dst_data->RotY);
+        getZRotMatrix(f_roll,  dst_data->RotZ);
+        getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->View);
+        getProjectionMatrix(f_sar, f_fovy, dst_data->Projection);
     }
     ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
+#undef RAD
 }
 
 static void CropStagingFormat(vout_display_t *vd, video_format_t *backup_fmt)
@@ -1499,6 +1544,8 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
     sys->picQuad.cropViewport.MinDepth = 0.0f;
     sys->picQuad.cropViewport.MaxDepth = 1.0f;
 
+    SetQuadVSProjection(vd, &sys->picQuad, &vd->cfg->viewpoint);
+
 #ifndef NDEBUG
     msg_Dbg(vd, "picQuad position (%.02f,%.02f) %.02fx%.02f", sys->picQuad.cropViewport.TopLeftX, sys->picQuad.cropViewport.TopLeftY, sys->picQuad.cropViewport.Width, sys->picQuad.cropViewport.Height );
 #endif
@@ -1852,12 +1899,12 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, WORD *triangle_pos)
             unsigned off = (lat * nbLatBands + lon) * 3 * 2;
 
             triangle_pos[off] = first;
-            triangle_pos[off + 1] = second;
-            triangle_pos[off + 2] = first + 1;
+            triangle_pos[off + 1] = first + 1;
+            triangle_pos[off + 2] = second;
 
             triangle_pos[off + 3] = second;
-            triangle_pos[off + 4] = second + 1;
-            triangle_pos[off + 5] = first + 1;
+            triangle_pos[off + 4] = first + 1;
+            triangle_pos[off + 5] = second + 1;
         }
     }
 }
