@@ -291,6 +291,7 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     dec->fmt_out.video = fmt_out;
     dec->fmt_out.video.orientation = dec->fmt_in.video.orientation;
     dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
+    dec->fmt_out.video.pose = dec->fmt_in.video.pose;
     return decoder_UpdateVideoFormat(dec);
 }
 
