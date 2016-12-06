@@ -281,7 +281,7 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         " TexCoord0 = MultiTexCoord0;"
         " TexCoord1 = MultiTexCoord1;"
         " TexCoord2 = MultiTexCoord2;"
-        " gl_Position = OrientationMatrix * ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
+        " gl_Position = ProjectionMatrix * OrientationMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
         "}";
 
     *shader = vgl->CreateShader(GL_VERTEX_SHADER);
