@@ -71,7 +71,6 @@ class CapturePin: public IPin, public IMemInputPin
     CapturePin( vlc_object_t *_p_input, access_sys_t *p_sys,
                 CaptureFilter* _p_filter,
                 AM_MEDIA_TYPE *mt, size_t mt_count );
-    virtual ~CapturePin();
 
     /* IUnknown methods */
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
@@ -112,6 +111,9 @@ class CapturePin: public IPin, public IMemInputPin
     HRESULT CustomGetSamples( std::deque<VLCMediaSample> &external_queue );
 
     AM_MEDIA_TYPE &CustomGetMediaType();
+
+private:
+    virtual ~CapturePin();
 };
 
 /****************************************************************************
@@ -132,7 +134,6 @@ class CaptureFilter : public IBaseFilter
   public:
     CaptureFilter( vlc_object_t *_p_input, access_sys_t *p_sys,
                    AM_MEDIA_TYPE *mt, size_t mt_count );
-    virtual ~CaptureFilter();
 
     /* IUnknown methods */
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
@@ -159,6 +160,9 @@ class CaptureFilter : public IBaseFilter
 
     /* Custom methods */
     ComPtr<CapturePin>& CustomGetPin();
+
+private:
+    virtual ~CaptureFilter();
 };
 
 /****************************************************************************
@@ -175,7 +179,6 @@ class CaptureEnumPins : public IEnumPins
 public:
     CaptureEnumPins( vlc_object_t *_p_input, ComPtr<CaptureFilter> _p_filter,
                      ComPtr<CaptureEnumPins> pEnumPins );
-    virtual ~CaptureEnumPins();
 
     // IUnknown
     STDMETHODIMP QueryInterface( REFIID riid, void **ppv );
@@ -187,6 +190,9 @@ public:
     STDMETHODIMP Skip( ULONG cPins );
     STDMETHODIMP Reset();
     STDMETHODIMP Clone( IEnumPins **ppEnum );
+
+private:
+    virtual ~CaptureEnumPins();
 };
 
 /****************************************************************************
@@ -205,8 +211,6 @@ public:
     CaptureEnumMediaTypes( vlc_object_t *_p_input, ComPtr<CapturePin> _p_pin,
                            CaptureEnumMediaTypes *pEnumMediaTypes );
 
-    virtual ~CaptureEnumMediaTypes();
-
     // IUnknown
     STDMETHODIMP QueryInterface( REFIID riid, void **ppv );
     STDMETHODIMP_(ULONG) AddRef();
@@ -218,4 +222,7 @@ public:
     STDMETHODIMP Skip( ULONG cMediaTypes );
     STDMETHODIMP Reset();
     STDMETHODIMP Clone( IEnumMediaTypes **ppEnum );
+
+private:
+    virtual ~CaptureEnumMediaTypes();
 };
