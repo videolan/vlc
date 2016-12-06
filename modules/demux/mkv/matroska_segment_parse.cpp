@@ -526,6 +526,46 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             /* FIXME: i_display_* allows you to not only set DAR, but also a zoom factor.
                we do not support this atm */
         }
+#if LIBMATROSKA_VERSION >= 0x010406
+        E_CASE( KaxVideoProjection, proj )
+        {
+            debug( vars, "Track Video Projection" ) ;
+
+            vars.level += 1;
+            dispatcher.iterate (proj.begin (), proj.end (), Payload( vars ) );
+            vars.level -= 1;
+        }
+        E_CASE( KaxVideoProjectionType, fint )
+        {
+            switch (static_cast<uint8>( fint ))
+            {
+            case 0:
+                vars.tk->fmt.video.projection_mode = PROJECTION_MODE_RECTANGULAR;
+                break;
+            case 1:
+                vars.tk->fmt.video.projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
+                break;
+            case 2:
+                vars.tk->fmt.video.projection_mode = PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD;
+                break;
+            default:
+                debug( vars, "Track Video Projection %u not supported", static_cast<uint8>( fint ) ) ;
+                break;
+            }
+        }
+        E_CASE( KaxVideoProjectionPoseYaw, pose )
+        {
+            vars.tk->fmt.video.pose.f_yaw_degrees = static_cast<float>( pose );
+        }
+        E_CASE( KaxVideoProjectionPosePitch, pose )
+        {
+            vars.tk->fmt.video.pose.f_pitch_degrees = static_cast<float>( pose );
+        }
+        E_CASE( KaxVideoProjectionPoseRoll, pose )
+        {
+            vars.tk->fmt.video.pose.f_roll_degrees = static_cast<float>( pose );
+        }
+#endif
         E_CASE( KaxVideoFlagInterlaced, fint ) // UNUSED
         {
             debug( vars, "Track Video Interlaced=%u", static_cast<uint8>( fint ) ) ;
