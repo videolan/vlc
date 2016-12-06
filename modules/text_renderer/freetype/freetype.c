@@ -933,19 +933,13 @@ static void FillDefaultStyles( filter_t *p_filter )
     p_sys->p_default_style->psz_monofontname = var_InheritString( p_filter, "freetype-monofont" );
 
     p_sys->p_default_style->i_font_alpha = var_InheritInteger( p_filter,"freetype-opacity" );
-    p_sys->p_default_style->i_font_alpha = VLC_CLIP( p_sys->p_default_style->i_font_alpha, 0, 255 );
     p_sys->p_default_style->i_font_color = var_InheritInteger( p_filter,"freetype-color" );
-    p_sys->p_default_style->i_font_color = VLC_CLIP( p_sys->p_default_style->i_font_color, 0, 0xFFFFFF );
 
     p_sys->p_default_style->i_outline_alpha = var_InheritInteger( p_filter, "freetype-outline-opacity" );
-    p_sys->p_default_style->i_outline_alpha = VLC_CLIP( p_sys->p_default_style->i_outline_alpha, 0, 255 );
     p_sys->p_default_style->i_outline_color = var_InheritInteger( p_filter, "freetype-outline-color" );
-    p_sys->p_default_style->i_outline_color = VLC_CLIP( p_sys->p_default_style->i_outline_color, 0, 0xFFFFFF );
 
     p_sys->p_default_style->i_shadow_alpha = var_InheritInteger( p_filter, "freetype-shadow-opacity" );
-    p_sys->p_default_style->i_shadow_alpha = VLC_CLIP( p_sys->p_default_style->i_shadow_alpha, 0, 255 );
     p_sys->p_default_style->i_shadow_color = var_InheritInteger( p_filter, "freetype-shadow-color" );
-    p_sys->p_default_style->i_shadow_color = VLC_CLIP( p_sys->p_default_style->i_shadow_color, 0, 0xFFFFFF );
 
     p_sys->p_default_style->i_font_size = 0;
     p_sys->p_default_style->i_style_flags |= STYLE_SHADOW;
