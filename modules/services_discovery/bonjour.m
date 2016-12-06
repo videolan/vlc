@@ -207,6 +207,10 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 {
     [_serviceBrowsers makeObjectsPerformSelector:@selector(stop)];
 
+    /* Work around a macOS 10.12 bug, see https://openradar.appspot.com/28943305 */
+    [_serviceBrowsers makeObjectsPerformSelector:@selector(setDelegate:) withObject:nil];
+    [_resolvedNetServices makeObjectsPerformSelector:@selector(setDelegate:) withObject:nil];
+
     for (NSValue *item in _inputItemsForNetServices) {
         if (_isRendererDiscovery) {
             [self removeRawRendererItem:item];
