@@ -356,17 +356,19 @@ static void DeleteDirectShowGraph( vlc_object_t *p_this, access_sys_t *p_sys )
 
     /* Remove filters from graph */
     msg_Dbg( p_this, "DeleteDirectShowGraph: Removing filters" );
-    for( int i = 0; i < p_sys->i_streams; i++ )
+    std::vector<dshow_stream_t*>::iterator it = p_sys->pp_streams.begin();
+    std::vector<dshow_stream_t*>::iterator end = p_sys->pp_streams.end();
+    for( ; it != end; ++it )
     {
         /* RemoveFilter does an undocumented Release()
          * but does not set item to NULL */
         msg_Dbg( p_this, "DeleteDirectShowGraph: Removing capture filter" );
-        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_capture_filter.Get() );
-        p_sys->pp_streams[i]->p_capture_filter.Reset();
+        p_sys->p_graph->RemoveFilter( (*it)->p_capture_filter.Get() );
+        (*it)->p_capture_filter.Reset();
 
         msg_Dbg( p_this, "DeleteDirectShowGraph: Removing device filter" );
-        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_device_filter.Get() );
-        p_sys->pp_streams[i]->p_device_filter.Reset();
+        p_sys->p_graph->RemoveFilter( (*it)->p_device_filter.Get() );
+        (*it)->p_device_filter.Reset();
     }
 
     /* Release directshow objects */
@@ -489,8 +491,6 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
 
     /* Initialize some data */
-    p_sys->i_streams = 0;
-    p_sys->pp_streams = NULL;
     p_sys->i_width = i_width;
     p_sys->i_height = i_height;
     p_sys->i_chroma = i_chroma;
@@ -522,7 +522,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     {
         /* Check if we can handle the demuxing ourselves or need to spawn
          * a demuxer module */
-        dshow_stream_t *p_stream = p_sys->pp_streams[p_sys->i_streams-1];
+        dshow_stream_t *p_stream = *(p_sys->pp_streams.rbegin());
 
         if( p_stream->mt.majortype == MEDIATYPE_Video )
         {
@@ -647,7 +647,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     /* Initialize some data */
     p_sys->i_current_stream = 0;
 
-    if( !p_sys->i_streams ) return VLC_EGENERIC;
+    if( p_sys->pp_streams.empty() ) return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
@@ -680,9 +680,11 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
-    for( int i = 0; i < p_sys->i_streams; i++ )
+    std::vector<dshow_stream_t*>::iterator it = p_sys->pp_streams.begin();
+    std::vector<dshow_stream_t*>::iterator end = p_sys->pp_streams.end();
+    for ( ; it != end; ++it )
     {
-        dshow_stream_t *p_stream = p_sys->pp_streams[i];
+        dshow_stream_t *p_stream = *it;
         es_format_t fmt;
 
         if( p_stream->mt.majortype == MEDIATYPE_Video )
@@ -794,8 +796,7 @@ static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
     /* Uninitialize OLE/COM */
     CoUninitialize();
 
-    for( int i = 0; i < p_sys->i_streams; i++ ) delete p_sys->pp_streams[i];
-    if( p_sys->i_streams ) free( p_sys->pp_streams );
+    vlc_delete_all( p_sys->pp_streams );
 
     vlc_mutex_destroy( &p_sys->lock );
     vlc_cond_destroy( &p_sys->wait );
@@ -950,10 +951,12 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
                        std::string devicename, bool b_audio )
 {
     /* See if device is already opened */
-    for( int i = 0; i < p_sys->i_streams; i++ )
+    std::vector<dshow_stream_t*>::iterator it = p_sys->pp_streams.begin();
+    std::vector<dshow_stream_t*>::iterator end = p_sys->pp_streams.end();
+    for ( ; it != end; ++it )
     {
         if( devicename.size() &&
-            p_sys->pp_streams[i]->devicename == devicename )
+            (*it)->devicename == devicename )
         {
             /* Already opened */
             return VLC_SUCCESS;
@@ -1129,10 +1132,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
             dshow_stream.p_device_filter = p_device_filter;
             dshow_stream.p_capture_filter = p_capture_filter;
 
-            p_sys->pp_streams = (dshow_stream_t **)xrealloc( p_sys->pp_streams,
-                          sizeof(dshow_stream_t *) * (p_sys->i_streams + 1) );
-            p_sys->pp_streams[p_sys->i_streams] = new dshow_stream_t;
-            *p_sys->pp_streams[p_sys->i_streams++] = dshow_stream;
+            p_sys->pp_streams.push_back( new dshow_stream_t(dshow_stream) );
 
             return VLC_SUCCESS;
         }
@@ -1749,9 +1749,11 @@ static int Demux( demux_t *p_demux )
     while ( !i_found_samples )
     {
         /* Try to grab samples from all streams */
-        for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+        std::vector<dshow_stream_t*>::iterator it = p_sys->pp_streams.begin();
+        std::vector<dshow_stream_t*>::iterator end = p_sys->pp_streams.end();
+        for ( ; it != end; ++it )
         {
-            dshow_stream_t *p_stream = p_sys->pp_streams[i_stream];
+            dshow_stream_t *p_stream = *it;
             if( p_stream->p_capture_filter &&
                 p_stream->p_capture_filter->CustomGetPin()
                 ->CustomGetSamples( p_stream->samples_queue ) == S_OK )
@@ -1773,10 +1775,12 @@ static int Demux( demux_t *p_demux )
 
     vlc_mutex_unlock( &p_sys->lock );
 
-    for ( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+    std::vector<dshow_stream_t*>::iterator it = p_sys->pp_streams.begin();
+    std::vector<dshow_stream_t*>::iterator end = p_sys->pp_streams.end();
+    for ( ; it != end; ++it )
     {
         int i_samples;
-        dshow_stream_t *p_stream = p_sys->pp_streams[i_stream];
+        dshow_stream_t *p_stream = *it;
 
         i_samples = p_stream->samples_queue.size();
         while ( i_samples > 0 )

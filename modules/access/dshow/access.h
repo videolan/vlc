@@ -28,6 +28,8 @@
 
 #include <dshow.h>
 
+#include <vector>
+
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
@@ -69,8 +71,7 @@ struct access_sys_t
     CrossbarRoute           crossbar_routes[MAX_CROSSBAR_DEPTH];
 
     /* list of elementary streams */
-    dshow_stream_t **pp_streams;
-    int            i_streams;
+    std::vector<dshow_stream_t*> pp_streams;
     int            i_current_stream;
 
     /* misc properties */
