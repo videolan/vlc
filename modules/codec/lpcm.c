@@ -469,6 +469,20 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         p_block->p_buffer += p_sys->i_header_size + i_padding;
         p_block->i_buffer -= p_sys->i_header_size + i_padding;
 
+        const unsigned block_nb_frames = p_block->i_buffer / ( i_bits * 4 / 8 );
+        const unsigned aout_nb_frames = p_aout_buffer->i_nb_samples
+            / ( p_dec->fmt_out.audio.i_bitspersample / 8 );
+
+        if( block_nb_frames > aout_nb_frames )
+        {
+            msg_Warn( p_dec, "invalid block size" );
+
+            block_Release( p_block );
+            block_Release( p_aout_buffer );
+
+            return NULL;
+        }
+
         switch( p_sys->i_type )
         {
         case LPCM_WIDI:
