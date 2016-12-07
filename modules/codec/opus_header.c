@@ -286,6 +286,9 @@ static int comment_pad(char **comments, size_t *length)
 {
     const unsigned padding = 512; /* default from opus-tools */
 
+    if(SIZE_MAX - *length < padding + 255)
+        return 1;
+
     char *p = *comments;
     /* Make sure there is at least "padding" worth of padding free, and
        round up to the maximum that fits in the current ogg segments. */
