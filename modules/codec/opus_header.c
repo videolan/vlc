@@ -267,9 +267,10 @@ static int comment_add(char **comments, size_t *length, const char *tag,
     size_t val_len = strlen(val);
     size_t len = (*length) + 4 + tag_len + val_len;
 
-    p = realloc(p, len);
-    if (p == NULL)
+    char *reaced = realloc(p, len);
+    if (reaced == NULL)
         return 1;
+    p = reaced;
 
     SetDWLE(p + *length, tag_len + val_len);          /* length of comment */
     if (tag) memcpy(p + *length + 4, tag, tag_len);         /* comment */
@@ -289,9 +290,10 @@ static int comment_pad(char **comments, size_t *length)
     /* Make sure there is at least "padding" worth of padding free, and
        round up to the maximum that fits in the current ogg segments. */
     size_t newlen = ((*length + padding) / 255 + 1) * 255 - 1;
-    p = realloc(p, newlen);
-    if (p == NULL)
+    char *reaced = realloc(p, newlen);
+    if (reaced == NULL)
         return 1;
+    p = reaced;
 
     memset(p + *length, 0, newlen - *length);
     *comments = p;
