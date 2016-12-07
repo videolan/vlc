@@ -371,8 +371,9 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
     int i_ret;
     unsigned i_channels_padding = 0;
-    unsigned i_padding = 0;
+    unsigned i_padding = 0; /* only for AOB */
     aob_group_t p_aob_group[2];
+
     switch( p_sys->i_type )
     {
     case LPCM_VOB:
@@ -816,7 +817,9 @@ static int AobHeader( unsigned *pi_rate,
     if( i_header_size + 3 < LPCM_AOB_HEADER_LEN )
         return VLC_EGENERIC;
 
-    *pi_padding = 3+i_header_size - LPCM_AOB_HEADER_LEN;
+    /* Padding = Total header size - Normal AOB header
+     *         + 3 bytes (1 for continuity counter + 2 for header_size ) */
+    *pi_padding = 3 + i_header_size - LPCM_AOB_HEADER_LEN;
 
     const int i_index_size_g1 = (p_header[6] >> 4) & 0x0f;
     const int i_index_size_g2 = (p_header[6]     ) & 0x0f;
