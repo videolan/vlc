@@ -370,6 +370,51 @@ static ts_standards_e ProbePMTStandard( const dvbpsi_pmt_t *p_dvbpsipmt )
     return TS_STANDARD_AUTO;
 }
 
+static void SetupAudioExtendedDescriptors( demux_t *p_demux, ts_pes_es_t *p_es,
+                                           const dvbpsi_pmt_es_t *p_dvbpsies )
+{
+    if( p_demux->p_sys->standard == TS_STANDARD_AUTO ||
+        p_demux->p_sys->standard == TS_STANDARD_DVB )
+    {
+        const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x7F );
+        if( p_dr && p_dr->i_length > 1 )
+        {
+            static const char *editorial_classification_coding[] = {
+                N_("Main audio"),
+                N_("Audio description for the visually impaired"),
+                N_("Clean audio for the hearing impaired"),
+                N_("Spoken subtitles for the visually impaired"),
+            };
+
+            uint8_t i_audio_type = (p_dr->p_data[1] & 0x7F) >> 2;
+
+            if( i_audio_type < ARRAY_SIZE(editorial_classification_coding) )
+            {
+                free( p_es->fmt.psz_description );
+                p_es->fmt.psz_description = strdup(editorial_classification_coding[i_audio_type]);
+            }
+
+            if( i_audio_type == 0x00 /* Main Audio */ )
+                p_es->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
+
+            if( (p_dr->p_data[1] & 0x80) == 0x00 ) /* Split mixed */
+                p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+
+            if( (p_dr->p_data[1] & 0x01) && p_dr->i_length >= 5 )
+            {
+                free( p_es->fmt.psz_language );
+                p_es->fmt.psz_language = malloc( 4 );
+                if( p_es->fmt.psz_language )
+                {
+                    memcpy( p_es->fmt.psz_language, &p_dr->p_data[2], 3 );
+                    p_es->fmt.psz_language[3] = 0;
+                    msg_Dbg( p_demux, "      found language: %s", p_es->fmt.psz_language );
+                }
+            }
+        }
+    }
+}
+
 static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_t *p_pes,
                                       const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
@@ -1402,6 +1447,11 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
           p_pes->p_es->fmt.i_codec != VLC_CODEC_TELETEXT ) )
     {
         PMTParseEsIso639( p_demux, p_pes->p_es, p_dvbpsies );
+    }
+
+    if( p_pes->p_es->fmt.i_cat == AUDIO_ES )
+    {
+        SetupAudioExtendedDescriptors( p_demux, p_pes->p_es, p_dvbpsies );
     }
 
     /* Set Groups / ID */
