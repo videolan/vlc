@@ -377,7 +377,7 @@ static void SetupAudioExtendedDescriptors( demux_t *p_demux, ts_pes_es_t *p_es,
         p_demux->p_sys->standard == TS_STANDARD_DVB )
     {
         const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x7F );
-        if( p_dr && p_dr->i_length > 1 )
+        if( p_dr && p_dr->i_length > 1 && p_dr->p_data[0] == 0x06 /* Tag extension */ )
         {
             static const char *editorial_classification_coding[] = {
                 N_("Main audio"),
@@ -942,7 +942,8 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->i_codec = VLC_CODEC_A52;
     }
-    else if( (desc = PMTEsFindDescriptor( p_dvbpsies, 0x7f ) ) && desc->i_length >= 2 &&
+    else if( (desc = PMTEsFindDescriptor( p_dvbpsies, 0x7f ) ) &&
+             desc->i_length >= 2 && desc->p_data[0] == 0x80 &&
               PMTEsHasRegistration(p_demux, p_dvbpsies, "Opus"))
     {
         OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
