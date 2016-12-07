@@ -901,6 +901,27 @@ explicit_config_too_short:
     msg_Err(demux, "Opus descriptor too short");
 }
 
+static void PMTSetupEs0x05PrivateData( demux_t *p_demux, ts_pes_es_t *p_es,
+                                       const dvbpsi_pmt_es_t *p_dvbpsies )
+{
+    VLC_UNUSED(p_es);
+    if( p_demux->p_sys->standard == TS_STANDARD_DVB ||
+        p_demux->p_sys->standard == TS_STANDARD_AUTO )
+    {
+        dvbpsi_descriptor_t *p_ait_dr = PMTEsFindDescriptor( p_dvbpsies, 0x6F );
+        if( p_ait_dr )
+        {
+            uint8_t *p_data = p_ait_dr->p_data;
+            for( uint8_t i_data = p_ait_dr->i_length; i_data >= 3; i_data -= 3, p_data += 3 )
+            {
+                uint16_t i_app_type = ((p_data[0] & 0x7F) << 8) | p_data[1];
+                msg_Dbg( p_demux, "      - Application type 0x%"PRIx16" version %"PRIu8,
+                         i_app_type, p_data[2] & 0x1F);
+            }
+        }
+    }
+}
+
 static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
                             const dvbpsi_pmt_es_t *p_dvbpsies )
 {
@@ -1398,6 +1419,7 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         {
         case 0x05: /* Private data in sections */
             p_pes->transport = TS_TRANSPORT_SECTIONS;
+            PMTSetupEs0x05PrivateData( p_demux, p_pes->p_es, p_dvbpsies );
             break;
         case 0x06:
             /* Handle PES private data */
