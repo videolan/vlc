@@ -240,10 +240,10 @@ static char *comment_init(size_t *length, const char *vendor)
     /*The 'vendor' field should be the actual encoding library used.*/
     if (!vendor)
         vendor = "unknown";
-    int vendor_length = strlen(vendor);
+    size_t vendor_length = strlen(vendor);
 
-    int user_comment_list_length = 0;
-    int len = 8 + 4 + vendor_length + 4;
+    size_t user_comment_list_length = 0;
+    size_t len = 8 + 4 + vendor_length + 4;
     char *p = malloc(len);
     if (p == NULL)
         return NULL;
@@ -261,7 +261,7 @@ static int comment_add(char **comments, size_t *length, const char *tag,
                        const char *val)
 {
     char *p = *comments;
-    int vendor_length = GetDWLE(p + 8);
+    uint32_t vendor_length = GetDWLE(p + 8);
     size_t user_comment_list_length = GetDWLE(p + 8 + 4 + vendor_length);
     size_t tag_len = (tag ? strlen(tag) : 0);
     size_t val_len = strlen(val);
