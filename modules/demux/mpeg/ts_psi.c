@@ -1165,22 +1165,21 @@ static bool PMTSetupEsRegistration( demux_t *p_demux, ts_pes_es_t *p_es,
     return false;
 }
 
-static char *GetAudioTypeDesc(demux_t *p_demux, int type)
+static char *GetIso639AudioTypeDesc( uint8_t type )
 {
     static const char *audio_type[] = {
-        NULL,
+        /* "Main audio", */
         N_("clean effects"),
         N_("hearing impaired"),
         N_("visual impaired commentary"),
     };
 
-    if (type < 0 || type > 3)
-        msg_Dbg( p_demux, "unknown audio type: %d", type);
-    else if (type > 0)
-        return strdup(audio_type[type]);
+    if ( type == 0 || type >= ARRAY_SIZE(audio_type) )
+        return NULL;
 
-    return NULL;
+    return strdup( audio_type[ --type ] );
 }
+
 static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
                               const dvbpsi_pmt_es_t *p_dvbpsies )
 {
@@ -1197,7 +1196,6 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
         return;
     }
 
-#if defined(DR_0A_API_VER) && (DR_0A_API_VER >= 2)
     p_es->fmt.psz_language = malloc( 4 );
     if( p_es->fmt.psz_language )
     {
@@ -1205,9 +1203,10 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
         p_es->fmt.psz_language[3] = 0;
         msg_Dbg( p_demux, "      found language: %s", p_es->fmt.psz_language);
     }
-    int type = p_decoded->code[0].i_audio_type;
-    p_es->fmt.psz_description = GetAudioTypeDesc(p_demux, type);
-    if (type == 0)
+
+    uint8_t type = p_decoded->code[0].i_audio_type;
+    p_es->fmt.psz_description = GetIso639AudioTypeDesc( type );
+    if (type == 0x00) /* Undefined */
         p_es->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1; // prioritize normal audio tracks
 
     p_es->fmt.i_extra_languages = p_decoded->i_code_count-1;
@@ -1219,26 +1218,15 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
     {
         for( unsigned i = 0; i < p_es->fmt.i_extra_languages; i++ )
         {
-            p_es->fmt.p_extra_languages[i].psz_language = malloc(4);
-            if( p_es->fmt.p_extra_languages[i].psz_language )
+            extra_languages_t *p_lang = &p_es->fmt.p_extra_languages[i];
+            if( (p_lang->psz_language = malloc(4)) )
             {
-                memcpy( p_es->fmt.p_extra_languages[i].psz_language,
-                    p_decoded->code[i+1].iso_639_code, 3 );
-                p_es->fmt.p_extra_languages[i].psz_language[3] = '\0';
+                memcpy( p_lang->psz_language, p_decoded->code[i+1].iso_639_code, 3 );
+                p_lang->psz_language[3] = '\0';
             }
-            int type = p_decoded->code[i].i_audio_type;
-            p_es->fmt.p_extra_languages[i].psz_description = GetAudioTypeDesc(p_demux, type);
+            p_lang->psz_description = GetIso639AudioTypeDesc( p_decoded->code[i].i_audio_type );
         }
     }
-#else
-    p_es->fmt.psz_language = malloc( 4 );
-    if( p_es->fmt.psz_language )
-    {
-        memcpy( p_es->fmt.psz_language,
-                p_decoded->i_iso_639_code, 3 );
-        p_es->fmt.psz_language[3] = 0;
-    }
-#endif
 }
 
 static void PIDFillFormat( demux_t *p_demux, ts_pes_t *p_pes,
