@@ -27,6 +27,7 @@
 #include <assert.h>
 
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
+typedef ANativeWindow* (*ptr_ANativeWindow_fromSurfaceTexture)(JNIEnv*, jobject);
 typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
 
 struct AWindowHandler
@@ -52,15 +53,37 @@ struct AWindowHandler
     } event;
 };
 
+struct SurfaceTexture
+{
+    JavaVM *p_jvm;
+
+    ptr_ANativeWindow_fromSurface pf_winFromSurface;
+    ptr_ANativeWindow_release pf_winRelease;
+
+    jobject thiz;
+    jobject jsurface;
+    ANativeWindow *p_anw;
+
+    jfloatArray jtransform_mtx_array;
+    jfloat *jtransform_mtx;
+};
+
 static struct
 {
     struct {
+        jclass clazz;
         jmethodID getVideoSurface;
         jmethodID getSubtitlesSurface;
         jmethodID setCallback;
         jmethodID setBuffersGeometry;
         jmethodID setWindowLayout;
     } AndroidNativeWindow;
+    struct {
+        jmethodID create;
+        jmethodID release;
+        jmethodID waitAndUpdateTexImage;
+        jmethodID getSurface;
+    } SurfaceTextureThread;
 } jfields;
 
 /*
@@ -401,29 +424,57 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
     if (i_init_state != -1)
         goto end;
 
-#define CHECK_EXCEPTION(what) do { \
+#define CHECK_EXCEPTION(what, critical) do { \
     if( (*env)->ExceptionCheck(env) ) \
     { \
         msg_Err(p_obj, "%s failed", what); \
         (*env)->ExceptionClear(env); \
-        i_init_state = 0; \
-        goto end; \
+        if (critical) { \
+            i_init_state = 0; \
+            goto end; \
+        } \
     } \
 } while( 0 )
-#define GET_METHOD(id, str, args) do { \
-    jfields.AndroidNativeWindow.id = (*env)->GetMethodID(env, clazz, (str), (args)); \
-    CHECK_EXCEPTION("GetMethodID("str")"); \
+#define GET_METHOD(id, str, args, critical) do { \
+    jfields.id = (*env)->GetMethodID(env, clazz, (str), (args)); \
+    CHECK_EXCEPTION("GetMethodID("str")", critical); \
+} while( 0 )
+#define GET_SMETHOD(id, str, args, critical) do { \
+    jfields.id = (*env)->GetStaticMethodID(env, clazz, (str), (args)); \
+    CHECK_EXCEPTION("GetMethodID("str")", critical); \
 } while( 0 )
 
     clazz = (*env)->GetObjectClass(env, jobj);
-    CHECK_EXCEPTION("AndroidNativeWindow clazz");
-    GET_METHOD(getVideoSurface, "getVideoSurface", "()Landroid/view/Surface;");
-    GET_METHOD(getSubtitlesSurface, "getSubtitlesSurface", "()Landroid/view/Surface;");
-    GET_METHOD(setCallback, "setCallback", "(J)Z");
-    GET_METHOD(setBuffersGeometry, "setBuffersGeometry", "(Landroid/view/Surface;III)Z");
-    GET_METHOD(setWindowLayout, "setWindowLayout", "(IIIIII)V");
-#undef CHECK_EXCEPTION
-#undef GET_METHOD
+    CHECK_EXCEPTION("AndroidNativeWindow clazz", true);
+    GET_METHOD(AndroidNativeWindow.getVideoSurface,
+               "getVideoSurface", "()Landroid/view/Surface;", true);
+    GET_METHOD(AndroidNativeWindow.getSubtitlesSurface,
+               "getSubtitlesSurface", "()Landroid/view/Surface;", true);
+    GET_METHOD(AndroidNativeWindow.setCallback,
+               "setCallback", "(J)Z", true);
+    GET_METHOD(AndroidNativeWindow.setBuffersGeometry,
+               "setBuffersGeometry", "(Landroid/view/Surface;III)Z", true);
+    GET_METHOD(AndroidNativeWindow.setWindowLayout,
+               "setWindowLayout", "(IIIIII)V", true);
+
+    GET_SMETHOD(SurfaceTextureThread.create,
+                "SurfaceTextureThread_create",
+                "(I)Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;", false);
+    if (jfields.SurfaceTextureThread.create != NULL)
+    {
+        GET_SMETHOD(SurfaceTextureThread.release,
+                    "SurfaceTextureThread_release",
+                    "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;)V",
+                    true);
+        GET_SMETHOD(SurfaceTextureThread.waitAndUpdateTexImage,
+                    "SurfaceTextureThread_waitAndUpdateTexImage",
+                    "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;[F)Z",
+                    true);
+        GET_SMETHOD(SurfaceTextureThread.getSurface,
+                    "SurfaceTextureThread_getSurface",
+                    "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;)"
+                    "Landroid/view/Surface;", true);
+    }
 
     if ((*env)->RegisterNatives(env, clazz, jni_callbacks, 2) < 0)
     {
@@ -431,7 +482,11 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
         i_init_state = 0;
         goto end;
     }
+    jfields.AndroidNativeWindow.clazz = (*env)->NewGlobalRef(env, clazz);
     (*env)->DeleteLocalRef(env, clazz);
+
+#undef GET_METHOD
+#undef CHECK_EXCEPTION
 
     i_init_state = 1;
     msg_Dbg(p_obj, "InitJNIFields success");
@@ -443,8 +498,12 @@ end:
     return ret;
 }
 
-#define JNI_CALL(what, method, ...) \
+#define JNI_CALL(what, obj, method, ...) \
+    (*p_env)->what(p_env, obj, jfields.method, ##__VA_ARGS__)
+#define JNI_ANWCALL(what, method, ...) \
     (*p_env)->what(p_env, p_awh->jobj, jfields.AndroidNativeWindow.method, ##__VA_ARGS__)
+#define JNI_STEXCALL(what, method, ...) \
+    (*p_env)->what(p_env, jfields.AndroidNativeWindow.clazz, jfields.SurfaceTextureThread.method, ##__VA_ARGS__)
 
 static JNIEnv*
 AWindowHandler_getEnv(AWindowHandler *p_awh)
@@ -486,8 +545,8 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
     LoadNativeWindowAPI(p_awh);
     p_awh->wnd = wnd;
     p_awh->event.cb = *p_events;
-    p_awh->event.b_registered = JNI_CALL(CallBooleanMethod, setCallback,
-                                         (jlong)(intptr_t)p_awh);
+    p_awh->event.b_registered = JNI_ANWCALL(CallBooleanMethod, setCallback,
+                                            (jlong)(intptr_t)p_awh);
 
     return p_awh;
 }
@@ -537,7 +596,7 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
     if (p_env)
     {
         if (p_awh->event.b_registered)
-            JNI_CALL(CallBooleanMethod, setCallback, (jlong)0LL);
+            JNI_ANWCALL(CallBooleanMethod, setCallback, (jlong)0LL);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video,
                                                false);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles,
@@ -564,9 +623,9 @@ WindowHandler_NewSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
     jobject jsurface;
 
     if (id == AWindow_Video)
-        jsurface = JNI_CALL(CallObjectMethod, getVideoSurface);
+        jsurface = JNI_ANWCALL(CallObjectMethod, getVideoSurface);
     else
-        jsurface = JNI_CALL(CallObjectMethod, getSubtitlesSurface);
+        jsurface = JNI_ANWCALL(CallObjectMethod, getSubtitlesSurface);
     if (!jsurface)
         return VLC_EGENERIC;
 
@@ -659,9 +718,9 @@ AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
     if (!jsurf)
         return VLC_EGENERIC;
 
-    return JNI_CALL(CallBooleanMethod, setBuffersGeometry,
-                    jsurf, i_width, i_height, i_format) ? VLC_SUCCESS
-                                                        : VLC_EGENERIC;
+    return JNI_ANWCALL(CallBooleanMethod, setBuffersGeometry,
+                       jsurf, i_width, i_height, i_format) ? VLC_SUCCESS
+                                                           : VLC_EGENERIC;
 }
 
 int
@@ -674,7 +733,157 @@ AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
     if (!p_env)
         return VLC_EGENERIC;
 
-    JNI_CALL(CallVoidMethod, setWindowLayout, i_width, i_height,
-             i_visible_width,i_visible_height, i_sar_num, i_sar_den);
+    JNI_ANWCALL(CallVoidMethod, setWindowLayout, i_width, i_height,
+                i_visible_width,i_visible_height, i_sar_num, i_sar_den);
     return VLC_SUCCESS;
+}
+
+SurfaceTexture *
+SurfaceTexture_create(vlc_object_t *p_obj, int i_tex_name)
+{
+    if (jfields.SurfaceTextureThread.create == NULL)
+        return NULL;
+
+    JavaVM *p_jvm = var_InheritAddress(p_obj, "android-jvm");
+    if (p_jvm == NULL)
+        return NULL;
+
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return NULL;
+
+    SurfaceTexture *p_stex = malloc(sizeof(SurfaceTexture));
+    if (p_stex == NULL)
+        return NULL;
+
+    /* At this point, libandroid.so should be already be loaded */
+    p_stex->pf_winFromSurface = dlsym(RTLD_DEFAULT, "ANativeWindow_fromSurface");
+    p_stex->pf_winRelease = dlsym(RTLD_DEFAULT, "ANativeWindow_release");
+    if (p_stex->pf_winFromSurface == NULL || p_stex->pf_winRelease == NULL)
+    {
+        free(p_stex);
+        return NULL;
+    }
+
+    p_stex->p_jvm = p_jvm;
+    p_stex->p_anw = NULL;
+    p_stex->jsurface = NULL;
+
+    jfloatArray jarray = (*p_env)->NewFloatArray(p_env, 16);
+    if ((*p_env)->ExceptionCheck(p_env))
+    {
+        (*p_env)->ExceptionClear(p_env);
+        goto error;
+    }
+    p_stex->jtransform_mtx_array = (*p_env)->NewGlobalRef(p_env, jarray);
+    (*p_env)->DeleteLocalRef(p_env, jarray);
+    p_stex->jtransform_mtx = NULL;
+
+    jobject thiz = JNI_STEXCALL(CallStaticObjectMethod, create, i_tex_name);
+    if ((*p_env)->ExceptionCheck(p_env))
+    {
+        (*p_env)->ExceptionClear(p_env);
+        (*p_env)->DeleteGlobalRef(p_env, p_stex->jtransform_mtx_array);
+        goto error;
+    }
+    p_stex->thiz = (*p_env)->NewGlobalRef(p_env, thiz);
+    (*p_env)->DeleteLocalRef(p_env, thiz);
+
+    return p_stex;
+
+error:
+    free(p_stex);
+    return NULL;
+}
+
+void
+SurfaceTexture_release(SurfaceTexture *p_stex)
+{
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_stex->p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return;
+
+    if (p_stex->p_anw != NULL)
+        p_stex->pf_winRelease(p_stex->p_anw);
+
+    if (p_stex->jsurface != NULL)
+        (*p_env)->DeleteGlobalRef(p_env, p_stex->jsurface);
+
+    JNI_STEXCALL(CallStaticVoidMethod, release, p_stex->thiz);
+    (*p_env)->DeleteGlobalRef(p_env, p_stex->thiz);
+
+    if (p_stex->jtransform_mtx != NULL)
+        (*p_env)->ReleaseFloatArrayElements(p_env, p_stex->jtransform_mtx_array,
+                                            p_stex->jtransform_mtx,
+                                            JNI_ABORT);
+    (*p_env)->DeleteGlobalRef(p_env, p_stex->jtransform_mtx_array);
+
+    free(p_stex);
+}
+
+jobject
+SurfaceTexture_getSurface(SurfaceTexture *p_stex)
+{
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_stex->p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return NULL;
+
+    if (p_stex->jsurface == NULL)
+    {
+        jobject jsurface =
+            JNI_STEXCALL(CallStaticObjectMethod, getSurface, p_stex->thiz);
+        if ((*p_env)->ExceptionCheck(p_env))
+        {
+            (*p_env)->ExceptionClear(p_env);
+            return NULL;
+        }
+        p_stex->jsurface = (*p_env)->NewGlobalRef(p_env, jsurface);
+        (*p_env)->DeleteLocalRef(p_env, jsurface);
+    }
+    return p_stex->jsurface;
+}
+
+ANativeWindow *
+SurfaceTexture_getANativeWindow(SurfaceTexture *p_stex)
+{
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_stex->p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return NULL;
+
+    if (p_stex->p_anw == NULL)
+    {
+        jobject jsurface = SurfaceTexture_getSurface(p_stex);
+        if (jsurface != NULL)
+            p_stex->p_anw = p_stex->pf_winFromSurface(p_env, jsurface);
+    }
+    return p_stex->p_anw;
+}
+
+int
+SurfaceTexture_waitAndUpdateTexImage(SurfaceTexture *p_stex,
+                                     const float **pp_transform_mtx)
+{
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_stex->p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return VLC_EGENERIC;
+
+    if (p_stex->jtransform_mtx != NULL)
+        (*p_env)->ReleaseFloatArrayElements(p_env, p_stex->jtransform_mtx_array,
+                                            p_stex->jtransform_mtx,
+                                            JNI_ABORT);
+
+    bool ret = JNI_STEXCALL(CallStaticBooleanMethod, waitAndUpdateTexImage,
+                            p_stex->thiz, p_stex->jtransform_mtx_array);
+    if (ret)
+    {
+        p_stex->jtransform_mtx = (*p_env)->GetFloatArrayElements(p_env,
+                                            p_stex->jtransform_mtx_array, NULL);
+        *pp_transform_mtx = p_stex->jtransform_mtx;
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        p_stex->jtransform_mtx = NULL;
+        return VLC_EGENERIC;
+    }
 }

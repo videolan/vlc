@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 
 typedef struct AWindowHandler AWindowHandler;
+typedef struct SurfaceTexture SurfaceTexture;
 
 enum AWindow_ID {
     AWindow_Video,
@@ -167,3 +168,51 @@ int AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
                                    int i_width, int i_height,
                                    int i_visible_width, int i_visible_height,
                                    int i_sar_num, int i_sar_den);
+
+/**
+ * Construct a new Java SurfaceTexture to stream images to a given OpenGL
+ * texture
+ *
+ * See SurfaceTexture Android documentation.
+ */
+SurfaceTexture *
+SurfaceTexture_create(vlc_object_t *p_obj, int tex_name);
+
+/**
+ * Release a SurfaceTexture
+ */
+void
+SurfaceTexture_release(SurfaceTexture *p_stex);
+
+/**
+ * Get a Java Surface from the SurfaceTexture
+ *
+ * This object can be used with mediacodec_jni.
+ */
+jobject
+SurfaceTexture_getSurface(SurfaceTexture *p_stex);
+
+/**
+ * Get a ANativeWindow from the SurfaceTexture
+ *
+ * This pointer can be used with mediacodec_ndk.
+ */
+ANativeWindow *
+SurfaceTexture_getANativeWindow(SurfaceTexture *p_stex);
+
+/**
+ * Wait for a new frame and update it
+ *
+ * This function must be called from the OpenGL thread. This is an helper that
+ * waits for a new frame via the Java SurfaceTexture.OnFrameAvailableListener
+ * listener and update the frame via the SurfaceTexture.updateTexImage()
+ * method.
+ *
+ * \param pp_transform_mtx the transform matrix fetched from
+ * SurfaceTexture.getTransformMatrix() after the
+ * SurfaceTexture.updateTexImage() call
+ * \return VLC_SUCCESS or a VLC error
+ */
+int
+SurfaceTexture_waitAndUpdateTexImage(SurfaceTexture *p_stex,
+                                     const float **pp_transform_mtx);
