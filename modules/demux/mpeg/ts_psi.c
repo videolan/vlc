@@ -1202,8 +1202,11 @@ static bool PMTSetupEsRegistration( demux_t *p_demux, ts_pes_es_t *p_es,
         {
             p_fmt->i_cat   = p_regs[i].i_cat;
             p_fmt->i_codec = p_regs[i].i_codec;
-            if (p_dvbpsies->i_type == 0x87)
+
+            /* System A AC3 extension, see ATSC A/52 Annex G.2 */
+            if ( p_regs[i].i_codec == VLC_CODEC_A52 && p_dvbpsies->i_type == 0x87 )
                 p_fmt->i_codec = VLC_CODEC_EAC3;
+
             return true;
         }
     }
