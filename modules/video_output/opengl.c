@@ -670,10 +670,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             continue;
 
         char *infolog = malloc(infoLength);
-        int charsWritten;
-        vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten, infolog);
-        fprintf(stderr, "shader %d: %s\n", j, infolog);
-        free(infolog);
+        if (infolog != NULL)
+        {
+            int charsWritten;
+            vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten,
+                                  infolog);
+            fprintf(stderr, "shader %d: %s\n", j, infolog);
+            free(infolog);
+        }
     }
 
     /* YUV/XYZ & Vertex shaders */
@@ -695,10 +699,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         if (infoLength <= 1)
             continue;
         char *infolog = malloc(infoLength);
-        int charsWritten;
-        vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten, infolog);
-        fprintf(stderr, "shader program %d: %s\n", i, infolog);
-        free(infolog);
+        if (infolog != NULL)
+        {
+            int charsWritten;
+            vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten,
+                                   infolog);
+            fprintf(stderr, "shader program %d: %s\n", i, infolog);
+            free(infolog);
+        }
 
         /* If there is some message, better to check linking is ok */
         GLint link_status = GL_TRUE;
