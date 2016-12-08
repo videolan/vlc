@@ -402,12 +402,18 @@ int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const
     data[1] = (unsigned char *) comments;
     size[1] = comments_length;
 
+    *i_extra = 0;
+    *p_extra = NULL;
+
     for (unsigned i = 0; i < ARRAY_SIZE(data); ++i)
+    {
         if (xiph_AppendHeaders(i_extra, (void **) p_extra, size[i], data[i]))
         {
             *i_extra = 0;
+            free(*p_extra);
             *p_extra = NULL;
         }
+    }
 
     return 0;
 }
