@@ -376,7 +376,7 @@ int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const
     const int packet_size = opus_header_to_packet(header, header_data,
                                                   sizeof(header_data));
 
-    unsigned char *data[2];
+    const unsigned char *data[2];
     size_t size[2];
 
     data[0] = header_data;
@@ -414,6 +414,8 @@ int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const
             *p_extra = NULL;
         }
     }
+
+    free(comments);
 
     return 0;
 }
