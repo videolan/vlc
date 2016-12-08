@@ -139,11 +139,18 @@ struct vout_display_opengl_t {
 
     picture_pool_t *pool;
 
-    /* index 0 for normal and 1 for subtitle overlay */
+    /* One YUV program and/or one RGBA program (for subpics) */
     GLuint     program[2];
-    GLint      shader[3]; //3. is for the common vertex shader
+    /* One YUV fragment shader and/or one RGBA fragment shader and
+     * one vertex shader */
+    GLint      shader[3];
     int        local_count;
     GLfloat    local_value[16];
+
+    /* Index of main picture program */
+    unsigned   program_idx;
+    /* Index of subpicture program */
+    unsigned   program_sub_idx;
 
     GLuint vertex_buffer_object;
     GLuint index_buffer_object;
@@ -582,7 +589,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->tex_internal = GL_RGBA;
     vgl->tex_type     = GL_UNSIGNED_BYTE;
     /* Use YUV if possible and needed */
-    bool need_fs_xyz = false;
     float yuv_range_correction = 1.0;
 
     if (max_texture_units >= 3 && vlc_fourcc_IsYUV(fmt->i_chroma)) {
@@ -617,7 +623,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     if (fmt->i_chroma == VLC_CODEC_XYZ12) {
-        need_fs_xyz       = true;
         vgl->fmt          = *fmt;
         vgl->fmt.i_chroma = VLC_CODEC_XYZ12;
         vgl->tex_format   = GL_RGB;
@@ -648,17 +653,31 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[1] =
     vgl->shader[2] = -1;
     vgl->local_count = 0;
-    if (need_fs_xyz)
-        BuildXYZFragmentShader(vgl, &vgl->shader[0]);
-    else
-        BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
-                               vgl->local_value, fmt, yuv_range_correction);
+    unsigned nb_shaders = 0;
+    int vertex_shader_idx = -1, fragment_shader_idx = -1,
+        rgba_fragment_shader_idx = -1;
 
-    BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
-    BuildVertexShader(vgl, &vgl->shader[2]);
+    if (vgl->fmt.i_chroma == VLC_CODEC_XYZ12)
+    {
+        fragment_shader_idx = nb_shaders++;
+        BuildXYZFragmentShader(vgl, &vgl->shader[fragment_shader_idx]);
+    }
+    else if (vlc_fourcc_IsYUV(vgl->fmt.i_chroma))
+    {
+        fragment_shader_idx = nb_shaders++;
+        BuildYUVFragmentShader(vgl, &vgl->shader[fragment_shader_idx],
+                               &vgl->local_count, vgl->local_value, fmt,
+                               yuv_range_correction);
+    }
+
+    rgba_fragment_shader_idx = nb_shaders++;
+    BuildRGBAFragmentShader(vgl, &vgl->shader[rgba_fragment_shader_idx]);
+
+    vertex_shader_idx = nb_shaders++;
+    BuildVertexShader(vgl, &vgl->shader[vertex_shader_idx]);
 
     /* Check shaders messages */
-    for (unsigned j = 0; j < 3; j++) {
+    for (unsigned j = 0; j < nb_shaders; j++) {
         int infoLength;
         vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
@@ -674,21 +693,35 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             free(infolog);
         }
     }
+    assert(vertex_shader_idx != -1 && rgba_fragment_shader_idx != -1);
+
+    unsigned nb_programs = 0;
+    GLuint program;
+    int program_idx = -1, rgba_program_idx = -1;
 
     /* YUV/XYZ & Vertex shaders */
-    vgl->program[0] = vgl->CreateProgram();
-    vgl->AttachShader(vgl->program[0], vgl->shader[0]);
-    vgl->AttachShader(vgl->program[0], vgl->shader[2]);
-    vgl->LinkProgram(vgl->program[0]);
+    if (fragment_shader_idx != -1)
+    {
+        program_idx = nb_programs++;
+
+        program = vgl->program[program_idx] = vgl->CreateProgram();
+        vgl->AttachShader(program, vgl->shader[fragment_shader_idx]);
+        vgl->AttachShader(program, vgl->shader[vertex_shader_idx]);
+        vgl->LinkProgram(program);
+    }
 
     /* RGB & Vertex shaders */
-    vgl->program[1] = vgl->CreateProgram();
-    vgl->AttachShader(vgl->program[1], vgl->shader[1]);
-    vgl->AttachShader(vgl->program[1], vgl->shader[2]);
-    vgl->LinkProgram(vgl->program[1]);
+    rgba_program_idx = nb_programs++;
+    program = vgl->program[rgba_program_idx] = vgl->CreateProgram();
+    vgl->AttachShader(program, vgl->shader[rgba_fragment_shader_idx]);
+    vgl->AttachShader(program, vgl->shader[vertex_shader_idx]);
+    vgl->LinkProgram(program);
+
+    vgl->program_idx = program_idx != -1 ? program_idx : rgba_program_idx;
+    vgl->program_sub_idx = rgba_program_idx;
 
     /* Check program messages */
-    for (GLuint i = 0; i < 2; i++) {
+    for (GLuint i = 0; i < nb_programs; i++) {
         int infoLength = 0;
         vgl->GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
@@ -772,9 +805,9 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     }
     free(vgl->region);
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 2 && vgl->program[i] != 0; i++)
         vgl->DeleteProgram(vgl->program[i]);
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3 && vgl->shader[i] != 0; i++)
         vgl->DeleteShader(vgl->shader[i]);
     vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->DeleteBuffers(1, &vgl->index_buffer_object);
@@ -1515,22 +1548,26 @@ static int BuildRectangle(unsigned nbPlanes,
 static void DrawWithShaders(vout_display_opengl_t *vgl,
                             const float *left, const float *top,
                             const float *right, const float *bottom,
-                            int program)
+                            unsigned int program_idx)
 {
-    vgl->UseProgram(vgl->program[program]);
-    if (program == 0) {
+    GLuint program = vgl->program[program_idx];
+    vgl->UseProgram(program);
+    if (vlc_fourcc_IsYUV(vgl->fmt.i_chroma)
+     || vgl->fmt.i_chroma == VLC_CODEC_XYZ12) { /* FIXME: ugly */
         if (vgl->chroma->plane_count == 3) {
-            vgl->Uniform4fv(vgl->GetUniformLocation(vgl->program[0], "Coefficient"), 4, vgl->local_value);
-            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
-            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture1"), 1);
-            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture2"), 2);
+            vgl->Uniform4fv(vgl->GetUniformLocation(program,
+                            "Coefficient"), 4, vgl->local_value);
+            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture0"), 0);
+            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture1"), 1);
+            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture2"), 2);
         }
         else if (vgl->chroma->plane_count == 1) {
-            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
+            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture0"), 0);
         }
     } else {
-        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture0"), 0);
-        vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, 1.0f);
+        vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture0"), 0);
+        vgl->Uniform4f(vgl->GetUniformLocation(program, "FillColor"),
+                       1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     GLfloat *vertexCoord, *textureCoord;
@@ -1604,8 +1641,9 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
 
         char attribute[20];
         snprintf(attribute, sizeof(attribute), "MultiTexCoord%1d", j);
-        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], attribute));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], attribute), 2, GL_FLOAT, 0, 0, 0);
+        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(program, attribute));
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(program, attribute), 2,
+                                 GL_FLOAT, 0, 0, 0);
     }
     free(textureCoord);
     glActiveTexture(GL_TEXTURE0 + 0);
@@ -1617,15 +1655,23 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
     vgl->BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort), indices, GL_STATIC_DRAW);
     free(indices);
-    vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"));
-    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 3, GL_FLOAT, 0, 0, 0);
+    vgl->EnableVertexAttribArray(vgl->GetAttribLocation(program,
+                                 "VertexPosition"));
+    vgl->VertexAttribPointer(vgl->GetAttribLocation(program, "VertexPosition"),
+                             3, GL_FLOAT, 0, 0, 0);
 
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "OrientationMatrix"), 1, GL_FALSE, orientationMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ProjectionMatrix"), 1, GL_FALSE, projectionMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ZRotMatrix"), 1, GL_FALSE, zRotMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "YRotMatrix"), 1, GL_FALSE, yRotMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "XRotMatrix"), 1, GL_FALSE, xRotMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ZoomMatrix"), 1, GL_FALSE, zoomMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "OrientationMatrix"),
+                          1, GL_FALSE, orientationMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "ProjectionMatrix"),
+                          1, GL_FALSE, projectionMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "ZRotMatrix"),
+                          1, GL_FALSE, zRotMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "YRotMatrix"),
+                          1, GL_FALSE, yRotMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "XRotMatrix"),
+                          1, GL_FALSE, xRotMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "ZoomMatrix"),
+                          1, GL_FALSE, zoomMatrix);
 
     vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
     glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
@@ -1674,15 +1720,13 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
     }
 
-    assert(vgl->chroma->plane_count >= 1 && vgl->chroma->plane_count <= 3);
-
-    const int program_idx = vgl->chroma->plane_count == 1 ? 1 : 0;
-    DrawWithShaders(vgl, left, top, right, bottom, program_idx);
+    DrawWithShaders(vgl, left, top, right, bottom, vgl->program_idx);
 
     /* Draw the subpictures */
     // Change the program for overlays
-    vgl->UseProgram(vgl->program[1]);
-    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture"), 0);
+    GLuint sub_program = vgl->program[vgl->program_sub_idx];
+    vgl->UseProgram(sub_program);
+    vgl->Uniform1i(vgl->GetUniformLocation(sub_program, "Texture"), 0);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1720,25 +1764,36 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         };
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
-        vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
+        vgl->Uniform4f(vgl->GetUniformLocation(sub_program, "FillColor"),
+                       1.0f, 1.0f, 1.0f, glr->alpha);
 
         vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
         vgl->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
-        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(sub_program,
+                                     "MultiTexCoord0"));
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(sub_program,
+                                 "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
 
         vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
         vgl->BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
-        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(sub_program,
+                                     "VertexPosition"));
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(sub_program,
+                                 "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
 
         // Subpictures have the correct orientation:
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "OrientationMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ProjectionMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZRotMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "YRotMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "XRotMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZoomMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
+                              "OrientationMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
+                              "ProjectionMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
+                              "ZRotMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
+                              "YRotMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
+                              "XRotMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
+                              "ZoomMatrix"), 1, GL_FALSE, identity);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
