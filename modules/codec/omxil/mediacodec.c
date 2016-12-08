@@ -549,8 +549,10 @@ static int StartMediaCodec(decoder_t *p_dec)
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
             if (decoder_UpdateVideoFormat(p_dec) != 0
              || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
-                msg_Err(p_dec, "Opaque Vout request failed: "
-                               "fallback to non opaque");
+            {
+                msg_Err(p_dec, "Opaque Vout request failed");
+                return VLC_EGENERIC;
+            }
         }
         if (p_dummy_hwpic)
         {
