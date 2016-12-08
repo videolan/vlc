@@ -33,28 +33,23 @@
 #include <vlc_picture_pool.h>
 #include <vlc_opengl.h>
 
-/* Change USE_OPENGL_ES value to set the OpenGL ES version (1, 2) you want to use
- * A value of 0 will activate normal OpenGL */
+/* if USE_OPENGL_ES2 is defined, OpenGL ES version 2 will be used, otherwise
+ * normal OpenGL will be used */
 #ifdef __APPLE__
 # include <TargetConditionals.h>
 # if !TARGET_OS_IPHONE
-#  define USE_OPENGL_ES 0
+#  undef USE_OPENGL_ES2
 #  define MACOS_OPENGL
 #  include <OpenGL/gl.h>
 # else /* Force ESv2 on iOS */
-#  define USE_OPENGL_ES 2
+#  define USE_OPENGL_ES2
 #  include <OpenGLES/ES1/gl.h>
 #  include <OpenGLES/ES2/gl.h>
 #  include <OpenGLES/ES2/glext.h>
 # endif
 #else /* !defined (__APPLE__) */
-# ifndef USE_OPENGL_ES
-#  define USE_OPENGL_ES 0
-# endif
-# if USE_OPENGL_ES == 2
+# if defined (USE_OPENGL_ES2)
 #  include <GLES2/gl2.h>
-# elif USE_OPENGL_ES == 1
-#  include <GLES/gl.h>
 # else
 #  ifdef _WIN32
 #   include <GL/glew.h>

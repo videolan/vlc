@@ -3023,8 +3023,6 @@ AM_CONDITIONAL([HAVE_GL], [test "${have_gl}" = "yes"])
 
 dnl OpenGL ES 2: depends on EGL 1.1
 PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [disabled])
-dnl OpenGL ES 1: depends on EGL 1.0
-PKG_ENABLE_MODULES_VLC([GLES1], [], [glesv1_cm], [OpenGL ES v1 support], [disabled])
 
 dnl
 dnl  Xlib

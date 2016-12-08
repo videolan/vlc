@@ -32,21 +32,14 @@ vout_LTLIBRARIES += libvout_ios2_plugin.la
 endif
 
 ### OpenGL ###
-# TODO: merge all three source files (?)
 libgles2_plugin_la_SOURCES = video_output/opengl.c video_output/opengl.h \
 	video_output/gl.c
-libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES=2
+libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
 libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM)
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
-libgles1_plugin_la_SOURCES = video_output/opengl.c video_output/opengl.h \
-	video_output/gl.c
-libgles1_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES1_CFLAGS) -DUSE_OPENGL_ES=1
-libgles1_plugin_la_LIBADD = $(GLES1_LIBS) $(LIBM)
-libgles1_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-
-EXTRA_LTLIBRARIES += libgles2_plugin.la libgles1_plugin.la
-vout_LTLIBRARIES += $(LTLIBgles2) $(LTLIBgles1)
+EXTRA_LTLIBRARIES += libgles2_plugin.la
+vout_LTLIBRARIES += $(LTLIBgles2)
 
 libgl_plugin_la_SOURCES = video_output/opengl.c video_output/opengl.h \
 	video_output/gl.c

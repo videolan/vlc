@@ -45,7 +45,7 @@
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
-#if USE_OPENGL_ES == 2 || defined(__APPLE__)
+#if defined(USE_OPENGL_ES2) || defined(__APPLE__)
 #   define PFNGLGETPROGRAMIVPROC             typeof(glGetProgramiv)*
 #   define PFNGLGETPROGRAMINFOLOGPROC        typeof(glGetProgramInfoLog)*
 #   define PFNGLGETSHADERIVPROC              typeof(glGetShaderiv)*
@@ -71,24 +71,18 @@
 #   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
 #   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
-#if defined(__APPLE__) && USE_OPENGL_ES
+#if defined(__APPLE__)
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
 #endif
 
-#if USE_OPENGL_ES
+#if defined(USE_OPENGL_ES2)
 #   define GLSL_VERSION "100"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define PRECISION "precision highp float;"
-#if USE_OPENGL_ES == 2
 #   define VLCGL_PICTURE_MAX 128
 #   define SUPPORTS_SHADERS
 #   define glClientActiveTexture(x)
-#else
-#   define VLCGL_PICTURE_MAX 1
-#   define SUPPORTS_FIXED_PIPELINE
-#   define GL_MAX_TEXTURE_IMAGE_UNITS GL_MAX_TEXTURE_UNITS
-#endif
 #else
 #   define GLSL_VERSION "120"
 #   define VLCGL_TEXTURE_COUNT 1
@@ -231,7 +225,7 @@ static inline int GetAlignedSize(unsigned size)
     return ((align >> 1) == size) ? size : align;
 }
 
-#if !USE_OPENGL_ES
+#if !defined(USE_OPENGL_ES2)
 static int GetTexFormatSize(int target, int tex_format, int tex_internal,
                             int tex_type)
 {
@@ -479,7 +473,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
-#if !USE_OPENGL_ES
+#if !defined(USE_OPENGL_ES2)
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
     const bool oglv3 = strverscmp((const char *)ogl_version, "3.0") >= 0;
@@ -490,7 +484,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     const int yuv_plane_texformat = GL_LUMINANCE;
 #endif
 
-#if USE_OPENGL_ES == 2
+#if defined(USE_OPENGL_ES2)
     vgl->CreateShader  = glCreateShader;
     vgl->ShaderSource  = glShaderSource;
     vgl->CompileShader = glCompileShader;
@@ -569,7 +563,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
                          HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
 
-#if USE_OPENGL_ES == 2
+#if defined(USE_OPENGL_ES2)
     /* OpenGL ES 2 includes support for non-power of 2 textures by specification
      * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
     vgl->supports_npot = true;
@@ -579,7 +573,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
 #ifdef __APPLE__
-#if USE_OPENGL_ES
+#if defined(USE_OPENGL_ES2)
     supports_shaders = true;
 #endif
 #endif
@@ -603,7 +597,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
     bool need_fs_xyz = false;
-    bool need_fs_rgba = USE_OPENGL_ES == 2;
+#   if defined (USE_OPENGL_ES2)
+    bool need_fs_rgba = true;
+#   else
+    bool need_fs_rgba = false;
+#   endif
     bool need_vs = fmt->projection_mode != PROJECTION_MODE_RECTANGULAR;
     float yuv_range_correction = 1.0;
 
@@ -620,7 +618,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 vgl->tex_type     = GL_UNSIGNED_BYTE;
                 yuv_range_correction = 1.0;
                 break;
-#if !USE_OPENGL_ES
+#if !defined(USE_OPENGL_ES2)
             } else if (dsc && dsc->plane_count == 3 && dsc->pixel_size == 2 &&
                        GetTexFormatSize(vgl->tex_target,
                                         yuv_plane_texformat,
@@ -925,7 +923,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
             }
             glBindTexture(vgl->tex_target, vgl->texture[i][j]);
 
-#if !USE_OPENGL_ES
+#if !defined(USE_OPENGL_ES2)
             /* Set the texture parameters */
             glTexParameterf(vgl->tex_target, GL_TEXTURE_PRIORITY, 1.0);
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -1107,7 +1105,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 /* Could not recycle a previous texture, generate a new one. */
                 glGenTextures(1, &glr->texture);
                 glBindTexture(GL_TEXTURE_2D, glr->texture);
-#if !USE_OPENGL_ES
+#if !defined(USE_OPENGL_ES2)
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0);
                 glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #endif

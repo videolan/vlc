@@ -160,7 +160,6 @@ $Id$
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
  * gl: OpenGL video output using the generic OpenGL provider
- * gles1: OpenGL ES video output using the generic OpenGL provider
  * gles2: OpenGL ES2 video output using the generic OpenGL provider
  * glspectrum: 3D OpenGL spectrum visualization
  * glwin32: a opengl provider using DirectX OpenGL

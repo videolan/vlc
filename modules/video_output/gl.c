@@ -39,12 +39,11 @@ static void Close (vlc_object_t *);
 
 #define GL_TEXT N_("OpenGL extension")
 #define GLES2_TEXT N_("OpenGL ES 2 extension")
-#define GLES_TEXT N_("OpenGL ES extension")
 #define PROVIDER_LONGTEXT N_( \
     "Extension through which to use the Open Graphics Library (OpenGL).")
 
 vlc_module_begin ()
-#if USE_OPENGL_ES == 2
+#if defined (USE_OPENGL_ES2)
 # define API VLC_OPENGL_ES2
 # define MODULE_VARNAME "gles2"
     set_shortname (N_("OpenGL ES2"))
@@ -55,17 +54,8 @@ vlc_module_begin ()
     add_module ("gles2", "opengl es2", NULL,
                 GLES2_TEXT, PROVIDER_LONGTEXT, true)
 
-#elif USE_OPENGL_ES == 1
-# define API VLC_OPENGL_ES
-# define MODULE_VARNAME "gles"
-    set_shortname (N_("OpenGL ES"))
-    set_description (N_("OpenGL for Embedded Systems video output"))
-    set_capability ("vout display", /*260*/0)
-    set_callbacks (Open, Close)
-    add_shortcut ("opengles", "gles")
-    add_module ("gles", "opengl es", NULL,
-                GLES_TEXT, PROVIDER_LONGTEXT, true)
 #else
+
 # define API VLC_OPENGL
 # define MODULE_VARNAME "gl"
     set_shortname (N_("OpenGL"))

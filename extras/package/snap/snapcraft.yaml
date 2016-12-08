@@ -66,8 +66,6 @@ parts:
       - libfreerdp-dev
       - libfreetype6-dev
       - libfribidi-dev
-      - libgl1-mesa-dev
-      - libgles1-mesa-dev
       - libgles2-mesa-dev
       - libgnutls28-dev
       - libgtk2.0-dev
