@@ -937,6 +937,7 @@ static void FillDefaultStyles( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    p_sys->p_default_style->psz_fontname = var_InheritString( p_filter, "freetype-font" );
     /* Set default psz_fontname */
     if( !p_sys->p_default_style->psz_fontname || !*p_sys->p_default_style->psz_fontname )
     {
@@ -948,6 +949,7 @@ static void FillDefaultStyles( filter_t *p_filter )
 #endif
     }
 
+    p_sys->p_default_style->psz_monofontname = var_InheritString( p_filter, "freetype-monofont" );
     /* set default psz_monofontname */
     if( !p_sys->p_default_style->psz_monofontname || !*p_sys->p_default_style->psz_monofontname )
     {
@@ -960,9 +962,6 @@ static void FillDefaultStyles( filter_t *p_filter )
     }
 
     UpdateDefaultLiveStyles( p_filter );
-
-    p_sys->p_default_style->psz_fontname = var_InheritString( p_filter, "freetype-font" );
-    p_sys->p_default_style->psz_monofontname = var_InheritString( p_filter, "freetype-monofont" );
 
     p_sys->p_default_style->i_font_alpha = var_InheritInteger( p_filter, "freetype-opacity" );
 
