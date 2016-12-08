@@ -1219,6 +1219,70 @@ invalid:
     return NULL;
 }
 
+static block_t * ConvertPESBlock( demux_t *p_demux, ts_pes_es_t *p_es,
+                                  size_t i_pes_size, uint8_t i_stream_id,
+                                  block_t *p_block )
+{
+    if(!p_block)
+        return NULL;
+
+    if( p_es->fmt.i_codec == VLC_CODEC_SUBT )
+    {
+        if( i_pes_size > 0 && p_block->i_buffer > i_pes_size )
+        {
+            p_block->i_buffer = i_pes_size;
+        }
+        /* Append a \0 */
+        p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
+        if( p_block )
+            p_block->p_buffer[p_block->i_buffer -1] = '\0';
+    }
+    else if( p_es->fmt.i_codec == VLC_CODEC_TELETEXT )
+    {
+        if( p_block->i_pts <= VLC_TS_INVALID )
+        {
+            /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
+             * In this case use the last PCR + 40ms */
+            mtime_t i_pcr = p_es->p_program->pcr.i_current;
+            if( i_pcr > VLC_TS_INVALID )
+                p_block->i_pts = FROM_SCALE(i_pcr) + 40000;
+        }
+    }
+    else if( p_es->fmt.i_codec == VLC_CODEC_ARIB_A ||
+             p_es->fmt.i_codec == VLC_CODEC_ARIB_C )
+    {
+        if( p_block->i_pts <= VLC_TS_INVALID )
+        {
+            if( i_pes_size > 0 && p_block->i_buffer > i_pes_size )
+            {
+                p_block->i_buffer = i_pes_size;
+            }
+            /* Append a \0 */
+            p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
+            if( p_block )
+                p_block->p_buffer[p_block->i_buffer -1] = '\0';
+        }
+    }
+    else if( p_es->fmt.i_codec == VLC_CODEC_OPUS)
+    {
+        p_block = Opus_Parse(p_demux, p_block);
+    }
+    else if( p_es->fmt.i_codec == VLC_CODEC_JPEG2000 )
+    {
+        if( unlikely(i_stream_id != 0xBD) )
+        {
+            block_Release( p_block );
+            p_block = NULL;
+        }
+        else
+        {
+            p_block = J2K_Parse( p_demux, p_block, p_es->b_interlaced );
+        }
+    }
+
+    return p_block;
+}
+
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
@@ -1340,7 +1404,12 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
     if( p_pes )
     {
-        block_t *p_block;
+        ts_pmt_t *p_pmt = p_es->p_program;
+        if( unlikely(!p_pmt) )
+        {
+            block_ChainRelease( p_pes );
+            return;
+        }
 
         if( i_dts >= 0 )
             p_pes->i_dts = FROM_SCALE(i_dts);
@@ -1350,74 +1419,13 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
         p_pes->i_length = FROM_SCALE_NZ(i_length);
 
-        p_block = block_ChainGather( p_pes );
-        if( p_es->fmt.i_codec == VLC_CODEC_SUBT )
-        {
-            if( i_pes_size > 0 && p_block->i_buffer > i_pes_size )
-            {
-                p_block->i_buffer = i_pes_size;
-            }
-            /* Append a \0 */
-            p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
-            if( !p_block )
-                return;
-            p_block->p_buffer[p_block->i_buffer -1] = '\0';
-        }
-        else if( p_es->fmt.i_codec == VLC_CODEC_TELETEXT )
-        {
-            if( p_block->i_pts <= VLC_TS_INVALID )
-            {
-                /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
-                 * In this case use the last PCR + 40ms */
-                mtime_t i_pcr = p_es->p_program->pcr.i_current;
-                if( i_pcr > VLC_TS_INVALID )
-                    p_block->i_pts = FROM_SCALE(i_pcr) + 40000;
-            }
-        }
-        else if( p_es->fmt.i_codec == VLC_CODEC_ARIB_A ||
-                 p_es->fmt.i_codec == VLC_CODEC_ARIB_C )
-        {
-            if( p_block->i_pts <= VLC_TS_INVALID )
-            {
-                if( i_pes_size > 0 && p_block->i_buffer > i_pes_size )
-                {
-                    p_block->i_buffer = i_pes_size;
-                }
-                /* Append a \0 */
-                p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
-                if( !p_block )
-                    return;
-                p_block->p_buffer[p_block->i_buffer -1] = '\0';
-            }
-        }
-        else if( p_es->fmt.i_codec == VLC_CODEC_OPUS)
-        {
-            p_block = Opus_Parse(p_demux, p_block);
-        }
-        else if( p_es->fmt.i_codec == VLC_CODEC_JPEG2000 )
-        {
-            if( unlikely(i_stream_id != 0xBD) )
-            {
-                block_Release( p_block );
-                p_block = NULL;
-            }
-            else
-            {
-                p_block = J2K_Parse( p_demux, p_block, p_es->b_interlaced );
-            }
-            if( !p_block )
-                return;
-        }
+        /* Some codecs might need xform or AU splitting */
+        block_t *p_chain = ConvertPESBlock( p_demux, p_es, i_pes_size, i_stream_id,
+                                            block_ChainGather( p_pes ) );
 
-        ts_pmt_t *p_pmt = p_es->p_program;
-        if( unlikely(!p_pmt) )
-        {
-            block_ChainRelease( p_block );
-            return;
-        }
-
-        while (p_block) {
-            block_t *p_next = p_block->p_next;
+        while ( p_chain ) {
+            block_t *p_block = p_chain;
+            p_chain = p_chain->p_next;
             p_block->p_next = NULL;
 
             if( !p_pmt->pcr.b_fix_done ) /* Not seen yet */
@@ -1427,11 +1435,14 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             {
                 if( pid->u.p_pes->p_prepcr_outqueue )
                 {
+                    /* Rebuild current output chain, appending any prepcr outqueue */
                     block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_block );
-                    p_block = pid->u.p_pes->p_prepcr_outqueue;
-                    p_next = p_block->p_next;
-                    p_block->p_next = NULL;
+                    if( p_chain )
+                        block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_chain );
+                    p_chain = pid->u.p_pes->p_prepcr_outqueue;
                     pid->u.p_pes->p_prepcr_outqueue = NULL;
+                    /* Then now output all data */
+                    continue;
                 }
 
                 if ( p_pmt->pcr.b_disable && p_block->i_dts > VLC_TS_INVALID &&
@@ -1562,8 +1573,6 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
                 block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_block );
             }
-
-            p_block = p_next;
         }
     }
     else
