@@ -459,7 +459,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     if (vgl->gl->getProcAddress == NULL) {
-        fprintf(stderr, "getProcAddress not implemented, bailing out\n");
+        msg_Err(gl, "getProcAddress not implemented, bailing out\n");
         free(vgl);
         return NULL;
     }
@@ -675,7 +675,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             int charsWritten;
             vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten,
                                   infolog);
-            fprintf(stderr, "shader %d: %s\n", j, infolog);
+            msg_Err(gl, "shader %d: %s", j, infolog);
             free(infolog);
         }
     }
@@ -704,7 +704,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             int charsWritten;
             vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten,
                                    infolog);
-            fprintf(stderr, "shader program %d: %s\n", i, infolog);
+            msg_Err(gl, "shader program %d: %s", i, infolog);
             free(infolog);
         }
 
@@ -712,7 +712,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         GLint link_status = GL_TRUE;
         vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE) {
-            fprintf(stderr, "Unable to use program %d\n", i);
+            msg_Err(gl, "Unable to use program %d\n", i);
             vlc_gl_Unlock(vgl->gl);
             vout_display_opengl_Delete(vgl);
             return NULL;
