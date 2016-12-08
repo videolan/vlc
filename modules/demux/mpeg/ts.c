@@ -1115,8 +1115,8 @@ static int16_t read_opus_flag(uint8_t **buf, size_t *len)
 
 static block_t *Opus_Parse(demux_t *demux, block_t *block)
 {
-    block_t *out = NULL;
-    block_t **last = NULL;
+    block_t *p_chain = NULL;
+    block_t **pp_chain_last = &p_chain;
 
     uint8_t *buf = block->p_buffer;
     size_t len = block->i_buffer;
@@ -1170,13 +1170,7 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
             break;
         memcpy(au->p_buffer, buf, au_size);
         block_CopyProperties(au, block);
-        au->p_next = NULL;
-
-        if (!out)
-            out = au;
-        else
-            *last = au;
-        last = &au->p_next;
+        block_ChainLastAppend( &pp_chain_last, au );
 
         au->i_nb_samples = opus_frame_duration(buf, au_size);
         if (end_trim && (uint16_t) end_trim <= au->i_nb_samples)
@@ -1195,7 +1189,7 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
     }
 
     block_Release(block);
-    return out;
+    return p_chain;
 }
 
 static block_t *J2K_Parse( demux_t *p_demux, block_t *p_block, bool b_interlaced )
