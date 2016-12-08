@@ -705,7 +705,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE) {
             fprintf(stderr, "Unable to use program %d\n", i);
-            free(vgl);
+            vlc_gl_Unlock(vgl->gl);
+            vout_display_opengl_Delete(vgl);
             return NULL;
         }
     }
