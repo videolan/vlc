@@ -363,7 +363,7 @@ static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     char *psz_arturl = input_item_GetArtURL( p_item );
     assert( *psz_arturl );
 
-    if( !strncmp( psz_arturl , "file://", 7 ) )
+    if( !strncasecmp( psz_arturl , "file://", 7 ) )
     {
         msg_Dbg( p_fetcher->object,
                  "Album art is local file, no need to cache" );
