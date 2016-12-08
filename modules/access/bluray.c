@@ -1699,7 +1699,7 @@ static void blurayResetParser(demux_t *p_demux)
     if (p_sys->p_parser)
         vlc_demux_chained_Delete(p_sys->p_parser);
 
-    p_sys->p_parser = vlc_demux_chained_New(p_demux, "ts", p_sys->p_out);
+    p_sys->p_parser = vlc_demux_chained_New(VLC_OBJECT(p_demux), "ts", p_sys->p_out);
 
     if (!p_sys->p_parser)
         msg_Err(p_demux, "Failed to create TS demuxer");
