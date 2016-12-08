@@ -123,7 +123,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
             p_segment->style = text_style_Duplicate( sys->p_default_style );
         /* Update all segments font sizes in pixels, *** metric used by renderers *** */
         /* We only do this when a fixed font size isn't set */
-        if( p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
+        if( p_segment->style && p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
         {
             p_segment->style->i_font_size = p_segment->style->f_font_relsize *
                                             subpic->i_original_picture_height / 100;
