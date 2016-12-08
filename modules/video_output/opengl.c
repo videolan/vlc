@@ -81,15 +81,12 @@
 #   define VLCGL_TEXTURE_COUNT 1
 #   define PRECISION "precision highp float;"
 #   define VLCGL_PICTURE_MAX 128
-#   define SUPPORTS_SHADERS
 #   define glClientActiveTexture(x)
 #else
 #   define GLSL_VERSION "120"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 128
 #   define PRECISION ""
-#   define SUPPORTS_SHADERS
-#   define SUPPORTS_FIXED_PIPELINE
 #endif
 
 #ifndef GL_RED
@@ -156,7 +153,6 @@ struct vout_display_opengl_t {
     int    subpicture_buffer_object_count;
 
     /* Shader variables commands*/
-#ifdef SUPPORTS_SHADERS
     PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
     PFNGLGETATTRIBLOCATIONPROC       GetAttribLocation;
     PFNGLVERTEXATTRIBPOINTERPROC     VertexAttribPointer;
@@ -190,7 +186,6 @@ struct vout_display_opengl_t {
     PFNGLBINDBUFFERPROC    BindBuffer;
     PFNGLBUFFERDATAPROC    BufferData;
     PFNGLDELETEBUFFERSPROC DeleteBuffers;
-#endif
 
 #if defined(_WIN32)
     PFNGLACTIVETEXTUREPROC  ActiveTexture;
@@ -254,7 +249,6 @@ static int GetTexFormatSize(int target, int tex_format, int tex_internal,
 }
 #endif
 
-#ifdef SUPPORTS_SHADERS
 static void BuildVertexShader(vout_display_opengl_t *vgl,
                               GLint *shader)
 {
@@ -449,8 +443,6 @@ static void BuildXYZFragmentShader(vout_display_opengl_t *vgl,
     vgl->CompileShader(*shader);
 }
 
-#endif
-
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl,
@@ -480,7 +472,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     const int yuv_plane_texformat = oglv3 ? GL_RED : GL_LUMINANCE;
     const int yuv_plane_texformat_16 = oglv3 ? GL_R16 : GL_LUMINANCE16;
 #else
-    bool supports_shaders = false;
+    bool supports_shaders = true;
     const int yuv_plane_texformat = GL_LUMINANCE;
 #endif
 
@@ -516,8 +508,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->BufferData    = glBufferData;
     vgl->DeleteBuffers = glDeleteBuffers;
 
-    supports_shaders = true;
-#elif defined(SUPPORTS_SHADERS)
+#else
     vgl->CreateShader  = (PFNGLCREATESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateShader");
     vgl->ShaderSource  = (PFNGLSHADERSOURCEPROC)vlc_gl_GetProcAddress(vgl->gl, "glShaderSource");
     vgl->CompileShader = (PFNGLCOMPILESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCompileShader");
@@ -552,6 +543,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram)
         supports_shaders = false;
 #endif
+    if (!supports_shaders)
+    {
+        msg_Err(gl, "shaders not supported");
+        vlc_gl_Unlock(vgl->gl);
+        free(vgl);
+        return NULL;
+    }
 
 #if defined(_WIN32)
     vgl->ActiveTexture = (PFNGLACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTexture");
@@ -572,12 +570,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GLint max_texture_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
-#ifdef __APPLE__
-#if defined(USE_OPENGL_ES2)
-    supports_shaders = true;
-#endif
-#endif
-
     /* Initialize with default chroma */
     vgl->fmt = *fmt;
     vgl->fmt.i_chroma = VLC_CODEC_RGB32;
@@ -595,22 +587,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->tex_internal = GL_RGBA;
     vgl->tex_type     = GL_UNSIGNED_BYTE;
     /* Use YUV if possible and needed */
-    bool need_fs_yuv = false;
     bool need_fs_xyz = false;
-#   if defined (USE_OPENGL_ES2)
-    bool need_fs_rgba = true;
-#   else
-    bool need_fs_rgba = false;
-#   endif
-    bool need_vs = fmt->projection_mode != PROJECTION_MODE_RECTANGULAR;
     float yuv_range_correction = 1.0;
 
-    if (max_texture_units >= 3 && supports_shaders && vlc_fourcc_IsYUV(fmt->i_chroma)) {
+    if (max_texture_units >= 3 && vlc_fourcc_IsYUV(fmt->i_chroma)) {
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         while (*list) {
             const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(*list);
             if (dsc && dsc->plane_count == 3 && dsc->pixel_size == 1) {
-                need_fs_yuv       = true;
                 vgl->fmt          = *fmt;
                 vgl->fmt.i_chroma = *list;
                 vgl->tex_format   = yuv_plane_texformat;
@@ -624,7 +608,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                         yuv_plane_texformat,
                                         yuv_plane_texformat_16,
                                         GL_UNSIGNED_SHORT) == 16) {
-                need_fs_yuv       = true;
                 vgl->fmt          = *fmt;
                 vgl->fmt.i_chroma = *list;
                 vgl->tex_format   = yuv_plane_texformat;
@@ -670,67 +653,61 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[1] =
     vgl->shader[2] = -1;
     vgl->local_count = 0;
-    if (supports_shaders && (need_vs || need_fs_yuv || need_fs_xyz|| need_fs_rgba)) {
-#ifdef SUPPORTS_SHADERS
-        if (need_fs_xyz)
-            BuildXYZFragmentShader(vgl, &vgl->shader[0]);
-        else
-            BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
-                                vgl->local_value, fmt, yuv_range_correction);
+    if (need_fs_xyz)
+        BuildXYZFragmentShader(vgl, &vgl->shader[0]);
+    else
+        BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
+                               vgl->local_value, fmt, yuv_range_correction);
 
-        BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
-        BuildVertexShader(vgl, &vgl->shader[2]);
+    BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
+    BuildVertexShader(vgl, &vgl->shader[2]);
 
-        /* Check shaders messages */
-        for (unsigned j = 0; j < 3; j++) {
-            int infoLength;
-            vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
-            if (infoLength <= 1)
-                continue;
+    /* Check shaders messages */
+    for (unsigned j = 0; j < 3; j++) {
+        int infoLength;
+        vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
+        if (infoLength <= 1)
+            continue;
 
-            char *infolog = malloc(infoLength);
-            int charsWritten;
-            vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten, infolog);
-            fprintf(stderr, "shader %d: %s\n", j, infolog);
-            free(infolog);
+        char *infolog = malloc(infoLength);
+        int charsWritten;
+        vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten, infolog);
+        fprintf(stderr, "shader %d: %s\n", j, infolog);
+        free(infolog);
+    }
+
+    /* YUV/XYZ & Vertex shaders */
+    vgl->program[0] = vgl->CreateProgram();
+    vgl->AttachShader(vgl->program[0], vgl->shader[0]);
+    vgl->AttachShader(vgl->program[0], vgl->shader[2]);
+    vgl->LinkProgram(vgl->program[0]);
+
+    /* RGB & Vertex shaders */
+    vgl->program[1] = vgl->CreateProgram();
+    vgl->AttachShader(vgl->program[1], vgl->shader[1]);
+    vgl->AttachShader(vgl->program[1], vgl->shader[2]);
+    vgl->LinkProgram(vgl->program[1]);
+
+    /* Check program messages */
+    for (GLuint i = 0; i < 2; i++) {
+        int infoLength = 0;
+        vgl->GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
+        if (infoLength <= 1)
+            continue;
+        char *infolog = malloc(infoLength);
+        int charsWritten;
+        vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten, infolog);
+        fprintf(stderr, "shader program %d: %s\n", i, infolog);
+        free(infolog);
+
+        /* If there is some message, better to check linking is ok */
+        GLint link_status = GL_TRUE;
+        vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
+        if (link_status == GL_FALSE) {
+            fprintf(stderr, "Unable to use program %d\n", i);
+            free(vgl);
+            return NULL;
         }
-
-        /* YUV/XYZ & Vertex shaders */
-        vgl->program[0] = vgl->CreateProgram();
-        vgl->AttachShader(vgl->program[0], vgl->shader[0]);
-        vgl->AttachShader(vgl->program[0], vgl->shader[2]);
-        vgl->LinkProgram(vgl->program[0]);
-
-        /* RGB & Vertex shaders */
-        vgl->program[1] = vgl->CreateProgram();
-        vgl->AttachShader(vgl->program[1], vgl->shader[1]);
-        vgl->AttachShader(vgl->program[1], vgl->shader[2]);
-        vgl->LinkProgram(vgl->program[1]);
-
-        /* Check program messages */
-        for (GLuint i = 0; i < 2; i++) {
-            int infoLength = 0;
-            vgl->GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
-            if (infoLength <= 1)
-                continue;
-            char *infolog = malloc(infoLength);
-            int charsWritten;
-            vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten, infolog);
-            fprintf(stderr, "shader program %d: %s\n", i, infolog);
-            free(infolog);
-
-            /* If there is some message, better to check linking is ok */
-            GLint link_status = GL_TRUE;
-            vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
-            if (link_status == GL_FALSE) {
-                fprintf(stderr, "Unable to use program %d\n", i);
-                free(vgl);
-                return NULL;
-            }
-        }
-#else
-        (void)yuv_range_correction;
-#endif
     }
 
     /* */
@@ -741,7 +718,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-#ifdef SUPPORTS_SHADERS
     vgl->GenBuffers(1, &vgl->vertex_buffer_object);
     vgl->GenBuffers(1, &vgl->index_buffer_object);
     vgl->GenBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
@@ -756,7 +732,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
     vgl->subpicture_buffer_object_count = subpicture_buffer_object_count;
     vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
-#endif
 
     vlc_gl_Unlock(vgl->gl);
 
@@ -797,20 +772,16 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         }
         free(vgl->region);
 
-#ifdef SUPPORTS_SHADERS
-        if (vgl->program[0]) {
-            for (int i = 0; i < 2; i++)
-                vgl->DeleteProgram(vgl->program[i]);
-            for (int i = 0; i < 3; i++)
-                vgl->DeleteShader(vgl->shader[i]);
-        }
+        for (int i = 0; i < 2; i++)
+            vgl->DeleteProgram(vgl->program[i]);
+        for (int i = 0; i < 3; i++)
+            vgl->DeleteShader(vgl->shader[i]);
         vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
         vgl->DeleteBuffers(1, &vgl->index_buffer_object);
         vgl->DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
         if (vgl->subpicture_buffer_object_count > 0)
             vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
         free(vgl->subpicture_buffer_object);
-#endif
 
         free(vgl->texture_temp_buf);
         vlc_gl_Unlock(vgl->gl);
@@ -1130,7 +1101,6 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
-#ifdef SUPPORTS_SHADERS
 static const GLfloat identity[] = {
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f,
@@ -1283,58 +1253,7 @@ void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t o
         matrix[1 * 4 + 1] = cos;
     }
 }
-#endif
 
-#ifdef SUPPORTS_FIXED_PIPELINE
-static void DrawWithoutShaders(vout_display_opengl_t *vgl,
-                               float *left, float *top, float *right, float *bottom)
-{
-    static const GLfloat vertexCoord[] = {
-        -1.0f, -1.0f,
-         1.0f, -1.0f,
-        -1.0f,  1.0f,
-         1.0f,  1.0f,
-    };
-
-    const GLfloat textureCoord[] = {
-        left[0],  bottom[0],
-        right[0], bottom[0],
-        left[0],  top[0],
-        right[0], top[0]
-    };
-
-    GLfloat transformMatrix[16];
-    orientationTransformMatrix(transformMatrix, vgl->fmt.orientation);
-
-    glPushMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(transformMatrix);
-
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glEnable(vgl->tex_target);
-    glActiveTexture(GL_TEXTURE0 + 0);
-    glClientActiveTexture(GL_TEXTURE0 + 0);
-
-    glBindTexture(vgl->tex_target, vgl->texture[0][0]);
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-    glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
-    glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisable(vgl->tex_target);
-
-    glPopMatrix();
-
-}
-#endif
-
-#ifdef SUPPORTS_SHADERS
 static int BuildSphere(unsigned nbPlanes,
                         GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
                         GLushort **indices, unsigned *nbIndices,
@@ -1721,7 +1640,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
     glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
 }
-#endif
 
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
@@ -1769,35 +1687,19 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
     }
 
-#ifdef SUPPORTS_SHADERS
-    if (vgl->program[0] && (vgl->chroma->plane_count == 3 || vgl->chroma->plane_count == 2))
-        DrawWithShaders(vgl, left, top, right, bottom, 0);
-    else if (vgl->program[1] && vgl->chroma->plane_count == 1)
-        DrawWithShaders(vgl, left, top, right, bottom, 1);
-    else
-#endif
-    {
-#ifdef SUPPORTS_FIXED_PIPELINE
-        DrawWithoutShaders(vgl, left, top, right, bottom);
-#endif
-    }
+    assert(vgl->chroma->plane_count >= 1 && vgl->chroma->plane_count <= 3);
+
+    const int program_idx = vgl->chroma->plane_count == 1 ? 1 : 0;
+    DrawWithShaders(vgl, left, top, right, bottom, program_idx);
 
     /* Draw the subpictures */
-    if (vgl->program[1]) {
-#ifdef SUPPORTS_SHADERS
-        // Change the program for overlays
-        vgl->UseProgram(vgl->program[1]);
-        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture"), 0);
-#endif
-    }
+    // Change the program for overlays
+    vgl->UseProgram(vgl->program[1]);
+    vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture"), 0);
 
-#ifdef SUPPORTS_FIXED_PIPELINE
-    glEnable(GL_TEXTURE_2D);
-#endif
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-#ifdef SUPPORTS_SHADERS
     /* We need two buffer objects for each region: for vertex and texture coordinates. */
     if (2 * vgl->region_count > vgl->subpicture_buffer_object_count) {
         if (vgl->subpicture_buffer_object_count > 0)
@@ -1814,7 +1716,6 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         vgl->subpicture_buffer_object_count = new_count;
         vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
     }
-#endif
 
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
@@ -1834,51 +1735,29 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         };
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
-        if (vgl->program[1]) {
-#ifdef SUPPORTS_SHADERS
-            vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
+        vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
 
-            vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
-            vgl->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
-            vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"));
-            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
+        vgl->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
+        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"));
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
 
-            vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
-            vgl->BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
-            vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"));
-            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
+        vgl->BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
+        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"));
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
 
-            // Subpictures have the correct orientation:
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "OrientationMatrix"), 1, GL_FALSE, identity);
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ProjectionMatrix"), 1, GL_FALSE, identity);
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZRotMatrix"), 1, GL_FALSE, identity);
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "YRotMatrix"), 1, GL_FALSE, identity);
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "XRotMatrix"), 1, GL_FALSE, identity);
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZoomMatrix"), 1, GL_FALSE, identity);
-#endif
-        } else {
-#ifdef SUPPORTS_FIXED_PIPELINE
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glColor4f(1.0f, 1.0f, 1.0f, glr->alpha);
-            glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
-            glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
-#endif
-        }
+        // Subpictures have the correct orientation:
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "OrientationMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ProjectionMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZRotMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "YRotMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "XRotMatrix"), 1, GL_FALSE, identity);
+        vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZoomMatrix"), 1, GL_FALSE, identity);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        if (!vgl->program[1]) {
-#ifdef SUPPORTS_FIXED_PIPELINE
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-            glDisableClientState(GL_VERTEX_ARRAY);
-#endif
-        }
     }
     glDisable(GL_BLEND);
-#ifdef SUPPORTS_FIXED_PIPELINE
-    glDisable(GL_TEXTURE_2D);
-#endif
 
     /* Display */
     vlc_gl_Swap(vgl->gl);
