@@ -122,7 +122,11 @@ struct ts_pes_t
     bool        b_broken_PUSI_conformance;
     ts_sections_processor_t *p_sections_proc;
 
-    block_t *   p_prepcr_outqueue;
+    struct
+    {
+        block_t *p_head;
+        block_t **pp_last;
+    } prepcr;
 
     /* SL AU */
     struct

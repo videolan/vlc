@@ -281,7 +281,8 @@ ts_pes_t *ts_pes_New( demux_t *p_demux, ts_pmt_t *p_program )
     pes->b_broken_PUSI_conformance = false;
     pes->b_always_receive = false;
     pes->p_sections_proc = NULL;
-    pes->p_prepcr_outqueue = NULL;
+    pes->prepcr.p_head = NULL;
+    pes->prepcr.pp_last = &pes->prepcr.p_head;
     pes->sl.p_data = NULL;
     pes->sl.pp_last = &pes->sl.p_data;
 
@@ -298,8 +299,8 @@ void ts_pes_Del( demux_t *p_demux, ts_pes_t *pes )
     if( pes->p_sections_proc )
         ts_sections_processor_ChainDelete( pes->p_sections_proc );
 
-    if( pes->p_prepcr_outqueue )
-        block_ChainRelease( pes->p_prepcr_outqueue );
+    if( pes->prepcr.p_head )
+        block_ChainRelease( pes->prepcr.p_head );
 
     free( pes );
 }

@@ -1433,14 +1433,15 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
             if( p_es->id && (p_pmt->pcr.i_current > -1 || p_pmt->pcr.b_disable) )
             {
-                if( pid->u.p_pes->p_prepcr_outqueue )
+                if( pid->u.p_pes->prepcr.p_head )
                 {
                     /* Rebuild current output chain, appending any prepcr outqueue */
-                    block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_block );
+                    block_ChainLastAppend( &pid->u.p_pes->prepcr.pp_last, p_block );
                     if( p_chain )
-                        block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_chain );
-                    p_chain = pid->u.p_pes->p_prepcr_outqueue;
-                    pid->u.p_pes->p_prepcr_outqueue = NULL;
+                        block_ChainLastAppend( &pid->u.p_pes->prepcr.pp_last, p_chain );
+                    p_chain = pid->u.p_pes->prepcr.p_head;
+                    pid->u.p_pes->prepcr.p_head = NULL;
+                    pid->u.p_pes->prepcr.pp_last = &pid->u.p_pes->prepcr.p_head;
                     /* Then now output all data */
                     continue;
                 }
@@ -1571,7 +1572,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 if( !p_pmt->pcr.b_fix_done ) /* Not seen yet */
                     PCRFixHandle( p_demux, p_pmt, p_block );
 
-                block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_block );
+                block_ChainLastAppend( &pid->u.p_pes->prepcr.pp_last, p_block );
             }
         }
     }
@@ -1797,10 +1798,11 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
 
             pid->i_cc = 0xff;
 
-            if( pid->u.p_pes->p_prepcr_outqueue )
+            if( pid->u.p_pes->prepcr.p_head )
             {
-                block_ChainRelease( pid->u.p_pes->p_prepcr_outqueue );
-                pid->u.p_pes->p_prepcr_outqueue = NULL;
+                block_ChainRelease( pid->u.p_pes->prepcr.p_head );
+                pid->u.p_pes->prepcr.p_head = NULL;
+                pid->u.p_pes->prepcr.pp_last = &pid->u.p_pes->prepcr.p_head;
             }
 
             ts_sections_processor_Reset( pid->u.p_pes->p_sections_proc );
@@ -2087,7 +2089,7 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
             for( int j=0; j<p_pmt->e_streams.i_size; j++ )
             {
                 ts_pid_t *p_pid = p_pmt->e_streams.p_elems[j];
-                block_t *p_block = p_pid->u.p_pes->p_prepcr_outqueue;
+                block_t *p_block = p_pid->u.p_pes->prepcr.p_head;
                 while( p_block && p_block->i_dts == VLC_TS_INVALID )
                     p_block = p_block->p_next;
 
