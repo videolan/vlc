@@ -84,6 +84,24 @@ AndroidOpaquePicture_DetachDecoder(picture_sys_t *p_picsys)
         vlc_mutex_unlock(&p_picsys->hw.lock);
 }
 
+static inline void AndroidOpaquePicture_DetachVout(picture_t *p_pic)
+{
+    picture_sys_t *p_picsys = p_pic->p_sys;
+
+    vlc_mutex_lock(&p_picsys->hw.lock);
+    p_pic->p_sys->p_vd_sys = NULL;
+    /* Release p_picsys if references from VOUT and from decoder are NULL */
+    if (!p_picsys->p_vd_sys && !p_picsys->hw.p_dec)
+    {
+        vlc_mutex_unlock(&p_picsys->hw.lock);
+        vlc_mutex_destroy(&p_picsys->hw.lock);
+        free(p_picsys);
+    }
+    else
+        vlc_mutex_unlock(&p_picsys->hw.lock);
+    free(p_pic);
+}
+
 static inline void
 AndroidOpaquePicture_Release(picture_sys_t *p_picsys, bool b_render)
 {
