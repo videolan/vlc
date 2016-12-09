@@ -204,7 +204,7 @@ VlcProc::~VlcProc()
     var_DelCallback( getPL(), "playlist-item-deleted", onItemDelete, this );
     var_DelCallback( getPL(), "input-current", onInputNew, this );
     var_DelCallback( getPL(), "item-change", onItemChange, this );
-    var_DelCallback( getPL(), "interaction", onInteraction, this );
+    var_DelCallback( getIntf(), "interaction", onInteraction, this );
 }
 
 int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
