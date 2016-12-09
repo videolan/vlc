@@ -210,7 +210,7 @@ void Playtree::onAppend( int i_id )
     }
 
     Iterator it_node = findById( pItem->p_parent->i_id );
-    if( it_node != m_children.end() )
+    if( it_node == m_children.end() )
     {
         playlist_Unlock( m_pPlaylist );
         return;
