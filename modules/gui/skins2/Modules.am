@@ -215,26 +215,6 @@ SOURCES_skins2 += \
 	win32/win32_window.hpp \
     $(NULL)
 else
-if HAVE_DARWIN
-SOURCES_skins2 += \
-	macosx/macosx_dragdrop.cpp \
-	macosx/macosx_dragdrop.hpp \
-	macosx/macosx_factory.cpp \
-	macosx/macosx_factory.hpp \
-	macosx/macosx_graphics.cpp \
-	macosx/macosx_graphics.hpp \
-	macosx/macosx_loop.cpp \
-	macosx/macosx_loop.hpp \
-	macosx/macosx_popup.cpp \
-	macosx/macosx_popup.hpp \
-	macosx/macosx_timer.cpp \
-	macosx/macosx_timer.hpp \
-	macosx/macosx_window.cpp \
-	macosx/macosx_window.hpp \
-	macosx/macosx_tooltip.cpp \
-	macosx/macosx_tooltip.hpp \
-    $(NULL)
-else
 if HAVE_OS2
 SOURCES_skins2 += \
 	os2/os2_dragdrop.cpp \
@@ -275,6 +255,5 @@ SOURCES_skins2 += \
 	x11/x11_tooltip.cpp \
 	x11/x11_tooltip.hpp \
     $(NULL)
-endif
 endif
 endif
