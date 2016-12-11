@@ -81,7 +81,7 @@
                                     <action selector="jumpBackward:" target="-2" id="ft8-Or-fZy"/>
                                 </connections>
                             </button>
-                            <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ihl-7x-5mN">
+                            <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ihl-7x-5mN" customClass="VLCDefaultValueSlider">
                                 <rect key="frame" x="50" y="13" width="80" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="15" id="2ZX-Ma-yc0"/>

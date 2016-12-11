@@ -116,6 +116,7 @@
     /* Setup other controls */
     [_volumeSlider setMaxValue:[[VLCCoreInteraction sharedInstance] maxVolume]];
     [_volumeSlider setIntValue:AOUT_VOLUME_DEFAULT];
+    [_volumeSlider setDefaultValue:AOUT_VOLUME_DEFAULT];
 }
 
 #undef setupButton

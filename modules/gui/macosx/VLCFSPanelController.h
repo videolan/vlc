@@ -28,6 +28,7 @@
 
 #import "misc.h"
 #import "Windows.h"
+#import "VLCDefaultValueSlider.h"
 
 @interface VLCFSPanelController : NSWindowController
 
@@ -45,7 +46,7 @@
 @property IBOutlet VLCTimeField *elapsedTime;
 @property IBOutlet VLCTimeField *remainingOrTotalTime;
 @property IBOutlet NSSlider     *timeSlider;
-@property IBOutlet NSSlider     *volumeSlider;
+@property IBOutlet VLCDefaultValueSlider *volumeSlider;
 
 @property (assign) IBOutlet NSLayoutConstraint *heightMaxConstraint;
 
