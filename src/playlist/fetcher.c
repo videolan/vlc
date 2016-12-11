@@ -377,9 +377,6 @@ static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         goto error;
     }
 
-    if( !( p_fetcher->e_scope & FETCHER_SCOPE_NETWORK ) )
-        goto error;
-
     stream_t *p_stream = vlc_stream_NewURL( p_fetcher->object, psz_arturl );
     if( !p_stream )
         goto error;
