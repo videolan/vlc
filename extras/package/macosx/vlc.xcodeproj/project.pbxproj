@@ -419,6 +419,8 @@
 		6B3F8D2F1CE58E0E002A4998 /* VLCPreviousTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D2B1CE58E0E002A4998 /* VLCPreviousTemplate.pdf */; };
 		6B3F8D311CE5CC21002A4998 /* VLCStatusBarIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D301CE5CC21002A4998 /* VLCStatusBarIcon.pdf */; };
 		6B3F8D331CE5CD57002A4998 /* VLCShuffleTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D321CE5CD57002A4998 /* VLCShuffleTemplate.pdf */; };
+		6B6A499E1DFD9B23009128AC /* VLCDefaultValueSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */; };
+		6B6A499F1DFD9B23009128AC /* VLCDefaultValueSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B6A499D1DFD9B23009128AC /* VLCDefaultValueSliderCell.m */; };
 		6B846FE41CF5D88C00112E54 /* VLCHUDButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FDD1CF5D88C00112E54 /* VLCHUDButtonCell.m */; };
 		6B846FE51CF5D88C00112E54 /* VLCHUDCheckboxCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FDF1CF5D88C00112E54 /* VLCHUDCheckboxCell.m */; };
 		6B846FE61CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE11CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m */; };
@@ -1125,6 +1127,10 @@
 		6B3F8D2B1CE58E0E002A4998 /* VLCPreviousTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPreviousTemplate.pdf; path = Resources/vlcmenubaricon/VLCPreviousTemplate.pdf; sourceTree = "<group>"; };
 		6B3F8D301CE5CC21002A4998 /* VLCStatusBarIcon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCStatusBarIcon.pdf; path = Resources/vlcmenubaricon/VLCStatusBarIcon.pdf; sourceTree = "<group>"; };
 		6B3F8D321CE5CD57002A4998 /* VLCShuffleTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCShuffleTemplate.pdf; path = Resources/vlcmenubaricon/VLCShuffleTemplate.pdf; sourceTree = "<group>"; };
+		6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCDefaultValueSlider.h; path = ../../../modules/gui/macosx/VLCDefaultValueSlider.h; sourceTree = "<group>"; };
+		6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCDefaultValueSlider.m; path = ../../../modules/gui/macosx/VLCDefaultValueSlider.m; sourceTree = "<group>"; };
+		6B6A499C1DFD9B23009128AC /* VLCDefaultValueSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCDefaultValueSliderCell.h; path = ../../../modules/gui/macosx/VLCDefaultValueSliderCell.h; sourceTree = "<group>"; };
+		6B6A499D1DFD9B23009128AC /* VLCDefaultValueSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCDefaultValueSliderCell.m; path = ../../../modules/gui/macosx/VLCDefaultValueSliderCell.m; sourceTree = "<group>"; };
 		6B846FDC1CF5D88C00112E54 /* VLCHUDButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDButtonCell.h; path = ../../../modules/gui/macosx/VLCHUDButtonCell.h; sourceTree = "<group>"; };
 		6B846FDD1CF5D88C00112E54 /* VLCHUDButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDButtonCell.m; path = ../../../modules/gui/macosx/VLCHUDButtonCell.m; sourceTree = "<group>"; };
 		6B846FDE1CF5D88C00112E54 /* VLCHUDCheckboxCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDCheckboxCell.h; path = ../../../modules/gui/macosx/VLCHUDCheckboxCell.h; sourceTree = "<group>"; };
@@ -1763,6 +1769,10 @@
 				6B846FE81CF5D89500112E54 /* HUD UI Classes */,
 				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
 				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
+				6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */,
+				6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */,
+				6B6A499C1DFD9B23009128AC /* VLCDefaultValueSliderCell.h */,
+				6B6A499D1DFD9B23009128AC /* VLCDefaultValueSliderCell.m */,
 				E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */,
 				E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */,
 				E06CF7F416020F6200C698B7 /* Windows.h */,
@@ -3556,6 +3566,7 @@
 				6B846FE51CF5D88C00112E54 /* VLCHUDCheckboxCell.m in Sources */,
 				1CCB5F6A1A62A724004C3E90 /* VLCExtensionsDialogProvider.h in Sources */,
 				7DBB06641CC2314D004C74D2 /* caopengllayer.m in Sources */,
+				6B6A499E1DFD9B23009128AC /* VLCDefaultValueSlider.m in Sources */,
 				1CCB5F6B1A62A724004C3E90 /* VLCExtensionsDialogProvider.m in Sources */,
 				1CCB5F6C1A62A724004C3E90 /* VLCExtensionsManager.h in Sources */,
 				1CCB5F6D1A62A724004C3E90 /* VLCExtensionsManager.m in Sources */,
@@ -3582,6 +3593,7 @@
 				1C67C8A81D58C0A40079E1C1 /* VLCAboutWindowController.m in Sources */,
 				1CCB5F801A62A724004C3E90 /* VLCPlaylistInfo.m in Sources */,
 				1CCB5F811A62A724004C3E90 /* prefs_widgets.h in Sources */,
+				6B6A499F1DFD9B23009128AC /* VLCDefaultValueSliderCell.m in Sources */,
 				1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */,
 				1CCB5F831A62A724004C3E90 /* prefs.h in Sources */,
 				1CCB5F841A62A724004C3E90 /* prefs.m in Sources */,
