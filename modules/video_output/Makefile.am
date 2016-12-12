@@ -35,7 +35,7 @@ vout_LTLIBRARIES += libvout_ios2_plugin.la
 endif
 
 ### OpenGL ###
-libgles2_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) video_output/gl.c
+libgles2_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) video_output/opengl/display.c
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
 libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM)
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
@@ -43,7 +43,7 @@ libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libgles2_plugin.la
 vout_LTLIBRARIES += $(LTLIBgles2)
 
-libgl_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) video_output/gl.c
+libgl_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) video_output/opengl/display.c
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libgl_plugin_la_LIBADD = $(GL_LIBS) $(LIBM)
 if HAVE_GL
