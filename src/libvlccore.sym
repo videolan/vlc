@@ -108,6 +108,7 @@ es_format_Init
 es_format_InitFromVideo
 es_format_IsSimilar
 filter_Blend
+filter_chain_AppendConverter
 filter_chain_AppendFilter
 filter_chain_AppendFromString
 filter_chain_Delete

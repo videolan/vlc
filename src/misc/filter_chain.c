@@ -241,10 +241,9 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
 
 error:
     if( name != NULL )
-        msg_Err( parent, "Failed to create %s '%s'", chain->filter_cap,
-                 name );
+        msg_Err( parent, "Failed to create %s '%s'", capability, name );
     else
-        msg_Err( parent, "Failed to create %s", chain->filter_cap );
+        msg_Err( parent, "Failed to create %s", capability );
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
     vlc_object_release( filter );
@@ -257,6 +256,13 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *chain,
 {
     return filter_chain_AppendInner( chain, name, chain->filter_cap, cfg,
                                      fmt_in, fmt_out );
+}
+
+int filter_chain_AppendConverter( filter_chain_t *chain,
+    const es_format_t *fmt_in, const es_format_t *fmt_out )
+{
+    return filter_chain_AppendInner( chain, NULL, chain->filter_cap, NULL,
+                                     fmt_in, fmt_out ) != NULL ? 0 : -1;
 }
 
 void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
