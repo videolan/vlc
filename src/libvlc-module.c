@@ -1625,8 +1625,8 @@ vlc_module_begin ()
         change_short('V')
 
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL,
-                VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
+    add_module_list( "video-filter", "video filter", NULL,
+                     VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
 
     set_subcategory( SUBCAT_VIDEO_SPLITTER )
     add_module_list( "video-splitter", "video splitter", NULL,
