@@ -3062,12 +3062,23 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        }
        if( fmt->video.projection_mode != PROJECTION_MODE_RECTANGULAR )
        {
-           static const char *c_loc_names[] = { N_("Rectangular"),
-               N_("Equirectangular"),
-               N_("Cubemap"),
-           };
-           info_category_AddInfo( p_cat, _("Projection"), "%s",
-                   _(c_loc_names[fmt->video.projection_mode]) );
+           const char *psz_loc_name = NULL;
+           switch (fmt->video.projection_mode)
+           {
+           case PROJECTION_MODE_RECTANGULAR:
+               psz_loc_name = N_("Rectangular");
+               break;
+           case PROJECTION_MODE_EQUIRECTANGULAR:
+               psz_loc_name = N_("Equirectangular");
+               break;
+           case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
+               psz_loc_name = N_("Cubemap");
+               break;
+           default:
+               vlc_assert_unreachable();
+               break;
+           }
+           info_category_AddInfo( p_cat, _("Projection"), "%s", _(psz_loc_name) );
 
            info_category_AddInfo( p_cat, _("Yaw"), "%.2f",
                                   fmt->video.pose.f_yaw_degrees );
