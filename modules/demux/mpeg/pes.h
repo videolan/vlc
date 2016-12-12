@@ -20,13 +20,21 @@
 #ifndef VLC_MPEG_PES_H
 #define VLC_MPEG_PES_H
 
-static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
+static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, mtime_t *ret )
 {
-    return ((mtime_t)(p_data[ 0]&0x0e ) << 29)|
+    i_flags = (i_flags << 4) | 0x01; /* check marker bits, and i_flags = b 0010, 0011 or 0001 */
+    if((p_data[0] & 0xF1) != i_flags ||
+       (p_data[2] & 0x01) != 0x01 ||
+       (p_data[4] & 0x01) != 0x01)
+        return false;
+
+
+    *ret =  ((mtime_t)(p_data[ 0]&0x0e ) << 29)|
              (mtime_t)(p_data[1] << 22)|
             ((mtime_t)(p_data[2]&0xfe) << 14)|
              (mtime_t)(p_data[3] << 7)|
              (mtime_t)(p_data[4] >> 1);
+    return true;
 }
 
 /* PS SCR timestamp as defined in H222 2.5.3.2 */
@@ -78,20 +86,24 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
 
             if( p_header[7]&0x80 )    /* has pts */
             {
-                if( i_header < 9 + 5 )
+                if( i_header < 9 + 5 ||
+                   !ExtractPESTimestamp( &p_header[9], p_header[7] >> 6, pi_pts ) )
                     return VLC_EGENERIC;
-                *pi_pts = ExtractPESTimestamp( &p_header[9] );
 
                 if( p_header[7]&0x40 )    /* has dts */
                 {
-                    if( i_header < 14 + 5 )
+                    if( i_header < 14 + 5 ||
+                       !ExtractPESTimestamp( &p_header[14], 0x01, pi_dts ) )
                         return VLC_EGENERIC;
-                    *pi_dts = ExtractPESTimestamp( &p_header[14] );
                 }
             }
         }
         else
         {
+            /* FIXME?: WTH do we have undocumented MPEG1 packet stuff here ?
+               This code path should not be valid, but seems some ppl did
+               put MPEG1 packets into PS or TS.
+               Non spec reference for packet format on http://andrewduncan.net/mpeg/mpeg-1.html */
             i_skip = 6;
 
             if( pb_pes_scambling )
@@ -120,15 +132,15 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
 
             if(  p_header[i_skip]&0x20 )
             {
-                if( i_header < i_skip + 5 )
+                if( i_header < i_skip + 5  ||
+                   !ExtractPESTimestamp( &p_header[i_skip], p_header[i_skip] >> 4, pi_pts ) )
                     return VLC_EGENERIC;
-                *pi_pts = ExtractPESTimestamp( &p_header[i_skip] );
 
                 if( p_header[i_skip]&0x10 )    /* has dts */
                 {
-                    if( i_header < i_skip + 10 )
+                    if( i_header < i_skip + 10 ||
+                       !ExtractPESTimestamp( &p_header[i_skip+5], 0x01, pi_dts ) )
                         return VLC_EGENERIC;
-                    *pi_dts = ExtractPESTimestamp( &p_header[i_skip+5] );
                     i_skip += 10;
                 }
                 else

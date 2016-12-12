@@ -87,16 +87,16 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
     if( p_pes[7] & 0x80 ) // PTS
     {
         i_pesextoffset += 5;
-        if ( i_data < i_pesextoffset )
+        if ( i_data < i_pesextoffset ||
+            !ExtractPESTimestamp( &p_pes[9], p_pes[7] >> 6, &i_dts ) )
             return;
-        i_dts = ExtractPESTimestamp( &p_pes[9] );
     }
     if( p_pes[7] & 0x40 ) // DTS
     {
         i_pesextoffset += 5;
-        if ( i_data < i_pesextoffset )
+        if ( i_data < i_pesextoffset ||
+            !ExtractPESTimestamp( &p_pes[14], 0x01, &i_dts ) )
             return;
-        i_dts = ExtractPESTimestamp( &p_pes[14] );
     }
     if( p_pes[7] & 0x20 ) // ESCR
         i_pesextoffset += 6;
