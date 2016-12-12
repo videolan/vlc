@@ -39,13 +39,14 @@
 #include <assert.h>
 
 #define COBJMACROS
+#include <shobjidl.h>
+
+#include "common.h"
+
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
 # include <initguid.h>
 # include <dxgidebug.h>
 #endif
-#include <shobjidl.h>
-
-#include "common.h"
 
 static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 #if !VLC_WINSTORE_APP
