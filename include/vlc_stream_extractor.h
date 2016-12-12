@@ -43,7 +43,7 @@ extern "C" {
  *
  **/
 struct stream_extractor_t {
-    VLC_COMMON_MEMBERS;
+    VLC_COMMON_MEMBERS
 
     union {
         /**
