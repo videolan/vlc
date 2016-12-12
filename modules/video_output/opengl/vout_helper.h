@@ -53,10 +53,6 @@
 # else
 #  ifdef _WIN32
 #   include <GL/glew.h>
-#   undef glClientActiveTexture
-#   undef glActiveTexture
-    PFNGLACTIVETEXTUREPROC glActiveTexture;
-    PFNGLCLIENTACTIVETEXTUREPROC glClientActiveTexture;
 #  endif
 #  include <GL/gl.h>
 # endif

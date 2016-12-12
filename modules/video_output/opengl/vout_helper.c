@@ -40,53 +40,10 @@
 #include <vlc_vout.h>
 
 #include "vout_helper.h"
+#include "internal.h"
 
 #ifndef GL_CLAMP_TO_EDGE
 # define GL_CLAMP_TO_EDGE 0x812F
-#endif
-
-#if defined(USE_OPENGL_ES2) || defined(__APPLE__)
-#   define PFNGLGETPROGRAMIVPROC             typeof(glGetProgramiv)*
-#   define PFNGLGETPROGRAMINFOLOGPROC        typeof(glGetProgramInfoLog)*
-#   define PFNGLGETSHADERIVPROC              typeof(glGetShaderiv)*
-#   define PFNGLGETSHADERINFOLOGPROC         typeof(glGetShaderInfoLog)*
-#   define PFNGLGETUNIFORMLOCATIONPROC       typeof(glGetUniformLocation)*
-#   define PFNGLGETATTRIBLOCATIONPROC        typeof(glGetAttribLocation)*
-#   define PFNGLVERTEXATTRIBPOINTERPROC      typeof(glVertexAttribPointer)*
-#   define PFNGLENABLEVERTEXATTRIBARRAYPROC  typeof(glEnableVertexAttribArray)*
-#   define PFNGLUNIFORMMATRIX4FVPROC         typeof(glUniformMatrix4fv)*
-#   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
-#   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
-#   define PFNGLUNIFORM1IPROC                typeof(glUniform1i)*
-#   define PFNGLCREATESHADERPROC             typeof(glCreateShader)*
-#   define PFNGLSHADERSOURCEPROC             typeof(glShaderSource)*
-#   define PFNGLCOMPILESHADERPROC            typeof(glCompileShader)*
-#   define PFNGLDELETESHADERPROC             typeof(glDeleteShader)*
-#   define PFNGLCREATEPROGRAMPROC            typeof(glCreateProgram)*
-#   define PFNGLLINKPROGRAMPROC              typeof(glLinkProgram)*
-#   define PFNGLUSEPROGRAMPROC               typeof(glUseProgram)*
-#   define PFNGLDELETEPROGRAMPROC            typeof(glDeleteProgram)*
-#   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
-#   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
-#   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
-#   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
-#   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
-#if defined(__APPLE__)
-#   import <CoreFoundation/CoreFoundation.h>
-#endif
-#endif
-
-#if defined(USE_OPENGL_ES2)
-#   define GLSL_VERSION "100"
-#   define VLCGL_TEXTURE_COUNT 1
-#   define PRECISION "precision highp float;"
-#   define VLCGL_PICTURE_MAX 128
-#   define glClientActiveTexture(x)
-#else
-#   define GLSL_VERSION "120"
-#   define VLCGL_TEXTURE_COUNT 1
-#   define VLCGL_PICTURE_MAX 128
-#   define PRECISION ""
 #endif
 
 #ifndef GL_RED
@@ -119,6 +76,7 @@ typedef struct {
 struct vout_display_opengl_t {
 
     vlc_gl_t   *gl;
+    opengl_shaders_api_t api;
 
     video_format_t fmt;
     const vlc_chroma_description_t *chroma;
@@ -158,46 +116,6 @@ struct vout_display_opengl_t {
 
     GLuint *subpicture_buffer_object;
     int    subpicture_buffer_object_count;
-
-    /* Shader variables commands*/
-    PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
-    PFNGLGETATTRIBLOCATIONPROC       GetAttribLocation;
-    PFNGLVERTEXATTRIBPOINTERPROC     VertexAttribPointer;
-    PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray;
-
-    PFNGLUNIFORMMATRIX4FVPROC   UniformMatrix4fv;
-    PFNGLUNIFORM4FVPROC         Uniform4fv;
-    PFNGLUNIFORM4FPROC          Uniform4f;
-    PFNGLUNIFORM1IPROC          Uniform1i;
-
-    /* Shader command */
-    PFNGLCREATESHADERPROC CreateShader;
-    PFNGLSHADERSOURCEPROC ShaderSource;
-    PFNGLCOMPILESHADERPROC CompileShader;
-    PFNGLDELETESHADERPROC   DeleteShader;
-
-    PFNGLCREATEPROGRAMPROC CreateProgram;
-    PFNGLLINKPROGRAMPROC   LinkProgram;
-    PFNGLUSEPROGRAMPROC    UseProgram;
-    PFNGLDELETEPROGRAMPROC DeleteProgram;
-
-    PFNGLATTACHSHADERPROC  AttachShader;
-
-    /* Shader log commands */
-    PFNGLGETPROGRAMIVPROC  GetProgramiv;
-    PFNGLGETPROGRAMINFOLOGPROC GetProgramInfoLog;
-    PFNGLGETSHADERIVPROC   GetShaderiv;
-    PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
-
-    PFNGLGENBUFFERSPROC    GenBuffers;
-    PFNGLBINDBUFFERPROC    BindBuffer;
-    PFNGLBUFFERDATAPROC    BufferData;
-    PFNGLDELETEBUFFERSPROC DeleteBuffers;
-
-#if defined(_WIN32)
-    PFNGLACTIVETEXTUREPROC  ActiveTexture;
-    PFNGLCLIENTACTIVETEXTUREPROC  ClientActiveTexture;
-#endif
 
     /* Non-power-of-2 texture size support */
     bool supports_npot;
@@ -275,9 +193,9 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         " gl_Position = ProjectionMatrix * OrientationMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
         "}";
 
-    *shader = vgl->CreateShader(GL_VERTEX_SHADER);
-    vgl->ShaderSource(*shader, 1, &vertexShader, NULL);
-    vgl->CompileShader(*shader);
+    *shader = vgl->api.CreateShader(GL_VERTEX_SHADER);
+    vgl->api.ShaderSource(*shader, 1, &vertexShader, NULL);
+    vgl->api.CompileShader(*shader);
 }
 
 static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
@@ -357,9 +275,9 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
             local_value[i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.f;
     }
 
-    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
-    vgl->ShaderSource(*shader, 1, (const char **)&code, NULL);
-    vgl->CompileShader(*shader);
+    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
+    vgl->api.ShaderSource(*shader, 1, (const char **)&code, NULL);
+    vgl->api.CompileShader(*shader);
 
     free(code);
 }
@@ -378,9 +296,9 @@ static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
         "{ "
         "  gl_FragColor = texture2D(Texture[0], TexCoord0.st);"
         "}";
-    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
-    vgl->ShaderSource(*shader, 1, &code, NULL);
-    vgl->CompileShader(*shader);
+    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
+    vgl->api.ShaderSource(*shader, 1, &code, NULL);
+    vgl->api.CompileShader(*shader);
 }
 #endif
 
@@ -398,9 +316,9 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
         "{ "
         "  gl_FragColor = texture2D(Texture, TexCoord0.st) * FillColor;"
         "}";
-    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
-    vgl->ShaderSource(*shader, 1, &code, NULL);
-    vgl->CompileShader(*shader);
+    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
+    vgl->api.ShaderSource(*shader, 1, &code, NULL);
+    vgl->api.CompileShader(*shader);
 }
 
 static void BuildXYZFragmentShader(vout_display_opengl_t *vgl,
@@ -437,9 +355,9 @@ static void BuildXYZFragmentShader(vout_display_opengl_t *vgl,
         " v_out = clamp(v_out, 0.0, 1.0) ;"
         " gl_FragColor = v_out;"
         "}";
-    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
-    vgl->ShaderSource(*shader, 1, &code, NULL);
-    vgl->CompileShader(*shader);
+    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
+    vgl->api.ShaderSource(*shader, 1, &code, NULL);
+    vgl->api.CompileShader(*shader);
 }
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
@@ -471,44 +389,46 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     const int yuv_plane_texformat = GL_LUMINANCE;
 #endif
 
+    opengl_shaders_api_t *api = &vgl->api;
+
 #if defined(USE_OPENGL_ES2)
 #define GET_PROC_ADDR(name) name
 #else
 #define GET_PROC_ADDR(name) vlc_gl_GetProcAddress(gl, #name)
 #endif
-    vgl->CreateShader       = GET_PROC_ADDR(glCreateShader);
-    vgl->ShaderSource       = GET_PROC_ADDR(glShaderSource);
-    vgl->CompileShader      = GET_PROC_ADDR(glCompileShader);
-    vgl->AttachShader       = GET_PROC_ADDR(glAttachShader);
+    api->CreateShader       = GET_PROC_ADDR(glCreateShader);
+    api->ShaderSource       = GET_PROC_ADDR(glShaderSource);
+    api->CompileShader      = GET_PROC_ADDR(glCompileShader);
+    api->AttachShader       = GET_PROC_ADDR(glAttachShader);
 
-    vgl->GetProgramiv       = GET_PROC_ADDR(glGetProgramiv);
-    vgl->GetShaderiv        = GET_PROC_ADDR(glGetShaderiv);
-    vgl->GetProgramInfoLog  = GET_PROC_ADDR(glGetProgramInfoLog);
-    vgl->GetShaderInfoLog   = GET_PROC_ADDR(glGetShaderInfoLog);
+    api->GetProgramiv       = GET_PROC_ADDR(glGetProgramiv);
+    api->GetShaderiv        = GET_PROC_ADDR(glGetShaderiv);
+    api->GetProgramInfoLog  = GET_PROC_ADDR(glGetProgramInfoLog);
+    api->GetShaderInfoLog   = GET_PROC_ADDR(glGetShaderInfoLog);
 
-    vgl->DeleteShader       = GET_PROC_ADDR(glDeleteShader);
+    api->DeleteShader       = GET_PROC_ADDR(glDeleteShader);
 
-    vgl->GetUniformLocation      = GET_PROC_ADDR(glGetUniformLocation);
-    vgl->GetAttribLocation       = GET_PROC_ADDR(glGetAttribLocation);
-    vgl->VertexAttribPointer     = GET_PROC_ADDR(glVertexAttribPointer);
-    vgl->EnableVertexAttribArray = GET_PROC_ADDR(glEnableVertexAttribArray);
-    vgl->UniformMatrix4fv        = GET_PROC_ADDR(glUniformMatrix4fv);
-    vgl->Uniform4fv              = GET_PROC_ADDR(glUniform4fv);
-    vgl->Uniform4f               = GET_PROC_ADDR(glUniform4f);
-    vgl->Uniform1i               = GET_PROC_ADDR(glUniform1i);
+    api->GetUniformLocation      = GET_PROC_ADDR(glGetUniformLocation);
+    api->GetAttribLocation       = GET_PROC_ADDR(glGetAttribLocation);
+    api->VertexAttribPointer     = GET_PROC_ADDR(glVertexAttribPointer);
+    api->EnableVertexAttribArray = GET_PROC_ADDR(glEnableVertexAttribArray);
+    api->UniformMatrix4fv        = GET_PROC_ADDR(glUniformMatrix4fv);
+    api->Uniform4fv              = GET_PROC_ADDR(glUniform4fv);
+    api->Uniform4f               = GET_PROC_ADDR(glUniform4f);
+    api->Uniform1i               = GET_PROC_ADDR(glUniform1i);
 
-    vgl->CreateProgram = GET_PROC_ADDR(glCreateProgram);
-    vgl->LinkProgram   = GET_PROC_ADDR(glLinkProgram);
-    vgl->UseProgram    = GET_PROC_ADDR(glUseProgram);
-    vgl->DeleteProgram = GET_PROC_ADDR(glDeleteProgram);
+    api->CreateProgram = GET_PROC_ADDR(glCreateProgram);
+    api->LinkProgram   = GET_PROC_ADDR(glLinkProgram);
+    api->UseProgram    = GET_PROC_ADDR(glUseProgram);
+    api->DeleteProgram = GET_PROC_ADDR(glDeleteProgram);
 
-    vgl->GenBuffers    = GET_PROC_ADDR(glGenBuffers);
-    vgl->BindBuffer    = GET_PROC_ADDR(glBindBuffer);
-    vgl->BufferData    = GET_PROC_ADDR(glBufferData);
-    vgl->DeleteBuffers = GET_PROC_ADDR(glDeleteBuffers);
+    api->GenBuffers    = GET_PROC_ADDR(glGenBuffers);
+    api->BindBuffer    = GET_PROC_ADDR(glBindBuffer);
+    api->BufferData    = GET_PROC_ADDR(glBufferData);
+    api->DeleteBuffers = GET_PROC_ADDR(glDeleteBuffers);
 #undef GET_PROC_ADDR
 
-    if (!vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram)
+    if (!vgl->api.CreateShader || !vgl->api.ShaderSource || !vgl->api.CreateProgram)
         supports_shaders = false;
     if (!supports_shaders)
     {
@@ -518,10 +438,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
 #if defined(_WIN32)
-    vgl->ActiveTexture = (PFNGLACTIVETEXTUREPROC)vlc_gl_GetProcAddress(gl, "glActiveTexture");
-    vgl->ClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREPROC)vlc_gl_GetProcAddress(gl, "glClientActiveTexture");
-#   define glActiveTexture vgl->ActiveTexture
-#   define glClientActiveTexture vgl->ClientActiveTexture
+    api->ActiveTexture = vlc_gl_GetProcAddress(gl, "glActiveTexture");
+    api->ClientActiveTexture = vlc_gl_GetProcAddress(gl, "glClientActiveTexture");
+#   undef glActiveTexture
+#   undef glClientActiveTexture
+#   define glActiveTexture vgl->api.ActiveTexture
+#   define glClientActiveTexture vgl->api.ClientActiveTexture
 #endif
 
     vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
@@ -625,7 +547,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Check shaders messages */
     for (unsigned j = 0; j < nb_shaders; j++) {
         int infoLength;
-        vgl->GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
+        vgl->api.GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
             continue;
 
@@ -633,8 +555,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         if (infolog != NULL)
         {
             int charsWritten;
-            vgl->GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten,
-                                  infolog);
+            vgl->api.GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten,
+                                      infolog);
             msg_Err(gl, "shader %d: %s", j, infolog);
             free(infolog);
         }
@@ -650,18 +572,18 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     {
         program_idx = nb_programs++;
 
-        program = vgl->program[program_idx] = vgl->CreateProgram();
-        vgl->AttachShader(program, vgl->shader[fragment_shader_idx]);
-        vgl->AttachShader(program, vgl->shader[vertex_shader_idx]);
-        vgl->LinkProgram(program);
+        program = vgl->program[program_idx] = vgl->api.CreateProgram();
+        vgl->api.AttachShader(program, vgl->shader[fragment_shader_idx]);
+        vgl->api.AttachShader(program, vgl->shader[vertex_shader_idx]);
+        vgl->api.LinkProgram(program);
     }
 
     /* RGB & Vertex shaders */
     rgba_program_idx = nb_programs++;
-    program = vgl->program[rgba_program_idx] = vgl->CreateProgram();
-    vgl->AttachShader(program, vgl->shader[rgba_fragment_shader_idx]);
-    vgl->AttachShader(program, vgl->shader[vertex_shader_idx]);
-    vgl->LinkProgram(program);
+    program = vgl->program[rgba_program_idx] = vgl->api.CreateProgram();
+    vgl->api.AttachShader(program, vgl->shader[rgba_fragment_shader_idx]);
+    vgl->api.AttachShader(program, vgl->shader[vertex_shader_idx]);
+    vgl->api.LinkProgram(program);
 
     vgl->program_idx = program_idx != -1 ? program_idx : rgba_program_idx;
     vgl->program_sub_idx = rgba_program_idx;
@@ -669,22 +591,22 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Check program messages */
     for (GLuint i = 0; i < nb_programs; i++) {
         int infoLength = 0;
-        vgl->GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
+        vgl->api.GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
             continue;
         char *infolog = malloc(infoLength);
         if (infolog != NULL)
         {
             int charsWritten;
-            vgl->GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten,
-                                   infolog);
+            vgl->api.GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten,
+                                       infolog);
             msg_Err(gl, "shader program %d: %s", i, infolog);
             free(infolog);
         }
 
         /* If there is some message, better to check linking is ok */
         GLint link_status = GL_TRUE;
-        vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
+        vgl->api.GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE) {
             msg_Err(gl, "Unable to use program %d\n", i);
             vout_display_opengl_Delete(vgl);
@@ -719,9 +641,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    vgl->GenBuffers(1, &vgl->vertex_buffer_object);
-    vgl->GenBuffers(1, &vgl->index_buffer_object);
-    vgl->GenBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+    vgl->api.GenBuffers(1, &vgl->vertex_buffer_object);
+    vgl->api.GenBuffers(1, &vgl->index_buffer_object);
+    vgl->api.GenBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
 
     /* Initial number of allocated buffer objects for subpictures, will grow dynamically. */
     int subpicture_buffer_object_count = 8;
@@ -731,7 +653,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
     vgl->subpicture_buffer_object_count = subpicture_buffer_object_count;
-    vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+    vgl->api.GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
 
     /* */
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
@@ -771,14 +693,14 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     free(vgl->region);
 
     for (int i = 0; i < 2 && vgl->program[i] != 0; i++)
-        vgl->DeleteProgram(vgl->program[i]);
+        vgl->api.DeleteProgram(vgl->program[i]);
     for (int i = 0; i < 3 && vgl->shader[i] != 0; i++)
-        vgl->DeleteShader(vgl->shader[i]);
-    vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
-    vgl->DeleteBuffers(1, &vgl->index_buffer_object);
-    vgl->DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+        vgl->api.DeleteShader(vgl->shader[i]);
+    vgl->api.DeleteBuffers(1, &vgl->vertex_buffer_object);
+    vgl->api.DeleteBuffers(1, &vgl->index_buffer_object);
+    vgl->api.DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
     if (vgl->subpicture_buffer_object_count > 0)
-        vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+        vgl->api.DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
     free(vgl->subpicture_buffer_object);
 
     free(vgl->texture_temp_buf);
@@ -1511,22 +1433,22 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
                             unsigned int program_idx)
 {
     GLuint program = vgl->program[program_idx];
-    vgl->UseProgram(program);
+    vgl->api.UseProgram(program);
     if (vlc_fourcc_IsYUV(vgl->fmt.i_chroma)
      || vgl->fmt.i_chroma == VLC_CODEC_XYZ12) { /* FIXME: ugly */
         if (vgl->chroma->plane_count == 3) {
-            vgl->Uniform4fv(vgl->GetUniformLocation(program,
+            vgl->api.Uniform4fv(vgl->api.GetUniformLocation(program,
                             "Coefficient"), 4, vgl->local_value);
-            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture0"), 0);
-            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture1"), 1);
-            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture2"), 2);
+            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture0"), 0);
+            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture1"), 1);
+            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture2"), 2);
         }
         else if (vgl->chroma->plane_count == 1) {
-            vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture0"), 0);
+            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture0"), 0);
         }
     } else {
-        vgl->Uniform1i(vgl->GetUniformLocation(program, "Texture0"), 0);
-        vgl->Uniform4f(vgl->GetUniformLocation(program, "FillColor"),
+        vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture0"), 0);
+        vgl->api.Uniform4f(vgl->api.GetUniformLocation(program, "FillColor"),
                        1.0f, 1.0f, 1.0f, 1.0f);
     }
 
@@ -1595,45 +1517,45 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         glClientActiveTexture(GL_TEXTURE0+j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
 
-        vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
-        vgl->BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
+        vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
+        vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
                         textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
 
         char attribute[20];
         snprintf(attribute, sizeof(attribute), "MultiTexCoord%1d", j);
-        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(program, attribute));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(program, attribute), 2,
+        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program, attribute));
+        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program, attribute), 2,
                                  GL_FLOAT, 0, 0, 0);
     }
     free(textureCoord);
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
 
-    vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
-    vgl->BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat), vertexCoord, GL_STATIC_DRAW);
+    vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
+    vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat), vertexCoord, GL_STATIC_DRAW);
     free(vertexCoord);
-    vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
-    vgl->BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort), indices, GL_STATIC_DRAW);
+    vgl->api.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
+    vgl->api.BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort), indices, GL_STATIC_DRAW);
     free(indices);
-    vgl->EnableVertexAttribArray(vgl->GetAttribLocation(program,
+    vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program,
                                  "VertexPosition"));
-    vgl->VertexAttribPointer(vgl->GetAttribLocation(program, "VertexPosition"),
+    vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program, "VertexPosition"),
                              3, GL_FLOAT, 0, 0, 0);
 
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "OrientationMatrix"),
+    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "OrientationMatrix"),
                           1, GL_FALSE, orientationMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "ProjectionMatrix"),
+    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "ProjectionMatrix"),
                           1, GL_FALSE, projectionMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "ZRotMatrix"),
+    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "ZRotMatrix"),
                           1, GL_FALSE, zRotMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "YRotMatrix"),
+    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "YRotMatrix"),
                           1, GL_FALSE, yRotMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "XRotMatrix"),
+    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "XRotMatrix"),
                           1, GL_FALSE, xRotMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(program, "ZoomMatrix"),
+    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "ZoomMatrix"),
                           1, GL_FALSE, zoomMatrix);
 
-    vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
+    vgl->api.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
     glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
 }
 
@@ -1679,8 +1601,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     /* Draw the subpictures */
     // Change the program for overlays
     GLuint sub_program = vgl->program[vgl->program_sub_idx];
-    vgl->UseProgram(sub_program);
-    vgl->Uniform1i(vgl->GetUniformLocation(sub_program, "Texture"), 0);
+    vgl->api.UseProgram(sub_program);
+    vgl->api.Uniform1i(vgl->api.GetUniformLocation(sub_program, "Texture"), 0);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1688,7 +1610,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     /* We need two buffer objects for each region: for vertex and texture coordinates. */
     if (2 * vgl->region_count > vgl->subpicture_buffer_object_count) {
         if (vgl->subpicture_buffer_object_count > 0)
-            vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+            vgl->api.DeleteBuffers(vgl->subpicture_buffer_object_count,
+                                   vgl->subpicture_buffer_object);
         vgl->subpicture_buffer_object_count = 0;
 
         int new_count = 2 * vgl->region_count;
@@ -1697,7 +1620,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             return VLC_ENOMEM;
 
         vgl->subpicture_buffer_object_count = new_count;
-        vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+        vgl->api.GenBuffers(vgl->subpicture_buffer_object_count,
+                            vgl->subpicture_buffer_object);
     }
 
     glActiveTexture(GL_TEXTURE0 + 0);
@@ -1718,36 +1642,36 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         };
 
         glBindTexture(GL_TEXTURE_2D, glr->texture);
-        vgl->Uniform4f(vgl->GetUniformLocation(sub_program, "FillColor"),
-                       1.0f, 1.0f, 1.0f, glr->alpha);
+        vgl->api.Uniform4f(vgl->api.GetUniformLocation(sub_program, "FillColor"),
+                           1.0f, 1.0f, 1.0f, glr->alpha);
 
-        vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
-        vgl->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
-        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(sub_program,
-                                     "MultiTexCoord0"));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(sub_program,
-                                 "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
+        vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
+        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(sub_program,
+                                         "MultiTexCoord0"));
+        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(sub_program,
+                                     "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
 
-        vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
-        vgl->BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
-        vgl->EnableVertexAttribArray(vgl->GetAttribLocation(sub_program,
-                                     "VertexPosition"));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(sub_program,
-                                 "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
+        vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
+        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(sub_program,
+                                         "VertexPosition"));
+        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(sub_program,
+                                     "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
 
         // Subpictures have the correct orientation:
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
-                              "OrientationMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
-                              "ProjectionMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
-                              "ZRotMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
-                              "YRotMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
-                              "XRotMatrix"), 1, GL_FALSE, identity);
-        vgl->UniformMatrix4fv(vgl->GetUniformLocation(sub_program,
-                              "ZoomMatrix"), 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+                                  "OrientationMatrix"), 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+                                  "ProjectionMatrix"), 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+                                  "ZRotMatrix"), 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+                                  "YRotMatrix"), 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+                                  "XRotMatrix"), 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+                                  "ZoomMatrix"), 1, GL_FALSE, identity);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
