@@ -87,7 +87,7 @@ libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XPROTO_CFLAGS) $(XCB_CFLAGS) $(XCB_KEYSYMS_CFLAGS)
 libxcb_window_plugin_la_LIBADD = $(XPROTO_LIBS) $(XCB_LIBS) $(XCB_KEYSYMS_LIBS)
 
-libegl_x11_plugin_la_SOURCES = video_output/egl.c
+libegl_x11_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_x11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_X11=1
 libegl_x11_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
 libegl_x11_plugin_la_LIBADD = $(EGL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
@@ -128,7 +128,7 @@ libwl_shell_surface_plugin_la_SOURCES = video_output/wayland/shell_surface.c
 libwl_shell_surface_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libwl_shell_surface_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)
 
-libegl_wl_plugin_la_SOURCES = video_output/egl.c
+libegl_wl_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WAYLAND=1
 libegl_wl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) $(WAYLAND_EGL_CFLAGS)
 libegl_wl_plugin_la_LIBADD = $(EGL_LIBS) $(WAYLAND_EGL_LIBS)
@@ -224,7 +224,7 @@ if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwingdi_plugin.la
 endif
 
-libegl_win32_plugin_la_SOURCES = video_output/egl.c
+libegl_win32_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_win32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WIN32=1
 libegl_win32_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
 libegl_win32_plugin_la_LIBADD = $(EGL_LIBS)
@@ -253,7 +253,7 @@ endif
 
 ### Android ###
 
-libegl_android_plugin_la_SOURCES = video_output/egl.c
+libegl_android_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1
 libegl_android_plugin_la_LIBADD = $(EGL_LIBS)
 

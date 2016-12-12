@@ -40,7 +40,7 @@
 # include <wayland-egl.h>
 #endif
 #if defined (USE_PLATFORM_ANDROID)
-# include "android/utils.h"
+# include "../android/utils.h"
 #endif
 
 typedef struct vlc_gl_sys_t
