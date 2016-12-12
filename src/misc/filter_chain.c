@@ -61,6 +61,7 @@ struct filter_chain_t
     unsigned length; /**< Number of filters */
     bool b_allow_fmt_out_change; /**< Can the output format be changed? */
     const char *filter_cap; /**< Filter modules capability */
+    const char *conv_cap; /**< Converter modules capability */
 };
 
 /**
@@ -69,7 +70,8 @@ struct filter_chain_t
 static void FilterDeletePictures( picture_t * );
 
 static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
-    const char *cap, bool fmt_out_change, const filter_owner_t *owner )
+    const char *cap, const char *conv_cap, bool fmt_out_change,
+    const filter_owner_t *owner )
 {
     assert( callbacks != NULL && callbacks->sys != NULL );
     assert( cap != NULL );
@@ -88,6 +90,7 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     chain->length = 0;
     chain->b_allow_fmt_out_change = fmt_out_change;
     chain->filter_cap = cap;
+    chain->conv_cap = conv_cap;
     return chain;
 }
 
@@ -101,7 +104,7 @@ filter_chain_t *filter_chain_New( vlc_object_t *obj, const char *cap )
         .sys = obj,
     };
 
-    return filter_chain_NewInner( &callbacks, cap, false, NULL );
+    return filter_chain_NewInner( &callbacks, cap, NULL, false, NULL );
 }
 
 /** Chained filter picture allocator function */
@@ -137,8 +140,8 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
         },
     };
 
-    return filter_chain_NewInner( &callbacks, "video filter", allow_change,
-                                  owner );
+    return filter_chain_NewInner( &callbacks, "video filter", "video filter",
+                                  allow_change, owner );
 }
 
 /**
@@ -206,6 +209,8 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     filter->owner = chain->callbacks;
     filter->owner.sys = chain;
 
+    assert( capability != NULL );
+
     filter->p_module = module_need( filter, capability, name, name != NULL );
     if( filter->p_module == NULL )
         goto error;
@@ -261,7 +266,7 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *chain,
 int filter_chain_AppendConverter( filter_chain_t *chain,
     const es_format_t *fmt_in, const es_format_t *fmt_out )
 {
-    return filter_chain_AppendInner( chain, NULL, chain->filter_cap, NULL,
+    return filter_chain_AppendInner( chain, NULL, chain->conv_cap, NULL,
                                      fmt_in, fmt_out ) != NULL ? 0 : -1;
 }
 
