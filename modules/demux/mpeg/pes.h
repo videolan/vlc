@@ -122,6 +122,7 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
                 msg_Err( p_object, "too much MPEG-1 stuffing" );
                 return VLC_EGENERIC;
             }
+            /* Skip STD buffer size */
             if( ( p_header[i_skip] & 0xC0 ) == 0x40 )
             {
                 i_skip += 2;
@@ -150,6 +151,8 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
             }
             else
             {
+                if( p_header[i_skip] & 0xFF != 0x0F ) /* No pts/dts, lowest bits set to 0x0F */
+                    return VLC_EGENERIC;
                 i_skip += 1;
             }
         }
