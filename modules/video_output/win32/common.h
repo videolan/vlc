@@ -38,9 +38,6 @@
 #if defined(MODULE_NAME_IS_glwin32) || defined(MODULE_NAME_IS_wgl)
 # include "../opengl.h"
 #endif
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-# include <dxgidebug.h>
-#endif
 
 /*****************************************************************************
  * event_thread_t: event thread
