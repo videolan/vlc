@@ -46,7 +46,7 @@
 #import <vlc_vout_display.h>
 #import <vlc_opengl.h>
 #import <vlc_dialog.h>
-#import "opengl.h"
+#import "opengl/vout_helper.h"
 
 /**
  * Forward declarations

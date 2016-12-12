@@ -2,6 +2,8 @@ voutdir = $(pluginsdir)/video_output
 vout_LTLIBRARIES =
 
 EXTRA_DIST += video_output/README
+OPENGL_DISPLAY_SRCS = video_output/opengl/vout_helper.c \
+	video_output/opengl/vout_helper.h
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
@@ -11,17 +13,18 @@ vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
 if HAVE_OSX
-libvout_macosx_plugin_la_SOURCES = video_output/macosx.m video_output/opengl.c video_output/opengl.h
+libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_DISPLAY_SRCS)
 libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa
 
-libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m video_output/opengl.c video_output/opengl.h
+libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m \
+	$(OPENGL_DISPLAY_SRCS)
 libcaopengllayer_plugin_la_CFLAGS = $(AM_CFLAGS)
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la
 endif
 
-libvout_ios2_plugin_la_SOURCES = video_output/ios2.m video_output/opengl.h video_output/opengl.c
+libvout_ios2_plugin_la_SOURCES = video_output/ios2.m $(OPENGL_DISPLAY_SRCS)
 libvout_ios2_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvout_ios2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
 if HAVE_IOS
@@ -32,8 +35,7 @@ vout_LTLIBRARIES += libvout_ios2_plugin.la
 endif
 
 ### OpenGL ###
-libgles2_plugin_la_SOURCES = video_output/opengl.c video_output/opengl.h \
-	video_output/gl.c
+libgles2_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) video_output/gl.c
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
 libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM)
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
@@ -41,8 +43,7 @@ libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libgles2_plugin.la
 vout_LTLIBRARIES += $(LTLIBgles2)
 
-libgl_plugin_la_SOURCES = video_output/opengl.c video_output/opengl.h \
-	video_output/gl.c
+libgl_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) video_output/gl.c
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libgl_plugin_la_LIBADD = $(GL_LIBS) $(LIBM)
 if HAVE_GL
@@ -189,13 +190,12 @@ vout_LTLIBRARIES += $(LTLIBdirectdraw)
 EXTRA_LTLIBRARIES += libdirectdraw_plugin.la
 endif
 
-libglwin32_plugin_la_SOURCES = video_output/win32/glwin32.c \
-	video_output/opengl.c video_output/opengl.h \
+libglwin32_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) \
+	video_output/win32/glwin32.c \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
-libwgl_plugin_la_SOURCES = video_output/win32/wgl.c \
-        video_output/opengl.c video_output/opengl.h
+libwgl_plugin_la_SOURCES = video_output/win32/wgl.c $(OPENGL_DISPLAY_SRCS)
 
 libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_glwin32

@@ -36,7 +36,7 @@
 # include <d3dx9effect.h>
 #endif
 #if defined(MODULE_NAME_IS_glwin32) || defined(MODULE_NAME_IS_wgl)
-# include "../opengl.h"
+# include "../opengl/vout_helper.h"
 #endif
 
 /*****************************************************************************

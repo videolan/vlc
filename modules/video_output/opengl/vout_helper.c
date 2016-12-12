@@ -1,7 +1,7 @@
 /*****************************************************************************
- * opengl.c: OpenGL and OpenGL ES output common code
+ * vout_helper.c: OpenGL and OpenGL ES output common code
  *****************************************************************************
- * Copyright (C) 2004-2013 VLC authors and VideoLAN
+ * Copyright (C) 2004-2016 VLC authors and VideoLAN
  * Copyright (C) 2009, 2011 Laurent Aimar
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
@@ -39,7 +39,7 @@
 #include <vlc_memory.h>
 #include <vlc_vout.h>
 
-#include "opengl.h"
+#include "vout_helper.h"
 
 #ifndef GL_CLAMP_TO_EDGE
 # define GL_CLAMP_TO_EDGE 0x812F

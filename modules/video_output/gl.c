@@ -31,7 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
-#include "opengl.h"
+#include "opengl/vout_helper.h"
 
 /* Plugin callbacks */
 static int Open (vlc_object_t *);

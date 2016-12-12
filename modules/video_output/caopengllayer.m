@@ -41,7 +41,7 @@
 #import <OpenGL/OpenGL.h>
 #import <dlfcn.h>               /* dlsym */
 
-#include "opengl.h"
+#include "opengl/vout_helper.h"
 
 #define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
 

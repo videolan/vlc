@@ -1,7 +1,7 @@
 /*****************************************************************************
- * opengl.h: OpenGL vout_display helpers
+ * vout_helper.h: OpenGL vout_display helpers
  *****************************************************************************
- * Copyright (C) 2004-2013 VLC authors and VideoLAN
+ * Copyright (C) 2004-2016 VLC authors and VideoLAN
  * Copyright (C) 2009 Laurent Aimar
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
@@ -26,8 +26,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_OPENGL_H
-#define VLC_OPENGL_H
+#ifndef VLC_OPENGL_VOUT_HELPER_H
+#define VLC_OPENGL_VOUT_HELPER_H
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>

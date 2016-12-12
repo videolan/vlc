@@ -28,7 +28,7 @@
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
 
-#include "../opengl.h"
+#include "../opengl/vout_helper.h"
 #include <GL/wglew.h>
 
 #include "common.h"
