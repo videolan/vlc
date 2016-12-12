@@ -175,10 +175,9 @@ void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
     }
 }
 
-filter_t *filter_chain_AppendFilter( filter_chain_t *chain, const char *name,
-                                     config_chain_t *cfg,
-                                     const es_format_t *fmt_in,
-                                     const es_format_t *fmt_out )
+static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
+    const char *name, const char *capability, config_chain_t *cfg,
+    const es_format_t *fmt_in, const es_format_t *fmt_out )
 {
     vlc_object_t *parent = chain->callbacks.sys;
     chained_filter_t *chained =
@@ -207,8 +206,7 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *chain, const char *name,
     filter->owner = chain->callbacks;
     filter->owner.sys = chain;
 
-    filter->p_module = module_need( filter, chain->filter_cap, name,
-                                    name != NULL );
+    filter->p_module = module_need( filter, capability, name, name != NULL );
     if( filter->p_module == NULL )
         goto error;
 
@@ -251,6 +249,14 @@ error:
     es_format_Clean( &filter->fmt_in );
     vlc_object_release( filter );
     return NULL;
+}
+
+filter_t *filter_chain_AppendFilter( filter_chain_t *chain,
+    const char *name, config_chain_t *cfg,
+    const es_format_t *fmt_in, const es_format_t *fmt_out )
+{
+    return filter_chain_AppendInner( chain, name, chain->filter_cap, cfg,
+                                     fmt_in, fmt_out );
 }
 
 void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
