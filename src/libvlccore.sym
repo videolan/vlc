@@ -110,7 +110,6 @@ es_format_IsSimilar
 filter_Blend
 filter_chain_AppendFilter
 filter_chain_AppendFromString
-filter_chain_AudioFilter
 filter_chain_Delete
 filter_chain_DeleteFilter
 filter_chain_GetFmtOut

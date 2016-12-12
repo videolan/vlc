@@ -373,17 +373,6 @@ VLC_API picture_t *filter_chain_VideoFilter(filter_chain_t *chain,
 VLC_API void filter_chain_VideoFlush( filter_chain_t * );
 
 /**
- * Apply the filter chain to a audio block.
- * \bug Deal with block chains and document.
- *
- * \param chain pointer to filter chain
- * \param block audio frame to apply filters on
- * \return modified audio frame after applying all audio filters
- */
-VLC_API block_t *filter_chain_AudioFilter(filter_chain_t *chain,
-                                          block_t *block);
-
-/**
  * Generate subpictures from a chain of subpicture source "filters".
  *
  * \param chain filter chain
