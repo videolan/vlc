@@ -33,7 +33,7 @@ static int Open (vlc_object_t *);
 
 vlc_module_begin ()
     set_description (N_("ARM NEON video chroma conversions"))
-    set_capability ("video filter", 250)
+    set_capability ("video converter", 250)
     set_callbacks (Open, NULL)
 vlc_module_end ()
 

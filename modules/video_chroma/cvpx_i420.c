@@ -44,7 +44,7 @@ static picture_t *CVPX_I420_Filter( filter_t *, picture_t * );
 
 vlc_module_begin ()
 set_description( N_("Conversions from CoreVideo buffers to I420") )
-set_capability( "video filter", 10 )
+set_capability( "video converter", 10 )
 set_callbacks( Activate, NULL )
 vlc_module_end ()
 
