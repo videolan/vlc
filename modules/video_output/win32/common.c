@@ -40,7 +40,7 @@
 
 #define COBJMACROS
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-# define INITGUID
+# include <initguid.h>
 # include <dxgidebug.h>
 #endif
 #include <shobjidl.h>
