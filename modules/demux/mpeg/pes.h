@@ -29,7 +29,8 @@ static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
              (mtime_t)(p_data[4] >> 1);
 }
 
-static inline mtime_t ExtractMPEG1PESTimestamp( const uint8_t *p_data )
+/* PS SCR timestamp as defined in H222 2.5.3.2 */
+static inline mtime_t ExtractPackHeaderTimestamp( const uint8_t *p_data )
 {
     return ((mtime_t)(p_data[ 0]&0x38 ) << 27)|
             ((mtime_t)(p_data[0]&0x03 ) << 28)|
