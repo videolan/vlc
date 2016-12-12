@@ -930,6 +930,16 @@ static int ReleaseOutput(mc_api *api, int i_index, bool b_render)
 }
 
 /*****************************************************************************
+ * SetOutputSurface
+ *****************************************************************************/
+static int SetOutputSurface(mc_api *api, void *p_surface, void *p_jsurface)
+{
+    (void) api; (void) p_surface; (void) p_jsurface;
+
+    return MC_API_ERROR;
+}
+
+/*****************************************************************************
  * Clean
  *****************************************************************************/
 static void Clean(mc_api *api)
@@ -979,6 +989,7 @@ int MediaCodecJni_Init(mc_api *api)
     api->dequeue_out = DequeueOutput;
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
+    api->set_output_surface = SetOutputSurface;
 
     /* Allow interlaced picture only after API 21 */
     api->b_support_interlaced = jfields.get_input_buffer

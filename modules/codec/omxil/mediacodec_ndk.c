@@ -143,6 +143,9 @@ typedef uint8_t* (*pf_AMediaCodec_getOutputBuffer)(AMediaCodec*,
 typedef media_status_t (*pf_AMediaCodec_releaseOutputBuffer)(AMediaCodec*,
         size_t idx, bool render);
 
+typedef media_status_t (*pf_AMediaCodec_setOutputSurface)(AMediaCodec*,
+        ANativeWindow *surface);
+
 typedef AMediaFormat *(*pf_AMediaFormat_new)();
 typedef media_status_t (*pf_AMediaFormat_delete)(AMediaFormat*);
 
@@ -171,6 +174,7 @@ struct syms
         pf_AMediaCodec_dequeueOutputBuffer dequeueOutputBuffer;
         pf_AMediaCodec_getOutputBuffer getOutputBuffer;
         pf_AMediaCodec_releaseOutputBuffer releaseOutputBuffer;
+        pf_AMediaCodec_setOutputSurface setOutputSurface;
     } AMediaCodec;
     struct {
         pf_AMediaFormat_new new;
@@ -204,6 +208,7 @@ static struct members members[] =
     { "AMediaCodec_dequeueOutputBuffer", OFF(dequeueOutputBuffer), true },
     { "AMediaCodec_getOutputBuffer", OFF(getOutputBuffer), true },
     { "AMediaCodec_releaseOutputBuffer", OFF(releaseOutputBuffer), true },
+    { "AMediaCodec_setOutputSurface", OFF(setOutputSurface), false },
 #undef OFF
 #define OFF(x) offsetof(struct syms, AMediaFormat.x)
     { "AMediaFormat_new", OFF(new), true },
@@ -550,6 +555,19 @@ static int ReleaseOutput(mc_api *api, int i_index, bool b_render)
         return MC_API_ERROR;
 }
 
+/*****************************************************************************
+ * SetOutputSurface
+ *****************************************************************************/
+static int SetOutputSurface(mc_api *api, void *p_surface, void *p_jsurface)
+{
+    (void) p_jsurface;
+    assert(p_surface != NULL);
+    mc_api_sys *p_sys = api->p_sys;
+
+    return syms.AMediaCodec.setOutputSurface != NULL
+        && syms.AMediaCodec.setOutputSurface(p_sys->p_codec, p_surface)
+        == AMEDIA_OK ? 0 : MC_API_ERROR;
+}
 
 /*****************************************************************************
  * Clean
@@ -597,6 +615,7 @@ int MediaCodecNdk_Init(mc_api *api)
     api->dequeue_out = DequeueOutput;
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
+    api->set_output_surface = SetOutputSurface;
 
     api->b_support_interlaced = true;
     return 0;

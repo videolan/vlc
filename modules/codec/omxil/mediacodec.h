@@ -146,6 +146,10 @@ struct mc_api
 
     /* i_index is the index returned by dequeue_out and should be >= 0 */
     int (*release_out)(mc_api *, int i_index, bool b_render);
+
+    /* Dynamically sets the output surface
+     * Returns 0 on success, or MC_API_ERROR */
+    int (*set_output_surface)(mc_api*, void *p_surface, void *p_jsurface);
 };
 
 #endif
