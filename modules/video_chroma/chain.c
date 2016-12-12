@@ -55,7 +55,7 @@ static int BuildTransformChain( filter_t *p_filter );
 static int BuildChromaResize( filter_t * );
 static int BuildChromaChain( filter_t *p_filter );
 
-static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid, config_chain_t * );
+static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid );
 static filter_t * AppendTransform( filter_chain_t *p_chain, es_format_t *p_fmt_in, es_format_t *p_fmt_out );
 static void EsFormatMergeSize( es_format_t *p_dst,
                                const es_format_t *p_base,
@@ -124,7 +124,18 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( b_transform )
+    int type = VLC_VAR_INTEGER;
+    if( var_Type( p_filter->obj.parent, MODULE_STRING "-level" ) != 0 )
+        type |= VLC_VAR_DOINHERIT;
+
+    var_Create( p_filter, MODULE_STRING "-level", type );
+    /* Note: atomicity is not actually needed here. */
+    var_IncInteger( p_filter, MODULE_STRING "-level" );
+
+    int level = var_GetInteger( p_filter, MODULE_STRING "-level" );
+    if( level < 0 || level > CHAIN_LEVEL_MAX )
+        msg_Err( p_filter, "Too high level of recursion (%d)", level );
+    else if( b_transform )
         i_ret = BuildTransformChain( p_filter );
     else if( b_chroma && b_resize )
         i_ret = BuildChromaResize( p_filter );
@@ -136,6 +147,7 @@ static int Activate( vlc_object_t *p_this )
     if( i_ret )
     {
         /* Hum ... looks like this really isn't going to work. Too bad. */
+        var_Destroy( p_filter, MODULE_STRING "-level" );
         filter_chain_Delete( p_sys->p_chain );
         free( p_sys );
         return VLC_EGENERIC;
@@ -148,6 +160,8 @@ static int Activate( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+
+    var_Destroy( p_filter, MODULE_STRING "-level" );
     filter_chain_Delete( p_filter->p_sys->p_chain );
     free( p_filter->p_sys );
 }
@@ -174,7 +188,7 @@ static int BuildTransformChain( filter_t *p_filter )
     msg_Dbg( p_filter, "Trying to build transform, then chroma+resize" );
     es_format_Copy( &fmt_mid, &p_filter->fmt_in );
     video_format_TransformTo(&fmt_mid.video, p_filter->fmt_out.video.orientation);
-    i_ret = CreateChain( p_filter, &fmt_mid, NULL );
+    i_ret = CreateChain( p_filter, &fmt_mid );
     es_format_Clean( &fmt_mid );
     if( i_ret == VLC_SUCCESS )
         return VLC_SUCCESS;
@@ -182,7 +196,7 @@ static int BuildTransformChain( filter_t *p_filter )
     /* Lets try resize+chroma first, then transform */
     msg_Dbg( p_filter, "Trying to build chroma+resize" );
     EsFormatMergeSize( &fmt_mid, &p_filter->fmt_out, &p_filter->fmt_in );
-    i_ret = CreateChain( p_filter, &fmt_mid, NULL );
+    i_ret = CreateChain( p_filter, &fmt_mid );
     es_format_Clean( &fmt_mid );
     if( i_ret == VLC_SUCCESS )
         return VLC_SUCCESS;
@@ -198,7 +212,7 @@ static int BuildChromaResize( filter_t *p_filter )
     /* Lets try resizing and then doing the chroma conversion */
     msg_Dbg( p_filter, "Trying to build resize+chroma" );
     EsFormatMergeSize( &fmt_mid, &p_filter->fmt_in, &p_filter->fmt_out );
-    i_ret = CreateChain( p_filter, &fmt_mid, NULL );
+    i_ret = CreateChain( p_filter, &fmt_mid );
     es_format_Clean( &fmt_mid );
     if( i_ret == VLC_SUCCESS )
         return VLC_SUCCESS;
@@ -206,7 +220,7 @@ static int BuildChromaResize( filter_t *p_filter )
     /* Lets try it the other way arround (chroma and then resize) */
     msg_Dbg( p_filter, "Trying to build chroma+resize" );
     EsFormatMergeSize( &fmt_mid, &p_filter->fmt_out, &p_filter->fmt_in );
-    i_ret = CreateChain( p_filter, &fmt_mid, NULL );
+    i_ret = CreateChain( p_filter, &fmt_mid );
     es_format_Clean( &fmt_mid );
     if( i_ret == VLC_SUCCESS )
         return VLC_SUCCESS;
@@ -217,35 +231,7 @@ static int BuildChromaResize( filter_t *p_filter )
 static int BuildChromaChain( filter_t *p_filter )
 {
     es_format_t fmt_mid;
-
-    /* We have to protect ourself against a too high recursion */
-    const char *psz_option = MODULE_STRING"-level";
-    int i_level = 0;
-    for( const config_chain_t *c = p_filter->p_cfg; c != NULL; c = c->p_next)
-    {
-        if( c->psz_name && c->psz_value && !strcmp(c->psz_name, psz_option) )
-        {
-            i_level = atoi(c->psz_value);
-            if( i_level < 0 || i_level > CHAIN_LEVEL_MAX )
-            {
-                msg_Err( p_filter, "Too high level of recursion (%d)", i_level );
-                return VLC_EGENERIC;
-            }
-            break;
-        }
-    }
-
-    /* */
-    int i_ret = VLC_EGENERIC;
-
-    /* */
-    config_chain_t cfg_level;
-    memset(&cfg_level, 0, sizeof(cfg_level));
-    cfg_level.psz_name = strdup(psz_option);
-    if( asprintf( &cfg_level.psz_value, "%d", i_level + 1) < 0 )
-        cfg_level.psz_value = NULL;
-    if( !cfg_level.psz_name || !cfg_level.psz_value )
-        goto exit;
+    int i_ret;
 
     /* Now try chroma format list */
     for( int i = 0; pi_allowed_chromas[i]; i++ )
@@ -266,23 +252,21 @@ static int BuildChromaChain( filter_t *p_filter )
         fmt_mid.video.i_bmask  = 0;
         video_format_FixRgb(&fmt_mid.video);
 
-        i_ret = CreateChain( p_filter, &fmt_mid, &cfg_level );
+        i_ret = CreateChain( p_filter, &fmt_mid );
         es_format_Clean( &fmt_mid );
 
         if( i_ret == VLC_SUCCESS )
             break;
     }
 
-exit:
-    free( cfg_level.psz_name );
-    free( cfg_level.psz_value );
+    var_Destroy( p_filter, MODULE_STRING "-level" );
     return i_ret;
 }
 
 /*****************************************************************************
  *
  *****************************************************************************/
-static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid, config_chain_t *p_cfg )
+static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid )
 {
     filter_chain_Reset( p_parent->p_sys->p_chain, &p_parent->fmt_in, &p_parent->fmt_out );
 
@@ -294,7 +278,7 @@ static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid, config_chain
     }
     else
     {
-        p_filter = filter_chain_AppendFilter( p_parent->p_sys->p_chain, NULL, p_cfg, NULL, p_fmt_mid );
+        p_filter = filter_chain_AppendFilter( p_parent->p_sys->p_chain, NULL, NULL, NULL, p_fmt_mid );
     }
 
     if( !p_filter )
@@ -310,7 +294,7 @@ static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid, config_chain
     }
     else
     {
-        p_filter = filter_chain_AppendFilter( p_parent->p_sys->p_chain, NULL, p_cfg, p_fmt_mid, NULL );
+        p_filter = filter_chain_AppendFilter( p_parent->p_sys->p_chain, NULL, NULL, p_fmt_mid, NULL );
     }
 
     if( !p_filter )
