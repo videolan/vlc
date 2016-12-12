@@ -116,7 +116,7 @@ struct decoder_sys_t
     {
         struct
         {
-            unsigned int i_stride, i_slice_height, i_width, i_height;
+            unsigned int i_stride, i_slice_height;
             int i_pixel_format;
             uint8_t i_nal_length_size;
             size_t i_h264_profile;
@@ -278,7 +278,6 @@ static inline uint8_t RestoreSyncCode(const uint8_t *p_bufhead,
 static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
                       bool *p_size_changed)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     const uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
     size_t i_sps_size = 0, i_pps_size = 0;
 
@@ -330,11 +329,11 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
             }
 
             if (p_size_changed)
-                *p_size_changed = (vsize[0] != p_sys->video.i_width
-                                || vsize[1] != p_sys->video.i_height);
+                *p_size_changed = (vsize[0] != p_dec->fmt_out.video.i_width
+                                || vsize[1] != p_dec->fmt_out.video.i_height);
 
-            p_sys->video.i_width = vsize[0];
-            p_sys->video.i_height = vsize[1];
+            p_dec->fmt_out.video.i_width = vsize[0];
+            p_dec->fmt_out.video.i_height = vsize[1];
 
             h264_release_sps(p_sps);
 
@@ -502,14 +501,14 @@ static int StartMediaCodec(decoder_t *p_dec)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        if (!p_sys->video.i_width || !p_sys->video.i_height)
+        if (!p_dec->fmt_out.video.i_width  || !p_dec->fmt_out.video.i_height)
         {
             msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
                      (const char *)&p_dec->fmt_in.i_codec);
             return VLC_ENOOBJ;
         }
-        args.video.i_width = p_sys->video.i_width;
-        args.video.i_height = p_sys->video.i_height;
+        args.video.i_width = p_dec->fmt_out.video.i_width;
+        args.video.i_height = p_dec->fmt_out.video.i_height;
 
         switch (p_dec->fmt_in.video.orientation)
         {
@@ -544,8 +543,6 @@ static int StartMediaCodec(decoder_t *p_dec)
         {
             /* Direct rendering: Request a valid OPAQUE Vout in order to get
              * the surface attached to it */
-            p_dec->fmt_out.video.i_width = p_sys->video.i_width;
-            p_dec->fmt_out.video.i_height = p_sys->video.i_height;
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
             if (decoder_UpdateVideoFormat(p_dec) != 0
              || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
@@ -758,8 +755,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         }
         p_sys->pf_on_flush = Video_OnFlush;
         p_sys->pf_process_output = Video_ProcessOutput;
-        p_sys->video.i_width = p_dec->fmt_in.video.i_width;
-        p_sys->video.i_height = p_dec->fmt_in.video.i_height;
         p_sys->video.i_h264_profile = i_h264_profile;
 
         p_sys->video.timestamp_fifo = timestamp_FifoNew(32);
