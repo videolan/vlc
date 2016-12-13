@@ -298,7 +298,6 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
         unsigned vsize[4];
         (void) h264_get_picture_size(p_sps, &vsize[0], &vsize[1], &vsize[2],
                                      &vsize[3]);
-        /* FIXME: what to do with visible width/height ? */
 
         if (i_sps_size && RestoreSyncCode(p_buf, &p_sps_buf, &i_sps_size) == 4)
         {
@@ -332,7 +331,9 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
                 *p_size_changed = (vsize[0] != p_dec->fmt_out.video.i_width
                                 || vsize[1] != p_dec->fmt_out.video.i_height);
 
+            p_dec->fmt_out.video.i_visible_width =
             p_dec->fmt_out.video.i_width = vsize[0];
+            p_dec->fmt_out.video.i_visible_height =
             p_dec->fmt_out.video.i_height = vsize[1];
 
             h264_release_sps(p_sps);
