@@ -345,7 +345,9 @@
     if (_isCounting)
         return;
 
-    int _timeToKeepVisibleInSec = var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000;
+    /* Get timeout and make sure it is not lower than 1 second */
+    int _timeToKeepVisibleInSec = MAX(var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000, 1);
+
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:_timeToKeepVisibleInSec
                                                   target:self
                                                 selector:@selector(autohideCallback:)
