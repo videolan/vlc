@@ -174,23 +174,23 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
         bits_write( &bits, 8,   0x04 ); /* DecoderConfigDescrTag */
         bits_fix_Decoder = bits;
         bits_write( &bits, 24,  GetDescriptorLength24b( 0 ) );
-        if( p_stream->pes->i_stream_type == 0x10 )
+        if( p_stream->ts->i_stream_type == 0x10 )
         {
             bits_write( &bits, 8, 0x20 );   /* Visual 14496-2 */
             bits_write( &bits, 6, 0x04 );   /* VisualStream */
         }
-        else if( p_stream->pes->i_stream_type == 0x1b )
+        else if( p_stream->ts->i_stream_type == 0x1b )
         {
             bits_write( &bits, 8, 0x21 );   /* Visual 14496-2 */
             bits_write( &bits, 6, 0x04 );   /* VisualStream */
         }
-        else if( p_stream->pes->i_stream_type == 0x11 ||
-                 p_stream->pes->i_stream_type == 0x0f )
+        else if( p_stream->ts->i_stream_type == 0x11 ||
+                 p_stream->ts->i_stream_type == 0x0f )
         {
             bits_write( &bits, 8, 0x40 );   /* Audio 14496-3 */
             bits_write( &bits, 6, 0x05 );   /* AudioStream */
         }
-        else if( p_stream->pes->i_stream_type == 0x12 &&
+        else if( p_stream->ts->i_stream_type == 0x12 &&
                  p_stream->pes->i_codec == VLC_CODEC_SUBT )
         {
             bits_write( &bits, 8, 0x0B );   /* Text Stream */
@@ -251,11 +251,12 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
     dvbpsi_pmt_descriptor_add(&p_dvbpmt[0], 0x1d, bits.i_data, bits.p_data);
 }
 
-static void UpdateServiceType( uint8_t *pi_service_cat, uint8_t *pi_service_type, const pes_stream_t *p_pes )
+static void UpdateServiceType( uint8_t *pi_service_cat, uint8_t *pi_service_type,
+                               const ts_stream_t *p_ts, const pes_stream_t *p_pes )
 {
     uint8_t i_type = 0x00;
 
-    switch( p_pes->i_stream_type )
+    switch( p_ts->i_stream_type )
     {
         case 0x01: /* MPEG1 */
         case 0x02: /* MPEG2 */
@@ -297,7 +298,7 @@ static void UpdateServiceType( uint8_t *pi_service_cat, uint8_t *pi_service_type
     if( *pi_service_cat != VIDEO_ES ) /* Don't overwrite video */
     {
         /* Not video, try audio */
-        switch( p_pes->i_stream_type )
+        switch( p_ts->i_stream_type )
         {
             case 0x03: /* MPEG1 audio */
             case 0x04: /* MPEG2 audio */
@@ -404,7 +405,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         const pes_mapped_stream_t *p_stream = &p_mapped_streams[i];
 
         dvbpsi_pmt_es_t *p_es = dvbpsi_pmt_es_add( &dvbpmt[p_stream->i_mapped_prog],
-                    p_stream->pes->i_stream_type, p_stream->ts->i_pid );
+                    p_stream->ts->i_stream_type, p_stream->ts->i_pid );
 
         if( p_stream->pes->i_stream_id == 0xfa || p_stream->pes->i_stream_id == 0xfb )
         {
@@ -415,7 +416,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             es_id[1] = (p_stream->pes->i_es_id)&0xff;
             dvbpsi_pmt_es_descriptor_add( p_es, 0x1f, 2, es_id );
         }
-        else if( p_stream->pes->i_stream_type == 0xa0 )
+        else if( p_stream->ts->i_stream_type == 0xa0 )
         {
             uint8_t data[512];
             size_t i_extra = __MIN( p_stream->pes->i_extra, 502 );
@@ -436,7 +437,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             /* 0xa0 is private */
             dvbpsi_pmt_es_descriptor_add( p_es, 0xa0, i_extra + 10, data );
         }
-        else if( p_stream->pes->i_stream_type == 0x81 )
+        else if( p_stream->ts->i_stream_type == 0x81 )
         {
             uint8_t format[4] = { 'A', 'C', '-', '3'};
 
@@ -527,7 +528,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         {
             UpdateServiceType( &pi_service_cats[p_stream->i_mapped_prog],
                                &pi_service_types[p_stream->i_mapped_prog],
-                               p_stream->pes );
+                               p_stream->ts, p_stream->pes );
         }
     }
 

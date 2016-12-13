@@ -24,6 +24,7 @@ typedef struct
 {
     uint16_t        i_pid;
 
+    uint8_t         i_stream_type;
     uint8_t         i_continuity_counter;
     bool            b_discontinuity;
 
@@ -33,8 +34,7 @@ typedef struct
 {
     vlc_fourcc_t    i_codec;
 
-    int             i_stream_type;
-    int             i_stream_id;
+    int             i_stream_id; /* keep as int for drac */
 
     int             i_width, i_height;
 

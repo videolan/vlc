@@ -333,7 +333,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
                 continue;
 
             esstreams[j].pes.i_codec = p_pid->probed.i_fourcc;
-            esstreams[j].pes.i_stream_type = p_pid->probed.i_type;
+            esstreams[j].ts.i_stream_type = p_pid->probed.i_type;
             esstreams[j].ts.i_pid = p_pid->i_pid;
             mapped[j].pes = &esstreams[j].pes;
             mapped[j].ts = &esstreams[j].ts;
