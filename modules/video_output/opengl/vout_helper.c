@@ -122,6 +122,7 @@ struct vout_display_opengl_t {
 
     video_format_t fmt;
     const vlc_chroma_description_t *chroma;
+    const vlc_chroma_description_t *sub_chroma;
 
     int        tex_target;
     int        tex_format;
@@ -202,7 +203,7 @@ struct vout_display_opengl_t {
     bool supports_npot;
 
     uint8_t *texture_temp_buf;
-    int      texture_temp_buf_size;
+    size_t   texture_temp_buf_size;
 
     /* View point */
     float f_teta;
@@ -621,7 +622,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->tex_type     = GL_UNSIGNED_SHORT;
     }
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
-    assert(vgl->chroma != NULL);
+    vgl->sub_chroma = vlc_fourcc_GetChromaDescription(VLC_CODEC_RGB32);
+    assert(vgl->chroma != NULL && vgl->sub_chroma != NULL);
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
@@ -943,67 +945,73 @@ error:
 }
 
 #define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-static void Upload(vout_display_opengl_t *vgl, int in_width, int in_height,
-                   int in_full_width, int in_full_height,
-                   int w_num, int w_den, int h_num, int h_den,
-                   int pitch, int pixel_pitch,
-                   int full_upload, const uint8_t *pixels,
-                   int tex_target, int tex_format, int tex_type)
+static void UploadPlane(vout_display_opengl_t *vgl,
+                        unsigned width, unsigned height,
+                        unsigned pitch, unsigned pixel_pitch,
+                        const void *pixels,
+                        int tex_target, int tex_format, int tex_type)
 {
-    int width       =       in_width * w_num / w_den;
-    int full_width  =  in_full_width * w_num / w_den;
-    int height      =      in_height * h_num / h_den;
-    int full_height = in_full_height * h_num / h_den;
     // This unpack alignment is the default, but setting it just in case.
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 #ifndef GL_UNPACK_ROW_LENGTH
-    int dst_width = full_upload ? full_width : width;
-    int dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
+    unsigned dst_width = width;
+    unsigned dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
     if ( pitch != dst_pitch )
     {
-        int buf_size = dst_pitch * full_height * pixel_pitch;
+        size_t buf_size = dst_pitch * height * pixel_pitch;
         const uint8_t *source = pixels;
         uint8_t *destination;
-        if( !vgl->texture_temp_buf || vgl->texture_temp_buf_size < buf_size )
+        if( vgl->texture_temp_buf_size < buf_size )
         {
-            free( vgl->texture_temp_buf );
-            vgl->texture_temp_buf = xmalloc( buf_size );
+            vgl->texture_temp_buf =
+                realloc_or_free( vgl->texture_temp_buf, buf_size );
+            if (vgl->texture_temp_buf == NULL)
+            {
+                vgl->texture_temp_buf_size = 0;
+                return;
+            }
             vgl->texture_temp_buf_size = buf_size;
         }
         destination = vgl->texture_temp_buf;
 
-        for( int h = 0; h < height ; h++ )
+        for( unsigned h = 0; h < height ; h++ )
         {
             memcpy( destination, source, width * pixel_pitch );
             source += pitch;
             destination += dst_pitch;
         }
-        if (full_upload)
-            glTexImage2D( tex_target, 0, tex_format,
-                          full_width, full_height,
-                          0, tex_format, tex_type, vgl->texture_temp_buf );
-        else
-            glTexSubImage2D( tex_target, 0,
-                             0, 0,
-                             width, height,
-                             tex_format, tex_type, vgl->texture_temp_buf );
+        glTexSubImage2D( tex_target, 0, 0, 0, width, height,
+                         tex_format, tex_type, vgl->texture_temp_buf );
     } else {
 #else
-    (void) width;
-    (void) height;
     (void) vgl;
     {
         glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch / pixel_pitch);
 #endif
-        if (full_upload)
-            glTexImage2D(tex_target, 0, tex_format,
-                         full_width, full_height,
-                         0, tex_format, tex_type, pixels);
-        else
-            glTexSubImage2D(tex_target, 0,
-                            0, 0,
-                            width, height,
-                            tex_format, tex_type, pixels);
+        glTexSubImage2D(tex_target, 0, 0, 0, width, height,
+                        tex_format, tex_type, pixels);
+    }
+}
+
+static void UpdatePic(vout_display_opengl_t *vgl,
+                      const vlc_chroma_description_t *chroma,
+                      GLuint *textures, unsigned width, unsigned height,
+                      const picture_t *pic, const size_t *plane_offset,
+                      int tex_target, int tex_format, int tex_type)
+{
+    for (unsigned j = 0; j < chroma->plane_count; j++)
+    {
+        glActiveTexture(GL_TEXTURE0 + j);
+        glClientActiveTexture(GL_TEXTURE0 + j);
+        glBindTexture(tex_target, textures[j]);
+        const void *pixels = plane_offset != NULL ?
+                             &pic->p[j].p_pixels[plane_offset[j]] :
+                             pic->p[j].p_pixels;
+
+        UploadPlane(vgl, width * chroma->p[j].w.num / chroma->p[j].w.den,
+                    height * chroma->p[j].h.num / chroma->p[j].h.den,
+                    pic->p[j].i_pitch, pic->p[j].i_pixel_pitch, pixels,
+                    tex_target, tex_format, tex_type);
     }
 }
 
@@ -1011,16 +1019,9 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {
     /* Update the texture */
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        glActiveTexture(GL_TEXTURE0 + j);
-        glClientActiveTexture(GL_TEXTURE0 + j);
-        glBindTexture(vgl->tex_target, vgl->texture[0][j]);
-
-        Upload(vgl, picture->format.i_visible_width, vgl->fmt.i_visible_height,
-               vgl->fmt.i_width, vgl->fmt.i_height,
-               vgl->chroma->p[j].w.num, vgl->chroma->p[j].w.den, vgl->chroma->p[j].h.num, vgl->chroma->p[j].h.den,
-               picture->p[j].i_pitch, picture->p[j].i_pixel_pitch, 0, picture->p[j].p_pixels, vgl->tex_target, vgl->tex_format, vgl->tex_type);
-    }
+    UpdatePic(vgl, vgl->chroma, vgl->texture[0],
+              vgl->fmt.i_visible_width, vgl->fmt.i_visible_height,
+              picture, NULL, vgl->tex_target, vgl->tex_format, vgl->tex_type);
 
     int         last_count = vgl->region_count;
     gl_region_t *last = vgl->region;
@@ -1037,8 +1038,6 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         vgl->region_count = count;
         vgl->region       = calloc(count, sizeof(*vgl->region));
 
-        glActiveTexture(GL_TEXTURE0 + 0);
-        glClientActiveTexture(GL_TEXTURE0 + 0);
         int i = 0;
         for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
             gl_region_t *glr = &vgl->region[i];
@@ -1077,8 +1076,9 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 }
             }
 
-            const int pixels_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
-                                      r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
+            const size_t pixels_offset =
+                r->fmt.i_y_offset * r->p_picture->p->i_pitch +
+                r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
             if (!glr->texture)
             {
                 /* Could not recycle a previous texture, generate a new one. */
@@ -1086,10 +1086,10 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 GenTextures(GL_TEXTURE_2D, glr->format, glr->format, glr->type,
                             1, &tex_width, &tex_height, &glr->texture);
             }
-            glBindTexture(GL_TEXTURE_2D, glr->texture);
-            Upload(vgl, r->fmt.i_visible_width, r->fmt.i_visible_height, glr->width, glr->height, 1, 1, 1, 1,
-                   r->p_picture->p->i_pitch, r->p_picture->p->i_pixel_pitch, 0,
-                   &r->p_picture->p->p_pixels[pixels_offset], GL_TEXTURE_2D, glr->format, glr->type);
+            UpdatePic(vgl, vgl->sub_chroma, &glr->texture,
+                      r->fmt.i_visible_width, r->fmt.i_visible_height,
+                      r->p_picture, &pixels_offset,
+                      GL_TEXTURE_2D, glr->format, glr->type);
         }
     }
     for (int i = 0; i < last_count; i++) {
