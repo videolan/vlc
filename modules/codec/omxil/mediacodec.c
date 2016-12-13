@@ -58,13 +58,13 @@ struct csd
     size_t i_size;
 };
 
-#define NEWBLOCK_FLAG_RESTART (0x01)
-#define NEWBLOCK_FLAG_FLUSH (0x02)
+#define DECODE_FLAG_RESTART (0x01)
+#define DECODE_FLASH_FLUSH (0x02)
 /**
  * Callback called when a new block is processed from DecodeCommon.
  * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
  */
-typedef int (*dec_on_new_block_cb)(decoder_t *, block_t **, int *);
+typedef int (*dec_on_new_block_cb)(decoder_t *, block_t **);
 
 /**
  * Callback called when decoder is flushing.
@@ -111,6 +111,7 @@ struct decoder_sys_t
     /* If true, the first input block was successfully dequeued */
     bool            b_input_dequeued;
     bool            b_aborted;
+    int             i_decode_flags;
 
     union
     {
@@ -145,16 +146,16 @@ static int  OpenDecoderNdk(vlc_object_t *);
 static void CleanDecoder(decoder_t *);
 static void CloseDecoder(vlc_object_t *);
 
-static int Video_OnNewBlock(decoder_t *, block_t **, int *);
-static int VideoH264_OnNewBlock(decoder_t *, block_t **, int *);
-static int VideoHEVC_OnNewBlock(decoder_t *, block_t **, int *);
-static int VideoVC1_OnNewBlock(decoder_t *, block_t **, int *);
+static int Video_OnNewBlock(decoder_t *, block_t **);
+static int VideoH264_OnNewBlock(decoder_t *, block_t **);
+static int VideoHEVC_OnNewBlock(decoder_t *, block_t **);
+static int VideoVC1_OnNewBlock(decoder_t *, block_t **);
 static void Video_OnFlush(decoder_t *);
 static int Video_ProcessOutput(decoder_t *, mc_api_out *, picture_t **,
                                block_t **);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
-static int Audio_OnNewBlock(decoder_t *, block_t **, int *);
+static int Audio_OnNewBlock(decoder_t *, block_t **);
 static void Audio_OnFlush(decoder_t *);
 static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **,
                                block_t **);
@@ -1350,7 +1351,6 @@ static block_t *GetNextBlock(decoder_sys_t *p_sys, block_t *p_block)
 static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_flags = 0;
     int i_ret;
     bool b_dequeue_timeout = false;
     bool b_draining;
@@ -1377,46 +1377,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
         }
 
         /* Parse input block */
-        if ((i_ret = p_sys->pf_on_new_block(p_dec, pp_block, &i_flags)) == 1)
-        {
-            if (i_flags & (NEWBLOCK_FLAG_FLUSH|NEWBLOCK_FLAG_RESTART))
-            {
-                msg_Warn(p_dec, "Flushing from DecodeCommon");
-
-                /* Flush before restart to unblock OutThread */
-                DecodeFlushLocked(p_dec);
-                if (p_sys->b_aborted)
-                    goto end;
-
-                if (i_flags & NEWBLOCK_FLAG_RESTART)
-                {
-                    StopMediaCodec(p_dec);
-
-                    if (p_sys->api->b_direct_rendering
-                     && UpdateOpaqueVout(p_dec) != VLC_SUCCESS)
-                    {
-                        msg_Err(p_dec, "UpdateOpaqueVout failed");
-                        AbortDecoderLocked(p_dec);
-                        goto end;
-                    }
-
-                    int i_ret = StartMediaCodec(p_dec);
-                    switch (i_ret)
-                    {
-                    case VLC_SUCCESS:
-                        msg_Warn(p_dec, "Restarted from DecodeCommon");
-                        break;
-                    case VLC_ENOOBJ:
-                        break;
-                    default:
-                        msg_Err(p_dec, "StartMediaCodec failed");
-                        AbortDecoderLocked(p_dec);
-                        goto end;
-                    }
-                }
-            }
-        }
-        else
+        if ((i_ret = p_sys->pf_on_new_block(p_dec, pp_block)) != 1)
         {
             if (i_ret != 0)
             {
@@ -1436,6 +1397,45 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
         {
             /* Output no ready, no need to drain */
             goto end;
+        }
+    }
+
+    if (p_sys->i_decode_flags & (DECODE_FLASH_FLUSH|DECODE_FLAG_RESTART))
+    {
+        msg_Warn(p_dec, "Flushing from DecodeCommon");
+        const bool b_restart = p_sys->i_decode_flags & DECODE_FLAG_RESTART;
+        p_sys->i_decode_flags = 0;
+
+        /* Flush before restart to unblock OutThread */
+        DecodeFlushLocked(p_dec);
+        if (p_sys->b_aborted)
+            goto end;
+
+        if (b_restart)
+        {
+            StopMediaCodec(p_dec);
+
+            if (p_sys->api->b_direct_rendering
+             && UpdateOpaqueVout(p_dec) != VLC_SUCCESS)
+            {
+                msg_Err(p_dec, "UpdateOpaqueVout failed");
+                AbortDecoderLocked(p_dec);
+                goto end;
+            }
+
+            int i_ret = StartMediaCodec(p_dec);
+            switch (i_ret)
+            {
+            case VLC_SUCCESS:
+                msg_Warn(p_dec, "Restarted from DecodeCommon");
+                break;
+            case VLC_ENOOBJ:
+                break;
+            default:
+                msg_Err(p_dec, "StartMediaCodec failed");
+                AbortDecoderLocked(p_dec);
+                goto end;
+            }
         }
     }
 
@@ -1586,11 +1586,10 @@ end:
     }
 }
 
-static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
+static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = *pp_block;
-    VLC_UNUSED(p_flags);
 
     if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
         && !p_sys->api->b_support_interlaced)
@@ -1602,8 +1601,7 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
     return 1;
 }
 
-static int VideoH264_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
-                                int *p_flags)
+static int VideoH264_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = *pp_block;
@@ -1614,7 +1612,7 @@ static int VideoH264_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
     if (p_sys->video.i_nal_length_size)
     {
         h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->video.i_nal_length_size);
+                           p_sys->video.i_nal_length_size);
     } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
                           &b_size_changed) == VLC_SUCCESS)
     {
@@ -1623,19 +1621,18 @@ static int VideoH264_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
             if (p_sys->api->b_started)
                 msg_Err(p_dec, "SPS/PPS changed during playback and "
                         "video size are different. Restart it !");
-            *p_flags |= NEWBLOCK_FLAG_RESTART;
+            p_sys->i_decode_flags |= DECODE_FLAG_RESTART;
         } else
         {
             msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
-            *p_flags |= NEWBLOCK_FLAG_FLUSH;
+            p_sys->i_decode_flags  |= DECODE_FLASH_FLUSH;
         }
     }
 
-    return Video_OnNewBlock(p_dec, pp_block, p_flags);
+    return Video_OnNewBlock(p_dec, pp_block);
 }
 
-static int VideoHEVC_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
-                                int *p_flags)
+static int VideoHEVC_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = *pp_block;
@@ -1645,14 +1642,13 @@ static int VideoHEVC_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
     if (p_sys->video.i_nal_length_size)
     {
         h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->video.i_nal_length_size);
+                           p_sys->video.i_nal_length_size);
     }
 
-    return Video_OnNewBlock(p_dec, pp_block, p_flags);
+    return Video_OnNewBlock(p_dec, pp_block);
 }
 
-static int VideoVC1_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
-                               int *p_flags)
+static int VideoVC1_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     block_t *p_block = *pp_block;
 
@@ -1665,7 +1661,7 @@ static int VideoVC1_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
     p_block->p_buffer[2] = 0x01;
     p_block->p_buffer[3] = 0x0d;
 
-    return Video_OnNewBlock(p_dec, pp_block, p_flags);
+    return Video_OnNewBlock(p_dec, pp_block);
 }
 
 static void Video_OnFlush(decoder_t *p_dec)
@@ -1686,11 +1682,10 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     return NULL;
 }
 
-static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
+static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = *pp_block;
-    VLC_UNUSED(p_flags);
 
     /* We've just started the stream, wait for the first PTS. */
     if (!date_Get(&p_sys->audio.i_end_date))
