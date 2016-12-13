@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16A323" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11761" systemVersion="16B2657" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11761"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
@@ -14,6 +14,7 @@
                 <outlet property="controlsView" destination="Npt-C5-K77" id="Dnt-ku-O6u"/>
                 <outlet property="elapsedTime" destination="nJc-M4-sMF" id="DFf-yw-e6A"/>
                 <outlet property="forwardButton" destination="jSN-hV-r5D" id="3PN-jP-xPY"/>
+                <outlet property="fullscreenButton" destination="C5K-aX-3aJ" id="AGc-uy-2b0"/>
                 <outlet property="heightMaxConstraint" destination="Vwe-uz-fKC" id="yz0-Rh-MKt"/>
                 <outlet property="mediaTitle" destination="Vd8-0f-Usz" id="NZ0-KY-l4T"/>
                 <outlet property="nextButton" destination="2ai-dB-Wpq" id="Axl-RO-LfI"/>

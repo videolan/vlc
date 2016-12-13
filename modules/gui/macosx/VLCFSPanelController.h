@@ -40,6 +40,7 @@
 @property IBOutlet NSButton     *backwardButton;
 @property IBOutlet NSButton     *nextButton;
 @property IBOutlet NSButton     *previousButton;
+@property IBOutlet NSButton     *fullscreenButton;
 @property IBOutlet NSTextField  *mediaTitle;
 @property IBOutlet VLCTimeField *elapsedTime;
 @property IBOutlet VLCTimeField *remainingOrTotalTime;

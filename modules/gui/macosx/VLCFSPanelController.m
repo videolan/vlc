@@ -71,9 +71,49 @@
     [self injectBackgroundView];
 #endif
 
+    /* TODO: Write custom Image-only button subclass to behave properly */
     [(NSButtonCell*)[_playPauseButton cell] setHighlightsBy:NSPushInCellMask];
     [(NSButtonCell*)[_playPauseButton cell] setShowsStateBy:NSContentsCellMask];
 
+    [self setupControls];
+}
+
+#define setupButton(target, title, desc)                                              \
+    [target accessibilitySetOverrideValue:title                                       \
+                             forAttribute:NSAccessibilityTitleAttribute];             \
+    [target accessibilitySetOverrideValue:desc                                        \
+                             forAttribute:NSAccessibilityDescriptionAttribute];       \
+    [target setToolTip:desc];
+
+- (void)setupControls
+{
+    /* Setup translations for buttons */
+    setupButton(_playPauseButton,
+                _NS("Play/Pause"),
+                _NS("Click to play or pause the current media."));
+    setupButton(_nextButton,
+                _NS("Next"),
+                _NS("Click to go to the next playlist item."));
+    setupButton(_previousButton,
+                _NS("Previous"),
+                _NS("Click to go to the previous playlist item."));
+    setupButton(_forwardButton,
+                _NS("Forward"),
+                _NS("Click and hold to skip forward through the current media."));
+    setupButton(_backwardButton,
+                _NS("Backward"),
+                _NS("Click and hold to skip backward through the current media."));
+    setupButton(_fullscreenButton,
+                _NS("Toggle Fullscreen mode"),
+                _NS("Click to exit fullscreen playback."));
+    setupButton(_volumeSlider,
+                _NS("Volume"),
+                _NS("Drag to adjust the volume."));
+    setupButton(_timeSlider,
+                _NS("Position"),
+                _NS("Drag to adjust the current playback position."));
+
+    /* Setup other controls */
     [_volumeSlider setMaxValue:[[VLCCoreInteraction sharedInstance] maxVolume]];
     [_volumeSlider setIntValue:AOUT_VOLUME_DEFAULT];
 }
