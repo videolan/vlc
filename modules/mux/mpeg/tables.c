@@ -352,6 +352,7 @@ static inline size_t Write_AnnexA_String( uint8_t *p_dest, const char *p_src )
 }
 
 void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
+               ts_mux_standard standard,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pmt_version_number,
                int i_pcr_pid,
@@ -363,6 +364,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
     if( !dvbpmt )
             return;
 
+    VLC_UNUSED(standard);
     dvbpsi_sdt_t sdtpsi;
     uint8_t *pi_service_types = NULL;
     uint8_t *pi_service_cats = NULL;
@@ -461,6 +463,8 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         }
         else if( p_stream->pes->i_codec == VLC_CODEC_EAC3 )
         {
+            /* FIXME: ATSC AC-3 audio_stream_descriptor */
+            /* FIXME: DVB AC-3 descriptor */
             uint8_t data[1] = { 0x00 };
             dvbpsi_pmt_es_descriptor_add( p_es, 0x7a, 1, data );
         }

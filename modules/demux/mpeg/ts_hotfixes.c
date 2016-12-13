@@ -342,6 +342,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
         }
 
         BuildPMT( GetPID(p_sys, 0)->u.p_pat->handle, VLC_OBJECT(p_demux),
+                 p_sys->standard == TS_STANDARD_ATSC ? TS_MUX_STANDARD_ATSC : TS_MUX_STANDARD_DVB,
                 p_program_pid, BuildPMTCallback,
                 0, 1,
                 i_pcr_pid,

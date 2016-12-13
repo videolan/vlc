@@ -90,6 +90,13 @@ static int ActiveKeyCallback    ( vlc_object_t *, char const *, vlc_value_t, vlc
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
+static const char *const ts_standards_list[] =
+    { "dvb", "atsc", };
+static const char *const ts_standards_list_text[] =
+    { "DVB", "ATSC", };
+
+#define STANDARD_TEXT N_("Digital TV Standard")
+
 #define VPID_TEXT N_("Video PID")
 #define VPID_LONGTEXT N_("Assign a fixed PID to the video stream. The PCR " \
   "PID will automatically be the video.")
@@ -193,6 +200,8 @@ vlc_module_begin ()
     set_capability( "sout mux", 120 )
     add_shortcut( "ts" )
 
+    add_string( SOUT_CFG_PREFIX "standard", "dvb", STANDARD_TEXT, NULL, true )
+        change_string_list( ts_standards_list, ts_standards_list_text )
     add_integer(SOUT_CFG_PREFIX "pid-video", 100, VPID_TEXT, VPID_LONGTEXT, true)
         change_integer_range( 32, 8190 )
     add_integer(SOUT_CFG_PREFIX "pid-audio", 200, APID_TEXT, APID_LONGTEXT, true)
@@ -231,6 +240,7 @@ vlc_module_end ()
  * Local data structures
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
+    "standard",
     "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid",
     "netid", "sdtdesc",
     "es-id-pid", "shaping", "pcr", "bmin", "bmax", "use-key-frames",
@@ -351,6 +361,7 @@ struct sout_mux_sys_t
     bool            b_data_alignment;
 
     sdt_psi_t       sdt;
+    ts_mux_standard standard;
 
     /* for TS building */
     int64_t         i_bitrate_min;
@@ -542,6 +553,11 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_sys->p_dvbpsi->p_sys = (void *) p_mux;
+
+    char *psz_standard = var_GetString( p_mux, SOUT_CFG_PREFIX "standard" );
+    if( psz_standard && !strcmp("atsc", psz_standard) )
+        p_sys->standard = TS_MUX_STANDARD_ATSC;
+    free( psz_standard );
 
     p_sys->b_es_id_pid = var_GetBool( p_mux, SOUT_CFG_PREFIX "es-id-pid" );
 
@@ -975,8 +991,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->pes.i_stream_id = 0xc0;
         break;
     case VLC_CODEC_A52:
-        p_stream->ts.i_stream_type = 0x81;
         p_stream->pes.i_stream_id = 0xbd;
+        if( p_sys->standard == TS_MUX_STANDARD_ATSC )
+        {
+            p_stream->ts.i_stream_type = 0x81;
+        }
+        else
+        {
+            p_stream->ts.i_stream_type = 0x06;
+        }
         break;
     case VLC_CODEC_DVD_LPCM:
         p_stream->ts.i_stream_type = 0x83;
@@ -989,9 +1012,27 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             break;
         }
     case VLC_CODEC_EAC3:
-    case VLC_CODEC_DTS:
-        p_stream->ts.i_stream_type = 0x06;
         p_stream->pes.i_stream_id = 0xbd;
+        if( p_sys->standard == TS_MUX_STANDARD_ATSC )
+        {
+            /* FIXME: Mandatory EAC3 audio_descriptor */
+            p_stream->ts.i_stream_type = 0x87;
+        }
+        else
+        {
+            p_stream->ts.i_stream_type = 0x06;
+        }
+        break;
+    case VLC_CODEC_DTS:
+        if( p_sys->standard == TS_MUX_STANDARD_ATSC )
+        {
+            return VLC_EGENERIC;
+        }
+        else
+        {
+            p_stream->ts.i_stream_type = 0x06;
+            p_stream->pes.i_stream_id = 0xbd;
+        }
         break;
     case VLC_CODEC_MP4A:
         /* XXX: make that configurable in some way when LOAS
@@ -1996,7 +2037,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         mappeds[i_stream].ts = &p_stream->ts;
     }
 
-    BuildPMT( p_sys->p_dvbpsi, VLC_OBJECT(p_mux),
+    BuildPMT( p_sys->p_dvbpsi, VLC_OBJECT(p_mux), p_sys->standard,
               c, (PEStoTSCallback)BufferChainAppend,
               p_sys->i_tsid, p_sys->i_pmt_version_number,
               ((sout_input_sys_t *)p_sys->p_pcr_input->p_sys)->ts.i_pid,

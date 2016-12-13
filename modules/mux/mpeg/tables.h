@@ -49,7 +49,14 @@ typedef struct
     int i_mapped_prog;
 } pes_mapped_stream_t;
 
+typedef enum ts_mux_standard
+{
+    TS_MUX_STANDARD_DVB = 0,
+    TS_MUX_STANDARD_ATSC,
+} ts_mux_standard;
+
 void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
+               ts_mux_standard,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pmt_version_number,
                int i_pcr_pid,
