@@ -360,7 +360,7 @@
 
 - (void)autohideCallback:(NSTimer *)timer
 {
-    if (!NSPointInRect([NSEvent mouseLocation], [self.window frame])) {
+    if (!NSMouseInRect([NSEvent mouseLocation], [self.window frame], NO)) {
         [self fadeOut];
         [self hideMouse];
     }
