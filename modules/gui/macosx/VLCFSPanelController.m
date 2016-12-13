@@ -265,7 +265,7 @@
 - (void)fadeIn
 {
     [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.7f];
+    [[NSAnimationContext currentContext] setDuration:0.4f];
     [[self.window animator] setAlphaValue:1.0f];
     [NSAnimationContext endGrouping];
 
@@ -275,7 +275,7 @@
 - (void)fadeOut
 {
     [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.7f];
+    [[NSAnimationContext currentContext] setDuration:0.4f];
     [[self.window animator] setAlphaValue:0.0f];
     [NSAnimationContext endGrouping];
 }
