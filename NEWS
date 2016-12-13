@@ -149,6 +149,7 @@ Video ouput:
    supporting subpicture blending and hardware acceleration
  * EFL Evas video output with Tizen TBM Surface support
  * New OpenGL provider for Windows
+ * Drop OpenGL 1.x and OpenGL ES 1 support
 
 Text renderer:
  * CTL support through Harfbuzz in the Freetype module
