@@ -116,6 +116,7 @@ struct decoder_sys_t
     {
         struct
         {
+            void *p_surface, *p_jsurface;
             unsigned int i_stride, i_slice_height;
             int i_pixel_format;
             uint8_t i_nal_length_size;
@@ -484,13 +485,36 @@ static int ParseVideoExtra(decoder_t *p_dec)
     }
 }
 
+static int UpdateOpaqueVout(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    picture_t *p_dummy_hwpic;
+
+    /* Direct rendering: Request a valid OPAQUE Vout in order to get
+     * the surface attached to it */
+    if (decoder_UpdateVideoFormat(p_dec) != 0
+     || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
+    {
+        p_sys->video.p_surface = p_sys->video.p_jsurface = NULL;
+        return VLC_EGENERIC;
+    }
+
+    assert(p_dummy_hwpic->p_sys);
+    assert(p_dummy_hwpic->p_sys->priv.hw.p_surface);
+    assert(p_dummy_hwpic->p_sys->priv.hw.p_jsurface);
+
+    p_sys->video.p_surface = p_dummy_hwpic->p_sys->priv.hw.p_surface;
+    p_sys->video.p_jsurface = p_dummy_hwpic->p_sys->priv.hw.p_jsurface;
+    picture_Release(p_dummy_hwpic);
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * StartMediaCodec: Create the mediacodec instance
  *****************************************************************************/
 static int StartMediaCodec(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    picture_t *p_dummy_hwpic = NULL;
     union mc_api_args args;
 
     if (((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->pp_csd))
@@ -540,28 +564,8 @@ static int StartMediaCodec(decoder_t *p_dec)
             }
         }
 
-        if (var_InheritBool(p_dec, CFG_PREFIX "dr"))
-        {
-            /* Direct rendering: Request a valid OPAQUE Vout in order to get
-             * the surface attached to it */
-            p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
-            if (decoder_UpdateVideoFormat(p_dec) != 0
-             || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
-            {
-                msg_Err(p_dec, "Opaque Vout request failed");
-                return VLC_EGENERIC;
-            }
-        }
-        if (p_dummy_hwpic)
-        {
-            assert(p_dummy_hwpic->p_sys);
-            assert(p_dummy_hwpic->p_sys->priv.hw.p_surface);
-            assert(p_dummy_hwpic->p_sys->priv.hw.p_jsurface);
-            args.video.p_surface = p_dummy_hwpic->p_sys->priv.hw.p_surface;
-            args.video.p_jsurface = p_dummy_hwpic->p_sys->priv.hw.p_jsurface;
-        }
-        else
-            args.video.p_surface = args.video.p_jsurface = NULL;
+        args.video.p_surface = p_sys->video.p_surface;
+        args.video.p_jsurface = p_sys->video.p_jsurface;
         args.video.b_tunneled_playback = args.video.p_surface ?
                 var_InheritBool(p_dec, CFG_PREFIX "tunneled-playback") : false;
     }
@@ -573,10 +577,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.audio.i_channel_count  = p_dec->p_sys->audio.i_channels;
     }
 
-    int i_ret = p_sys->api->start(p_sys->api, &args);
-    if (p_dummy_hwpic != NULL)
-        picture_Release(p_dummy_hwpic);
-    return i_ret;
+    return p_sys->api->start(p_sys->api, &args);
 }
 
 /*****************************************************************************
@@ -764,6 +765,20 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
         TAB_INIT(p_sys->video.i_inflight_pictures,
                  p_sys->video.pp_inflight_pictures);
+
+        if (var_InheritBool(p_dec, CFG_PREFIX "dr"))
+        {
+            /* Direct rendering: Request a valid OPAQUE Vout in order to get
+             * the surface attached to it */
+            p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
+            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+            p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
+            if (UpdateOpaqueVout(p_dec) != VLC_SUCCESS)
+            {
+                msg_Err(p_dec, "Opaque Vout request failed");
+                goto bailout;
+            }
+        }
     }
     else
     {
@@ -1376,6 +1391,14 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
                 if (i_flags & NEWBLOCK_FLAG_RESTART)
                 {
                     StopMediaCodec(p_dec);
+
+                    if (p_sys->api->b_direct_rendering
+                     && UpdateOpaqueVout(p_dec) != VLC_SUCCESS)
+                    {
+                        msg_Err(p_dec, "UpdateOpaqueVout failed");
+                        AbortDecoderLocked(p_dec);
+                        goto end;
+                    }
 
                     int i_ret = StartMediaCodec(p_dec);
                     switch (i_ret)
