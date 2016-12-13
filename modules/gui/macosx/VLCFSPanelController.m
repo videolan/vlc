@@ -118,6 +118,8 @@
     [_volumeSlider setIntValue:AOUT_VOLUME_DEFAULT];
 }
 
+#undef setupButton
+
 #pragma mark -
 #pragma mark Control Actions
 
