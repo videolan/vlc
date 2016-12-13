@@ -922,7 +922,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->pes.i_height = p_input->fmt.video.i_height;
     }
 
-    p_stream->pes.i_stream_type = -1;
+    p_stream->pes.i_stream_type = 0x00;
     switch( p_input->p_fmt->i_codec )
     {
     /* VIDEO */
@@ -1024,7 +1024,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         break;
     }
 
-    if (p_stream->pes.i_stream_type == -1)
+    if (p_stream->pes.i_stream_type == 0x00)
     {
         msg_Warn( p_mux, "rejecting stream with unsupported codec %4.4s",
                   (char*)&p_stream->pes.i_codec );

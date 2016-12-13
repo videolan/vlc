@@ -22,9 +22,9 @@
 
 typedef struct
 {
-    int             i_pid;
+    uint16_t        i_pid;
 
-    int             i_continuity_counter;
+    uint8_t         i_continuity_counter;
     bool            b_discontinuity;
 
 } ts_stream_t;
@@ -41,11 +41,11 @@ typedef struct
     /* Specific to mpeg4 in mpeg2ts */
     int             i_es_id;
 
-    int             i_extra;
+    size_t          i_extra;
     uint8_t         *p_extra;
 
     /* language is iso639-2T */
-    int             i_langs;
+    size_t          i_langs;
     uint8_t         *lang;
 } pes_stream_t;
 

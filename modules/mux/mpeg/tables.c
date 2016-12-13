@@ -216,7 +216,7 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
             bits_write( &bits, 8,   0x05 ); /* tag */
             bits_write( &bits, 24, GetDescriptorLength24b(
                         p_stream->pes->i_extra ) );
-            for (int j = 0; j < p_stream->pes->i_extra; j++ )
+            for (size_t j = 0; j < p_stream->pes->i_extra; j++ )
             {
                 bits_write( &bits, 8,
                     ((uint8_t*)p_stream->pes->p_extra)[j] );
@@ -418,7 +418,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         else if( p_stream->pes->i_stream_type == 0xa0 )
         {
             uint8_t data[512];
-            int i_extra = __MIN( p_stream->pes->i_extra, 502 );
+            size_t i_extra = __MIN( p_stream->pes->i_extra, 502 );
 
             /* private DIV3 descripor */
             memcpy( &data[0], &p_stream->pes->i_codec, 4 );
