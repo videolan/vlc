@@ -1012,15 +1012,12 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         p_sys->video.i_pixel_format = p_out->conf.video.pixel_format;
 
         const char *name = "unknown";
-        if (p_sys->api->b_direct_rendering)
-            p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
-        else
+        if (!p_sys->api->b_direct_rendering
+         && !GetVlcChromaFormat(p_sys->video.i_pixel_format,
+                                &p_dec->fmt_out.i_codec, &name))
         {
-            if (!GetVlcChromaFormat(p_sys->video.i_pixel_format,
-                                    &p_dec->fmt_out.i_codec, &name)) {
-                msg_Err(p_dec, "color-format not recognized");
-                return -1;
-            }
+            msg_Err(p_dec, "color-format not recognized");
+            return -1;
         }
 
         msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
