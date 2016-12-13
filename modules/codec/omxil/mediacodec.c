@@ -285,7 +285,7 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
     if (h264_AnnexB_get_spspps(p_buf, i_size,
                         &p_sps_buf, &i_sps_size,
                         &p_pps_buf, &i_pps_size,
-                        NULL, NULL))
+                        NULL, NULL) && i_sps_size > 0)
     {
         struct csd csd[2];
         int i_csd_count = 0;
