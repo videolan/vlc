@@ -331,21 +331,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_date_set = false;
     p_sys->b_discontuinity = false;
+    memset(&p_sys->frame, 0, sizeof(vlc_a52_header_t));
 
     block_BytestreamInit( &p_sys->bytestream );
 
-    /* Set output properties */
+    /* Set output properties (Passthrough ONLY) */
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
-
-    p_sys->frame.b_eac3 = false;
-    p_sys->frame.i_rate = p_dec->fmt_out.audio.i_rate;
-    p_sys->frame.i_channels = p_dec->fmt_out.audio.i_channels;
-    p_sys->frame.i_size = p_dec->fmt_out.audio.i_bytes_per_frame;
-    p_sys->frame.i_samples = p_dec->fmt_out.audio.i_frame_length;
-    p_sys->frame.i_channels_conf = p_dec->fmt_out.audio.i_original_channels;
-    p_sys->frame.i_bitrate = p_dec->fmt_out.i_bitrate;
 
     /* Set callback */
     p_dec->pf_packetize = PacketizeBlock;
