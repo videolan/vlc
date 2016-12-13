@@ -1349,13 +1349,15 @@ static void PIDFillFormat( demux_t *p_demux, ts_pes_t *p_pes,
     case 0x84:  /* SDDS (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_SDDS );
         break;
-    case 0x85:  /* DTS (audio) */
+    case 0x85:  /* DTS (audio) FIXME: HDMV Only ? */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DTS );
         break;
     case 0x87: /* E-AC3, ATSC */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_EAC3 );
         break;
-
+    case 0x8a: /* DTS (audio) */
+        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DTS );
+        break;
     case 0x91:  /* A52 vls (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', 'b' ) );
         break;
