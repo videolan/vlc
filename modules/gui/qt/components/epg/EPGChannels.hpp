@@ -28,6 +28,7 @@
 #include <QWidget>
 
 class EPGView;
+class EPGProgram;
 
 class EPGChannels : public QWidget
 {
@@ -37,8 +38,8 @@ public:
 
 public slots:
     void setOffset( int offset );
-    void addChannel( QString );
-    void removeChannel( QString );
+    void addProgram( const EPGProgram * );
+    void reset();
 
 protected:
     void paintEvent( QPaintEvent *event ) Q_DECL_OVERRIDE;
@@ -46,7 +47,7 @@ protected:
 private:
     EPGView *m_epgView;
     int m_offset;
-    QStringList channelList;
+    QList<const EPGProgram *> programsList;
 };
 
 #endif // EPGCHANNELS_HPP

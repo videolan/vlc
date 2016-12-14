@@ -39,8 +39,7 @@ public:
 
 public slots:
     void setScale( double scale );
-    void setStartTime( const QDateTime& startTime );
-    void setDuration( int duration );
+    void setRange( const QDateTime&, const QDateTime& );
     void setOffset( int offset );
 
 protected:

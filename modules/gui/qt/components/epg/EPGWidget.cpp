@@ -69,25 +69,22 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     layout->addWidget( rootWidget );
     setLayout( layout );
 
-    CONNECT( m_epgView, startTimeChanged(QDateTime),
-             m_rulerWidget, setStartTime(QDateTime) );
-    CONNECT( m_epgView, durationChanged(int),
-             m_rulerWidget, setDuration(int) );
+    CONNECT( m_epgView, rangeChanged(const QDateTime &, const QDateTime &),
+             m_rulerWidget, setRange(const QDateTime &, const QDateTime &) );
+
     CONNECT( m_epgView->horizontalScrollBar(), valueChanged(int),
              m_rulerWidget, setOffset(int) );
     CONNECT( m_epgView->verticalScrollBar(), valueChanged(int),
              m_channelsWidget, setOffset(int) );
     connect( m_epgView, SIGNAL( itemFocused(EPGItem*)),
              this, SIGNAL(itemSelectionChanged(EPGItem*)) );
-    CONNECT( m_epgView, channelAdded(QString), m_channelsWidget, addChannel(QString) );
-    CONNECT( m_epgView, channelRemoved(QString), m_channelsWidget, removeChannel(QString) );
+    CONNECT( m_epgView, programAdded(const EPGProgram *), m_channelsWidget, addProgram(const EPGProgram *) );
 }
 
 void EPGWidget::reset()
 {
+    m_channelsWidget->reset();
     m_epgView->reset();
-    m_epgView->updateDuration();
-    m_epgView->updateStartTime();
 }
 
 void EPGWidget::setZoom( int level )
@@ -106,26 +103,15 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
     i_event_source_type = p_input_item->i_type;
     b_input_type_known = true;
 
-    m_epgView->cleanup(); /* expire items and flags */
     /* Fixme: input could have dissapeared */
     vlc_mutex_lock(  & p_input_item->lock );
-
-    for ( int i = 0; i < p_input_item->i_epg; ++i )
-    {
-        vlc_epg_t *p_epg = p_input_item->pp_epg[i];
-        /* Read current epg events from libvlc and try to insert them */
-        m_epgView->addEPGEvents( p_epg->pp_event, p_epg->i_event,
-                                 qfu( p_epg->psz_name ),
-                                 p_epg->p_current );
-    }
+    m_epgView->updateEPG( p_input_item->pp_epg, p_input_item->i_epg );
     vlc_mutex_unlock( & p_input_item->lock );
 
     /* toggle our widget view */
     rootWidget->setCurrentIndex(
             m_epgView->hasValidData() ? EPGVIEW_WIDGET : NOEPG_WIDGET );
 
-    // Update the global duration and start time.
-    m_epgView->updateDuration();
-    m_epgView->updateStartTime();
+    m_epgView->cleanup();
 }
 

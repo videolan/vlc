@@ -83,6 +83,7 @@ libqt_plugin_la_SOURCES = \
 	components/controller_widget.cpp components/controller_widget.hpp \
 	components/epg/EPGChannels.cpp components/epg/EPGChannels.hpp \
 	components/epg/EPGItem.cpp components/epg/EPGItem.hpp \
+	components/epg/EPGProgram.cpp components/epg/EPGProgram.hpp \
 	components/epg/EPGRuler.cpp components/epg/EPGRuler.hpp \
 	components/epg/EPGView.cpp components/epg/EPGView.hpp \
 	components/epg/EPGWidget.cpp components/epg/EPGWidget.hpp \
@@ -180,6 +181,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	components/controller.moc.cpp \
 	components/controller_widget.moc.cpp \
 	components/epg/EPGChannels.moc.cpp \
+	components/epg/EPGProgram.moc.cpp \
 	components/epg/EPGRuler.moc.cpp \
 	components/epg/EPGView.moc.cpp \
 	components/epg/EPGWidget.moc.cpp \

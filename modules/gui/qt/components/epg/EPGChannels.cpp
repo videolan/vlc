@@ -25,11 +25,13 @@
 #include <vlc_epg.h>
 
 #include "EPGChannels.hpp"
+#include "EPGProgram.hpp"
 #include "EPGView.hpp"
 
 #include <QPainter>
 #include <QFont>
 #include <QPaintEvent>
+#include <QtAlgorithms>
 
 EPGChannels::EPGChannels( QWidget *parent, EPGView *m_epgView )
     : QWidget( parent ), m_epgView( m_epgView ), m_offset( 0 )
@@ -43,19 +45,20 @@ void EPGChannels::setOffset( int offset )
     update();
 }
 
-void EPGChannels::addChannel( QString channelName )
+void EPGChannels::addProgram( const EPGProgram *program )
 {
-    if ( !channelList.contains( channelName ) )
+    if ( !programsList.contains( program ) )
     {
-        channelList << channelName;
-        channelList.sort();
+        programsList << program;
+        qSort(programsList.begin(), programsList.end(), EPGProgram::lessThan);
         update();
     }
 }
 
-void EPGChannels::removeChannel( QString channelName )
+void EPGChannels::reset()
 {
-    if ( channelList.removeOne( channelName ) ) update();
+    programsList.clear();
+    update();
 }
 
 void EPGChannels::paintEvent( QPaintEvent *event )
@@ -68,8 +71,9 @@ void EPGChannels::paintEvent( QPaintEvent *event )
     p.drawLine( 0, 0, width() - 1, 0 );
 
     unsigned int i=0;
-    foreach( QString text, channelList )
+    foreach( const EPGProgram *program, programsList )
     {
+        QString text = program->getName();
         /* try to remove the " [Program xxx]" end */
         int i_idx_channel = text.lastIndexOf(" [");
         if (i_idx_channel > 0)

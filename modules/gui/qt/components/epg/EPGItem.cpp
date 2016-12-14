@@ -35,11 +35,13 @@
 
 #include "qt.hpp"
 
-EPGItem::EPGItem( const vlc_epg_event_t *data, EPGView *view )
-    : m_view( view )
+EPGItem::EPGItem( const vlc_epg_event_t *data, EPGView *view, const EPGProgram *prog )
+    : QGraphicsItem()
 {
+    m_view = view;
+    program = prog;
+    m_id = data->i_id;
     setData( data );
-    m_current = false;
     m_boundingRect.setHeight( TRACKS_HEIGHT );
     setFlags( QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
     setAcceptHoverEvents( true );
@@ -67,8 +69,8 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     QLinearGradient gradient( mapped.topLeft(), mapped.bottomLeft() );
 
-    bool b_simultaneous = playsAt( m_view->baseTime() );
-    if ( m_current || b_simultaneous )
+    bool b_simultaneous = m_view->liveTime().isValid() && playsAt( m_view->liveTime() );
+    if ( program->getCurrent() == this || b_simultaneous )
         gradientColor.setRgb( 244, 125, 0 , b_simultaneous ? 192 : 255 );
     else
         gradientColor.setRgb( 201, 217, 242 );
@@ -139,15 +141,14 @@ QDateTime EPGItem::end() const
     return QDateTime( m_start ).addSecs( m_duration );
 }
 
-int EPGItem::duration() const
+uint32_t EPGItem::duration() const
 {
     return m_duration;
 }
 
-void EPGItem::setRow( unsigned int i_row_ )
+uint16_t EPGItem::eventID() const
 {
-    i_row = i_row_;
-    updatePos();
+    return m_id;
 }
 
 bool EPGItem::setData( const vlc_epg_event_t *data )
@@ -171,14 +172,10 @@ bool EPGItem::setData( const vlc_epg_event_t *data )
         setDuration( data->i_duration );
         setRating( data->i_rating );
         update();
+        updatePos();
         return true;
     }
     return false;
-}
-
-void EPGItem::setCurrent( bool b_current )
-{
-    m_current = b_current;
 }
 
 bool EPGItem::endsBefore( const QDateTime &ref ) const
@@ -191,7 +188,7 @@ bool EPGItem::playsAt( const QDateTime & ref ) const
     return (m_start <= ref) && !endsBefore( ref );
 }
 
-void EPGItem::setDuration( int duration )
+void EPGItem::setDuration( uint32_t duration )
 {
     m_duration = duration;
     m_boundingRect.setWidth( duration );
@@ -215,8 +212,12 @@ QString EPGItem::description() const
 
 void EPGItem::updatePos()
 {
-    int x = m_view->startTime().secsTo( m_start );
-    setPos( x, i_row * TRACKS_HEIGHT );
+    QDateTime overallmin = m_view->startTime();
+    if( overallmin.isValid() )
+    {
+        int x = m_view->startTime().secsTo( m_start );
+        setPos( x, program->getPosition() * TRACKS_HEIGHT );
+    }
 }
 
 void EPGItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
