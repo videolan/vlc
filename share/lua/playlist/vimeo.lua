@@ -41,14 +41,12 @@ function parse()
             local line = vlc.readline()
             if not line then break end
 
-            -- Get the appropriate ubiquitous meta tag. It appears twice:
-            -- <meta property="og:video:url" content="https://player.vimeo.com/video/123456789?autoplay=1">
-            -- <meta property="og:video:url" content="https://vimeo.com/moogaloop.swf?clip_id=123456789&amp;autoplay=1">
-            local meta = string.match( line, "(<meta[^>]- property=\"og:video:url\"[^>]->)" )
+            -- Get the appropriate ubiquitous meta tag
+            -- <meta name="twitter:player" content="https://player.vimeo.com/video/123456789">
+            local meta = string.match( line, "(<meta[^>]- name=\"twitter:player\"[^>]->)" )
             if meta then
                 local path = string.match( meta, " content=\"(.-)\"" )
-                -- Exclude moogaloop flash URL
-                if path and string.match( path, "player%.vimeo%.com" ) then
+                if path then
                     path = vlc.strings.resolve_xml_special_chars( path )
                     return { { path = path } }
                 end
