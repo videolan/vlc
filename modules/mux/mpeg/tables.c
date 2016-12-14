@@ -653,6 +653,7 @@ int FillPMTESParams( ts_mux_standard standard, const es_format_t *fmt,
     /* AUDIO */
 
     case VLC_CODEC_MPGA:
+    case VLC_CODEC_MP2:
     case VLC_CODEC_MP3:
         ts->i_stream_type = fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
         pes->i_stream_id = 0xc0;
