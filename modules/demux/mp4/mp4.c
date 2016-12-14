@@ -43,6 +43,11 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define CFG_PREFIX "mp4-"
+
+#define MP4_M4A_TEXT     "M4A audio only"
+#define MP4_M4A_LONGTEXT "Ignore non audio tracks from iTunes audio files"
+
 vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
@@ -50,6 +55,9 @@ vlc_module_begin ()
     set_shortname( N_("MP4") )
     set_capability( "demux", 240 )
     set_callbacks( Open, Close )
+
+    add_category_hint("Hacks", NULL, true)
+    add_bool( CFG_PREFIX"m4a-audioonly", false, MP4_M4A_TEXT, MP4_M4A_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -103,6 +111,11 @@ struct demux_sys_t
     asf_packet_sys_t asfpacketsys;
     uint64_t i_preroll;         /* foobar */
     int64_t  i_preroll_start;
+
+    struct
+    {
+        int es_cat_filters;
+    } hacks;
 };
 
 #define DEMUX_INCREMENT (CLOCK_FREQ / 8) /* How far the pcr will go, each round */
@@ -631,6 +644,11 @@ static int Open( vlc_object_t * p_this )
                 break;
             case MAJOR_dash:
                 msg_Dbg( p_demux, "DASH Stream" );
+                break;
+            case MAJOR_M4A:
+                msg_Dbg( p_demux, "iTunes audio" );
+                if( var_InheritBool( p_demux, CFG_PREFIX"m4a-audioonly" ) )
+                    p_sys->hacks.es_cat_filters = AUDIO_ES;
                 break;
             default:
                 msg_Dbg( p_demux,
@@ -3211,6 +3229,11 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                 break;
             }
         }
+    }
+
+    if( p_sys->hacks.es_cat_filters && (p_sys->hacks.es_cat_filters & p_track->fmt.i_cat) == 0 )
+    {
+        p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
     }
 
     if( TrackCreateES( p_demux,
