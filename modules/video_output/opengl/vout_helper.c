@@ -913,34 +913,41 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     if (vgl->pool)
         return vgl->pool;
 
-    /* Allocate our pictures */
-    picture_t *picture[VLCGL_PICTURE_MAX] = {NULL, };
-    unsigned count;
-
-    for (count = 0; count < __MIN(VLCGL_PICTURE_MAX, requested_count); count++) {
-        picture[count] = picture_NewFromFormat(&vgl->fmt);
-        if (!picture[count])
-            break;
-    }
-    if (count <= 0)
-        return NULL;
-
-    /* Wrap the pictures into a pool */
-    vgl->pool = picture_pool_New(count, picture);
-    if (!vgl->pool)
-        goto error;
-
     /* Allocates our textures */
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
         GenTextures(vgl->tex_target, vgl->tex_internal, vgl->tex_format,
                     vgl->tex_type, vgl->chroma->plane_count,
                     vgl->tex_width, vgl->tex_height, vgl->texture[i]);
 
+    /* Allocate our pictures */
+    picture_t *picture[VLCGL_PICTURE_MAX] = {NULL, };
+    unsigned count;
+    for (count = 0; count < __MIN(VLCGL_PICTURE_MAX, requested_count); count++)
+    {
+        picture[count] = picture_NewFromFormat(&vgl->fmt);
+        if (!picture[count])
+            break;
+    }
+    if (count <= 0)
+        goto error;
+
+    /* Wrap the pictures into a pool */
+    vgl->pool = picture_pool_New(count, picture);
+    if (!vgl->pool)
+    {
+        for (unsigned i = 0; i < count; i++)
+            picture_Release(picture[i]);
+        goto error;
+    }
+
     return vgl->pool;
 
 error:
-    for (unsigned i = 0; i < count; i++)
-        picture_Release(picture[i]);
+    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
+    {
+        glDeleteTextures(vgl->chroma->plane_count, vgl->texture[i]);
+        memset(vgl->texture[i], 0, PICTURE_PLANE_MAX * sizeof(GLuint));
+    }
     return NULL;
 }
 
