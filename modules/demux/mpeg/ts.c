@@ -2432,7 +2432,8 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
         }
     }
 
-    if( i_skip >= 188 )
+    if( i_skip >= 188 ||
+        unlikely(!(b_payload || b_adaptation)) ) /* Invalid */
     {
         block_Release( p_pkt );
         return b_ret;
