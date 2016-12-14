@@ -621,22 +621,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->tex_internal = GL_RGB;
         vgl->tex_type     = GL_UNSIGNED_SHORT;
     }
-    vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
-    vgl->sub_chroma = vlc_fourcc_GetChromaDescription(VLC_CODEC_RGB32);
-    assert(vgl->chroma != NULL && vgl->sub_chroma != NULL);
-
-    /* Texture size */
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        int w = vgl->fmt.i_visible_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den;
-        int h = vgl->fmt.i_visible_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den;
-        if (vgl->supports_npot) {
-            vgl->tex_width[j]  = w;
-            vgl->tex_height[j] = h;
-        } else {
-            vgl->tex_width[j]  = GetAlignedSize(w);
-            vgl->tex_height[j] = GetAlignedSize(h);
-        }
-    }
 
     /* Build program if needed */
     vgl->program[0] =
@@ -733,6 +717,25 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             msg_Err(gl, "Unable to use program %d\n", i);
             vout_display_opengl_Delete(vgl);
             return NULL;
+        }
+    }
+
+    vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
+    vgl->sub_chroma = vlc_fourcc_GetChromaDescription(VLC_CODEC_RGB32);
+    assert(vgl->chroma != NULL && vgl->sub_chroma != NULL);
+
+    /* Texture size */
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+        int w = vgl->fmt.i_visible_width  * vgl->chroma->p[j].w.num
+              / vgl->chroma->p[j].w.den;
+        int h = vgl->fmt.i_visible_height * vgl->chroma->p[j].h.num
+              / vgl->chroma->p[j].h.den;
+        if (vgl->supports_npot) {
+            vgl->tex_width[j]  = w;
+            vgl->tex_height[j] = h;
+        } else {
+            vgl->tex_width[j]  = GetAlignedSize(w);
+            vgl->tex_height[j] = GetAlignedSize(h);
         }
     }
 
