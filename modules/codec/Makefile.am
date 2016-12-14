@@ -173,6 +173,9 @@ liblibass_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_libass)
 liblibass_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBASS_CFLAGS)
 liblibass_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 liblibass_plugin_la_LIBADD = $(LIBASS_LIBS) $(LIBS_libass) $(LIBS_freetype) $(FREETYPE_LIBS)
+if HAVE_WINSTORE
+liblibass_plugin_la_LIBADD += -ldwrite
+endif
 EXTRA_LTLIBRARIES += liblibass_plugin.la
 codec_LTLIBRARIES += $(LTLIBlibass)
 

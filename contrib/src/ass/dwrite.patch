@@ -1,0 +1,48 @@
+--- libass/libass/ass_directwrite.c.orig	2016-12-14 12:09:24.569899227 +0100
++++ libass/libass/ass_directwrite.c	2016-12-14 12:21:28.429203219 +0100
+@@ -23,6 +23,7 @@
+ #include <initguid.h>
+ #include <ole2.h>
+ #include <shobjidl.h>
++#include <winapifamily.h>
+ 
+ #include "dwrite_c.h"
+ 
+@@ -742,8 +743,9 @@
+     ASS_FontProvider *provider = NULL;
+     DWriteCreateFactoryFn DWriteCreateFactoryPtr = NULL;
+     ProviderPrivate *priv = NULL;
+-
+-    HMODULE directwrite_lib = LoadLibraryW(L"Dwrite.dll");
++    HMODULE directwrite_lib = NULL;
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++    directwrite_lib = LoadLibraryW(L"Dwrite.dll");
+     if (!directwrite_lib)
+         goto cleanup;
+ 
+@@ -751,6 +753,9 @@
+                                                                    "DWriteCreateFactory");
+     if (!DWriteCreateFactoryPtr)
+         goto cleanup;
++#else
++    DWriteCreateFactoryPtr = DWriteCreateFactory;
++#endif
+ 
+     hr = DWriteCreateFactoryPtr(DWRITE_FACTORY_TYPE_SHARED,
+                                 &IID_IDWriteFactory,
+--- libass/libass/dwrite_c.h.orig	2016-12-14 12:36:59.215968100 +0100
++++ libass/libass/dwrite_c.h	2016-12-14 12:38:42.359500667 +0100
+@@ -142,6 +142,13 @@
+ typedef struct DWRITE_TRIMMING DWRITE_TRIMMING;
+ typedef struct DWRITE_UNDERLINE DWRITE_UNDERLINE;
+ 
++DWRITEAPI HRESULT WINAPI DWriteCreateFactory(
++  DWRITE_FACTORY_TYPE factoryType,
++  REFIID iid,
++  IUnknown **factory
++);
++
++
+ #ifndef __MINGW_DEF_ARG_VAL
+ #ifdef __cplusplus
+ #define __MINGW_DEF_ARG_VAL(x) = x

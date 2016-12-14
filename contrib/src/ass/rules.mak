@@ -25,6 +25,7 @@ else
 ifdef HAVE_WINSTORE
 WITH_FONTCONFIG = 0
 WITH_HARFBUZZ = 1
+WITH_DWRITE = 1
 else
 WITH_FONTCONFIG = 1
 WITH_HARFBUZZ = 1
@@ -43,18 +44,23 @@ libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/ass/use-topendir.patch
+ifdef HAVE_WINSTORE
+	$(APPLY) $(SRC)/ass/dwrite.patch
+endif
 endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 DEPS_ass = freetype2 $(DEPS_freetype2) fribidi
 
-ASS_CONF=--disable-enca
-
 ifneq ($(WITH_FONTCONFIG), 0)
 DEPS_ass += fontconfig $(DEPS_fontconfig)
 else
 ASS_CONF += --disable-fontconfig --disable-require-system-font-provider
+endif
+
+ifneq ($(WITH_DWRITE), 0)
+ASS_CONF += --enable-directwrite
 endif
 
 ifneq ($(WITH_HARFBUZZ), 0)
