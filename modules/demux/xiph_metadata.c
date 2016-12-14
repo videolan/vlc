@@ -395,9 +395,13 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         if( comment_size == 0 )
             continue;
 
-        char* psz_comment = strndup( (const char*)p_data, comment_size );
+        char* psz_comment = malloc( comment_size + 1 );
 
-        RM(comment_size);
+        if( unlikely( !psz_comment ) )
+            goto next_comment;
+
+        memcpy( psz_comment, p_data, comment_size );
+        psz_comment[comment_size] = '\0';
 
         EnsureUTF8( psz_comment );
 
@@ -475,7 +479,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         else if( !strncasecmp( psz_comment, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
         {
             if( attachments == NULL )
-                continue;
+                goto next_comment;
 
             uint8_t *p_picture;
             size_t i_size = vlc_b64_decode_binary( &p_picture, &psz_comment[strlen("METADATA_BLOCK_PICTURE=")]);
@@ -491,7 +495,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         else if ( ppf_replay_gain && ppf_replay_peak && !strncmp(psz_comment, "REPLAYGAIN_", 11) )
         {
             char *p = strchr( psz_comment, '=' );
-            if (!p) continue;
+            if (!p) goto next_comment;
             if ( !strncasecmp(psz_comment, "REPLAYGAIN_TRACK_GAIN=", 22) )
             {
                 (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( ++p );
@@ -523,7 +527,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
             {
                 char *p = strchr( psz_comment, '=' );
                 p_seekpoint = getChapterEntry( i_chapt, &chapters_array );
-                if ( !p || ! p_seekpoint ) continue;
+                if ( !p || ! p_seekpoint ) goto next_comment;
                 if ( ! p_seekpoint->psz_name )
                     p_seekpoint->psz_name = strdup( ++p );
             }
@@ -534,7 +538,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
                 if( p && sscanf( ++p, "%u:%u:%u.%u", &h, &m, &s, &ms ) == 4 )
                 {
                     p_seekpoint = getChapterEntry( i_chapt, &chapters_array );
-                    if ( ! p_seekpoint ) continue;
+                    if ( ! p_seekpoint ) goto next_comment;
                     p_seekpoint->i_time_offset =
                       (((int64_t)h * 3600 + (int64_t)m * 60 + (int64_t)s) * 1000 + ms) * 1000;
                 }
@@ -559,7 +563,9 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
             vlc_meta_AddExtra( p_meta, psz_comment, p );
         }
 #undef IF_EXTRACT
+next_comment:
         free( psz_comment );
+        RM( comment_size );
     }
 #undef RM
 
