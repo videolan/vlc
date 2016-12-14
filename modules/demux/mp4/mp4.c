@@ -2624,7 +2624,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     if( pp_es )
         *pp_es = MP4_AddTrackES( p_demux->out, p_track );
 
-    return VLC_SUCCESS;
+    return ( !pp_es || *pp_es ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 /* *** Try to find nearest sync points *** */
