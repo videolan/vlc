@@ -198,10 +198,6 @@ struct vout_display_opengl_t {
     PFNGLCLIENTACTIVETEXTUREPROC  ClientActiveTexture;
 #endif
 
-
-    /* multitexture */
-    bool use_multitexture;
-
     /* Non-power-of-2 texture size support */
     bool supports_npot;
 
@@ -626,7 +622,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
     assert(vgl->chroma != NULL);
-    vgl->use_multitexture = vgl->chroma->plane_count > 1;
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
@@ -910,10 +905,8 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-            if (vgl->use_multitexture) {
-                glActiveTexture(GL_TEXTURE0 + j);
-                glClientActiveTexture(GL_TEXTURE0 + j);
-            }
+            glActiveTexture(GL_TEXTURE0 + j);
+            glClientActiveTexture(GL_TEXTURE0 + j);
             glBindTexture(vgl->tex_target, vgl->texture[i][j]);
 
 #if !defined(USE_OPENGL_ES2)
@@ -1012,10 +1005,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 {
     /* Update the texture */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        if (vgl->use_multitexture) {
-            glActiveTexture(GL_TEXTURE0 + j);
-            glClientActiveTexture(GL_TEXTURE0 + j);
-        }
+        glActiveTexture(GL_TEXTURE0 + j);
+        glClientActiveTexture(GL_TEXTURE0 + j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
 
         Upload(vgl, picture->format.i_visible_width, vgl->fmt.i_visible_height,
@@ -1039,10 +1030,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         vgl->region_count = count;
         vgl->region       = calloc(count, sizeof(*vgl->region));
 
-        if (vgl->use_multitexture) {
-            glActiveTexture(GL_TEXTURE0 + 0);
-            glClientActiveTexture(GL_TEXTURE0 + 0);
-        }
+        glActiveTexture(GL_TEXTURE0 + 0);
+        glClientActiveTexture(GL_TEXTURE0 + 0);
         int i = 0;
         for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
             gl_region_t *glr = &vgl->region[i];
