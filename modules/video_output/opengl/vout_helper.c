@@ -878,6 +878,33 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
     UpdateZ(vgl);
 }
 
+static void GenTextures(GLenum tex_target, GLint tex_internal,
+                        GLenum tex_format, GLenum tex_type, GLsizei n,
+                        GLsizei *tex_width, GLsizei *tex_height,
+                        GLuint * textures)
+{
+    glGenTextures(n, textures);
+    for (GLsizei j = 0; j < n; j++) {
+        glActiveTexture(GL_TEXTURE0 + j);
+        glClientActiveTexture(GL_TEXTURE0 + j);
+        glBindTexture(tex_target, textures[j]);
+
+#if !defined(USE_OPENGL_ES2)
+        /* Set the texture parameters */
+        glTexParameterf(tex_target, GL_TEXTURE_PRIORITY, 1.0);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#endif
+
+        glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        /* Call glTexImage2D only once, and use glTexSubImage2D later */
+        glTexImage2D(tex_target, 0, tex_internal, tex_width[j], tex_height[j],
+                     0, tex_format, tex_type, NULL);
+    }
+}
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
 {
@@ -902,30 +929,10 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         goto error;
 
     /* Allocates our textures */
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
-        for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-            glActiveTexture(GL_TEXTURE0 + j);
-            glClientActiveTexture(GL_TEXTURE0 + j);
-            glBindTexture(vgl->tex_target, vgl->texture[i][j]);
-
-#if !defined(USE_OPENGL_ES2)
-            /* Set the texture parameters */
-            glTexParameterf(vgl->tex_target, GL_TEXTURE_PRIORITY, 1.0);
-            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#endif
-
-            glTexParameteri(vgl->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(vgl->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(vgl->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(vgl->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-            /* Call glTexImage2D only once, and use glTexSubImage2D later */
-            glTexImage2D(vgl->tex_target, 0,
-                         vgl->tex_internal, vgl->tex_width[j], vgl->tex_height[j],
-                         0, vgl->tex_format, vgl->tex_type, NULL);
-        }
-    }
+    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
+        GenTextures(vgl->tex_target, vgl->tex_internal, vgl->tex_format,
+                    vgl->tex_type, vgl->chroma->plane_count,
+                    vgl->tex_width, vgl->tex_height, vgl->texture[i]);
 
     return vgl->pool;
 
@@ -1072,28 +1079,17 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
             const int pixels_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
                                       r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
-            if (glr->texture) {
-                /* A texture was successfully recycled, reuse it. */
-                glBindTexture(GL_TEXTURE_2D, glr->texture);
-                Upload(vgl, r->fmt.i_visible_width, r->fmt.i_visible_height, glr->width, glr->height, 1, 1, 1, 1,
-                       r->p_picture->p->i_pitch, r->p_picture->p->i_pixel_pitch, 0,
-                       &r->p_picture->p->p_pixels[pixels_offset], GL_TEXTURE_2D, glr->format, glr->type);
-            } else {
+            if (!glr->texture)
+            {
                 /* Could not recycle a previous texture, generate a new one. */
-                glGenTextures(1, &glr->texture);
-                glBindTexture(GL_TEXTURE_2D, glr->texture);
-#if !defined(USE_OPENGL_ES2)
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0);
-                glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#endif
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                Upload(vgl, r->fmt.i_visible_width, r->fmt.i_visible_height, glr->width, glr->height, 1, 1, 1, 1,
-                       r->p_picture->p->i_pitch, r->p_picture->p->i_pixel_pitch, 1,
-                       &r->p_picture->p->p_pixels[pixels_offset], GL_TEXTURE_2D, glr->format, glr->type);
+                GLsizei tex_width = glr->width, tex_height = glr->height;
+                GenTextures(GL_TEXTURE_2D, glr->format, glr->format, glr->type,
+                            1, &tex_width, &tex_height, &glr->texture);
             }
+            glBindTexture(GL_TEXTURE_2D, glr->texture);
+            Upload(vgl, r->fmt.i_visible_width, r->fmt.i_visible_height, glr->width, glr->height, 1, 1, 1, 1,
+                   r->p_picture->p->i_pitch, r->p_picture->p->i_pixel_pitch, 0,
+                   &r->p_picture->p->p_pixels[pixels_offset], GL_TEXTURE_2D, glr->format, glr->type);
         }
     }
     for (int i = 0; i < last_count; i++) {
