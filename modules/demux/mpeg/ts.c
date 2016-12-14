@@ -2398,6 +2398,7 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
     if( b_payload && i_diff == 1 )
     {
         pid->i_cc = ( pid->i_cc + 1 ) & 0xf;
+        pid->i_dup = 0;
     }
     else
     {
@@ -2407,12 +2408,19 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
                       pid->i_pid, i_cc );
             pid->i_cc = i_cc;
         }
+        else if( i_diff == 0 && pid->i_dup == 0 && b_payload )
+        {
+            /* Discard duplicated payload 2.4.3.3 */
+            i_skip = 188;
+            pid->i_dup++;
+        }
         else if( i_diff != 0 && !b_discontinuity )
         {
             msg_Warn( p_demux, "discontinuity received 0x%x instead of 0x%x (pid=%d)",
                       i_cc, ( pid->i_cc + 1 )&0x0f, pid->i_pid );
 
             pid->i_cc = i_cc;
+            pid->i_dup = 0;
             if( p_pes->gather.p_data &&
                 p_pes->p_es->fmt.i_cat != VIDEO_ES &&
                 p_pes->p_es->fmt.i_cat != AUDIO_ES )

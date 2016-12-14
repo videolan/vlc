@@ -54,6 +54,7 @@ struct ts_pid_t
 
     uint8_t     i_flags;
     uint8_t     i_cc;   /* countinuity counter */
+    uint8_t     i_dup;  /* duplicate counter */
     uint8_t     type;
 
     uint16_t    i_refcount;
