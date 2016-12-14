@@ -313,6 +313,8 @@ void MissingPATPMTFixup( demux_t *p_demux )
         return;
     }
 
+    ts_mux_standard mux_standard = (p_sys->standard == TS_STANDARD_ATSC) ? TS_MUX_STANDARD_ATSC
+                                                                         : TS_MUX_STANDARD_DVB;
     struct esstreams_t
     {
         pes_stream_t pes;
@@ -332,8 +334,14 @@ void MissingPATPMTFixup( demux_t *p_demux )
                 p_pid->probed.i_type == -1 )
                 continue;
 
-            esstreams[j].pes.i_codec = p_pid->probed.i_fourcc;
-            esstreams[j].ts.i_stream_type = p_pid->probed.i_type;
+            esfmt.i_codec = p_pid->probed.i_fourcc;
+            if( VLC_SUCCESS !=
+                FillPMTESParams(mux_standard, &esfmt, &esstreams[j].ts, &esstreams[j].pes ) )
+                continue;
+
+            /* Important for correct remapping: Enforce probed PES stream id */
+            esstreams[j].pes.i_stream_id = p_pid->probed.i_stream_id;
+
             esstreams[j].ts.i_pid = p_pid->i_pid;
             mapped[j].pes = &esstreams[j].pes;
             mapped[j].ts = &esstreams[j].ts;
@@ -342,7 +350,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
         }
 
         BuildPMT( GetPID(p_sys, 0)->u.p_pat->handle, VLC_OBJECT(p_demux),
-                 p_sys->standard == TS_STANDARD_ATSC ? TS_MUX_STANDARD_ATSC : TS_MUX_STANDARD_DVB,
+                 mux_standard,
                 p_program_pid, BuildPMTCallback,
                 0, 1,
                 i_pcr_pid,

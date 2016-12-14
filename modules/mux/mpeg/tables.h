@@ -64,4 +64,8 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                unsigned i_programs, ts_stream_t *p_pmt, const int *pi_programs_number,
                unsigned i_mapped_streams, const pes_mapped_stream_t *p_mapped_streams );
 
+
+int FillPMTESParams( ts_mux_standard, const es_format_t *,
+                   ts_stream_t *, pes_stream_t * );
+
 #endif

@@ -41,6 +41,7 @@
 #include "tsutil.h"
 #include "tables.h"
 #include "bits.h"
+#include "pes.h"
 
 block_t *WritePSISection( dvbpsi_psi_section_t* p_section )
 {
@@ -603,5 +604,140 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
     }
 }
 
+int FillPMTESParams( ts_mux_standard standard, const es_format_t *fmt,
+                     ts_stream_t *ts, pes_stream_t *pes )
+{
+    switch( fmt->i_codec )
+    {
+    /* VIDEO */
+
+    case VLC_CODEC_MPGV:
+    case VLC_CODEC_MP2V:
+    case VLC_CODEC_MP1V:
+        /* TODO: do we need to check MPEG-I/II ? */
+        ts->i_stream_type = 0x02;
+        pes->i_stream_id = 0xe0;
+        break;
+    case VLC_CODEC_MP4V:
+        ts->i_stream_type = 0x10;
+        pes->i_stream_id = 0xe0;
+        pes->i_es_id = ts->i_pid;
+        break;
+    case VLC_CODEC_HEVC:
+        ts->i_stream_type = 0x24;
+        pes->i_stream_id = 0xe0;
+        break;
+    case VLC_CODEC_H264:
+        ts->i_stream_type = 0x1b;
+        pes->i_stream_id = 0xe0;
+        break;
+    /* XXX dirty dirty but somebody want crapy MS-codec XXX */
+    case VLC_CODEC_H263I:
+    case VLC_CODEC_H263:
+    case VLC_CODEC_WMV3:
+    case VLC_CODEC_WMV2:
+    case VLC_CODEC_WMV1:
+    case VLC_CODEC_DIV3:
+    case VLC_CODEC_DIV2:
+    case VLC_CODEC_DIV1:
+    case VLC_CODEC_MJPG:
+        ts->i_stream_type = 0xa0; /* private */
+        pes->i_stream_id = 0xa0;   /* beurk */
+        break;
+    case VLC_CODEC_DIRAC:
+        /* stream_id makes use of stream_id_extension */
+        pes->i_stream_id = (PES_EXTENDED_STREAM_ID << 8) | 0x60;
+        ts->i_stream_type = 0xd1;
+        break;
+
+    /* AUDIO */
+
+    case VLC_CODEC_MPGA:
+    case VLC_CODEC_MP3:
+        ts->i_stream_type = fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
+        pes->i_stream_id = 0xc0;
+        break;
+    case VLC_CODEC_A52:
+        pes->i_stream_id = 0xbd;
+        if( standard == TS_MUX_STANDARD_ATSC )
+        {
+            ts->i_stream_type = 0x81;
+        }
+        else
+        {
+            ts->i_stream_type = 0x06;
+        }
+        break;
+    case VLC_CODEC_DVD_LPCM:
+        ts->i_stream_type = 0x83;
+        pes->i_stream_id = 0xbd;
+        break;
+    case VLC_CODEC_OPUS:
+        if (fmt->audio.i_channels > 8)
+            return VLC_EGENERIC;
+        pes->i_stream_id = 0xbd;
+        pes->i_stream_id = 0x06;
+        break;
+    case VLC_CODEC_EAC3:
+        pes->i_stream_id = 0xbd;
+        if( standard == TS_MUX_STANDARD_ATSC )
+        {
+            /* FIXME: Mandatory EAC3 audio_descriptor */
+            ts->i_stream_type = 0x87;
+        }
+        else
+        {
+            ts->i_stream_type = 0x06;
+        }
+        break;
+    case VLC_CODEC_DTS:
+        if( standard == TS_MUX_STANDARD_ATSC )
+        {
+            return VLC_EGENERIC;
+        }
+        else
+        {
+            ts->i_stream_type = 0x06;
+            pes->i_stream_id = 0xbd;
+        }
+        break;
+    case VLC_CODEC_MP4A:
+        /* XXX: make that configurable in some way when LOAS
+         * is implemented for AAC in TS */
+        //ts->i_stream_type = 0x11; /* LOAS/LATM */
+        ts->i_stream_type = 0x0f; /* ADTS */
+        pes->i_stream_id = 0xc0;
+        pes->i_es_id = ts->i_pid;
+        break;
+
+    /* TEXT */
+
+    case VLC_CODEC_SPU:
+        ts->i_stream_type = 0x82;
+        pes->i_stream_id = 0xbd;
+        break;
+    case VLC_CODEC_SUBT:
+        ts->i_stream_type = 0x12;
+        pes->i_stream_id = 0xfa;
+        pes->i_es_id = ts->i_pid;
+        break;
+    case VLC_CODEC_DVBS:
+        ts->i_stream_type = 0x06;
+        pes->i_es_id = fmt->subs.dvb.i_id;
+        pes->i_stream_id = 0xbd;
+        break;
+    case VLC_CODEC_TELETEXT:
+        ts->i_stream_type = 0x06;
+        pes->i_stream_id = 0xbd; /* FIXME */
+        break;
+
+    default:
+        return VLC_EGENERIC;
+    }
+
+    pes->i_codec = fmt->i_codec;
+
+    return VLC_SUCCESS;
+}
 
 #endif

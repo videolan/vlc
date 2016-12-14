@@ -931,146 +931,19 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     else
         p_stream->ts.i_pid = AllocatePID( p_mux, p_input->p_fmt->i_cat );
 
-    p_stream->pes.i_codec = p_input->p_fmt->i_codec;
+    if( FillPMTESParams( p_sys->standard, p_input->p_fmt,
+                        &p_stream->ts, &p_stream->pes ) != VLC_SUCCESS )
+    {
+        msg_Warn( p_mux, "rejecting stream with unsupported codec %4.4s",
+                  (char*)&p_input->fmt.i_codec );
+        free( p_stream );
+        return VLC_EGENERIC;
+    }
+
     if( p_input->p_fmt->i_cat == VIDEO_ES )
     {
         p_stream->pes.i_width = p_input->fmt.video.i_width;
         p_stream->pes.i_height = p_input->fmt.video.i_height;
-    }
-
-    p_stream->ts.i_stream_type = 0x00;
-    switch( p_input->p_fmt->i_codec )
-    {
-    /* VIDEO */
-
-    case VLC_CODEC_MPGV:
-    case VLC_CODEC_MP2V:
-    case VLC_CODEC_MP1V:
-        /* TODO: do we need to check MPEG-I/II ? */
-        p_stream->ts.i_stream_type = 0x02;
-        p_stream->pes.i_stream_id = 0xe0;
-        break;
-    case VLC_CODEC_MP4V:
-        p_stream->ts.i_stream_type = 0x10;
-        p_stream->pes.i_stream_id = 0xe0;
-        p_stream->pes.i_es_id = p_stream->ts.i_pid;
-        break;
-    case VLC_CODEC_HEVC:
-        p_stream->ts.i_stream_type = 0x24;
-        p_stream->pes.i_stream_id = 0xe0;
-        break;
-    case VLC_CODEC_H264:
-        p_stream->ts.i_stream_type = 0x1b;
-        p_stream->pes.i_stream_id = 0xe0;
-        break;
-    /* XXX dirty dirty but somebody want crapy MS-codec XXX */
-    case VLC_CODEC_H263I:
-    case VLC_CODEC_H263:
-    case VLC_CODEC_WMV3:
-    case VLC_CODEC_WMV2:
-    case VLC_CODEC_WMV1:
-    case VLC_CODEC_DIV3:
-    case VLC_CODEC_DIV2:
-    case VLC_CODEC_DIV1:
-    case VLC_CODEC_MJPG:
-        p_stream->ts.i_stream_type = 0xa0; /* private */
-        p_stream->pes.i_stream_id = 0xa0;   /* beurk */
-        break;
-    case VLC_CODEC_DIRAC:
-        /* stream_id makes use of stream_id_extension */
-        p_stream->pes.i_stream_id = (PES_EXTENDED_STREAM_ID << 8) | 0x60;
-        p_stream->ts.i_stream_type = 0xd1;
-        break;
-
-    /* AUDIO */
-
-    case VLC_CODEC_MPGA:
-    case VLC_CODEC_MP3:
-        p_stream->ts.i_stream_type =
-            p_input->p_fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
-        p_stream->pes.i_stream_id = 0xc0;
-        break;
-    case VLC_CODEC_A52:
-        p_stream->pes.i_stream_id = 0xbd;
-        if( p_sys->standard == TS_MUX_STANDARD_ATSC )
-        {
-            p_stream->ts.i_stream_type = 0x81;
-        }
-        else
-        {
-            p_stream->ts.i_stream_type = 0x06;
-        }
-        break;
-    case VLC_CODEC_DVD_LPCM:
-        p_stream->ts.i_stream_type = 0x83;
-        p_stream->pes.i_stream_id = 0xbd;
-        break;
-    case VLC_CODEC_OPUS:
-        if (p_input->p_fmt->audio.i_channels > 8) {
-            msg_Err(p_mux, "Too many opus channels (%d > 8)",
-                p_input->p_fmt->audio.i_channels);
-            break;
-        }
-    case VLC_CODEC_EAC3:
-        p_stream->pes.i_stream_id = 0xbd;
-        if( p_sys->standard == TS_MUX_STANDARD_ATSC )
-        {
-            /* FIXME: Mandatory EAC3 audio_descriptor */
-            p_stream->ts.i_stream_type = 0x87;
-        }
-        else
-        {
-            p_stream->ts.i_stream_type = 0x06;
-        }
-        break;
-    case VLC_CODEC_DTS:
-        if( p_sys->standard == TS_MUX_STANDARD_ATSC )
-        {
-            return VLC_EGENERIC;
-        }
-        else
-        {
-            p_stream->ts.i_stream_type = 0x06;
-            p_stream->pes.i_stream_id = 0xbd;
-        }
-        break;
-    case VLC_CODEC_MP4A:
-        /* XXX: make that configurable in some way when LOAS
-         * is implemented for AAC in TS */
-        //p_stream->ts.i_stream_type = 0x11; /* LOAS/LATM */
-        p_stream->ts.i_stream_type = 0x0f; /* ADTS */
-        p_stream->pes.i_stream_id = 0xc0;
-        p_stream->pes.i_es_id = p_stream->ts.i_pid;
-        break;
-
-    /* TEXT */
-
-    case VLC_CODEC_SPU:
-        p_stream->ts.i_stream_type = 0x82;
-        p_stream->pes.i_stream_id = 0xbd;
-        break;
-    case VLC_CODEC_SUBT:
-        p_stream->ts.i_stream_type = 0x12;
-        p_stream->pes.i_stream_id = 0xfa;
-        p_stream->pes.i_es_id = p_stream->ts.i_pid;
-        break;
-    case VLC_CODEC_DVBS:
-        p_stream->ts.i_stream_type = 0x06;
-        p_stream->pes.i_es_id = p_input->p_fmt->subs.dvb.i_id;
-        p_stream->pes.i_stream_id = 0xbd;
-        break;
-    case VLC_CODEC_TELETEXT:
-        p_stream->ts.i_stream_type = 0x06;
-        p_stream->pes.i_stream_id = 0xbd; /* FIXME */
-        break;
-    }
-
-    if (p_stream->ts.i_stream_type == 0x00)
-    {
-        msg_Warn( p_mux, "rejecting stream with unsupported codec %4.4s",
-                  (char*)&p_stream->pes.i_codec );
-        free( p_stream );
-        return VLC_EGENERIC;
     }
 
     p_stream->pes.i_langs = 1 + p_input->p_fmt->i_extra_languages;
