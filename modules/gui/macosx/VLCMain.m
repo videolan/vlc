@@ -92,14 +92,19 @@ int OpenIntf (vlc_object_t *p_this)
         p_interface_thread = p_intf;
         msg_Dbg(p_intf, "Starting macosx interface");
 
-        [VLCApplication sharedApplication];
-        [VLCMain sharedInstance];
+        @try {
+            [VLCApplication sharedApplication];
+            [VLCMain sharedInstance];
 
-        [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
-        [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
+            [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
+            [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
 
-        msg_Dbg(p_intf, "Finished loading macosx interface");
-        return VLC_SUCCESS;
+            msg_Dbg(p_intf, "Finished loading macosx interface");
+            return VLC_SUCCESS;
+        } @catch (NSException *exception) {
+            msg_Err(p_intf, "Loading the macosx interface failed. Do you have a valid window server?");
+            return VLC_EGENERIC;
+        }
     }
 }
 
