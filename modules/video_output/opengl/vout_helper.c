@@ -1683,19 +1683,13 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     float top[PICTURE_PLANE_MAX];
     float right[PICTURE_PLANE_MAX];
     float bottom[PICTURE_PLANE_MAX];
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        /* glTexCoord works differently with GL_TEXTURE_2D and
-           GL_TEXTURE_RECTANGLE_EXT */
-        float scale_w, scale_h;
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++)
+    {
+        float scale_w = (float)vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den
+                      / vgl->tex_width[j];
+        float scale_h = (float)vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den
+                      / vgl->tex_height[j];
 
-        if (vgl->tex_target == GL_TEXTURE_2D) {
-            scale_w = (float)vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den / vgl->tex_width[j];
-            scale_h = (float)vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den / vgl->tex_height[j];
-
-        } else {
-            scale_w = 1.0;
-            scale_h = 1.0;
-        }
         /* Warning: if NPOT is not supported a larger texture is
            allocated. This will cause right and bottom coordinates to
            land on the edge of two texels with the texels to the
