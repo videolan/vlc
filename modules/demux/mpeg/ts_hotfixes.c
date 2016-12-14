@@ -51,7 +51,6 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint8_t *p_pes = p_pesstart;
-    pid->probed.i_type = -1;
 
     if( b_adaptfield )
     {
@@ -148,53 +147,39 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
         return;
 
     const uint8_t *p_data = &p_pes[i_payloadoffset];
+    const uint8_t i_stream_id = pid->probed.i_stream_id = p_pes[3];
     /* NON MPEG audio & subpictures STREAM */
-    if(p_pes[3] == 0xBD)
+    if(i_stream_id == 0xBD)
     {
         if( !memcmp( p_data, "\x7F\xFE\x80\x01", 4 ) )
         {
-            pid->probed.i_type = 0x06;
             pid->probed.i_fourcc = VLC_CODEC_DTS;
+            pid->probed.i_cat = AUDIO_ES;
         }
         else if( !memcmp( p_data, "\x0B\x77", 2 ) )
         {
-            pid->probed.i_type = 0x06;
             pid->probed.i_fourcc = VLC_CODEC_EAC3;
+            pid->probed.i_cat = AUDIO_ES;
         }
     }
     /* MPEG AUDIO STREAM */
-    else if(p_pes[3] >= 0xC0 && p_pes[3] <= 0xDF)
+    else if(i_stream_id >= 0xC0 && i_stream_id <= 0xDF)
     {
+        pid->probed.i_cat = AUDIO_ES;
         if( p_data[0] == 0xFF && (p_data[1] & 0xE0) == 0xE0 )
         {
-            switch(p_data[1] & 18)
-            {
-            /* 10 - MPEG Version 2 (ISO/IEC 13818-3)
-               11 - MPEG Version 1 (ISO/IEC 11172-3) */
-                case 0x10:
-                    pid->probed.i_type = 0x04;
-                    break;
-                case 0x18:
-                    pid->probed.i_type = 0x03;
-                default:
-                    break;
-            }
-
             switch(p_data[1] & 6)
             {
             /* 01 - Layer III
                10 - Layer II
                11 - Layer I */
                 case 0x06:
-                    pid->probed.i_type = 0x04;
                     pid->probed.i_fourcc = VLC_CODEC_MPGA;
                     break;
                 case 0x04:
-                    pid->probed.i_type = 0x04;
                     pid->probed.i_fourcc = VLC_CODEC_MP2;
                     break;
                 case 0x02:
-                    pid->probed.i_type = 0x04;
                     pid->probed.i_fourcc = VLC_CODEC_MP3;
                 default:
                     break;
@@ -202,16 +187,15 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
         }
     }
     /* VIDEO STREAM */
-    else if( p_pes[3] >= 0xE0 && p_pes[3] <= 0xEF )
+    else if( i_stream_id >= 0xE0 && i_stream_id <= 0xEF )
     {
+        pid->probed.i_cat = VIDEO_ES;
         if( !memcmp( p_data, "\x00\x00\x00\x01", 4 ) )
         {
-            pid->probed.i_type = 0x1b;
             pid->probed.i_fourcc = VLC_CODEC_H264;
         }
         else if( !memcmp( p_data, "\x00\x00\x01", 4 ) )
         {
-            pid->probed.i_type = 0x02;
             pid->probed.i_fourcc = VLC_CODEC_MPGV;
         }
     }
@@ -273,10 +257,10 @@ void MissingPATPMTFixup( demux_t *p_demux )
     ts_pid_next_context_t pidnextctx = ts_pid_NextContextInitValue;
     while( (p_pid = ts_pid_Next( &p_sys->pids, &pidnextctx )) )
     {
-        if( !SEEN(p_pid) || p_pid->probed.i_type == -1 )
+        if( !SEEN(p_pid) || p_pid->probed.i_fourcc == 0 )
             continue;
 
-        if( i_pcr_pid == 0x1FFF && ( p_pid->probed.i_type == 0x03 ||
+        if( i_pcr_pid == 0x1FFF && ( p_pid->probed.i_cat == AUDIO_ES ||
                                      p_pid->probed.i_pcr_count ) )
             i_pcr_pid = p_pid->i_pid;
 
@@ -331,7 +315,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
             const ts_pid_t *p_pid = p_sys->pids.pp_all[i];
 
             if( !SEEN(p_pid) ||
-                p_pid->probed.i_type == -1 )
+                p_pid->probed.i_fourcc == 0 )
                 continue;
 
             esfmt.i_codec = p_pid->probed.i_fourcc;
