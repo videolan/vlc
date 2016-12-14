@@ -348,7 +348,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
                 i_pcr_pid,
                 NULL,
                 1, &pmtprogramstream, &i_program_number,
-                i_num_pes, mapped );
+                j, mapped );
     }
     free(esstreams);
     free(mapped);
