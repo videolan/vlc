@@ -56,10 +56,10 @@ enum vlc_module_properties
     /* command line name (args=const char *) */
 
     VLC_CONFIG_VALUE,
-    /* actual value (args=int/double/const char *) */
+    /* actual value (args=int64_t/double/const char *) */
 
     VLC_CONFIG_RANGE,
-    /* minimum value (args=int/double/const char * twice) */
+    /* minimum value (args=int64_t/double/const char * twice) */
 
     VLC_CONFIG_ADVANCED,
     /* enable advanced flag (args=none) */
