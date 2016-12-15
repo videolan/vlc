@@ -46,19 +46,16 @@
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
-#ifndef GL_RED
-#define GL_RED 0
-#endif
-#ifndef GL_R16
-#define GL_R16 0
-#endif
-
 #define SPHERE_RADIUS 1.f
+
+static opengl_tex_converter_init_cb opengl_tex_converter_init_cbs[] =
+{
+    opengl_tex_converter_yuv_init,
+    opengl_tex_converter_xyz12_init,
+};
 
 typedef struct {
     GLuint   texture;
-    unsigned format;
-    unsigned type;
     unsigned width;
     unsigned height;
 
@@ -80,12 +77,6 @@ struct vout_display_opengl_t {
 
     video_format_t fmt;
     const vlc_chroma_description_t *chroma;
-    const vlc_chroma_description_t *sub_chroma;
-
-    int        tex_target;
-    int        tex_format;
-    int        tex_internal;
-    int        tex_type;
 
     int        tex_width[PICTURE_PLANE_MAX];
     int        tex_height[PICTURE_PLANE_MAX];
@@ -100,10 +91,8 @@ struct vout_display_opengl_t {
 
     /* One YUV program and/or one RGBA program (for subpics) */
     GLuint     program[2];
-    /* One YUV fragment shader and/or one RGBA fragment shader and
-     * one vertex shader */
-    GLint      shader[3];
-    GLfloat    local_value[16];
+    opengl_tex_converter_t tex_conv[2];
+    GLuint     vertex_shader;
 
     /* Index of main picture program */
     unsigned   program_idx;
@@ -119,9 +108,6 @@ struct vout_display_opengl_t {
 
     /* Non-power-of-2 texture size support */
     bool supports_npot;
-
-    uint8_t *texture_temp_buf;
-    size_t   texture_temp_buf_size;
 
     /* View point */
     float f_teta;
@@ -141,37 +127,8 @@ static inline int GetAlignedSize(unsigned size)
     return ((align >> 1) == size) ? size : align;
 }
 
-#if !defined(USE_OPENGL_ES2)
-static int GetTexFormatSize(int target, int tex_format, int tex_internal,
-                            int tex_type)
-{
-    GLint tex_param_size;
-    switch (tex_format)
-    {
-        case GL_RED:
-            tex_param_size = GL_TEXTURE_RED_SIZE;
-            break;
-        case GL_LUMINANCE:
-            tex_param_size = GL_TEXTURE_LUMINANCE_SIZE;
-            break;
-        default:
-            return -1;
-    }
-    GLuint texture;
-
-    glGenTextures(1, &texture);
-    glBindTexture(target, texture);
-    glTexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
-    GLint size = 0;
-    glGetTexLevelParameteriv(target, 0, tex_param_size, &size);
-
-    glDeleteTextures(1, &texture);
-    return size;
-}
-#endif
-
 static void BuildVertexShader(vout_display_opengl_t *vgl,
-                              GLint *shader)
+                              GLuint *shader)
 {
     /* Basic vertex shader */
     const char *vertexShader =
@@ -198,168 +155,6 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
     vgl->api.CompileShader(*shader);
 }
 
-static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
-                                   GLint *shader,
-                                   GLfloat *local_value,
-                                   const video_format_t *fmt,
-                                   float yuv_range_correction)
-
-{
-    /* [R/G/B][Y U V O] from TV range to full range
-     * XXX we could also do hue/brightness/constrast/gamma
-     * by simply changing the coefficients
-     */
-    const float matrix_bt601_tv2full[12] = {
-        1.164383561643836,  0.0000,             1.596026785714286, -0.874202217873451 ,
-        1.164383561643836, -0.391762290094914, -0.812967647237771,  0.531667823499146 ,
-        1.164383561643836,  2.017232142857142,  0.0000,            -1.085630789302022 ,
-    };
-    const float matrix_bt709_tv2full[12] = {
-        1.164383561643836,  0.0000,             1.792741071428571, -0.972945075016308 ,
-        1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
-        1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
-    };
-    const float *matrix;
-    switch( fmt->space )
-    {
-        case COLOR_SPACE_BT601:
-            matrix = matrix_bt601_tv2full;
-            break;
-        default:
-            matrix = matrix_bt709_tv2full;
-    };
-
-    /* Basic linear YUV -> RGB conversion using bilinear interpolation */
-    const char *template_glsl_yuv =
-        "#version " GLSL_VERSION "\n"
-        PRECISION
-        "uniform sampler2D Texture0;"
-        "uniform sampler2D Texture1;"
-        "uniform sampler2D Texture2;"
-        "uniform vec4      Coefficient[4];"
-        "varying vec4      TexCoord0,TexCoord1,TexCoord2;"
-
-        "void main(void) {"
-        " vec4 x,y,z,result;"
-
-        /* The texture format can be GL_RED: vec4(R,0,0,1) or GL_LUMINANCE:
-         * vec4(L,L,L,1). The following transform a vec4(x, y, z, w) into a
-         * vec4(x, x, x, 1) (we may want to use texture swizzling starting
-         * OpenGL 3.3). */
-        " float val0 = texture2D(Texture0, TexCoord0.st).x;"
-        " float val1 = texture2D(Texture1, TexCoord1.st).x;"
-        " float val2 = texture2D(Texture2, TexCoord2.st).x;"
-        " x  = vec4(val0, val0, val0, 1);"
-        " %c = vec4(val1, val1, val1, 1);"
-        " %c = vec4(val2, val2, val2, 1);"
-
-        " result = x * Coefficient[0] + Coefficient[3];"
-        " result = (y * Coefficient[1]) + result;"
-        " result = (z * Coefficient[2]) + result;"
-        " gl_FragColor = result;"
-        "}";
-    bool swap_uv = fmt->i_chroma == VLC_CODEC_YV12 ||
-                   fmt->i_chroma == VLC_CODEC_YV9;
-
-    char *code;
-    if (asprintf(&code, template_glsl_yuv,
-                 swap_uv ? 'z' : 'y',
-                 swap_uv ? 'y' : 'z') < 0)
-        return;
-
-    for (int i = 0; i < 4; i++) {
-        float correction = i < 3 ? yuv_range_correction : 1.f;
-        /* We place coefficient values for coefficient[4] in one array from matrix values.
-           Notice that we fill values from top down instead of left to right.*/
-        for (int j = 0; j < 4; j++)
-            local_value[i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.f;
-    }
-
-    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
-    vgl->api.ShaderSource(*shader, 1, (const char **)&code, NULL);
-    vgl->api.CompileShader(*shader);
-
-    free(code);
-}
-
-#if 0
-static void BuildRGBFragmentShader(vout_display_opengl_t *vgl,
-                                   GLint *shader)
-{
-    // Simple shader for RGB
-    const char *code =
-        "#version " GLSL_VERSION "\n"
-        PRECISION
-        "uniform sampler2D Texture[3];"
-        "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
-        "void main()"
-        "{ "
-        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st);"
-        "}";
-    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
-    vgl->api.ShaderSource(*shader, 1, &code, NULL);
-    vgl->api.CompileShader(*shader);
-}
-#endif
-
-static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
-                                   GLint *shader)
-{
-    // Simple shader for RGBA
-    const char *code =
-        "#version " GLSL_VERSION "\n"
-        PRECISION
-        "uniform sampler2D Texture;"
-        "uniform vec4 FillColor;"
-        "varying vec4 TexCoord0;"
-        "void main()"
-        "{ "
-        "  gl_FragColor = texture2D(Texture, TexCoord0.st) * FillColor;"
-        "}";
-    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
-    vgl->api.ShaderSource(*shader, 1, &code, NULL);
-    vgl->api.CompileShader(*shader);
-}
-
-static void BuildXYZFragmentShader(vout_display_opengl_t *vgl,
-                                   GLint *shader)
-{
-    /* Shader for XYZ to RGB correction
-     * 3 steps :
-     *  - XYZ gamma correction
-     *  - XYZ to RGB matrix conversion
-     *  - reverse RGB gamma correction
-     */
-      const char *code =
-        "#version " GLSL_VERSION "\n"
-        PRECISION
-        "uniform sampler2D Texture0;"
-        "uniform vec4 xyz_gamma = vec4(2.6);"
-        "uniform vec4 rgb_gamma = vec4(1.0/2.2);"
-        // WARN: matrix Is filled column by column (not row !)
-        "uniform mat4 matrix_xyz_rgb = mat4("
-        "    3.240454 , -0.9692660, 0.0556434, 0.0,"
-        "   -1.5371385,  1.8760108, -0.2040259, 0.0,"
-        "    -0.4985314, 0.0415560, 1.0572252,  0.0,"
-        "    0.0,      0.0,         0.0,        1.0 "
-        " );"
-
-        "varying vec4 TexCoord0;"
-        "void main()"
-        "{ "
-        " vec4 v_in, v_out;"
-        " v_in  = texture2D(Texture0, TexCoord0.st);"
-        " v_in = pow(v_in, xyz_gamma);"
-        " v_out = matrix_xyz_rgb * v_in ;"
-        " v_out = pow(v_out, rgb_gamma) ;"
-        " v_out = clamp(v_out, 0.0, 1.0) ;"
-        " gl_FragColor = v_out;"
-        "}";
-    *shader = vgl->api.CreateShader(GL_FRAGMENT_SHADER);
-    vgl->api.ShaderSource(*shader, 1, &code, NULL);
-    vgl->api.CompileShader(*shader);
-}
-
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl,
@@ -381,12 +176,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #if !defined(USE_OPENGL_ES2)
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
-    const bool oglv3 = strverscmp((const char *)ogl_version, "3.0") >= 0;
-    const int yuv_plane_texformat = oglv3 ? GL_RED : GL_LUMINANCE;
-    const int yuv_plane_texformat_16 = oglv3 ? GL_R16 : GL_LUMINANCE16;
 #else
     bool supports_shaders = true;
-    const int yuv_plane_texformat = GL_LUMINANCE;
 #endif
 
     opengl_shaders_api_t *api = &vgl->api;
@@ -455,9 +246,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->supports_npot = true;
 #endif
 
-    GLint max_texture_units = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
-
     /* Initialize with default chroma */
     vgl->fmt = *fmt;
     vgl->fmt.i_chroma = VLC_CODEC_RGB32;
@@ -470,84 +258,65 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->fmt.i_gmask  = 0x0000ff00;
     vgl->fmt.i_bmask  = 0x00ff0000;
 #   endif
-    vgl->tex_target   = GL_TEXTURE_2D;
-    vgl->tex_format   = GL_RGBA;
-    vgl->tex_internal = GL_RGBA;
-    vgl->tex_type     = GL_UNSIGNED_BYTE;
-    /* Use YUV if possible and needed */
-    float yuv_range_correction = 1.0;
+    opengl_tex_converter_t tex_conv;
+    opengl_tex_converter_t rgba_tex_conv = {
+        .parent = VLC_OBJECT(vgl->gl),
+        .api = &vgl->api,
+        .orientation = fmt->orientation,
+    };
 
-    if (max_texture_units >= 3 && vlc_fourcc_IsYUV(fmt->i_chroma)) {
-        const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
-        while (*list) {
-            const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(*list);
-            if (dsc && dsc->plane_count == 3 && dsc->pixel_size == 1) {
-                vgl->fmt          = *fmt;
-                vgl->fmt.i_chroma = *list;
-                vgl->tex_format   = yuv_plane_texformat;
-                vgl->tex_internal = yuv_plane_texformat;
-                vgl->tex_type     = GL_UNSIGNED_BYTE;
-                yuv_range_correction = 1.0;
-                break;
-#if !defined(USE_OPENGL_ES2)
-            } else if (dsc && dsc->plane_count == 3 && dsc->pixel_size == 2 &&
-                       GetTexFormatSize(vgl->tex_target,
-                                        yuv_plane_texformat,
-                                        yuv_plane_texformat_16,
-                                        GL_UNSIGNED_SHORT) == 16) {
-                vgl->fmt          = *fmt;
-                vgl->fmt.i_chroma = *list;
-                vgl->tex_format   = yuv_plane_texformat;
-                vgl->tex_internal = yuv_plane_texformat_16;
-                vgl->tex_type     = GL_UNSIGNED_SHORT;
-                yuv_range_correction = (float)((1 << 16) - 1) / ((1 << dsc->pixel_bits) - 1);
-                break;
-#endif
-            }
-            list++;
-        }
+    /* RGBA is needed for subpictures or for non YUV pictures */
+    if (opengl_tex_converter_rgba_init(&vgl->fmt, &rgba_tex_conv) != VLC_SUCCESS)
+    {
+        msg_Err(gl, "RGBA shader failed");
+        free(vgl);
+        return NULL;
     }
 
-    if (fmt->i_chroma == VLC_CODEC_XYZ12) {
-        vgl->fmt          = *fmt;
-        vgl->fmt.i_chroma = VLC_CODEC_XYZ12;
-        vgl->tex_format   = GL_RGB;
-        vgl->tex_internal = GL_RGB;
-        vgl->tex_type     = GL_UNSIGNED_SHORT;
+    for (size_t i = 0; i < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++i)
+    {
+        tex_conv = (opengl_tex_converter_t) {
+            .parent = VLC_OBJECT(vgl->gl),
+            .api = &vgl->api,
+            .orientation = fmt->orientation,
+        };
+        int ret = opengl_tex_converter_init_cbs[i](fmt, &tex_conv);
+        if (ret == VLC_SUCCESS)
+        {
+            assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
+                   tex_conv.fragment_shader != 0 &&
+                   tex_conv.pf_gen_textures != NULL &&
+                   tex_conv.pf_update != NULL &&
+                   tex_conv.pf_prepare_shader != NULL &&
+                   tex_conv.pf_release != NULL);
+            vgl->fmt = *fmt;
+            vgl->fmt.i_chroma = tex_conv.chroma;
+            break;
+        }
     }
 
     /* Build program if needed */
     vgl->program[0] =
     vgl->program[1] = 0;
-    vgl->shader[0] =
-    vgl->shader[1] =
-    vgl->shader[2] = -1;
+    vgl->vertex_shader = 0;
+    GLuint shaders[3] = { 0, 0, 0 };
     unsigned nb_shaders = 0;
-    int vertex_shader_idx = -1, fragment_shader_idx = -1,
-        rgba_fragment_shader_idx = -1;
 
-    if (vgl->fmt.i_chroma == VLC_CODEC_XYZ12)
-    {
-        fragment_shader_idx = nb_shaders++;
-        BuildXYZFragmentShader(vgl, &vgl->shader[fragment_shader_idx]);
-    }
-    else if (vlc_fourcc_IsYUV(vgl->fmt.i_chroma))
-    {
-        fragment_shader_idx = nb_shaders++;
-        BuildYUVFragmentShader(vgl, &vgl->shader[fragment_shader_idx],
-                               vgl->local_value, fmt, yuv_range_correction);
-    }
+    if (tex_conv.fragment_shader != 0)
+        shaders[nb_shaders++] = tex_conv.fragment_shader;
 
-    rgba_fragment_shader_idx = nb_shaders++;
-    BuildRGBAFragmentShader(vgl, &vgl->shader[rgba_fragment_shader_idx]);
+    shaders[nb_shaders++] = rgba_tex_conv.fragment_shader;
 
-    vertex_shader_idx = nb_shaders++;
-    BuildVertexShader(vgl, &vgl->shader[vertex_shader_idx]);
+    BuildVertexShader(vgl, &vgl->vertex_shader);
+    shaders[nb_shaders++] = vgl->vertex_shader;
+
+    /* One/two fragment shader and one vertex shader */
+    assert(shaders[0] != 0 && shaders[1] != 0);
 
     /* Check shaders messages */
     for (unsigned j = 0; j < nb_shaders; j++) {
         int infoLength;
-        vgl->api.GetShaderiv(vgl->shader[j], GL_INFO_LOG_LENGTH, &infoLength);
+        vgl->api.GetShaderiv(shaders[j], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
             continue;
 
@@ -555,34 +324,35 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         if (infolog != NULL)
         {
             int charsWritten;
-            vgl->api.GetShaderInfoLog(vgl->shader[j], infoLength, &charsWritten,
+            vgl->api.GetShaderInfoLog(shaders[j], infoLength, &charsWritten,
                                       infolog);
             msg_Err(gl, "shader %d: %s", j, infolog);
             free(infolog);
         }
     }
-    assert(vertex_shader_idx != -1 && rgba_fragment_shader_idx != -1);
 
     unsigned nb_programs = 0;
     GLuint program;
     int program_idx = -1, rgba_program_idx = -1;
 
     /* YUV/XYZ & Vertex shaders */
-    if (fragment_shader_idx != -1)
+    if (tex_conv.fragment_shader != 0)
     {
         program_idx = nb_programs++;
 
+        vgl->tex_conv[program_idx] = tex_conv;
         program = vgl->program[program_idx] = vgl->api.CreateProgram();
-        vgl->api.AttachShader(program, vgl->shader[fragment_shader_idx]);
-        vgl->api.AttachShader(program, vgl->shader[vertex_shader_idx]);
+        vgl->api.AttachShader(program, tex_conv.fragment_shader);
+        vgl->api.AttachShader(program, vgl->vertex_shader);
         vgl->api.LinkProgram(program);
     }
 
     /* RGB & Vertex shaders */
     rgba_program_idx = nb_programs++;
+    vgl->tex_conv[rgba_program_idx] = rgba_tex_conv;
     program = vgl->program[rgba_program_idx] = vgl->api.CreateProgram();
-    vgl->api.AttachShader(program, vgl->shader[rgba_fragment_shader_idx]);
-    vgl->api.AttachShader(program, vgl->shader[vertex_shader_idx]);
+    vgl->api.AttachShader(program, rgba_tex_conv.fragment_shader);
+    vgl->api.AttachShader(program, vgl->vertex_shader);
     vgl->api.LinkProgram(program);
 
     vgl->program_idx = program_idx != -1 ? program_idx : rgba_program_idx;
@@ -614,9 +384,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
-    vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
-    vgl->sub_chroma = vlc_fourcc_GetChromaDescription(VLC_CODEC_RGB32);
-    assert(vgl->chroma != NULL && vgl->sub_chroma != NULL);
+    vgl->chroma = vgl->tex_conv[vgl->program_idx].desc;
+    assert(vgl->chroma != NULL);
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
@@ -684,26 +453,31 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     glFinish();
     glFlush();
 
+    opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
-        glDeleteTextures(vgl->chroma->plane_count, vgl->texture[i]);
-    for (int i = 0; i < vgl->region_count; i++) {
+        tc->pf_del_textures(tc, vgl->texture[i]);
+
+    tc = &vgl->tex_conv[vgl->program_sub_idx];
+    for (int i = 0; i < vgl->region_count; i++)
+    {
         if (vgl->region[i].texture)
-            glDeleteTextures(1, &vgl->region[i].texture);
+            tc->pf_del_textures(tc, &vgl->region[i].texture);
     }
     free(vgl->region);
 
     for (int i = 0; i < 2 && vgl->program[i] != 0; i++)
+    {
         vgl->api.DeleteProgram(vgl->program[i]);
-    for (int i = 0; i < 3 && vgl->shader[i] != 0; i++)
-        vgl->api.DeleteShader(vgl->shader[i]);
+        opengl_tex_converter_t *tc = &vgl->tex_conv[i];
+        tc->pf_release(tc);
+    }
+    vgl->api.DeleteShader(vgl->vertex_shader);
     vgl->api.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->api.DeleteBuffers(1, &vgl->index_buffer_object);
     vgl->api.DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
     if (vgl->subpicture_buffer_object_count > 0)
         vgl->api.DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
     free(vgl->subpicture_buffer_object);
-
-    free(vgl->texture_temp_buf);
 
     if (vgl->pool)
         picture_pool_Release(vgl->pool);
@@ -777,49 +551,36 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
     UpdateZ(vgl);
 }
 
-static void GenTextures(GLenum tex_target, GLint tex_internal,
-                        GLenum tex_format, GLenum tex_type, GLsizei n,
-                        GLsizei *tex_width, GLsizei *tex_height,
-                        GLuint * textures)
-{
-    glGenTextures(n, textures);
-    for (GLsizei j = 0; j < n; j++) {
-        glActiveTexture(GL_TEXTURE0 + j);
-        glClientActiveTexture(GL_TEXTURE0 + j);
-        glBindTexture(tex_target, textures[j]);
-
-#if !defined(USE_OPENGL_ES2)
-        /* Set the texture parameters */
-        glTexParameterf(tex_target, GL_TEXTURE_PRIORITY, 1.0);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#endif
-
-        glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        /* Call glTexImage2D only once, and use glTexSubImage2D later */
-        glTexImage2D(tex_target, 0, tex_internal, tex_width[j], tex_height[j],
-                     0, tex_format, tex_type, NULL);
-    }
-}
-
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
 {
     if (vgl->pool)
         return vgl->pool;
 
     /* Allocates our textures */
+    opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
-        GenTextures(vgl->tex_target, vgl->tex_internal, vgl->tex_format,
-                    vgl->tex_type, vgl->chroma->plane_count,
-                    vgl->tex_width, vgl->tex_height, vgl->texture[i]);
+    {
+        int ret = tc->pf_gen_textures(tc, vgl->tex_width, vgl->tex_height,
+                                      vgl->texture[i]);
+        if (ret != VLC_SUCCESS)
+            return NULL;
+    }
+
+    requested_count = __MIN(VLCGL_PICTURE_MAX, requested_count);
+    /* Allocate with tex converter pool callback if it exists */
+    if (tc->pf_get_pool != NULL)
+    {
+        vgl->pool = tc->pf_get_pool(tc, &vgl->fmt, requested_count,
+                                    vgl->texture[0]);
+        if (!vgl->pool)
+            goto error;
+        return vgl->pool;
+    }
 
     /* Allocate our pictures */
     picture_t *picture[VLCGL_PICTURE_MAX] = {NULL, };
     unsigned count;
-    for (count = 0; count < __MIN(VLCGL_PICTURE_MAX, requested_count); count++)
+    for (count = 0; count < requested_count; count++)
     {
         picture[count] = picture_NewFromFormat(&vgl->fmt);
         if (!picture[count])
@@ -842,90 +603,23 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 error:
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
     {
-        glDeleteTextures(vgl->chroma->plane_count, vgl->texture[i]);
+        tc->pf_del_textures(tc, vgl->texture[i]);
         memset(vgl->texture[i], 0, PICTURE_PLANE_MAX * sizeof(GLuint));
     }
     return NULL;
 }
 
-#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-static void UploadPlane(vout_display_opengl_t *vgl,
-                        unsigned width, unsigned height,
-                        unsigned pitch, unsigned pixel_pitch,
-                        const void *pixels,
-                        int tex_target, int tex_format, int tex_type)
-{
-    // This unpack alignment is the default, but setting it just in case.
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-#ifndef GL_UNPACK_ROW_LENGTH
-    unsigned dst_width = width;
-    unsigned dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
-    if ( pitch != dst_pitch )
-    {
-        size_t buf_size = dst_pitch * height * pixel_pitch;
-        const uint8_t *source = pixels;
-        uint8_t *destination;
-        if( vgl->texture_temp_buf_size < buf_size )
-        {
-            vgl->texture_temp_buf =
-                realloc_or_free( vgl->texture_temp_buf, buf_size );
-            if (vgl->texture_temp_buf == NULL)
-            {
-                vgl->texture_temp_buf_size = 0;
-                return;
-            }
-            vgl->texture_temp_buf_size = buf_size;
-        }
-        destination = vgl->texture_temp_buf;
-
-        for( unsigned h = 0; h < height ; h++ )
-        {
-            memcpy( destination, source, width * pixel_pitch );
-            source += pitch;
-            destination += dst_pitch;
-        }
-        glTexSubImage2D( tex_target, 0, 0, 0, width, height,
-                         tex_format, tex_type, vgl->texture_temp_buf );
-    } else {
-#else
-    (void) vgl;
-    {
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch / pixel_pitch);
-#endif
-        glTexSubImage2D(tex_target, 0, 0, 0, width, height,
-                        tex_format, tex_type, pixels);
-    }
-}
-
-static void UpdatePic(vout_display_opengl_t *vgl,
-                      const vlc_chroma_description_t *chroma,
-                      GLuint *textures, unsigned width, unsigned height,
-                      const picture_t *pic, const size_t *plane_offset,
-                      int tex_target, int tex_format, int tex_type)
-{
-    for (unsigned j = 0; j < chroma->plane_count; j++)
-    {
-        glActiveTexture(GL_TEXTURE0 + j);
-        glClientActiveTexture(GL_TEXTURE0 + j);
-        glBindTexture(tex_target, textures[j]);
-        const void *pixels = plane_offset != NULL ?
-                             &pic->p[j].p_pixels[plane_offset[j]] :
-                             pic->p[j].p_pixels;
-
-        UploadPlane(vgl, width * chroma->p[j].w.num / chroma->p[j].w.den,
-                    height * chroma->p[j].h.num / chroma->p[j].h.den,
-                    pic->p[j].i_pitch, pic->p[j].i_pixel_pitch, pixels,
-                    tex_target, tex_format, tex_type);
-    }
-}
-
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {
+    opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
+
     /* Update the texture */
-    UpdatePic(vgl, vgl->chroma, vgl->texture[0],
-              vgl->fmt.i_visible_width, vgl->fmt.i_visible_height,
-              picture, NULL, vgl->tex_target, vgl->tex_format, vgl->tex_type);
+    int ret = tc->pf_update(tc, vgl->texture[0],
+                            vgl->fmt.i_visible_width, vgl->fmt.i_visible_height,
+                            picture, NULL);
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     int         last_count = vgl->region_count;
     gl_region_t *last = vgl->region;
@@ -933,6 +627,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     vgl->region_count = 0;
     vgl->region       = NULL;
 
+    tc = &vgl->tex_conv[vgl->program_sub_idx];
     if (subpicture) {
 
         int count = 0;
@@ -943,11 +638,10 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         vgl->region       = calloc(count, sizeof(*vgl->region));
 
         int i = 0;
-        for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
+        for (subpicture_region_t *r = subpicture->p_region;
+             r && ret == VLC_SUCCESS; r = r->p_next, i++) {
             gl_region_t *glr = &vgl->region[i];
 
-            glr->format = GL_RGBA;
-            glr->type   = GL_UNSIGNED_BYTE;
             glr->width  = r->fmt.i_visible_width;
             glr->height = r->fmt.i_visible_height;
             if (!vgl->supports_npot) {
@@ -971,9 +665,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             for (int j = 0; j < last_count; j++) {
                 if (last[j].texture &&
                     last[j].width  == glr->width &&
-                    last[j].height == glr->height &&
-                    last[j].format == glr->format &&
-                    last[j].type   == glr->type) {
+                    last[j].height == glr->height) {
                     glr->texture = last[j].texture;
                     memset(&last[j], 0, sizeof(last[j]));
                     break;
@@ -987,23 +679,24 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             {
                 /* Could not recycle a previous texture, generate a new one. */
                 GLsizei tex_width = glr->width, tex_height = glr->height;
-                GenTextures(GL_TEXTURE_2D, glr->format, glr->format, glr->type,
-                            1, &tex_width, &tex_height, &glr->texture);
+                ret = tc->pf_gen_textures(tc, &tex_width, &tex_height,
+                                          &glr->texture);
+                if (ret != VLC_SUCCESS)
+                    continue;
             }
-            UpdatePic(vgl, vgl->sub_chroma, &glr->texture,
-                      r->fmt.i_visible_width, r->fmt.i_visible_height,
-                      r->p_picture, &pixels_offset,
-                      GL_TEXTURE_2D, glr->format, glr->type);
+            ret = tc->pf_update(tc, &glr->texture,
+                                r->fmt.i_visible_width, r->fmt.i_visible_height,
+                                r->p_picture, &pixels_offset);
         }
     }
     for (int i = 0; i < last_count; i++) {
         if (last[i].texture)
-            glDeleteTextures(1, &last[i].texture);
+            tc->pf_del_textures(tc, &last[i].texture);
     }
     free(last);
 
     VLC_UNUSED(subpicture);
-    return VLC_SUCCESS;
+    return ret;
 }
 
 static const GLfloat identity[] = {
@@ -1433,24 +1126,9 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
                             unsigned int program_idx)
 {
     GLuint program = vgl->program[program_idx];
+    opengl_tex_converter_t *tc = &vgl->tex_conv[program_idx];
     vgl->api.UseProgram(program);
-    if (vlc_fourcc_IsYUV(vgl->fmt.i_chroma)
-     || vgl->fmt.i_chroma == VLC_CODEC_XYZ12) { /* FIXME: ugly */
-        if (vgl->chroma->plane_count == 3) {
-            vgl->api.Uniform4fv(vgl->api.GetUniformLocation(program,
-                            "Coefficient"), 4, vgl->local_value);
-            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture0"), 0);
-            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture1"), 1);
-            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture2"), 2);
-        }
-        else if (vgl->chroma->plane_count == 1) {
-            vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture0"), 0);
-        }
-    } else {
-        vgl->api.Uniform1i(vgl->api.GetUniformLocation(program, "Texture0"), 0);
-        vgl->api.Uniform4f(vgl->api.GetUniformLocation(program, "FillColor"),
-                       1.0f, 1.0f, 1.0f, 1.0f);
-    }
+    tc->pf_prepare_shader(tc, program, 1.0f);
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
@@ -1491,7 +1169,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
             zRotMatrix[16], yRotMatrix[16], xRotMatrix[16],
             zoomMatrix[16], orientationMatrix[16];
 
-    orientationTransformMatrix(orientationMatrix, vgl->fmt.orientation);
+    orientationTransformMatrix(orientationMatrix, tc->orientation);
 
     if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
@@ -1515,7 +1193,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         glActiveTexture(GL_TEXTURE0+j);
         glClientActiveTexture(GL_TEXTURE0+j);
-        glBindTexture(vgl->tex_target, vgl->texture[0][j]);
+        glBindTexture(tc->tex_target, vgl->texture[0][j]);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
@@ -1601,8 +1279,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     /* Draw the subpictures */
     // Change the program for overlays
     GLuint sub_program = vgl->program[vgl->program_sub_idx];
+    opengl_tex_converter_t *sub_tc = &vgl->tex_conv[vgl->program_sub_idx];
     vgl->api.UseProgram(sub_program);
-    vgl->api.Uniform1i(vgl->api.GetUniformLocation(sub_program, "Texture"), 0);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1641,9 +1319,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             glr->tex_width, glr->tex_height,
         };
 
-        glBindTexture(GL_TEXTURE_2D, glr->texture);
-        vgl->api.Uniform4f(vgl->api.GetUniformLocation(sub_program, "FillColor"),
-                           1.0f, 1.0f, 1.0f, glr->alpha);
+        glBindTexture(sub_tc->tex_target, glr->texture);
+        sub_tc->pf_prepare_shader(sub_tc, sub_program, glr->alpha);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);

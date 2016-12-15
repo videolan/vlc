@@ -3,7 +3,8 @@ vout_LTLIBRARIES =
 
 EXTRA_DIST += video_output/README
 OPENGL_DISPLAY_SRCS = video_output/opengl/vout_helper.c \
-	video_output/opengl/vout_helper.h video_output/opengl/internal.h
+	video_output/opengl/vout_helper.h video_output/opengl/internal.h \
+	video_output/opengl/converters.c
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp

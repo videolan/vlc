@@ -243,4 +243,15 @@ struct opengl_tex_converter_t
      */
     void (*pf_release)(const opengl_tex_converter_t *fc);
 };
+
+extern int
+opengl_tex_converter_rgba_init(const video_format_t *,
+                               opengl_tex_converter_t *);
+extern int
+opengl_tex_converter_yuv_init(const video_format_t *,
+                              opengl_tex_converter_t *);
+extern int
+opengl_tex_converter_xyz12_init(const video_format_t *,
+                                opengl_tex_converter_t *);
+
 #endif /* include-guard */
