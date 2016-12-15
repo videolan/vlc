@@ -3808,10 +3808,6 @@ AS_IF([test "${enable_skins2}" != "no"], [
   AS_IF([test "${SYS}" = "mingw32"], [
     VLC_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -DWIN32_SKINS])
     VLC_ADD_LIBS([skins2],[-lgdi32 -lole32 -luuid -lmsimg32])
-  dnl MacOS
-  ], [test "${SYS}" = "darwin"], [
-    VLC_ADD_CPPFLAGS([skins2],[ -DMACOSX_SKINS])
-    VLC_ADD_LIBS([skins2],[-Wl,-framework,Carbon])
   dnl OS/2
   ], [test "${SYS}" = "os2"], [
     VLC_ADD_CPPFLAGS([skins2],[ -DOS2_SKINS])
