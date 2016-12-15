@@ -37,6 +37,9 @@ endif
 
 ### OpenGL ###
 libgles2_plugin_la_SOURCES = $(OPENGL_DISPLAY_SRCS) video_output/opengl/display.c
+if HAVE_ANDROID
+libgles2_plugin_la_SOURCES += video_output/opengl/converter_android.c
+endif
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
 libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM)
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'

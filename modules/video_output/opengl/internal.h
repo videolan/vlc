@@ -254,4 +254,10 @@ extern int
 opengl_tex_converter_xyz12_init(const video_format_t *,
                                 opengl_tex_converter_t *);
 
+#ifdef __ANDROID__
+extern int
+opengl_tex_converter_anop_init(const video_format_t *,
+                               opengl_tex_converter_t *);
+#endif
+
 #endif /* include-guard */
