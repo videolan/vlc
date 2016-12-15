@@ -183,17 +183,17 @@ static void AndroidOpaquePicture_DetachVout(picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
 
-    vlc_mutex_lock(&p_picsys->priv.hw.lock);
+    vlc_mutex_lock(&p_picsys->hw.lock);
     p_pic->p_sys->p_vd_sys = NULL;
     /* Release p_picsys if references from VOUT and from decoder are NULL */
-    if (!p_picsys->p_vd_sys && !p_picsys->priv.hw.p_dec)
+    if (!p_picsys->p_vd_sys && !p_picsys->hw.p_dec)
     {
-        vlc_mutex_unlock(&p_picsys->priv.hw.lock);
-        vlc_mutex_destroy(&p_picsys->priv.hw.lock);
+        vlc_mutex_unlock(&p_picsys->hw.lock);
+        vlc_mutex_destroy(&p_picsys->hw.lock);
         free(p_picsys);
     }
     else
-        vlc_mutex_unlock(&p_picsys->priv.hw.lock);
+        vlc_mutex_unlock(&p_picsys->hw.lock);
     free(p_pic);
 }
 
@@ -214,10 +214,10 @@ static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt,
 
     if (b_opaque)
     {
-        p_picsys->priv.hw.p_surface = sys->p_window->p_surface;
-        p_picsys->priv.hw.p_jsurface =  sys->p_window->p_jsurface;
-        p_picsys->priv.hw.i_index = -1;
-        vlc_mutex_init(&p_picsys->priv.hw.lock);
+        p_picsys->hw.p_surface = sys->p_window->p_surface;
+        p_picsys->hw.p_jsurface =  sys->p_window->p_jsurface;
+        p_picsys->hw.i_index = -1;
+        vlc_mutex_init(&p_picsys->hw.lock);
         rsc.pf_destroy = AndroidOpaquePicture_DetachVout;
     }
 
@@ -576,7 +576,7 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
     picture_sys_t *p_picsys = p_pic->p_sys;
 
     if (p_window->b_use_priv) {
-        void *p_handle = p_picsys->priv.sw.p_handle;
+        void *p_handle = p_picsys->sw.p_handle;
 
         if (p_handle == NULL)
             return;
@@ -597,29 +597,29 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
         int err;
 
         err = sys->anwp.lockData(p_window->p_surface_priv,
-                                 &p_handle, &p_picsys->priv.sw.buf);
+                                 &p_handle, &p_picsys->sw.buf);
         if (err != 0)
             return -1;
-        p_picsys->priv.sw.p_handle = p_handle;
+        p_picsys->sw.p_handle = p_handle;
     } else {
         if (sys->anw->winLock(p_window->p_surface,
-                              &p_picsys->priv.sw.buf, NULL) != 0)
+                              &p_picsys->sw.buf, NULL) != 0)
             return -1;
     }
-    if (p_picsys->priv.sw.buf.width < 0 ||
-        p_picsys->priv.sw.buf.height < 0 ||
-        (unsigned)p_picsys->priv.sw.buf.width < p_window->fmt.i_width ||
-        (unsigned)p_picsys->priv.sw.buf.height < p_window->fmt.i_height) {
+    if (p_picsys->sw.buf.width < 0 ||
+        p_picsys->sw.buf.height < 0 ||
+        (unsigned)p_picsys->sw.buf.width < p_window->fmt.i_width ||
+        (unsigned)p_picsys->sw.buf.height < p_window->fmt.i_height) {
         AndroidWindow_UnlockPicture(sys, p_window, p_pic, false);
         return -1;
     }
 
-    p_pic->p[0].p_pixels = p_picsys->priv.sw.buf.bits;
-    p_pic->p[0].i_lines = p_picsys->priv.sw.buf.height;
-    p_pic->p[0].i_pitch = p_pic->p[0].i_pixel_pitch * p_picsys->priv.sw.buf.stride;
+    p_pic->p[0].p_pixels = p_picsys->sw.buf.bits;
+    p_pic->p[0].i_lines = p_picsys->sw.buf.height;
+    p_pic->p[0].i_pitch = p_pic->p[0].i_pixel_pitch * p_picsys->sw.buf.stride;
 
-    if (p_picsys->priv.sw.buf.format == PRIV_WINDOW_FORMAT_YV12)
-        SetupPictureYV12(p_pic, p_picsys->priv.sw.buf.stride);
+    if (p_picsys->sw.buf.format == PRIV_WINDOW_FORMAT_YV12)
+        SetupPictureYV12(p_pic, p_picsys->sw.buf.stride);
 
     return 0;
 }

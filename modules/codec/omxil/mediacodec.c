@@ -501,11 +501,11 @@ static int UpdateOpaqueVout(decoder_t *p_dec)
     }
 
     assert(p_dummy_hwpic->p_sys);
-    assert(p_dummy_hwpic->p_sys->priv.hw.p_surface);
-    assert(p_dummy_hwpic->p_sys->priv.hw.p_jsurface);
+    assert(p_dummy_hwpic->p_sys->hw.p_surface);
+    assert(p_dummy_hwpic->p_sys->hw.p_jsurface);
 
-    p_sys->video.p_surface = p_dummy_hwpic->p_sys->priv.hw.p_surface;
-    p_sys->video.p_jsurface = p_dummy_hwpic->p_sys->priv.hw.p_jsurface;
+    p_sys->video.p_surface = p_dummy_hwpic->p_sys->hw.p_surface;
+    p_sys->video.p_jsurface = p_dummy_hwpic->p_sys->hw.p_jsurface;
     picture_Release(p_dummy_hwpic);
     return VLC_SUCCESS;
 }
@@ -934,10 +934,10 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_sys_t *p_picsys)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (!p_picsys->priv.hw.p_dec)
+    if (!p_picsys->hw.p_dec)
     {
-        p_picsys->priv.hw.p_dec = p_dec;
-        p_picsys->priv.hw.pf_release = ReleasePicture;
+        p_picsys->hw.p_dec = p_dec;
+        p_picsys->hw.pf_release = ReleasePicture;
         TAB_APPEND_CAST((picture_sys_t **),
                         p_sys->video.i_inflight_pictures,
                         p_sys->video.pp_inflight_pictures,
@@ -1003,7 +1003,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         if (p_sys->api->b_direct_rendering)
         {
-            p_pic->p_sys->priv.hw.i_index = p_out->buf.i_index;
+            p_pic->p_sys->hw.i_index = p_out->buf.i_index;
             InsertInflightPicture(p_dec, p_pic->p_sys);
         } else {
             unsigned int chroma_div;

@@ -1629,8 +1629,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if (invalid_picture) {
                 invalid_picture->date = VLC_TS_INVALID;
                 picture_sys_t *p_picsys = invalid_picture->p_sys;
-                p_picsys->priv.hw.p_dec = NULL;
-                p_picsys->priv.hw.i_index = -1;
+                p_picsys->hw.p_dec = NULL;
+                p_picsys->hw.i_index = -1;
             } else {
                 /* If we cannot return a picture we must free the
                    block since the decoder will proceed with the
@@ -2076,7 +2076,7 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
         msg_Err(p_dec, "Opaque Vout request failed");
         goto error;
     }
-    ANativeWindow *p_anw = p_dummy_hwpic->p_sys->priv.hw.p_surface;
+    ANativeWindow *p_anw = p_dummy_hwpic->p_sys->hw.p_surface;
     if( !p_anw )
         goto error;
 
@@ -2464,9 +2464,9 @@ static int HwBuffer_GetPic( decoder_t *p_dec, OmxPort *p_port,
     p_pic->date = FromOmxTicks( p_header->nTimeStamp );
 
     p_picsys = p_pic->p_sys;
-    p_picsys->priv.hw.i_index = i_index;
-    p_picsys->priv.hw.p_dec = p_dec;
-    p_picsys->priv.hw.pf_release = ReleasePicture;
+    p_picsys->hw.i_index = i_index;
+    p_picsys->hw.p_dec = p_dec;
+    p_picsys->hw.pf_release = ReleasePicture;
 
     p_port->p_hwbuf->inflight_picture[i_index] = p_picsys;
 

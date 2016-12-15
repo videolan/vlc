@@ -55,48 +55,48 @@ struct picture_sys_t
             void *p_handle;
             ANativeWindow_Buffer buf;
         } sw;
-    } priv;
+    };
     bool b_locked;
 };
 
 static inline void
 AndroidOpaquePicture_DetachDecoder(picture_sys_t *p_picsys)
 {
-    vlc_mutex_lock(&p_picsys->priv.hw.lock);
-    if (p_picsys->priv.hw.i_index >= 0)
+    vlc_mutex_lock(&p_picsys->hw.lock);
+    if (p_picsys->hw.i_index >= 0)
     {
-        assert(p_picsys->priv.hw.pf_release && p_picsys->priv.hw.p_dec);
-        p_picsys->priv.hw.pf_release(p_picsys->priv.hw.p_dec,
-                                     (unsigned int) p_picsys->priv.hw.i_index,
+        assert(p_picsys->hw.pf_release && p_picsys->hw.p_dec);
+        p_picsys->hw.pf_release(p_picsys->hw.p_dec,
+                                     (unsigned int) p_picsys->hw.i_index,
                                      false);
-        p_picsys->priv.hw.i_index = -1;
+        p_picsys->hw.i_index = -1;
     }
-    p_picsys->priv.hw.pf_release = NULL;
-    p_picsys->priv.hw.p_dec = NULL;
+    p_picsys->hw.pf_release = NULL;
+    p_picsys->hw.p_dec = NULL;
     /* Release p_picsys if references from VOUT and from decoder are NULL */
-    if (!p_picsys->p_vd_sys && !p_picsys->priv.hw.p_dec)
+    if (!p_picsys->p_vd_sys && !p_picsys->hw.p_dec)
     {
-        vlc_mutex_unlock(&p_picsys->priv.hw.lock);
-        vlc_mutex_destroy(&p_picsys->priv.hw.lock);
+        vlc_mutex_unlock(&p_picsys->hw.lock);
+        vlc_mutex_destroy(&p_picsys->hw.lock);
         free(p_picsys);
     }
     else
-        vlc_mutex_unlock(&p_picsys->priv.hw.lock);
+        vlc_mutex_unlock(&p_picsys->hw.lock);
 }
 
 static inline void
 AndroidOpaquePicture_Release(picture_sys_t *p_picsys, bool b_render)
 {
-    vlc_mutex_lock(&p_picsys->priv.hw.lock);
-    if (p_picsys->priv.hw.i_index >= 0)
+    vlc_mutex_lock(&p_picsys->hw.lock);
+    if (p_picsys->hw.i_index >= 0)
     {
-        assert(p_picsys->priv.hw.pf_release && p_picsys->priv.hw.p_dec);
-        p_picsys->priv.hw.pf_release(p_picsys->priv.hw.p_dec,
-                                     (unsigned int) p_picsys->priv.hw.i_index,
+        assert(p_picsys->hw.pf_release && p_picsys->hw.p_dec);
+        p_picsys->hw.pf_release(p_picsys->hw.p_dec,
+                                     (unsigned int) p_picsys->hw.i_index,
                                      b_render);
-        p_picsys->priv.hw.i_index = -1;
+        p_picsys->hw.i_index = -1;
     }
-    vlc_mutex_unlock(&p_picsys->priv.hw.lock);
+    vlc_mutex_unlock(&p_picsys->hw.lock);
 }
 
 #endif
