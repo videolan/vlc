@@ -123,7 +123,6 @@ struct vout_display_sys_t
     filter_t *p_spu_blend;
     picture_t *p_sub_pic;
     buffer_bounds *p_sub_buffer_bounds;
-    bool b_sub_pic_locked;
     int64_t i_sub_last_order;
     ARect sub_last_region;
 
@@ -557,15 +556,18 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
 
+    if (!p_picsys->b_locked)
+        return;
+
     if (p_window->b_use_priv) {
         void *p_handle = p_picsys->sw.p_handle;
 
-        if (p_handle == NULL)
-            return;
-
-        sys->anwp.unlockData(p_window->p_surface_priv, p_handle, b_render);
+        if (p_handle != NULL)
+            sys->anwp.unlockData(p_window->p_surface_priv, p_handle, b_render);
     } else
         sys->anw->unlockAndPost(p_window->p_surface);
+
+    p_picsys->b_locked = false;
 }
 
 static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
@@ -573,6 +575,9 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
                                      picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
+
+    if (p_picsys->b_locked)
+        return -1;
 
     if (p_window->b_use_priv) {
         void *p_handle;
@@ -591,7 +596,9 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
     if (p_picsys->sw.buf.width < 0 ||
         p_picsys->sw.buf.height < 0 ||
         (unsigned)p_picsys->sw.buf.width < p_window->fmt.i_width ||
-        (unsigned)p_picsys->sw.buf.height < p_window->fmt.i_height) {
+        (unsigned)p_picsys->sw.buf.height < p_window->fmt.i_height)
+    {
+        p_picsys->b_locked = true;
         AndroidWindow_UnlockPicture(sys, p_window, p_pic, false);
         return -1;
     }
@@ -603,6 +610,7 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
     if (p_picsys->sw.buf.format == PRIV_WINDOW_FORMAT_YV12)
         SetupPictureYV12(p_pic, p_picsys->sw.buf.stride);
 
+    p_picsys->b_locked = true;
     return 0;
 }
 
@@ -749,8 +757,7 @@ static void Close(vlc_object_t *p_this)
     if (sys->b_has_subpictures)
     {
         SubpicturePrepare(vd, NULL);
-        if (sys->b_sub_pic_locked)
-            AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
+        AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
     }
 
     if (sys->pool)
@@ -772,37 +779,38 @@ static void Close(vlc_object_t *p_this)
     free(sys);
 }
 
-static void UnlockPicture(picture_t *p_pic, bool b_render)
-{
-    picture_sys_t *p_picsys = p_pic->p_sys;
-    vout_display_sys_t *sys = p_picsys->p_vd_sys;
-
-    if (p_picsys->b_locked)
-    {
-        if (sys->p_window->b_opaque)
-            AndroidOpaquePicture_Release(p_picsys, b_render);
-        else
-            AndroidWindow_UnlockPicture(sys, sys->p_window, p_pic, b_render);
-        p_picsys->b_locked  = false;
-    }
-}
-
 static int PoolLockPicture(picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
     vout_display_sys_t *sys = p_picsys->p_vd_sys;
 
-    if (!sys->p_window->b_opaque
-     && AndroidWindow_LockPicture(sys, sys->p_window, p_pic) != 0)
+    if (AndroidWindow_LockPicture(sys, sys->p_window, p_pic) != 0)
         return -1;
 
-    p_picsys->b_locked = true;
     return 0;
 }
 
 static void PoolUnlockPicture(picture_t *p_pic)
 {
-    UnlockPicture(p_pic, false);
+    picture_sys_t *p_picsys = p_pic->p_sys;
+    vout_display_sys_t *sys = p_picsys->p_vd_sys;
+
+    AndroidWindow_UnlockPicture(sys, sys->p_window, p_pic, false);
+}
+
+static int PoolLockOpaquePicture(picture_t *p_pic)
+{
+    picture_sys_t *p_picsys = p_pic->p_sys;
+
+    p_picsys->b_locked = true;
+    return 0;
+}
+
+static void PoolUnlockOpaquePicture(picture_t *p_pic)
+{
+    picture_sys_t *p_picsys = p_pic->p_sys;
+
+    AndroidOpaquePicture_Release(p_picsys, false);
 }
 
 static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
@@ -837,8 +845,16 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = requested_count;
     pool_cfg.picture       = pp_pics;
-    pool_cfg.lock          = PoolLockPicture;
-    pool_cfg.unlock        = PoolUnlockPicture;
+    if (sys->p_window->b_opaque)
+    {
+        pool_cfg.lock      = PoolLockOpaquePicture;
+        pool_cfg.unlock    = PoolUnlockOpaquePicture;
+    }
+    else
+    {
+        pool_cfg.lock      = PoolLockPicture;
+        pool_cfg.unlock    = PoolUnlockPicture;
+    }
     pool = picture_pool_NewExtended(&pool_cfg);
 
 error:
@@ -956,8 +972,6 @@ static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture)
     if (AndroidWindow_LockPicture(sys, sys->p_sub_window, sys->p_sub_pic) != 0)
         return;
 
-    sys->b_sub_pic_locked = true;
-
     /* Clear the subtitles surface. */
     SubtitleGetDirtyBounds(vd, subpicture, &memset_bounds);
     const int x_pixels_offset = memset_bounds.left
@@ -1033,14 +1047,17 @@ static void Display(vout_display_t *vd, picture_t *picture,
 {
     vout_display_sys_t *sys = vd->sys;
 
-    /* refcount lowers to 0, and pool_cfg.unlock is called */
-    UnlockPicture(picture, true);
+    if (sys->p_window->b_opaque)
+        AndroidOpaquePicture_Release(picture->p_sys, true);
+    else
+        AndroidWindow_UnlockPicture(sys, sys->p_window, picture, true);
+
     picture_Release(picture);
 
-    if (sys->b_sub_pic_locked) {
-        sys->b_sub_pic_locked = false;
-        AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
-    }
+    if (sys->p_sub_pic)
+        AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic,
+                                    true);
+
     if (subpicture)
         subpicture_Delete(subpicture);
 }

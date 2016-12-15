@@ -105,6 +105,8 @@ static inline void AndroidOpaquePicture_DetachVout(picture_t *p_pic)
 static inline void
 AndroidOpaquePicture_Release(picture_sys_t *p_picsys, bool b_render)
 {
+    if (!p_picsys->b_locked)
+        return;
     vlc_mutex_lock(&p_picsys->hw.lock);
     if (p_picsys->hw.i_index >= 0)
     {
@@ -115,6 +117,7 @@ AndroidOpaquePicture_Release(picture_sys_t *p_picsys, bool b_render)
         p_picsys->hw.i_index = -1;
     }
     vlc_mutex_unlock(&p_picsys->hw.lock);
+    p_picsys->b_locked = false;
 }
 
 #endif
