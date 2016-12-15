@@ -389,7 +389,7 @@ const JNINativeMethod jni_callbacks[] = {
 };
 
 static int
-InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, AWindowHandler *p_awh)
+InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
@@ -415,7 +415,7 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, AWindowHandler *p_awh)
     CHECK_EXCEPTION("GetMethodID("str")"); \
 } while( 0 )
 
-    clazz = (*env)->GetObjectClass(env, p_awh);
+    clazz = (*env)->GetObjectClass(env, jobj);
     CHECK_EXCEPTION("AndroidNativeWindow clazz");
     GET_METHOD(getVideoSurface, "getVideoSurface", "()Landroid/view/Surface;");
     GET_METHOD(getSubtitlesSurface, "getSubtitlesSurface", "()Landroid/view/Surface;");
