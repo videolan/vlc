@@ -276,10 +276,10 @@ static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid )
     {
         p_filter = AppendTransform( p_parent->p_sys->p_chain, &p_parent->fmt_in, p_fmt_mid );
         // Check if filter was enough:
-        if( es_format_IsSimilar(&p_filter->fmt_out, &p_parent->fmt_out ))
-           return VLC_SUCCESS;
         if( p_filter == NULL )
             return VLC_EGENERIC;
+        if( es_format_IsSimilar(&p_filter->fmt_out, &p_parent->fmt_out ))
+           return VLC_SUCCESS;
     }
     else
     {
