@@ -188,19 +188,21 @@ static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt,
     if (unlikely(p_picsys == NULL))
         return NULL;
 
-    p_picsys->p_vd_sys = sys;
 
     memset(&rsc, 0, sizeof(picture_resource_t));
     rsc.p_sys = p_picsys;
 
     if (b_opaque)
     {
+        p_picsys->hw.b_vd_ref = true;
         p_picsys->hw.p_surface = sys->p_window->p_surface;
         p_picsys->hw.p_jsurface =  sys->p_window->p_jsurface;
         p_picsys->hw.i_index = -1;
         vlc_mutex_init(&p_picsys->hw.lock);
         rsc.pf_destroy = AndroidOpaquePicture_DetachVout;
     }
+    else
+        p_picsys->sw.p_vd_sys = sys;
 
     p_pic = picture_NewFromResource(fmt, &rsc);
     if (!p_pic)
@@ -782,7 +784,7 @@ static void Close(vlc_object_t *p_this)
 static int PoolLockPicture(picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
-    vout_display_sys_t *sys = p_picsys->p_vd_sys;
+    vout_display_sys_t *sys = p_picsys->sw.p_vd_sys;
 
     if (AndroidWindow_LockPicture(sys, sys->p_window, p_pic) != 0)
         return -1;
@@ -793,7 +795,7 @@ static int PoolLockPicture(picture_t *p_pic)
 static void PoolUnlockPicture(picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
-    vout_display_sys_t *sys = p_picsys->p_vd_sys;
+    vout_display_sys_t *sys = p_picsys->sw.p_vd_sys;
 
     AndroidWindow_UnlockPicture(sys, sys->p_window, p_pic, false);
 }
