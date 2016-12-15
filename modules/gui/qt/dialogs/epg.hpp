@@ -36,6 +36,9 @@ class EPGWidget;
 class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
 {
     Q_OBJECT
+protected:
+    virtual void showEvent(QShowEvent * event) Q_DECL_OVERRIDE;
+
 private:
     EpgDialog( intf_thread_t * );
     virtual ~EpgDialog();
@@ -48,8 +51,10 @@ private:
     friend class    Singleton<EpgDialog>;
 
 private slots:
-    void displayEvent( EPGItem * );
+    void scheduleUpdate();
     void updateInfos();
+    void timeout();
+    void displayEvent( EPGItem * );
 };
 
 #endif
