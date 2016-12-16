@@ -45,22 +45,6 @@ access_LTLIBRARIES += libtimecode_plugin.la
 libvdr_plugin_la_SOURCES = access/vdr.c
 access_LTLIBRARIES += libvdr_plugin.la
 
-libzip_plugin_la_SOURCES = access/zip/zip.h access/zip/zipstream.c access/zip/zipaccess.c
-libzip_plugin_la_CFLAGS = $(AM_CFLAGS) $(MINIZIP_CFLAGS)
-libzip_plugin_la_LIBADD = $(MINIZIP_LIBS)
-libunzip_la_SOURCES = access/zip/unzip/unzip.c access/zip/unzip/unzip.h access/zip/unzip/crypt.h \
-	access/zip/unzip/ioapi.c access/zip/unzip/ioapi.h
-libunzip_la_LIBADD = -lz
-libunzip_la_LDFLAGS = -static
-if HAVE_ZLIB
-access_LTLIBRARIES += libzip_plugin.la
-if !HAVE_MINIZIP
-noinst_LTLIBRARIES += libunzip.la
-libzip_plugin_la_CFLAGS += -I$(srcdir)/access/zip/unzip
-libzip_plugin_la_LIBADD += libunzip.la
-endif
-endif
-
 ### Audio capture ###
 
 libaccess_alsa_plugin_la_SOURCES = access/alsa.c

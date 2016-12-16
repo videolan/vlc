@@ -478,5 +478,4 @@ $Id$
  * yuvp: YUVP to YUVA/RGBA chroma converter
  * yuy2_i420: yuy2 to 4:2:0 conversions functions
  * yuy2_i422: yuy2 to 4:2:2 conversions functions
- * zip: access+filter to extract different archives, based on zlib
  * zvbi: Teletext decoder using libzbvi
