@@ -854,19 +854,15 @@ AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
 AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
 if test "${have_zlib}" = "yes"
 then
-  VLC_ADD_LIBS([skins2 sap unzip zip],[-lz])
+  VLC_ADD_LIBS([sap],[-lz])
   PKG_CHECK_MODULES([MINIZIP], [minizip] , [ have_minizip=yes ], [
     AC_CHECK_HEADERS([unzip.h], [
       have_minizip=yes
       MINIZIP_LIBS="-lminizip -lz"
     ], [
-      VLC_ADD_CPPFLAGS([skins2], [-I\\\$(top_srcdir)/modules/access/zip/unzip])
-      VLC_ADD_LIBS([skins2], [\\\$(top_builddir)/modules/libunzip.la])
       have_minizip=no
     ])
   ])
-  VLC_ADD_CPPFLAGS([skins2],[$MINIZIP_CFLAGS])
-  VLC_ADD_LIBS([skins2],[$MINIZIP_LIBS])
 fi
 AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 

@@ -27,9 +27,6 @@
 
 #include "skin_common.hpp"
 #include <string>
-#if defined( HAVE_ZLIB_H )
-#   include "unzip.h"
-#endif
 
 class ThemeLoader: public SkinObject
 {
@@ -41,7 +38,6 @@ public:
     bool load( const std::string &fileName );
 
 private:
-#if defined( HAVE_ZLIB_H )
     /// Extract files from an archive (handles tar.gz and zip)
     /**
      * Expects a string from the current locale.
@@ -50,33 +46,10 @@ private:
 
     bool unarchive( const std::string &fileName, const std::string &tempPath );
 
-    /// Extract files from a tar.gz archive
-    /**
-     * Expects strings from the current locale.
-     */
-    bool extractTarGz( const std::string &tarFile, const std::string &rootDir );
-
-    /// Extract files from a .zip archive
-    /**
-     * Expects strings from the current locale.
-     */
-    bool extractZip( const std::string &zipFile, const std::string &rootDir );
-
-    /// Extract the current file from a .zip archive
-    /**
-     * Expects a string from the current locale.
-     */
-    bool extractFileInZip( unzFile file, const std::string &rootDir, bool isWsz );
-
-    /// Clean up the temporary files created by the extraction
-    /**
-     * Expects a string from the current locale.
-     */
     void deleteTempFiles( const std::string &path );
 
     /// Get a unique temporary directory
     std::string getTmpDir( );
-#endif
 
     /// Parse the XML file given as a parameter and build the skin
     /**
@@ -97,9 +70,6 @@ private:
 
     /// Get the base path of a file
     std::string getFilePath( const std::string &rFullPath );
-
-    /// Replace '/' separators by the actual separator of the OS
-    std::string fixDirSeparators( const std::string &rPath );
 };
 
 #endif
