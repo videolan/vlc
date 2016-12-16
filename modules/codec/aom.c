@@ -74,6 +74,61 @@ struct decoder_sys_t
     aom_codec_ctx_t ctx;
 };
 
+static const struct
+{
+    vlc_fourcc_t     i_chroma;
+    enum aom_img_fmt i_chroma_id;
+    uint8_t          i_bitdepth;
+    uint8_t          i_needs_hack;
+
+} chroma_table[] =
+{
+    { VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, 0 },
+    { VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, 0 },
+    { VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, 0 },
+    { VLC_CODEC_I440, AOM_IMG_FMT_I440, 8, 0 },
+
+    { VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, 0 },
+    { VLC_CODEC_YUVA, AOM_IMG_FMT_444A, 8, 0 },
+    { VLC_CODEC_YUYV, AOM_IMG_FMT_YUY2, 8, 0 },
+    { VLC_CODEC_UYVY, AOM_IMG_FMT_UYVY, 8, 0 },
+    { VLC_CODEC_YVYU, AOM_IMG_FMT_YVYU, 8, 0 },
+
+    { VLC_CODEC_RGB15, AOM_IMG_FMT_RGB555, 8, 0 },
+    { VLC_CODEC_RGB16, AOM_IMG_FMT_RGB565, 8, 0 },
+    { VLC_CODEC_RGB24, AOM_IMG_FMT_RGB24, 8, 0 },
+    { VLC_CODEC_RGB32, AOM_IMG_FMT_RGB32, 8, 0 },
+
+    { VLC_CODEC_ARGB, AOM_IMG_FMT_ARGB, 8, 0 },
+    { VLC_CODEC_BGRA, AOM_IMG_FMT_ARGB_LE, 8, 0 },
+
+    { VLC_CODEC_GBR_PLANAR, AOM_IMG_FMT_I444, 8, 1 },
+    { VLC_CODEC_GBR_PLANAR_10L, AOM_IMG_FMT_I44416, 10, 1 },
+
+    { VLC_CODEC_I420_10L, AOM_IMG_FMT_I42016, 10, 0 },
+    { VLC_CODEC_I422_10L, AOM_IMG_FMT_I42216, 10, 0 },
+    { VLC_CODEC_I444_10L, AOM_IMG_FMT_I44416, 10, 0 },
+
+    { VLC_CODEC_I420_12L, AOM_IMG_FMT_I42016, 12, 0 },
+    { VLC_CODEC_I422_12L, AOM_IMG_FMT_I42216, 12, 0 },
+    { VLC_CODEC_I444_12L, AOM_IMG_FMT_I44416, 12, 0 },
+
+    { VLC_CODEC_I444_16L, AOM_IMG_FMT_I44416, 16, 0 },
+};
+
+static vlc_fourcc_t FindVlcChroma( struct aom_image *img )
+{
+    uint8_t hack = (img->fmt & AOM_IMG_FMT_I444) && (img->cs == AOM_CS_SRGB);
+
+    for( unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++ )
+        if( chroma_table[i].i_chroma_id == img->fmt &&
+            chroma_table[i].i_bitdepth == img->bit_depth &&
+            chroma_table[i].i_needs_hack == hack )
+            return chroma_table[i].i_chroma;
+
+    return 0;
+}
+
 /****************************************************************************
  * Decode: the whole thing
  ****************************************************************************/
@@ -124,7 +179,8 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     mtime_t pts = *pkt_pts;
     free(pkt_pts);
 
-    if (img->fmt != AOM_IMG_FMT_I420) {
+    dec->fmt_out.i_codec = FindVlcChroma(img);
+    if (dec->fmt_out.i_codec == 0) {
         msg_Err(dec, "Unsupported output colorspace %d", img->fmt);
         return NULL;
     }
@@ -140,6 +196,26 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     {
         dec->fmt_out.video.i_sar_num = 1;
         dec->fmt_out.video.i_sar_den = 1;
+    }
+
+    v->b_color_range_full = img->range == AOM_CR_FULL_RANGE;
+
+    switch( img->cs )
+    {
+        case AOM_CS_SRGB:
+        case AOM_CS_BT_709:
+            v->space = COLOR_SPACE_BT709;
+            break;
+        case AOM_CS_BT_601:
+        case AOM_CS_SMPTE_170:
+        case AOM_CS_SMPTE_240:
+            v->space = COLOR_SPACE_BT601;
+            break;
+        case AOM_CS_BT_2020:
+            v->space = COLOR_SPACE_BT2020;
+            break;
+        default:
+            break;
     }
 
     if (decoder_UpdateVideoFormat(dec))
