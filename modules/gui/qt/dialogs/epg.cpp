@@ -127,7 +127,13 @@ void EpgDialog::scheduleUpdate()
 
 void EpgDialog::displayEvent( EPGItem *epgItem )
 {
-    if( !epgItem ) return;
+    if( !epgItem )
+    {
+        title->clear();
+        description->clear();
+        return;
+    }
+
 
     QDateTime end = epgItem->start().addSecs( epgItem->duration() );
     title->setText( QString("%1 - %2 : %3%4")

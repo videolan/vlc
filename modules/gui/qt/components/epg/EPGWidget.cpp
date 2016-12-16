@@ -85,6 +85,7 @@ void EPGWidget::reset()
 {
     m_channelsWidget->reset();
     m_epgView->reset();
+    emit itemSelectionChanged( NULL );
 }
 
 void EPGWidget::setZoom( int level )
