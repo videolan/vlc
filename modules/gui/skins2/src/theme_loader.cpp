@@ -299,11 +299,9 @@ bool ThemeLoader::extract( const std::string &fileName )
     if( tempPath.empty() )
         return false;
 
-    // Extract the file in a temporary directory
-    if( ! extractTarGz( fileName, tempPath ) &&
-        ! extractZip( fileName, tempPath ) )
+    if( unarchive( fileName, tempPath ) == false )
     {
-        deleteTempFiles( tempPath );
+        msg_Err( getIntf(), "extraction from %s failed", fileName.c_str() );
         return false;
     }
 
