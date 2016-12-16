@@ -341,6 +341,7 @@ dnl for program foo on win32
 case "${build_os}" in
     cygwin|msys|mingw32)
         ac_executable_extensions=".exe"
+        BUILDEXEEXT=".exe"
     ;;
     os2*)
         BUILDEXEEXT=".exe"
@@ -439,13 +440,13 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
 
   AS_IF([test -z "$LUAC"], [
     dnl Old contribs mixed cross-tools and cross-compiled executables
-    AS_IF([test -x "${CONTRIB_DIR}/bin/luac"], [
-      LUAC="${CONTRIB_DIR}/bin/luac"
+    AS_IF([test -x "${CONTRIB_DIR}/bin/luac${BUILDEXEEXT}"], [
+      LUAC="${CONTRIB_DIR}/bin/luac${BUILDEXEEXT}"
     ])
 
     dnl Newer contribs follow usual name space rules
-    AS_IF([test -x "${CONTRIB_DIR}/../bin/${host_alias}-luac"], [
-      LUAC="${CONTRIB_DIR}/../bin/${host_alias}-luac"
+    AS_IF([test -x "${CONTRIB_DIR}/../bin/${host_alias}-luac${BUILDEXEEXT}"], [
+      LUAC="${CONTRIB_DIR}/../bin/${host_alias}-luac${BUILDEXEEXT}"
     ])
   ])
 
