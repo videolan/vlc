@@ -790,7 +790,9 @@ static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]
      memcpy(matrix, m, sizeof(m));
 }
 
-void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t orientation) {
+static void orientationTransformMatrix(GLfloat matrix[static 16],
+                                       video_orientation_t orientation)
+{
     memcpy(matrix, identity, sizeof(identity));
 
     const int k_cos_pi = -1;

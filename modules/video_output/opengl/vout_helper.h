@@ -76,8 +76,6 @@ static inline bool HasExtension(const char *apis, const char *api)
     return false;
 }
 
-void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t orientation);
-
 typedef struct vout_display_opengl_t vout_display_opengl_t;
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
