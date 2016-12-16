@@ -29,9 +29,13 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fstream>
+#include <memory>
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
+#include <vlc_url.h>
+#include <vlc_stream_extractor.h>
 
 #include "theme_loader.hpp"
 #include "theme.hpp"
@@ -351,6 +355,120 @@ bool ThemeLoader::extract( const std::string &fileName )
     return result;
 }
 
+bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tempPath )
+{
+#define UPTR_HELPER(type,deleter) []( type * data ) { \
+        return std::unique_ptr< type, decltype( deleter )> ( data, deleter ); }
+
+    auto make_input_node_ptr = UPTR_HELPER( input_item_node_t, &input_item_node_Delete );
+    auto make_input_item_ptr = UPTR_HELPER( input_item_t, &input_item_Release );
+    auto make_stream_ptr = UPTR_HELPER( stream_t, &vlc_stream_Delete );
+    auto make_cstr_ptr = UPTR_HELPER( char, &std::free );
+
+#undef UPTR_HELPER
+
+    auto uri = make_cstr_ptr( vlc_path2uri( fileName.c_str(), "file" ) );
+    if( !uri )
+    {
+        msg_Err( getIntf(), "unable to convert %s to local URI",
+                            fileName.c_str() );
+        return false;
+    }
+
+    auto input = make_stream_ptr( vlc_stream_NewURL( getIntf(), uri.get() ) );
+    if( !input )
+    {
+        msg_Err( getIntf(), "unable to open %s", uri.get() );
+        return false;
+    }
+
+    stream_t* stream = input.get();
+    if( vlc_stream_directory_Attach( &stream, NULL ) )
+    {
+        msg_Err( getIntf(), "unable to attach stream_directory, treat as XML!" );
+    }
+    else
+    {
+        input.release();
+        input.reset( stream );
+
+        auto item = make_input_item_ptr( input_item_New( "vlc://dummy", "vlc://dummy" ) );
+        auto node = make_input_node_ptr( (input_item_node_t*)std::calloc( 1, sizeof( input_item_node_t ) ) );
+
+        if( !item || !node )
+            return false;
+
+        node->p_item = item.release();
+
+        if( vlc_stream_ReadDir( input.get(), node.get() ) )
+        {
+            msg_Err( getIntf(), "unable to read items in %s", uri.get() );
+            return false;
+        }
+
+        for( int i = 0; i < node->i_children; ++i )
+        {
+            auto child = node->pp_children[i]->p_item;
+            auto child_stream = make_stream_ptr( vlc_stream_NewURL( getIntf(), uri.get() ) );
+            if( !child_stream )
+            {
+                msg_Err( getIntf(), "unable to open %s for reading", child->psz_name );
+            }
+
+            stream_t* stream = child_stream.get();
+            if( vlc_stream_extractor_Attach( &stream, child->psz_name, NULL ) )
+            {
+                msg_Err( getIntf(), "unable to locate %s within %s",
+                         child->psz_name, fileName.c_str() );
+
+                return false;
+            }
+
+            child_stream.release();
+            child_stream.reset( stream );
+
+            auto out_path = tempPath + "/" + child->psz_name;
+
+            { /* create directory tree */
+                auto out_directory = out_path.substr( 0, out_path.find_last_of( '/' ) );
+
+                if( makedir( out_directory.c_str() ) == false )
+                {
+                    msg_Err( getIntf(), "failed to create directory tree for %s (%s)",
+                             out_path.c_str(), out_directory.c_str() );
+
+                    return false;
+                }
+            }
+
+            { /* write data to disk */
+                std::string contents;
+
+                char buf[1024];
+                ssize_t n;
+
+                while( ( n = vlc_stream_Read( child_stream.get(), buf, sizeof buf ) ) > 0 )
+                    contents.append( buf, n );
+
+                std::ofstream out_stream( out_path, std::ios::binary );
+
+                if( out_stream.write( contents.data(), contents.size() ) )
+                {
+                    msg_Dbg( getIntf(), "finished writing %zu bytes to %s",
+                        size_t{ contents.size() }, out_path.c_str() );
+                }
+                else
+                {
+                    msg_Err( getIntf(), "unable to write %zu bytes to %s",
+                        size_t{ contents.size() }, out_path.c_str() );
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
 
 void ThemeLoader::deleteTempFiles( const std::string &path )
 {

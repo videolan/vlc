@@ -48,6 +48,8 @@ private:
      */
     bool extract( const std::string &fileName );
 
+    bool unarchive( const std::string &fileName, const std::string &tempPath );
+
     /// Extract files from a tar.gz archive
     /**
      * Expects strings from the current locale.
