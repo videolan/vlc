@@ -134,11 +134,20 @@ void EpgDialog::displayEvent( EPGItem *epgItem )
         return;
     }
 
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime enddate = epgItem->start().addSecs( epgItem->duration() );
 
-    QDateTime end = epgItem->start().addSecs( epgItem->duration() );
+    QString start, end;
+    if( epgItem->start().daysTo(now) != 0 )
+        start = epgItem->start().toString( Qt::SystemLocaleLongDate );
+    else
+        start = epgItem->start().time().toString( "hh:mm" );
+
+    end = enddate.time().toString( "hh:mm" );
+
     title->setText( QString("%1 - %2 : %3%4")
-                   .arg( epgItem->start().toString( "hh:mm" ) )
-                   .arg( end.toString( "hh:mm" ) )
+                   .arg( start )
+                   .arg( end )
                    .arg( epgItem->name() )
                    .arg( epgItem->rating() ?
                              qtr(" (%1+ rated)").arg( epgItem->rating() ) :
