@@ -49,10 +49,6 @@ struct vlc_gl_t
     void (*releaseCurrent)(vlc_gl_t *);
     void (*resize)(vlc_gl_t *, unsigned, unsigned);
     void (*swap)(vlc_gl_t *);
-#ifdef __APPLE__
-    int  (*lock)(vlc_gl_t *);
-    void (*unlock)(vlc_gl_t *);
-#endif
     void*(*getProcAddress)(vlc_gl_t *, const char *);
 };
 

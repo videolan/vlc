@@ -256,8 +256,8 @@ static int Open(vlc_object_t *this)
         if (!sys->zero_copy) {
             msg_Dbg(vd, "will use regular OpenGL rendering");
             /* Initialize common OpenGL video display */
-            sys->gl.lock = OpenglESClean;
-            sys->gl.unlock = nil;
+            sys->gl.makeCurrent = OpenglESClean;
+            sys->gl.releaseCurrent = OpenglESNoop;
             sys->gl.swap = OpenglESSwap;
             sys->gl.getProcAddress = OurGetProcAddress;
             sys->gl.sys = sys;

@@ -171,8 +171,8 @@ static int Open (vlc_object_t *p_this)
             msg_Warn(vd, "we might not have an OpenGL context yet");
 
         /* Initialize common OpenGL video display */
-        sys->gl.lock = OpenglLock;
-        sys->gl.unlock = OpenglUnlock;
+        sys->gl.makeCurrent = OpenglLock;
+        sys->gl.releaseCurrent = OpenglUnlock;
         sys->gl.swap = OpenglSwap;
         sys->gl.getProcAddress = OurGetProcAddress;
         sys->gl.sys = sys;

@@ -253,8 +253,8 @@ static int Open (vlc_object_t *this)
         }
 
         /* Initialize common OpenGL video display */
-        sys->gl.lock = OpenglLock;
-        sys->gl.unlock = OpenglUnlock;
+        sys->gl.makeCurrent = OpenglLock;
+        sys->gl.releaseCurrent = OpenglUnlock;
         sys->gl.swap = OpenglSwap;
         sys->gl.getProcAddress = OurGetProcAddress;
         sys->gl.sys = sys;
