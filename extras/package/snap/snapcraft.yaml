@@ -169,7 +169,6 @@ parts:
       - libva-drm1
       - libva-x11-1
       - libva1
-      - libvlccore8
       - libvncclient1
       - libx11-6
       - libxcb-composite0
