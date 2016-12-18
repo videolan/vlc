@@ -453,10 +453,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
 
     vgl->gl = gl;
-    if (vlc_gl_Lock(gl)) {
-        free(vgl);
-        return NULL;
-    }
 
     if (gl->getProcAddress == NULL) {
         msg_Err(gl, "getProcAddress not implemented, bailing out\n");
@@ -546,7 +542,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!supports_shaders)
     {
         msg_Err(gl, "shaders not supported");
-        vlc_gl_Unlock(gl);
         free(vgl);
         return NULL;
     }
@@ -713,7 +708,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE) {
             msg_Err(gl, "Unable to use program %d\n", i);
-            vlc_gl_Unlock(gl);
             vout_display_opengl_Delete(vgl);
             return NULL;
         }
@@ -735,14 +729,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     int subpicture_buffer_object_count = 8;
     vgl->subpicture_buffer_object = malloc(subpicture_buffer_object_count * sizeof(GLuint));
     if (!vgl->subpicture_buffer_object) {
-        vlc_gl_Unlock(gl);
         vout_display_opengl_Delete(vgl);
         return NULL;
     }
     vgl->subpicture_buffer_object_count = subpicture_buffer_object_count;
     vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
-
-    vlc_gl_Unlock(gl);
 
     /* */
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
@@ -770,31 +761,30 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 {
     /* */
-    if (!vlc_gl_Lock(vgl->gl)) {
-        glFinish();
-        glFlush();
-        for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
-            glDeleteTextures(vgl->chroma->plane_count, vgl->texture[i]);
-        for (int i = 0; i < vgl->region_count; i++) {
-            if (vgl->region[i].texture)
-                glDeleteTextures(1, &vgl->region[i].texture);
-        }
-        free(vgl->region);
+    glFinish();
+    glFlush();
 
-        for (int i = 0; i < 2; i++)
-            vgl->DeleteProgram(vgl->program[i]);
-        for (int i = 0; i < 3; i++)
-            vgl->DeleteShader(vgl->shader[i]);
-        vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
-        vgl->DeleteBuffers(1, &vgl->index_buffer_object);
-        vgl->DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
-        if (vgl->subpicture_buffer_object_count > 0)
-            vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
-        free(vgl->subpicture_buffer_object);
-
-        free(vgl->texture_temp_buf);
-        vlc_gl_Unlock(vgl->gl);
+    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
+        glDeleteTextures(vgl->chroma->plane_count, vgl->texture[i]);
+    for (int i = 0; i < vgl->region_count; i++) {
+        if (vgl->region[i].texture)
+            glDeleteTextures(1, &vgl->region[i].texture);
     }
+    free(vgl->region);
+
+    for (int i = 0; i < 2; i++)
+        vgl->DeleteProgram(vgl->program[i]);
+    for (int i = 0; i < 3; i++)
+        vgl->DeleteShader(vgl->shader[i]);
+    vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
+    vgl->DeleteBuffers(1, &vgl->index_buffer_object);
+    vgl->DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+    if (vgl->subpicture_buffer_object_count > 0)
+        vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+    free(vgl->subpicture_buffer_object);
+
+    free(vgl->texture_temp_buf);
+
     if (vgl->pool)
         picture_pool_Release(vgl->pool);
     free(vgl);
@@ -891,9 +881,6 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         goto error;
 
     /* Allocates our textures */
-    if (vlc_gl_Lock(vgl->gl))
-        return vgl->pool;
-
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
@@ -920,8 +907,6 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
                          0, vgl->tex_format, vgl->tex_type, NULL);
         }
     }
-
-    vlc_gl_Unlock(vgl->gl);
 
     return vgl->pool;
 
@@ -999,9 +984,6 @@ static void Upload(vout_display_opengl_t *vgl, int in_width, int in_height,
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {
-    if (vlc_gl_Lock(vgl->gl))
-        return VLC_EGENERIC;
-
     /* Update the texture */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         if (vgl->use_multitexture) {
@@ -1105,7 +1087,6 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     }
     free(last);
 
-    vlc_gl_Unlock(vgl->gl);
     VLC_UNUSED(subpicture);
     return VLC_SUCCESS;
 }
@@ -1653,9 +1634,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
 {
-    if (vlc_gl_Lock(vgl->gl))
-        return VLC_EGENERIC;
-
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.i
        Currently, the OS X provider uses it to get a smooth window resizing */
@@ -1717,10 +1695,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
         int new_count = 2 * vgl->region_count;
         vgl->subpicture_buffer_object = realloc_or_free(vgl->subpicture_buffer_object, new_count * sizeof(GLuint));
-        if (!vgl->subpicture_buffer_object) {
-            vlc_gl_Unlock(vgl->gl);
+        if (!vgl->subpicture_buffer_object)
             return VLC_ENOMEM;
-        }
 
         vgl->subpicture_buffer_object_count = new_count;
         vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
@@ -1771,7 +1747,6 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     /* Display */
     vlc_gl_Swap(vgl->gl);
 
-    vlc_gl_Unlock(vgl->gl);
     return VLC_SUCCESS;
 }
 

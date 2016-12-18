@@ -75,25 +75,6 @@ static inline void vlc_gl_ReleaseCurrent(vlc_gl_t *gl)
     gl->releaseCurrent(gl);
 }
 
-static inline int vlc_gl_Lock(vlc_gl_t *gl)
-{
-#ifdef __APPLE__
-    return (gl->lock != NULL) ? gl->lock(gl) : VLC_SUCCESS;
-#else
-    (void) gl; return VLC_SUCCESS;
-#endif
-}
-
-static inline void vlc_gl_Unlock(vlc_gl_t *gl)
-{
-#ifdef __APPLE__
-    if (gl->unlock != NULL)
-        gl->unlock(gl);
-#else
-    (void) gl;
-#endif
-}
-
 static inline void vlc_gl_Resize(vlc_gl_t *gl, unsigned w, unsigned h)
 {
     if (gl->resize != NULL)
