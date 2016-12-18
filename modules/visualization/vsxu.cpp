@@ -305,11 +305,7 @@ static void *Thread( void *p_data )
         if (intro) intro->draw();
 
         // swap buffers etc.
-        if( !vlc_gl_Lock(gl) )
-        {
-            vlc_gl_Swap( gl );
-            vlc_gl_Unlock( gl );
-        }
+        vlc_gl_Swap( gl );
     }
 
     // stop vsxu nicely (unloads textures and frees memory)
