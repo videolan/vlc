@@ -368,11 +368,7 @@ static void *Thread( void *p_data )
         /* */
         mwait( i_deadline );
 
-        if( !vlc_gl_Lock(gl) )
-        {
-            vlc_gl_Swap( gl );
-            vlc_gl_Unlock( gl );
-        }
+        vlc_gl_Swap( gl );
     }
 
     delete p_projectm;
