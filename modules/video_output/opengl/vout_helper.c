@@ -453,12 +453,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
 
     vgl->gl = gl;
-    if (vlc_gl_Lock(vgl->gl)) {
+    if (vlc_gl_Lock(gl)) {
         free(vgl);
         return NULL;
     }
 
-    if (vgl->gl->getProcAddress == NULL) {
+    if (gl->getProcAddress == NULL) {
         msg_Err(gl, "getProcAddress not implemented, bailing out\n");
         free(vgl);
         return NULL;
@@ -509,36 +509,36 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->DeleteBuffers = glDeleteBuffers;
 
 #else
-    vgl->CreateShader  = (PFNGLCREATESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateShader");
-    vgl->ShaderSource  = (PFNGLSHADERSOURCEPROC)vlc_gl_GetProcAddress(vgl->gl, "glShaderSource");
-    vgl->CompileShader = (PFNGLCOMPILESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCompileShader");
-    vgl->AttachShader  = (PFNGLATTACHSHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glAttachShader");
+    vgl->CreateShader  = (PFNGLCREATESHADERPROC)vlc_gl_GetProcAddress(gl, "glCreateShader");
+    vgl->ShaderSource  = (PFNGLSHADERSOURCEPROC)vlc_gl_GetProcAddress(gl, "glShaderSource");
+    vgl->CompileShader = (PFNGLCOMPILESHADERPROC)vlc_gl_GetProcAddress(gl, "glCompileShader");
+    vgl->AttachShader  = (PFNGLATTACHSHADERPROC)vlc_gl_GetProcAddress(gl, "glAttachShader");
 
-    vgl->GetProgramiv  = (PFNGLGETPROGRAMIVPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetProgramiv");
-    vgl->GetShaderiv   = (PFNGLGETSHADERIVPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetShaderiv");
-    vgl->GetProgramInfoLog  = (PFNGLGETPROGRAMINFOLOGPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetProgramInfoLog");
-    vgl->GetShaderInfoLog   = (PFNGLGETSHADERINFOLOGPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetShaderInfoLog");
+    vgl->GetProgramiv  = (PFNGLGETPROGRAMIVPROC)vlc_gl_GetProcAddress(gl, "glGetProgramiv");
+    vgl->GetShaderiv   = (PFNGLGETSHADERIVPROC)vlc_gl_GetProcAddress(gl, "glGetShaderiv");
+    vgl->GetProgramInfoLog  = (PFNGLGETPROGRAMINFOLOGPROC)vlc_gl_GetProcAddress(gl, "glGetProgramInfoLog");
+    vgl->GetShaderInfoLog   = (PFNGLGETSHADERINFOLOGPROC)vlc_gl_GetProcAddress(gl, "glGetShaderInfoLog");
 
-    vgl->DeleteShader  = (PFNGLDELETESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteShader");
+    vgl->DeleteShader  = (PFNGLDELETESHADERPROC)vlc_gl_GetProcAddress(gl, "glDeleteShader");
 
-    vgl->GetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetUniformLocation");
-    vgl->GetAttribLocation  = (PFNGLGETATTRIBLOCATIONPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetAttribLocation");
-    vgl->VertexAttribPointer= (PFNGLVERTEXATTRIBPOINTERPROC)vlc_gl_GetProcAddress(vgl->gl, "glVertexAttribPointer");
-    vgl->EnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)vlc_gl_GetProcAddress(vgl->gl, "glEnableVertexAttribArray");
-    vgl->UniformMatrix4fv   = (PFNGLUNIFORMMATRIX4FVPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniformMatrix4fv");
-    vgl->Uniform4fv    = (PFNGLUNIFORM4FVPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform4fv");
-    vgl->Uniform4f     = (PFNGLUNIFORM4FPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform4f");
-    vgl->Uniform1i     = (PFNGLUNIFORM1IPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform1i");
+    vgl->GetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)vlc_gl_GetProcAddress(gl, "glGetUniformLocation");
+    vgl->GetAttribLocation  = (PFNGLGETATTRIBLOCATIONPROC)vlc_gl_GetProcAddress(gl, "glGetAttribLocation");
+    vgl->VertexAttribPointer= (PFNGLVERTEXATTRIBPOINTERPROC)vlc_gl_GetProcAddress(gl, "glVertexAttribPointer");
+    vgl->EnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)vlc_gl_GetProcAddress(gl, "glEnableVertexAttribArray");
+    vgl->UniformMatrix4fv   = (PFNGLUNIFORMMATRIX4FVPROC)vlc_gl_GetProcAddress(gl,"glUniformMatrix4fv");
+    vgl->Uniform4fv    = (PFNGLUNIFORM4FVPROC)vlc_gl_GetProcAddress(gl,"glUniform4fv");
+    vgl->Uniform4f     = (PFNGLUNIFORM4FPROC)vlc_gl_GetProcAddress(gl,"glUniform4f");
+    vgl->Uniform1i     = (PFNGLUNIFORM1IPROC)vlc_gl_GetProcAddress(gl,"glUniform1i");
 
-    vgl->CreateProgram = (PFNGLCREATEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateProgram");
-    vgl->LinkProgram   = (PFNGLLINKPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glLinkProgram");
-    vgl->UseProgram    = (PFNGLUSEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glUseProgram");
-    vgl->DeleteProgram = (PFNGLDELETEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteProgram");
+    vgl->CreateProgram = (PFNGLCREATEPROGRAMPROC)vlc_gl_GetProcAddress(gl, "glCreateProgram");
+    vgl->LinkProgram   = (PFNGLLINKPROGRAMPROC)vlc_gl_GetProcAddress(gl, "glLinkProgram");
+    vgl->UseProgram    = (PFNGLUSEPROGRAMPROC)vlc_gl_GetProcAddress(gl, "glUseProgram");
+    vgl->DeleteProgram = (PFNGLDELETEPROGRAMPROC)vlc_gl_GetProcAddress(gl, "glDeleteProgram");
 
-    vgl->GenBuffers    = (PFNGLGENBUFFERSPROC)vlc_gl_GetProcAddress(vgl->gl, "glGenBuffers");
-    vgl->BindBuffer    = (PFNGLBINDBUFFERPROC)vlc_gl_GetProcAddress(vgl->gl, "glBindBuffer");
-    vgl->BufferData    = (PFNGLBUFFERDATAPROC)vlc_gl_GetProcAddress(vgl->gl, "glBufferData");
-    vgl->DeleteBuffers = (PFNGLDELETEBUFFERSPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteBuffers");
+    vgl->GenBuffers    = (PFNGLGENBUFFERSPROC)vlc_gl_GetProcAddress(gl, "glGenBuffers");
+    vgl->BindBuffer    = (PFNGLBINDBUFFERPROC)vlc_gl_GetProcAddress(gl, "glBindBuffer");
+    vgl->BufferData    = (PFNGLBUFFERDATAPROC)vlc_gl_GetProcAddress(gl, "glBufferData");
+    vgl->DeleteBuffers = (PFNGLDELETEBUFFERSPROC)vlc_gl_GetProcAddress(gl, "glDeleteBuffers");
 
     if (!vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram)
         supports_shaders = false;
@@ -546,14 +546,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!supports_shaders)
     {
         msg_Err(gl, "shaders not supported");
-        vlc_gl_Unlock(vgl->gl);
+        vlc_gl_Unlock(gl);
         free(vgl);
         return NULL;
     }
 
 #if defined(_WIN32)
-    vgl->ActiveTexture = (PFNGLACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTexture");
-    vgl->ClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glClientActiveTexture");
+    vgl->ActiveTexture = (PFNGLACTIVETEXTUREPROC)vlc_gl_GetProcAddress(gl, "glActiveTexture");
+    vgl->ClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREPROC)vlc_gl_GetProcAddress(gl, "glClientActiveTexture");
 #   define glActiveTexture vgl->ActiveTexture
 #   define glClientActiveTexture vgl->ClientActiveTexture
 #endif
@@ -713,7 +713,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE) {
             msg_Err(gl, "Unable to use program %d\n", i);
-            vlc_gl_Unlock(vgl->gl);
+            vlc_gl_Unlock(gl);
             vout_display_opengl_Delete(vgl);
             return NULL;
         }
@@ -735,14 +735,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     int subpicture_buffer_object_count = 8;
     vgl->subpicture_buffer_object = malloc(subpicture_buffer_object_count * sizeof(GLuint));
     if (!vgl->subpicture_buffer_object) {
-        vlc_gl_Unlock(vgl->gl);
+        vlc_gl_Unlock(gl);
         vout_display_opengl_Delete(vgl);
         return NULL;
     }
     vgl->subpicture_buffer_object_count = subpicture_buffer_object_count;
     vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
 
-    vlc_gl_Unlock(vgl->gl);
+    vlc_gl_Unlock(gl);
 
     /* */
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
