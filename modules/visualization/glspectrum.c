@@ -483,11 +483,7 @@ static void *Thread( void *p_data )
 
         /* Wait to swapp the frame on time. */
         mwait(block->i_pts + (block->i_length / 2));
-        if (!vlc_gl_Lock(gl))
-        {
-            vlc_gl_Swap(gl);
-            vlc_gl_Unlock(gl);
-        }
+        vlc_gl_Swap(gl);
 
 release:
         window_close(&wind_ctx);
