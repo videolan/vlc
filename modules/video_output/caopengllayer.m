@@ -101,7 +101,7 @@ struct vout_display_sys_t {
 
     CGLContextObj glContext;
 
-    vlc_gl_t gl;
+    vlc_gl_t *gl;
     vout_display_opengl_t *vgl;
 
     vout_display_place_t place;
@@ -171,19 +171,21 @@ static int Open (vlc_object_t *p_this)
             msg_Warn(vd, "we might not have an OpenGL context yet");
 
         /* Initialize common OpenGL video display */
-        sys->gl.makeCurrent = OpenglLock;
-        sys->gl.releaseCurrent = OpenglUnlock;
-        sys->gl.swap = OpenglSwap;
-        sys->gl.getProcAddress = OurGetProcAddress;
-        sys->gl.sys = sys;
+        sys->gl = vlc_gl_Create(vd);
+        if (unlikely(!sys->gl))
+            goto bailout;
+        sys->gl->makeCurrent = OpenglLock;
+        sys->gl->releaseCurrent = OpenglUnlock;
+        sys->gl->swap = OpenglSwap;
+        sys->gl->getProcAddress = OurGetProcAddress;
+        sys->gl->sys = sys;
 
         const vlc_fourcc_t *subpicture_chromas;
         video_format_t fmt = vd->fmt;
-        sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl,
+        sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, sys->gl,
                                            &vd->cfg->viewpoint);
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");
-            sys->gl.sys = NULL;
             goto bailout;
         }
 
@@ -297,8 +299,11 @@ static void Close (vlc_object_t *p_this)
     if (sys->embed)
         vout_display_DeleteWindow(vd, sys->embed);
 
-    if (sys->gl.sys != NULL)
+    if (sys->vgl != NULL)
         vout_display_opengl_Delete(sys->vgl);
+
+    if (sys->gl != NULL)
+        vlc_gl_Destroy(sys->gl);
 
     if (sys->glContext)
         CGLReleaseContext(sys->glContext);
