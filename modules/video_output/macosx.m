@@ -116,7 +116,7 @@ struct vout_display_sys_t
     NSColorSpace *nsColorSpace;
 
     vout_window_t *embed;
-    vlc_gl_t gl;
+    vlc_gl_t *gl;
     vout_display_opengl_t *vgl;
 
     picture_pool_t *pool;
@@ -148,8 +148,9 @@ static int Open (vlc_object_t *this)
 
         vd->sys = sys;
         sys->pool = NULL;
-        sys->gl.sys = NULL;
         sys->embed = NULL;
+        sys->vgl = NULL;
+        sys->gl = NULL;
 
         /* Get the drawable object */
         id container = var_CreateGetAddress (vd, "drawable-nsobject");
@@ -253,18 +254,23 @@ static int Open (vlc_object_t *this)
         }
 
         /* Initialize common OpenGL video display */
-        sys->gl.makeCurrent = OpenglLock;
-        sys->gl.releaseCurrent = OpenglUnlock;
-        sys->gl.swap = OpenglSwap;
-        sys->gl.getProcAddress = OurGetProcAddress;
-        sys->gl.sys = sys;
+        sys->gl = vlc_gl_Create(this);
+
+        if( unlikely( !sys->gl ) )
+            goto error;
+
+        sys->gl->makeCurrent = OpenglLock;
+        sys->gl->releaseCurrent = OpenglUnlock;
+        sys->gl->swap = OpenglSwap;
+        sys->gl->getProcAddress = OurGetProcAddress;
+        sys->gl->sys = sys;
+
         const vlc_fourcc_t *subpicture_chromas;
 
-        sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl,
+        sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, sys->gl,
                                             &vd->cfg->viewpoint);
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");
-            sys->gl.sys = NULL;
             goto error;
         }
 
@@ -316,8 +322,11 @@ void Close (vlc_object_t *this)
                                       withObject:nil
                                    waitUntilDone:NO];
 
-        if (sys->gl.sys != NULL)
+        if (sys->vgl != NULL)
             vout_display_opengl_Delete (sys->vgl);
+
+        if (sys->gl != NULL)
+            vlc_gl_Destroy (sys->gl);
 
         [sys->glView release];
 
