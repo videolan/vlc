@@ -770,8 +770,12 @@ static int OpenOpaque(vlc_object_t *p_this)
     vout_display_t *vd = (vout_display_t*)p_this;
 
     if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
-     || vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR)
+     || vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
+     || vd->fmt.orientation != ORIENT_NORMAL)
+    {
+        /* Let the gles2 vout handle orientation and projection */
         return VLC_EGENERIC;
+    }
 
     return OpenCommon(vd);
 }
