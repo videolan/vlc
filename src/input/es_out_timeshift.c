@@ -114,6 +114,11 @@ typedef struct attribute_packed
         } int_epg;
         struct
         {
+            int       i_int;
+            vlc_epg_event_t *p_evt;
+        } int_epg_evt;
+        struct
+        {
             es_out_id_t *p_es;
             bool        b_bool;
         } es_bool;
@@ -632,6 +637,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_SET_NEXT_DISPLAY_TIME:
     case ES_OUT_SET_GROUP_META:
     case ES_OUT_SET_GROUP_EPG:
+    case ES_OUT_SET_GROUP_EPG_EVENT:
     case ES_OUT_SET_ES_SCRAMBLED_STATE:
     case ES_OUT_DEL_GROUP:
     case ES_OUT_SET_META:
@@ -1443,6 +1449,24 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         }
         break;
     }
+    case ES_OUT_SET_GROUP_EPG_EVENT:   /* arg1=int i_group arg2=const vlc_epg_event_t* */
+    {
+        p_cmd->u.control.u.int_epg_evt.i_int = (int)va_arg( args, int );
+        const vlc_epg_event_t *p_evt = va_arg( args, const vlc_epg_event_t * );
+
+        if( b_copy )
+        {
+            p_cmd->u.control.u.int_epg_evt.p_evt = vlc_epg_event_Duplicate( p_evt );
+            if( !p_cmd->u.control.u.int_epg_evt.p_evt )
+                return VLC_EGENERIC;
+        }
+        else
+        {
+            /* The cast is only needed to avoid warning */
+            p_cmd->u.control.u.int_epg_evt.p_evt = (vlc_epg_event_t*)p_evt;
+        }
+        break;
+    }
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
@@ -1541,6 +1565,10 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_epg.i_int,
                                                p_cmd->u.control.u.int_epg.p_epg );
 
+    case ES_OUT_SET_GROUP_EPG_EVENT: /* arg1=int i_group arg2=const vlc_epg_event_t* */
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_epg_evt.i_int,
+                                               p_cmd->u.control.u.int_epg_evt.p_evt );
+
     case ES_OUT_SET_ES_SCRAMBLED_STATE: /* arg1=int es_out_id_t* arg2=bool */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_bool.p_es->p_es,
                                                p_cmd->u.control.u.es_bool.b_bool );
@@ -1593,6 +1621,10 @@ static void CmdCleanControl( ts_cmd_t *p_cmd )
     case ES_OUT_SET_GROUP_EPG:
         if( p_cmd->u.control.u.int_epg.p_epg )
             vlc_epg_Delete( p_cmd->u.control.u.int_epg.p_epg );
+        break;
+    case ES_OUT_SET_GROUP_EPG_EVENT:
+        if( p_cmd->u.control.u.int_epg_evt.p_evt )
+            vlc_epg_event_Delete( p_cmd->u.control.u.int_epg_evt.p_evt );
         break;
     case ES_OUT_SET_ES_FMT:
         if( p_cmd->u.control.u.es_fmt.p_fmt )

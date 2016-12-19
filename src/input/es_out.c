@@ -1317,6 +1317,23 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
         input_Control( p_input, INPUT_MERGE_INFOS, p_cat );
 }
 
+static void EsOutProgramEpgEvent( es_out_t *out, int i_group, const vlc_epg_event_t *p_event )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    input_thread_t    *p_input = p_sys->p_input;
+    input_item_t      *p_item = input_priv(p_input)->p_item;
+    es_out_pgrm_t     *p_pgrm;
+
+    /* Find program */
+    if( !EsOutIsProgramVisible( out, i_group ) )
+        return;
+    p_pgrm = EsOutProgramFind( out, i_group );
+    if( !p_pgrm )
+        return;
+
+    input_item_SetEpgEvent( p_item, p_event );
+}
+
 static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg )
 {
     es_out_sys_t      *p_sys = out->p_sys;
@@ -2463,6 +2480,14 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         const vlc_epg_t *p_epg = va_arg( args, const vlc_epg_t * );
 
         EsOutProgramEpg( out, i_group, p_epg );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_SET_GROUP_EPG_EVENT:
+    {
+        int i_group = (int)va_arg( args, int );
+        const vlc_epg_event_t *p_evt = va_arg( args, const vlc_epg_event_t * );
+
+        EsOutProgramEpgEvent( out, i_group, p_evt );
         return VLC_SUCCESS;
     }
 

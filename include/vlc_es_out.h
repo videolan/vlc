@@ -70,7 +70,8 @@ enum es_out_query_e
     /* Set meta data for group (dynamic) (The vlc_meta_t is not modified nor released) */
     ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=const vlc_meta_t */
     /* Set epg for group (dynamic) (The vlc_epg_t is not modified nor released) */
-    ES_OUT_SET_GROUP_EPG,   /* arg1=int i_group arg2=const vlc_epg_t */
+    ES_OUT_SET_GROUP_EPG,       /* arg1=int i_group arg2=const vlc_epg_t * */
+    ES_OUT_SET_GROUP_EPG_EVENT, /* arg1=int i_group arg2=const vlc_epg_event_t * */
     /* */
     ES_OUT_DEL_GROUP,       /* arg1=int i_group */
 
