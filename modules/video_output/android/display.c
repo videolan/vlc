@@ -49,6 +49,7 @@
 
 #define CFG_PREFIX "android-display-"
 static int  Open (vlc_object_t *);
+static int  OpenOpaque (vlc_object_t *);
 static void Close(vlc_object_t *);
 static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture);
 
@@ -60,6 +61,10 @@ vlc_module_begin()
     add_shortcut("android-display")
     add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     set_callbacks(Open, Close)
+    add_submodule ()
+        set_description("Android opaque video output")
+        set_capability("vout display", 280)
+        set_callbacks(OpenOpaque, Close)
 vlc_module_end()
 
 /*****************************************************************************
@@ -634,9 +639,8 @@ static void SetRGBMask(video_format_t *p_fmt)
     }
 }
 
-static int Open(vlc_object_t *p_this)
+static int OpenCommon(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t*)p_this;
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
 
@@ -745,8 +749,31 @@ static int Open(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
-    Close(p_this);
+    Close(VLC_OBJECT(vd));
     return VLC_EGENERIC;
+}
+
+static int Open(vlc_object_t *p_this)
+{
+    vout_display_t *vd = (vout_display_t*)p_this;
+
+    if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
+        return VLC_EGENERIC;
+
+    /* At this point, gles2 vout failed (old Android device) */
+    vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
+    return OpenCommon(vd);
+}
+
+static int OpenOpaque(vlc_object_t *p_this)
+{
+    vout_display_t *vd = (vout_display_t*)p_this;
+
+    if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
+     || vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR)
+        return VLC_EGENERIC;
+
+    return OpenCommon(vd);
 }
 
 static void Close(vlc_object_t *p_this)
