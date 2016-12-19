@@ -615,7 +615,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
 
     switch (query) {
         case VOUT_DISPLAY_HIDE_MOUSE:
-        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
             ret = VLC_SUCCESS;
             break;
 
