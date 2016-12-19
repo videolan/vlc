@@ -215,13 +215,18 @@ static int Open(vlc_object_t *object)
 #endif
 
     /* */
-    sys->gl.swap = Swap;
-    sys->gl.getProcAddress = OurGetProcAddress;
-    sys->gl.sys = vd;
+    sys->gl = vlc_gl_Create(object);
+
+    if (unlikely(!sys->gl))
+        goto error;
+
+    sys->gl->swap = Swap;
+    sys->gl->getProcAddress = OurGetProcAddress;
+    sys->gl->sys = vd;
 
     video_format_t fmt = vd->fmt;
     const vlc_fourcc_t *subpicture_chromas;
-    sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, &sys->gl,
+    sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, sys->gl,
                                        &vd->cfg->viewpoint);
     if (!sys->vgl)
         goto error;
@@ -258,6 +263,9 @@ static void Close(vlc_object_t *object)
 
     if (sys->vgl)
         vout_display_opengl_Delete(sys->vgl);
+
+    if (sys->gl)
+        vlc_gl_Destroy(sys->gl);
 
     if (sys->hGLDC && sys->hGLRC)
         wglMakeCurrent(NULL, NULL);
