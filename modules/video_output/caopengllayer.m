@@ -182,8 +182,12 @@ static int Open (vlc_object_t *p_this)
 
         const vlc_fourcc_t *subpicture_chromas;
         video_format_t fmt = vd->fmt;
-        sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, sys->gl,
-                                           &vd->cfg->viewpoint);
+        if (!OpenglLock(sys->gl)) {
+            sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
+                                               sys->gl, &vd->cfg->viewpoint);
+            OpenglUnlock(sys->gl);
+        } else
+            sys->vgl = NULL;
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");
             goto bailout;
@@ -299,8 +303,10 @@ static void Close (vlc_object_t *p_this)
     if (sys->embed)
         vout_display_DeleteWindow(vd, sys->embed);
 
-    if (sys->vgl != NULL)
+    if (sys->vgl != NULL && !OpenglLock(sys->gl)) {
         vout_display_opengl_Delete(sys->vgl);
+        OpenglUnlock(sys->gl);
+    }
 
     if (sys->gl != NULL)
         vlc_gl_Destroy(sys->gl);
@@ -318,9 +324,11 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->pool)
+    if (!sys->pool && !OpenglLock(sys->gl)) {
         sys->pool = vout_display_opengl_GetPool(sys->vgl, count);
-    assert(sys->pool);
+        OpenglUnlock(sys->gl);
+        assert(sys->pool);
+    }
     return sys->pool;
 }
 
@@ -334,7 +342,10 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
     }
 
     @synchronized (sys->cgLayer) {
-        vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
+        if (!OpenglLock(sys->gl)) {
+            vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
+            OpenglUnlock(sys->gl);
+        }
     }
 }
 
@@ -394,7 +405,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             vout_display_place_t place;
             vout_display_PlacePicture (&place, source, &cfg_tmp, false);
+            if (OpenglLock(sys->gl))
+                return VLC_EGENERIC;
+
             vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+            OpenglUnlock(sys->gl);
+
             sys->place = place;
 
             return VLC_SUCCESS;
@@ -412,8 +428,17 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
 
         case VOUT_DISPLAY_CHANGE_VIEWPOINT:
-            return vout_display_opengl_SetViewpoint(sys->vgl,
+        {
+            int ret;
+
+            if (OpenglLock(sys->gl))
+                return VLC_EGENERIC;
+
+            ret = vout_display_opengl_SetViewpoint(sys->vgl,
                 &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
+            OpenglUnlock(sys->gl);
+            return ret;
+        }
 
         case VOUT_DISPLAY_RESET_PICTURES:
             vlc_assert_unreachable ();
