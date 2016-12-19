@@ -115,6 +115,7 @@ struct mc_api
     int  i_quirks;
     char *psz_name;
     bool b_support_interlaced;
+    bool b_support_rotation;
 
     bool b_started;
     bool b_direct_rendering;

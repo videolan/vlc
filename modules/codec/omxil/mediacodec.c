@@ -118,6 +118,7 @@ struct decoder_sys_t
         struct
         {
             void *p_surface, *p_jsurface;
+            unsigned i_angle;
             unsigned int i_stride, i_slice_height;
             int i_pixel_format;
             uint8_t i_nal_length_size;
@@ -491,6 +492,33 @@ static int UpdateOpaqueVout(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_dummy_hwpic;
 
+    if (p_sys->api->b_support_rotation)
+    {
+        switch (p_dec->fmt_in.video.orientation)
+        {
+            case ORIENT_ROTATED_90:
+                p_sys->video.i_angle = 90;
+                break;
+            case ORIENT_ROTATED_180:
+                p_sys->video.i_angle = 180;
+                break;
+            case ORIENT_ROTATED_270:
+                p_sys->video.i_angle = 270;
+                break;
+            default:
+                p_sys->video.i_angle = 0;
+                break;
+        }
+
+        /* If MediaCodec can handle the rotation, reset the orientation to
+         * Normal in order to ask the vout not to rotate. */
+        if (p_sys->video.i_angle != 0)
+            video_format_ApplyRotation(&p_dec->fmt_out.video,
+                                       &p_dec->fmt_in.video);
+    }
+    else
+        p_sys->video.i_angle = 0;
+
     /* Direct rendering: Request a valid OPAQUE Vout in order to get
      * the surface attached to it */
     if (decoder_UpdateVideoFormat(p_dec) != 0
@@ -535,21 +563,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         }
         args.video.i_width = p_dec->fmt_out.video.i_width;
         args.video.i_height = p_dec->fmt_out.video.i_height;
-
-        switch (p_dec->fmt_in.video.orientation)
-        {
-            case ORIENT_ROTATED_90:
-                args.video.i_angle = 90;
-                break;
-            case ORIENT_ROTATED_180:
-                args.video.i_angle = 180;
-                break;
-            case ORIENT_ROTATED_270:
-                args.video.i_angle = 270;
-                break;
-            default:
-                args.video.i_angle = 0;
-        }
+        args.video.i_angle = p_sys->video.i_angle;
 
         /* Configure again if h264 profile changed */
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264

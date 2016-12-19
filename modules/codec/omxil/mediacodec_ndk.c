@@ -618,5 +618,6 @@ int MediaCodecNdk_Init(mc_api *api)
     api->set_output_surface = SetOutputSurface;
 
     api->b_support_interlaced = true;
+    api->b_support_rotation = true;
     return 0;
 }

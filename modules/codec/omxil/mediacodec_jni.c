@@ -530,6 +530,7 @@ static int Start(mc_api *api, union mc_api_args *p_args)
 
     if (api->i_cat == VIDEO_ES)
     {
+        assert(p_args->video.i_angle == 0 || api->b_support_rotation);
         jformat = (*env)->CallStaticObjectMethod(env,
                                                  jfields.media_format_class,
                                                  jfields.create_video_format,
@@ -539,16 +540,7 @@ static int Start(mc_api *api, union mc_api_args *p_args)
         jsurface = p_args->video.p_jsurface;
         b_direct_rendering = !!jsurface;
 
-        /* There is no way to rotate the video using direct rendering (and
-         * using a SurfaceView) before  API 21 (Lollipop). Therefore, we
-         * deactivate direct rendering if video doesn't have a normal rotation
-         * and if get_input_buffer method is not present (This method exists
-         * since API 21). */
-        if (b_direct_rendering && p_args->video.i_angle != 0
-         && !jfields.get_input_buffer)
-            b_direct_rendering = false;
-
-        if (b_direct_rendering && p_args->video.i_angle != 0)
+        if (p_args->video.i_angle != 0)
             SET_INTEGER(jformat, "rotation-degrees", p_args->video.i_angle);
 
         /* feature-tunneled-playback available since API 21 */
@@ -991,8 +983,11 @@ int MediaCodecJni_Init(mc_api *api)
     api->release_out = ReleaseOutput;
     api->set_output_surface = SetOutputSurface;
 
-    /* Allow interlaced picture only after API 21 */
-    api->b_support_interlaced = jfields.get_input_buffer
-                                && jfields.get_output_buffer;
+    /* Allow interlaced picture and rotation only after API 21 */
+    if (jfields.get_input_buffer && jfields.get_output_buffer)
+    {
+        api->b_support_interlaced = true;
+        api->b_support_rotation = true;
+    }
     return 0;
 }
