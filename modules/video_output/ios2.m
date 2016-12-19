@@ -301,7 +301,6 @@ static int Open(vlc_object_t *this)
             scaleFactor = sys->viewContainer.contentScaleFactor;
             viewSize = sys->viewContainer.bounds.size;
         }
-        vout_display_SendEventFullscreen(vd, false);
         vout_display_SendEventDisplaySize(vd, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
 
         /* */

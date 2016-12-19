@@ -134,7 +134,6 @@ static int Open(vlc_object_t *object)
 
     /* Inspect initial configuration and send correction events
      * FIXME how to handle aspect ratio with aa ? */
-    vout_display_SendEventFullscreen(vd, false);
     vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
 
     return VLC_SUCCESS;

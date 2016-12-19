@@ -273,7 +273,6 @@ static int Open (vlc_object_t *p_this)
             outputSize = [container currentOutputSize];
         else
             outputSize = [sys->container visibleRect].size;
-        vout_display_SendEventFullscreen(vd, false);
         vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height);
         
         return VLC_SUCCESS;
