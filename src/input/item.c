@@ -897,6 +897,41 @@ void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
     vlc_event_send( &p_item->event_manager, &event );
 }
 
+void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_evt )
+{
+    bool b_changed = false;
+    vlc_mutex_lock( &p_item->lock );
+
+    for( int i = 0; i < p_item->i_epg; i++ )
+    {
+        vlc_epg_t *p_epg = p_item->pp_epg[i];
+        for( size_t j = 0; j < p_epg->i_event; j++ )
+        {
+            /* Same event can exist in more than one table */
+            if( p_epg->pp_event[j]->i_id == p_epg_evt->i_id )
+            {
+                vlc_epg_event_t *p_dup = vlc_epg_event_Duplicate( p_epg_evt );
+                if( p_dup )
+                {
+                    if( p_epg->p_current == p_epg->pp_event[j] )
+                        p_epg->p_current = p_dup;
+                    vlc_epg_event_Delete( p_epg->pp_event[j] );
+                    p_epg->pp_event[j] = p_dup;
+                    b_changed = true;
+                }
+                break;
+            }
+        }
+    }
+    vlc_mutex_unlock( &p_item->lock );
+
+    if ( b_changed )
+    {
+        vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
+        vlc_event_send( &p_item->event_manager, &event );
+    }
+}
+
 #define EPG_DEBUG
 void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
 {
