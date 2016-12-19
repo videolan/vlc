@@ -232,7 +232,37 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
     tc->chroma       = VLC_CODEC_ANDROID_OPAQUE;
     tc->desc         = &desc;
     tc->tex_target   = GL_TEXTURE_EXTERNAL_OES;
-    tc->orientation  = ORIENT_VFLIPPED;
+
+    /* The transform Matrix (uSTMatrix) given by the SurfaceTexture is not
+     * using the same origin than us. Ask the caller to rotate textures
+     * coordinates, via the vertex shader, by forcing an orientation. */
+    switch (tc->orientation)
+    {
+        case ORIENT_TOP_LEFT:
+            tc->orientation = ORIENT_BOTTOM_LEFT;
+            break;
+        case ORIENT_TOP_RIGHT:
+            tc->orientation = ORIENT_BOTTOM_RIGHT;
+            break;
+        case ORIENT_BOTTOM_LEFT:
+            tc->orientation = ORIENT_TOP_LEFT;
+            break;
+        case ORIENT_BOTTOM_RIGHT:
+            tc->orientation = ORIENT_TOP_RIGHT;
+            break;
+        case ORIENT_LEFT_TOP:
+            tc->orientation = ORIENT_RIGHT_TOP;
+            break;
+        case ORIENT_LEFT_BOTTOM:
+            tc->orientation = ORIENT_RIGHT_BOTTOM;
+            break;
+        case ORIENT_RIGHT_TOP:
+            tc->orientation = ORIENT_LEFT_TOP;
+            break;
+        case ORIENT_RIGHT_BOTTOM:
+            tc->orientation = ORIENT_LEFT_BOTTOM;
+            break;
+    }
 
     static const char *code =
         "#version " GLSL_VERSION "\n"
