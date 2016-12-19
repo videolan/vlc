@@ -477,7 +477,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->api.DeleteShader(vgl->vertex_shader);
     vgl->api.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->api.DeleteBuffers(1, &vgl->index_buffer_object);
-    vgl->api.DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+    if (vgl->chroma != NULL)
+        vgl->api.DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
     if (vgl->subpicture_buffer_object_count > 0)
         vgl->api.DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
     free(vgl->subpicture_buffer_object);
