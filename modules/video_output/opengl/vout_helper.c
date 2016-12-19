@@ -144,10 +144,10 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         "uniform mat4 ZRotMatrix;"
         "uniform mat4 ZoomMatrix;"
         "void main() {"
-        " TexCoord0 = MultiTexCoord0;"
-        " TexCoord1 = MultiTexCoord1;"
-        " TexCoord2 = MultiTexCoord2;"
-        " gl_Position = ProjectionMatrix * OrientationMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
+        " TexCoord0 = OrientationMatrix * MultiTexCoord0;"
+        " TexCoord1 = OrientationMatrix * MultiTexCoord1;"
+        " TexCoord2 = OrientationMatrix * MultiTexCoord2;"
+        " gl_Position = ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
         "}";
 
     *shader = vgl->api.CreateShader(GL_VERTEX_SHADER);
@@ -803,54 +803,56 @@ static void orientationTransformMatrix(GLfloat matrix[static 16],
     const int k_sin_pi_2 = 1;
     const int k_sin_n_pi_2 = -1;
 
-    bool rotate = false;
-    int cos = 0, sin = 0;
-
     switch (orientation) {
 
         case ORIENT_ROTATED_90:
-            cos = k_cos_pi_2;
-            sin = k_sin_pi_2;
-            rotate = true;
+            matrix[0 * 4 + 0] = k_cos_pi_2;
+            matrix[0 * 4 + 1] = -k_sin_pi_2;
+            matrix[1 * 4 + 0] = k_sin_pi_2;
+            matrix[1 * 4 + 1] = k_cos_pi_2;
+            matrix[3 * 4 + 1] = 1;
             break;
         case ORIENT_ROTATED_180:
-            cos = k_cos_pi;
-            sin = k_sin_pi;
-            rotate = true;
+            matrix[0 * 4 + 0] = k_cos_pi;
+            matrix[0 * 4 + 1] = -k_sin_pi;
+            matrix[1 * 4 + 0] = k_sin_pi;
+            matrix[1 * 4 + 1] = k_cos_pi;
+            matrix[3 * 4 + 0] = 1;
+            matrix[3 * 4 + 1] = 1;
             break;
         case ORIENT_ROTATED_270:
-            cos = k_cos_n_pi_2;
-            sin = k_sin_n_pi_2;
-            rotate = true;
+            matrix[0 * 4 + 0] = k_cos_n_pi_2;
+            matrix[0 * 4 + 1] = -k_sin_n_pi_2;
+            matrix[1 * 4 + 0] = k_sin_n_pi_2;
+            matrix[1 * 4 + 1] = k_cos_n_pi_2;
+            matrix[3 * 4 + 0] = 1;
             break;
         case ORIENT_HFLIPPED:
             matrix[0 * 4 + 0] = -1;
+            matrix[3 * 4 + 0] = 1;
             break;
         case ORIENT_VFLIPPED:
             matrix[1 * 4 + 1] = -1;
+            matrix[3 * 4 + 1] = 1;
             break;
         case ORIENT_TRANSPOSED:
             matrix[0 * 4 + 0] = 0;
-            matrix[0 * 4 + 1] = -1;
-            matrix[1 * 4 + 0] = -1;
             matrix[1 * 4 + 1] = 0;
+            matrix[2 * 4 + 2] = -1;
+            matrix[0 * 4 + 1] = 1;
+            matrix[1 * 4 + 0] = 1;
             break;
         case ORIENT_ANTI_TRANSPOSED:
             matrix[0 * 4 + 0] = 0;
-            matrix[0 * 4 + 1] = 1;
-            matrix[1 * 4 + 0] = 1;
             matrix[1 * 4 + 1] = 0;
+            matrix[2 * 4 + 2] = -1;
+            matrix[0 * 4 + 1] = -1;
+            matrix[1 * 4 + 0] = -1;
+            matrix[3 * 4 + 0] = 1;
+            matrix[3 * 4 + 1] = 1;
             break;
         default:
             break;
-    }
-
-    if (rotate) {
-
-        matrix[0 * 4 + 0] = cos;
-        matrix[0 * 4 + 1] = -sin;
-        matrix[1 * 4 + 0] = sin;
-        matrix[1 * 4 + 1] = cos;
     }
 }
 
