@@ -313,10 +313,9 @@ static const char * ATSC_A53_get_service_type( uint8_t i_type )
     } while(0);
 #endif
 
-static time_t ATSC_AddVLCEPGEvent( demux_t *p_demux, ts_psip_context_t *p_basectx,
-                                   const dvbpsi_atsc_eit_event_t *p_evt,
-                                   const dvbpsi_atsc_ett_t *p_ett,
-                                   vlc_epg_t *p_epg )
+static vlc_epg_event_t * ATSC_CreateVLCEPGEvent( demux_t *p_demux, ts_psip_context_t *p_basectx,
+                                                 const dvbpsi_atsc_eit_event_t *p_evt,
+                                                 const dvbpsi_atsc_ett_t *p_ett )
 {
 #ifndef ATSC_DEBUG_EIT
     VLC_UNUSED(p_demux);
@@ -325,6 +324,7 @@ static time_t ATSC_AddVLCEPGEvent( demux_t *p_demux, ts_psip_context_t *p_basect
                                                        p_evt->i_title, p_evt->i_title_length );
     char *psz_shortdesc_text = NULL;
     char *psz_longdesc_text = NULL;
+    vlc_epg_event_t *p_epgevt = NULL;
 
     time_t i_start = atsc_a65_GPSTimeToEpoch( p_evt->i_start_time, p_basectx->p_stt->i_gps_utc_offset );
     EIT_DEBUG_TIMESHIFT( i_start );
@@ -379,22 +379,37 @@ static time_t ATSC_AddVLCEPGEvent( demux_t *p_demux, ts_psip_context_t *p_basect
         msg_Dbg( p_demux, "EIT Event time %ld +%d %s id 0x%x",
                  i_start, p_evt->i_length_seconds, psz_title, p_evt->i_event_id );
 #endif
-        vlc_epg_event_t *p_epgevt = vlc_epg_event_New( p_evt->i_event_id, i_start, p_evt->i_length_seconds );
+        p_epgevt = vlc_epg_event_New( p_evt->i_event_id, i_start, p_evt->i_length_seconds );
         if( p_epgevt )
         {
             p_epgevt->psz_name = grab_notempty( &psz_title );
             p_epgevt->psz_short_description = grab_notempty( &psz_shortdesc_text );
             p_epgevt->psz_description = grab_notempty( &psz_longdesc_text );
-            if( !vlc_epg_AddEvent( p_epg, p_epgevt ) )
-                vlc_epg_event_Delete( p_epgevt );
         }
     }
 
     free( psz_title );
     free( psz_shortdesc_text );
     free( psz_longdesc_text );
-    return i_start;
+    return p_epgevt;
 }
+
+static time_t ATSC_AddVLCEPGEvent( demux_t *p_demux, ts_psip_context_t *p_basectx,
+                                   const dvbpsi_atsc_eit_event_t *p_event,
+                                   const dvbpsi_atsc_ett_t *p_ett,
+                                   vlc_epg_t *p_epg )
+{
+    vlc_epg_event_t *p_evt = ATSC_CreateVLCEPGEvent( p_demux, p_basectx,
+                                                     p_event, p_ett );
+    if( p_evt )
+    {
+        if( vlc_epg_AddEvent( p_epg, p_evt ) )
+            return p_evt->i_start;
+        vlc_epg_event_Delete( p_evt );
+    }
+    return VLC_TS_INVALID;
+}
+
 
 static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
 {
@@ -534,18 +549,15 @@ static void ATSC_ETT_Callback( void *p_pid, dvbpsi_atsc_ett_t *p_ett )
 #ifdef ATSC_DEBUG_EIT
                     msg_Dbg( p_demux, "Should update EIT %x (matched EIT)", p_event->i_event_id );
 #endif
-                    vlc_epg_t *p_epg = vlc_epg_New( p_basectx->i_tabletype - ATSC_TABLE_TYPE_ETT_0,
-                                                    i_program_number );
-                    if( likely(p_epg) )
+                    vlc_epg_event_t *p_evt = ATSC_CreateVLCEPGEvent( p_demux, p_basectx, p_event, p_ett );
+                    if( likely(p_evt) )
                     {
-                        (void)
-                        ATSC_AddVLCEPGEvent( p_demux, p_basectx, p_event, p_ett, p_epg );
-                        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG,
-                                        (int)i_program_number, p_epg );
+                        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG_EVENT,
+                                        (int)i_program_number, p_evt );
 #ifdef ATSC_DEBUG_EIT
-                        msg_Dbg( p_demux, "Updated event %x with ETT", p_event->i_event_id );
+                        msg_Dbg( p_demux, "Updated event %x with ETT", p_evt->i_id );
 #endif
-                        vlc_epg_Delete( p_epg );
+                        vlc_epg_event_Delete( p_evt );
                     }
                 }
                 /* Insert to avoid duplicated event, and to be available to EIT if didn't appear yet */
