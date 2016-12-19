@@ -906,7 +906,8 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
     vlc_epg_t *p_epg = NULL;
     for( int i = 0; i < p_item->i_epg; i++ )
     {
-        if( p_item->pp_epg[i]->i_source_id == p_update->i_source_id )
+        if( p_item->pp_epg[i]->i_source_id == p_update->i_source_id &&
+            p_item->pp_epg[i]->i_id == p_update->i_id )
         {
             p_epg = p_item->pp_epg[i];
             break;
