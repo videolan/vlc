@@ -196,7 +196,6 @@ static int Open(vlc_object_t *object)
     vd->manage  = Manage;
 
     /* Fix initial state */
-    vout_display_SendEventFullscreen(vd, false);
     Refresh(vd);
 
     return VLC_SUCCESS;

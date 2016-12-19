@@ -166,7 +166,6 @@ static int Open(vlc_object_t *object)
     vd->control = Control;
     vd->manage  = NULL;
 
-    vout_display_SendEventFullscreen(vd, false);
     vout_display_DeleteWindow(vd, NULL);
     return VLC_SUCCESS;
 }

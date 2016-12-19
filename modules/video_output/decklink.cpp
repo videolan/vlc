@@ -1073,7 +1073,6 @@ static int OpenVideo(vlc_object_t *p_this)
     vd->display = DisplayVideo;
     vd->control = ControlVideo;
     vd->manage  = NULL;
-    vout_display_SendEventFullscreen(vd, false);
 
     return VLC_SUCCESS;
 }
