@@ -434,7 +434,9 @@ static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
                                                      p_basectx->p_stt->i_gps_utc_offset );
     EIT_DEBUG_TIMESHIFT( i_current_time );
 
-
+    /* Use PID for segmenting our EPG tables updates. 1 EIT/PID transmits 3 hours,
+     * with a max of 16 days over 128 EIT/PID. Unlike DVD, table ID is here fixed.
+     * see ATSC A/65 5.0 */
     vlc_epg_t *p_epg = vlc_epg_New( p_basectx->i_tabletype - ATSC_TABLE_TYPE_EIT_0,
                                     i_program_number );
     if( !p_epg )
