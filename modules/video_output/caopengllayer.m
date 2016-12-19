@@ -171,7 +171,7 @@ static int Open (vlc_object_t *p_this)
             msg_Warn(vd, "we might not have an OpenGL context yet");
 
         /* Initialize common OpenGL video display */
-        sys->gl = vlc_gl_Create(vd);
+        sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
         if (unlikely(!sys->gl))
             goto bailout;
         sys->gl->makeCurrent = OpenglLock;

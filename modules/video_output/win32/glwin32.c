@@ -215,7 +215,7 @@ static int Open(vlc_object_t *object)
 #endif
 
     /* */
-    sys->gl = vlc_gl_Create(object);
+    sys->gl = vlc_object_create(object, sizeof(*sys->gl));
 
     if (unlikely(!sys->gl))
         goto error;

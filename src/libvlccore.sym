@@ -691,7 +691,6 @@ vlc_fifo_GetCount
 vlc_fifo_GetBytes
 vlc_gl_Create
 vlc_gl_Destroy
-vlc_gl_ModuleCreate
 vlc_gl_surface_Create
 vlc_gl_surface_CheckSize
 vlc_gl_surface_Destroy

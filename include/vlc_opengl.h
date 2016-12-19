@@ -58,27 +58,7 @@ enum {
     VLC_OPENGL_ES2,
 };
 
-/**
- * Create a VLC OpenGL object
- *
- * @note The allocated resource, if any, shall be released
- *       with a call to \ref vlc_gl_Destroy.
- * @return a created object on success, NULL on failure.
- **/
-VLC_API vlc_gl_t *vlc_gl_Create(vlc_object_t* parent);
-
-/**
- * Creates a VLC OpenGL object with associated surface and module
- *
- * @note In most cases, you should vlc_gl_MakeCurrent() afterward.
- *
- * @param wnd window to use as OpenGL surface
- * @param flags OpenGL context type
- * @param name module name (or NULL for auto)
- * @return a new context, or NULL on failure
- */
-VLC_API vlc_gl_t *vlc_gl_ModuleCreate(struct vout_window_t *wnd, unsigned flags,
-                                      const char *name) VLC_USED;
+VLC_API vlc_gl_t *vlc_gl_Create(struct vout_window_t *, unsigned, const char *) VLC_USED;
 VLC_API void vlc_gl_Destroy(vlc_gl_t *);
 
 static inline int vlc_gl_MakeCurrent(vlc_gl_t *gl)

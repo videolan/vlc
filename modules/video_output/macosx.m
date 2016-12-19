@@ -254,7 +254,7 @@ static int Open (vlc_object_t *this)
         }
 
         /* Initialize common OpenGL video display */
-        sys->gl = vlc_gl_Create(this);
+        sys->gl = vlc_object_create(this, sizeof(*sys->gl));
 
         if( unlikely( !sys->gl ) )
             goto error;

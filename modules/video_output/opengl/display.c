@@ -103,7 +103,7 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    sys->gl = vlc_gl_ModuleCreate (surface, API, "$" MODULE_VARNAME);
+    sys->gl = vlc_gl_Create (surface, API, "$" MODULE_VARNAME);
     if (sys->gl == NULL)
         goto error;
 

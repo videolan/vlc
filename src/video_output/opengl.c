@@ -29,43 +29,47 @@
 #include <vlc_opengl.h>
 #include "libvlc.h"
 #include <vlc_modules.h>
-#include <vlc_vout_window.h>
 
-vlc_gl_t *vlc_gl_Create(vlc_object_t* parent)
+#undef vlc_gl_Create
+/**
+ * Creates an OpenGL context (and its underlying surface).
+ *
+ * @note In most cases, you should vlc_gl_MakeCurrent() afterward.
+ *
+ * @param wnd window to use as OpenGL surface
+ * @param flags OpenGL context type
+ * @param name module name (or NULL for auto)
+ * @return a new context, or NULL on failure
+ */
+vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
+                        const char *name)
 {
-    return vlc_custom_create(parent, sizeof(vlc_gl_t), "gl");
-}
+    vlc_object_t *parent = (vlc_object_t *)wnd;
+    vlc_gl_t *gl;
+    const char *type;
 
-vlc_gl_t *vlc_gl_ModuleCreate(struct vout_window_t *wnd, unsigned flags,
-                              const char *module_name)
-{
-    const char *module_type;
-
-    switch (flags)
+    switch (flags /*& VLC_OPENGL_API_MASK*/)
     {
         case VLC_OPENGL:
-            module_type = "opengl";
+            type = "opengl";
             break;
         case VLC_OPENGL_ES:
-            module_type = "opengl es";
+            type = "opengl es";
             break;
         case VLC_OPENGL_ES2:
-            module_type = "opengl es2";
+            type = "opengl es2";
             break;
-
         default:
             return NULL;
     }
 
-    vlc_gl_t *gl = vlc_gl_Create(VLC_OBJECT(wnd));
-
-    if( unlikely( !gl ) )
+    gl = vlc_custom_create(parent, sizeof (*gl), "gl");
+    if (unlikely(gl == NULL))
         return NULL;
 
     gl->surface = wnd;
-    gl->module = module_need(gl, module_type, module_name, true);
-
-    if (gl->module == NULL )
+    gl->module = module_need(gl, type, name, true);
+    if (gl->module == NULL)
     {
         vlc_object_release(gl);
         return NULL;
@@ -76,10 +80,11 @@ vlc_gl_t *vlc_gl_ModuleCreate(struct vout_window_t *wnd, unsigned flags,
 
 void vlc_gl_Destroy(vlc_gl_t *gl)
 {
-    if(gl->module)
-        module_unneed(gl, gl->module);
+    module_unneed(gl, gl->module);
     vlc_object_release(gl);
 }
+
+#include <vlc_vout_window.h>
 
 typedef struct vlc_gl_surface
 {
@@ -125,7 +130,7 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
         *wp = surface;
 
     /* TODO: support ES? */
-    vlc_gl_t *gl = vlc_gl_ModuleCreate(surface, VLC_OPENGL, NULL);
+    vlc_gl_t *gl = vlc_gl_Create(surface, VLC_OPENGL, NULL);
     if (gl == NULL) {
         vout_window_Delete(surface);
         return NULL;
