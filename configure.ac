@@ -3002,6 +3002,7 @@ have_gl="no"
 PKG_CHECK_MODULES([GL], [gl], [
   have_gl="yes"
 ], [
+  AC_MSG_CHECKING([for OpenGL])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #ifdef _WIN32
 # include <GL/glew.h>
@@ -3018,6 +3019,7 @@ PKG_CHECK_MODULES([GL], [gl], [
       GL_LIBS="-lopengl32"
     ])
   ])
+  AC_MSG_RESULT([${have_gl}])
 ])
 AM_CONDITIONAL([HAVE_GL], [test "${have_gl}" = "yes"])
 
