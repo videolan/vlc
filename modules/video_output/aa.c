@@ -78,7 +78,6 @@ struct vout_display_sys_t {
     struct aa_context*  aa_context;
     aa_palette          palette;
 
-    vout_display_cfg_t  state;
     picture_pool_t      *pool;
 };
 
@@ -135,8 +134,6 @@ static int Open(vlc_object_t *object)
 
     /* Inspect initial configuration and send correction events
      * FIXME how to handle aspect ratio with aa ? */
-    sys->state = *vd->cfg;
-    sys->state.is_fullscreen = false;
     vout_display_SendEventFullscreen(vd, false);
     vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
 
