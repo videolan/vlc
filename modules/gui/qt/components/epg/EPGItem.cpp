@@ -171,8 +171,8 @@ bool EPGItem::setData( const vlc_epg_event_t *data )
         m_shortDescription = newshortdesc;
         setDuration( data->i_duration );
         setRating( data->i_rating );
-        update();
         updatePos();
+        prepareGeometryChange();
         return true;
     }
     return false;
