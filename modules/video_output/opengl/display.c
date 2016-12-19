@@ -89,10 +89,6 @@ static int Control (vout_display_t *, int, va_list);
 static int Open (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
-
-    if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
-        return VLC_EGENERIC;
-
     vout_display_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
