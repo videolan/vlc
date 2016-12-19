@@ -743,9 +743,6 @@ static int OpenCommon(vout_display_t *vd)
     vd->manage  = NULL;
     vd->info.is_slow = !sys->p_window->b_opaque;
 
-    /* Fix initial state */
-    vout_display_SendEventFullscreen(vd, true);
-
     return VLC_SUCCESS;
 
 error:

@@ -313,7 +313,6 @@ static int Open(vlc_object_t *object)
     vd->manage  = NULL;
 
     /* */
-    vout_display_SendEventFullscreen(vd, true);
     vout_display_SendEventDisplaySize(vd, fmt.i_visible_width, fmt.i_visible_height);
     return VLC_SUCCESS;
 }

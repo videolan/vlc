@@ -912,9 +912,6 @@ Open( vlc_object_t *p_this )
     vd->control = Control;
     vd->manage  = Manage;
 
-    /* Fix initial state */
-    vout_display_SendEventFullscreen( vd, true );
-
     return VLC_SUCCESS;
 }
 

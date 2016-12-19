@@ -329,9 +329,6 @@ static int Open(vlc_object_t *p_this)
         goto error;
     }
 
-    /* Fix initial state */
-    vout_display_SendEventFullscreen(vd, true);
-
     free(pictures);
     return VLC_SUCCESS;
 
