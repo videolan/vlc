@@ -399,6 +399,12 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
      * (Should be even better with tableid+segmentid compound if dvbpsi would export segment id)
      * see TS 101 211, 4.1.4.2.1 */
     p_epg = vlc_epg_New( p_eit->i_table_id, p_eit->i_extension );
+    if( !p_epg )
+    {
+        dvbpsi_eit_delete( p_eit );
+        return;
+    }
+
     for( p_evt = p_eit->p_first_event; p_evt; p_evt = p_evt->p_next )
     {
         dvbpsi_descriptor_t *p_dr;
