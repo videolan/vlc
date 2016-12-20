@@ -91,7 +91,10 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
     struct priv *priv = tc->priv;
     priv->stex = SurfaceTexture_create(tc->parent, textures[0]);
     if (priv->stex == NULL)
+    {
+        msg_Err(tc->parent, "tc_anop_get_pool: SurfaceTexture_create failed");
         return NULL;
+    }
 
 #define FORCED_COUNT 31
     requested_count = FORCED_COUNT;
