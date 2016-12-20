@@ -69,9 +69,8 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     QLinearGradient gradient( mapped.topLeft(), mapped.bottomLeft() );
 
-    bool b_simultaneous = m_view->liveTime().isValid() && playsAt( m_view->liveTime() );
-    if ( program->getCurrent() == this || b_simultaneous )
-        gradientColor.setRgb( 244, 125, 0 , b_simultaneous ? 192 : 255 );
+    if ( program->getCurrent() == this )
+        gradientColor.setRgb( 244, 125, 0 , 255 );
     else
         gradientColor.setRgb( 201, 217, 242 );
 
