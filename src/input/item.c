@@ -1004,9 +1004,10 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
     free( psz_epg );
 signal:
 #endif
-
-    vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
-    vlc_event_send( &p_item->event_manager, &event );
+    do {
+        vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
+        vlc_event_send( &p_item->event_manager, &event );
+    } while(0);
 }
 
 void input_item_SetEpgOffline( input_item_t *p_item )
