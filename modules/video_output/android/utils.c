@@ -57,6 +57,7 @@ struct SurfaceTexture
 {
     JavaVM *p_jvm;
 
+    void *p_anw_dl;
     ptr_ANativeWindow_fromSurface pf_winFromSurface;
     ptr_ANativeWindow_release pf_winRelease;
 
@@ -756,15 +757,15 @@ SurfaceTexture_create(vlc_object_t *p_obj, int i_tex_name)
     if (p_stex == NULL)
         return NULL;
 
-    /* At this point, libandroid.so should be already be loaded */
-    p_stex->pf_winFromSurface = dlsym(RTLD_DEFAULT, "ANativeWindow_fromSurface");
-    p_stex->pf_winRelease = dlsym(RTLD_DEFAULT, "ANativeWindow_release");
-    if (p_stex->pf_winFromSurface == NULL || p_stex->pf_winRelease == NULL)
-    {
-        free(p_stex);
-        return NULL;
-    }
+    void *p_library = dlopen("libandroid.so", RTLD_NOW);
+    if (!p_library)
+        goto error;
 
+    p_stex->pf_winFromSurface = dlsym(p_library, "ANativeWindow_fromSurface");
+    p_stex->pf_winRelease = dlsym(p_library, "ANativeWindow_release");
+    if (p_stex->pf_winFromSurface == NULL || p_stex->pf_winRelease == NULL)
+        goto error;
+    p_stex->p_anw_dl = p_library;
     p_stex->p_jvm = p_jvm;
     p_stex->p_anw = NULL;
     p_stex->jsurface = NULL;
@@ -793,6 +794,8 @@ SurfaceTexture_create(vlc_object_t *p_obj, int i_tex_name)
 
 error:
     free(p_stex);
+    if (p_library != NULL)
+        dlclose(p_library);
     return NULL;
 }
 
@@ -818,6 +821,7 @@ SurfaceTexture_release(SurfaceTexture *p_stex)
                                             JNI_ABORT);
     (*p_env)->DeleteGlobalRef(p_env, p_stex->jtransform_mtx_array);
 
+    dlclose(p_stex->p_anw_dl);
     free(p_stex);
 }
 
