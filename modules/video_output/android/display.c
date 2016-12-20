@@ -34,6 +34,9 @@
 #include <vlc_picture_pool.h>
 #include <vlc_filter.h>
 
+#include <vlc_opengl.h> /* for ClearSurface */
+#include <GLES2/gl2.h>  /* for ClearSurface */
+
 #include <dlfcn.h>
 
 #include "display.h"
@@ -776,6 +779,27 @@ static int OpenOpaque(vlc_object_t *p_this)
     return OpenCommon(vd);
 }
 
+static void ClearSurface(vout_window_t *wnd)
+{
+    /* Clear the surface to black with OpenGL ES 2 */
+    vlc_gl_t *gl = vlc_gl_Create(wnd, VLC_OPENGL_ES2, "$gles2");
+    if (gl == NULL)
+        return;
+
+    if (vlc_gl_MakeCurrent(gl))
+        goto end;
+
+    vlc_gl_Resize(gl, 1, 1);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    vlc_gl_Swap(gl);
+
+    vlc_gl_ReleaseCurrent(gl);
+
+end:
+    vlc_gl_Destroy(gl);
+}
+
 static void Close(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
@@ -791,6 +815,10 @@ static void Close(vlc_object_t *p_this)
 
     if (sys->pool)
         picture_pool_Release(sys->pool);
+
+    if (sys->embed)
+        ClearSurface(sys->embed);
+
     if (sys->p_window)
         AndroidWindow_Destroy(vd, sys->p_window);
 
