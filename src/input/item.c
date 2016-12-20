@@ -932,7 +932,7 @@ void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_
     }
 }
 
-#define EPG_DEBUG
+//#define EPG_DEBUG
 void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
 {
     vlc_mutex_lock( &p_item->lock );
