@@ -575,7 +575,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                     vlc_epg_event_Delete( p_epgevt );
 
                 /* Update "now playing" field */
-                if( b_current_event )
+                if( b_current_event && p_epg->p_current == NULL )
                     vlc_epg_SetCurrent( p_epg, i_start );
             }
         }
