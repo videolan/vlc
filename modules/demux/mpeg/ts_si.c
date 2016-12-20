@@ -377,7 +377,6 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
     demux_sys_t        *p_sys = p_demux->p_sys;
     dvbpsi_eit_event_t *p_evt;
     vlc_epg_t *p_epg;
-    //bool b_current_following = (p_eit->i_table_id == 0x4e);
 
     msg_Dbg( p_demux, "EITCallBack called" );
     if( !p_eit->b_current_next )
@@ -594,7 +593,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 
     if( p_epg->i_event > 0 )
     {
-        if( p_epg->p_current )
+        if( p_epg->b_present && p_epg->p_current )
         {
             ts_pat_t *p_pat = ts_pid_Get(&p_sys->pids, 0)->u.p_pat;
             ts_pmt_t *p_pmt = ts_pat_Get_pmt(p_pat, p_eit->i_extension);
@@ -604,6 +603,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                 p_pmt->eit.i_event_length = p_epg->p_current->i_duration;
             }
         }
+        p_epg->b_present = (p_eit->i_table_id == 0x4e);
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, p_eit->i_extension, p_epg );
     }
     vlc_epg_Delete( p_epg );

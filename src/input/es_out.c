@@ -1363,10 +1363,10 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     input_SendEventMetaEpg( p_sys->p_input );
 
     /* Update now playing */
-    if( p_epg->p_current || p_epg->i_event == 0 )
+    if( p_epg->b_present && p_pgrm->p_meta &&
+       ( p_epg->p_current || p_epg->i_event == 0 ) )
     {
-        if( p_pgrm->p_meta )
-            vlc_meta_SetNowPlaying( p_pgrm->p_meta, NULL );
+        vlc_meta_SetNowPlaying( p_pgrm->p_meta, NULL );
     }
 
     vlc_mutex_lock( &p_item->lock );
@@ -1374,7 +1374,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     {
         const vlc_epg_t *p_tmp = p_item->pp_epg[i];
 
-        if( p_tmp->i_source_id == p_pgrm->i_id )
+        if( p_tmp->b_present && p_tmp->i_source_id == p_pgrm->i_id )
         {
             const char *psz_name = ( p_tmp->p_current ) ? p_tmp->p_current->psz_name : NULL;
             if( !p_pgrm->p_meta )

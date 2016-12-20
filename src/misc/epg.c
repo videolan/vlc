@@ -87,6 +87,7 @@ static void vlc_epg_Init( vlc_epg_t *p_epg, uint32_t i_id, uint16_t i_source_id 
     p_epg->i_source_id = i_source_id;
     p_epg->psz_name = NULL;
     p_epg->p_current = NULL;
+    p_epg->b_present = false;
     TAB_INIT( p_epg->i_event, p_epg->pp_event );
 }
 
@@ -270,6 +271,7 @@ vlc_epg_t * vlc_epg_Duplicate( const vlc_epg_t *p_src )
     if( p_epg )
     {
         p_epg->psz_name = ( p_src->psz_name ) ? strdup( p_src->psz_name ) : NULL;
+        p_epg->b_present = p_src->b_present;
         for( size_t i=0; i<p_src->i_event; i++ )
         {
             vlc_epg_event_t *p_dup = vlc_epg_event_Duplicate( p_src->pp_event[i] );

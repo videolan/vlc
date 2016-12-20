@@ -463,6 +463,9 @@ static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
         return;
     }
 
+    /* Use first table as present/following (not split like DVB) */
+    p_epg->b_present = (i_table_type == ATSC_TABLE_TYPE_EIT_0);
+
     if( !p_basectx->p_a65 && !(p_basectx->p_a65 = atsc_a65_handle_New( NULL )) )
         goto end;
 
@@ -486,7 +489,7 @@ static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
     }
 
     /* Update epg current time from system time ( required for pruning ) */
-    if( i_current_event_start_time )
+    if( p_epg->b_present && i_current_event_start_time )
     {
         vlc_epg_SetCurrent( p_epg, i_current_event_start_time );
         ts_pat_t *p_pat = ts_pid_Get(&p_demux->p_sys->pids, 0)->u.p_pat;
