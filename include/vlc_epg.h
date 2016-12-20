@@ -45,7 +45,7 @@ typedef struct
 typedef struct
 {
     char            *psz_name;
-    vlc_epg_event_t *p_current;  /* Can be null or should be the same than one of pp_event entry */
+    const vlc_epg_event_t *p_current; /* Can be null or should be the same than one of pp_event entry */
     uint32_t         i_id;       /* Unique identifier for this table / events (partial sets) */
     uint16_t         i_source_id;/* Channel / Program reference id this epg relates to */
 

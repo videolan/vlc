@@ -1386,23 +1386,25 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     }
     vlc_mutex_unlock( &p_item->lock );
 
-    const char *psz_nowplaying = p_pgrm->p_meta ?
-                                 vlc_meta_Get( p_pgrm->p_meta, vlc_meta_ESNowPlaying ) : NULL;
+    /* Update selected program input info */
     if( p_pgrm == p_sys->p_pgrm )
     {
+        const char *psz_nowplaying = p_pgrm->p_meta ?
+                                     vlc_meta_Get( p_pgrm->p_meta, vlc_meta_ESNowPlaying ) : NULL;
+
         input_item_SetESNowPlaying( input_priv(p_input)->p_item, psz_nowplaying );
         input_SendEventMeta( p_input );
-    }
 
-    if( psz_nowplaying )
-    {
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-            vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying), "%s", psz_nowplaying );
-    }
-    else
-    {
-        input_Control( p_input, INPUT_DEL_INFO, psz_cat,
-            vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying) );
+        if( psz_nowplaying )
+        {
+            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying), "%s", psz_nowplaying );
+        }
+        else
+        {
+            input_Control( p_input, INPUT_DEL_INFO, psz_cat,
+                vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying) );
+        }
     }
 
     free( psz_cat );
