@@ -935,30 +935,33 @@ void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_
 //#define EPG_DEBUG
 void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
 {
+    vlc_epg_t *p_epg = vlc_epg_Duplicate( p_update );
+    if( !p_epg )
+        return;
+
     vlc_mutex_lock( &p_item->lock );
 
     /* */
-    vlc_epg_t *p_epg = NULL;
+    vlc_epg_t **pp_epg = NULL;
     for( int i = 0; i < p_item->i_epg; i++ )
     {
         if( p_item->pp_epg[i]->i_source_id == p_update->i_source_id &&
             p_item->pp_epg[i]->i_id == p_update->i_id )
         {
-            p_epg = p_item->pp_epg[i];
+            pp_epg = &p_item->pp_epg[i];
             break;
         }
     }
 
-    /* */
-    if( !p_epg )
+    /* replace with new version */
+    if( pp_epg )
     {
-        p_epg = vlc_epg_Duplicate( p_update );
-        if( p_epg )
-            TAB_APPEND( p_item->i_epg, p_item->pp_epg, p_epg );
+        vlc_epg_Delete( *pp_epg );
+        *pp_epg = p_epg;
     }
     else
     {
-        vlc_epg_Merge( p_epg, p_update );
+        TAB_APPEND( p_item->i_epg, p_item->pp_epg, p_epg );
     }
 
     vlc_mutex_unlock( &p_item->lock );
@@ -1002,11 +1005,8 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
 signal:
 #endif
 
-    if( p_epg->i_event > 0 )
-    {
-        vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
-        vlc_event_send( &p_item->event_manager, &event );
-    }
+    vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
+    vlc_event_send( &p_item->event_manager, &event );
 }
 
 void input_item_SetEpgOffline( input_item_t *p_item )
