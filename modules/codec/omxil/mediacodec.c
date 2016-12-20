@@ -1067,9 +1067,6 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             i_width = p_out->conf.video.width;
             i_height = p_out->conf.video.height;
         }
-        bool b_video_changed =
-            (unsigned) i_width != p_dec->fmt_out.video.i_width ||
-            (unsigned) i_height != p_dec->fmt_out.video.i_height;
 
         p_dec->fmt_out.video.i_visible_width =
         p_dec->fmt_out.video.i_width = i_width;
@@ -1091,27 +1088,8 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_sys->video.i_stride = p_dec->fmt_out.video.i_width;
         }
 
-        if (p_sys->api->b_direct_rendering)
-        {
-            if (b_video_changed)
-            {
-                /* p_surface/p_jsurface can change when the vout is updated */
-                if (UpdateOpaqueVout(p_dec) != VLC_SUCCESS)
-                    return -1;
-
-                if (p_sys->api->set_output_surface(p_sys->api,
-                        p_sys->video.p_surface, p_sys->video.p_jsurface) != 0)
-                {
-                    /* Corner case: not able to update directly the new surface
-                     * to MediaCodec: ask for a restart */
-                    msg_Warn(p_dec, "The vout changed and the output surface "
-                             "could not be updated: restarting MediaCodec");
-                    p_sys->i_decode_flags |= DECODE_FLAG_RESTART;
-                    return 0;
-                }
-            }
-        }
-        else if (decoder_UpdateVideoFormat(p_dec) != 0)
+        if (!p_sys->api->b_direct_rendering
+         && decoder_UpdateVideoFormat(p_dec) != 0)
         {
             msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
             return -1;
