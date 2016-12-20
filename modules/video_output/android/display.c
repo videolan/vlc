@@ -803,7 +803,10 @@ static void Close(vlc_object_t *p_this)
         AndroidWindow_Destroy(vd, sys->p_sub_window);
 
     if (sys->embed)
+    {
+        AWindowHandler_setWindowLayout(sys->p_awh, 0, 0, 0, 0, 0, 0);
         vout_display_DeleteWindow(vd, sys->embed);
+    }
 
     free(sys);
 }
