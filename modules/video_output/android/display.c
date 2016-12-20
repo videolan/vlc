@@ -319,15 +319,14 @@ static void SetupPictureYV12(picture_t *p_picture, uint32_t i_in_stride)
 }
 
 static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
-                                            android_window *p_window,
-                                            bool b_clear)
+                                            android_window *p_window)
 {
     if (p_window->p_surface_priv) {
         sys->anwp.disconnect(p_window->p_surface_priv);
         p_window->p_surface_priv = NULL;
     }
     if (p_window->p_surface) {
-        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id, b_clear);
+        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id);
         p_window->p_surface = NULL;
     }
 }
@@ -406,9 +405,9 @@ error:
 }
 
 static void AndroidWindow_Destroy(vout_display_t *vd,
-                                  android_window *p_window, bool b_clear)
+                                  android_window *p_window)
 {
-    AndroidWindow_DisconnectSurface(vd->sys, p_window, b_clear);
+    AndroidWindow_DisconnectSurface(vd->sys, p_window);
     free(p_window);
 }
 
@@ -495,7 +494,7 @@ static int AndroidWindow_ConfigureJavaSurface(vout_display_sys_t *sys,
                                           p_window->i_android_hal) == VLC_SUCCESS)
     {
         *p_java_configured = true;
-        AndroidWindow_DisconnectSurface(sys, p_window, false);
+        AndroidWindow_DisconnectSurface(sys, p_window);
         if (AndroidWindow_ConnectSurface(sys, p_window) != 0)
             return -1;
     } else
@@ -793,7 +792,7 @@ static void Close(vlc_object_t *p_this)
     if (sys->pool)
         picture_pool_Release(sys->pool);
     if (sys->p_window)
-        AndroidWindow_Destroy(vd, sys->p_window, true);
+        AndroidWindow_Destroy(vd, sys->p_window);
 
     if (sys->p_sub_pic)
         picture_Release(sys->p_sub_pic);
@@ -801,7 +800,7 @@ static void Close(vlc_object_t *p_this)
         filter_DeleteBlend(sys->p_spu_blend);
     free(sys->p_sub_buffer_bounds);
     if (sys->p_sub_window)
-        AndroidWindow_Destroy(vd, sys->p_sub_window, false);
+        AndroidWindow_Destroy(vd, sys->p_sub_window);
 
     if (sys->embed)
         vout_display_DeleteWindow(vd, sys->embed);

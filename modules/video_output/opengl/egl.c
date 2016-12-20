@@ -193,7 +193,7 @@ static void Close (vlc_object_t *obj)
 #endif
 #ifdef USE_PLATFORM_ANDROID
     AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
-                                        AWindow_Video, false);
+                                        AWindow_Video);
 #endif
     free (sys);
 }

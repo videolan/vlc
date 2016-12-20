@@ -149,7 +149,7 @@ ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
  * Release the Video/Subtitles Surface/ANativeWindow
  */
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
-                                         enum AWindow_ID id, bool b_clear);
+                                         enum AWindow_ID id);
 /**
  * Pre-ICS hack of ANativeWindow_setBuffersGeometry
  *

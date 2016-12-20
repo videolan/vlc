@@ -554,30 +554,12 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
 
 static void
 AWindowHandler_releaseANativeWindowEnv(AWindowHandler *p_awh, JNIEnv *p_env,
-                                       enum AWindow_ID id, bool b_clear)
+                                       enum AWindow_ID id)
 {
     assert(id < AWindow_Max);
 
     if (p_awh->views[id].p_anw)
     {
-        /* Clear the surface starting Android M (anwp is NULL in that case).
-         * Don't do it earlier because MediaCodec may not be able to connect to
-         * the surface anymore. */
-        if (b_clear && p_awh->anw_api.setBuffersGeometry
-         && dlsym(RTLD_DEFAULT, "ANativeWindowPriv_connect") == NULL)
-        {
-            /* Clear the surface by displaying a 1x1 black RGB buffer */
-            ANativeWindow *p_anw = p_awh->views[id].p_anw;
-            p_awh->anw_api.setBuffersGeometry(p_anw, 1, 1,
-                                              WINDOW_FORMAT_RGB_565);
-            ANativeWindow_Buffer buf;
-            if (p_awh->anw_api.winLock(p_anw, &buf, NULL) == 0)
-            {
-                uint16_t *p_bit = buf.bits;
-                p_bit[0] = 0x0000;
-                p_awh->anw_api.unlockAndPost(p_anw);
-            }
-        }
         p_awh->pf_winRelease(p_awh->views[id].p_anw);
         p_awh->views[id].p_anw = NULL;
     }
@@ -598,10 +580,8 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
     {
         if (p_awh->event.b_registered)
             JNI_ANWCALL(CallBooleanMethod, setCallback, (jlong)0LL);
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video,
-                                               false);
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles,
-                                               false);
+        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
+        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
         (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
     }
 
@@ -672,11 +652,11 @@ AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id)
 
 
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
-                                         enum AWindow_ID id, bool b_clear)
+                                         enum AWindow_ID id)
 {
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (p_env)
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, id, b_clear);
+        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, id);
 }
 
 static inline AWindowHandler *jlong_AWindowHandler(jlong handle)
