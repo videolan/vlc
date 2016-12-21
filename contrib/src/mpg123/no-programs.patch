@@ -1,11 +1,16 @@
---- mpg123/Makefile.am	2014-09-28 23:27:28.000000000 +0200
-+++ mpg123.new/Makefile.am	2014-12-01 19:26:28.156173697 +0100
-@@ -6,7 +6,7 @@
- ## initially written by Nicholas J. Humfrey
- dist_man_MANS = man1/mpg123.1 man1/out123.1
+diff -Naur mpg123/src/Makemodule.am mpg123.new/src/Makemodule.am
+--- mpg123/src/Makemodule.am	2016-09-26 23:20:25.000000000 +0200
++++ mpg123.new/src/Makemodule.am	2016-12-21 17:40:12.917251022 +0100
+@@ -4,12 +4,6 @@
+ include src/libmpg123/Makemodule.am
+ include src/libout123/Makemodule.am
  
--SUBDIRS = src doc
-+SUBDIRS = src/libmpg123 doc
- DIST_SUBDIRS = src doc
- ACLOCAL_AMFLAGS = -I m4
- 
+-bin_PROGRAMS += \
+-  src/mpg123 \
+-  src/out123 \
+-  src/mpg123-id3dump \
+-  src/mpg123-strip
+-
+ src_mpg123_LDADD = \
+   src/compat/libcompat.la \
+   src/libmpg123/libmpg123.la \

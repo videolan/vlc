@@ -1,6 +1,6 @@
 # mpg123
-MPG123_VERSION := 1.22.4
-MPG123_URL := $(SF)/mpg123/$(MPG123_VERSION)/mpg123-$(MPG123_VERSION).tar.bz2
+MPG123_VERSION := 1.23.8
+MPG123_URL := $(SF)/mpg123/mpg123/$(MPG123_VERSION)/mpg123-$(MPG123_VERSION).tar.bz2
 
 PKGS += mpg123
 ifeq ($(call need_pkg,"mpg123"),)
@@ -8,6 +8,7 @@ PKGS_FOUND += mpg123
 endif
 
 MPG123CONF = $(HOSTCONF)
+MPG123CONF += --with-default-audio=dummy --enable-buffer=no
 
 ifdef HAVE_ANDROID
 ifeq ($(ANDROID_ABI), armeabi-v7a)
@@ -33,7 +34,6 @@ $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
 	$(APPLY) $(SRC)/mpg123/no-programs.patch
-	$(APPLY) $(SRC)/mpg123/mpg123-libm.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/mpg123/mpg123_android_off_t.patch
 endif
