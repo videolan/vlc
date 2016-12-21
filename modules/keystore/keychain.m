@@ -30,6 +30,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
+#import <Cocoa/Cocoa.h>
 
 static int Open(vlc_object_t *);
 
@@ -203,9 +204,15 @@ static NSString * ErrorForStatus(OSStatus status)
     return message;
 }
 
+#define OSX_MAVERICKS (NSAppKitVersionNumber >= 1265)
+extern const CFStringRef kSecAttrAccessible;
+
 static void SetAccessibilityForQuery(vlc_keystore *p_keystore,
                                      NSMutableDictionary *query)
 {
+    if (!OSX_MAVERICKS)
+	return;
+
     int accessibilityType = var_InheritInteger(p_keystore, "keychain-accessibility-type");
     switch (accessibilityType) {
         case 1:
