@@ -86,16 +86,12 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
 
             if( p_header[7]&0x80 )    /* has pts */
             {
-                if( i_header < 9 + 5 ||
-                   !ExtractPESTimestamp( &p_header[9], p_header[7] >> 6, pi_pts ) )
-                    return VLC_EGENERIC;
+                if( i_header >= 9 + 5 )
+                   (void) ExtractPESTimestamp( &p_header[9], p_header[7] >> 6, pi_pts );
 
-                if( p_header[7]&0x40 )    /* has dts */
-                {
-                    if( i_header < 14 + 5 ||
-                       !ExtractPESTimestamp( &p_header[14], 0x01, pi_dts ) )
-                        return VLC_EGENERIC;
-                }
+                if( ( p_header[7]&0x40 ) &&    /* has dts */
+                    i_header >= 14 + 5 )
+                   (void) ExtractPESTimestamp( &p_header[14], 0x01, pi_dts );
             }
         }
         else
@@ -133,15 +129,13 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
 
             if(  p_header[i_skip]&0x20 )
             {
-                if( i_header < i_skip + 5  ||
-                   !ExtractPESTimestamp( &p_header[i_skip], p_header[i_skip] >> 4, pi_pts ) )
-                    return VLC_EGENERIC;
+                if( i_header >= i_skip + 5 )
+                    (void) ExtractPESTimestamp( &p_header[i_skip], p_header[i_skip] >> 4, pi_pts );
 
-                if( p_header[i_skip]&0x10 )    /* has dts */
+                if( ( p_header[i_skip]&0x10 ) &&     /* has dts */
+                    i_header >= i_skip + 10 )
                 {
-                    if( i_header < i_skip + 10 ||
-                       !ExtractPESTimestamp( &p_header[i_skip+5], 0x01, pi_dts ) )
-                        return VLC_EGENERIC;
+                    (void) ExtractPESTimestamp( &p_header[i_skip+5], 0x01, pi_dts );
                     i_skip += 10;
                 }
                 else
