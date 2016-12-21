@@ -172,6 +172,9 @@
         // Attach pull-down menu
         [self.statusItem setMenu:_vlcStatusBarIconMenu];
 
+        // Visibility is 10.12+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
         if (OSX_SIERRA) {
             [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
             [self.statusItem setAutosaveName:@"statusBarItem"];
@@ -198,6 +201,7 @@
         [[NSStatusBar systemStatusBar] removeStatusItem:self.statusItem];
         self.statusItem = nil;
     }
+#pragma clang diagnostic pop
 }
 
 - (void)dealloc
