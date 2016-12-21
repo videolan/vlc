@@ -91,6 +91,16 @@ public:
                                 const QString& path = QString() );
     bool isDying() { return b_isDying; }
     static QString getDirectoryDialog( intf_thread_t *p_intf);
+    static QStringList getOpenFileNames( QWidget *parent = Q_NULLPTR,
+                                         const QString &caption = QString(),
+                                         const QString &dir = QString(),
+                                         const QString &filter = QString(),
+                                         QString *selectedFilter = Q_NULLPTR );
+    static QString getSaveFileName( QWidget *parent = Q_NULLPTR,
+                                    const QString &caption = QString(),
+                                    const QString &dir = QString(),
+                                    const QString &filter = QString(),
+                                    QString *selectedFilter = Q_NULLPTR );
 
 protected:
     QSignalMapper *menusMapper;

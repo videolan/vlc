@@ -220,7 +220,7 @@ void FileOpenPanel::dropEvent( QDropEvent *event )
 
 void FileOpenPanel::browseFile()
 {
-    QStringList files = QFileDialog::getOpenFileNames( this, qtr( "Select one or multiple files" ), p_intf->p_sys->filepath) ;
+    QStringList files = DialogsProvider::getOpenFileNames( this, qtr( "Select one or multiple files" ), p_intf->p_sys->filepath );
     foreach( const QString &file, files )
     {
         QListWidgetItem *item =
@@ -273,9 +273,15 @@ void FileOpenPanel::updateMRL()
         }
     else
     {
+#if HAS_QT52
+        QList<QUrl> urls = dialogBox->selectedUrls();
+        foreach( const QUrl &url, urls )
+            fileList.append( url.toEncoded() );
+#else
         fileList = dialogBox->selectedFiles();
         for( int i = 0; i < fileList.count(); i++ )
             fileList[i] = toURI( fileList[i] );
+#endif
     }
 
     /* Options */

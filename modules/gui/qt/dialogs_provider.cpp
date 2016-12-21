@@ -110,6 +110,40 @@ DialogsProvider::~DialogsProvider()
     delete miscPopupMenu;
 }
 
+QStringList DialogsProvider::getOpenFileNames( QWidget *parent,
+                                               const QString &caption,
+                                               const QString &dir,
+                                               const QString &filter,
+                                               QString *selectedFilter )
+{
+    QStringList files;
+
+#if HAS_QT52
+    QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
+
+    foreach( const QUrl url, urls )
+        files.append( url.toEncoded() );
+#else
+    files = QFileDialog::getOpenFileNames( parent, caption, dir, filter, selectedFilter );
+#endif
+
+    return files;
+}
+
+QString DialogsProvider::getSaveFileName( QWidget *parent,
+                                          const QString &caption,
+                                          const QString &dir,
+                                          const QString &filter,
+                                          QString *selectedFilter )
+{
+#if HAS_QT52
+    QUrl url = QFileDialog::getSaveFileUrl( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
+    return QString( url.toEncoded() );
+#else
+    return QFileDialog::getSaveFileName( parent, caption, dir, filter, selectedFilter );
+#endif
+}
+
 void DialogsProvider::quit()
 {
     b_isDying = true;
@@ -349,7 +383,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     /* Save */
     if( p_arg->b_save )
     {
-        QString file = QFileDialog::getSaveFileName( NULL,
+        QString file = getSaveFileName( NULL,
                                         qfu( p_arg->psz_title ),
                                         p_intf->p_sys->filepath, extensions );
         if( !file.isEmpty() )
@@ -363,7 +397,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     }
     else /* non-save mode */
     {
-        QStringList files = QFileDialog::getOpenFileNames( NULL,
+        QStringList files = getOpenFileNames( NULL,
                 qfu( p_arg->psz_title ), p_intf->p_sys->filepath,
                 extensions );
         p_arg->i_results = files.count();
@@ -462,7 +496,7 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
     ADD_EXT_FILTER( fileTypes, EXTENSIONS_ALL );
     fileTypes.replace( ";*", " *");
 
-    QStringList files = QFileDialog::getOpenFileNames( NULL,
+    QStringList files = getOpenFileNames( NULL,
         help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
         path.isEmpty() ? p_intf->p_sys->filepath : path,
         fileTypes );
@@ -616,10 +650,10 @@ void DialogsProvider::saveAPlaylist(playlist_t *p_playlist, playlist_item_t *p_n
     }
 
     QString selected;
-    QString file = QFileDialog::getSaveFileName( NULL,
-                                                 qtr( "Save playlist as..." ),
-                                                 p_intf->p_sys->filepath, filters.join( ";;" ),
-                                                 &selected );
+    QString file = getSaveFileName( NULL,
+                                    qtr( "Save playlist as..." ),
+                                    p_intf->p_sys->filepath, filters.join( ";;" ),
+                                    &selected );
     const char *psz_selected_module = NULL;
     const char *psz_last_playlist_ext = NULL;
 
