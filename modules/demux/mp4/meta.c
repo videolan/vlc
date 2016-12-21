@@ -287,23 +287,26 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
         }
 
         char* data = FromCharset( charset, p_peek, i_len );
-        if( meta_type )
+        if( data )
         {
-            vlc_meta_Set( p_meta_intl, *meta_type, data );
-
-            meta_key = vlc_meta_TypeToLocalizedString( *meta_type );
-            meta_type = NULL;
-        }
-        else
-        {
-            char* key;
-            if( asprintf( &key, "%s (%s)", meta_key, charset+11 ) != -1 )
+            if( meta_type )
             {
-                vlc_meta_AddExtra( p_meta_intl, key, data );
-                free( key );
+                vlc_meta_Set( p_meta_intl, *meta_type, data );
+
+                meta_key = vlc_meta_TypeToLocalizedString( *meta_type );
+                meta_type = NULL;
             }
+            else
+            {
+                char* key;
+                if( asprintf( &key, "%s (%s)", meta_key, charset+11 ) != -1 )
+                {
+                    vlc_meta_AddExtra( p_meta_intl, key, data );
+                    free( key );
+                }
+            }
+            free( data );
         }
-        free( data );
 
         p_peek += i_len;
         i_read -= i_len;
