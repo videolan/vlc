@@ -1161,20 +1161,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_HIDE_MOUSE:
     case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         return VLC_SUCCESS;
-    case VOUT_DISPLAY_RESET_PICTURES:
-    {
-        if (sys->p_window->b_opaque)
-            return VLC_EGENERIC;
-
-        msg_Dbg(vd, "resetting pictures");
-
-        if (sys->pool != NULL)
-        {
-            picture_pool_Release(sys->pool);
-            sys->pool = NULL;
-        }
-        return VLC_SUCCESS;
-    }
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     {
@@ -1203,6 +1189,8 @@ static int Control(vout_display_t *vd, int query, va_list args)
         FixSubtitleFormat(sys);
         return VLC_SUCCESS;
     }
+    case VOUT_DISPLAY_RESET_PICTURES:
+        vlc_assert_unreachable();
     default:
         msg_Warn(vd, "Unknown request in android-display: %d", query);
     case VOUT_DISPLAY_CHANGE_ZOOM:
