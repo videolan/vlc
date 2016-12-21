@@ -59,7 +59,7 @@
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 1090
+#if MAC_OS_X_VERSION_MIN_ALLOWED < 1090
 const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder = CFSTR("EnableHardwareAcceleratedVideoDecoder");
 const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
 #endif
