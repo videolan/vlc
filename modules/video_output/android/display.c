@@ -779,25 +779,49 @@ static int OpenOpaque(vlc_object_t *p_this)
     return OpenCommon(vd);
 }
 
-static void ClearSurface(vout_window_t *wnd)
+static void ClearSurface(vout_display_t *vd)
 {
-    /* Clear the surface to black with OpenGL ES 2 */
-    vlc_gl_t *gl = vlc_gl_Create(wnd, VLC_OPENGL_ES2, "$gles2");
-    if (gl == NULL)
-        return;
+    vout_display_sys_t *sys = vd->sys;
 
-    if (vlc_gl_MakeCurrent(gl))
-        goto end;
+    if (sys->p_window->b_opaque)
+    {
+        /* Clear the surface to black with OpenGL ES 2 */
+        vlc_gl_t *gl = vlc_gl_Create(sys->embed, VLC_OPENGL_ES2, "$gles2");
+        if (gl == NULL)
+            return;
 
-    vlc_gl_Resize(gl, 1, 1);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    vlc_gl_Swap(gl);
+        if (vlc_gl_MakeCurrent(gl))
+            goto end;
 
-    vlc_gl_ReleaseCurrent(gl);
+        vlc_gl_Resize(gl, 1, 1);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        vlc_gl_Swap(gl);
+
+        vlc_gl_ReleaseCurrent(gl);
 
 end:
-    vlc_gl_Destroy(gl);
+        vlc_gl_Destroy(gl);
+    }
+    else
+    {
+        android_window *p_window = sys->p_window;
+        ANativeWindow_Buffer buf;
+
+        if (p_window->p_surface_priv) {
+            sys->anwp.disconnect(p_window->p_surface_priv);
+            p_window->p_surface_priv = NULL;
+        }
+
+        if (sys->anw->setBuffersGeometry(p_window->p_surface, 1, 1,
+                                         WINDOW_FORMAT_RGB_565) == 0
+          && sys->anw->winLock(p_window->p_surface, &buf, NULL) == 0)
+        {
+            uint16_t *p_bit = buf.bits;
+            p_bit[0] = 0x0000;
+            sys->anw->unlockAndPost(p_window->p_surface);
+        }
+    }
 }
 
 static void Close(vlc_object_t *p_this)
@@ -816,11 +840,11 @@ static void Close(vlc_object_t *p_this)
     if (sys->pool)
         picture_pool_Release(sys->pool);
 
-    if (sys->embed)
-        ClearSurface(sys->embed);
-
     if (sys->p_window)
+    {
+        ClearSurface(vd);
         AndroidWindow_Destroy(vd, sys->p_window);
+    }
 
     if (sys->p_sub_pic)
         picture_Release(sys->p_sub_pic);
