@@ -303,7 +303,7 @@ static int Open(vlc_object_t *p_this)
 
         if ( ivideo < [myVideoDevices count] )
         {
-            p_sys->device = CFBridgingRetain(myVideoDevices[ivideo]);
+            p_sys->device = CFBridgingRetain([myVideoDevices objectAtIndex:ivideo]);
         }
         else
         {
