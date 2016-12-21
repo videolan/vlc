@@ -1,7 +1,7 @@
 notifydir = $(pluginsdir)/notify
 
 libosx_notifications_plugin_la_SOURCES = notify/osx_notifications.m
-libosx_notifications_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) $(OBJCFLAGS_osx_notifications)
+libosx_notifications_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) $(OBJCFLAGS_osx_notifications) -mmacosx-version-min=10.8
 libosx_notifications_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(notifydir)' -Wl,-framework,AppKit
 libosx_notifications_plugin_la_LIBADD = $(LIBS_osx_notifications)
 libosx_notifications_plugin_la_LIBTOOLFLAGS = --tag=CC
