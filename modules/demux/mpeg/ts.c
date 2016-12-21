@@ -174,8 +174,8 @@ static inline int PIDGet( block_t *p )
 }
 static mtime_t GetPCR( const block_t * );
 
-static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt );
-static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk, size_t, bool );
+static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, int * );
+static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk, size_t );
 static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_prg, mtime_t i_pcr );
 
 static block_t* ReadTSPacket( demux_t *p_demux );
@@ -602,6 +602,7 @@ static int Demux( demux_t *p_demux )
     for( unsigned i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
     {
         bool         b_frame = false;
+        int          i_header = 0;
         block_t     *p_pkt;
         if( !(p_pkt = ReadTSPacket( p_demux )) )
         {
@@ -650,6 +651,11 @@ static int Demux( demux_t *p_demux )
                 p_sys->b_valid_scrambling = true;
         }
 
+        /* Drop duplicates and invalid (DOES NOT drop corrupted) */
+        p_pkt = ProcessTSPacket( p_demux, p_pid, p_pkt, &i_header );
+        if( !p_pkt )
+            continue;
+
         /* Adaptation field cannot be scrambled */
         mtime_t i_pcr = GetPCR( p_pkt );
         if( i_pcr > VLC_TS_INVALID )
@@ -696,7 +702,21 @@ static int Demux( demux_t *p_demux )
                 continue;
             }
 
-            b_frame = ProcessTSPacket( p_demux, p_pid, p_pkt );
+            if( p_pid->u.p_pes->transport == TS_TRANSPORT_PES )
+            {
+                b_frame = GatherPESData( p_demux, p_pid, p_pkt, i_header );
+            }
+            else if( p_pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS &&
+                    !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
+            {
+                ts_sections_processor_Push( p_pid->u.p_pes->p_sections_proc, p_pkt );
+                b_frame = true;
+            }
+            else // pid->u.p_pes->transport == TS_TRANSPORT_IGNORE
+            {
+                block_Release( p_pkt );
+            }
+
             break;
 
         case TYPE_SI:
@@ -2335,21 +2355,16 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
     }
 }
 
-static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
+static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, int *pi_skip )
 {
     const uint8_t *p = p_pkt->p_buffer;
-    const bool b_unit_start = p[1]&0x40;
     const bool b_adaptation = p[3]&0x20;
     const bool b_payload    = p[3]&0x10;
     const int  i_cc         = p[3]&0x0f; /* continuity counter */
     bool       b_discontinuity = false;  /* discontinuity */
 
     /* transport_scrambling_control is ignored */
-    int         i_skip = 0;
-    bool        b_ret  = false;
-
-   assert(pid->type == TYPE_PES);
-   ts_pes_t *p_pes = pid->u.p_pes;
+    *pi_skip = 4;
 
 #if 0
     msg_Dbg( p_demux, "pid=%d unit_start=%d adaptation=%d payload=%d "
@@ -2375,21 +2390,23 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
         }
     }
 
-    if( !b_adaptation )
-    {
-        /* We don't have any adaptation_field, so payload starts
-         * immediately after the 4 byte TS header */
-        i_skip = 4;
-    }
-    else
+    /* We don't have any adaptation_field, so payload starts
+     * immediately after the 4 byte TS header */
+    if( b_adaptation )
     {
         /* p[4] is adaptation_field_length minus one */
-        i_skip = 5 + p[4];
-        if( p[4] > 0 )
+        *pi_skip += 1 + p[4];
+        if( p[4] + 5 > 188 /* adaptation field only == 188 */ )
+        {
+            /* Broken is broken */
+            block_Release( p_pkt );
+            return NULL;
+        }
+        else if( p[4] > 0 )
         {
             /* discontinuity indicator found in stream */
             b_discontinuity = (p[5]&0x80) ? true : false;
-            if( b_discontinuity && p_pes->gather.p_data )
+            if( b_discontinuity )
             {
                 msg_Warn( p_demux, "discontinuity indicator (pid=%d) ",
                             pid->i_pid );
@@ -2426,8 +2443,9 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
         else if( i_diff == 0 && pid->i_dup == 0 && b_payload )
         {
             /* Discard duplicated payload 2.4.3.3 */
-            i_skip = 188;
             pid->i_dup++;
+            block_Release( p_pkt );
+            return NULL;
         }
         else if( i_diff != 0 && !b_discontinuity )
         {
@@ -2436,39 +2454,17 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
 
             pid->i_cc = i_cc;
             pid->i_dup = 0;
-            if( p_pes->gather.p_data &&
-                p_pes->p_es->fmt.i_cat != VIDEO_ES &&
-                p_pes->p_es->fmt.i_cat != AUDIO_ES )
-            {
-                /* Small audio/video artifacts are usually better than
-                 * dropping full frames */
-                p_pes->gather.p_data->i_flags |= BLOCK_FLAG_CORRUPTED;
-            }
+            p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
     }
 
-    if( i_skip >= 188 ||
-        unlikely(!(b_payload || b_adaptation)) ) /* Invalid */
+    if( unlikely(!(b_payload || b_adaptation)) ) /* Invalid, ignore */
     {
         block_Release( p_pkt );
-        return b_ret;
+        return NULL;
     }
 
-    if( pid->u.p_pes->transport == TS_TRANSPORT_PES )
-    {
-        return GatherPESData( p_demux, pid, p_pkt, i_skip, b_unit_start );
-    }
-    else if( pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS &&
-            !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
-    {
-        ts_sections_processor_Push( pid->u.p_pes->p_sections_proc, p_pkt );
-        return true;
-    }
-    else // pid->u.p_pes->transport == TS_TRANSPORT_IGNORE
-    {
-        block_Release( p_pkt );
-        return true;
-    }
+    return p_pkt;
 }
 
 /* Avoids largest memcpy */
@@ -2535,9 +2531,9 @@ static bool MayHaveStartCodeOnEnd( const uint8_t *p_buf, size_t i_buf )
     return !( *(--p_buf) > 1 || *(--p_buf) > 0 || *(--p_buf) > 0 );
 }
 
-static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt,
-                           size_t i_skip, bool b_unit_start )
+static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size_t i_skip )
 {
+    const bool b_unit_start = p_pkt->p_buffer[1]&0x40;
     bool b_ret = false;
     ts_pes_t *p_pes = pid->u.p_pes;
 
@@ -2555,6 +2551,19 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt,
         b_aligned_ts_payload = false;
         b_single_payload = false;
 
+    }
+
+    /* Data discontinuity, we need to drop or output currently
+     * gathered data as it can't match the target size or can
+     * have dropped next sync code */
+    if( p_pkt->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    {
+        p_pes->gather.i_saved = 0;
+        /* Propagate to output block to notify packetizers/decoders */
+        if( p_pes->gather.p_data )
+            p_pes->gather.p_data->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+        /* Flush/output current */
+        b_ret |= PushPESBlock( p_demux, pid, NULL, true );
     }
 
     if ( unlikely(p_pes->gather.i_saved > 0) )
