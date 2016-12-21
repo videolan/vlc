@@ -375,7 +375,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
             return 0;
         }
 
-        SecKeychainItemRef itemRef = (__bridge SecKeychainItemRef)(listOfResults[i]);
+        SecKeychainItemRef itemRef = (__bridge SecKeychainItemRef)([listOfResults objectAtIndex:i]);
 
         SecKeychainAttributeInfo attrInfo;
 
@@ -453,7 +453,7 @@ static unsigned int Remove(vlc_keystore *p_keystore,
         matchCount = matches.count;
 
         for (NSUInteger x = 0; x < matchCount; x++) {
-            status = SecKeychainItemDelete((__bridge SecKeychainItemRef _Nonnull)(matches[x]));
+            status = SecKeychainItemDelete((__bridge SecKeychainItemRef _Nonnull)([matches objectAtIndex:x]));
             if (status != noErr) {
                 msg_Err(p_keystore, "Deletion error %i (%s)", status , [ErrorForStatus(status) UTF8String]);
                 failed = YES;
