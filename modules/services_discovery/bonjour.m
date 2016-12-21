@@ -177,24 +177,24 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
     msg_Info(_p_this, "starting discovery");
     for (NSDictionary *protocol in VLCSupportedProtocols) {
-        msg_Info(_p_this, "looking up %s", [protocol[VLCBonjourProtocolName] UTF8String]);
+        msg_Info(_p_this, "looking up %s", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
 
         /* Only discover services if we actually have a module that can handle those */
-        if (!module_exists([protocol[VLCBonjourProtocolName] UTF8String]) && !_isRendererDiscovery) {
-            msg_Info(_p_this, "no module for %s, skipping", [protocol[VLCBonjourProtocolName] UTF8String]);
+        if (!module_exists([[protocol objectForKey: VLCBonjourProtocolName] UTF8String]) && !_isRendererDiscovery) {
+            msg_Info(_p_this, "no module for %s, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
             continue;
         }
 
         /* Only discover hosts it they match the current mode (renderer or service) */
-        if ([protocol[VLCBonjourIsRenderer] boolValue] != _isRendererDiscovery) {
-            msg_Info(_p_this, "%s does not match current discovery mode, skipping", [protocol[VLCBonjourProtocolName] UTF8String]);
+        if ([[protocol objectForKey: VLCBonjourIsRenderer] boolValue] != _isRendererDiscovery) {
+            msg_Info(_p_this, "%s does not match current discovery mode, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
             continue;
         }
 
         NSNetServiceBrowser *serviceBrowser = [[NSNetServiceBrowser alloc] init];
         [serviceBrowser setDelegate:self];
-        msg_Info(_p_this, "starting discovery for type %s", [protocol[VLCBonjourProtocolServiceName] UTF8String]);
-        [serviceBrowser searchForServicesOfType:protocol[VLCBonjourProtocolServiceName] inDomain:@"local."];
+        msg_Info(_p_this, "starting discovery for type %s", [[protocol objectForKey: VLCBonjourProtocolServiceName] UTF8String]);
+        [serviceBrowser searchForServicesOfType:[protocol objectForKey: VLCBonjourProtocolServiceName] inDomain:@"local."];
         [discoverers addObject:serviceBrowser];
         [protocols addObject:protocol];
     }
@@ -254,9 +254,9 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
         [_resolvedNetServices removeObjectAtIndex:index];
 
         if (_isRendererDiscovery) {
-            [self removeRawRendererItem:_inputItemsForNetServices[index]];
+            [self removeRawRendererItem:[_inputItemsForNetServices objectAtIndex:index]];
         } else {
-            [self removeRawInputItem:_inputItemsForNetServices[index]];
+            [self removeRawInputItem:[_inputItemsForNetServices objectAtIndex:index]];
         }
 
         /* Remove item pointer from our lookup array */
@@ -271,8 +271,8 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
         NSString *serviceType = aNetService.type;
         NSString *protocol = nil;
         for (NSDictionary *protocolDefinition in _activeProtocols) {
-            if ([serviceType isEqualToString:protocolDefinition[VLCBonjourProtocolServiceName]]) {
-                protocol = protocolDefinition[VLCBonjourProtocolName];
+            if ([serviceType isEqualToString:[protocolDefinition objectForKey:VLCBonjourProtocolServiceName]]) {
+                protocol = [protocolDefinition objectForKey:VLCBonjourProtocolName];
             }
         }
 
