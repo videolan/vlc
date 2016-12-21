@@ -144,7 +144,7 @@ int vasprintf (char **, const char *, va_list);
 
 /* string.h */
 #ifndef HAVE_FFSLL
-int ffsll(unsigned long long);
+int ffsll(long long);
 #endif
 
 #ifndef HAVE_MEMRCHR

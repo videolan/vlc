@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ffsllp.c: GNU ffsll() replacement
+ * ffsll.c: GNU ffsll() replacement
  *****************************************************************************
  * Copyright © 2015 Rémi Denis-Courmont
  *
@@ -24,7 +24,7 @@
 
 #include <limits.h>
 
-int ffsll(unsigned long long x)
+int ffsll(long long x)
 {
     for (unsigned i = 0; i < sizeof (x) * CHAR_BIT; i++)
         if ((x >> i) & 1)
