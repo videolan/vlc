@@ -98,7 +98,7 @@ else
 VPX_CONF += --extra-cflags="-mstackrealign"
 endif
 ifdef HAVE_MACOSX
-VPX_CONF += --sdk-path=$(MACOSX_SDK)
+VPX_CONF += --sdk-path=$(MACOSX_SDK) --extra-cflags="$(EXTRA_CFLAGS)"
 endif
 ifdef HAVE_IOS
 VPX_CONF += --sdk-path=$(IOS_SDK) --enable-vp8-decoder
