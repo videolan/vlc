@@ -312,6 +312,7 @@ codec_LTLIBRARIES += $(LTLIBoggspots)
 libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h codec/videotoolbox.m \
                                     packetizer/h264_nal.c packetizer/h264_nal.h \
                                     packetizer/hxxx_nal.c packetizer/hxxx_nal.h
+libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_CFLAGS) -mmacosx-version-min=10.8
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
 codec_LTLIBRARIES += $(LTLIBvideotoolbox)
