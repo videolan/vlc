@@ -101,7 +101,7 @@ ifdef HAVE_MACOSX
 VPX_CONF += --sdk-path=$(MACOSX_SDK)
 endif
 ifdef HAVE_IOS
-VPX_CONF += --sdk-path=$(IOS_SDK) --enable-vp8-decoder --disable-vp8-encoder --disable-vp9-encoder
+VPX_CONF += --sdk-path=$(IOS_SDK) --enable-vp8-decoder
 ifdef HAVE_TVOS
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) -mtvos-version-min=9.0
 else
