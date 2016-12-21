@@ -660,6 +660,15 @@ static int OpenCommon(vout_display_t *vd)
     if (embed == NULL)
         return VLC_EGENERIC;
     assert(embed->handle.anativewindow);
+    AWindowHandler *p_awh = embed->handle.anativewindow;
+
+    if (!AWindowHandler_canSetVideoLayout(p_awh))
+    {
+        /* It's better to use gles2 if we are not able to change the video
+         * layout */
+        vout_display_DeleteWindow(vd, embed);
+        return VLC_EGENERIC;
+    }
 
     /* Allocate structure */
     vd->sys = sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
@@ -670,7 +679,7 @@ static int OpenCommon(vout_display_t *vd)
     }
 
     sys->embed = embed;
-    sys->p_awh = embed->handle.anativewindow;
+    sys->p_awh = p_awh;
     sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
 
 #ifdef USE_ANWP
@@ -735,6 +744,12 @@ static int OpenCommon(vout_display_t *vd)
 
         /* Export the subpicture capability of this vout. */
         vd->info.subpicture_chromas = subpicture_chromas;
+    }
+    else if (sys->p_window->b_opaque)
+    {
+        msg_Warn(vd, "cannot blend subtitles with an opaque surface, "
+                     "trying next vout");
+        goto error;
     }
 
     /* Setup vout_display */

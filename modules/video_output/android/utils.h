@@ -162,7 +162,14 @@ int AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
                                       int i_width, int i_height, int i_format);
 
 /**
+ * Returns true if the video layout can be changed
+ */
+bool AWindowHandler_canSetVideoLayout(AWindowHandler *p_awh);
+
+/**
  * Set the video layout
+ *
+ * Should be called only if AWindowHandler_canSetVideoLayout() returned true
  */
 int AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
                                   int i_width, int i_height,

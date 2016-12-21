@@ -48,9 +48,9 @@ struct AWindowHandler
     native_window_priv_api_t anwpriv_api;
 
     struct {
-        bool b_registered;
         awh_events_t cb;
     } event;
+    bool b_has_video_layout_listener;
 };
 
 struct SurfaceTexture
@@ -75,7 +75,8 @@ static struct
         jclass clazz;
         jmethodID getVideoSurface;
         jmethodID getSubtitlesSurface;
-        jmethodID setCallback;
+        jmethodID registerNative;
+        jmethodID unregisterNative;
         jmethodID setBuffersGeometry;
         jmethodID setVideoLayout;
     } AndroidNativeWindow;
@@ -451,8 +452,10 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
                "getVideoSurface", "()Landroid/view/Surface;", true);
     GET_METHOD(AndroidNativeWindow.getSubtitlesSurface,
                "getSubtitlesSurface", "()Landroid/view/Surface;", true);
-    GET_METHOD(AndroidNativeWindow.setCallback,
-               "setCallback", "(J)Z", true);
+    GET_METHOD(AndroidNativeWindow.registerNative,
+               "registerNative", "(J)I", true);
+    GET_METHOD(AndroidNativeWindow.unregisterNative,
+               "unregisterNative", "()V", true);
     GET_METHOD(AndroidNativeWindow.setBuffersGeometry,
                "setBuffersGeometry", "(Landroid/view/Surface;III)Z", true);
     GET_METHOD(AndroidNativeWindow.setVideoLayout,
@@ -460,22 +463,19 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
 
     GET_SMETHOD(SurfaceTextureThread.create,
                 "SurfaceTextureThread_create",
-                "(I)Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;", false);
-    if (jfields.SurfaceTextureThread.create != NULL)
-    {
-        GET_SMETHOD(SurfaceTextureThread.release,
-                    "SurfaceTextureThread_release",
-                    "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;)V",
-                    true);
-        GET_SMETHOD(SurfaceTextureThread.waitAndUpdateTexImage,
-                    "SurfaceTextureThread_waitAndUpdateTexImage",
-                    "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;[F)Z",
-                    true);
-        GET_SMETHOD(SurfaceTextureThread.getSurface,
-                    "SurfaceTextureThread_getSurface",
-                    "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;)"
-                    "Landroid/view/Surface;", true);
-    }
+                "(I)Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;", true);
+    GET_SMETHOD(SurfaceTextureThread.release,
+                "SurfaceTextureThread_release",
+                "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;)V",
+                true);
+    GET_SMETHOD(SurfaceTextureThread.waitAndUpdateTexImage,
+                "SurfaceTextureThread_waitAndUpdateTexImage",
+                "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;[F)Z",
+                true);
+    GET_SMETHOD(SurfaceTextureThread.getSurface,
+                "SurfaceTextureThread_getSurface",
+                "(Lorg/videolan/libvlc/AWindow$SurfaceTextureThread;)"
+                "Landroid/view/Surface;", true);
 
     if ((*env)->RegisterNatives(env, clazz, jni_callbacks, 2) < 0)
     {
@@ -490,7 +490,6 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
 #undef CHECK_EXCEPTION
 
     i_init_state = 1;
-    msg_Dbg(p_obj, "InitJNIFields success");
 end:
     ret = i_init_state == 1 ? VLC_SUCCESS : VLC_EGENERIC;
     if (ret)
@@ -515,6 +514,9 @@ AWindowHandler_getEnv(AWindowHandler *p_awh)
 AWindowHandler *
 AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
 {
+#define AWINDOW_REGISTER_FLAGS_SUCCESS 0x1
+#define AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER 0x2
+
     AWindowHandler *p_awh;
     JNIEnv *p_env;
     JavaVM *p_jvm = var_InheritAddress(wnd, "android-jvm");
@@ -538,16 +540,31 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
         msg_Err(wnd, "InitJNIFields failed");
         return NULL;
     }
+    msg_Dbg(wnd, "InitJNIFields success");
+
     p_awh = calloc(1, sizeof(AWindowHandler));
     if (!p_awh)
         return NULL;
+
     p_awh->p_jvm = p_jvm;
     p_awh->jobj = (*p_env)->NewGlobalRef(p_env, jobj);
-    LoadNativeWindowAPI(p_awh);
+
     p_awh->wnd = wnd;
     p_awh->event.cb = *p_events;
-    p_awh->event.b_registered = JNI_ANWCALL(CallBooleanMethod, setCallback,
-                                            (jlong)(intptr_t)p_awh);
+
+    const jint flags = JNI_ANWCALL(CallIntMethod, registerNative,
+                                   (jlong)(intptr_t)p_awh);
+    if ((flags & AWINDOW_REGISTER_FLAGS_SUCCESS) == 0)
+    {
+        msg_Err(wnd, "AWindow already registered");
+        (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
+        free(p_awh);
+        return NULL;
+    }
+    LoadNativeWindowAPI(p_awh);
+
+    p_awh->b_has_video_layout_listener =
+        flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER;
 
     return p_awh;
 }
@@ -578,8 +595,7 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
 
     if (p_env)
     {
-        if (p_awh->event.b_registered)
-            JNI_ANWCALL(CallBooleanMethod, setCallback, (jlong)0LL);
+        JNI_ANWCALL(CallVoidMethod, unregisterNative);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
         (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
@@ -704,12 +720,19 @@ AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
                                                            : VLC_EGENERIC;
 }
 
+bool
+AWindowHandler_canSetVideoLayout(AWindowHandler *p_awh)
+{
+    return p_awh->b_has_video_layout_listener;
+}
+
 int
 AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
                               int i_width, int i_height,
                               int i_visible_width, int i_visible_height,
                               int i_sar_num, int i_sar_den)
 {
+    assert(p_awh->b_has_video_layout_listener);
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (!p_env)
         return VLC_EGENERIC;
