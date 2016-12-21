@@ -139,14 +139,14 @@ static int RenderText(filter_t *p_filter,
                     NSRange range = NSMakeRange(0, 2);
 
                     for (NSUInteger i = 0; i < count; i++) {
-                        NSDictionary *voiceAttributes = [NSSpeechSynthesizer attributesForVoice:voices[i]];
-                        NSString *voiceLanguage = voiceAttributes[@"VoiceLanguage"];
+                        NSDictionary *voiceAttributes = [NSSpeechSynthesizer attributesForVoice: [voices objectAtIndex:i]];
+                        NSString *voiceLanguage = [voiceAttributes objectForKey:@"VoiceLanguage"];
                         if ([p_sys->currentLocale isEqualToString:[voiceLanguage substringWithRange:range]]) {
-                            NSString *voiceName = voiceAttributes[@"VoiceName"];
+                            NSString *voiceName = [voiceAttributes objectForKey:@"VoiceName"];
                             msg_Dbg(p_filter, "switched to voice '%s'", [voiceName UTF8String]);
                             if ([voiceName isEqualToString:@"Agnes"] || [voiceName isEqualToString:@"Albert"])
                                 continue;
-                            [p_sys->speechSynthesizer setVoice:voices[i]];
+                            [p_sys->speechSynthesizer setVoice: [voices objectAtIndex:i]];
                             break;
                         }
                     }
