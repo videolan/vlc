@@ -540,9 +540,12 @@ static void OpenglSwap (vlc_gl_t *gl)
     [self setWantsBestResolutionOpenGLSurface:YES];
 
     /* request our screen's HDR mode (introduced in OS X 10.11) */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
     if ([self respondsToSelector:@selector(setWantsExtendedDynamicRangeOpenGLSurface:)]) {
         [self setWantsExtendedDynamicRangeOpenGLSurface:YES];
     }
+#pragma clang diagnostic pop
 
     /* Swap buffers only during the vertical retrace of the monitor.
      http://developer.apple.com/documentation/GraphicsImaging/
