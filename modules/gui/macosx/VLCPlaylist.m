@@ -161,7 +161,7 @@
     NSArray *columns = [_outlineView tableColumns];
     NSUInteger count = columns.count;
     for (NSUInteger x = 0; x < count; x++)
-        [[columns[x] dataCell] setFont:fontToUse];
+        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
     [_outlineView setRowHeight:rowHeight];
 }
 
@@ -208,14 +208,14 @@
     NSString * column;
 
     for (NSUInteger i = 0; i < columnCount; i++) {
-        column = [columnArray[i] firstObject];
+        column = [[columnArray objectAtIndex:i] firstObject];
         if ([column isEqualToString:@"status"])
             continue;
 
         if(![self setPlaylistColumnTableState: NSOnState forColumn:column])
             continue;
 
-        [[_outlineView tableColumnWithIdentifier: column] setWidth: [columnArray[i][1] floatValue]];
+        [[_outlineView tableColumnWithIdentifier: column] setWidth: [[[columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
     }
 }
 
@@ -556,7 +556,7 @@
     NSUInteger columnCount = [columns count];
     NSTableColumn *currentColumn;
     for (NSUInteger i = 0; i < columnCount; i++) {
-        currentColumn = columns[i];
+        currentColumn = [columns objectAtIndex:i];
         [arrayToSave addObject:[NSArray arrayWithObjects:[currentColumn identifier], [NSNumber numberWithFloat:[currentColumn width]], nil]];
     }
     [[NSUserDefaults standardUserDefaults] setObject:arrayToSave forKey:@"PlaylistColumnSelection"];
@@ -617,7 +617,7 @@
     if (optionsArray) {
         NSUInteger count = [optionsArray count];
         for (NSUInteger i = 0; i < count; i++)
-            input_item_AddOption(p_input, [optionsArray[i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+            input_item_AddOption(p_input, [[optionsArray objectAtIndex:i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
     }
 
     /* Recent documents menu */
@@ -707,7 +707,7 @@
     int i_current_offset = 0;
     for (NSUInteger i = 0; i < count; ++i) {
 
-        NSDictionary *o_current_item = array[i];
+        NSDictionary *o_current_item = [array objectAtIndex:i];
         input_item_t *p_input = [self createItem: o_current_item];
         if (!p_input)
             continue;
@@ -807,7 +807,7 @@
     /* Clear indications of any existing column sorting */
     NSUInteger count = [[_outlineView tableColumns] count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        [_outlineView setIndicatorImage:nil inTableColumn: [_outlineView tableColumns][i]];
+        [_outlineView setIndicatorImage:nil inTableColumn: [[_outlineView tableColumns] objectAtIndex:i]];
 
     [_outlineView setHighlightedTableColumn:nil];
     _sortTableColumn = aTableColumn;

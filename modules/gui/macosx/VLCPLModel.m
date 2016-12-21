@@ -273,7 +273,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 - (void)VLCPLItemAppended:(NSArray *)valueArray
 {
     int i_node = [[valueArray firstObject] intValue];
-    int i_item = [valueArray[1] intValue];
+    int i_item = [[valueArray objectAtIndex:1] intValue];
 
     [self addItem:i_item withParentNode:i_node];
 
