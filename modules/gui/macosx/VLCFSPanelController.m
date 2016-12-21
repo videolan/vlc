@@ -376,6 +376,9 @@
 #pragma mark Helpers
 
 #ifdef MAC_OS_X_VERSION_10_10
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+
 /**
  Create an image mask for the NSVisualEffectView
  with rounded corners in the given rect
@@ -389,8 +392,6 @@
  
  \param bounds  The rect for the image size
  */
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 - (NSImage *)maskImageWithBounds:(NSRect)bounds
 {
     static const float radius = 8.0;
