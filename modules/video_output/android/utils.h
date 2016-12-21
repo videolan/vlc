@@ -162,12 +162,12 @@ int AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
                                       int i_width, int i_height, int i_format);
 
 /**
- * Set the window layout
+ * Set the video layout
  */
-int AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
-                                   int i_width, int i_height,
-                                   int i_visible_width, int i_visible_height,
-                                   int i_sar_num, int i_sar_den);
+int AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
+                                  int i_width, int i_height,
+                                  int i_visible_width, int i_visible_height,
+                                  int i_sar_num, int i_sar_den);
 
 /**
  * Construct a new Java SurfaceTexture to stream images to a given OpenGL

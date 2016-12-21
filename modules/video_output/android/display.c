@@ -158,8 +158,8 @@ static inline int ChromaToAndroidHal(vlc_fourcc_t i_chroma)
     }
 }
 
-static int UpdateWindowSize(vout_display_sys_t *sys, video_format_t *p_fmt,
-                            bool b_cropped)
+static int UpdateVideoSize(vout_display_sys_t *sys, video_format_t *p_fmt,
+                           bool b_cropped)
 {
     unsigned int i_width, i_height;
     unsigned int i_sar_num = 1, i_sar_den = 1;
@@ -179,10 +179,10 @@ static int UpdateWindowSize(vout_display_sys_t *sys, video_format_t *p_fmt,
         i_height = rot_fmt.i_height;
     }
 
-    AWindowHandler_setWindowLayout(sys->p_awh, i_width, i_height,
-                                   rot_fmt.i_visible_width,
-                                   rot_fmt.i_visible_height,
-                                   i_sar_num, i_sar_den);
+    AWindowHandler_setVideoLayout(sys->p_awh, i_width, i_height,
+                                  rot_fmt.i_visible_width,
+                                  rot_fmt.i_visible_height,
+                                  i_sar_num, i_sar_den);
     return 0;
 }
 
@@ -856,7 +856,7 @@ static void Close(vlc_object_t *p_this)
 
     if (sys->embed)
     {
-        AWindowHandler_setWindowLayout(sys->p_awh, 0, 0, 0, 0, 0, 0);
+        AWindowHandler_setVideoLayout(sys->p_awh, 0, 0, 0, 0, 0, 0);
         vout_display_DeleteWindow(vd, sys->embed);
     }
 
@@ -911,7 +911,7 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     requested_count = sys->p_window->i_pic_count;
     msg_Dbg(vd, "PoolAlloc: got %d frames", requested_count);
 
-    UpdateWindowSize(sys, &sys->p_window->fmt, sys->p_window->b_use_priv);
+    UpdateVideoSize(sys, &sys->p_window->fmt, sys->p_window->b_use_priv);
 
     pp_pics = calloc(requested_count, sizeof(picture_t));
 
@@ -1173,8 +1173,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         } else
             CopySourceAspect(&sys->p_window->fmt, source);
 
-        UpdateWindowSize(sys, &sys->p_window->fmt,
-                         sys->p_window->b_use_priv);
+        UpdateVideoSize(sys, &sys->p_window->fmt, sys->p_window->b_use_priv);
         FixSubtitleFormat(sys);
         return VLC_SUCCESS;
     }

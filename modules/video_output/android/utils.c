@@ -77,7 +77,7 @@ static struct
         jmethodID getSubtitlesSurface;
         jmethodID setCallback;
         jmethodID setBuffersGeometry;
-        jmethodID setWindowLayout;
+        jmethodID setVideoLayout;
     } AndroidNativeWindow;
     struct {
         jmethodID create;
@@ -455,8 +455,8 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
                "setCallback", "(J)Z", true);
     GET_METHOD(AndroidNativeWindow.setBuffersGeometry,
                "setBuffersGeometry", "(Landroid/view/Surface;III)Z", true);
-    GET_METHOD(AndroidNativeWindow.setWindowLayout,
-               "setWindowLayout", "(IIIIII)V", true);
+    GET_METHOD(AndroidNativeWindow.setVideoLayout,
+               "setVideoLayout", "(IIIIII)V", true);
 
     GET_SMETHOD(SurfaceTextureThread.create,
                 "SurfaceTextureThread_create",
@@ -705,16 +705,16 @@ AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
 }
 
 int
-AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
-                               int i_width, int i_height,
-                               int i_visible_width, int i_visible_height,
-                               int i_sar_num, int i_sar_den)
+AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
+                              int i_width, int i_height,
+                              int i_visible_width, int i_visible_height,
+                              int i_sar_num, int i_sar_den)
 {
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (!p_env)
         return VLC_EGENERIC;
 
-    JNI_ANWCALL(CallVoidMethod, setWindowLayout, i_width, i_height,
+    JNI_ANWCALL(CallVoidMethod, setVideoLayout, i_width, i_height,
                 i_visible_width,i_visible_height, i_sar_num, i_sar_den);
     return VLC_SUCCESS;
 }
