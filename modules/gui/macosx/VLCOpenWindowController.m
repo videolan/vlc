@@ -94,7 +94,7 @@ struct display_info_t
 - (void)dealloc
 {
     for (int i = 0; i < [_displayInfos count]; i ++) {
-        NSValue *v = _displayInfos[i];
+        NSValue *v = [_displayInfos objectAtIndex:i];
         free([v pointerValue]);
     }
 }
@@ -205,7 +205,7 @@ struct display_info_t
 
         NSUInteger deviceCount = _avvideoDevices.count;
         for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
-            AVCaptureDevice *avDevice = _avvideoDevices[ivideo];
+            AVCaptureDevice *avDevice = [_avvideoDevices objectAtIndex:ivideo];
             // allow same name for multiple times
             [[_qtkVideoDevicePopup menu] addItemWithTitle:[avDevice localizedName] action:nil keyEquivalent:@""];
 
@@ -229,7 +229,7 @@ struct display_info_t
 
         NSUInteger deviceCount = _avaudioDevices.count;
         for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
-            AVCaptureDevice *avAudioDevice = _avaudioDevices[iaudio];
+            AVCaptureDevice *avAudioDevice = [_avaudioDevices objectAtIndex:iaudio];
 
             // allow same name for multiple times
             NSString *localizedName = [avAudioDevice localizedName];
@@ -424,9 +424,9 @@ struct display_info_t
             if (componentCount == 1)
                 tempValue = [[components firstObject] intValue];
             else if (componentCount == 2)
-                tempValue = [[components firstObject] intValue] * 60 + [components[1] intValue];
+                tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
             else if (componentCount == 3)
-                tempValue = [[components firstObject] intValue] * 3600 + [components[1] intValue] * 60 + [components[2] intValue];
+                tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
             if (tempValue > 0)
                 [options addObject: [NSString stringWithFormat:@"start-time=%li", tempValue]];
             components = [[_fileStopTimeTextField stringValue] componentsSeparatedByString:@":"];
@@ -434,9 +434,9 @@ struct display_info_t
             if (componentCount == 1)
                 tempValue = [[components firstObject] intValue];
             else if (componentCount == 2)
-                tempValue = [[components firstObject] intValue] * 60 + [components[1] intValue];
+                tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
             else if (componentCount == 3)
-                tempValue = [[components firstObject] intValue] * 3600 + [components[1] intValue] * 60 + [components[2] intValue];
+                tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
             if (tempValue != 0)
                 [options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
         }
@@ -444,14 +444,14 @@ struct display_info_t
             NSArray *soutMRL = [_output soutMRL];
             NSUInteger count = [soutMRL count];
             for (NSUInteger i = 0 ; i < count ; i++)
-                [options addObject: [NSString stringWithString: soutMRL[i]]];
+                [options addObject: [NSString stringWithString: [soutMRL objectAtIndex:i]]];
         }
         if ([_fileSlaveCheckbox state] && _fileSlavePath)
             [options addObject: [NSString stringWithFormat: @"input-slave=%@", _fileSlavePath]];
         if ([[[_tabView selectedTabViewItem] label] isEqualToString: _NS("Capture")]) {
             if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
                 int selected_index = [_screenPopup indexOfSelectedItem];
-                NSValue *v = _displayInfos[selected_index];
+                NSValue *v = [_displayInfos objectAtIndex:selected_index];
                 struct display_info_t *item = (struct display_info_t *)[v pointerValue];
 
                 [options addObject: [NSString stringWithFormat: @"screen-fps=%f", [_screenFPSTextField floatValue]]];
@@ -487,7 +487,7 @@ struct display_info_t
     int selected_index = [_screenPopup indexOfSelectedItem];
     if (selected_index >= [_displayInfos count]) return;
 
-    NSValue *v = _displayInfos[selected_index];
+    NSValue *v = [_displayInfos objectAtIndex:selected_index];
     struct display_info_t *item = (struct display_info_t *)[v pointerValue];
 
     [_screenLeftStepper setMaxValue: item->rect.size.width];
@@ -502,7 +502,7 @@ struct display_info_t
 {
     NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
     if (_avvideoDevices.count >= 1) {
-        _avCurrentDeviceUID = [[(AVCaptureDevice *)_avvideoDevices[selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        _avCurrentDeviceUID = [[(AVCaptureDevice *)[_avvideoDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
 }
 
@@ -510,7 +510,7 @@ struct display_info_t
 {
     NSInteger selectedDevice = [_qtkAudioDevicePopup indexOfSelectedItem];
     if (_avaudioDevices.count >= 1) {
-        _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)_avaudioDevices[selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)[_avaudioDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     [_screenqtkAudioPopup selectItemAtIndex: selectedDevice];
     [_qtkAudioDevicePopup selectItemAtIndex: selectedDevice];
@@ -616,12 +616,12 @@ struct display_info_t
         NSMutableArray *values = [NSMutableArray arrayWithCapacity:count];
         NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
         for (NSUInteger i = 0; i < count; i++)
-            [values addObject: [URLs[i] path]];
+            [values addObject: [[URLs objectAtIndex:i] path]];
         [values sortUsingSelector:@selector(caseInsensitiveCompare:)];
 
         for (NSUInteger i = 0; i < count; i++) {
             NSDictionary *dictionary;
-            char *psz_uri = vlc_path2uri([values[i] UTF8String], "file");
+            char *psz_uri = vlc_path2uri([[values objectAtIndex:i] UTF8String], "file");
             if (!psz_uri)
                 continue;
             dictionary = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
@@ -848,7 +848,7 @@ struct display_info_t
         NSUInteger count = [paths count];
         NSMutableArray *o_result = [NSMutableArray array];
         for (NSUInteger i = 0; i < count; i++)
-            [o_result addObject: [self scanPath:paths[i]]];
+            [o_result addObject: [self scanPath:[paths objectAtIndex:i]]];
 
         @synchronized (self) {
             _opticalDevices = [[NSArray alloc] initWithArray: o_result];
@@ -889,7 +889,7 @@ struct display_info_t
     NSUInteger count = [_allMediaDevices count];
     if (count > 0) {
         for (NSUInteger i = 0; i < count ; i++) {
-            NSDictionary *o_dict = _allMediaDevices[i];
+            NSDictionary *o_dict = [_allMediaDevices objectAtIndex:i];
             [_discSelectorPopup addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:[o_dict objectForKey:@"path"]]];
         }
 
@@ -913,7 +913,7 @@ struct display_info_t
 
 - (IBAction)discSelectorChanged:(id)sender
 {
-    [self showOpticalAtPath:_allMediaDevices[[_discSelectorPopup indexOfSelectedItem]]];
+    [self showOpticalAtPath:[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]]];
 }
 
 - (IBAction)openSpecialMediaFolder:(id)sender
@@ -940,7 +940,7 @@ struct display_info_t
 
 - (IBAction)dvdreadOptionChanged:(id)sender
 {
-    NSString *devicePath = [_allMediaDevices[[_discSelectorPopup indexOfSelectedItem]] objectForKey:@"devicePath"];
+    NSString *devicePath = [[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]] objectForKey:@"devicePath"];
 
     if (sender == _discDVDwomenusEnableMenusButton) {
         b_nodvdmenus = NO;
@@ -976,7 +976,7 @@ struct display_info_t
     if (sender == _discVCDChapterStepper)
         [_discVCDChapterTextField setIntValue: [_discVCDChapterStepper intValue]];
 
-    NSString *devicePath = [_allMediaDevices[[_discSelectorPopup indexOfSelectedItem]] objectForKey:@"devicePath"];
+    NSString *devicePath = [[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]] objectForKey:@"devicePath"];
     [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", devicePath, [_discVCDTitleTextField intValue], [_discVCDChapterTextField intValue]]];
 }
 
@@ -1166,7 +1166,7 @@ struct display_info_t
             if (!returnedError) {
                 NSUInteger displayInfoCount = [_displayInfos count];
                 for (NSUInteger i = 0; i < displayInfoCount; i ++) {
-                    v = _displayInfos[i];
+                    v = [_displayInfos objectAtIndex:i];
                     free([v pointerValue]);
                 }
                 [_displayInfos removeAllObjects];
