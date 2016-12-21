@@ -53,6 +53,8 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
     return transform;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 - (void) drawKnob:(NSRect)smallRect
 {
     NSBezierPath *path = [NSBezierPath bezierPath];
@@ -176,6 +178,7 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
     path = [NSBezierPath bezierPathWithRoundedRect:activeRect xRadius:2.0 yRadius:2.0];
     [path fill];
 }
+#pragma clang diagnostic pop
 
 - (void)drawTickMarks
 {

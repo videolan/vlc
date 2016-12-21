@@ -120,6 +120,8 @@
  * This is later used to draw the default tick mark in the center of
  * where the knob would be, when it is at the default value.
  */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 - (NSRect)knobRectFlipped:(BOOL)flipped forValue:(double)doubleValue
 {
     NSRect superRect = [super knobRectFlipped:flipped];
@@ -186,6 +188,7 @@
     // Redraw knob
     [super drawKnob];
 }
+#pragma clang diagnostic pop
 
 - (BOOL)continueTracking:(NSPoint)lastPoint at:(NSPoint)currentPoint inView:(NSView *)controlView
 {
