@@ -618,14 +618,11 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
     ts_pid_t *p_pid = (ts_pid_t *) p_pid_cbdata;
     demux_t *p_demux = (demux_t *) h->p_sys;
 #if 0
-    msg_Dbg( p_demux, "SINewTableCallback: table 0x%x(%d) ext=0x%x(%d) pid=0x%x",
-             i_table_id, i_table_id, i_extension, i_extension, p_pid->i_pid );
+    msg_Dbg( p_demux, "SINewTableCallback: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
+             i_table_id, i_table_id, i_extension, i_extension );
 #endif
     if( p_pid->i_pid == TS_SI_SDT_PID && i_table_id == 0x42 )
     {
-        msg_Dbg( p_demux, "SINewTableCallback: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
-                 i_table_id, i_table_id, i_extension, i_extension );
-
         if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_demux ) )
             msg_Err( p_demux, "SINewTableCallback: failed attaching SDTCallback" );
     }
@@ -633,9 +630,6 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
              ( i_table_id == 0x4e || /* Current/Following */
                (i_table_id >= 0x50 && i_table_id <= 0x5f) ) ) /* Schedule */
     {
-        msg_Dbg( p_demux, "SINewTableCallback: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
-                 i_table_id, i_table_id, i_extension, i_extension );
-
         /* Do not attach decoders if we can't decode timestamps */
         if( p_demux->p_sys->i_network_time > 0 )
         {
@@ -647,9 +641,6 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
     else if( p_pid->i_pid == TS_SI_TDT_PID &&
             (i_table_id == TS_SI_TDT_TABLE_ID || i_table_id == TS_SI_TOT_TABLE_ID) )
     {
-         msg_Dbg( p_demux, "SINewTableCallBack: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
-                 i_table_id, i_table_id, i_extension, i_extension );
-
         if( !dvbpsi_tot_attach( h, i_table_id, i_extension, (dvbpsi_tot_callback)TDTCallBack, p_demux ) )
             msg_Err( p_demux, "SINewTableCallback: failed attaching TDTCallback" );
     }
