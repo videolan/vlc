@@ -389,6 +389,8 @@
  
  \param bounds  The rect for the image size
  */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 - (NSImage *)maskImageWithBounds:(NSRect)bounds
 {
     static const float radius = 8.0;
@@ -426,6 +428,7 @@
     [_controlsView setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [self.window.contentView addSubview:_controlsView];
 }
+#pragma clang diagnostic pop
 #endif
 
 /**
