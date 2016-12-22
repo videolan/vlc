@@ -636,13 +636,6 @@ static int Demux( demux_t *p_demux )
 
         /* Parse the TS packet */
         ts_pid_t *p_pid = GetPID( p_sys, PIDGet( p_pkt ) );
-
-        if( (p_pkt->p_buffer[1] & 0x40) && (p_pkt->p_buffer[3] & 0x10) &&
-            !SCRAMBLED(*p_pid) != !(p_pkt->p_buffer[3] & 0x80) )
-        {
-            UpdatePIDScrambledState( p_demux, p_pid, p_pkt->p_buffer[3] & 0x80 );
-        }
-
         if( !SEEN(p_pid) )
         {
             if( p_pid->type == TYPE_FREE )
@@ -657,16 +650,15 @@ static int Demux( demux_t *p_demux )
         if( !p_pkt )
             continue;
 
+        if( !SCRAMBLED(*p_pid) != !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
+        {
+            UpdatePIDScrambledState( p_demux, p_pid, p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED );
+        }
+
         /* Adaptation field cannot be scrambled */
         mtime_t i_pcr = GetPCR( p_pkt );
         if( i_pcr > VLC_TS_INVALID )
             PCRHandle( p_demux, p_pid, i_pcr );
-
-        if ( SCRAMBLED(*p_pid) && !p_demux->p_sys->csa && p_sys->b_valid_scrambling )
-        {
-            block_Release( p_pkt );
-            continue;
-        }
 
         /* Probe streams to build PAT/PMT after MIN_PAT_INTERVAL in case we don't see any PAT */
         if( !SEEN( GetPID( p_sys, 0 ) ) &&
@@ -682,6 +674,7 @@ static int Demux( demux_t *p_demux )
         {
         case TYPE_PAT:
         case TYPE_PMT:
+            /* PAT and PMT are not allowed to be scrambled */
             ts_psi_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
@@ -719,12 +712,14 @@ static int Demux( demux_t *p_demux )
             break;
 
         case TYPE_SI:
-            ts_si_Packet_Push( p_pid, p_pkt->p_buffer );
+            if( (p_pkt->i_flags & (BLOCK_FLAG_SCRAMBLED|BLOCK_FLAG_CORRUPTED)) == 0 )
+                ts_si_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 
         case TYPE_PSIP:
-            ts_psip_Packet_Push( p_pid, p_pkt->p_buffer );
+            if( (p_pkt->i_flags & (BLOCK_FLAG_SCRAMBLED|BLOCK_FLAG_CORRUPTED)) == 0 )
+                ts_psip_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 
@@ -1337,12 +1332,6 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
     const int i_max = block_ChainExtract( p_pes, header, 34 );
     if ( i_max < 4 )
-    {
-        block_ChainRelease( p_pes );
-        return;
-    }
-
-    if( (p_pes->i_flags & BLOCK_FLAG_SCRAMBLED) && p_demux->p_sys->b_valid_scrambling )
     {
         block_ChainRelease( p_pes );
         return;
@@ -2359,6 +2348,7 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
     const uint8_t *p = p_pkt->p_buffer;
     const bool b_adaptation = p[3]&0x20;
     const bool b_payload    = p[3]&0x10;
+    const bool b_scrambled  = p[3]&0xc0;
     const int  i_cc         = p[3]&0x0f; /* continuity counter */
     bool       b_discontinuity = false;  /* discontinuity */
 
@@ -2375,7 +2365,7 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
      * TODO: handle Reed-Solomon 204,188 error correction */
     p_pkt->i_buffer = TS_PACKET_SIZE_188;
 
-    if( SCRAMBLED(*pid) )
+    if( b_scrambled )
     {
         if( p_demux->p_sys->csa )
         {
@@ -2383,10 +2373,8 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
             csa_Decrypt( p_demux->p_sys->csa, p_pkt->p_buffer, p_demux->p_sys->i_csa_pkt_size );
             vlc_mutex_unlock( &p_demux->p_sys->csa_lock );
         }
-        else if( p_demux->p_sys->b_valid_scrambling )
-        {
+        else
             p_pkt->i_flags |= BLOCK_FLAG_SCRAMBLED;
-        }
     }
 
     /* We don't have any adaptation_field, so payload starts
@@ -2550,6 +2538,13 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size
         b_aligned_ts_payload = false;
         b_single_payload = false;
 
+    }
+
+    /* We'll cannot parse any pes data */
+    if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) && p_demux->p_sys->b_valid_scrambling )
+    {
+        block_Release( p_pkt );
+        return PushPESBlock( p_demux, pid, NULL, true );
     }
 
     /* Data discontinuity, we need to drop or output currently
