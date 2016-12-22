@@ -176,6 +176,7 @@ static mtime_t GetPCR( const block_t * );
 
 static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, int * );
 static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk, size_t );
+static bool GatherSectionsData( demux_t *p_demux, ts_pid_t *, block_t *, size_t );
 static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_prg, mtime_t i_pcr );
 
 static block_t* ReadTSPacket( demux_t *p_demux );
@@ -706,11 +707,9 @@ static int Demux( demux_t *p_demux )
             {
                 b_frame = GatherPESData( p_demux, p_pid, p_pkt, i_header );
             }
-            else if( p_pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS &&
-                    !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
+            else if( p_pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS )
             {
-                ts_sections_processor_Push( p_pid->u.p_pes->p_sections_proc, p_pkt->p_buffer );
-                b_frame = true;
+                b_frame = GatherSectionsData( p_demux, p_pid, p_pkt, i_header );
             }
             else // pid->u.p_pes->transport == TS_TRANSPORT_IGNORE
             {
@@ -2666,6 +2665,27 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size
             p_pkt = NULL;
         }
     }
+
+    return b_ret;
+}
+
+static bool GatherSectionsData( demux_t *p_demux, ts_pid_t *p_pid, block_t *p_pkt, size_t i_skip )
+{
+    VLC_UNUSED(i_skip); VLC_UNUSED(p_demux);
+    bool b_ret = false;
+
+    if( p_pkt->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    {
+        ts_sections_processor_Reset( p_pid->u.p_pes->p_sections_proc );
+    }
+
+    if( (p_pkt->i_flags & (BLOCK_FLAG_SCRAMBLED | BLOCK_FLAG_CORRUPTED)) == 0 )
+    {
+        ts_sections_processor_Push( p_pid->u.p_pes->p_sections_proc, p_pkt->p_buffer );
+        b_ret = true;
+    }
+
+    block_Release( p_pkt );
 
     return b_ret;
 }
