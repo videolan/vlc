@@ -159,11 +159,9 @@ static void Close( vlc_object_t *p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
 
-    if( p_sys->p_map )
-    {
-        free( p_sys->p_map->p_keys );
-        free( p_sys->p_map );
-    }
+    for( int i = 0; i < p_sys->i_map; i++ )
+        free( p_sys->p_map[i].p_keys );
+    free( p_sys->p_map );
     xcb_key_symbols_free( p_sys->p_symbols );
     xcb_disconnect( p_sys->p_connection );
     free( p_sys );
