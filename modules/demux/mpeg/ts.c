@@ -623,6 +623,15 @@ static int Demux( demux_t *p_demux )
             continue;
         }
 
+        /* Reject any fully uncorrected packet. Even PID can be incorrect */
+        if( p_pkt->p_buffer[1]&0x80 )
+        {
+            msg_Dbg( p_demux, "transport_error_indicator set (pid=%d)",
+                     PIDGet( p_pkt ) );
+            block_Release( p_pkt );
+            continue;
+        }
+
         /* Parse the TS packet */
         ts_pid_t *p_pid = GetPID( p_sys, PIDGet( p_pkt ) );
 
@@ -1940,7 +1949,8 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
             break;
         }
 
-        if( p_pkt->i_size < TS_PACKET_SIZE_188 )
+        if( p_pkt->i_size < TS_PACKET_SIZE_188 &&
+           ( p_pkt->p_buffer[1]&0x80 ) /* transport error */ )
         {
             block_Release( p_pkt );
             continue;
@@ -2350,14 +2360,6 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
     /* For now, ignore additional error correction
      * TODO: handle Reed-Solomon 204,188 error correction */
     p_pkt->i_buffer = TS_PACKET_SIZE_188;
-
-    if( p[1]&0x80 )
-    {
-        msg_Dbg( p_demux, "transport_error_indicator set (pid=%d)",
-                 pid->i_pid );
-        if( p_pes->gather.p_data ) //&& pid->es->fmt.i_cat == VIDEO_ES )
-            p_pes->gather.p_data->i_flags |= BLOCK_FLAG_CORRUPTED;
-    }
 
     if( SCRAMBLED(*pid) )
     {
