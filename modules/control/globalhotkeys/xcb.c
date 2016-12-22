@@ -325,15 +325,16 @@ static bool Mapping( intf_thread_t *p_intf )
             if( i != 0 && i_ignored == 0)
                 continue;
 
-            hotkey_mapping_t *p_map_old = p_sys->p_map;
-            p_sys->p_map = realloc( p_sys->p_map,
-                    sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
-            if( !p_sys->p_map )
+            hotkey_mapping_t *p_map = realloc( p_sys->p_map,
+                              sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
+            if( !p_map )
             {
-                p_sys->p_map = p_map_old;
+                free( p_keys );
                 break;
             }
-            hotkey_mapping_t *p_map = &p_sys->p_map[p_sys->i_map++];
+            p_sys->p_map = p_map;
+            p_map += p_sys->i_map;
+            p_sys->i_map++;
 
             p_map->p_keys = p_keys;
             p_map->i_modifier = i_modifier|i_ignored;
