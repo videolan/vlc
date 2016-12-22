@@ -616,6 +616,13 @@ static int Demux( demux_t *p_demux )
             p_sys->b_start_record = false;
         }
 
+        /* Early reject truncated packets from hw devices */
+        if( unlikely(p_pkt->i_buffer < TS_PACKET_SIZE_188) )
+        {
+            block_Release( p_pkt );
+            continue;
+        }
+
         /* Parse the TS packet */
         ts_pid_t *p_pid = GetPID( p_sys, PIDGet( p_pkt ) );
 
@@ -1931,6 +1938,12 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
         if( i_count++ > PROBE_CHUNK_COUNT || !( p_pkt = ReadTSPacket( p_demux ) ) )
         {
             break;
+        }
+
+        if( p_pkt->i_size < TS_PACKET_SIZE_188 )
+        {
+            block_Release( p_pkt );
+            continue;
         }
 
         const int i_pid = PIDGet( p_pkt );
