@@ -265,10 +265,10 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     SetupOutputFormat( p_dec, false );
 
     date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    if( !p_dec->fmt_out.audio.i_rate )
+        p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
     if( p_dec->fmt_out.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
-    else if( p_dec->fmt_in.audio.i_rate )
-        date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
     p_dec->pf_decode_audio = DecodeAudio;
     p_dec->pf_flush        = Flush;
@@ -393,11 +393,6 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 
                 block_Release( p_block );
                 *pp_block = p_block = NULL;
-
-                /* FIXME: Should those init be really done after block and not frame ? */
-                SetupOutputFormat( p_dec, true );
-                if( decoder_UpdateAudioFormat( p_dec ) )
-                    goto drop;
             }
             else if ( ret != AVERROR(EAGAIN) ) /* Errors other than buffer full */
             {
@@ -423,6 +418,10 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
             {
                 date_Init( &p_sys->end_date, ctx->sample_rate, 1 );
             }
+
+            SetupOutputFormat( p_dec, true );
+            if( decoder_UpdateAudioFormat( p_dec ) )
+                goto drop;
 
             block_t *p_converted = ConvertAVFrame( p_dec, frame ); /* Consumes frame */
             if( p_converted )
