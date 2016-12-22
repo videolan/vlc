@@ -497,6 +497,7 @@ void InfoPanel::update( input_item_t *p_item)
     QTreeWidgetItem *current_item = NULL;
     QTreeWidgetItem *child_item = NULL;
 
+    vlc_mutex_lock( &p_item->lock );
     for( int i = 0; i< p_item->i_categories ; i++)
     {
         current_item = new QTreeWidgetItem();
@@ -515,6 +516,7 @@ void InfoPanel::update( input_item_t *p_item)
         }
         InfoTree->setItemExpanded( current_item, true);
     }
+    vlc_mutex_unlock( &p_item->lock );
 }
 
 /**
