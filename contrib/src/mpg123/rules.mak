@@ -34,6 +34,7 @@ $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
 	$(APPLY) $(SRC)/mpg123/no-programs.patch
+	$(APPLY) $(SRC)/mpg123/mpg123-libm.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/mpg123/mpg123_android_off_t.patch
 endif
