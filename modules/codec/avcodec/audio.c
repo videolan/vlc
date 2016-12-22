@@ -462,6 +462,8 @@ end:
 drop:
     if( p_block != NULL )
         block_Release(p_block);
+    if( frame != NULL )
+        av_frame_free( &frame );
     return NULL;
 }
 
