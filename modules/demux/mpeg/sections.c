@@ -22,7 +22,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_block.h>
 #include <vlc_demux.h>
 
 #include "ts_pid.h"
@@ -140,20 +139,11 @@ void ts_sections_processor_Reset( ts_sections_processor_t *p_chain )
 }
 
 void ts_sections_processor_Push( ts_sections_processor_t *p_chain,
-                                 block_t *p_pkt )
+                                 const uint8_t *p_buf )
 {
-    if(likely(p_pkt->i_buffer >= 188 ))
+    for( ts_sections_processor_t *p_proc = p_chain;
+         p_proc; p_proc = p_proc->p_next )
     {
-        for( ts_sections_processor_t *p_proc = p_chain;
-             p_proc; p_proc = p_proc->p_next )
-        {
-            dvbpsi_packet_push( p_chain->p_dvbpsi, p_pkt->p_buffer );
-        }
+        dvbpsi_packet_push( p_chain->p_dvbpsi, (uint8_t *) p_buf );
     }
-    else
-    {
-        assert( p_pkt->i_buffer >= 188 );
-    }
-
-    block_Release( p_pkt );
 }

@@ -709,7 +709,7 @@ static int Demux( demux_t *p_demux )
             else if( p_pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS &&
                     !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
             {
-                ts_sections_processor_Push( p_pid->u.p_pes->p_sections_proc, p_pkt );
+                ts_sections_processor_Push( p_pid->u.p_pes->p_sections_proc, p_pkt->p_buffer );
                 b_frame = true;
             }
             else // pid->u.p_pes->transport == TS_TRANSPORT_IGNORE

@@ -38,5 +38,5 @@ void ts_sections_processor_ChainDelete( ts_sections_processor_t *p_chain );
 void ts_sections_processor_Reset( ts_sections_processor_t *p_chain );
 
 void ts_sections_processor_Push( ts_sections_processor_t *p_chain,
-                                 block_t *p_pkt );
+                                 const uint8_t * );
 #endif
