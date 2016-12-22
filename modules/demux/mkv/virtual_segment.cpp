@@ -448,7 +448,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     /* we have moved to a new chapter */
     if ( p_cur_vchapter != NULL && p_current_vchapter != p_cur_vchapter )
         {
-            msg_Dbg( &demux, "NEW CHAPTER %" PRId64 " uid=%" PRId64, sys.i_pts - VLC_TS_0, p_cur_vchapter->p_chapter->i_uid );
+            msg_Dbg( &demux, "New Chapter %" PRId64 " uid=%" PRIu64, sys.i_pts - VLC_TS_0, p_cur_vchapter->p_chapter->i_uid );
             if ( p_cur_vedition->b_ordered )
             {
                 /* FIXME EnterAndLeave has probably been broken for a long time */
