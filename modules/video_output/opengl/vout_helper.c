@@ -175,8 +175,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
 #if !defined(USE_OPENGL_ES2)
+    const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
 #else
@@ -240,13 +240,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #   define glClientActiveTexture vgl->api.ClientActiveTexture
 #endif
 
-    vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
-                         HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
-
 #if defined(USE_OPENGL_ES2)
     /* OpenGL ES 2 includes support for non-power of 2 textures by specification
      * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
     vgl->supports_npot = true;
+#else
+    vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
+                         HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
 #endif
 
     /* Initialize with default chroma */
