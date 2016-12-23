@@ -227,7 +227,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 if( p_block == NULL ) /* drain */
                 {
-                    p_sys->i_state = STATE_SEND_DATA;
+                    p_sys->i_state = STATE_GET_DATA;
                     break;
                 }
                 /* Need more data */
