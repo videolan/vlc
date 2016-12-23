@@ -191,6 +191,8 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     if (err != VPX_CODEC_OK) {
         free(pkt_pts);
         VPX_ERR(dec, ctx, "Failed to decode frame");
+        if (err == VPX_CODEC_UNSUP_BITSTREAM)
+            dec->b_error = true;
         return NULL;
     }
 
