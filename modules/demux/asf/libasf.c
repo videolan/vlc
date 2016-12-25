@@ -46,9 +46,9 @@
  */
 /* ASF_HAVE(n):
  *  Check that n bytes can be read */
-static inline bool AsfObjectHelperHave( const uint8_t *p_peek, int i_peek, const uint8_t *p_current, int i_wanted )
+static inline bool AsfObjectHelperHave( const uint8_t *p_peek, size_t i_peek, const uint8_t *p_current, size_t i_wanted )
 {
-    if( i_wanted < 0 || i_wanted > i_peek )
+    if( i_wanted > i_peek )
         return false;
     return &p_current[i_wanted] <= &p_peek[i_peek];
 }
@@ -56,7 +56,7 @@ static inline bool AsfObjectHelperHave( const uint8_t *p_peek, int i_peek, const
 
 /* ASF_SKIP(n)
  *  Skip n bytes if possible */
-static inline void AsfObjectHelperSkip( const uint8_t *p_peek, int i_peek, uint8_t **pp_data, int i_wanted )
+static inline void AsfObjectHelperSkip( const uint8_t *p_peek, size_t i_peek, uint8_t **pp_data, size_t i_wanted )
 {
     if( AsfObjectHelperHave( p_peek, i_peek, *pp_data, i_wanted ) )
         *pp_data += i_wanted;
@@ -88,7 +88,7 @@ ASF_FUNCTION_READ_X( uint64_t, 8, GetQWLE(p_data) )
 /* ASF_READS(n)
  *  Read a string of n/2 wchar long ie n bytes. Do a stupid conversion (suppose latin1)
  *  Return allocated "" if not possible */
-static char *AsfObjectHelperReadString( const uint8_t *p_peek, int i_peek, uint8_t **pp_data, int i_size )
+static char *AsfObjectHelperReadString( const uint8_t *p_peek, size_t i_peek, uint8_t **pp_data, size_t i_size )
 {
     uint8_t *p_data = *pp_data;
     char *psz_string;
