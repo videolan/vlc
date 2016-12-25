@@ -294,6 +294,7 @@ static void set_video_color_settings( encoder_t *p_enc, AVCodecContext *p_contex
             p_context->colorspace = AVCOL_SPC_BT2020_CL;
             break;
         default:
+            p_context->colorspace = AVCOL_SPC_UNSPECIFIED;
             break;
     }
 
@@ -305,8 +306,23 @@ static void set_video_color_settings( encoder_t *p_enc, AVCodecContext *p_contex
         case TRANSFER_FUNC_SRGB:
             p_context->color_trc = AVCOL_TRC_GAMMA22;
             break;
+        case TRANSFER_FUNC_BT470_BG:
+            p_context->color_trc = AVCOL_TRC_GAMMA28;
+            break;
+        case TRANSFER_FUNC_BT470_M:
+            p_context->color_trc = AVCOL_TRC_GAMMA22;
+            break;
         case TRANSFER_FUNC_BT709:
             p_context->color_trc = AVCOL_TRC_BT709;
+            break;
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            p_context->color_trc = AVCOL_TRC_SMPTEST2084;
+            break;
+        case TRANSFER_FUNC_SMPTE_240:
+            p_context->color_trc = AVCOL_TRC_SMPTE240M;
+            break;
+        default:
+            p_context->color_trc = AVCOL_TRC_UNSPECIFIED;
             break;
     }
     switch( p_enc->fmt_in.video.primaries )
@@ -322,6 +338,12 @@ static void set_video_color_settings( encoder_t *p_enc, AVCodecContext *p_contex
             break;
         case COLOR_PRIMARIES_BT2020:
             p_context->color_primaries = AVCOL_PRI_BT2020;
+            break;
+        case COLOR_PRIMARIES_FCC1953:
+            p_context->color_primaries = AVCOL_PRI_BT470M;
+            break;
+        default:
+            p_context->color_primaries = AVCOL_PRI_UNSPECIFIED;
             break;
     }
 }
