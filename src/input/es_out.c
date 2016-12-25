@@ -3058,8 +3058,11 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            static const char *func_names[] = { N_("Undefined"),
                N_("Linear"),
                "sRGB",
+               "ITU-R BT.470 BG",
+               "ITU-R BT.470 M",
                "ITU-R BT.709, ITU-R BT.2020",
                "SMPTE ST2084",
+               "SMPTE 240M",
            };
            if( fmt->video.transfer < ARRAY_SIZE(func_names) )
                 info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
