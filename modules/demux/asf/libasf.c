@@ -359,7 +359,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_metadata_t *p_meta = &p_obj->metadata;
 
-    int i_peek;
+    ssize_t i_peek;
     uint32_t i;
     const uint8_t *p_peek, *p_data;
 
@@ -396,7 +396,8 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         p_record->i_type = ASF_READ2();
         i_data = ASF_READ4();
 
-        if( !ASF_HAVE( i_name + i_data ) )
+        if( UINT32_MAX - i_name < i_data ||
+            !ASF_HAVE( i_name + i_data ) )
             break;
 
         /* Read name */
