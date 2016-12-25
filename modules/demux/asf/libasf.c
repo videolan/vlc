@@ -284,7 +284,10 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
     p_index->index_entry = calloc( p_index->i_index_entry_count,
                                    sizeof(asf_index_entry_t) );
     if( !p_index->index_entry )
+    {
+        p_index->i_index_entry_count = 0;
         return VLC_ENOMEM;
+    }
 
     for( i = 0, p_peek += 56; i < p_index->i_index_entry_count; i++, p_peek += 6 )
     {
@@ -371,7 +374,10 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     p_meta->record = calloc( p_meta->i_record_entries_count,
                              sizeof(asf_metadata_record_t) );
     if( !p_meta->record )
+    {
+        p_meta->i_record_entries_count = 0;
         return VLC_ENOMEM;
+    }
 
     for( i = 0; i < p_meta->i_record_entries_count; i++ )
     {
@@ -1038,7 +1044,10 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     p_ae->i_stream_number_count = ASF_READ2();
     p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count, sizeof(uint16_t) );
     if ( !p_ae->pi_stream_number )
+    {
+        p_ae->i_stream_number_count = 0;
         return VLC_ENOMEM;
+    }
 
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
     {
@@ -1046,10 +1055,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
             break;
         p_ae->pi_stream_number[i] = ASF_READ2();
         if ( p_ae->pi_stream_number[i] > ASF_MAX_STREAMNUMBER )
-        {
-            free( p_ae->pi_stream_number );
-            return VLC_EGENERIC;
-        }
+            break;
     }
     p_ae->i_stream_number_count = i;
 
