@@ -3047,6 +3047,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                "ITU-R BT.709",
                "ITU-R BT.2020",
                "DCI/P3 D65",
+               "ITU-R BT.470 M",
            };
            if( fmt->video.primaries < ARRAY_SIZE(primaries_names) )
                 info_category_AddInfo( p_cat, _("Color primaries"), "%s",
