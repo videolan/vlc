@@ -3044,9 +3044,9 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            static const char *primaries_names[] = { N_("Undefined"),
                N_("ITU-R BT.601 (525 lines, 60 Hz)"),
                N_("ITU-R BT.601 (625 lines, 50 Hz)"),
-               N_("ITU-R BT.709"),
-               N_("ITU-R BT.2020"),
-               N_("DCI/P3 D65"),
+               "ITU-R BT.709",
+               "ITU-R BT.2020",
+               "DCI/P3 D65",
            };
            info_category_AddInfo( p_cat, _("Color primaries"), "%s",
                                   _(primaries_names[fmt->video.primaries]) );
@@ -3055,8 +3055,8 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        {
            static const char *func_names[] = { N_("Undefined"),
                N_("Linear"),
-               N_("sRGB"),
-               N_("ITU-R BT.709 or BT.2020"),
+               "sRGB",
+               "ITU-R BT.709, ITU-R BT.2020",
            };
            info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
                                   _(func_names[fmt->video.transfer]) );
@@ -3064,9 +3064,9 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        if( fmt->video.space != COLOR_SPACE_UNDEF )
        {
            static const char *space_names[] = { N_("Undefined"),
-               N_("ITU-R BT.601"),
-               N_("ITU-R BT.709"),
-               N_("ITU-R BT.2020"),
+               "ITU-R BT.601",
+               "ITU-R BT.709",
+               "ITU-R BT.2020",
            };
            static const char *range_names[] = {
                N_("Limited Range"),
