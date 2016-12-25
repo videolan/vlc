@@ -3048,8 +3048,9 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                "ITU-R BT.2020",
                "DCI/P3 D65",
            };
-           info_category_AddInfo( p_cat, _("Color primaries"), "%s",
-                                  _(primaries_names[fmt->video.primaries]) );
+           if( fmt->video.primaries < ARRAY_SIZE(primaries_names) )
+                info_category_AddInfo( p_cat, _("Color primaries"), "%s",
+                                      _(primaries_names[fmt->video.primaries]) );
        }
        if( fmt->video.transfer != TRANSFER_FUNC_UNDEF )
        {
@@ -3059,8 +3060,9 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                "ITU-R BT.709, ITU-R BT.2020",
                "SMPTE ST2084",
            };
-           info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
-                                  _(func_names[fmt->video.transfer]) );
+           if( fmt->video.transfer < ARRAY_SIZE(func_names) )
+                info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
+                                      _(func_names[fmt->video.transfer]) );
        }
        if( fmt->video.space != COLOR_SPACE_UNDEF )
        {
@@ -3073,9 +3075,10 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                N_("Limited Range"),
                N_("Full Range"),
            };
-           info_category_AddInfo( p_cat, _("Color space"), "%s %s",
-                                  _(space_names[fmt->video.space]),
-                                  _(range_names[fmt->video.b_color_range_full]) );
+           if( fmt->video.space < ARRAY_SIZE(space_names) )
+                info_category_AddInfo( p_cat, _("Color space"), "%s %s",
+                                      _(space_names[fmt->video.space]),
+                                      _(range_names[fmt->video.b_color_range_full]) );
        }
        if( fmt->video.chroma_location != CHROMA_LOCATION_UNDEF )
        {
