@@ -575,6 +575,36 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
                 if( !p_sys->b_sequence_header )
                     msg_Dbg( p_dec, "frame rate %d/%d", p_es->video.i_frame_rate, p_es->video.i_frame_rate_base );
             }
+            if( bs_read1( &s ) ) /* Color Format */
+            {
+                switch( bs_read( &s, 8 ) ) /* Color Primaries */
+                {
+                    case 1:  p_es->video.primaries = COLOR_PRIMARIES_BT709; break;
+                    case 4:  p_es->video.primaries = COLOR_PRIMARIES_BT470_M; break;
+                    case 5:  p_es->video.primaries = COLOR_PRIMARIES_BT470_BG; break;
+                    case 6:  p_es->video.primaries = COLOR_PRIMARIES_SMTPE_RP145; break;
+                    default: p_es->video.primaries = COLOR_PRIMARIES_UNDEF; break;
+                }
+
+                switch( bs_read( &s, 8 ) ) /* Transfert Chars */
+                {
+                    case 1:  p_es->video.transfer = TRANSFER_FUNC_BT709; break;
+                    case 4:  p_es->video.transfer = TRANSFER_FUNC_BT470_M; break;
+                    case 5:  p_es->video.transfer = TRANSFER_FUNC_BT470_BG; break;
+                    case 6:  p_es->video.transfer = TRANSFER_FUNC_SMPTE_170; break;
+                    case 7:  p_es->video.transfer = TRANSFER_FUNC_SMPTE_240; break;
+                    case 8:  p_es->video.transfer = TRANSFER_FUNC_LINEAR; break;
+                    default: p_es->video.transfer = TRANSFER_FUNC_UNDEF; break;
+                }
+
+                switch( bs_read( &s, 8 ) ) /* Matrix Coef */
+                {
+                    case 1:  p_es->video.space = COLOR_SPACE_BT709; break;
+                    case 6:  p_es->video.space = COLOR_SPACE_BT601; break;
+                    case 7:  p_es->video.space = COLOR_SPACE_SMPTE_240; break;
+                    default: p_es->video.space = COLOR_SPACE_UNDEF; break;
+                }
+            }
         }
         else
         {
