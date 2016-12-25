@@ -3057,6 +3057,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                N_("Linear"),
                "sRGB",
                "ITU-R BT.709, ITU-R BT.2020",
+               "SMPTE ST2084",
            };
            info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
                                   _(func_names[fmt->video.transfer]) );
