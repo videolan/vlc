@@ -400,15 +400,18 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         if( p_record->i_type == ASF_METADATA_TYPE_STRING )
         {
             p_record->p_data = (uint8_t *)ASF_READS( i_data );
-            p_record->i_data = i_data/2; /* FIXME Is that needed ? */
+            if( p_record->p_data )
+                p_record->i_data = i_data/2; /* FIXME Is that needed ? */
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_BYTE )
         {
             p_record->p_data = malloc( i_data );
-            p_record->i_data = i_data;
-            if( p_record->p_data && i_data > 0 )
-                memcpy( p_record->p_data, p_data, i_data );
-
+            if( p_record->p_data )
+            {
+                p_record->i_data = i_data;
+                if( p_record->p_data && i_data > 0 )
+                    memcpy( p_record->p_data, p_data, i_data );
+            }
             p_data += i_data;
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_QWORD )
