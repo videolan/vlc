@@ -91,14 +91,10 @@ ASF_FUNCTION_READ_X( uint64_t, 8, GetQWLE(p_data) )
 static char *AsfObjectHelperReadString( const uint8_t *p_peek, size_t i_peek, uint8_t **pp_data, size_t i_size )
 {
     uint8_t *p_data = *pp_data;
-    char *psz_string;
+    char *psz_string = NULL;
     if( ASF_HAVE(i_size) )
     {
         psz_string = FromCharset( "UTF-16LE", p_data, i_size );
-    }
-    else
-    {
-        psz_string = strdup("");
     }
     ASF_SKIP(i_size);
     *pp_data = p_data;

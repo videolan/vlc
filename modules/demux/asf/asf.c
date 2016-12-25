@@ -1013,6 +1013,8 @@ static int DemuxInit( demux_t *p_demux )
                 uint32_t i;
                 for( i = 0; i < p_meta->i_record_entries_count; i++ )
                 {
+                    if( !p_meta->record[i].psz_name )
+                        continue;
                     if( !strcmp( p_meta->record[i].psz_name, "AspectRatioX" ) )
                     {
                         if( (!i_aspect_x && !p_meta->record[i].i_stream) ||
@@ -1103,7 +1105,8 @@ static int DemuxInit( demux_t *p_demux )
         if( fmt.i_cat != UNKNOWN_ES )
         {
             if( p_esp && p_languages &&
-                p_esp->i_language_index < p_languages->i_language )
+                p_esp->i_language_index < p_languages->i_language &&
+                p_languages->ppsz_language[p_esp->i_language_index] )
             {
                 fmt.psz_language = strdup( p_languages->ppsz_language[p_esp->i_language_index] );
                 char *p;
@@ -1248,7 +1251,7 @@ static int DemuxInit( demux_t *p_demux )
         {
 
 #define set_meta( name, vlc_type ) \
-            if( !strncmp( p_ecd->ppsz_name[i], name, strlen(name) ) ) \
+            if( p_ecd->ppsz_name[i] && !strncmp( p_ecd->ppsz_name[i], name, strlen(name) ) ) \
                 vlc_meta_Set( p_sys->meta, vlc_type, p_ecd->ppsz_value[i] );
 
             set_meta( "WM/AlbumTitle",   vlc_meta_Album )
@@ -1258,7 +1261,7 @@ static int DemuxInit( demux_t *p_demux )
             else set_meta( "WM/Genre",        vlc_meta_Genre )
             else set_meta( "WM/AlbumArtist",  vlc_meta_Artist )
             else set_meta( "WM/Publisher",    vlc_meta_Publisher )
-            else if( p_ecd->ppsz_value[i] != NULL &&
+            else if( p_ecd->ppsz_value[i] != NULL && p_ecd->ppsz_name[i] &&
                     *p_ecd->ppsz_value[i] != '\0' && /* no empty value */
                     *p_ecd->ppsz_value[i] != '{'  && /* no guid value */
                     *p_ecd->ppsz_name[i] != '{' )    /* no guid name */
