@@ -1340,7 +1340,10 @@ static int ASF_ReadObject_marker(stream_t *s, asf_object_t *p_obj)
             p_marker->i_send_time = ASF_READ4();
             p_marker->i_flags = ASF_READ4();
             p_marker->i_marker_description_length = ASF_READ4();
-            p_marker->p_marker_description = ASF_READS( p_marker->i_marker_description_length * 2 );
+            if( p_marker->i_marker_description_length <= (UINT32_MAX / 2) )
+                p_marker->p_marker_description = ASF_READS( p_marker->i_marker_description_length * 2 );
+            else
+                p_marker->i_marker_description_length = 0;
         }
     }
 
