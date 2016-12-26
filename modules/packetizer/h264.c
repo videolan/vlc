@@ -766,13 +766,16 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
             p_dec->fmt_out.video.i_frame_rate_base = p_sps->vui.i_num_units_in_tick;
             p_dec->fmt_out.video.i_frame_rate = p_sps->vui.i_time_scale >> 1 /* num_clock_ts == 2 */;
         }
-        p_dec->fmt_out.video.primaries =
-            hxxx_colour_primaries_to_vlc( p_sps->vui.colour.i_colour_primaries );
-        p_dec->fmt_out.video.transfer =
-            hxxx_transfer_characteristics_to_vlc( p_sps->vui.colour.i_transfer_characteristics );
-        p_dec->fmt_out.video.space =
-            hxxx_matrix_coeffs_to_vlc( p_sps->vui.colour.i_matrix_coefficients );
-        p_dec->fmt_out.video.b_color_range_full = p_sps->vui.colour.b_full_range;
+        if( p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF )
+        {
+            p_dec->fmt_out.video.primaries =
+                hxxx_colour_primaries_to_vlc( p_sps->vui.colour.i_colour_primaries );
+            p_dec->fmt_out.video.transfer =
+                hxxx_transfer_characteristics_to_vlc( p_sps->vui.colour.i_transfer_characteristics );
+            p_dec->fmt_out.video.space =
+                hxxx_matrix_coeffs_to_vlc( p_sps->vui.colour.i_matrix_coefficients );
+            p_dec->fmt_out.video.b_color_range_full = p_sps->vui.colour.b_full_range;
+        }
     }
     /* We have a new SPS */
     if( !p_sys->b_sps )
