@@ -93,6 +93,7 @@ enum hxxx_transfer_characteristics
     HXXX_TRANSFER_BT2020_V15        = 15,
     HXXX_TRANSFER_SMPTE_ST_2084     = 16,
     HXXX_TRANSFER_SMPTE_ST_428      = 17,
+    HXXX_TRANSFER_ARIB_STD_B67      = 18,
 };
 
 static inline video_transfer_func_t
