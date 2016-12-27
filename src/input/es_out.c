@@ -1054,6 +1054,9 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
         EsOutSelect( out, p_sys->es[i], false );
     }
 
+    /* Ensure the correct running EPG table is selected */
+    input_item_ChangeEPGSource( input_priv(p_input)->p_item, p_pgrm->i_id );
+
     /* Update now playing */
     input_item_SetESNowPlaying( input_priv(p_input)->p_item,
                                 p_pgrm->p_meta ? vlc_meta_Get( p_pgrm->p_meta, vlc_meta_ESNowPlaying ) : NULL );
@@ -1359,7 +1362,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     epg = *p_epg;
     epg.psz_name = psz_cat;
 
-    input_item_SetEpg( p_item, &epg );
+    input_item_SetEpg( p_item, &epg, p_epg->i_source_id == p_pgrm->i_id );
     input_SendEventMetaEpg( p_sys->p_input );
 
     /* Update now playing */

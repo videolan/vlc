@@ -933,7 +933,7 @@ void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_
 }
 
 //#define EPG_DEBUG
-void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
+void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update, bool b_current_source )
 {
     vlc_epg_t *p_epg = vlc_epg_Duplicate( p_update );
     if( !p_epg )
@@ -957,12 +957,17 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
     if( pp_epg )
     {
         vlc_epg_Delete( *pp_epg );
+        if( *pp_epg == p_item->p_epg_table ) /* current table can have changed */
+            p_item->p_epg_table = NULL;
         *pp_epg = p_epg;
     }
     else
     {
         TAB_APPEND( p_item->i_epg, p_item->pp_epg, p_epg );
     }
+
+    if( b_current_source && p_epg->b_present )
+        p_item->p_epg_table = p_epg;
 
     vlc_mutex_unlock( &p_item->lock );
 
@@ -1010,12 +1015,29 @@ signal:
     } while(0);
 }
 
-void input_item_SetEpgOffline( input_item_t *p_item )
+void input_item_ChangeEPGSource( input_item_t *p_item, int i_source_id )
 {
     vlc_mutex_lock( &p_item->lock );
-    for( int i = 0; i < p_item->i_epg; i++ )
-        vlc_epg_SetCurrent( p_item->pp_epg[i], -1 );
+    p_item->p_epg_table = NULL;
+    if( i_source_id > 0 )
+    {
+        /* Update pointer to current/next table in the full schedule */
+        for( int i = 0; i < p_item->i_epg; i++ )
+        {
+            if( p_item->pp_epg[i]->i_source_id == i_source_id &&
+                p_item->pp_epg[i]->b_present )
+            {
+                p_item->p_epg_table = p_item->pp_epg[i];
+                break;
+            }
+        }
+    }
     vlc_mutex_unlock( &p_item->lock );
+}
+
+void input_item_SetEpgOffline( input_item_t *p_item )
+{
+    input_item_ChangeEPGSource( p_item, -1 );
 
 #ifdef EPG_DEBUG
     vlc_mutex_lock( &p_item->lock );

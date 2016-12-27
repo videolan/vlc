@@ -81,6 +81,7 @@ struct input_item_t
 
     int         i_epg;               /**< Number of EPG entries */
     vlc_epg_t   **pp_epg;            /**< EPG entries */
+    const vlc_epg_t *p_epg_table;    /** running/selected program cur/next EPG table */
 
     int         i_slaves;            /**< Number of slaves */
     input_item_slave_t **pp_slaves;  /**< Slave entries that will be loaded by
