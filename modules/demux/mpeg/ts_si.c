@@ -377,7 +377,9 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
 static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    dvbpsi_eit_event_t *p_evt;
+    const dvbpsi_eit_event_t *p_evt;
+    uint64_t i_runevt = 0;
+    uint64_t i_fallbackevt = 0;
     vlc_epg_t *p_epg;
 
     msg_Dbg( p_demux, "EITCallBack called" );
@@ -550,17 +552,18 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
             }
         }
 
-        bool b_current_event = false;
         switch ( p_evt->i_running_status )
         {
             case TS_SI_RUNSTATUS_RUNNING:
-                b_current_event = true;
+                if( i_runevt == 0 )
+                    i_runevt = i_start;
                 break;
             case TS_SI_RUNSTATUS_UNDEFINED:
             {
-                if( i_start <= p_sys->i_network_time &&
+                if( i_fallbackevt == 0 &&
+                    i_start <= p_sys->i_network_time &&
                     p_sys->i_network_time < i_start + i_duration )
-                    b_current_event = true;
+                    i_fallbackevt = i_start;
                 break;
             }
             default:
@@ -580,10 +583,6 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                 p_epgevt->i_rating = i_min_age;
                 if( !vlc_epg_AddEvent( p_epg, p_epgevt ) )
                     vlc_epg_event_Delete( p_epgevt );
-
-                /* Update "now playing" field */
-                if( b_current_event && p_epg->p_current == NULL )
-                    vlc_epg_SetCurrent( p_epg, i_start );
             }
         }
 
@@ -592,6 +591,10 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 
         free( psz_extra );
     }
+
+    /* Update "now playing" field */
+    if( i_runevt || i_fallbackevt )
+        vlc_epg_SetCurrent( p_epg, (i_runevt) ? i_runevt : i_fallbackevt );
 
     if( p_epg->i_event > 0 )
     {
