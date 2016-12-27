@@ -87,7 +87,7 @@ vlc_module_begin ()
         change_string_list( speaker_list, speaker_list )
     add_float( "directx-volume", 1.0f,
                  VOLUME_TEXT, VOLUME_LONGTEXT, true )
-        change_integer_range( DSBVOLUME_MIN, DSBVOLUME_MAX )
+        change_float_range( 0.f, 2.f )
 
     set_callbacks( Open, Close )
 
