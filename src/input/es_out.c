@@ -1413,6 +1413,15 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     free( psz_cat );
 }
 
+static void EsOutEpgTime( es_out_t *out, int64_t time )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    input_thread_t    *p_input = p_sys->p_input;
+    input_item_t      *p_item = input_priv(p_input)->p_item;
+
+    input_item_SetEpgTime( p_item, time );
+}
+
 static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm )
 {
     es_out_sys_t    *p_sys = p_out->p_sys;
@@ -2493,6 +2502,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         const vlc_epg_event_t *p_evt = va_arg( args, const vlc_epg_event_t * );
 
         EsOutProgramEpgEvent( out, i_group, p_evt );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_SET_EPG_TIME:
+    {
+        int i64 = (int64_t)va_arg( args, int64_t );
+
+        EsOutEpgTime( out, i64 );
         return VLC_SUCCESS;
     }
 

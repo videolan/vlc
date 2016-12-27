@@ -638,6 +638,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_SET_GROUP_META:
     case ES_OUT_SET_GROUP_EPG:
     case ES_OUT_SET_GROUP_EPG_EVENT:
+    case ES_OUT_SET_EPG_TIME:
     case ES_OUT_SET_ES_SCRAMBLED_STATE:
     case ES_OUT_DEL_GROUP:
     case ES_OUT_SET_META:
@@ -1467,6 +1468,9 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         }
         break;
     }
+    case ES_OUT_SET_EPG_TIME: /* arg1=int64_t (seconds) */
+        p_cmd->u.control.u.i_i64 = (int64_t)va_arg( args, int64_t );
+        break;
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
@@ -1568,6 +1572,9 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_SET_GROUP_EPG_EVENT: /* arg1=int i_group arg2=const vlc_epg_event_t* */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_epg_evt.i_int,
                                                p_cmd->u.control.u.int_epg_evt.p_evt );
+
+    case ES_OUT_SET_EPG_TIME: /* arg1=int64_t */
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.i_i64 );
 
     case ES_OUT_SET_ES_SCRAMBLED_STATE: /* arg1=int es_out_id_t* arg2=bool */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_bool.p_es->p_es,
