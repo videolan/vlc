@@ -837,6 +837,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     screenRes = getSettings()->value( "FullScreen/screen" ).toRect();
     isWideFSC = getSettings()->value( "FullScreen/wide" ).toBool();
     i_screennumber = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
+
+    CONNECT( this, fullscreenChanged( bool ), THEMIM, changeFullscreen( bool ) );
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
@@ -1185,7 +1187,6 @@ void FullscreenControllerWidget::setVoutList( vout_thread_t **pp_vout, int i_vou
         vout.append( p_vout );
         var_AddCallback( p_vout, "fullscreen",
                          FullscreenControllerWidgetFullscreenChanged, this );
-	CONNECT( this, fullscreenChanged( bool ), THEMIM, changeFullscreen( bool ) );
         /* I miss a add and fire */
         fullscreenChanged( p_vout, var_GetBool( p_vout, "fullscreen" ),
                            var_GetInteger( p_vout, "mouse-hide-timeout" ) );
