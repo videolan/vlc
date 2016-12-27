@@ -1189,6 +1189,21 @@ static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
     return psz;
 }
 
+static char *EsOutProgramGetProgramName( es_out_pgrm_t *p_pgrm )
+{
+    char *psz = NULL;
+    if( p_pgrm->p_meta && vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Title ) )
+    {
+        return strdup( vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Title ) );
+    }
+    else
+    {
+        if( asprintf( &psz, "%s %d", _("Program"), p_pgrm->i_id ) == -1 )
+            return NULL;
+    }
+    return psz;
+}
+
 static char *EsInfoCategoryName( es_out_id_t* es )
 {
     char *psz_category;
@@ -1360,10 +1375,12 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     vlc_epg_t epg;
 
     epg = *p_epg;
-    epg.psz_name = psz_cat;
+    epg.psz_name = EsOutProgramGetProgramName( p_pgrm );
 
-    input_item_SetEpg( p_item, &epg, p_epg->i_source_id == p_pgrm->i_id );
+    input_item_SetEpg( p_item, &epg, p_sys->p_pgrm && (p_epg->i_source_id == p_sys->p_pgrm->i_id) );
     input_SendEventMetaEpg( p_sys->p_input );
+
+    free( epg.psz_name );
 
     /* Update now playing */
     if( p_epg->b_present && p_pgrm->p_meta &&
