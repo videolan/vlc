@@ -165,13 +165,13 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
 
     /* Display the name of the current program. */
     last_ptr = &(*last_ptr)->p_next;
-    *last_ptr = vout_OSDEpgText(epg->p_current->psz_name,
+    *last_ptr = vout_OSDEpgText(epg->p_current ? epg->p_current->psz_name : NULL,
                                 x + visible_width  * (EPG_LEFT + 0.025),
                                 y + visible_height * (EPG_TOP + 0.05),
                                 visible_height * EPG_PROGRAM_SIZE,
                                 0x00ffffff);
 
-    if (!*last_ptr)
+    if (!*last_ptr || !epg->p_current)
         return head;
 
     /* Display the current program time slider. */
@@ -276,36 +276,46 @@ static void OSDEpgDestroy(subpicture_t *subpic)
  */
 int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
 {
-    char *now_playing = input_item_GetNowPlayingFb(input);
     vlc_epg_t *epg = NULL;
 
     /* Look for the current program EPG event */
-    if(now_playing){
-        vlc_mutex_lock(&input->lock);
 
-        for (int i = 0; i < input->i_epg; i++) {
-            const vlc_epg_t *tmp = input->pp_epg[i];
+    vlc_mutex_lock(&input->lock);
 
-            if (tmp->p_current &&
-                tmp->p_current->psz_name &&
-                !strcmp(tmp->p_current->psz_name, now_playing)) {
-                 epg = vlc_epg_New(tmp->i_id, tmp->i_source_id);
-                if(epg){
-                    if(tmp->psz_name)
-                        epg->psz_name = strdup(tmp->psz_name);
-                    vlc_epg_Merge(epg, tmp);
+    const vlc_epg_t *tmp = input->p_epg_table;
+    if ( tmp )
+    {
+        /* Pick table designated event, or first/next one */
+        const vlc_epg_event_t *p_current_event = tmp->p_current;
+        epg = vlc_epg_New(tmp->i_id, tmp->i_source_id);
+        if(epg)
+        {
+            if( p_current_event )
+            {
+                vlc_epg_event_t *p_event = vlc_epg_event_Duplicate(p_current_event);
+                if(p_event)
+                {
+                    if(!vlc_epg_AddEvent(epg, p_event))
+                    {
+                        vlc_epg_Delete(epg);
+                        vlc_epg_event_Delete(p_event);
+                        epg = NULL;
+                    }
+                    else vlc_epg_SetCurrent(epg, p_event->i_start);
                 }
-                break;
             }
+            if(tmp->psz_name)
+                epg->psz_name = strdup(tmp->psz_name);
         }
-
-        vlc_mutex_unlock(&input->lock);
-        free(now_playing);
     }
+    vlc_mutex_unlock(&input->lock);
 
     /* If no EPG event has been found. */
     if (epg == NULL)
         return VLC_EGENERIC;
+
+    if(epg->psz_name == NULL) /* Fallback (title == channel name) */
+        epg->psz_name = input_item_GetMeta( input, vlc_meta_Title );
 
     subpicture_updater_sys_t *sys = malloc(sizeof(*sys));
     if (!sys) {
