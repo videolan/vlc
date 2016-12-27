@@ -161,35 +161,33 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
                                 visible_height * EPG_NAME_SIZE,
                                 0x00ffffff);
 
-    if (!*last_ptr)
-        return head;
+    if (*last_ptr)
+        last_ptr = &(*last_ptr)->p_next;
 
     /* Display the name of the current program. */
-    last_ptr = &(*last_ptr)->p_next;
     *last_ptr = vout_OSDEpgText(epg->p_current ? epg->p_current->psz_name : NULL,
                                 x + visible_width  * (EPG_LEFT + 0.025),
                                 y + visible_height * (EPG_TOP + 0.05),
                                 visible_height * EPG_PROGRAM_SIZE,
                                 0x00ffffff);
 
-    if (!*last_ptr || !epg->p_current)
-        return head;
+    if (*last_ptr)
+        last_ptr = &(*last_ptr)->p_next;
 
-    if(epgtime)
+    if(epgtime && epg->p_current)
     {
         f_progress = (epgtime - epg->p_current->i_start) /
                      (float)epg->p_current->i_duration;
     }
 
     /* Display the current program time slider. */
-    last_ptr = &(*last_ptr)->p_next;
     *last_ptr = vout_OSDEpgSlider(x + visible_width  * EPG_LEFT,
                                   y + visible_height * (EPG_TOP + 0.1),
                                   visible_width  * (1 - 2 * EPG_LEFT),
                                   visible_height * 0.05,
                                   f_progress);
 
-    if (!*last_ptr)
+    if (!*last_ptr || !epg->p_current)
         return head;
 
     /* Format the hours of the beginning and the end of the current program. */
@@ -316,6 +314,10 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
             if(tmp->psz_name)
                 epg->psz_name = strdup(tmp->psz_name);
         }
+    }
+    else /* Always display something as user hotkey feedback */
+    {
+        epg = vlc_epg_New(0, 0);
     }
     epg_time = input->i_epg_time;
     vlc_mutex_unlock(&input->lock);
