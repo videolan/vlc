@@ -801,6 +801,8 @@ static void ATSC_STT_Callback( void *p_cb_basepid, dvbpsi_atsc_stt_t* p_stt )
         EIT_DEBUG_TIMESHIFT( i_current_time );
         p_demux->p_sys->i_network_time =  i_current_time;
         p_demux->p_sys->i_network_time_update = time(NULL);
+
+        es_out_Control( p_demux->out, ES_OUT_SET_EPG_TIME, p_demux->p_sys->i_network_time );
     }
 
     p_ctx->p_stt = p_stt;

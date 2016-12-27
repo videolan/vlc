@@ -144,6 +144,7 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
 
 
 static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
+                                              int64_t epgtime,
                                               int x, int y,
                                               int visible_width,
                                               int visible_height)
@@ -151,7 +152,7 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
     subpicture_region_t *head;
     subpicture_region_t **last_ptr = &head;
 
-    time_t current_time = time(NULL);
+    float f_progress = 0;
 
     /* Display the name of the channel. */
     *last_ptr = vout_OSDEpgText(epg->psz_name,
@@ -174,14 +175,19 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
     if (!*last_ptr || !epg->p_current)
         return head;
 
+    if(epgtime)
+    {
+        f_progress = (epgtime - epg->p_current->i_start) /
+                     (float)epg->p_current->i_duration;
+    }
+
     /* Display the current program time slider. */
     last_ptr = &(*last_ptr)->p_next;
     *last_ptr = vout_OSDEpgSlider(x + visible_width  * EPG_LEFT,
                                   y + visible_height * (EPG_TOP + 0.1),
                                   visible_width  * (1 - 2 * EPG_LEFT),
                                   visible_height * 0.05,
-                                  (current_time - epg->p_current->i_start)
-                                  / (float)epg->p_current->i_duration);
+                                  f_progress);
 
     if (!*last_ptr)
         return head;
@@ -223,6 +229,7 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
 struct subpicture_updater_sys_t
 {
     vlc_epg_t *epg;
+    int64_t    time;
 };
 
 static int OSDEpgValidate(subpicture_t *subpic,
@@ -255,6 +262,7 @@ static void OSDEpgUpdate(subpicture_t *subpic,
     subpic->i_original_picture_width  = fmt.i_width;
     subpic->i_original_picture_height = fmt.i_height;
     subpic->p_region = vout_BuildOSDEpg(sys->epg,
+                                        sys->time,
                                         fmt.i_x_offset,
                                         fmt.i_y_offset,
                                         fmt.i_visible_width,
@@ -277,6 +285,7 @@ static void OSDEpgDestroy(subpicture_t *subpic)
 int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
 {
     vlc_epg_t *epg = NULL;
+    int64_t epg_time;
 
     /* Look for the current program EPG event */
 
@@ -308,6 +317,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
                 epg->psz_name = strdup(tmp->psz_name);
         }
     }
+    epg_time = input->i_epg_time;
     vlc_mutex_unlock(&input->lock);
 
     /* If no EPG event has been found. */
@@ -323,6 +333,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
         return VLC_EGENERIC;
     }
     sys->epg = epg;
+    sys->time = epg_time;
     subpicture_updater_t updater = {
         .pf_validate = OSDEpgValidate,
         .pf_update   = OSDEpgUpdate,

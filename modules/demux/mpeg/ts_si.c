@@ -370,6 +370,8 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
     ts_pid_t *pid = ts_pid_Get( &p_sys->pids, TS_SI_TDT_PID );
     dvbpsi_decoder_reset( pid->u.p_si->handle->p_decoder, true );
     dvbpsi_tot_delete(p_tdt);
+
+    es_out_Control( p_demux->out, ES_OUT_SET_EPG_TIME, (int64_t) p_sys->i_network_time );
 }
 
 static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
