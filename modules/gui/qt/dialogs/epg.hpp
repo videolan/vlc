@@ -52,6 +52,7 @@ private:
 
 private slots:
     void scheduleUpdate();
+    void inputChanged();
     void updateInfos();
     void timeout();
     void displayEvent( EPGItem * );
