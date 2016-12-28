@@ -265,7 +265,7 @@ static void Close(vlc_object_t *object)
         vout_display_opengl_Delete(sys->vgl);
 
     if (sys->gl)
-        vlc_gl_Destroy(sys->gl);
+        vlc_object_release(sys->gl);
 
     if (sys->hGLDC && sys->hGLRC)
         wglMakeCurrent(NULL, NULL);

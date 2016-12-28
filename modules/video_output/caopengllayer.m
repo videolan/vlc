@@ -308,7 +308,7 @@ static void Close (vlc_object_t *p_this)
     }
 
     if (sys->gl != NULL)
-        vlc_gl_Destroy(sys->gl);
+        vlc_object_release(sys->gl);
 
     if (sys->glContext)
         CGLReleaseContext(sys->glContext);

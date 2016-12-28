@@ -326,7 +326,7 @@ void Close (vlc_object_t *this)
             vout_display_opengl_Delete (sys->vgl);
 
         if (sys->gl != NULL)
-            vlc_gl_Destroy (sys->gl);
+            vlc_object_release(sys->gl);
 
         [sys->glView release];
 
