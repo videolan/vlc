@@ -69,9 +69,9 @@ void EPGGraphicsScene::drawBackground( QPainter *painter, const QRectF &rect)
        painter->drawLine( QLineF( rect.left(), y, rect.right(), y ) );
 
     /* current hour line */
-    if( epgView->liveTime().isValid() )
+    if( epgView->epgTime().isValid() )
     {
-        int x = epgView->startTime().secsTo( epgView->liveTime() );
+        int x = epgView->startTime().secsTo( epgView->epgTime() );
         painter->setPen( QPen( QColor( 255, 192, 192 ) ) );
         painter->drawLine( QLineF( x, rect.top(), x, rect.bottom() ) );
     }
@@ -104,15 +104,16 @@ const QDateTime& EPGView::startTime() const
     return m_startTime;
 }
 
-QDateTime EPGView::liveTime() const
+QDateTime EPGView::epgTime() const
 {
     if( m_startTime.isValid() && m_maxTime.isValid() )
-    {
-        QDateTime now = QDateTime::currentDateTime();
-        if( now >= m_startTime && now <= m_maxTime )
-            return now;
-    }
+        return m_epgTime;
     return QDateTime();
+}
+
+void EPGView::setEpgTime(const QDateTime &time)
+{
+    m_epgTime = time;
 }
 
 bool EPGView::hasValidData() const
