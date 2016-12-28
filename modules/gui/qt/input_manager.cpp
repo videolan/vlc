@@ -831,6 +831,14 @@ void InputManager::sectionMenu()
  *  Teletext Functions
  */
 
+void InputManager::changeProgram( int program )
+{
+    if( hasInput() )
+    {
+        var_SetInteger( p_input, "program", program );
+    }
+}
+
 /* Set a new Teletext Page */
 void InputManager::telexSetPage( int page )
 {

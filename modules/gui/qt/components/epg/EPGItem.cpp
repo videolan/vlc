@@ -35,7 +35,7 @@
 
 #include "qt.hpp"
 
-EPGItem::EPGItem( const vlc_epg_event_t *data, EPGView *view, const EPGProgram *prog )
+EPGItem::EPGItem( const vlc_epg_event_t *data, EPGView *view, EPGProgram *prog )
     : QGraphicsItem()
 {
     m_view = view;
@@ -228,6 +228,11 @@ void EPGItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 void EPGItem::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 { /* required to redraw our background without flaws */
     hoverEnterEvent( event );
+}
+
+void EPGItem::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * )
+{
+    program->activate();
 }
 
 void EPGItem::focusInEvent( QFocusEvent * event )

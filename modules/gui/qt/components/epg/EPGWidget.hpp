@@ -51,6 +51,7 @@ public:
 public slots:
     void setZoom( int level );
     void updateEPG( input_item_t * );
+    void activateProgram( int );
 
 private:
     EPGRuler* m_rulerWidget;
@@ -63,6 +64,7 @@ private:
 
 signals:
     void itemSelectionChanged( EPGItem * );
+    void programActivated( int );
 };
 
 #endif // EPGWIDGET_H

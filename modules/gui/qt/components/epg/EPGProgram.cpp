@@ -64,6 +64,11 @@ void EPGProgram::setPosition( size_t i )
     pos = i;
 }
 
+void EPGProgram::activate()
+{
+    view->programActivated( sourceid );
+}
+
 void EPGProgram::pruneEvents( const QDateTime &date )
 {
     QMap<QDateTime, const EPGItem *>::iterator it = eventsbytime.begin();

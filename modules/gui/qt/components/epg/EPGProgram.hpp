@@ -45,6 +45,7 @@ class EPGProgram : public QObject
         void updateEventPos();
         size_t getPosition() const;
         void setPosition( size_t );
+        void activate();
         const EPGItem * getCurrent() const;
         const QString & getName() const;
         static bool lessThan( const EPGProgram *, const EPGProgram * );

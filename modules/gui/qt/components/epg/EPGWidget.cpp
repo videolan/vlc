@@ -80,6 +80,7 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     connect( m_epgView, SIGNAL( itemFocused(EPGItem*)),
              this, SIGNAL(itemSelectionChanged(EPGItem*)) );
     CONNECT( m_epgView, programAdded(const EPGProgram *), m_channelsWidget, addProgram(const EPGProgram *) );
+    CONNECT( m_epgView, programActivated(int), this, activateProgram(int) );
 }
 
 void EPGWidget::reset()
@@ -120,3 +121,7 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
     m_epgView->cleanup();
 }
 
+void EPGWidget::activateProgram( int id )
+{
+    emit programActivated( id );
+}

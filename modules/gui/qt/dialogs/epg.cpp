@@ -76,6 +76,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( descBox );
 
     CONNECT( epg, itemSelectionChanged( EPGItem *), this, displayEvent( EPGItem *) );
+    CONNECT( epg, programActivated(int), THEMIM->getIM(), changeProgram(int) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, scheduleUpdate() );
     CONNECT( THEMIM, inputChanged( bool ), this, inputChanged() );
 

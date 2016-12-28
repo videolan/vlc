@@ -202,6 +202,8 @@ public slots:
     void sectionNext();
     void sectionPrev();
     void sectionMenu();
+    /* Program */
+    void changeProgram( int );
     /* Teletext */
     void telexSetPage( int );          ///< Goto teletext page
     void telexSetTransparency( bool ); ///< Transparency on teletext background

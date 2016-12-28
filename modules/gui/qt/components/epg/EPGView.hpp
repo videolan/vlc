@@ -67,11 +67,13 @@ public:
     void            reset();
     void            cleanup();
     bool            hasValidData() const;
+    void            activateProgram( int );
 
 signals:
     void            rangeChanged( const QDateTime&, const QDateTime& );
     void            itemFocused( EPGItem * );
     void            programAdded( const EPGProgram * );
+    void            programActivated( int );
 
 protected:
     void            walkItems( bool );

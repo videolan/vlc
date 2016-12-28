@@ -214,3 +214,8 @@ void EPGView::focusItem( EPGItem *epgItem )
 {
     emit itemFocused( epgItem );
 }
+
+void EPGView::activateProgram( int id )
+{
+    emit programActivated( id );
+}
