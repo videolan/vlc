@@ -152,4 +152,7 @@ static inline void aout_InputRequestRestart(audio_output_t *aout)
     aout_RequestRestart(aout, AOUT_RESTART_FILTERS);
 }
 
+/* From filters.c */
+bool aout_FiltersCanResample (aout_filters_t *filters);
+
 #endif /* !LIBVLC_AOUT_INTERNAL_H */

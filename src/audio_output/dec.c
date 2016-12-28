@@ -288,6 +288,9 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
         drift = 0;
     }
 
+    if (!aout_FiltersCanResample(owner->filters))
+        return;
+
     /* Resampling */
     if (drift > +AOUT_MAX_PTS_DELAY
      && owner->sync.resamp_type != AOUT_RESAMPLING_UP)

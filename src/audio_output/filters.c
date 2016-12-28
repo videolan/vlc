@@ -548,6 +548,11 @@ void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
     free (filters);
 }
 
+bool aout_FiltersCanResample (aout_filters_t *filters)
+{
+    return (filters->resampler != NULL);
+}
+
 bool aout_FiltersAdjustResampling (aout_filters_t *filters, int adjust)
 {
     if (filters->resampler == NULL)
