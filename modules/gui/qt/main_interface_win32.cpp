@@ -113,7 +113,6 @@ void MainInterface::createTaskBarButtons()
 {
     /*Here is the code for the taskbar thumb buttons
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
-    FIXME:the play button's picture doesn't changed to pause when clicked
     */
     p_taskbl = NULL;
     himl = NULL;
@@ -351,11 +350,7 @@ void MainInterface::changeThumbbarButtons( int i_status )
             return;
     }
 
-    HRESULT hr;
-    if( videoWidget && THEMIM->getIM()->hasVideo() )
-        hr =  p_taskbl->ThumbBarUpdateButtons(WinId(videoWidget), 3, thbButtons);
-    else
-        hr =  p_taskbl->ThumbBarUpdateButtons(WinId(this), 3, thbButtons);
+    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(WinId(this), 3, thbButtons);
 
     if(S_OK != hr)
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
