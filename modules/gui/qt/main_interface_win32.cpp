@@ -354,4 +354,15 @@ void MainInterface::changeThumbbarButtons( int i_status )
 
     if(S_OK != hr)
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
+
+    if( videoWidget && THEMIM->getIM()->hasVideo() )
+    {
+        RECT rect;
+        GetClientRect(WinId(videoWidget), &rect);
+        hr = p_taskbl->SetThumbnailClip(WinId(this), &rect);
+    }
+    else
+        hr = p_taskbl->SetThumbnailClip(WinId(this), NULL);
+    if(S_OK != hr)
+        msg_Err( p_intf, "SetThumbnailClip failed with error %08lx", hr );
 }
