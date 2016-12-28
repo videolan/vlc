@@ -197,6 +197,13 @@ void MainInterface::createTaskBarButtons()
              this, changeThumbbarButtons( int ) );
 }
 
+#if HAS_QT5
+bool MainInterface::nativeEvent(const QByteArray &, void *message, long *result)
+{
+    return winEvent( static_cast<MSG*>( message ), result );
+}
+#endif
+
 bool MainInterface::winEvent ( MSG * msg, long * result )
 {
     if (msg->message == taskbar_wmsg)
