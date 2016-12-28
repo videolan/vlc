@@ -176,6 +176,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     himl = NULL;
     p_taskbl = NULL;
     taskbar_wmsg = RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
+    if (taskbar_wmsg == 0)
+        msg_Warn( p_intf, "Failed to register TaskbarButtonCreated message" );
 #endif
 
     /*********************************
