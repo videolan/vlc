@@ -271,6 +271,20 @@
                </property>
               </widget>
              </item>
+             <item row="10" column="0">
+              <widget class="QLabel" name="continuePlaybackLabel">
+               <property name="text">
+                <string>Continue playback?</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="2" colspan="2">
+              <widget class="QComboBox" name="continuePlaybackComboBox">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -557,13 +571,6 @@
        <widget class="QCheckBox" name="MetadataNetworkAccessMode">
         <property name="text">
          <string>Allow metadata network access</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="4">
-       <widget class="QCheckBox" name="continueBox">
-        <property name="text">
-         <string>Continue playback?</string>
         </property>
        </widget>
       </item>
