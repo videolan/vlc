@@ -197,7 +197,7 @@ struct vout_display_sys_t
     UIView *viewContainer;
     UITapGestureRecognizer *tapRecognizer;
 
-    vlc_gl_t gl;
+    vlc_gl_t *gl;
     vout_display_opengl_t *vgl;
 
     picture_pool_t *picturePool;
@@ -228,7 +228,7 @@ static int Open(vlc_object_t *this)
 
     vd->sys = sys;
     sys->picturePool = NULL;
-    sys->gl.sys = NULL;
+    sys->gl = NULL;
 
     @autoreleasepool {
         if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
@@ -255,19 +255,21 @@ static int Open(vlc_object_t *this)
         video_format_t fmt = vd->fmt;
         if (!sys->zero_copy) {
             msg_Dbg(vd, "will use regular OpenGL rendering");
-            /* Initialize common OpenGL video display */
-            sys->gl.makeCurrent = OpenglESClean;
-            sys->gl.releaseCurrent = OpenglESNoop;
-            sys->gl.swap = OpenglESSwap;
-            sys->gl.getProcAddress = OurGetProcAddress;
-            sys->gl.sys = sys;
 
-            sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl,
-                                               &vd->cfg->viewpoint);
-            if (!sys->vgl) {
-                sys->gl.sys = NULL;
+            sys->gl = vlc_object_create(this, sizeof(*sys->gl));
+            if (!sys->gl)
                 goto bailout;
-            }
+            /* Initialize common OpenGL video display */
+            sys->gl->makeCurrent = OpenglESClean;
+            sys->gl->releaseCurrent = OpenglESNoop;
+            sys->gl->swap = OpenglESSwap;
+            sys->gl->getProcAddress = OurGetProcAddress;
+            sys->gl->sys = sys;
+
+            sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
+                                               sys->gl, &vd->cfg->viewpoint);
+            if (!sys->vgl)
+                goto bailout;
         } else {
             subpicture_chromas = gl_subpicture_chromas;
         }
@@ -341,13 +343,14 @@ void Close (vlc_object_t *this)
         }
         sys->viewContainer = nil;
 
-        if (sys->gl.sys != NULL) {
+        if (sys->gl != NULL) {
             @synchronized (sys->glESView) {
                 msg_Dbg(this, "deleting display");
 
                 if (likely([sys->glESView isAppActive]))
                     vout_display_opengl_Delete(sys->vgl);
             }
+            vlc_object_release(sys->gl);
         }
 
         [sys->glESView release];
@@ -417,7 +420,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                     sys->place = place;
                 }
 
-                if (sys->gl.sys != NULL)
+                if (sys->gl != NULL)
                     vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
 
                 // x / y are top left corner, but we need the lower left one
@@ -428,7 +431,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         }
 
         case VOUT_DISPLAY_CHANGE_VIEWPOINT:
-            if (sys->gl.sys != NULL)
+            if (sys->gl != NULL)
                 return vout_display_opengl_SetViewpoint(sys->vgl,
                     &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
             else
