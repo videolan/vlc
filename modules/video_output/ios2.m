@@ -491,6 +491,11 @@ static int OpenglESClean(vlc_gl_t *gl)
     return 0;
 }
 
+static void OpenglESNoop(vlc_gl_t *gl)
+{
+    (void) gl;
+}
+
 static void OpenglESSwap(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
