@@ -54,7 +54,6 @@ struct vlc_gl_t
 
 enum {
     VLC_OPENGL,
-    VLC_OPENGL_ES,
     VLC_OPENGL_ES2,
 };
 

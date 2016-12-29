@@ -387,15 +387,6 @@ static int OpenGLES2 (vlc_object_t *obj)
     return Open (obj, &api);
 }
 
-static int OpenGLES (vlc_object_t *obj)
-{
-    static const struct gl_api api = {
-        "OpenGL_ES", EGL_OPENGL_ES_API, 0, EGL_OPENGL_ES_BIT,
-        { EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE },
-    };
-    return Open (obj, &api);
-}
-
 static int OpenGL (vlc_object_t *obj)
 {
     static const struct gl_api api = {
@@ -417,11 +408,6 @@ vlc_module_begin ()
     add_submodule ()
     set_capability ("opengl es2", 50)
     set_callbacks (OpenGLES2, Close)
-    add_shortcut ("egl")
-
-    add_submodule ()
-    set_capability ("opengl es", 50)
-    set_callbacks (OpenGLES, Close)
     add_shortcut ("egl")
 
 vlc_module_end ()

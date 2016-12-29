@@ -53,9 +53,6 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
         case VLC_OPENGL:
             type = "opengl";
             break;
-        case VLC_OPENGL_ES:
-            type = "opengl es";
-            break;
         case VLC_OPENGL_ES2:
             type = "opengl es2";
             break;
