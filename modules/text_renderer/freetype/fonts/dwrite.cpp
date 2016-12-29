@@ -123,8 +123,10 @@ extern "C" int InitDWrite( filter_t *p_filter )
     catch( const exception &e )
     {
 #if !VLC_WINSTORE_APP
-        msg_Err( p_filter, "InitDWrite(): %s", e.what() );
         FreeLibrary( p_dw_dll );
+        (void)e;
+#else
+        msg_Err( p_filter, "InitDWrite(): %s", e.what() );
 #endif
 
         return VLC_EGENERIC;
