@@ -116,19 +116,15 @@ extern "C" int InitDWrite( filter_t *p_filter )
 #else
         p_dw_dll = LoadLibrary( TEXT( "Dwrite.dll" ) );
         if( p_dw_dll == NULL )
-        {
-            msg_Err( p_filter, "InitDWrite(): LoadLibrary() failed" );
             return VLC_EGENERIC;
-        }
 
         p_dw_sys = new dw_sys_t( p_dw_dll );
 #endif
     }
     catch( const exception &e )
     {
-        msg_Err( p_filter, "InitDWrite(): %s", e.what() );
-
 #if !VLC_WINSTORE_APP
+        msg_Err( p_filter, "InitDWrite(): %s", e.what() );
         FreeLibrary( p_dw_dll );
 #endif
 
@@ -136,6 +132,7 @@ extern "C" int InitDWrite( filter_t *p_filter )
     }
 
     p_sys->p_dw_sys = p_dw_sys;
+    msg_Dbg( p_filter, "Using DWrite backend" );
     return VLC_SUCCESS;
 }
 
