@@ -136,6 +136,7 @@ static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
 static int OpenglESClean(vlc_gl_t *);
 static void OpenglESSwap(vlc_gl_t *);
+static void OpenglESNoop(vlc_gl_t *);
 
 static picture_pool_t *ZeroCopyPicturePool(vout_display_t *, unsigned);
 static void DestroyZeroCopyPoolPicture(picture_t *);
