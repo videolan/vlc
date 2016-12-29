@@ -136,7 +136,11 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
     };
     picture_pool_t *pool = picture_pool_NewExtended(&pool_cfg);
     if (!pool)
+    {
+        for (unsigned i = 0; i < count; i++)
+            picture_Release(picture[i]);
         goto error;
+    }
 
     return pool;
 error:
