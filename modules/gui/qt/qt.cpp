@@ -36,7 +36,11 @@
 
 #include "input_manager.hpp"    /* THEMIM destruction */
 #include "dialogs_provider.hpp" /* THEDP creation */
-#include "main_interface.hpp"   /* MainInterface creation */
+#ifdef _WIN32
+# include "main_interface_win32.hpp"
+#else
+# include "main_interface.hpp"   /* MainInterface creation */
+#endif
 #include "extensions_manager.hpp" /* Extensions manager */
 #include "managers/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help.hpp"     /* Launch Update */
@@ -574,7 +578,11 @@ static void *ThreadPlatform( void *obj, char *platform_name )
 
     if( !p_sys->b_isDialogProvider )
     {
+#ifdef _WIN32
+        p_mi = new MainInterfaceWin32( p_intf );
+#else
         p_mi = new MainInterface( p_intf );
+#endif
         p_sys->p_mi = p_mi;
 
         /* Check window type from the Qt platform back-end */

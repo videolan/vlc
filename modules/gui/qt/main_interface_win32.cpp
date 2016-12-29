@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +22,11 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#include "main_interface.hpp"
+#include "main_interface_win32.hpp"
 
 #include "input_manager.hpp"
 #include "actions_manager.hpp"
@@ -37,7 +41,6 @@
 # include <QWindow>
 # include <qpa/qplatformnativeinterface.h>
 #endif
-
 
 #define WM_APPCOMMAND 0x0319
 
@@ -80,7 +83,28 @@
 #define GET_FLAGS_LPARAM(lParam)      (LOWORD(lParam))
 #define GET_KEYSTATE_LPARAM(lParam)   GET_FLAGS_LPARAM(lParam)
 
-HWND MainInterface::WinId( QWidget *w )
+MainInterfaceWin32::MainInterfaceWin32( intf_thread_t *_p_intf )
+    : MainInterface( _p_intf )
+    , himl( NULL )
+    , p_taskbl( NULL )
+{
+    /* Volume keys */
+    _p_intf->p_sys->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
+    taskbar_wmsg = RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
+    if (taskbar_wmsg == 0)
+        msg_Warn( p_intf, "Failed to register TaskbarButtonCreated message" );
+}
+
+MainInterfaceWin32::~MainInterfaceWin32()
+{
+    if( himl )
+        ImageList_Destroy( himl );
+    if(p_taskbl)
+        p_taskbl->Release();
+    CoUninitialize();
+}
+
+HWND MainInterfaceWin32::WinId( QWidget *w )
 {
 #if HAS_QT5
     if( w && w->windowHandle() )
@@ -109,7 +133,7 @@ enum HBitmapFormat
 };
 #endif
 
-void MainInterface::createTaskBarButtons()
+void MainInterfaceWin32::createTaskBarButtons()
 {
     /*Here is the code for the taskbar thumb buttons
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
@@ -203,13 +227,13 @@ void MainInterface::createTaskBarButtons()
 }
 
 #if HAS_QT5
-bool MainInterface::nativeEvent(const QByteArray &, void *message, long *result)
+bool MainInterfaceWin32::nativeEvent(const QByteArray &, void *message, long *result)
 {
     return winEvent( static_cast<MSG*>( message ), result );
 }
 #endif
 
-bool MainInterface::winEvent ( MSG * msg, long * result )
+bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
 {
     if (msg->message == taskbar_wmsg)
     {
@@ -307,17 +331,58 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
     return false;
 }
 
-void MainInterface::playlistItemAppended( int, int )
+void MainInterfaceWin32::setVideoFullScreen( bool fs )
+{
+    MainInterface::setVideoFullScreen( fs );
+    if( !fs )
+        changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+}
+
+void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
+{
+    /* check if any visible window is above vlc in the z-order,
+     * but ignore the ones always on top
+     * and the ones which can't be activated */
+    HWND winId;
+#if HAS_QT5
+    QWindow *window = windowHandle();
+    winId = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
+#else
+    winId = internalWinId();
+#endif
+
+    WINDOWINFO wi;
+    HWND hwnd;
+    wi.cbSize = sizeof( WINDOWINFO );
+    for( hwnd = GetNextWindow( winId, GW_HWNDPREV );
+            hwnd && ( !IsWindowVisible( hwnd ) || ( GetWindowInfo( hwnd, &wi ) &&
+                                                    ( wi.dwExStyle&WS_EX_NOACTIVATE ) ) );
+            hwnd = GetNextWindow( hwnd, GW_HWNDPREV ) )
+    {
+    }
+    if( !hwnd || !GetWindowInfo( hwnd, &wi ) || (wi.dwExStyle&WS_EX_TOPMOST) )
+        hide();
+    else
+        activateWindow();
+}
+
+void MainInterfaceWin32::reloadPrefs()
+{
+    p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
+    MainInterface::reloadPrefs();
+}
+
+void MainInterfaceWin32::playlistItemAppended( int, int )
 {
     changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
 
-void MainInterface::playlistItemRemoved( int )
+void MainInterfaceWin32::playlistItemRemoved( int )
 {
     changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
 
-void MainInterface::changeThumbbarButtons( int i_status )
+void MainInterfaceWin32::changeThumbbarButtons( int i_status )
 {
     if( p_taskbl == NULL )
         return;

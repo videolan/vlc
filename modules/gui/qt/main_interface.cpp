@@ -65,12 +65,6 @@
 #include <vlc_keys.h>                       /* Wheel event */
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
-
-#if defined(_WIN32) && HAS_QT5
-#include <QWindow>
-#include <qpa/qplatformnativeinterface.h>
-#endif
-
 // #define DEBUG_INTF
 
 /* Callback prototypes */
@@ -143,11 +137,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Set the other interface settings */
     settings = getSettings();
 
-#ifdef _WIN32
-    /* Volume keys */
-    p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
-#endif
-
     /* */
     b_plDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
 
@@ -171,14 +160,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **************/
     createStatusBar();
     setStatusBarVisibility( getSettings()->value( "MainWindow/status-bar-visible", false ).toBool() );
-
-#ifdef _WIN32
-    himl = NULL;
-    p_taskbl = NULL;
-    taskbar_wmsg = RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
-    if (taskbar_wmsg == 0)
-        msg_Warn( p_intf, "Failed to register TaskbarButtonCreated message" );
-#endif
 
     /*********************************
      * Create the Systray Management *
@@ -278,14 +259,6 @@ MainInterface::~MainInterface()
     if( videoWidget )
         releaseVideoSlot();
 
-#ifdef _WIN32
-    if( himl )
-        ImageList_Destroy( himl );
-    if(p_taskbl)
-        p_taskbl->Release();
-    CoUninitialize();
-#endif
-
     /* Be sure to kill the actionsManager... Only used in the MI and control */
     ActionsManager::killInstance();
 
@@ -362,9 +335,6 @@ void MainInterface::reloadPrefs()
 {
     i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
     b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
-#ifdef _WIN32
-    p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
-#endif
     if( !var_InheritBool( p_intf, "qt-fs-controller" ) && fullscreenControls )
     {
         delete fullscreenControls;
@@ -864,9 +834,6 @@ void MainInterface::setVideoFullScreen( bool fs )
          * qt-fullscreen-screennumber is forced) */
         setMinimalView( b_minimalView );
         setInterfaceFullScreen( b_interfaceFullScreen );
-#ifdef _WIN32
-        changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
-#endif
     }
     videoWidget->sync();
 }
@@ -1257,6 +1224,11 @@ void MainInterface::createSystray()
              this, updateSystrayTooltipStatus( int ) );
 }
 
+void MainInterface::toggleUpdateSystrayMenuWhenVisible()
+{
+    hide();
+}
+
 /**
  * Updates the Systray Icon's menu and toggle the main interface
  */
@@ -1277,38 +1249,7 @@ void MainInterface::toggleUpdateSystrayMenu()
     else
     {
         /* Visible (possibly under other windows) */
-#ifdef _WIN32
-        /* check if any visible window is above vlc in the z-order,
-         * but ignore the ones always on top
-         * and the ones which can't be activated */
-        HWND winId;
-#if HAS_QT5
-        QWindow *window = windowHandle();
-        winId = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
-#else
-        winId = internalWinId();
-#endif
-
-        WINDOWINFO wi;
-        HWND hwnd;
-        wi.cbSize = sizeof( WINDOWINFO );
-        for( hwnd = GetNextWindow( winId, GW_HWNDPREV );
-                hwnd && ( !IsWindowVisible( hwnd ) ||
-                    ( GetWindowInfo( hwnd, &wi ) &&
-                      (wi.dwExStyle&WS_EX_NOACTIVATE) ) );
-                hwnd = GetNextWindow( hwnd, GW_HWNDPREV ) );
-            if( !hwnd || !GetWindowInfo( hwnd, &wi ) ||
-                (wi.dwExStyle&WS_EX_TOPMOST) )
-            {
-                hide();
-            }
-            else
-            {
-                activateWindow();
-            }
-#else
-        hide();
-#endif // _WIN32
+        toggleUpdateSystrayMenuWhenVisible();
     }
     if( sysTray )
         VLCMenuBar::updateSystrayMenu( this, p_intf );

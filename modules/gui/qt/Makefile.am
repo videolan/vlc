@@ -120,7 +120,7 @@ libqt_plugin_la_SOURCES = \
 	util/singleton.hpp \
 	styles/seekstyle.cpp styles/seekstyle.hpp
 if HAVE_WIN32
-libqt_plugin_la_SOURCES += main_interface_win32.cpp
+libqt_plugin_la_SOURCES += main_interface_win32.cpp main_interface_win32.hpp
 endif
 
 # Meta-object compilation
@@ -206,6 +206,10 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/buttons/DeckButtonsLayout.moc.cpp \
 	util/buttons/BrowseButton.moc.cpp \
 	styles/seekstyle.moc.cpp
+
+if HAVE_WIN32
+nodist_libqt_plugin_la_SOURCES += main_interface_win32.moc.cpp
+endif
 
 nodist_libqt_plugin_la_SOURCES += \
 	ui/equalizer.h \
