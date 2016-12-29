@@ -103,7 +103,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->f_scale = var_InheritFloat( p_this, "svg-scale" );
 
     /* Initialize library */
-    rsvg_init();
+#if (GLIB_MAJOR_VERSION < 2 || GLIB_MINOR_VERSION < 36)
+    g_type_init();
+#endif
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -266,5 +268,7 @@ done:
 static void CloseDecoder( vlc_object_t *p_this )
 {
     VLC_UNUSED( p_this );
+#if (GLIB_MAJOR_VERSION < 2 || GLIB_MINOR_VERSION < 36)
     rsvg_term();
+#endif
 }
