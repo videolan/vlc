@@ -258,6 +258,10 @@ public:
     void updateFullwidthGeometry( int number );
     int targetScreen();
 
+private:
+    static int FullscreenChanged( vlc_object_t *obj,
+                    const char *, vlc_value_t, vlc_value_t new_val, void *data );
+
 signals:
     void keyPressed( QKeyEvent * );
     void fullscreenChanged( bool );
