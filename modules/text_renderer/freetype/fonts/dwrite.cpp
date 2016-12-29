@@ -105,7 +105,6 @@ static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family 
 
 extern "C" int InitDWrite( filter_t *p_filter )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     dw_sys_t *p_dw_sys;
     HMODULE p_dw_dll = NULL;
 
@@ -131,7 +130,7 @@ extern "C" int InitDWrite( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
-    p_sys->p_dw_sys = p_dw_sys;
+    p_filter->p_sys->p_dw_sys = p_dw_sys;
     msg_Dbg( p_filter, "Using DWrite backend" );
     return VLC_SUCCESS;
 }
