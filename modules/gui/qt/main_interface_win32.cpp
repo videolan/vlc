@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-#if defined(_WIN32) && HAS_QT5
+#if HAS_QT5
 # include <QWindow>
 # include <qpa/qplatformnativeinterface.h>
 #endif
@@ -117,7 +117,7 @@ HWND MainInterfaceWin32::WinId( QWidget *w )
 #endif
 }
 
-#if defined(_WIN32) && !HAS_QT5
+#if !HAS_QT5
 static const int PremultipliedAlpha = QPixmap::PremultipliedAlpha;
 static HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0)
 {
