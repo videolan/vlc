@@ -211,6 +211,8 @@ public slots:
 
 #ifdef _WIN32
     void changeThumbbarButtons( int );
+    void playlistItemAppended( int itemId, int parentId );
+    void playlistItemRemoved( int itemId );
 #endif
 
     /* Manage the Video Functions from the vout threads */

@@ -169,17 +169,17 @@ void MainInterface::createTaskBarButtons()
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THBF_HIDDEN;
+    thbButtons[0].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     thbButtons[1].dwMask = dwMask;
     thbButtons[1].iId = 1;
     thbButtons[1].iBitmap = 2;
-    thbButtons[1].dwFlags = THBF_HIDDEN;
+    thbButtons[1].dwFlags = THEPL->items.i_size > 0 ? THBF_ENABLED : THBF_HIDDEN;
 
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THBF_HIDDEN;
+    thbButtons[2].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     hr = p_taskbl->ThumbBarSetImageList( WinId(this), himl );
     if( FAILED(hr) )
@@ -194,6 +194,10 @@ void MainInterface::createTaskBarButtons()
     }
     CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
              this, changeThumbbarButtons( int ) );
+    CONNECT( THEMIM, playlistItemAppended( int, int ),
+            this, playlistItemAppended( int, int ) );
+    CONNECT( THEMIM, playlistItemRemoved( int ),
+            this, playlistItemRemoved( int ) );
     if( THEMIM->getIM()->playingStatus() == PLAYING_S )
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
@@ -303,6 +307,16 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
     return false;
 }
 
+void MainInterface::playlistItemAppended( int, int )
+{
+    changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+}
+
+void MainInterface::playlistItemRemoved( int )
+{
+    changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+}
+
 void MainInterface::changeThumbbarButtons( int i_status )
 {
     if( p_taskbl == NULL )
@@ -317,24 +331,24 @@ void MainInterface::changeThumbbarButtons( int i_status )
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
+    thbButtons[0].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     //play/pause
     thbButtons[1].dwMask = dwMask;
     thbButtons[1].iId = 1;
+    thbButtons[1].dwFlags = THBF_ENABLED;
 
     //next
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
+    thbButtons[2].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     switch( i_status )
     {
         case OPENING_S:
         case PLAYING_S:
             {
-                thbButtons[0].dwFlags = THBF_ENABLED;
-                thbButtons[1].dwFlags = THBF_ENABLED;
-                thbButtons[2].dwFlags = THBF_ENABLED;
                 thbButtons[1].iBitmap = 1;
                 break;
             }
@@ -342,9 +356,6 @@ void MainInterface::changeThumbbarButtons( int i_status )
         case PAUSE_S:
         case ERROR_S:
             {
-                thbButtons[0].dwFlags = THBF_ENABLED;
-                thbButtons[1].dwFlags = THBF_ENABLED;
-                thbButtons[2].dwFlags = THBF_ENABLED;
                 thbButtons[1].iBitmap = 2;
                 break;
             }
