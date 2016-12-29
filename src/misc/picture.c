@@ -445,6 +445,8 @@ int picture_Export( vlc_object_t *p_obj,
     }
 
     image_handler_t *p_image = image_HandlerCreate( p_obj );
+    if( !p_image )
+        return VLC_ENOMEM;
 
     block_t *p_block = image_Write( p_image, p_picture, &fmt_in, &fmt_out );
 
