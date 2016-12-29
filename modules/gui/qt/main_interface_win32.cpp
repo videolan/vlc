@@ -194,6 +194,8 @@ void MainInterface::createTaskBarButtons()
     }
     CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
              this, changeThumbbarButtons( int ) );
+    if( THEMIM->getIM()->playingStatus() == PLAYING_S )
+        changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
 
 #if HAS_QT5
