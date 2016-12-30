@@ -209,7 +209,7 @@ static int DemuxOpen(vlc_object_t *obj)
     /* Track number in input item */
     if (sys->start == (unsigned)-1 || sys->length == (unsigned)-1)
     {
-        int *sectors; /* Track sectors */
+        int *sectors = NULL; /* Track sectors */
         unsigned titles = ioctl_GetTracksMap(obj, sys->vcddev, &sectors);
 
         if (track > titles)
