@@ -464,126 +464,134 @@ static void GetTracks( access_t *p_access, input_item_t *p_current )
     const mtime_t i_duration = (int64_t)( p_sys->p_sectors[p_sys->titles] - p_sys->p_sectors[0] ) *
                                CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
     input_item_SetDuration( p_current, i_duration );
+}
 
-    input_item_node_t *p_root = input_item_node_Create( p_current );
+static int ReadDir(access_t *access, input_item_node_t *node)
+{
+    access_sys_t *sys = access->p_sys;
 
     /* Build title table */
-    for( int i = 0; i < p_sys->titles; i++ )
+    for (int i = 0; i < sys->titles; i++)
     {
-        char *psz_opt, *psz_name;
+        msg_Dbg(access, "track[%d] start=%d", i, sys->p_sectors[i]);
 
-        msg_Dbg( obj, "track[%d] start=%d", i, p_sys->p_sectors[i] );
+        /* Initial/default name */
+        char *name;
 
-        /* Define a "default name" */
-        if( asprintf( &psz_name, _("Audio CD - Track %02i"), (i+1) ) == -1 )
-            psz_name = p_access->psz_url;
+        if (unlikely(asprintf(&name, _("Audio CD - Track %02i"), i + 1) == -1))
+            name = NULL;
 
         /* Create playlist items */
-        const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i+1] - p_sys->p_sectors[i] ) *
-                                   CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
+        const mtime_t duration =
+            (mtime_t)(sys->p_sectors[i + 1] - sys->p_sectors[i])
+            * CDDA_DATA_SIZE * CLOCK_FREQ / 44100 / 2 / 2;
 
-        input_item_t *p_item = input_item_NewDisc( p_access->psz_url,
-                                                   psz_name, i_duration );
-        if( likely(psz_name != p_access->psz_url) )
-            free( psz_name );
+        input_item_t *item = input_item_NewDisc(access->psz_url,
+                                                (name != NULL) ? name :
+                                                access->psz_url, duration);
+        free(name);
 
-        if( unlikely(p_item == NULL) )
+        if (unlikely(item == NULL))
             continue;
 
-        input_item_CopyOptions( p_item, p_current );
-
-        if( likely(asprintf( &psz_opt, "cdda-track=%i", i+1 ) != -1) )
+        char *opt;
+        if (likely(asprintf(&opt, "cdda-track=%i", i + 1) != -1))
         {
-            input_item_AddOption( p_item, psz_opt, VLC_INPUT_OPTION_TRUSTED );
-            free( psz_opt );
-        }
-        if( likely(asprintf( &psz_opt, "cdda-first-sector=%i",
-                             p_sys->p_sectors[i] ) != -1) )
-        {
-            input_item_AddOption( p_item, psz_opt, VLC_INPUT_OPTION_TRUSTED );
-            free( psz_opt );
-        }
-        if( likely(asprintf( &psz_opt, "cdda-last-sector=%i",
-                             p_sys->p_sectors[i+1] ) != -1) )
-        {
-            input_item_AddOption( p_item, psz_opt, VLC_INPUT_OPTION_TRUSTED );
-            free( psz_opt );
+            input_item_AddOption(item, opt, VLC_INPUT_OPTION_TRUSTED);
+            free(opt);
         }
 
-        const char *psz_track_title = NULL;
-        const char *psz_track_artist = NULL;
-        const char *psz_track_genre = NULL;
-        const char *psz_track_description = NULL;
+        if (likely(asprintf(&opt, "cdda-first-sector=%i",
+                            sys->p_sectors[i]) != -1))
+        {
+            input_item_AddOption(item, opt, VLC_INPUT_OPTION_TRUSTED);
+            free(opt);
+        }
+
+        if (likely(asprintf(&opt, "cdda-last-sector=%i",
+                            sys->p_sectors[i + 1]) != -1))
+        {
+            input_item_AddOption(item, opt, VLC_INPUT_OPTION_TRUSTED);
+            free(opt);
+        }
+
+        const char *title = NULL;
+        const char *artist = NULL;
+        const char *album = NULL;
+        const char *genre = NULL;
+        const char *description = NULL;
+        int year = 0;
 
 #ifdef HAVE_LIBCDDB
-        /* Retreive CDDB information */
-        if( p_disc )
+        if (sys->cddb != NULL)
         {
-            cddb_track_t *t = cddb_disc_get_track( p_disc, i );
-            if( t != NULL )
+            cddb_track_t *t = cddb_disc_get_track(sys->cddb, i);
+            if (t != NULL)
             {
-                psz_track_title = cddb_track_get_title( t );
-                psz_track_artist = cddb_track_get_artist( t );
+                title = cddb_track_get_title(t);
+                artist = cddb_track_get_artist(t);
             }
+
+            ON_EMPTY(artist, cddb_disc_get_artist(sys->cddb));
+            album = cddb_disc_get_title(sys->cddb);
+            genre = cddb_disc_get_genre(sys->cddb);
+            year = cddb_disc_get_year(sys->cddb);
         }
 #endif
+        const vlc_meta_t *m;
 
-        /* Retreive CD-TEXT information but prefer CDDB */
-        if( i+1 < i_cd_text && pp_cd_text[i+1] )
+        if (sys->cdtextc > 0 && (m = sys->cdtextv[0]) != NULL)
         {
-            const vlc_meta_t *t = pp_cd_text[i+1];
-
-            ON_EMPTY( psz_track_title,       vlc_meta_Get( t, vlc_meta_Title ) );
-            ON_EMPTY( psz_track_artist,      vlc_meta_Get( t, vlc_meta_Artist ) );
-            ON_EMPTY( psz_track_genre,       vlc_meta_Get( t, vlc_meta_Genre ) );
-            ON_EMPTY( psz_track_description, vlc_meta_Get( t, vlc_meta_Description ) );
+            ON_EMPTY(artist, vlc_meta_Get(m, vlc_meta_Artist));
+            ON_EMPTY(album,  vlc_meta_Get(m, vlc_meta_Album));
+            ON_EMPTY(genre,  vlc_meta_Get(m, vlc_meta_Genre));
+            description =    vlc_meta_Get(m, vlc_meta_Description);
         }
 
-        /* */
-        ON_EMPTY( psz_track_artist,       psz_artist );
-        ON_EMPTY( psz_track_genre,        psz_genre );
-        ON_EMPTY( psz_track_description,  psz_description );
-
-        /* */
-        if( NONEMPTY( psz_track_title ) )
+        if (i + 1 < sys->cdtextc && (m = sys->cdtextv[i + 1]) != NULL)
         {
-            input_item_SetName( p_item, psz_track_title );
-            input_item_SetTitle( p_item, psz_track_title );
+            ON_EMPTY(title,       vlc_meta_Get(m, vlc_meta_Title));
+            ON_EMPTY(artist,      vlc_meta_Get(m, vlc_meta_Artist));
+            ON_EMPTY(genre,       vlc_meta_Get(m, vlc_meta_Genre));
+            ON_EMPTY(description, vlc_meta_Get(m, vlc_meta_Description));
         }
 
-        if( NONEMPTY( psz_track_artist ) )
-            input_item_SetArtist( p_item, psz_track_artist );
+        if (NONEMPTY(title))
+        {
+            input_item_SetName(item, title);
+            input_item_SetTitle(item, title);
+        }
 
-        if( NONEMPTY( psz_track_genre ) )
-            input_item_SetGenre( p_item, psz_track_genre );
+        if (NONEMPTY(artist))
+            input_item_SetArtist(item, artist);
 
-        if( NONEMPTY( psz_track_description ) )
-            input_item_SetDescription( p_item, psz_track_description );
+        if (NONEMPTY(genre))
+            input_item_SetGenre(item, genre);
 
-        if( NONEMPTY( psz_album ) )
-            input_item_SetAlbum( p_item, psz_album );
+        if (NONEMPTY(description))
+            input_item_SetDescription(item, description);
 
-        if( NONEMPTY( psz_year ) )
-            input_item_SetDate( p_item, psz_year );
+        if (NONEMPTY(album))
+            input_item_SetAlbum(item, album);
 
-        char psz_num[3+1];
-        snprintf( psz_num, sizeof(psz_num), "%d", 1+i );
-        input_item_SetTrackNum( p_item, psz_num );
+        if (year != 0)
+        {
+            char yearbuf[5];
 
-        input_item_node_AppendItem( p_root, p_item );
-        vlc_gc_decref( p_item );
+            snprintf(yearbuf, sizeof (yearbuf), "%u", year);
+            input_item_SetDate(item, yearbuf);
+        }
+
+        char num[4];
+        snprintf(num, sizeof (num), "%d", i + 1);
+        input_item_SetTrackNum(item, num);
+
+        input_item_node_AppendItem(node, item);
+        input_item_Release(item);
     }
 #undef ON_EMPTY
 #undef NONEMPTY
-
-    input_item_node_PostAndDelete( p_root );
-}
-
-static block_t *BlockDummy( access_t *p_access, bool *restrict eof )
-{
-    (void) p_access;
-    *eof = true;
-    return NULL;
+    return VLC_SUCCESS;
 }
 
 static int AccessOpen(vlc_object_t *obj)
@@ -648,9 +656,10 @@ static int AccessOpen(vlc_object_t *obj)
             GetTracks(p_access, p_current);
     }
 
-    p_access->pf_block = BlockDummy;
-    p_access->pf_seek = NULL;
     p_access->pf_read = NULL;
+    p_access->pf_block = NULL;
+    p_access->pf_readdir = ReadDir;
+    p_access->pf_seek = NULL;
     p_access->pf_control = access_vaDirectoryControlHelper;
     return VLC_SUCCESS;
 
