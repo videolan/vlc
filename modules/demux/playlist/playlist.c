@@ -201,7 +201,7 @@ int Control(demux_t *demux, int query, va_list args)
         }
         case DEMUX_GET_META:
         {
-            return VLC_SUCCESS;
+            return vlc_stream_vaControl(demux->s, STREAM_GET_META, args);
         }
         case DEMUX_HAS_UNSUPPORTED_META:
         {
