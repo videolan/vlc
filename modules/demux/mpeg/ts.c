@@ -2423,7 +2423,7 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
     {
         if( pid->i_cc == 0xff )
         {
-            msg_Warn( p_demux, "first packet for pid=%d cc=0x%x",
+            msg_Dbg( p_demux, "first packet for pid=%d cc=0x%x",
                       pid->i_pid, i_cc );
             pid->i_cc = i_cc;
         }
