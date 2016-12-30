@@ -69,7 +69,7 @@ static vcddev_t *DiscOpen(vlc_object_t *obj, const char *path)
 
 #if defined (_WIN32) || defined (__OS2__)
     /* Trim backslash after drive letter */
-    if (filename[0] != '\0' && !strcmp(&filename[1], ":\\")
+    if (filename[0] != '\0' && !strcmp(&filename[1], ":\\"))
         filename[2] = '\0';
 #endif
 
