@@ -56,6 +56,32 @@
  #include <errno.h>
 #endif
 
+static vcddev_t *DiscOpen(vlc_object_t *obj, const char *path)
+{
+    char *filename;
+
+    if (path == NULL)
+        filename = var_InheritString(obj, "cd-audio");
+    else
+        filename = ToLocaleDup(path);
+    if (filename == NULL)
+        return NULL;
+
+#if defined (_WIN32) || defined (__OS2__)
+    /* Trim backslash after drive letter */
+    if (filename[0] != '\0' && !strcmp(&filename[1], ":\\")
+        filename[2] = '\0';
+#endif
+
+    /* Open CDDA */
+    vcddev_t *dev = ioctl_Open(obj, filename);
+    if (dev == NULL)
+        msg_Warn(obj, "cannot open disc %s", filename);
+    free(filename);
+
+    return dev;
+}
+
 /* how many blocks Demux() will read in each iteration */
 #define CDDA_BLOCKS_ONCE 20
 
@@ -164,37 +190,18 @@ static int DemuxOpen(vlc_object_t *obj)
     if (track == 0)
         return VLC_EGENERIC; /* Whole disc -> use access plugin */
 
-    char *path;
-    if (demux->psz_file != NULL)
-        path = ToLocaleDup(demux->psz_file);
-    else
-        path = var_InheritString(obj, "cd-audio");
-    if (path == NULL)
-        return VLC_EGENERIC;
-
-#if defined( _WIN32 ) || defined( __OS2__ )
-    if (path[0] != '\0' && strcmp(path + 1, ":" DIR_SEP) == 0)
-        path[2] = '\0';
- #endif
-
     demux_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
-    {
-        free(path);
         return VLC_ENOMEM;
-    }
-    demux->p_sys = sys;
 
     /* Open CDDA */
-    sys->vcddev = ioctl_Open(obj, path);
-    if (sys->vcddev == NULL)
-        msg_Warn(obj, "could not open %s", path);
-    free(path);
+    sys->vcddev = DiscOpen(obj, demux->psz_file);
     if (sys->vcddev == NULL)
     {
         free(sys);
         return VLC_EGENERIC;
     }
+    demux->p_sys = sys;
 
     sys->start = var_InheritInteger(obj, "cdda-first-sector");
     sys->length = var_InheritInteger(obj, "cdda-last-sector") - sys->start;
@@ -614,46 +621,25 @@ static block_t *BlockDummy( access_t *p_access, bool *restrict eof )
 static int AccessOpen(vlc_object_t *obj)
 {
     access_t *p_access = (access_t *)obj;
-    vcddev_t     *vcddev;
-    char         *psz_name;
 
     /* Do we play a single track ? */
     if (var_InheritInteger(obj, "cdda-track") != 0)
         return VLC_EGENERIC;
 
-    if( !p_access->psz_filepath || !*p_access->psz_filepath )
-    {
-        psz_name = var_InheritString(obj, "cd-audio");
-        if( !psz_name )
-            return VLC_EGENERIC;
-    }
-    else psz_name = ToLocaleDup( p_access->psz_filepath );
-
-#if defined( _WIN32 ) || defined( __OS2__ )
-    if( psz_name[0] && psz_name[1] == ':' &&
-        psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
-#endif
-
-    access_sys_t *p_sys = calloc( 1, sizeof (*p_sys) );
-    if( unlikely(p_sys == NULL) )
-    {
-        free( psz_name );
+    access_sys_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-    }
-    p_access->p_sys = p_sys;
 
     /* Open CDDA */
-    vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name );
-    if( vcddev == NULL )
-        msg_Warn( p_access, "could not open %s", psz_name );
-    free( psz_name );
-    if( vcddev == NULL )
+    sys->vcddev = DiscOpen(obj, p_access->psz_filepath);
+    if (sys->vcddev == NULL)
     {
-        free( p_sys );
+        free(sys);
         return VLC_EGENERIC;
     }
 
-    p_sys->vcddev = vcddev;
+    sys->p_sectors = NULL;
+    p_access->p_sys = sys;
 
     /* We only do separate items if the whole disc is requested */
     input_thread_t *p_input = p_access->p_input;
@@ -671,9 +657,9 @@ static int AccessOpen(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    free( p_sys->p_sectors );
-    ioctl_Close( VLC_OBJECT(p_access), p_sys->vcddev );
-    free( p_sys );
+    free(sys->p_sectors);
+    ioctl_Close(obj, sys->vcddev);
+    free(sys);
     return VLC_EGENERIC;
 }
 
@@ -682,7 +668,7 @@ static void AccessClose(vlc_object_t *obj)
     access_t *access = (access_t *)obj;
     access_sys_t *sys = access->p_sys;
 
-    free(sys->p_sectors );
+    free(sys->p_sectors);
     ioctl_Close(obj, sys->vcddev);
     free(sys);
 }
