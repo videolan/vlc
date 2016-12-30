@@ -260,7 +260,13 @@ static void DemuxClose(vlc_object_t *obj)
 struct access_sys_t
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
-    int        *p_sectors;                                  /* Track sectors */
+    int         *p_sectors;                                 /* Track sectors */
+    int          titles;
+    int          cdtextc;
+    vlc_meta_t **cdtextv;
+#ifdef HAVE_LIBCDDB
+    cddb_disc_t *cddb;
+#endif
 };
 
 #ifdef HAVE_LIBCDDB
@@ -369,23 +375,11 @@ error:
 }
 #endif /* HAVE_LIBCDDB */
 
-static int GetTracks( access_t *p_access, input_item_t *p_current )
+static void GetTracks( access_t *p_access, input_item_t *p_current )
 {
     vlc_object_t *obj = VLC_OBJECT(p_access);
     access_sys_t *p_sys = p_access->p_sys;
 
-    const int i_titles = ioctl_GetTracksMap( obj, p_sys->vcddev,
-                                             &p_sys->p_sectors );
-    if( i_titles <= 0 )
-    {
-        if( i_titles < 0 )
-            msg_Err( obj, "unable to count tracks" );
-        else if( i_titles <= 0 )
-            msg_Err( obj, "no audio tracks found" );
-        return VLC_EGENERIC;;
-    }
-
-    /* */
     input_item_SetName( p_current, "Audio CD" );
 
     const char *psz_album = NULL;
@@ -401,9 +395,9 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 
     /* Retreive CDDB information */
 #ifdef HAVE_LIBCDDB
+    cddb_disc_t *p_disc = p_sys->cddb;
     char psz_year_buffer[4+1];
-    msg_Dbg( obj, "fetching infos with CDDB..." );
-    cddb_disc_t *p_disc = GetCDDBInfo( obj, i_titles, p_sys->p_sectors );
+
     if( p_disc )
     {
         msg_Dbg( obj, "Disc ID: %08x", cddb_disc_get_discid( p_disc ) );
@@ -419,7 +413,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         }
 
         /* Set artist only if unique */
-        for( int i = 0; i < i_titles; i++ )
+        for( int i = 0; i < p_sys->titles; i++ )
         {
             cddb_track_t *t = cddb_disc_get_track( p_disc, i );
             if( !t )
@@ -434,20 +428,10 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
             psz_artist = psz_track_artist;
         }
     }
-    else
-        msg_Dbg( obj, "GetCDDBInfo failed" );
 #endif
 
-    /* CD-Text */
-    vlc_meta_t **pp_cd_text;
-    int        i_cd_text;
-
-    if( ioctl_GetCdText( obj, p_sys->vcddev, &pp_cd_text, &i_cd_text ) )
-    {
-        msg_Dbg( obj, "CD-TEXT information missing" );
-        i_cd_text = 0;
-        pp_cd_text = NULL;
-    }
+    vlc_meta_t *const *const pp_cd_text = p_sys->cdtextv;
+    const int i_cd_text = p_sys->cdtextc;
 
     /* Retrieve CD-TEXT information but prefer CDDB */
     if( i_cd_text > 0 && pp_cd_text[0] )
@@ -477,14 +461,14 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     if( NONEMPTY( psz_description ) )
         input_item_SetDescription( p_current, psz_description );
 
-    const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i_titles] - p_sys->p_sectors[0] ) *
+    const mtime_t i_duration = (int64_t)( p_sys->p_sectors[p_sys->titles] - p_sys->p_sectors[0] ) *
                                CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
     input_item_SetDuration( p_current, i_duration );
 
     input_item_node_t *p_root = input_item_node_Create( p_current );
 
     /* Build title table */
-    for( int i = 0; i < i_titles; i++ )
+    for( int i = 0; i < p_sys->titles; i++ )
     {
         char *psz_opt, *psz_name;
 
@@ -593,22 +577,6 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 #undef NONEMPTY
 
     input_item_node_PostAndDelete( p_root );
-
-    /* */
-    for( int i = 0; i < i_cd_text; i++ )
-    {
-        vlc_meta_t *p_meta = pp_cd_text[i];
-        if( !p_meta )
-            continue;
-        vlc_meta_Delete( p_meta );
-    }
-    free( pp_cd_text );
-
-#ifdef HAVE_LIBCDDB
-    if( p_disc )
-        cddb_disc_destroy( p_disc );
-#endif
-    return VLC_SUCCESS;
 }
 
 static block_t *BlockDummy( access_t *p_access, bool *restrict eof )
@@ -637,8 +605,38 @@ static int AccessOpen(vlc_object_t *obj)
         free(sys);
         return VLC_EGENERIC;
     }
-
     sys->p_sectors = NULL;
+
+    sys->titles = ioctl_GetTracksMap(obj, sys->vcddev, &sys->p_sectors);
+    if (sys->titles < 0)
+    {
+        msg_Err(obj, "cannot count tracks");
+        goto error;
+    }
+
+    if (sys->titles == 0)
+    {
+        msg_Err(obj, "no audio tracks found");
+        goto error;
+    }
+
+#ifdef HAVE_LIBCDDB
+    msg_Dbg(obj, "retrieving metadata with CDDB");
+
+    sys->cddb = GetCDDBInfo(obj, sys->titles, sys->p_sectors);
+    if (sys->cddb != NULL)
+        msg_Dbg(obj, "disc ID: 0x%08x", cddb_disc_get_discid(sys->cddb));
+    else
+        msg_Dbg(obj, "CDDB failure");
+#endif
+
+    if (ioctl_GetCdText(obj, sys->vcddev, &sys->cdtextv, &sys->cdtextc))
+    {
+        msg_Dbg(obj, "CD-TEXT information missing");
+        sys->cdtextv = NULL;
+        sys->cdtextc = 0;
+    }
+
     p_access->p_sys = sys;
 
     /* We only do separate items if the whole disc is requested */
@@ -646,8 +644,8 @@ static int AccessOpen(vlc_object_t *obj)
     if( p_input )
     {
         input_item_t *p_current = input_GetItem( p_input );
-        if (p_current != NULL && GetTracks(p_access, p_current) < 0)
-            goto error;
+        if (p_current != NULL)
+            GetTracks(p_access, p_current);
     }
 
     p_access->pf_block = BlockDummy;
@@ -667,6 +665,19 @@ static void AccessClose(vlc_object_t *obj)
 {
     access_t *access = (access_t *)obj;
     access_sys_t *sys = access->p_sys;
+
+    for (int i = 0; i < sys->cdtextc; i++)
+    {
+        vlc_meta_t *meta = sys->cdtextv[i];
+        if (meta != NULL)
+            vlc_meta_Delete(meta);
+    }
+    free(sys->cdtextv);
+
+#ifdef HAVE_LIBCDDB
+    if (sys->cddb != NULL)
+        cddb_disc_destroy(sys->cddb);
+#endif
 
     free(sys->p_sectors);
     ioctl_Close(obj, sys->vcddev);
