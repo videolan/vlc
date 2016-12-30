@@ -104,6 +104,7 @@ ts_pid_t * ts_pid_Get( ts_pid_list_t *p_list, uint16_t i_pid )
         //return NULL;
     }
 
+    p_pid->i_cc  = 0xff;
     p_pid->i_pid = i_pid;
     p_list->pp_all[p_list->i_all++] = p_pid;
 
