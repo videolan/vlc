@@ -33,6 +33,9 @@
 #   define GLSL_VERSION "120"
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 128
+#   ifdef GL_VERSION_4_4
+#       define VLCGL_HAS_PBO
+#   endif
 #   define PRECISION ""
 #endif
 
@@ -61,6 +64,15 @@
 #   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
 #   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
+#   ifdef VLCGL_HAS_PBO
+#    define PFNGLBUFFERSTORAGEPROC           typeof(glBufferStorage)*
+#    define PFNGLMAPBUFFERRANGEPROC          typeof(glMapBufferRange)*
+#    define PFNGLFLUSHMAPPEDBUFFERRANGEPROC  typeof(glFlushMappedBufferRange)*
+#    define PFNGLUNMAPBUFFERPROC             typeof(glUnmapBuffer)*
+#    define PFNGLFENCESYNCPROC               typeof(glFenceSync)*
+#    define PFNGLDELETESYNCPROC              typeof(glDeleteSync)*
+#    define PFNGLCLIENTWAITSYNCPROC          typeof(glClientWaitSync)*
+#   endif
 #   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
 #if defined(__APPLE__)
 #   import <CoreFoundation/CoreFoundation.h>
@@ -104,6 +116,15 @@ typedef struct {
     PFNGLGENBUFFERSPROC    GenBuffers;
     PFNGLBINDBUFFERPROC    BindBuffer;
     PFNGLBUFFERDATAPROC    BufferData;
+#ifdef VLCGL_HAS_PBO
+    PFNGLBUFFERSTORAGEPROC          BufferStorage;
+    PFNGLMAPBUFFERRANGEPROC         MapBufferRange;
+    PFNGLFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange;
+    PFNGLUNMAPBUFFERPROC            UnmapBuffer;
+    PFNGLFENCESYNCPROC              FenceSync;
+    PFNGLDELETESYNCPROC             DeleteSync;
+    PFNGLCLIENTWAITSYNCPROC         ClientWaitSync;
+#endif
     PFNGLDELETEBUFFERSPROC DeleteBuffers;
 
 #if defined(_WIN32)

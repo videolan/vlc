@@ -220,6 +220,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     api->BindBuffer    = GET_PROC_ADDR(glBindBuffer);
     api->BufferData    = GET_PROC_ADDR(glBufferData);
     api->DeleteBuffers = GET_PROC_ADDR(glDeleteBuffers);
+#ifdef VLCGL_HAS_PBO
+    api->BufferStorage          = GET_PROC_ADDR(glBufferStorage);
+    api->MapBufferRange         = GET_PROC_ADDR(glMapBufferRange);
+    api->FlushMappedBufferRange = GET_PROC_ADDR(glFlushMappedBufferRange);
+    api->UnmapBuffer            = GET_PROC_ADDR(glUnmapBuffer);
+    api->FenceSync              = GET_PROC_ADDR(glFenceSync);
+    api->DeleteSync             = GET_PROC_ADDR(glDeleteSync);
+    api->ClientWaitSync         = GET_PROC_ADDR(glClientWaitSync);
+#endif
 #undef GET_PROC_ADDR
 
     if (!vgl->api.CreateShader || !vgl->api.ShaderSource || !vgl->api.CreateProgram)
