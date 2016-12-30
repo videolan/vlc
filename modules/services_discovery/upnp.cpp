@@ -793,7 +793,8 @@ namespace
             {
                 VIDEO = 0,
                 AUDIO,
-                IMAGE
+                IMAGE,
+                CONTAINER
             };
 
         MEDIA_TYPE media_type;
@@ -829,6 +830,8 @@ namespace
                 media_type = AUDIO;
             else if (strncmp(psz_media_type, "object.item.imageItem", 21) == 0)
                 media_type = IMAGE;
+            else if (strncmp(psz_media_type, "object.container", 16 ) == 0)
+                media_type = CONTAINER;
             else
                 return false;
             return true;
@@ -893,6 +896,20 @@ namespace
             }
             return input_item_NewExt( psz_resource_url, title, i_duration,
                                       ITEM_TYPE_FILE, ITEM_NET );
+        }
+
+        input_item_t *createNewContainerItem( const char* psz_root )
+        {
+            if ( objectID == NULL || title == NULL )
+                return NULL;
+
+            char* psz_url;
+            if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root, objectID ) < 0 )
+                return NULL;
+
+            input_item_t* p_item = input_item_NewDirectory( psz_url, title, ITEM_NET );
+            free( psz_url);
+            return p_item;
         }
     };
 }
@@ -975,23 +992,15 @@ MediaServer::~MediaServer()
 
 bool MediaServer::addContainer( IXML_Element* containerElement )
 {
-    char* psz_url;
+    ItemDescriptionHolder holder;
 
-    const char* objectID = ixmlElement_getAttribute( containerElement, "id" );
-    if ( !objectID )
+    if ( holder.init( containerElement ) == false )
         return false;
 
-    const char* title = xml_getChildElementValue( containerElement, "dc:title" );
-    if ( !title )
-        return false;
-
-    if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", m_psz_root, objectID ) < 0 )
-        return false;
-
-    input_item_t* p_item = input_item_NewDirectory( psz_url, title, ITEM_NET );
-    free( psz_url);
+    input_item_t* p_item = holder.createNewContainerItem( m_psz_root );
     if ( !p_item )
         return false;
+    holder.apply( p_item );
     input_item_CopyOptions( p_item, m_node->p_item );
     input_item_node_AppendItem( m_node, p_item );
     input_item_Release( p_item );
@@ -1038,6 +1047,9 @@ bool MediaServer::addItem( IXML_Element* itemElement )
             case ItemDescriptionHolder::AUDIO:
                 holder.setArtworkURL(p_resource);
                 break;
+            case ItemDescriptionHolder::CONTAINER:
+                msg_Warn( m_access, "Unexpected object.container in item enumeration" );
+                continue;
             }
         else if (strncmp(rez_type, "http-get:*:text/", 16) == 0)
             holder.addSlave(xml_getChildElementValue( p_resource, "res" ), SLAVE_TYPE_SPU);
