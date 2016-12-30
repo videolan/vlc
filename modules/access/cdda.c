@@ -375,95 +375,69 @@ error:
 }
 #endif /* HAVE_LIBCDDB */
 
-static void GetTracks( access_t *p_access, input_item_t *p_current )
+static void AccessGetMeta(access_t *access, vlc_meta_t *meta)
 {
-    vlc_object_t *obj = VLC_OBJECT(p_access);
-    access_sys_t *p_sys = p_access->p_sys;
+    access_sys_t *sys = access->p_sys;
+    const char *str;
 
-    input_item_SetName( p_current, "Audio CD" );
+    vlc_meta_SetTitle(meta, "Audio CD");
 
-    const char *psz_album = NULL;
-    const char *psz_year = NULL;
-    const char *psz_genre = NULL;
-    const char *psz_artist = NULL;
-    const char *psz_description = NULL;
+    /* Retrieve CD-TEXT information */
+    if (sys->cdtextc > 0 && sys->cdtextv[0] != NULL)
+        vlc_meta_Merge(meta, sys->cdtextv[0]);
 
 /* Return true if the given string is not NULL and not empty */
 #define NONEMPTY( psz ) ( (psz) && *(psz) )
 /* If the given string is NULL or empty, fill it by the return value of 'code' */
 #define ON_EMPTY( psz, code ) do { if( !NONEMPTY( psz) ) { (psz) = code; } } while(0)
 
-    /* Retreive CDDB information */
+    /* Retrieve CDDB information (preferred over CD-TEXT) */
 #ifdef HAVE_LIBCDDB
-    cddb_disc_t *p_disc = p_sys->cddb;
-    char psz_year_buffer[4+1];
-
-    if( p_disc )
+    if (sys->cddb != NULL)
     {
-        msg_Dbg( obj, "Disc ID: %08x", cddb_disc_get_discid( p_disc ) );
-        psz_album = cddb_disc_get_title( p_disc );
-        psz_genre = cddb_disc_get_genre( p_disc );
+        str = cddb_disc_get_title(sys->cddb);
+        if (NONEMPTY(str))
+            vlc_meta_SetTitle(meta, str);
 
-        /* */
-        const unsigned i_year = cddb_disc_get_year( p_disc );
-        if( i_year > 0 )
+        str = cddb_disc_get_genre(sys->cddb);
+        if (NONEMPTY(str))
+            vlc_meta_SetGenre(meta, str);
+
+        const unsigned year = cddb_disc_get_year(sys->cddb);
+        if (year != 0)
         {
-            psz_year = psz_year_buffer;
-            snprintf( psz_year_buffer, sizeof(psz_year_buffer), "%u", i_year );
+            char yearbuf[5];
+
+            snprintf(yearbuf, sizeof (yearbuf), "%u", year);
+            vlc_meta_SetDate(meta, yearbuf);
         }
 
-        /* Set artist only if unique */
-        for( int i = 0; i < p_sys->titles; i++ )
+        /* Set artist only if identical across tracks */
+        str = cddb_disc_get_artist(sys->cddb);
+        if (NONEMPTY(str))
         {
-            cddb_track_t *t = cddb_disc_get_track( p_disc, i );
-            if( !t )
-                continue;
-            const char *psz_track_artist = cddb_track_get_artist( t );
-            if( psz_artist && psz_track_artist &&
-                strcmp( psz_artist, psz_track_artist ) )
+            for (int i = 0; i < sys->titles; i++)
             {
-                psz_artist = NULL;
-                break;
+                cddb_track_t *t = cddb_disc_get_track(sys->cddb, i);
+                if (t == NULL)
+                    continue;
+
+                const char *track_artist = cddb_track_get_artist(t);
+                if (NONEMPTY(track_artist))
+                {
+                    if (str == NULL)
+                        str = track_artist;
+                    else
+                    if (strcmp(str, track_artist))
+                    {
+                        str = NULL;
+                        break;
+                    }
+                }
             }
-            psz_artist = psz_track_artist;
         }
     }
 #endif
-
-    vlc_meta_t *const *const pp_cd_text = p_sys->cdtextv;
-    const int i_cd_text = p_sys->cdtextc;
-
-    /* Retrieve CD-TEXT information but prefer CDDB */
-    if( i_cd_text > 0 && pp_cd_text[0] )
-    {
-        const vlc_meta_t *p_disc = pp_cd_text[0];
-        ON_EMPTY( psz_album,       vlc_meta_Get( p_disc, vlc_meta_Album ) );
-        ON_EMPTY( psz_genre,       vlc_meta_Get( p_disc, vlc_meta_Genre ) );
-        ON_EMPTY( psz_artist,      vlc_meta_Get( p_disc, vlc_meta_Artist ) );
-        ON_EMPTY( psz_description, vlc_meta_Get( p_disc, vlc_meta_Description ) );
-    }
-
-    if( NONEMPTY( psz_album ) )
-    {
-        input_item_SetName( p_current, psz_album );
-        input_item_SetAlbum( p_current, psz_album );
-    }
-
-    if( NONEMPTY( psz_genre ) )
-        input_item_SetGenre( p_current, psz_genre );
-
-    if( NONEMPTY( psz_artist ) )
-        input_item_SetArtist( p_current, psz_artist );
-
-    if( NONEMPTY( psz_year ) )
-        input_item_SetDate( p_current, psz_year );
-
-    if( NONEMPTY( psz_description ) )
-        input_item_SetDescription( p_current, psz_description );
-
-    const mtime_t i_duration = (int64_t)( p_sys->p_sectors[p_sys->titles] - p_sys->p_sectors[0] ) *
-                               CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
-    input_item_SetDuration( p_current, i_duration );
 }
 
 static int ReadDir(access_t *access, input_item_node_t *node)
@@ -594,6 +568,16 @@ static int ReadDir(access_t *access, input_item_node_t *node)
     return VLC_SUCCESS;
 }
 
+static int AccessControl(access_t *access, int query, va_list args)
+{
+    if (query == STREAM_GET_META)
+    {
+        AccessGetMeta(access, va_arg(args, vlc_meta_t *));
+        return VLC_SUCCESS;
+    }
+    return access_vaDirectoryControlHelper(access, query, args);
+}
+
 static int AccessOpen(vlc_object_t *obj)
 {
     access_t *p_access = (access_t *)obj;
@@ -646,21 +630,11 @@ static int AccessOpen(vlc_object_t *obj)
     }
 
     p_access->p_sys = sys;
-
-    /* We only do separate items if the whole disc is requested */
-    input_thread_t *p_input = p_access->p_input;
-    if( p_input )
-    {
-        input_item_t *p_current = input_GetItem( p_input );
-        if (p_current != NULL)
-            GetTracks(p_access, p_current);
-    }
-
     p_access->pf_read = NULL;
     p_access->pf_block = NULL;
     p_access->pf_readdir = ReadDir;
     p_access->pf_seek = NULL;
-    p_access->pf_control = access_vaDirectoryControlHelper;
+    p_access->pf_control = AccessControl;
     return VLC_SUCCESS;
 
 error:
