@@ -228,7 +228,8 @@ enum {
     OMXCODEC_NO_QUIRKS = 0,
     OMXCODEC_QUIRKS_NEED_CSD = 0x1,
     OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING = 0x2,
-    OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS = 0x4,
+    OMXCODEC_VIDEO_QUIRKS_SUPPORT_INTERLACED = 0x4,
+    OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS = 0x8,
 };
 int OMXCodec_GetQuirks( int i_cat, vlc_fourcc_t i_codec,
                         const char *p_name, unsigned int i_name_len );

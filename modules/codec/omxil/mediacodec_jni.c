@@ -952,6 +952,10 @@ static int Configure(mc_api *api, size_t i_h264_profile)
         return MC_API_ERROR;
     api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
                                        strlen(api->psz_name));
+
+    /* Allow interlaced picture after API 21 */
+    if (jfields.get_input_buffer && jfields.get_output_buffer)
+        api->i_quirks |= MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED;
     return 0;
 }
 
@@ -983,11 +987,8 @@ int MediaCodecJni_Init(mc_api *api)
     api->release_out = ReleaseOutput;
     api->set_output_surface = SetOutputSurface;
 
-    /* Allow interlaced picture and rotation only after API 21 */
+    /* Allow rotation only after API 21 */
     if (jfields.get_input_buffer && jfields.get_output_buffer)
-    {
-        api->b_support_interlaced = true;
         api->b_support_rotation = true;
-    }
     return 0;
 }

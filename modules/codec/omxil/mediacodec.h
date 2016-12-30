@@ -42,7 +42,8 @@ int MediaCodecNdk_Init(mc_api*);
 #define MC_API_NO_QUIRKS 0
 #define MC_API_QUIRKS_NEED_CSD 0x1
 #define MC_API_VIDEO_QUIRKS_IGNORE_PADDING 0x2
-#define MC_API_AUDIO_QUIRKS_NEED_CHANNELS 0x4
+#define MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED 0x4
+#define MC_API_AUDIO_QUIRKS_NEED_CHANNELS 0x8
 
 struct mc_api_out
 {
@@ -114,7 +115,6 @@ struct mc_api
     /* Set after configure */
     int  i_quirks;
     char *psz_name;
-    bool b_support_interlaced;
     bool b_support_rotation;
 
     bool b_started;

@@ -1602,8 +1602,15 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
     block_t *p_block = *pp_block;
 
     if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
-        && !p_sys->api.b_support_interlaced)
+     && !(p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED))
+    {
+        /* Before Android 21 and depending on the vendor, MediaCodec can crash
+         * or be in an inconsistent state when decoding interlaced videos. See
+         * OMXCodec_GetQuirks() for a white list of decoders that supported
+         * interlaced videos before Android 21. */
+        msg_Warn(p_dec, "codec doesn't support interlaced videos");
         return -1;
+    }
 
     timestamp_FifoPut(p_sys->video.timestamp_fifo,
                       p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
