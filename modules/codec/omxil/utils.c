@@ -369,6 +369,7 @@ int OMXCodec_GetQuirks( int i_cat, vlc_fourcc_t i_codec,
         { "OMX.SEC.MPEG4.Decoder", OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING },
         { "OMX.SEC.mpeg4.dec", OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING },
         { "OMX.SEC.vc1.dec", OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING },
+        { "OMX.amlogic.avc.decoder.awesome", OMXCODEC_VIDEO_QUIRKS_SUPPORT_INTERLACED },
         { NULL, 0 }
     };
 
