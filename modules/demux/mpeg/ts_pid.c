@@ -29,6 +29,7 @@
 #include "ts.h"
 
 #include <assert.h>
+#include <stdlib.h>
 
 #define PID_ALLOC_CHUNK 16
 
@@ -58,6 +59,20 @@ void ts_pid_list_Release( demux_t *p_demux, ts_pid_list_t *p_list )
     free( p_list->pp_all );
 }
 
+struct searchkey
+{
+    int16_t i_pid;
+    ts_pid_t **pp_last;
+};
+
+static int ts_bsearch_searchkey_Compare( void *key, void *other )
+{
+    struct searchkey *p_key = (struct searchkey *) key;
+    ts_pid_t *p_pid = *((ts_pid_t **) other);
+    p_key->pp_last = (ts_pid_t **) other;
+    return ( p_key->i_pid >= p_pid->i_pid ) ? p_key->i_pid - p_pid->i_pid : -1;
+}
+
 ts_pid_t * ts_pid_Get( ts_pid_list_t *p_list, uint16_t i_pid )
 {
     switch( i_pid )
@@ -74,39 +89,63 @@ ts_pid_t * ts_pid_Get( ts_pid_list_t *p_list, uint16_t i_pid )
         break;
     }
 
-    for( int i=0; i < p_list->i_all; i++ )
+    size_t i_index = 0;
+    ts_pid_t *p_pid = NULL;
+
+    if( p_list->pp_all )
     {
-        if( p_list->pp_all[i]->i_pid == i_pid )
-        {
-            p_list->p_last = p_list->pp_all[i];
-            p_list->i_last_pid = i_pid;
-            return p_list->p_last;
-        }
+        struct searchkey pidkey;
+        pidkey.i_pid = i_pid;
+        pidkey.pp_last = NULL;
+
+        ts_pid_t **pp_pidk = bsearch( &pidkey, p_list->pp_all, p_list->i_all,
+                                      sizeof(ts_pid_t *), ts_bsearch_searchkey_Compare );
+        if ( pp_pidk )
+            p_pid = *pp_pidk;
+        else
+            i_index = (pidkey.pp_last - p_list->pp_all); /* Last visited index */
     }
 
-    if( p_list->i_all >= p_list->i_all_alloc )
+    if( p_pid == NULL )
     {
-        ts_pid_t **p_realloc = realloc( p_list->pp_all,
-                                       (p_list->i_all_alloc + PID_ALLOC_CHUNK) * sizeof(ts_pid_t *) );
-        if( !p_realloc )
+        if( p_list->i_all >= p_list->i_all_alloc )
+        {
+            ts_pid_t **p_realloc = realloc( p_list->pp_all,
+                                            (p_list->i_all_alloc + PID_ALLOC_CHUNK) * sizeof(ts_pid_t *) );
+            if( !p_realloc )
+            {
+                abort();
+                //return NULL;
+            }
+            p_list->pp_all = p_realloc;
+            p_list->i_all_alloc += PID_ALLOC_CHUNK;
+        }
+
+        p_pid = calloc( 1, sizeof(*p_pid) );
+        if( !p_pid )
         {
             abort();
             //return NULL;
         }
-        p_list->pp_all = p_realloc;
-        p_list->i_all_alloc += PID_ALLOC_CHUNK;
-    }
 
-    ts_pid_t *p_pid = calloc( 1, sizeof(*p_pid) );
-    if( !p_pid )
-    {
-        abort();
-        //return NULL;
-    }
+        p_pid->i_cc  = 0xff;
+        p_pid->i_pid = i_pid;
 
-    p_pid->i_cc  = 0xff;
-    p_pid->i_pid = i_pid;
-    p_list->pp_all[p_list->i_all++] = p_pid;
+        /* Do insertion based on last bsearch mid point */
+        if( p_list->i_all )
+        {
+            if( p_list->pp_all[i_index]->i_pid < i_pid )
+                i_index++;
+
+            memmove( &p_list->pp_all[i_index + 1],
+                    &p_list->pp_all[i_index],
+                    (p_list->i_all - i_index) * sizeof(ts_pid_t *) );
+        }
+
+        p_list->pp_all[i_index] = p_pid;
+        p_list->i_all++;
+
+    }
 
     p_list->p_last = p_pid;
     p_list->i_last_pid = i_pid;
