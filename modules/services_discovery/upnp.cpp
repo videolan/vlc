@@ -761,107 +761,6 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event )
 namespace Access
 {
 
-Upnp_i11e_cb::Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie )
-    : m_refCount( 2 ) /* 2: owned by the caller, and the Upnp Async function */
-    , m_callback( callback )
-    , m_cookie( cookie )
-
-{
-    vlc_mutex_init( &m_lock );
-    vlc_sem_init( &m_sem, 0 );
-}
-
-Upnp_i11e_cb::~Upnp_i11e_cb()
-{
-    vlc_mutex_destroy( &m_lock );
-    vlc_sem_destroy( &m_sem );
-}
-
-void Upnp_i11e_cb::waitAndRelease( void )
-{
-    vlc_sem_wait_i11e( &m_sem );
-
-    vlc_mutex_lock( &m_lock );
-    if ( --m_refCount == 0 )
-    {
-        /* The run callback is processed, we can destroy this object */
-        vlc_mutex_unlock( &m_lock );
-        delete this;
-    } else
-    {
-        /* Interrupted, let the run callback destroy this object */
-        vlc_mutex_unlock( &m_lock );
-    }
-}
-
-int Upnp_i11e_cb::run( Upnp_EventType eventType, void *p_event, void *p_cookie )
-{
-    Upnp_i11e_cb *self = static_cast<Upnp_i11e_cb*>( p_cookie );
-
-    vlc_mutex_lock( &self->m_lock );
-    if ( --self->m_refCount == 0 )
-    {
-        /* Interrupted, we can destroy self */
-        vlc_mutex_unlock( &self->m_lock );
-        delete self;
-        return 0;
-    }
-    /* Process the user callback_ */
-    self->m_callback( eventType, p_event, self->m_cookie);
-    vlc_mutex_unlock( &self->m_lock );
-
-    /* Signal that the callback is processed */
-    vlc_sem_post( &self->m_sem );
-    return 0;
-}
-
-MediaServer::MediaServer( access_t *p_access, input_item_node_t *node )
-    : m_psz_objectId( NULL )
-    , m_access( p_access )
-    , m_node( node )
-
-{
-    m_psz_root = strdup( p_access->psz_location );
-    char* psz_objectid = strstr( m_psz_root, "ObjectID=" );
-    if ( psz_objectid != NULL )
-    {
-        // Remove this parameter from the URL, since it might cause some servers to fail
-        // Keep in mind that we added a '&' or a '?' to the URL, so remove it as well
-        *( psz_objectid - 1) = 0;
-        m_psz_objectId = &psz_objectid[strlen( "ObjectID=" )];
-    }
-}
-
-MediaServer::~MediaServer()
-{
-    free( m_psz_root );
-}
-
-bool MediaServer::addContainer( IXML_Element* containerElement )
-{
-    char* psz_url;
-
-    const char* objectID = ixmlElement_getAttribute( containerElement, "id" );
-    if ( !objectID )
-        return false;
-
-    const char* title = xml_getChildElementValue( containerElement, "dc:title" );
-    if ( !title )
-        return false;
-
-    if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", m_psz_root, objectID ) < 0 )
-        return false;
-
-    input_item_t* p_item = input_item_NewDirectory( psz_url, title, ITEM_NET );
-    free( psz_url);
-    if ( !p_item )
-        return false;
-    input_item_CopyOptions( p_item, m_node->p_item );
-    input_item_node_AppendItem( m_node, p_item );
-    input_item_Release( p_item );
-    return true;
-}
-
 namespace
 {
     class ItemDescriptionHolder
@@ -996,6 +895,107 @@ namespace
                                       ITEM_TYPE_FILE, ITEM_NET );
         }
     };
+}
+
+Upnp_i11e_cb::Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie )
+    : m_refCount( 2 ) /* 2: owned by the caller, and the Upnp Async function */
+    , m_callback( callback )
+    , m_cookie( cookie )
+
+{
+    vlc_mutex_init( &m_lock );
+    vlc_sem_init( &m_sem, 0 );
+}
+
+Upnp_i11e_cb::~Upnp_i11e_cb()
+{
+    vlc_mutex_destroy( &m_lock );
+    vlc_sem_destroy( &m_sem );
+}
+
+void Upnp_i11e_cb::waitAndRelease( void )
+{
+    vlc_sem_wait_i11e( &m_sem );
+
+    vlc_mutex_lock( &m_lock );
+    if ( --m_refCount == 0 )
+    {
+        /* The run callback is processed, we can destroy this object */
+        vlc_mutex_unlock( &m_lock );
+        delete this;
+    } else
+    {
+        /* Interrupted, let the run callback destroy this object */
+        vlc_mutex_unlock( &m_lock );
+    }
+}
+
+int Upnp_i11e_cb::run( Upnp_EventType eventType, void *p_event, void *p_cookie )
+{
+    Upnp_i11e_cb *self = static_cast<Upnp_i11e_cb*>( p_cookie );
+
+    vlc_mutex_lock( &self->m_lock );
+    if ( --self->m_refCount == 0 )
+    {
+        /* Interrupted, we can destroy self */
+        vlc_mutex_unlock( &self->m_lock );
+        delete self;
+        return 0;
+    }
+    /* Process the user callback_ */
+    self->m_callback( eventType, p_event, self->m_cookie);
+    vlc_mutex_unlock( &self->m_lock );
+
+    /* Signal that the callback is processed */
+    vlc_sem_post( &self->m_sem );
+    return 0;
+}
+
+MediaServer::MediaServer( access_t *p_access, input_item_node_t *node )
+    : m_psz_objectId( NULL )
+    , m_access( p_access )
+    , m_node( node )
+
+{
+    m_psz_root = strdup( p_access->psz_location );
+    char* psz_objectid = strstr( m_psz_root, "ObjectID=" );
+    if ( psz_objectid != NULL )
+    {
+        // Remove this parameter from the URL, since it might cause some servers to fail
+        // Keep in mind that we added a '&' or a '?' to the URL, so remove it as well
+        *( psz_objectid - 1) = 0;
+        m_psz_objectId = &psz_objectid[strlen( "ObjectID=" )];
+    }
+}
+
+MediaServer::~MediaServer()
+{
+    free( m_psz_root );
+}
+
+bool MediaServer::addContainer( IXML_Element* containerElement )
+{
+    char* psz_url;
+
+    const char* objectID = ixmlElement_getAttribute( containerElement, "id" );
+    if ( !objectID )
+        return false;
+
+    const char* title = xml_getChildElementValue( containerElement, "dc:title" );
+    if ( !title )
+        return false;
+
+    if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", m_psz_root, objectID ) < 0 )
+        return false;
+
+    input_item_t* p_item = input_item_NewDirectory( psz_url, title, ITEM_NET );
+    free( psz_url);
+    if ( !p_item )
+        return false;
+    input_item_CopyOptions( p_item, m_node->p_item );
+    input_item_node_AppendItem( m_node, p_item );
+    input_item_Release( p_item );
+    return true;
 }
 
 bool MediaServer::addItem( IXML_Element* itemElement )
