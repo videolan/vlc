@@ -153,7 +153,7 @@ static int ProbeHEVC( const uint8_t *p_peek, size_t i_peek, void *p_priv )
             p_peek[4] != 0 || p_peek[5] != 0 ) /* Must prefix another NAL */
             return -1;
    }
-   else if( i_type != HEVC_NAL_PREF_SEI ) /* Prefix SEI */
+   else if( i_type == HEVC_NAL_PREF_SEI ) /* Prefix SEI */
    {
        if( p_peek[2] == 0xFF ) /* empty SEI */
            return -1;
