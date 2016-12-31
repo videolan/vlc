@@ -226,12 +226,22 @@ SORTFN( SORT_ALBUM, first, second )
     return i_ret;
 }
 
+SORTFN( SORT_DATE, first, second )
+{
+    int i_ret = meta_sort( first, second, vlc_meta_Date, true );
+    /* Items came from the same date: compare the albums */
+    if( i_ret == 0 )
+        i_ret = proto_SORT_ALBUM( first, second );
+
+    return i_ret;
+}
+
 SORTFN( SORT_ARTIST, first, second )
 {
     int i_ret = meta_sort( first, second, vlc_meta_Artist, false );
-    /* Items came from the same artist: compare the albums */
+    /* Items came from the same artist: compare the dates */
     if( i_ret == 0 )
-        i_ret = proto_SORT_ALBUM( first, second );
+        i_ret = proto_SORT_DATE( first, second );
 
     return i_ret;
 }
