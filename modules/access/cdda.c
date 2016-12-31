@@ -48,6 +48,7 @@
 #include <vlc_access.h>
 #include <vlc_meta.h>
 #include <vlc_charset.h> /* ToLocaleDup */
+#include <vlc_url.h>
 
 #include "vcd/cdrom.h"  /* For CDDA_DATA_SIZE */
 
@@ -56,28 +57,57 @@
  #include <errno.h>
 #endif
 
-static vcddev_t *DiscOpen(vlc_object_t *obj, const char *path)
+static vcddev_t *DiscOpen(vlc_object_t *obj, const char *location,
+                         const char *path, unsigned *restrict trackp)
 {
-    char *filename;
+    char *devpath;
 
-    if (path == NULL)
-        filename = var_InheritString(obj, "cd-audio");
+    *trackp = var_InheritInteger(obj, "cdda-track");
+
+    if (path != NULL)
+        devpath = ToLocaleDup(path);
+    else if (location[0] != '\0')
+    {
+#if (DIR_SEP_CHAR == '/')
+        char *dec = vlc_uri_decode_duplicate(location);
+        if (dec == NULL)
+            return NULL;
+
+        /* GNOME CDDA syntax */
+        const char *sl = strrchr(dec, '/');
+        if (sl != NULL)
+        {
+            if (sscanf(sl, "/Track %2u", trackp) == 1)
+                dec[sl - dec] = '\0';
+            else
+                *trackp = 0;
+        }
+
+        if (unlikely(asprintf(&devpath, "/dev/%s", dec) == -1))
+            devpath = NULL;
+        free(dec);
+#else
+        (void) location;
+        return NULL;
+#endif
+    }
     else
-        filename = ToLocaleDup(path);
-    if (filename == NULL)
+        devpath = var_InheritString(obj, "cd-audio");
+
+    if (devpath == NULL)
         return NULL;
 
 #if defined (_WIN32) || defined (__OS2__)
     /* Trim backslash after drive letter */
-    if (filename[0] != '\0' && !strcmp(&filename[1], ":\\"))
-        filename[2] = '\0';
+    if (devpath[0] != '\0' && !strcmp(&devpath[1], ":" DIR_SEP))
+        devpath[2] = '\0';
 #endif
 
     /* Open CDDA */
-    vcddev_t *dev = ioctl_Open(obj, filename);
+    vcddev_t *dev = ioctl_Open(obj, devpath);
     if (dev == NULL)
-        msg_Warn(obj, "cannot open disc %s", filename);
-    free(filename);
+        msg_Warn(obj, "cannot open disc %s", devpath);
+    free(devpath);
 
     return dev;
 }
@@ -185,24 +215,28 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
 static int DemuxOpen(vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
+    unsigned track;
 
-    unsigned track = var_InheritInteger(obj, "cdda-track");
-    if (track == 0)
-        return VLC_EGENERIC; /* Whole disc -> use access plugin */
+    vcddev_t *dev = DiscOpen(obj, demux->psz_location, demux->psz_file,
+                             &track);
+    if (dev == NULL)
+        return VLC_EGENERIC;
+
+    if (track == 0 /* Whole disc -> use access plugin */)
+    {
+        ioctl_Close(obj, dev);
+        return VLC_EGENERIC;
+    }
 
     demux_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    /* Open CDDA */
-    sys->vcddev = DiscOpen(obj, demux->psz_file);
-    if (sys->vcddev == NULL)
     {
-        free(sys);
-        return VLC_EGENERIC;
+        ioctl_Close(obj, dev);
+        return VLC_ENOMEM;
     }
-    demux->p_sys = sys;
 
+    demux->p_sys = sys;
+    sys->vcddev = dev;
     sys->start = var_InheritInteger(obj, "cdda-first-sector");
     sys->length = var_InheritInteger(obj, "cdda-last-sector") - sys->start;
 
@@ -210,7 +244,7 @@ static int DemuxOpen(vlc_object_t *obj)
     if (sys->start == (unsigned)-1 || sys->length == (unsigned)-1)
     {
         int *sectors = NULL; /* Track sectors */
-        unsigned titles = ioctl_GetTracksMap(obj, sys->vcddev, &sectors);
+        unsigned titles = ioctl_GetTracksMap(obj, dev, &sectors);
 
         if (track > titles)
         {
@@ -240,7 +274,7 @@ static int DemuxOpen(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    ioctl_Close(obj, sys->vcddev);
+    ioctl_Close(obj, dev);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -580,26 +614,31 @@ static int AccessControl(access_t *access, int query, va_list args)
 
 static int AccessOpen(vlc_object_t *obj)
 {
-    access_t *p_access = (access_t *)obj;
+    access_t *access = (access_t *)obj;
+    unsigned track;
 
-    /* Do we play a single track ? */
-    if (var_InheritInteger(obj, "cdda-track") != 0)
+    vcddev_t *dev = DiscOpen(obj, access->psz_location, access->psz_filepath,
+                             &track);
+    if (dev == NULL)
         return VLC_EGENERIC;
+
+    if (track != 0 /* Only whole discs here */)
+    {
+        ioctl_Close(obj, dev);
+        return VLC_EGENERIC;
+    }
 
     access_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    /* Open CDDA */
-    sys->vcddev = DiscOpen(obj, p_access->psz_filepath);
-    if (sys->vcddev == NULL)
     {
-        free(sys);
-        return VLC_EGENERIC;
+        ioctl_Close(obj, dev);
+        return VLC_ENOMEM;
     }
+
+    sys->vcddev = dev;
     sys->p_sectors = NULL;
 
-    sys->titles = ioctl_GetTracksMap(obj, sys->vcddev, &sys->p_sectors);
+    sys->titles = ioctl_GetTracksMap(obj, dev, &sys->p_sectors);
     if (sys->titles < 0)
     {
         msg_Err(obj, "cannot count tracks");
@@ -622,24 +661,24 @@ static int AccessOpen(vlc_object_t *obj)
         msg_Dbg(obj, "CDDB failure");
 #endif
 
-    if (ioctl_GetCdText(obj, sys->vcddev, &sys->cdtextv, &sys->cdtextc))
+    if (ioctl_GetCdText(obj, dev, &sys->cdtextv, &sys->cdtextc))
     {
         msg_Dbg(obj, "CD-TEXT information missing");
         sys->cdtextv = NULL;
         sys->cdtextc = 0;
     }
 
-    p_access->p_sys = sys;
-    p_access->pf_read = NULL;
-    p_access->pf_block = NULL;
-    p_access->pf_readdir = ReadDir;
-    p_access->pf_seek = NULL;
-    p_access->pf_control = AccessControl;
+    access->p_sys = sys;
+    access->pf_read = NULL;
+    access->pf_block = NULL;
+    access->pf_readdir = ReadDir;
+    access->pf_seek = NULL;
+    access->pf_control = AccessControl;
     return VLC_SUCCESS;
 
 error:
     free(sys->p_sectors);
-    ioctl_Close(obj, sys->vcddev);
+    ioctl_Close(obj, dev);
     free(sys);
     return VLC_EGENERIC;
 }
