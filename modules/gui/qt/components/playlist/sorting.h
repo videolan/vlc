@@ -42,10 +42,11 @@ enum
     COLUMN_RATING         = 0x0200,
     COLUMN_COVER          = 0x0400,
     COLUMN_DISC_NUMBER    = 0x0800,
+    COLUMN_DATE           = 0x1000,
 
     /* Add new entries here and update the COLUMN_END value*/
 
-    COLUMN_END          = 0x1000
+    COLUMN_END            = 0x2000
 };
 
 #define COLUMN_DEFAULT (COLUMN_TITLE|COLUMN_DURATION|COLUMN_ALBUM)
@@ -67,6 +68,7 @@ static inline const char * psz_column_title( uint32_t i_column )
     case COLUMN_RATING:          return VLC_META_RATING;
     case COLUMN_COVER:           return _("Cover");
     case COLUMN_DISC_NUMBER:     return VLC_META_DISCNUMBER;
+    case COLUMN_DATE:            return VLC_META_DATE;
     default: abort();
     }
 }
@@ -106,6 +108,8 @@ static inline char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
         return input_item_GetArtworkURL( p_item );
     case COLUMN_DISC_NUMBER:
         return input_item_GetDiscNumber( p_item );
+    case COLUMN_DATE:
+        return input_item_GetDate( p_item );
     default:
         abort();
     }
@@ -127,10 +131,12 @@ static inline int i_column_sorting( uint32_t i_column )
     case COLUMN_URI:            return SORT_URI;
     case COLUMN_RATING:         return SORT_RATING;
     case COLUMN_DISC_NUMBER:    return SORT_DISC_NUMBER;
+    case COLUMN_DATE:           return SORT_DATE;
     default: abort();
     }
 }
 
+/* Return the media library query select type */
 static inline ml_select_e meta_to_mlmeta( uint32_t i_column )
 {
     switch( i_column )
@@ -147,6 +153,7 @@ static inline ml_select_e meta_to_mlmeta( uint32_t i_column )
     case COLUMN_RATING:         return ML_VOTE;
     case COLUMN_COVER:          return ML_COVER;
     case COLUMN_DISC_NUMBER:    return ML_DISC_NUMBER;
+    case COLUMN_DATE:           return ML_YEAR;
     default: abort();
     }
 }
