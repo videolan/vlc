@@ -34,5 +34,7 @@ endif
 
 .speexdsp: speexdsp
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SPEEXDSP_CONF)
+	cd $< && $(MAKE)
+	cd $< && ../../../contrib/src/pkg-static.sh speexdsp.pc
 	cd $< && $(MAKE) install
 	touch $@
