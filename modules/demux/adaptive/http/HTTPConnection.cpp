@@ -226,7 +226,10 @@ int HTTPConnection::parseReply()
     int replycode;
     ss >> replycode;
     if (replycode != 200 && replycode != 206)
+    {
+        msg_Err(p_object, "Failed reading %s: %s", params.getUrl().c_str(), line.c_str());
         return VLC_ENOOBJ;
+    }
 
     line = readLine();
 
