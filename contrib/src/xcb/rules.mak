@@ -46,6 +46,7 @@ XCBCONF := \
 	--disable-xtest \
 	--enable-xv \
 	--disable-xvmc \
+	--without-doxygen \
 	$(HOSTCONF)
 
 DEPS_xcb = xau $(DEPS_xau) xcb-proto $(DEPS_xcb-proto)
