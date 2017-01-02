@@ -46,6 +46,7 @@ vlc_module_begin ()
     add_shortcut( "ttml", "subtitle" )
 vlc_module_end ()
 
+#define TTML_REALLOC_EXTRA 32
 
 typedef struct
 {
@@ -170,6 +171,27 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
     }
     return VLC_EGENERIC;
+}
+
+static int SubtitlesRealloc( demux_sys_t *p_sys, size_t i_add )
+{
+    subtitle_t* p_realloc = NULL;
+    const size_t i_max_alloc = SIZE_MAX / sizeof(subtitle_t*);
+    if( i_max_alloc - p_sys->subs.i_alloc >= i_add )
+    {
+        size_t i_realloc = p_sys->subs.i_alloc + p_sys->subs.i_count;
+        if( i_max_alloc - TTML_REALLOC_EXTRA > i_realloc )
+            i_realloc += TTML_REALLOC_EXTRA;
+        p_realloc = realloc( p_sys->subs.p_array, sizeof(subtitle_t *) * i_realloc );
+        if( likely( p_realloc ) )
+        {
+            p_sys->subs.p_array = p_realloc;
+            p_sys->subs.i_alloc = i_realloc;
+        }
+    }
+    if( unlikely( p_realloc == NULL ) )
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static int Convert_time( int64_t *timing_value, const char *s )
@@ -518,17 +540,10 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, const char* psz_text )
 
     qsort( p_times->pp_elems, p_times->i_count, sizeof( mtime_t* ), timeCmp );
 
-    ssize_t total_count = p_times->i_count + p_sys->subs.i_count - 1;
-
-    if( total_count > 0 )
-    {
-        subtitle_t* p_tmp_sub = realloc( p_sys->subs.p_array, sizeof( *p_sys->subs.p_array ) * total_count );
-
-        if( unlikely( p_tmp_sub == NULL ) )
+    if( p_sys->subs.i_alloc - p_sys->subs.i_count < (size_t) p_times->i_count &&
+        unlikely( SubtitlesRealloc( p_sys, p_times->i_count ) != VLC_SUCCESS ) )
             goto error;
 
-        p_sys->subs.p_array = p_tmp_sub;
-    }
     /*
     * For each time space represented by the times inside the p_times array
     * we create a p tag with all the spans inside.
@@ -626,15 +641,10 @@ static int ReadTTML( demux_t* p_demux )
 
                 if( p_node->psz_begin && p_node->psz_end )
                 {
-                    if( p_sys->subs.i_count >= p_sys->subs.i_alloc )
-                    {
-                        p_sys->subs.i_alloc += 500;
-                        subtitle_t* p_subtitles = realloc( p_sys->subs.p_array,
-                                sizeof( *p_sys->subs.p_array ) * p_sys->subs.i_alloc );
-                        if( unlikely( p_subtitles == NULL ) )
+                    if( p_sys->subs.i_count == p_sys->subs.i_alloc &&
+                        unlikely( SubtitlesRealloc( p_sys, 1 ) != VLC_SUCCESS ) )
                             goto error;
-                        p_sys->subs.p_array = p_subtitles;
-                    }
+
                     subtitle_t *p_subtitle = &p_sys->subs.p_array[p_sys->subs.i_count];
 
                     Convert_time( &p_subtitle->i_start, p_node->psz_begin );
@@ -707,7 +717,6 @@ static int ReadTTML( demux_t* p_demux )
                         goto error;
 
                     p_subtitle->psz_text = psz_text;
-                    p_sys->subs.i_count++;
                     ClearNode( p_node );
                 }
                 else
