@@ -21,6 +21,7 @@ $(TARBALLS)/libxcb-$(XCB_VERSION).tar.bz2:
 
 libxcb: libxcb-$(XCB_VERSION).tar.bz2 .sum-xcb
 	$(UNPACK)
+	$(call pkg_static,"xcb.pc.in")
 	$(MOVE)
 
 XCBCONF := \
