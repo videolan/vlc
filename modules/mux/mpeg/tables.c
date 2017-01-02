@@ -43,6 +43,8 @@
 #include "bits.h"
 #include "pes.h"
 
+#include <assert.h>
+
 block_t *WritePSISection( dvbpsi_psi_section_t* p_section )
 {
     block_t   *p_psi, *p_first = NULL;
@@ -440,13 +442,6 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             /* 0xa0 is private */
             dvbpsi_pmt_es_descriptor_add( p_es, 0xa0, i_extra + 10, data );
         }
-        else if( p_stream->ts->i_stream_type == 0x81 )
-        {
-            uint8_t format[4] = { 'A', 'C', '-', '3'};
-
-            /* "registration" descriptor : "AC-3" */
-            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, format );
-        }
         else if( p_stream->pes->i_codec == VLC_CODEC_DIRAC )
         {
             /* Dirac registration descriptor */
@@ -467,12 +462,47 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                 }
             }
         }
+        else if( p_stream->pes->i_codec == VLC_CODEC_A52 )
+        {
+            uint8_t format[4] = { 'A', 'C', '-', '3'};
+
+            /* "registration" descriptor : "AC-3" */
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, format );
+
+            if( standard == TS_MUX_STANDARD_ATSC )
+            {
+                assert(p_stream->ts->i_stream_type == 0x81);
+                /* FIXME: ATSC AC-3 audio_stream_descriptor */
+                uint8_t data[1] = { 0x00 };
+                dvbpsi_pmt_es_descriptor_add( p_es, 0x81, 1, data );
+            }
+            else
+            {
+                /* FIXME: DVB AC-3 descriptor */
+                uint8_t data[1] = { 0x00 };
+                dvbpsi_pmt_es_descriptor_add( p_es, 0x6a, 1, data );
+            }
+        }
         else if( p_stream->pes->i_codec == VLC_CODEC_EAC3 )
         {
-            /* FIXME: ATSC AC-3 audio_stream_descriptor */
-            /* FIXME: DVB AC-3 descriptor */
-            uint8_t data[1] = { 0x00 };
-            dvbpsi_pmt_es_descriptor_add( p_es, 0x7a, 1, data );
+            uint8_t format[4] = { 'E', 'A', 'C', '3'};
+
+            /* "registration" descriptor : "EAC3" */
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, format );
+
+            if( standard == TS_MUX_STANDARD_ATSC )
+            {
+                assert( p_stream->ts->i_stream_type == 0x87 );
+                /* FIXME: ATSC EAC3 audio_stream_descriptor */
+                uint8_t data[1] = { 0x00 };
+                dvbpsi_pmt_es_descriptor_add( p_es, 0xcc, 1, data );
+                /* FIXME: ATSC A-71 stream_info_details */
+            }
+            else
+            {
+                uint8_t data[1] = { 0x00 };
+                dvbpsi_pmt_es_descriptor_add( p_es, 0x7a, 1, data );
+            }
         }
         else if( p_stream->pes->i_codec == VLC_CODEC_OPUS )
         {
