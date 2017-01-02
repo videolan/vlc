@@ -44,7 +44,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
     add_shortcut( "ttml", "subtitle" )
-vlc_module_end ();
+vlc_module_end ()
 
 
 typedef struct
