@@ -65,6 +65,7 @@ struct demux_sys_t
     {
         subtitle_t* p_array;
         size_t i_count;
+        size_t i_alloc;
         size_t i_current;
     } subs;
 
@@ -585,7 +586,6 @@ static int ReadTTML( demux_t* p_demux )
     node_t* p_node = NULL;
     char* psz_text = NULL;
     const char* psz_node_name;
-    int i_max_sub = 0;
     int i_type;
 
     do
@@ -626,11 +626,11 @@ static int ReadTTML( demux_t* p_demux )
 
                 if( p_node->psz_begin && p_node->psz_end )
                 {
-                    if( p_sys->subs.i_count >= i_max_sub )
+                    if( p_sys->subs.i_count >= p_sys->subs.i_alloc )
                     {
-                        i_max_sub += 500;
+                        p_sys->subs.i_alloc += 500;
                         subtitle_t* p_subtitles = realloc( p_sys->subs.p_array,
-                                sizeof( *p_sys->subs.p_array ) * i_max_sub );
+                                sizeof( *p_sys->subs.p_array ) * p_sys->subs.i_alloc );
                         if( unlikely( p_subtitles == NULL ) )
                             goto error;
                         p_sys->subs.p_array = p_subtitles;
