@@ -58,12 +58,16 @@ struct demux_sys_t
 {
     xml_t*          p_xml;
     xml_reader_t*   p_reader;
-    subtitle_t*     subtitle;
     es_out_id_t*    p_es;
     int64_t         i_length;
     int64_t         i_next_demux_time;
-    int             i_subtitle;
-    int             i_subtitles;
+    struct
+    {
+        subtitle_t* p_array;
+        size_t i_count;
+        size_t i_current;
+    } subs;
+
     char*           psz_head;
     size_t          i_head_len;
     bool            b_has_head;
@@ -92,27 +96,27 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_subtitle < p_sys->i_subtitles )
-                *pi64 = p_sys->subtitle[p_sys->i_subtitle].i_start;
+            if( p_sys->subs.i_current < p_sys->subs.i_count )
+                *pi64 = p_sys->subs.p_array[p_sys->subs.i_current].i_start;
             else
                 *pi64 = p_sys->i_length;
             return VLC_SUCCESS;
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
-            p_sys->i_subtitle = 0;
-            while( p_sys->i_subtitle < p_sys->i_subtitles )
+            p_sys->subs.i_current = 0;
+            while( p_sys->subs.i_current < p_sys->subs.i_count )
             {
-                const subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitle];
+                const subtitle_t *p_subtitle = &p_sys->subs.p_array[p_sys->subs.i_current];
 
                 if( p_subtitle->i_start > i64 )
                     break;
                 if( p_subtitle->i_stop > p_subtitle->i_start && p_subtitle->i_stop > i64 )
                     break;
 
-                p_sys->i_subtitle++;
+                p_sys->subs.i_current++;
             }
 
-            if( p_sys->i_subtitle >= p_sys->i_subtitles )
+            if( p_sys->subs.i_current >= p_sys->subs.i_count )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         case DEMUX_SET_NEXT_DEMUX_TIME:
@@ -125,13 +129,13 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-            if( p_sys->i_subtitle >= p_sys->i_subtitles )
+            if( p_sys->subs.i_current >= p_sys->subs.i_count )
             {
                 *pf = 1.0;
             }
-            else if( p_sys->i_subtitles > 0 )
+            else if( p_sys->subs.i_count > 0 )
             {
-                *pf = (double)p_sys->subtitle[p_sys->i_subtitle].i_start /
+                *pf = (double)p_sys->subs.p_array[p_sys->subs.i_current].i_start /
                       (double)p_sys->i_length;
             }
             else
@@ -143,13 +147,13 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             f = (double)va_arg( args, double );
             i64 = f * p_sys->i_length;
 
-            p_sys->i_subtitle = 0;
-            while( p_sys->i_subtitle < p_sys->i_subtitles &&
-                   p_sys->subtitle[p_sys->i_subtitle].i_start < i64 )
+            p_sys->subs.i_current = 0;
+            while( p_sys->subs.i_current < p_sys->subs.i_count &&
+                   p_sys->subs.p_array[p_sys->subs.i_current].i_start < i64 )
             {
-                p_sys->i_subtitle++;
+                p_sys->subs.i_current++;
             }
-            if( p_sys->i_subtitle >= p_sys->i_subtitles )
+            if( p_sys->subs.i_current >= p_sys->subs.i_count )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         case DEMUX_GET_PTS_DELAY:
@@ -513,16 +517,16 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, const char* psz_text )
 
     qsort( p_times->pp_elems, p_times->i_count, sizeof( mtime_t* ), timeCmp );
 
-    ssize_t total_count = p_times->i_count + p_sys->i_subtitles - 1;
+    ssize_t total_count = p_times->i_count + p_sys->subs.i_count - 1;
 
     if( total_count > 0 )
     {
-        subtitle_t* p_tmp_sub = realloc( p_sys->subtitle, sizeof( *p_sys->subtitle ) * total_count );
+        subtitle_t* p_tmp_sub = realloc( p_sys->subs.p_array, sizeof( *p_sys->subs.p_array ) * total_count );
 
         if( unlikely( p_tmp_sub == NULL ) )
             goto error;
 
-        p_sys->subtitle = p_tmp_sub;
+        p_sys->subs.p_array = p_tmp_sub;
     }
     /*
     * For each time space represented by the times inside the p_times array
@@ -560,11 +564,11 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, const char* psz_text )
             psz_sub = Append( psz_sub, "</tt:p>");
         else
             psz_sub = Append( psz_sub, "</p>");
-        subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
+        subtitle_t *p_subtitle = &p_sys->subs.p_array[p_sys->subs.i_count];
         p_subtitle->i_start = *(mtime_t*)p_times->pp_elems[j];
         p_subtitle->i_stop = *(mtime_t*)p_times->pp_elems[j+1];
         p_subtitle->psz_text = psz_sub;
-        p_sys->i_subtitles++;
+        p_sys->subs.i_count++;
     }
     ret = VLC_SUCCESS;
 
@@ -622,16 +626,16 @@ static int ReadTTML( demux_t* p_demux )
 
                 if( p_node->psz_begin && p_node->psz_end )
                 {
-                    if( p_sys->i_subtitles >= i_max_sub )
+                    if( p_sys->subs.i_count >= i_max_sub )
                     {
                         i_max_sub += 500;
-                        subtitle_t* p_subtitles = realloc( p_sys->subtitle,
-                                sizeof( *p_sys->subtitle ) * i_max_sub );
+                        subtitle_t* p_subtitles = realloc( p_sys->subs.p_array,
+                                sizeof( *p_sys->subs.p_array ) * i_max_sub );
                         if( unlikely( p_subtitles == NULL ) )
                             goto error;
-                        p_sys->subtitle = p_subtitles;
+                        p_sys->subs.p_array = p_subtitles;
                     }
-                    subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
+                    subtitle_t *p_subtitle = &p_sys->subs.p_array[p_sys->subs.i_count];
 
                     Convert_time( &p_subtitle->i_start, p_node->psz_begin );
                     Convert_time( &p_subtitle->i_stop, p_node->psz_end );
@@ -703,7 +707,7 @@ static int ReadTTML( demux_t* p_demux )
                         goto error;
 
                     p_subtitle->psz_text = psz_text;
-                    p_sys->i_subtitles++;
+                    p_sys->subs.i_count++;
                     ClearNode( p_node );
                 }
                 else
@@ -746,13 +750,13 @@ error:
 static int Demux( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
-    if( p_sys->i_subtitle >= p_sys->i_subtitles )
+    if( p_sys->subs.i_current >= p_sys->subs.i_count )
         return 0;
 
-    while( p_sys->i_subtitle < p_sys->i_subtitles &&
-            p_sys->subtitle[p_sys->i_subtitle].i_start < p_sys->i_next_demux_time )
+    while( p_sys->subs.i_current < p_sys->subs.i_count &&
+            p_sys->subs.p_array[p_sys->subs.i_current].i_start < p_sys->i_next_demux_time )
     {
-        const subtitle_t* p_subtitle = &p_sys->subtitle[p_sys->i_subtitle];
+        const subtitle_t* p_subtitle = &p_sys->subs.p_array[p_sys->subs.i_current];
 
         block_t* p_block = block_Alloc( strlen( p_subtitle->psz_text ) + 1 );
         if( unlikely( p_block == NULL ) )
@@ -768,7 +772,7 @@ static int Demux( demux_t* p_demux )
 
         es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
-        p_sys->i_subtitle++;
+        p_sys->subs.i_current++;
     }
     p_sys->i_next_demux_time = 0;
     return 1;
@@ -963,18 +967,18 @@ static int Open( vlc_object_t* p_this )
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     es_format_Clean( &fmt );
 
-    if( p_sys->i_subtitles > 0 )
+    if( p_sys->subs.i_count > 0 )
     {
-        for( int i = 0; i < p_sys->i_subtitles; i++ )
+        for( size_t i = 0; i < p_sys->subs.i_count; i++ )
         {
             char* p_sub = NULL;
-            if( asprintf( &p_sub, "%s%s</%s>", psz_root_node, p_sys->subtitle[i].psz_text, psz_end_root_node ) < 0 )
+            if( asprintf( &p_sub, "%s%s</%s>", psz_root_node, p_sys->subs.p_array[i].psz_text, psz_end_root_node ) < 0 )
                 goto error;
 
-            free( p_sys->subtitle[i].psz_text );
-            p_sys->subtitle[i].psz_text = p_sub;
+            free( p_sys->subs.p_array[i].psz_text );
+            p_sys->subs.p_array[i].psz_text = p_sub;
         }
-        p_sys->i_length = p_sys->subtitle[ p_sys->i_subtitles - 1 ].i_stop;
+        p_sys->i_length = p_sys->subs.p_array[ p_sys->subs.i_count - 1 ].i_stop;
     }
     else
         p_sys->i_length = 0;
@@ -1001,10 +1005,10 @@ static void Close( demux_t* p_demux )
         xml_ReaderDelete( p_sys->p_reader );
     if( p_sys->p_xml )
         xml_Delete( p_sys->p_xml );
-    for( int i = 0; i < p_sys->i_subtitles; ++i )
+    for( size_t i = 0; i < p_sys->subs.i_count; ++i )
     {
-        free( p_sys->subtitle[i].psz_text );
+        free( p_sys->subs.p_array[i].psz_text );
     }
-    free( p_sys->subtitle );
+    free( p_sys->subs.p_array );
     free( p_sys );
 }
