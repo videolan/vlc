@@ -151,7 +151,7 @@ upload_plane(const opengl_tex_converter_t *tc,
 static int
 tc_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
                  unsigned width, unsigned height,
-                 const picture_t *pic, const size_t *plane_offset)
+                 picture_t *pic, const size_t *plane_offset)
 {
     int ret = VLC_SUCCESS;
     for (unsigned i = 0; i < tc->desc->plane_count && ret == VLC_SUCCESS; i++)

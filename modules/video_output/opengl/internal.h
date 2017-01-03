@@ -219,7 +219,7 @@ struct opengl_tex_converter_t
      */
     int (*pf_update)(const opengl_tex_converter_t *fc, const GLuint *textures,
                      unsigned width, unsigned height,
-                     const picture_t *pic, const size_t *plane_offset);
+                     picture_t *pic, const size_t *plane_offset);
 
     /*
      * Callback to prepare the fragment shader
