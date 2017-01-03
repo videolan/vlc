@@ -223,7 +223,7 @@ skip:
         case 0: /* EOF */
             return XML_READER_NONE;
         case -1: /* error */
-            return -1;
+            return XML_READER_ERROR;
     }
 
     switch( xmlTextReaderNodeType( p_sys->xml ) )
@@ -245,19 +245,19 @@ skip:
             break;
 
         case -1:
-            return -1;
+            return XML_READER_ERROR;
 
         default:
             goto skip;
     }
 
     if( unlikely(node == NULL) )
-        return -1;
+        return XML_READER_ERROR;
 
     p_sys->node = strdup( (const char *)node );
     if( pval != NULL )
         *pval = p_sys->node;
-    return likely(p_sys->node != NULL) ? ret : -1;
+    return likely(p_sys->node != NULL) ? ret : XML_READER_ERROR;
 }
 
 #if 0
