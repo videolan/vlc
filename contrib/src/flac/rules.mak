@@ -1,6 +1,6 @@
 # FLAC
 
-FLAC_VERSION := 1.3.1
+FLAC_VERSION := 1.3.2
 FLAC_URL := http://downloads.xiph.org/releases/flac/flac-$(FLAC_VERSION).tar.xz
 
 PKGS += flac
@@ -57,5 +57,5 @@ DEPS_flac = ogg $(DEPS_ogg)
 .flac: flac
 	cd $< && $(HOSTVARS) CFLAGS="$(FLAC_CFLAGS)" ./configure $(FLACCONF)
 	cd $</include && $(MAKE) install
-	cd $</src && $(MAKE) -C share install && $(MAKE) -C libFLAC install
+	cd $</src && $(MAKE) -C libFLAC install && $(MAKE) -C share install
 	touch $@

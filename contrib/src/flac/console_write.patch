@@ -1,41 +1,43 @@
---- flac.orig/src/share/win_utf8_io/win_utf8_io.c	2016-05-16 14:52:36.408520025 +0200
-+++ flac/src/share/win_utf8_io/win_utf8_io.c	2016-05-16 14:57:07.880507930 +0200
-@@ -42,6 +42,7 @@
- #include <stdarg.h>
- #define WIN32_LEAN_AND_MEAN
- #include <windows.h> /* for WideCharToMultiByte and MultiByteToWideChar */
+--- flac.orig/src/share/win_utf8_io/win_utf8_io.c	2017-01-02 18:07:08.794676209 -0500
++++ flac/src/share/win_utf8_io/win_utf8_io.c	2017-01-02 18:10:16.633867994 -0500
+@@ -34,6 +34,7 @@
+ #endif
+ 
+ #include <windows.h>
 +#include <winapifamily.h>
- 
  #include "share/win_utf8_io.h"
+ #include "share/windows_unicode_filenames.h"
  
-@@ -163,16 +164,22 @@
+@@ -164,11 +165,13 @@
  int win_get_console_width(void)
  {
  	int width = 80;
 +#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
  	CONSOLE_SCREEN_BUFFER_INFO csbi;
  	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
- 	if (GetConsoleScreenBufferInfo(hOut, &csbi) != 0) width = csbi.dwSize.X;
+ 	if(hOut != INVALID_HANDLE_VALUE && hOut != NULL)
+ 		if (GetConsoleScreenBufferInfo(hOut, &csbi) != 0)
+ 			width = csbi.dwSize.X;
 +#endif
  	return width;
  }
  
- /* print functions */
--
- int print_console(FILE *stream, const wchar_t *text, size_t len)
+@@ -176,6 +179,11 @@
+ 
+ static int wprint_console(FILE *stream, const wchar_t *text, size_t len)
  {
 +#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 +	(void)stream;
 +	OutputDebugStringW(text);
 +	return len;
 +#else
- 	static HANDLE hOut;
- 	static HANDLE hErr;
  	DWORD out;
-@@ -189,6 +196,7 @@
- 		if (ret < 0) return ret;
- 		return len;
- 	}
+ 	int ret;
+ 
+@@ -202,6 +210,7 @@
+ 	if (ret < 0)
+ 		return ret;
+ 	return len;
 +#endif
  }
  
