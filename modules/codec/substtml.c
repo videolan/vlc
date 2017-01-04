@@ -47,7 +47,8 @@
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
-static text_segment_t *ParseTTMLSubtitles( decoder_t *, subpicture_updater_sys_t *, char * );
+static text_segment_t *ParseTTMLSubtitles( decoder_t *, subpicture_updater_sys_t *,
+                                           const uint8_t *, size_t );
 
 vlc_module_begin ()
     set_capability( "decoder", 10 )
@@ -565,7 +566,8 @@ static void ParseTTMLStyles( decoder_t* p_dec )
     vlc_stream_Delete( p_stream );
 }
 
-static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_sys_t *p_update_sys, char *psz_subtitle )
+static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_sys_t *p_update_sys,
+                                           const uint8_t *p_buffer, size_t i_buffer )
 {
     stream_t*       p_sub = NULL;
     xml_reader_t*   p_xml_reader = NULL;
@@ -574,7 +576,7 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
     style_stack_t*  p_style_stack = NULL;
     ttml_style_t*   p_style = NULL;
 
-    p_sub = vlc_stream_MemoryNew( p_dec, (uint8_t*)psz_subtitle, strlen( psz_subtitle ), true );
+    p_sub = vlc_stream_MemoryNew( p_dec, (uint8_t*) p_buffer, i_buffer, true );
     if( unlikely( p_sub == NULL ) )
         return NULL;
 
@@ -753,7 +755,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
-    char *psz_subtitle = NULL;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         return NULL;
@@ -775,18 +776,11 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         return NULL;
     }
 
-    psz_subtitle = malloc( p_block->i_buffer );
-    if( unlikely( psz_subtitle == NULL ) )
-        return NULL;
-    memcpy( psz_subtitle, p_block->p_buffer, p_block->i_buffer );
-
     /* Create the subpicture unit */
     p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
-    {
-        free( psz_subtitle );
         return NULL;
-    }
+
     p_spu->i_start    = p_block->i_pts;
     p_spu->i_stop     = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer  = (p_block->i_length == 0);
@@ -795,8 +789,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-    p_spu_sys->p_segments = ParseTTMLSubtitles( p_dec, p_spu_sys, psz_subtitle );
-    free( psz_subtitle );
+    p_spu_sys->p_segments = ParseTTMLSubtitles( p_dec, p_spu_sys, p_block->p_buffer, p_block->i_buffer );
 
     return p_spu;
 }
