@@ -1,0 +1,22 @@
+--- flac/src/libFLAC/windows_unicode_filenames.c.orig	2017-01-05 16:36:45.696358168 +0100
++++ flac/src/libFLAC/windows_unicode_filenames.c	2017-01-05 17:03:41.052478210 +0100
+@@ -35,6 +35,7 @@
+ 
+ #include <io.h>
+ #include "share/windows_unicode_filenames.h"
++#include <winapifamily.h>
+ 
+ /* convert UTF-8 back to WCHAR. Caller is responsible for freeing memory */
+ static wchar_t *wchar_from_utf8(const char *str)
+@@ -186,7 +187,11 @@
+ HANDLE WINAPI flac_internal_CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+ {
+ 	if (!utf8_filenames) {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) 
+ 		return CreateFileA(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
++#else
++        return INVALID_HANDLE_VALUE;
++#endif
+ 	} else {
+ 		wchar_t *wname;
+ 		HANDLE handle = INVALID_HANDLE_VALUE;
