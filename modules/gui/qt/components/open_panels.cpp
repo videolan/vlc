@@ -220,7 +220,7 @@ void FileOpenPanel::dropEvent( QDropEvent *event )
 
 void FileOpenPanel::browseFile()
 {
-    QStringList files = DialogsProvider::getOpenFileNames( this, qtr( "Select one or multiple files" ), p_intf->p_sys->filepath );
+    QStringList files = QFileDialog::getOpenFileNames( this, qtr( "Select one or multiple files" ), p_intf->p_sys->filepath );
     foreach( const QString &file, files )
     {
         QListWidgetItem *item =
@@ -250,11 +250,11 @@ void FileOpenPanel::removeFile()
 void FileOpenPanel::browseFileSub()
 {
     // TODO Handle selection of more than one subtitles file
-    QStringList files = THEDP->showSimpleOpen( qtr("Open subtitle file"),
+    QStringList urls = THEDP->showSimpleOpen( qtr("Open subtitle file"),
                            EXT_FILTER_SUBTITLE, p_intf->p_sys->filepath );
 
-    if( files.isEmpty() ) return;
-    ui.subInput->setText( toNativeSeparators( files.join(" ") ) );
+    if( urls.isEmpty() ) return;
+    ui.subInput->setText( urls.join(" ") );
     updateMRL();
 }
 

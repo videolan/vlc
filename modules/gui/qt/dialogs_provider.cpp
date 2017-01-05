@@ -110,24 +110,26 @@ DialogsProvider::~DialogsProvider()
     delete miscPopupMenu;
 }
 
-QStringList DialogsProvider::getOpenFileNames( QWidget *parent,
+QStringList DialogsProvider::getOpenURL( intf_thread_t* p_intf, QWidget *parent,
                                                const QString &caption,
                                                const QString &dir,
                                                const QString &filter,
                                                QString *selectedFilter )
 {
-    QStringList files;
+    QStringList res;
 
 #if HAS_QT52
     QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
 
-    foreach( const QUrl url, urls )
-        files.append( url.toEncoded() );
+    foreach( const QUrl& url, urls )
+        res.append( url.toEncoded() );
 #else
-    files = QFileDialog::getOpenFileNames( parent, caption, dir, filter, selectedFilter );
+    QStringList files = QFileDialog::getOpenFileNames( parent, caption, dir, filter, selectedFilter );
+    foreach ( const QString& file : files )
+        res.append( toURI( toNativeSeparators( file ) ) );
 #endif
 
-    return files;
+    return res;
 }
 
 QString DialogsProvider::getSaveFileName( QWidget *parent,
@@ -397,14 +399,14 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     }
     else /* non-save mode */
     {
-        QStringList files = getOpenFileNames( NULL,
+        QStringList urls = getOpenURL( p_intf, NULL,
                 qfu( p_arg->psz_title ), p_intf->p_sys->filepath,
                 extensions );
-        p_arg->i_results = files.count();
+        p_arg->i_results = urls.count();
         p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
         i = 0;
-        foreach( const QString &file, files )
-            p_arg->psz_results[i++] = strdup( qtu( toNativeSepNoSlash( file ) ) );
+        foreach( const QString &uri, urls )
+            p_arg->psz_results[i++] = strdup( qtu( uri ) );
         if(i == 0)
             p_intf->p_sys->filepath = QString::fromLatin1("");
         else
@@ -496,14 +498,14 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
     ADD_EXT_FILTER( fileTypes, EXTENSIONS_ALL );
     fileTypes.replace( ";*", " *");
 
-    QStringList files = getOpenFileNames( NULL,
+    QStringList urls = getOpenURL( p_intf, NULL,
         help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
         path.isEmpty() ? p_intf->p_sys->filepath : path,
         fileTypes );
 
-    if( !files.isEmpty() ) savedirpathFromFile( files.last() );
+    if( !urls.isEmpty() ) savedirpathFromFile( urls.last() );
 
-    return files;
+    return urls;
 }
 
 /**
@@ -513,13 +515,12 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
  **/
 void DialogsProvider::addFromSimple( bool pl, bool go)
 {
-    QStringList files = DialogsProvider::showSimpleOpen();
+    QStringList urls = DialogsProvider::showSimpleOpen();
 
     bool first = go;
-    files.sort();
-    foreach( const QString &file, files )
+    urls.sort();
+    foreach( const QString &url, urls )
     {
-        QString url = toURI( toNativeSeparators( file ) );
         Open::openMRL( p_intf, url, first, pl);
         first = false;
     }
@@ -615,11 +616,11 @@ void DialogsProvider::PLAppendDir()
  ****************/
 void DialogsProvider::openAPlaylist()
 {
-    QStringList files = showSimpleOpen( qtr( "Open playlist..." ),
+    QStringList urls = showSimpleOpen( qtr( "Open playlist..." ),
                                         EXT_FILTER_PLAYLIST );
-    foreach( const QString &file, files )
+    foreach( const QString &url, urls )
     {
-        playlist_Import( THEPL, qtu( toNativeSeparators( file ) ) );
+        playlist_Import( THEPL, qtu( url ) );
     }
 }
 
@@ -826,12 +827,12 @@ void DialogsProvider::loadSubtitlesFile()
                                       EXT_FILTER_SUBTITLE,
                                       qfu( path2 ) );
     free( path2 );
-    foreach( const QString &qsFile, qsl )
+    foreach( const QString &qsUrl, qsl )
     {
-        if( input_AddSubtitleOSD( p_input, qtu( toNativeSeparators( qsFile ) ),
+        if( input_AddSubtitleOSD( p_input, qtu( toNativeSeparators( QUrl( qsUrl ).toLocalFile() ) ),
                     true, true ) )
             msg_Warn( p_intf, "unable to load subtitles from '%s'",
-                      qtu( qsFile ) );
+                      qtu( qsUrl ) );
     }
 }
 

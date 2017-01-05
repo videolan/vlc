@@ -91,7 +91,7 @@ public:
                                 const QString& path = QString() );
     bool isDying() { return b_isDying; }
     static QString getDirectoryDialog( intf_thread_t *p_intf);
-    static QStringList getOpenFileNames( QWidget *parent = Q_NULLPTR,
+    static QStringList getOpenURL(intf_thread_t* p_intf, QWidget *parent = Q_NULLPTR,
                                          const QString &caption = QString(),
                                          const QString &dir = QString(),
                                          const QString &filter = QString(),
