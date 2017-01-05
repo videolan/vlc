@@ -604,7 +604,7 @@ static inline int input_AddSlave( input_thread_t *p_input, enum slave_type type,
  * Update the viewpoint of the input thread. The viewpoint will be applied to
  * all vouts and aouts.
  *
- * @param p_input an input thread 
+ * @param p_input an input thread
  * @param p_viewpoint the viewpoint value
  * @param b_absolute if true replace the old viewpoint with the new one. If
  * false, increase/decrease it.
