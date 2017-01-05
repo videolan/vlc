@@ -328,7 +328,7 @@
 
 - (void)setVoutWasUpdated:(VLCWindow *)voutWindow
 {
-    _voutWindow = voutWindow;
+    [_controlsView setLimitWindow:voutWindow];
     int newDisplayID = [[self.window screen] displayID];
 
     if (_displayID != newDisplayID) {

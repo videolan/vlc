@@ -802,6 +802,8 @@ void _drawFrameInRect(NSRect frameRect)
             b_time_remaining = !b_time_remaining;
         }
     }
+
+    [[self nextResponder] mouseDown:ourEvent];
 }
 
 - (BOOL)timeRemaining

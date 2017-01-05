@@ -334,7 +334,7 @@
 
 - (BOOL)mouseDownCanMoveWindow
 {
-    return YES;
+    return NO;
 }
 
 - (BOOL)acceptsFirstResponder

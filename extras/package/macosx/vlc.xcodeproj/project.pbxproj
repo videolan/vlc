@@ -317,6 +317,7 @@
 		1C88BC5619DC7C8100645190 /* ys-volume-slider-track_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BBE419DC7C8100645190 /* ys-volume-slider-track_dark@2x.png */; };
 		1C94659B1B77B9FC007C965A /* PopupPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C9465971B77B9FC007C965A /* PopupPanel.xib */; };
 		1C94659C1B77B9FC007C965A /* TextfieldPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C9465991B77B9FC007C965A /* TextfieldPanel.xib */; };
+		1CAEBC011E1EC0A400A99E49 /* VLCFSPanelDraggableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */; };
 		1CBB2CC81B06A6DE00110ADA /* Help.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CBB2CC61B06A6DE00110ADA /* Help.xib */; };
 		1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CC25CA71B2C585D0003F994 /* darwinvlc.m */; };
 		1CC30CE81DC8D561001400E2 /* VLCFSPanelController.h in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */; };
@@ -1098,6 +1099,8 @@
 		1C88BBE419DC7C8100645190 /* ys-volume-slider-track_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-volume-slider-track_dark@2x.png"; sourceTree = "<group>"; };
 		1C9465981B77B9FC007C965A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PopupPanel.xib; sourceTree = "<group>"; };
 		1C94659A1B77B9FC007C965A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/TextfieldPanel.xib; sourceTree = "<group>"; };
+		1CAEBBFF1E1EC0A400A99E49 /* VLCFSPanelDraggableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCFSPanelDraggableView.h; path = ../../../modules/gui/macosx/VLCFSPanelDraggableView.h; sourceTree = "<group>"; };
+		1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCFSPanelDraggableView.m; path = ../../../modules/gui/macosx/VLCFSPanelDraggableView.m; sourceTree = "<group>"; };
 		1CBB2CC71B06A6DE00110ADA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Help.xib; sourceTree = "<group>"; };
 		1CC25CA71B2C585D0003F994 /* darwinvlc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = darwinvlc.m; path = ../../../bin/darwinvlc.m; sourceTree = "<group>"; };
 		1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pseudo-vlc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1705,6 +1708,8 @@
 				5CCED71314C0D4A90057F8D1 /* VLCExtensionsManager.m */,
 				6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */,
 				6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */,
+				1CAEBBFF1E1EC0A400A99E49 /* VLCFSPanelDraggableView.h */,
+				1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */,
 				7D871D391B5E684D000B56C0 /* helpers.h */,
 				7DF812ED1B555A340052293C /* VLCInputManager.h */,
 				7DF812EE1B555A340052293C /* VLCInputManager.m */,
@@ -3641,6 +3646,7 @@
 				1CCB5FAB1A62A724004C3E90 /* SPMediaKeyTap.h in Sources */,
 				1C67C8A51D58C0980079E1C1 /* VLCHelpWindowController.m in Sources */,
 				1CCB5FAC1A62A724004C3E90 /* SPMediaKeyTap.m in Sources */,
+				1CAEBC011E1EC0A400A99E49 /* VLCFSPanelDraggableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

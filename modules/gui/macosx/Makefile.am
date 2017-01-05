@@ -89,5 +89,6 @@ libmacosx_plugin_la_SOURCES = \
 	VLCTrackSynchronizationWindowController.h VLCTrackSynchronizationWindowController.m \
 	VLCVideoEffectsWindowController.h VLCVideoEffectsWindowController.m \
 	VLCFSPanelController.h VLCFSPanelController.m \
+	VLCFSPanelDraggableView.h VLCFSPanelDraggableView.m \
 	VLCDefaultValueSlider.h VLCDefaultValueSlider.m \
 	VLCDefaultValueSliderCell.h VLCDefaultValueSliderCell.m
