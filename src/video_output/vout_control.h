@@ -51,11 +51,6 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
 void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
 
 /*
- * Reset the states of the vout.
- */
-void vout_Reset( vout_thread_t *p_vout );
-
-/*
  * Cancel the vout, if cancel is true, it won't return any pictures after this
  * call.
  */

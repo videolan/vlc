@@ -1793,10 +1793,6 @@ static void DeleteDecoder( decoder_t * p_dec )
     }
     if( p_owner->p_vout )
     {
-        /* Hack to make sure all the the pictures are freed by the decoder
-         * and that the vout is not paused anymore */
-        vout_Reset( p_owner->p_vout );
-
         /* */
         input_resource_RequestVout( p_owner->p_resource, p_owner->p_vout, NULL,
                                     0, true );

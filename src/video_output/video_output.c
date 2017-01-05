@@ -332,12 +332,6 @@ void vout_Flush(vout_thread_t *vout, mtime_t date)
     vout_control_WaitEmpty(&vout->p->control);
 }
 
-void vout_Reset(vout_thread_t *vout)
-{
-    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_RESET);
-    vout_control_WaitEmpty(&vout->p->control);
-}
-
 bool vout_IsEmpty(vout_thread_t *vout)
 {
     picture_t *picture = picture_fifo_Peek(vout->p->decoder_fifo);
@@ -1207,32 +1201,6 @@ static void ThreadFlush(vout_thread_t *vout, bool below, mtime_t date)
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
 }
 
-static void ThreadReset(vout_thread_t *vout)
-{
-    ThreadFlush(vout, true, INT64_MAX);
-    if (vout->p->decoder_pool) {
-        unsigned count, leaks;
-
-        if (vout->p->private_pool != NULL) {
-            count = picture_pool_GetSize(vout->p->private_pool);
-            picture_pool_Release(vout->p->private_pool);
-        }
-
-        leaks = picture_pool_Reset(vout->p->decoder_pool);
-        if (leaks > 0)
-            msg_Err(vout, "%u picture(s) leaked by decoder", leaks);
-
-        if (vout->p->private_pool != NULL) {
-            vout->p->private_pool = picture_pool_Reserve(vout->p->decoder_pool,
-                                                         count);
-            if (vout->p->private_pool == NULL)
-                abort();
-        }
-    }
-    vout->p->pause.is_on = false;
-    vout->p->pause.date  = mdate();
-}
-
 static void ThreadStep(vout_thread_t *vout, mtime_t *duration)
 {
     *duration = 0;
@@ -1602,9 +1570,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_FLUSH:
         ThreadFlush(vout, false, cmd.u.time);
-        break;
-    case VOUT_CONTROL_RESET:
-        ThreadReset(vout);
         break;
     case VOUT_CONTROL_STEP:
         ThreadStep(vout, cmd.u.time_ptr);
