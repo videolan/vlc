@@ -988,6 +988,7 @@ Section "un.$Name_Section91" SEC91
   DeleteRegKey HKCR "VLC.VCDMovie"
   DeleteRegKey HKCR "VLC.SVCDMovie"
   DeleteRegKey HKCR "VLC.OPENFolder"
+  DeleteRegKey HKCR "VLC.Bluray"
 
 
   DeleteRegKey HKLM \
