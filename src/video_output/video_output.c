@@ -1423,7 +1423,7 @@ static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
         vout_CloseWrapper(vout, state);
         goto error;
     }
-    assert(vout->p->decoder_pool);
+    assert(vout->p->decoder_pool && vout->p->private_pool);
 
     vout->p->displayed.current       = NULL;
     vout->p->displayed.next          = NULL;

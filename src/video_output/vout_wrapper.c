@@ -163,6 +163,13 @@ int vout_InitWrapper(vout_thread_t *vout)
         NoDrInit(vout);
     }
     sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
+    if (!sys->private_pool)
+    {
+        if (sys->decoder_pool != sys->display_pool)
+            picture_pool_Release(sys->decoder_pool);
+        sys->display_pool = sys->decoder_pool = NULL;
+        return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
@@ -173,8 +180,9 @@ void vout_EndWrapper(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
-    if (sys->private_pool)
-        picture_pool_Release(sys->private_pool);
+    assert(vout->p->decoder_pool && vout->p->private_pool);
+
+    picture_pool_Release(sys->private_pool);
 
     if (sys->decoder_pool != sys->display_pool)
         picture_pool_Release(sys->decoder_pool);
