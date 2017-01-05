@@ -364,6 +364,13 @@ ${MementoSection} $Name_Section05 SEC05
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "InvokeVerb" "Open"
   WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayMusicFilesOnArrival" "Provider" "VideoLAN VLC media player"
 
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBlurayOnArrival" "VLCPlayBlurayOnArrival" ""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "Action" $Action_OnArrivalBluray
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "InvokeProgID" "VLC.Bluray"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "InvokeVerb" "Open"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival" "Provider" "VideoLAN VLC media player"
+
   WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
   WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Open"
   WriteRegStr HKCR "VLC.DVDMovie\shell\Open\command" "" \
@@ -393,6 +400,12 @@ ${MementoSection} $Name_Section05 SEC05
   WriteRegStr HKCR "VLC.OPENFolder\shell\Open\command" "" \
      '"$INSTDIR\vlc.exe" %1'
   WriteRegStr HKCR "VLC.OPENFolder\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
+
+  WriteRegStr HKCR "VLC.Bluray" "" "VLC Bluray"
+  WriteRegStr HKCR "VLC.Bluray\shell" "" "Open"
+  WriteRegStr HKCR "VLC.Bluray\shell\Open\command" "" \
+    '"$INSTDIR\vlc.exe" --started-from-file bluray:///%1'
+  WriteRegStr HKCR "VLC.Bluray\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 ${MementoSectionEnd}
 

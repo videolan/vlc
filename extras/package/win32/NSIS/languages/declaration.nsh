@@ -44,6 +44,7 @@ Var Action_OnArrivalSVCDMovie
 Var Action_OnArrivalVideoFiles
 Var Action_OnArrivalMusicFiles
 Var Action_OnArrivalDVDAudio
+Var Action_OnArrivalBluray
 
 Var License_NextText
 
