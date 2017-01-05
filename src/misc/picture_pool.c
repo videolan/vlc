@@ -288,20 +288,6 @@ void picture_pool_Cancel(picture_pool_t *pool, bool canceled)
     vlc_mutex_unlock(&pool->lock);
 }
 
-unsigned picture_pool_Reset(picture_pool_t *pool)
-{
-    unsigned ret;
-
-    vlc_mutex_lock(&pool->lock);
-    assert(pool->refs > 0);
-    ret = pool->picture_count - popcountll(pool->available);
-    pool->available = (1ULL << pool->picture_count) - 1;
-    pool->canceled = false;
-    vlc_mutex_unlock(&pool->lock);
-
-    return ret;
-}
-
 unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;
