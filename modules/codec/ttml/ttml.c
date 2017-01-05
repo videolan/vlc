@@ -22,6 +22,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_xml.h>
 #include <vlc_strings.h>
 
@@ -29,6 +30,34 @@
 #include <stdlib.h>
 
 #include "ttml.h"
+
+#define ALIGN_TEXT N_("Subtitle justification")
+#define ALIGN_LONGTEXT N_("Set the justification of subtitles")
+
+/*****************************************************************************
+ * Modules descriptor.
+ *****************************************************************************/
+
+vlc_module_begin ()
+    set_capability( "decoder", 10 )
+    set_shortname( N_("TTML decoder"))
+    set_description( N_("TTML subtitles decoder") )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
+    add_integer( "ttml-align", 0, ALIGN_TEXT, ALIGN_LONGTEXT, false )
+
+    add_submodule()
+        set_shortname( N_("TTML") )
+        set_description( N_("TTML demuxer") )
+        set_capability( "demux", 2 )
+        set_category( CAT_INPUT )
+        set_subcategory( SUBCAT_INPUT_DEMUX )
+        set_callbacks( OpenDemux, CloseDemux )
+        add_shortcut( "ttml", "subtitle" )
+
+vlc_module_end ()
+
 
 int tt_node_NameCompare( const char* psz_tagname, const char* psz_pattern )
 {

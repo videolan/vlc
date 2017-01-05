@@ -404,7 +404,7 @@ modules/codec/svcdsub.c
 modules/codec/t140.c
 modules/codec/telx.c
 modules/codec/theora.c
-modules/codec/substtml.c
+modules/codec/ttml/ttml.c
 modules/codec/twolame.c
 modules/codec/uleaddvaudio.c
 modules/codec/videotoolbox.m

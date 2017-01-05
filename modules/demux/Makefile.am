@@ -458,7 +458,3 @@ libadaptive_plugin_la_LIBADD += $(GCRYPT_LIBS)
 endif
 demux_LTLIBRARIES += libadaptive_plugin.la
 
-libttml_plugin_la_SOURCES = demux/ttml.c \
-                            codec/ttml/ttml.h codec/ttml/ttml.c
-demux_LTLIBRARIES += libttml_plugin.la
-

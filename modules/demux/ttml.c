@@ -26,7 +26,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_xml.h>
 #include <vlc_strings.h>
@@ -39,19 +38,6 @@
 #include "../codec/ttml/ttml.h"
 
 //#define TTML_DEMUX_DEBUG
-
-static int Open( vlc_object_t* p_this );
-static void Close( demux_t* p_demux );
-
-vlc_module_begin ()
-    set_shortname( N_("TTML") )
-    set_description( N_("TTML demuxer") )
-    set_capability( "demux", 2 )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_DEMUX )
-    set_callbacks( Open, Close )
-    add_shortcut( "ttml", "subtitle" )
-vlc_module_end ()
 
 struct demux_sys_t
 {
@@ -408,7 +394,7 @@ static int Demux( demux_t* p_demux )
     return VLC_DEMUXER_SUCCESS;
 }
 
-static int Open( vlc_object_t* p_this )
+int OpenDemux( vlc_object_t* p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
@@ -490,12 +476,12 @@ static int Open( vlc_object_t* p_this )
     return VLC_SUCCESS;
 
 error:
-    Close( p_demux );
+    CloseDemux( p_demux );
 
     return VLC_EGENERIC;
 }
 
-static void Close( demux_t* p_demux )
+void CloseDemux( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
 

@@ -385,7 +385,6 @@ $Id$
  * stream_out_transcode: audio & video transcoder
  * subsdec: a codec to output textual subtitles
  * subsdelay: subtitles delay filter
- * substtml: TTML subtitles decoder
  * substx3g: tx3g styled subtitles decoder
  * subsusf: a demuxer for USF subtitles
  * subtitle: a demuxer for subtitle files
@@ -408,7 +407,7 @@ $Id$
  * trivial_channel_mixer: Simple channel mixer plugin
  * ts: MPEG-TS demuxer
  * tta: Lossless True Audio parser
- * ttml: a TTML subtitles demuxer
+ * ttml: a TTML subtitles demuxer and decoder
  * twolame: a mp1 mp2 audio encoder based on twolame
  * ty: TY demuxer
  * udev: udev probing module
