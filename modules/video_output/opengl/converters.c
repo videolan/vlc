@@ -35,16 +35,20 @@
 #define GL_R16 0
 #endif
 
+#ifndef GL_UNPACK_ROW_LENGTH
+#define GL_UNPACK_ROW_LENGTH 0x0CF2
+#define NEED_GL_EXT_unpack_subimage
+#endif
+
 struct priv
 {
     GLint  tex_internal;
     GLenum tex_format;
     GLenum tex_type;
 
-#ifndef GL_UNPACK_ROW_LENGTH
+    bool   has_unpack_subimage;
     void * texture_temp_buf;
     size_t texture_temp_buf_size;
-#endif
 };
 
 struct yuv_priv
@@ -106,42 +110,48 @@ upload_plane(const opengl_tex_converter_t *tc,
     /* This unpack alignment is the default, but setting it just in case. */
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-#ifndef GL_UNPACK_ROW_LENGTH
-# define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-    unsigned dst_width = width;
-    unsigned dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
-    if (pitch != dst_pitch)
+    if (!priv->has_unpack_subimage)
     {
-        size_t buf_size = dst_pitch * height * pixel_pitch;
-        const uint8_t *source = pixels;
-        uint8_t *destination;
-        if (priv->texture_temp_buf_size < buf_size)
+#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
+        unsigned dst_width = width;
+        unsigned dst_pitch = ALIGN(dst_width * pixel_pitch, 4);
+        if (pitch != dst_pitch)
         {
-            priv->texture_temp_buf =
-                realloc_or_free(priv->texture_temp_buf, buf_size);
-            if (priv->texture_temp_buf == NULL)
+            size_t buf_size = dst_pitch * height * pixel_pitch;
+            const uint8_t *source = pixels;
+            uint8_t *destination;
+            if (priv->texture_temp_buf_size < buf_size)
             {
-                priv->texture_temp_buf_size = 0;
-                return VLC_ENOMEM;
+                priv->texture_temp_buf =
+                    realloc_or_free(priv->texture_temp_buf, buf_size);
+                if (priv->texture_temp_buf == NULL)
+                {
+                    priv->texture_temp_buf_size = 0;
+                    return VLC_ENOMEM;
+                }
+                priv->texture_temp_buf_size = buf_size;
             }
-            priv->texture_temp_buf_size = buf_size;
-        }
-        destination = priv->texture_temp_buf;
+            destination = priv->texture_temp_buf;
 
-        for (unsigned h = 0; h < height ; h++)
-        {
-            memcpy(destination, source, width * pixel_pitch);
-            source += pitch;
-            destination += dst_pitch;
+            for (unsigned h = 0; h < height ; h++)
+            {
+                memcpy(destination, source, width * pixel_pitch);
+                source += pitch;
+                destination += dst_pitch;
+            }
+            glTexSubImage2D(tex_target, 0, 0, 0, width, height,
+                            tex_format, tex_type, priv->texture_temp_buf);
         }
-        glTexSubImage2D(tex_target, 0, 0, 0, width, height,
-                        tex_format, tex_type, priv->texture_temp_buf);
-    } else {
-# undef ALIGN
-#else
+        else
+        {
+            glTexSubImage2D(tex_target, 0, 0, 0, width, height,
+                            tex_format, tex_type, pixels);
+        }
+#undef ALIGN
+    }
+    else
     {
         glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch / pixel_pitch);
-#endif
         glTexSubImage2D(tex_target, 0, 0, 0, width, height,
                         tex_format, tex_type, pixels);
     }
@@ -176,10 +186,9 @@ tc_common_release(const opengl_tex_converter_t *tc)
 {
     tc->api->DeleteShader(tc->fragment_shader);
 
-#ifndef GL_UNPACK_ROW_LENGTH
     struct priv *priv = tc->priv;
     free(priv->texture_temp_buf);
-#endif
+
     free(tc->priv);
 }
 
@@ -204,6 +213,13 @@ common_init(opengl_tex_converter_t *tc, size_t priv_size, vlc_fourcc_t chroma,
     priv->tex_internal  = tex_internal;
     priv->tex_format    = tex_format;
     priv->tex_type      = tex_type;
+
+#ifdef NEED_GL_EXT_unpack_subimage
+    priv->has_unpack_subimage = HasExtension(tc->glexts,
+                                             "GL_EXT_unpack_subimage");
+#else
+    priv->has_unpack_subimage = true;
+#endif
 
     return VLC_SUCCESS;
 }
