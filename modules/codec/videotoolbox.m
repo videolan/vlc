@@ -407,10 +407,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             i_ret = VLC_SUCCESS;
         }
         else
-        {
-            vlc_assert_unreachable();
             return VLC_EGENERIC;
-        }
 
         /* get the SPS and PPS units from the NAL unit which is either
          * part of the demuxer's avvC atom or the mid stream data block */
