@@ -417,7 +417,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                       &p_sps_nal, &i_sps_nalsize,
                                       &p_pps_nal, &i_pps_nalsize,
                                       NULL, NULL) ? VLC_SUCCESS : VLC_EGENERIC;
-        if (i_ret != VLC_SUCCESS) {
+        if (i_ret != VLC_SUCCESS || i_sps_nalsize == 0) {
             free(p_alloc_buf);
             msg_Warn(p_dec, "sps pps detection failed");
             return VLC_EGENERIC;
