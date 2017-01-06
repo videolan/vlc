@@ -175,8 +175,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-#if !defined(USE_OPENGL_ES2)
     const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
+#if !defined(USE_OPENGL_ES2)
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
 #else
@@ -265,6 +265,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     opengl_tex_converter_t rgba_tex_conv = {
         .parent = VLC_OBJECT(vgl->gl),
         .api = &vgl->api,
+        .glexts = extensions,
         .orientation = fmt->orientation,
     };
 
@@ -281,6 +282,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         tex_conv = (opengl_tex_converter_t) {
             .parent = VLC_OBJECT(vgl->gl),
             .api = &vgl->api,
+            .glexts = extensions,
             .orientation = fmt->orientation,
         };
         int ret = opengl_tex_converter_init_cbs[i](fmt, &tex_conv);

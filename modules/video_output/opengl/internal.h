@@ -141,6 +141,8 @@ struct opengl_tex_converter_t
     vlc_object_t *parent;
     /* Function pointer to shaders commands, set by the caller of the init cb */
     const opengl_shaders_api_t *api;
+    /* Available gl extensions (from GL_EXTENSIONS) */
+    const char *glexts;
     /* Set it to request a special orientation (by default = fmt.orientation) */
     video_orientation_t orientation;
 
