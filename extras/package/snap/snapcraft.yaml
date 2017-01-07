@@ -9,7 +9,7 @@ confinement: strict
 
 apps:
   vlc:
-    command: desktop-launch vlc
+    command: bin/vlc-snap-wrapper.sh
     plugs:
       - unity7
       - network
@@ -183,3 +183,9 @@ parts:
       - libxpm4
       - zlib1g
     after: [vlc] # VLC build fails if stage packages are present
+
+  wrapper:
+    plugin: dump
+    source: .
+    organize:
+      vlc-snap-wrapper.sh: bin/vlc-snap-wrapper.sh
