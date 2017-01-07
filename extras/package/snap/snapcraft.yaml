@@ -1,5 +1,6 @@
 name: vlc
 version: "daily"
+grade: stable
 summary: Read, capture, broadcast your multimedia streams
 description: |
   VLC is a free and open source cross-platform multimedia player and
