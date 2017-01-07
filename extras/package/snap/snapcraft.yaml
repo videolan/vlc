@@ -138,7 +138,7 @@ parts:
       - qtbase5-dev
       - zlib1g-dev
       - zsh
-    after: [desktop/qt5]
+    after: [desktop-qt5]
 
   env:
     plugin: nil
