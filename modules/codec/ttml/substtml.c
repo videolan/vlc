@@ -52,6 +52,7 @@ typedef struct
     int             i_margin_percent_v;
     int             i_direction;
     bool            b_direction_set;
+    bool            b_preserve_space;
 }  ttml_style_t;
 
 typedef struct
@@ -307,6 +308,10 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
             p_ttml_style->b_direction_set = true;
         }
     }
+    else if( !strcasecmp( "xml:space", psz_attr ) )
+    {
+        p_ttml_style->b_preserve_space = !strcmp( "preserve", psz_val );
+    }
     else FillTextStyle( psz_attr, psz_val, p_ttml_style->font_style );
 }
 
@@ -482,6 +487,14 @@ static void BIDIConvert( text_segment_t *p_segment, int i_direction )
     }
 }
 
+static void StripSpacing( text_segment_t *p_segment )
+{
+    /* Newlines must be replaced */
+    char *p = p_segment->psz_text;
+    while( (p = strchr( p, '\n' )) )
+        *p = ' ';
+}
+
 static text_segment_t * ConvertNodesToSegments( ttml_context_t *p_ctx, const tt_node_t *p_node,
                                                 bool b_has_prev_text, ttml_style_t **pp_ret_ttml_style )
 {
@@ -506,6 +519,8 @@ static text_segment_t * ConvertNodesToSegments( ttml_context_t *p_ctx, const tt_
             ttml_style_t *s = InheritTTMLStyles( p_ctx, p_child->p_parent );
             (*pp_last)->style = s->font_style;
             s->font_style = NULL;
+            if( !s->b_preserve_space )
+                StripSpacing( *pp_last );
             if( s->b_direction_set )
                 BIDIConvert( *pp_last, s->i_direction );
             /* FIXME: This is carried from broken prev code feat
