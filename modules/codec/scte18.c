@@ -196,7 +196,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = false;
 
-            p_spu_sys->align = SUBPICTURE_ALIGN_TOP;
+            p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_TOP;
             p_spu_sys->p_default_style->i_style_flags = STYLE_BOLD | STYLE_BACKGROUND;
             p_spu_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
             p_spu_sys->p_default_style->i_background_color = 0x000000;
@@ -205,7 +205,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             p_spu_sys->p_default_style->i_font_color = 0xFF0000;
             p_spu_sys->p_default_style->i_features |= STYLE_HAS_FONT_COLOR;
 
-            p_spu_sys->p_segments = text_segment_New( p_cea->psz_alert_text );
+            p_spu_sys->region.p_segments = text_segment_New( p_cea->psz_alert_text );
         }
         msg_Info( p_dec, "Received %s", p_cea->psz_alert_text );
         scte18_cea_Free( p_cea );

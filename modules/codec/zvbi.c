@@ -395,7 +395,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             if( !p_spu )
                 goto error;
             subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-            p_spu_sys->p_segments = text_segment_New("");
+            p_spu_sys->region.p_segments = text_segment_New("");
 
             p_sys->b_update = true;
             p_sys->i_last_page = i_wanted_page;
@@ -452,20 +452,20 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
            offset++;
 
         subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-        p_spu_sys->p_segments = text_segment_New( &p_text[offset] );
-        if( p_spu_sys->p_segments && b_opaque )
+        p_spu_sys->region.p_segments = text_segment_New( &p_text[offset] );
+        if( p_spu_sys->region.p_segments && b_opaque )
         {
-            p_spu_sys->p_segments->style = text_style_Create( STYLE_NO_DEFAULTS );
-            if( p_spu_sys->p_segments->style )
+            p_spu_sys->region.p_segments->style = text_style_Create( STYLE_NO_DEFAULTS );
+            if( p_spu_sys->region.p_segments->style )
             {
                 /* Set text background */
-                p_spu_sys->p_segments->style->i_style_flags = STYLE_BACKGROUND;
-                p_spu_sys->p_segments->style->i_features |= STYLE_HAS_FLAGS;
+                p_spu_sys->region.p_segments->style->i_style_flags = STYLE_BACKGROUND;
+                p_spu_sys->region.p_segments->style->i_features |= STYLE_HAS_FLAGS;
             }
         }
 
-        p_spu_sys->align = i_align;
-        p_spu_sys->noregionbg = true;
+        p_spu_sys->region.inner_align = i_align;
+        p_spu_sys->region.flags = UPDT_REGION_IGNORE_BACKGROUND;
 
 #ifdef ZVBI_DEBUG
         msg_Info( p_dec, "page %x-%x(%d)\n\"%s\"", p_page.pgno, p_page.subno, i_total, &p_text[offset] );

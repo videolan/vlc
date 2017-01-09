@@ -434,10 +434,9 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
 
     /* The "leavetext" alignment is a special mode where the subpicture
        region itself gets aligned, but the text inside it does not */
-    p_spu_sys->align = SUBPICTURE_ALIGN_LEAVETEXT;
-    p_spu_sys->p_segments = p_segments;
-    p_spu_sys->noregionbg = true;
-    p_spu_sys->gridmode = true;
+    p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_LEAVETEXT;
+    p_spu_sys->region.p_segments = p_segments;
+    p_spu_sys->region.flags = UPDT_REGION_IGNORE_BACKGROUND | UPDT_REGION_USES_GRID_COORDINATES;
     /* Set style defaults (will be added to segments if none set) */
     p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
     if( p_dec->p_sys->b_opaque )

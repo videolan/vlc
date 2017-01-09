@@ -630,7 +630,12 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
         /* Create the subpicture unit */
         p_spu = decoder_NewSubpictureText( p_dec );
         if( !p_spu )
+        {
+            text_segment_ChainDelete( p_segments );
+            if( p_ttml_style )
+                ttml_style_Delete( p_ttml_style );
             return NULL;
+        }
 
         p_spu->i_start    = p_block->i_pts;
         p_spu->i_stop     = p_block->i_pts + p_block->i_length;
@@ -642,19 +647,47 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
         /* Broken stuff. See comments */
         if( p_ttml_style )
         {
-            p_spu_sys->x = ( p_ttml_style->i_margin_h ) ? p_ttml_style->i_margin_h
-                                                        : p_ttml_style->i_margin_percent_h;
+            if( p_ttml_style->i_margin_percent_h )
+            {
+                p_spu_sys->region.origin.x = p_ttml_style->i_margin_percent_h;
+                p_spu_sys->region.flags |= UPDT_REGION_ORIGIN_X_IS_PERCENTILE;
+            }
+            else
+            {
+                p_spu_sys->region.origin.x = p_ttml_style->i_margin_h;
+            }
 
-            p_spu_sys->y = ( p_ttml_style->i_margin_v ) ? p_ttml_style->i_margin_v
-                                                        : p_ttml_style->i_margin_percent_v;
+            if( p_ttml_style->i_margin_percent_v )
+            {
+                p_spu_sys->region.origin.y = p_ttml_style->i_margin_percent_v;
+                p_spu_sys->region.flags |= UPDT_REGION_ORIGIN_Y_IS_PERCENTILE;
+            }
+            else
+            {
+                p_spu_sys->region.origin.y = p_ttml_style->i_margin_v;
+            }
 
-            p_spu_sys->align |= p_ttml_style->i_align;
+            if( p_ttml_style->i_align & SUBPICTURE_ALIGN_LEFT )
+                p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_LEFT;
+            else if( p_ttml_style->i_align & SUBPICTURE_ALIGN_LEFT )
+                p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_RIGHT;
+
+            /* broken legacy align var (can't handle center...) */
+            if( (p_ttml_style->i_align & SUBPICTURE_ALIGN_MASK) == 0 &&
+                (p_sys->i_align & SUBPICTURE_ALIGN_MASK) != 0 )
+            {
+                p_spu_sys->region.align = p_sys->i_align;
+            }
+            else
+            {
+                if( p_ttml_style->i_align & SUBPICTURE_ALIGN_TOP )
+                    p_spu_sys->region.align = SUBPICTURE_ALIGN_TOP;
+                else
+                    p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
+            }
         }
 
-        if( (p_spu_sys->align & SUBPICTURE_ALIGN_MASK) == 0 )
-            p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-
-        p_spu_sys->p_segments = p_segments;
+        p_spu_sys->region.p_segments = p_segments;
     }
 
     if( p_ttml_style )
