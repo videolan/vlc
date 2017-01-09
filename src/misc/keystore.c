@@ -277,11 +277,12 @@ smb_split_domain(vlc_credential *p_credential)
         size_t i_len = psz_delim - p_credential->psz_username;
         if (i_len > 0)
         {
-            p_credential->psz_split_username =
+            free(p_credential->psz_split_domain);
+            p_credential->psz_split_domain =
                 strndup(p_credential->psz_username, i_len);
-            p_credential->psz_username = p_credential->psz_split_username;
+            p_credential->psz_realm = p_credential->psz_split_domain;
         }
-        p_credential->psz_realm = psz_delim + 1;
+        p_credential->psz_username = psz_delim + 1;
     }
 }
 
@@ -362,7 +363,7 @@ vlc_credential_clean(vlc_credential *p_credential)
     if (p_credential->p_keystore)
         vlc_keystore_release(p_credential->p_keystore);
 
-    free(p_credential->psz_split_username);
+    free(p_credential->psz_split_domain);
     free(p_credential->psz_var_username);
     free(p_credential->psz_var_password);
     free(p_credential->psz_dialog_username);

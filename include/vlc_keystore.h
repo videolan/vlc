@@ -185,7 +185,7 @@ struct vlc_credential
     vlc_keystore_entry *p_entries;
     unsigned int i_entries_count;
 
-    char *psz_split_username;
+    char *psz_split_domain;
     char *psz_var_username;
     char *psz_var_password;
 
