@@ -1119,45 +1119,43 @@ skip:
             imageBufferObject = [p_sys->outputFrames objectForKey:timeStamp];
         }
         imageBuffer = (__bridge CVPixelBufferRef)imageBufferObject;
+        if (imageBuffer == NULL || CVPixelBufferGetDataSize(imageBuffer) == 0)
+            return NULL;
 
-        if (imageBuffer != NULL) {
-            if (CVPixelBufferGetDataSize(imageBuffer) > 0) {
-                if (decoder_UpdateVideoFormat(p_dec))
-                    return NULL;
-                p_pic = decoder_NewPicture(p_dec);
+        if (decoder_UpdateVideoFormat(p_dec))
+            return NULL;
+        p_pic = decoder_NewPicture(p_dec);
 
-                if (!p_pic)
-                    return NULL;
+        if (!p_pic)
+            return NULL;
 
-                if (!p_sys->b_zero_copy) {
-                    /* ehm, *cough*, memcpy.. */
-                    copy420YpCbCr8Planar(p_pic,
-                                         imageBuffer,
-                                         CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
-                                         CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
-                } else {
-                    /* the structure is allocated by the vout's pool */
-                    if (p_pic->p_sys) {
-                        /* if we received a recycled picture from the pool
-                         * we need release the previous reference first,
-                         * otherwise we would leak it */
-                        if (p_pic->p_sys->pixelBuffer != nil) {
-                            CFRelease(p_pic->p_sys->pixelBuffer);
-                            p_pic->p_sys->pixelBuffer = nil;
-                        }
-
-                        p_pic->p_sys->pixelBuffer = CFBridgingRetain(imageBufferObject);
-                    }
-                    /* will be freed by the vout */
+        if (!p_sys->b_zero_copy) {
+            /* ehm, *cough*, memcpy.. */
+            copy420YpCbCr8Planar(p_pic,
+                                 imageBuffer,
+                                 CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
+                                 CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
+        } else {
+            /* the structure is allocated by the vout's pool */
+            if (p_pic->p_sys) {
+                /* if we received a recycled picture from the pool
+                 * we need release the previous reference first,
+                 * otherwise we would leak it */
+                if (p_pic->p_sys->pixelBuffer != nil) {
+                    CFRelease(p_pic->p_sys->pixelBuffer);
+                    p_pic->p_sys->pixelBuffer = nil;
                 }
 
-                p_pic->date = timeStamp.longLongValue;
+                p_pic->p_sys->pixelBuffer = CFBridgingRetain(imageBufferObject);
+            }
+            /* will be freed by the vout */
+        }
 
-                if (imageBufferObject) {
-                    @synchronized(p_sys->outputFrames) {
-                        [p_sys->outputFrames removeObjectForKey:timeStamp];
-                    }
-                }
+        p_pic->date = timeStamp.longLongValue;
+
+        if (imageBufferObject) {
+            @synchronized(p_sys->outputFrames) {
+                [p_sys->outputFrames removeObjectForKey:timeStamp];
             }
         }
         return p_pic;
