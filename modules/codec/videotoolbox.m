@@ -985,12 +985,10 @@ static void Flush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (likely(p_sys->b_started)) {
-        vlc_mutex_lock(&p_sys->outLock);
-        [p_sys->outputTimeStamps removeAllObjects];
-        [p_sys->outputFrames removeAllObjects];
-        vlc_mutex_unlock(&p_sys->outLock);
-    }
+    vlc_mutex_lock(&p_sys->outLock);
+    [p_sys->outputTimeStamps removeAllObjects];
+    [p_sys->outputFrames removeAllObjects];
+    vlc_mutex_unlock(&p_sys->outLock);
 }
 
 static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
