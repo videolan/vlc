@@ -119,6 +119,7 @@ struct decoder_sys_t
     CFMutableDictionaryRef      decoderConfiguration;
     CFMutableDictionaryRef      destinationPixelBufferAttributes;
 
+    vlc_mutex_t                 outLock;
     NSMutableArray              *outputTimeStamps;
     NSMutableDictionary         *outputFrames;
     bool                        b_zero_copy;
@@ -740,6 +741,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->videoFormatDescription = nil;
     p_sys->decoderConfiguration = nil;
     p_sys->destinationPixelBufferAttributes = nil;
+    vlc_mutex_init(&p_sys->outLock);
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
     if (i_ret != VLC_SUCCESS) {
@@ -777,6 +779,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     }
     StopVideoToolbox(p_dec);
 
+    vlc_mutex_destroy(&p_sys->outLock);
     free(p_sys);
 }
 
@@ -982,12 +985,10 @@ static void Flush(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (likely(p_sys->b_started)) {
-        @synchronized(p_sys->outputTimeStamps) {
-            [p_sys->outputTimeStamps removeAllObjects];
-        }
-        @synchronized(p_sys->outputFrames) {
-            [p_sys->outputFrames removeAllObjects];
-        }
+        vlc_mutex_lock(&p_sys->outLock);
+        [p_sys->outputTimeStamps removeAllObjects];
+        [p_sys->outputFrames removeAllObjects];
+        vlc_mutex_unlock(&p_sys->outLock);
     }
 }
 
@@ -1090,42 +1091,49 @@ skip:
     if (unlikely(!p_sys->b_started))
         return NULL;
 
+    vlc_mutex_lock(&p_sys->outLock);
     NSUInteger outputFramesCount = [p_sys->outputFrames count];
 
     if (outputFramesCount > 5) {
-        CVPixelBufferRef imageBuffer = NULL;
-        id imageBufferObject = nil;
-        picture_t *p_pic = NULL;
+        CVPixelBufferRef imageBuffer;
+        id imageBufferObject;
+        picture_t *p_pic;
 
         NSString *timeStamp;
-        @synchronized(p_sys->outputTimeStamps) {
-            [p_sys->outputTimeStamps sortUsingComparator:^(id obj1, id obj2) {
-                if ([obj1 longLongValue] > [obj2 longLongValue]) {
-                    return (NSComparisonResult)NSOrderedDescending;
-                }
-                if ([obj1 longLongValue] < [obj2 longLongValue]) {
-                    return (NSComparisonResult)NSOrderedAscending;
-                }
-                return (NSComparisonResult)NSOrderedSame;
-            }];
-            NSMutableArray *timeStamps = p_sys->outputTimeStamps;
-            timeStamp = [timeStamps firstObject];
-            if (timeStamps.count > 0) {
-                [timeStamps removeObjectAtIndex:0];
+        [p_sys->outputTimeStamps sortUsingComparator:^(id obj1, id obj2) {
+            if ([obj1 longLongValue] > [obj2 longLongValue]) {
+                return (NSComparisonResult)NSOrderedDescending;
             }
+            if ([obj1 longLongValue] < [obj2 longLongValue]) {
+                return (NSComparisonResult)NSOrderedAscending;
+            }
+            return (NSComparisonResult)NSOrderedSame;
+        }];
+        NSMutableArray *timeStamps = p_sys->outputTimeStamps;
+        timeStamp = [timeStamps firstObject];
+        if (timeStamps.count > 0) {
+            [timeStamps removeObjectAtIndex:0];
         }
 
-        @synchronized(p_sys->outputFrames) {
-            imageBufferObject = [p_sys->outputFrames objectForKey:timeStamp];
-        }
-        imageBuffer = (__bridge CVPixelBufferRef)imageBufferObject;
-        if (imageBuffer == NULL || CVPixelBufferGetDataSize(imageBuffer) == 0)
+        imageBufferObject = [p_sys->outputFrames objectForKey:timeStamp];
+        if (imageBufferObject == NULL)
+        {
+            vlc_mutex_unlock(&p_sys->outLock);
             return NULL;
+        }
+        imageBuffer = (CVPixelBufferRef) CFBridgingRetain(imageBufferObject);
+        [p_sys->outputFrames removeObjectForKey:timeStamp];
+        vlc_mutex_unlock(&p_sys->outLock);
+
+        if (CVPixelBufferGetDataSize(imageBuffer) == 0)
+        {
+            CFRelease(imageBuffer);
+            return NULL;
+        }
 
         if (decoder_UpdateVideoFormat(p_dec))
             return NULL;
         p_pic = decoder_NewPicture(p_dec);
-
         if (!p_pic)
             return NULL;
 
@@ -1135,6 +1143,7 @@ skip:
                                  imageBuffer,
                                  CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
                                  CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
+            CFRelease(imageBuffer);
         } else {
             /* the structure is allocated by the vout's pool */
             if (p_pic->p_sys) {
@@ -1146,20 +1155,15 @@ skip:
                     p_pic->p_sys->pixelBuffer = nil;
                 }
 
-                p_pic->p_sys->pixelBuffer = CFBridgingRetain(imageBufferObject);
+                p_pic->p_sys->pixelBuffer = imageBuffer;
             }
             /* will be freed by the vout */
         }
-
         p_pic->date = timeStamp.longLongValue;
-
-        if (imageBufferObject) {
-            @synchronized(p_sys->outputFrames) {
-                [p_sys->outputFrames removeObjectForKey:timeStamp];
-            }
-        }
         return p_pic;
     }
+    else
+        vlc_mutex_unlock(&p_sys->outLock);
 
     return NULL;
 }
@@ -1270,10 +1274,9 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
     NSNumber *timeStamp = [NSNumber numberWithLongLong:pts.value];
     id imageBufferObject = (__bridge id)imageBuffer;
-    @synchronized(p_sys->outputTimeStamps) {
-        [p_sys->outputTimeStamps addObject:timeStamp];
-    }
-    @synchronized(p_sys->outputFrames) {
-        [p_sys->outputFrames setObject:imageBufferObject forKey:timeStamp];
-    }
+
+    vlc_mutex_lock(&p_sys->outLock);
+    [p_sys->outputTimeStamps addObject:timeStamp];
+    [p_sys->outputFrames setObject:imageBufferObject forKey:timeStamp];
+    vlc_mutex_unlock(&p_sys->outLock);
 }
