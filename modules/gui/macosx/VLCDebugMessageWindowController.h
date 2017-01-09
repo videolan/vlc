@@ -31,11 +31,13 @@
 @property (assign) IBOutlet NSButton *saveButton;
 @property (assign) IBOutlet NSButton *clearButton;
 @property (assign) IBOutlet NSButton *refreshButton;
+@property (assign) IBOutlet NSButton *toggleDetailsButton;
+@property (assign) IBOutlet NSSplitView *splitView;
+@property (assign) IBOutlet NSView *detailView;
+@property (assign) IBOutlet NSArrayController *arrayController;
 
-- (void)showWindow:(id)sender;
-
-- (IBAction)updateMessagesPanel:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;
+- (IBAction)refreshLog:(id)sender;
 - (IBAction)clearLog:(id)sender;
 
 @end

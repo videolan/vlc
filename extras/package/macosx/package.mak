@@ -757,6 +757,8 @@ EXTRA_DIST += \
    	extras/package/macosx/Resources/Button-Icons/VLCVolumeOffTemplate.pdf \
    	extras/package/macosx/Resources/Button-Icons/VLCVolumeOnTemplate.pdf \
    	extras/package/macosx/Resources/Button-Icons/VLCVolumeOffTemplate.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCClearLogTemplate.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCSaveTemplate.pdf \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/VLC.entitlements \

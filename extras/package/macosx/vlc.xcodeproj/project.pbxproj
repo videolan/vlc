@@ -413,6 +413,9 @@
 		1CE5ED2619DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */; };
 		633121D01B5112C300E636DA /* ResumeDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 633121CE1B5112C300E636DA /* ResumeDialog.xib */; };
 		6B13E2A81BC67678001AD24A /* VLCScrollingClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */; };
+		6B1C62EE1E16CCBE009B87EE /* LogMessageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B1C62EC1E16CCBE009B87EE /* LogMessageWindow.xib */; };
+		6B1C62F31E18217B009B87EE /* VLCClearLogTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B1C62F21E18217B009B87EE /* VLCClearLogTemplate.pdf */; };
+		6B1C62F51E18267C009B87EE /* VLCSaveTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B1C62F41E18267C009B87EE /* VLCSaveTemplate.pdf */; };
 		6B2260501D82DE5400D2DD26 /* vlc-xmas.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6B22604F1D82DE5400D2DD26 /* vlc-xmas.icns */; };
 		6B3F8D2C1CE58E0E002A4998 /* VLCNextTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D281CE58E0E002A4998 /* VLCNextTemplate.pdf */; };
 		6B3F8D2D1CE58E0E002A4998 /* VLCPauseTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D291CE58E0E002A4998 /* VLCPauseTemplate.pdf */; };
@@ -441,7 +444,6 @@
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D5678ED1D5BA1DC002698F3 /* VLCApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */; };
 		7D5678F01D5BA397002698F3 /* VLCMainWindowControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */; };
-		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
 		7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */; };
 		7D9516B71C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516B51C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib */; };
@@ -1123,6 +1125,9 @@
 		633121CF1B5112C300E636DA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ResumeDialog.xib; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCScrollingClipView.h; path = ../../../modules/gui/macosx/VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCScrollingClipView.m; path = ../../../modules/gui/macosx/VLCScrollingClipView.m; sourceTree = "<group>"; };
+		6B1C62ED1E16CCBE009B87EE /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/LogMessageWindow.xib; sourceTree = "<group>"; };
+		6B1C62F21E18217B009B87EE /* VLCClearLogTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCClearLogTemplate.pdf; path = "Resources/Button-Icons/VLCClearLogTemplate.pdf"; sourceTree = "<group>"; };
+		6B1C62F41E18267C009B87EE /* VLCSaveTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCSaveTemplate.pdf; path = "Resources/Button-Icons/VLCSaveTemplate.pdf"; sourceTree = "<group>"; };
 		6B22604F1D82DE5400D2DD26 /* vlc-xmas.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "vlc-xmas.icns"; path = "Resources/icons/vlc-xmas.icns"; sourceTree = "<group>"; };
 		6B3F8D281CE58E0E002A4998 /* VLCNextTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCNextTemplate.pdf; path = Resources/vlcmenubaricon/VLCNextTemplate.pdf; sourceTree = "<group>"; };
 		6B3F8D291CE58E0E002A4998 /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = Resources/vlcmenubaricon/VLCPauseTemplate.pdf; sourceTree = "<group>"; };
@@ -1174,7 +1179,6 @@
 		7D871D391B5E684D000B56C0 /* helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = helpers.h; path = ../../../modules/gui/macosx/helpers.h; sourceTree = "<group>"; };
 		7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCDebugMessageWindowController.h; path = ../../../modules/gui/macosx/VLCDebugMessageWindowController.h; sourceTree = SOURCE_ROOT; };
 		7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCDebugMessageWindowController.m; path = ../../../modules/gui/macosx/VLCDebugMessageWindowController.m; sourceTree = SOURCE_ROOT; };
-		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
 		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7D8BB0BF1830393300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		7D9516B61C60B69200D14E1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/VLCStatusBarIconMainMenu.xib; sourceTree = "<group>"; };
@@ -2234,6 +2238,8 @@
 				6B8CD3FF1DA2FE7C0087C27A /* VLCVolumeOnTemplate.pdf */,
 				6B8CD4021DA304050087C27A /* VLCFullscreenOffTemplate.pdf */,
 				6B8CD4031DA304050087C27A /* VLCFullscreenOnTemplate.pdf */,
+				6B1C62F21E18217B009B87EE /* VLCClearLogTemplate.pdf */,
+				6B1C62F41E18267C009B87EE /* VLCSaveTemplate.pdf */,
 				7D9516BB1C60B6C700D14E1A /* status bar item */,
 				1C88BA9D19DC7C7800645190 /* mainwindow_yosemite */,
 				CC0432C213B2479E00D7D52E /* mainwindow */,
@@ -2685,7 +2691,7 @@
 				1C9465971B77B9FC007C965A /* PopupPanel.xib */,
 				1C9465991B77B9FC007C965A /* TextfieldPanel.xib */,
 				1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */,
-				7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */,
+				6B1C62EC1E16CCBE009B87EE /* LogMessageWindow.xib */,
 				7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */,
 				7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */,
 				7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */,
@@ -2968,6 +2974,7 @@
 				1C88BC3C19DC7C8100645190 /* ys-repeat_dark@2x.png in Resources */,
 				CC04337913B28B8200D7D52E /* playlist-btn-pressed.png in Resources */,
 				CC04337A13B28B8200D7D52E /* playlist-btn.png in Resources */,
+				6B1C62F31E18217B009B87EE /* VLCClearLogTemplate.pdf in Resources */,
 				CC04337B13B28B8200D7D52E /* progression-fill-left.png in Resources */,
 				1C88BC0219DC7C8100645190 /* ys-forward-6btns-dark@2x.png in Resources */,
 				1C88BC2419DC7C8100645190 /* ys-progressbar-fill-left_dark@2x.png in Resources */,
@@ -2978,7 +2985,6 @@
 				1CE5ED2519DD6AB700FCEFD3 /* lion-window-fullscreen.png in Resources */,
 				CC04337E13B28B8200D7D52E /* progression-knob.png in Resources */,
 				CC04337F13B28B8200D7D52E /* progression-track-wrapper-left.png in Resources */,
-				7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */,
 				1C88BA9219DC7C5D00645190 /* ys-sidebar-local@2x.png in Resources */,
 				1C88BB4519DC7C7800645190 /* ys-progression-fill-left@2x.png in Resources */,
 				CC04338013B28B8200D7D52E /* progression-track-wrapper-middle.png in Resources */,
@@ -3065,6 +3071,7 @@
 				1C88BC4E19DC7C8100645190 /* ys-topbar-dark-right@2x.png in Resources */,
 				1C88BA7119DC7B2200645190 /* yosemite-window-minimize-on@2x.png in Resources */,
 				1C88BC4019DC7C8100645190 /* ys-shuffle-blue_dark@2x.png in Resources */,
+				6B1C62EE1E16CCBE009B87EE /* LogMessageWindow.xib in Resources */,
 				CC0433D013B28C8C00D7D52E /* spref_cone_Hotkeys_64.png in Resources */,
 				CC0433D113B28C8C00D7D52E /* spref_cone_Input_64.png in Resources */,
 				1C88BC1219DC7C8100645190 /* ys-pause_dark@2x.png in Resources */,
@@ -3357,6 +3364,7 @@
 				CC919097159B4BB800E634A7 /* fullscreen-double-buttons_dark@2x.png in Resources */,
 				1C88BB2E19DC7C7800645190 /* ys-next-6btns.png in Resources */,
 				CC919098159B4BB800E634A7 /* fullscreen-double-buttons-pressed_dark@2x.png in Resources */,
+				6B1C62F51E18267C009B87EE /* VLCSaveTemplate.pdf in Resources */,
 				1C88BA6119DC7B2200645190 /* yosemite-window-fullscreen-graphite@2x.png in Resources */,
 				CC919099159B4BB800E634A7 /* fullscreen-one-button-pressed_dark@2x.png in Resources */,
 				CC91909C159B4BB800E634A7 /* bottom-background_dark@2x.png in Resources */,
@@ -3701,6 +3709,14 @@
 			name = ResumeDialog.xib;
 			sourceTree = "<group>";
 		};
+		6B1C62EC1E16CCBE009B87EE /* LogMessageWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6B1C62ED1E16CCBE009B87EE /* English */,
+			);
+			name = LogMessageWindow.xib;
+			sourceTree = "<group>";
+		};
 		6BBBB8AC1D108A87001BD9BA /* VLCRendererDialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -3723,14 +3739,6 @@
 				7D3F6524188051F2005776C4 /* English */,
 			);
 			name = BWQuincyMain.xib;
-			sourceTree = "<group>";
-		};
-		7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7D8BB0B61830311300FAE9B7 /* English */,
-			);
-			name = DebugMessageVisualizer.xib;
 			sourceTree = "<group>";
 		};
 		7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */ = {
