@@ -1297,6 +1297,8 @@ static int Init( input_thread_t * p_input )
     /* Create es out */
     priv->p_es_out = input_EsOutTimeshiftNew( p_input, priv->p_es_out_display,
                                               priv->i_rate );
+    if( priv->p_es_out == NULL )
+        goto error;
 
     /* */
     input_ChangeState( p_input, OPENING_S );
