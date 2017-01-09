@@ -627,14 +627,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         decoder_UpdateVideoFormat(p_dec);
     }
 
-    /* setup storage */
-    p_sys->outputTimeStamps = [[NSMutableArray alloc] init];
-    p_sys->outputFrames = [[NSMutableDictionary alloc] init];
-    if (!p_sys->outputFrames) {
-        msg_Warn(p_dec, "buffer management structure allocation failed");
-        return VLC_ENOMEM;
-    }
-
     p_sys->b_started = YES;
     p_sys->b_is_restarting = NO;
 
@@ -646,13 +638,7 @@ static void StopVideoToolbox(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (p_sys->b_started) {
-        if (p_sys->outputTimeStamps != nil)
-            [p_sys->outputTimeStamps release];
-        p_sys->outputTimeStamps = nil;
-        if (p_sys->outputFrames != nil)
-            [p_sys->outputFrames release];
-        p_sys->outputFrames = nil;
-
+        Flush(p_dec);
         p_sys->b_started = false;
         if (p_sys->session != nil) {
             VTDecompressionSessionInvalidate(p_sys->session);
@@ -741,6 +727,18 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->videoFormatDescription = nil;
     p_sys->decoderConfiguration = nil;
     p_sys->destinationPixelBufferAttributes = nil;
+
+    /* setup storage */
+    p_sys->outputTimeStamps = [[NSMutableArray alloc] init];
+    p_sys->outputFrames = [[NSMutableDictionary alloc] init];
+    if (!p_sys->outputTimeStamps || !p_sys->outputFrames) {
+        if (p_sys->outputTimeStamps)
+            [p_sys->outputTimeStamps release];
+        if (p_sys->outputFrames)
+            [p_sys->outputFrames release];
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
     vlc_mutex_init(&p_sys->outLock);
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
@@ -778,6 +776,9 @@ static void CloseDecoder(vlc_object_t *p_this)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
     }
     StopVideoToolbox(p_dec);
+
+    [p_sys->outputTimeStamps release];
+    [p_sys->outputFrames release];
 
     vlc_mutex_destroy(&p_sys->outLock);
     free(p_sys);
