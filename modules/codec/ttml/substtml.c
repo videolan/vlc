@@ -43,13 +43,8 @@
 
 typedef struct
 {
-    char*           psz_styleid;
     text_style_t*   font_style;
-    int             i_align;
-    int             i_margin_h;
-    int             i_margin_v;
-    int             i_margin_percent_h;
-    int             i_margin_percent_v;
+    int             i_text_align;
     int             i_direction;
     bool            b_direction_set;
     bool            b_preserve_space;
@@ -57,8 +52,15 @@ typedef struct
 
 typedef struct
 {
-    tt_node_t *             p_rootnode; /* for now. FIXME: split header */
+    vlc_dictionary_t regions;
+    tt_node_t *      p_rootnode; /* for now. FIXME: split header */
 } ttml_context_t;
+
+typedef struct
+{
+    subpicture_updater_sys_region_t updt;
+    text_segment_t **pp_last_segment;
+} ttml_region_t;
 
 struct decoder_sys_t
 {
@@ -73,13 +75,11 @@ enum
     UNICODE_BIDI_OVERRIDE = 4,
 };
 
-static text_segment_t *ParseTTML( decoder_t *, const uint8_t *, size_t,
-                                  ttml_style_t ** );
+static ttml_region_t *ParseTTML( decoder_t *, const uint8_t *, size_t );
 
 static void ttml_style_Delete( ttml_style_t* p_ttml_style )
 {
     text_style_Delete( p_ttml_style->font_style );
-    free( p_ttml_style->psz_styleid );
     free( p_ttml_style );
 }
 
@@ -96,6 +96,26 @@ static ttml_style_t * ttml_style_New( )
         return NULL;
     }
     return p_ttml_style;
+}
+
+static void ttml_region_Delete( ttml_region_t *p_region )
+{
+    SubpictureUpdaterSysRegionClean( &p_region->updt );
+    free( p_region );
+}
+
+static ttml_region_t *ttml_region_New( )
+{
+    ttml_region_t *p_ttml_region = calloc( 1, sizeof( ttml_region_t ) );
+    if( unlikely( !p_ttml_region ) )
+        return NULL;
+
+    SubpictureUpdaterSysRegionInit( &p_ttml_region->updt );
+    p_ttml_region->pp_last_segment = &p_ttml_region->updt.p_segments;
+    /* Align to bottom by default. !Warn: center align is obtained with NO flags */
+    p_ttml_region->updt.align = SUBPICTURE_ALIGN_BOTTOM;
+
+    return p_ttml_region;
 }
 
 static tt_node_t * FindNode( tt_node_t *p_node, const char *psz_nodename,
@@ -221,21 +241,17 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
     }
 }
 
-static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
-                           ttml_style_t *p_ttml_style )
+static void FillRegionStyle( const char *psz_attr, const char *psz_val,
+                             ttml_region_t *p_region )
 {
-    if( !strcasecmp( "tts:textAlign", psz_attr ) )
+    if( !strcasecmp( "tts:displayAlign", psz_attr ) )
     {
-        if( !strcasecmp ( "left", psz_val ) )
-            p_ttml_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
-        else if( !strcasecmp ( "right", psz_val ) )
-            p_ttml_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
+        if( !strcasecmp ( "top", psz_val ) )
+            p_region->updt.align = SUBPICTURE_ALIGN_TOP;
         else if( !strcasecmp ( "center", psz_val ) )
-            p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
-        else if( !strcasecmp ( "start", psz_val ) )
-            p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
-        else if( !strcasecmp ( "end", psz_val ) )
-            p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+            p_region->updt.align = 0;
+        else
+            p_region->updt.align = SUBPICTURE_ALIGN_BOTTOM;
     }
     else if( !strcasecmp ( "tts:origin", psz_attr ) )
     {
@@ -248,30 +264,36 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
             return;
         const char *psz_percent_sign = strchr( psz_token, '%' );
 
+        p_region->updt.origin.x = atoi( psz_token );
         if( psz_percent_sign != NULL && psz_percent_sign < psz_separator )
-        {
-            p_ttml_style->i_margin_h = 0;
-            p_ttml_style->i_margin_percent_h = atoi( psz_token );
-        }
-        else
-        {
-            p_ttml_style->i_margin_h = atoi( psz_token );
-            p_ttml_style->i_margin_percent_h = 0;
-        }
+            p_region->updt.flags |= UPDT_REGION_EXTENT_X_IS_PERCENTILE;
+
         while( isspace( *psz_separator ) )
             psz_separator++;
         psz_token = psz_separator;
         psz_percent_sign = strchr( psz_token, '%' );
+
+        p_region->updt.origin.y = atoi( psz_token );
         if( psz_percent_sign != NULL )
-        {
-            p_ttml_style->i_margin_v = 0;
-            p_ttml_style->i_margin_percent_v = atoi( psz_val );
-        }
-        else
-        {
-            p_ttml_style->i_margin_v = atoi( psz_val );
-            p_ttml_style->i_margin_percent_v = 0;
-        }
+            p_region->updt.flags |= UPDT_REGION_EXTENT_Y_IS_PERCENTILE;
+    }
+}
+
+static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
+                           ttml_style_t *p_ttml_style )
+{
+    if( !strcasecmp( "tts:textAlign", psz_attr ) )
+    {
+        if( !strcasecmp ( "left", psz_val ) )
+            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_LEFT;
+        else if( !strcasecmp ( "right", psz_val ) )
+            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_RIGHT;
+        else if( !strcasecmp ( "center", psz_val ) )
+            p_ttml_style->i_text_align = 0;
+        else if( !strcasecmp ( "start", psz_val ) ) /* FIXME: should be BIDI based */
+            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_LEFT;
+        else if( !strcasecmp ( "end", psz_val ) )  /* FIXME: should be BIDI based */
+            p_ttml_style->i_text_align = SUBPICTURE_ALIGN_RIGHT;
     }
     else if( !strcasecmp( "tts:direction", psz_attr ) )
     {
@@ -298,13 +320,13 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
         if( !strcasecmp( "rl", psz_val ) || !strcasecmp( "rltb", psz_val ) )
         {
             p_ttml_style->i_direction = UNICODE_BIDI_RTL | UNICODE_BIDI_OVERRIDE;
-            p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+            //p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
             p_ttml_style->b_direction_set = true;
         }
         else if( !strcasecmp( "lr", psz_val ) || !strcasecmp( "lrtb", psz_val ) )
         {
             p_ttml_style->i_direction = UNICODE_BIDI_LTR | UNICODE_BIDI_OVERRIDE;
-            p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+            //p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
             p_ttml_style->b_direction_set = true;
         }
     }
@@ -375,6 +397,7 @@ static void DictMergeWithRegionID( ttml_context_t *p_ctx, const char *psz_id,
 
 static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_node )
 {
+    assert( p_node );
     ttml_style_t *p_ttml_style = NULL;
     vlc_dictionary_t merged;
     vlc_dictionary_init( &merged, 0 );
@@ -495,18 +518,93 @@ static void StripSpacing( text_segment_t *p_segment )
         *p = ' ';
 }
 
-static text_segment_t * ConvertNodesToSegments( ttml_context_t *p_ctx, const tt_node_t *p_node,
-                                                bool b_has_prev_text, ttml_style_t **pp_ret_ttml_style )
+static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, const char *psz_region_id )
 {
-    text_segment_t *p_head = NULL;
-    text_segment_t **pp_last = &p_head;
+    ttml_region_t *p_region = ( ttml_region_t * )
+            vlc_dictionary_value_for_key( &p_ctx->regions, psz_region_id ? psz_region_id : "" );
+    if( p_region == NULL )
+    {
+        if( psz_region_id && strcmp( psz_region_id, "" ) ) /* not default region */
+        {
+            /* Create if missing and exists as node */
+            const tt_node_t *p_node = FindNode( p_ctx->p_rootnode, "region", -1, psz_region_id );
+            if( p_node && (p_region = ttml_region_New()) )
+            {
+                /* Fill from its own attributes */
+                for( int i = 0; i < p_node->attr_dict.i_size; ++i )
+                {
+                    for ( vlc_dictionary_entry_t* p_entry = p_node->attr_dict.p_entries[i];
+                          p_entry != NULL; p_entry = p_entry->p_next )
+                    {
+                        FillRegionStyle( p_entry->psz_key, p_entry->p_value, p_region );
+                    }
+                }
+            }
+            vlc_dictionary_insert( &p_ctx->regions, psz_region_id, p_region );
+        }
+        else if( (p_region = ttml_region_New()) ) /* create default */
+        {
+            vlc_dictionary_insert( &p_ctx->regions, "", p_region );
+        }
+    }
+    return p_region;
+}
+
+static void AppendLineBreakToRegion( ttml_region_t *p_region )
+{
+    text_segment_t *p_segment = text_segment_New( "\n" );
+    if( p_segment )
+    {
+        *p_region->pp_last_segment = p_segment;
+        p_region->pp_last_segment = &p_segment->p_next;
+    }
+}
+
+static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_ttnode,
+                                ttml_region_t *p_region )
+{
+    text_segment_t *p_segment;
+
+    if( p_region == NULL )
+        return;
+
+    p_segment = text_segment_New( p_ttnode->psz_text );
+    if( p_segment )
+    {
+        ttml_style_t *s = InheritTTMLStyles( p_ctx, p_ttnode->p_parent );
+        if( s )
+        {
+            p_segment->style = s->font_style;
+            s->font_style = NULL;
+
+            if( !s->b_preserve_space )
+                StripSpacing( p_segment );
+            if( s->b_direction_set )
+                BIDIConvert( p_segment, s->i_direction );
+
+            ttml_style_Delete( s );
+        }
+    }
+
+    *p_region->pp_last_segment = p_segment;
+    p_region->pp_last_segment = &p_segment->p_next;
+}
+
+static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t *p_node,
+                                         ttml_region_t *p_region )
+{
+    const char *psz_regionid = (const char *)
+        vlc_dictionary_value_for_key( &p_node->attr_dict, "region" );
+
+    /* Region isn't set or is changing */
+    if( psz_regionid || p_region == NULL )
+        p_region = GetTTMLRegion( p_ctx, psz_regionid );
 
     /* awkward paragraph handling */
-    if( !tt_node_NameCompare( p_node->psz_node_name, "p" ) && b_has_prev_text )
+    if( !tt_node_NameCompare( p_node->psz_node_name, "p" ) &&
+        p_region->updt.p_segments )
     {
-        *pp_last = text_segment_New( "\n" );
-        if( (*pp_last) )
-            pp_last = &(*pp_last)->p_next;
+        AppendLineBreakToRegion( p_region );
     }
 
     for( const tt_basenode_t *p_child = p_node->p_child;
@@ -514,53 +612,25 @@ static text_segment_t * ConvertNodesToSegments( ttml_context_t *p_ctx, const tt_
     {
         if( p_child->i_type == TT_NODE_TYPE_TEXT )
         {
-            const tt_textnode_t *p_ttnode = (const tt_textnode_t *) p_child;
-            *pp_last = text_segment_New( p_ttnode->psz_text );
-            ttml_style_t *s = InheritTTMLStyles( p_ctx, p_child->p_parent );
-            if( s )
-            {
-                (*pp_last)->style = s->font_style;
-                s->font_style = NULL;
-                if( !s->b_preserve_space )
-                    StripSpacing( *pp_last );
-                if( s->b_direction_set )
-                    BIDIConvert( *pp_last, s->i_direction );
-                /* FIXME: This is carried from broken prev code feat
-                 * as there can be multiple regions. Return first ttml style
-                 * to apply to default SPU region for now */
-                if( *pp_ret_ttml_style == NULL )
-                    *pp_ret_ttml_style = s;
-                else
-                    ttml_style_Delete( s );
-            }
+            AppendTextToRegion( p_ctx, (const tt_textnode_t *) p_child, p_region );
+        }
+        else if( !tt_node_NameCompare( ((const tt_node_t *)p_child)->psz_node_name, "br" ) )
+        {
+            AppendLineBreakToRegion( p_region );
         }
         else
         {
-            const tt_node_t *p_childnode = (const tt_node_t *) p_child;
-            if( !tt_node_NameCompare( p_childnode->psz_node_name, "br" ) )
-            {
-                *pp_last = text_segment_New( "\n" );
-            }
-            else
-            {
-                *pp_last = ConvertNodesToSegments( p_ctx, p_childnode,
-                                                   p_head != NULL, pp_ret_ttml_style );
-            }
+            ConvertNodesToRegionContent( p_ctx, (const tt_node_t *) p_child, p_region );
         }
-
-        while( (*pp_last) )
-            pp_last = &(*pp_last)->p_next;
     }
-
-    return p_head;
 }
 
-static text_segment_t *ParseTTML( decoder_t *p_dec,  const uint8_t *p_buffer, size_t i_buffer,
-                                  ttml_style_t **p_ret_ttml_style )
+static ttml_region_t *ParseTTML( decoder_t *p_dec,  const uint8_t *p_buffer, size_t i_buffer )
 {
     stream_t*       p_sub = NULL;
     xml_reader_t*   p_xml_reader = NULL;
-    text_segment_t* p_segments = NULL;
+    ttml_region_t*  p_regions = NULL;
+    ttml_region_t** pp_region_last = &p_regions;
 
     p_sub = vlc_stream_MemoryNew( p_dec, (uint8_t*) p_buffer, i_buffer, true );
     if( unlikely( p_sub == NULL ) )
@@ -588,8 +658,20 @@ static text_segment_t *ParseTTML( decoder_t *p_dec,  const uint8_t *p_buffer, si
         {
             ttml_context_t context;
             context.p_rootnode = p_rootnode;
-            p_segments = ConvertNodesToSegments( &context, p_bodynode,
-                                                 false, p_ret_ttml_style );
+            vlc_dictionary_init( &context.regions, 1 );
+            ConvertNodesToRegionContent( &context, p_bodynode, NULL );
+
+            for( int i = 0; i < context.regions.i_size; ++i )
+            {
+                for ( const vlc_dictionary_entry_t* p_entry = context.regions.p_entries[i];
+                                                    p_entry != NULL; p_entry = p_entry->p_next )
+                {
+                    *pp_region_last = (ttml_region_t *) p_entry->p_value;
+                    pp_region_last = (ttml_region_t **) &(*pp_region_last)->updt.p_next;
+                }
+            }
+
+            vlc_dictionary_clear( &context.regions, NULL, NULL );
         }
     }
     else if ( !tt_node_NameCompare( p_rootnode->psz_node_name, "div" ) ||
@@ -604,12 +686,11 @@ end:
     xml_ReaderDelete( p_xml_reader );
     vlc_stream_Delete( p_sub );
 
-    return p_segments;
+    return p_regions;
 }
 
 static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
@@ -622,18 +703,13 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
         return NULL;
     }
 
-    ttml_style_t *p_ttml_style = NULL;
-    text_segment_t *p_segments = ParseTTML( p_dec, p_block->p_buffer, p_block->i_buffer,
-                                            &p_ttml_style );
-    if( p_segments )
+    ttml_region_t *p_regions = ParseTTML( p_dec, p_block->p_buffer, p_block->i_buffer );
+    if( p_regions )
     {
         /* Create the subpicture unit */
         p_spu = decoder_NewSubpictureText( p_dec );
         if( !p_spu )
         {
-            text_segment_ChainDelete( p_segments );
-            if( p_ttml_style )
-                ttml_style_Delete( p_ttml_style );
             return NULL;
         }
 
@@ -643,55 +719,47 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
         p_spu->b_absolute = false;
 
         subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+        subpicture_updater_sys_region_t *p_updtregion = NULL;
 
-        /* Broken stuff. See comments */
-        if( p_ttml_style )
+        /* Create region update info from each ttml region */
+        for( ttml_region_t *p_region = p_regions;
+                            p_region; p_region = (ttml_region_t *) p_region->updt.p_next )
         {
-            if( p_ttml_style->i_margin_percent_h )
+            if( p_updtregion == NULL )
             {
-                p_spu_sys->region.origin.x = p_ttml_style->i_margin_percent_h;
-                p_spu_sys->region.flags |= UPDT_REGION_ORIGIN_X_IS_PERCENTILE;
+                p_updtregion = &p_spu_sys->region;
             }
             else
             {
-                p_spu_sys->region.origin.x = p_ttml_style->i_margin_h;
+                p_updtregion = SubpictureUpdaterSysRegionNew();
+                if( p_updtregion == NULL )
+                    break;
+                SubpictureUpdaterSysRegionAdd( &p_spu_sys->region, p_updtregion );
             }
-
-            if( p_ttml_style->i_margin_percent_v )
-            {
-                p_spu_sys->region.origin.y = p_ttml_style->i_margin_percent_v;
-                p_spu_sys->region.flags |= UPDT_REGION_ORIGIN_Y_IS_PERCENTILE;
-            }
-            else
-            {
-                p_spu_sys->region.origin.y = p_ttml_style->i_margin_v;
-            }
-
-            if( p_ttml_style->i_align & SUBPICTURE_ALIGN_LEFT )
-                p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_LEFT;
-            else if( p_ttml_style->i_align & SUBPICTURE_ALIGN_LEFT )
-                p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_RIGHT;
 
             /* broken legacy align var (can't handle center...) */
-            if( (p_ttml_style->i_align & SUBPICTURE_ALIGN_MASK) == 0 &&
-                (p_sys->i_align & SUBPICTURE_ALIGN_MASK) != 0 )
+            if( p_dec->p_sys->i_align & SUBPICTURE_ALIGN_MASK )
             {
-                p_spu_sys->region.align = p_sys->i_align;
+                p_spu_sys->region.align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_TOP);
+                p_spu_sys->region.inner_align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT);
             }
-            else
-            {
-                if( p_ttml_style->i_align & SUBPICTURE_ALIGN_TOP )
-                    p_spu_sys->region.align = SUBPICTURE_ALIGN_TOP;
-                else
-                    p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
-            }
+
+            /* copy and take ownership of pointeds */
+            *p_updtregion = p_region->updt;
+            p_updtregion->p_next = NULL;
+            p_region->updt.p_region_style = NULL;
+            p_region->updt.p_segments = NULL;
         }
 
-        p_spu_sys->region.p_segments = p_segments;
     }
 
-    if( p_ttml_style )
-        ttml_style_Delete( p_ttml_style );
+    /* cleanup */
+    while( p_regions )
+    {
+        ttml_region_t *p_nextregion = (ttml_region_t *) p_regions->updt.p_next;
+        ttml_region_Delete( p_regions );
+        p_regions = p_nextregion;
+    }
 
     return p_spu;
 }
