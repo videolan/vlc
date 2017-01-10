@@ -58,19 +58,16 @@ void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
 
     if( b_changed )
     {
-        vlc_event_t event;
-
-        event.type = vlc_InputItemErrorWhenReadingChanged;
-        event.u.input_item_error_when_reading_changed.new_value = b_error;
-        vlc_event_send( &p_i->event_manager, &event );
+        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
+            .type = vlc_InputItemErrorWhenReadingChanged,
+            .u.input_item_error_when_reading_changed.new_value = b_error } );
     }
 }
 void input_item_SignalPreparseEnded( input_item_t *p_i, int status )
 {
-    vlc_event_t event;
-    event.type = vlc_InputItemPreparseEnded;
-    event.u.input_item_preparse_ended.new_status = status;
-    vlc_event_send( &p_i->event_manager, &event );
+    vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
+        .type = vlc_InputItemPreparseEnded,
+        .u.input_item_preparse_ended.new_status = status } );
 }
 
 void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
@@ -98,10 +95,9 @@ void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
 
     if( b_send_event )
     {
-        vlc_event_t event;
-        event.type = vlc_InputItemPreparsedChanged;
-        event.u.input_item_preparsed_changed.new_status = new_status;
-        vlc_event_send( &p_i->event_manager, &event );
+        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
+            .type = vlc_InputItemPreparsedChanged,
+            .u.input_item_preparsed_changed.new_status = new_status } );
     }
 }
 
@@ -145,8 +141,6 @@ void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched )
 
 void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val )
 {
-    vlc_event_t event;
-
     vlc_mutex_lock( &p_i->lock );
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
@@ -154,9 +148,9 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
     vlc_mutex_unlock( &p_i->lock );
 
     /* Notify interested third parties */
-    event.type = vlc_InputItemMetaChanged;
-    event.u.input_item_meta_changed.meta_type = meta_type;
-    vlc_event_send( &p_i->event_manager, &event );
+    vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
+        .type = vlc_InputItemMetaChanged,
+        .u.input_item_meta_changed.meta_type = meta_type } );
 }
 
 void input_item_CopyOptions( input_item_t *p_child,
@@ -236,10 +230,10 @@ static void post_subitems( input_item_node_t *p_node )
 {
     for( int i = 0; i < p_node->i_children; i++ )
     {
-        vlc_event_t event;
-        event.type = vlc_InputItemSubItemAdded;
-        event.u.input_item_subitem_added.p_new_child = p_node->pp_children[i]->p_item;
-        vlc_event_send( &p_node->p_item->event_manager, &event );
+        vlc_event_send( &p_node->p_item->event_manager, &(vlc_event_t) {
+            .type = vlc_InputItemSubItemAdded,
+            .u.input_item_subitem_added.p_new_child =
+                p_node->pp_children[i]->p_item } );
 
         post_subitems( p_node->pp_children[i] );
     }
@@ -447,11 +441,9 @@ void input_item_SetDuration( input_item_t *p_i, mtime_t i_duration )
 
     if( b_send_event )
     {
-        vlc_event_t event;
-
-        event.type = vlc_InputItemDurationChanged;
-        event.u.input_item_duration_changed.new_duration = i_duration;
-        vlc_event_send( &p_i->event_manager, &event );
+        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
+            .type = vlc_InputItemDurationChanged,
+            .u.input_item_duration_changed.new_duration = i_duration } );
     }
 }
 
@@ -804,12 +796,9 @@ int input_item_AddInfo( input_item_t *p_i,
 
 
     if( !i_ret )
-    {
-        vlc_event_t event;
+        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
+            .type = vlc_InputItemInfoChanged } );
 
-        event.type = vlc_InputItemInfoChanged;
-        vlc_event_send( &p_i->event_manager, &event );
-    }
     return i_ret;
 }
 
@@ -844,10 +833,8 @@ int input_item_DelInfo( input_item_t *p_i,
     }
     vlc_mutex_unlock( &p_i->lock );
 
-
-    vlc_event_t event;
-    event.type = vlc_InputItemInfoChanged;
-    vlc_event_send( &p_i->event_manager, &event );
+    vlc_event_send( &p_i->event_manager,
+                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
 
     return VLC_SUCCESS;
 }
@@ -868,11 +855,10 @@ void input_item_ReplaceInfos( input_item_t *p_item, info_category_t *p_cat )
     }
     vlc_mutex_unlock( &p_item->lock );
 
-
-    vlc_event_t event;
-    event.type = vlc_InputItemInfoChanged;
-    vlc_event_send( &p_item->event_manager, &event );
+    vlc_event_send( &p_item->event_manager,
+                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
 }
+
 void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
 {
     vlc_mutex_lock( &p_item->lock );
@@ -891,10 +877,8 @@ void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
     }
     vlc_mutex_unlock( &p_item->lock );
 
-
-    vlc_event_t event;
-    event.type = vlc_InputItemInfoChanged;
-    vlc_event_send( &p_item->event_manager, &event );
+    vlc_event_send( &p_item->event_manager,
+                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
 }
 
 void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_evt )
@@ -927,8 +911,8 @@ void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_
 
     if ( b_changed )
     {
-        vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
-        vlc_event_send( &p_item->event_manager, &event );
+        vlc_event_send( &p_item->event_manager,
+                        &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
     }
 }
 
@@ -1070,8 +1054,8 @@ void input_item_SetEpgOffline( input_item_t *p_item )
         vlc_mutex_unlock( &p_item->lock );
 #endif
 
-    vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
-    vlc_event_send( &p_item->event_manager, &event );
+    vlc_event_send( &p_item->event_manager,
+                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
 }
 
 input_item_t *
@@ -1344,10 +1328,9 @@ void input_item_node_PostAndDelete( input_item_node_t *p_root )
 {
     post_subitems( p_root );
 
-    vlc_event_t event;
-    event.type = vlc_InputItemSubItemTreeAdded;
-    event.u.input_item_subitem_tree_added.p_root = p_root;
-    vlc_event_send( &p_root->p_item->event_manager, &event );
+    vlc_event_send( &p_root->p_item->event_manager, &(vlc_event_t) {
+        .type = vlc_InputItemSubItemTreeAdded,
+        .u.input_item_subitem_tree_added.p_root = p_root } );
 
     input_item_node_Delete( p_root );
 }
