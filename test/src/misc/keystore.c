@@ -23,6 +23,7 @@
 #endif
 #include <vlc/vlc.h>
 
+#include "../../libvlc/test.h"
 #include "../../../lib/libvlc_internal.h"
 
 #include <vlc_common.h>
@@ -33,9 +34,7 @@
 #include <vlc_url.h>
 #include <vlc_fs.h>
 
-#undef NDEBUG
 #include <assert.h>
-
 
 struct cred
 {
@@ -301,7 +300,7 @@ create_libvlc(int i_vlc_argc, const char *const *ppsz_vlc_argv)
 int
 main(void)
 {
-    setenv("VLC_PLUGIN_PATH", "../modules", 1);
+    test_init();
 
     printf("creating tmp plaintext keystore file\n");
     char psz_tmp_path[] = "/tmp/libvlc_XXXXXX";
