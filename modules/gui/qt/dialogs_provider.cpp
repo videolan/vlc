@@ -111,10 +111,10 @@ DialogsProvider::~DialogsProvider()
 }
 
 QStringList DialogsProvider::getOpenURL( intf_thread_t* p_intf, QWidget *parent,
-                                               const QString &caption,
-                                               const QString &dir,
-                                               const QString &filter,
-                                               QString *selectedFilter )
+                                         const QString &caption,
+                                         const QString &dir,
+                                         const QString &filter,
+                                         QString *selectedFilter )
 {
     QStringList res;
 
