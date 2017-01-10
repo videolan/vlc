@@ -1009,10 +1009,8 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update, bool b_
     free( psz_epg );
 signal:
 #endif
-    do {
-        vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
-        vlc_event_send( &p_item->event_manager, &event );
-    } while(0);
+    vlc_event_send( &p_item->event_manager,
+                    &(vlc_event_t){ .type = vlc_InputItemInfoChanged, } );
 }
 
 void input_item_ChangeEPGSource( input_item_t *p_item, int i_source_id )
