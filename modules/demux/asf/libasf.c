@@ -41,7 +41,7 @@
  * They are expansion safe
  * They make the following assumptions:
  *  const uint8_t *p_peek exists and points to the start of a buffer
- *  ssize_t i_peek gives the size of the buffer pointed by p_peek
+ *  ssize_t i_peek the size of the buffer pointed to by p_peek
  *  const uint8_t *p_data exits and points to the data inside p_peek to be read.
  */
 /* ASF_HAVE(n):
