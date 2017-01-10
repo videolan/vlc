@@ -64,7 +64,7 @@ static const struct testcase
     /* First tests use sftp protocol: no realm and results doesn't depend on
      * path */
     { true, SFTP("user1:pwd1@ex.com/testing/deprecated_url"),
-      { "user1", "pwd1" }, {} , {}, false, false },
+      { "user1", "pwd1" }, {} , {}, false },
 
     { true, SFTP("ex.com/testing/opt"),
       { "user1", "pwd1" }, { "user1", "pwd1" }, {}, false },
