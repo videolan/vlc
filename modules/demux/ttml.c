@@ -119,15 +119,6 @@ static bool tt_textstream_Append( tt_textstream_t *p_stream, const char *psz )
     return true;
 }
 
-#if 0
-static bool tt_textstream_Grab( tt_textstream_t *p_stream, char *psz )
-{
-    bool b_ret = tt_textstream_Append( p_stream, psz );
-    free( psz );
-    return b_ret;
-}
-#endif
-
 static bool tt_node_AttributesToText( tt_textstream_t *p_stream, const tt_node_t* p_node )
 {
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
@@ -177,7 +168,11 @@ static bool tt_node_ToText( tt_textstream_t *p_stream, const tt_basenode_t *p_ba
                                       p_node->timings.i_begin,
                                       p_node->timings.i_end ) >= 0 )
             {
-                if( !tt_textstream_Grab( p_stream, psz_debug ) )
+                bool ret = tt_textstream_Append( p_stream, psz_debug );
+
+                free( psz_debug );
+
+                if( !ret )
                     return false;
             }
 #endif
@@ -457,7 +452,7 @@ int OpenDemux( vlc_object_t* p_this )
             tt_textstream_Finish( &stream, true );
         if( stream.p_block )
         {
-            msg_Dbg("%s\n", stream.p_block->p_buffer);
+            msg_Dbg( p_demux, "%s", stream.p_block->p_buffer );
             block_Release( stream.p_block );
         }
     }
