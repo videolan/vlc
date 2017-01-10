@@ -517,19 +517,22 @@ static text_segment_t * ConvertNodesToSegments( ttml_context_t *p_ctx, const tt_
             const tt_textnode_t *p_ttnode = (const tt_textnode_t *) p_child;
             *pp_last = text_segment_New( p_ttnode->psz_text );
             ttml_style_t *s = InheritTTMLStyles( p_ctx, p_child->p_parent );
-            (*pp_last)->style = s->font_style;
-            s->font_style = NULL;
-            if( !s->b_preserve_space )
-                StripSpacing( *pp_last );
-            if( s->b_direction_set )
-                BIDIConvert( *pp_last, s->i_direction );
-            /* FIXME: This is carried from broken prev code feat
-             * as there can be multiple regions. Return first ttml style
-             * to apply to default SPU region for now */
-            if( *pp_ret_ttml_style == NULL )
-                *pp_ret_ttml_style = s;
-            else
-                ttml_style_Delete( s );
+            if( s )
+            {
+                (*pp_last)->style = s->font_style;
+                s->font_style = NULL;
+                if( !s->b_preserve_space )
+                    StripSpacing( *pp_last );
+                if( s->b_direction_set )
+                    BIDIConvert( *pp_last, s->i_direction );
+                /* FIXME: This is carried from broken prev code feat
+                 * as there can be multiple regions. Return first ttml style
+                 * to apply to default SPU region for now */
+                if( *pp_ret_ttml_style == NULL )
+                    *pp_ret_ttml_style = s;
+                else
+                    ttml_style_Delete( s );
+            }
         }
         else
         {
