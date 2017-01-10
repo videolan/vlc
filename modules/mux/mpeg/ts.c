@@ -892,7 +892,8 @@ static void SelectPCRStream( sout_mux_t *p_mux, sout_input_t *p_removed_pcr_inpu
             continue;
 
         if( p_input->p_fmt->i_cat == VIDEO_ES &&
-            p_sys->p_pcr_input->fmt.i_cat != VIDEO_ES )
+           (p_sys->p_pcr_input == NULL ||
+            p_sys->p_pcr_input->fmt.i_cat != VIDEO_ES) )
         {
             p_sys->p_pcr_input = p_input;
             break;
