@@ -2363,13 +2363,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         }
         else
         {
-            i_group = (int)va_arg( args, int );
+            i_group = va_arg( args, int );
             p_pgrm = EsOutProgramFind( out, i_group );
         }
         if( !p_pgrm )
             return VLC_EGENERIC;
 
-        i_pcr = (int64_t)va_arg( args, int64_t );
+        i_pcr = va_arg( args, int64_t );
         if( i_pcr <= VLC_TS_INVALID )
         {
             msg_Err( p_sys->p_input, "Invalid PCR value in ES_OUT_SET_(GROUP_)PCR !" );
@@ -2488,7 +2488,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_SET_NEXT_DISPLAY_TIME:
     {
-        const int64_t i_date = (int64_t)va_arg( args, int64_t );
+        const int64_t i_date = va_arg( args, int64_t );
 
         if( i_date < 0 )
             return VLC_EGENERIC;
@@ -2499,7 +2499,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
     case ES_OUT_SET_GROUP_META:
     {
-        int i_group = (int)va_arg( args, int );
+        int i_group = va_arg( args, int );
         const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
         EsOutProgramMeta( out, i_group, p_meta );
@@ -2507,7 +2507,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
     case ES_OUT_SET_GROUP_EPG:
     {
-        int i_group = (int)va_arg( args, int );
+        int i_group = va_arg( args, int );
         const vlc_epg_t *p_epg = va_arg( args, const vlc_epg_t * );
 
         EsOutProgramEpg( out, i_group, p_epg );
@@ -2515,7 +2515,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
     case ES_OUT_SET_GROUP_EPG_EVENT:
     {
-        int i_group = (int)va_arg( args, int );
+        int i_group = va_arg( args, int );
         const vlc_epg_event_t *p_evt = va_arg( args, const vlc_epg_event_t * );
 
         EsOutProgramEpgEvent( out, i_group, p_evt );
@@ -2523,7 +2523,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
     case ES_OUT_SET_EPG_TIME:
     {
-        int i64 = (int64_t)va_arg( args, int64_t );
+        int i64 = va_arg( args, int64_t );
 
         EsOutEpgTime( out, i64 );
         return VLC_SUCCESS;
@@ -2531,7 +2531,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_DEL_GROUP:
     {
-        int i_group = (int)va_arg( args, int );
+        int i_group = va_arg( args, int );
 
         return EsOutProgramDel( out, i_group );
     }
@@ -2546,7 +2546,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_GET_WAKE_UP:
     {
-        mtime_t *pi_wakeup = (mtime_t*)va_arg( args, mtime_t* );
+        mtime_t *pi_wakeup = va_arg( args, mtime_t* );
         *pi_wakeup = EsOutGetWakeup( out );
         return VLC_SUCCESS;
     }
@@ -2555,7 +2555,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     case ES_OUT_RESTART_ES_BY_ID:
     case ES_OUT_SET_ES_DEFAULT_BY_ID:
     {
-        const int i_id = (int)va_arg( args, int );
+        const int i_id = va_arg( args, int );
         es_out_id_t *p_es = EsOutGetFromID( out, i_id );
         int i_new_query = 0;
 
@@ -2621,8 +2621,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_SET_DELAY:
     {
-        const int i_cat = (int)va_arg( args, int );
-        const mtime_t i_delay = (mtime_t)va_arg( args, mtime_t );
+        const int i_cat = va_arg( args, int );
+        const mtime_t i_delay = va_arg( args, mtime_t );
         EsOutSetDelay( out, i_cat, i_delay );
         return VLC_SUCCESS;
     }
@@ -2637,7 +2637,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     {
         const bool b_source_paused = (bool)va_arg( args, int );
         const bool b_paused = (bool)va_arg( args, int );
-        const mtime_t i_date = (mtime_t) va_arg( args, mtime_t );
+        const mtime_t i_date = va_arg( args, mtime_t );
 
         assert( !b_source_paused == !b_paused );
         EsOutChangePause( out, b_paused, i_date );
@@ -2647,8 +2647,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_SET_RATE:
     {
-        const int i_src_rate = (int)va_arg( args, int );
-        const int i_rate = (int)va_arg( args, int );
+        const int i_src_rate = va_arg( args, int );
+        const int i_rate = va_arg( args, int );
 
         assert( i_src_rate == i_rate );
         EsOutChangeRate( out, i_rate );
@@ -2658,7 +2658,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_SET_TIME:
     {
-        const mtime_t i_date = (mtime_t)va_arg( args, mtime_t );
+        const mtime_t i_date = va_arg( args, mtime_t );
 
         assert( i_date == -1 );
         EsOutChangePosition( out );
@@ -2672,9 +2672,9 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_SET_TIMES:
     {
-        double f_position = (double)va_arg( args, double );
-        mtime_t i_time = (mtime_t)va_arg( args, mtime_t );
-        mtime_t i_length = (mtime_t)va_arg( args, mtime_t );
+        double f_position = va_arg( args, double );
+        mtime_t i_time = va_arg( args, mtime_t );
+        mtime_t i_length = va_arg( args, mtime_t );
 
         input_SendEventLength( p_sys->p_input, i_length );
 
@@ -2704,9 +2704,9 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
     case ES_OUT_SET_JITTER:
     {
-        mtime_t i_pts_delay  = (mtime_t)va_arg( args, mtime_t );
-        mtime_t i_pts_jitter = (mtime_t)va_arg( args, mtime_t );
-        int     i_cr_average = (int)va_arg( args, int );
+        mtime_t i_pts_delay  = va_arg( args, mtime_t );
+        mtime_t i_pts_jitter = va_arg( args, mtime_t );
+        int     i_cr_average = va_arg( args, int );
 
         bool b_change_clock =
             i_pts_delay + i_pts_jitter != p_sys->i_pts_delay ||
