@@ -66,7 +66,7 @@ struct demux_sys_t
     } times;
 };
 
-static bool tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node )
+static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node )
 {
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
     for( int i = 0; i < p_attr_dict->i_size; ++i )
@@ -79,11 +79,9 @@ static bool tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_n
                                   (char const*)p_entry->p_value );
         }
     }
-
-    return true;
 }
 
-static bool tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t *p_basenode,
+static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t *p_basenode,
                             int64_t i_playbacktime )
 {
     if( p_basenode->i_type == TT_NODE_TYPE_ELEMENT )
@@ -92,13 +90,12 @@ static bool tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
 
         if( i_playbacktime != -1 &&
            !tt_timings_Contains( &p_node->timings, i_playbacktime ) )
-            return true;
+            return;
 
         vlc_memstream_putc( p_stream, '<' );
         vlc_memstream_puts( p_stream, p_node->psz_node_name );
 
-        if( !tt_node_AttributesToText( p_stream, p_node ) )
-            return false;
+        tt_node_AttributesToText( p_stream, p_node );
 
         if( tt_node_HasChild( p_node ) )
         {
@@ -113,8 +110,7 @@ static bool tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
             for( const tt_basenode_t *p_child = p_node->p_child;
                                    p_child; p_child = p_child->p_next )
             {
-                if( !tt_node_ToText( p_stream, p_child, i_playbacktime ) )
-                    return false;
+                tt_node_ToText( p_stream, p_child, i_playbacktime );
             }
 
             vlc_memstream_printf( p_stream, "</%s>", p_node->psz_node_name );
@@ -127,7 +123,6 @@ static bool tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
         const tt_textnode_t *p_textnode = (const tt_textnode_t *) p_basenode;
         vlc_memstream_puts( p_stream, p_textnode->psz_text );
     }
-    return true;
 }
 
 static int Control( demux_t* p_demux, int i_query, va_list args )
@@ -286,24 +281,21 @@ static int Demux( demux_t* p_demux )
         if( vlc_memstream_open( &stream ) )
             return VLC_DEMUXER_EGENERIC;
 
-        if( tt_node_ToText( &stream, (tt_basenode_t *) p_sys->p_rootnode, i_playbacktime ) )
+        tt_node_ToText( &stream, (tt_basenode_t *) p_sys->p_rootnode, i_playbacktime );
+
+        if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
         {
-            if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
-            {
-                block_t* p_block = block_heap_Alloc( stream.ptr, stream.length );
+            block_t* p_block = block_heap_Alloc( stream.ptr, stream.length );
 
-                if( unlikely( p_block == NULL ) )
-                    return VLC_DEMUXER_EGENERIC;
+            if( unlikely( p_block == NULL ) )
+                return VLC_DEMUXER_EGENERIC;
 
-                p_block->i_dts =
+            p_block->i_dts =
                 p_block->i_pts = VLC_TS_0 + i_playbacktime;
-                p_block->i_length = i_playbackendtime - i_playbacktime;
+            p_block->i_length = i_playbackendtime - i_playbacktime;
 
-                es_out_Send( p_demux->out, p_sys->p_es, p_block );
-            }
+            es_out_Send( p_demux->out, p_sys->p_es, p_block );
         }
-        else if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
-            free( stream.ptr );
 
         p_sys->times.i_current++;
     }
