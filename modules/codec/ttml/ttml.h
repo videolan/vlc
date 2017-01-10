@@ -89,7 +89,7 @@ int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node );
 void tt_timings_Resolve( tt_basenode_t *p_child, const tt_timings_t *p_container_timings,
                          int64_t **pp_array, size_t *pi_count );
 bool tt_timings_Contains( const tt_timings_t *p_range, int64_t i_time );
-size_t tt_timings_FindLowerIndex( const int64_t *p_times, size_t i_times, int64_t i_time );
+size_t tt_timings_FindLowerIndex( const int64_t *p_times, size_t i_times, int64_t i_time, bool *pb_found );
 
 
 

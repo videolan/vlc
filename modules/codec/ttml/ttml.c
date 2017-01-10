@@ -337,7 +337,7 @@ static int tt_bsearch_searchkey_Compare( const void *key, const void *other )
     return ( p_key->i_time >= i_time ) ? p_key->i_time - i_time : -1;
 }
 
-size_t tt_timings_FindLowerIndex( const int64_t *p_times, size_t i_times, int64_t i_time )
+size_t tt_timings_FindLowerIndex( const int64_t *p_times, size_t i_times, int64_t i_time, bool *pb_found )
 {
     size_t i_index = 0;
     if( p_times )
@@ -350,18 +350,23 @@ size_t tt_timings_FindLowerIndex( const int64_t *p_times, size_t i_times, int64_
                                    sizeof(int64_t), tt_bsearch_searchkey_Compare );
         if( lookup )
             key.p_last = lookup;
+        *pb_found = !!lookup;
 
         /* Compute index from last visited */
         i_index = (key.p_last - p_times);
         if( p_times[i_index] < i_time )
             i_index++;
     }
+    else *pb_found = false;
     return i_index;
 }
 
 static void tt_bsearch_Insert( int64_t **pp_times, size_t *pi_times, int64_t i_time )
 {
-    size_t i_index = tt_timings_FindLowerIndex( *pp_times, *pi_times, i_time );
+    bool b_exists;
+    size_t i_index = tt_timings_FindLowerIndex( *pp_times, *pi_times, i_time, &b_exists );
+    if( b_exists )
+        return;
 
     if( SIZE_MAX / sizeof(int64_t) < (*pi_times + 1) )
         return;

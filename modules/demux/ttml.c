@@ -214,6 +214,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64, i64;
     double *pf, f;
+    bool b;
 
     switch( i_query )
     {
@@ -234,7 +235,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             if( p_sys->times.i_count )
             {
                 size_t i_index = tt_timings_FindLowerIndex( p_sys->times.p_array,
-                                                            p_sys->times.i_count, i64 );
+                                                            p_sys->times.i_count, i64, &b );
                 p_sys->times.i_current = i_index;
                 p_sys->b_first_time = true;
                 return VLC_SUCCESS;
@@ -276,7 +277,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             {
                 i64 = f * p_sys->times.p_array[p_sys->times.i_count - 1];
                 size_t i_index = tt_timings_FindLowerIndex( p_sys->times.p_array,
-                                                            p_sys->times.i_count, i64 );
+                                                            p_sys->times.i_count, i64, &b );
                 p_sys->times.i_current = i_index;
                 p_sys->b_first_time = true;
                 return VLC_SUCCESS;
