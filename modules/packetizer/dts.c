@@ -57,6 +57,7 @@ struct decoder_sys_t
     int i_state;
 
     block_bytestream_t bytestream;
+    size_t i_next_offset;
 
     /*
      * Common properties
@@ -204,39 +205,43 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
+            p_sys->i_next_offset = p_sys->dts.i_frame_size;
             p_sys->i_state = STATE_NEXT_SYNC;
 
         case STATE_NEXT_SYNC:
             /* Check if next expected frame contains the sync word */
-            if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                       p_sys->dts.i_frame_size, p_header, 6 )
-                != VLC_SUCCESS )
+            while( p_sys->i_state == STATE_NEXT_SYNC )
             {
-                if( p_block == NULL ) /* drain */
+                if( block_PeekOffsetBytes( &p_sys->bytestream,
+                                           p_sys->i_next_offset, p_header, 6 )
+                                           != VLC_SUCCESS )
                 {
-                    p_sys->i_state = STATE_GET_DATA;
+                    if( p_block == NULL ) /* drain */
+                    {
+                        p_sys->i_state = STATE_GET_DATA;
+                        break;
+                    }
+                    /* Need more data */
+                    return NULL;
+                }
+
+                if( p_header[0] == 0 )
+                {
+                    /* DTS wav files, audio CD's and some mkvs use stuffing */
+                    p_sys->i_next_offset++;
+                    continue;
+                }
+
+                if( !vlc_dts_header_IsSync( p_header, 6 ) )
+                {
+                    msg_Dbg( p_dec, "emulated sync word "
+                             "(no sync on following frame)" );
+                    p_sys->i_state = STATE_NOSYNC;
+                    block_SkipByte( &p_sys->bytestream );
                     break;
                 }
-                /* Need more data */
-                return NULL;
+                p_sys->i_state = STATE_SEND_DATA;
             }
-
-            if( p_header[0] == 0 && p_header[1] == 0 )
-            {
-                /* DTS wav files and audio CD's use stuffing */
-                p_sys->i_state = STATE_GET_DATA;
-                break;
-            }
-
-            if( !vlc_dts_header_IsSync( p_header, 6 ) )
-            {
-                msg_Dbg( p_dec, "emulated sync word "
-                         "(no sync on following frame)" );
-                p_sys->i_state = STATE_NOSYNC;
-                block_SkipByte( &p_sys->bytestream );
-                break;
-            }
-            p_sys->i_state = STATE_SEND_DATA;
             break;
 
         case STATE_GET_DATA:
