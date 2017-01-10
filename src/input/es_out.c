@@ -2523,7 +2523,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
     case ES_OUT_SET_EPG_TIME:
     {
-        int i64 = va_arg( args, int64_t );
+        int64_t i64 = va_arg( args, int64_t );
 
         EsOutEpgTime( out, i64 );
         return VLC_SUCCESS;
