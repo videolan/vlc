@@ -30,6 +30,7 @@
 #include <vlc_xml.h>
 #include <vlc_strings.h>
 #include <vlc_memory.h>
+#include <vlc_memstream.h>
 #include <vlc_es_out.h>
 
 #include <assert.h>
@@ -65,61 +66,7 @@ struct demux_sys_t
     } times;
 };
 
-typedef struct
-{
-    size_t   i_used;
-    block_t *p_block;
-} tt_textstream_t;
-
-/* String to block */
-static bool tt_textstream_Extend( tt_textstream_t *p_stream, size_t i )
-{
-    if( SIZE_MAX - p_stream->i_used < i )
-        return false;
-
-    if( p_stream->p_block &&
-        p_stream->p_block->i_buffer < p_stream->i_used + i )
-        return true;
-
-    size_t i_buffer =  p_stream->i_used + i;
-    if( SIZE_MAX - i_buffer > 2048 )
-        i_buffer += 2048;
-
-    if( p_stream->p_block )
-        p_stream->p_block = block_Realloc( p_stream->p_block, 0, i_buffer );
-    else
-        p_stream->p_block = block_Alloc( i_buffer );
-
-    if( p_stream->p_block == NULL )
-        p_stream->i_used = 0;
-
-    return !!p_stream->p_block;
-}
-
-static bool tt_textstream_Finish( tt_textstream_t *p_stream, bool b_as_text )
-{
-    if( b_as_text )
-    {
-        if( !tt_textstream_Extend( p_stream, 1 ) )
-            return false;
-        p_stream->p_block->p_buffer[p_stream->i_used++] = 0;
-    }
-    if( p_stream->p_block )
-        p_stream->p_block->i_buffer = p_stream->i_used;
-    return true;
-}
-
-static bool tt_textstream_Append( tt_textstream_t *p_stream, const char *psz )
-{
-    size_t i_len = strlen( psz );
-    if( !tt_textstream_Extend( p_stream, i_len ) )
-        return false;
-    memcpy( &p_stream->p_block->p_buffer[p_stream->i_used], psz, i_len );
-    p_stream->i_used += i_len;
-    return true;
-}
-
-static bool tt_node_AttributesToText( tt_textstream_t *p_stream, const tt_node_t* p_node )
+static bool tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node )
 {
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
     for( int i = 0; i < p_attr_dict->i_size; ++i )
@@ -127,19 +74,16 @@ static bool tt_node_AttributesToText( tt_textstream_t *p_stream, const tt_node_t
         for ( vlc_dictionary_entry_t* p_entry = p_attr_dict->p_entries[i];
                                       p_entry != NULL; p_entry = p_entry->p_next )
         {
-            if( !tt_textstream_Append( p_stream, " " ) ||
-                !tt_textstream_Append( p_stream, p_entry->psz_key ) ||
-                !tt_textstream_Append( p_stream, "=\"" ) ||
-                !tt_textstream_Append( p_stream, p_entry->p_value ) ||
-                !tt_textstream_Append( p_stream, "\"" ) )
-                return false;
+            vlc_memstream_printf( p_stream, " %s=\"%s\"",
+                                  p_entry->psz_key,
+                                  (char const*)p_entry->p_value );
         }
     }
 
     return true;
 }
 
-static bool tt_node_ToText( tt_textstream_t *p_stream, const tt_basenode_t *p_basenode,
+static bool tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t *p_basenode,
                             int64_t i_playbacktime )
 {
     if( p_basenode->i_type == TT_NODE_TYPE_ELEMENT )
@@ -150,31 +94,20 @@ static bool tt_node_ToText( tt_textstream_t *p_stream, const tt_basenode_t *p_ba
            !tt_timings_Contains( &p_node->timings, i_playbacktime ) )
             return true;
 
-        if( !tt_textstream_Append( p_stream, "<" ) ||
-            !tt_textstream_Append( p_stream, p_node->psz_node_name ) )
-                return false;
+        vlc_memstream_putc( p_stream, '<' );
+        vlc_memstream_puts( p_stream, p_node->psz_node_name );
 
         if( !tt_node_AttributesToText( p_stream, p_node ) )
             return false;
 
         if( tt_node_HasChild( p_node ) )
         {
-            if( !tt_textstream_Append( p_stream, ">" ) )
-                return false;
+            vlc_memstream_putc( p_stream, '>' );
 
 #ifdef TTML_DEMUX_DEBUG
-            char *psz_debug;
-            if( asprintf( &psz_debug, "<!-- starts %ld ends %ld -->",
-                                      p_node->timings.i_begin,
-                                      p_node->timings.i_end ) >= 0 )
-            {
-                bool ret = tt_textstream_Append( p_stream, psz_debug );
-
-                free( psz_debug );
-
-                if( !ret )
-                    return false;
-            }
+            vlc_memstream_printf( p_stream, "<!-- starts %ld ends %ld -->",
+                                  p_node->timings.i_begin,
+                                  p_node->timings.i_end );
 #endif
 
             for( const tt_basenode_t *p_child = p_node->p_child;
@@ -184,22 +117,15 @@ static bool tt_node_ToText( tt_textstream_t *p_stream, const tt_basenode_t *p_ba
                     return false;
             }
 
-            if( !tt_textstream_Append( p_stream, "</" ) ||
-                !tt_textstream_Append( p_stream, p_node->psz_node_name ) ||
-                !tt_textstream_Append( p_stream, ">" ) )
-                    return false;
+            vlc_memstream_printf( p_stream, "</%s>", p_node->psz_node_name );
         }
         else
-        {
-            if( !tt_textstream_Append( p_stream, "/>" ) )
-                    return false;
-        }
+            vlc_memstream_puts( p_stream, "/>" );
     }
     else
     {
         const tt_textnode_t *p_textnode = (const tt_textnode_t *) p_basenode;
-        if( !tt_textstream_Append( p_stream, p_textnode->psz_text ) )
-            return false;
+        vlc_memstream_puts( p_stream, p_textnode->psz_text );
     }
     return true;
 }
@@ -355,25 +281,29 @@ static int Demux( demux_t* p_demux )
             p_sys->b_first_time = false;
         }
 
-        tt_textstream_t stream;
-        stream.i_used = 0;
-        stream.p_block = NULL;
+        struct vlc_memstream stream;
+
+        if( vlc_memstream_open( &stream ) )
+            return VLC_DEMUXER_EGENERIC;
+
         if( tt_node_ToText( &stream, (tt_basenode_t *) p_sys->p_rootnode, i_playbacktime ) )
         {
-
-            tt_textstream_Finish( &stream, false );
-            if( stream.p_block )
+            if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
             {
-                stream.p_block->i_dts =
-                stream.p_block->i_pts = VLC_TS_0 + i_playbacktime;
-                stream.p_block->i_length = i_playbackendtime - i_playbacktime;
-                es_out_Send( p_demux->out, p_sys->p_es, stream.p_block );
+                block_t* p_block = block_heap_Alloc( stream.ptr, stream.length );
+
+                if( unlikely( p_block == NULL ) )
+                    return VLC_DEMUXER_EGENERIC;
+
+                p_block->i_dts =
+                p_block->i_pts = VLC_TS_0 + i_playbacktime;
+                p_block->i_length = i_playbackendtime - i_playbacktime;
+
+                es_out_Send( p_demux->out, p_sys->p_es, p_block );
             }
         }
-        else if( stream.p_block )
-        {
-            block_Release( stream.p_block );
-        }
+        else if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
+            free( stream.ptr );
 
         p_sys->times.i_current++;
     }
@@ -445,15 +375,19 @@ int OpenDemux( vlc_object_t* p_this )
 
 #ifdef TTML_DEMUX_DEBUG
     {
-        tt_textstream_t stream;
-        stream.i_used = 0;
-        stream.p_block = NULL;
-        if( tt_node_ToText( &stream, (tt_basenode_t *) p_sys->p_rootnode, -1 ) )
-            tt_textstream_Finish( &stream, true );
-        if( stream.p_block )
+        struct vlc_memstream stream;
+
+        if( vlc_memstream_open( &stream ) )
+            goto error;
+
+        tt_node_ToText( &stream, (tt_basenode_t*)p_sys->p_rootnode, -1 );
+
+        vlc_memstream_putc( &stream, '\0' );
+
+        if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
         {
-            msg_Dbg( p_demux, "%s", stream.p_block->p_buffer );
-            block_Release( stream.p_block );
+            msg_Dbg( p_demux, "%s", stream.ptr );
+            free( stream.ptr );
         }
     }
 #endif
