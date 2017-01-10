@@ -124,6 +124,7 @@ EXTRA_DIST += \
 	extras/package/macosx/dmg_setup.scpt \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/vlc_status_icon.svg \
+	extras/package/macosx/vlc_app_icon.svg \
 	extras/package/macosx/Info.plist.in \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/English.lproj/About.xib \
