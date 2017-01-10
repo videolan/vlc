@@ -50,7 +50,7 @@ typedef struct
     size_t            i_event;
     vlc_epg_event_t **pp_event;
     bool             b_present;  /* Contains present/following or similar, and sets below */
-    const vlc_epg_event_t *p_current; /* Can be null or should be the same than one of pp_event entry */
+    const vlc_epg_event_t *p_current; /* NULL, or equal to one of the entries in pp_event */
 } vlc_epg_t;
 
 /**
