@@ -765,20 +765,6 @@ static int InputItemVaAddInfo( input_item_t *p_i,
     return VLC_SUCCESS;
 }
 
-static int InputItemAddInfo( input_item_t *p_i,
-                             const char *psz_cat,
-                             const char *psz_name,
-                             const char *psz_format, ... )
-{
-    va_list args;
-
-    va_start( args, psz_format );
-    const int i_ret = InputItemVaAddInfo( p_i, psz_cat, psz_name, psz_format, args );
-    va_end( args );
-
-    return i_ret;
-}
-
 int input_item_AddInfo( input_item_t *p_i,
                         const char *psz_cat,
                         const char *psz_name,
@@ -917,6 +903,22 @@ void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_
 }
 
 //#define EPG_DEBUG
+#ifdef EPG_DEBUG
+static int InputItemAddInfo( input_item_t *p_i,
+                             const char *psz_cat,
+                             const char *psz_name,
+                             const char *psz_format, ... )
+{
+    va_list args;
+
+    va_start( args, psz_format );
+    const int i_ret = InputItemVaAddInfo( p_i, psz_cat, psz_name, psz_format, args );
+    va_end( args );
+
+    return i_ret;
+}
+#endif
+
 void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update, bool b_current_source )
 {
     vlc_epg_t *p_epg = vlc_epg_Duplicate( p_update );
