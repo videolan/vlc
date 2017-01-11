@@ -37,6 +37,12 @@ enum subpicture_updater_sys_region_flags_e
     UPDT_REGION_FIX_DONE               = 1 << 31,
 };
 
+#define EIA608_MARGIN  0.10
+#define EIA608_VISIBLE 0.80
+#define EIA608_ROWS 15
+
+#define FONT_TO_LINE_HEIGHT_RATIO 1.06
+
 struct subpicture_updater_sys_region_t
 {
     struct
@@ -128,13 +134,23 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
         return;
 
-    subpic->i_original_picture_width  = fmt_dst->i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
-    subpic->i_original_picture_height = fmt_dst->i_height;
-
     video_format_t fmt;
     video_format_Init(&fmt, VLC_CODEC_TEXT);
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
+
+    if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
+    {
+        fmt.i_sar_num = 4;
+        fmt.i_sar_den = 3;
+        subpic->i_original_picture_width  = fmt_dst->i_visible_height * fmt.i_sar_num / fmt.i_sar_den;
+        subpic->i_original_picture_height = fmt_dst->i_visible_height;
+    }
+    else
+    {
+        subpic->i_original_picture_width  = fmt_dst->i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
+        subpic->i_original_picture_height = fmt_dst->i_height;
+        fmt.i_sar_num = 1;
+        fmt.i_sar_den = 1;
+    }
 
     subpicture_region_t **pp_last_region = &subpic->p_region;
 
@@ -150,23 +166,38 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->i_align  = p_updtregion->inner_align | p_updtregion->align; /* we do not support text align by itself */
         r->b_noregionbg = p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND;
         r->b_gridmode = p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES;
+
+        if( r->b_gridmode )
+        {
+            /* Ensure correct flags are set */
+            r->i_align &= ~(SUBPICTURE_ALIGN_RIGHT | SUBPICTURE_ALIGN_BOTTOM);
+            r->i_align |= (SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP);
+        }
+
         if (!(p_updtregion->flags & UPDT_REGION_FIX_DONE))
         {
-            const float margin_ratio = 0.04;
-            const int   margin_h     = margin_ratio * fmt_dst->i_visible_width;
+            const float margin_ratio = ( r->b_gridmode ) ? 0.10 : 0.04;
+            const int   margin_h     = margin_ratio * (( r->b_gridmode ) ? (unsigned) subpic->i_original_picture_width
+                                                                         : fmt_dst->i_visible_width );
             const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
 
-            r->i_x = 0;
             if (r->i_align & SUBPICTURE_ALIGN_LEFT)
-                r->i_x += margin_h + fmt_dst->i_x_offset;
+                r->i_x = margin_h + fmt_dst->i_x_offset;
             else if (r->i_align & SUBPICTURE_ALIGN_RIGHT)
-                r->i_x += margin_h + fmt_dst->i_width - (fmt_dst->i_visible_width + fmt_dst->i_x_offset);
+                r->i_x = margin_h + fmt_dst->i_width - (fmt_dst->i_visible_width + fmt_dst->i_x_offset);
 
-            r->i_y = 0;
             if (r->i_align & SUBPICTURE_ALIGN_TOP )
-                r->i_y += margin_v + fmt_dst->i_y_offset;
+                r->i_y = margin_v + fmt_dst->i_y_offset;
             else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
-                r->i_y += margin_v + fmt_dst->i_height - (fmt_dst->i_visible_height + fmt_dst->i_y_offset);
+                r->i_y = margin_v + fmt_dst->i_height - (fmt_dst->i_visible_height + fmt_dst->i_y_offset);
+
+            if( r->b_gridmode )
+            {
+                r->i_y += p_updtregion->origin.y * /* row number */
+                         (EIA608_VISIBLE / EIA608_ROWS) *
+                         (fmt_dst->i_visible_height - r->i_y) * FONT_TO_LINE_HEIGHT_RATIO;
+            }
+
         } else {
             /* FIXME it doesn't adapt on crop settings changes */
             r->i_x = p_updtregion->origin.x * fmt_dst->i_width  / p_updtregion->extent.x;
@@ -183,7 +214,14 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                 p_segment->style = text_style_Duplicate( sys->p_default_style );
             /* Update all segments font sizes in pixels, *** metric used by renderers *** */
             /* We only do this when a fixed font size isn't set */
-            if( p_segment->style && p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
+            if( r->b_gridmode )
+            {
+                /* Ensure font size is correct for grid layout */
+                p_segment->style->f_font_relsize = 0; /* Force to unset */
+                p_segment->style->i_font_size = EIA608_VISIBLE * subpic->i_original_picture_height /
+                                                EIA608_ROWS / FONT_TO_LINE_HEIGHT_RATIO;
+            }
+            else if( p_segment->style && p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
             {
                 p_segment->style->i_font_size = p_segment->style->f_font_relsize *
                         subpic->i_original_picture_height / 100;
