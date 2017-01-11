@@ -564,9 +564,9 @@ void vout_ControlChangeViewpoint(vout_thread_t *vout,
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
 {
     /* Load configuration */
-    cfg->is_fullscreen = var_CreateGetBool(vout, "fullscreen")
-                         || var_InheritBool(vout, "video-wallpaper");
-    const vlc_viewpoint_t *p_viewpoint = var_InheritAddress(vout, "viewpoint");
+    cfg->is_fullscreen = var_GetBool(vout, "fullscreen")
+                         || var_GetBool(vout, "video-wallpaper");
+    const vlc_viewpoint_t *p_viewpoint = var_GetAddress(vout, "viewpoint");
     if (p_viewpoint != NULL)
         cfg->viewpoint = *p_viewpoint;
     else
@@ -577,11 +577,11 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
         cfg->viewpoint.fov   = vout->p->original.pose.f_fov_degrees;
     }
     cfg->display.title = title;
-    const int display_width = var_CreateGetInteger(vout, "width");
-    const int display_height = var_CreateGetInteger(vout, "height");
+    const int display_width = var_GetInteger(vout, "width");
+    const int display_height = var_GetInteger(vout, "height");
     cfg->display.width   = display_width > 0  ? display_width  : 0;
     cfg->display.height  = display_height > 0 ? display_height : 0;
-    cfg->is_display_filled  = var_CreateGetBool(vout, "autoscale");
+    cfg->is_display_filled  = var_GetBool(vout, "autoscale");
     unsigned msar_num, msar_den;
     if (var_InheritURational(vout, &msar_num, &msar_den, "monitor-par") ||
         msar_num <= 0 || msar_den <= 0) {
@@ -591,13 +591,13 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     cfg->display.sar.num = msar_num;
     cfg->display.sar.den = msar_den;
     unsigned zoom_den = 1000;
-    unsigned zoom_num = zoom_den * var_CreateGetFloat(vout, "zoom");
+    unsigned zoom_num = zoom_den * var_GetFloat(vout, "zoom");
     vlc_ureduce(&zoom_num, &zoom_den, zoom_num, zoom_den, 0);
     cfg->zoom.num = zoom_num;
     cfg->zoom.den = zoom_den;
     cfg->align.vertical = VOUT_DISPLAY_ALIGN_CENTER;
     cfg->align.horizontal = VOUT_DISPLAY_ALIGN_CENTER;
-    const int align_mask = var_CreateGetInteger(vout, "align");
+    const int align_mask = var_GetInteger(vout, "align");
     if (align_mask & 0x1)
         cfg->align.horizontal = VOUT_DISPLAY_ALIGN_LEFT;
     else if (align_mask & 0x2)
