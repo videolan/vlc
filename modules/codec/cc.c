@@ -205,7 +205,7 @@ typedef struct
 
 static void         Eia608Init( eia608_t * );
 static eia608_status_t Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
-static text_segment_t *Eia608Text( eia608_t *h );
+static void         Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia608_t *h );
 
 /* It will be enough up to 63 B frames, which is far too high for
  * broadcast environment */
@@ -405,26 +405,20 @@ static block_t *Pop( decoder_t *p_dec )
     return p_block;
 }
 
-static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mtime_t i_pts )
+static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
 {
     //decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
 
     /* We cannot display a subpicture with no date */
     if( i_pts <= VLC_TS_INVALID )
-    {
-        msg_Warn( p_dec, "subtitle without a date" );
-        text_segment_ChainDelete( p_segments );
         return NULL;
-    }
 
     /* Create the subpicture unit */
     p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
-    {
-        text_segment_ChainDelete( p_segments );
         return NULL;
-    }
+
     p_spu->i_start    = i_pts;
     p_spu->i_stop     = i_pts + 10000000;   /* 10s max */
     p_spu->b_ephemer  = true;
@@ -434,8 +428,8 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
 
     /* The "leavetext" alignment is a special mode where the subpicture
        region itself gets aligned, but the text inside it does not */
+    p_spu_sys->region.align = SUBPICTURE_ALIGN_TOP;
     p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_LEAVETEXT;
-    p_spu_sys->region.p_segments = p_segments;
     p_spu_sys->region.flags = UPDT_REGION_IGNORE_BACKGROUND | UPDT_REGION_USES_GRID_COORDINATES;
     /* Set style defaults (will be added to segments if none set) */
     p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
@@ -449,6 +443,8 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
     /* FCC defined "safe area" for EIA-608 captions is 80% of the height of the display */
     p_spu_sys->p_default_style->f_font_relsize = 100 * 8 / 10 / EIA608_SCREEN_ROWS;
     p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FLAGS);
+
+    Eia608FillUpdaterRegions( p_spu_sys, h );
 
     return p_spu;
 }
@@ -498,8 +494,7 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t **pp_block )
      */
     if( i_status & (EIA608_STATUS_DISPLAY | EIA608_STATUS_CHANGED) )
     {
-        text_segment_t *p_segments = Eia608Text( &p_sys->eia608 );
-        return Subtitle( p_dec, p_segments, i_pts );
+        return Subtitle( p_dec, &p_sys->eia608, i_pts );
     }
     return NULL;
 }
@@ -1021,7 +1016,7 @@ static void Eia608Strlcat( char *d, const char *s, int i_max )
 
 #define CAT(t) Eia608Strlcat( psz_text, t, i_text_max )
 
-static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row, bool b_endline )
+static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row )
 {
     const uint8_t *p_char = screen->characters[i_row];
     const eia608_color_t *p_color = screen->colors[i_row];
@@ -1036,19 +1031,6 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
     const unsigned i_text_max = 4 * EIA608_SCREEN_COLUMNS + 1;
     char psz_text[i_text_max + 1];
     psz_text[0] = '\0';
-
-    text_segment_t *p_segment, *p_segments_head = p_segment = text_segment_New( NULL );
-    if(!p_segment)
-        return NULL;
-
-    p_segment->style = text_style_Create( STYLE_NO_DEFAULTS );
-    if(!p_segment->style)
-    {
-        text_segment_Delete(p_segment);
-        return NULL;
-    }
-    /* Ensure we get a monospaced font (required for accurate positioning */
-    p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
     /* Search the start */
     i_start = 0;
@@ -1067,6 +1049,21 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
         i_end--;
 
     /* */
+    if( i_start > i_end ) /* Nothing to render */
+        return NULL;
+
+    text_segment_t *p_segment, *p_segments_head = p_segment = text_segment_New( NULL );
+    if(!p_segment)
+        return NULL;
+
+    p_segment->style = text_style_Create( STYLE_NO_DEFAULTS );
+    if(!p_segment->style)
+    {
+        text_segment_Delete(p_segment);
+        return NULL;
+    }
+    /* Ensure we get a monospaced font (required for accurate positioning */
+    p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
     for( x = i_start; x <= i_end; x++ )
     {
@@ -1118,11 +1115,6 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
         prev_color = color;
     }
 
-    if(b_endline)
-    {
-        CAT( "\n" );
-    }
-
 #undef CAT
 
     if( p_segment )
@@ -1133,6 +1125,54 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
     }
 
     return p_segments_head;
+}
+
+static void Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia608_t *h )
+{
+    struct eia608_screen *screen = &h->screen[h->i_screen];
+    subpicture_updater_sys_region_t *p_region = &p_updater->region;
+    text_segment_t **pp_last = &p_region->p_segments;
+    bool b_newregion = false;
+
+    for( int i = 0; i < EIA608_SCREEN_ROWS; i++ )
+    {
+        if( !screen->row_used[i] )
+            continue;
+
+        text_segment_t *p_segments = Eia608TextLine( screen, i );
+        if( p_segments )
+        {
+            if( b_newregion )
+            {
+                p_region = SubpictureUpdaterSysRegionNew();
+                if( !p_region )
+                {
+                    text_segment_ChainDelete( p_segments );
+                    return;
+                }
+                pp_last = &p_region->p_segments;
+                b_newregion = false;
+            }
+
+            if( p_region->p_segments == NULL ) /* First segment in the [new] region */
+            {
+                p_region->origin.y = i; /* set start line number */
+            }
+            else /* Insert line break between region lines */
+            {
+                *pp_last = text_segment_New( "\n" );
+                if( *pp_last )
+                    pp_last = &((*pp_last)->p_next);
+            }
+
+            *pp_last = p_segments;
+            do { pp_last = &((*pp_last)->p_next); } while ( *pp_last != NULL );
+        }
+        else
+        {
+            b_newregion = !!p_region->p_segments;
+        }
+    }
 }
 
 /* */
@@ -1186,25 +1226,4 @@ static eia608_status_t Eia608Parse( eia608_t *h, int i_channel_selected, const u
         /* XDS block / End of XDS block */
     }
     return i_screen_status;
-}
-
-static text_segment_t *Eia608Text( eia608_t *h )
-{
-    struct eia608_screen *screen = &h->screen[h->i_screen];
-    text_segment_t *p_head = NULL, *p_last = NULL;
-
-    for( int i = 0; i < EIA608_SCREEN_ROWS; i++ )
-    {
-        text_segment_t *p_line = Eia608TextLine( screen, i, (i + 1 != EIA608_SCREEN_ROWS) );
-        if(p_line)
-        {
-            if(!p_head)
-                p_head = p_line;
-            else
-                p_last->p_next = p_line;
-            p_last = p_line;
-        }
-    }
-
-    return p_head;
 }
