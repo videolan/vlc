@@ -881,6 +881,11 @@ static eia608_status_t Eia608ParseData( eia608_t *h, uint8_t d1, uint8_t d2 )
         if( d2 >= 0x20 )
             i_status |= Eia608ParseSingle( h, d2 );
     }
+
+    /* Ignore changes occuring to doublebuffer */
+    if( h->mode == EIA608_MODE_POPUP && i_status == EIA608_STATUS_CHANGED )
+        i_status = EIA608_STATUS_DEFAULT;
+
     return i_status;
 }
 
