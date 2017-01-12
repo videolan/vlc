@@ -1275,8 +1275,22 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         SetBlockDuration( p_input, p_data );
 
-        if (p_sys->first_dts == 0)
+        if ( p_sys->first_dts == 0 )
+        {
+            /* Pick the really first DTS */
             p_sys->first_dts = p_data->i_dts;
+            for (int j = 0; j < p_mux->i_nb_inputs; j++ )
+            {
+                if( p_mux->pp_inputs[j] != p_input &&
+                    block_FifoCount( p_mux->pp_inputs[j]->p_fifo) > 0 )
+                {
+                    block_t *p_block = block_FifoShow( p_mux->pp_inputs[j]->p_fifo );
+                    if( p_block->i_dts > VLC_TS_INVALID &&
+                        p_block->i_dts < p_sys->first_dts )
+                        p_sys->first_dts = p_block->i_dts;
+                }
+            }
+        }
 
         if( ( p_pcr_stream->state.i_pes_dts > 0 &&
               p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->state.i_pes_dts +
