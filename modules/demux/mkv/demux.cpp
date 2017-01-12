@@ -502,6 +502,8 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 
     while (p_l0 != 0)
     {
+        bool b_l0_handled = false;
+
         if ( MKV_IS_ID( p_l0, KaxSegment) )
         {
             EbmlParser  *ep;
@@ -577,7 +579,12 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                 p_segment1->segment = NULL;
                 delete p_segment1;
             }
+
+            b_l0_handled = true;
         }
+
+        EbmlElement* p_l0_prev = p_l0;
+
         if (p_l0->IsFiniteSize() )
         {
             p_l0->SkipData(*p_estream, KaxMatroska_Context);
@@ -587,6 +594,9 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
         {
             p_l0 = NULL;
         }
+
+        if( b_l0_handled == false )
+            delete p_l0_prev;
     }
 
     if ( !b_keep_stream )
