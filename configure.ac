@@ -3823,9 +3823,6 @@ AS_IF([test "${enable_skins2}" != "no"], [
     VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} ${XINERAMA_LIBS} -lX11])
   ])
 
-  dnl for All OSes
-  VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-
   dnl we need freetype
   AS_IF([test "${have_freetype}" != "yes"], [
     have_skins_deps="no"
@@ -3839,7 +3836,6 @@ AS_IF([test "${enable_skins2}" != "no"], [
     ])
     enable_skins2="no"
   ], [
-    VLC_ADD_PLUGIN([skins2])
     ALIASES="${ALIASES} svlc"
     enable_skins2="yes"
   ])

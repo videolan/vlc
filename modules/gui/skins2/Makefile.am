@@ -1,4 +1,7 @@
-SOURCES_skins2 = \
+include $(top_srcdir)/modules/common.am
+guidir = $(pluginsdir)/gui
+
+libskins2_plugin_la_SOURCES = \
 	commands/async_queue.cpp \
 	commands/async_queue.hpp \
 	commands/cmd_add_item.cpp \
@@ -196,7 +199,7 @@ SOURCES_skins2 = \
 	vars/volume.hpp
 
 if HAVE_WIN32
-SOURCES_skins2 += \
+libskins2_plugin_la_SOURCES += \
 	win32/win32_dragdrop.cpp \
 	win32/win32_dragdrop.hpp \
 	win32/win32_factory.cpp \
@@ -216,7 +219,7 @@ SOURCES_skins2 += \
     $(NULL)
 else
 if HAVE_OS2
-SOURCES_skins2 += \
+libskins2_plugin_la_SOURCES += \
 	os2/os2_dragdrop.cpp \
 	os2/os2_dragdrop.hpp \
 	os2/os2_factory.cpp \
@@ -235,7 +238,7 @@ SOURCES_skins2 += \
 	os2/os2_window.hpp \
     $(NULL)
 else
-SOURCES_skins2 += \
+libskins2_plugin_la_SOURCES += \
 	x11/x11_display.cpp \
 	x11/x11_display.hpp \
 	x11/x11_dragdrop.cpp \
@@ -256,4 +259,12 @@ SOURCES_skins2 += \
 	x11/x11_tooltip.hpp \
     $(NULL)
 endif
+endif
+
+libskins2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_skins2)
+libskins2_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) -O2 -fno-rtti
+libskins2_plugin_la_LIBADD = $(LIBS_skins2)
+
+if BUILD_SKINS
+gui_LTLIBRARIES = libskins2_plugin.la
 endif
