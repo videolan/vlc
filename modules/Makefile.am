@@ -15,7 +15,7 @@ endif
 
 TESTS =
 
-dist_noinst_SCRIPTS = genmf list.sh module.rc.in
+dist_noinst_SCRIPTS = list.sh module.rc.in
 dist_noinst_DATA = MODULES_LIST
 EXTRA_LTLIBRARIES =
 

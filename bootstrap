@@ -57,21 +57,6 @@ EOF
 fi
 
 ###
-### Generate the modules makefile, by parsing modules/**/Modules.am
-###
-
-echo "generating modules/**/Makefile.am"
-for d in modules/*/*/Modules.am; do
-	d="${d#modules/}"
-	d="${d%/Modules.am}"
-	${CONFIG_SHELL-sh} modules/genmf "$d"
-	printf "."
-done || true
-printf "\n"
-
-set -x
-
-###
 ###  classic bootstrap stuff
 ###
 
