@@ -1295,7 +1295,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
         if( ( p_pcr_stream->state.i_pes_dts > 0 &&
               p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->state.i_pes_dts +
               p_pcr_stream->state.i_pes_length ) ||
-            p_data->i_dts < p_stream->state.i_pes_dts ||
+            p_data->i_dts + i_shaping_delay < p_stream->state.i_pes_dts ||
             ( p_stream->state.i_pes_dts > 0 &&
               p_input->p_fmt->i_cat != SPU_ES &&
               p_data->i_dts - 10 * CLOCK_FREQ > p_stream->state.i_pes_dts +
