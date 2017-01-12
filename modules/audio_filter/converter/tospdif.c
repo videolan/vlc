@@ -66,7 +66,7 @@ struct filter_sys_t
         {
             unsigned int i_frame_count;
         } truehd;
-    } spec;
+    };
 };
 
 #define SPDIF_HEADER_SIZE 8
@@ -257,13 +257,13 @@ static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
         {
             /* cf. Annex E 2.3.1.2 of AC3 spec */
             if( a52.eac3.i_substreamid == 0 )
-                p_sys->spec.eac3.i_nb_blocks_substream0
+                p_sys->eac3.i_nb_blocks_substream0
                     += a52.i_blocks_per_sync_frame;
 
-            if( p_sys->spec.eac3.i_nb_blocks_substream0 != 6 )
+            if( p_sys->eac3.i_nb_blocks_substream0 != 6 )
                 return SPDIF_MORE_DATA;
             else
-                p_sys->spec.eac3.i_nb_blocks_substream0 = 0;
+                p_sys->eac3.i_nb_blocks_substream0 = 0;
         }
         write_finalize( p_filter, IEC61937_EAC3, 1 /* in bytes */ );
         return SPDIF_SUCCESS;
@@ -293,7 +293,7 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
         return SPDIF_ERROR;
 
     int i_padding = 0;
-    if( p_sys->spec.truehd.i_frame_count == 0 )
+    if( p_sys->truehd.i_frame_count == 0 )
     {
         static const char p_mat_start_code[20] = {
             0x07, 0x9E, 0x00, 0x03, 0x84, 0x01, 0x01, 0x01, 0x80, 0x00,
@@ -304,12 +304,12 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
         i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer - 20
                   - SPDIF_HEADER_SIZE;
     }
-    else if( p_sys->spec.truehd.i_frame_count == 11 )
+    else if( p_sys->truehd.i_frame_count == 11 )
     {
         /* The middle mat code need to be at the ((2560 * 12) - 4) offset */
         i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer - 4;
     }
-    else if( p_sys->spec.truehd.i_frame_count == 12 )
+    else if( p_sys->truehd.i_frame_count == 12 )
     {
         static const char p_mat_middle_code[12] = {
             0xC3, 0xC1, 0x42, 0x49, 0x3B, 0xFA,
@@ -318,7 +318,7 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
         write_data( p_filter, p_mat_middle_code, 12, true );
         i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer - ( 12 - 4 );
     }
-    else if( p_sys->spec.truehd.i_frame_count == 23 )
+    else if( p_sys->truehd.i_frame_count == 23 )
     {
         static const char p_mat_end_code[16] = {
             0xC3, 0xC2, 0xC0, 0xC4, 0x00, 0x00, 0x00, 0x00,
@@ -336,7 +336,7 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
         write_padding( p_filter, i_padding );
         write_data( p_filter, p_mat_end_code, 16, true );
         write_finalize( p_filter, IEC61937_TRUEHD, 1 /* in bytes */ );
-        p_sys->spec.truehd.i_frame_count = 0;
+        p_sys->truehd.i_frame_count = 0;
         return SPDIF_SUCCESS;
     }
     else
@@ -348,7 +348,7 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
 
     write_buffer( p_filter, p_in_buf );
     write_padding( p_filter, i_padding );
-    p_sys->spec.truehd.i_frame_count++;
+    p_sys->truehd.i_frame_count++;
     return SPDIF_MORE_DATA;
 }
 
@@ -413,7 +413,17 @@ static void Flush( filter_t *p_filter )
         block_Release( p_sys->p_out_buf );
         p_sys->p_out_buf = NULL;
     }
-    memset( &p_sys->spec, 0, sizeof( p_sys->spec ) );
+    switch( p_filter->fmt_in.audio.i_format )
+    {
+        case VLC_CODEC_TRUEHD:
+            p_sys->truehd.i_frame_count = 0;
+            break;
+        case VLC_CODEC_EAC3:
+            p_sys->eac3.i_nb_blocks_substream0 = 0;
+            break;
+        default:
+            break;
+    }
 }
 
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
@@ -473,12 +483,9 @@ static int Open( vlc_object_t *p_this )
           p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB ) )
         return VLC_EGENERIC;
 
-    p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
+    p_sys = p_filter->p_sys = calloc( 1, sizeof(filter_sys_t) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
-    p_sys->p_out_buf = NULL;
-
-    memset( &p_sys->spec, 0, sizeof( p_sys->spec ) );
 
     p_filter->pf_audio_filter = DoWork;
     p_filter->pf_flush = Flush;
