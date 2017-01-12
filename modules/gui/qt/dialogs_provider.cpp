@@ -62,6 +62,7 @@
 #include <QApplication>
 #include <QSignalMapper>
 #include <QFileDialog>
+#include <QUrl>
 
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
@@ -125,7 +126,7 @@ QStringList DialogsProvider::getOpenURL( intf_thread_t* p_intf, QWidget *parent,
         res.append( url.toEncoded() );
 #else
     QStringList files = QFileDialog::getOpenFileNames( parent, caption, dir, filter, selectedFilter );
-    foreach ( const QString& file : files )
+    foreach ( const QString& file, files )
         res.append( toURI( toNativeSeparators( file ) ) );
 #endif
 

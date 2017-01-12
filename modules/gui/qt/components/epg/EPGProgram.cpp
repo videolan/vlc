@@ -66,7 +66,7 @@ void EPGProgram::setPosition( size_t i )
 
 void EPGProgram::activate()
 {
-    view->programActivated( sourceid );
+    view->activateProgram( sourceid );
 }
 
 void EPGProgram::pruneEvents( const QDateTime &date )
