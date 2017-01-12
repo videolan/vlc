@@ -24,7 +24,6 @@ EXTRA_DIST = \
 	nls.m4 \
 	po.m4 \
 	printf-posix.m4 \
-	private.m4 \
 	progtest.m4 \
 	size_max.m4 \
 	stdcxx_11.m4 \
