@@ -1,9 +1,9 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.1.2
+LIBARCHIVE_VERSION := 3.2.2
 LIBARCHIVE_URL := http://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
-ifeq ($(call need_pkg,"libarchive >= 3.1.0"),)
+ifeq ($(call need_pkg,"libarchive >= 3.2.0"),)
 PKGS_FOUND += libarchive
 endif
 
@@ -22,7 +22,7 @@ libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 
 .libarchive: libarchive
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
-		--disable-bsdcpio --disable-bsdtar --without-nettle --without-bz2lib \
+		--disable-bsdcpio --disable-bsdtar --without-nettle \
 		--without-xml2 --without-lzmadec --without-iconv --without-expat
 	cd $< && $(MAKE) install
 	touch $@
