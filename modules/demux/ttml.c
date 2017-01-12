@@ -66,7 +66,27 @@ struct demux_sys_t
     } times;
 };
 
-static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node )
+static char *tt_genTiming( int64_t i_time )
+{
+    if( i_time < 0 )
+        i_time = 0;
+    char *psz;
+    unsigned h, m, s, f;
+    f = (i_time % CLOCK_FREQ) / 10000;
+    i_time /= CLOCK_FREQ;
+    h = i_time / 3600;
+    m = (i_time - h) / 3600;
+    s = (i_time - h - m);
+
+    if( asprintf( &psz, "%2.2u:%2.2u:%2.2u.%2.2u",
+                        h, m, s, f ) < 0 )
+        psz = NULL;
+
+    return psz;
+}
+
+static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node,
+                                      int64_t i_splicetime )
 {
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
     for( int i = 0; i < p_attr_dict->i_size; ++i )
@@ -74,9 +94,36 @@ static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_n
         for ( vlc_dictionary_entry_t* p_entry = p_attr_dict->p_entries[i];
                                       p_entry != NULL; p_entry = p_entry->p_next )
         {
+            const char *psz_value = NULL;
+            char *psz_alloc = NULL;
+
+            if( !strcmp(p_entry->psz_key, "begin") )
+            {
+                if( p_node->timings.i_begin != -1 )
+                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_begin - i_splicetime );
+            }
+            else if( !strcmp(p_entry->psz_key, "end") )
+            {
+                if( p_node->timings.i_end != -1 )
+                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_end - i_splicetime );
+            }
+            else if( !strcmp(p_entry->psz_key, "dur") )
+            {
+                /* remove */
+                continue;
+            }
+            else
+            {
+                psz_value = (char const*)p_entry->p_value;
+            }
+
+            if( psz_value == NULL )
+                continue;
+
             vlc_memstream_printf( p_stream, " %s=\"%s\"",
-                                  p_entry->psz_key,
-                                  (char const*)p_entry->p_value );
+                                  p_entry->psz_key, psz_value );
+
+            free( psz_alloc );
         }
     }
 }
@@ -95,7 +142,7 @@ static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
         vlc_memstream_putc( p_stream, '<' );
         vlc_memstream_puts( p_stream, p_node->psz_node_name );
 
-        tt_node_AttributesToText( p_stream, p_node );
+        tt_node_AttributesToText( p_stream, p_node, i_playbacktime );
 
         if( tt_node_HasChild( p_node ) )
         {
