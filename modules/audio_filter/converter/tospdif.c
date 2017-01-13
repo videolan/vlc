@@ -99,7 +99,7 @@ static bool is_big_endian( filter_t *p_filter, block_t *p_in_buf )
     }
 }
 
-static inline void write_16( filter_t *p_filter, void *p_buf, uint16_t i_val )
+static void set_16( filter_t *p_filter, void *p_buf, uint16_t i_val )
 {
     if( p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB )
         SetWBE( p_buf, i_val );
@@ -142,7 +142,7 @@ static void write_data( filter_t *p_filter, const void *p_buf, size_t i_size,
     {
         assert( p_sys->p_out_buf->i_buffer - p_sys->i_out_offset >= 2 );
         p_out += ( i_size & ~1 );
-        write_16( p_filter, p_out, p_in[i_size - 1] << 8 );
+        set_16( p_filter, p_out, p_in[i_size - 1] << 8 );
         p_sys->i_out_offset += 2;
     }
 }
@@ -186,11 +186,11 @@ static void write_finalize( filter_t *p_filter, uint16_t i_data_type,
         assert( p_sys->i_out_offset > SPDIF_HEADER_SIZE );
         assert( i_length_mul == 1 || i_length_mul == 8 );
 
-        write_16( p_filter, &p_out[0], 0xf872 ); /* syncword 1 */
-        write_16( p_filter, &p_out[2], 0x4e1f ); /* syncword 2 */
-        write_16( p_filter, &p_out[4], i_data_type ); /* data type */
+        set_16( p_filter, &p_out[0], 0xf872 ); /* syncword 1 */
+        set_16( p_filter, &p_out[2], 0x4e1f ); /* syncword 2 */
+        set_16( p_filter, &p_out[4], i_data_type ); /* data type */
         /* length in bits or bytes */
-        write_16( p_filter, &p_out[6],
+        set_16( p_filter, &p_out[6],
                   ( p_sys->i_out_offset - SPDIF_HEADER_SIZE ) * i_length_mul );
     }
 
