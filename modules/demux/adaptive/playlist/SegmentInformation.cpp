@@ -197,6 +197,9 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
             if( i_delay == 0 || i_delay > getPlaylist()->timeShiftBufferDepth.Get() )
                  i_delay = getPlaylist()->timeShiftBufferDepth.Get();
 
+            if( i_delay < getPlaylist()->getMinBuffering() )
+                i_delay = getPlaylist()->getMinBuffering();
+
             const uint64_t startnumber = mediaSegmentTemplate->startNumber.Get();
             end = mediaSegmentTemplate->getCurrentLiveTemplateNumber();
 
