@@ -385,12 +385,11 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 block_SkipByte( &p_sys->bytestream );
                 break;
             }
-            p_sys->i_state = STATE_SEND_DATA;
+            p_sys->i_state = STATE_GET_DATA;
             break;
 
         case STATE_GET_DATA:
-            /* Make sure we have enough data.
-             * (Not useful if we went through NEXT_SYNC) */
+            /* Make sure we have enough data. */
             if( block_WaitBytes( &p_sys->bytestream, p_sys->i_frame_size ) )
             {
                 /* Need more data */
