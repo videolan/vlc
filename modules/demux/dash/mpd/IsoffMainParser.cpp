@@ -124,6 +124,10 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
     it = attr.find("timeShiftBufferDepth");
         if(it != attr.end())
             mpd->timeShiftBufferDepth.Set(IsoTime(it->second) * CLOCK_FREQ);
+
+    it = attr.find("suggestedPresentationDelay");
+    if(it != attr.end())
+        mpd->suggestedPresentationDelay.Set(IsoTime(it->second) * CLOCK_FREQ);
 }
 
 void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)

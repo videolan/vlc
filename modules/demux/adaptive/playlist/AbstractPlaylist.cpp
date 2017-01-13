@@ -45,6 +45,7 @@ AbstractPlaylist::AbstractPlaylist (vlc_object_t *p_object_) :
     maxSegmentDuration.Set( 0 );
     minBufferTime = 0;
     timeShiftBufferDepth.Set( 0 );
+    suggestedPresentationDelay.Set( 0 );
 }
 
 AbstractPlaylist::~AbstractPlaylist()

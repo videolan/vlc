@@ -192,11 +192,15 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         /* Else compute, current time and timeshiftdepth based */
         else if( mediaSegmentTemplate->duration.Get() )
         {
-            const mtime_t i_buffer_depth = getPlaylist()->timeShiftBufferDepth.Get();
+            mtime_t i_delay = getPlaylist()->suggestedPresentationDelay.Get();
+
+            if( i_delay == 0 || i_delay > getPlaylist()->timeShiftBufferDepth.Get() )
+                 i_delay = getPlaylist()->timeShiftBufferDepth.Get();
+
             const uint64_t startnumber = mediaSegmentTemplate->startNumber.Get();
             end = mediaSegmentTemplate->getCurrentLiveTemplateNumber();
 
-            const uint64_t count = timescale.ToScaled( i_buffer_depth ) / mediaSegmentTemplate->duration.Get();
+            const uint64_t count = timescale.ToScaled( i_delay ) / mediaSegmentTemplate->duration.Get();
             if( startnumber + count >= end )
                 start = startnumber;
             else
