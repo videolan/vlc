@@ -1097,6 +1097,16 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_HNM4_VIDEO, "Cryo Interactive Entertainment HNM4"),
 
     B(VLC_CODEC_CINEFORM, "CineForm" ),
+
+    B(VLC_CODEC_SPEEDHQ, "NewTek SpeedHQ" ),
+        A("SHQ0"),
+        A("SHQ1"),
+        A("SHQ2"),
+        A("SHQ3"),
+        A("SHQ4"),
+        A("SHQ5"),
+        A("SHQ7"),
+        A("SHQ9"),
 };
 
 static const staticentry_t p_list_audio[] = {

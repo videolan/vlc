@@ -279,6 +279,9 @@ static const struct
     /* ffmpeg only: AV_CODEC_ID_SNOW */
     /* ffmpeg only: AV_CODEC_ID_SMVJPEG */
 
+#if LIBAVCODEC_VERSION_CHECK( 57, 71, 101, 999, 999 )
+    { VLC_CODEC_SPEEDHQ, AV_CODEC_ID_SPEEDHQ, VIDEO_ES },
+#endif
 
     /*
      *  Audio Codecs

@@ -181,6 +181,7 @@
 #define VLC_CODEC_HAP             VLC_FOURCC('H','A','P','1')
 #define VLC_CODEC_DXV             VLC_FOURCC('D','X','D','3')
 #define VLC_CODEC_CINEFORM        VLC_FOURCC('C','F','H','D')
+#define VLC_CODEC_SPEEDHQ         VLC_FOURCC('S','H','Q','2')
 
 /***********
  * Chromas
