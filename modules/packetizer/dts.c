@@ -240,13 +240,12 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                     block_SkipByte( &p_sys->bytestream );
                     break;
                 }
-                p_sys->i_state = STATE_SEND_DATA;
+                p_sys->i_state = STATE_GET_DATA;
             }
             break;
 
         case STATE_GET_DATA:
-            /* Make sure we have enough data.
-             * (Not useful if we went through NEXT_SYNC) */
+            /* Make sure we have enough data. */
             if( block_WaitBytes( &p_sys->bytestream,
                                  p_sys->dts.i_frame_size ) != VLC_SUCCESS )
             {
@@ -259,8 +258,10 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->dts.b_substream  )
             {
                 /* FIXME: DTSHD is ignored for now */
-                block_SkipBytes( &p_sys->bytestream, p_sys->dts.i_frame_size );
                 p_sys->i_state = STATE_NOSYNC;
+                if( block_SkipBytes( &p_sys->bytestream,
+                                     p_sys->dts.i_frame_size ) != VLC_SUCCESS )
+                    return NULL;
                 break;
             }
 
