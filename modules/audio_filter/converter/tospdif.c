@@ -355,17 +355,15 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
 static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
 {
     uint16_t i_data_type;
-    if( p_in_buf->i_nb_samples == 0 )
-    {
-        /* Input is not correctly packetizer. Try to parse the buffer in order
-         * to get the mandatory informations to play DTS over S/PDIF */
-        vlc_dts_header_t header;
-        if( vlc_dts_header_Parse( &header, p_in_buf->p_buffer,
-                                  p_in_buf->i_buffer ) != VLC_SUCCESS )
-            return SPDIF_ERROR;
-        p_in_buf->i_nb_samples = header.i_frame_length;
-        p_in_buf->i_buffer = header.i_frame_size;
-    }
+
+    /* Only send the DTS core part */
+    vlc_dts_header_t core;
+    if( vlc_dts_header_Parse( &core, p_in_buf->p_buffer,
+                              p_in_buf->i_buffer ) != VLC_SUCCESS )
+        return SPDIF_ERROR;
+    p_in_buf->i_nb_samples = core.i_frame_length;
+    p_in_buf->i_buffer = core.i_frame_size;
+
     switch( p_in_buf->i_nb_samples )
     {
     case  512:
