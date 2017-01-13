@@ -1144,12 +1144,15 @@ static void Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia60
         {
             if( b_newregion )
             {
-                p_region = SubpictureUpdaterSysRegionNew();
-                if( !p_region )
+                subpicture_updater_sys_region_t *p_newregion;
+                p_newregion = SubpictureUpdaterSysRegionNew();
+                if( !p_newregion )
                 {
                     text_segment_ChainDelete( p_segments );
                     return;
                 }
+                SubpictureUpdaterSysRegionAdd( p_region, p_newregion );
+                p_region = p_newregion;
                 pp_last = &p_region->p_segments;
                 b_newregion = false;
             }
