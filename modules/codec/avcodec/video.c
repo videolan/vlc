@@ -81,7 +81,6 @@ struct decoder_sys_t
     vlc_sem_t sem_mt;
 };
 
-#ifdef HAVE_AVCODEC_MT
 static inline void wait_mt(decoder_sys_t *sys)
 {
     vlc_sem_wait(&sys->sem_mt);
@@ -91,10 +90,6 @@ static inline void post_mt(decoder_sys_t *sys)
 {
     vlc_sem_post(&sys->sem_mt);
 }
-#else
-# define wait_mt(s) ((void)s)
-# define post_mt(s) ((void)s)
-#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -363,7 +358,6 @@ static int OpenVideoCodec( decoder_t *p_dec )
     if( ret < 0 )
         return ret;
 
-#ifdef HAVE_AVCODEC_MT
     switch( p_sys->p_context->active_thread_type )
     {
         case FF_THREAD_FRAME:
@@ -383,7 +377,6 @@ static int OpenVideoCodec( decoder_t *p_dec )
                       p_sys->p_context->thread_count );
             break;
     }
-#endif
     return 0;
 }
 
@@ -477,7 +470,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_context->refcounted_frames = true;
     p_context->opaque = p_dec;
 
-#ifdef HAVE_AVCODEC_MT
     int i_thread_count = var_InheritInteger( p_dec, "avcodec-threads" );
     if( i_thread_count <= 0 )
     {
@@ -515,7 +507,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     if( p_context->thread_type & FF_THREAD_FRAME )
         p_dec->i_extra_picture_buffers = 2 * p_context->thread_count;
-#endif
 
     /* ***** misc init ***** */
     p_sys->i_pts = VLC_TS_INVALID;

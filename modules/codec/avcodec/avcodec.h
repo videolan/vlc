@@ -242,7 +242,3 @@ void ffmpeg_CloseCodec( decoder_t *p_dec );
 #   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
 #endif
 
-#if defined(FF_THREAD_FRAME)
-#   define HAVE_AVCODEC_MT
-#endif
-
