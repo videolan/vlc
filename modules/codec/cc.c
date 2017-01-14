@@ -322,7 +322,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         {
             Flush( p_dec );
             /* clear flags, as we might process it more than once */
-            p_sys->p_block->i_flags ^= (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED);
+            p_sys->p_block->i_flags &= ~(BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED);
             continue;
         }
 
