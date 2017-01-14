@@ -5,7 +5,6 @@ $Id$
  * access_alsa: Alsa access module
  * access_archive: libarchive based access and stream filter
  * access_concat: concatenated access
- * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_imem: memory bitstream access module
  * access_jack: JACK audio input module
  * access_mms: MMS over TCP, UDP and HTTP access module
@@ -36,8 +35,8 @@ $Id$
  * amem: audio memory output
  * anaglyph: anaglyph 3d video filter
  * android_audiotrack: audio output for Android, based on AudioTrack
+ * android_display: Android native window provider module
  * android_logger: logger output to native Android logs (adb logcat)
- * android_native_window: Android native window provider module
  * android_window: Android direct/undirect rendering video output
  * antiflicker: anti-flicker video filter
  * aom: AOM decoder (AV1)
