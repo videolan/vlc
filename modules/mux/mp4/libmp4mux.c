@@ -1467,6 +1467,11 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
     uint32_t        i_movie_timescale = 90000;
     int64_t         i_timestamp = get_timestamp();
 
+    /* Important for smooth streaming where its (not muxed here) media time offsets
+     * are in timescale == track timescale */
+    if( i_tracks == 1 )
+        i_movie_timescale = pp_tracks[0]->i_timescale;
+
     moov = box_new("moov");
     if(!moov)
         return NULL;
