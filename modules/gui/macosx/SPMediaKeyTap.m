@@ -291,7 +291,7 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 {
     NSValue *psnv = [NSValue valueWithBytes:&psn objCType:@encode(ProcessSerialNumber)];
 
-    NSDictionary *processInfo = (__bridge NSDictionary *)ProcessInformationCopyDictionary(
+    NSDictionary *processInfo = (__bridge_transfer NSDictionary *)ProcessInformationCopyDictionary(
         &psn,
         kProcessDictionaryIncludeAllInformationMask
     );
