@@ -2928,7 +2928,8 @@ static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
     uint32_t i_sample_pos_backup = p_track->i_sample;
     mp4_chunk_t *cchunk_backup = p_track->cchunk;
     p_track->cchunk = NULL;
-    mtime_t time_backup = p_track->i_time * p_track->i_timescale;
+    mtime_t time_backup = p_track->i_time;
+    uint32_t timescale_backup = p_track->i_timescale;
 
     /* Save previous format and ES */
     es_format_t fmtbackup;
@@ -2980,8 +2981,7 @@ static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
     /* Restore fragmented pos */
     p_track->cchunk = cchunk_backup;
     p_track->i_sample = i_sample_pos_backup;
-    if( p_track->i_timescale )
-        p_track->i_time = time_backup / p_track->i_timescale;
+    p_track->i_time = time_backup * (uint64_t) p_track->i_timescale / timescale_backup;
 }
 
 /****************************************************************************
