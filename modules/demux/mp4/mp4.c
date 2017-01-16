@@ -216,6 +216,22 @@ static MP4_Box_t * MP4_GetTrakByTrackID( MP4_Box_t *p_moov, const uint32_t i_id 
     return p_trak;
 }
 
+static MP4_Box_t * MP4_GetTrafByTrackID( MP4_Box_t *p_moof, const uint32_t i_id )
+{
+    MP4_Box_t *p_traf = MP4_BoxGet( p_moof, "traf" );
+    MP4_Box_t *p_tfhd;
+    while( p_traf )
+    {
+        if( p_traf->i_type == ATOM_traf &&
+            (p_tfhd = MP4_BoxGet( p_traf, "tfhd" )) && BOXDATA(p_tfhd) &&
+            BOXDATA(p_tfhd)->i_track_ID == i_id )
+                break;
+        else
+            p_traf = p_traf->p_next;
+    }
+    return p_traf;
+}
+
 static es_out_id_t * MP4_AddTrackES( es_out_t *out, mp4_track_t *p_track )
 {
     es_out_id_t *p_es = es_out_Add( out, &p_track->fmt );
@@ -5200,19 +5216,40 @@ static int DemuxAsLeaf( demux_t *p_demux )
                     {
                         msg_Info( p_demux, "Fragment sequence discontinuity detected %"PRIu32" != %"PRIu32,
                                   BOXDATA(p_mfhd)->i_sequence_number, p_sys->context.i_lastseqnumber + 1 );
-                        MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
-                        if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
+
+                        bool b_has_base_media_decode_time = false;
+                        for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
                         {
-                            mtime_t i_time_base = BOXDATA(p_sidx)->i_earliest_presentation_time;
-
-                            for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+                            mp4_track_t *p_track = &p_sys->track[i_track];
+                            MP4_Box_t *p_traf = MP4_GetTrafByTrackID( p_mooxbox, p_track->i_track_ID );
+                            if( p_traf )
                             {
-                                p_sys->track[i_track].i_time = i_time_base * p_sys->track[i_track].i_timescale
-                                                                           / BOXDATA(p_sidx)->i_timescale;
+                                MP4_Box_t *p_tfdt = MP4_BoxGet( p_traf, "tfdt" );
+                                if( p_tfdt )
+                                {
+                                    p_track->i_time = BOXDATA(p_tfdt)->i_base_media_decode_time *
+                                                      p_track->i_timescale / p_sys->i_timescale;
+                                    b_has_base_media_decode_time = true;
+                                }
                             }
+                        }
 
-                            p_sys->i_time = i_time_base * p_sys->i_timescale / BOXDATA(p_sidx)->i_timescale;
-                            p_sys->i_pcr  = VLC_TS_INVALID;
+                        if( !b_has_base_media_decode_time )
+                        {
+                            MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
+                            if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
+                            {
+                                mtime_t i_time_base = BOXDATA(p_sidx)->i_earliest_presentation_time;
+
+                                for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+                                {
+                                    p_sys->track[i_track].i_time = i_time_base * p_sys->track[i_track].i_timescale /
+                                                                   BOXDATA(p_sidx)->i_timescale;
+                                }
+
+                                p_sys->i_time = i_time_base * p_sys->i_timescale / BOXDATA(p_sidx)->i_timescale;
+                                p_sys->i_pcr  = VLC_TS_INVALID;
+                            }
                         }
                     }
                     p_sys->context.i_lastseqnumber = BOXDATA(p_mfhd)->i_sequence_number;
