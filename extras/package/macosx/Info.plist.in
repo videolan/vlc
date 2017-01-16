@@ -1380,7 +1380,7 @@
 		</dict>
 	</array>
 	<key>SUFeedURL</key>
-	<string>http://update.videolan.org/vlc/sparkle/vlc-intel64.xml</string>
+	<string>https://update.videolan.org/vlc/sparkle/vlc-intel64.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>NSAppTransportSecurity</key>
