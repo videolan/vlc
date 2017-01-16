@@ -521,12 +521,11 @@ void AbstractStream::setTimeOffset(mtime_t i_offset)
      * will start from zero from seek point */
     if(i_offset < 0) /* reset */
     {
-        fakeesout->setTimestampOffset(0);
+        fakeesout->setExpectedTimestampOffset(0);
     }
     else if(demuxer)
     {
-        if(demuxer->alwaysStartsFromZero())
-            fakeesout->setTimestampOffset(i_offset);
+        fakeesout->setExpectedTimestampOffset(i_offset);
     }
 }
 
