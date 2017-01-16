@@ -501,8 +501,10 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
         case DEMUX_CAN_PAUSE:
         {
-            vlc_mutex_locker locker(&cached.lock);
-            *(va_arg (args, bool *)) = ! cached.b_live;
+            /* Always return true then fail late.
+             * See demux.c/demux_vaControl,
+             * misleading and should be DEMUX_CAN_CONTROL_PAUSE */
+            *(va_arg (args, bool *)) = true;
             break;
         }
 
