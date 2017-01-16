@@ -222,6 +222,9 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
         if(streamIndexNode->hasAttribute("Language"))
             adaptSet->addLang(streamIndexNode->getAttributeValue("Language"));
 
+        if(streamIndexNode->hasAttribute("Name"))
+            adaptSet->description.Set(streamIndexNode->getAttributeValue("Name"));
+
         if(streamIndexNode->hasAttribute("TimeScale"))
             adaptSet->setTimescale(Integer<uint64_t>(streamIndexNode->getAttributeValue("TimeScale")));
 
