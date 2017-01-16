@@ -3931,7 +3931,7 @@ have_lirc="no"
 AS_IF([test "${enable_lirc}" = "yes"], [
   AC_CHECK_HEADER(lirc/lirc_client.h, [
     AC_CHECK_LIB(lirc_client, lirc_init, [
-      have_lirc="true"
+      have_lirc="yes"
     ])
   ])
 ])
