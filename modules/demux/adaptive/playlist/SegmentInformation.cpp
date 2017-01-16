@@ -343,12 +343,18 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
             return true;
         }
 
-        /* Note: incorrect for live */
         const stime_t duration = mediaSegmentTemplate->duration.Get();
-        *ret = mediaSegmentTemplate->startNumber.Get();
-        if(duration)
+        if( duration )
         {
-            *ret += timescale.ToScaled(time) / duration;
+            if( getPlaylist()->isLive() )
+            {
+                *ret = getLiveStartSegmentNumber( mediaSegmentTemplate->startNumber.Get() );
+            }
+            else
+            {
+                *ret = mediaSegmentTemplate->startNumber.Get();
+                *ret += timescale.ToScaled(time) / duration;
+            }
             return true;
         }
     }
