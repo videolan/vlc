@@ -1141,7 +1141,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
 #if 0
         msg_Dbg( p_demux, "tk(%i)=%"PRId64" mv=%"PRId64" pos=%"PRIu64, tk->i_track_ID,
                  MP4_TrackGetDTS( p_demux, tk ),
-                 MP4_GetMoviePTS( p_sys ), i_readpos );
+                 MP4_GetMoviePTS( p_demux->p_sys ), i_readpos );
 #endif
 
         i_samplessize = MP4_TrackGetReadSize( tk, &i_nb_samples );
