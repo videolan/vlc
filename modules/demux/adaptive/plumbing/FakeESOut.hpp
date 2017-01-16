@@ -41,11 +41,13 @@ namespace adaptive
             ~FakeESOut();
             es_out_t * getEsOut();
             void setTimestampOffset( mtime_t );
+            void setExpectedTimestampOffset(mtime_t);
             size_t esCount() const;
             bool hasSelectedEs() const;
             bool drain();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
+            void checkTimestampsStart(mtime_t);
 
             /* Used by FakeES ID */
             void recycle( FakeESOutID *id );
@@ -73,6 +75,8 @@ namespace adaptive
             CommandsQueue *commandsqueue;
             es_out_t *fakeesout;
             mtime_t timestamps_offset;
+            mtime_t timestamps_expected;
+            bool timestamps_check_done;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
     };

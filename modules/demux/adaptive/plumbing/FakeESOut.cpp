@@ -46,6 +46,8 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     commandsqueue = queue;
 
     timestamps_offset = 0;
+    timestamps_expected = 0;
+    timestamps_check_done = false;
     extrainfo = NULL;
     vlc_mutex_init(&lock);
 }
@@ -64,10 +66,20 @@ FakeESOut::~FakeESOut()
     vlc_mutex_destroy(&lock);
 }
 
+void FakeESOut::setExpectedTimestampOffset(mtime_t offset)
+{
+    vlc_mutex_lock(&lock);
+    timestamps_offset = 0;
+    timestamps_expected = offset;
+    timestamps_check_done = false;
+    vlc_mutex_unlock(&lock);
+}
+
 void FakeESOut::setTimestampOffset(mtime_t offset)
 {
     vlc_mutex_lock(&lock);
     timestamps_offset = offset;
+    timestamps_check_done = true;
     vlc_mutex_unlock(&lock);
 }
 
@@ -302,11 +314,29 @@ es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *
     return NULL;
 }
 
+void FakeESOut::checkTimestampsStart(mtime_t i_start)
+{
+    if( i_start == VLC_TS_INVALID )
+        return;
+
+    vlc_mutex_lock(&lock);
+    if( !timestamps_check_done )
+    {
+        if( i_start < CLOCK_FREQ ) /* Starts 0 */
+            timestamps_offset = timestamps_expected;
+        timestamps_check_done = true;
+    }
+    vlc_mutex_unlock(&lock);
+}
+
 int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
 {
     FakeESOut *me = (FakeESOut *) fakees->p_sys;
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
     assert(!es_id->scheduledForDeletion());
+
+    me->checkTimestampsStart( p_block->i_dts );
+
     mtime_t offset = me->getTimestampOffset();
     if( p_block->i_dts > VLC_TS_INVALID )
     {
