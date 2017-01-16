@@ -1497,6 +1497,10 @@ static int ThreadReinit(vout_thread_t *vout,
                         const vout_configuration_t *cfg)
 {
     video_format_t original;
+
+    vout->p->pause.is_on = false;
+    vout->p->pause.date  = VLC_TS_INVALID;
+
     if (VoutValidateFormat(&original, cfg->fmt)) {
         ThreadStop(vout, NULL);
         ThreadClean(vout);
