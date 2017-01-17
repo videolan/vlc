@@ -492,7 +492,10 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         buffer_duration = AOUT_MAX_PREPARE_TIME * 10;
     }
     else
+    {
+        hr = E_FAIL;
         goto error;
+    }
 
     hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
                                         pwf, &pwf_closest);
