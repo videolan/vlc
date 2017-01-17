@@ -513,12 +513,8 @@ static void MP4_GetInterleaving( demux_t *p_demux, uint64_t *pi_max_contiguous, 
         p_sys->track[i].i_chunk = 0;
 }
 
-static block_t * MP4_Block_Read( demux_t *p_demux, const mp4_track_t *p_track, int i_size )
+static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track, block_t *p_block )
 {
-    block_t *p_block = vlc_stream_Block( p_demux->s, i_size );
-    if ( !p_block )
-        return NULL;
-
     /* might have some encap */
     if( p_track->fmt.i_cat == SPU_ES )
     {
@@ -546,6 +542,10 @@ static block_t * MP4_Block_Read( demux_t *p_demux, const mp4_track_t *p_track, i
 
 static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_block )
 {
+    p_block = MP4_Block_Convert( p_demux, p_track, p_block );
+    if( p_block == NULL )
+        return;
+
     if ( p_track->b_chans_reorder )
     {
         aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
@@ -1176,7 +1176,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
             }
 
             /* now read pes */
-            if( !(p_block = MP4_Block_Read( p_demux, tk, i_samplessize )) )
+            if( !(p_block = vlc_stream_Block( p_demux->s, i_samplessize )) )
             {
                 msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)"
                                    ": Failed to read %d bytes sample at %"PRIu64,
@@ -4593,12 +4593,11 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
             return VLC_EGENERIC;
         }
 
-        block_t *p_block = MP4_Block_Read( p_demux, p_track, __MIN( len, INT32_MAX ) );
+        block_t *p_block = vlc_stream_Block( p_demux->s, len );
         uint32_t i_read = ( p_block ) ? p_block->i_buffer : 0;
         if( i_read < len )
         {
             /* update data left in mdat */
-            *pi_mdatlen -= chunk_size;
             *pi_mdatlen -= i_read;
             free( p_block );
             return VLC_EGENERIC;
@@ -4823,7 +4822,7 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
 
                 /* now read pes */
 
-                if( !(p_block = MP4_Block_Read( p_demux, p_track, i_samplessize )) )
+                if( !(p_block = vlc_stream_Block( p_demux->s, i_samplessize )) )
                 {
                     uint64_t i_pos = vlc_stream_Tell( p_demux->s );
                     p_sys->context.i_mdatbytesleft -= ( i_pos - i_current_pos );
