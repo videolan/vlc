@@ -247,6 +247,8 @@ static int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, M
             if( !strcmp(pch, "H264") )
             {
                 p_track->fmt.i_codec = VLC_CODEC_H264;
+                /* ******* sending AnnexB ! */
+                p_track->fmt.b_packetized = false;
             }
             else if( !strcmp(pch, "GSM") )
             {
