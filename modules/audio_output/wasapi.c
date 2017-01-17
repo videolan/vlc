@@ -472,18 +472,15 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     {
         vlc_SpdifToWave(pwfe, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
-        buffer_duration = AOUT_MAX_PREPARE_TIME * 10;
+        /* The max buffer duration in exclusive mode is 2 seconds */
+        buffer_duration = AOUT_MAX_PREPARE_TIME;
     }
     else if (AOUT_FMT_HDMI(&fmt))
     {
         vlc_HdmiToWave(&wf_iec61937, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
-
-        /* Less buffer duration for these very high sample rate codecs
-         * (IAudioClient_Initialize return an out of memory error if higher).
-         * It seems that the max buffer size for EXCLUSIVE/HDMI is 1MB (there
-         * is no such limitation for PCM). */
-        buffer_duration = CLOCK_FREQ * 10 * 1024 * 1024 / pwf->nAvgBytesPerSec;
+        /* The max buffer duration in exclusive mode is 2 seconds */
+        buffer_duration = AOUT_MAX_PREPARE_TIME;
     }
     else if (AOUT_FMT_LINEAR(&fmt))
     {
