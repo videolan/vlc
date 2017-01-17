@@ -519,6 +519,7 @@ static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track
     {
         switch( p_track->fmt.i_codec )
         {
+            case VLC_CODEC_TTML:
             case VLC_CODEC_TX3G:
             case VLC_CODEC_SPU:
             /* accept as-is */
@@ -3098,6 +3099,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         case( ATOM_tx3g ):
         case( ATOM_text ):
         case( ATOM_subp ):
+        case( ATOM_subt ): /* ttml */
         case( ATOM_sbtl ):
         case( ATOM_clcp ): /* closed captions */
             p_track->fmt.i_cat = SPU_ES;
