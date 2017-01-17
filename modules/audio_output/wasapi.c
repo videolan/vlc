@@ -53,6 +53,11 @@ DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DTS,
             WAVE_FORMAT_DTS_MS, 0x0000, 0x0010, 0x80, 0x00,
             0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 
+/* 0000000b-0cea-0010-8000-00aa00389b71 */
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD,
+            0x000b, 0x0cea, 0x0010, 0x80, 0x00,
+            0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+
 /* 0000000a-0cea-0010-8000-00aa00389b71 */
 DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS,
             0x000a, 0x0cea, 0x0010, 0x80, 0x00,
@@ -261,6 +266,12 @@ static void vlc_HdmiToWave(WAVEFORMATEXTENSIBLE_IEC61937 *restrict wf_iec61937,
 
     switch (audio->i_format)
     {
+    case VLC_CODEC_DTS:
+        wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD;
+        wf->Format.nChannels = 8;
+        wf->dwChannelMask = KSAUDIO_SPEAKER_7POINT1;
+        audio->i_rate = 768000;
+        break;
     case VLC_CODEC_EAC3:
         wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS;
         wf->Format.nChannels = 2;
@@ -438,8 +449,9 @@ static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
     return aout_CheckChannelReorder(chans_in, chans_out, mask, table);
 }
 
-static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
-                     const GUID *sid)
+
+static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
+                       const GUID *sid, bool force_dts_spdif)
 {
     static INIT_ONCE freq_once = INIT_ONCE_STATIC_INIT;
 
@@ -468,14 +480,27 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     REFERENCE_TIME buffer_duration;
     audio_sample_format_t fmt = *pfmt;
 
-    if (AOUT_FMT_SPDIF(&fmt))
+    bool b_spdif = AOUT_FMT_SPDIF(&fmt);
+    bool b_hdmi = AOUT_FMT_HDMI(&fmt);
+    if (b_spdif && !b_hdmi && fmt.i_format == VLC_CODEC_DTS && !force_dts_spdif
+     && fmt.i_rate >= 48000)
+    {
+        /* Try to configure the output rate (IEC958 rate) at 768kHz. Indeed,
+         * DTS-HD (and other DTS extensions like DTS-X) can only be transmitted
+         * at 768kHz. We'll also be able to transmit DTS-Core only at this
+         * rate. */
+        b_spdif = false;
+        b_hdmi = true;
+    }
+
+    if (b_spdif)
     {
         vlc_SpdifToWave(pwfe, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
         /* The max buffer duration in exclusive mode is 2 seconds */
         buffer_duration = AOUT_MAX_PREPARE_TIME;
     }
-    else if (AOUT_FMT_HDMI(&fmt))
+    else if (b_hdmi)
     {
         vlc_HdmiToWave(&wf_iec61937, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
@@ -499,6 +524,14 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     if (FAILED(hr))
     {
+        if (pfmt->i_format == VLC_CODEC_DTS && b_hdmi)
+        {
+            msg_Warn(s, "cannot negotiate DTS at 768khz IEC958 rate (HDMI), "
+                     "fallback to 48kHz (S/PDIF)");
+            IAudioClient_Release(sys->client);
+            free(sys);
+            return Restart(s, pfmt, sid, true);
+        }
         msg_Err(s, "cannot negotiate audio format (error 0x%lx)%s", hr,
                 hr == AUDCLNT_E_UNSUPPORTED_FORMAT
                 && fmt.i_format == VLC_CODEC_SPDIFL ?
@@ -568,6 +601,12 @@ error:
         IAudioClient_Release(sys->client);
     free(sys);
     return hr;
+}
+
+static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
+                     const GUID *sid)
+{
+    return Restart(s, pfmt, sid, false);
 }
 
 static void Stop(aout_stream_t *s)
