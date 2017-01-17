@@ -3107,11 +3107,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         case( ATOM_text ):
         case( ATOM_subp ):
         case( ATOM_sbtl ):
-            p_track->fmt.i_cat = SPU_ES;
-            break;
-
-        /* closed captions */
-        case( ATOM_clcp ):
+        case( ATOM_clcp ): /* closed captions */
             p_track->fmt.i_cat = SPU_ES;
             break;
 
