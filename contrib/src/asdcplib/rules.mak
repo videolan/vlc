@@ -1,6 +1,6 @@
 # asdcplib
 
-ASDCPLIB_VERSION := 1.12.58
+ASDCPLIB_VERSION := 2.7.19
 
 ASDCPLIB_URL := http://download.cinecert.com/asdcplib/asdcplib-$(ASDCPLIB_VERSION).tar.gz
 
@@ -16,11 +16,16 @@ $(TARBALLS)/asdcplib-$(ASDCPLIB_VERSION).tar.gz:
 
 asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz .sum-asdcplib
 	$(UNPACK)
+	$(APPLY) $(SRC)/asdcplib/port-to-nettle.patch
+	$(APPLY) $(SRC)/asdcplib/static-programs.patch
+	$(APPLY) $(SRC)/asdcplib/adding-pkg-config-file.patch
 	$(APPLY) $(SRC)/asdcplib/win32-cross-compilation.patch
 	$(MOVE)
 
 .asdcplib: asdcplib
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-freedist
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-freedist --enable-dev-headers
 	cd $< && $(MAKE) install
+	mkdir -p -- "$(PREFIX)/lib/pkgconfig"
+	cp $</asdcplib.pc "$(PREFIX)/lib/pkgconfig/"
 	touch $@

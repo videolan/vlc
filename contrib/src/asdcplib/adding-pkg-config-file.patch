@@ -1,0 +1,29 @@
+From 283142c645a906a64da4a8e9d6d619762a0c8305 Mon Sep 17 00:00:00 2001
+From: Aaron Boxer <boxerab@gmail.com>
+Date: Fri, 27 May 2016 19:25:38 -0400
+Subject: [PATCH 5/5] adding pkg-config file
+
+---
+ asdcplib.pc | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+ create mode 100644 asdcplib.pc
+
+diff --git a/asdcplib.pc b/asdcplib.pc
+new file mode 100644
+index 0000000..36fdd12
+--- /dev/null
++++ b/asdcplib.pc
+@@ -0,0 +1,10 @@
++prefix=/usr/local
++exec_prefix=${prefix}
++includedir=${prefix}/include
++libdir=${exec_prefix}/lib
++
++Name: asdcplib
++Description: The asdcp library
++Version: 2.5.14
++Cflags: -I${includedir}
++Libs: -L${libdir} -lasdcp -lkumu -lnettle -lgmp
+-- 
+2.11.0
+
