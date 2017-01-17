@@ -1167,36 +1167,23 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     return 1;
 }
 
-int SetupCCES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
-{
-    VLC_UNUSED(p_demux);
-
-    switch( p_sample->i_type )
-    {
-        case( ATOM_c608 ): /* EIA608 closed captions */
-        //case( ATOM_c708 ): /* EIA708 closed captions */
-            p_track->fmt.i_codec = VLC_CODEC_EIA608_1;
-            p_track->fmt.i_cat = SPU_ES;
-            break;
-        default:
-            return 0;
-    }
-
-    return 1;
-}
-
 int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
-    MP4_Box_data_sample_text_t *p_text = p_sample->data.p_sample_text;
-    if(!p_text)
-        return 0;
-
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
     {
+        case ATOM_c608: /* EIA608 closed captions */
+        //case ATOM_c708: /* EIA708 closed captions */
+            p_track->fmt.i_codec = VLC_CODEC_EIA608_1;
+            break;
+
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
         case( VLC_FOURCC( 't', 'x', '3', 'g' ) ):
         {
+            const MP4_Box_data_sample_text_t *p_text = p_sample->data.p_sample_text;
+            if(!p_text)
+                return 0;
+
             p_track->fmt.i_codec = VLC_CODEC_TX3G;
 
             if( p_text->i_display_flags & 0xC0000000 )

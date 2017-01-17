@@ -2652,16 +2652,9 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         break;
 
     case SPU_ES:
-        switch( p_sample->i_handler )
-        {
-            case ATOM_clcp:
-                if ( !SetupCCES( p_demux, p_track, p_sample ) )
-                    return VLC_EGENERIC;
-                break;
-            default:
-                if ( !SetupSpuES( p_demux, p_track, p_sample ) )
-                 return VLC_EGENERIC;
-        }
+        if ( !SetupSpuES( p_demux, p_track, p_sample ) )
+           return VLC_EGENERIC;
+        break;
 
     default:
         break;
