@@ -107,7 +107,7 @@ struct vlc_playlist_locker {
     vlc_playlist_locker( playlist_t* p_playlist )
         : p_playlist( p_playlist )
     {
-        playlist_Lock( p_playlist ); 
+        playlist_Lock( p_playlist );
     }
 
     ~vlc_playlist_locker()
