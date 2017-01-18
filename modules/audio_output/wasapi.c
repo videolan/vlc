@@ -282,6 +282,7 @@ static void vlc_HdmiToWave(WAVEFORMATEXTENSIBLE_IEC61937 *restrict wf_iec61937,
         wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP;
         wf->Format.nChannels = 8;
         wf->dwChannelMask = KSAUDIO_SPEAKER_7POINT1;
+        audio->i_rate = 768000;
         break;
     default:
         vlc_assert_unreachable();
