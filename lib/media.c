@@ -1194,6 +1194,7 @@ unsigned int libvlc_media_slaves_get( libvlc_media_t *p_md,
 {
     assert( p_md && ppp_slaves );
     input_item_t *p_input_item = p_md->p_input_item;
+    *ppp_slaves = NULL;
 
     vlc_mutex_lock( &p_input_item->lock );
 
@@ -1270,6 +1271,6 @@ void libvlc_media_slaves_release( libvlc_media_slave_t **pp_slaves,
         assert( pp_slaves );
         for( unsigned int i = 0; i < i_count; ++i )
             free( pp_slaves[i] );
-        free( pp_slaves );
     }
+    free( pp_slaves );
 }
