@@ -119,7 +119,7 @@ QStringList DialogsProvider::getOpenURL( intf_thread_t* p_intf, QWidget *parent,
 {
     QStringList res;
 
-#if HAS_QT52
+#if HAS_QT5
     QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
 
     foreach( const QUrl& url, urls )
@@ -139,7 +139,7 @@ QString DialogsProvider::getSaveFileName( QWidget *parent,
                                           const QString &filter,
                                           QString *selectedFilter )
 {
-#if HAS_QT52
+#if HAS_QT5
     QUrl url = QFileDialog::getSaveFileUrl( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
     return QString( url.toEncoded() );
 #else

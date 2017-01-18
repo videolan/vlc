@@ -273,7 +273,7 @@ void FileOpenPanel::updateMRL()
         }
     else
     {
-#if HAS_QT52
+#if HAS_QT5
         QList<QUrl> urls = dialogBox->selectedUrls();
         foreach( const QUrl &url, urls )
             fileList.append( url.toEncoded() );
