@@ -1334,7 +1334,10 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
     {
         UpnpInstanceWrapper* instance = new(std::nothrow) UpnpInstanceWrapper;
         if ( unlikely( !instance ) )
+        {
+            delete p_server_list;
             return NULL;
+        }
 
     #ifdef UPNP_ENABLE_IPV6
         char* psz_miface = var_InheritString( p_obj, "miface" );
@@ -1349,6 +1352,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
         {
             msg_Err( p_obj, "Initialization failed: %s", UpnpGetErrorMessage( i_res ) );
             delete instance;
+            delete p_server_list;
             return NULL;
         }
 
@@ -1360,6 +1364,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
         {
             msg_Err( p_obj, "Client registration failed: %s", UpnpGetErrorMessage( i_res ) );
             delete instance;
+            delete p_server_list;
             return NULL;
         }
 
@@ -1371,6 +1376,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
             msg_Err( p_obj, "Failed to set maximum content length: %s",
                     UpnpGetErrorMessage( i_res ));
             delete instance;
+            delete p_server_list;
             return NULL;
         }
         s_instance = instance;
