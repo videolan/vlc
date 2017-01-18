@@ -5308,7 +5308,7 @@ static int DemuxAsLeaf( demux_t *p_demux )
     for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
         const mp4_track_t *p_track = &p_sys->track[i_track];
-        if( !p_track->b_selected || ( p_track->fmt.i_cat != VIDEO_ES && p_track->fmt.i_cat != AUDIO_ES ) )
+        if( !p_track->b_selected || !p_track->b_ok )
             continue;
 
         i_lowest_time = __MIN( i_lowest_time, MP4_rescale( p_track->i_time, p_track->i_timescale, p_sys->i_timescale ) );
