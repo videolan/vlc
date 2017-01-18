@@ -66,6 +66,10 @@ struct filter_sys_t
         {
             unsigned int i_frame_count;
         } truehd;
+        struct
+        {
+            bool b_skip;
+        } dtshd;
     };
 };
 
@@ -77,6 +81,7 @@ struct filter_sys_t
 #define IEC61937_DTS1 0x0B
 #define IEC61937_DTS2 0x0C
 #define IEC61937_DTS3 0x0D
+#define IEC61937_DTSHD 0x11
 
 #define SPDIF_MORE_DATA 1
 #define SPDIF_SUCCESS VLC_SUCCESS
@@ -105,6 +110,17 @@ static void set_16( filter_t *p_filter, void *p_buf, uint16_t i_val )
         SetWBE( p_buf, i_val );
     else
         SetWLE( p_buf, i_val );
+}
+
+static void write_16( filter_t *p_filter, uint16_t i_val )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    assert( p_sys->p_out_buf != NULL );
+
+    assert( p_sys->p_out_buf->i_buffer - p_sys->i_out_offset
+            >= sizeof( uint16_t ) );
+    set_16( p_filter, &p_sys->p_out_buf->p_buffer[p_sys->i_out_offset], i_val );
+    p_sys->i_out_offset += sizeof( uint16_t );
 }
 
 static void write_padding( filter_t *p_filter, size_t i_size )
@@ -402,6 +418,86 @@ static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
     return SPDIF_SUCCESS;
 }
 
+/* Adapted from libavformat/spdifenc.c:
+ * DTS type IV (DTS-HD) can be transmitted with various frame repetition
+ * periods; longer repetition periods allow for longer packets and therefore
+ * higher bitrate. Longer repetition periods mean that the constant bitrate of
+ * the output IEC 61937 stream is higher.
+ * The repetition period is measured in IEC 60958 frames (4 bytes).
+ */
+static int dtshd_get_subtype( unsigned i_frame_length )
+{
+    switch( i_frame_length )
+    {
+        case 512:   return 0x0;
+        case 1024:  return 0x1;
+        case 2048:  return 0x2;
+        case 4096:  return 0x3;
+        case 8192:  return 0x4;
+        case 16384: return 0x5;
+        default:    return -1;
+    }
+}
+
+/* Adapted from libavformat/spdifenc.c: */
+static int write_buffer_dtshd( filter_t *p_filter, block_t *p_in_buf )
+{
+    static const char p_dtshd_start_code[10] = {
+        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfe, 0xfe
+    };
+    static const size_t i_dtshd_start_code = sizeof( p_dtshd_start_code );
+
+    filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_dts_header_t core;
+    if( vlc_dts_header_Parse( &core, p_in_buf->p_buffer,
+                              p_in_buf->i_buffer ) != VLC_SUCCESS )
+        return SPDIF_ERROR;
+    unsigned i_period = p_filter->fmt_out.audio.i_rate
+                      * core.i_frame_length / core.i_rate;
+
+    int i_subtype = dtshd_get_subtype( i_period );
+    if( i_subtype == -1 )
+        return SPDIF_ERROR;
+
+    size_t i_in_size = i_dtshd_start_code + 2 + p_in_buf->i_buffer;
+    size_t i_out_size = i_period * 4;
+    uint16_t i_data_type = IEC61937_DTSHD | i_subtype << 8;
+
+    if( p_filter->p_sys->dtshd.b_skip
+     || i_in_size + SPDIF_HEADER_SIZE > i_out_size )
+    {
+        /* The bitrate is too high, pass only the core part */
+        p_in_buf->i_buffer = core.i_frame_size;
+        i_in_size = i_dtshd_start_code + 2 + p_in_buf->i_buffer;
+        if( i_in_size + SPDIF_HEADER_SIZE > i_out_size )
+            return SPDIF_ERROR;
+
+        /* Don't try to send substreams anymore. That way, we avoid to switch
+         * back and forth between DTD and DTS-HD */
+        p_filter->p_sys->dtshd.b_skip = true;
+    }
+
+    if( write_init( p_filter, p_in_buf, i_out_size,
+                    i_out_size / p_filter->fmt_out.audio.i_bytes_per_frame ) )
+        return SPDIF_ERROR;
+
+    write_data( p_filter, p_dtshd_start_code, i_dtshd_start_code, true );
+    write_16( p_filter, p_in_buf->i_buffer );
+    write_buffer( p_filter, p_in_buf );
+
+    /* Align so that (length_code & 0xf) == 0x8. This is reportedly needed
+     * with some receivers, but the exact requirement is unconfirmed. */
+#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
+    size_t i_align = ALIGN( i_in_size + 0x8, 0x10 ) - 0x8;
+#undef ALIGN
+    if( i_align > i_in_size && i_align - i_in_size
+        <= p_sys->p_out_buf->i_buffer - p_sys->i_out_offset )
+        write_padding( p_filter, i_align - i_in_size );
+
+    write_finalize( p_filter, i_data_type, 1 /* in bytes */ );
+    return SPDIF_SUCCESS;
+}
+
 static void Flush( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -443,7 +539,13 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             i_ret = write_buffer_truehd( p_filter, p_in_buf );
             break;
         case VLC_CODEC_DTS:
-            i_ret = write_buffer_dts( p_filter, p_in_buf );
+            /* if the fmt_out is configured for a higher rate than 48kHz
+             * (IEC958 rate), use the DTS-HD framing to pass the DTS Core and
+             * or DTS substreams (like DTS-HD MA). */
+            if( p_filter->fmt_out.audio.i_rate > 48000 )
+                i_ret = write_buffer_dtshd( p_filter, p_in_buf );
+            else
+                i_ret = write_buffer_dts( p_filter, p_in_buf );
             break;
         default:
             vlc_assert_unreachable();
