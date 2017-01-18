@@ -365,8 +365,7 @@ void StandardPLPanel::popupAction( QAction *action )
         uris = THEDP->showSimpleOpen();
         if ( uris.isEmpty() ) return;
         uris.sort();
-        foreach( const QString &file, uris )
-            a.uris << qtu( toURI( toNativeSeparators( file ) ) );
+        a.uris = uris;
         action->setData( QVariant::fromValue( a ) );
         model->action( action, list );
         break;
