@@ -51,6 +51,10 @@
 #include <vlc_url.h>
 #include <vlc_aout.h>
 
+#ifdef _WIN32
+# define KM_WIN32
+#endif
+
 /* ASDCP headers */
 #include <AS_DCP.h>
 
