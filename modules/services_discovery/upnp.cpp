@@ -507,13 +507,12 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                     p_server->isSatIp = true;
                     if ( !addServer( p_server ) )
                         delete p_server;
-
-                    free(psz_satip_channellist);
                 } else {
                     msg_Warn( m_sd, "SAT>IP server '%s' did not provide a playlist", url.psz_host);
                 }
 
                 /* to comply with the SAT>IP specifications, we don't fallback on another channel list if this path failed */
+                free(psz_satip_channellist);
                 vlc_UrlClean( &url );
                 continue;
             }
