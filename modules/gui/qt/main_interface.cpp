@@ -814,7 +814,9 @@ void MainInterface::setVideoFullScreen( bool fs )
         /* To be sure window is on proper-screen in xinerama */
         if( !screenres.contains( pos() ) )
         {
-            msg_Dbg( p_intf, "Moving video to correct screen");
+            lastWinPosition = pos();
+            lastWinSize = size();
+            msg_Dbg( p_intf, "Moving video to correct position");
             move( QPoint( screenres.x(), screenres.y() ) );
         }
 
@@ -830,10 +832,16 @@ void MainInterface::setVideoFullScreen( bool fs )
     }
     else
     {
-        /* TODO do we want to restore screen and position ? (when
-         * qt-fullscreen-screennumber is forced) */
         setMinimalView( b_minimalView );
         setInterfaceFullScreen( b_interfaceFullScreen );
+        if( lastWinPosition.isNull() == false )
+        {
+            move( lastWinPosition );
+            resize( lastWinSize );
+            lastWinPosition = QPoint();
+            lastWinSize = QSize();
+        }
+
     }
     videoWidget->sync();
 }

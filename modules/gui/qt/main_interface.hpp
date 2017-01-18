@@ -156,6 +156,8 @@ protected:
 
     /* Status and flags */
     QWidget             *stackCentralOldWidget;
+    QPoint              lastWinPosition;
+    QSize               lastWinSize;  /// To restore the same window size when leaving fullscreen
 
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
