@@ -309,6 +309,8 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
         p_input_item = input_item_NewDirectory( desc->location.c_str(),
                                                 desc->friendlyName.c_str(),
                                                 ITEM_NET );
+        if ( !p_input_item )
+            return false;
 
         input_item_SetSetting( p_input_item, SATIP_SERVER_DEVICE_TYPE );
 
@@ -329,12 +331,13 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
         p_input_item = input_item_NewDirectory( psz_mrl,
                                                 desc->friendlyName.c_str(),
                                                 ITEM_NET );
+        free( psz_mrl );
+
+        if ( !p_input_item )
+            return false;
 
         input_item_SetSetting( p_input_item, MEDIA_SERVER_DEVICE_TYPE );
-        free( psz_mrl );
     }
-    if ( !p_input_item )
-        return false;
 
     if ( desc->iconUrl.empty() == false )
         input_item_SetArtworkURL( p_input_item, desc->iconUrl.c_str() );
