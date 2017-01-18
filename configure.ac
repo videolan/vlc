@@ -2269,27 +2269,6 @@ dnl
 dnl
 PKG_ENABLE_MODULES_VLC([MPG123], [mpg123], [libmpg123], [libmpg123 decoder support], [auto])
 
-
-AC_ARG_ENABLE(merge-ffmpeg,
-[  --enable-merge-ffmpeg   merge FFmpeg-based plugins (default disabled)],, [
-  enable_merge_ffmpeg="no"
-])
-AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
-
-AC_MSG_CHECKING([for libavutil variant])
-PKG_CHECK_EXISTS([libavutil], [
-  libavutil_version="$(${PKG_CONFIG} --modversion libavutil)"
-  libavutil_micro="${libavutil_version##*.}"
-  AS_IF([test ${libavutil_micro} -le 99], [
-    avfork="libav"
-  ], [
-    avfork="ffmpeg"
-  ])
-], [
-  avfork="none"
-])
-AC_MSG_RESULT([${avfork}])
-
 dnl
 dnl gstreamer stuff
 dnl
@@ -2313,6 +2292,26 @@ AM_CONDITIONAL([HAVE_GST_DECODE], [test "${have_gst_decode}" = "yes"])
 dnl
 dnl  avcodec decoder/encoder plugin
 dnl
+AC_ARG_ENABLE(merge-ffmpeg,
+[  --enable-merge-ffmpeg   merge FFmpeg-based plugins (default disabled)],, [
+  enable_merge_ffmpeg="no"
+])
+AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
+
+AC_MSG_CHECKING([for libavutil variant])
+PKG_CHECK_EXISTS([libavutil], [
+  libavutil_version="$(${PKG_CONFIG} --modversion libavutil)"
+  libavutil_micro="${libavutil_version##*.}"
+  AS_IF([test ${libavutil_micro} -le 99], [
+    avfork="libav"
+  ], [
+    avfork="ffmpeg"
+  ])
+], [
+  avfork="none"
+])
+AC_MSG_RESULT([${avfork}])
+
 AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 AS_IF([test "${enable_avcodec}" != "no"], [
