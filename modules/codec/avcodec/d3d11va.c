@@ -952,6 +952,19 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
         ID3D10Multithread_Release(pMultithread);
     }
 
+#if VLC_WINSTORE_APP
+    /* On the Xbox 1/S, any decoding of H264 with one dimension over 2304
+     * crashes totally the device */
+    if (codec_id == AV_CODEC_ID_H264 &&
+        (dx_sys->surface_width > 2304 || dx_sys->surface_height > 2304) &&
+        isXboxHardware((ID3D11Device*) dx_sys->d3ddev))
+    {
+        msg_Warn(va, "%dx%d resolution not supported by your hardware", dx_sys->surface_width, dx_sys->surface_height);
+        dx_sys->surface_count = 0;
+        return VLC_EGENERIC;
+    }
+#endif
+
     D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
     ZeroMemory(&viewDesc, sizeof(viewDesc));
     viewDesc.DecodeProfile = dx_sys->input;
