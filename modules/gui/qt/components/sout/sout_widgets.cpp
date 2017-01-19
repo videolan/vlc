@@ -70,6 +70,8 @@ SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( 
 void SoutInputBox::setMRL( const QString& mrl )
 {
     QUrl uri = QUrl::fromEncoded( mrl.toLatin1() );
+    QString type = uri.scheme();
+
     if( !uri.isValid() &&
         !mrl.startsWith("http") &&
         !mrl.startsWith("ftp") &&
@@ -82,10 +84,14 @@ void SoutInputBox::setMRL( const QString& mrl )
             sourceLine->setText( mrl );
         }
     }
+    else if ( type == "window" )
+    {
+        /* QUrl mangles X11 Window identifiers so use the raw mrl */
+        sourceLine->setText( mrl );
+    }
     else
     {
         sourceLine->setText( uri.toString() );
-        QString type = uri.scheme();
         if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
         sourceValueLabel->setText( type );
     }

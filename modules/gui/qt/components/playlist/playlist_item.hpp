@@ -32,7 +32,6 @@
 
 #include <QList>
 #include <QString>
-#include <QUrl>
 
 class AbstractPLItem
 {
@@ -57,7 +56,7 @@ protected:
     virtual AbstractPLItem *child( int id ) const = 0;
     void removeChild( AbstractPLItem *item );
     void clearChildren();
-    virtual QUrl getURI() const = 0;
+    virtual QString getURI() const = 0;
     virtual QString getTitle() const = 0;
     virtual bool readOnly() const = 0;
 
@@ -79,7 +78,7 @@ private:
     int id() const Q_DECL_OVERRIDE;
     input_item_t *inputItem() Q_DECL_OVERRIDE { return p_input; }
     AbstractPLItem *child( int id ) const Q_DECL_OVERRIDE { return children.value( id ); };
-    virtual QUrl getURI() const Q_DECL_OVERRIDE;
+    virtual QString getURI() const Q_DECL_OVERRIDE;
     virtual QString getTitle() const Q_DECL_OVERRIDE;
     virtual bool readOnly() const Q_DECL_OVERRIDE;
 

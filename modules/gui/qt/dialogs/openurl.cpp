@@ -35,7 +35,6 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QList>
-#include <QUrl>
 #include <QFile>
 #include <QLabel>
 

@@ -163,7 +163,7 @@ QString VLCModel::getURI( const QModelIndex &index ) const
 {
     AbstractPLItem *item = getItem( index );
     if ( !item ) return QString();
-    return item->getURI().toString();
+    return item->getURI();
 }
 
 input_item_t * VLCModel::getInputItem( const QModelIndex &index ) const

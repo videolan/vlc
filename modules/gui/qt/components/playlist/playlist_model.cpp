@@ -1048,7 +1048,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
         if( !item )
             return false;
 
-        char*  psz_path = vlc_uri2path( qtu( item->getURI().toString() ) );
+        char*  psz_path = vlc_uri2path( qtu( item->getURI() ) );
         free(  psz_path );
         return psz_path != NULL;
     }

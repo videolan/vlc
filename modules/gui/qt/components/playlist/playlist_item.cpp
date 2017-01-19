@@ -125,13 +125,13 @@ bool PLItem::operator< ( AbstractPLItem& other )
     return false;
 }
 
-QUrl PLItem::getURI() const
+QString PLItem::getURI() const
 {
     QString uri;
     vlc_mutex_lock( &p_input->lock );
     uri = QString( p_input->psz_uri );
     vlc_mutex_unlock( &p_input->lock );
-    return QUrl( uri );
+    return uri;
 }
 
 QString PLItem::getTitle() const

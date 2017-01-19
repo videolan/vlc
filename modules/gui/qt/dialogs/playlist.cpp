@@ -30,7 +30,6 @@
 
 #include "util/qt_dirs.hpp"
 
-#include <QUrl>
 #include <QMimeData>
 #include <QHBoxLayout>
 
