@@ -638,7 +638,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
-    p_sys->context.i_lastseqnumber = 1;
+    p_sys->context.i_lastseqnumber = UINT32_MAX;
 
     MP4_Fragments_Init( &p_sys->fragments );
 
@@ -5055,6 +5055,66 @@ static void MP4_GetDefaultSizeAndDuration( demux_t *p_demux,
     }
 }
 
+static void LeafCheckandSetMOOFOffset( demux_t *p_demux, MP4_Box_t *p_vroot, MP4_Box_t *p_moof )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    MP4_Box_t *p_mfhd = MP4_BoxGet( p_moof, "mfhd" );
+    if( p_mfhd && BOXDATA(p_mfhd) )
+    {
+        /* Detect and Handle Passive Seek */
+        if( p_sys->context.i_lastseqnumber + 1 != BOXDATA(p_mfhd)->i_sequence_number )
+        {
+            msg_Info( p_demux, "Fragment sequence discontinuity detected %"PRIu32" != %"PRIu32,
+                      BOXDATA(p_mfhd)->i_sequence_number, p_sys->context.i_lastseqnumber + 1 );
+
+            bool b_has_base_media_decode_time = false;
+            int64_t i_lowest_media_time = INT64_MAX;
+            for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+            {
+                mp4_track_t *p_track = &p_sys->track[i_track];
+                MP4_Box_t *p_traf = MP4_GetTrafByTrackID( p_moof, p_track->i_track_ID );
+                if( p_traf )
+                {
+                    MP4_Box_t *p_tfdt = MP4_BoxGet( p_traf, "tfdt" );
+                    if( p_tfdt )
+                    {
+                        p_track->i_time = MP4_rescale( BOXDATA(p_tfdt)->i_base_media_decode_time,
+                                                       p_sys->i_timescale, p_track->i_timescale );
+                        b_has_base_media_decode_time = true;
+                        if( BOXDATA(p_tfdt)->i_base_media_decode_time < i_lowest_media_time )
+                            i_lowest_media_time = BOXDATA(p_tfdt)->i_base_media_decode_time;
+                    }
+                }
+            }
+
+            if( i_lowest_media_time != INT64_MAX )
+                p_sys->i_time = i_lowest_media_time;
+
+            /* Try using SIDX as base offset.
+             * This can not work for global sidx but only when sent within each fragment (dash) */
+            if( p_vroot != NULL && !b_has_base_media_decode_time )
+            {
+                MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
+                if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
+                {
+                    mtime_t i_time_base = BOXDATA(p_sidx)->i_earliest_presentation_time;
+
+                    for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+                    {
+                        p_sys->track[i_track].i_time = MP4_rescale( i_time_base, BOXDATA(p_sidx)->i_timescale,
+                                                                    p_sys->track[i_track].i_timescale );
+                    }
+
+                    p_sys->i_time = MP4_rescale( i_time_base, BOXDATA(p_sidx)->i_timescale, p_sys->i_timescale );
+                }
+            }
+            p_sys->i_pcr  = VLC_TS_INVALID;
+        }
+        p_sys->context.i_lastseqnumber = BOXDATA(p_mfhd)->i_sequence_number;
+    }
+}
+
 static int LeafParseMDATwithMOOF( demux_t *p_demux, MP4_Box_t *p_moof )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -5208,52 +5268,6 @@ static int DemuxAsLeaf( demux_t *p_demux )
                     return VLC_DEMUXER_SUCCESS;
                 }
 
-                MP4_Box_t *p_mfhd = MP4_BoxGet( p_mooxbox, "mfhd" );
-                if( p_mfhd && BOXDATA(p_mfhd) )
-                {
-                    /* Detect and Handle Passive Seek */
-                    if( p_sys->context.i_lastseqnumber + 1 != BOXDATA(p_mfhd)->i_sequence_number )
-                    {
-                        msg_Info( p_demux, "Fragment sequence discontinuity detected %"PRIu32" != %"PRIu32,
-                                  BOXDATA(p_mfhd)->i_sequence_number, p_sys->context.i_lastseqnumber + 1 );
-
-                        bool b_has_base_media_decode_time = false;
-                        for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
-                        {
-                            mp4_track_t *p_track = &p_sys->track[i_track];
-                            MP4_Box_t *p_traf = MP4_GetTrafByTrackID( p_mooxbox, p_track->i_track_ID );
-                            if( p_traf )
-                            {
-                                MP4_Box_t *p_tfdt = MP4_BoxGet( p_traf, "tfdt" );
-                                if( p_tfdt )
-                                {
-                                    p_track->i_time = MP4_rescale( BOXDATA(p_tfdt)->i_base_media_decode_time,
-                                                                   p_sys->i_timescale, p_track->i_timescale );
-                                    b_has_base_media_decode_time = true;
-                                }
-                            }
-                        }
-
-                        if( !b_has_base_media_decode_time )
-                        {
-                            MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
-                            if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
-                            {
-                                mtime_t i_time_base = BOXDATA(p_sidx)->i_earliest_presentation_time;
-
-                                for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
-                                {
-                                    p_sys->track[i_track].i_time = MP4_rescale( i_time_base, BOXDATA(p_sidx)->i_timescale,
-                                                                                p_sys->track[i_track].i_timescale );
-                                }
-
-                                p_sys->i_time = MP4_rescale( i_time_base, BOXDATA(p_sidx)->i_timescale, p_sys->i_timescale );
-                                p_sys->i_pcr  = VLC_TS_INVALID;
-                            }
-                        }
-                    }
-                    p_sys->context.i_lastseqnumber = BOXDATA(p_mfhd)->i_sequence_number;
-                }
 
                 /* create fragment */
                 AddFragment( p_demux, p_mooxbox );
@@ -5293,6 +5307,7 @@ static int DemuxAsLeaf( demux_t *p_demux )
                 LeafParseMDATwithMOOV( p_demux );
             break;
             case ATOM_moof:
+                LeafCheckandSetMOOFOffset( p_demux, NULL, p_sys->context.p_fragment->p_moox );
                 LeafParseMDATwithMOOF( p_demux, p_sys->context.p_fragment->p_moox ); // BACKUP CHUNK!
             break;
         default:
