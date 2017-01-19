@@ -126,6 +126,11 @@ struct vout_display_sys_t
     vout_display_place_t place;
 };
 
+struct gl_sys
+{
+    CGLContextObj locked_ctx;
+    VLCOpenGLVideoView *glView;
+};
 
 static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 {
@@ -259,11 +264,18 @@ static int Open (vlc_object_t *this)
         if( unlikely( !sys->gl ) )
             goto error;
 
+        struct gl_sys *glsys = sys->gl->sys = malloc(sizeof(struct gl_sys));
+        if( unlikely( !sys->gl->sys ) )
+        {
+            vlc_object_release(sys->gl);
+            goto error;
+        }
+        glsys->locked_ctx = NULL;
+        glsys->glView = sys->glView;
         sys->gl->makeCurrent = OpenglLock;
         sys->gl->releaseCurrent = OpenglUnlock;
         sys->gl->swap = OpenglSwap;
         sys->gl->getProcAddress = OurGetProcAddress;
-        sys->gl->sys = sys;
 
         const vlc_fourcc_t *subpicture_chromas;
 
@@ -332,7 +344,11 @@ void Close (vlc_object_t *this)
         }
 
         if (sys->gl != NULL)
+        {
+            assert(((struct gl_sys *)sys->gl->sys)->locked_ctx == NULL);
+            free(sys->gl->sys);
             vlc_object_release(sys->gl);
+        }
 
         [sys->glView release];
 
@@ -478,13 +494,18 @@ static int Control (vout_display_t *vd, int query, va_list ap)
  *****************************************************************************/
 static int OpenglLock (vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
-    if (!sys->glView || ![sys->glView respondsToSelector:@selector(openGLContext)])
+    struct gl_sys *sys = gl->sys;
+    if (![sys->glView respondsToSelector:@selector(openGLContext)])
         return 1;
 
+    assert(sys->locked_ctx == NULL);
+
     NSOpenGLContext *context = [sys->glView openGLContext];
-    CGLError err = CGLLockContext ([context CGLContextObj]);
+    CGLContextObj cglcntx = [context CGLContextObj];
+
+    CGLError err = CGLLockContext (cglcntx);
     if (kCGLNoError == err) {
+        sys->locked_ctx = cglcntx;
         [context makeCurrentContext];
         return 0;
     }
@@ -493,13 +514,14 @@ static int OpenglLock (vlc_gl_t *gl)
 
 static void OpenglUnlock (vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
-    CGLUnlockContext ([[sys->glView openGLContext] CGLContextObj]);
+    struct gl_sys *sys = gl->sys;
+    CGLUnlockContext (sys->locked_ctx);
+    sys->locked_ctx = NULL;
 }
 
 static void OpenglSwap (vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
+    struct gl_sys *sys = gl->sys;
     [[sys->glView openGLContext] flushBuffer];
 }
 
