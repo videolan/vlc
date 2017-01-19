@@ -948,10 +948,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
 #ifdef HAVE_ID3D11VIDEODECODER
     if (is_d3d11_opaque(picture->format.i_chroma)) {
-        if( sys->context_lock != INVALID_HANDLE_VALUE )
-        {
-            WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
-        }
         D3D11_BOX box;
         picture_sys_t *p_sys = picture->p_sys;
         D3D11_TEXTURE2D_DESC texDesc;
@@ -973,11 +969,17 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         box.back = 1;
         box.front = 0;
 
+        if( sys->context_lock != INVALID_HANDLE_VALUE )
+        {
+            WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+        }
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
                                                   (ID3D11Resource*) sys->picQuad.pTexture,
                                                   0, 0, 0, 0,
                                                   (ID3D11Resource*) p_sys->texture,
                                                   p_sys->slice_index, &box);
+        if ( sys->context_lock != INVALID_HANDLE_VALUE)
+            ReleaseMutex( sys->context_lock );
     }
 #endif
 
@@ -1021,6 +1023,12 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+#ifdef HAVE_ID3D11VIDEODECODER
+    if (sys->context_lock != INVALID_HANDLE_VALUE && is_d3d11_opaque(picture->format.i_chroma))
+    {
+        WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+    }
+#endif
 
     FLOAT blackRGBA[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     ID3D11DeviceContext_ClearRenderTargetView(sys->d3dcontext, sys->d3drenderTargetView, blackRGBA);
