@@ -85,8 +85,7 @@ static char *tt_genTiming( int64_t i_time )
     return psz;
 }
 
-static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node,
-                                      int64_t i_splicetime )
+static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node )
 {
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
     for( int i = 0; i < p_attr_dict->i_size; ++i )
@@ -100,12 +99,12 @@ static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_n
             if( !strcmp(p_entry->psz_key, "begin") )
             {
                 if( p_node->timings.i_begin != -1 )
-                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_begin - i_splicetime );
+                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_begin );
             }
             else if( !strcmp(p_entry->psz_key, "end") )
             {
                 if( p_node->timings.i_end != -1 )
-                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_end - i_splicetime );
+                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_end );
             }
             else if( !strcmp(p_entry->psz_key, "dur") )
             {
@@ -142,7 +141,7 @@ static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
         vlc_memstream_putc( p_stream, '<' );
         vlc_memstream_puts( p_stream, p_node->psz_node_name );
 
-        tt_node_AttributesToText( p_stream, p_node, i_playbacktime );
+        tt_node_AttributesToText( p_stream, p_node );
 
         if( tt_node_HasChild( p_node ) )
         {
