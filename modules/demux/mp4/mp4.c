@@ -5305,6 +5305,8 @@ static int DemuxAsLeaf( demux_t *p_demux )
         {
             case ATOM_moov://[ftyp/moov, mdat]+ -> [moof, mdat]+
                 LeafParseMDATwithMOOV( p_demux );
+                if( p_sys->i_pcr < VLC_TS_0 ) /* empty moov, don't set pcr below because moof start could be > 0 */
+                    return VLC_DEMUXER_SUCCESS;
             break;
             case ATOM_moof:
                 LeafCheckandSetMOOFOffset( p_demux, NULL, p_sys->context.p_fragment->p_moox );
@@ -5314,28 +5316,27 @@ static int DemuxAsLeaf( demux_t *p_demux )
              msg_Err( p_demux, "fragment type %4.4s", (char*) &p_sys->context.p_fragment->p_moox->i_type );
              break;
         }
-    }
 
-    /* Get current time */
-    mtime_t i_lowest_dts = VLC_TS_INVALID;
-    mtime_t i_lowest_time = INT64_MAX;
-    for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
-    {
-        const mp4_track_t *p_track = &p_sys->track[i_track];
-        if( !p_track->b_selected || !p_track->b_ok )
-            continue;
+        /* Get current time */
+        mtime_t i_lowest_dts = INT64_MAX;
+        mtime_t i_lowest_time = INT64_MAX;
+        for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+        {
+            const mp4_track_t *p_track = &p_sys->track[i_track];
+            if( !p_track->b_selected || !p_track->b_ok )
+                continue;
 
-        i_lowest_time = __MIN( i_lowest_time, MP4_rescale( p_track->i_time, p_track->i_timescale, p_sys->i_timescale ) );
-
-        if ( i_lowest_dts == VLC_TS_INVALID )
-            i_lowest_dts = MP4_rescale( p_track->i_time, p_track->i_timescale, CLOCK_FREQ );
-        else
+            i_lowest_time = __MIN( i_lowest_time, MP4_rescale( p_track->i_time, p_track->i_timescale, p_sys->i_timescale ) );
             i_lowest_dts = __MIN( i_lowest_dts, MP4_rescale( p_track->i_time, p_track->i_timescale, CLOCK_FREQ ) );
-    }
+        }
 
-    p_sys->i_time = i_lowest_time;
-    p_sys->i_pcr = i_lowest_dts;
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+        if( INT64_MAX != i_lowest_time )
+        {
+            p_sys->i_time = i_lowest_time;
+            p_sys->i_pcr = i_lowest_dts;
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+        }
+    }
 
     return VLC_DEMUXER_SUCCESS;
 }
