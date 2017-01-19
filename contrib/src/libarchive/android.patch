@@ -1,0 +1,11 @@
+diff -ruN libarchive/Makefile.am libarchive.new/Makefile.am
+--- libarchive/Makefile.am	2016-10-24 04:20:30.000000000 +0200
++++ libarchive.new/Makefile.am	2017-01-19 12:58:42.433742303 +0100
+@@ -246,6 +246,7 @@
+ 
+ # -no-undefined marks that libarchive doesn't rely on symbols
+ # defined in the application.  This is mandatory for cygwin.
++libarchive_la_CPPFLAGS= -I$(top_srcdir)/contrib/android/include
+ libarchive_la_LDFLAGS= -no-undefined -version-info $(ARCHIVE_LIBTOOL_VERSION)
+ libarchive_la_LIBADD= $(LTLIBICONV)
+ 
