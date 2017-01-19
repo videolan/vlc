@@ -986,8 +986,9 @@ void MainInterface::dockPlaylist( bool p_docked )
         playlistVisible = playlistWidget->isVisible();
         stackCentralW->removeWidget( playlistWidget );
         dialog->importPlaylistWidget( playlistWidget );
+        if (THEMIM->getIM()->hasVideo())
+            showTab(videoWidget);
         if ( playlistVisible ) dialog->show();
-        restoreStackOldWidget();
     }
     else /* Previously undocked */
     {
