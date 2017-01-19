@@ -752,8 +752,6 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->session)
-        VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
     StopVideoToolbox(p_dec);
 
     vlc_mutex_destroy(&p_sys->lock);
@@ -1031,7 +1029,15 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     int i_ret = 0;
 
     if (!pp_block)
-        return NULL;
+    {
+        /* draining: return last pictures of the reordered queue */
+        if (p_sys->session)
+            VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
+        vlc_mutex_lock(&p_sys->lock);
+        picture_t *p_pic = PicReorder_pop(p_dec, true);
+        vlc_mutex_unlock(&p_sys->lock);
+        return p_pic;
+    }
 
     p_block = *pp_block;
 
