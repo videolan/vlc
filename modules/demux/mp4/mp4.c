@@ -2955,7 +2955,7 @@ static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
     {
         if( !es_format_IsSimilar( &fmtbackup, &p_track->fmt ) ||
             fmtbackup.i_extra != p_track->fmt.i_extra ||
-            memcmp( &fmtbackup.p_extra, &p_track->fmt.p_extra, fmtbackup.i_extra ) )
+            memcmp( fmtbackup.p_extra, p_track->fmt.p_extra, fmtbackup.i_extra ) )
         {
             if( p_es_backup )
                 es_out_Del( p_demux->out, p_es_backup );
