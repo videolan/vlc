@@ -181,14 +181,19 @@ void PlaylistManager::stop()
     }
 }
 
-static bool streamCompare(AbstractStream *a,  AbstractStream *b)
+struct PrioritizedAbstractStream
 {
-    AbstractStream::buffering_status ba = a->getLastBufferStatus();
-    AbstractStream::buffering_status bb = b->getLastBufferStatus();
-    if( ba >= bb ) /* Highest prio is higer value in enum */
+    AbstractStream::buffering_status status;
+    mtime_t demuxed_amount;
+    AbstractStream *st;
+};
+
+static bool streamCompare(PrioritizedAbstractStream a,  PrioritizedAbstractStream b)
+{
+    if( a.status >= b.status ) /* Highest prio is higer value in enum */
     {
-        if ( ba == bb ) /* Highest prio is lowest buffering */
-           return a->getDemuxedAmount() < b->getDemuxedAmount();
+        if ( a.status == b.status ) /* Highest prio is lowest buffering */
+           return a.demuxed_amount < b.demuxed_amount;
         else
             return true;
     }
@@ -201,13 +206,22 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
     AbstractStream::buffering_status i_return = AbstractStream::buffering_end;
 
     /* First reorder by status >> buffering level */
-    std::vector<AbstractStream *> prioritized_streams(streams);
+    std::vector<PrioritizedAbstractStream> prioritized_streams(streams.size());
+    std::vector<PrioritizedAbstractStream>::iterator it = prioritized_streams.begin();
+    std::vector<AbstractStream *>::iterator sit = streams.begin();
+    for( ; sit!=streams.end(); ++sit)
+    {
+        PrioritizedAbstractStream &p = *it;
+        p.st = *sit;
+        p.status = p.st->getLastBufferStatus();
+        p.demuxed_amount = p.st->getDemuxedAmount();
+        ++it;
+    }
     std::sort(prioritized_streams.begin(), prioritized_streams.end(), streamCompare);
 
-    std::vector<AbstractStream *>::iterator it;
     for(it=prioritized_streams.begin(); it!=prioritized_streams.end(); ++it)
     {
-        AbstractStream *st = *it;
+        AbstractStream *st = (*it).st;
 
         if (st->isDisabled() &&
             (!st->isSelected() || !st->canActivate() || !reactivateStream(st)))
