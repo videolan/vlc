@@ -704,15 +704,8 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
     }
 
     ttml_region_t *p_regions = ParseTTML( p_dec, p_block->p_buffer, p_block->i_buffer );
-    if( p_regions )
+    if( p_regions && ( p_spu = decoder_NewSubpictureText( p_dec ) ) )
     {
-        /* Create the subpicture unit */
-        p_spu = decoder_NewSubpictureText( p_dec );
-        if( !p_spu )
-        {
-            return NULL;
-        }
-
         p_spu->i_start    = p_block->i_pts;
         p_spu->i_stop     = p_block->i_pts + p_block->i_length;
         p_spu->b_ephemer  = (p_block->i_length == 0);
