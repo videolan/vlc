@@ -127,7 +127,6 @@ struct demux_sys_t
 static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool, bool );
 static void MP4_TrackDestroy( demux_t *, mp4_track_t * );
 
-static block_t * MP4_Block_Read( demux_t *, const mp4_track_t *, int );
 static void MP4_Block_Send( demux_t *, mp4_track_t *, block_t * );
 
 static int  MP4_TrackSelect ( demux_t *, mp4_track_t *, mtime_t );
