@@ -607,16 +607,8 @@ static char *DxDescribe(directx_sys_t *dx_sys)
         { 0, "" }
     };
 
-    IDXGIDevice *pDXGIDevice = NULL;
-    HRESULT hr = ID3D11Device_QueryInterface( (ID3D11Device*) dx_sys->d3ddev, &IID_IDXGIDevice, (void **)&pDXGIDevice);
-    if (FAILED(hr)) {
-       return NULL;
-    }
-
-    IDXGIAdapter *p_adapter;
-    hr = IDXGIDevice_GetAdapter(pDXGIDevice, &p_adapter);
-    if (FAILED(hr)) {
-        IDXGIDevice_Release(pDXGIDevice);
+    IDXGIAdapter *p_adapter = D3D11DeviceAdapter((ID3D11Device*) dx_sys->d3ddev);
+    if (!p_adapter) {
        return NULL;
     }
 
@@ -636,12 +628,10 @@ static char *DxDescribe(directx_sys_t *dx_sys)
                      adapterDesc.VendorId, vendor, adapterDesc.DeviceId, adapterDesc.Revision) < 0)
             return NULL;
         IDXGIAdapter_Release(p_adapter);
-        IDXGIDevice_Release(pDXGIDevice);
         return description;
     }
 
     IDXGIAdapter_Release(p_adapter);
-    IDXGIDevice_Release(pDXGIDevice);
     return NULL;
 }
 

@@ -1195,17 +1195,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    IDXGIDevice *pDXGIDevice = NULL;
-    hr = ID3D11Device_QueryInterface(sys->d3ddevice, &IID_IDXGIDevice, (void **)&pDXGIDevice);
+    dxgiadapter = D3D11DeviceAdapter(sys->d3ddevice);
     if (FAILED(hr)) {
-       msg_Err(vd, "Could not Query DXGI Interface. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-
-    hr = IDXGIDevice_GetAdapter(pDXGIDevice, &dxgiadapter);
-    IDXGIAdapter_Release(pDXGIDevice);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not get the DXGI Adapter. (hr=0x%lX)", hr);
+       msg_Err(vd, "Could not get the DXGI Adapter");
        return VLC_EGENERIC;
     }
 
