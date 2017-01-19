@@ -1,0 +1,37 @@
+Description: Add a pkg-config file for the shared libraries.
+Author: Benjamin Drung <bdrung@debian.org>
+
+diff --git a/Makefile.tail b/Makefile.tail
+--- a/Makefile.tail
++++ b/Makefile.tail
+@@ -22,7 +22,12 @@
+ 	@echo
+ 	@echo "For more information about this source code (including your obligations under the LGPL), please see our FAQ at http://live555.com/liveMedia/faq.html"
+ 
+-install:
++install_shared_libraries:
++	install -d $(DESTDIR)$(LIBDIR)/pkgconfig
++	sed "s#@PREFIX@#$(PREFIX)#;s#@LIBDIR@#$(LIBDIR)#;s#@VERSION@#$(VERSION)#" live555.pc.in > $(DESTDIR)$(LIBDIR)/pkgconfig/live555.pc
++	chmod 644 $(DESTDIR)$(LIBDIR)/pkgconfig/live555.pc
++
++install: $(INSTALL2)
+ 	cd $(LIVEMEDIA_DIR) ; $(MAKE) install
+ 	cd $(GROUPSOCK_DIR) ; $(MAKE) install
+ 	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE) install
+--- /dev/null	2017-01-19 15:35:15.538412775 +0100
++++ live.2016.07.19/live555.pc.in	2017-01-19 18:46:01.456059400 +0100
+@@ -0,0 +1,9 @@
++prefix=@PREFIX@
++libdir=@LIBDIR@
++includedir=${prefix}/include
++
++Name: live555
++Description: multimedia RTSP streaming library
++Version: @VERSION@
++Cflags: -I${includedir}/liveMedia -I${includedir}/groupsock -I${includedir}/BasicUsageEnvironment -I${includedir}/UsageEnvironment
++Libs: -L${libdir} -lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment
+--- live.2016.07.19/Makefile.head.orig	2017-01-19 18:47:50.376062631 +0100
++++ live.2016.07.19/Makefile.head	2017-01-19 18:48:09.940063212 +0100
+@@ -1 +1,2 @@
++VERSION = $(shell grep LIVEMEDIA_LIBRARY_VERSION_STRING liveMedia/include/liveMedia_version.hh | sed 's/.*"\([^"]*\)".*/\1/')
+ ##### Change the following for your environment:
