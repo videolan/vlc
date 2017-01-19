@@ -62,7 +62,7 @@ endif
 			&& $(MAKE) $(HOSTVARS) -C liveMedia \
 			&& $(MAKE) $(HOSTVARS) -C UsageEnvironment \
 			&& $(MAKE) $(HOSTVARS) -C BasicUsageEnvironment
-	mkdir -p -- "$(PREFIX)/lib" "$(PREFIX)/include"
+	mkdir -p -- "$(PREFIX)/lib" "$(PREFIX)/include/liveMedia"
 	cp \
 		$</groupsock/libgroupsock.a \
 		$</liveMedia/libliveMedia.a \
@@ -75,5 +75,5 @@ endif
 		$</liveMedia/include/*.hh \
 		$</UsageEnvironment/include/*.hh \
 		$</BasicUsageEnvironment/include/*.hh \
-		"$(PREFIX)/include/"
+		"$(PREFIX)/include/liveMedia"
 	touch $@
