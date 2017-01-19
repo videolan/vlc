@@ -23,6 +23,7 @@
 #ifndef VLC_VIDEOCHROMA_DXGI_FMT_H_
 #define VLC_VIDEOCHROMA_DXGI_FMT_H_
 
+#include <dxgi.h>
 #include <dxgiformat.h>
 
 #include <vlc_common.h>
@@ -44,5 +45,9 @@ extern const char *DxgiFormatToStr(DXGI_FORMAT format);
 extern vlc_fourcc_t DxgiFormatFourcc(DXGI_FORMAT format);
 extern const d3d_format_t *GetRenderFormatList(void);
 extern void DxgiFormatMask(DXGI_FORMAT format, video_format_t *);
+
+typedef struct ID3D11Device ID3D11Device;
+bool isXboxHardware(ID3D11Device *d3ddev);
+IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
 
 #endif /* include-guard */

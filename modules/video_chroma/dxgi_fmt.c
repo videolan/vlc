@@ -24,8 +24,13 @@
 # include "config.h"
 #endif
 
-#include "dxgi_fmt.h"
 #include <vlc_es.h>
+
+#define COBJMACROS
+#include <initguid.h>
+#include <d3d11.h>
+
+#include "dxgi_fmt.h"
 
 typedef struct
 {
@@ -118,4 +123,40 @@ void DxgiFormatMask(DXGI_FORMAT format, video_format_t *fmt)
         fmt->i_gmask = 0x00ff0000;
         fmt->i_bmask = 0xff000000;
     }
+}
+
+IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev)
+{
+    IDXGIDevice *pDXGIDevice = NULL;
+    HRESULT hr = ID3D11Device_QueryInterface(d3ddev, &IID_IDXGIDevice, (void **)&pDXGIDevice);
+    if (FAILED(hr)) {
+        return NULL;
+    }
+
+    IDXGIAdapter *p_adapter;
+    hr = IDXGIDevice_GetAdapter(pDXGIDevice, &p_adapter);
+    IDXGIDevice_Release(pDXGIDevice);
+    if (FAILED(hr)) {
+        return NULL;
+    }
+    return p_adapter;
+}
+
+bool isXboxHardware(ID3D11Device *d3ddev)
+{
+    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(d3ddev);
+    if (!p_adapter)
+        return NULL;
+
+    bool result = false;
+    DXGI_ADAPTER_DESC adapterDesc;
+    if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
+        if (adapterDesc.VendorId == 0 &&
+            adapterDesc.DeviceId == 0 &&
+            !wcscmp(L"ROOT\\SraKmd\\0000", adapterDesc.Description))
+            result = true;
+    }
+
+    IDXGIAdapter_Release(p_adapter);
+    return result;
 }
