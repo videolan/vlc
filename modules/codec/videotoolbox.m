@@ -114,6 +114,8 @@ struct decoder_sys_t
     CMVideoCodecType            codec;
     uint8_t                     i_nal_length_size;
 
+    bool                        b_vt_feed;
+    bool                        b_vt_flush;
     bool                        b_is_avcc;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
@@ -632,24 +634,27 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     return VLC_SUCCESS;
 }
 
-static void StopVideoToolboxSession(decoder_t *p_dec)
+static void StopVideoToolboxSession(decoder_t *p_dec, bool b_reset_format)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     VTDecompressionSessionInvalidate(p_sys->session);
     CFRelease(p_sys->session);
     p_sys->session = nil;
-    p_sys->b_format_propagated = false;
+    if (b_reset_format)
+        p_sys->b_format_propagated = false;
+
+    vlc_mutex_lock(&p_sys->lock);
+    PicReorder_flush(p_dec);
+    vlc_mutex_unlock(&p_sys->lock);
 }
 
 static void StopVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->session != nil) {
-        Flush(p_dec);
-        StopVideoToolboxSession(p_dec);
-    }
+    if (p_sys->session != nil)
+        StopVideoToolboxSession(p_dec, true);
 
     if (p_sys->videoFormatDescription != nil) {
         CFRelease(p_sys->videoFormatDescription);
@@ -665,16 +670,14 @@ static void StopVideoToolbox(decoder_t *p_dec)
     }
 }
 
-static void RestartVideoToolbox(decoder_t *p_dec)
+static void RestartVideoToolbox(decoder_t *p_dec, bool b_reset_format)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     msg_Dbg(p_dec, "Restarting decoder session");
 
     if (p_sys->session != nil)
-        StopVideoToolboxSession(p_dec);
-
-    Flush(p_dec);
+        StopVideoToolboxSession(p_dec, b_reset_format);
 
     if (StartVideoToolboxSession(p_dec) != VLC_SUCCESS) {
         msg_Warn(p_dec, "Decoder session restart failed");
@@ -712,6 +715,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
     p_sys->session = nil;
+    p_sys->b_vt_feed = false;
+    p_sys->b_vt_flush = false;
     p_sys->b_is_avcc = false;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = nil;
@@ -1014,9 +1019,10 @@ static void Flush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    vlc_mutex_lock(&p_sys->lock);
-    PicReorder_flush(p_dec);
-    vlc_mutex_unlock(&p_sys->lock);
+    /* There is no Flush in VT api, ask to restart VT from next DecodeBlock if
+     * we already feed some input blocks (it's better to not restart here in
+     * order to avoid useless restart just before a close). */
+    p_sys->b_vt_flush = p_sys->b_vt_feed;
 }
 
 static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
@@ -1027,6 +1033,11 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     VTDecodeInfoFlags flagOut;
     OSStatus status;
     int i_ret = 0;
+
+    if (p_sys->b_vt_flush) {
+        RestartVideoToolbox(p_dec, false);
+        p_sys->b_vt_flush = false;
+    }
 
     if (!pp_block)
     {
@@ -1044,7 +1055,8 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     if (likely(p_block != NULL)) {
         if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
         {
-            Flush(p_dec);
+            if (p_sys->b_vt_feed)
+                RestartVideoToolbox(p_dec, false);
             block_Release(p_block);
             goto skip;
         }
@@ -1090,7 +1102,9 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                                                            decoderFlags,
                                                            NULL, // sourceFrameRefCon
                                                            &flagOut); // infoFlagsOut
-                if (status != noErr) {
+                if (status == noErr)
+                    p_sys->b_vt_feed = true;
+                else {
                     if (status == kCVReturnInvalidSize)
                         msg_Err(p_dec, "decoder failure: invalid block size");
                     else if (status == -666)
@@ -1103,10 +1117,10 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                         StopVideoToolbox(p_dec);
                     } else if (status == -8960 || status == -12911) {
                         msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
-                        RestartVideoToolbox(p_dec);
+                        RestartVideoToolbox(p_dec, true);
                     } else if (status == -12903) {
                         msg_Warn(p_dec, "decoder failure: session invalid");
-                        RestartVideoToolbox(p_dec);
+                        RestartVideoToolbox(p_dec, true);
                     } else
                         msg_Dbg(p_dec, "decoding frame failed (%i)", status);
                 }
