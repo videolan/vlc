@@ -1114,8 +1114,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     UINT creationFlags = 0;
     HRESULT hr = S_OK;
 
-# if !defined(NDEBUG) && defined(_MSC_VER)
-    creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+# if !defined(NDEBUG)
+    HINSTANCE sdklayer_dll = LoadLibrary(TEXT("d3d11_1sdklayers.dll"));
+    if (sdklayer_dll) {
+        creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+        FreeLibrary(sdklayer_dll);
+    }
 # endif
 
     DXGI_SWAP_CHAIN_DESC1 scd;
