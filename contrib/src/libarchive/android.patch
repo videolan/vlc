@@ -9,3 +9,15 @@ diff -ruN libarchive/Makefile.am libarchive.new/Makefile.am
  libarchive_la_LDFLAGS= -no-undefined -version-info $(ARCHIVE_LIBTOOL_VERSION)
  libarchive_la_LIBADD= $(LTLIBICONV)
  
+diff -ruN libarchive/Makefile.am libarchive.new/Makefile.am
+--- libarchive/Makefile.am	2017-01-19 14:56:31.721427332 +0100
++++ libarchive.new/Makefile.am	2017-01-19 14:52:46.857437351 +0100
+@@ -88,7 +88,7 @@
+ #
+ #
+ 
+-include_HEADERS= libarchive/archive.h libarchive/archive_entry.h
++include_HEADERS= libarchive/archive.h libarchive/archive_entry.h contrib/android/include/android_lf.h
+ 
+ libarchive_la_SOURCES= \
+ 	libarchive/archive_acl.c \
