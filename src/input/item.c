@@ -1346,8 +1346,6 @@ void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt)
         return;
 
     es_format_Copy(fmt_copy, fmt);
-    /* XXX: we could free p_extra to save memory, we will likely not need
-     * the decoder specific data */
 
     vlc_mutex_lock( &item->lock );
 

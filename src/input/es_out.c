@@ -2943,6 +2943,11 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
             update.i_extra_languages = es->fmt.i_extra_languages;
             update.p_extra_languages = es->fmt.p_extra_languages;
         }
+
+        /* No need to update codec specific data */
+        update.i_extra = 0;
+        update.p_extra = NULL;
+
         input_item_UpdateTracksInfo(input_GetItem(p_input), &update);
     }
 
