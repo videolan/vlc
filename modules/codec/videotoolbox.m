@@ -111,8 +111,6 @@ struct decoder_sys_t
     CMVideoCodecType            codec;
     uint8_t                     i_nal_length_size;
 
-    bool                        b_started;
-    bool                        b_is_restarting;
     bool                        b_is_avcc;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
@@ -627,9 +625,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         decoder_UpdateVideoFormat(p_dec);
     }
 
-    p_sys->b_started = YES;
-    p_sys->b_is_restarting = NO;
-
     return VLC_SUCCESS;
 }
 
@@ -637,14 +632,11 @@ static void StopVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->b_started) {
+    if (p_sys->session != nil) {
         Flush(p_dec);
-        p_sys->b_started = false;
-        if (p_sys->session != nil) {
-            VTDecompressionSessionInvalidate(p_sys->session);
-            CFRelease(p_sys->session);
-            p_sys->session = nil;
-        }
+        VTDecompressionSessionInvalidate(p_sys->session);
+        CFRelease(p_sys->session);
+        p_sys->session = nil;
 
         p_sys->b_format_propagated = false;
     }
@@ -669,9 +661,6 @@ static void RestartVideoToolbox(decoder_t *p_dec)
 
     msg_Dbg(p_dec, "Restarting decoder session");
 
-    p_sys->b_is_restarting = true;
-    p_sys->b_started = false;
-
     if (p_sys->session != nil) {
         VTDecompressionSessionInvalidate(p_sys->session);
         CFRelease(p_sys->session);
@@ -682,13 +671,9 @@ static void RestartVideoToolbox(decoder_t *p_dec)
 
     Flush(p_dec);
 
-    if (StartVideoToolboxSession(p_dec) == VLC_SUCCESS) {
-        p_sys->b_started = true;
-    } else {
+    if (StartVideoToolboxSession(p_dec) != VLC_SUCCESS) {
         msg_Warn(p_dec, "Decoder session restart failed");
     }
-
-    p_sys->b_is_restarting = false;
 }
 
 #pragma mark - module open and close
@@ -721,7 +706,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (!p_sys)
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
-    p_sys->b_started = false;
+    p_sys->session = nil;
     p_sys->b_is_avcc = false;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = nil;
@@ -772,9 +757,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->session && p_sys->b_started) {
+    if (p_sys->session)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
-    }
     StopVideoToolbox(p_dec);
 
     [p_sys->outputTimeStamps release];
@@ -1006,7 +990,8 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
 
     if (likely(p_block != NULL)) {
-        if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED) || p_sys->b_is_restarting)) {
+        if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
+        {
             Flush(p_dec);
             block_Release(p_block);
             goto skip;
@@ -1014,13 +999,13 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 
         /* feed to vt */
         if (likely(p_block->i_buffer)) {
-            if (!p_sys->b_started) {
+            if (!p_sys->session) {
                 /* decoding didn't start yet, which is ok for H264, let's see
                  * if we can use this block to get going */
                 p_sys->codec = kCMVideoCodecType_H264;
                 i_ret = StartVideoToolbox(p_dec, p_block);
             }
-            if (i_ret != VLC_SUCCESS || !p_sys->b_started) {
+            if (i_ret != VLC_SUCCESS || !p_sys->session) {
                 *pp_block = NULL;
                 return NULL;
             }
