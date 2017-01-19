@@ -38,7 +38,7 @@
 #include <math.h>
 
 #define COBJMACROS
-#define INITGUID
+#include <initguid.h>
 #include <d3d11.h>
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
