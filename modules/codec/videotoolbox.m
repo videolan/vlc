@@ -91,6 +91,9 @@ vlc_module_end()
 
 static CFDataRef ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static picture_t *DecodeBlock(decoder_t *, block_t **);
+static void PicReorder_pushSorted(decoder_t *, picture_t *);
+static picture_t *PicReorder_pop(decoder_t *, bool);
+static void PicReorder_flush(decoder_t *);
 static void Flush(decoder_t *);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
@@ -117,9 +120,10 @@ struct decoder_sys_t
     CFMutableDictionaryRef      decoderConfiguration;
     CFMutableDictionaryRef      destinationPixelBufferAttributes;
 
-    vlc_mutex_t                 outLock;
-    NSMutableArray              *outputTimeStamps;
-    NSMutableDictionary         *outputFrames;
+    vlc_mutex_t                 lock;
+    picture_t                   *p_pic_reorder;
+    size_t                      i_pic_reorder;
+
     bool                        b_zero_copy;
     bool                        b_enable_temporal_processing;
 
@@ -712,19 +716,9 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->videoFormatDescription = nil;
     p_sys->decoderConfiguration = nil;
     p_sys->destinationPixelBufferAttributes = nil;
-
-    /* setup storage */
-    p_sys->outputTimeStamps = [[NSMutableArray alloc] init];
-    p_sys->outputFrames = [[NSMutableDictionary alloc] init];
-    if (!p_sys->outputTimeStamps || !p_sys->outputFrames) {
-        if (p_sys->outputTimeStamps)
-            [p_sys->outputTimeStamps release];
-        if (p_sys->outputFrames)
-            [p_sys->outputFrames release];
-        free(p_sys);
-        return VLC_ENOMEM;
-    }
-    vlc_mutex_init(&p_sys->outLock);
+    p_sys->p_pic_reorder = NULL;
+    p_sys->i_pic_reorder = 0;
+    vlc_mutex_init(&p_sys->lock);
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
     if (i_ret != VLC_SUCCESS) {
@@ -761,10 +755,7 @@ static void CloseDecoder(vlc_object_t *p_this)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
     StopVideoToolbox(p_dec);
 
-    [p_sys->outputTimeStamps release];
-    [p_sys->outputFrames release];
-
-    vlc_mutex_destroy(&p_sys->outLock);
+    vlc_mutex_destroy(&p_sys->lock);
     free(p_sys);
 }
 
@@ -965,14 +956,68 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
 
 #pragma mark - actual decoding
 
+static void PicReorder_pushSorted(decoder_t *p_dec, picture_t *p_pic)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    assert(p_pic->p_next == NULL);
+    p_sys->i_pic_reorder++;
+    if (p_sys->p_pic_reorder == NULL)
+    {
+        p_sys->p_pic_reorder = p_pic;
+        return;
+    }
+
+    picture_t **pp_last = &p_sys->p_pic_reorder;
+    for (picture_t *p_cur = *pp_last; p_cur != NULL;
+         pp_last = &p_cur->p_next, p_cur = *pp_last)
+    {
+        if (p_pic->date < p_cur->date)
+        {
+            p_pic->p_next = p_cur;
+            *pp_last = p_pic;
+            return;
+        }
+    }
+    *pp_last = p_pic;
+}
+
+static picture_t *PicReorder_pop(decoder_t *p_dec, bool force)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_sys->i_pic_reorder == 0
+     || (!force && p_sys->i_pic_reorder <= 5)) /* FIXME: calculate number of ref frames */
+        return NULL;
+
+    picture_t *p_pic = p_sys->p_pic_reorder;
+    p_sys->p_pic_reorder = p_pic->p_next;
+    p_pic->p_next = NULL;
+    p_sys->i_pic_reorder--;
+    return p_pic;
+}
+
+static void PicReorder_flush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    for (picture_t *p_cur = p_sys->p_pic_reorder, *p_next;
+         p_cur != NULL; p_cur = p_next)
+    {
+        p_next = p_cur->p_next;
+        picture_Release(p_cur);
+    }
+    p_sys->i_pic_reorder = 0;
+    p_sys->p_pic_reorder = NULL;
+}
+
 static void Flush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    vlc_mutex_lock(&p_sys->outLock);
-    [p_sys->outputTimeStamps removeAllObjects];
-    [p_sys->outputFrames removeAllObjects];
-    vlc_mutex_unlock(&p_sys->outLock);
+    vlc_mutex_lock(&p_sys->lock);
+    PicReorder_flush(p_dec);
+    vlc_mutex_unlock(&p_sys->lock);
 }
 
 static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
@@ -1071,84 +1116,6 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 skip:
 
     *pp_block = NULL;
-
-    if (unlikely(!p_sys->b_started))
-        return NULL;
-
-    vlc_mutex_lock(&p_sys->outLock);
-    NSUInteger outputFramesCount = [p_sys->outputFrames count];
-
-    if (outputFramesCount > 5) {
-        CVPixelBufferRef imageBuffer;
-        id imageBufferObject;
-        picture_t *p_pic;
-
-        NSString *timeStamp;
-        [p_sys->outputTimeStamps sortUsingComparator:^(id obj1, id obj2) {
-            if ([obj1 longLongValue] > [obj2 longLongValue]) {
-                return (NSComparisonResult)NSOrderedDescending;
-            }
-            if ([obj1 longLongValue] < [obj2 longLongValue]) {
-                return (NSComparisonResult)NSOrderedAscending;
-            }
-            return (NSComparisonResult)NSOrderedSame;
-        }];
-        NSMutableArray *timeStamps = p_sys->outputTimeStamps;
-        timeStamp = [timeStamps firstObject];
-        if (timeStamps.count > 0) {
-            [timeStamps removeObjectAtIndex:0];
-        }
-
-        imageBufferObject = [p_sys->outputFrames objectForKey:timeStamp];
-        if (imageBufferObject == NULL)
-        {
-            vlc_mutex_unlock(&p_sys->outLock);
-            return NULL;
-        }
-        imageBuffer = (CVPixelBufferRef) CFBridgingRetain(imageBufferObject);
-        [p_sys->outputFrames removeObjectForKey:timeStamp];
-        vlc_mutex_unlock(&p_sys->outLock);
-
-        if (CVPixelBufferGetDataSize(imageBuffer) == 0)
-        {
-            CFRelease(imageBuffer);
-            return NULL;
-        }
-
-        if (decoder_UpdateVideoFormat(p_dec))
-            return NULL;
-        p_pic = decoder_NewPicture(p_dec);
-        if (!p_pic)
-            return NULL;
-
-        if (!p_sys->b_zero_copy) {
-            /* ehm, *cough*, memcpy.. */
-            copy420YpCbCr8Planar(p_pic,
-                                 imageBuffer,
-                                 CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
-                                 CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
-            CFRelease(imageBuffer);
-        } else {
-            /* the structure is allocated by the vout's pool */
-            if (p_pic->p_sys) {
-                /* if we received a recycled picture from the pool
-                 * we need release the previous reference first,
-                 * otherwise we would leak it */
-                if (p_pic->p_sys->pixelBuffer != nil) {
-                    CFRelease(p_pic->p_sys->pixelBuffer);
-                    p_pic->p_sys->pixelBuffer = nil;
-                }
-
-                p_pic->p_sys->pixelBuffer = imageBuffer;
-            }
-            /* will be freed by the vout */
-        }
-        p_pic->date = timeStamp.longLongValue;
-        return p_pic;
-    }
-    else
-        vlc_mutex_unlock(&p_sys->outLock);
-
     return NULL;
 }
 
@@ -1239,28 +1206,54 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", status, (unsigned int) infoFlags);
         return;
     }
+    assert(imageBuffer);
 
-    if (infoFlags & kVTDecodeInfo_FrameDropped) {
+    if (infoFlags & kVTDecodeInfo_FrameDropped)
+    {
         msg_Dbg(p_dec, "decoder dropped frame");
-        if (imageBuffer)
-            CFRelease(imageBuffer);
         return;
     }
 
-    if (!imageBuffer)
+    if (!CMTIME_IS_VALID(pts))
         return;
 
-    if (!CMTIME_IS_VALID(pts)) {
-        msg_Dbg(p_dec, "invalid timestamp, dropping frame");
-        CFRelease(imageBuffer);
+    if (CVPixelBufferGetDataSize(imageBuffer) == 0)
         return;
+
+    picture_t *p_pic = decoder_NewPicture(p_dec);
+    if (!p_pic)
+        return;
+
+    p_pic->date = pts.value;
+    p_pic->b_progressive = true;
+
+    if (!p_sys->b_zero_copy) {
+        /* ehm, *cough*, memcpy.. */
+        copy420YpCbCr8Planar(p_pic,
+                             imageBuffer,
+                             CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
+                             CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
+    } else {
+        /* the structure is allocated by the vout's pool */
+        if (p_pic->p_sys) {
+            /* if we received a recycled picture from the pool
+             * we need release the previous reference first,
+             * otherwise we would leak it */
+            if (p_pic->p_sys->pixelBuffer != nil) {
+                CFRelease(p_pic->p_sys->pixelBuffer);
+                p_pic->p_sys->pixelBuffer = nil;
+            }
+
+            /* will be freed by the vout */
+            p_pic->p_sys->pixelBuffer = CVPixelBufferRetain(imageBuffer);
+        }
     }
+    vlc_mutex_lock(&p_sys->lock);
+    PicReorder_pushSorted(p_dec, p_pic);
+    p_pic = PicReorder_pop(p_dec, false);
+    vlc_mutex_unlock(&p_sys->lock);
 
-    NSNumber *timeStamp = [NSNumber numberWithLongLong:pts.value];
-    id imageBufferObject = (__bridge id)imageBuffer;
-
-    vlc_mutex_lock(&p_sys->outLock);
-    [p_sys->outputTimeStamps addObject:timeStamp];
-    [p_sys->outputFrames setObject:imageBufferObject forKey:timeStamp];
-    vlc_mutex_unlock(&p_sys->outLock);
+    if (p_pic != NULL)
+        decoder_QueueVideo(p_dec, p_pic);
+    return;
 }
