@@ -54,6 +54,7 @@ static const dxgi_format_t dxgi_formats[] = {
     { "Y410",        DXGI_FORMAT_Y410,                0                  },
     { "NV11",        DXGI_FORMAT_NV11,                0                  },
     { "RGB10A2",     DXGI_FORMAT_R10G10B10A2_UNORM,   0                  },
+    { "RGB16_FLOAT", DXGI_FORMAT_R16G16B16A16_FLOAT,  0                  },
     { "UNKNOWN",     DXGI_FORMAT_UNKNOWN,             0                  },
 
     { NULL, 0, 0}
