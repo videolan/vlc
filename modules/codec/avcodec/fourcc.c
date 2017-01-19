@@ -279,6 +279,10 @@ static const struct
     /* ffmpeg only: AV_CODEC_ID_SNOW */
     /* ffmpeg only: AV_CODEC_ID_SMVJPEG */
 
+#if LIBAVCODEC_VERSION_CHECK( 57, 999, 999, 70, 100 )
+    { VLC_CODEC_PIXLET, AV_CODEC_ID_PIXLET, VIDEO_ES },
+#endif
+
 #if LIBAVCODEC_VERSION_CHECK( 57, 71, 101, 999, 999 )
     { VLC_CODEC_SPEEDHQ, AV_CODEC_ID_SPEEDHQ, VIDEO_ES },
 #endif

@@ -1111,6 +1111,9 @@ static const staticentry_t p_list_video[] = {
         A("SHQ5"),
         A("SHQ7"),
         A("SHQ9"),
+
+    B(VLC_CODEC_PIXLET, "Apple Pixlet" ),
+        A("pxlt"),
 };
 
 static const staticentry_t p_list_audio[] = {
