@@ -1937,6 +1937,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         case COLOR_SPACE_BT601:
             ppColorspace = COLORSPACE_BT601_TO_FULL;
             break;
+        default:
         case COLOR_SPACE_UNDEF:
             if( fmt->i_height > 576 )
                 ppColorspace = COLORSPACE_BT709_TO_FULL;
