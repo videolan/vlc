@@ -258,10 +258,8 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
     case VLC_CODEC_D3D11_OPAQUE_10B:
     {
         picture_sys_t *p_sys_out = output->p_sys;
-        picture_sys_t *p_sys_in = surface->p_pic->p_sys;
 
         assert(p_sys_out->texture != NULL);
-        assert(p_sys_in->decoder == src);
 
         if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
             WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
@@ -270,6 +268,9 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 #ifdef ID3D11VideoContext_VideoProcessorBlt
         if (sys->videoProcessor)
         {
+            picture_sys_t *p_sys_in = surface->p_pic->p_sys;
+            assert(p_sys_in->decoder == src);
+
             // extract the decoded video to a the output Texture
             if (p_sys_out->decoder == NULL)
             {
@@ -308,9 +309,11 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         else
 #endif
         {
+            picture_sys_t *p_sys_in = surface->p_pic->p_sys;
+            assert(p_sys_in->decoder == src);
+
             D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
             ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
-
 
             D3D11_TEXTURE2D_DESC dstDesc;
             ID3D11Texture2D_GetDesc( (ID3D11Texture2D*) p_sys_out->texture, &dstDesc);
