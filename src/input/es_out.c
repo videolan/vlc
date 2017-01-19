@@ -2926,6 +2926,23 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         update.i_id = es->i_meta_id;
         update.i_codec = es->fmt.i_codec;
         update.i_original_fourcc = es->fmt.i_original_fourcc;
+
+        /* Update infos that could have been lost by the decoder (no need to
+         * dup them since input_item_UpdateTracksInfo() will do it). */
+        if (update.psz_language == NULL)
+            update.psz_language = es->fmt.psz_language;
+        if (update.psz_description == NULL)
+            update.psz_description = es->fmt.psz_description;
+        if (update.subs.psz_encoding == NULL)
+            update.subs.psz_encoding = es->fmt.subs.psz_encoding;
+        if (update.subs.p_style == NULL)
+            update.subs.p_style = es->fmt.subs.p_style;
+        if (update.i_extra_languages == 0)
+        {
+            assert(update.p_extra_languages == NULL);
+            update.i_extra_languages = es->fmt.i_extra_languages;
+            update.p_extra_languages = es->fmt.p_extra_languages;
+        }
         input_item_UpdateTracksInfo(input_GetItem(p_input), &update);
     }
 
