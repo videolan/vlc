@@ -1064,10 +1064,6 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
         goto skip;
     }
 
-    /* feed to vt */
-    if (unlikely(!p_block->i_buffer))
-        goto skip;
-
     if (!p_sys->session) {
         /* decoding didn't start yet, which is ok for H264, let's see
          * if we can use this block to get going */
