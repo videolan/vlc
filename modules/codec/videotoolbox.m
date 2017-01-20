@@ -1083,6 +1083,15 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
             return NULL;
     }
 
+    if (p_block->i_pts == VLC_TS_INVALID && p_block->i_dts != VLC_TS_INVALID &&
+        p_sys->i_pic_reorder_max > 1)
+    {
+        /* VideoToolbox won't reorder output frames and there is no way to know
+         * the right order. Abort and use an other decoder. */
+        msg_Warn(p_dec, "unable to reorder output frames, abort");
+        goto reload;
+    }
+
     CMSampleBufferRef sampleBuffer =
         VTSampleBufferCreate(p_dec, p_sys->videoFormatDescription, p_block);
     if (unlikely(!sampleBuffer))
