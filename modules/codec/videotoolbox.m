@@ -427,32 +427,29 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             msg_Warn(p_dec, "sps pps detection failed");
             return VLC_EGENERIC;
         }
+        assert(p_sps_nal);
 
         /* Decode Sequence Parameter Set */
-        if( p_sps_nal )
+        h264_sequence_parameter_set_t *p_sps_data;
+        if( !( p_sps_data = h264_decode_sps(p_sps_nal, i_sps_nalsize, true) ) )
         {
-            h264_sequence_parameter_set_t *p_sps_data;
-            if( !( p_sps_data = h264_decode_sps(p_sps_nal, i_sps_nalsize, true) ) )
-            {
-                free(p_alloc_buf);
-                msg_Warn(p_dec, "sps pps parsing failed");
-                return VLC_EGENERIC;
-            }
-
-            /* this data is more trust-worthy than what we receive
-             * from the demuxer, so we will use it to over-write
-             * the current values */
-            (void)
-            h264_get_picture_size( p_sps_data, &i_video_width,
-                                  &i_video_height,
-                                  &i_video_visible_width,
-                                  &i_video_visible_height );
-            i_sar_den = p_sps_data->vui.i_sar_den;
-            i_sar_num = p_sps_data->vui.i_sar_num;
-
-            h264_release_sps( p_sps_data );
+            free(p_alloc_buf);
+            msg_Warn(p_dec, "sps pps parsing failed");
+            return VLC_EGENERIC;
         }
-        /* !Decode Sequence Parameter Set */
+
+        /* this data is more trust-worthy than what we receive
+         * from the demuxer, so we will use it to over-write
+         * the current values */
+        (void)
+        h264_get_picture_size( p_sps_data, &i_video_width,
+                              &i_video_height,
+                              &i_video_visible_width,
+                              &i_video_visible_height );
+        i_sar_den = p_sps_data->vui.i_sar_den;
+        i_sar_num = p_sps_data->vui.i_sar_num;
+
+        h264_release_sps( p_sps_data );
 
         if(!p_sys->b_is_avcc)
         {
