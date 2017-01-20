@@ -632,17 +632,23 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     return VLC_SUCCESS;
 }
 
+static void StopVideoToolboxSession(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    VTDecompressionSessionInvalidate(p_sys->session);
+    CFRelease(p_sys->session);
+    p_sys->session = nil;
+    p_sys->b_format_propagated = false;
+}
+
 static void StopVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (p_sys->session != nil) {
         Flush(p_dec);
-        VTDecompressionSessionInvalidate(p_sys->session);
-        CFRelease(p_sys->session);
-        p_sys->session = nil;
-
-        p_sys->b_format_propagated = false;
+        StopVideoToolboxSession(p_dec);
     }
 
     if (p_sys->videoFormatDescription != nil) {
@@ -665,13 +671,8 @@ static void RestartVideoToolbox(decoder_t *p_dec)
 
     msg_Dbg(p_dec, "Restarting decoder session");
 
-    if (p_sys->session != nil) {
-        VTDecompressionSessionInvalidate(p_sys->session);
-        CFRelease(p_sys->session);
-        p_sys->session = nil;
-    }
-
-    p_sys->b_format_propagated = false;
+    if (p_sys->session != nil)
+        StopVideoToolboxSession(p_dec);
 
     Flush(p_dec);
 
