@@ -185,12 +185,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->times.i_current < p_sys->times.i_count )
-                *pi64 = p_sys->times.p_array[p_sys->times.i_current];
-            else if( p_sys->times.i_count )
-                *pi64 = p_sys->times.p_array[p_sys->times.i_count - 1];
-            else
-                break;
+            *pi64 = p_sys->i_next_demux_time;
             return VLC_SUCCESS;
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
@@ -225,7 +220,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             }
             else if( p_sys->times.i_count > 0 )
             {
-                *pf = (double) p_sys->times.p_array[p_sys->times.i_current] /
+                *pf = (double) p_sys->i_next_demux_time /
                       (p_sys->times.p_array[p_sys->times.i_count - 1] + 0.5);
             }
             else
