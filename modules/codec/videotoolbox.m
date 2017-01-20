@@ -125,6 +125,7 @@ struct decoder_sys_t
     vlc_mutex_t                 lock;
     picture_t                   *p_pic_reorder;
     size_t                      i_pic_reorder;
+    size_t                      i_pic_reorder_max;
 
     bool                        b_zero_copy;
     bool                        b_enable_temporal_processing;
@@ -449,6 +450,14 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         i_sar_den = p_sps_data->vui.i_sar_den;
         i_sar_num = p_sps_data->vui.i_sar_num;
 
+        uint8_t i_depth;
+        unsigned i_delay;
+        if (h264_get_dpb_values(p_sps_data, &i_depth, &i_delay) == false)
+            i_depth = 4;
+        vlc_mutex_lock(&p_sys->lock);
+        p_sys->i_pic_reorder_max = i_depth + 1;
+        vlc_mutex_unlock(&p_sys->lock);
+
         h264_release_sps( p_sps_data );
 
         if(!p_sys->b_is_avcc)
@@ -721,6 +730,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->destinationPixelBufferAttributes = nil;
     p_sys->p_pic_reorder = NULL;
     p_sys->i_pic_reorder = 0;
+    p_sys->i_pic_reorder_max = 1; /* 1 == no reordering */
     vlc_mutex_init(&p_sys->lock);
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
@@ -988,7 +998,7 @@ static picture_t *PicReorder_pop(decoder_t *p_dec, bool force)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (p_sys->i_pic_reorder == 0
-     || (!force && p_sys->i_pic_reorder <= 5)) /* FIXME: calculate number of ref frames */
+     || (!force && p_sys->i_pic_reorder < p_sys->i_pic_reorder_max))
         return NULL;
 
     picture_t *p_pic = p_sys->p_pic_reorder;
