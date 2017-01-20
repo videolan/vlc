@@ -705,6 +705,7 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_G2M4, "GoTo Meeting Codec 4"),
         A("G2M4"),
+        A("G2M5"),
 
     B(VLC_CODEC_FIC, "Mirillis FIC video"),
         A("FICV"),
