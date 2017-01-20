@@ -1061,59 +1061,59 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     }
 
     /* feed to vt */
-    if (likely(p_block->i_buffer)) {
-        if (!p_sys->session) {
-            /* decoding didn't start yet, which is ok for H264, let's see
-             * if we can use this block to get going */
-            p_sys->codec = kCMVideoCodecType_H264;
-            StartVideoToolbox(p_dec, p_block);
-        }
-        if (!p_sys->session)
-            goto skip;
+    if (unlikely(!p_block->i_buffer))
+        goto skip;
 
-        if (p_sys->codec == kCMVideoCodecType_H264) {
-            p_block = H264ProcessBlock(p_dec, p_block);
-            if (!p_block)
-                return NULL;
-        }
+    if (!p_sys->session) {
+        /* decoding didn't start yet, which is ok for H264, let's see
+         * if we can use this block to get going */
+        p_sys->codec = kCMVideoCodecType_H264;
+        StartVideoToolbox(p_dec, p_block);
+    }
+    if (!p_sys->session)
+        goto skip;
 
-        CMSampleBufferRef sampleBuffer =
-            VTSampleBufferCreate(p_dec, p_sys->videoFormatDescription, p_block);
-        if (unlikely(!sampleBuffer))
-            goto skip;
+    if (p_sys->codec == kCMVideoCodecType_H264) {
+        p_block = H264ProcessBlock(p_dec, p_block);
+        if (!p_block)
+            return NULL;
+    }
 
-        VTDecodeInfoFlags flagOut;
-        VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
-        if (unlikely(p_sys->b_enable_temporal_processing))
-            decoderFlags |= kVTDecodeFrame_EnableTemporalProcessing;
+    CMSampleBufferRef sampleBuffer =
+        VTSampleBufferCreate(p_dec, p_sys->videoFormatDescription, p_block);
+    if (unlikely(!sampleBuffer))
+        goto skip;
 
-        OSStatus status =
-            VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
-                                              decoderFlags, NULL, &flagOut);
-        if (status == noErr)
-            p_sys->b_vt_feed = true;
-        else {
-            if (status == kCVReturnInvalidSize)
-                msg_Err(p_dec, "decoder failure: invalid block size");
-            else if (status == -666)
-                msg_Err(p_dec, "decoder failure: invalid SPS/PPS");
-            else if (status == -6661) {
-                msg_Err(p_dec, "decoder failure: invalid argument");
-                p_dec->b_error = true;
-            } else if (status == -8969 || status == -12909) {
-                msg_Err(p_dec, "decoder failure: bad data (%i)", status);
-                StopVideoToolbox(p_dec);
-            } else if (status == -8960 || status == -12911) {
-                msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
-                RestartVideoToolbox(p_dec, true);
-            } else if (status == -12903) {
-                msg_Warn(p_dec, "decoder failure: session invalid");
-                RestartVideoToolbox(p_dec, true);
-            } else
-                msg_Dbg(p_dec, "decoding frame failed (%i)", status);
-        }
+    VTDecodeInfoFlags flagOut;
+    VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
+    if (unlikely(p_sys->b_enable_temporal_processing))
+        decoderFlags |= kVTDecodeFrame_EnableTemporalProcessing;
 
-        CFRelease(sampleBuffer);
+    OSStatus status =
+        VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
+                                          decoderFlags, NULL, &flagOut);
+    CFRelease(sampleBuffer);
+    if (status == noErr)
+        p_sys->b_vt_feed = true;
+    else {
+        if (status == kCVReturnInvalidSize)
+            msg_Err(p_dec, "decoder failure: invalid block size");
+        else if (status == -666)
+            msg_Err(p_dec, "decoder failure: invalid SPS/PPS");
+        else if (status == -6661) {
+            msg_Err(p_dec, "decoder failure: invalid argument");
+            p_dec->b_error = true;
+        } else if (status == -8969 || status == -12909) {
+            msg_Err(p_dec, "decoder failure: bad data (%i)", status);
+            StopVideoToolbox(p_dec);
+        } else if (status == -8960 || status == -12911) {
+            msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
+            RestartVideoToolbox(p_dec, true);
+        } else if (status == -12903) {
+            msg_Warn(p_dec, "decoder failure: session invalid");
+            RestartVideoToolbox(p_dec, true);
+        } else
+            msg_Dbg(p_dec, "decoding frame failed (%i)", status);
     }
 
 skip:
