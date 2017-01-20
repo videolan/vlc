@@ -5069,7 +5069,7 @@ static void LeafCheckandSetMOOFOffset( demux_t *p_demux, MP4_Box_t *p_vroot, MP4
                       BOXDATA(p_mfhd)->i_sequence_number, p_sys->context.i_lastseqnumber + 1 );
 
             bool b_has_base_media_decode_time = false;
-            int64_t i_lowest_media_time = INT64_MAX;
+            int64_t i_lowest_pres_time = INT64_MAX;
             for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
             {
                 mp4_track_t *p_track = &p_sys->track[i_track];
@@ -5079,17 +5079,19 @@ static void LeafCheckandSetMOOFOffset( demux_t *p_demux, MP4_Box_t *p_vroot, MP4
                     MP4_Box_t *p_tfdt = MP4_BoxGet( p_traf, "tfdt" );
                     if( p_tfdt )
                     {
-                        p_track->i_time = MP4_rescale( BOXDATA(p_tfdt)->i_base_media_decode_time,
-                                                       p_sys->i_timescale, p_track->i_timescale );
+                        p_track->i_time = BOXDATA(p_tfdt)->i_base_media_decode_time;
                         b_has_base_media_decode_time = true;
-                        if( BOXDATA(p_tfdt)->i_base_media_decode_time < i_lowest_media_time )
-                            i_lowest_media_time = BOXDATA(p_tfdt)->i_base_media_decode_time;
+
+                        const mtime_t i_pres_time = MP4_rescale( p_sys->i_time,
+                                                                 p_track->i_timescale, p_sys->i_timescale );
+                        if( i_pres_time < i_lowest_pres_time )
+                            i_lowest_pres_time = i_pres_time;
                     }
                 }
             }
 
-            if( i_lowest_media_time != INT64_MAX )
-                p_sys->i_time = i_lowest_media_time;
+            if( i_lowest_pres_time != INT64_MAX )
+                p_sys->i_time = i_lowest_pres_time;
 
             /* Try using SIDX as base offset.
              * This can not work for global sidx but only when sent within each fragment (dash) */
