@@ -881,31 +881,25 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
                                               CMFormatDescriptionRef fmt_desc,
-                                              void *buffer,
-                                              size_t size,
-                                              mtime_t i_pts,
-                                              mtime_t i_dts,
-                                              mtime_t i_length)
+                                              block_t *p_block)
 {
     OSStatus status;
     CMBlockBufferRef  block_buf = NULL;
     CMSampleBufferRef sample_buf = NULL;
 
-    CMSampleTimingInfo timeInfo;
-    CMSampleTimingInfo timeInfoArray[1];
-
-    timeInfo.duration = CMTimeMake(i_length, 1);
-    timeInfo.presentationTimeStamp = CMTimeMake(i_pts > 0 ? i_pts : i_dts, CLOCK_FREQ);
-    timeInfo.decodeTimeStamp = CMTimeMake(i_dts, CLOCK_FREQ);
-    timeInfoArray[0] = timeInfo;
+    CMSampleTimingInfo timeInfoArray[1] = { {
+        .duration = CMTimeMake(p_block->i_length, 1),
+        .presentationTimeStamp = CMTimeMake(p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts, CLOCK_FREQ),
+        .decodeTimeStamp = CMTimeMake(p_block->i_dts, CLOCK_FREQ),
+    } };
 
     status = CMBlockBufferCreateWithMemoryBlock(kCFAllocatorDefault,// structureAllocator
-                                                buffer,             // memoryBlock
-                                                size,               // blockLength
+                                                p_block->p_buffer,  // memoryBlock
+                                                p_block->i_buffer,  // blockLength
                                                 kCFAllocatorNull,   // blockAllocator
                                                 NULL,               // customBlockSource
                                                 0,                  // offsetToData
-                                                size,               // dataLength
+                                                p_block->i_buffer,  // dataLength
                                                 false,              // flags
                                                 &block_buf);
 
@@ -1035,10 +1029,6 @@ static void Flush(decoder_t *p_dec)
 static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
-    VTDecodeFrameFlags decoderFlags = 0;
-    VTDecodeInfoFlags flagOut;
-    OSStatus status;
     int i_ret = 0;
 
     if (p_sys->b_vt_flush) {
@@ -1057,89 +1047,80 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
         return p_pic;
     }
 
-    p_block = *pp_block;
+    block_t *p_block = *pp_block;
+    if (p_block == NULL)
+        return NULL; /* no need to be called again, pics are queued asynchronously */
 
-    if (likely(p_block != NULL)) {
-        if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
-        {
-            if (p_sys->b_vt_feed)
-                RestartVideoToolbox(p_dec, false);
-            block_Release(p_block);
-            goto skip;
+    if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
+    {
+        if (p_sys->b_vt_feed)
+            RestartVideoToolbox(p_dec, false);
+        block_Release(p_block);
+        goto skip;
+    }
+
+    /* feed to vt */
+    if (likely(p_block->i_buffer)) {
+        if (!p_sys->session) {
+            /* decoding didn't start yet, which is ok for H264, let's see
+             * if we can use this block to get going */
+            p_sys->codec = kCMVideoCodecType_H264;
+            i_ret = StartVideoToolbox(p_dec, p_block);
+        }
+        if (i_ret != VLC_SUCCESS || !p_sys->session) {
+            *pp_block = NULL;
+            return NULL;
         }
 
-        /* feed to vt */
-        if (likely(p_block->i_buffer)) {
-            if (!p_sys->session) {
-                /* decoding didn't start yet, which is ok for H264, let's see
-                 * if we can use this block to get going */
-                p_sys->codec = kCMVideoCodecType_H264;
-                i_ret = StartVideoToolbox(p_dec, p_block);
-            }
-            if (i_ret != VLC_SUCCESS || !p_sys->session) {
+        if (p_sys->codec == kCMVideoCodecType_H264) {
+            p_block = H264ProcessBlock(p_dec, p_block);
+            if (!p_block)
+            {
                 *pp_block = NULL;
                 return NULL;
             }
-
-            if (p_sys->codec == kCMVideoCodecType_H264) {
-                p_block = H264ProcessBlock(p_dec, p_block);
-                if (!p_block)
-                {
-                    *pp_block = NULL;
-                    return NULL;
-                }
-            }
-
-            CMSampleBufferRef sampleBuffer;
-            sampleBuffer = VTSampleBufferCreate(p_dec,
-                                                p_sys->videoFormatDescription,
-                                                p_block->p_buffer,
-                                                p_block->i_buffer,
-                                                p_block->i_pts,
-                                                p_block->i_dts,
-                                                p_block->i_length);
-            if (likely(sampleBuffer)) {
-                if (likely(!p_sys->b_enable_temporal_processing))
-                    decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
-                else
-                    decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression | kVTDecodeFrame_EnableTemporalProcessing;
-
-                status = VTDecompressionSessionDecodeFrame(p_sys->session,
-                                                           sampleBuffer,
-                                                           decoderFlags,
-                                                           NULL, // sourceFrameRefCon
-                                                           &flagOut); // infoFlagsOut
-                if (status == noErr)
-                    p_sys->b_vt_feed = true;
-                else {
-                    if (status == kCVReturnInvalidSize)
-                        msg_Err(p_dec, "decoder failure: invalid block size");
-                    else if (status == -666)
-                        msg_Err(p_dec, "decoder failure: invalid SPS/PPS");
-                    else if (status == -6661) {
-                        msg_Err(p_dec, "decoder failure: invalid argument");
-                        p_dec->b_error = true;
-                    } else if (status == -8969 || status == -12909) {
-                        msg_Err(p_dec, "decoder failure: bad data (%i)", status);
-                        StopVideoToolbox(p_dec);
-                    } else if (status == -8960 || status == -12911) {
-                        msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
-                        RestartVideoToolbox(p_dec, true);
-                    } else if (status == -12903) {
-                        msg_Warn(p_dec, "decoder failure: session invalid");
-                        RestartVideoToolbox(p_dec, true);
-                    } else
-                        msg_Dbg(p_dec, "decoding frame failed (%i)", status);
-                }
-
-                if (likely(sampleBuffer != nil))
-                    CFRelease(sampleBuffer);
-                sampleBuffer = nil;
-            }
         }
 
-        block_Release(p_block);
+        CMSampleBufferRef sampleBuffer =
+            VTSampleBufferCreate(p_dec, p_sys->videoFormatDescription, p_block);
+        if (unlikely(!sampleBuffer))
+            goto skip;
+
+        VTDecodeInfoFlags flagOut;
+        VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
+        if (unlikely(p_sys->b_enable_temporal_processing))
+            decoderFlags |= kVTDecodeFrame_EnableTemporalProcessing;
+
+        OSStatus status =
+            VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
+                                              decoderFlags, NULL, &flagOut);
+        if (status == noErr)
+            p_sys->b_vt_feed = true;
+        else {
+            if (status == kCVReturnInvalidSize)
+                msg_Err(p_dec, "decoder failure: invalid block size");
+            else if (status == -666)
+                msg_Err(p_dec, "decoder failure: invalid SPS/PPS");
+            else if (status == -6661) {
+                msg_Err(p_dec, "decoder failure: invalid argument");
+                p_dec->b_error = true;
+            } else if (status == -8969 || status == -12909) {
+                msg_Err(p_dec, "decoder failure: bad data (%i)", status);
+                StopVideoToolbox(p_dec);
+            } else if (status == -8960 || status == -12911) {
+                msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
+                RestartVideoToolbox(p_dec, true);
+            } else if (status == -12903) {
+                msg_Warn(p_dec, "decoder failure: session invalid");
+                RestartVideoToolbox(p_dec, true);
+            } else
+                msg_Dbg(p_dec, "decoding frame failed (%i)", status);
+        }
+
+        CFRelease(sampleBuffer);
     }
+
+    block_Release(p_block);
 
 skip:
 
