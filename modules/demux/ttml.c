@@ -332,15 +332,14 @@ static int Demux( demux_t* p_demux )
         if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
         {
             block_t* p_block = block_heap_Alloc( stream.ptr, stream.length );
+            if( p_block )
+            {
+                p_block->i_dts =
+                    p_block->i_pts = VLC_TS_0 + i_playbacktime;
+                p_block->i_length = i_playbackendtime - i_playbacktime;
 
-            if( unlikely( p_block == NULL ) )
-                return VLC_DEMUXER_EGENERIC;
-
-            p_block->i_dts =
-                p_block->i_pts = VLC_TS_0 + i_playbacktime;
-            p_block->i_length = i_playbackendtime - i_playbacktime;
-
-            es_out_Send( p_demux->out, p_sys->p_es, p_block );
+                es_out_Send( p_demux->out, p_sys->p_es, p_block );
+            }
         }
 
         p_sys->times.i_current++;
