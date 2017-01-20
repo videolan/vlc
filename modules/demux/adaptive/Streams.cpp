@@ -349,8 +349,9 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
             return AbstractStream::buffering_suspended;
         }
 
-        nz_deadline = commandsqueue->getBufferingLevel() +
-                     (i_total_buffering - commandsqueue->getDemuxedAmount()) / (CLOCK_FREQ/4);
+        mtime_t nz_extdeadline = commandsqueue->getBufferingLevel() +
+                                (i_total_buffering - commandsqueue->getDemuxedAmount()) / (CLOCK_FREQ/4);
+        nz_deadline = std::max(nz_deadline, nz_extdeadline);
 
         /* need to read, demuxer still buffering, ... */
         vlc_mutex_unlock(&lock);
