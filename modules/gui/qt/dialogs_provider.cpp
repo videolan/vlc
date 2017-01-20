@@ -139,12 +139,7 @@ QString DialogsProvider::getSaveFileName( QWidget *parent,
                                           const QString &filter,
                                           QString *selectedFilter )
 {
-#if HAS_QT5
-    QUrl url = QFileDialog::getSaveFileUrl( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
-    return QString( url.toEncoded() );
-#else
     return QFileDialog::getSaveFileName( parent, caption, dir, filter, selectedFilter );
-#endif
 }
 
 void DialogsProvider::quit()
