@@ -872,11 +872,12 @@ static CFDataRef ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_siz
 static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    assert(p_block);
 
     if (p_sys->b_is_avcc) /* FIXME: no change checks done for AVC ? */
         return p_block;
 
-    return (p_block) ? hxxx_AnnexB_to_xVC(p_block, p_sys->i_nal_length_size) : NULL;
+    return hxxx_AnnexB_to_xVC(p_block, p_sys->i_nal_length_size);
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
@@ -1029,7 +1030,6 @@ static void Flush(decoder_t *p_dec)
 static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_ret = 0;
 
     if (p_sys->b_vt_flush) {
         RestartVideoToolbox(p_dec, false);
@@ -1048,6 +1048,8 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     }
 
     block_t *p_block = *pp_block;
+    *pp_block = NULL;
+
     if (p_block == NULL)
         return NULL; /* no need to be called again, pics are queued asynchronously */
 
@@ -1055,7 +1057,6 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     {
         if (p_sys->b_vt_feed)
             RestartVideoToolbox(p_dec, false);
-        block_Release(p_block);
         goto skip;
     }
 
@@ -1065,20 +1066,15 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
             /* decoding didn't start yet, which is ok for H264, let's see
              * if we can use this block to get going */
             p_sys->codec = kCMVideoCodecType_H264;
-            i_ret = StartVideoToolbox(p_dec, p_block);
+            StartVideoToolbox(p_dec, p_block);
         }
-        if (i_ret != VLC_SUCCESS || !p_sys->session) {
-            *pp_block = NULL;
-            return NULL;
-        }
+        if (!p_sys->session)
+            goto skip;
 
         if (p_sys->codec == kCMVideoCodecType_H264) {
             p_block = H264ProcessBlock(p_dec, p_block);
             if (!p_block)
-            {
-                *pp_block = NULL;
                 return NULL;
-            }
         }
 
         CMSampleBufferRef sampleBuffer =
@@ -1120,11 +1116,8 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
         CFRelease(sampleBuffer);
     }
 
-    block_Release(p_block);
-
 skip:
-
-    *pp_block = NULL;
+    block_Release(p_block);
     return NULL;
 }
 
