@@ -706,6 +706,10 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (p_dec->fmt_in.i_cat != VIDEO_ES)
         return VLC_EGENERIC;
 
+    /* Fail if this module already failed to decode this ES */
+    if (var_Type(p_dec, "videotoolbox-failed") != 0)
+        return VLC_EGENERIC;
+
     /* check quickly if we can digest the offered data */
     CMVideoCodecType codec;
     codec = CodecPrecheck(p_dec);
@@ -1102,7 +1106,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
             msg_Err(p_dec, "decoder failure: invalid SPS/PPS");
         else if (status == -6661) {
             msg_Err(p_dec, "decoder failure: invalid argument");
-            p_dec->b_error = true;
+            goto reload;
         } else if (status == -8969 || status == -12909) {
             msg_Err(p_dec, "decoder failure: bad data (%i)", status);
             StopVideoToolbox(p_dec);
@@ -1117,6 +1121,16 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     }
 
 skip:
+    block_Release(p_block);
+    return NULL;
+
+reload:
+    /* Add an empty variable so that videotoolbox won't be loaded again for
+     * this ES */
+     if (var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID) == VLC_SUCCESS)
+        decoder_RequestReload(p_dec);
+    else
+        p_dec->b_error = true;
     block_Release(p_block);
     return NULL;
 }
