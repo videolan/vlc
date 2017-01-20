@@ -1163,7 +1163,8 @@ static const float f_min_window_height = 307.;
     } else {
         PL_LOCK;
         playlist_item_t *pl_item = playlist_ChildSearchName(p_playlist->p_root, [[item untranslatedTitle] UTF8String]);
-        [[[[VLCMain sharedInstance] playlist] model] changeRootItem:pl_item];
+        if (pl_item != NULL)
+            [[[[VLCMain sharedInstance] playlist] model] changeRootItem:pl_item];
 
         PL_UNLOCK;
     }
