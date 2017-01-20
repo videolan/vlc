@@ -1120,6 +1120,69 @@ skip:
     return NULL;
 }
 
+static void UpdateVideoFormat(decoder_t *p_dec, NSDictionary *attachmentDict)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    NSString *colorSpace = attachmentDict[(NSString *)kCVImageBufferYCbCrMatrixKey];
+    if (colorSpace != nil) {
+        if ([colorSpace isEqualToString:(NSString *)kCVImageBufferYCbCrMatrix_ITU_R_601_4])
+            p_dec->fmt_out.video.space = COLOR_SPACE_BT601;
+        else if ([colorSpace isEqualToString:(NSString *)kCVImageBufferYCbCrMatrix_ITU_R_709_2])
+            p_dec->fmt_out.video.space = COLOR_SPACE_BT709;
+        else
+            p_dec->fmt_out.video.space = COLOR_SPACE_UNDEF;
+    }
+
+    NSString *colorprimary = attachmentDict[(NSString *)kCVImageBufferColorPrimariesKey];
+    if (colorprimary != nil) {
+        if ([colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_SMPTE_C] ||
+            [colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_EBU_3213])
+            p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT601_625;
+        else if ([colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_ITU_R_709_2])
+            p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT709;
+        else if ([colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_P22])
+            p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_DCI_P3;
+        else
+            p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_UNDEF;
+    }
+
+    NSString *transfer = attachmentDict[(NSString *)kCVImageBufferTransferFunctionKey];
+    if (transfer != nil) {
+        if ([transfer isEqualToString:(NSString *)kCVImageBufferTransferFunction_ITU_R_709_2] ||
+            [transfer isEqualToString:(NSString *)kCVImageBufferTransferFunction_SMPTE_240M_1995])
+            p_dec->fmt_out.video.transfer = TRANSFER_FUNC_BT709;
+        else
+            p_dec->fmt_out.video.transfer = TRANSFER_FUNC_UNDEF;
+    }
+
+    NSString *chromaLocation = attachmentDict[(NSString *)kCVImageBufferChromaLocationTopFieldKey];
+    if (chromaLocation != nil) {
+        if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Left] ||
+            [chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_DV420])
+            p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_LEFT;
+        else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Center])
+            p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_CENTER;
+        else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_TopLeft])
+            p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_TOP_LEFT;
+        else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Top])
+            p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_TOP_CENTER;
+        else
+            p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_UNDEF;
+    }
+    if (p_dec->fmt_out.video.chroma_location == CHROMA_LOCATION_UNDEF) {
+        chromaLocation = attachmentDict[(NSString *)kCVImageBufferChromaLocationBottomFieldKey];
+        if (chromaLocation != nil) {
+            if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_BottomLeft])
+                p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_BOTTOM_LEFT;
+            else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Bottom])
+                p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_BOTTOM_CENTER;
+        }
+    }
+    p_sys->b_format_propagated = true;
+    decoder_UpdateVideoFormat(p_dec);
+}
+
 static void DecoderCallback(void *decompressionOutputRefCon,
                             void *sourceFrameRefCon,
                             OSStatus status,
@@ -1139,68 +1202,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 #ifndef NDEBUG
         NSLog(@"%@", attachments);
 #endif
-        if (attachmentDict != nil) {
-            if (attachmentDict.count > 0) {
-                p_sys->b_format_propagated = true;
-
-                NSString *colorSpace = attachmentDict[(NSString *)kCVImageBufferYCbCrMatrixKey];
-                if (colorSpace != nil) {
-                    if ([colorSpace isEqualToString:(NSString *)kCVImageBufferYCbCrMatrix_ITU_R_601_4])
-                        p_dec->fmt_out.video.space = COLOR_SPACE_BT601;
-                    else if ([colorSpace isEqualToString:(NSString *)kCVImageBufferYCbCrMatrix_ITU_R_709_2])
-                        p_dec->fmt_out.video.space = COLOR_SPACE_BT709;
-                    else
-                        p_dec->fmt_out.video.space = COLOR_SPACE_UNDEF;
-                }
-
-                NSString *colorprimary = attachmentDict[(NSString *)kCVImageBufferColorPrimariesKey];
-                if (colorprimary != nil) {
-                    if ([colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_SMPTE_C] ||
-                        [colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_EBU_3213])
-                        p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT601_625;
-                    else if ([colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_ITU_R_709_2])
-                        p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT709;
-                    else if ([colorprimary isEqualToString:(NSString *)kCVImageBufferColorPrimaries_P22])
-                        p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_DCI_P3;
-                    else
-                        p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_UNDEF;
-                }
-
-                NSString *transfer = attachmentDict[(NSString *)kCVImageBufferTransferFunctionKey];
-                if (transfer != nil) {
-                    if ([transfer isEqualToString:(NSString *)kCVImageBufferTransferFunction_ITU_R_709_2] ||
-                        [transfer isEqualToString:(NSString *)kCVImageBufferTransferFunction_SMPTE_240M_1995])
-                        p_dec->fmt_out.video.transfer = TRANSFER_FUNC_BT709;
-                    else
-                        p_dec->fmt_out.video.transfer = TRANSFER_FUNC_UNDEF;
-                }
-
-                NSString *chromaLocation = attachmentDict[(NSString *)kCVImageBufferChromaLocationTopFieldKey];
-                if (chromaLocation != nil) {
-                    if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Left] ||
-                        [chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_DV420])
-                        p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_LEFT;
-                    else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Center])
-                        p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_CENTER;
-                    else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_TopLeft])
-                        p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_TOP_LEFT;
-                    else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Top])
-                        p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_TOP_CENTER;
-                    else
-                        p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_UNDEF;
-                }
-                if (p_dec->fmt_out.video.chroma_location == CHROMA_LOCATION_UNDEF) {
-                    chromaLocation = attachmentDict[(NSString *)kCVImageBufferChromaLocationBottomFieldKey];
-                    if (chromaLocation != nil) {
-                        if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_BottomLeft])
-                            p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_BOTTOM_LEFT;
-                        else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Bottom])
-                            p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_BOTTOM_CENTER;
-                    }
-                }
-                decoder_UpdateVideoFormat(p_dec);
-            }
-        }
+        if (attachmentDict != nil && attachmentDict.count > 0)
+            UpdateVideoFormat(p_dec, attachmentDict);
     }
 
     if (status != noErr) {
