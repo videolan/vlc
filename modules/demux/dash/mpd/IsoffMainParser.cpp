@@ -89,7 +89,7 @@ MPD * IsoffMainParser::parse()
 
 void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 {
-    const std::map<std::string, std::string> attr = node->getAttributes();
+    const std::map<std::string, std::string> & attr = node->getAttributes();
 
     std::map<std::string, std::string>::const_iterator it;
 
