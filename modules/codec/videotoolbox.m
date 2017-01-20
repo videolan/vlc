@@ -1073,12 +1073,6 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     if (!p_sys->session)
         goto skip;
 
-    if (p_sys->codec == kCMVideoCodecType_H264) {
-        p_block = H264ProcessBlock(p_dec, p_block);
-        if (!p_block)
-            return NULL;
-    }
-
     if (p_block->i_pts == VLC_TS_INVALID && p_block->i_dts != VLC_TS_INVALID &&
         p_sys->i_pic_reorder_max > 1)
     {
@@ -1086,6 +1080,12 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
          * the right order. Abort and use an other decoder. */
         msg_Warn(p_dec, "unable to reorder output frames, abort");
         goto reload;
+    }
+
+    if (p_sys->codec == kCMVideoCodecType_H264) {
+        p_block = H264ProcessBlock(p_dec, p_block);
+        if (!p_block)
+            return NULL;
     }
 
     CMSampleBufferRef sampleBuffer =
