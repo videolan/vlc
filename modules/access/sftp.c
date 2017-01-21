@@ -93,6 +93,57 @@ struct access_sys_t
     char *psz_base_url;
 };
 
+static int AuthKeyAgent( access_t *p_access, const char *psz_username )
+{
+    access_sys_t* p_sys = p_access->p_sys;
+    int i_result = VLC_EGENERIC;
+    LIBSSH2_AGENT *p_sshagent = NULL;
+    struct libssh2_agent_publickey *p_identity = NULL,
+                                   *p_prev_identity = NULL;
+
+    if( !psz_username || !psz_username[0] )
+        return i_result;
+
+    p_sshagent = libssh2_agent_init( p_sys->ssh_session );
+
+    if( !p_sshagent )
+    {
+        msg_Dbg( p_access, "Failed to initialize key agent" );
+        goto bailout;
+    }
+    if( libssh2_agent_connect( p_sshagent ) )
+    {
+        msg_Dbg( p_access, "Failed to connect key agent" );
+        goto bailout;
+    }
+    if( libssh2_agent_list_identities( p_sshagent ) )
+    {
+        msg_Dbg( p_access, "Failed to request identities" );
+        goto bailout;
+    }
+
+    while( libssh2_agent_get_identity( p_sshagent, &p_identity, p_prev_identity ) == 0 )
+    {
+        msg_Dbg( p_access, "Using key %s", p_identity->comment );
+        if( libssh2_agent_userauth( p_sshagent, psz_username, p_identity ) == 0 )
+        {
+            msg_Info( p_access, "Public key agent authentication succeeded" );
+            i_result = VLC_SUCCESS;
+            goto bailout;
+        }
+        msg_Dbg( p_access, "Public key agent authentication failed" );
+        p_prev_identity = p_identity;
+    }
+
+bailout:
+    if( p_sshagent )
+    {
+        libssh2_agent_disconnect( p_sshagent );
+        libssh2_agent_free( p_sshagent );
+    }
+    return i_result;
+}
+
 
 static int AuthPublicKey( access_t *p_access, const char *psz_home, const char *psz_username )
 {
@@ -255,18 +306,19 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    //TODO: ask for the available auth methods
+    char* psz_userauthlist = NULL;
+    do
+    {
+        psz_userauthlist = libssh2_userauth_list( p_sys->ssh_session, credential.psz_username, strlen( credential.psz_username ) );
 
-    /* Try public key auth first */
-    if( AuthPublicKey( p_access, psz_home, url.psz_username ) != VLC_SUCCESS )
-    {
-    while( vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
-                               _("SFTP authentication"),
-                               _("Please enter a valid login and password for "
-                               "the sftp connexion to %s"), url.psz_host ) )
-    {
-        /* send the login/password */
-        if( libssh2_userauth_password( p_sys->ssh_session,
+        /* TODO: Follow PreferredAuthentications in ssh_config */
+
+        if( strstr( psz_userauthlist, "publickey" ) != NULL &&
+            ( AuthKeyAgent( p_access, credential.psz_username ) == VLC_SUCCESS ||
+              AuthPublicKey( p_access, psz_home, credential.psz_username ) == VLC_SUCCESS ) )
+            break;
+        if( strstr( psz_userauthlist, "password" ) != NULL &&
+            libssh2_userauth_password( p_sys->ssh_session,
                                        credential.psz_username,
                                        credential.psz_password ) == 0 )
         {
@@ -274,12 +326,11 @@ static int Open( vlc_object_t* p_this )
             break;
         }
 
-        if( AuthPublicKey( p_access, psz_home, credential.psz_username ) == VLC_SUCCESS )
-            break;
-
         msg_Warn( p_access, "sftp auth failed for %s", credential.psz_username );
-    }
-    }
+    } while( vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
+                                _("SFTP authentication"),
+                                _("Please enter a valid login and password for "
+                                "the sftp connexion to %s"), url.psz_host ) );
 
     /* Create the sftp session */
     p_sys->sftp_session = libssh2_sftp_init( p_sys->ssh_session );
@@ -372,6 +423,7 @@ static int Open( vlc_object_t* p_this )
 error:
     free( psz_home );
     free( psz_remote_home );
+    free( psz_userauthlist );
     vlc_UrlClean( &url );
     vlc_credential_clean( &credential );
     vlc_UrlClean( &credential_url );
