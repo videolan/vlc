@@ -440,6 +440,7 @@
 #define VLC_CODEC_AMR_WB                     VLC_FOURCC('s','a','w','b')
 #define VLC_CODEC_ALAC                       VLC_FOURCC('a','l','a','c')
 #define VLC_CODEC_QDM2                       VLC_FOURCC('Q','D','M','2')
+#define VLC_CODEC_QDMC                       VLC_FOURCC('Q','D','M','C')
 #define VLC_CODEC_COOK                       VLC_FOURCC('c','o','o','k')
 #define VLC_CODEC_SIPR                       VLC_FOURCC('s','i','p','r')
 #define VLC_CODEC_TTA                        VLC_FOURCC('T','T','A','1')

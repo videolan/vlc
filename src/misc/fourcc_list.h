@@ -1322,6 +1322,10 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_QDM2, "QDM2 Audio"),
         A("QDM2"),
 
+    /* QDMC */
+    B(VLC_CODEC_QDMC, "QDMC Audio"),
+        A("QDMC"),
+
     /* COOK */
     B(VLC_CODEC_COOK, "Cook Audio"),
         A("cook"),

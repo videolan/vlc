@@ -1105,7 +1105,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case VLC_CODEC_AMR_WB:
             p_track->fmt.audio.i_rate = 16000;
             break;
-        case VLC_FOURCC( 'Q', 'D', 'M', 'C' ):
+        case VLC_CODEC_QDMC:
         case VLC_CODEC_QDM2:
         case VLC_CODEC_ALAC:
         {
