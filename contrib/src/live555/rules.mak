@@ -1,6 +1,6 @@
 # live555
 
-LIVE555_VERSION := 2016.07.19
+LIVE555_VERSION := 2016.11.28
 LIVE555_FILE := live.$(LIVE555_VERSION).tar.gz
 LIVEDOTCOM_URL := http://live555.com/liveMedia/public/$(LIVE555_FILE)
 
@@ -79,4 +79,5 @@ SUBDIRS=groupsock liveMedia UsageEnvironment BasicUsageEnvironment
 	cd $< && ./genMakefiles $(LIVE_TARGET)
 	cd $< && for subdir in $(SUBDIRS); do $(MAKE) $(HOSTVARS) -C $$subdir; done
 	cd $< && for subdir in $(SUBDIRS); do $(MAKE) $(HOSTVARS) -C $$subdir install; done
+	cd $< && make install_shared_libraries
 	touch $@
