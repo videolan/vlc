@@ -1701,7 +1701,7 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
     VLC_SAVE_FLAGS
 
     dnl detect include paths
-    AS_IF([test -f "${CONTRIB_DIR}/include/UsageEnvironment.hh"], [
+    AS_IF([test -f "${CONTRIB_DIR}/include/UsageEnvironment/UsageEnvironment.hh"], [
       CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
     ], [
       AS_IF([test "${SYS}" != "os2"], [
