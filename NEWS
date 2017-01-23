@@ -24,6 +24,9 @@ Core:
  * Support wayland surface type
  * Allow to start the video paused on the first frame
  * Refactor preparsing input
+ * EPG reworked: table and single event updates, now using network time
+ * Refactored and fixed subtitles es selection. Demuxers can now override
+   es category single only or multiple es behavior
 
 Access:
  * New NFS access module using libnfs
@@ -79,6 +82,9 @@ Decoder:
    supporting H.263, H.264/MPEG-4 AVC, MPEG-4 Part 2, and DV depending on device
    and OS version
  * Support for the OggSpots video codec
+ * HEVC packetization is now correct
+ * H264 packetizer can now generate timestamps
+ * Packetizers have support for captions in SEI
  * JPEG images correctly oriented using embedded orientation tag, if present
  * Support VPX high bit depth support
  * Extend MicroDVD support with color, fontname, size, position extensions
@@ -235,6 +241,7 @@ libVLC:
  * Add libvlc_media_player_(get|set)_role to set the media role
  * Add libvlc_media_player_add_slave to replace libvlc_video_set_subtitle_file,
    working with MRL and supporting also audio slaves
+ * Add vlc_epg_event_(New|Delete|Duplicate), vlc_epg_AddEvent, vlc_epg_Duplicate
 
 Logging
  * Support for the SystemD Journal
