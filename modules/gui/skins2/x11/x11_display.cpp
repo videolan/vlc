@@ -32,7 +32,7 @@
 #include "x11_display.hpp"
 #include "../src/logger.hpp"
 
-#include "../../../share/icons/32x32/vlc.xpm"
+#include "../share/icons/32x32/vlc.xpm"
 
 template<class type> type X11Display::putPixel(type r, type g, type b) const
 {
