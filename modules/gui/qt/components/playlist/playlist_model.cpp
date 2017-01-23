@@ -1021,7 +1021,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     {
     case ACTION_ADDTOPLAYLIST:
         /* Only if we are not already in Current Playing */
-		return getPLRootType() != ROOTTYPE_CURRENT_PLAYING;
+        return getPLRootType() != ROOTTYPE_CURRENT_PLAYING;
     case ACTION_SORT:
         return rowCount();
     case ACTION_PLAY:
@@ -1040,7 +1040,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     }
     case ACTION_PAUSE:
     {
-		if( !isCurrent( index ) )
+        if( !isCurrent( index ) )
             return false;
 
         vlc_playlist_locker pl_lock ( THEPL );
