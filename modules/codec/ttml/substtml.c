@@ -37,6 +37,8 @@
 #include "substext.h"
 #include "ttml.h"
 
+//#define TTML_DEBUG
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -728,9 +730,11 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
     tt_timings_Resolve( (tt_basenode_t *) p_rootnode, &temporal_extent,
                         &p_timings_array, &i_timings_count );
 
+#ifdef TTML_DEBUG
     for( size_t i=0; i<i_timings_count; i++ )
         printf("%ld ", p_timings_array[i]);
     printf("\n");
+#endif
 
     for( size_t i=0; i+1 < i_timings_count; i++ )
     {
