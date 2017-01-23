@@ -199,6 +199,12 @@ static const struct testcase
       { "user1", "pwd1" }, {}, { "user1", "pwd1" }, false },
 };
 
+struct dialog_ctx
+{
+    bool b_abort;
+    const struct testcase *p_test;
+};
+
 static void
 display_login_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                  const char *psz_text, const char *psz_default_username,
@@ -208,13 +214,18 @@ display_login_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
     (void) psz_text;
     (void) psz_default_username;
     (void) b_ask_store;
-    struct testcase *p_testcase = p_data;
+    struct dialog_ctx *p_dialog_ctx = p_data;
+    const struct testcase *p_testcase = p_dialog_ctx->p_test;
 
     const char *psz_user = p_testcase->dialog.psz_user != NULL ?
                            p_testcase->dialog.psz_user : psz_default_username;
-    if (psz_user != NULL && p_testcase->dialog.psz_pwd != NULL)
+    if (!p_dialog_ctx->b_abort && psz_user != NULL
+     && p_testcase->dialog.psz_pwd != NULL)
+    {
         vlc_dialog_id_post_login(p_id, psz_user, p_testcase->dialog.psz_pwd,
                                  p_testcase->b_dialog_store);
+        p_dialog_ctx->b_abort = true;
+    }
     else
         vlc_dialog_id_dismiss(p_id);
 }
@@ -240,7 +251,11 @@ test(vlc_object_t *p_obj, unsigned int i_id, const struct testcase *p_test)
         .pf_display_login = display_login_cb,
         .pf_cancel = cancel_cb,
     };
-    vlc_dialog_provider_set_callbacks(p_obj, &cbs, (void *)p_test);
+    struct dialog_ctx dialog_ctx = {
+        .b_abort = false,
+        .p_test = p_test,
+    };
+    vlc_dialog_provider_set_callbacks(p_obj, &cbs, &dialog_ctx);
 
     const char *psz_opt_user = NULL, *psz_opt_pwd = NULL;
     if (p_test->opt.psz_user != NULL)
