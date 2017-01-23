@@ -190,7 +190,12 @@ static const struct testcase
     /* Testing smb realm split */
 
     { true, SMB("host/share/path1/ks_store"),
-      { "user6", "pwd6", "domain", NULL }, {}, { "domain;user6", "pwd6" }, false },
+      { "user6", "pwd6", "domain", NULL }, {}, { "domain;user6", "pwd6" }, true },
+
+    WIPE_MEMORY_KEYSTORE,
+
+    { true, SMB("host/share/path1/ks_store"),
+      { "user6", "pwd6", "domain", NULL }, {}, {}, false },
 
     { true, SMB("domain;user6@host/share/path1/ks_find"),
       { "user6", "pwd6", "domain", NULL }, {}, {}, false },
