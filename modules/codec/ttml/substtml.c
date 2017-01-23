@@ -75,7 +75,7 @@ enum
     UNICODE_BIDI_OVERRIDE = 4,
 };
 
-static ttml_region_t *ParseTTML( decoder_t *, const uint8_t *, size_t );
+static tt_node_t *ParseTTML( decoder_t *, const uint8_t *, size_t );
 
 static void ttml_style_Delete( ttml_style_t* p_ttml_style )
 {
@@ -591,8 +591,12 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
 }
 
 static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t *p_node,
-                                         ttml_region_t *p_region )
+                                         ttml_region_t *p_region, int64_t i_playbacktime )
 {
+    if( i_playbacktime != -1 &&
+       !tt_timings_Contains( &p_node->timings, i_playbacktime ) )
+        return;
+
     const char *psz_regionid = (const char *)
         vlc_dictionary_value_for_key( &p_node->attr_dict, "region" );
 
@@ -620,17 +624,16 @@ static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t 
         }
         else
         {
-            ConvertNodesToRegionContent( p_ctx, (const tt_node_t *) p_child, p_region );
+            ConvertNodesToRegionContent( p_ctx, (const tt_node_t *) p_child,
+                                         p_region, i_playbacktime );
         }
     }
 }
 
-static ttml_region_t *ParseTTML( decoder_t *p_dec,  const uint8_t *p_buffer, size_t i_buffer )
+static tt_node_t *ParseTTML( decoder_t *p_dec, const uint8_t *p_buffer, size_t i_buffer )
 {
-    stream_t*       p_sub = NULL;
-    xml_reader_t*   p_xml_reader = NULL;
-    ttml_region_t*  p_regions = NULL;
-    ttml_region_t** pp_region_last = &p_regions;
+    stream_t*       p_sub;
+    xml_reader_t*   p_xml_reader;
 
     p_sub = vlc_stream_MemoryNew( p_dec, (uint8_t*) p_buffer, i_buffer, true );
     if( unlikely( p_sub == NULL ) )
@@ -648,8 +651,19 @@ static ttml_region_t *ParseTTML( decoder_t *p_dec,  const uint8_t *p_buffer, siz
     {
         if( p_rootnode )
             tt_node_RecursiveDelete( p_rootnode );
-        goto end;
+        p_rootnode = NULL;
     }
+
+    xml_ReaderDelete( p_xml_reader );
+    vlc_stream_Delete( p_sub );
+
+    return p_rootnode;
+}
+
+static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, int64_t i_playbacktime )
+{
+    ttml_region_t*  p_regions = NULL;
+    ttml_region_t** pp_region_last = &p_regions;
 
     if( !tt_node_NameCompare( p_rootnode->psz_node_name, "tt" ) )
     {
@@ -659,7 +673,7 @@ static ttml_region_t *ParseTTML( decoder_t *p_dec,  const uint8_t *p_buffer, siz
             ttml_context_t context;
             context.p_rootnode = p_rootnode;
             vlc_dictionary_init( &context.regions, 1 );
-            ConvertNodesToRegionContent( &context, p_bodynode, NULL );
+            ConvertNodesToRegionContent( &context, p_bodynode, NULL, i_playbacktime );
 
             for( int i = 0; i < context.regions.i_size; ++i )
             {
@@ -680,18 +694,22 @@ static ttml_region_t *ParseTTML( decoder_t *p_dec,  const uint8_t *p_buffer, siz
         /* TODO */
     }
 
-    tt_node_RecursiveDelete( p_rootnode );
-
-end:
-    xml_ReaderDelete( p_xml_reader );
-    vlc_stream_Delete( p_sub );
-
     return p_regions;
 }
 
 static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
 {
-    subpicture_t *p_spu = NULL;
+    subpicture_t *p_spus_head = NULL;
+    subpicture_t **pp_spus_tail = &p_spus_head;
+
+    int64_t *p_timings_array = NULL;
+    size_t   i_timings_count = 0;
+
+    tt_timings_t temporal_extent;
+    temporal_extent.i_type = TT_TIMINGS_PARALLEL;
+    temporal_extent.i_begin = -1;
+    temporal_extent.i_end = -1;
+    temporal_extent.i_dur = -1;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         return NULL;
@@ -703,58 +721,90 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
         return NULL;
     }
 
-    ttml_region_t *p_regions = ParseTTML( p_dec, p_block->p_buffer, p_block->i_buffer );
-    if( p_regions && ( p_spu = decoder_NewSubpictureText( p_dec ) ) )
+    tt_node_t *p_rootnode = ParseTTML( p_dec, p_block->p_buffer, p_block->i_buffer );
+    if( !p_rootnode )
+        return NULL;
+
+    tt_timings_Resolve( (tt_basenode_t *) p_rootnode, &temporal_extent,
+                        &p_timings_array, &i_timings_count );
+
+    for( size_t i=0; i<i_timings_count; i++ )
+        printf("%ld ", p_timings_array[i]);
+    printf("\n");
+
+    for( size_t i=0; i+1 < i_timings_count; i++ )
     {
-        p_spu->i_start    = p_block->i_pts;
-        p_spu->i_stop     = p_block->i_pts + p_block->i_length;
-        p_spu->b_ephemer  = (p_block->i_length == 0);
-        p_spu->b_absolute = false;
-
-        subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-        subpicture_updater_sys_region_t *p_updtregion = NULL;
-
-        /* Create region update info from each ttml region */
-        for( ttml_region_t *p_region = p_regions;
-                            p_region; p_region = (ttml_region_t *) p_region->updt.p_next )
+        subpicture_t *p_spu = NULL;
+        ttml_region_t *p_regions = GenerateRegions( p_rootnode, p_timings_array[i] );
+        if( p_regions && ( p_spu = decoder_NewSubpictureText( p_dec ) ) )
         {
-            if( p_updtregion == NULL )
+            p_spu->i_start    = VLC_TS_0 + p_timings_array[i];
+            p_spu->i_stop     = VLC_TS_0 + p_timings_array[i+1] - 1;
+            p_spu->b_ephemer  = false;
+            p_spu->b_absolute = false;
+
+            mtime_t i_reftime = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
+            if( p_spu->i_start < i_reftime - VLC_TS_0 ) /* relative timings have been sent */
             {
-                p_updtregion = &p_spu_sys->region;
+                p_spu->i_start += i_reftime - VLC_TS_0;
+                p_spu->i_stop += i_reftime - VLC_TS_0;
             }
-            else
+
+            subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+            subpicture_updater_sys_region_t *p_updtregion = NULL;
+
+            /* Create region update info from each ttml region */
+            for( ttml_region_t *p_region = p_regions;
+                 p_region; p_region = (ttml_region_t *) p_region->updt.p_next )
             {
-                p_updtregion = SubpictureUpdaterSysRegionNew();
                 if( p_updtregion == NULL )
-                    break;
-                SubpictureUpdaterSysRegionAdd( &p_spu_sys->region, p_updtregion );
+                {
+                    p_updtregion = &p_spu_sys->region;
+                }
+                else
+                {
+                    p_updtregion = SubpictureUpdaterSysRegionNew();
+                    if( p_updtregion == NULL )
+                        break;
+                    SubpictureUpdaterSysRegionAdd( &p_spu_sys->region, p_updtregion );
+                }
+
+                /* broken legacy align var (can't handle center...) */
+                if( p_dec->p_sys->i_align & SUBPICTURE_ALIGN_MASK )
+                {
+                    p_spu_sys->region.align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_TOP);
+                    p_spu_sys->region.inner_align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT);
+                }
+
+                /* copy and take ownership of pointeds */
+                *p_updtregion = p_region->updt;
+                p_updtregion->p_next = NULL;
+                p_region->updt.p_region_style = NULL;
+                p_region->updt.p_segments = NULL;
             }
 
-            /* broken legacy align var (can't handle center...) */
-            if( p_dec->p_sys->i_align & SUBPICTURE_ALIGN_MASK )
-            {
-                p_spu_sys->region.align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_TOP);
-                p_spu_sys->region.inner_align = p_dec->p_sys->i_align & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT);
-            }
-
-            /* copy and take ownership of pointeds */
-            *p_updtregion = p_region->updt;
-            p_updtregion->p_next = NULL;
-            p_region->updt.p_region_style = NULL;
-            p_region->updt.p_segments = NULL;
         }
 
+        /* cleanup */
+        while( p_regions )
+        {
+            ttml_region_t *p_nextregion = (ttml_region_t *) p_regions->updt.p_next;
+            ttml_region_Delete( p_regions );
+            p_regions = p_nextregion;
+        }
+
+        if( p_spu )
+        {
+            *pp_spus_tail = p_spu;
+            pp_spus_tail = &p_spu->p_next;
+        }
     }
 
-    /* cleanup */
-    while( p_regions )
-    {
-        ttml_region_t *p_nextregion = (ttml_region_t *) p_regions->updt.p_next;
-        ttml_region_Delete( p_regions );
-        p_regions = p_nextregion;
-    }
+    tt_node_RecursiveDelete( p_rootnode );
 
-    return p_spu;
+    free( p_timings_array );
+
+    return p_spus_head;
 }
 
 
