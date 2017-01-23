@@ -105,7 +105,7 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
     {
         picture_sys_t *p_picsys = calloc(1, sizeof(*p_picsys));
         if (unlikely(p_picsys == NULL))
-            break;
+            goto error;
         picture_resource_t rsc = {
             .p_sys = p_picsys,
             .pf_destroy = AndroidOpaquePicture_DetachVout,
@@ -121,11 +121,9 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
         if (!picture[count])
         {
             free(p_picsys);
-            break;
+            goto error;
         }
     }
-    if (count <= 0)
-        goto error;
 
     /* Wrap the pictures into a pool */
     picture_pool_configuration_t pool_cfg = {
@@ -136,14 +134,12 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
     };
     picture_pool_t *pool = picture_pool_NewExtended(&pool_cfg);
     if (!pool)
-    {
-        for (unsigned i = 0; i < count; i++)
-            picture_Release(picture[i]);
         goto error;
-    }
 
     return pool;
 error:
+    for (unsigned i = 0; i < count; i++)
+        picture_Release(picture[i]);
     SurfaceTexture_release(priv->stex);
     return NULL;
 }
