@@ -339,6 +339,8 @@ credential_find_keystore(vlc_credential *p_credential, vlc_keystore *p_keystore)
         {
             p_credential->psz_password = (const char *)p_entry->p_secret;
             p_credential->psz_username = p_entry->ppsz_values[KEY_USER];
+            p_credential->psz_realm = p_entry->ppsz_values[KEY_REALM];
+            p_credential->psz_authtype = p_entry->ppsz_values[KEY_AUTHTYPE];
             p_credential->b_from_keystore = true;
         }
     }
