@@ -143,6 +143,7 @@ private:
     /* Lookups */
     PLItem *findByPLId( PLItem *, int i_plitemid ) const;
     PLItem *findByInput( PLItem *, const input_item_t * ) const;
+    PLItem *findByInputLocked( PLItem *, const input_item_t * ) const;
     enum pl_nodetype
     {
         ROOTTYPE_CURRENT_PLAYING,

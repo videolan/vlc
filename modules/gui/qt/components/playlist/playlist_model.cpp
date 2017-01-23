@@ -220,7 +220,7 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
             playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
             if( !p_item ) continue;
 
-            PLItem *item = findByInput( rootItem, p_input );
+            PLItem *item = findByInputLocked( rootItem, p_input );
             if( !item ) continue;
 
             /* Better not try to move a node into itself.
@@ -547,6 +547,16 @@ PLItem *PLModel::findByInput( PLItem *root, const input_item_t *input ) const
         i_id = item->i_id;
     }
     return findByPLId( root, i_id );
+}
+
+PLItem *PLModel::findByInputLocked( PLItem *root, const input_item_t *input ) const
+{
+    PL_ASSERT_LOCKED;
+
+    playlist_item_t* item = playlist_ItemGetByInput( THEPL, input );
+    if( item == NULL )
+        return NULL;
+    return findByPLId( root, item->i_id );
 }
 
 PLModel::pl_nodetype PLModel::getPLRootType() const
