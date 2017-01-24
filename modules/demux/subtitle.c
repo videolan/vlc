@@ -564,12 +564,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->subtitles.i_current = 0;
     p_sys->i_length = 0;
     if( p_sys->subtitles.i_count > 0 )
-    {
         p_sys->i_length = p_sys->subtitles.p_array[p_sys->subtitles.i_count-1].i_stop;
-        /* +1 to avoid 0 */
-        if( p_sys->i_length <= 0 )
-            p_sys->i_length = p_sys->subtitles.p_array[p_sys->subtitles.i_count-1].i_start+1;
-    }
 
     /* *** add subtitle ES *** */
     if( p_sys->props.i_type == SUB_TYPE_SSA1 ||
@@ -678,7 +673,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 *pf = 1.0;
             }
-            else if( p_sys->subtitles.i_count > 0 )
+            else if( p_sys->subtitles.i_count > 0 && p_sys->i_length )
             {
                 *pf = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
                 if( *pf < 0 )
