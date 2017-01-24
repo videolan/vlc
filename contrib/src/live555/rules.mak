@@ -75,7 +75,8 @@ SUBDIRS=groupsock liveMedia UsageEnvironment BasicUsageEnvironment
 	cd $< && for subdir in $(SUBDIRS); do \
 		echo "PREFIX = $(PREFIX)" >> $$subdir/Makefile.head && \
 		echo "LIBDIR = $(PREFIX)/lib" >> $$subdir/Makefile.head ; done
-	cd $< && echo "LIBDIR = $(PREFIX)/lib" >> Makefile.head
+	cd $< && echo "LIBDIR = $(PREFIX)/lib" >> Makefile.head && \
+		echo "PREFIX = $(PREFIX)" >> Makefile.head
 	cd $< && ./genMakefiles $(LIVE_TARGET)
 	cd $< && for subdir in $(SUBDIRS); do $(MAKE) $(HOSTVARS) -C $$subdir; done
 	cd $< && for subdir in $(SUBDIRS); do $(MAKE) $(HOSTVARS) -C $$subdir install; done
