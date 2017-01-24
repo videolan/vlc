@@ -749,7 +749,7 @@ static int Demux( demux_t *p_demux )
         }
 
         block_t *p_block;
-        int i_len = strlen( p_subtitle->psz_text ) + 1;
+        size_t i_len = strlen( p_subtitle->psz_text ) + 1;
 
         if( i_len <= 1 || p_subtitle->i_start < 0 )
         {
@@ -976,8 +976,8 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
     for( ;; )
     {
         const char *s = TextGetLine( txt );
-        int i_len;
-        int i_old;
+        size_t i_len;
+        size_t i_old;
 
         i_len = s ? strlen( s ) : 0;
         if( i_len <= 0 )
@@ -1214,7 +1214,6 @@ static int ParseVplayer( vlc_object_t *p_obj, subs_properties_t *p_props,
     VLC_UNUSED(p_props);
     VLC_UNUSED( i_idx );
     char *psz_text;
-    int i;
 
     for( ;; )
     {
@@ -1241,7 +1240,7 @@ static int ParseVplayer( vlc_object_t *p_obj, subs_properties_t *p_props,
     }
 
     /* replace | by \n */
-    for( i = 0; psz_text[i] != '\0'; i++ )
+    for( size_t i = 0; psz_text[i] != '\0'; i++ )
     {
         if( psz_text[i] == '|' )
             psz_text[i] = '\n';
@@ -1672,11 +1671,11 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_EGENERIC;
         }
 
-        int i_len = strlen( s );
+        size_t i_len = strlen( s );
         if( i_len == 0 )
             break;
 
-        int i_old = strlen( psz_text );
+        size_t i_old = strlen( psz_text );
 
         psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
         if( !psz_text )
@@ -1816,11 +1815,11 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_EGENERIC;
         }
 
-        int i_len = strlen( s2 );
+        size_t i_len = strlen( s2 );
         if( i_len == 0 )
             break;
 
-        int i_old = strlen( psz_text );
+        size_t i_old = strlen( psz_text );
 
         psz_text = realloc_or_free( psz_text, i_old + i_len + 1 );
         if( !psz_text )
@@ -2054,7 +2053,7 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_EGENERIC;
         }
 
-        int i_len = strlen( s );
+        size_t i_len = strlen( s );
         if( i_len == 0 ) break;
 
         if( strcasestr( s, "<time" ) ||
@@ -2064,7 +2063,7 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
             break;
         }
 
-        int i_old = strlen( psz_text );
+        size_t i_old = strlen( psz_text );
 
         psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
         if( !psz_text )
@@ -2262,8 +2261,8 @@ static int ParseCommonVTTSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
     for( ;; )
     {
         const char *s = TextGetLine( txt );
-        int i_len;
-        int i_old;
+        size_t i_len;
+        size_t i_old;
 
         i_len = s ? strlen( s ) : 0;
         if( i_len <= 0 )
