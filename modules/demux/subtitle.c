@@ -94,7 +94,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Prototypes:
  *****************************************************************************/
-enum
+enum subtitle_type_e
 {
     SUB_TYPE_UNKNOWN = -1,
     SUB_TYPE_MICRODVD,
@@ -140,7 +140,7 @@ typedef struct
 
 typedef struct
 {
-    int         i_type;
+    enum subtitle_type_e i_type;
     int64_t     i_microsecperframe;
 
     char        *psz_header; /* SSA */
