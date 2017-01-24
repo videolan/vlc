@@ -750,6 +750,9 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
                 pt.destroy = xiph_destroy;
                 pt.decode = xiph_decode;
                 pt.frequency = 90000;
+
+                free (dynamic);
+                break;
             }
             else
                 msg_Err (demux, "unknown dynamic payload format `%s' "
