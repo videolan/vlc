@@ -24,7 +24,7 @@
 
 #ifdef WIN32_SKINS
 
-#include "win32/win32_dragdrop.hpp"
+#include "win32_dragdrop.hpp"
 #include "../commands/cmd_add_item.hpp"
 #include "../events/evt_dragndrop.hpp"
 #include <list>
