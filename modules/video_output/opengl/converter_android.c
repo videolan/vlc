@@ -58,10 +58,11 @@ tc_anop_gen_textures(const opengl_tex_converter_t *tc,
 }
 
 static void
-tc_anop_del_textures(const opengl_tex_converter_t *tc, const GLuint *textures)
+tc_anop_del_textures(const opengl_tex_converter_t *tc, GLuint *textures)
 {
     (void) tc;
     glDeleteTextures(1, textures);
+    textures[0] = 0;
 }
 
 static int
@@ -86,9 +87,10 @@ pool_unlock_pic(picture_t *p_pic)
 
 static picture_pool_t *
 tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                 unsigned requested_count, const GLuint *textures)
+                 unsigned requested_count, GLuint *textures)
 {
     struct priv *priv = tc->priv;
+    assert(textures[0] != 0);
     priv->stex = SurfaceTexture_create(tc->parent, textures[0]);
     if (priv->stex == NULL)
     {
@@ -145,11 +147,12 @@ error:
 }
 
 static int
-tc_anop_update(const opengl_tex_converter_t *tc, const GLuint *textures,
+tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
                unsigned width, unsigned height,
                picture_t *pic, const size_t *plane_offset)
 {
     (void) width; (void) height; (void) plane_offset;
+    assert(textures[0] != 0);
 
     if (plane_offset != NULL)
         return VLC_EGENERIC;

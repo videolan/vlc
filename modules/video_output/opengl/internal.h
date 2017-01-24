@@ -204,7 +204,7 @@ struct opengl_tex_converter_t
      * \param textures array of textures to delete (one per plane)
      */
     void (*pf_del_textures)(const opengl_tex_converter_t *fc,
-                            const GLuint *textures);
+                            GLuint *textures);
 
     /*
      * Callback to allocate a picture pool
@@ -221,7 +221,7 @@ struct opengl_tex_converter_t
     picture_pool_t *(*pf_get_pool)(const opengl_tex_converter_t *fc,
                                    const video_format_t *fmt,
                                    unsigned requested_count,
-                                   const GLuint *textures);
+                                   GLuint *textures);
 
     /*
      * Callback to update a picture
@@ -238,7 +238,7 @@ struct opengl_tex_converter_t
      * (one per plane, can be NULL)
      * \return VLC_SUCCESS or a VLC error
      */
-    int (*pf_update)(const opengl_tex_converter_t *fc, const GLuint *textures,
+    int (*pf_update)(const opengl_tex_converter_t *fc, GLuint *textures,
                      unsigned width, unsigned height,
                      picture_t *pic, const size_t *plane_offset);
 

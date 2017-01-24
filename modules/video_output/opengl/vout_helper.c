@@ -611,7 +611,6 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 
 error:
     tc->pf_del_textures(tc, vgl->texture);
-    memset(vgl->texture, 0, PICTURE_PLANE_MAX * sizeof(GLuint));
     return NULL;
 }
 
@@ -1201,6 +1200,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     }
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+        assert(vgl->texture[j] != 0);
         glActiveTexture(GL_TEXTURE0+j);
         glClientActiveTexture(GL_TEXTURE0+j);
         glBindTexture(tc->tex_target, vgl->texture[j]);
@@ -1329,6 +1329,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             glr->tex_width, glr->tex_height,
         };
 
+        assert(glr->texture != 0);
         glBindTexture(sub_tc->tex_target, glr->texture);
         sub_tc->pf_prepare_shader(sub_tc, sub_program, glr->alpha);
 

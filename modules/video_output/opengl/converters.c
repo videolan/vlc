@@ -233,7 +233,7 @@ picture_destroy_cb(picture_t *pic)
 
 static picture_pool_t *
 tc_common_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                   unsigned requested_count, const GLuint *textures)
+                   unsigned requested_count, GLuint *textures)
 {
     struct priv *priv = tc->priv;
     picture_t *pictures[VLCGL_PICTURE_MAX];
@@ -343,10 +343,10 @@ tc_common_gen_textures(const opengl_tex_converter_t *tc,
 }
 
 static void
-tc_common_del_textures(const opengl_tex_converter_t *tc,
-                       const GLuint *textures)
+tc_common_del_textures(const opengl_tex_converter_t *tc, GLuint *textures)
 {
     glDeleteTextures(tc->desc->plane_count, textures);
+    memset(textures, 0, tc->desc->plane_count * sizeof(GLuint));
 }
 
 static int
@@ -410,7 +410,7 @@ upload_plane(const opengl_tex_converter_t *tc,
 }
 
 static int
-tc_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
+tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
                  unsigned width, unsigned height,
                  picture_t *pic, const size_t *plane_offset)
 {
@@ -422,6 +422,7 @@ tc_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
     int ret = VLC_SUCCESS;
     for (unsigned i = 0; i < tc->desc->plane_count && ret == VLC_SUCCESS; i++)
     {
+        assert(textures[i] != 0);
         glActiveTexture(GL_TEXTURE0 + i);
         glClientActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(tc->tex_target, textures[i]);
