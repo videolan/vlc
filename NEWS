@@ -85,6 +85,8 @@ Decoder:
  * HEVC packetization is now correct
  * H264 packetizer can now generate timestamps
  * Packetizers have support for captions in SEI
+ * DTS packetizer handle DTS extensions (like DTS-HD): decoders like avcodec
+ * can now decode up to 8 channels
  * JPEG images correctly oriented using embedded orientation tag, if present
  * Support VPX high bit depth support
  * Extend MicroDVD support with color, fontname, size, position extensions
@@ -137,7 +139,7 @@ Audio output:
    module for Android. It now supports HDMI/SPDIF passthrough for AC3/DTS/EAC3,
    5.1/7.1 channels and float output, depending on the Android version.
  * Added Tizen audio module
- * HDMI/SPDIF pass-through support for WASAPI (AC3/DTS/EAC3/TRUEHD)
+ * HDMI/SPDIF pass-through support for WASAPI (AC3/DTS/DTSHD/EAC3/TRUEHD)
  * Support EAC3 and TRUEHD pass-through for PulseAudio
 
 Audio filters:
