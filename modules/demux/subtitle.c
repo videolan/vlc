@@ -526,8 +526,12 @@ static int Open ( vlc_object_t *p_this )
 
     msg_Dbg( p_demux, "loading all subtitles..." );
 
-    if( unicode ) /* skip BOM */
-        vlc_stream_Seek( p_demux->s, 3 );
+    if( unicode && /* skip BOM */
+        vlc_stream_Seek( p_demux->s, 3 ) != VLC_SUCCESS )
+    {
+        Close( p_this );
+        return VLC_EGENERIC;
+    }
 
     /* Load the whole file */
     TextLoad( &p_sys->txt, p_demux->s );
