@@ -727,7 +727,7 @@ static int Demux( demux_t *p_demux )
     int64_t i_maxdate;
 
     if( p_sys->subtitles.i_current >= p_sys->subtitles.i_count )
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     i_maxdate = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );;
     if( i_maxdate <= 0 && p_sys->subtitles.i_current < p_sys->subtitles.i_count )
@@ -771,7 +771,7 @@ static int Demux( demux_t *p_demux )
     /* */
     p_sys->i_next_demux_date = 0;
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 
