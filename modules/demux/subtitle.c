@@ -168,6 +168,8 @@ struct demux_sys_t
 {
     text_t      txt;
     es_out_id_t *es;
+    bool        b_slave;
+    bool        b_first_time;
 
     int64_t     i_next_demux_date;
 
@@ -266,6 +268,10 @@ static int Open ( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
+
+    p_sys->b_slave = false;
+    p_sys->b_first_time = true;
+    p_sys->i_next_demux_date = 0;
 
     p_sys->subtitles.i_current= 0;
     p_sys->subtitles.i_count  = 0;
@@ -648,31 +654,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->subtitles.i_current < p_sys->subtitles.i_count )
-            {
-                *pi64 = p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start;
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
+            *pi64 = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
+            if( *pi64 < 0 )
+               *pi64 = p_sys->i_next_demux_date;
+            return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
-            p_sys->subtitles.i_current = 0;
-            while( p_sys->subtitles.i_current < p_sys->subtitles.i_count )
+            for( size_t i = 0; i + 1< p_sys->subtitles.i_count; i++ )
             {
-                const subtitle_t *p_subtitle = &p_sys->subtitles.p_array[p_sys->subtitles.i_current];
-
-                if( p_subtitle->i_start > i64 )
-                    break;
-                if( p_subtitle->i_stop > p_subtitle->i_start && p_subtitle->i_stop > i64 )
-                    break;
-
-                p_sys->subtitles.i_current++;
+                if( p_sys->subtitles.p_array[i + 1].i_start >= i64 )
+                {
+                    p_sys->subtitles.i_current = i;
+                    p_sys->i_next_demux_date = i64;
+                    p_sys->b_first_time = true;
+                    return VLC_SUCCESS;
+                }
             }
-
-            if( p_sys->subtitles.i_current >= p_sys->subtitles.i_count )
-                return VLC_EGENERIC;
-            return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
@@ -682,8 +680,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( p_sys->subtitles.i_count > 0 )
             {
-                *pf = (double)p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start /
-                      (double)p_sys->i_length;
+                *pf = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
+                if( *pf < 0 )
+                    *pf = p_sys->i_next_demux_date;
+                *pf /= p_sys->i_length;
             }
             else
             {
@@ -693,20 +693,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
-            i64 = f * p_sys->i_length;
-
-            p_sys->subtitles.i_current = 0;
-            while( p_sys->subtitles.i_current < p_sys->subtitles.i_count &&
-                   p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start < i64 )
+            if( p_sys->subtitles.i_count && p_sys->i_length )
             {
-                p_sys->subtitles.i_current++;
+                i64 = VLC_TS_0 + f * p_sys->i_length;
+                for( size_t i = 0; i + 1< p_sys->subtitles.i_count; i++ )
+                {
+                    if( p_sys->subtitles.p_array[i + 1].i_start >= i64 )
+                    {
+                        p_sys->subtitles.i_current = i;
+                        p_sys->i_next_demux_date = i64;
+                        p_sys->b_first_time = true;
+                        return VLC_SUCCESS;
+                    }
+                }
             }
-            if( p_sys->subtitles.i_current >= p_sys->subtitles.i_count )
-                return VLC_EGENERIC;
-            return VLC_SUCCESS;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
-            p_sys->i_next_demux_date = (int64_t)va_arg( args, int64_t );
+            p_sys->b_slave = true;
+            p_sys->i_next_demux_date = (int64_t)va_arg( args, int64_t ) - VLC_TS_0;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
@@ -717,8 +721,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_HAS_UNSUPPORTED_META:
         case DEMUX_CAN_RECORD:
         default:
-            return VLC_EGENERIC;
+            break;
+
     }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -727,22 +733,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t i_maxdate;
 
-    if( p_sys->subtitles.i_current >= p_sys->subtitles.i_count )
-        return VLC_DEMUXER_EOF;
-
-    i_maxdate = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );;
-    if( i_maxdate <= 0 && p_sys->subtitles.i_current < p_sys->subtitles.i_count )
-    {
-        /* Should not happen */
-        i_maxdate = p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start + 1;
-    }
+    int64_t i_barrier = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
+    if( i_barrier < 0 )
+        i_barrier = p_sys->i_next_demux_date;
 
     while( p_sys->subtitles.i_current < p_sys->subtitles.i_count &&
-           p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start < i_maxdate )
+           p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start <= i_barrier )
     {
         const subtitle_t *p_subtitle = &p_sys->subtitles.p_array[p_sys->subtitles.i_current];
+
+        if ( !p_sys->b_slave && p_sys->b_first_time )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_barrier );
+            p_sys->b_first_time = false;
+        }
 
         block_t *p_block;
         int i_len = strlen( p_subtitle->psz_text ) + 1;
@@ -771,8 +776,14 @@ static int Demux( demux_t *p_demux )
         p_sys->subtitles.i_current++;
     }
 
-    /* */
-    p_sys->i_next_demux_date = 0;
+    if ( !p_sys->b_slave )
+    {
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_barrier );
+        p_sys->i_next_demux_date += CLOCK_FREQ / 8;
+    }
+
+    if( p_sys->subtitles.i_current >= p_sys->subtitles.i_count )
+        return VLC_DEMUXER_EOF;
 
     return VLC_DEMUXER_SUCCESS;
 }
