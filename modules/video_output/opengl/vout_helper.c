@@ -547,7 +547,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GLuint fragment_shader = 0, sub_fragment_shader;
     opengl_tex_converter_t tex_conv;
     opengl_tex_converter_t sub_tex_conv = {
-        .parent = VLC_OBJECT(vgl->gl),
+        .gl = vgl->gl,
         .api = &vgl->api,
         .glexts = extensions,
         .orientation = fmt->orientation,
@@ -569,7 +569,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
         {
             tex_conv = (opengl_tex_converter_t) {
-                .parent = VLC_OBJECT(vgl->gl),
+                .gl = vgl->gl,
                 .api = &vgl->api,
                 .glexts = extensions,
                 .orientation = fmt->orientation,

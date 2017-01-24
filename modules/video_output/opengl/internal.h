@@ -158,8 +158,8 @@ typedef GLuint (*opengl_tex_converter_init_cb)(const video_format_t *fmt,
  */
 struct opengl_tex_converter_t
 {
-    /* Pointer to object parent, set by the caller of the init cb */
-    vlc_object_t *parent;
+    /* Pointer to object gl, set by the caller of the init cb */
+    vlc_gl_t *gl;
     /* Function pointer to shaders commands, set by the caller of the init cb */
     const opengl_shaders_api_t *api;
     /* Available gl extensions (from GL_EXTENSIONS) */

@@ -67,10 +67,10 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
 {
     struct priv *priv = tc->priv;
     assert(textures[0] != 0);
-    priv->stex = SurfaceTexture_create(tc->parent, textures[0]);
+    priv->stex = SurfaceTexture_create(VLC_OBJECT(tc->gl), textures[0]);
     if (priv->stex == NULL)
     {
-        msg_Err(tc->parent, "tc_anop_get_pool: SurfaceTexture_create failed");
+        msg_Err(tc->gl, "tc_anop_get_pool: SurfaceTexture_create failed");
         return NULL;
     }
 

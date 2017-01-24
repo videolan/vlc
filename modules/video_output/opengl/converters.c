@@ -482,7 +482,7 @@ pbo_map(const opengl_tex_converter_t *tc, picture_t *pic)
 
         if (pic->p[i].p_pixels == NULL)
         {
-            msg_Err(tc->parent, "could not map PBO buffers");
+            msg_Err(tc->gl, "could not map PBO buffers");
             for (i = i - 1; i >= 0; --i)
             {
                 tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
@@ -825,7 +825,7 @@ common_init(opengl_tex_converter_t *tc)
         && HasExtension(tc->glexts, "GL_ARB_buffer_storage");
     if (supports_pbo)
         tc->pf_get_pool = tc_common_get_pool;
-    msg_Dbg(tc->parent, "PBO support (direct rendering): %s",
+    msg_Dbg(tc->gl, "PBO support (direct rendering): %s",
             supports_pbo ? "On" : "Off");
 #endif
 
