@@ -598,10 +598,10 @@ static int Open ( vlc_object_t *p_this )
         fmt.psz_description = psz_description;
     else
         free( psz_description );
-    if( p_sys->props.psz_header != NULL )
+    if( p_sys->props.psz_header != NULL &&
+       (fmt.p_extra = strdup( p_sys->props.psz_header )) )
     {
         fmt.i_extra = strlen( p_sys->props.psz_header ) + 1;
-        fmt.p_extra = strdup( p_sys->props.psz_header );
     }
 
     p_sys->es = es_out_Add( p_demux->out, &fmt );
