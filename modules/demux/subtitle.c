@@ -122,8 +122,8 @@ enum subtitle_type_e
 
 typedef struct
 {
-    int     i_line_count;
-    int     i_line;
+    size_t  i_line_count;
+    size_t  i_line;
     char    **line;
 } text_t;
 
@@ -804,7 +804,7 @@ static void Fix( demux_t *p_demux )
 
 static int TextLoad( text_t *txt, stream_t *s )
 {
-    int   i_line_max;
+    size_t i_line_max;
 
     /* init txt */
     i_line_max          = 500;
@@ -822,17 +822,19 @@ static int TextLoad( text_t *txt, stream_t *s )
         if( psz == NULL )
             break;
 
-        txt->line[txt->i_line_count++] = psz;
-        if( txt->i_line_count >= i_line_max )
+        txt->line[txt->i_line_count] = psz;
+        if( txt->i_line_count + 1 >= i_line_max )
         {
             i_line_max += 100;
-            txt->line = realloc_or_free( txt->line, i_line_max * sizeof( char * ) );
-            if( !txt->line )
+            char **p_realloc = realloc( txt->line, i_line_max * sizeof( char * ) );
+            if( p_realloc == NULL )
                 return VLC_ENOMEM;
+            txt->line = p_realloc;
         }
+        txt->i_line_count++;
     }
 
-    if( txt->i_line_count <= 0 )
+    if( txt->i_line_count == 0 )
     {
         free( txt->line );
         return VLC_EGENERIC;
@@ -842,9 +844,7 @@ static int TextLoad( text_t *txt, stream_t *s )
 }
 static void TextUnload( text_t *txt )
 {
-    int i;
-
-    for( i = 0; i < txt->i_line_count; i++ )
+    for( size_t i = 0; i < txt->i_line_count; i++ )
     {
         free( txt->line[i] );
     }
