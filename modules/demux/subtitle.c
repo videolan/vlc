@@ -166,7 +166,6 @@ typedef struct
 
 struct demux_sys_t
 {
-    text_t      txt;
     es_out_id_t *es;
     bool        b_slave;
     bool        b_first_time;
@@ -534,7 +533,8 @@ static int Open ( vlc_object_t *p_this )
     }
 
     /* Load the whole file */
-    TextLoad( &p_sys->txt, p_demux->s );
+    text_t txtlines;
+    TextLoad( &txtlines, p_demux->s );
 
     /* Parse it */
     for( size_t i_max = 0; i_max < SIZE_MAX - 500 * sizeof(subtitle_t); )
@@ -545,14 +545,14 @@ static int Open ( vlc_object_t *p_this )
             subtitle_t *p_realloc = realloc( p_sys->subtitles.p_array, sizeof(subtitle_t) * i_max );
             if( p_realloc == NULL )
             {
-                TextUnload( &p_sys->txt );
+                TextUnload( &txtlines );
                 Close( p_this );
                 return VLC_ENOMEM;
             }
             p_sys->subtitles.p_array = p_realloc;
         }
 
-        if( pf_read( VLC_OBJECT(p_demux), &p_sys->props, &p_sys->txt,
+        if( pf_read( VLC_OBJECT(p_demux), &p_sys->props, &txtlines,
                      &p_sys->subtitles.p_array[p_sys->subtitles.i_count],
                      p_sys->subtitles.i_count ) )
             break;
@@ -560,7 +560,7 @@ static int Open ( vlc_object_t *p_this )
         p_sys->subtitles.i_count++;
     }
     /* Unload */
-    TextUnload( &p_sys->txt );
+    TextUnload( &txtlines );
 
     msg_Dbg(p_demux, "loaded %zu subtitles", p_sys->subtitles.i_count );
 
