@@ -70,6 +70,10 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
     audioLayout->addWidget( audioTab );
 
+    StereoWidener *stereowiden = new StereoWidener( p_intf, audioTab );
+    audioTab->addTab( stereowiden, qtr( "Stereo Widener" ) );
+    audioLayout->addWidget( audioTab );
+
     mainTabW->insertTab( AUDIO_TAB, audioWidget, qtr( "Audio Effects" ) );
 
     /* Video Effects */

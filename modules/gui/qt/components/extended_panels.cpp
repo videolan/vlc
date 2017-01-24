@@ -1408,6 +1408,25 @@ Spatializer::Spatializer( intf_thread_t *p_intf, QWidget *parent )
     build();
 }
 
+/**********************************************************************
+ * Spatializer
+ **********************************************************************/
+
+StereoWidener::StereoWidener( intf_thread_t *p_intf, QWidget *parent )
+    : AudioFilterControlWidget( p_intf, parent, "stereo_widen" )
+{
+    i_smallfont = -1;
+    const FilterSliderData::slider_data_t a[4] =
+    {
+        { "stereowiden-delay",     N_("Delay time"),    "ms", 1.0, 100,  20, 1.0, 1.0 },
+        { "stereowiden-feedback",  N_("Feedback gain"), "%",  0.0, 0.9, 0.3, 0.1, 1.0 },
+        { "stereowiden-crossfeed", N_("Crossfeed"),     "%",  0.0, 0.8, 0.3, 0.1, 1.0 },
+        { "stereowiden-dry-mix",   N_("Dry mix"),       "%",  0.0, 1.0, 0.8, 0.1, 1.0 },
+    };
+    for( int i=0; i<4 ;i++ ) controls.append( a[i] );
+    build();
+}
+
 #include <QToolButton>
 #include <QGridLayout>
 
