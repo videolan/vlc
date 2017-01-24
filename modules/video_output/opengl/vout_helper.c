@@ -84,7 +84,7 @@ struct vout_display_opengl_t {
     int        tex_width[PICTURE_PLANE_MAX];
     int        tex_height[PICTURE_PLANE_MAX];
 
-    GLuint     texture[VLCGL_TEXTURE_COUNT][PICTURE_PLANE_MAX];
+    GLuint     texture[PICTURE_PLANE_MAX];
 
     int         region_count;
     gl_region_t *region;
@@ -439,10 +439,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->api.GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
 
     /* */
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        for (int j = 0; j < PICTURE_PLANE_MAX; j++)
-            vgl->texture[i][j] = 0;
-    }
+    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++)
+        vgl->texture[i] = 0;
     vgl->region_count = 0;
     vgl->region = NULL;
     vgl->pool = NULL;
@@ -468,8 +466,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     glFlush();
 
     opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
-        tc->pf_del_textures(tc, vgl->texture[i]);
+    tc->pf_del_textures(tc, vgl->texture);
 
     tc = &vgl->tex_conv[vgl->program_sub_idx];
     for (int i = 0; i < vgl->region_count; i++)
@@ -573,20 +570,17 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 
     /* Allocates our textures */
     opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
-    {
-        int ret = tc->pf_gen_textures(tc, vgl->tex_width, vgl->tex_height,
-                                      vgl->texture[i]);
-        if (ret != VLC_SUCCESS)
-            return NULL;
-    }
+    int ret = tc->pf_gen_textures(tc, vgl->tex_width, vgl->tex_height,
+                                  vgl->texture);
+    if (ret != VLC_SUCCESS)
+        return NULL;
 
     requested_count = __MIN(VLCGL_PICTURE_MAX, requested_count);
     /* Allocate with tex converter pool callback if it exists */
     if (tc->pf_get_pool != NULL)
     {
         vgl->pool = tc->pf_get_pool(tc, &vgl->fmt, requested_count,
-                                    vgl->texture[0]);
+                                    vgl->texture);
         if (!vgl->pool)
             goto error;
         return vgl->pool;
@@ -616,11 +610,8 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     return vgl->pool;
 
 error:
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
-    {
-        tc->pf_del_textures(tc, vgl->texture[i]);
-        memset(vgl->texture[i], 0, PICTURE_PLANE_MAX * sizeof(GLuint));
-    }
+    tc->pf_del_textures(tc, vgl->texture);
+    memset(vgl->texture, 0, PICTURE_PLANE_MAX * sizeof(GLuint));
     return NULL;
 }
 
@@ -630,7 +621,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
 
     /* Update the texture */
-    int ret = tc->pf_update(tc, vgl->texture[0],
+    int ret = tc->pf_update(tc, vgl->texture,
                             vgl->fmt.i_visible_width, vgl->fmt.i_visible_height,
                             picture, NULL);
     if (ret != VLC_SUCCESS)
@@ -1212,7 +1203,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         glActiveTexture(GL_TEXTURE0+j);
         glClientActiveTexture(GL_TEXTURE0+j);
-        glBindTexture(tc->tex_target, vgl->texture[0][j]);
+        glBindTexture(tc->tex_target, vgl->texture[j]);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),

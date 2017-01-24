@@ -25,13 +25,11 @@
 
 #if defined(USE_OPENGL_ES2)
 #   define GLSL_VERSION "100"
-#   define VLCGL_TEXTURE_COUNT 1
 #   define PRECISION "precision highp float;"
 #   define VLCGL_PICTURE_MAX 128
 #   define glClientActiveTexture(x)
 #else
 #   define GLSL_VERSION "120"
-#   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 128
 #   ifdef GL_VERSION_4_4
 #       define VLCGL_HAS_PBO
