@@ -519,18 +519,19 @@ static int Open ( vlc_object_t *p_this )
     TextLoad( &p_sys->txt, p_demux->s );
 
     /* Parse it */
-    for( size_t i_max = 0;; )
+    for( size_t i_max = 0; i_max < SIZE_MAX - 500 * sizeof(subtitle_t); )
     {
         if( p_sys->subtitles.i_count >= i_max )
         {
             i_max += 500;
-            if( !( p_sys->subtitles.p_array = realloc_or_free( p_sys->subtitles.p_array,
-                                              sizeof(subtitle_t) * i_max ) ) )
+            subtitle_t *p_realloc = realloc( p_sys->subtitles.p_array, sizeof(subtitle_t) * i_max );
+            if( p_realloc == NULL )
             {
                 TextUnload( &p_sys->txt );
-                free( p_sys );
+                Close( p_this );
                 return VLC_ENOMEM;
             }
+            p_sys->subtitles.p_array = p_realloc;
         }
 
         if( pf_read( p_demux, &p_sys->subtitles.p_array[p_sys->subtitles.i_count],
