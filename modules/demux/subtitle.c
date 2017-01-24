@@ -598,8 +598,14 @@ static int Open ( vlc_object_t *p_this )
         fmt.i_extra = strlen( p_sys->props.psz_header ) + 1;
         fmt.p_extra = strdup( p_sys->props.psz_header );
     }
+
     p_sys->es = es_out_Add( p_demux->out, &fmt );
     es_format_Clean( &fmt );
+    if( p_sys->es == NULL )
+    {
+        Close( p_this );
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
