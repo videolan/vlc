@@ -120,8 +120,7 @@ Demuxers:
  * Support raw h265/hevc files
  * Support multi-channel WAV without channel-maps
  * Rewrite MKV seeking
- * Rewrite of TTML demuxer
- * Support for TTML in ISOBMF/MP4 and DASH
+ * Support for TTML and WebVTT in ISOBMF/MP4 and DASH
  * Fix Quicktime Mp4 inside MKV and unpacketized VC1
 
 Stream filter:

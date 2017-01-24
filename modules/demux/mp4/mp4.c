@@ -380,6 +380,38 @@ static int AllocateTracks( demux_t *p_demux, unsigned i_tracks )
     return VLC_SUCCESS;
 }
 
+static block_t * MP4_WebVTT_Convert( demux_t *p_demux, block_t * p_block )
+{
+    stream_t *p_stream =
+            vlc_stream_MemoryNew( p_demux, p_block->p_buffer,
+                                  p_block->i_buffer, true );
+    if( p_stream )
+    {
+        MP4_Box_t *p_vroot = MP4_BoxNew(ATOM_wvtt);
+        if( p_vroot )
+        {
+            p_vroot->i_size = p_block->i_buffer;
+            if ( MP4_ReadBoxContainerChildren( p_stream, p_vroot, NULL ) == 1 )
+            {
+                MP4_Box_t *p_payl = MP4_BoxGet( p_vroot, "vttc/payl" );
+                if( p_payl && p_payl->i_size >= 9 )
+                {
+                    p_block->p_buffer += p_payl->i_pos + 8;
+                    p_block->i_buffer = p_payl->i_size - 8;
+                    p_block->p_buffer[p_block->i_buffer - 1] = '\0';
+                }
+                else p_block->i_buffer = 0;
+#ifndef NDEBUG
+                MP4_BoxDumpStructure(p_stream, p_vroot);
+#endif
+            }
+            MP4_BoxFree(p_vroot);
+        }
+        vlc_stream_Delete( p_stream );
+     }
+    return p_block;
+}
+
 static block_t * MP4_EIA608_Convert( block_t * p_block )
 {
     /* Rebuild codec data from encap */
@@ -526,6 +558,10 @@ static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track
             break;
             case VLC_CODEC_EIA608_1:
                 p_block = MP4_EIA608_Convert( p_block );
+            break;
+            case VLC_CODEC_SUBT:
+                if( p_track->fmt.i_original_fourcc == ATOM_wvtt )
+                    p_block = MP4_WebVTT_Convert( p_demux, p_block );
             break;
         default:
             p_block->i_buffer = 0;

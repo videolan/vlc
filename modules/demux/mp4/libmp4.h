@@ -288,6 +288,11 @@ typedef int64_t stime_t;
 #define ATOM_clcp VLC_FOURCC( 'c', 'l', 'c', 'p' )
 #define ATOM_c608 VLC_FOURCC( 'c', '6', '0', '8' )
 #define ATOM_c708 VLC_FOURCC( 'c', '7', '0', '8' )
+#define ATOM_wvtt VLC_FOURCC( 'w', 'v', 't', 't' )
+
+/* In sample for WebVTT */
+#define ATOM_vttc VLC_FOURCC( 'v', 't', 't', 'c' )
+#define ATOM_payl VLC_FOURCC( 'p', 'a', 'y', 'l' )
 
 #define ATOM_0xa9nam VLC_FOURCC( 0xa9, 'n', 'a', 'm' )
 #define ATOM_0xa9aut VLC_FOURCC( 0xa9, 'a', 'u', 't' )

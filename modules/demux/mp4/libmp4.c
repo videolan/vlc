@@ -4257,6 +4257,9 @@ static const struct
     { ATOM_tx3g,    MP4_ReadBox_sample_tx3g,      0 },
     { ATOM_c608,    MP4_ReadBox_sample_clcp,      ATOM_stsd },
     //{ ATOM_text,    MP4_ReadBox_sample_text,    0 },
+    /* In sample WebVTT subtitle atoms. No ATOM_wvtt in normal parsing */
+    { ATOM_vttc,    MP4_ReadBoxContainer,         ATOM_wvtt },
+    { ATOM_payl,    MP4_ReadBox_Binary,           ATOM_vttc },
 
     /* for codecs */
     { ATOM_soun,    MP4_ReadBox_sample_soun,  ATOM_stsd },
