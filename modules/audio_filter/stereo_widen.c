@@ -117,6 +117,7 @@ static int MakeRingBuffer( float **pp_buffer, size_t *pi_buffer,
 static int Open( vlc_object_t *obj )
 {
     filter_t *p_filter  = (filter_t *)obj;
+    vlc_object_t *p_aout = p_filter->obj.parent;
     filter_sys_t *p_sys;
 
     if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
@@ -134,8 +135,8 @@ static int Open( vlc_object_t *obj )
         return VLC_ENOMEM;
 
 #define CREATE_VAR( stor, var ) \
-    p_sys->stor = var_CreateGetFloat( obj, var ); \
-    var_AddCallback( p_filter, var, paramCallback, p_sys );
+    p_sys->stor = var_CreateGetFloat( p_aout, var ); \
+    var_AddCallback( p_aout, var, paramCallback, p_sys );
 
     CREATE_VAR( f_delay,     CONFIG_PREFIX "delay" )
     CREATE_VAR( f_feedback,  CONFIG_PREFIX "feedback" )
@@ -148,7 +149,7 @@ static int Open( vlc_object_t *obj )
     if( MakeRingBuffer( &p_sys->pf_ringbuf, &p_sys->i_len, &p_sys->pf_write,
                         p_sys->f_delay, p_filter->fmt_in.audio.i_rate ) != VLC_SUCCESS )
     {
-        free( p_sys );
+        Close( obj );
         return VLC_ENOMEM;
     }
 
@@ -196,16 +197,17 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
 static void Close( vlc_object_t *obj )
 {
     filter_t *p_filter  = (filter_t *)obj;
+    vlc_object_t *p_aout = p_filter->obj.parent;
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #define DEL_VAR(var) \
-    var_DelCallback( p_filter, var, paramCallback, p_sys ); \
-    var_Destroy( p_filter, var );
+    var_DelCallback( p_aout, var, paramCallback, p_sys ); \
+    var_Destroy( p_aout, var );
 
     DEL_VAR( CONFIG_PREFIX "feedback" );
     DEL_VAR( CONFIG_PREFIX "crossfeed" );
     DEL_VAR( CONFIG_PREFIX "dry-mix" );
-    var_Destroy( p_filter, CONFIG_PREFIX "delay" );
+    DEL_VAR( CONFIG_PREFIX "delay" );
 
     free( p_sys->pf_ringbuf );
     free( p_sys );
