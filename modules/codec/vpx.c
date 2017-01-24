@@ -328,6 +328,11 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
     dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
 
+    if (dec->fmt_in.video.i_sar_num > 0 && dec->fmt_in.video.i_sar_den > 0) {
+        dec->fmt_out.video.i_sar_num = dec->fmt_in.video.i_sar_num;
+        dec->fmt_out.video.i_sar_den = dec->fmt_in.video.i_sar_den;
+    }
+
     return VLC_SUCCESS;
 }
 
