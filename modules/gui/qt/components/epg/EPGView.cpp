@@ -85,6 +85,7 @@ EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
 
     m_startTime = QDateTime();
     m_maxTime = m_startTime;
+    m_scaleFactor = 1.0;
 
     EPGGraphicsScene *EPGscene = new EPGGraphicsScene( this );
 

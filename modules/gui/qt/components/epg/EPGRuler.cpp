@@ -39,6 +39,7 @@ EPGRuler::EPGRuler( QWidget* parent )
     setMinimumHeight( height() );
     setMaximumHeight( height() );
     m_offset = 0;
+    m_scale = 1.0;
 }
 
 void EPGRuler::setScale( double scale )

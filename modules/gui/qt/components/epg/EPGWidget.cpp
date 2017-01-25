@@ -41,6 +41,7 @@
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {
     b_input_type_known = false;
+    i_event_source_type = ITEM_TYPE_UNKNOWN;
     m_rulerWidget = new EPGRuler( this );
     m_epgView = new EPGView( this );
     m_channelsWidget = new EPGChannels( this, m_epgView );
