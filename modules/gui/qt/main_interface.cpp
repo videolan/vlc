@@ -187,8 +187,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(WId*,struct vout_window_t*,unsigned*,unsigned *, bool)),
-             this, SLOT(getVideoSlot(WId*,struct vout_window_t*,unsigned*,unsigned*, bool)),
+    connect( this, SIGNAL(askGetVideo(WId*, struct vout_window_t*, unsigned, unsigned, bool)),
+             this, SLOT(getVideoSlot(WId*, struct vout_window_t*, unsigned, unsigned, bool)),
              Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
@@ -683,7 +683,7 @@ void MainInterface::toggleFSC()
  * That's why we have all those emit statements...
  */
 WId MainInterface::getVideo( struct vout_window_t *p_wnd,
-                             unsigned int *pi_width, unsigned int *pi_height,
+                             unsigned int i_width, unsigned int i_height,
                              bool fullscreen )
 {
     if( !videoWidget )
@@ -692,12 +692,12 @@ WId MainInterface::getVideo( struct vout_window_t *p_wnd,
     /* This is a blocking call signal. Results are returned through pointers.
      * Beware of deadlocks! */
     WId id;
-    emit askGetVideo( &id, p_wnd, pi_width, pi_height, fullscreen );
+    emit askGetVideo( &id, p_wnd, i_width, i_height, fullscreen );
     return id;
 }
 
 void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
-                                  unsigned *pi_width, unsigned *pi_height,
+                                  unsigned i_width, unsigned i_height,
                                   bool fullscreen )
 {
     /* Hidden or minimized, activate */
@@ -705,7 +705,7 @@ void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
         toggleUpdateSystrayMenu();
 
     /* Request the videoWidget */
-    WId ret = videoWidget->request( p_wnd, pi_width, pi_height, !b_autoresize );
+    WId ret = videoWidget->request( p_wnd );
     *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {
@@ -716,7 +716,7 @@ void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
 
         /* Ask videoWidget to resize correctly, if we are in normal mode */
         if( b_autoresize )
-            videoWidget->setSize( *pi_width, *pi_height );
+            videoWidget->setSize( i_width, i_height );
     }
 }
 

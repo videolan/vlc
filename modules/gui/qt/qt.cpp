@@ -735,10 +735,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     MainInterface *p_mi = p_intf->p_sys->p_mi;
     msg_Dbg( p_wnd, "requesting video window..." );
 
-    unsigned i_width = cfg->width;
-    unsigned i_height = cfg->height;
-
-    WId wid = p_mi->getVideo( p_wnd, &i_width, &i_height, cfg->is_fullscreen );
+    WId wid = p_mi->getVideo( p_wnd, cfg->width, cfg->height, cfg->is_fullscreen );
     if( !wid )
         return VLC_EGENERIC;
 

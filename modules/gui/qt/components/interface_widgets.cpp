@@ -100,8 +100,7 @@ void VideoWidget::sync( void )
 /**
  * Request the video to avoid the conflicts
  **/
-WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
-                          unsigned int *pi_height, bool b_keep_size )
+WId VideoWidget::request( struct vout_window_t *p_wnd )
 {
     if( stable )
     {
@@ -109,12 +108,6 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
         return 0;
     }
     assert( !p_window );
-
-    if( b_keep_size )
-    {
-        *pi_width  = size().width();
-        *pi_height = size().height();
-    }
 
     /* The owner of the video window needs a stable handle (WinId). Reparenting
      * in Qt4-X11 changes the WinId of the widget, so we need to create another
