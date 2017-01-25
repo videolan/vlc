@@ -1724,10 +1724,10 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( sscanf( s, "%d:%d:%d.%d %d:%d:%d.%d %[^\n\r]",
                     &h1, &m1, &s1, &f1, &h2, &m2, &s2, &f2, psz_text ) == 9 )
         {
-            p_subtitle->i_start = ( (int64_t)( h1 *3600 + m1 * 60 + s1 ) +
+            p_subtitle->i_start = ( ( (int64_t) h1 *3600 + m1 * 60 + s1 ) +
                 (int64_t)( ( f1 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution ) )
                 * 1000000;
-            p_subtitle->i_stop = ( (int64_t)( h2 *3600 + m2 * 60 + s2 ) +
+            p_subtitle->i_stop = ( ( (int64_t) h2 *3600 + m2 * 60 + s2 ) +
                 (int64_t)( ( f2 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution ) )
                 * 1000000;
             break;
@@ -1735,9 +1735,9 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
         /* Short time lines */
         else if( sscanf( s, "@%d @%d %[^\n\r]", &f1, &f2, psz_text ) == 3 )
         {
-            p_subtitle->i_start = (int64_t)(
+            p_subtitle->i_start = ((int64_t)
                     ( f1 + p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution * 1000000.0 );
-            p_subtitle->i_stop = (int64_t)(
+            p_subtitle->i_stop = ((int64_t)
                     ( f2 + p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution * 1000000.0 );
             break;
         }
