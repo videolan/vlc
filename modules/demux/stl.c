@@ -179,12 +179,19 @@ static int Open(vlc_object_t *object)
     const int tti_count = ParseInteger(&header[238], 5);
     msg_Dbg(demux, "Detected EBU STL : CCT=%d TTI=%d start=%8.8s %"PRId64, cct, tti_count, &header[256], program_start);
 
-    demux_sys_t *sys = xmalloc(sizeof(*sys));
+    demux_sys_t *sys = malloc(sizeof(*sys));
+    if(!sys)
+        return VLC_EGENERIC;
+
     sys->next_date = 0;
     sys->current   = 0;
     sys->count     = 0;
-    sys->index     = xcalloc(tti_count, sizeof(*sys->index));
-
+    sys->index     = calloc(tti_count, sizeof(*sys->index));
+    if(!sys->index)
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
 
     bool comment = false;
     stl_entry_t *s = &sys->index[0];
