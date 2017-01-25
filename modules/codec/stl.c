@@ -119,12 +119,20 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
     if (b->i_buffer < 128)
         goto exit;
 
-    int     payload_size = (b->i_buffer / 128) * 112;
-    uint8_t *payload = malloc(payload_size);
+    int     payload_size = 0;
+    uint8_t *payload = malloc((b->i_buffer / 128) * 112);
     if (!payload)
         goto exit;
+
+    /* */
+    int j = 0;
     for (unsigned i = 0; i < b->i_buffer / 128; i++)
-        memcpy(&payload[112 * i], &b->p_buffer[128 * i + 16], 112);
+    {
+        if( b->p_buffer[128 * i + 3] != 0xfe ) {
+            memcpy(&payload[112 * j++], &b->p_buffer[128 * i + 16], 112);
+            payload_size += 112;
+        }
+    }
 
     sub = decoder_NewSubpicture(dec, NULL);
     if (!sub) {

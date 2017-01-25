@@ -135,12 +135,13 @@ static int Demux(demux_t *demux)
 {
     demux_sys_t *sys = demux->p_sys;
 
+    int prev_index = 0;
     while(sys->current < sys->count) {
         stl_entry_t *s = &sys->index[sys->current];
         if (s->start > sys->next_date)
             break;
 
-        block_t *b = vlc_stream_Block(demux->s, 128 * s->count);
+        block_t *b = vlc_stream_Block(demux->s, 128 * (s->index - prev_index ));
         if (b) {
             b->i_dts =
             b->i_pts = VLC_TS_0 + s->start;
@@ -149,6 +150,7 @@ static int Demux(demux_t *demux)
             es_out_Send(demux->out, sys->es, b);
         }
         sys->current++;
+        prev_index = s->index;
     }
     return sys->current < sys->count ? 1 : 0;
 }
