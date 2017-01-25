@@ -1216,9 +1216,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
                                  GL_FLOAT, 0, 0, 0);
     }
     free(textureCoord);
-    glActiveTexture(GL_TEXTURE0 + 0);
-    glClientActiveTexture(GL_TEXTURE0 + 0);
-
     vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
     vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat), vertexCoord, GL_STATIC_DRAW);
     free(vertexCoord);
@@ -1243,7 +1240,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "ZoomMatrix"),
                           1, GL_FALSE, zoomMatrix);
 
-    vgl->api.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
     glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
 }
 
