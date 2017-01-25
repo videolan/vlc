@@ -831,7 +831,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
               this, setDisplayPosition( float, int64_t, int ) );
 
     connect( this, SIGNAL( broadcastRemainingTime( bool ) ),
-	     THEMIM->getIM(), SIGNAL( remainingTimeChanged( bool ) ) );
+         THEMIM->getIM(), SIGNAL( remainingTimeChanged( bool ) ) );
 
     CONNECT( THEMIM->getIM(), remainingTimeChanged( bool ),
               this, setRemainingTime( bool ) );
