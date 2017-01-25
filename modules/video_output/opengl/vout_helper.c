@@ -52,6 +52,7 @@ static opengl_tex_converter_init_cb opengl_tex_converter_init_cbs[] =
 {
     opengl_tex_converter_yuv_init,
     opengl_tex_converter_xyz12_init,
+    opengl_tex_converter_rgba_init,
 #ifdef __ANDROID__
     opengl_tex_converter_anop_init,
 #endif
@@ -73,6 +74,12 @@ typedef struct {
     float    tex_height;
 } gl_region_t;
 
+struct prgm
+{
+    GLuint id;
+    opengl_tex_converter_t tc;
+};
+
 struct vout_display_opengl_t {
 
     vlc_gl_t   *gl;
@@ -92,15 +99,11 @@ struct vout_display_opengl_t {
 
     picture_pool_t *pool;
 
-    /* One YUV program and/or one RGBA program (for subpics) */
-    GLuint     program[2];
-    opengl_tex_converter_t tex_conv[2];
     GLuint     vertex_shader;
-
-    /* Index of main picture program */
-    unsigned   program_idx;
-    /* Index of subpicture program */
-    unsigned   program_sub_idx;
+    /* One YUV program and one RGBA program (for subpics) */
+    struct prgm prgms[2];
+    struct prgm *prgm; /* Main program */
+    struct prgm *sub_prgm; /* Subpicture program */
 
     GLuint vertex_buffer_object;
     GLuint index_buffer_object;
@@ -271,7 +274,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->fmt.i_bmask  = 0x00ff0000;
 #   endif
     opengl_tex_converter_t tex_conv;
-    opengl_tex_converter_t rgba_tex_conv = {
+    opengl_tex_converter_t sub_tex_conv = {
         .parent = VLC_OBJECT(vgl->gl),
         .api = &vgl->api,
         .glexts = extensions,
@@ -279,56 +282,61 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    if (opengl_tex_converter_rgba_init(&vgl->fmt, &rgba_tex_conv) != VLC_SUCCESS)
+    if (opengl_tex_converter_rgba_init(&vgl->fmt, &sub_tex_conv) != VLC_SUCCESS)
     {
         msg_Err(gl, "RGBA shader failed");
         free(vgl);
         return NULL;
     }
+    assert(sub_tex_conv.fragment_shader != 0);
 
-    for (size_t i = 0; i < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++i)
+    const video_format_t *fmts[2] = { fmt, &vgl->fmt };
+    int ret = VLC_EGENERIC;
+    for (size_t i = 0; i < 2 && ret != VLC_SUCCESS; ++i)
     {
-        tex_conv = (opengl_tex_converter_t) {
-            .parent = VLC_OBJECT(vgl->gl),
-            .api = &vgl->api,
-            .glexts = extensions,
-            .orientation = fmt->orientation,
-        };
-        int ret = opengl_tex_converter_init_cbs[i](fmt, &tex_conv);
-        if (ret == VLC_SUCCESS)
+        /* Try first the untouched fmt, then the rgba fmt */
+        for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
         {
-            assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
-                   tex_conv.fragment_shader != 0 &&
-                   tex_conv.pf_gen_textures != NULL &&
-                   tex_conv.pf_update != NULL &&
-                   tex_conv.pf_prepare_shader != NULL &&
-                   tex_conv.pf_release != NULL);
-            vgl->fmt = *fmt;
-            vgl->fmt.i_chroma = tex_conv.chroma;
-            break;
+            tex_conv = (opengl_tex_converter_t) {
+                .parent = VLC_OBJECT(vgl->gl),
+                .api = &vgl->api,
+                .glexts = extensions,
+                .orientation = fmt->orientation,
+            };
+            ret = opengl_tex_converter_init_cbs[j](fmts[i], &tex_conv);
+            if (ret == VLC_SUCCESS)
+            {
+                assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
+                       tex_conv.fragment_shader != 0 &&
+                       tex_conv.pf_gen_textures != NULL &&
+                       tex_conv.pf_update != NULL &&
+                       tex_conv.pf_prepare_shader != NULL &&
+                       tex_conv.pf_release != NULL);
+                vgl->fmt = *fmt;
+                vgl->fmt.i_chroma = tex_conv.chroma;
+                break;
+            }
         }
     }
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Err(gl, "could not init tex converter");
+        sub_tex_conv.pf_release(&sub_tex_conv);
+        free(vgl);
+        return NULL;
+    }
+    assert(tex_conv.fragment_shader != 0);
 
     /* Build program if needed */
-    vgl->program[0] =
-    vgl->program[1] = 0;
-    vgl->vertex_shader = 0;
-    GLuint shaders[3] = { 0, 0, 0 };
-    unsigned nb_shaders = 0;
-
-    if (tex_conv.fragment_shader != 0)
-        shaders[nb_shaders++] = tex_conv.fragment_shader;
-
-    shaders[nb_shaders++] = rgba_tex_conv.fragment_shader;
-
     BuildVertexShader(vgl, &vgl->vertex_shader);
-    shaders[nb_shaders++] = vgl->vertex_shader;
-
-    /* One/two fragment shader and one vertex shader */
-    assert(shaders[0] != 0 && shaders[1] != 0);
+    GLuint shaders[3] = {
+        tex_conv.fragment_shader,
+        sub_tex_conv.fragment_shader,
+        vgl->vertex_shader
+    };
 
     /* Check shaders messages */
-    for (unsigned j = 0; j < nb_shaders; j++) {
+    for (unsigned j = 0; j < 3; j++) {
         int infoLength;
         vgl->api.GetShaderiv(shaders[j], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
@@ -345,44 +353,34 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
-    unsigned nb_programs = 0;
-    GLuint program;
-    int program_idx = -1, rgba_program_idx = -1;
+    /* Main picture vertex shaders */
+    vgl->prgm = &vgl->prgms[0];
+    vgl->prgm->tc = tex_conv;
+    vgl->prgm->id = vgl->api.CreateProgram();
+    vgl->api.AttachShader(vgl->prgm->id, tex_conv.fragment_shader);
+    vgl->api.AttachShader(vgl->prgm->id, vgl->vertex_shader);
+    vgl->api.LinkProgram(vgl->prgm->id);
 
-    /* YUV/XYZ & Vertex shaders */
-    if (tex_conv.fragment_shader != 0)
-    {
-        program_idx = nb_programs++;
+    /* Subpicture Vertex shaders */
+    vgl->sub_prgm = &vgl->prgms[1];
 
-        vgl->tex_conv[program_idx] = tex_conv;
-        program = vgl->program[program_idx] = vgl->api.CreateProgram();
-        vgl->api.AttachShader(program, tex_conv.fragment_shader);
-        vgl->api.AttachShader(program, vgl->vertex_shader);
-        vgl->api.LinkProgram(program);
-    }
-
-    /* RGB & Vertex shaders */
-    rgba_program_idx = nb_programs++;
-    vgl->tex_conv[rgba_program_idx] = rgba_tex_conv;
-    program = vgl->program[rgba_program_idx] = vgl->api.CreateProgram();
-    vgl->api.AttachShader(program, rgba_tex_conv.fragment_shader);
-    vgl->api.AttachShader(program, vgl->vertex_shader);
-    vgl->api.LinkProgram(program);
-
-    vgl->program_idx = program_idx != -1 ? program_idx : rgba_program_idx;
-    vgl->program_sub_idx = rgba_program_idx;
+    vgl->sub_prgm->tc = sub_tex_conv;
+    vgl->sub_prgm->id = vgl->api.CreateProgram();
+    vgl->api.AttachShader(vgl->sub_prgm->id, sub_tex_conv.fragment_shader);
+    vgl->api.AttachShader(vgl->sub_prgm->id, vgl->vertex_shader);
+    vgl->api.LinkProgram(vgl->sub_prgm->id);
 
     /* Check program messages */
-    for (GLuint i = 0; i < nb_programs; i++) {
+    for (GLuint i = 0; i < 2; i++) {
         int infoLength = 0;
-        vgl->api.GetProgramiv(vgl->program[i], GL_INFO_LOG_LENGTH, &infoLength);
+        vgl->api.GetProgramiv(vgl->prgms[i].id, GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
             continue;
         char *infolog = malloc(infoLength);
         if (infolog != NULL)
         {
             int charsWritten;
-            vgl->api.GetProgramInfoLog(vgl->program[i], infoLength, &charsWritten,
+            vgl->api.GetProgramInfoLog(vgl->prgms[i].id, infoLength, &charsWritten,
                                        infolog);
             msg_Err(gl, "shader program %d: %s", i, infolog);
             free(infolog);
@@ -390,7 +388,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
         /* If there is some message, better to check linking is ok */
         GLint link_status = GL_TRUE;
-        vgl->api.GetProgramiv(vgl->program[i], GL_LINK_STATUS, &link_status);
+        vgl->api.GetProgramiv(vgl->prgms[i].id, GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE) {
             msg_Err(gl, "Unable to use program %d\n", i);
             vout_display_opengl_Delete(vgl);
@@ -398,7 +396,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
-    vgl->chroma = vgl->tex_conv[vgl->program_idx].desc;
+    vgl->chroma = vgl->prgm->tc.desc;
     assert(vgl->chroma != NULL);
 
     /* Texture size */
@@ -465,10 +463,10 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     glFinish();
     glFlush();
 
-    opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
+    opengl_tex_converter_t *tc = &vgl->prgm->tc;
     tc->pf_del_textures(tc, vgl->texture);
 
-    tc = &vgl->tex_conv[vgl->program_sub_idx];
+    tc = &vgl->sub_prgm->tc;
     for (int i = 0; i < vgl->region_count; i++)
     {
         if (vgl->region[i].texture)
@@ -476,10 +474,10 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     }
     free(vgl->region);
 
-    for (int i = 0; i < 2 && vgl->program[i] != 0; i++)
+    for (int i = 0; i < 2 && vgl->prgms[i].id != 0; i++)
     {
-        vgl->api.DeleteProgram(vgl->program[i]);
-        opengl_tex_converter_t *tc = &vgl->tex_conv[i];
+        vgl->api.DeleteProgram(vgl->prgms[i].id);
+        opengl_tex_converter_t *tc = &vgl->prgms[i].tc;
         tc->pf_release(tc);
     }
     vgl->api.DeleteShader(vgl->vertex_shader);
@@ -569,7 +567,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         return vgl->pool;
 
     /* Allocates our textures */
-    opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
+    opengl_tex_converter_t *tc = &vgl->prgm->tc;
     int ret = tc->pf_gen_textures(tc, vgl->tex_width, vgl->tex_height,
                                   vgl->texture);
     if (ret != VLC_SUCCESS)
@@ -617,7 +615,7 @@ error:
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {
-    opengl_tex_converter_t *tc = &vgl->tex_conv[vgl->program_idx];
+    opengl_tex_converter_t *tc = &vgl->prgm->tc;
 
     /* Update the texture */
     int ret = tc->pf_update(tc, vgl->texture,
@@ -632,7 +630,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     vgl->region_count = 0;
     vgl->region       = NULL;
 
-    tc = &vgl->tex_conv[vgl->program_sub_idx];
+    tc = &vgl->sub_prgm->tc;
     if (subpicture) {
 
         int count = 0;
@@ -1132,10 +1130,10 @@ static int BuildRectangle(unsigned nbPlanes,
 static void DrawWithShaders(vout_display_opengl_t *vgl,
                             const float *left, const float *top,
                             const float *right, const float *bottom,
-                            unsigned int program_idx)
+                            struct prgm *prgm)
 {
-    GLuint program = vgl->program[program_idx];
-    opengl_tex_converter_t *tc = &vgl->tex_conv[program_idx];
+    GLuint program = prgm->id;
+    opengl_tex_converter_t *tc = &prgm->tc;
     vgl->api.UseProgram(program);
     tc->pf_prepare_shader(tc, program, 1.0f);
 
@@ -1280,13 +1278,14 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
     }
 
-    DrawWithShaders(vgl, left, top, right, bottom, vgl->program_idx);
+    DrawWithShaders(vgl, left, top, right, bottom, vgl->prgm);
 
     /* Draw the subpictures */
     // Change the program for overlays
-    GLuint sub_program = vgl->program[vgl->program_sub_idx];
-    opengl_tex_converter_t *sub_tc = &vgl->tex_conv[vgl->program_sub_idx];
-    vgl->api.UseProgram(sub_program);
+    struct prgm *prgm = vgl->sub_prgm;
+    GLuint program = prgm->id;
+    opengl_tex_converter_t *tc = &prgm->tc;
+    vgl->api.UseProgram(program);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1326,35 +1325,35 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         };
 
         assert(glr->texture != 0);
-        glBindTexture(sub_tc->tex_target, glr->texture);
-        sub_tc->pf_prepare_shader(sub_tc, sub_program, glr->alpha);
+        glBindTexture(tc->tex_target, glr->texture);
+        tc->pf_prepare_shader(tc, program, glr->alpha);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
-        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(sub_program,
+        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program,
                                          "MultiTexCoord0"));
-        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(sub_program,
+        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program,
                                      "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
-        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(sub_program,
+        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program,
                                          "VertexPosition"));
-        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(sub_program,
+        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program,
                                      "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
 
         // Subpictures have the correct orientation:
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
                                   "OrientationMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
                                   "ProjectionMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
                                   "ZRotMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
                                   "YRotMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
                                   "XRotMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(sub_program,
+        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
                                   "ZoomMatrix"), 1, GL_FALSE, identity);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
