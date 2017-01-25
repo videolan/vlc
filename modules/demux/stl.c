@@ -224,10 +224,15 @@ static int Open(vlc_object_t *object)
     fmt.p_extra = header;
 
     sys->es = es_out_Add(demux->out, &fmt);
-
     fmt.i_extra = 0;
     fmt.p_extra = NULL;
     es_format_Clean(&fmt);
+
+    if(sys->es == NULL)
+    {
+        Close(object);
+        return VLC_EGENERIC;
+    }
 
     demux->p_sys      = sys;
     demux->pf_demux   = Demux;
