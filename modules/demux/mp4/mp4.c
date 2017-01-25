@@ -1864,10 +1864,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
             }
 
-            if( p_udta == NULL && !b_attachment_set )
-                return VLC_EGENERIC;
-
-            SetupMeta( p_meta, p_udta );
+            if( p_udta == NULL )
+            {
+                if( !b_attachment_set )
+                    return VLC_EGENERIC;
+            }
+            else SetupMeta( p_meta, p_udta );
 
             return VLC_SUCCESS;
         }
