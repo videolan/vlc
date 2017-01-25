@@ -696,16 +696,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->subtitles.i_count && p_sys->i_length )
             {
                 i64 = VLC_TS_0 + f * p_sys->i_length;
-                for( size_t i = 0; i + 1< p_sys->subtitles.i_count; i++ )
-                {
-                    if( p_sys->subtitles.p_array[i + 1].i_start >= i64 )
-                    {
-                        p_sys->subtitles.i_current = i;
-                        p_sys->i_next_demux_date = i64;
-                        p_sys->b_first_time = true;
-                        return VLC_SUCCESS;
-                    }
-                }
+                return Control( p_demux, DEMUX_SET_TIME, i64 );
             }
             break;
 

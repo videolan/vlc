@@ -66,6 +66,8 @@ struct demux_sys_t {
 
     int         current;
     int64_t     next_date;
+    bool        b_slave;
+    bool        b_first_time;
 };
 
 static int ParseInteger(uint8_t *data, size_t size)
@@ -105,30 +107,65 @@ static int Control(demux_t *demux, int query, va_list args)
     }
     case DEMUX_GET_TIME: {
         int64_t *t = va_arg(args, int64_t *);
-        *t = sys->current < sys->count ? sys->index[sys->count-1].start : 0;
+        *t = sys->next_date - var_GetInteger(demux->obj.parent, "spu-delay");
+        if( *t < 0 )
+            *t = sys->next_date;
         return VLC_SUCCESS;
     }
     case DEMUX_SET_NEXT_DEMUX_TIME: {
+        sys->b_slave = true;
         sys->next_date = va_arg(args, int64_t);
         return VLC_SUCCESS;
     }
     case DEMUX_SET_TIME: {
         int64_t t = va_arg(args, int64_t);
-        sys->current = 0;
-        while (sys->current < sys->count) {
-            if (sys->index[sys->current].stop > t) {
-                vlc_stream_Seek(demux->s, 1024 + 128LL * sys->index[sys->current].index);
-                break;
+        for( size_t i = 0; i + 1< sys->count; i++ )
+        {
+            if( sys->index[i + 1].start >= t &&
+                vlc_stream_Seek(demux->s, 1024 + 128LL * sys->index[i].index) == VLC_SUCCESS )
+            {
+                sys->current = i;
+                sys->next_date = t;
+                sys->b_first_time = true;
+                return VLC_SUCCESS;
             }
-            sys->current++;
+        }
+        break;
+    }
+    case DEMUX_SET_POSITION:
+    {
+        double f = (double)va_arg( args, double );
+        if(sys->count && sys->index[sys->count-1].stop > 0)
+        {
+            int64_t i64 = f * sys->index[sys->count-1].stop;
+            return Control(demux, DEMUX_SET_TIME, i64);
+        }
+        break;
+    }
+    case DEMUX_GET_POSITION:
+    {
+        double *pf = (double*)va_arg(args, double *);
+        if(sys->current >= sys->count)
+        {
+            *pf = 1.0;
+        }
+        else if(sys->count > 0 && sys->index[sys->count-1].stop > 0)
+        {
+            *pf = sys->next_date - var_GetInteger(demux->obj.parent, "spu-delay");
+            if(*pf < 0)
+               *pf = sys->next_date;
+            *pf /= sys->index[sys->count-1].stop;
+        }
+        else
+        {
+            *pf = 0.0;
         }
         return VLC_SUCCESS;
     }
-    case DEMUX_SET_POSITION:
-    case DEMUX_GET_POSITION:
     default:
-        return VLC_EGENERIC;
+        break;
     }
+    return VLC_EGENERIC;
 }
 
 static int Demux(demux_t *demux)
@@ -136,10 +173,20 @@ static int Demux(demux_t *demux)
     demux_sys_t *sys = demux->p_sys;
 
     int prev_index = 0;
-    while(sys->current < sys->count) {
+    int64_t i_barrier = sys->next_date - var_GetInteger(demux->obj.parent, "spu-delay");
+    if(i_barrier < 0)
+        i_barrier = sys->next_date;
+
+    while(sys->current < sys->count &&
+          sys->index[sys->current].start <= i_barrier)
+    {
         stl_entry_t *s = &sys->index[sys->current];
-        if (s->start > sys->next_date)
-            break;
+
+        if (!sys->b_slave && sys->b_first_time)
+        {
+            es_out_Control(demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_barrier);
+            sys->b_first_time = false;
+        }
 
         block_t *b = vlc_stream_Block(demux->s, 128 * (s->index - prev_index ));
         if (b) {
@@ -152,7 +199,14 @@ static int Demux(demux_t *demux)
         sys->current++;
         prev_index = s->index;
     }
-    return sys->current < sys->count ? 1 : 0;
+
+    if (!sys->b_slave)
+    {
+        es_out_Control(demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_barrier);
+        sys->next_date += CLOCK_FREQ / 8;
+    }
+
+    return sys->current < sys->count ? VLC_DEMUXER_SUCCESS : VLC_DEMUXER_EOF;
 }
 
 static int Open(vlc_object_t *object)
@@ -183,6 +237,8 @@ static int Open(vlc_object_t *object)
     if(!sys)
         return VLC_EGENERIC;
 
+    sys->b_slave   = false;
+    sys->b_first_time = true;
     sys->next_date = 0;
     sys->current   = 0;
     sys->count     = 0;
