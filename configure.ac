@@ -1824,7 +1824,7 @@ dnl
 dnl  libsmbclient plugin
 dnl
 PKG_ENABLE_MODULES_VLC([SMBCLIENT], [smb], [smbclient], (SMB/CIFS support), [auto])
-AS_IF([test "${SYS}" = "mingw32" -a "${enable_smbclient}" != "no"], [ VLC_ADD_PLUGIN([smb]) ])
+AS_IF([test "${SYS}" = "mingw32" -a "${enable_winstore_app}" != "yes"], [ VLC_ADD_PLUGIN([smb]) ])
 
 dnl
 dnl  liBDSM access module
