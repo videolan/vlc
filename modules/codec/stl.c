@@ -85,6 +85,10 @@ static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *c
     if (text == NULL)
         return NULL;
 
+    text_segment_t *segment = text_segment_New( NULL );
+    if (segment == NULL)
+        return NULL;
+
     size_t text_size = 0;
 
     for (size_t i = 0; i < size; i++) {
@@ -96,28 +100,39 @@ static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *c
             continue;
         if (code & 0x60)
             text[text_size++] = code;
-        /* italics begin/end 0x80/0x81, underline being/end 0x82/0x83
-         * TODO: handle the endings */
-        if (code == 0x80 || code == 0x82 )
+        /* italics begin/end 0x80/0x81, underline being/end 0x82/0x83 */
+        if (code >= 0x80 && code <= 0x83 )
         {
-            style = text_style_Create( STYLE_NO_DEFAULTS );
-            if (code == 0x80)
-                style->i_style_flags |= STYLE_ITALIC;
-            if (code == 0x82)
-                style->i_style_flags |= STYLE_UNDERLINE;
-            style->i_features |= STYLE_HAS_FLAGS;
+            /* Style Change, we do a new segment */
+            if( text_size != 0 )
+            {
+                segment->p_next = ParseText( &data[i], (size - i), charset);
+                break;
+            }
+            else
+            {
+                style = text_style_Create( STYLE_NO_DEFAULTS );
+                if (code == 0x80)
+                    style->i_style_flags |= STYLE_ITALIC;
+                if (code == 0x81)
+                    style->i_style_flags &= STYLE_ITALIC;
+                if (code == 0x82)
+                    style->i_style_flags |= STYLE_UNDERLINE;
+                if (code == 0x83)
+                    style->i_style_flags &= STYLE_UNDERLINE;
+                style->i_features |= STYLE_HAS_FLAGS;
+            }
         }
         if (code == 0x8a)
             text[text_size++] = '\n';
     }
 
-    char *u8 = FromCharset(charset, text, text_size);
+    segment->psz_text = FromCharset(charset, text, text_size);
     free(text);
 
-    text_segment_t *segment = text_segment_New( u8 );
-    free( u8 );
     if( style )
         segment->style = style;
+
     return segment;
 }
 
