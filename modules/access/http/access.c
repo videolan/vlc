@@ -173,6 +173,7 @@ static int Open(vlc_object_t *obj)
 
     struct vlc_credential crd;
     struct vlc_url_t crd_url;
+    char *psz_realm = NULL;
 
     vlc_UrlParse(&crd_url, access->psz_url);
     vlc_credential_init(&crd, &crd_url);
@@ -206,11 +207,12 @@ static int Open(vlc_object_t *obj)
     while (status == 401) /* authentication */
     {
         crd.psz_authtype = "Basic";
-        free((char *)crd.psz_realm);
-        crd.psz_realm = vlc_http_res_get_basic_realm(sys->resource);
+        free(psz_realm);
+        psz_realm = vlc_http_res_get_basic_realm(sys->resource);
 
-        if (crd.psz_realm == NULL)
+        if (psz_realm == NULL)
             break;
+        crd.psz_realm = psz_realm;
         if (!vlc_credential_get(&crd, obj, NULL, NULL, _("HTTP authentication"),
                                 _("Please enter a valid login name and "
                                   "a password for realm %s."), crd.psz_realm))
@@ -242,7 +244,7 @@ static int Open(vlc_object_t *obj)
     }
 
     vlc_credential_store(&crd, obj);
-    free((char *)crd.psz_realm);
+    free(psz_realm);
     vlc_credential_clean(&crd);
     vlc_UrlClean(&crd_url);
 
@@ -267,7 +269,7 @@ error:
         vlc_http_res_destroy(sys->resource);
     if (sys->manager != NULL)
         vlc_http_mgr_destroy(sys->manager);
-    free((char *)crd.psz_realm);
+    free(psz_realm);
     vlc_credential_clean(&crd);
     vlc_UrlClean(&crd_url);
     free(sys);
