@@ -830,6 +830,7 @@ static int Open( vlc_object_t * p_this )
                 if( strstr( psz_ref, "qt5gateQT" ) )
                 {
                     msg_Dbg( p_demux, "ignoring pseudo ref =`%s'", psz_ref );
+                    free( psz_ref );
                     continue;
                 }
                 if( !strncmp( psz_ref, "http://", 7 ) ||
