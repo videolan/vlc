@@ -215,8 +215,13 @@ static int Open(vlc_object_t *object)
         if (ebn == 0xff && sys->count < tti_count)
             s->count = 0;
     }
-    if (sys->count > 0)
-        vlc_stream_Seek(demux->s, 1024 + 128LL * sys->index[0].index);
+
+    if (sys->count == 0 ||
+        vlc_stream_Seek(demux->s, 1024 + 128LL * sys->index[0].index) != VLC_SUCCESS)
+    {
+        Close(object);
+        return VLC_EGENERIC;
+    }
 
     es_format_t fmt;
     es_format_Init(&fmt, SPU_ES, VLC_CODEC_EBU_STL);
