@@ -49,6 +49,7 @@
 #   define PFNGLUNIFORMMATRIX4FVPROC         typeof(glUniformMatrix4fv)*
 #   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
 #   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
+#   define PFNGLUNIFORM2FPROC                typeof(glUniform2f)*
 #   define PFNGLUNIFORM1IPROC                typeof(glUniform1i)*
 #   define PFNGLCREATESHADERPROC             typeof(glCreateShader)*
 #   define PFNGLSHADERSOURCEPROC             typeof(glShaderSource)*
@@ -90,6 +91,7 @@ typedef struct {
     PFNGLUNIFORMMATRIX4FVPROC   UniformMatrix4fv;
     PFNGLUNIFORM4FVPROC         Uniform4fv;
     PFNGLUNIFORM4FPROC          Uniform4f;
+    PFNGLUNIFORM2FPROC          Uniform2f;
     PFNGLUNIFORM1IPROC          Uniform1i;
 
     /* Shader command */

@@ -482,6 +482,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     api->UniformMatrix4fv        = GET_PROC_ADDR(glUniformMatrix4fv);
     api->Uniform4fv              = GET_PROC_ADDR(glUniform4fv);
     api->Uniform4f               = GET_PROC_ADDR(glUniform4f);
+    api->Uniform2f               = GET_PROC_ADDR(glUniform2f);
     api->Uniform1i               = GET_PROC_ADDR(glUniform1i);
 
     api->CreateProgram = GET_PROC_ADDR(glCreateProgram);
