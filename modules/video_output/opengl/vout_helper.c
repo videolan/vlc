@@ -78,6 +78,19 @@ struct prgm
 {
     GLuint id;
     opengl_tex_converter_t tc;
+
+    struct { /* UniformLocation */
+        GLint OrientationMatrix;
+        GLint ProjectionMatrix;
+        GLint ZRotMatrix;
+        GLint YRotMatrix;
+        GLint XRotMatrix;
+        GLint ZoomMatrix;
+    } uloc;
+    struct { /* AttribLocation */
+        GLint MultiTexCoord[3];
+        GLint VertexPosition;
+    } aloc;
 };
 
 struct vout_display_opengl_t {
@@ -310,6 +323,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                        tex_conv.fragment_shader != 0 &&
                        tex_conv.pf_gen_textures != NULL &&
                        tex_conv.pf_update != NULL &&
+                       tex_conv.pf_fetch_locations != NULL &&
                        tex_conv.pf_prepare_shader != NULL &&
                        tex_conv.pf_release != NULL);
                 vgl->fmt = *fmt;
@@ -398,6 +412,53 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     vgl->chroma = vgl->prgm->tc.desc;
     assert(vgl->chroma != NULL);
+
+    /* Fetch UniformLocations and AttribLocations */
+    for (GLuint i = 0; i < 2; i++)
+    {
+#define GET_LOC(type, x, str) do { \
+    x = vgl->api.Get##type##Location(prgm->id, str); \
+    assert(x != -1); \
+    if (x == -1) { \
+        msg_Err(gl, "Unable to Get"#type"Location(%s)\n", str); \
+        vout_display_opengl_Delete(vgl); \
+        return NULL; \
+    } \
+} while (0)
+#define GET_ULOC(x, str) GET_LOC(Uniform, prgm->uloc.x, str)
+#define GET_ALOC(x, str) GET_LOC(Attrib, prgm->aloc.x, str)
+        struct prgm *prgm = &vgl->prgms[i];
+        GET_ULOC(OrientationMatrix, "OrientationMatrix");
+        GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
+        GET_ULOC(ZRotMatrix, "ZRotMatrix");
+        GET_ULOC(YRotMatrix, "YRotMatrix");
+        GET_ULOC(XRotMatrix, "XRotMatrix");
+        GET_ULOC(ZoomMatrix, "ZoomMatrix");
+
+        GET_ALOC(VertexPosition, "VertexPosition");
+        GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
+        /* MultiTexCoord 1 and 2 can be optimized out if not used */
+        if (prgm->tc.desc->plane_count > 1)
+            GET_ALOC(MultiTexCoord[1], "MultiTexCoord1");
+        else
+            prgm->aloc.MultiTexCoord[1] = -1;
+        if (prgm->tc.desc->plane_count > 2)
+            GET_ALOC(MultiTexCoord[2], "MultiTexCoord2");
+        else
+            prgm->aloc.MultiTexCoord[2] = -1;
+#undef GET_LOC
+#undef GET_ULOC
+#undef GET_ALOC
+        int ret = prgm->tc.pf_fetch_locations(&prgm->tc, prgm->id);
+        assert(ret == VLC_SUCCESS);
+        if (ret != VLC_SUCCESS)
+        {
+            msg_Err(gl, "Unable to get locations from %4.4s tex_conv\n",
+                    (const char *) &prgm->tc.chroma);
+            vout_display_opengl_Delete(vgl);
+            return NULL;
+        }
+    }
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
@@ -1135,7 +1196,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     GLuint program = prgm->id;
     opengl_tex_converter_t *tc = &prgm->tc;
     vgl->api.UseProgram(program);
-    tc->pf_prepare_shader(tc, program, 1.0f);
+    tc->pf_prepare_shader(tc, 1.0f);
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
@@ -1207,11 +1268,10 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
                         textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
 
-        char attribute[20];
-        snprintf(attribute, sizeof(attribute), "MultiTexCoord%1d", j);
-        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program, attribute));
-        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program, attribute), 2,
-                                 GL_FLOAT, 0, 0, 0);
+        assert(prgm->aloc.MultiTexCoord[j] != -1);
+        vgl->api.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[j]);
+        vgl->api.VertexAttribPointer(prgm->aloc.MultiTexCoord[j], 2, GL_FLOAT,
+                                     0, 0, 0);
     }
     free(textureCoord);
     vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
@@ -1220,23 +1280,17 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     vgl->api.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
     vgl->api.BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort), indices, GL_STATIC_DRAW);
     free(indices);
-    vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program,
-                                 "VertexPosition"));
-    vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program, "VertexPosition"),
-                             3, GL_FLOAT, 0, 0, 0);
+    vgl->api.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+    vgl->api.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
-    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "OrientationMatrix"),
-                          1, GL_FALSE, orientationMatrix);
-    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "ProjectionMatrix"),
-                          1, GL_FALSE, projectionMatrix);
-    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "ZRotMatrix"),
-                          1, GL_FALSE, zRotMatrix);
-    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "YRotMatrix"),
-                          1, GL_FALSE, yRotMatrix);
-    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "XRotMatrix"),
-                          1, GL_FALSE, xRotMatrix);
-    vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program, "ZoomMatrix"),
-                          1, GL_FALSE, zoomMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
+                              orientationMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
+                              projectionMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE, zRotMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE, yRotMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE, xRotMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE, zoomMatrix);
 
     glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
 }
@@ -1326,35 +1380,27 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
         assert(glr->texture != 0);
         glBindTexture(tc->tex_target, glr->texture);
-        tc->pf_prepare_shader(tc, program, glr->alpha);
+        tc->pf_prepare_shader(tc, glr->alpha);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
-        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program,
-                                         "MultiTexCoord0"));
-        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program,
-                                     "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->api.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
+        vgl->api.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT,
+                                     0, 0, 0);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
-        vgl->api.EnableVertexAttribArray(vgl->api.GetAttribLocation(program,
-                                         "VertexPosition"));
-        vgl->api.VertexAttribPointer(vgl->api.GetAttribLocation(program,
-                                     "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
+        vgl->api.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+        vgl->api.VertexAttribPointer(prgm->aloc.VertexPosition, 2, GL_FLOAT,
+                                     0, 0, 0);
 
         // Subpictures have the correct orientation:
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
-                                  "OrientationMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
-                                  "ProjectionMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
-                                  "ZRotMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
-                                  "YRotMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
-                                  "XRotMatrix"), 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(vgl->api.GetUniformLocation(program,
-                                  "ZoomMatrix"), 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE, identity);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }

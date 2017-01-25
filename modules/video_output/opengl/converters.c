@@ -58,6 +58,14 @@ struct priv
     GLenum tex_format;
     GLenum tex_type;
 
+    struct {
+        GLint Texture0;
+        GLint Texture1;
+        GLint Texture2;
+        GLint Coefficient;
+        GLint FillColor;
+    } uloc;
+
     bool   has_unpack_subimage;
     void * texture_temp_buf;
     size_t texture_temp_buf_size;
@@ -499,13 +507,22 @@ common_init(opengl_tex_converter_t *tc, size_t priv_size, vlc_fourcc_t chroma,
     return VLC_SUCCESS;
 }
 
-static void
-tc_rgba_prepare_shader(const opengl_tex_converter_t *tc,
-                       GLuint program, float alpha)
+static int
+tc_rgba_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
 {
-    tc->api->Uniform1i(tc->api->GetUniformLocation(program, "Texture0"), 0);
-    tc->api->Uniform4f(tc->api->GetUniformLocation(program, "FillColor"),
-                       1.0f, 1.0f, 1.0f, alpha);
+    struct priv *priv = tc->priv;
+    priv->uloc.Texture0 = tc->api->GetUniformLocation(program, "Texture0");
+    priv->uloc.FillColor = tc->api->GetUniformLocation(program, "FillColor");
+    return priv->uloc.Texture0 != -1 && priv->uloc.FillColor != -1 ?
+           VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static void
+tc_rgba_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
+{
+    struct priv *priv = tc->priv;
+    tc->api->Uniform1i(priv->uloc.Texture0, 0);
+    tc->api->Uniform4f(priv->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
 }
 
 int
@@ -519,6 +536,7 @@ opengl_tex_converter_rgba_init(const video_format_t *fmt,
                     GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE) != VLC_SUCCESS)
         return VLC_ENOMEM;
 
+    tc->pf_fetch_locations = tc_rgba_fetch_locations;
     tc->pf_prepare_shader = tc_rgba_prepare_shader;
 
 #if 0
@@ -538,12 +556,12 @@ opengl_tex_converter_rgba_init(const video_format_t *fmt,
     static const char *code =
         "#version " GLSL_VERSION "\n"
         PRECISION
-        "uniform sampler2D Texture;"
+        "uniform sampler2D Texture0;"
         "uniform vec4 FillColor;"
         "varying vec4 TexCoord0;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(Texture, TexCoord0.st) * FillColor;"
+        "  gl_FragColor = texture2D(Texture0, TexCoord0.st) * FillColor;"
         "}";
 
     tc->fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
@@ -586,17 +604,29 @@ static int GetTexFormatSize(int target, int tex_format, int tex_internal,
 }
 #endif
 
+static int
+tc_yuv_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
+{
+    struct priv *priv = tc->priv;
+    priv->uloc.Coefficient = tc->api->GetUniformLocation(program, "Coefficient");
+    priv->uloc.Texture0 = tc->api->GetUniformLocation(program, "Texture0");
+    priv->uloc.Texture1 = tc->api->GetUniformLocation(program, "Texture1");
+    priv->uloc.Texture2 = tc->api->GetUniformLocation(program, "Texture2");
+    return priv->uloc.Coefficient != -1 && priv->uloc.Texture0 != -1
+        && priv->uloc.Texture1 != -1 && priv->uloc.Texture2 != -1 ?
+        VLC_SUCCESS : VLC_EGENERIC;
+}
+
 static void
-tc_yuv_prepare_shader(const opengl_tex_converter_t *tc,
-                      GLuint program, float alpha)
+tc_yuv_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
 {
     (void) alpha;
-    struct yuv_priv *priv = tc->priv;
-    tc->api->Uniform4fv(tc->api->GetUniformLocation(program, "Coefficient"), 4,
-                        priv->local_value);
-    tc->api->Uniform1i(tc->api->GetUniformLocation(program, "Texture0"), 0);
-    tc->api->Uniform1i(tc->api->GetUniformLocation(program, "Texture1"), 1);
-    tc->api->Uniform1i(tc->api->GetUniformLocation(program, "Texture2"), 2);
+    struct priv *priv = tc->priv;
+    tc->api->Uniform4fv(priv->uloc.Coefficient, 4,
+                        ((struct yuv_priv *)priv)->local_value);
+    tc->api->Uniform1i(priv->uloc.Texture0, 0);
+    tc->api->Uniform1i(priv->uloc.Texture1, 1);
+    tc->api->Uniform1i(priv->uloc.Texture2, 2);
 }
 
 int
@@ -658,6 +688,7 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
     if (!*list)
         return VLC_EGENERIC;
 
+    tc->pf_fetch_locations = tc_yuv_fetch_locations;
     tc->pf_prepare_shader = tc_yuv_prepare_shader;
 
     GLfloat *local_value = ((struct yuv_priv*) tc->priv)->local_value;
@@ -750,12 +781,20 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
     return VLC_SUCCESS;
 }
 
-static void
-tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
-                        GLuint program, float alpha)
+static int
+tc_xyz12_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
 {
-    (void) tc; (void) alpha;
-    tc->api->Uniform1i(tc->api->GetUniformLocation(program, "Texture0"), 0);
+    struct priv *priv = tc->priv;
+    priv->uloc.Texture0 = tc->api->GetUniformLocation(program, "Texture0");
+    return priv->uloc.Texture0 != -1 ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static void
+tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
+{
+    (void) alpha;
+    struct priv *priv = tc->priv;
+    tc->api->Uniform1i(priv->uloc.Texture0, 0);
 }
 
 int
@@ -769,6 +808,7 @@ opengl_tex_converter_xyz12_init(const video_format_t *fmt,
                     GL_RGB, GL_RGB, GL_UNSIGNED_SHORT) != VLC_SUCCESS)
         return VLC_ENOMEM;
 
+    tc->pf_fetch_locations = tc_xyz12_fetch_locations;
     tc->pf_prepare_shader = tc_xyz12_prepare_shader;
 
     /* Shader for XYZ to RGB correction

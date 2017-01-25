@@ -35,6 +35,10 @@ struct priv
 {
     SurfaceTexture *stex;
     const float *transform_mtx;
+
+    struct {
+        GLint uSTMatrix;
+    } uloc;
 };
 
 static int
@@ -177,17 +181,22 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
     return VLC_SUCCESS;
 }
 
+static int
+tc_anop_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
+{
+    struct priv *priv = tc->priv;
+    priv->uloc.uSTMatrix = tc->api->GetUniformLocation(program, "uSTMatrix");
+    return priv->uloc.uSTMatrix != -1 ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 static void
-tc_anop_prepare_shader(const opengl_tex_converter_t *tc,
-                       GLuint program, float alpha)
+tc_anop_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
 {
     (void) alpha;
     struct priv *priv = tc->priv;
     if (priv->transform_mtx != NULL)
-    {
-        GLint handle = tc->api->GetUniformLocation(program, "uSTMatrix");
-        tc->api->UniformMatrix4fv(handle, 1, GL_FALSE, priv->transform_mtx);
-    }
+        tc->api->UniformMatrix4fv(priv->uloc.uSTMatrix, 1, GL_FALSE,
+                                  priv->transform_mtx);
 }
 
 static void
@@ -221,6 +230,7 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
     tc->pf_del_textures   = tc_anop_del_textures;
     tc->pf_get_pool       = tc_anop_get_pool;
     tc->pf_update         = tc_anop_update;
+    tc->pf_fetch_locations = tc_anop_fetch_locations;
     tc->pf_prepare_shader = tc_anop_prepare_shader;
     tc->pf_release        = tc_anop_release;
 

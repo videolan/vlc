@@ -243,18 +243,27 @@ struct opengl_tex_converter_t
                      picture_t *pic, const size_t *plane_offset);
 
     /*
+     * Callback to fetch locations of uniform or attributes variables
+     *
+     * This function pointer cannot be NULL. This callback is called one time
+     * after init.
+     *
+     * \param fc OpenGL tex converter
+     * \param program linked program that will be used by this tex converter
+     * \return VLC_SUCCESS or a VLC error
+     */
+    int (*pf_fetch_locations)(const opengl_tex_converter_t *fc, GLuint program);
+
+    /*
      * Callback to prepare the fragment shader
      *
      * This function pointer cannot be NULL. This callback can be used to
-     * specify values of uniform variables for the program object that is
-     * attached to the configured shader.
+     * specify values of uniform variables.
      *
      * \param fc OpenGL tex converter
      * \param alpha alpha value, used only for RGBA fragment shader
-     * \param program current program object
      */
-    void (*pf_prepare_shader)(const opengl_tex_converter_t *fc,
-                              GLuint program, float alpha);
+    void (*pf_prepare_shader)(const opengl_tex_converter_t *fc, float alpha);
 
     /*
      * Callback to release the shader and the private context
