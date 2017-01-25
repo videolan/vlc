@@ -372,7 +372,7 @@ new_entries_sd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
     struct srv *p_srvs;
     unsigned i_nb_srv;
     const char *psz_ip;
-    bool b_ipv6;
+    bool b_ipv6 = false;
     if( parse_entries( p_entries, false, &p_srvs, &i_nb_srv,
                        &psz_ip, &b_ipv6 ) != VLC_SUCCESS )
         return;
@@ -448,7 +448,7 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
     struct srv *p_srvs;
     unsigned i_nb_srv;
     const char *psz_ip;
-    bool b_ipv6;
+    bool b_ipv6 = false;
     if( parse_entries( p_entries, true, &p_srvs, &i_nb_srv,
                        &psz_ip, &b_ipv6 ) != VLC_SUCCESS )
         return;
