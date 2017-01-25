@@ -670,6 +670,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_SUCCESS;
                 }
             }
+            break;
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
@@ -706,6 +707,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     }
                 }
             }
+            break;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
