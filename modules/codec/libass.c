@@ -208,7 +208,6 @@ static int Create( vlc_object_t *p_this )
     ass_set_use_margins( p_renderer, false);
     //if( false )
     //    ass_set_margins( p_renderer, int t, int b, int l, int r);
-    ass_set_hinting( p_renderer, ASS_HINTING_LIGHT );
     ass_set_font_scale( p_renderer, 1.0 );
     ass_set_line_spacing( p_renderer, 0.0 );
 
@@ -239,6 +238,10 @@ static int Create( vlc_object_t *p_this )
 #else
     ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );
 #endif
+
+    /* Anything else than NONE will break smooth img updating.
+       TODO: List and force ASS_HINTING_LIGHT for known problematic fonts */
+    ass_set_hinting( p_renderer, ASS_HINTING_NONE );
 
     /* Add a track */
     ASS_Track *p_track = p_sys->p_track = ass_new_track( p_sys->p_library );
