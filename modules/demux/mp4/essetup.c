@@ -665,6 +665,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 }
             }
         }
+        break;
 
         case ATOM_WMV3:
         {
@@ -901,6 +902,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     p_track->fmt.b_packetized = false;
                 }
             }
+            break;
         }
         case( ATOM_eac3 ):
         {
