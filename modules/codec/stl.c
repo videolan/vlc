@@ -80,6 +80,7 @@ static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
 
 static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *charset)
 {
+    text_style_t *style = NULL;
     char *text = malloc(size);
     if (text == NULL)
         return NULL;
@@ -93,16 +94,29 @@ static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *c
             break;
         if (code == 0x7f)
             continue;
-        /* TODO: italics begin/end 0x80/0x81, underline being/end 0x82/0x83 */
         if (code & 0x60)
             text[text_size++] = code;
+        /* italics begin/end 0x80/0x81, underline being/end 0x82/0x83
+         * TODO: handle the endings */
+        if (code == 0x80 || code == 0x82 )
+        {
+            style = text_style_Create( STYLE_NO_DEFAULTS );
+            if (code == 0x80)
+                style->i_style_flags |= STYLE_ITALIC;
+            if (code == 0x82)
+                style->i_style_flags |= STYLE_UNDERLINE;
+            style->i_features |= STYLE_HAS_FLAGS;
+        }
         if (code == 0x8a)
             text[text_size++] = '\n';
     }
 
     char *u8 = FromCharset(charset, text, text_size);
     free(text);
+
     text_segment_t *segment = text_segment_New( u8 );
+    if( style )
+        segment->style = style;
     return segment;
 }
 
