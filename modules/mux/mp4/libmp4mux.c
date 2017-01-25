@@ -670,7 +670,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
     };
 
     struct nal rg_vps[HEVC_VPS_ID_MAX + 1], rg_sps[HEVC_SPS_ID_MAX + 1],
-               rg_pps[HEVC_VPS_ID_MAX + 1], *p_sei = NULL, *p_nal = NULL;
+               rg_pps[HEVC_PPS_ID_MAX + 1], *p_sei = NULL, *p_nal = NULL;
     uint8_t i_vps = 0, i_sps = 0, i_pps = 0, i_num_arrays = 0;
     size_t i_sei = 0;
 
