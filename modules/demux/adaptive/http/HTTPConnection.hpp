@@ -89,6 +89,7 @@ namespace adaptive
                 std::string readLine();
                 char * psz_useragent;
 
+                ConnectionParams    locationparams;
                 bool                connectionClose;
                 bool                chunked;
                 bool                chunked_eof;

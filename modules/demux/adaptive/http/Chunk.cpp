@@ -203,7 +203,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
     return p_block;
 }
 
-bool HTTPChunkSource::prepare()
+bool HTTPChunkSource::prepare(int i_redir)
 {
     if(prepared)
         return true;
@@ -218,8 +218,13 @@ bool HTTPChunkSource::prepare()
             return false;
     }
 
-    if( connection->request(params.getPath(), bytesRange) != VLC_SUCCESS )
+    int i_ret = connection->request(params.getPath(), bytesRange);
+    if(i_ret != VLC_SUCCESS)
+    {
+        if(i_ret == VLC_ETIMEOUT && i_redir < 3)
+            return HTTPChunkSource::prepare(i_redir + 1);
         return false;
+    }
     /* Because we don't know Chunk size at start, we need to get size
            from content length */
     contentLength = connection->getContentLength();

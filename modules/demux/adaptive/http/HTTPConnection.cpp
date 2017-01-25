@@ -150,6 +150,15 @@ int HTTPConnection::request(const std::string &path, const BytesRange &range)
     {
         queryOk = true;
     }
+    else if(i_ret == VLC_ETIMEOUT) /* redir */
+    {
+        socket->disconnect();
+        if(locationparams.getScheme().empty())
+            params.setPath(locationparams.getPath());
+        else
+            params = locationparams;
+        locationparams = ConnectionParams();
+    }
     else if(i_ret == VLC_EGENERIC)
     {
         socket->disconnect();
@@ -225,11 +234,7 @@ int HTTPConnection::parseReply()
     ss.imbue(std::locale("C"));
     int replycode;
     ss >> replycode;
-    if (replycode != 200 && replycode != 206)
-    {
-        msg_Err(p_object, "Failed reading %s: %s", params.getUrl().c_str(), line.c_str());
-        return VLC_ENOOBJ;
-    }
+
 
     line = readLine();
 
@@ -243,6 +248,18 @@ int HTTPConnection::parseReply()
 
         onHeader(line.substr(0, split), line.substr(value));
         line = readLine();
+    }
+
+    if((replycode == 301 || replycode == 307) &&
+       !locationparams.getUrl().empty())
+    {
+        msg_Info(p_object, "%d redirection to %s", replycode, locationparams.getUrl().c_str());
+        return VLC_ETIMEOUT;
+    }
+    else if (replycode != 200 && replycode != 206)
+    {
+        msg_Err(p_object, "Failed reading %s: %s", params.getUrl().c_str(), line.c_str());
+        return VLC_ENOOBJ;
     }
 
     return VLC_SUCCESS;
@@ -336,6 +353,10 @@ void HTTPConnection::onHeader(const std::string &key,
     else if (key == "Transfer-Encoding" && value == "chunked")
     {
         chunked = true;
+    }
+    else if(key == "Location")
+    {
+        locationparams = ConnectionParams( value );
     }
 }
 
