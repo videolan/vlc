@@ -78,7 +78,7 @@ static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
                                    {CCT_ISO_8859_8, "ISO_8859-8"} };
 
 
-static char *ParseText(const uint8_t *data, size_t size, const char *charset)
+static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *charset)
 {
     char *text = malloc(size);
     if (text == NULL)
@@ -102,7 +102,8 @@ static char *ParseText(const uint8_t *data, size_t size, const char *charset)
 
     char *u8 = FromCharset(charset, text, text_size);
     free(text);
-    return u8;
+    text_segment_t *segment = text_segment_New( u8 );
+    return segment;
 }
 
 static subpicture_t *Decode(decoder_t *dec, block_t **block)
@@ -152,9 +153,9 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
     video_format_Clean(&fmt);
 
     if (sub->p_region) {
-        sub->p_region->p_text = text_segment_New( ParseText(payload,
-                                            payload_size,
-                                            cct_nums[dec->p_sys->cct - CCT_BEGIN].str) );
+        sub->p_region->p_text = ParseText(payload,
+                                         payload_size,
+                                         cct_nums[dec->p_sys->cct - CCT_BEGIN].str);
         sub->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
     }
 
