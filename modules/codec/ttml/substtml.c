@@ -222,22 +222,28 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
     {
         char *value = strdup( psz_val );
         char* psz_saveptr = NULL;
-        char* token = strtok_r( value, " ", &psz_saveptr );
+        char* token = (value) ? strtok_r( value, " ", &psz_saveptr ) : NULL;
         // <color>? <length> <length>?
-        bool b_ok = false;
-        unsigned int color = vlc_html_color( token, &b_ok );
-        if( b_ok )
+        if( token != NULL )
         {
-            p_text_style->i_outline_color = color & 0xFFFFFF;
-            p_text_style->i_outline_alpha = (color & 0xFF000000) >> 24;
-            token = strtok_r( NULL, " ", &psz_saveptr );
-        }
-        char* psz_end = NULL;
-        int i_outline_width = strtol( token, &psz_end, 10 );
-        if( psz_end != token )
-        {
-            // Assume unit is pixel, and ignore border radius
-            p_text_style->i_outline_width = i_outline_width;
+            bool b_ok = false;
+            unsigned int color = vlc_html_color( token, &b_ok );
+            if( b_ok )
+            {
+                p_text_style->i_outline_color = color & 0xFFFFFF;
+                p_text_style->i_outline_alpha = (color & 0xFF000000) >> 24;
+                token = strtok_r( NULL, " ", &psz_saveptr );
+                if( token != NULL )
+                {
+                    char* psz_end = NULL;
+                    int i_outline_width = strtol( token, &psz_end, 10 );
+                    if( psz_end != token )
+                    {
+                        // Assume unit is pixel, and ignore border radius
+                        p_text_style->i_outline_width = i_outline_width;
+                    }
+                }
+            }
         }
         free( value );
     }
