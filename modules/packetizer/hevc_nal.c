@@ -347,7 +347,7 @@ static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
                 return 0;
 
             const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
-            if(i_buf < i_nalu_length)
+            if(i_buf < i_nalu_length + 2)
                 return 0;
 
             i_total += i_nalu_length + i_nal_length_size;
