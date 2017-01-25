@@ -163,9 +163,11 @@ struct vlc_credential
 {
     /** url to store or to search */
     const vlc_url_t *p_url;
-    /** http realm or smb domain */
+    /** http realm or smb domain to search, can be overridden after a call to
+     * vlc_credential_get() */
     const char *psz_realm;
-    /** http authtype */
+    /** http authtype to search, can be overridden after a call to
+     * vlc_credential_get() */
     const char *psz_authtype;
     /** valid only if vlc_credential_get() returned true */
     const char *psz_username;
