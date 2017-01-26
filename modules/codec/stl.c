@@ -35,6 +35,8 @@
 #include <vlc_memory.h>
 #include <vlc_charset.h>
 
+#include "substext.h" /* required for font scaling / updater */
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -54,6 +56,26 @@ vlc_module_end()
  *****************************************************************************/
 #define GSI_BLOCK_SIZE 1024
 
+#define STL_GROUPS_MAX 255
+
+#define STL_TEXTFIELD_SIZE     112
+#define STL_TTI_HEADER_SIZE    16
+#define STL_TTI_SIZE           (STL_TTI_HEADER_SIZE + STL_TEXTFIELD_SIZE)
+
+#define STL_TF_TELETEXT_FIRST     0x00
+#define STL_TF_TELETEXT_LAST      0x1f
+#define STL_TF_CHARCODE1_FIRST    0x20
+#define STL_TF_CHARCODE1_LAST     0x7f
+#define STL_TF_ITALICS_ON         0x80
+#define STL_TF_ITALICS_OFF        0x81
+#define STL_TF_UNDERLINE_ON       0x82
+#define STL_TF_UNDERLINE_OFF      0x83
+#define STL_TF_BOXING_ON          0x84
+#define STL_TF_BOXING_OFF         0x85
+#define STL_TF_LINEBREAK          0x8a
+#define STL_TF_END_FILL           0x8f
+#define STL_TF_CHARCODE2_FIRST    0xa1
+
 typedef enum {
     CCT_ISO_6937_2 = 0x3030, CCT_BEGIN = CCT_ISO_6937_2,
     CCT_ISO_8859_5 = 0x3031,
@@ -62,12 +84,24 @@ typedef enum {
     CCT_ISO_8859_8 = 0x3034, CCT_END = CCT_ISO_8859_8
 } cct_number_value_t;
 
+typedef struct
+{
+    uint8_t i_accumulating;
+    uint8_t i_justify;
+    int64_t i_start;
+    int64_t i_end;
+    text_style_t *p_style;
+    text_segment_t *p_segment;
+    text_segment_t **pp_segment_last;
+} stl_sg_t;
+
 typedef struct {
     cct_number_value_t value;
     const char *str;
 } cct_number_t;
 
 struct decoder_sys_t {
+    stl_sg_t groups[STL_GROUPS_MAX + 1];
     cct_number_value_t cct;
 };
 
@@ -77,127 +111,318 @@ static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
                                    {CCT_ISO_8859_7, "ISO_8859-7"},
                                    {CCT_ISO_8859_8, "ISO_8859-8"} };
 
-
-static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *charset)
+static text_style_t * CreateGroupStyle()
 {
-    text_style_t *style = NULL;
-    char *text = malloc(size);
-    if (text == NULL)
-        return NULL;
-
-    text_segment_t *segment = text_segment_New( NULL );
-    if (segment == NULL)
-        return NULL;
-
-    size_t text_size = 0;
-
-    for (size_t i = 0; i < size; i++) {
-        uint8_t code = data[i];
-
-        if (code == 0x8f)
-            break;
-        if (code == 0x7f)
-            continue;
-        if (code & 0x60)
-            text[text_size++] = code;
-        /* italics begin/end 0x80/0x81, underline being/end 0x82/0x83 */
-        if (code >= 0x80 && code <= 0x85 )
-        {
-            /* Style Change, we do a new segment */
-            if( text_size != 0 )
-            {
-                segment->p_next = ParseText( &data[i], (size - i), charset);
-                break;
-            }
-            else
-            {
-                style = text_style_Create( STYLE_NO_DEFAULTS );
-                if (code == 0x80)
-                    style->i_style_flags |= STYLE_ITALIC;
-                if (code == 0x81)
-                    style->i_style_flags &= STYLE_ITALIC;
-                if (code == 0x82)
-                    style->i_style_flags |= STYLE_UNDERLINE;
-                if (code == 0x83)
-                    style->i_style_flags &= STYLE_UNDERLINE;
-                if (code == 0x84)
-                    style->i_style_flags |= STYLE_BACKGROUND;
-                if (code == 0x85)
-                    style->i_style_flags &= STYLE_BACKGROUND;
-                style->i_features |= STYLE_HAS_FLAGS;
-            }
-        }
-        if (code == 0x8a)
-            text[text_size++] = '\n';
+    text_style_t *p_style = text_style_Create(STYLE_NO_DEFAULTS);
+    if(p_style)
+    {
+        p_style->i_features = STYLE_HAS_FLAGS|STYLE_HAS_BACKGROUND_ALPHA|STYLE_HAS_BACKGROUND_COLOR;
+        /* Teletext needs default background to black */
+        p_style->i_background_alpha = STYLE_ALPHA_OPAQUE;
+        p_style->i_background_color = 0x000000;
+        p_style->i_font_size = 0;
+        p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE;
     }
-
-    segment->psz_text = FromCharset(charset, text, text_size);
-    free(text);
-
-    if( style )
-        segment->style = style;
-
-    return segment;
+    return p_style;
 }
 
-static subpicture_t *Decode(decoder_t *dec, block_t **block)
+static void TextBufferFlush(stl_sg_t *p_group, uint8_t *p_buf, uint8_t *pi_buf,
+                            const char *psz_charset)
 {
-    if (block == NULL || *block == NULL)
-        return NULL;
+    if(*pi_buf == 0)
+        return;
 
-    subpicture_t *sub = NULL;
-
-    block_t *b = *block;
-    *block = NULL;
-    if (b->i_flags & (BLOCK_FLAG_CORRUPTED))
-        goto exit;
-    if (b->i_buffer < 128)
-        goto exit;
-
-    int     payload_size = 0;
-    uint8_t *payload = malloc((b->i_buffer / 128) * 112);
-    if (!payload)
-        goto exit;
-
-    /* */
-    int j = 0;
-    for (unsigned i = 0; i < b->i_buffer / 128; i++)
+    char *psz_utf8 = FromCharset(psz_charset, p_buf, *pi_buf);
+    if(psz_utf8)
     {
-        if( b->p_buffer[128 * i + 3] != 0xfe ) {
-            memcpy(&payload[112 * j++], &b->p_buffer[128 * i + 16], 112);
-            payload_size += 112;
+        *p_group->pp_segment_last = text_segment_New(psz_utf8);
+        if(*p_group->pp_segment_last)
+        {
+            if(p_group->p_style)
+                (*p_group->pp_segment_last)->style = text_style_Duplicate(p_group->p_style);
+            p_group->pp_segment_last = &((*p_group->pp_segment_last)->p_next);
+        }
+        free(psz_utf8);
+    }
+
+    *pi_buf = 0;
+}
+
+static void GroupParseTeletext(stl_sg_t *p_group, uint8_t code)
+{
+    if(p_group->p_style == NULL &&
+      !(p_group->p_style = CreateGroupStyle()))
+        return;
+
+    /* See ETS 300 706 Table 26 as EBU 3264 does only name values
+       and does not explain at all */
+
+    static const uint32_t const colors[] =
+    {
+        0x000000,
+        0xFF0000,
+        0x00FF00,
+        0xFFFF00,
+        0x0000FF,
+        0xFF00FF,
+        0x00FFFF,
+        0xFFFFFF,
+    };
+
+    /* Teletext data received, so we need to enable background */
+    p_group->p_style->i_style_flags |= STYLE_BACKGROUND;
+
+    switch(code)
+    {
+        case 0x0c:
+            p_group->p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE;
+            p_group->p_style->i_style_flags &= ~(STYLE_DOUBLEWIDTH|STYLE_HALFWIDTH);
+            break;
+
+        case 0x0d: /* double height */
+            p_group->p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE * 2;
+            p_group->p_style->i_style_flags &= ~STYLE_DOUBLEWIDTH;
+            p_group->p_style->i_style_flags |= STYLE_HALFWIDTH;
+            break;
+
+        case 0x0e: /* double width */
+            p_group->p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE;
+            p_group->p_style->i_style_flags &= ~STYLE_HALFWIDTH;
+            p_group->p_style->i_style_flags |= STYLE_DOUBLEWIDTH;
+            break;
+
+        case 0x0f: /* double size */
+            p_group->p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE * 2;
+            p_group->p_style->i_style_flags &= ~(STYLE_DOUBLEWIDTH|STYLE_HALFWIDTH);
+            break;
+
+        case 0x1d:
+            p_group->p_style->i_background_color = p_group->p_style->i_font_color;
+            p_group->p_style->i_features &= ~STYLE_HAS_FONT_COLOR;
+            break;
+
+        case 0x1c:
+            p_group->p_style->i_background_color = colors[0];
+            break;
+
+        default:
+            if(code < 8)
+            {
+                p_group->p_style->i_font_color = colors[code];
+                p_group->p_style->i_features |= STYLE_HAS_FONT_COLOR;
+            }
+
+            /* Need to handle Mosaic ? Really ? */
+            break;
+    }
+
+}
+
+static void GroupApplyStyle(stl_sg_t *p_group, uint8_t code)
+{
+    if(p_group->p_style == NULL &&
+      !(p_group->p_style = CreateGroupStyle()))
+        return;
+
+    switch(code)
+    {
+        case STL_TF_ITALICS_ON:
+            p_group->p_style->i_style_flags |= STYLE_ITALIC;
+            break;
+        case STL_TF_ITALICS_OFF:
+            p_group->p_style->i_style_flags &= ~STYLE_ITALIC;
+            break;
+        case STL_TF_UNDERLINE_ON:
+            p_group->p_style->i_style_flags |= STYLE_UNDERLINE;
+            break;
+        case STL_TF_UNDERLINE_OFF:
+            p_group->p_style->i_style_flags &= ~STYLE_UNDERLINE;
+            break;
+        case STL_TF_BOXING_ON:
+        case STL_TF_BOXING_OFF:
+        default:
+            break;
+    }
+}
+
+static int64_t ParseTimeCode(const uint8_t *data, double fps)
+{
+    return INT64_C(1000000) * (data[0] * 3600 +
+                               data[1] *   60 +
+                               data[2] *    1 +
+                               data[3] /  fps);
+}
+
+static void ClearTeletextStyles(stl_sg_t *p_group)
+{
+    if(p_group->p_style)
+    {
+        p_group->p_style->i_features &= ~STYLE_HAS_FONT_COLOR;
+        p_group->p_style->i_background_color = 0x000000;
+        p_group->p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE;
+        p_group->p_style->i_style_flags &= ~(STYLE_DOUBLEWIDTH|STYLE_HALFWIDTH);
+    }
+}
+
+/* Returns true if group is we need to output group */
+static bool ParseTTI(stl_sg_t *p_group, const uint8_t *p_data, const char *psz_charset)
+{
+    uint8_t p_buffer[STL_TEXTFIELD_SIZE];
+    uint8_t i_buffer = 0;
+
+    /* Header */
+    uint8_t ebn = p_data[3];
+    if(ebn > 0xef && ebn != 0xff)
+        return false;
+
+    if(p_data[15] != 0x00) /* comment flag */
+        return false;
+
+    if(p_data[14] > 0x00)
+        p_group->i_justify = p_data[14];
+
+    /* Accumulating started or continuing.
+     * We must not flush current segments on output and continue on next block */
+    p_group->i_accumulating = (p_data[4] == 0x01 || p_data[4] == 0x02);
+
+    p_group->i_start = ParseTimeCode( &p_data[5], 30 );
+    p_group->i_end = ParseTimeCode( &p_data[9], 30 );
+
+    /* Text Field */
+    for (size_t i = STL_TTI_HEADER_SIZE; i < STL_TTI_SIZE; i++)
+    {
+        const uint8_t code = p_data[i];
+        switch(code)
+        {
+            case STL_TF_LINEBREAK:
+                p_buffer[i_buffer++] = '\n';
+                TextBufferFlush(p_group, p_buffer, &i_buffer, psz_charset);
+                /* Clear teletext styles on each new row */
+                ClearTeletextStyles(p_group);
+                break;
+
+            case STL_TF_END_FILL:
+                TextBufferFlush(p_group, p_buffer, &i_buffer, psz_charset);
+                ClearTeletextStyles(p_group);
+                return true;
+
+            default:
+                if(code <= STL_TF_TELETEXT_LAST)
+                {
+                    TextBufferFlush(p_group, p_buffer, &i_buffer, psz_charset);
+                    GroupParseTeletext(p_group, code);
+                }
+                else if((code >= STL_TF_CHARCODE1_FIRST && code <= STL_TF_CHARCODE1_LAST) ||
+                    code >= STL_TF_CHARCODE2_FIRST)
+                {
+                    p_buffer[i_buffer++] = code;
+                }
+                else if(code >= STL_TF_ITALICS_ON && code <= STL_TF_BOXING_OFF)
+                {
+                    TextBufferFlush(p_group, p_buffer, &i_buffer, psz_charset);
+                    GroupApplyStyle(p_group, code);
+                }
+                break;
         }
     }
 
-    sub = decoder_NewSubpicture(dec, NULL);
-    if (!sub) {
-        free(payload);
-        goto exit;
+    TextBufferFlush(p_group, p_buffer, &i_buffer, psz_charset);
+
+    return false;
+}
+
+static void FillSubpictureUpdater(stl_sg_t *p_group, subpicture_updater_sys_t *p_spu_sys)
+{
+    if(p_group->i_accumulating)
+    {
+        p_spu_sys->region.p_segments = text_segment_Copy(p_group->p_segment);
     }
-    sub->i_start    = b->i_pts;
-    sub->i_stop     = b->i_pts + b->i_length;
-    sub->b_ephemer  = b->i_length == 0;
-    sub->b_absolute = false;
-    //sub->i_original_picture_width  = 0;
-    //sub->i_original_picture_height = 0;
-
-    video_format_t fmt;
-    video_format_Init(&fmt, VLC_CODEC_TEXT);
-    sub->p_region = subpicture_region_New(&fmt);
-    video_format_Clean(&fmt);
-
-    if (sub->p_region) {
-        sub->p_region->p_text = ParseText(payload,
-                                         payload_size,
-                                         cct_nums[dec->p_sys->cct - CCT_BEGIN].str);
-        sub->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
+    else
+    {
+        p_spu_sys->region.p_segments = p_group->p_segment;
+        p_group->p_segment = NULL;
+        p_group->pp_segment_last = &p_group->p_segment;
     }
 
-    free(payload);
+    p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
+    if(p_group->i_justify == 0x01)
+        p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_LEFT;
+    else if(p_group->i_justify == 0x03)
+        p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_RIGHT;
+}
 
-exit:
-    block_Release(b);
-    return sub;
+static void ResetGroups(decoder_sys_t *p_sys)
+{
+    for(size_t i=0; i<=STL_GROUPS_MAX; i++)
+    {
+        if(p_sys->groups[i].p_segment)
+            text_segment_ChainDelete(p_sys->groups[i].p_segment);
+        if(p_sys->groups[i].p_style)
+            text_style_Delete(p_sys->groups[i].p_style);
+    }
+    memset(p_sys->groups, 0, sizeof(stl_sg_t) * (STL_GROUPS_MAX + 1));
+}
+
+static subpicture_t *Decode(decoder_t *p_dec, block_t **pp_block)
+{
+    if (pp_block == NULL || *pp_block == NULL)
+        return NULL;
+
+    subpicture_t *p_sub_first = NULL;
+    subpicture_t **pp_sub_last = &p_sub_first;
+
+    block_t *p_block = *pp_block;
+    *pp_block = NULL;
+
+    if(p_block->i_buffer < STL_TTI_SIZE)
+        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
+
+    if(p_block->i_flags & (BLOCK_FLAG_CORRUPTED|BLOCK_FLAG_DISCONTINUITY))
+    {
+        ResetGroups(p_dec->p_sys);
+
+        if(p_block->i_flags & BLOCK_FLAG_CORRUPTED)
+        {
+            block_Release(p_block);
+            return NULL;
+        }
+    }
+
+    const char *psz_charset = cct_nums[p_dec->p_sys->cct - CCT_BEGIN].str;
+    for (size_t i = 0; i < p_block->i_buffer / STL_TTI_SIZE; i++)
+    {
+        stl_sg_t *p_group = &p_dec->p_sys->groups[p_block->p_buffer[0]];
+        if(ParseTTI(p_group, &p_block->p_buffer[i * STL_TTI_SIZE], psz_charset) &&
+           p_group->p_segment != NULL )
+        {
+            /* output */
+            subpicture_t *p_sub = decoder_NewSubpictureText(p_dec);
+            if( p_sub )
+            {
+                FillSubpictureUpdater(p_group, p_sub->updater.p_sys );
+
+                p_sub->b_absolute = false;
+
+                if(p_group->i_end && p_group->i_start >= p_block->i_dts)
+                {
+                    p_sub->i_start = VLC_TS_0 + p_group->i_start;
+                    p_sub->i_stop =  VLC_TS_0 + p_group->i_end;
+                }
+                else
+                {
+                    p_sub->i_start    = p_block->i_pts;
+                    p_sub->i_stop     = p_block->i_pts + p_block->i_length;
+                    p_sub->b_ephemer  = (p_block->i_length == 0);
+                }
+
+                *pp_sub_last = p_sub;
+                pp_sub_last = &p_sub->p_next;
+            }
+        }
+    }
+
+    block_Release(p_block);
+    return p_sub_first;
 }
 
 static int ExtractCCT(const decoder_t *dec, cct_number_value_t *cct_number)
@@ -238,11 +463,13 @@ static int Open(vlc_object_t *object)
 
     msg_Dbg(dec, "CCT=0x%x", cct);
 
-    decoder_sys_t *sys = malloc(sizeof(*sys));
+    decoder_sys_t *sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
 
     sys->cct = cct;
+    for(size_t i=0; i<=STL_GROUPS_MAX; i++)
+        sys->groups[i].pp_segment_last = &sys->groups[i].p_segment;
 
     dec->p_sys = sys;
     dec->pf_decode_sub = Decode;
@@ -254,7 +481,8 @@ static int Open(vlc_object_t *object)
 static void Close(vlc_object_t *object)
 {
     decoder_t *dec = (decoder_t*)object;
-    decoder_sys_t *sys = dec->p_sys;
+    decoder_sys_t *p_sys = dec->p_sys;
 
-    free(sys);
+    ResetGroups(p_sys);
+    free(p_sys);
 }
