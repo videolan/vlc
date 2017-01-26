@@ -138,7 +138,7 @@ static int Control(demux_t *demux, int query, va_list args)
         if(sys->count && sys->index[sys->count-1].stop > 0)
         {
             int64_t i64 = f * sys->index[sys->count-1].stop;
-            return Control(demux, DEMUX_SET_TIME, i64);
+            return demux_Control(demux, DEMUX_SET_TIME, i64);
         }
         break;
     }

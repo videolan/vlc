@@ -696,7 +696,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->subtitles.i_count && p_sys->i_length )
             {
                 i64 = VLC_TS_0 + f * p_sys->i_length;
-                return Control( p_demux, DEMUX_SET_TIME, i64 );
+                return demux_Control( p_demux, DEMUX_SET_TIME, i64 );
             }
             break;
 
