@@ -66,8 +66,8 @@
  * This class handles resize issues
  **********************************************************************/
 
-VideoWidget::VideoWidget( intf_thread_t *_p_i )
-            : QFrame( NULL ) , p_intf( _p_i )
+VideoWidget::VideoWidget( intf_thread_t *_p_i, QWidget* p_parent )
+            : QFrame( p_parent ) , p_intf( _p_i )
 {
     /* Set the policy to expand in both directions */
     // setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );

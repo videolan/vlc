@@ -450,7 +450,7 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
     /* And video Outputs */
     if( b_videoEmbedded )
     {
-        videoWidget = new VideoWidget( p_intf );
+        videoWidget = new VideoWidget( p_intf, stackCentralW );
         stackCentralW->addWidget( videoWidget );
     }
     mainLayout->insertWidget( 1, stackCentralW );

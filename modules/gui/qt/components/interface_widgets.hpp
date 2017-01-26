@@ -56,7 +56,7 @@ class VideoWidget : public QFrame
 {
     Q_OBJECT
 public:
-    VideoWidget( intf_thread_t * );
+    VideoWidget( intf_thread_t *, QWidget* p_parent );
     virtual ~VideoWidget();
 
     WId request( struct vout_window_t * );
