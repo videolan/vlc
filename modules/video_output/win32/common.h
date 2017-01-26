@@ -275,7 +275,7 @@ void CommonClean(vout_display_t *);
 void CommonManage(vout_display_t *);
 int  CommonControl(vout_display_t *, int , va_list );
 void CommonDisplay(vout_display_t *);
-int  CommonUpdatePicture(picture_t *, picture_t **, uint8_t *, unsigned);
+int  CommonUpdatePicture(picture_t *, picture_t **fallback, uint8_t *plane, unsigned pitch);
 
 void UpdateRects (vout_display_t *,
                   const vout_display_cfg_t *,
