@@ -98,6 +98,7 @@ typedef struct
 #define STYLE_STRIKEOUT         (1 << 6)
 #define STYLE_HALFWIDTH         (1 << 7)
 #define STYLE_MONOSPACED        (1 << 8)
+#define STYLE_DOUBLEWIDTH       (1 << 9)
 
 #define STYLE_DEFAULT_FONT_SIZE 20
 #define STYLE_DEFAULT_REL_FONT_SIZE 6.25

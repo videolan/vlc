@@ -56,8 +56,11 @@ static FT_Face LoadFace( filter_t *p_filter, const char *psz_fontfile, int i_idx
     char *psz_key = NULL;
 
     int i_font_size  = ConvertToLiveSize( p_filter, p_style );
-    int i_font_width = p_style->i_style_flags & STYLE_HALFWIDTH ?
-                       i_font_size / 2 : i_font_size;
+    int i_font_width = i_font_size;
+    if( p_style->i_style_flags & STYLE_HALFWIDTH )
+        i_font_width /= 2;
+    else if( p_style->i_style_flags & STYLE_DOUBLEWIDTH )
+        i_font_width *= 2;
 
     if( asprintf( &psz_key, "%s - %d - %d - %d",
                   psz_fontfile, i_idx,

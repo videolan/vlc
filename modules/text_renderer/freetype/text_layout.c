@@ -572,7 +572,7 @@ static bool FaceStyleEquals( filter_t *p_filter, const text_style_t *p_style1,
     if( p_style1 == p_style2 )
         return true;
 
-    const int i_style_mask = STYLE_BOLD | STYLE_ITALIC | STYLE_HALFWIDTH;
+    const int i_style_mask = STYLE_BOLD | STYLE_ITALIC | STYLE_HALFWIDTH | STYLE_DOUBLEWIDTH;
 
     const char *psz_fontname1 = p_style1->i_style_flags & STYLE_MONOSPACED
                               ? p_style1->psz_monofontname : p_style1->psz_fontname;
@@ -1134,9 +1134,11 @@ static int LayoutLine( filter_t *p_filter,
             p_style = p_run->p_style;
             p_face = p_run->p_face;
 
-            i_font_size = ConvertToLiveSize( p_filter, p_style );
-            i_font_width = p_style->i_style_flags & STYLE_HALFWIDTH ?
-                           i_font_size / 2 : i_font_size;
+            i_font_width = i_font_size = ConvertToLiveSize( p_filter, p_style );
+            if( p_style->i_style_flags & STYLE_HALFWIDTH )
+                i_font_width /= 2;
+            else if( p_style->i_style_flags & STYLE_DOUBLEWIDTH )
+                i_font_width *= 2;
         }
 
         FT_Vector pen_new = {
