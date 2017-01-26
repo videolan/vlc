@@ -127,12 +127,20 @@ struct vout_display_opengl_t {
     struct prgm *prgm; /* Main program */
     struct prgm *sub_prgm; /* Subpicture program */
 
+    unsigned nb_indices;
     GLuint vertex_buffer_object;
     GLuint index_buffer_object;
     GLuint texture_buffer_object[PICTURE_PLANE_MAX];
 
     GLuint *subpicture_buffer_object;
     int    subpicture_buffer_object_count;
+
+    struct {
+        unsigned int i_x_offset;
+        unsigned int i_y_offset;
+        unsigned int i_visible_width;
+        unsigned int i_visible_height;
+    } last_source;
 
     /* Non-power-of-2 texture size support */
     bool supports_npot;
@@ -1231,16 +1239,10 @@ static int BuildRectangle(unsigned nbPlanes,
     return VLC_SUCCESS;
 }
 
-static void DrawWithShaders(vout_display_opengl_t *vgl,
-                            const float *left, const float *top,
-                            const float *right, const float *bottom,
-                            struct prgm *prgm)
+static int SetupCoords(vout_display_opengl_t *vgl,
+                       const float *left, const float *top,
+                       const float *right, const float *bottom)
 {
-    GLuint program = prgm->id;
-    opengl_tex_converter_t *tc = &prgm->tc;
-    vgl->api.UseProgram(program);
-    tc->pf_prepare_shader(tc, 1.0f);
-
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
     unsigned nbVertices, nbIndices;
@@ -1274,7 +1276,36 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     }
 
     if (i_ret != VLC_SUCCESS)
-        return;
+        return i_ret;
+
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++)
+    {
+        vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
+        vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
+                        textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
+    }
+
+    vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
+    vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat),
+                        vertexCoord, GL_STATIC_DRAW);
+
+    vgl->api.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
+    vgl->api.BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort),
+                        indices, GL_STATIC_DRAW);
+
+    free(textureCoord);
+    free(vertexCoord);
+    free(indices);
+
+    vgl->nb_indices = nbIndices;
+
+    return VLC_SUCCESS;
+}
+
+static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
+{
+    opengl_tex_converter_t *tc = &prgm->tc;
+    tc->pf_prepare_shader(tc, 1.0f);
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         assert(vgl->texture[j] != 0);
@@ -1283,21 +1314,15 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         glBindTexture(tc->tex_target, vgl->texture[j]);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
-        vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
-                        textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
 
         assert(prgm->aloc.MultiTexCoord[j] != -1);
         vgl->api.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[j]);
         vgl->api.VertexAttribPointer(prgm->aloc.MultiTexCoord[j], 2, GL_FLOAT,
                                      0, 0, 0);
     }
-    free(textureCoord);
+
     vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
-    vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat), vertexCoord, GL_STATIC_DRAW);
-    free(vertexCoord);
     vgl->api.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
-    vgl->api.BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort), indices, GL_STATIC_DRAW);
-    free(indices);
     vgl->api.EnableVertexAttribArray(prgm->aloc.VertexPosition);
     vgl->api.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
@@ -1314,7 +1339,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     vgl->api.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                               prgm->var.ZoomMatrix);
 
-    glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, vgl->nb_indices, GL_UNSIGNED_SHORT, 0);
 }
 
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
@@ -1325,36 +1350,51 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
        Currently, the OS X provider uses it to get a smooth window resizing */
     glClear(GL_COLOR_BUFFER_BIT);
 
-    /* Draw the picture */
-    float left[PICTURE_PLANE_MAX];
-    float top[PICTURE_PLANE_MAX];
-    float right[PICTURE_PLANE_MAX];
-    float bottom[PICTURE_PLANE_MAX];
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++)
+    vgl->api.UseProgram(vgl->prgm->id);
+
+    if (source->i_x_offset != vgl->last_source.i_x_offset
+     || source->i_y_offset != vgl->last_source.i_y_offset
+     || source->i_visible_width != vgl->last_source.i_visible_width
+     || source->i_visible_height != vgl->last_source.i_visible_height)
     {
-        float scale_w = (float)vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den
-                      / vgl->tex_width[j];
-        float scale_h = (float)vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den
-                      / vgl->tex_height[j];
+        float left[PICTURE_PLANE_MAX];
+        float top[PICTURE_PLANE_MAX];
+        float right[PICTURE_PLANE_MAX];
+        float bottom[PICTURE_PLANE_MAX];
+        for (unsigned j = 0; j < vgl->chroma->plane_count; j++)
+        {
+            float scale_w = (float)vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den
+                          / vgl->tex_width[j];
+            float scale_h = (float)vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den
+                          / vgl->tex_height[j];
 
-        /* Warning: if NPOT is not supported a larger texture is
-           allocated. This will cause right and bottom coordinates to
-           land on the edge of two texels with the texels to the
-           right/bottom uninitialized by the call to
-           glTexSubImage2D. This might cause a green line to appear on
-           the right/bottom of the display.
-           There are two possible solutions:
-           - Manually mirror the edges of the texture.
-           - Add a "-1" when computing right and bottom, however the
-           last row/column might not be displayed at all.
-        */
-        left[j]   = (source->i_x_offset +                       0 ) * scale_w;
-        top[j]    = (source->i_y_offset +                       0 ) * scale_h;
-        right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
-        bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
+            /* Warning: if NPOT is not supported a larger texture is
+               allocated. This will cause right and bottom coordinates to
+               land on the edge of two texels with the texels to the
+               right/bottom uninitialized by the call to
+               glTexSubImage2D. This might cause a green line to appear on
+               the right/bottom of the display.
+               There are two possible solutions:
+               - Manually mirror the edges of the texture.
+               - Add a "-1" when computing right and bottom, however the
+               last row/column might not be displayed at all.
+            */
+            left[j]   = (source->i_x_offset +                       0 ) * scale_w;
+            top[j]    = (source->i_y_offset +                       0 ) * scale_h;
+            right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
+            bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
+        }
+
+        int ret = SetupCoords(vgl, left, top, right, bottom);
+        if (ret != VLC_SUCCESS)
+            return ret;
+
+        vgl->last_source.i_x_offset = source->i_x_offset;
+        vgl->last_source.i_y_offset = source->i_y_offset;
+        vgl->last_source.i_visible_width = source->i_visible_width;
+        vgl->last_source.i_visible_height = source->i_visible_height;
     }
-
-    DrawWithShaders(vgl, left, top, right, bottom, vgl->prgm);
+    DrawWithShaders(vgl, vgl->prgm);
 
     /* Draw the subpictures */
     // Change the program for overlays
