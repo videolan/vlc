@@ -1389,7 +1389,15 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
     block_t **pp_block = p_block ? &p_block : NULL;
 
     while( (p_spu = p_dec->pf_decode_sub( p_dec, pp_block ) ) )
-        DecoderQueueSpu( p_dec, p_spu );
+    {
+        do
+        {
+            subpicture_t *p = p_spu;
+            p_spu = p_spu->p_next;
+            p->p_next = NULL;
+            DecoderQueueSpu( p_dec, p );
+        } while( p_spu );
+    }
 }
 
 /**
