@@ -79,6 +79,15 @@ struct prgm
     GLuint id;
     opengl_tex_converter_t tc;
 
+    struct {
+        GLfloat OrientationMatrix[16];
+        GLfloat ProjectionMatrix[16];
+        GLfloat ZRotMatrix[16];
+        GLfloat YRotMatrix[16];
+        GLfloat XRotMatrix[16];
+        GLfloat ZoomMatrix[16];
+    } var;
+
     struct { /* UniformLocation */
         GLint OrientationMatrix;
         GLint ProjectionMatrix;
@@ -230,8 +239,32 @@ static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]
      memcpy(matrix, m, sizeof(m));
 }
 
-static void orientationTransformMatrix(GLfloat matrix[static 16],
-                                       video_orientation_t orientation)
+static void getViewpointMatrixes(vout_display_opengl_t *vgl,
+                                 video_projection_mode_t projection_mode,
+                                 struct prgm *prgm)
+{
+    if (projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
+        || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+    {
+        float sar = (float) vgl->f_sar;
+        getProjectionMatrix(sar, vgl->f_fovy, prgm->var.ProjectionMatrix);
+        getYRotMatrix(vgl->f_teta, prgm->var.YRotMatrix);
+        getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
+        getZRotMatrix(vgl->f_roll, prgm->var.ZRotMatrix);
+        getZoomMatrix(vgl->f_z, prgm->var.ZoomMatrix);
+    }
+    else
+    {
+        memcpy(prgm->var.ProjectionMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.ZRotMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.YRotMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.XRotMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.ZoomMatrix, identity, sizeof(identity));
+    }
+}
+
+static void getOrientationTransformMatrix(video_orientation_t orientation,
+                                          GLfloat matrix[static 16])
 {
     memcpy(matrix, identity, sizeof(identity));
 
@@ -616,6 +649,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             return NULL;
         }
     }
+    getOrientationTransformMatrix(vgl->prgm->tc.orientation,
+                                  vgl->prgm->var.OrientationMatrix);
+    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
+
+    /* Normal orientation and no projection for subtitles */
+    getOrientationTransformMatrix(ORIENT_NORMAL,
+                                  vgl->sub_prgm->var.OrientationMatrix);
+    getViewpointMatrixes(vgl, PROJECTION_MODE_RECTANGULAR, vgl->sub_prgm);
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
@@ -762,6 +803,7 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
         UpdateFOVy(vgl);
         UpdateZ(vgl);
     }
+    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
 
     return VLC_SUCCESS;
 #undef RAD
@@ -777,6 +819,7 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
     vgl->f_sar = f_sar;
     UpdateFOVy(vgl);
     UpdateZ(vgl);
+    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
 }
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
@@ -1233,31 +1276,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     if (i_ret != VLC_SUCCESS)
         return;
 
-    GLfloat projectionMatrix[16],
-            zRotMatrix[16], yRotMatrix[16], xRotMatrix[16],
-            zoomMatrix[16], orientationMatrix[16];
-
-    orientationTransformMatrix(orientationMatrix, tc->orientation);
-
-    if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
-        || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
-    {
-        float sar = (float) vgl->f_sar;
-        getProjectionMatrix(sar, vgl->f_fovy, projectionMatrix);
-        getYRotMatrix(vgl->f_teta, yRotMatrix);
-        getXRotMatrix(vgl->f_phi, xRotMatrix);
-        getZRotMatrix(vgl->f_roll, zRotMatrix);
-        getZoomMatrix(vgl->f_z, zoomMatrix);
-    }
-    else
-    {
-        memcpy(projectionMatrix, identity, sizeof(identity));
-        memcpy(zRotMatrix, identity, sizeof(identity));
-        memcpy(yRotMatrix, identity, sizeof(identity));
-        memcpy(xRotMatrix, identity, sizeof(identity));
-        memcpy(zoomMatrix, identity, sizeof(identity));
-    }
-
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         assert(vgl->texture[j] != 0);
         glActiveTexture(GL_TEXTURE0+j);
@@ -1284,13 +1302,17 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     vgl->api.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
     vgl->api.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
-                              orientationMatrix);
+                              prgm->var.OrientationMatrix);
     vgl->api.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
-                              projectionMatrix);
-    vgl->api.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE, zRotMatrix);
-    vgl->api.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE, yRotMatrix);
-    vgl->api.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE, xRotMatrix);
-    vgl->api.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE, zoomMatrix);
+                              prgm->var.ProjectionMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
+                              prgm->var.ZRotMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
+                              prgm->var.YRotMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
+                              prgm->var.XRotMatrix);
+    vgl->api.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
+                              prgm->var.ZoomMatrix);
 
     glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
 }
@@ -1394,13 +1416,18 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         vgl->api.VertexAttribPointer(prgm->aloc.VertexPosition, 2, GL_FLOAT,
                                      0, 0, 0);
 
-        // Subpictures have the correct orientation:
-        vgl->api.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE, identity);
-        vgl->api.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE, identity);
+        vgl->api.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
+                                  prgm->var.OrientationMatrix);
+        vgl->api.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
+                                  prgm->var.ProjectionMatrix);
+        vgl->api.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
+                                  prgm->var.ZRotMatrix);
+        vgl->api.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
+                                  prgm->var.YRotMatrix);
+        vgl->api.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
+                                  prgm->var.XRotMatrix);
+        vgl->api.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
+                                  prgm->var.ZoomMatrix);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
