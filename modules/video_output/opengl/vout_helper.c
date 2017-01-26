@@ -121,7 +121,6 @@ struct vout_display_opengl_t {
 
     picture_pool_t *pool;
 
-    GLuint     vertex_shader;
     /* One YUV program and one RGBA program (for subpics) */
     struct prgm prgms[2];
     struct prgm *prgm; /* Main program */
@@ -540,11 +539,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     assert(tex_conv.fragment_shader != 0);
 
     /* Build program if needed */
-    BuildVertexShader(vgl, &vgl->vertex_shader);
+    GLuint vertex_shader;
+    BuildVertexShader(vgl, &vertex_shader);
     GLuint shaders[3] = {
         tex_conv.fragment_shader,
         sub_tex_conv.fragment_shader,
-        vgl->vertex_shader
+        vertex_shader
     };
 
     /* Check shaders messages */
@@ -570,7 +570,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->prgm->tc = tex_conv;
     vgl->prgm->id = vgl->api.CreateProgram();
     vgl->api.AttachShader(vgl->prgm->id, tex_conv.fragment_shader);
-    vgl->api.AttachShader(vgl->prgm->id, vgl->vertex_shader);
+    vgl->api.AttachShader(vgl->prgm->id, vertex_shader);
     vgl->api.LinkProgram(vgl->prgm->id);
 
     /* Subpicture Vertex shaders */
@@ -579,8 +579,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->sub_prgm->tc = sub_tex_conv;
     vgl->sub_prgm->id = vgl->api.CreateProgram();
     vgl->api.AttachShader(vgl->sub_prgm->id, sub_tex_conv.fragment_shader);
-    vgl->api.AttachShader(vgl->sub_prgm->id, vgl->vertex_shader);
+    vgl->api.AttachShader(vgl->sub_prgm->id, vertex_shader);
     vgl->api.LinkProgram(vgl->sub_prgm->id);
+
+    vgl->api.DeleteShader(vertex_shader);
 
     /* Check program messages */
     for (GLuint i = 0; i < 2; i++) {
@@ -747,7 +749,6 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         opengl_tex_converter_t *tc = &vgl->prgms[i].tc;
         tc->pf_release(tc);
     }
-    vgl->api.DeleteShader(vgl->vertex_shader);
     vgl->api.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->api.DeleteBuffers(1, &vgl->index_buffer_object);
     if (vgl->chroma != NULL)
