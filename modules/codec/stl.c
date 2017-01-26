@@ -115,6 +115,7 @@ static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *c
     free(text);
 
     text_segment_t *segment = text_segment_New( u8 );
+    free( u8 );
     if( style )
         segment->style = style;
     return segment;
