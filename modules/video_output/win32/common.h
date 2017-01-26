@@ -290,5 +290,3 @@ picture_pool_t *CommonPool(vout_display_t *, unsigned);
  *****************************************************************************/
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
 #define DX_POSITION_CHANGE 0x1000
-#define DX_WALLPAPER_CHANGE 0x2000
-#define DX_DESKTOP_CHANGE 0x4000
