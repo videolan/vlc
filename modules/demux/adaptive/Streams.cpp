@@ -33,6 +33,8 @@
 #include "tools/Debug.hpp"
 #include <vlc_demux.h>
 
+#include <algorithm>
+
 using namespace adaptive;
 using namespace adaptive::http;
 
