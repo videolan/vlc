@@ -343,15 +343,14 @@ static inline int GetAlignedSize(unsigned size)
     return ((align >> 1) == size) ? size : align;
 }
 
-static void BuildVertexShader(vout_display_opengl_t *vgl,
-                              GLuint *shader)
+static GLuint BuildVertexShader(vout_display_opengl_t *vgl, unsigned plane_count)
 {
     /* Basic vertex shader */
-    const char *vertexShader =
+    static const char *template =
         "#version " GLSL_VERSION "\n"
         PRECISION
-        "varying vec4 TexCoord0,TexCoord1, TexCoord2;"
-        "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
+        "varying vec4 TexCoord0;attribute vec4 MultiTexCoord0;"
+        "%s%s"
         "attribute vec3 VertexPosition;"
         "uniform mat4 OrientationMatrix;"
         "uniform mat4 ProjectionMatrix;"
@@ -361,14 +360,29 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         "uniform mat4 ZoomMatrix;"
         "void main() {"
         " TexCoord0 = OrientationMatrix * MultiTexCoord0;"
-        " TexCoord1 = OrientationMatrix * MultiTexCoord1;"
-        " TexCoord2 = OrientationMatrix * MultiTexCoord2;"
+        "%s%s"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
         "}";
 
-    *shader = vgl->api.CreateShader(GL_VERTEX_SHADER);
-    vgl->api.ShaderSource(*shader, 1, &vertexShader, NULL);
-    vgl->api.CompileShader(*shader);
+    const char *coord1_header = plane_count > 1 ?
+        "varying vec4 TexCoord1;attribute vec4 MultiTexCoord1;" : "";
+    const char *coord1_code = plane_count > 1 ?
+        " TexCoord1 = OrientationMatrix * MultiTexCoord1;" : "";
+    const char *coord2_header = plane_count > 2 ?
+        "varying vec4 TexCoord2;attribute vec4 MultiTexCoord2;" : "";
+    const char *coord2_code = plane_count > 2 ?
+        " TexCoord2 = OrientationMatrix * MultiTexCoord2;" : "";
+
+    char *code;
+    if (asprintf(&code, template, coord1_header, coord2_header,
+                 coord1_code, coord2_code) < 0)
+        return 0;
+
+    GLuint shader = vgl->api.CreateShader(GL_VERTEX_SHADER);
+    vgl->api.ShaderSource(shader, 1, (const char **) &code, NULL);
+    vgl->api.CompileShader(shader);
+    free(code);
+    return shader;
 }
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
@@ -539,16 +553,28 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     assert(tex_conv.fragment_shader != 0);
 
     /* Build program if needed */
-    GLuint vertex_shader;
-    BuildVertexShader(vgl, &vertex_shader);
-    GLuint shaders[3] = {
+    GLuint vertex_shader, sub_vertex_shader;
+    vertex_shader = BuildVertexShader(vgl, tex_conv.desc->plane_count);
+    sub_vertex_shader = BuildVertexShader(vgl, sub_tex_conv.desc->plane_count);
+    if (vertex_shader == 0 || sub_vertex_shader == 0)
+    {
+        vgl->api.DeleteShader(vertex_shader);
+        vgl->api.DeleteShader(sub_vertex_shader);
+        tex_conv.pf_release(&tex_conv);
+        sub_tex_conv.pf_release(&sub_tex_conv);
+        free(vgl);
+        return NULL;
+    }
+
+    GLuint shaders[] = {
         tex_conv.fragment_shader,
         sub_tex_conv.fragment_shader,
-        vertex_shader
+        vertex_shader,
+        sub_vertex_shader
     };
 
     /* Check shaders messages */
-    for (unsigned j = 0; j < 3; j++) {
+    for (unsigned j = 0; j < 4; j++) {
         int infoLength;
         vgl->api.GetShaderiv(shaders[j], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
@@ -575,14 +601,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Subpicture Vertex shaders */
     vgl->sub_prgm = &vgl->prgms[1];
-
     vgl->sub_prgm->tc = sub_tex_conv;
     vgl->sub_prgm->id = vgl->api.CreateProgram();
     vgl->api.AttachShader(vgl->sub_prgm->id, sub_tex_conv.fragment_shader);
-    vgl->api.AttachShader(vgl->sub_prgm->id, vertex_shader);
+    vgl->api.AttachShader(vgl->sub_prgm->id, sub_vertex_shader);
     vgl->api.LinkProgram(vgl->sub_prgm->id);
 
     vgl->api.DeleteShader(vertex_shader);
+    vgl->api.DeleteShader(sub_vertex_shader);
 
     /* Check program messages */
     for (GLuint i = 0; i < 2; i++) {
