@@ -63,7 +63,7 @@ PredictiveAdaptationLogic::~PredictiveAdaptationLogic()
 
 BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *prevRep)
 {
-    RepresentationSelector selector;
+    RepresentationSelector selector(maxwidth, maxheight);
     BaseRepresentation *rep;
 
     vlc_mutex_lock(&lock);

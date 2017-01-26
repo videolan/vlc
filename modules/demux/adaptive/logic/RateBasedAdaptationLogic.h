@@ -36,7 +36,7 @@ namespace adaptive
         class RateBasedAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                RateBasedAdaptationLogic            (vlc_object_t *, int, int);
+                RateBasedAdaptationLogic            (vlc_object_t *);
                 virtual ~RateBasedAdaptationLogic   ();
 
                 BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
@@ -44,8 +44,6 @@ namespace adaptive
                 virtual void trackerEvent(const SegmentTrackerEvent &); /* reimpl */
 
             private:
-                int                     width;
-                int                     height;
                 size_t                  bpsAvg;
                 size_t                  currentBps;
                 size_t                  usedBps;

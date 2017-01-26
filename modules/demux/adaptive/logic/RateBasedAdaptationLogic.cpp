@@ -36,13 +36,11 @@
 using namespace adaptive::logic;
 using namespace adaptive;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (vlc_object_t *p_obj_, int w, int h) :
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (vlc_object_t *p_obj_) :
                           AbstractAdaptationLogic   (),
                           bpsAvg(0),
                           currentBps(0)
 {
-    width  = w;
-    height = h;
     usedBps = 0;
     dllength = 0;
     p_obj = p_obj_;
@@ -68,8 +66,8 @@ BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptati
     else
         availBps = 0;
 
-    RepresentationSelector selector;
-    BaseRepresentation *rep = selector.select(adaptSet, availBps, width, height);
+    RepresentationSelector selector(maxwidth, maxheight);
+    BaseRepresentation *rep = selector.select(adaptSet, availBps);
     if ( rep == NULL )
     {
         rep = selector.select(adaptSet);
@@ -136,7 +134,7 @@ BaseRepresentation *FixedRateAdaptationLogic::getNextRepresentation(BaseAdaptati
     if(adaptSet == NULL)
         return NULL;
 
-    RepresentationSelector selector;
+    RepresentationSelector selector(maxwidth, maxheight);
     BaseRepresentation *rep = selector.select(adaptSet, currentBps);
     if ( rep == NULL )
     {

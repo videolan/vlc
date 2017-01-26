@@ -27,10 +27,14 @@
 
 #include "AbstractAdaptationLogic.h"
 
+#include <limits>
+
 using namespace adaptive::logic;
 
 AbstractAdaptationLogic::AbstractAdaptationLogic    ()
 {
+    maxwidth = std::numeric_limits<int>::max();
+    maxheight = std::numeric_limits<int>::max();
 }
 
 AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
@@ -39,4 +43,10 @@ AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 
 void AbstractAdaptationLogic::updateDownloadRate    (const adaptive::ID &, size_t, mtime_t)
 {
+}
+
+void AbstractAdaptationLogic::setMaxDeviceResolution (int w, int h)
+{
+    maxwidth = w;
+    maxheight = h;
 }

@@ -722,37 +722,49 @@ void PlaylistManager::updateControlsContentType()
 
 AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::LogicType type, AbstractConnectionManager *conn)
 {
+    AbstractAdaptationLogic *logic = NULL;
     switch(type)
     {
         case AbstractAdaptationLogic::FixedRate:
         {
             size_t bps = var_InheritInteger(p_demux, "adaptive-bw") * 8192;
-            return new (std::nothrow) FixedRateAdaptationLogic(bps);
+            logic = new (std::nothrow) FixedRateAdaptationLogic(bps);
+            break;
         }
         case AbstractAdaptationLogic::AlwaysLowest:
-            return new (std::nothrow) AlwaysLowestAdaptationLogic();
+            logic = new (std::nothrow) AlwaysLowestAdaptationLogic();
+            break;
         case AbstractAdaptationLogic::AlwaysBest:
-            return new (std::nothrow) AlwaysBestAdaptationLogic();
+            logic = new (std::nothrow) AlwaysBestAdaptationLogic();
+            break;
         case AbstractAdaptationLogic::RateBased:
         {
-            int width = var_InheritInteger(p_demux, "adaptive-width");
-            int height = var_InheritInteger(p_demux, "adaptive-height");
-            RateBasedAdaptationLogic *logic =
-                    new (std::nothrow) RateBasedAdaptationLogic(VLC_OBJECT(p_demux), width, height);
-            if(logic)
-                conn->setDownloadRateObserver(logic);
-            return logic;
+            RateBasedAdaptationLogic *ratelogic =
+                    new (std::nothrow) RateBasedAdaptationLogic(VLC_OBJECT(p_demux));
+            if(ratelogic)
+                conn->setDownloadRateObserver(ratelogic);
+            logic = ratelogic;
+            break;
         }
         case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::Predictive:
         {
-            AbstractAdaptationLogic *logic = new (std::nothrow) PredictiveAdaptationLogic(VLC_OBJECT(p_demux));
-            if(logic)
-                conn->setDownloadRateObserver(logic);
-            return logic;
+            AbstractAdaptationLogic *predictivelogic =
+                    new (std::nothrow) PredictiveAdaptationLogic(VLC_OBJECT(p_demux));
+            if(predictivelogic)
+                conn->setDownloadRateObserver(predictivelogic);
+            logic = predictivelogic;
         }
 
         default:
-            return NULL;
+            break;
     }
+
+    if(logic)
+    {
+        logic->setMaxDeviceResolution( var_InheritInteger(p_demux, "adaptive-maxwidth"),
+                                       var_InheritInteger(p_demux, "adaptive-maxheight") );
+    }
+
+    return logic;
 }

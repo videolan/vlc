@@ -38,6 +38,6 @@ AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    () :
 
 BaseRepresentation *AlwaysBestAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *)
 {
-    RepresentationSelector selector;
+    RepresentationSelector selector(maxwidth, maxheight);
     return selector.highest(adaptSet);
 }

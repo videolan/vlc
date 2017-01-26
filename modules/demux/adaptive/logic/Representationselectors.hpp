@@ -38,7 +38,7 @@ namespace adaptive
         class RepresentationSelector
         {
         public:
-            RepresentationSelector();
+            RepresentationSelector(int, int);
              ~RepresentationSelector();
             BaseRepresentation * lowest(BaseAdaptationSet *) const;
             BaseRepresentation * highest(BaseAdaptationSet *) const;
@@ -46,9 +46,10 @@ namespace adaptive
             BaseRepresentation * lower(BaseAdaptationSet *, BaseRepresentation *) const;
             BaseRepresentation * select(BaseAdaptationSet *) const;
             BaseRepresentation * select(BaseAdaptationSet *, uint64_t bitrate) const;
-            BaseRepresentation * select(BaseAdaptationSet *, uint64_t bitrate,
-                                        int width, int height) const;
+
         protected:
+            int maxwidth;
+            int maxheight;
             BaseRepresentation * select(std::vector<BaseRepresentation *>&reps,
                                         uint64_t minbitrate, uint64_t maxbitrate) const;
         };

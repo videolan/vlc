@@ -50,6 +50,7 @@ namespace adaptive
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) = 0;
                 virtual void                updateDownloadRate     (const ID &, size_t, mtime_t);
                 virtual void                trackerEvent           (const SegmentTrackerEvent &) {}
+                void                        setMaxDeviceResolution (int, int);
 
                 enum LogicType
                 {
@@ -60,6 +61,10 @@ namespace adaptive
                     FixedRate,
                     Predictive
                 };
+
+            protected:
+                int maxwidth;
+                int maxheight;
         };
     }
 }
