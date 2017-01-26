@@ -1819,7 +1819,10 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, video_projec
         quad->indexCount = nbLatBands * nbLonBands * 2 * 3;
     }
     else
+    {
+        msg_Warn(vd, "Projection mode %s not handled", projection);
         return false;
+    }
 
     D3D11_BUFFER_DESC bd;
     memset(&bd, 0, sizeof(bd));
