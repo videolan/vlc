@@ -70,14 +70,14 @@ static char *tt_genTiming( int64_t i_time )
 {
     if( i_time < 0 )
         i_time = 0;
-    char *psz;
-    unsigned h, m, s, f;
-    f = (i_time % CLOCK_FREQ) / 10000;
-    i_time /= CLOCK_FREQ;
-    h = i_time / 3600;
-    m = (i_time - h) / 3600;
-    s = (i_time - h - m);
 
+    unsigned f = (i_time % CLOCK_FREQ) / 10000;
+    i_time /= CLOCK_FREQ;
+    unsigned h = i_time / 3600;
+    unsigned m = i_time % 3600 / 60;
+    unsigned s = i_time % 60;
+
+    char *psz;
     if( asprintf( &psz, "%2.2u:%2.2u:%2.2u.%2.2u",
                         h, m, s, f ) < 0 )
         psz = NULL;
