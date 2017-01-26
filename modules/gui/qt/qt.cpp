@@ -188,6 +188,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define VOLUME_MAX_TEXT N_( "Maximum Volume displayed" )
 
+#define AUTORAISE_ON_PLAYBACK_TEXT N_( "When to raise the interface" )
+#define AUTORAISE_ON_PLAYBACK_LONGTEXT N_( "This option allows the interface to be raised automatically " \
+    "when a video/audio playback starts, or never" )
+
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
 #define CONTINUE_PLAYBACK_TEXT N_("Continue playback?")
@@ -204,6 +208,12 @@ static const int i_continue_list[] =
 static const char *const psz_continue_list_text[] =
     { N_("Never"), N_("Ask"), N_("Always") };
 
+static const int i_raise_list[] =
+    { MainInterface::RAISE_NEVER, MainInterface::RAISE_VIDEO, \
+      MainInterface::RAISE_AUDIO, MainInterface::RAISE_AUDIOVIDEO,  };
+
+static const char *const psz_raise_list_text[] =
+    { N_( "Never" ), N_( "Video" ), N_( "Audio" ), _( "Both" ) };
 
 /**********************************************************************/
 vlc_module_begin ()
@@ -305,6 +315,10 @@ vlc_module_begin ()
     add_obsolete_bool( "qt-adv-options" )     /* Since 2.0.0 */
     add_obsolete_bool( "qt-volume-complete" ) /* Since 2.0.0 */
     add_obsolete_integer( "qt-startvolume" )  /* Since 2.0.0 */
+
+    add_integer( "qt-auto-raise", MainInterface::RAISE_VIDEO, AUTORAISE_ON_PLAYBACK_TEXT,
+                 AUTORAISE_ON_PLAYBACK_LONGTEXT, false )
+            change_integer_list( i_raise_list, psz_raise_list_text )
 
     cannot_unload_broken_library()
 

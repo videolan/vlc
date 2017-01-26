@@ -84,6 +84,13 @@ public:
         CONTROLS_HIDDEN   = 0x2,
         CONTROLS_ADVANCED = 0x4,
     };
+    enum
+    {
+        RAISE_NEVER,
+        RAISE_VIDEO,
+        RAISE_AUDIO,
+        RAISE_AUDIOVIDEO,
+    };
     int getControlsVisibilityStatus();
     bool isPlDocked() { return ( b_plDocked != false ); }
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
@@ -251,6 +258,7 @@ protected slots:
     void showResumePanel( int64_t);
     void hideResumePanel();
     void resumePlayback();
+    void onInputChanged( bool );
 
 signals:
     void askGetVideo( WId *, struct vout_window_t *, unsigned, unsigned, bool );

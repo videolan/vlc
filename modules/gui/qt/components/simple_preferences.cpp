@@ -852,6 +852,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "qt-continue", IntegerList, ui.continuePlaybackLabel, continuePlaybackComboBox );
             CONFIG_GENERIC( "qt-recentplay-filter", String, ui.filterLabel,
                     recentlyPlayedFilters );
+            CONFIG_GENERIC( "qt-auto-raise", IntegerList, ui.autoRaiseLabel, autoRaiseComboBox );
 
         END_SPREFS_CAT;
 

@@ -185,6 +185,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
                  this, setVLCWindowsTitle( const QString& ) );
     }
+    CONNECT( THEMIM, inputChanged( bool ), this, onInputChanged( bool ) );
+
     /* END CONNECTS ON IM */
 
     /* VideoWidget connects for asynchronous calls */
@@ -419,6 +421,23 @@ void MainInterface::resumePlayback()
     hideResumePanel();
 }
 
+void MainInterface::onInputChanged( bool hasInput )
+{
+    if( hasInput == false )
+        return;
+    int autoRaise = var_InheritInteger( p_intf, "qt-auto-raise" );
+    if ( autoRaise == MainInterface::RAISE_NEVER )
+        return;
+    if( THEMIM->getIM()->hasVideo() == true )
+    {
+        if( ( autoRaise & MainInterface::RAISE_VIDEO ) == 0 )
+            return;
+    }
+    else if ( ( autoRaise & MainInterface::RAISE_AUDIO ) == 0 )
+        return;
+    emit askRaise();
+}
+
 void MainInterface::createMainWidget( QSettings *creationSettings )
 {
     /* Create the main Widget and the mainLayout */
@@ -590,7 +609,7 @@ void MainInterface::debug()
 #endif
 }
 
-inline void MainInterface::showVideo() { showTab( videoWidget ); setRaise(); }
+inline void MainInterface::showVideo() { showTab( videoWidget ); }
 inline void MainInterface::restoreStackOldWidget()
             { showTab( stackCentralOldWidget ); }
 
