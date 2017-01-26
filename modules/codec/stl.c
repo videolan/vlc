@@ -101,7 +101,7 @@ static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *c
         if (code & 0x60)
             text[text_size++] = code;
         /* italics begin/end 0x80/0x81, underline being/end 0x82/0x83 */
-        if (code >= 0x80 && code <= 0x83 )
+        if (code >= 0x80 && code <= 0x85 )
         {
             /* Style Change, we do a new segment */
             if( text_size != 0 )
@@ -120,6 +120,10 @@ static text_segment_t *ParseText(const uint8_t *data, size_t size, const char *c
                     style->i_style_flags |= STYLE_UNDERLINE;
                 if (code == 0x83)
                     style->i_style_flags &= STYLE_UNDERLINE;
+                if (code == 0x84)
+                    style->i_style_flags |= STYLE_BACKGROUND;
+                if (code == 0x85)
+                    style->i_style_flags &= STYLE_BACKGROUND;
                 style->i_features |= STYLE_HAS_FLAGS;
             }
         }
