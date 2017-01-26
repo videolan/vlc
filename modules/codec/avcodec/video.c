@@ -1173,16 +1173,14 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
         if (pic->p[i].i_pitch % aligns[i])
         {
             if (!atomic_exchange(&sys->b_dr_failure, true))
-                msg_Warn(dec, "plane %d: pitch not aligned (%d%%%d): %s",
-                         i, pic->p[i].i_pitch, aligns[i],
-                         "disabling direct rendering");
+                msg_Warn(dec, "plane %d: pitch not aligned (%d%%%d): disabling direct rendering",
+                         i, pic->p[i].i_pitch, aligns[i]);
             goto error;
         }
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
         {
             if (!atomic_exchange(&sys->b_dr_failure, true))
-                msg_Warn(dec, "plane %d not aligned: %s", i,
-                         "disabling direct rendering");
+                msg_Warn(dec, "plane %d not aligned: disabling direct rendering", i);
             goto error;
         }
     }
