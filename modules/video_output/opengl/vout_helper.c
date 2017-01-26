@@ -139,6 +139,163 @@ struct vout_display_opengl_t {
     float f_sar;
 };
 
+static const GLfloat identity[] = {
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f
+};
+
+/* rotation around the Z axis */
+static void getZRotMatrix(float theta, GLfloat matrix[static 16])
+{
+    float st, ct;
+
+    sincosf(theta, &st, &ct);
+
+    const GLfloat m[] = {
+    /*  x    y    z    w */
+        ct,  -st, 0.f, 0.f,
+        st,  ct,  0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+/* rotation around the Y axis */
+static void getYRotMatrix(float theta, GLfloat matrix[static 16])
+{
+    float st, ct;
+
+    sincosf(theta, &st, &ct);
+
+    const GLfloat m[] = {
+    /*  x    y    z    w */
+        ct,  0.f, -st, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        st,  0.f, ct,  0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+/* rotation around the X axis */
+static void getXRotMatrix(float phi, GLfloat matrix[static 16])
+{
+    float sp, cp;
+
+    sincosf(phi, &sp, &cp);
+
+    const GLfloat m[] = {
+    /*  x    y    z    w */
+        1.f, 0.f, 0.f, 0.f,
+        0.f, cp,  sp,  0.f,
+        0.f, -sp, cp,  0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
+
+    const GLfloat m[] = {
+        /* x   y     z     w */
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, zoom, 1.0f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+/* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
+static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]) {
+
+    float zFar  = 1000;
+    float zNear = 0.01;
+
+    float f = 1.f / tanf(fovy / 2.f);
+
+    const GLfloat m[] = {
+        f / sar, 0.f,                   0.f,                0.f,
+        0.f,     f,                     0.f,                0.f,
+        0.f,     0.f,     (zNear + zFar) / (zNear - zFar), -1.f,
+        0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
+
+     memcpy(matrix, m, sizeof(m));
+}
+
+static void orientationTransformMatrix(GLfloat matrix[static 16],
+                                       video_orientation_t orientation)
+{
+    memcpy(matrix, identity, sizeof(identity));
+
+    const int k_cos_pi = -1;
+    const int k_cos_pi_2 = 0;
+    const int k_cos_n_pi_2 = 0;
+
+    const int k_sin_pi = 0;
+    const int k_sin_pi_2 = 1;
+    const int k_sin_n_pi_2 = -1;
+
+    switch (orientation) {
+
+        case ORIENT_ROTATED_90:
+            matrix[0 * 4 + 0] = k_cos_pi_2;
+            matrix[0 * 4 + 1] = -k_sin_pi_2;
+            matrix[1 * 4 + 0] = k_sin_pi_2;
+            matrix[1 * 4 + 1] = k_cos_pi_2;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        case ORIENT_ROTATED_180:
+            matrix[0 * 4 + 0] = k_cos_pi;
+            matrix[0 * 4 + 1] = -k_sin_pi;
+            matrix[1 * 4 + 0] = k_sin_pi;
+            matrix[1 * 4 + 1] = k_cos_pi;
+            matrix[3 * 4 + 0] = 1;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        case ORIENT_ROTATED_270:
+            matrix[0 * 4 + 0] = k_cos_n_pi_2;
+            matrix[0 * 4 + 1] = -k_sin_n_pi_2;
+            matrix[1 * 4 + 0] = k_sin_n_pi_2;
+            matrix[1 * 4 + 1] = k_cos_n_pi_2;
+            matrix[3 * 4 + 0] = 1;
+            break;
+        case ORIENT_HFLIPPED:
+            matrix[0 * 4 + 0] = -1;
+            matrix[3 * 4 + 0] = 1;
+            break;
+        case ORIENT_VFLIPPED:
+            matrix[1 * 4 + 1] = -1;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        case ORIENT_TRANSPOSED:
+            matrix[0 * 4 + 0] = 0;
+            matrix[1 * 4 + 1] = 0;
+            matrix[2 * 4 + 2] = -1;
+            matrix[0 * 4 + 1] = 1;
+            matrix[1 * 4 + 0] = 1;
+            break;
+        case ORIENT_ANTI_TRANSPOSED:
+            matrix[0 * 4 + 0] = 0;
+            matrix[1 * 4 + 1] = 0;
+            matrix[2 * 4 + 2] = -1;
+            matrix[0 * 4 + 1] = -1;
+            matrix[1 * 4 + 0] = -1;
+            matrix[3 * 4 + 0] = 1;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        default:
+            break;
+    }
+}
+
 static inline int GetAlignedSize(unsigned size)
 {
     /* Return the smallest larger or equal power of 2 */
@@ -761,163 +918,6 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
     VLC_UNUSED(subpicture);
     return ret;
-}
-
-static const GLfloat identity[] = {
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 0.0f, 1.0f
-};
-
-/* rotation around the Z axis */
-static void getZRotMatrix(float theta, GLfloat matrix[static 16])
-{
-    float st, ct;
-
-    sincosf(theta, &st, &ct);
-
-    const GLfloat m[] = {
-    /*  x    y    z    w */
-        ct,  -st, 0.f, 0.f,
-        st,  ct,  0.f, 0.f,
-        0.f, 0.f, 1.f, 0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* rotation around the Y axis */
-static void getYRotMatrix(float theta, GLfloat matrix[static 16])
-{
-    float st, ct;
-
-    sincosf(theta, &st, &ct);
-
-    const GLfloat m[] = {
-    /*  x    y    z    w */
-        ct,  0.f, -st, 0.f,
-        0.f, 1.f, 0.f, 0.f,
-        st,  0.f, ct,  0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* rotation around the X axis */
-static void getXRotMatrix(float phi, GLfloat matrix[static 16])
-{
-    float sp, cp;
-
-    sincosf(phi, &sp, &cp);
-
-    const GLfloat m[] = {
-    /*  x    y    z    w */
-        1.f, 0.f, 0.f, 0.f,
-        0.f, cp,  sp,  0.f,
-        0.f, -sp, cp,  0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
-
-    const GLfloat m[] = {
-        /* x   y     z     w */
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, zoom, 1.0f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
-static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]) {
-
-    float zFar  = 1000;
-    float zNear = 0.01;
-
-    float f = 1.f / tanf(fovy / 2.f);
-
-    const GLfloat m[] = {
-        f / sar, 0.f,                   0.f,                0.f,
-        0.f,     f,                     0.f,                0.f,
-        0.f,     0.f,     (zNear + zFar) / (zNear - zFar), -1.f,
-        0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
-
-     memcpy(matrix, m, sizeof(m));
-}
-
-static void orientationTransformMatrix(GLfloat matrix[static 16],
-                                       video_orientation_t orientation)
-{
-    memcpy(matrix, identity, sizeof(identity));
-
-    const int k_cos_pi = -1;
-    const int k_cos_pi_2 = 0;
-    const int k_cos_n_pi_2 = 0;
-
-    const int k_sin_pi = 0;
-    const int k_sin_pi_2 = 1;
-    const int k_sin_n_pi_2 = -1;
-
-    switch (orientation) {
-
-        case ORIENT_ROTATED_90:
-            matrix[0 * 4 + 0] = k_cos_pi_2;
-            matrix[0 * 4 + 1] = -k_sin_pi_2;
-            matrix[1 * 4 + 0] = k_sin_pi_2;
-            matrix[1 * 4 + 1] = k_cos_pi_2;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        case ORIENT_ROTATED_180:
-            matrix[0 * 4 + 0] = k_cos_pi;
-            matrix[0 * 4 + 1] = -k_sin_pi;
-            matrix[1 * 4 + 0] = k_sin_pi;
-            matrix[1 * 4 + 1] = k_cos_pi;
-            matrix[3 * 4 + 0] = 1;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        case ORIENT_ROTATED_270:
-            matrix[0 * 4 + 0] = k_cos_n_pi_2;
-            matrix[0 * 4 + 1] = -k_sin_n_pi_2;
-            matrix[1 * 4 + 0] = k_sin_n_pi_2;
-            matrix[1 * 4 + 1] = k_cos_n_pi_2;
-            matrix[3 * 4 + 0] = 1;
-            break;
-        case ORIENT_HFLIPPED:
-            matrix[0 * 4 + 0] = -1;
-            matrix[3 * 4 + 0] = 1;
-            break;
-        case ORIENT_VFLIPPED:
-            matrix[1 * 4 + 1] = -1;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        case ORIENT_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[1 * 4 + 1] = 0;
-            matrix[2 * 4 + 2] = -1;
-            matrix[0 * 4 + 1] = 1;
-            matrix[1 * 4 + 0] = 1;
-            break;
-        case ORIENT_ANTI_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[1 * 4 + 1] = 0;
-            matrix[2 * 4 + 2] = -1;
-            matrix[0 * 4 + 1] = -1;
-            matrix[1 * 4 + 0] = -1;
-            matrix[3 * 4 + 0] = 1;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        default:
-            break;
-    }
 }
 
 static int BuildSphere(unsigned nbPlanes,
