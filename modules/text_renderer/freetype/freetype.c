@@ -765,8 +765,8 @@ static inline void RenderBackground( subpicture_region_t *p_region,
         {
             /* find last char having the same style */
             int i_seg_end = i_char_index;
-            while( i_seg_end < p_line->i_last_visible_char_index &&
-                   p_prev_style == p_line->p_character[i_seg_end].p_style )
+            while( i_seg_end + 1 <= p_line->i_last_visible_char_index &&
+                   p_prev_style == p_line->p_character[i_seg_end + 1].p_style )
             {
                 i_seg_end++;
             }
