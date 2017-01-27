@@ -1184,8 +1184,11 @@ static bool PMTSetupEsHDMV( demux_t *p_demux, ts_pes_es_t *p_es,
         p_fmt->i_codec = VLC_CODEC_BD_PG;
         break;
     case 0x91: /* Interactive graphics */
-    case 0x92: /* Subtitle */
         return false;
+    case 0x92: /* Subtitle */
+        p_fmt->i_cat = SPU_ES;
+        p_fmt->i_codec = VLC_CODEC_BD_TEXT;
+        break;
     case 0xEA:
         p_fmt->i_cat = VIDEO_ES;
         p_fmt->i_codec = VLC_CODEC_VC1;
