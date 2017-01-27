@@ -114,7 +114,7 @@ typedef struct input_thread_private_t
 
     /* Title infos FIXME multi-input (not easy) ? */
     int          i_title;
-    input_title_t **title;
+    const input_title_t **title;
 
     int i_title_offset;
     int i_seekpoint_offset;
