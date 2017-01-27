@@ -254,12 +254,12 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
         "#version " GLSL_VERSION "\n"
         "#extension GL_OES_EGL_image_external : require\n"
         PRECISION
-        "varying vec4 TexCoord0;"
+        "varying vec2 TexCoord0;"
         "uniform samplerExternalOES sTexture;"
         "uniform mat4 uSTMatrix;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(sTexture, (uSTMatrix * TexCoord0).xy);"
+        "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy);"
         "}";
     GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
     tc->api->ShaderSource(fragment_shader, 1, &code, NULL);

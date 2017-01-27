@@ -542,10 +542,10 @@ opengl_tex_converter_rgba_init(const video_format_t *fmt,
         "#version " GLSL_VERSION "\n"
         PRECISION
         "uniform sampler2D Texture[3];"
-        "varying vec4 TexCoord0,TexCoord1,TexCoord2;"
+        "varying vec2 TexCoord0;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(Texture[0], TexCoord0.st);"
+        "  gl_FragColor = texture2D(Texture[0], TexCoord0);"
         "}";
 #endif
 
@@ -555,10 +555,10 @@ opengl_tex_converter_rgba_init(const video_format_t *fmt,
         PRECISION
         "uniform sampler2D Texture0;"
         "uniform vec4 FillColor;"
-        "varying vec4 TexCoord0;"
+        "varying vec2 TexCoord0;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(Texture0, TexCoord0.st) * FillColor;"
+        "  gl_FragColor = texture2D(Texture0, TexCoord0) * FillColor;"
         "}";
 
     GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
@@ -695,7 +695,7 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
         "uniform sampler2D Texture1;"
         "uniform sampler2D Texture2;"
         "uniform vec4      Coefficient[4];"
-        "varying vec4      TexCoord0,TexCoord1,TexCoord2;"
+        "varying vec2      TexCoord0,TexCoord1,TexCoord2;"
 
         "void main(void) {"
         " vec4 x,y,z,result;"
@@ -704,9 +704,9 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
          * vec4(L,L,L,1). The following transform a vec4(x, y, z, w) into a
          * vec4(x, x, x, 1) (we may want to use texture swizzling starting
          * OpenGL 3.3). */
-        " float val0 = texture2D(Texture0, TexCoord0.st).x;"
-        " float val1 = texture2D(Texture1, TexCoord1.st).x;"
-        " float val2 = texture2D(Texture2, TexCoord2.st).x;"
+        " float val0 = texture2D(Texture0, TexCoord0).x;"
+        " float val1 = texture2D(Texture1, TexCoord1).x;"
+        " float val2 = texture2D(Texture2, TexCoord2).x;"
         " x  = vec4(val0, val0, val0, 1);"
         " %c = vec4(val1, val1, val1, 1);"
         " %c = vec4(val2, val2, val2, 1);"
@@ -803,11 +803,11 @@ opengl_tex_converter_xyz12_init(const video_format_t *fmt,
         "    0.0,      0.0,         0.0,        1.0 "
         " );"
 
-        "varying vec4 TexCoord0;"
+        "varying vec2 TexCoord0;"
         "void main()"
         "{ "
         " vec4 v_in, v_out;"
-        " v_in  = texture2D(Texture0, TexCoord0.st);"
+        " v_in  = texture2D(Texture0, TexCoord0);"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
         " v_out = pow(v_out, rgb_gamma) ;"

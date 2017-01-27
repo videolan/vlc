@@ -349,7 +349,7 @@ static GLuint BuildVertexShader(vout_display_opengl_t *vgl, unsigned plane_count
     static const char *template =
         "#version " GLSL_VERSION "\n"
         PRECISION
-        "varying vec4 TexCoord0;attribute vec4 MultiTexCoord0;"
+        "varying vec2 TexCoord0;attribute vec4 MultiTexCoord0;"
         "%s%s"
         "attribute vec3 VertexPosition;"
         "uniform mat4 OrientationMatrix;"
@@ -359,19 +359,19 @@ static GLuint BuildVertexShader(vout_display_opengl_t *vgl, unsigned plane_count
         "uniform mat4 ZRotMatrix;"
         "uniform mat4 ZoomMatrix;"
         "void main() {"
-        " TexCoord0 = OrientationMatrix * MultiTexCoord0;"
+        " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;"
         "%s%s"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
-        "varying vec4 TexCoord1;attribute vec4 MultiTexCoord1;" : "";
+        "varying vec2 TexCoord1;attribute vec4 MultiTexCoord1;" : "";
     const char *coord1_code = plane_count > 1 ?
-        " TexCoord1 = OrientationMatrix * MultiTexCoord1;" : "";
+        " TexCoord1 = vec4(OrientationMatrix * MultiTexCoord1).st;" : "";
     const char *coord2_header = plane_count > 2 ?
-        "varying vec4 TexCoord2;attribute vec4 MultiTexCoord2;" : "";
+        "varying vec2 TexCoord2;attribute vec4 MultiTexCoord2;" : "";
     const char *coord2_code = plane_count > 2 ?
-        " TexCoord2 = OrientationMatrix * MultiTexCoord2;" : "";
+        " TexCoord2 = vec4(OrientationMatrix * MultiTexCoord2).st;" : "";
 
     char *code;
     if (asprintf(&code, template, coord1_header, coord2_header,
