@@ -676,7 +676,10 @@ static const struct
                                                FAKE_FMT() },
     { { VLC_CODEC_D3D11_OPAQUE_10B, VLC_CODEC_D3D9_OPAQUE_10B },
                                                FAKE_FMT() },
-    { { VLC_CODEC_CVPX_NV12 },                 FAKE_FMT() },
+
+    { { VLC_CODEC_CVPX_NV12, VLC_CODEC_CVPX_UYVY,
+        VLC_CODEC_CVPX_I420, VLC_CODEC_CVPX_BGRA },
+                                               FAKE_FMT() },
 
     { { 0 },                                   FAKE_FMT() }
 };

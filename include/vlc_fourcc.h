@@ -363,6 +363,9 @@
 
 /* CVPixelBuffer opaque buffer type */
 #define VLC_CODEC_CVPX_NV12       VLC_FOURCC('C','V','P','N')
+#define VLC_CODEC_CVPX_UYVY       VLC_FOURCC('C','V','P','Y')
+#define VLC_CODEC_CVPX_I420       VLC_FOURCC('C','V','P','I')
+#define VLC_CODEC_CVPX_BGRA       VLC_FOURCC('C','V','P','B')
 
 /* Image codec (video) */
 #define VLC_CODEC_PNG             VLC_FOURCC('p','n','g',' ')
