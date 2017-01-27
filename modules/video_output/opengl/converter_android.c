@@ -154,7 +154,7 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
 }
 
 static int
-tc_anop_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
+tc_anop_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 {
     struct priv *priv = tc->priv;
     priv->uloc.uSTMatrix = tc->api->GetUniformLocation(program, "uSTMatrix");

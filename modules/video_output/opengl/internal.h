@@ -170,8 +170,27 @@ struct opengl_tex_converter_t
 
     /* Description of the chroma, cannot be NULL */
     const vlc_chroma_description_t *desc;
+
     /* Texture mapping (usually: GL_TEXTURE_2D), cannot be 0 */
     GLenum tex_target;
+
+    struct opengl_tex_cfg {
+        /* The following is used and filled by the opengl_fragment_shader_init
+         * function. */
+        GLint  internal;
+        GLenum format;
+        GLenum type;
+    } texs[PICTURE_PLANE_MAX];
+
+    /* The following is used and filled by the opengl_fragment_shader_init
+     * function. */
+    struct {
+        GLint Texture[PICTURE_PLANE_MAX];
+        GLint Coefficients;
+        GLint FillColor;
+    } uloc;
+    bool yuv_color;
+    GLfloat yuv_coefficients[16];
 
     /* Private context */
     void *priv;
@@ -240,7 +259,7 @@ struct opengl_tex_converter_t
      * \param program linked program that will be used by this tex converter
      * \return VLC_SUCCESS or a VLC error
      */
-    int (*pf_fetch_locations)(const opengl_tex_converter_t *fc, GLuint program);
+    int (*pf_fetch_locations)(opengl_tex_converter_t *fc, GLuint program);
 
     /*
      * Callback to prepare the fragment shader
@@ -265,6 +284,26 @@ struct opengl_tex_converter_t
      */
     void (*pf_release)(const opengl_tex_converter_t *fc);
 };
+
+/*
+ * Generate a fragment shader
+ *
+ * This utility function can be used by hw opengl tex converters that need a
+ * generic fragment shader. It will compile a fragment shader generated from
+ * the chroma and the tex target. This will initialize all elements of the
+ * opengl_tex_converter_t struct except for priv, pf_allocate_texture,
+ * pf_get_pool, pf_update, and pf_release.
+ *
+ * \param tc OpenGL tex converter
+ * \param tex_target GL_TEXTURE_2D
+ * \param chroma chroma used to generate the fragment shader
+ * \param if not COLOR_SPACE_UNDEF, YUV planes will be converted to RGB
+ * according to the color space
+ * \return the compiled fragment shader or 0 in case of error
+ */
+GLuint
+opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
+                            vlc_fourcc_t chroma, video_color_space_t yuv_space);
 
 extern GLuint
 opengl_tex_converter_rgba_init(const video_format_t *,
