@@ -1446,6 +1446,10 @@ static void End( input_thread_t * p_input )
 
     /* Clean up master */
     InputSourceDestroy( priv->master );
+    priv->i_title = 0;
+    priv->title = NULL;
+    priv->i_title_offset = 0;
+    priv->i_seekpoint_offset = 0;
 
     /* Unload all modules */
     if( priv->p_es_out )
