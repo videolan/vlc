@@ -35,6 +35,9 @@
 #       define VLCGL_HAS_PBO
 #   endif
 #   define PRECISION ""
+#   if defined(__APPLE__)
+#       define GL_TEXTURE_RECTANGLE 0x84F5
+#   endif
 #endif
 
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
@@ -330,6 +333,12 @@ opengl_tex_converter_xyz12_init(const video_format_t *,
 extern GLuint
 opengl_tex_converter_anop_init(const video_format_t *,
                                opengl_tex_converter_t *);
+#endif
+
+#ifdef __APPLE__
+GLuint
+opengl_tex_converter_cvpx_init(const video_format_t *fmt,
+                               opengl_tex_converter_t *tc);
 #endif
 
 #endif /* include-guard */

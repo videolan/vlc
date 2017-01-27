@@ -14,9 +14,12 @@ vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
 if HAVE_OSX
-libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_DISPLAY_SRCS)
-libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS)
-libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa
+libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_DISPLAY_SRCS) \
+	video_output/opengl/converter_cvpx.c
+libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) -DVLCGL_CONV_CVPX
+libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+	-Wl,-framework,OpenGL,-framework,Cocoa -Wl,-framework,IOSurface \
+	-Wl,-framework,CoreVideo
 
 libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m \
 	$(OPENGL_DISPLAY_SRCS)

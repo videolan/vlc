@@ -55,6 +55,9 @@ static opengl_tex_converter_init_cb opengl_tex_converter_init_cbs[] =
 #ifdef __ANDROID__
     opengl_tex_converter_anop_init,
 #endif
+#ifdef VLCGL_CONV_CVPX
+    opengl_tex_converter_cvpx_init,
+#endif
 };
 
 typedef struct {
