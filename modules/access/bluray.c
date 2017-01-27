@@ -1980,9 +1980,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_FPS:
     case DEMUX_SET_GROUP:
     case DEMUX_HAS_UNSUPPORTED_META:
-        return VLC_EGENERIC;
     default:
-        msg_Warn(p_demux, "unimplemented query (%d) in control", query);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
