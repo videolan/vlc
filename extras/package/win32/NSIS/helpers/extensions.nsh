@@ -79,6 +79,16 @@ FunctionEnd
   ${MementoSectionEnd}
 !macroend
 
+!macro AssociateExtensionUnselectedSection TYPE EXT
+  ${MementoUnselectedSection} ${EXT} SEC_EXT_${TYPE}_${EXT}
+    SectionIn 1 3
+    Push $R0
+    StrCpy $R0 ${EXT}
+    Call AssociateExtension
+    Pop $R0
+  ${MementoSectionEnd}
+!macroend
+
 !macro RegisterExtensionMacro TYPE EXT
   Push $R0
   StrCpy $R0 ${EXT}
@@ -231,6 +241,9 @@ FunctionEnd
   !insertmacro ${_action} Other ".xspf"
 !macroend
 
+!macro MacroUnassociatedExtensions _action
+!macroend
+
 !macro MacroSkinExtensions _action
   !insertmacro ${_action} Skin ".vlt"
   !insertmacro ${_action} Skin ".wsz"
@@ -241,6 +254,7 @@ FunctionEnd
   !insertmacro MacroAudioExtensions ${_action}
   !insertmacro MacroVideoExtensions ${_action}
   !insertmacro MacroOtherExtensions ${_action}
+  !insertmacro MacroUnassociatedExtensions ${_action}
 !macroend
 
 ; Generic function for adding the context menu for one ext.

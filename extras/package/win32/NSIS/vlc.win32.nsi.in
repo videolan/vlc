@@ -420,6 +420,7 @@ SectionGroup /e !$Name_Section06 SEC06
   SectionGroup $Name_SectionGroupOther
     !insertmacro MacroOtherExtensions AssociateExtensionSection
     !insertmacro MacroSkinExtensions AssociateSkinExtensionSection
+    !insertmacro MacroUnassociatedExtensions AssociateExtensionUnselectedSection
   SectionGroupEnd
 SectionGroupEnd
 
