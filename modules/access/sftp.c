@@ -423,7 +423,6 @@ static int Open( vlc_object_t* p_this )
 error:
     free( psz_home );
     free( psz_remote_home );
-    free( psz_userauthlist );
     vlc_UrlClean( &url );
     vlc_credential_clean( &credential );
     vlc_UrlClean( &credential_url );
