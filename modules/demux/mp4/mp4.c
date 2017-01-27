@@ -5100,6 +5100,10 @@ static void LeafCheckandSetMOOFOffset( demux_t *p_demux, MP4_Box_t *p_vroot, MP4
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    /* Only on start of moof parsing */
+    if( p_sys->context.i_mdatbytesleft != 0 )
+        return;
+
     MP4_Box_t *p_mfhd = MP4_BoxGet( p_moof, "mfhd" );
     if( p_mfhd && BOXDATA(p_mfhd) )
     {
