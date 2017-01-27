@@ -278,6 +278,7 @@ static int Open( vlc_object_t* p_this )
 
         default:
             msg_Err( p_access, "Host uses unrecognized session-key algorithm" );
+            libssh2_knownhost_free( ssh_knownhosts );
             goto error;
 
     }
