@@ -412,14 +412,14 @@ ${MementoSectionEnd}
 
 SectionGroup /e !$Name_Section06 SEC06
   SectionGroup $Name_SectionGroupAudio
-    !insertmacro MacroAudioExtensions RegisterExtensionSection
+    !insertmacro MacroAudioExtensions AssociateExtensionSection
   SectionGroupEnd
   SectionGroup $Name_SectionGroupVideo
-    !insertmacro MacroVideoExtensions RegisterExtensionSection
+    !insertmacro MacroVideoExtensions AssociateExtensionSection
   SectionGroupEnd
   SectionGroup $Name_SectionGroupOther
-    !insertmacro MacroOtherExtensions RegisterExtensionSection
-    !insertmacro MacroSkinExtensions RegisterSkinExtensionSection
+    !insertmacro MacroOtherExtensions AssociateExtensionSection
+    !insertmacro MacroSkinExtensions AssociateSkinExtensionSection
   SectionGroupEnd
 SectionGroupEnd
 

@@ -59,7 +59,7 @@ NoOwn:
     DeleteRegKey HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations\VLC$R0" ; for vista
 FunctionEnd
 
-!macro RegisterExtensionSection TYPE EXT
+!macro AssociateExtensionSection TYPE EXT
   ${MementoSection} ${EXT} SEC_EXT_${TYPE}_${EXT}
     SectionIn 1 3
     Push $R0
@@ -69,7 +69,7 @@ FunctionEnd
   ${MementoSectionEnd}
 !macroend
 
-!macro RegisterSkinExtensionSection TYPE EXT
+!macro AssociateSkinExtensionSection TYPE EXT
   ${MementoUnselectedSection} ${EXT} SEC_EXT_SKIN_${EXT}
     SectionIn 1 3
     Push $R0
