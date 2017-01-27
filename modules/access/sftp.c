@@ -309,6 +309,9 @@ static int Open( vlc_object_t* p_this )
     char* psz_userauthlist = NULL;
     do
     {
+        if (!credential.psz_username || !credential.psz_username[0])
+            continue;
+
         psz_userauthlist = libssh2_userauth_list( p_sys->ssh_session, credential.psz_username, strlen( credential.psz_username ) );
 
         /* TODO: Follow PreferredAuthentications in ssh_config */
