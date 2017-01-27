@@ -242,6 +242,7 @@ FunctionEnd
 !macroend
 
 !macro MacroUnassociatedExtensions _action
+  !insertmacro ${_action} Other ".iso"
 !macroend
 
 !macro MacroSkinExtensions _action
