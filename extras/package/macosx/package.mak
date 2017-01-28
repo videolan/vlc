@@ -135,7 +135,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/BWQuincyMain.xib \
 	extras/package/macosx/Resources/English.lproj/ConvertAndSave.xib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.xib \
-	extras/package/macosx/Resources/English.lproj/DebugMessageVisualizer.xib \
+	extras/package/macosx/Resources/English.lproj/LogMessageWindow.xib \
 	extras/package/macosx/Resources/English.lproj/DetachedVideoWindow.xib \
 	extras/package/macosx/Resources/English.lproj/FSPanel.xib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
