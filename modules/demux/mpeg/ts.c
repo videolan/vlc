@@ -1597,6 +1597,14 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                     PCRFixHandle( p_demux, p_pmt, p_block );
 
                 block_ChainLastAppend( &pid->u.p_pes->prepcr.pp_last, p_block );
+
+                /* PCR Seen and no es->id, cleanup current and prepcr blocks */
+                if( p_pmt->pcr.i_current > -1)
+                {
+                    block_ChainRelease( pid->u.p_pes->prepcr.p_head );
+                    pid->u.p_pes->prepcr.p_head = NULL;
+                    pid->u.p_pes->prepcr.pp_last = &pid->u.p_pes->prepcr.p_head;
+                }
             }
         }
     }
