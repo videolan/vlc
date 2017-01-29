@@ -137,9 +137,9 @@ video_output/wayland/viewporter-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml
 	$(AM_V_GEN)$(WAYLAND_SCANNER) code $< $@
 
-libwl_shell_surface_plugin_la_SOURCES = video_output/wayland/shell_surface.c
-libwl_shell_surface_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
-libwl_shell_surface_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)
+libwl_shell_plugin_la_SOURCES = video_output/wayland/shell.c
+libwl_shell_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
+libwl_shell_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)
 
 libegl_wl_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WAYLAND=1
@@ -149,7 +149,7 @@ libegl_wl_plugin_la_LIBADD = $(EGL_LIBS) $(WAYLAND_EGL_LIBS)
 if HAVE_WAYLAND
 BUILT_SOURCES += $(nodist_libwl_shm_plugin_la_SOURCES)
 vout_LTLIBRARIES += libwl_shm_plugin.la
-vout_LTLIBRARIES += libwl_shell_surface_plugin.la
+vout_LTLIBRARIES += libwl_shell_plugin.la
 if HAVE_WAYLAND_EGL
 if HAVE_EGL
 vout_LTLIBRARIES += libegl_wl_plugin.la

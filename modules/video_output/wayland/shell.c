@@ -1,5 +1,5 @@
 /**
- * @file shell_surface.c
+ * @file shell.c
  * @brief Wayland shell surface provider module for VLC media player
  */
 /*****************************************************************************
