@@ -63,6 +63,9 @@
     [self.window setStyleMask:self.window.styleMask | NSResizableWindowMask];
     [self.window setBackgroundColor:[NSColor clearColor]];
 
+    /* Set autosave name after we changed window mask to resizable */
+    [self.window setFrameAutosaveName:@"VLCFullscreenControls"];
+
 #ifdef MAC_OS_X_VERSION_10_10
     /* Inject correct background view depending on OS support */
     if (OSX_YOSEMITE_OR_HIGHER) {
