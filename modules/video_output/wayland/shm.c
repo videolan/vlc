@@ -3,7 +3,7 @@
  * @brief Wayland shared memory video output module for VLC media player
  */
 /*****************************************************************************
- * Copyright © 2014 Rémi Denis-Courmont
+ * Copyright © 2014, 2017 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@
 #include <unistd.h>
 
 #include <wayland-client.h>
-#include "scaler-client-protocol.h"
+#include "viewporter-client-protocol.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -49,8 +49,8 @@ struct vout_display_sys_t
     vout_window_t *embed; /* VLC window */
     struct wl_event_queue *eventq;
     struct wl_shm *shm;
-    struct wl_scaler *scaler;
-    struct wl_viewport *viewport;
+    struct wp_viewporter *viewporter;
+    struct wp_viewport *viewport;
 
     picture_pool_t *pool; /* picture pool */
 
@@ -322,11 +322,12 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                 video_format_t fmt;
 
                 video_format_ApplyRotation(&fmt, src);
-                wl_viewport_set(sys->viewport,
+                wp_viewport_set_source(sys->viewport,
                                 wl_fixed_from_int(fmt.i_x_offset),
                                 wl_fixed_from_int(fmt.i_y_offset),
                                 wl_fixed_from_int(fmt.i_visible_width),
-                                wl_fixed_from_int(fmt.i_visible_height),
+                                wl_fixed_from_int(fmt.i_visible_height));
+                wp_viewport_set_destination(sys->viewport,
                                 place.width, place.height);
             }
             else
@@ -370,9 +371,9 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
     if (!strcmp(iface, "wl_shm"))
         sys->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
     else
-    if (!strcmp(iface, "wl_scaler"))
-        sys->scaler = wl_registry_bind(registry, name, &wl_scaler_interface,
-                                       1);
+    if (!strcmp(iface, "wp_viewporter"))
+        sys->viewporter = wl_registry_bind(registry, name,
+                                           &wp_viewporter_interface, 1);
     else
     if (!strcmp(iface, "wl_compositor"))
         sys->use_buffer_transform = vers >= 2;
@@ -404,7 +405,7 @@ static int Open(vlc_object_t *obj)
     sys->embed = NULL;
     sys->eventq = NULL;
     sys->shm = NULL;
-    sys->scaler = NULL;
+    sys->viewporter = NULL;
     sys->pool = NULL;
     sys->x = 0;
     sys->y = 0;
@@ -437,8 +438,8 @@ static int Open(vlc_object_t *obj)
     wl_display_roundtrip_queue(display, sys->eventq);
 
     struct wl_surface *surface = sys->embed->handle.wl;
-    if (sys->scaler != NULL)
-        sys->viewport = wl_scaler_get_viewport(sys->scaler, surface);
+    if (sys->viewporter != NULL)
+        sys->viewport = wp_viewporter_get_viewport(sys->viewporter, surface);
     else
         sys->viewport = NULL;
 
@@ -494,9 +495,9 @@ static void Close(vlc_object_t *obj)
     ResetPictures(vd);
 
     if (sys->viewport != NULL)
-        wl_viewport_destroy(sys->viewport);
-    if (sys->scaler != NULL)
-        wl_scaler_destroy(sys->scaler);
+        wp_viewport_destroy(sys->viewport);
+    if (sys->viewporter != NULL)
+        wp_viewporter_destroy(sys->viewporter);
     wl_shm_destroy(sys->shm);
     wl_display_flush(sys->embed->display.wl);
     wl_event_queue_destroy(sys->eventq);
