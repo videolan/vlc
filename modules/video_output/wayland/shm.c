@@ -72,22 +72,19 @@ static void buffer_release_cb(void *data, struct wl_buffer *buffer)
 {
     picture_t *pic = data;
 
-    picture_Release(pic);
+#ifndef NDEBUG
+    assert(pic != NULL);
+    wl_buffer_set_user_data(buffer, NULL);
+#else
     (void) buffer;
+#endif
+    picture_Release(pic);
 }
 
 static const struct wl_buffer_listener buffer_cbs =
 {
     buffer_release_cb,
 };
-
-static void PictureAttach(void *data, picture_t *pic)
-{
-    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
-
-    wl_buffer_add_listener(buf, &buffer_cbs, pic);
-    (void) data;
-}
 
 static void PictureDetach(void *data, picture_t *pic)
 {
@@ -187,6 +184,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
             break;
         }
 
+        wl_buffer_add_listener(buf, &buffer_cbs, NULL);
         pics[count++] = pic;
     }
 
@@ -203,10 +201,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     {
         while (count > 0)
             picture_Release(pics[--count]);
-        return NULL;
     }
-
-    picture_pool_Enum(sys->pool, PictureAttach, NULL);
     return sys->pool;
 }
 
@@ -217,6 +212,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
     struct wl_surface *surface = sys->embed->handle.wl;
     struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
 
+    wl_buffer_set_user_data(buf, pic);
     wl_surface_attach(surface, buf, sys->x, sys->y);
     wl_surface_damage(surface, 0, 0,
                       vd->cfg->display.width, vd->cfg->display.height);
