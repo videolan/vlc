@@ -230,6 +230,15 @@ static inline int vout_window_HideMouse(vout_window_t *window, bool hide)
     return vout_window_Control(window, VOUT_WINDOW_HIDE_MOUSE, hide);
 }
 
+/**
+ * Report current window size
+ *
+ * This notifies the user of the window what the pixel dimensions of the
+ * window are (or should be, depending on the windowing system).
+ *
+ * \note This function is thread-safe. In case of concurrent call, it is
+ * undefined which one is taken into account (but at least one is).
+ */
 static inline void vout_window_ReportSize(vout_window_t *window,
                                           unsigned width, unsigned height)
 {
