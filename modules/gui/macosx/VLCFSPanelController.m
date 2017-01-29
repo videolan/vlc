@@ -316,6 +316,7 @@
 - (void)setActive
 {
     [self.window orderFront:self];
+    [self fadeIn];
 }
 
 #pragma mark -
