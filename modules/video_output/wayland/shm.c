@@ -90,6 +90,11 @@ static void PictureDetach(void *data, picture_t *pic)
 {
     struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
 
+    /* Detach the buffer if it is attached */
+    pic = wl_buffer_get_user_data(buf);
+    if (pic != NULL)
+        buffer_release_cb(pic, buf);
+
     wl_buffer_destroy(buf);
     (void) data;
 }
