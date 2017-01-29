@@ -61,7 +61,7 @@
         if (newFrame.origin.x < limitFrame.origin.x)
             newFrame.origin.x = limitFrame.origin.x;
         if (newFrame.origin.y < limitFrame.origin.y)
-            newFrame.origin.y = limitFrame.origin.x;
+            newFrame.origin.y = limitFrame.origin.y;
 
         // Limit size (could be needed after resolution changes)
         if (newFrame.size.height > limitFrame.size.height)
