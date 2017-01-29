@@ -58,7 +58,7 @@
     /* Do some window setup that is not possible in IB */
     [self.window setOpaque:NO];
     [self.window setAlphaValue:0.0f];
-    [self.window setMovableByWindowBackground:YES];
+    [self.window setMovableByWindowBackground:NO];
     [self.window setLevel:NSModalPanelWindowLevel];
     [self.window setStyleMask:self.window.styleMask | NSResizableWindowMask];
     [self.window setBackgroundColor:[NSColor clearColor]];
