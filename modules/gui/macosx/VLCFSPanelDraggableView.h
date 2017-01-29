@@ -25,7 +25,5 @@
 
 @interface VLCFSPanelDraggableView : NSView
 
-@property NSWindow     *limitWindow;
-
 @end
 

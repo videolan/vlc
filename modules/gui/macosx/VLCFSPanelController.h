@@ -29,13 +29,12 @@
 #import "misc.h"
 #import "Windows.h"
 #import "VLCDefaultValueSlider.h"
-#import "VLCFSPanelDraggableView.h"
 
 @interface VLCFSPanelController : NSWindowController
 
 @property (readwrite, weak) NSTimer   *hideTimer;
 
-@property IBOutlet VLCFSPanelDraggableView *controlsView;
+@property IBOutlet NSView       *controlsView;
 @property IBOutlet NSButton     *playPauseButton;
 @property IBOutlet NSButton     *forwardButton;
 @property IBOutlet NSButton     *backwardButton;
@@ -61,7 +60,6 @@
 
 - (void)fadeIn;
 - (void)fadeOut;
-- (void)center;
 - (void)setActive;
 - (void)setNonActive;
 - (void)setVoutWasUpdated:(VLCWindow *)voutWindow;
@@ -73,13 +71,7 @@
 - (void)setPlay;
 - (void)setPause;
 
-/**
- Center the window on the specified screen in the lower third
-
- \note If the screen is invalid, the main screen is used
-
- \param screenID    The screen on which to center the window
- */
-- (void)centerWindowOnScreen:(CGDirectDisplayID)screenID;
+// Constrain frame to window. Used by VLCFSPanelDraggableView.
+- (NSRect)contrainFrameToAssociatedVoutWindow:(NSRect)frame;
 
 @end

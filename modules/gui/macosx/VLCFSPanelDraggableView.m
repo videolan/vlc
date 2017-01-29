@@ -23,6 +23,8 @@
 
 #import "VLCFSPanelDraggableView.h"
 
+#import "VLCFSPanelController.h"
+
 @implementation VLCFSPanelDraggableView
 
 - (BOOL)mouseDownCanMoveWindow
@@ -52,27 +54,11 @@
         NSPoint delta = NSMakePoint(newMouseLocation.x - originalMouseLocation.x,
                                     newMouseLocation.y - originalMouseLocation.y);
 
-        NSRect limitFrame = _limitWindow.frame;
         NSRect newFrame = originalFrame;
         newFrame.origin.x += delta.x;
         newFrame.origin.y += delta.y;
 
-        // Limit rect to limitation view
-        if (newFrame.origin.x < limitFrame.origin.x)
-            newFrame.origin.x = limitFrame.origin.x;
-        if (newFrame.origin.y < limitFrame.origin.y)
-            newFrame.origin.y = limitFrame.origin.y;
-
-        // Limit size (could be needed after resolution changes)
-        if (newFrame.size.height > limitFrame.size.height)
-            newFrame.size.height = limitFrame.size.height;
-        if (newFrame.size.width > limitFrame.size.width)
-            newFrame.size.width = limitFrame.size.width;
-
-        if (newFrame.origin.x + newFrame.size.width > limitFrame.origin.x + limitFrame.size.width)
-            newFrame.origin.x = limitFrame.origin.x + limitFrame.size.width - newFrame.size.width;
-        if (newFrame.origin.y + newFrame.size.height > limitFrame.origin.y + limitFrame.size.height)
-            newFrame.origin.y = limitFrame.origin.y + limitFrame.size.height - newFrame.size.height;
+        newFrame = [(VLCFSPanelController *)[[self window] delegate] contrainFrameToAssociatedVoutWindow: newFrame];
 
         [window setFrame:newFrame display:YES animate:NO];
     }
