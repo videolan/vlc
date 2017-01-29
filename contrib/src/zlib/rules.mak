@@ -1,5 +1,5 @@
 # ZLIB
-ZLIB_VERSION := 1.2.8
+ZLIB_VERSION := 1.2.11
 ZLIB_URL := $(SF)/libpng/zlib-$(ZLIB_VERSION).tar.gz
 
 PKGS += zlib
