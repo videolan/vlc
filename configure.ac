@@ -3124,37 +3124,35 @@ dnl
 AC_ARG_ENABLE(wayland,
   [AS_HELP_STRING([--enable-wayland], [Wayland support (default auto)])])
 have_wayland="no"
-AC_ARG_VAR([WAYLAND_SCANNER], [Wayland scanner utility])
+have_wayland_egl="no"
 
 AS_IF([test "${enable_wayland}" != "no"], [
-  AC_MSG_CHECKING([for the Wayland scanner])
-  AS_IF([test -z "$WAYLAND_SCANNER"], [
+  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91], [
+    AC_MSG_CHECKING([for the Wayland scanner])
     PKG_CHECK_EXISTS([wayland-scanner], [
       WAYLAND_SCANNER="$(${PKG_CONFIG} wayland-scanner --variable wayland_scanner)"
+      AC_MSG_RESULT([${WAYLAND_SCANNER}])
     ], [
-      WAYLAND_SCANNER="wayland-scanner"
+      AC_MSG_RESULT([not found])
+      AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors wayland-scanner)])
     ])
-  ])
-  AC_MSG_RESULT([$WAYLAND_SCANNER])
 
-  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91], [
     have_wayland="yes"
+
+    AS_IF([test "${have_egl}" = "yes"], [
+      PKG_CHECK_MODULES([WAYLAND_EGL], [wayland-egl], [
+        have_wayland_egl="yes"
+      ], [
+        AC_MSG_ERROR([${WAYLAND_EGL_PKG_ERRORS}.])
+      ])
+    ])
   ], [
     AS_IF([test -n "${enable_wayland}"], [
       AC_MSG_ERROR([${WAYLAND_CLIENT_PKG_ERRORS}.])
     ])
   ])
-
-  AS_IF([test "${have_egl}" = "yes"], [
-    PKG_CHECK_MODULES([WAYLAND_EGL], [wayland-egl], [
-      have_wayland_egl="yes"
-    ], [
-      AS_IF([test -n "${enable_wayland}"], [
-        AC_MSG_ERROR([${WAYLAND_EGL_PKG_ERRORS}.])
-      ])
-    ])
-  ])
 ])
+AC_SUBST([WAYLAND_SCANNER])
 AM_CONDITIONAL([HAVE_WAYLAND], [test "${have_wayland}" = "yes"])
 AM_CONDITIONAL([HAVE_WAYLAND_EGL], [test "${have_wayland_egl}" = "yes"])
 
