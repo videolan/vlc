@@ -34,8 +34,6 @@
 # include "config.h"
 #endif
 
-#ifdef UPDATE_CHECK
-
 #include <gcrypt.h>
 #include <assert.h>
 #include <limits.h>
@@ -1106,5 +1104,3 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
 
     return VLC_SUCCESS;
 }
-
-#endif /* UPDATE_CHECK */

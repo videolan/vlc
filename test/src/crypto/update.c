@@ -24,15 +24,6 @@
 
 #include <stdio.h>
 
-#ifndef UPDATE_CHECK
-int main(void)
-{
-    fprintf(stderr, "Update checking disabled, not testing.\n");
-    return 77;
-}
-
-#else
-
 #include <vlc_common.h>
 #include "../src/misc/update_crypto.c"
 
@@ -292,4 +283,3 @@ int main(void)
     check(&key, &key2, status, &sig, key_longid, key_longid2);
 
 }
-#endif

@@ -39,8 +39,6 @@
 #include <vlc_common.h>
 #include <vlc_update.h>
 
-#ifdef UPDATE_CHECK
-
 #include <assert.h>
 
 #include <vlc_pgpkey.h>
@@ -757,40 +755,3 @@ update_release_t *update_GetRelease( update_t *p_update )
 {
     return &p_update->release;
 }
-
-#else
-#undef update_New
-update_t *update_New( vlc_object_t *p_this )
-{
-    (void)p_this;
-    return NULL;
-}
-
-void update_Delete( update_t *p_update )
-{
-    (void)p_update;
-}
-
-void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ),
-                   void *p_data )
-{
-    (void)p_update; (void)pf_callback; (void)p_data;
-}
-
-bool update_NeedUpgrade( update_t *p_update )
-{
-    (void)p_update;
-    return false;
-}
-
-void update_Download( update_t *p_update, const char *psz_destdir )
-{
-    (void)p_update; (void)psz_destdir;
-}
-
-update_release_t *update_GetRelease( update_t *p_update )
-{
-    (void)p_update;
-    return NULL;
-}
-#endif

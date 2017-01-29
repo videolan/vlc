@@ -23,7 +23,6 @@ check_PROGRAMS = \
 	test_libvlc_slaves \
 	test_src_config_chain \
 	test_src_misc_variables \
-	test_src_crypto_update \
 	test_src_input_stream \
 	test_src_input_stream_fifo \
 	test_src_interface_dialog \
@@ -32,8 +31,10 @@ check_PROGRAMS = \
 	test_src_misc_keystore \
 	test_modules_packetizer_hxxx \
 	test_modules_keystore \
-	test_modules_tls \
-	$(NULL)
+	test_modules_tls
+if UPDATE_CHECK
+check_PROGRAMS += test_src_crypto_update
+endif
 
 check_SCRIPTS = \
 	modules/lua/telnet.sh \

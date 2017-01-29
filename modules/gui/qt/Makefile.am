@@ -14,6 +14,7 @@ guidir = $(pluginsdir)/gui
 
 SUFFIXES += .ui .h .hpp .moc.cpp
 
+libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
@@ -30,6 +31,9 @@ libqt_plugin_la_LIBADD += $(WAYLAND_CLIENT_LIBS)
 endif
 if HAVE_WIN32
 libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid
+endif
+if UPDATE_CHECK
+libqt_plugin_la_CPPFLAGS += -DUPDATE_CHECK
 endif
 
 gui_LTLIBRARIES =  $(LTLIBqt)

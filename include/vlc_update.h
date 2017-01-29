@@ -34,8 +34,6 @@
  *VLC software update interface
  */
 
-#ifdef UPDATE_CHECK
-
 /**
  * Describes an update VLC release number
  */
@@ -48,8 +46,6 @@ struct update_release_t
     char* psz_url;      ///< Download URL
     char* psz_desc;     ///< Release description
 };
-
-#endif /* UPDATE_CHECK */
 
 typedef struct update_release_t update_release_t;
 

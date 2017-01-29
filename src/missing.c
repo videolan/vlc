@@ -402,3 +402,43 @@ vlm_t *vlm_New (vlc_object_t *obj)
      return NULL;
 }
 #endif /* !ENABLE_VLM */
+
+#ifndef UPDATE_CHECK
+# include <vlc_update.h>
+
+update_t *(update_New)(vlc_object_t *obj)
+{
+    (void) obj;
+    return NULL;
+}
+
+void update_Delete(update_t *u)
+{
+    (void) u;
+    vlc_assert_unreachable();
+}
+
+void update_Check(update_t *u, void (*cb)(void *, bool), void *opaque)
+{
+    (void) u; (void) cb; (void) opaque;
+    vlc_assert_unreachable();
+}
+
+bool update_NeedUpgrade(update_t *u)
+{
+    (void) u;
+    vlc_assert_unreachable();
+}
+
+void update_Download(update_t *u, const char *dir)
+{
+    (void) u; (void) dir;
+    vlc_assert_unreachable();
+}
+
+update_release_t *update_GetRelease(update_t *u)
+{
+    (void) u;
+    vlc_assert_unreachable();
+}
+#endif /* !UPDATE_CHECK */

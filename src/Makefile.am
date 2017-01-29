@@ -339,9 +339,6 @@ libvlccore_la_SOURCES = \
 	misc/variables.h \
 	misc/variables.c \
 	misc/error.c \
-	misc/update.h \
-	misc/update.c \
-	misc/update_crypto.c \
 	misc/xml.c \
 	misc/addons.c \
 	misc/filter.c \
@@ -440,6 +437,15 @@ libvlccore_la_SOURCES += \
 if ENABLE_VLM
 libvlccore_la_SOURCES += input/vlm.c input/vlm_event.c input/vlmshell.c
 endif
+endif
+
+if UPDATE_CHECK
+libvlccore_la_SOURCES += \
+	misc/update.h misc/update.c \
+	misc/update_crypto.c
+AM_CPPFLAGS += -DUPDATE_CHECK
+AM_CFLAGS += $(GCRYPT_CFLAGS)
+libvlccore_la_LIBADD += $(GCRYPT_LIBS)
 endif
 
 libvlccore_la_LDFLAGS = \
