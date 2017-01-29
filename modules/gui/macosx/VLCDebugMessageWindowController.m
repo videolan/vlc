@@ -105,6 +105,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [self.window setExcludedFromWindowsMenu:YES];
     [self.window setDelegate:self];
     [self.window setTitle:_NS("Messages")];
+    [self.window setLevel:NSModalPanelWindowLevel];
 
 #define setupButton(target, title, desc)                                              \
     [target accessibilitySetOverrideValue:title                                       \
