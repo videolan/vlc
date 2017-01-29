@@ -47,6 +47,6 @@ void AbstractAdaptationLogic::updateDownloadRate    (const adaptive::ID &, size_
 
 void AbstractAdaptationLogic::setMaxDeviceResolution (int w, int h)
 {
-    maxwidth = w;
-    maxheight = h;
+    maxwidth = (w > 0) ? w : std::numeric_limits<int>::max();
+    maxheight = (h > 0) ? h : std::numeric_limits<int>::max();
 }

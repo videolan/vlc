@@ -47,8 +47,6 @@
 #include "../smooth/SmoothStream.hpp"
 #include "../smooth/playlist/Parser.hpp"
 
-#include <limits>
-
 using namespace adaptive::logic;
 using namespace adaptive::playlist;
 using namespace adaptive::xml;
@@ -113,9 +111,9 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_INPUT_DEMUX )
         add_string( "adaptive-logic",  "", ADAPT_LOGIC_TEXT, NULL, false )
             change_string_list( ppsz_logics_values, ppsz_logics )
-        add_integer( "adaptive-maxwidth",  std::numeric_limits<int>::max(),
+        add_integer( "adaptive-maxwidth",  0,
                      ADAPT_WIDTH_TEXT,  ADAPT_WIDTH_TEXT,  false )
-        add_integer( "adaptive-maxheight", std::numeric_limits<int>::max(),
+        add_integer( "adaptive-maxheight", 0,
                      ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, false )
         add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
         add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT, true );
