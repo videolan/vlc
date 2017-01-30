@@ -90,6 +90,7 @@ Decoder:
  * JPEG images correctly oriented using embedded orientation tag, if present
  * Support VPX high bit depth support
  * Extend MicroDVD support with color, fontname, size, position extensions
+ * BluRay text subtitles are now decoded
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
