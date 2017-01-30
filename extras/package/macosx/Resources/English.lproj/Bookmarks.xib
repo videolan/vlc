@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <deployment identifier="macosx"/>
+        <development version="7000" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCBookmarksWindowController">
@@ -28,19 +30,16 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="330" width="540" height="307"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="85">
                 <rect key="frame" x="0.0" y="0.0" width="540" height="307"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="88">
                         <rect key="frame" x="20" y="268" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89" customClass="BGHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </buttonCell>
                         <connections>
                             <action selector="add:" target="-2" id="177"/>
@@ -48,12 +47,9 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="90">
                         <rect key="frame" x="20" y="243" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91" customClass="BGHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </buttonCell>
                         <connections>
                             <action selector="edit:" target="-2" id="179"/>
@@ -61,12 +57,9 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92">
                         <rect key="frame" x="20" y="218" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93" customClass="BGHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </buttonCell>
                         <connections>
                             <action selector="remove:" target="-2" id="183"/>
@@ -74,12 +67,9 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94">
                         <rect key="frame" x="20" y="193" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95" customClass="BGHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </buttonCell>
                         <connections>
                             <action selector="clear:" target="-2" id="178"/>
@@ -87,25 +77,22 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="96">
                         <rect key="frame" x="20" y="133" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Extract" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="97" customClass="BGHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Extract" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="97">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </buttonCell>
                         <connections>
                             <action selector="extract:" target="-2" id="182"/>
                         </connections>
                     </button>
-                    <scrollView borderType="line" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="107" customClass="BGHUDScrollView">
+                    <scrollView borderType="line" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="107">
                         <rect key="frame" x="126" y="20" width="394" height="276"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="KmY-DA-2er">
-                            <rect key="frame" x="1" y="24" width="392" height="251"/>
+                            <rect key="frame" x="1" y="1" width="392" height="274"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" autosaveColumns="NO" autosaveName="bookmarks-table" headerView="111" id="110" customClass="BGHUDTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="382" height="19"/>
+                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" autosaveColumns="NO" autosaveName="bookmarks-table" headerView="111" id="110">
+                                    <rect key="frame" x="0.0" y="0.0" width="392" height="251"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -138,34 +125,22 @@
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
                                     </tableColumns>
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                    </userDefinedRuntimeAttributes>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" name="controlDarkShadowColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="109" customClass="BGHUDScroller">
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="109">
                             <rect key="frame" x="1" y="260" width="377" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="108" customClass="BGHUDScroller">
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="108">
                             <rect key="frame" x="378" y="18" width="15" height="242"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </scroller>
                         <tableHeaderView key="headerView" id="111">
                             <rect key="frame" x="0.0" y="0.0" width="392" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                        </userDefinedRuntimeAttributes>
                     </scrollView>
                 </subviews>
                 <constraints>
@@ -195,7 +170,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="401" width="298" height="125"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="134">
                 <rect key="frame" x="0.0" y="0.0" width="298" height="125"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -205,37 +180,28 @@
                         <constraints>
                             <constraint firstAttribute="width" constant="204" id="bLc-El-nRp"/>
                         </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="136" customClass="BGHUDTextFieldCell">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="136">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="137">
                         <rect key="frame" x="74" y="51" width="204" height="22"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="138" customClass="BGHUDTextFieldCell">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="138">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="141">
                         <rect key="frame" x="246" y="18" width="32" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142" customClass="BGHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </buttonCell>
                         <connections>
                             <action selector="edit_ok:" target="-2" id="181"/>
@@ -243,41 +209,32 @@ DQ
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="143">
                         <rect key="frame" x="185" y="18" width="53" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144" customClass="BGHUDButtonCell">
+                        <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </buttonCell>
                         <connections>
                             <action selector="edit_cancel:" target="-2" id="180"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="145" customClass="BGHUDLabel">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="145">
                         <rect key="frame" x="25" y="85" width="44" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Name:" id="146">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                        </userDefinedRuntimeAttributes>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="147" customClass="BGHUDLabel">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="147">
                         <rect key="frame" x="31" y="53" width="38" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time:" id="148">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                        </userDefinedRuntimeAttributes>
                     </textField>
                 </subviews>
                 <constraints>

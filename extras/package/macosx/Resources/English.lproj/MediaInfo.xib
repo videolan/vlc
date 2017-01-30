@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -78,35 +78,32 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="34" width="506" height="476"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="3">
                 <rect key="frame" x="0.0" y="0.0" width="506" height="476"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView translatesAutoresizingMaskIntoConstraints="NO" id="418" customClass="BGHUDTabView">
+                    <tabView translatesAutoresizingMaskIntoConstraints="NO" id="418">
                         <rect key="frame" x="-28" y="-11" width="562" height="482"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
-                            <tabViewItem label="General" identifier="1" id="419" customClass="BGHUDTabViewItem">
+                            <tabViewItem label="General" identifier="1" id="419">
                                 <view key="view" id="422">
                                     <rect key="frame" x="10" y="33" width="542" height="436"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="427">
                                             <rect key="frame" x="37" y="396" width="468" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="428" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="428">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="726"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="429" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="429">
                                             <rect key="frame" x="35" y="418" width="373" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="369" id="QQR-jU-J5W"/>
@@ -116,9 +113,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="509">
                                             <rect key="frame" x="37" y="18" width="468" height="19"/>
@@ -126,66 +120,51 @@
                                                 <constraint firstAttribute="width" constant="468" id="CrL-XR-Ww4"/>
                                                 <constraint firstAttribute="height" constant="19" id="POw-kc-CJg"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="512" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="512">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="510" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="510">
                                             <rect key="frame" x="35" y="40" width="475" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Location" id="511">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="431">
                                             <rect key="frame" x="37" y="352" width="368" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="434" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="434">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="724"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="432" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="432">
                                             <rect key="frame" x="35" y="374" width="330" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Artist" id="433">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="435">
                                             <rect key="frame" x="413" y="352" width="92" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="438" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="438">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="725"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="436" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="436">
                                             <rect key="frame" x="411" y="374" width="93" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="89" id="R0Z-z4-bc9"/>
@@ -195,228 +174,174 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="439">
                                             <rect key="frame" x="37" y="308" width="368" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="446" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="446">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="722"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="440" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="440">
                                             <rect key="frame" x="35" y="330" width="330" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Album" id="445">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="441">
                                             <rect key="frame" x="413" y="308" width="92" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="444" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="444">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="723"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="442" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="442">
                                             <rect key="frame" x="411" y="330" width="93" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Track Number" id="443">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="461">
                                             <rect key="frame" x="37" y="264" width="300" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="468" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="468">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="720"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="462" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="462">
                                             <rect key="frame" x="35" y="286" width="307" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Genre" id="467">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="476">
                                             <rect key="frame" x="37" y="220" width="300" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="479" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="479">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="719"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="477" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="477">
                                             <rect key="frame" x="35" y="242" width="307" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now Playing" id="478">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="481">
                                             <rect key="frame" x="37" y="88" width="228" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="484" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="484">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="715"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="482" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="482">
                                             <rect key="frame" x="35" y="110" width="232" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Publisher" id="483">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="504">
                                             <rect key="frame" x="273" y="87" width="232" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="507" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="507">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="716"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="505" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="505">
                                             <rect key="frame" x="273" y="109" width="232" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Encoded by" id="506">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="486">
                                             <rect key="frame" x="37" y="132" width="300" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="489" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="489">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="717"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="487" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="487">
                                             <rect key="frame" x="35" y="154" width="307" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Copyright" id="488">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="497">
                                             <rect key="frame" x="37" y="176" width="300" height="19"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="300" id="fNh-e9-7HF"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="500" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="500">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="718"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="498" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="498">
                                             <rect key="frame" x="35" y="198" width="307" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description" id="499">
                                                 <font key="font" metaFont="smallSystemBold"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="463">
                                             <rect key="frame" x="345" y="264" width="160" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="466" customClass="BGHUDTextFieldCell">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" focusRingType="none" id="466">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="metaFieldChanged:" target="-2" id="721"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="464" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="464">
                                             <rect key="frame" x="343" y="286" width="93" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="89" id="qse-Y4-EaG"/>
@@ -426,9 +351,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                         <imageView translatesAutoresizingMaskIntoConstraints="NO" id="88">
                                             <rect key="frame" x="345" y="119" width="160" height="130"/>
@@ -440,12 +362,9 @@
                                         </imageView>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="412">
                                             <rect key="frame" x="345" y="61" width="160" height="19"/>
-                                            <buttonCell key="cell" type="roundRect" title="Save Metadata" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="413" customClass="BGHUDButtonCell">
+                                            <buttonCell key="cell" type="roundRect" title="Save Metadata" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="413">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="saveMetaData:" target="-2" id="714"/>
@@ -539,19 +458,19 @@
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Codec Details" identifier="2" id="420" customClass="BGHUDTabViewItem">
+                            <tabViewItem label="Codec Details" identifier="2" id="420">
                                 <view key="view" id="421">
                                     <rect key="frame" x="10" y="33" width="542" height="436"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="516" customClass="BGHUDScrollView">
+                                        <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="516">
                                             <rect key="frame" x="17" y="-3" width="508" height="436"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="jDW-Lc-WE4">
                                                 <rect key="frame" x="1" y="1" width="506" height="434"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="521" id="519" customClass="BGHUDOutlineView">
-                                                        <rect key="frame" x="0.0" y="0.0" width="506" height="19"/>
+                                                    <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="521" id="519">
+                                                        <rect key="frame" x="0.0" y="0.0" width="506" height="434"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -584,30 +503,17 @@
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
                                                         </tableColumns>
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
                                                     </outlineView>
                                                 </subviews>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
-                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="518" customClass="BGHUDScroller">
+                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="518">
                                                 <rect key="frame" x="1" y="420" width="501" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </scroller>
-                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="517" customClass="BGHUDScroller">
+                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="517">
                                                 <rect key="frame" x="-100" y="-100" width="15" height="458"/>
                                                 <autoresizingMask key="autoresizingMask"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                </userDefinedRuntimeAttributes>
                                             </scroller>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </scrollView>
                                     </subviews>
                                     <constraints>
@@ -618,18 +524,18 @@
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Statistics" identifier="3" id="425" customClass="BGHUDTabViewItem">
+                            <tabViewItem label="Statistics" identifier="3" id="425">
                                 <view key="view" id="426">
                                     <rect key="frame" x="10" y="33" width="542" height="436"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" title="Box" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="549" customClass="BGHUDBox">
+                                        <box autoresizesSubviews="NO" boxType="custom" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="549">
                                             <rect key="frame" x="28" y="302" width="238" height="103"/>
                                             <view key="contentView" id="enP-o2-JOw">
                                                 <rect key="frame" x="1" y="1" width="236" height="101"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="531" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="531">
                                                         <rect key="frame" x="12" y="72" width="121" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="Fe5-cw-cYX"/>
@@ -643,7 +549,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="535" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="535">
                                                         <rect key="frame" x="135" y="72" width="89" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="jaJ-qV-SHG"/>
@@ -657,7 +563,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="537" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="537">
                                                         <rect key="frame" x="12" y="53" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input bitrate" id="540">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -668,7 +574,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="538" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="538">
                                                         <rect key="frame" x="135" y="53" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="539">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -679,7 +585,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="541" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="541">
                                                         <rect key="frame" x="12" y="34" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Demuxed" id="544">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -690,7 +596,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="542" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="542">
                                                         <rect key="frame" x="135" y="34" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="543">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -701,7 +607,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="545" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="545">
                                                         <rect key="frame" x="12" y="15" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stream bitrate" id="548">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -712,7 +618,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="546" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="546">
                                                         <rect key="frame" x="135" y="15" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="547">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -749,16 +655,8 @@
                                                     <constraint firstItem="541" firstAttribute="trailing" secondItem="545" secondAttribute="trailing" id="vJG-yN-xWT"/>
                                                 </constraints>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="useTheme">
-                                                    <bool key="value" value="YES"/>
-                                                </userDefinedRuntimeAttribute>
-                                            </userDefinedRuntimeAttributes>
                                         </box>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="550" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="550">
                                             <rect key="frame" x="27" y="407" width="121" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="117" id="9nA-Gr-Hi1"/>
@@ -768,17 +666,14 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
-                                        <box autoresizesSubviews="NO" title="Box" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="552" customClass="BGHUDBox">
+                                        <box autoresizesSubviews="NO" boxType="custom" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="552">
                                             <rect key="frame" x="276" y="302" width="238" height="103"/>
                                             <view key="contentView" id="QnG-Hd-ZtQ">
                                                 <rect key="frame" x="1" y="1" width="236" height="101"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="555" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="555">
                                                         <rect key="frame" x="12" y="72" width="121" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="Htg-L7-ZFh"/>
@@ -792,7 +687,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="556" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="556">
                                                         <rect key="frame" x="135" y="72" width="89" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="NGB-dc-ns6"/>
@@ -806,7 +701,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="557" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="557">
                                                         <rect key="frame" x="12" y="53" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Displayed frames" id="568">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -817,7 +712,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="558" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="558">
                                                         <rect key="frame" x="135" y="53" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000/s" id="567">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -828,7 +723,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="559" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="559">
                                                         <rect key="frame" x="12" y="34" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost frames" id="566">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -839,7 +734,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="560" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="560">
                                                         <rect key="frame" x="135" y="34" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="565">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -870,16 +765,8 @@
                                                     <constraint firstItem="555" firstAttribute="trailing" secondItem="557" secondAttribute="trailing" id="xDT-yR-J6i"/>
                                                 </constraints>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="useTheme">
-                                                    <bool key="value" value="YES"/>
-                                                </userDefinedRuntimeAttribute>
-                                            </userDefinedRuntimeAttributes>
                                         </box>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="553" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="553">
                                             <rect key="frame" x="275" y="407" width="121" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="117" id="zpS-Zr-N7Z"/>
@@ -889,17 +776,14 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
-                                        <box autoresizesSubviews="NO" title="Box" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="571" customClass="BGHUDBox">
+                                        <box autoresizesSubviews="NO" boxType="custom" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="571">
                                             <rect key="frame" x="28" y="186" width="238" height="84"/>
                                             <view key="contentView" id="YFK-nx-YL4">
                                                 <rect key="frame" x="1" y="1" width="236" height="82"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="593" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="593">
                                                         <rect key="frame" x="12" y="53" width="121" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="I4C-Np-0Vf"/>
@@ -913,7 +797,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="594" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="594">
                                                         <rect key="frame" x="135" y="53" width="89" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="Sqd-F6-iuk"/>
@@ -927,7 +811,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="595" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="595">
                                                         <rect key="frame" x="12" y="34" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sent bytes" id="606">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -938,7 +822,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="596" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="596">
                                                         <rect key="frame" x="135" y="34" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="605">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -949,7 +833,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="597" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="597">
                                                         <rect key="frame" x="12" y="15" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Send rate" id="604">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -960,7 +844,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="598" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="598">
                                                         <rect key="frame" x="135" y="15" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="603">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -991,33 +875,22 @@
                                                     <constraint firstItem="597" firstAttribute="trailing" secondItem="595" secondAttribute="trailing" id="zPj-cc-dPl"/>
                                                 </constraints>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="useTheme">
-                                                    <bool key="value" value="YES"/>
-                                                </userDefinedRuntimeAttribute>
-                                            </userDefinedRuntimeAttributes>
                                         </box>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="572" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="572">
                                             <rect key="frame" x="27" y="272" width="121" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Streaming" id="592">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
-                                        <box autoresizesSubviews="NO" title="Box" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="573" customClass="BGHUDBox">
+                                        <box autoresizesSubviews="NO" boxType="custom" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="573">
                                             <rect key="frame" x="276" y="186" width="238" height="84"/>
                                             <view key="contentView" id="7tR-kf-2ax">
                                                 <rect key="frame" x="1" y="1" width="236" height="82"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="583" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="583">
                                                         <rect key="frame" x="12" y="53" width="121" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="FaO-BP-Myr"/>
@@ -1031,7 +904,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="582" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="582">
                                                         <rect key="frame" x="135" y="53" width="89" height="14"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="pgJ-Ad-US6"/>
@@ -1045,7 +918,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="581" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="581">
                                                         <rect key="frame" x="12" y="34" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Played buffer" id="586">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1056,7 +929,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="580" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="580">
                                                         <rect key="frame" x="135" y="34" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="587">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1067,7 +940,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="579" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="579">
                                                         <rect key="frame" x="12" y="15" width="121" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost buffers" id="588">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1078,7 +951,7 @@
                                                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                                         </userDefinedRuntimeAttributes>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="578" customClass="BGHUDLabel">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="578">
                                                         <rect key="frame" x="135" y="15" width="89" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="589">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1109,25 +982,14 @@
                                                     <constraint firstItem="580" firstAttribute="leading" secondItem="582" secondAttribute="leading" id="ypU-eT-UOn"/>
                                                 </constraints>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="useTheme">
-                                                    <bool key="value" value="YES"/>
-                                                </userDefinedRuntimeAttribute>
-                                            </userDefinedRuntimeAttributes>
                                         </box>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="574" customClass="BGHUDLabel">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="574">
                                             <rect key="frame" x="275" y="272" width="121" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio" id="575">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                            </userDefinedRuntimeAttributes>
                                         </textField>
                                     </subviews>
                                     <constraints>

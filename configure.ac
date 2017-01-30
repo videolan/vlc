@@ -3865,11 +3865,6 @@ AC_ARG_ENABLE(macosx,
 if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
   VLC_ADD_PLUGIN([macosx])
-
-  if test ! -d ${CONTRIB_DIR}/BGHUDAppKit.framework
-  then
-    AC_MSG_ERROR([BGHUDAppKit framework is required and was not found in ${CONTRIB_DIR}])
-  fi
 fi
 AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no"])
 

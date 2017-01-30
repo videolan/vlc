@@ -567,7 +567,7 @@
                 <button verticalHuggingPriority="750" id="5263">
                     <rect key="frame" x="5" y="-1" width="101" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="roundRect" title="Subscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5264" customClass="BGHUDButtonCell">
+                    <buttonCell key="cell" type="roundRect" title="Subscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5264">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
                         <userDefinedRuntimeAttributes>
@@ -581,7 +581,7 @@
                 <button verticalHuggingPriority="750" id="5302">
                     <rect key="frame" x="298" y="-1" width="101" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="roundRect" title="Unsubscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5303" customClass="BGHUDButtonCell">
+                    <buttonCell key="cell" type="roundRect" title="Unsubscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5303">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
                         <userDefinedRuntimeAttributes>

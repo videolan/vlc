@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11761" systemVersion="16B2657" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11761"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -88,12 +88,12 @@
                 <rect key="frame" x="0.0" y="0.0" width="409" height="255"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView initialItem="81" id="80" customClass="BGHUDTabView">
+                    <tabView initialItem="81" id="80">
                         <rect key="frame" x="-7" y="25" width="424" height="223"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
-                            <tabViewItem label="Graphic Equalizer" identifier="equalizer" id="81" customClass="BGHUDTabViewItem">
+                            <tabViewItem label="Graphic Equalizer" identifier="equalizer" id="81">
                                 <view key="view" id="84">
                                     <rect key="frame" x="10" y="33" width="404" height="177"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -242,7 +242,7 @@
                                                 <popUpButton verticalHuggingPriority="750" id="168">
                                                     <rect key="frame" x="196" y="156" width="155" height="22"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169" customClass="BGHUDPopUpButtonCell">
+                                                    <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169">
                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <menu key="menu" title="OtherViews" id="170">
@@ -303,9 +303,6 @@
                                                                 </menuItem>
                                                             </items>
                                                         </menu>
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
                                                     </popUpButtonCell>
                                                     <connections>
                                                         <action selector="equalizerChangePreset:" target="-2" id="Io0-Eg-HA8"/>
@@ -415,7 +412,7 @@
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Compressor" identifier="compressor" id="82" customClass="BGHUDTabViewItem">
+                            <tabViewItem label="Compressor" identifier="compressor" id="82">
                                 <view key="view" id="83">
                                     <rect key="frame" x="10" y="33" width="404" height="177"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -620,7 +617,7 @@
                                                 <button verticalHuggingPriority="750" id="621">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="C59B0B11-FDE2-465D-A6F0-044ED7678EA4" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="58959107-CC37-4D1A-9926-50D65AA0CF35" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -633,7 +630,7 @@
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Spatializer" identifier="spatializer" id="85" customClass="BGHUDTabViewItem">
+                            <tabViewItem label="Spatializer" identifier="spatializer" id="85">
                                 <view key="view" id="86">
                                     <rect key="frame" x="10" y="33" width="404" height="177"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -656,7 +653,7 @@
                                                 <button verticalHuggingPriority="750" id="618">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="8A662FAB-BAE7-46D0-B836-382044D38A71" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="3DA61402-F3E5-40AB-9D54-E800993C906C" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -799,7 +796,7 @@
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Filter" identifier="filter" id="339" customClass="BGHUDTabViewItem">
+                            <tabViewItem label="Filter" identifier="filter" id="339">
                                 <view key="view" id="340">
                                     <rect key="frame" x="10" y="33" width="404" height="177"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -872,7 +869,7 @@
                     <popUpButton verticalHuggingPriority="750" id="701">
                         <rect key="frame" x="110" y="6" width="190" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="706" id="702" customClass="BGHUDPopUpButtonCell">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="706" id="702">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                             <menu key="menu" title="OtherViews" id="703">
@@ -882,9 +879,6 @@
                                     <menuItem title="Item 3" id="704"/>
                                 </items>
                             </menu>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                            </userDefinedRuntimeAttributes>
                         </popUpButtonCell>
                         <connections>
                             <action selector="profileSelectorAction:" target="-2" id="uTq-Bz-2S2"/>
@@ -896,7 +890,7 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="8A662FAB-BAE7-46D0-B836-382044D38A71" width="1" height="1">
+        <image name="3DA61402-F3E5-40AB-9D54-E800993C906C" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -937,7 +931,7 @@ B04HVwdcB2QHZwdsB3sHfweGB44HmwegB6IHpAepB7EHtAe5B8EHxAfWB9kH3gAAAAAAAAIBAAAAAAAA
 AEEAAAAAAAAAAAAAAAAAAAfgA
 </mutableData>
         </image>
-        <image name="C59B0B11-FDE2-465D-A6F0-044ED7678EA4" width="1" height="1">
+        <image name="58959107-CC37-4D1A-9926-50D65AA0CF35" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
