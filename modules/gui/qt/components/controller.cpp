@@ -1189,7 +1189,7 @@ void FullscreenControllerWidget::setVoutList( vout_thread_t **pp_vout, int i_vou
         var_AddCallback( p_vout, "fullscreen",
                          FullscreenControllerWidget::FullscreenChanged, this );
         /* I miss a add and fire */
-        fullscreenChanged( p_vout, var_GetBool( THEPL, "fullscreen" ),
+        emit fullscreenChanged( p_vout, var_GetBool( THEPL, "fullscreen" ),
                            var_GetInteger( p_vout, "mouse-hide-timeout" ) );
         vlc_mutex_unlock( &lock );
     }
