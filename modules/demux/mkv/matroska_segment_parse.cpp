@@ -1816,6 +1816,9 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         S_CASE("S_HDMV/PGS") {
             vars.p_fmt->i_codec = VLC_CODEC_BD_PG;
         }
+        S_CASE("S_HDMV/TEXTST") {
+            vars.p_fmt->i_codec = VLC_CODEC_BD_TEXT;
+        }
         S_CASE("D_WEBVTT/SUBTITLES") {
             vars.p_fmt->i_codec = VLC_CODEC_SUBT;
             vars.p_fmt->subs.psz_encoding = strdup( "UTF-8");
