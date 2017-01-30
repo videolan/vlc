@@ -114,7 +114,7 @@ static size_t textst_FillRegion(decoder_t *p_dec, const uint8_t *p_data, size_t 
                  //p_data[0] font_id;
                  break;
              case BD_TEXTST_DATA_FONT_STYLE:
-                 if(p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS )))
+                 if(i_data > 2 && (p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS ))))
                  {
                     if(p_data[0] & 0x01)
                         p_style->i_style_flags |= STYLE_BOLD;
@@ -129,13 +129,17 @@ static size_t textst_FillRegion(decoder_t *p_dec, const uint8_t *p_data, size_t 
                  }
                  break;
              case BD_TEXTST_DATA_FONT_SIZE:
-                 /*p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE *
+                 /*if(i_data > 0)
+                   p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE *
                                            (p_data[0] << 4) / STYLE_DEFAULT_FONT_SIZE;*/
                  break;
              case BD_TEXTST_DATA_FONT_COLOR:
-                 p_style->i_font_color = p_dec->p_sys->palette[p_data[1]] & 0x00FFFFFF;
-                 p_style->i_font_alpha = p_dec->p_sys->palette[p_data[1]] >> 24;
-                 p_style->i_features |= STYLE_HAS_FONT_ALPHA | STYLE_HAS_FONT_COLOR;
+                 if(i_data > 1)
+                 {
+                    p_style->i_font_color = p_dec->p_sys->palette[p_data[1]] & 0x00FFFFFF;
+                    p_style->i_font_alpha = p_dec->p_sys->palette[p_data[1]] >> 24;
+                    p_style->i_features |= STYLE_HAS_FONT_ALPHA | STYLE_HAS_FONT_COLOR;
+                 }
                  break;
              case BD_TEXTST_DATA_NEWLINE:
                  *pp_last = text_segment_New("\n");
