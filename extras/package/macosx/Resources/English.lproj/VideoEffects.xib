@@ -127,13 +127,13 @@
                 <rect key="frame" x="0.0" y="0.0" width="642" height="274"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                        <rect key="frame" x="-8" y="25" width="658" height="243"/>
+                    <tabView drawsBackground="NO" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="3">
+                        <rect key="frame" x="-1" y="35" width="644" height="197"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Basic" identifier="basic" id="4">
                                 <view key="view" id="7">
-                                    <rect key="frame" x="10" y="33" width="638" height="197"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="48">
@@ -142,7 +142,7 @@
                                                 <rect key="frame" x="1" y="1" width="308" height="164"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="31">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="31">
                                                         <rect key="frame" x="119" y="136" width="171" height="15"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="171" id="Qmh-zW-wC1"/>
@@ -152,7 +152,7 @@
                                                             <action selector="adjustSliderChanged:" target="-2" id="9Ra-Ux-sYu"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="25">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="25">
                                                         <rect key="frame" x="15" y="138" width="26" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Hue" id="38">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -160,14 +160,14 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="30">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="30">
                                                         <rect key="frame" x="119" y="114" width="171" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="33"/>
                                                         <connections>
                                                             <action selector="adjustSliderChanged:" target="-2" id="ceo-WZ-Y3X"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="24">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="24">
                                                         <rect key="frame" x="15" y="116" width="50" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Contrast" id="39">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -175,14 +175,14 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="29">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="29">
                                                         <rect key="frame" x="119" y="92" width="171" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="34"/>
                                                         <connections>
                                                             <action selector="adjustSliderChanged:" target="-2" id="oSl-TZ-hTC"/>
                                                         </connections>
                                                     </slider>
-                                                    <button misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="46">
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="46">
                                                         <rect key="frame" x="116" y="73" width="135" height="18"/>
                                                         <buttonCell key="cell" type="check" title="Brightness Threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="47">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -192,7 +192,7 @@
                                                             <action selector="enableAdjustBrightnessThreshold:" target="-2" id="9OQ-2E-4Ii"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="23">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="23">
                                                         <rect key="frame" x="15" y="94" width="61" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Brightness" id="40">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -200,14 +200,14 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="28">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
                                                         <rect key="frame" x="119" y="54" width="171" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="3" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="35"/>
                                                         <connections>
                                                             <action selector="adjustSliderChanged:" target="-2" id="8p1-yp-x16"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="22">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="22">
                                                         <rect key="frame" x="15" y="56" width="59" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Saturation" id="41">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -215,7 +215,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="21">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="21">
                                                         <rect key="frame" x="15" y="34" width="44" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Gamma" id="42">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -223,14 +223,14 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="27">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="27">
                                                         <rect key="frame" x="119" y="32" width="171" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="36"/>
                                                         <connections>
                                                             <action selector="enableMotionDetect:" target="-2" id="K42-v1-HXL"/>
                                                         </connections>
                                                     </slider>
-                                                    <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="704">
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="704">
                                                         <rect key="frame" x="251" y="10" width="39" height="17"/>
                                                         <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="705">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -248,25 +248,25 @@
                                                     <constraint firstItem="21" firstAttribute="leading" secondItem="22" secondAttribute="leading" id="5dg-ua-Wds"/>
                                                     <constraint firstItem="24" firstAttribute="leading" secondItem="25" secondAttribute="leading" id="8hK-LP-6OX"/>
                                                     <constraint firstItem="28" firstAttribute="width" secondItem="27" secondAttribute="width" id="9Fp-e1-iMS"/>
-                                                    <constraint firstItem="31" firstAttribute="top" secondItem="wwn-Le-8VF" secondAttribute="top" constant="12" id="9Wi-Lg-FaX"/>
+                                                    <constraint firstItem="31" firstAttribute="top" secondItem="wwn-Le-8VF" secondAttribute="top" constant="14" id="9Wi-Lg-FaX"/>
                                                     <constraint firstItem="29" firstAttribute="width" secondItem="28" secondAttribute="width" id="9e7-gp-dAj"/>
-                                                    <constraint firstItem="27" firstAttribute="top" secondItem="28" secondAttribute="bottom" constant="7" id="AiU-Qg-YrD"/>
-                                                    <constraint firstItem="30" firstAttribute="centerY" secondItem="24" secondAttribute="centerY" id="Br9-a5-oLM"/>
-                                                    <constraint firstItem="29" firstAttribute="top" secondItem="30" secondAttribute="bottom" constant="7" id="Gj5-rg-gvh"/>
-                                                    <constraint firstItem="30" firstAttribute="top" secondItem="31" secondAttribute="bottom" constant="7" id="ICT-ay-DIU"/>
-                                                    <constraint firstItem="23" firstAttribute="centerY" secondItem="29" secondAttribute="centerY" id="JVF-Sh-s7B"/>
+                                                    <constraint firstItem="27" firstAttribute="top" secondItem="28" secondAttribute="bottom" constant="9" id="AiU-Qg-YrD"/>
+                                                    <constraint firstItem="30" firstAttribute="centerY" secondItem="24" secondAttribute="centerY" constant="1.5" id="Br9-a5-oLM"/>
+                                                    <constraint firstItem="29" firstAttribute="top" secondItem="30" secondAttribute="bottom" constant="9" id="Gj5-rg-gvh"/>
+                                                    <constraint firstItem="30" firstAttribute="top" secondItem="31" secondAttribute="bottom" constant="9" id="ICT-ay-DIU"/>
+                                                    <constraint firstItem="23" firstAttribute="centerY" secondItem="29" secondAttribute="centerY" constant="-1.5" id="JVF-Sh-s7B"/>
                                                     <constraint firstItem="30" firstAttribute="width" secondItem="31" secondAttribute="width" id="KzM-fh-ytL"/>
                                                     <constraint firstItem="46" firstAttribute="leading" secondItem="29" secondAttribute="leading" id="ME1-fu-8tY"/>
                                                     <constraint firstItem="29" firstAttribute="leading" secondItem="30" secondAttribute="leading" id="Msg-qq-uKg"/>
-                                                    <constraint firstItem="22" firstAttribute="centerY" secondItem="28" secondAttribute="centerY" id="O8e-Hv-caT"/>
+                                                    <constraint firstItem="22" firstAttribute="centerY" secondItem="28" secondAttribute="centerY" constant="-1.5" id="O8e-Hv-caT"/>
                                                     <constraint firstItem="704" firstAttribute="top" secondItem="27" secondAttribute="bottom" constant="7" id="Og1-XU-Yzi"/>
                                                     <constraint firstAttribute="trailing" secondItem="31" secondAttribute="trailing" constant="18" id="UWE-8K-eek"/>
                                                     <constraint firstItem="23" firstAttribute="leading" secondItem="24" secondAttribute="leading" id="VIx-Sp-uhx"/>
-                                                    <constraint firstItem="25" firstAttribute="centerY" secondItem="31" secondAttribute="centerY" id="WfY-UB-PFt"/>
+                                                    <constraint firstItem="25" firstAttribute="centerY" secondItem="31" secondAttribute="centerY" constant="-1.5" id="WfY-UB-PFt"/>
                                                     <constraint firstItem="25" firstAttribute="leading" secondItem="wwn-Le-8VF" secondAttribute="leading" constant="17" id="dfY-CP-f9m"/>
-                                                    <constraint firstItem="28" firstAttribute="top" secondItem="29" secondAttribute="bottom" constant="23" id="i3W-0P-Dh7"/>
+                                                    <constraint firstItem="28" firstAttribute="top" secondItem="29" secondAttribute="bottom" constant="25" id="i3W-0P-Dh7"/>
                                                     <constraint firstItem="704" firstAttribute="trailing" secondItem="27" secondAttribute="trailing" id="m4o-gm-JZO"/>
-                                                    <constraint firstItem="21" firstAttribute="centerY" secondItem="27" secondAttribute="centerY" id="mUN-p9-OSr"/>
+                                                    <constraint firstItem="21" firstAttribute="centerY" secondItem="27" secondAttribute="centerY" constant="-1.5" id="mUN-p9-OSr"/>
                                                     <constraint firstItem="22" firstAttribute="leading" secondItem="23" secondAttribute="leading" id="uac-H8-N26"/>
                                                     <constraint firstItem="29" firstAttribute="leading" secondItem="28" secondAttribute="leading" id="vt8-oF-ZjH"/>
                                                     <constraint firstItem="29" firstAttribute="width" secondItem="30" secondAttribute="width" id="ymY-el-kZH"/>
@@ -297,9 +297,9 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="57">
-                                            <rect key="frame" x="320" y="137" width="310" height="42"/>
+                                            <rect key="frame" x="320" y="137" width="316" height="42"/>
                                             <view key="contentView" id="XDn-1w-i62">
-                                                <rect key="frame" x="1" y="1" width="308" height="40"/>
+                                                <rect key="frame" x="1" y="1" width="314" height="40"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="54">
@@ -311,7 +311,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="53">
-                                                        <rect key="frame" x="119" y="12" width="171" height="15"/>
+                                                        <rect key="frame" x="125" y="12" width="171" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="0.050000000000000003" tickMarkPosition="above" sliderType="linear" id="56"/>
                                                         <connections>
                                                             <action selector="sharpenSliderChanged:" target="-2" id="rDd-ql-8sc"/>
@@ -340,9 +340,9 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="61">
-                                            <rect key="frame" x="320" y="75" width="310" height="42"/>
+                                            <rect key="frame" x="320" y="75" width="316" height="42"/>
                                             <view key="contentView" id="ppw-UH-GKm">
-                                                <rect key="frame" x="1" y="1" width="308" height="40"/>
+                                                <rect key="frame" x="1" y="1" width="314" height="40"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="62">
@@ -353,7 +353,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="63">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="63">
                                                         <rect key="frame" x="119" y="10" width="171" height="18"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="4" maxValue="32" doubleValue="16" tickMarkPosition="below" numberOfTickMarks="8" allowsTickMarkValuesOnly="YES" sliderType="linear" id="64"/>
                                                         <connections>
@@ -363,9 +363,9 @@
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="62" firstAttribute="leading" secondItem="ppw-UH-GKm" secondAttribute="leading" constant="17" id="Fkf-xx-s6z"/>
-                                                    <constraint firstAttribute="trailing" secondItem="63" secondAttribute="trailing" constant="18" id="beC-M1-38P"/>
+                                                    <constraint firstAttribute="trailing" secondItem="63" secondAttribute="trailing" constant="24" id="beC-M1-38P"/>
                                                     <constraint firstItem="62" firstAttribute="centerY" secondItem="ppw-UH-GKm" secondAttribute="centerY" id="kiW-0e-nEJ"/>
-                                                    <constraint firstItem="63" firstAttribute="centerY" secondItem="ppw-UH-GKm" secondAttribute="centerY" id="qh0-5Y-OgY"/>
+                                                    <constraint firstItem="63" firstAttribute="centerY" secondItem="ppw-UH-GKm" secondAttribute="centerY" constant="1" id="qh0-5Y-OgY"/>
                                                 </constraints>
                                             </view>
                                             <constraints>
@@ -383,9 +383,9 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="68">
-                                            <rect key="frame" x="320" y="13" width="310" height="42"/>
+                                            <rect key="frame" x="320" y="13" width="316" height="42"/>
                                             <view key="contentView" id="xSw-Z6-2rH">
-                                                <rect key="frame" x="1" y="1" width="308" height="40"/>
+                                                <rect key="frame" x="1" y="1" width="314" height="40"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="70">
@@ -397,7 +397,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="69">
-                                                        <rect key="frame" x="119" y="12" width="171" height="15"/>
+                                                        <rect key="frame" x="125" y="12" width="171" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="40" doubleValue="2" tickMarkPosition="above" sliderType="linear" id="72"/>
                                                         <connections>
                                                             <action selector="grainSliderChanged:" target="-2" id="Z7w-sc-MfL"/>
@@ -1019,11 +1019,11 @@
                             </tabViewItem>
                             <tabViewItem label="Color" identifier="color" id="10">
                                 <view key="view" id="11">
-                                    <rect key="frame" x="10" y="33" width="638" height="197"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="203">
-                                            <rect key="frame" x="224" y="91" width="189" height="89"/>
+                                            <rect key="frame" x="230" y="91" width="189" height="89"/>
                                             <view key="contentView" id="q62-YN-hEA">
                                                 <rect key="frame" x="1" y="1" width="187" height="87"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1110,7 +1110,7 @@
                                             </constraints>
                                         </box>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="204">
-                                            <rect key="frame" x="224" y="179" width="68" height="18"/>
+                                            <rect key="frame" x="230" y="179" width="68" height="18"/>
                                             <buttonCell key="cell" type="check" title="Gradient" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="205">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1120,7 +1120,7 @@
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="213">
-                                            <rect key="frame" x="415" y="179" width="71" height="18"/>
+                                            <rect key="frame" x="421" y="179" width="71" height="18"/>
                                             <buttonCell key="cell" type="check" title="Posterize" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="214">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1130,7 +1130,7 @@
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="254">
-                                            <rect key="frame" x="413" y="51" width="97" height="18"/>
+                                            <rect key="frame" x="419" y="51" width="97" height="18"/>
                                             <buttonCell key="cell" type="check" title="Motion Detect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="255">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1140,7 +1140,7 @@
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="256">
-                                            <rect key="frame" x="413" y="36" width="87" height="18"/>
+                                            <rect key="frame" x="419" y="36" width="87" height="18"/>
                                             <buttonCell key="cell" type="check" title="Water effect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="257">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1150,7 +1150,7 @@
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="258">
-                                            <rect key="frame" x="413" y="21" width="57" height="18"/>
+                                            <rect key="frame" x="419" y="21" width="57" height="18"/>
                                             <buttonCell key="cell" type="check" title="Waves" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="259">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1160,7 +1160,7 @@
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="260">
-                                            <rect key="frame" x="413" y="6" width="85" height="18"/>
+                                            <rect key="frame" x="419" y="6" width="85" height="18"/>
                                             <buttonCell key="cell" type="check" title="Psychedelic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="261">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1190,7 +1190,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="207">
-                                            <rect key="frame" x="415" y="133" width="214" height="47"/>
+                                            <rect key="frame" x="421" y="133" width="214" height="47"/>
                                             <view key="contentView" id="s4h-VJ-0fi">
                                                 <rect key="frame" x="1" y="1" width="212" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1369,7 +1369,7 @@
                                             </constraints>
                                         </box>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="217">
-                                            <rect key="frame" x="413" y="113" width="82" height="18"/>
+                                            <rect key="frame" x="419" y="113" width="82" height="18"/>
                                             <buttonCell key="cell" type="check" title="Motion blur" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="223">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1379,12 +1379,12 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="218">
-                                            <rect key="frame" x="413" y="68" width="214" height="47"/>
+                                            <rect key="frame" x="419" y="68" width="214" height="47"/>
                                             <view key="contentView" id="zp9-ZY-iRy">
                                                 <rect key="frame" x="1" y="1" width="212" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="220">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="220">
                                                         <rect key="frame" x="104" y="14" width="90" height="15"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="90" id="fiC-8c-fdb"/>
@@ -1394,7 +1394,7 @@
                                                             <action selector="blurModifierChanged:" target="-2" id="gLG-Z8-DSC"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="219">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="219">
                                                         <rect key="frame" x="61" y="15" width="38" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Factor" id="222">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1407,7 +1407,7 @@
                                                     <constraint firstItem="219" firstAttribute="centerY" secondItem="220" secondAttribute="centerY" id="0H3-vc-cXv"/>
                                                     <constraint firstAttribute="trailing" secondItem="220" secondAttribute="trailing" constant="18" id="P1F-3s-B7C"/>
                                                     <constraint firstItem="220" firstAttribute="leading" secondItem="219" secondAttribute="trailing" constant="7" id="R71-a1-Xp1"/>
-                                                    <constraint firstItem="220" firstAttribute="centerY" secondItem="zp9-ZY-iRy" secondAttribute="centerY" id="YAe-Cp-Gg9"/>
+                                                    <constraint firstItem="220" firstAttribute="centerY" secondItem="zp9-ZY-iRy" secondAttribute="centerY" constant="1" id="YAe-Cp-Gg9"/>
                                                 </constraints>
                                             </view>
                                         </box>
@@ -1427,14 +1427,14 @@
                                                 <rect key="frame" x="1" y="1" width="212" height="88"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="274">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="274">
                                                         <rect key="frame" x="94" y="34" width="100" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" doubleValue="20" tickMarkPosition="above" sliderType="linear" id="275"/>
                                                         <connections>
                                                             <action selector="thresholdModifierChanged:" target="-2" id="DA5-ev-OYe"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="273">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="273">
                                                         <rect key="frame" x="15" y="35" width="59" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Saturation" id="276">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1442,14 +1442,14 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="296">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="296">
                                                         <rect key="frame" x="94" y="13" width="100" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="15" tickMarkPosition="above" sliderType="linear" id="299"/>
                                                         <connections>
                                                             <action selector="thresholdModifierChanged:" target="-2" id="B6O-zi-366"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="297">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="297">
                                                         <rect key="frame" x="15" y="14" width="53" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Similarity" id="298">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1481,13 +1481,13 @@
                                                     </textField>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstItem="296" firstAttribute="top" secondItem="274" secondAttribute="bottom" constant="6" id="4rS-4S-mtL"/>
+                                                    <constraint firstItem="296" firstAttribute="top" secondItem="274" secondAttribute="bottom" constant="8" id="4rS-4S-mtL"/>
                                                     <constraint firstItem="297" firstAttribute="centerY" secondItem="296" secondAttribute="centerY" id="7MJ-8A-VUw"/>
                                                     <constraint firstItem="274" firstAttribute="width" secondItem="296" secondAttribute="width" id="MR9-gQ-kjC"/>
                                                     <constraint firstAttribute="trailing" secondItem="293" secondAttribute="trailing" constant="18" id="NTh-jN-dOv"/>
                                                     <constraint firstItem="292" firstAttribute="leading" secondItem="VxL-14-NoR" secondAttribute="leading" constant="17" id="XE9-bA-co6"/>
                                                     <constraint firstItem="274" firstAttribute="trailing" secondItem="293" secondAttribute="trailing" id="XfE-7Q-JSG"/>
-                                                    <constraint firstItem="274" firstAttribute="top" secondItem="293" secondAttribute="bottom" constant="7" id="cl7-cH-sq3"/>
+                                                    <constraint firstItem="274" firstAttribute="top" secondItem="293" secondAttribute="bottom" constant="9" id="cl7-cH-sq3"/>
                                                     <constraint firstItem="293" firstAttribute="top" secondItem="VxL-14-NoR" secondAttribute="top" constant="12" id="egX-rg-pTr"/>
                                                     <constraint firstItem="273" firstAttribute="leading" secondItem="VxL-14-NoR" secondAttribute="leading" constant="17" id="hbU-GC-kjO"/>
                                                     <constraint firstItem="292" firstAttribute="centerY" secondItem="293" secondAttribute="centerY" id="kgm-SJ-fQF"/>
@@ -1547,7 +1547,7 @@
                             </tabViewItem>
                             <tabViewItem label="Miscellaneous" identifier="misc" id="12">
                                 <view key="view" id="13">
-                                    <rect key="frame" x="10" y="33" width="638" height="197"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="302">
@@ -1632,7 +1632,7 @@
                                             </constraints>
                                         </box>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="643">
-                                            <rect key="frame" x="314" y="178" width="69" height="18"/>
+                                            <rect key="frame" x="320" y="178" width="69" height="18"/>
                                             <buttonCell key="cell" type="check" title="Add logo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="667">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1642,7 +1642,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="644">
-                                            <rect key="frame" x="314" y="85" width="312" height="95"/>
+                                            <rect key="frame" x="320" y="85" width="312" height="95"/>
                                             <view key="contentView" id="4L0-QJ-InP">
                                                 <rect key="frame" x="1" y="1" width="310" height="93"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1663,7 +1663,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="649">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="649">
                                                         <rect key="frame" x="16" y="12" width="76" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Transparency" id="661">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1682,7 +1682,7 @@
                                                             <action selector="addLogoModifierChanged:" target="-2" id="51s-RT-Vjo"/>
                                                         </connections>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="645">
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="645">
                                                         <rect key="frame" x="106" y="11" width="184" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="255" doubleValue="255" tickMarkPosition="above" sliderType="linear" id="666"/>
                                                         <connections>
@@ -1708,7 +1708,7 @@
                                                     </popUpButton>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstItem="645" firstAttribute="top" secondItem="692" secondAttribute="bottom" constant="8" id="Ay9-KD-AAk"/>
+                                                    <constraint firstItem="645" firstAttribute="top" secondItem="692" secondAttribute="bottom" constant="10" id="Ay9-KD-AAk"/>
                                                     <constraint firstItem="651" firstAttribute="centerY" secondItem="692" secondAttribute="centerY" id="FcV-54-ix3"/>
                                                     <constraint firstAttribute="trailing" secondItem="646" secondAttribute="trailing" constant="20" id="MKd-lG-nhq"/>
                                                     <constraint firstItem="649" firstAttribute="leading" secondItem="4L0-QJ-InP" secondAttribute="leading" constant="18" id="ZzV-fj-ODF"/>
@@ -1774,14 +1774,44 @@
                             <action selector="profileSelectorAction:" target="-2" id="Kw0-Rg-y67"/>
                         </connections>
                     </popUpButton>
+                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PmS-HT-UdA">
+                        <rect key="frame" x="147" y="246" width="352" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="9aO-Gu-WkU"/>
+                        </constraints>
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="l7E-0O-cd7">
+                            <font key="font" metaFont="system"/>
+                            <segments>
+                                <segment label="Basic" selected="YES"/>
+                                <segment label="Crop" tag="1"/>
+                                <segment label="Geometry" tag="2"/>
+                                <segment label="Color" tag="3"/>
+                                <segment label="Miscellaneous" tag="4"/>
+                            </segments>
+                        </segmentedCell>
+                        <connections>
+                            <action selector="takeSelectedTabViewItemFromSender:" target="3" id="lDP-xP-F9v"/>
+                        </connections>
+                    </segmentedControl>
+                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="jys-n2-OlJ">
+                        <rect key="frame" x="0.0" y="238" width="642" height="5"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="1" id="La9-tY-5he"/>
+                        </constraints>
+                    </box>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="3" secondAttribute="bottom" constant="35" id="0Mc-wz-dcA"/>
                     <constraint firstItem="720" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="1bu-sd-Qlq"/>
+                    <constraint firstItem="PmS-HT-UdA" firstAttribute="top" secondItem="2" secondAttribute="top" constant="5" id="3rB-pQ-qQO"/>
                     <constraint firstAttribute="trailing" secondItem="3" secondAttribute="trailing" constant="-1" id="5fu-BL-Ohf"/>
-                    <constraint firstItem="3" firstAttribute="top" secondItem="2" secondAttribute="top" constant="12" id="CDC-fg-sWo"/>
+                    <constraint firstItem="jys-n2-OlJ" firstAttribute="top" secondItem="PmS-HT-UdA" secondAttribute="bottom" constant="7" id="AUf-ez-t4g"/>
+                    <constraint firstItem="3" firstAttribute="top" secondItem="2" secondAttribute="top" constant="42" id="CDC-fg-sWo"/>
                     <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="-1" id="CVD-Zn-f0c"/>
+                    <constraint firstItem="jys-n2-OlJ" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="enn-VY-kt7"/>
                     <constraint firstAttribute="bottom" secondItem="720" secondAttribute="bottom" constant="9" id="kdJ-1Z-QDw"/>
+                    <constraint firstItem="PmS-HT-UdA" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" constant="2" id="mLU-YV-qlE"/>
+                    <constraint firstAttribute="trailing" secondItem="jys-n2-OlJ" secondAttribute="trailing" id="vib-rA-rOt"/>
                 </constraints>
             </view>
         </window>
