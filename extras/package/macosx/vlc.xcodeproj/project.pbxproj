@@ -644,8 +644,6 @@
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4EFC2C13E96BD00091D19A /* dropzone.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
-		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
-		CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CC91906E159B4BB800E634A7 /* volume-high_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC91903C159B4BB800E634A7 /* volume-high_dark@2x.png */; };
 		CC91906F159B4BB800E634A7 /* volume-low_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC91903D159B4BB800E634A7 /* volume-low_dark@2x.png */; };
 		CC919070159B4BB800E634A7 /* volume-slider-knob_dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC91903E159B4BB800E634A7 /* volume-slider-knob_dark@2x.png */; };
@@ -796,7 +794,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1446,7 +1443,6 @@
 		CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCTrackSynchronizationWindowController.m; path = ../../../modules/gui/macosx/VLCTrackSynchronizationWindowController.m; sourceTree = SOURCE_ROOT; };
 		CC79F66614014FC30015D89E /* opengl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../../modules/video_output/opengl.h; sourceTree = "<group>"; };
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
-		CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = ../../../contrib/BGHUDAppKit.framework; sourceTree = "<absolute>"; };
 		CC91903C159B4BB800E634A7 /* volume-high_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "volume-high_dark@2x.png"; path = "Resources/mainwindow_dark/volume-high_dark@2x.png"; sourceTree = "<group>"; };
 		CC91903D159B4BB800E634A7 /* volume-low_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "volume-low_dark@2x.png"; path = "Resources/mainwindow_dark/volume-low_dark@2x.png"; sourceTree = "<group>"; };
 		CC91903E159B4BB800E634A7 /* volume-slider-knob_dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "volume-slider-knob_dark@2x.png"; path = "Resources/mainwindow_dark/volume-slider-knob_dark@2x.png"; sourceTree = "<group>"; };
@@ -1627,7 +1623,6 @@
 				CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */,
 				CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */,
 				CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */,
-				CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */,
 				CC3F9F861350B2A000B0E885 /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1795,7 +1790,6 @@
 			isa = PBXGroup;
 			children = (
 				CC3F9F851350B2A000B0E885 /* Growl.framework */,
-				CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */,
 				CC426FD01020D44F00A32659 /* Sparkle.framework */,
 				CCBE999E0F922C51000705F8 /* CoreServices.framework */,
 				CC962E2C0CC7992800A56695 /* WebKit.framework */,

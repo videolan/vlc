@@ -18,8 +18,6 @@ VLC-dev.app: VLC-tmp
 VLC.app: VLC-tmp
 	rm -Rf $@
 	cp -R VLC-tmp $@
-	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Versions/A/Resources/BGHUDAppKitPlugin.ibplugin
-	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Versions/A/Resources/README.textile
 	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
 	bin/vlc-cache-gen $@/Contents/MacOS/plugins
 	find $@ -type d -exec chmod ugo+rx '{}' \;
