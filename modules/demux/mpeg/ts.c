@@ -2291,8 +2291,7 @@ int FindPCRCandidate( ts_pmt_t *p_pmt )
     for( int i=0; i<p_pmt->e_streams.i_size; i++ )
     {
         ts_pid_t *p_pid = p_pmt->e_streams.p_elems[i];
-        if( SEEN(p_pid) &&
-            (!p_cand || p_cand->i_pid != i_previous) )
+        if( SEEN(p_pid) && p_pid->i_pid != i_previous )
         {
             if( p_pid->probed.i_pcr_count ) /* check PCR frequency first */
             {
