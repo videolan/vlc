@@ -255,6 +255,9 @@ static const guid_t mfasf_sampleextension_encryptionkeyid_guid =
 static const guid_t asf_dvr_sampleextension_videoframe_guid =
 {0xDD6432CC, 0xE229, 0x40DB, {0x80, 0xF6, 0xD2, 0x63, 0x28, 0xD2, 0x76, 0x1F}};
 
+static const guid_t asf_dvr_sampleextension_timing_rep_data_guid =
+{0xFD3CC02A, 0x06DB, 0x4CFA, {0x80, 0x1C, 0x72, 0x12, 0xd3, 0x87, 0x45, 0xE4}};
+
 /****************************************************************************
  * GUID functions
  ****************************************************************************/
