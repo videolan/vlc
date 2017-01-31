@@ -284,7 +284,7 @@ static void Preparse( playlist_preparser_t *preparser,
         input_item_SetPreparsed( p_item, true );
         input_item_SignalPreparseEnded( p_item, status );
     }
-    else if (!b_preparse)
+    else
         input_item_SignalPreparseEnded( p_item, ITEM_PREPARSE_SKIPPED );
 }
 
