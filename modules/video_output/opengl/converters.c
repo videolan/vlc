@@ -317,44 +317,16 @@ error:
 #endif /* VLCGL_HAS_PBO */
 
 static int
-tc_common_gen_textures(const opengl_tex_converter_t *tc,
-                       const GLsizei *tex_width, const GLsizei *tex_height,
-                       GLuint *textures)
+tc_common_allocate_texture(const opengl_tex_converter_t *tc, GLuint texture,
+                           unsigned tex_idx, const GLsizei tex_width,
+                           const GLsizei tex_height)
 {
+    (void) texture; (void) tex_idx;
     struct priv *priv = tc->priv;
 
-    glGenTextures(tc->desc->plane_count, textures);
-
-    for (unsigned i = 0; i < tc->desc->plane_count; i++)
-    {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glClientActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(tc->tex_target, textures[i]);
-
-#if !defined(USE_OPENGL_ES2)
-        /* Set the texture parameters */
-        glTexParameterf(tc->tex_target, GL_TEXTURE_PRIORITY, 1.0);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#endif
-
-        glTexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        /* Call glTexImage2D only once, and use glTexSubImage2D later */
-        glTexImage2D(tc->tex_target, 0, priv->tex_internal,
-                     tex_width[i], tex_height[i], 0, priv->tex_format,
-                     priv->tex_type, NULL);
-    }
+    glTexImage2D(tc->tex_target, 0, priv->tex_internal, tex_width, tex_height,
+                 0, priv->tex_format, priv->tex_type, NULL);
     return VLC_SUCCESS;
-}
-
-static void
-tc_common_del_textures(const opengl_tex_converter_t *tc, GLuint *textures)
-{
-    glDeleteTextures(tc->desc->plane_count, textures);
-    memset(textures, 0, tc->desc->plane_count * sizeof(GLuint));
 }
 
 static int
@@ -474,10 +446,9 @@ common_init(opengl_tex_converter_t *tc, size_t priv_size, vlc_fourcc_t chroma,
     tc->desc    = vlc_fourcc_GetChromaDescription(chroma);
     assert(tc->desc != NULL);
 
-    tc->pf_gen_textures = tc_common_gen_textures;
-    tc->pf_del_textures = tc_common_del_textures;
     tc->pf_update       = tc_common_update;
     tc->pf_release      = tc_common_release;
+    tc->pf_allocate_texture = tc_common_allocate_texture;
 
 #ifdef VLCGL_HAS_PBO
     const bool supports_pbo = tc->api->BufferStorage

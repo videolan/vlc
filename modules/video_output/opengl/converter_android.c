@@ -42,34 +42,6 @@ struct priv
 };
 
 static int
-tc_anop_gen_textures(const opengl_tex_converter_t *tc,
-                     const GLsizei *tex_width, const GLsizei *tex_height,
-                     GLuint *textures)
-{
-    (void) tex_width; (void) tex_height;
-
-    glActiveTexture(GL_TEXTURE0);
-    glClientActiveTexture(GL_TEXTURE0);
-
-    glGenTextures(1, textures);
-    glBindTexture(tc->tex_target, textures[0]);
-
-    glTexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    return VLC_SUCCESS;
-}
-
-static void
-tc_anop_del_textures(const opengl_tex_converter_t *tc, GLuint *textures)
-{
-    (void) tc;
-    glDeleteTextures(1, textures);
-    textures[0] = 0;
-}
-
-static int
 pool_lock_pic(picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
@@ -226,8 +198,6 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
     priv->stex = NULL;
     priv->transform_mtx = NULL;
 
-    tc->pf_gen_textures   = tc_anop_gen_textures;
-    tc->pf_del_textures   = tc_anop_del_textures;
     tc->pf_get_pool       = tc_anop_get_pool;
     tc->pf_update         = tc_anop_update;
     tc->pf_fetch_locations = tc_anop_fetch_locations;

@@ -385,6 +385,54 @@ static GLuint BuildVertexShader(vout_display_opengl_t *vgl, unsigned plane_count
     return shader;
 }
 
+static int
+GenTextures(const opengl_tex_converter_t *tc,
+            const GLsizei *tex_width, const GLsizei *tex_height,
+            GLuint *textures)
+{
+    glGenTextures(tc->desc->plane_count, textures);
+
+    for (unsigned i = 0; i < tc->desc->plane_count; i++)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glClientActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(tc->tex_target, textures[i]);
+
+#if !defined(USE_OPENGL_ES2)
+        /* Set the texture parameters */
+        glTexParameterf(tc->tex_target, GL_TEXTURE_PRIORITY, 1.0);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#endif
+
+        glTexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        if (tc->pf_allocate_texture != NULL)
+        {
+            int ret = tc->pf_allocate_texture(tc, textures[i], i, tex_width[i],
+                                              tex_height[i]);
+            if (ret != VLC_SUCCESS)
+            {
+                if (i > 0)
+                {
+                    glDeleteTextures(i, textures);
+                    memset(textures, 0, tc->desc->plane_count * sizeof(GLuint));
+                }
+                return ret;
+            }
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static void
+DelTextures(const opengl_tex_converter_t *tc, GLuint *textures)
+{
+    glDeleteTextures(tc->desc->plane_count, textures);
+    memset(textures, 0, tc->desc->plane_count * sizeof(GLuint));
+}
+
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl,
@@ -532,7 +580,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             {
                 assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
                        tex_conv.fragment_shader != 0 &&
-                       tex_conv.pf_gen_textures != NULL &&
                        tex_conv.pf_update != NULL &&
                        tex_conv.pf_fetch_locations != NULL &&
                        tex_conv.pf_prepare_shader != NULL &&
@@ -759,13 +806,13 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     glFlush();
 
     opengl_tex_converter_t *tc = &vgl->prgm->tc;
-    tc->pf_del_textures(tc, vgl->texture);
+    DelTextures(tc, vgl->texture);
 
     tc = &vgl->sub_prgm->tc;
     for (int i = 0; i < vgl->region_count; i++)
     {
         if (vgl->region[i].texture)
-            tc->pf_del_textures(tc, &vgl->region[i].texture);
+            DelTextures(tc, &vgl->region[i].texture);
     }
     free(vgl->region);
 
@@ -864,8 +911,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 
     /* Allocates our textures */
     opengl_tex_converter_t *tc = &vgl->prgm->tc;
-    int ret = tc->pf_gen_textures(tc, vgl->tex_width, vgl->tex_height,
-                                  vgl->texture);
+    int ret = GenTextures(tc, vgl->tex_width, vgl->tex_height, vgl->texture);
     if (ret != VLC_SUCCESS)
         return NULL;
 
@@ -904,7 +950,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     return vgl->pool;
 
 error:
-    tc->pf_del_textures(tc, vgl->texture);
+    DelTextures(tc, vgl->texture);
     return NULL;
 }
 
@@ -978,8 +1024,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             {
                 /* Could not recycle a previous texture, generate a new one. */
                 GLsizei tex_width = glr->width, tex_height = glr->height;
-                ret = tc->pf_gen_textures(tc, &tex_width, &tex_height,
-                                          &glr->texture);
+                ret = GenTextures(tc, &tex_width, &tex_height, &glr->texture);
                 if (ret != VLC_SUCCESS)
                     continue;
             }
@@ -990,7 +1035,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     }
     for (int i = 0; i < last_count; i++) {
         if (last[i].texture)
-            tc->pf_del_textures(tc, &last[i].texture);
+            DelTextures(tc, &last[i].texture);
     }
     free(last);
 
