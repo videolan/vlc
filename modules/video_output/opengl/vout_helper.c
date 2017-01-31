@@ -1376,7 +1376,7 @@ static int SetupCoords(vout_display_opengl_t *vgl,
 static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
     opengl_tex_converter_t *tc = &prgm->tc;
-    tc->pf_prepare_shader(tc, 1.0f);
+    tc->pf_prepare_shader(tc, vgl->tex_width, vgl->tex_height, 1.0f);
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         assert(vgl->texture[j] != 0);
@@ -1513,7 +1513,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
         assert(glr->texture != 0);
         glBindTexture(tc->tex_target, glr->texture);
-        tc->pf_prepare_shader(tc, glr->alpha);
+
+        tc->pf_prepare_shader(tc, &glr->width, &glr->height, glr->alpha);
 
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);

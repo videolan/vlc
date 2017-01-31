@@ -489,8 +489,11 @@ tc_rgba_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
 }
 
 static void
-tc_rgba_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
+tc_rgba_prepare_shader(const opengl_tex_converter_t *tc,
+                       const GLsizei *tex_width, const GLsizei *tex_height,
+                       float alpha)
 {
+    (void) tex_width; (void) tex_height;
     struct priv *priv = tc->priv;
     tc->api->Uniform1i(priv->uloc.Texture0, 0);
     tc->api->Uniform4f(priv->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
@@ -589,9 +592,11 @@ tc_yuv_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
 }
 
 static void
-tc_yuv_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
+tc_yuv_prepare_shader(const opengl_tex_converter_t *tc,
+                      const GLsizei *tex_width, const GLsizei *tex_height,
+                      float alpha)
 {
-    (void) alpha;
+    (void) tex_width; (void) tex_height; (void) alpha;
     struct priv *priv = tc->priv;
     tc->api->Uniform4fv(priv->uloc.Coefficient, 4,
                         ((struct yuv_priv *)priv)->local_value);
@@ -761,9 +766,11 @@ tc_xyz12_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
 }
 
 static void
-tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
+tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
+                        const GLsizei *tex_width, const GLsizei *tex_height,
+                        float alpha)
 {
-    (void) alpha;
+    (void) tex_width; (void) tex_height; (void) alpha;
     struct priv *priv = tc->priv;
     tc->api->Uniform1i(priv->uloc.Texture0, 0);
 }

@@ -252,9 +252,13 @@ struct opengl_tex_converter_t
      * specify values of uniform variables.
      *
      * \param fc OpenGL tex converter
+     * \param tex_width array of tex width (one per plane)
+     * \param tex_height array of tex height (one per plane)
      * \param alpha alpha value, used only for RGBA fragment shader
      */
-    void (*pf_prepare_shader)(const opengl_tex_converter_t *fc, float alpha);
+    void (*pf_prepare_shader)(const opengl_tex_converter_t *fc,
+                              const GLsizei *tex_width, const GLsizei *tex_height,
+                              float alpha);
 
     /*
      * Callback to release the shader and the private context

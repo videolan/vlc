@@ -162,9 +162,11 @@ tc_anop_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
 }
 
 static void
-tc_anop_prepare_shader(const opengl_tex_converter_t *tc, float alpha)
+tc_anop_prepare_shader(const opengl_tex_converter_t *tc,
+                       const GLsizei *tex_width, const GLsizei *tex_height,
+                       float alpha)
 {
-    (void) alpha;
+    (void) tex_width; (void) tex_height; (void) alpha;
     struct priv *priv = tc->priv;
     if (priv->transform_mtx != NULL)
         tc->api->UniformMatrix4fv(priv->uloc.uSTMatrix, 1, GL_FALSE,
