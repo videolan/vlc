@@ -249,7 +249,6 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( Description, description_text );
     CONNECT( description_text, textChanged(), this, enterEditMode() );
     UPDATE_META( Language, language_text );
-    UPDATE_META( NowPlaying, nowplaying_text );
     UPDATE_META( Publisher, publisher_text );
     UPDATE_META( EncodedBy, encodedby_text );
 
@@ -258,6 +257,12 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( TrackTotal, seqtot_text );
 //    UPDATE_META( Setting, setting_text );
 //    UPDATE_META_INT( Rating, rating_text );
+
+    /* Now Playing || ES Now Playing */
+    psz_meta = input_item_GetNowPlayingFb( p_item );
+    if( !EMPTY_STR( psz_meta ) )
+        nowplaying_text->setText( qfu( psz_meta ) );
+    free( psz_meta );
 
     /* URL */
     psz_meta = input_item_GetURL( p_item );
