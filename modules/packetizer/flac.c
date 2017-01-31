@@ -393,7 +393,7 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
             return 0;
 
     /* Find samplerate */
-    int samplerate_hint = p_buf[2] & 0xf;;
+    int samplerate_hint = p_buf[2] & 0xf;
     unsigned int samplerate;
     if (samplerate_hint == 0) {
         if (p_sys->b_stream_info)
@@ -406,7 +406,7 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
         static const int16_t flac_samplerate[12] = {
             0,    8820, 17640, 19200,
             800,  1600, 2205,  2400,
-            3200, 4410, 4800,  9600, 
+            3200, 4410, 4800,  9600,
         };
         samplerate = flac_samplerate[samplerate_hint] * 10;
     } else {
