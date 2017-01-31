@@ -58,7 +58,9 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QStackedWidget>
+#ifdef _WIN32
 #include <QFileInfo>
+#endif
 
 #include <QTimer>
 
@@ -1449,6 +1451,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play, bool b_playli
         if( url.isValid() )
         {
             QString mrl = toURI( url.toEncoded().constData() );
+#ifdef _WIN32
             QFileInfo info( url.toLocalFile() );
             if( info.exists() && info.isSymLink() )
             {
@@ -1464,6 +1467,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play, bool b_playli
                 }
                 mrl = toURI( url.toEncoded().constData() );
             }
+#endif
             if( mrl.length() > 0 )
             {
                 Open::openMRL( p_intf, mrl, first, b_playlist );
