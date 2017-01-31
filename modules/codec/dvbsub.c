@@ -953,8 +953,8 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     /* Erase background of region */
     if( b_fill )
     {
-        int i_background = ( p_region->i_depth == 1 ) ? i_2_bg :
-            ( ( p_region->i_depth == 2 ) ? i_4_bg : i_8_bg );
+        int i_background = ( i_depth == 1 ) ? i_2_bg :
+            ( ( i_depth == 2 ) ? i_4_bg : i_8_bg );
         memset( p_region->p_pixbuf, i_background, i_width * i_height );
     }
 
