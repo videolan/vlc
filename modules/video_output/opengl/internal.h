@@ -148,8 +148,8 @@ typedef struct opengl_tex_converter_t opengl_tex_converter_t;
  * \param fc OpenGL tex converter that needs to be filled on success
  * \return VLC_SUCCESS or a VLC error
  */
-typedef int (*opengl_tex_converter_init_cb)(const video_format_t *fmt,
-                                            opengl_tex_converter_t *fc);
+typedef GLuint (*opengl_tex_converter_init_cb)(const video_format_t *fmt,
+                                               opengl_tex_converter_t *fc);
 
 /*
  * Structure that is filled by an opengl_tex_converter_init_cb function
@@ -172,9 +172,6 @@ struct opengl_tex_converter_t
     const vlc_chroma_description_t *desc;
     /* Texture mapping (usually: GL_TEXTURE_2D), cannot be 0 */
     GLenum tex_target;
-
-    /* The compiled fragment shader, cannot be 0 */
-    GLuint fragment_shader;
 
     /* Private context */
     void *priv;
@@ -261,26 +258,26 @@ struct opengl_tex_converter_t
                               float alpha);
 
     /*
-     * Callback to release the shader and the private context
+     * Callback to release the private context
      *
-     * This function pointer cannot be NULL.
+     * This function pointer can be NULL.
      * \param fc OpenGL tex converter
      */
     void (*pf_release)(const opengl_tex_converter_t *fc);
 };
 
-extern int
+extern GLuint
 opengl_tex_converter_rgba_init(const video_format_t *,
                                opengl_tex_converter_t *);
-extern int
+extern GLuint
 opengl_tex_converter_yuv_init(const video_format_t *,
                               opengl_tex_converter_t *);
-extern int
+extern GLuint
 opengl_tex_converter_xyz12_init(const video_format_t *,
                                 opengl_tex_converter_t *);
 
 #ifdef __ANDROID__
-extern int
+extern GLuint
 opengl_tex_converter_anop_init(const video_format_t *,
                                opengl_tex_converter_t *);
 #endif

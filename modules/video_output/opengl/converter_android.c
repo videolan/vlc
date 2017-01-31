@@ -176,8 +176,6 @@ tc_anop_prepare_shader(const opengl_tex_converter_t *tc,
 static void
 tc_anop_release(const opengl_tex_converter_t *tc)
 {
-    tc->api->DeleteShader(tc->fragment_shader);
-
     struct priv *priv = tc->priv;
     if (priv->stex != NULL)
         SurfaceTexture_release(priv->stex);
@@ -185,16 +183,16 @@ tc_anop_release(const opengl_tex_converter_t *tc)
     free(priv);
 }
 
-int
+GLuint
 opengl_tex_converter_anop_init(const video_format_t *fmt,
                                opengl_tex_converter_t *tc)
 {
     if (fmt->i_chroma != VLC_CODEC_ANDROID_OPAQUE)
-        return VLC_EGENERIC;
+        return 0;
 
     tc->priv = malloc(sizeof(struct priv));
     if (unlikely(tc->priv == NULL))
-        return VLC_ENOMEM;
+        return 0;
 
     struct priv *priv = tc->priv;
     priv->stex = NULL;
@@ -263,9 +261,9 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
         "{ "
         "  gl_FragColor = texture2D(sTexture, (uSTMatrix * TexCoord0).xy);"
         "}";
-    tc->fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
-    tc->api->ShaderSource(tc->fragment_shader, 1, &code, NULL);
-    tc->api->CompileShader(tc->fragment_shader);
+    GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
+    tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
+    tc->api->CompileShader(fragment_shader);
 
-    return VLC_SUCCESS;
+    return fragment_shader;
 }

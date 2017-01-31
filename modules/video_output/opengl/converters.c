@@ -421,9 +421,6 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
 static void
 tc_common_release(const opengl_tex_converter_t *tc)
 {
-    if (tc->fragment_shader != 0)
-        tc->api->DeleteShader(tc->fragment_shader);
-
     struct priv *priv = tc->priv;
     free(priv->texture_temp_buf);
 
@@ -499,16 +496,16 @@ tc_rgba_prepare_shader(const opengl_tex_converter_t *tc,
     tc->api->Uniform4f(priv->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
 }
 
-int
+GLuint
 opengl_tex_converter_rgba_init(const video_format_t *fmt,
                                opengl_tex_converter_t *tc)
 {
     if (fmt->i_chroma != VLC_CODEC_RGBA && fmt->i_chroma != VLC_CODEC_RGB32)
-        return VLC_EGENERIC;
+        return 0;
 
     if (common_init(tc, sizeof(struct priv), VLC_CODEC_RGBA,
                     GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE) != VLC_SUCCESS)
-        return VLC_ENOMEM;
+        return 0;
 
     tc->pf_fetch_locations = tc_rgba_fetch_locations;
     tc->pf_prepare_shader = tc_rgba_prepare_shader;
@@ -538,15 +535,15 @@ opengl_tex_converter_rgba_init(const video_format_t *fmt,
         "  gl_FragColor = texture2D(Texture0, TexCoord0.st) * FillColor;"
         "}";
 
-    tc->fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
-    if (tc->fragment_shader == 0)
+    GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
+    if (fragment_shader == 0)
     {
         tc_common_release(tc);
-        return VLC_EGENERIC;
+        return 0;
     }
-    tc->api->ShaderSource(tc->fragment_shader, 1, &code, NULL);
-    tc->api->CompileShader(tc->fragment_shader);
-    return VLC_SUCCESS;
+    tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
+    tc->api->CompileShader(fragment_shader);
+    return fragment_shader;
 }
 
 #if !defined(USE_OPENGL_ES2)
@@ -605,18 +602,18 @@ tc_yuv_prepare_shader(const opengl_tex_converter_t *tc,
     tc->api->Uniform1i(priv->uloc.Texture2, 2);
 }
 
-int
+GLuint
 opengl_tex_converter_yuv_init(const video_format_t *fmt,
                               opengl_tex_converter_t *tc)
 {
     if (!vlc_fourcc_IsYUV(fmt->i_chroma))
-        return VLC_EGENERIC;
+        return 0;
 
     GLint max_texture_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 
     if (max_texture_units < 3)
-        return VLC_EGENERIC;
+        return 0;
 
 #if !defined(USE_OPENGL_ES2)
     const unsigned char *ogl_version = glGetString(GL_VERSION);
@@ -638,7 +635,7 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
             if (common_init(tc, sizeof(struct yuv_priv), *list,
                             yuv_plane_texformat, yuv_plane_texformat,
                             GL_UNSIGNED_BYTE) != VLC_SUCCESS)
-                return VLC_ENOMEM;
+                return 0;
 
             yuv_range_correction = 1.0;
             break;
@@ -652,7 +649,7 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
             if (common_init(tc, sizeof(struct yuv_priv), *list,
                             yuv_plane_texformat_16, yuv_plane_texformat,
                             GL_UNSIGNED_SHORT) != VLC_SUCCESS)
-                return VLC_ENOMEM;
+                return 0;
 
             yuv_range_correction = (float)((1 << 16) - 1)
                                  / ((1 << dsc->pixel_bits) - 1);
@@ -662,7 +659,7 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
         list++;
     }
     if (!*list)
-        return VLC_EGENERIC;
+        return 0;
 
     tc->pf_fetch_locations = tc_yuv_fetch_locations;
     tc->pf_prepare_shader = tc_yuv_prepare_shader;
@@ -731,7 +728,7 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
                  swap_uv ? 'y' : 'z') < 0)
     {
         tc_common_release(tc);
-        return VLC_ENOMEM;
+        return 0;
     }
 
     for (int i = 0; i < 4; i++) {
@@ -743,18 +740,18 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
             local_value[i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.f;
     }
 
-    tc->fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
-    if (tc->fragment_shader == 0)
+    GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
+    if (fragment_shader == 0)
     {
         tc_common_release(tc);
         free(code);
-        return VLC_EGENERIC;
+        return 0;
     }
-    tc->api->ShaderSource(tc->fragment_shader, 1, (const char **)&code, NULL);
-    tc->api->CompileShader(tc->fragment_shader);
+    tc->api->ShaderSource(fragment_shader, 1, (const char **)&code, NULL);
+    tc->api->CompileShader(fragment_shader);
     free(code);
 
-    return VLC_SUCCESS;
+    return fragment_shader;
 }
 
 static int
@@ -775,16 +772,16 @@ tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
     tc->api->Uniform1i(priv->uloc.Texture0, 0);
 }
 
-int
+GLuint
 opengl_tex_converter_xyz12_init(const video_format_t *fmt,
                                 opengl_tex_converter_t *tc)
 {
     if (fmt->i_chroma != VLC_CODEC_XYZ12)
-        return VLC_EGENERIC;
+        return 0;
 
     if (common_init(tc, sizeof(struct priv), VLC_CODEC_XYZ12,
                     GL_RGB, GL_RGB, GL_UNSIGNED_SHORT) != VLC_SUCCESS)
-        return VLC_ENOMEM;
+        return 0;
 
     tc->pf_fetch_locations = tc_xyz12_fetch_locations;
     tc->pf_prepare_shader = tc_xyz12_prepare_shader;
@@ -821,13 +818,13 @@ opengl_tex_converter_xyz12_init(const video_format_t *fmt,
         " gl_FragColor = v_out;"
         "}";
 
-    tc->fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
-    if (tc->fragment_shader == 0)
+    GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
+    if (fragment_shader == 0)
     {
         tc_common_release(tc);
-        return VLC_EGENERIC;
+        return 0;
     }
-    tc->api->ShaderSource(tc->fragment_shader, 1, &code, NULL);
-    tc->api->CompileShader(tc->fragment_shader);
-    return VLC_SUCCESS;
+    tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
+    tc->api->CompileShader(fragment_shader);
+    return fragment_shader;
 }

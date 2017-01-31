@@ -545,6 +545,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->fmt.i_gmask  = 0x0000ff00;
     vgl->fmt.i_bmask  = 0x00ff0000;
 #   endif
+    GLuint fragment_shader = 0, sub_fragment_shader;
     opengl_tex_converter_t tex_conv;
     opengl_tex_converter_t sub_tex_conv = {
         .parent = VLC_OBJECT(vgl->gl),
@@ -554,17 +555,16 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    if (opengl_tex_converter_rgba_init(&vgl->fmt, &sub_tex_conv) != VLC_SUCCESS)
+    sub_fragment_shader = opengl_tex_converter_rgba_init(&vgl->fmt, &sub_tex_conv);
+    if (sub_fragment_shader == 0)
     {
         msg_Err(gl, "RGBA shader failed");
         free(vgl);
         return NULL;
     }
-    assert(sub_tex_conv.fragment_shader != 0);
 
     const video_format_t *fmts[2] = { fmt, &vgl->fmt };
-    int ret = VLC_EGENERIC;
-    for (size_t i = 0; i < 2 && ret != VLC_SUCCESS; ++i)
+    for (size_t i = 0; i < 2 && fragment_shader == 0; ++i)
     {
         /* Try first the untouched fmt, then the rgba fmt */
         for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
@@ -575,47 +575,37 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 .glexts = extensions,
                 .orientation = fmt->orientation,
             };
-            ret = opengl_tex_converter_init_cbs[j](fmts[i], &tex_conv);
-            if (ret == VLC_SUCCESS)
+            fragment_shader = opengl_tex_converter_init_cbs[j](fmts[i], &tex_conv);
+            if (fragment_shader != 0)
             {
                 assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
-                       tex_conv.fragment_shader != 0 &&
                        tex_conv.pf_update != NULL &&
                        tex_conv.pf_fetch_locations != NULL &&
-                       tex_conv.pf_prepare_shader != NULL &&
-                       tex_conv.pf_release != NULL);
+                       tex_conv.pf_prepare_shader != NULL);
                 vgl->fmt = *fmt;
                 vgl->fmt.i_chroma = tex_conv.chroma;
                 break;
             }
         }
     }
-    if (ret != VLC_SUCCESS)
+    if (fragment_shader == 0)
     {
         msg_Err(gl, "could not init tex converter");
-        sub_tex_conv.pf_release(&sub_tex_conv);
+        if (sub_tex_conv.pf_release != NULL)
+            sub_tex_conv.pf_release(&sub_tex_conv);
+        vgl->api.DeleteShader(sub_fragment_shader);
         free(vgl);
         return NULL;
     }
-    assert(tex_conv.fragment_shader != 0);
 
     /* Build program if needed */
     GLuint vertex_shader, sub_vertex_shader;
     vertex_shader = BuildVertexShader(vgl, tex_conv.desc->plane_count);
     sub_vertex_shader = BuildVertexShader(vgl, sub_tex_conv.desc->plane_count);
-    if (vertex_shader == 0 || sub_vertex_shader == 0)
-    {
-        vgl->api.DeleteShader(vertex_shader);
-        vgl->api.DeleteShader(sub_vertex_shader);
-        tex_conv.pf_release(&tex_conv);
-        sub_tex_conv.pf_release(&sub_tex_conv);
-        free(vgl);
-        return NULL;
-    }
 
-    GLuint shaders[] = {
-        tex_conv.fragment_shader,
-        sub_tex_conv.fragment_shader,
+    const GLuint shaders[] = {
+        fragment_shader,
+        sub_fragment_shader,
         vertex_shader,
         sub_vertex_shader
     };
@@ -642,7 +632,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->prgm = &vgl->prgms[0];
     vgl->prgm->tc = tex_conv;
     vgl->prgm->id = vgl->api.CreateProgram();
-    vgl->api.AttachShader(vgl->prgm->id, tex_conv.fragment_shader);
+    vgl->api.AttachShader(vgl->prgm->id, fragment_shader);
     vgl->api.AttachShader(vgl->prgm->id, vertex_shader);
     vgl->api.LinkProgram(vgl->prgm->id);
 
@@ -650,12 +640,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->sub_prgm = &vgl->prgms[1];
     vgl->sub_prgm->tc = sub_tex_conv;
     vgl->sub_prgm->id = vgl->api.CreateProgram();
-    vgl->api.AttachShader(vgl->sub_prgm->id, sub_tex_conv.fragment_shader);
+    vgl->api.AttachShader(vgl->sub_prgm->id, sub_fragment_shader);
     vgl->api.AttachShader(vgl->sub_prgm->id, sub_vertex_shader);
     vgl->api.LinkProgram(vgl->sub_prgm->id);
 
     vgl->api.DeleteShader(vertex_shader);
+    vgl->api.DeleteShader(fragment_shader);
     vgl->api.DeleteShader(sub_vertex_shader);
+    vgl->api.DeleteShader(sub_fragment_shader);
 
     /* Check program messages */
     for (GLuint i = 0; i < 2; i++) {
@@ -820,7 +812,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     {
         vgl->api.DeleteProgram(vgl->prgms[i].id);
         opengl_tex_converter_t *tc = &vgl->prgms[i].tc;
-        tc->pf_release(tc);
+        if (tc->pf_release != NULL)
+            tc->pf_release(tc);
     }
     vgl->api.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->api.DeleteBuffers(1, &vgl->index_buffer_object);
