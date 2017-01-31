@@ -1058,14 +1058,17 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     input_item_ChangeEPGSource( input_priv(p_input)->p_item, p_pgrm->i_id );
 
     /* Update now playing */
-    input_item_SetESNowPlaying( input_priv(p_input)->p_item,
-                                p_pgrm->p_meta ? vlc_meta_Get( p_pgrm->p_meta, vlc_meta_ESNowPlaying ) : NULL );
-    input_item_SetPublisher( input_priv(p_input)->p_item,
-                             p_pgrm->p_meta ? vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Publisher ) : NULL);
-    input_item_SetTitle( input_priv(p_input)->p_item,
-                         p_pgrm->p_meta ? vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Title ) : NULL );
-    /* FIXME: we probably want to replace every input meta */
-    input_SendEventMeta( p_input );
+    if( p_pgrm->p_meta )
+    {
+        input_item_SetESNowPlaying( input_priv(p_input)->p_item,
+                                    vlc_meta_Get( p_pgrm->p_meta, vlc_meta_ESNowPlaying ) );
+        input_item_SetPublisher( input_priv(p_input)->p_item,
+                                 vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Publisher ) );
+        input_item_SetTitle( input_priv(p_input)->p_item,
+                             vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Title ) );
+        input_SendEventMeta( p_input );
+        /* FIXME: we probably want to replace every input meta */
+    }
 }
 
 /* EsOutAddProgram:
