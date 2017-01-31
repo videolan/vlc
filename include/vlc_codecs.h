@@ -476,7 +476,7 @@ static inline int guidcmp( const GUID *s1, const GUID *s2 )
     return( s1->Data1 == s2->Data1 && guidcmpbase( s1, s2 ) );
 }
 
-#define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
+#define GUID_FMT "0x%8.8x-0x%4.4x-0x%4.4x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \
     (unsigned)(guid).Data1,              \
     (guid).Data2,              \
