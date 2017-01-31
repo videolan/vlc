@@ -134,7 +134,7 @@ static size_t textst_FillRegion(decoder_t *p_dec, const uint8_t *p_data, size_t 
                                            (p_data[0] << 4) / STYLE_DEFAULT_FONT_SIZE;*/
                  break;
              case BD_TEXTST_DATA_FONT_COLOR:
-                 if(i_data > 1)
+                 if(i_data > 1 && (p_style || (p_style = text_style_Create( STYLE_NO_DEFAULTS ))))
                  {
                     p_style->i_font_color = p_dec->p_sys->palette[p_data[1]] & 0x00FFFFFF;
                     p_style->i_font_alpha = p_dec->p_sys->palette[p_data[1]] >> 24;
