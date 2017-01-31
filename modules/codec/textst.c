@@ -169,21 +169,22 @@ static size_t textst_FillRegion(decoder_t *p_dec, const uint8_t *p_data, size_t 
 
 static size_t textst_Decode_palette(decoder_t *p_dec, const uint8_t *p_data, size_t i_data)
 {
+    if(i_data < 2)
+        return i_data;
     uint16_t i_size = GetWBE(&p_data[0]);
+    p_data += 2; i_data -= 2;
+
     i_size = i_data = __MIN(i_data, i_size);
-    if(i_data > 0)
+    while (i_data > 4)
     {
-        p_data++; i_data--;
-        while (i_data > 4)
-        {
-            p_dec->p_sys->palette[p_data[0]] = /* YCrCbT to ARGB */
+        p_dec->p_sys->palette[p_data[0]] = /* YCrCbT to ARGB */
                 ( (uint32_t)((float)p_data[1] +1.402f * (p_data[2]-128)) << 16 ) |
                 ( (uint32_t)((float)p_data[1] -0.34414 * (p_data[3]-128) -0.71414 * (p_data[2]-128)) << 8 ) |
                 ( (uint32_t)((float)p_data[1] +1.722 * (p_data[3]-128)) ) |
                 ( (0xFF - p_data[4]) << 24 );
-            p_data += 5; i_data -= 5;
-        }
+        p_data += 5; i_data -= 5;
     }
+
     return i_size;
 }
 
