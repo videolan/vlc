@@ -50,9 +50,8 @@
 
 static opengl_tex_converter_init_cb opengl_tex_converter_init_cbs[] =
 {
-    opengl_tex_converter_yuv_init,
+    opengl_tex_converter_generic_init,
     opengl_tex_converter_xyz12_init,
-    opengl_tex_converter_rgba_init,
 #ifdef __ANDROID__
     opengl_tex_converter_anop_init,
 #endif
@@ -555,7 +554,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    sub_fragment_shader = opengl_tex_converter_rgba_init(&vgl->fmt, &sub_tex_conv);
+    sub_fragment_shader = opengl_tex_converter_generic_init(&vgl->fmt, &sub_tex_conv);
     if (sub_fragment_shader == 0)
     {
         msg_Err(gl, "RGBA shader failed");

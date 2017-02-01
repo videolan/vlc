@@ -771,27 +771,8 @@ common_init(opengl_tex_converter_t *tc)
 }
 
 GLuint
-opengl_tex_converter_rgba_init(const video_format_t *fmt,
-                               opengl_tex_converter_t *tc)
-{
-    GLuint fragment_shader =
-        opengl_fragment_shader_init(tc, GL_TEXTURE_2D, fmt->i_chroma,
-                                   COLOR_SPACE_UNDEF);
-    if (fragment_shader == 0)
-        return 0;
-
-    if (common_init(tc) != VLC_SUCCESS)
-    {
-        tc->api->DeleteShader(fragment_shader);
-        return 0;
-    }
-
-    return fragment_shader;
-}
-
-GLuint
-opengl_tex_converter_yuv_init(const video_format_t *fmt,
-                              opengl_tex_converter_t *tc)
+opengl_tex_converter_generic_init(const video_format_t *fmt,
+                                  opengl_tex_converter_t *tc)
 {
     GLuint fragment_shader = 0;
     if (vlc_fourcc_IsYUV(fmt->i_chroma))
@@ -813,7 +794,13 @@ opengl_tex_converter_yuv_init(const video_format_t *fmt,
             return 0;
     }
     else
-        return 0;
+    {
+        fragment_shader =
+            opengl_fragment_shader_init(tc, GL_TEXTURE_2D, fmt->i_chroma,
+                                       COLOR_SPACE_UNDEF);
+        if (fragment_shader == 0)
+            return 0;
+    }
 
     if (common_init(tc) != VLC_SUCCESS)
     {

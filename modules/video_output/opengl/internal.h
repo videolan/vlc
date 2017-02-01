@@ -306,11 +306,9 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space);
 
 extern GLuint
-opengl_tex_converter_rgba_init(const video_format_t *,
-                               opengl_tex_converter_t *);
-extern GLuint
-opengl_tex_converter_yuv_init(const video_format_t *,
-                              opengl_tex_converter_t *);
+opengl_tex_converter_generic_init(const video_format_t *,
+                                  opengl_tex_converter_t *);
+
 extern GLuint
 opengl_tex_converter_xyz12_init(const video_format_t *,
                                 opengl_tex_converter_t *);
