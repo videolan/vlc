@@ -83,6 +83,35 @@ struct yuv_priv
     GLfloat local_value[16];
 };
 
+#if !defined(USE_OPENGL_ES2)
+static int GetTexFormatSize(int target, int tex_format, int tex_internal,
+                            int tex_type)
+{
+    GLint tex_param_size;
+    switch (tex_format)
+    {
+        case GL_RED:
+            tex_param_size = GL_TEXTURE_RED_SIZE;
+            break;
+        case GL_LUMINANCE:
+            tex_param_size = GL_TEXTURE_LUMINANCE_SIZE;
+            break;
+        default:
+            return -1;
+    }
+    GLuint texture;
+
+    glGenTextures(1, &texture);
+    glBindTexture(target, texture);
+    glTexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
+    GLint size = 0;
+    glGetTexLevelParameteriv(target, 0, tex_param_size, &size);
+
+    glDeleteTextures(1, &texture);
+    return size;
+}
+#endif
+
 #ifdef VLCGL_HAS_PBO
 static int
 pbo_map(const opengl_tex_converter_t *tc, picture_t *pic)
@@ -542,35 +571,6 @@ opengl_tex_converter_rgba_init(const video_format_t *fmt,
     tc->api->CompileShader(fragment_shader);
     return fragment_shader;
 }
-
-#if !defined(USE_OPENGL_ES2)
-static int GetTexFormatSize(int target, int tex_format, int tex_internal,
-                            int tex_type)
-{
-    GLint tex_param_size;
-    switch (tex_format)
-    {
-        case GL_RED:
-            tex_param_size = GL_TEXTURE_RED_SIZE;
-            break;
-        case GL_LUMINANCE:
-            tex_param_size = GL_TEXTURE_LUMINANCE_SIZE;
-            break;
-        default:
-            return -1;
-    }
-    GLuint texture;
-
-    glGenTextures(1, &texture);
-    glBindTexture(target, texture);
-    glTexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
-    GLint size = 0;
-    glGetTexLevelParameteriv(target, 0, tex_param_size, &size);
-
-    glDeleteTextures(1, &texture);
-    return size;
-}
-#endif
 
 static int
 tc_yuv_fetch_locations(const opengl_tex_converter_t *tc, GLuint program)
