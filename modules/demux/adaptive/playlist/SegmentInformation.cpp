@@ -164,7 +164,8 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
 
 uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
 {
-    const mtime_t i_max_buffering = getPlaylist()->getMaxBuffering();
+    const mtime_t i_max_buffering = getPlaylist()->getMaxBuffering() +
+                                    /* FIXME: add dynamic pts-delay */ CLOCK_FREQ;
 
     if( mediaSegmentTemplate )
     {
