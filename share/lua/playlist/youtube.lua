@@ -281,6 +281,11 @@ function parse()
                 local js_url = string.match( line, "\"js\": *\"(.-)\"" )
                 if js_url then
                     js_url = string.gsub( js_url, "\\/", "/" )
+                    -- Resolve URL
+                    if string.match( js_url, "^/[^/]" ) then
+                        local authority = string.match( vlc.path, "^([^/]*)/" )
+                        js_url = "//"..authority..js_url
+                    end
                     js_url = string.gsub( js_url, "^//", vlc.access.."://" )
                 end
 
