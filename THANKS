@@ -2,7 +2,7 @@ Some VLC plugins use external libraries and make extensive use of the
 following persons' or companies' code:
 
 FAAD2 - Copyright (c) Nero AG, www.nero.com" - GPLv2 or later
-FFmpeg - Copyright (c) 2000-2015 the FFmpeg developers - LGPLv2.1 or later
+FFmpeg - Copyright (c) 2000-2017 the FFmpeg developers - LGPLv2.1 or later
 FluidLite - Copyright (c) 2016 Robin Lobel - LGPLv2.1 or later
 FluidSynth - Copyright (c) 2003-2010 Peter Hanappe, Conrad Berhörster, Antoine
    Schmitt, Pedro López-Cabanillas, Josh Green, David Henningsson - LGPLv2.1 or
@@ -30,8 +30,8 @@ libbluray - Copyright (c) 2009-2015 VideoLAN and authors - LGPLv2.1 or later
 libcaca - Copyright (c) 2004 Sam Hocevar - WTFPL / LGPLv2.1 or later /
    GPLv2 or later / ISC
 libdca - Copyright (c) 2004-2007 VideoLAN and authors - GPLv2 or later
-libdvbpsi - Copyright (c) 2001-2015 VideoLAN and authors - LGPLv2.1 or later
-libdvdcss - Copyright (c) 2001-2015 VideoLAN and authors - GPLv2 or later
+libdvbpsi - Copyright (c) 2001-2017 VideoLAN and authors - LGPLv2.1 or later
+libdvdcss - Copyright (c) 2001-2017 VideoLAN and authors - GPLv2 or later
 libdvdread - GPLv2 or later
 libdvdnav - GPLv2 or later
 libebml - Copyright (c) 2002-2015 Steve Lhomme - LGPLv2.1 or later
@@ -76,12 +76,12 @@ Speex, Speexdsp - Copyright (c) 1992-2015 Xiph.org Foundation, Jean-Marc Valin,
    Analog Devices Inc. Commonwealth Scientific and Industrial Research
    Organisation, David Row, Jutta Degener, Carsten Bormann - 3-clause BSD
    License
-taglib - Copyright (c) 2004-2013 Scott Wheeler, et al. - LGPLv2.1 or later
-x264 - Copyright (c) 2004-2015 VideoLAN and authors - GPLv2 or later
+taglib - Copyright (c) 2004-2016 Scott Wheeler, et al. - LGPLv2.1 or later
+x264 - Copyright (c) 2004-2017 VideoLAN and authors - GPLv2 or later
 x265 - Copyright (c) 2004-2015 x265 project - GPLv2 or later
 Zapping VBI library - Copyright (c) 2000-2003 Michael H. Schimek, Iñaki García
    Etxebarria - LGPLv2.1 or later
-zlib - Copyright (c) 1995-2012 Jean-loup Gailly and Mark Adler - zlib license
+zlib - Copyright (c) 1995-2017 Jean-loup Gailly and Mark Adler - zlib license
 
 The VideoLAN team would like to thank the following donators:
 
