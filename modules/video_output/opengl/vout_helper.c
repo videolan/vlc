@@ -60,8 +60,8 @@ static opengl_tex_converter_init_cb opengl_tex_converter_init_cbs[] =
 
 typedef struct {
     GLuint   texture;
-    unsigned width;
-    unsigned height;
+    GLsizei  width;
+    GLsizei  height;
 
     float    alpha;
 
@@ -110,8 +110,8 @@ struct vout_display_opengl_t {
     video_format_t fmt;
     const vlc_chroma_description_t *chroma;
 
-    int        tex_width[PICTURE_PLANE_MAX];
-    int        tex_height[PICTURE_PLANE_MAX];
+    GLsizei    tex_width[PICTURE_PLANE_MAX];
+    GLsizei    tex_height[PICTURE_PLANE_MAX];
 
     GLuint     texture[PICTURE_PLANE_MAX];
 
@@ -336,7 +336,7 @@ static void getOrientationTransformMatrix(video_orientation_t orientation,
     }
 }
 
-static inline int GetAlignedSize(unsigned size)
+static inline GLsizei GetAlignedSize(unsigned size)
 {
     /* Return the smallest larger or equal power of 2 */
     unsigned align = 1 << (8 * sizeof (unsigned) - clz(size));
@@ -743,10 +743,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        int w = vgl->fmt.i_visible_width  * vgl->chroma->p[j].w.num
-              / vgl->chroma->p[j].w.den;
-        int h = vgl->fmt.i_visible_height * vgl->chroma->p[j].h.num
-              / vgl->chroma->p[j].h.den;
+        const GLsizei w = vgl->fmt.i_visible_width  * vgl->chroma->p[j].w.num
+                        / vgl->chroma->p[j].w.den;
+        const GLsizei h = vgl->fmt.i_visible_height * vgl->chroma->p[j].h.num
+                        / vgl->chroma->p[j].h.den;
         if (vgl->supports_npot) {
             vgl->tex_width[j]  = w;
             vgl->tex_height[j] = h;
@@ -1023,8 +1023,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             if (!glr->texture)
             {
                 /* Could not recycle a previous texture, generate a new one. */
-                GLsizei tex_width = glr->width, tex_height = glr->height;
-                ret = GenTextures(tc, &tex_width, &tex_height, &glr->texture);
+                ret = GenTextures(tc, &glr->width, &glr->height, &glr->texture);
                 if (ret != VLC_SUCCESS)
                     continue;
             }
