@@ -64,7 +64,6 @@ const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDec
 const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
 #endif
 
-#define VT_ZERO_COPY N_("Use zero-copy rendering")
 #if !TARGET_OS_IPHONE
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
 #endif
@@ -80,10 +79,7 @@ set_callbacks(OpenDecoder, CloseDecoder)
 
 add_bool("videotoolbox-temporal-deinterlacing", true, VT_TEMPO_DEINTERLACE, VT_TEMPO_DEINTERLACE_LONG, false)
 #if !TARGET_OS_IPHONE
-add_bool("videotoolbox-zero-copy", false, VT_ZERO_COPY, VT_ZERO_COPY, false)
 add_bool("videotoolbox-hw-decoder-only", false, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
-#else
-add_bool("videotoolbox-zero-copy", true, VT_ZERO_COPY, VT_ZERO_COPY, false)
 #endif
 vlc_module_end()
 
@@ -126,8 +122,6 @@ struct decoder_sys_t
     picture_t                   *p_pic_reorder;
     size_t                      i_pic_reorder;
     size_t                      i_pic_reorder_max;
-
-    bool                        b_zero_copy;
     bool                        b_enable_temporal_processing;
 
     bool                        b_format_propagated;
@@ -357,7 +351,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     CFDictionarySetValue(p_sys->decoderConfiguration,
                          kCVImageBufferChromaLocationTopFieldKey,
                          kCVImageBufferChromaLocation_Left);
-    p_sys->b_zero_copy = var_InheritBool(p_dec, "videotoolbox-zero-copy");
 
     /* fetch extradata */
     CFMutableDictionaryRef extradata_info = NULL;
@@ -593,7 +586,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
 #if !TARGET_OS_IPHONE
     CFDictionarySetValue(p_sys->destinationPixelBufferAttributes,
-                         kCVPixelBufferOpenGLCompatibilityKey,
+                         kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey,
                          kCFBooleanTrue);
 #else
     CFDictionarySetValue(p_sys->destinationPixelBufferAttributes,
@@ -601,16 +594,22 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                          kCFBooleanTrue);
 #endif
 
+#if TARGET_OS_IPHONE
+    /* FIXME: we should let vt decide its preferred format on IOS too */
     /* full range allows a broader range of colors but is H264 only */
-    if (p_sys->codec == kCMVideoCodecType_H264) {
-        VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
-                             kCVPixelBufferPixelFormatTypeKey,
-                             kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
-    } else {
-        VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
-                             kCVPixelBufferPixelFormatTypeKey,
-                             kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange);
+    if (p_dec->fmt_out.i_codec == VLC_CODEC_I420) {
+        if (p_sys->codec == kCMVideoCodecType_H264) {
+            VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
+                                 kCVPixelBufferPixelFormatTypeKey,
+                                 kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
+        } else {
+            VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
+                                 kCVPixelBufferPixelFormatTypeKey,
+                                 kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange);
+        }
     }
+#endif
+
     VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
                          kCVPixelBufferWidthKey,
                          i_video_width);
@@ -621,10 +620,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                          kCVPixelBufferBytesPerRowAlignmentKey,
                          i_video_width * 2);
 
-    if (StartVideoToolboxSession(p_dec) != VLC_SUCCESS) {
-        return VLC_EGENERIC;
-    }
-
     p_dec->fmt_out.video.i_width = i_video_width;
     p_dec->fmt_out.video.i_height = i_video_height;
     p_dec->fmt_out.video.i_visible_width = i_video_visible_width;
@@ -632,9 +627,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
     p_dec->fmt_out.video.i_sar_num = i_sar_num;
 
-    if (p_block) {
-        /* this is a mid stream change so we need to tell the core about it */
-        decoder_UpdateVideoFormat(p_dec);
+    if (StartVideoToolboxSession(p_dec) != VLC_SUCCESS) {
+        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
@@ -647,10 +641,14 @@ static void StopVideoToolboxSession(decoder_t *p_dec, bool b_reset_format)
     VTDecompressionSessionInvalidate(p_sys->session);
     CFRelease(p_sys->session);
     p_sys->session = nil;
-    if (b_reset_format)
-        p_sys->b_format_propagated = false;
 
     vlc_mutex_lock(&p_sys->lock);
+    if (b_reset_format)
+    {
+        p_sys->b_format_propagated = false;
+        p_dec->fmt_out.i_codec = 0;
+    }
+
     PicReorder_flush(p_dec);
     vlc_mutex_unlock(&p_sys->lock);
 }
@@ -735,24 +733,19 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->p_pic_reorder = NULL;
     p_sys->i_pic_reorder = 0;
     p_sys->i_pic_reorder_max = 1; /* 1 == no reordering */
+    p_sys->b_format_propagated = false;
     vlc_mutex_init(&p_sys->lock);
+
+    /* return our proper VLC internal state */
+    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
+    p_dec->fmt_out.video = p_dec->fmt_in.video;
+
+    p_dec->fmt_out.i_codec = 0;
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
     if (i_ret != VLC_SUCCESS) {
         CloseDecoder(p_this);
         return i_ret;
-    }
-
-    /* return our proper VLC internal state */
-    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
-    p_dec->fmt_out.video = p_dec->fmt_in.video;
-    p_dec->fmt_out.audio = p_dec->fmt_in.audio;
-    if (p_sys->b_zero_copy) {
-        msg_Dbg(p_dec, "zero-copy rendering pipeline enabled");
-        p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
-    } else {
-        msg_Dbg(p_dec, "copy rendering pipeline enabled");
-        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
     }
 
     p_dec->pf_decode_video = DecodeBlock;
@@ -1140,9 +1133,15 @@ reload:
     return NULL;
 }
 
-static void UpdateVideoFormat(decoder_t *p_dec, NSDictionary *attachmentDict)
+static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
+    CFDictionaryRef attachments = CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
+    NSDictionary *attachmentDict = (NSDictionary *)attachments;
+#ifndef NDEBUG
+    NSLog(@"%@", attachments);
+#endif
+    if (attachmentDict == nil || attachmentDict.count == 0)
+        return -1;
 
     NSString *colorSpace = attachmentDict[(NSString *)kCVImageBufferYCbCrMatrixKey];
     if (colorSpace != nil) {
@@ -1199,8 +1198,32 @@ static void UpdateVideoFormat(decoder_t *p_dec, NSDictionary *attachmentDict)
                 p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_BOTTOM_CENTER;
         }
     }
-    p_sys->b_format_propagated = true;
-    decoder_UpdateVideoFormat(p_dec);
+
+    uint32_t cvfmt = CVPixelBufferGetPixelFormatType(imageBuffer);
+    switch (cvfmt)
+    {
+        case kCVPixelFormatType_422YpCbCr8:
+        case 'yuv2':
+            p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_UYVY;
+            assert(CVPixelBufferIsPlanar(imageBuffer) == false);
+            break;
+        case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
+        case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
+            p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
+            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
+            break;
+        case kCVPixelFormatType_420YpCbCr8Planar:
+            p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_I420;
+            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
+            break;
+        case kCVPixelFormatType_32BGRA:
+            p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
+            assert(CVPixelBufferIsPlanar(imageBuffer) == false);
+            break;
+        default:
+            return -1;
+    }
+    return decoder_UpdateVideoFormat(p_dec);
 }
 
 static void DecoderCallback(void *decompressionOutputRefCon,
@@ -1216,21 +1239,22 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     decoder_t *p_dec = (decoder_t *)decompressionOutputRefCon;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (unlikely(!p_sys->b_format_propagated)) {
-        CFDictionaryRef attachments = CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
-        NSDictionary *attachmentDict = (NSDictionary *)attachments;
-#ifndef NDEBUG
-        NSLog(@"%@", attachments);
-#endif
-        if (attachmentDict != nil && attachmentDict.count > 0)
-            UpdateVideoFormat(p_dec, attachmentDict);
-    }
-
     if (status != noErr) {
         msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", status, (unsigned int) infoFlags);
         return;
     }
     assert(imageBuffer);
+
+    if (unlikely(!p_sys->b_format_propagated)) {
+        vlc_mutex_lock(&p_sys->lock);
+        p_sys->b_format_propagated =
+            UpdateVideoFormat(p_dec, imageBuffer) == VLC_SUCCESS;
+        vlc_mutex_unlock(&p_sys->lock);
+
+        if (!p_sys->b_format_propagated)
+            return;
+        assert(p_dec->fmt_out.i_codec != 0);
+    }
 
     if (infoFlags & kVTDecodeInfo_FrameDropped)
     {
@@ -1247,31 +1271,21 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     picture_t *p_pic = decoder_NewPicture(p_dec);
     if (!p_pic)
         return;
+    if (!p_pic->p_sys) {
+        picture_Release(p_pic);
+        return;
+    }
+
+    /* Can happen if the pic was discarded */
+    if (p_pic->p_sys->pixelBuffer != nil)
+        CFRelease(p_pic->p_sys->pixelBuffer);
+
+    /* will be freed by the vout */
+    p_pic->p_sys->pixelBuffer = CVPixelBufferRetain(imageBuffer);
 
     p_pic->date = pts.value;
     p_pic->b_progressive = true;
 
-    if (!p_sys->b_zero_copy) {
-        /* ehm, *cough*, memcpy.. */
-        copy420YpCbCr8Planar(p_pic,
-                             imageBuffer,
-                             CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
-                             CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
-    } else {
-        /* the structure is allocated by the vout's pool */
-        if (p_pic->p_sys) {
-            /* if we received a recycled picture from the pool
-             * we need release the previous reference first,
-             * otherwise we would leak it */
-            if (p_pic->p_sys->pixelBuffer != nil) {
-                CFRelease(p_pic->p_sys->pixelBuffer);
-                p_pic->p_sys->pixelBuffer = nil;
-            }
-
-            /* will be freed by the vout */
-            p_pic->p_sys->pixelBuffer = CVPixelBufferRetain(imageBuffer);
-        }
-    }
     vlc_mutex_lock(&p_sys->lock);
     PicReorder_pushSorted(p_dec, p_pic);
     p_pic = PicReorder_pop(p_dec, false);
