@@ -63,7 +63,7 @@ static inline void MP4_Fragment_Delete( mp4_fragment_t *p_fragment )
 }
 
 bool MP4_Fragments_Init(mp4_fragments_t *);
-void MP4_Fragments_Clean(mp4_fragments_t *);
+void MP4_Fragments_Clean(mp4_fragments_t *, void (*pf_box_clean)(MP4_Box_t *));
 void MP4_Fragments_Insert(mp4_fragments_t *, mp4_fragment_t *);
 void MP4_Fragments_Remove( mp4_fragments_t *, mp4_fragment_t * );
 

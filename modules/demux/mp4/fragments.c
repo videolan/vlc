@@ -61,11 +61,13 @@ void MP4_Fragments_Remove( mp4_fragments_t *p_frags, mp4_fragment_t *p_fragment 
     }
 }
 
-void MP4_Fragments_Clean( mp4_fragments_t *p_frags )
+void MP4_Fragments_Clean( mp4_fragments_t *p_frags,
+                          void (*pf_box_clean)(MP4_Box_t *) )
 {
     while( p_frags->moov.p_next )
     {
         mp4_fragment_t *p_fragment = p_frags->moov.p_next->p_next;
+        pf_box_clean( p_frags->moov.p_next->p_moox );
         MP4_Fragment_Clean( p_frags->moov.p_next );
         free( p_frags->moov.p_next );
         p_frags->moov.p_next = p_fragment;

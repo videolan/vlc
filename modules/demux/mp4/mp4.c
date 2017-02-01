@@ -741,25 +741,27 @@ static int Open( vlc_object_t * p_this )
 
     if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 )
     {
+        const MP4_Box_t *p_moov = MP4_BoxGet( p_sys->p_root, "/moov" );
         if ( p_sys->b_seekable )
         {
             /* Probe remaining to check if there's really fragments
                or if that file is just ready to append fragments */
             ProbeFragments( p_demux, false );
-            p_sys->b_fragmented = !!MP4_BoxCount( p_sys->p_root, "/moof" );
+            const MP4_Box_t *p_moof = MP4_BoxGet( p_sys->p_root, "/moof" );
+            p_sys->b_fragmented = !!p_moof;
 
             if ( p_sys->b_fragmented && !p_sys->i_overall_duration )
                 ProbeFragments( p_demux, true );
 
-            MP4_Box_t *p_mdat = MP4_BoxGet( p_sys->p_root, "mdat" );
-            if ( p_mdat )
-            {
-                vlc_stream_Seek( p_demux->s, p_mdat->i_pos );
-                msg_Dbg( p_demux, "rewinding to mdat %"PRId64, p_mdat->i_pos );
-            }
+            if( vlc_stream_Seek( p_demux->s, p_moov->i_pos ) != VLC_SUCCESS )
+                goto error;
         }
-        else
+        else /* Handle as fragmented by default as we can't see moof */
+        {
+            p_sys->context.p_fragment = &p_sys->fragments.moov;
+            p_sys->context.i_current_box_type = ATOM_moov;
             p_sys->b_fragmented = true;
+        }
     }
 
     if ( !MP4_Fragment_Moov(&p_sys->fragments)->p_moox )
@@ -1951,7 +1953,7 @@ static void Close ( vlc_object_t * p_this )
     if( p_sys->p_title )
         vlc_input_title_Delete( p_sys->p_title );
 
-    MP4_Fragments_Clean( &p_sys->fragments );
+    MP4_Fragments_Clean( &p_sys->fragments, MP4_BoxFree );
 
     free( p_sys );
 }
@@ -4218,20 +4220,6 @@ int DemuxFrg( demux_t *p_demux )
     return VLC_DEMUXER_SUCCESS;
 }
 
-static bool BoxExistsInRootTree( MP4_Box_t *p_root, uint32_t i_type, uint64_t i_pos )
-{
-    while ( p_root )
-    {
-        if ( p_root->i_pos == i_pos )
-        {
-            assert( i_type == p_root->i_type );
-            break;
-        }
-        p_root = p_root->p_next;
-    }
-    return (p_root != NULL);
-}
-
 static mtime_t SumFragmentsDurations( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -4550,8 +4538,8 @@ static int ProbeFragments( demux_t *p_demux, bool b_force )
     {
         /* We stop at first moof, which validates our fragmentation condition
          * and we'll find others while reading. */
-        const uint32_t stoplist[] = { ATOM_moof, 0 };
-        MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, stoplist );
+        const uint32_t excllist[] = { ATOM_moof, 0 };
+        MP4_ReadBoxContainerRestricted( p_demux->s, p_sys->p_root, NULL, excllist );
     }
 
     if ( !MP4_Fragment_Moov( &p_sys->fragments )->p_moox )
@@ -4564,14 +4552,6 @@ static int ProbeFragments( demux_t *p_demux, bool b_force )
             return VLC_EGENERIC;
         }
         AddFragment( p_demux, p_moov );
-    }
-
-    MP4_Box_t *p_moof = MP4_BoxGet( p_sys->p_root, "moof" );
-    while ( p_moof )
-    {
-        if ( p_moof->i_type == ATOM_moof )
-            AddFragment( p_demux, p_moof );
-        p_moof = p_moof->p_next;
     }
 
     return VLC_SUCCESS;
@@ -5197,14 +5177,20 @@ static int LeafParseMDATwithMOOF( demux_t *p_demux, MP4_Box_t *p_moof )
         uint8_t mdat[8];
         int i_read = vlc_stream_Read( p_demux->s, &mdat, 8 );
         p_sys->context.i_mdatbytesleft = GetDWBE( mdat );
+        i_pos = vlc_stream_Tell( p_demux->s );
         if ( i_read < 8 || p_sys->context.i_mdatbytesleft < 8 ||
              VLC_FOURCC( mdat[4], mdat[5], mdat[6], mdat[7] ) != ATOM_mdat )
         {
-            i_pos = vlc_stream_Tell( p_demux->s );
             msg_Err(p_demux, "No mdat atom at %"PRIu64, i_pos - i_read );
             return VLC_EGENERIC;
         }
         p_sys->context.i_mdatbytesleft -= 8;
+
+        if( p_sys->context.p_fragment->i_chunk_range_min_offset > i_pos )
+        {
+            uint64_t i_diff = p_sys->context.p_fragment->i_chunk_range_min_offset - i_pos;
+            p_sys->context.i_mdatbytesleft -= vlc_stream_Read( p_demux->s, NULL, i_diff );
+        }
     }
 
     i_pos = vlc_stream_Tell( p_demux->s );
@@ -5253,20 +5239,6 @@ end:
     return VLC_SUCCESS;
 }
 
-static void RestartAllTracks( demux_t *p_demux, const MP4_Box_t *p_root )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    for( unsigned i_track = 0; i_track < p_sys->i_tracks; i_track++ )
-    {
-        mp4_track_t *tk = &p_sys->track[i_track];
-        if( !tk->b_ok || tk->b_chapters_source )
-            continue;
-
-        ReInitDecoder( p_demux, p_root, tk );
-    }
-}
-
 static int DemuxAsLeaf( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -5305,66 +5277,65 @@ static int DemuxAsLeaf( demux_t *p_demux )
     {
         /* Othewise mdat is skipped. FIXME: mdat reading ! */
         const uint8_t *p_peek;
-        int i_read  = vlc_stream_Peek( p_demux->s, &p_peek, 8 );
-        if ( i_read < 8 )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) != 8 )
             return VLC_DEMUXER_EOF;
 
         p_sys->context.i_current_box_type = VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] );
-
         if ( p_sys->context.i_current_box_type != ATOM_mdat )
         {
-            if ( !BoxExistsInRootTree( p_sys->p_root, p_sys->context.i_current_box_type, vlc_stream_Tell( p_demux->s ) ) )
-            {// only if !b_probed ??
-                MP4_Box_t *p_vroot = MP4_BoxGetNextChunk( p_demux->s );
-                if(!p_vroot)
-                    return VLC_DEMUXER_SUCCESS;
+            MP4_Box_t *p_vroot = MP4_BoxGetNextChunk( p_demux->s );
+            if(!p_vroot)
+                return VLC_DEMUXER_SUCCESS;
 
-                MP4_Box_t *p_mooxbox = MP4_BoxExtract( &p_vroot->p_first, ATOM_moof );
-                if( !p_mooxbox )
+            MP4_Box_t *p_box = NULL;
+            mp4_fragment_t *p_fragment = NULL;
+            for( p_box = p_vroot->p_first; p_box; p_box = p_box->p_next )
+            {
+                if( p_box->i_type == ATOM_moof ||
+                    p_box->i_type == ATOM_moov )
+                    break;
+            }
+
+            if( p_box )
+            {
+                if( p_sys->context.p_fragment && !p_sys->b_seekable )
                 {
-                    RestartAllTracks( p_demux, p_vroot );
-                    p_mooxbox = MP4_BoxExtract( &p_vroot->p_first, ATOM_moov );
+                    if( p_sys->context.p_fragment != &p_sys->fragments.moov )
+                    {
+                        MP4_BoxFree( p_sys->context.p_fragment->p_moox );
+                        MP4_Fragments_Remove( &p_sys->fragments, p_sys->context.p_fragment );
+                        MP4_Fragment_Delete( p_sys->context.p_fragment );
+                    }
+                    p_sys->context.p_fragment = NULL;
                 }
 
-                if(!p_mooxbox)
+                p_fragment = GetFragmentByAtomPos( &p_sys->fragments, p_box->i_pos );
+                if( p_fragment == NULL && p_box->i_type != ATOM_moov )
                 {
-                    MP4_BoxFree( p_vroot );
-                    msg_Info(p_demux, "no moof or moov in current chunk");
-                    return VLC_DEMUXER_SUCCESS;
+                    p_box = MP4_BoxExtract( &p_vroot->p_first, p_box->i_type );
+                    /* create fragment */
+                    AddFragment( p_demux, p_box );
+                    p_fragment = GetFragmentByAtomPos( &p_sys->fragments, p_box->i_pos );
                 }
 
-
-                /* create fragment */
-                AddFragment( p_demux, p_mooxbox );
-
-                /* Append to root */
-                p_sys->p_root->p_last->p_next = p_mooxbox;
-                p_sys->p_root->p_last = p_mooxbox;
-                MP4_BoxFree( p_vroot );
+                p_sys->context.p_fragment = p_fragment;
+                p_sys->context.i_current_box_type = p_box->i_type;
             }
-            else
+
+            MP4_BoxFree( p_vroot );
+
+            if( p_fragment == NULL )
             {
-                /* Skip */
-                msg_Err( p_demux, "skipping known chunk type %4.4s size %"PRIu32, (char*)& p_sys->context.i_current_box_type, GetDWBE( p_peek ) );
-                vlc_stream_Read( p_demux->s, NULL, GetDWBE( p_peek ) );
+                msg_Info(p_demux, "no moof or moov in current chunk");
+                return VLC_DEMUXER_SUCCESS;
             }
         }
-        else
-        {
-            if( p_sys->context.p_fragment && !p_sys->b_seekable )
-            {
-                MP4_Fragments_Remove( &p_sys->fragments, p_sys->context.p_fragment );
-                MP4_Fragment_Delete( p_sys->context.p_fragment );
-            }
-            /* skip mdat header */
-            p_sys->context.p_fragment = GetFragmentByPos( &p_sys->fragments, vlc_stream_Tell( p_demux->s ) + 8, true );
-        }
-
     }
 
     if ( p_sys->context.i_current_box_type == ATOM_mdat )
     {
         assert(p_sys->context.p_fragment);
+
         if ( p_sys->context.p_fragment )
         switch( p_sys->context.p_fragment->p_moox->i_type )
         {

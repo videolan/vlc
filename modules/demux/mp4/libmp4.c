@@ -4643,30 +4643,14 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
 {
     /* p_chunk is a virtual root container for the moof and mdat boxes */
     MP4_Box_t *p_fakeroot;
-    MP4_Box_t *p_tmp_box = MP4_BoxNew( 0 );
-    if( unlikely( p_tmp_box == NULL ) )
-        return NULL;
-
-    /* We might get a ftyp box or a SmooBox */
-    if( MP4_PeekBoxHeader( s, p_tmp_box ) == 0 )
-    {
-        free( p_tmp_box );
-        return NULL;
-    }
-
-    if( p_tmp_box->i_type == ATOM_ftyp )
-    {
-        MP4_BoxFree( p_tmp_box );
-        return MP4_BoxGetRoot( s );
-    }
-    MP4_BoxFree( p_tmp_box );
+    MP4_Box_t *p_tmp_box;
 
     p_fakeroot = MP4_BoxNew( ATOM_root );
     if( unlikely( p_fakeroot == NULL ) )
         return NULL;
     p_fakeroot->i_shortsize = 1;
 
-    const uint32_t stoplist[] = { ATOM_moof, 0 };
+    const uint32_t stoplist[] = { ATOM_moov, ATOM_moof, 0 };
     MP4_ReadBoxContainerChildren( s, p_fakeroot, stoplist );
 
     p_tmp_box = p_fakeroot->p_first;
