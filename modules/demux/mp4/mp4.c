@@ -5138,14 +5138,32 @@ static void LeafCheckandSetMOOFOffset( demux_t *p_demux, MP4_Box_t *p_vroot, MP4
             if( i_lowest_pres_time != INT64_MAX )
                 p_sys->i_time = i_lowest_pres_time;
 
-            /* Try using SIDX as base offset.
-             * This can not work for global sidx but only when sent within each fragment (dash) */
+            /* Try using Tfxd for base offset (Smooth) */
+            if( !b_has_base_media_decode_time && p_sys->i_tracks == 1 )
+            {
+                const MP4_Box_t *p_uuid = MP4_BoxGet( p_moof, "traf/uuid" );
+                for( ; p_uuid; p_uuid = p_uuid->p_next)
+                {
+                    if( p_uuid->i_type == ATOM_uuid
+                            && !CmpUUID( &p_uuid->i_uuid, &TfxdBoxUUID )
+                            && p_uuid->data.p_tfxd )
+                    {
+                        p_sys->track[0].i_time = p_uuid->data.p_tfxd->i_fragment_abs_time;
+                        p_sys->i_time = MP4_rescale( p_sys->track[0].i_time, p_sys->track[0].i_timescale, p_sys->i_timescale );
+                        b_has_base_media_decode_time = true;
+                        break;
+                    }
+                }
+            }
+
             if( p_vroot != NULL && !b_has_base_media_decode_time )
             {
-                MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
+                /* Try using SIDX as base offset.
+                 * This can not work for global sidx but only when sent within each fragment (dash) */
+                const MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
                 if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
                 {
-                    mtime_t i_time_base = BOXDATA(p_sidx)->i_earliest_presentation_time;
+                    const uint64_t i_time_base = BOXDATA(p_sidx)->i_earliest_presentation_time;
 
                     for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
                     {
