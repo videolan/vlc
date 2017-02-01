@@ -92,7 +92,7 @@ mtime_t AbstractPlaylist::getMinBuffering() const
 mtime_t AbstractPlaylist::getMaxBuffering() const
 {
     const mtime_t minbuf = getMinBuffering();
-    return std::min(minbuf * 3 / 2, minbuf + 6 * CLOCK_FREQ);
+    return std::max(minbuf, 60 * CLOCK_FREQ);
 }
 
 Url AbstractPlaylist::getUrlSegment() const
