@@ -9,6 +9,9 @@ OPENGL_COMMONLIBS =
 OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
 	video_output/opengl/vout_helper.h video_output/opengl/internal.h \
 	video_output/opengl/converters.c
+if HAVE_ANDROID
+OPENGL_COMMONSOURCES += video_output/opengl/converter_android.c
+endif
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
@@ -47,9 +50,6 @@ endif
 
 ### OpenGL ###
 libgles2_plugin_la_SOURCES = $(OPENGL_COMMONSOURCES) video_output/opengl/display.c
-if HAVE_ANDROID
-libgles2_plugin_la_SOURCES += video_output/opengl/converter_android.c
-endif
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2 \
 	$(OPENGL_COMMONCFLAGS)
 libgles2_plugin_la_LIBADD = $(GLES2_LIBS) $(LIBM) $(OPENGL_COMMONLIBS)
