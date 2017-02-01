@@ -107,7 +107,6 @@ struct vout_display_opengl_t {
     opengl_shaders_api_t api;
 
     video_format_t fmt;
-    const vlc_chroma_description_t *chroma;
 
     GLsizei    tex_width[PICTURE_PLANE_MAX];
     GLsizei    tex_height[PICTURE_PLANE_MAX];
@@ -389,9 +388,9 @@ GenTextures(const opengl_tex_converter_t *tc,
             const GLsizei *tex_width, const GLsizei *tex_height,
             GLuint *textures)
 {
-    glGenTextures(tc->desc->plane_count, textures);
+    glGenTextures(tc->tex_count, textures);
 
-    for (unsigned i = 0; i < tc->desc->plane_count; i++)
+    for (unsigned i = 0; i < tc->tex_count; i++)
     {
         glActiveTexture(GL_TEXTURE0 + i);
         glClientActiveTexture(GL_TEXTURE0 + i);
@@ -416,7 +415,7 @@ GenTextures(const opengl_tex_converter_t *tc,
                 if (i > 0)
                 {
                     glDeleteTextures(i, textures);
-                    memset(textures, 0, tc->desc->plane_count * sizeof(GLuint));
+                    memset(textures, 0, tc->tex_count * sizeof(GLuint));
                 }
                 return ret;
             }
@@ -428,8 +427,8 @@ GenTextures(const opengl_tex_converter_t *tc,
 static void
 DelTextures(const opengl_tex_converter_t *tc, GLuint *textures)
 {
-    glDeleteTextures(tc->desc->plane_count, textures);
-    memset(textures, 0, tc->desc->plane_count * sizeof(GLuint));
+    glDeleteTextures(tc->tex_count, textures);
+    memset(textures, 0, tc->tex_count * sizeof(GLuint));
 }
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
@@ -578,7 +577,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             if (fragment_shader != 0)
             {
                 assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
-                       tex_conv.pf_update != NULL &&
+                       tex_conv.tex_count > 0 &&  tex_conv.pf_update != NULL &&
                        tex_conv.pf_fetch_locations != NULL &&
                        tex_conv.pf_prepare_shader != NULL);
                 vgl->fmt = *fmt;
@@ -599,8 +598,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Build program if needed */
     GLuint vertex_shader, sub_vertex_shader;
-    vertex_shader = BuildVertexShader(vgl, tex_conv.desc->plane_count);
-    sub_vertex_shader = BuildVertexShader(vgl, sub_tex_conv.desc->plane_count);
+    vertex_shader = BuildVertexShader(vgl, tex_conv.tex_count);
+    sub_vertex_shader = BuildVertexShader(vgl, sub_tex_conv.tex_count);
 
     const GLuint shaders[] = {
         fragment_shader,
@@ -674,9 +673,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
-    vgl->chroma = vgl->prgm->tc.desc;
-    assert(vgl->chroma != NULL);
-
     /* Fetch UniformLocations and AttribLocations */
     for (GLuint i = 0; i < 2; i++)
     {
@@ -702,11 +698,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         GET_ALOC(VertexPosition, "VertexPosition");
         GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
         /* MultiTexCoord 1 and 2 can be optimized out if not used */
-        if (prgm->tc.desc->plane_count > 1)
+        if (prgm->tc.tex_count > 1)
             GET_ALOC(MultiTexCoord[1], "MultiTexCoord1");
         else
             prgm->aloc.MultiTexCoord[1] = -1;
-        if (prgm->tc.desc->plane_count > 2)
+        if (prgm->tc.tex_count > 2)
             GET_ALOC(MultiTexCoord[2], "MultiTexCoord2");
         else
             prgm->aloc.MultiTexCoord[2] = -1;
@@ -733,11 +729,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     getViewpointMatrixes(vgl, PROJECTION_MODE_RECTANGULAR, vgl->sub_prgm);
 
     /* Texture size */
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        const GLsizei w = vgl->fmt.i_visible_width  * vgl->chroma->p[j].w.num
-                        / vgl->chroma->p[j].w.den;
-        const GLsizei h = vgl->fmt.i_visible_height * vgl->chroma->p[j].h.num
-                        / vgl->chroma->p[j].h.den;
+    const opengl_tex_converter_t *tc = &vgl->prgm->tc;
+    for (unsigned j = 0; j < tc->tex_count; j++) {
+        const GLsizei w = vgl->fmt.i_visible_width  * tc->texs[j].w.num
+                        / tc->texs[j].w.den;
+        const GLsizei h = vgl->fmt.i_visible_height * tc->texs[j].h.num
+                        / tc->texs[j].h.den;
         if (vgl->supports_npot) {
             vgl->tex_width[j]  = w;
             vgl->tex_height[j] = h;
@@ -757,7 +754,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     vgl->api.GenBuffers(1, &vgl->vertex_buffer_object);
     vgl->api.GenBuffers(1, &vgl->index_buffer_object);
-    vgl->api.GenBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+    vgl->api.GenBuffers(vgl->prgm->tc.tex_count, vgl->texture_buffer_object);
 
     /* Initial number of allocated buffer objects for subpictures, will grow dynamically. */
     int subpicture_buffer_object_count = 8;
@@ -816,8 +813,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     }
     vgl->api.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->api.DeleteBuffers(1, &vgl->index_buffer_object);
-    if (vgl->chroma != NULL)
-        vgl->api.DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+
+    vgl->api.DeleteBuffers(vgl->prgm->tc.tex_count, vgl->texture_buffer_object);
     if (vgl->subpicture_buffer_object_count > 0)
         vgl->api.DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
     free(vgl->subpicture_buffer_object);
@@ -1312,19 +1309,19 @@ static int SetupCoords(vout_display_opengl_t *vgl,
     switch (vgl->fmt.projection_mode)
     {
     case PROJECTION_MODE_RECTANGULAR:
-        i_ret = BuildRectangle(vgl->chroma->plane_count,
+        i_ret = BuildRectangle(vgl->prgm->tc.tex_count,
                                &vertexCoord, &textureCoord, &nbVertices,
                                &indices, &nbIndices,
                                left, top, right, bottom);
         break;
     case PROJECTION_MODE_EQUIRECTANGULAR:
-        i_ret = BuildSphere(vgl->chroma->plane_count,
+        i_ret = BuildSphere(vgl->prgm->tc.tex_count,
                             &vertexCoord, &textureCoord, &nbVertices,
                             &indices, &nbIndices,
                             left, top, right, bottom);
         break;
     case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
-        i_ret = BuildCube(vgl->chroma->plane_count,
+        i_ret = BuildCube(vgl->prgm->tc.tex_count,
                           (float)vgl->fmt.i_cubemap_padding / vgl->fmt.i_width,
                           (float)vgl->fmt.i_cubemap_padding / vgl->fmt.i_height,
                           &vertexCoord, &textureCoord, &nbVertices,
@@ -1339,7 +1336,7 @@ static int SetupCoords(vout_display_opengl_t *vgl,
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++)
+    for (unsigned j = 0; j < vgl->prgm->tc.tex_count; j++)
     {
         vgl->api.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
         vgl->api.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
@@ -1368,7 +1365,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
     opengl_tex_converter_t *tc = &prgm->tc;
     tc->pf_prepare_shader(tc, vgl->tex_width, vgl->tex_height, 1.0f);
 
-    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+    for (unsigned j = 0; j < vgl->prgm->tc.tex_count; j++) {
         assert(vgl->texture[j] != 0);
         glActiveTexture(GL_TEXTURE0+j);
         glClientActiveTexture(GL_TEXTURE0+j);
@@ -1422,11 +1419,12 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         float top[PICTURE_PLANE_MAX];
         float right[PICTURE_PLANE_MAX];
         float bottom[PICTURE_PLANE_MAX];
-        for (unsigned j = 0; j < vgl->chroma->plane_count; j++)
+        const opengl_tex_converter_t *tc = &vgl->prgm->tc;
+        for (unsigned j = 0; j < tc->tex_count; j++)
         {
-            float scale_w = (float)vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den
+            float scale_w = (float)tc->texs[j].w.num / tc->texs[j].w.den
                           / vgl->tex_width[j];
-            float scale_h = (float)vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den
+            float scale_h = (float)tc->texs[j].h.num / tc->texs[j].h.den
                           / vgl->tex_height[j];
 
             /* Warning: if NPOT is not supported a larger texture is

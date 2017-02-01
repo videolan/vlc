@@ -168,13 +168,23 @@ struct opengl_tex_converter_t
     /* Video chroma used by this configuration, cannot be 0 */
     vlc_fourcc_t chroma;
 
-    /* Description of the chroma, cannot be NULL */
-    const vlc_chroma_description_t *desc;
+    /* Number of textures, cannot be 0 */
+    unsigned tex_count;
 
     /* Texture mapping (usually: GL_TEXTURE_2D), cannot be 0 */
     GLenum tex_target;
 
     struct opengl_tex_cfg {
+        /* Texture scale factor, cannot be 0 */
+        struct {
+            unsigned num;
+            unsigned den;
+        } w;
+        struct {
+            unsigned num;
+            unsigned den;
+        } h;
+
         /* The following is used and filled by the opengl_fragment_shader_init
          * function. */
         GLint  internal;

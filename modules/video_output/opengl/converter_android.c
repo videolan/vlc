@@ -204,19 +204,10 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
     tc->pf_prepare_shader = tc_anop_prepare_shader;
     tc->pf_release        = tc_anop_release;
 
-    /* fake plane_count to 1 */
-    static const vlc_chroma_description_t desc = {
-        .plane_count = 1,
-        .p[0].w.num = 1,
-        .p[0].w.den = 1,
-        .p[0].h.num = 1,
-        .p[0].h.den = 1,
-        .pixel_size = 0,
-        .pixel_bits = 0,
-    };
+    tc->tex_count = 1;
+    tc->texs[0] = (struct opengl_tex_cfg) { { 1, 1 }, { 1, 1 } };
 
     tc->chroma       = VLC_CODEC_ANDROID_OPAQUE;
-    tc->desc         = &desc;
     tc->tex_target   = GL_TEXTURE_EXTERNAL_OES;
 
     /* The transform Matrix (uSTMatrix) given by the SurfaceTexture is not

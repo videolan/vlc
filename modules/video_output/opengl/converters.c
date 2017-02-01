@@ -148,9 +148,12 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
         assert(internal != 0);
 
-        for (unsigned i = 0; i < desc->plane_count; ++i )
+        tc->tex_count = 3;
+        for (unsigned i = 0; i < tc->tex_count; ++i )
         {
             tc->texs[i] = (struct opengl_tex_cfg) {
+                { desc->p[i].w.num, desc->p[i].w.den },
+                { desc->p[i].h.num, desc->p[i].h.den },
                 internal, oneplane_texfmt, GL_UNSIGNED_BYTE
             };
         }
@@ -197,7 +200,6 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
     tc->chroma = chroma;
     tc->yuv_color = true;
-    tc->desc = desc;
 
     *swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9;
     return VLC_SUCCESS;
@@ -213,11 +215,9 @@ tc_rgba_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         return VLC_EGENERIC;
 
     tc->chroma = VLC_CODEC_RGBA;
-    tc->desc = vlc_fourcc_GetChromaDescription(chroma);
-    assert(tc->desc != NULL);
-
+    tc->tex_count = 1;
     tc->texs[0] = (struct opengl_tex_cfg) {
-        GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
+        { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
     };
     return VLC_SUCCESS;
 }
@@ -233,7 +233,7 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
             return VLC_EGENERIC;
     }
 
-    for (unsigned int i = 0; i < tc->desc->plane_count; ++i)
+    for (unsigned int i = 0; i < tc->tex_count; ++i)
     {
         char name[sizeof("TextureX")];
         snprintf(name, sizeof(name), "Texture%1u", i);
@@ -258,7 +258,7 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
     if (tc->yuv_color)
         tc->api->Uniform4fv(tc->uloc.Coefficients, 4, tc->yuv_coefficients);
 
-    for (unsigned i = 0; i < tc->desc->plane_count; ++i)
+    for (unsigned i = 0; i < tc->tex_count; ++i)
         tc->api->Uniform1i(tc->uloc.Texture[i], i);
 
     tc->api->Uniform4f(tc->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
@@ -302,7 +302,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
     ADD("#version " GLSL_VERSION "\n" PRECISION);
 
-    for (unsigned i = 0; i < tc->desc->plane_count; ++i)
+    for (unsigned i = 0; i < tc->tex_count; ++i)
         ADDF("uniform %s Texture%u;"
              "varying vec2 TexCoord%u;", sampler, i, i);
 
@@ -314,7 +314,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
         "float val;vec4 colors;");
 
     unsigned color_idx = 0;
-    for (unsigned i = 0; i < tc->desc->plane_count; ++i)
+    for (unsigned i = 0; i < tc->tex_count; ++i)
     {
         const char *swizzle = swizzle_per_tex[i];
         if (swizzle)
@@ -582,7 +582,7 @@ tc_common_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
         }
 
         assert(pic->i_planes > 0
-            && (unsigned) pic->i_planes == tc->desc->plane_count);
+            && (unsigned) pic->i_planes == tc->tex_count);
 
         for (int i = 0; i < pic->i_planes; ++i)
         {
@@ -707,7 +707,7 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
 #endif
 
     int ret = VLC_SUCCESS;
-    for (unsigned i = 0; i < tc->desc->plane_count && ret == VLC_SUCCESS; i++)
+    for (unsigned i = 0; i < tc->tex_count && ret == VLC_SUCCESS; i++)
     {
         assert(textures[i] != 0);
         glActiveTexture(GL_TEXTURE0 + i);
@@ -835,11 +835,10 @@ opengl_tex_converter_xyz12_init(const video_format_t *fmt,
         return 0;
 
     tc->chroma  = VLC_CODEC_XYZ12;
-    tc->desc    = vlc_fourcc_GetChromaDescription(tc->chroma);
-    assert(tc->desc != NULL);
+    tc->tex_count = 1;
     tc->tex_target = GL_TEXTURE_2D;
     tc->texs[0] = (struct opengl_tex_cfg) {
-        GL_RGB, GL_RGB, GL_UNSIGNED_SHORT
+        { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT
     };
 
     tc->pf_fetch_locations = tc_xyz12_fetch_locations;
