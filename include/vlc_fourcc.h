@@ -362,7 +362,7 @@
 #define VLC_CODEC_D3D11_OPAQUE_10B      VLC_FOURCC('D','X','1','0') /* 4:2:0 10 bpc */
 
 /* CVPixelBuffer opaque buffer type */
-#define VLC_CODEC_CVPX_OPAQUE     VLC_FOURCC('C','V','P','X')
+#define VLC_CODEC_CVPX_NV12       VLC_FOURCC('C','V','P','N')
 
 /* Image codec (video) */
 #define VLC_CODEC_PNG             VLC_FOURCC('p','n','g',' ')

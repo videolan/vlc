@@ -51,7 +51,7 @@ vlc_module_end ()
 static int Activate(vlc_object_t *obj)
 {
     filter_t *p_filter = (filter_t *)obj;
-    if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_OPAQUE)
+    if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12)
         return VLC_EGENERIC;
 
     if (p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height

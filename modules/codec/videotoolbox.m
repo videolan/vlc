@@ -749,7 +749,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     if (p_sys->b_zero_copy) {
         msg_Dbg(p_dec, "zero-copy rendering pipeline enabled");
-        p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_OPAQUE;
+        p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
     } else {
         msg_Dbg(p_dec, "copy rendering pipeline enabled");
         p_dec->fmt_out.i_codec = VLC_CODEC_I420;

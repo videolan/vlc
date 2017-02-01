@@ -232,7 +232,7 @@ static int Open(vlc_object_t *this)
     sys->gl = NULL;
 
     @autoreleasepool {
-        if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
+        if (vd->fmt.i_chroma == VLC_CODEC_CVPX_NV12) {
             msg_Dbg(vd, "will use zero-copy rendering");
             sys->zero_copy = true;
         }
