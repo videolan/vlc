@@ -93,7 +93,25 @@ Manifest * SmoothManager::fetchManifest()
 
 bool SmoothManager::updatePlaylist()
 {
-    return updatePlaylist(false);
+    bool b_playlist_empty = false;
+    /* Trigger full playlist update in case we cannot get next
+       segment from atom */
+    std::vector<AbstractStream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
+    {
+        const AbstractStream *st = *it;
+        const mtime_t m = st->getMinAheadTime();
+        if(st->isDisabled() || !st->isSelected())
+        {
+            continue;
+        }
+        else if(m < 1)
+        {
+            b_playlist_empty = true;
+            break;
+        }
+    }
+    return updatePlaylist(b_playlist_empty);
 }
 
 void SmoothManager::scheduleNextUpdate()
