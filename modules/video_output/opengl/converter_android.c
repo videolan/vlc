@@ -124,10 +124,10 @@ error:
 
 static int
 tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
-               unsigned width, unsigned height,
+               const GLsizei *tex_width, const GLsizei *tex_height,
                picture_t *pic, const size_t *plane_offset)
 {
-    (void) width; (void) height; (void) plane_offset;
+    (void) tex_width; (void) tex_height; (void) plane_offset;
     assert(textures[0] != 0);
 
     if (plane_offset != NULL)

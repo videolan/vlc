@@ -160,7 +160,8 @@ pbo_release_gpupics(const opengl_tex_converter_t *tc, bool force)
 
 static int
 pbo_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
-                  unsigned width, unsigned height, picture_t *pic)
+                  const GLsizei *tex_width, const GLsizei *tex_height,
+                  picture_t *pic)
 {
     struct priv *priv = tc->priv;
     picture_sys_t *picsys = pic->p_sys;
@@ -178,9 +179,7 @@ pbo_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
         glPixelStorei(GL_UNPACK_ROW_LENGTH,
                       pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
 
-        glTexSubImage2D(tc->tex_target, 0, 0, 0,
-                        width * tc->desc->p[i].w.num / tc->desc->p[i].w.den,
-                        height * tc->desc->p[i].h.num / tc->desc->p[i].h.den,
+        glTexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                         priv->tex_format, priv->tex_type, NULL);
     }
 
@@ -331,7 +330,7 @@ tc_common_allocate_texture(const opengl_tex_converter_t *tc, GLuint texture,
 
 static int
 upload_plane(const opengl_tex_converter_t *tc,
-             unsigned width, unsigned height,
+             GLsizei width, GLsizei height,
              unsigned pitch, unsigned pixel_pitch, const void *pixels)
 {
     struct priv *priv = tc->priv;
@@ -364,7 +363,7 @@ upload_plane(const opengl_tex_converter_t *tc,
             }
             destination = priv->texture_temp_buf;
 
-            for (unsigned h = 0; h < height ; h++)
+            for (GLsizei h = 0; h < height ; h++)
             {
                 memcpy(destination, source, width * pixel_pitch);
                 source += pitch;
@@ -391,12 +390,12 @@ upload_plane(const opengl_tex_converter_t *tc,
 
 static int
 tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
-                 unsigned width, unsigned height,
+                 const GLsizei *tex_width, const GLsizei *tex_height,
                  picture_t *pic, const size_t *plane_offset)
 {
 #ifdef VLCGL_HAS_PBO
     if (pic->p_sys != NULL)
-        return pbo_common_update(tc, textures, width, height, pic);
+        return pbo_common_update(tc, textures, tex_width, tex_height, pic);
 #endif
 
     int ret = VLC_SUCCESS;
@@ -410,9 +409,7 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
                              &pic->p[i].p_pixels[plane_offset[i]] :
                              pic->p[i].p_pixels;
 
-        ret = upload_plane(tc,
-                           width * tc->desc->p[i].w.num / tc->desc->p[i].w.den,
-                           height * tc->desc->p[i].h.num / tc->desc->p[i].h.den,
+        ret = upload_plane(tc, tex_width[i], tex_height[i],
                            pic->p[i].i_pitch, pic->p[i].i_pixel_pitch, pixels);
     }
     return ret;

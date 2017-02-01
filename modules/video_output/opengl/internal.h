@@ -219,15 +219,15 @@ struct opengl_tex_converter_t
      *
      * \param fc OpenGL tex converter
      * \param textures array of textures to bind (one per plane)
-     * \param width width in pixels
-     * \param height height in pixels
+     * \param tex_width array of tex width (one per plane)
+     * \param tex_height array of tex height (one per plane)
      * \param pic picture to update
      * \param plane_offset offsets of each picture planes to read data from
      * (one per plane, can be NULL)
      * \return VLC_SUCCESS or a VLC error
      */
     int (*pf_update)(const opengl_tex_converter_t *fc, GLuint *textures,
-                     unsigned width, unsigned height,
+                     const GLsizei *tex_width, const GLsizei *tex_height,
                      picture_t *pic, const size_t *plane_offset);
 
     /*

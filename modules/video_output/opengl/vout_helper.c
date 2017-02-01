@@ -953,8 +953,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     opengl_tex_converter_t *tc = &vgl->prgm->tc;
 
     /* Update the texture */
-    int ret = tc->pf_update(tc, vgl->texture,
-                            vgl->fmt.i_visible_width, vgl->fmt.i_visible_height,
+    int ret = tc->pf_update(tc, vgl->texture, vgl->tex_width, vgl->tex_height,
                             picture, NULL);
     if (ret != VLC_SUCCESS)
         return ret;
@@ -1020,8 +1019,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 if (ret != VLC_SUCCESS)
                     continue;
             }
-            ret = tc->pf_update(tc, &glr->texture,
-                                r->fmt.i_visible_width, r->fmt.i_visible_height,
+            ret = tc->pf_update(tc, &glr->texture, &glr->width, &glr->height,
                                 r->p_picture, &pixels_offset);
         }
     }
