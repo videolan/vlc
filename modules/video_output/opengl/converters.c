@@ -267,6 +267,15 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
         tc->uloc.Texture[i] = tc->api->GetUniformLocation(program, name);
         if (tc->uloc.Texture[i] == -1)
             return VLC_EGENERIC;
+#ifdef GL_TEXTURE_RECTANGLE
+        if (tc->tex_target == GL_TEXTURE_RECTANGLE)
+        {
+            snprintf(name, sizeof(name), "TexSize%1u", i);
+            tc->uloc.TexSize[i] = tc->api->GetUniformLocation(program, name);
+            if (tc->uloc.TexSize[i] == -1)
+                return VLC_EGENERIC;
+        }
+#endif
     }
 
     tc->uloc.FillColor = tc->api->GetUniformLocation(program, "FillColor");
@@ -289,6 +298,15 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
         tc->api->Uniform1i(tc->uloc.Texture[i], i);
 
     tc->api->Uniform4f(tc->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
+
+#ifdef GL_TEXTURE_RECTANGLE
+    if (tc->tex_target == GL_TEXTURE_RECTANGLE)
+    {
+        for (unsigned i = 0; i < tc->tex_count; ++i)
+            tc->api->Uniform2f(tc->uloc.TexSize[i], tex_width[i],
+                               tex_height[i]);
+    }
+#endif
 }
 
 GLuint
@@ -316,6 +334,13 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
             lookup  = "texture2D";
             coord_name = "TexCoord";
             break;
+#ifdef GL_TEXTURE_RECTANGLE
+        case GL_TEXTURE_RECTANGLE:
+            sampler = "sampler2DRect";
+            lookup  = "texture2DRect";
+            coord_name = "TexCoordRect";
+            break;
+#endif
         default:
             vlc_assert_unreachable();
     }
@@ -333,12 +358,29 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
         ADDF("uniform %s Texture%u;"
              "varying vec2 TexCoord%u;", sampler, i, i);
 
+#ifdef GL_TEXTURE_RECTANGLE
+    if (tex_target == GL_TEXTURE_RECTANGLE)
+    {
+        for (unsigned i = 0; i < tc->tex_count; ++i)
+            ADDF("uniform vec2 TexSize%u;", i);
+    }
+#endif
+
     if (is_yuv)
         ADD("uniform vec4 Coefficients[4];");
 
     ADD("uniform vec4 FillColor;"
         "void main(void) {"
         "float val;vec4 colors;");
+
+#ifdef GL_TEXTURE_RECTANGLE
+    if (tex_target == GL_TEXTURE_RECTANGLE)
+    {
+        for (unsigned i = 0; i < tc->tex_count; ++i)
+            ADDF("vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
+                 "TexCoord%u.y * TexSize%u.y);", i, i, i, i, i);
+    }
+#endif
 
     unsigned color_idx = 0;
     for (unsigned i = 0; i < tc->tex_count; ++i)

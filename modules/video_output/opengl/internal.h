@@ -196,6 +196,7 @@ struct opengl_tex_converter_t
      * function. */
     struct {
         GLint Texture[PICTURE_PLANE_MAX];
+        GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
         GLint Coefficients;
         GLint FillColor;
     } uloc;
@@ -305,7 +306,7 @@ struct opengl_tex_converter_t
  * pf_get_pool, pf_update, and pf_release.
  *
  * \param tc OpenGL tex converter
- * \param tex_target GL_TEXTURE_2D
+ * \param tex_target GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE
  * \param chroma chroma used to generate the fragment shader
  * \param if not COLOR_SPACE_UNDEF, YUV planes will be converted to RGB
  * according to the color space
