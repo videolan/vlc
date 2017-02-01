@@ -167,6 +167,9 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
     const mtime_t i_max_buffering = getPlaylist()->getMaxBuffering() +
                                     /* FIXME: add dynamic pts-delay */ CLOCK_FREQ;
 
+    /* Try to never buffer up to really end */
+    const uint64_t OFFSET_FROM_END = 3;
+
     if( mediaSegmentTemplate )
     {
         uint64_t start = 0;
@@ -178,6 +181,8 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         {
             start = timeline->minElementNumber();
             end = timeline->maxElementNumber();
+            /* Try to never buffer up to really end */
+            end = end - std::min(end - start, OFFSET_FROM_END);
             stime_t endtime, duration;
             timeline->getScaledPlaybackTimeDurationBySegmentNumber( end, &endtime, &duration );
 
@@ -210,7 +215,7 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
             else
                 start = end - count;
 
-            const uint64_t bufcount = ( 1 + timescale.ToScaled(i_max_buffering) /
+            const uint64_t bufcount = ( OFFSET_FROM_END + timescale.ToScaled(i_max_buffering) /
                                         mediaSegmentTemplate->duration.Get() );
 
             return ( end - start > bufcount ) ? end - bufcount : start;
@@ -226,6 +231,10 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         uint64_t number;
         if( !segmentList->getSegmentNumberByScaledTime( bufferingstart, &number ) )
             return list.front()->getSequenceNumber();
+        if( number + OFFSET_FROM_END > list.front()->getSequenceNumber() )
+            number -= OFFSET_FROM_END;
+        else
+            number = list.front()->getSequenceNumber();
         return number;
     }
     else if( segmentBase )
@@ -236,7 +245,8 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
 
         const Timescale timescale = inheritTimescale();
         const ISegment *back = list.back();
-        const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() - timescale.ToScaled( i_max_buffering );
+        const stime_t bufferingstart = back->startTime.Get() -
+                (OFFSET_FROM_END * back->duration.Get())- timescale.ToScaled( i_max_buffering );
         uint64_t number;
         if( !SegmentInfoCommon::getSegmentNumberByScaledTime( list, bufferingstart, &number ) )
             return list.front()->getSequenceNumber();
