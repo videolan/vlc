@@ -109,19 +109,21 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     if (desc == NULL)
         return VLC_EGENERIC;
 
-    GLint oneplane_texfmt, oneplane16_texfmt;
+    GLint oneplane_texfmt, oneplane16_texfmt, twoplanes_texfmt;
 
 #if !defined(USE_OPENGL_ES2)
     if (HasExtension(tc->glexts, "GL_ARB_texture_rg"))
     {
         oneplane_texfmt = GL_RED;
         oneplane16_texfmt = GL_R16;
+        twoplanes_texfmt = GL_RG;
     }
     else
 #endif
     {
         oneplane_texfmt = GL_LUMINANCE;
         oneplane16_texfmt = GL_LUMINANCE16;
+        twoplanes_texfmt = GL_LUMINANCE_ALPHA;
     }
 
     float yuv_range_correction = 1.0;
@@ -160,6 +162,30 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
         if (oneplane_texfmt == GL_RED)
             swizzle_per_tex[0] = swizzle_per_tex[1] = swizzle_per_tex[2] = "r";
+    }
+    else if (desc->plane_count == 2)
+    {
+        if (desc->pixel_size != 1)
+            return VLC_EGENERIC;
+
+        tc->tex_count = 2;
+        tc->texs[0] = (struct opengl_tex_cfg) {
+            { 1, 1 }, { 1, 1 }, oneplane_texfmt, oneplane_texfmt, GL_UNSIGNED_BYTE
+        };
+        tc->texs[1] = (struct opengl_tex_cfg) {
+            { 1, 2 }, { 1, 2 }, twoplanes_texfmt, twoplanes_texfmt, GL_UNSIGNED_BYTE
+        };
+
+        if (oneplane_texfmt == GL_RED)
+        {
+            swizzle_per_tex[0] = "r";
+            swizzle_per_tex[1] = "rg";
+        }
+        else
+        {
+            swizzle_per_tex[0] = NULL;
+            swizzle_per_tex[1] = "xa";
+        }
     }
     else
         return VLC_EGENERIC;
@@ -201,7 +227,8 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     tc->chroma = chroma;
     tc->yuv_color = true;
 
-    *swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9;
+    *swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9 ||
+               chroma == VLC_CODEC_NV21;
     return VLC_SUCCESS;
 }
 
