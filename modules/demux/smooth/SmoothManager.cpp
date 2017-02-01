@@ -123,6 +123,8 @@ void SmoothManager::scheduleNextUpdate()
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         const AbstractStream *st = *it;
+        if(st->isDisabled() || !st->isSelected())
+            continue;
         const mtime_t m = st->getMinAheadTime();
         if(m > 0 && (m < minbuffer || minbuffer == 0))
             minbuffer = m;
