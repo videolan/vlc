@@ -291,6 +291,14 @@
 
     switch([[NSApp currentEvent] type]) {
         case NSLeftMouseUp:
+            /* Ignore mouse up, as this is a continous slider and
+             * when the user does a single click to a position on the slider,
+             * the action is called twice, once for the mouse down and once
+             * for the mouse up event. This results in two short seeks one
+             * after another to the same position, which results in weird
+             * audio quirks.
+             */
+            return;
         case NSLeftMouseDown:
         case NSLeftMouseDragged:
             f_updated = [sender floatValue];
