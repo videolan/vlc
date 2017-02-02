@@ -190,7 +190,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    sys->use_desktop = var_CreateGetBool(vd, "video-wallpaper");
+    sys->sys.use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
     sys->reopen_device = false;
     sys->lost_not_ready = false;
@@ -232,7 +232,7 @@ static int Open(vlc_object_t *object)
     /* Interaction */
     vlc_mutex_init(&sys->lock);
     sys->ch_desktop = false;
-    sys->desktop_requested = sys->use_desktop;
+    sys->desktop_requested = sys->sys.use_desktop;
 
     vlc_value_t val;
     val.psz_string = _("Desktop");
@@ -251,7 +251,7 @@ static int Open(vlc_object_t *object)
     vd->manage  = Manage;
 
     /* Fix state in case of desktop mode */
-    if (sys->use_desktop && vd->cfg->is_fullscreen)
+    if (sys->sys.use_desktop && vd->cfg->is_fullscreen)
         vout_display_SendEventFullscreen(vd, false);
 
     return VLC_SUCCESS;
@@ -293,8 +293,8 @@ static void DestroyPicture(picture_t *picture)
 /* */
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
-    if ( vd->sys->pool != NULL )
-        return vd->sys->pool;
+    if ( vd->sys->sys.pool != NULL )
+        return vd->sys->sys.pool;
 
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
@@ -341,15 +341,15 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     pool_cfg.picture_count = count;
     pool_cfg.picture       = pictures;
 
-    vd->sys->pool = picture_pool_NewExtended( &pool_cfg );
+    vd->sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
 
 error:
-    if (vd->sys->pool == NULL && pictures) {
+    if (vd->sys->sys.pool == NULL && pictures) {
         for (unsigned i=0;i<picture_count; ++i)
             DestroyPicture(pictures[i]);
     }
     free(pictures);
-    return vd->sys->pool;
+    return vd->sys->sys.pool;
 }
 
 static int  Direct3D9LockSurface(picture_t *);
@@ -415,8 +415,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     // Present the back buffer contents to the display
     // No stretching should happen here !
-    const RECT src = sys->rect_dest_clipped;
-    const RECT dst = sys->rect_dest_clipped;
+    const RECT src = sys->sys.rect_dest_clipped;
+    const RECT dst = sys->sys.rect_dest_clipped;
 
     HRESULT hr;
     if (sys->use_d3d9ex) {
@@ -447,31 +447,31 @@ static int ControlReopenDevice(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->use_desktop) {
+    if (!sys->sys.use_desktop) {
         /* Save non-desktop state */
         sys->desktop_save.is_fullscreen = vd->cfg->is_fullscreen;
-        sys->desktop_save.is_on_top     = sys->is_on_top;
+        sys->desktop_save.is_on_top     = sys->sys.is_on_top;
 
         WINDOWPLACEMENT wp = { .length = sizeof(wp), };
-        GetWindowPlacement(sys->hparent ? sys->hparent : sys->hwnd, &wp);
+        GetWindowPlacement(sys->sys.hparent ? sys->sys.hparent : sys->sys.hwnd, &wp);
         sys->desktop_save.win = wp.rcNormalPosition;
     }
 
     /* */
     Direct3D9Close(vd);
-    EventThreadStop(sys->event);
+    EventThreadStop(sys->sys.event);
 
     /* */
     vlc_mutex_lock(&sys->lock);
-    sys->use_desktop = sys->desktop_requested;
+    sys->sys.use_desktop = sys->desktop_requested;
     sys->ch_desktop = false;
     vlc_mutex_unlock(&sys->lock);
 
     /* */
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
-    cfg.use_desktop = sys->use_desktop;
-    if (!sys->use_desktop) {
+    cfg.use_desktop = sys->sys.use_desktop;
+    if (!sys->sys.use_desktop) {
         cfg.x      = sys->desktop_save.win.left;
         cfg.y      = sys->desktop_save.win.top;
         cfg.width  = sys->desktop_save.win.right  - sys->desktop_save.win.left;
@@ -479,16 +479,16 @@ static int ControlReopenDevice(vout_display_t *vd)
     }
 
     event_hwnd_t hwnd;
-    if (EventThreadStart(sys->event, &hwnd, &cfg)) {
+    if (EventThreadStart(sys->sys.event, &hwnd, &cfg)) {
         msg_Err(vd, "Failed to restart event thread");
         return VLC_EGENERIC;
     }
-    sys->parent_window = hwnd.parent_window;
-    sys->hparent       = hwnd.hparent;
-    sys->hwnd          = hwnd.hwnd;
-    sys->hvideownd     = hwnd.hvideownd;
-    sys->hfswnd        = hwnd.hfswnd;
-    SetRectEmpty(&sys->rect_parent);
+    sys->sys.parent_window = hwnd.parent_window;
+    sys->sys.hparent       = hwnd.hparent;
+    sys->sys.hwnd          = hwnd.hwnd;
+    sys->sys.hvideownd     = hwnd.hvideownd;
+    sys->sys.hfswnd        = hwnd.hfswnd;
+    SetRectEmpty(&sys->sys.rect_parent);
 
     /* */
     video_format_t fmt;
@@ -498,9 +498,9 @@ static int ControlReopenDevice(vout_display_t *vd)
         return VLC_EGENERIC;
     }
     vd->fmt = fmt;
-    sys->is_first_display = true;
+    sys->sys.is_first_display = true;
 
-    if (sys->use_desktop) {
+    if (sys->sys.use_desktop) {
         /* Disable fullscreen/on_top while using desktop */
         if (sys->desktop_save.is_fullscreen)
             vout_display_SendEventFullscreen(vd, false);
@@ -558,12 +558,12 @@ static void Manage (vout_display_t *vd)
     }
 
     /* Position Change */
-    if (sys->changes & DX_POSITION_CHANGE) {
+    if (sys->sys.changes & DX_POSITION_CHANGE) {
 #if 0 /* need that when bicubic filter is available */
         RECT rect;
         UINT width, height;
 
-        GetClientRect(p_sys->hvideownd, &rect);
+        GetClientRect(p_sys->sys.hvideownd, &rect);
         width  = rect.right-rect.left;
         height = rect.bottom-rect.top;
 
@@ -576,7 +576,7 @@ static void Manage (vout_display_t *vd)
         }
 #endif
         sys->clear_scene = true;
-        sys->changes &= ~DX_POSITION_CHANGE;
+        sys->sys.changes &= ~DX_POSITION_CHANGE;
     }
 }
 
@@ -719,7 +719,7 @@ static int Direct3D9FillPresentationParameters(vout_display_t *vd)
     ZeroMemory(d3dpp, sizeof(D3DPRESENT_PARAMETERS));
     d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
     d3dpp->Windowed               = TRUE;
-    d3dpp->hDeviceWindow          = vd->sys->hvideownd;
+    d3dpp->hDeviceWindow          = vd->sys->sys.hvideownd;
     d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
                                           d3ddm.Width);
     d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
@@ -732,7 +732,7 @@ static int Direct3D9FillPresentationParameters(vout_display_t *vd)
     d3dpp->EnableAutoDepthStencil = FALSE;
 
     /* */
-    RECT *display = &vd->sys->rect_display;
+    RECT *display = &vd->sys->sys.rect_display;
     display->left   = 0;
     display->top    = 0;
     display->right  = d3dpp->BackBufferWidth;
@@ -788,7 +788,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     if (sys->use_d3d9ex) {
         LPDIRECT3DDEVICE9EX d3ddevex;
         hr = IDirect3D9Ex_CreateDeviceEx((LPDIRECT3D9EX)d3dobj, AdapterToUse,
-                                         DeviceType, sys->hvideownd,
+                                         DeviceType, sys->sys.hvideownd,
                                          D3DCREATE_SOFTWARE_VERTEXPROCESSING|
                                          D3DCREATE_MULTITHREADED,
                                          &sys->d3dpp, NULL, &d3ddevex);
@@ -796,7 +796,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     } else {
         LPDIRECT3DDEVICE9 d3ddev;
         hr = IDirect3D9_CreateDevice(d3dobj, AdapterToUse,
-                                     DeviceType, sys->hvideownd,
+                                     DeviceType, sys->sys.hvideownd,
                                      D3DCREATE_SOFTWARE_VERTEXPROCESSING|
                                      D3DCREATE_MULTITHREADED,
                                      &sys->d3dpp, &d3ddev);
@@ -816,7 +816,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     }
 
     /* Change the window title bar text */
-    EventThreadUpdateTitle(sys->event, VOUT_TITLE " (Direct3D9 output)");
+    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D9 output)");
 
     msg_Dbg(vd, "Direct3D9 device adapter successfully initialized");
     return VLC_SUCCESS;
@@ -1147,8 +1147,8 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
     pool_cfg.lock          = Direct3D9LockSurface;
     pool_cfg.unlock        = Direct3D9UnlockSurface;
 
-    sys->pool = picture_pool_NewExtended(&pool_cfg);
-    if (!sys->pool) {
+    sys->sys.pool = picture_pool_NewExtended(&pool_cfg);
+    if (!sys->sys.pool) {
         picture_Release(picture);
         IDirect3DSurface9_Release(surface);
         return VLC_ENOMEM;
@@ -1162,16 +1162,16 @@ static void Direct3D9DestroyPool(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->pool) {
+    if (sys->sys.pool) {
         picture_sys_t *picsys = sys->picsys;
         if ( picsys != NULL ) {
             IDirect3DSurface9_Release(picsys->surface);
             if (picsys->fallback)
                 picture_Release(picsys->fallback);
         }
-        picture_pool_Release(sys->pool);
+        picture_pool_Release(sys->sys.pool);
     }
-    sys->pool = NULL;
+    sys->sys.pool = NULL;
 }
 
 /**
@@ -1604,7 +1604,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &vd->sys->rect_src_clipped, destination, NULL, D3DTEXF_NONE );
+    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &vd->sys->sys.rect_src_clipped, destination, NULL, D3DTEXF_NONE );
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx",
@@ -1614,7 +1614,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->d3dtex;
-    Direct3D9SetupVertices(region->vertex, &vd->sys->rect_dest_clipped, 255, vd->fmt.orientation);
+    Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_dest_clipped, 255, vd->fmt.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1721,8 +1721,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
             msg_Err(vd, "Failed to lock the texture");
         }
 
-        /* Map the subpicture to sys->rect_dest */
-        const RECT video = sys->rect_dest;
+        /* Map the subpicture to sys->sys.rect_dest */
+        const RECT video = sys->sys.rect_dest;
         const float scale_w = (float)(video.right  - video.left) / subpicture->i_original_picture_width;
         const float scale_h = (float)(video.bottom - video.top)  / subpicture->i_original_picture_height;
 

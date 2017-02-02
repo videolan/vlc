@@ -59,7 +59,7 @@ static void RestoreScreensaver(vout_display_t *);
 /* */
 int CommonInit(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 
     sys->hwnd      = NULL;
     sys->hvideownd = NULL;
@@ -124,7 +124,7 @@ int CommonInit(vout_display_t *vd)
 picture_pool_t *CommonPool(vout_display_t *vd, unsigned count)
 {
     VLC_UNUSED(count);
-    return vd->sys->pool;
+    return vd->sys->sys.pool;
 }
 
 /*****************************************************************************
@@ -139,7 +139,7 @@ void UpdateRects(vout_display_t *vd,
     const video_format_t *source,
     bool is_forced)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 #define rect_src sys->rect_src
 #define rect_src_clipped sys->rect_src_clipped
 #define rect_dest sys->rect_dest
@@ -355,7 +355,7 @@ exit:
 /* */
 void CommonClean(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
     if (sys->event) {
         CommonChangeThumbnailClip(vd, false);
         EventThreadStop(sys->event);
@@ -382,7 +382,7 @@ void CommonClean(vout_display_t *vd)
 
 void CommonManage(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 
     /* We used to call the Win32 PeekMessage function here to read the window
      * messages. But since window can stay blocked into this function for a
@@ -432,7 +432,7 @@ void CommonManage(vout_display_t *vd)
  */
 void CommonDisplay(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
     if (!sys->is_first_display)
         return;
 
@@ -536,7 +536,7 @@ void AlignRect(RECT *r, int align_boundary, int align_size)
 /* */
 static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 
     /* Windows 7 taskbar thumbnail code */
     OSVERSIONINFO winVer;
@@ -578,7 +578,7 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
 
 static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 
 #ifdef MODULE_NAME_IS_direct3d9
     if (sys->use_desktop && is_fullscreen)
@@ -665,7 +665,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
 
 int CommonControl(vout_display_t *vd, int query, va_list args)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
@@ -741,7 +741,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
 
 static void DisableScreensaver(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 
     /* disable screensaver by temporarily changing system settings */
     sys->i_spi_screensaveactive = 0;
@@ -758,7 +758,7 @@ static void DisableScreensaver(vout_display_t *vd)
 
 static void RestoreScreensaver(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_win32_t *sys = &vd->sys->sys;
 
     /* restore screensaver system settings */
     if (0 != sys->i_spi_screensaveactive) {

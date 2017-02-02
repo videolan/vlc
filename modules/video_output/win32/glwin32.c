@@ -81,7 +81,7 @@ static void CreateGPUAffinityDC(vout_display_t *vd, UINT nVidiaAffinity) {
     pfd.iLayerType = PFD_MAIN_PLANE;
 
     /* create a temporary GL context */
-    HDC winDC = GetDC(vd->sys->hvideownd);
+    HDC winDC = GetDC(vd->sys->sys.hvideownd);
     SetPixelFormat(winDC, ChoosePixelFormat(winDC, &pfd), &pfd);
     HGLRC hGLRC = wglCreateContext(winDC);
     wglMakeCurrent(winDC, hGLRC);
@@ -129,7 +129,7 @@ static void DestroyGPUAffinityDC(vout_display_t *vd) {
     pfd.iLayerType = PFD_MAIN_PLANE;
 
     /* create a temporary GL context */
-    HDC winDC = GetDC(vd->sys->hvideownd);
+    HDC winDC = GetDC(vd->sys->sys.hvideownd);
     SetPixelFormat(winDC, ChoosePixelFormat(winDC, &pfd), &pfd);
     HGLRC hGLRC = wglCreateContext(winDC);
     wglMakeCurrent(winDC, hGLRC);
@@ -175,14 +175,14 @@ static int Open(vlc_object_t *object)
     if (CommonInit(vd))
         goto error;
 
-    EventThreadUpdateTitle(sys->event, VOUT_TITLE " (OpenGL output)");
+    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
 
     /* process selected GPU affinity */
     int nVidiaAffinity = var_InheritInteger(vd, "gpu-affinity");
     if (nVidiaAffinity >= 0) CreateGPUAffinityDC(vd, nVidiaAffinity);
 
     /* */
-    sys->hGLDC = GetDC(sys->hvideownd);
+    sys->hGLDC = GetDC(sys->sys.hvideownd);
 
     /* Set the pixel format for the DC */
     PIXELFORMATDESCRIPTOR pfd;
@@ -272,7 +272,7 @@ static void Close(vlc_object_t *object)
     if (sys->hGLRC)
         wglDeleteContext(sys->hGLRC);
     if (sys->hGLDC)
-        ReleaseDC(sys->hvideownd, sys->hGLDC);
+        ReleaseDC(sys->sys.hvideownd, sys->hGLDC);
     DestroyGPUAffinityDC(vd);
 
     CommonClean(vd);
@@ -285,9 +285,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->pool)
-        sys->pool = vout_display_opengl_GetPool(sys->vgl, count);
-    return sys->pool;
+    if (!sys->sys.pool)
+        sys->sys.pool = vout_display_opengl_GetPool(sys->vgl, count);
+    return sys->sys.pool;
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -316,8 +316,8 @@ static void Manage (vout_display_t *vd)
 
     CommonManage(vd);
 
-    const int width  = sys->rect_dest.right  - sys->rect_dest.left;
-    const int height = sys->rect_dest.bottom - sys->rect_dest.top;
+    const int width  = sys->sys.rect_dest.right  - sys->sys.rect_dest.left;
+    const int height = sys->sys.rect_dest.bottom - sys->sys.rect_dest.top;
     vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
     glViewport(0, 0, width, height);
 }

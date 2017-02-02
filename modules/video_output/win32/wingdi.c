@@ -122,7 +122,7 @@ static void Close(vlc_object_t *object)
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     VLC_UNUSED(count);
-    return vd->sys->pool;
+    return vd->sys->sys.pool;
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -130,11 +130,11 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     vout_display_sys_t *sys = vd->sys;
 
 #define rect_src vd->sys->rect_src
-#define rect_src_clipped vd->sys->rect_src_clipped
-#define rect_dest vd->sys->rect_dest
-#define rect_dest_clipped vd->sys->rect_dest_clipped
+#define rect_src_clipped vd->sys->sys.rect_src_clipped
+#define rect_dest vd->sys->sys.rect_dest
+#define rect_dest_clipped vd->sys->sys.rect_dest_clipped
     RECT rect_dst = rect_dest_clipped;
-    HDC hdc = GetDC(sys->hvideownd);
+    HDC hdc = GetDC(sys->sys.hvideownd);
 
     OffsetRect(&rect_dst, -rect_dest.left, -rect_dest.top);
     SelectObject(sys->off_dc, sys->off_bitmap);
@@ -157,7 +157,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                SRCCOPY);
     }
 
-    ReleaseDC(sys->hvideownd, hdc);
+    ReleaseDC(sys->sys.hvideownd, hdc);
 #undef rect_src
 #undef rect_src_clipped
 #undef rect_dest
@@ -192,7 +192,7 @@ static int Init(vout_display_t *vd,
     vout_display_sys_t *sys = vd->sys;
 
     /* */
-    RECT *display = &sys->rect_display;
+    RECT *display = &sys->sys.rect_display;
     display->left   = 0;
     display->top    = 0;
     display->right  = GetSystemMetrics(SM_CXSCREEN);;
@@ -201,7 +201,7 @@ static int Init(vout_display_t *vd,
     /* Initialize an offscreen bitmap for direct buffer operations. */
 
     /* */
-    HDC window_dc = GetDC(sys->hvideownd);
+    HDC window_dc = GetDC(sys->sys.hvideownd);
 
     /* */
     sys->i_depth = GetDeviceCaps(window_dc, PLANES) *
@@ -278,9 +278,9 @@ static int Init(vout_display_t *vd,
     sys->off_dc = CreateCompatibleDC(window_dc);
 
     SelectObject(sys->off_dc, sys->off_bitmap);
-    ReleaseDC(sys->hvideownd, window_dc);
+    ReleaseDC(sys->sys.hvideownd, window_dc);
 
-    EventThreadUpdateTitle(sys->event, VOUT_TITLE " (WinGDI output)");
+    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
     /* */
     picture_resource_t rsc;
@@ -291,9 +291,9 @@ static int Init(vout_display_t *vd,
 
     picture_t *picture = picture_NewFromResource(fmt, &rsc);
     if (picture != NULL)
-        sys->pool = picture_pool_New(1, &picture);
+        sys->sys.pool = picture_pool_New(1, &picture);
     else
-        sys->pool = NULL;
+        sys->sys.pool = NULL;
 
     UpdateRects(vd, NULL, NULL, true);
 
@@ -304,9 +304,9 @@ static void Clean(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
-    sys->pool = NULL;
+    if (sys->sys.pool)
+        picture_pool_Release(sys->sys.pool);
+    sys->sys.pool = NULL;
 
     if (sys->off_dc)
         DeleteDC(sys->off_dc);

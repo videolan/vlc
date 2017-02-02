@@ -85,7 +85,7 @@ extern const GUID GUID_SWAPCHAIN_HEIGHT;
  * This structure is part of the video output thread descriptor.
  * It describes the module specific properties of an output thread.
  *****************************************************************************/
-struct vout_display_sys_t
+typedef struct vout_display_sys_win32_t
 {
     /* */
     event_thread_t *event;
@@ -124,20 +124,27 @@ struct vout_display_sys_t
 
     picture_pool_t *pool;
 
+    bool use_desktop;     /* show video on desktop window ? */
+
+    bool use_overlay;     /* Are we using an overlay surface */
+    /* Overlay alignment restrictions */
+    int  i_align_src_boundary;
+    int  i_align_src_size;
+    int  i_align_dest_boundary;
+    int  i_align_dest_size;
+} vout_display_sys_win32_t;
+
+
+struct vout_display_sys_t
+{
+    vout_display_sys_win32_t sys;
 #ifdef MODULE_NAME_IS_directdraw
     /* Multi-monitor support */
     HMONITOR             hmonitor;          /* handle of the current monitor */
     GUID                 *display_driver;
 
-    /* Overlay alignment restrictions */
-    int          i_align_src_boundary;
-    int          i_align_src_size;
-    int          i_align_dest_boundary;
-    int          i_align_dest_size;
-
     bool   use_wallpaper;   /* show as desktop wallpaper ? */
 
-    bool   use_overlay;     /* Are we using an overlay surface */
     bool   restore_overlay;
 
     /* DDraw capabilities */
@@ -214,8 +221,6 @@ struct vout_display_sys_t
 
 #ifdef MODULE_NAME_IS_direct3d9
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
-    /* show video on desktop window ? */
-    bool use_desktop;
     struct {
         bool is_fullscreen;
         bool is_on_top;
