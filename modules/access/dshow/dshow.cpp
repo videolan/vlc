@@ -68,7 +68,7 @@ static ComPtr<IBaseFilter> FindCaptureDevice( vlc_object_t *, std::string *,
                                        std::list<std::string> *, bool );
 static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                               int, int, int, int, int, int,
-                              AM_MEDIA_TYPE *mt, size_t );
+                              AM_MEDIA_TYPE *mt, size_t, bool );
 static bool ConnectFilters( vlc_object_t *, access_sys_t *,
                             IBaseFilter *, CaptureFilter * );
 static int FindDevices( vlc_object_t *, const char *, char ***, char *** );
@@ -950,6 +950,8 @@ static int GetFourCCPriority( int i_fourcc )
 static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
                        std::string devicename, bool b_audio )
 {
+    ComPtr<IBaseFilter> p_device_filter;
+
     /* See if device is already opened */
     std::vector<dshow_stream_t*>::iterator it = p_sys->pp_streams.begin();
     std::vector<dshow_stream_t*>::iterator end = p_sys->pp_streams.end();
@@ -959,45 +961,78 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
             (*it)->devicename == devicename )
         {
             /* Already opened */
-            return VLC_SUCCESS;
+            wchar_t *pwsz_devicename = ToWide( devicename.c_str() );
+
+            if( likely( pwsz_devicename ) )
+                p_sys->p_graph->FindFilterByName( pwsz_devicename, p_device_filter.GetAddressOf() );
+
+            free( pwsz_devicename );
+
+            if( !p_device_filter )
+            {
+                msg_Err( p_this, "Device '%s' already opened, but couldn't be retrieved", devicename.c_str() );
+                return VLC_EGENERIC;
+            }
+
+            break;
         }
     }
 
-    std::list<std::string> list_devices;
-
-    /* Enumerate devices and display their names */
-    FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
-    if( list_devices.empty() )
-        return VLC_EGENERIC;
-
-    std::list<std::string>::iterator iter;
-    for( iter = list_devices.begin(); iter != list_devices.end(); ++iter )
-        msg_Dbg( p_this, "found device: %s", iter->c_str() );
-
-    /* If no device name was specified, pick the 1st one */
-    if( devicename.size() == 0 )
+    if( !p_device_filter )
     {
-        /* When none selected */
-        devicename = *list_devices.begin();
-        msg_Dbg( p_this, "asking for default device: %s", devicename.c_str() ) ;
-    }
-    else
-        msg_Dbg( p_this, "asking for device: %s", devicename.c_str() ) ;
-    // Use the system device enumerator and class enumerator to find
-    // a capture/preview device, such as a desktop USB video camera.
-    ComPtr<IBaseFilter> p_device_filter =
-        FindCaptureDevice( p_this, &devicename, NULL, b_audio );
+        std::list<std::string> list_devices;
 
-    if( p_device_filter )
-        msg_Dbg( p_this, "using device: %s", devicename.c_str() );
-    else
-    {
-        msg_Err( p_this, "can't use device: %s, unsupported device type",
-                 devicename.c_str() );
-        vlc_dialog_display_error( p_this, _("Capture failed"),
-                        _("The device you selected cannot be used, because its "
-                          "type is not supported.") );
-        return VLC_EGENERIC;
+        /* Enumerate devices and display their names */
+        FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
+        if( list_devices.empty() )
+            return VLC_EGENERIC;
+
+        std::list<std::string>::iterator iter;
+        for( iter = list_devices.begin(); iter != list_devices.end(); ++iter )
+            msg_Dbg( p_this, "found device: %s", iter->c_str() );
+
+        /* If no device name was specified, pick the 1st one */
+        if( devicename.size() == 0 )
+        {
+            /* When none selected */
+            devicename = *list_devices.begin();
+            msg_Dbg( p_this, "asking for default device: %s", devicename.c_str() ) ;
+        }
+        else
+            msg_Dbg( p_this, "asking for device: %s", devicename.c_str() ) ;
+
+        // Use the system device enumerator and class enumerator to find
+        // a capture/preview device, such as a desktop USB video camera.
+        p_device_filter = FindCaptureDevice( p_this, &devicename, NULL, b_audio );
+
+        if( p_device_filter )
+            msg_Dbg( p_this, "using device: %s", devicename.c_str() );
+        else
+        {
+            msg_Err( p_this, "can't use device: %s, unsupported device type",
+                     devicename.c_str() );
+            vlc_dialog_display_error( p_this, _("Capture failed"),
+                            _("The device you selected cannot be used, because its "
+                              "type is not supported.") );
+            return VLC_EGENERIC;
+        }
+
+        /* Add the device filter to the graph (seems necessary with VfW before
+         * accessing pin attributes). */
+
+        HRESULT hr = E_FAIL;
+        wchar_t *pwsz_devicename = ToWide( devicename.c_str() );
+
+        if( likely( pwsz_devicename ) )
+            hr = p_sys->p_graph->AddFilter( p_device_filter.Get(), pwsz_devicename );
+
+        free( pwsz_devicename );
+
+        if( FAILED( hr ) )
+        {
+            msg_Err( p_this, "Error adding device '%s' to the graph", devicename.c_str() );
+            return VLC_EGENERIC;
+        }
     }
 
     // Retreive acceptable media types supported by device
@@ -1008,7 +1043,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
       b_audio ? var_CreateGetInteger( p_this, CFG_PREFIX "audio-channels" ) : 0,
       b_audio ? var_CreateGetInteger( p_this, CFG_PREFIX "audio-samplerate" ) : 0,
       b_audio ? var_CreateGetInteger( p_this, CFG_PREFIX "audio-bitspersample" ) : 0,
-      media_types, MAX_MEDIA_TYPES );
+      media_types, MAX_MEDIA_TYPES, b_audio );
 
     AM_MEDIA_TYPE *mt = NULL;
 
@@ -1058,10 +1093,6 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         new CaptureFilter( p_this, p_sys, mt, media_count ) );
     p_sys->p_graph->AddFilter( p_capture_filter.Get(), 0 );
 
-    /* Add the device filter to the graph (seems necessary with VfW before
-     * accessing pin attributes). */
-    p_sys->p_graph->AddFilter( p_device_filter.Get(), 0 );
-
     /* Attempt to connect one of this device's capture output pins */
     msg_Dbg( p_this, "connecting filters" );
     if( ConnectFilters( p_this, p_sys, p_device_filter.Get(), p_capture_filter.Get() ) )
@@ -1070,6 +1101,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         msg_Dbg( p_this, "filters connected successfully !" );
 
         dshow_stream_t dshow_stream;
+        dshow_stream.devicename = devicename;
         dshow_stream.b_pts = false;
         dshow_stream.p_es = 0;
         dshow_stream.mt =
@@ -1267,7 +1299,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                               int i_fourcc, int i_width, int i_height,
                               int i_channels, int i_samplespersec,
                               int i_bitspersample, AM_MEDIA_TYPE *mt,
-                              size_t mt_max )
+                              size_t mt_max, bool b_audio )
 {
     ComPtr<IEnumPins> p_enumpins;
     ComPtr<IPin> p_output_pin;
@@ -1345,7 +1377,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                 continue;
                             }
 
-                            if( MEDIATYPE_Video == p_mt->majortype
+                            if( !b_audio && MEDIATYPE_Video == p_mt->majortype
                                     && FORMAT_VideoInfo == p_mt->formattype )
                             {
                                 VIDEO_STREAM_CONFIG_CAPS *pVSCC = reinterpret_cast<VIDEO_STREAM_CONFIG_CAPS*>(pSCC);
@@ -1421,7 +1453,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                         i = piCount;
                                 }
                             }
-                            else if( p_mt->majortype == MEDIATYPE_Audio
+                            else if( b_audio && p_mt->majortype == MEDIATYPE_Audio
                                     && p_mt->formattype == FORMAT_WaveFormatEx )
                             {
                                 AUDIO_STREAM_CONFIG_CAPS *pASCC = reinterpret_cast<AUDIO_STREAM_CONFIG_CAPS*>(pSCC);
@@ -1527,7 +1559,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
         while( p_enummt->Next( 1, &p_mt, NULL ) == S_OK )
         {
             int i_current_fourcc = GetFourCCFromMediaType( *p_mt );
-            if( i_current_fourcc && p_mt->majortype == MEDIATYPE_Video
+            if( !b_audio && i_current_fourcc && p_mt->majortype == MEDIATYPE_Video
                 && p_mt->formattype == FORMAT_VideoInfo )
             {
                 int i_current_width = ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth;
@@ -1553,7 +1585,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 }
                 else FreeMediaType( *p_mt );
             }
-            else if( i_current_fourcc && p_mt->majortype == MEDIATYPE_Audio
+            else if( b_audio && i_current_fourcc && p_mt->majortype == MEDIATYPE_Audio
                     && p_mt->formattype == FORMAT_WaveFormatEx)
             {
                 int i_current_channels =
@@ -1642,7 +1674,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 const char *pfcc = (char *)&p_mt->subtype;
                 int i_current_fourcc = VLC_FOURCC(pfcc[0], pfcc[1], pfcc[2], pfcc[3]);
                 if( VLC_FOURCC('H','C','W','2') == i_current_fourcc
-                 && p_mt->majortype == MEDIATYPE_Video )
+                 && p_mt->majortype == MEDIATYPE_Video && !b_audio )
                 {
                     // output format for 'Hauppauge WinTV PVR PCI II Capture'
                     // try I420 as an input format
@@ -1920,6 +1952,50 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
+static int AppendAudioEnabledVDevs( vlc_object_t *p_this, std::list<std::string> &audio_list,
+                                    std::list<std::string> &video_list )
+{
+    ComPtr<IFilterGraph> p_graph;
+    ComPtr<IGraphBuilder> p_gbuilder;
+    ComPtr<ICaptureGraphBuilder2> p_cgbuilder;
+
+    if( FAILED( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_IFilterGraph,
+                                  ( void ** ) p_graph.GetAddressOf() ) ) )
+        return VLC_EGENERIC;
+
+    if( FAILED( p_graph->QueryInterface( IID_IGraphBuilder, ( void ** ) p_gbuilder.GetAddressOf() ) ) )
+        return VLC_EGENERIC;
+
+    if( FAILED( CoCreateInstance( CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC_SERVER,
+                                  IID_ICaptureGraphBuilder2, ( void ** ) p_cgbuilder.GetAddressOf() ) ) )
+        return VLC_EGENERIC;
+
+    if( FAILED( p_cgbuilder->SetFiltergraph( p_gbuilder.Get() ) ) )
+        return VLC_EGENERIC;
+
+    for( std::list<std::string>::iterator iter = video_list.begin();
+         iter != video_list.end();
+         ++iter )
+    {
+        ComPtr<IBaseFilter> p_device;
+        ComPtr<IPin> p_pin;
+
+        p_device = FindCaptureDevice( p_this, &( *iter ), NULL, false );
+        if( !p_device ) continue;
+
+        if( FAILED( p_gbuilder->AddFilter( p_device.Get(), NULL ) ) )
+            continue;
+
+        if( SUCCEEDED( p_cgbuilder->FindPin( p_device.Get(), PINDIR_OUTPUT, NULL, &MEDIATYPE_Audio,
+                                            true, 0, p_pin.GetAddressOf() ) ) )
+            audio_list.push_back( *iter );
+
+        p_gbuilder->RemoveFilter( p_device.Get() );
+    }
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * config variable callback
  *****************************************************************************/
@@ -1934,6 +2010,15 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
         bool b_audio = !strcmp( psz_name, CFG_PREFIX "adev" );
 
         FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
+
+        if( b_audio )
+        {
+            std::list<std::string> list_vdevs;
+            FindCaptureDevice( p_this, NULL, &list_vdevs, false );
+            if( !list_vdevs.empty() )
+                AppendAudioEnabledVDevs( p_this, list_devices, list_vdevs );
+        }
+
         CoUninitialize();
     }
 
