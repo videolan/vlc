@@ -1521,6 +1521,42 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 #endif
 }
 
+static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool pixel)
+{
+    vout_display_sys_t *sys = vd->sys;
+    ID3DBlob* pShaderBlob = NULL, *pErrBlob;
+
+    /* TODO : Match the version to the D3D_FEATURE_LEVEL */
+    HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
+                            NULL, NULL, NULL, pixel ? "PS" : "VS",
+                            pixel ? "ps_4_0_level_9_1" : "vs_4_0_level_9_1",
+                            0, 0, &pShaderBlob, &pErrBlob);
+
+    if (FAILED(hr)) {
+        char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
+        msg_Err(vd, "invalid %s Shader (hr=0x%lX): %s", pixel?"Pixel":"Vertex", hr, err );
+        if (pErrBlob)
+            ID3D10Blob_Release(pErrBlob);
+        return NULL;
+    }
+    return pShaderBlob;
+}
+
+static HRESULT CompilePixelShader(vout_display_t *vd, const char *psz_shader, ID3D11PixelShader **output)
+{
+    vout_display_sys_t *sys = vd->sys;
+    ID3DBlob *pPSBlob = CompileShader(vd, psz_shader, true);
+    if (!pPSBlob)
+        return E_INVALIDARG;
+
+    HRESULT hr = ID3D11Device_CreatePixelShader(sys->d3ddevice,
+                                                (void *)ID3D10Blob_GetBufferPointer(pPSBlob),
+                                                ID3D10Blob_GetBufferSize(pPSBlob), NULL, output);
+
+    ID3D10Blob_Release(pPSBlob);
+    return hr;
+}
+
 /* TODO : handle errors better
    TODO : seperate out into smaller functions like createshaders */
 static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
@@ -1584,15 +1620,28 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    ID3DBlob* pVSBlob = NULL;
-    /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    hr = D3DCompile(globVertexShaderFlat, strlen(globVertexShaderFlat),
-                    NULL, NULL, NULL, "VS", "vs_4_0_level_9_1", 0, 0, &pVSBlob, NULL);
-
-    if( FAILED(hr)) {
-      msg_Err(vd, "The flat Vertex Shader is invalid. (hr=0x%lX)", hr);
-      return VLC_EGENERIC;
+    ID3D11PixelShader *pPicQuadShader;
+    hr = CompilePixelShader(vd, sys->d3dPxShader, &pPicQuadShader);
+    if (FAILED(hr))
+    {
+        msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
     }
+
+    if (sys->psz_rgbaPxShader != NULL)
+    {
+        hr = CompilePixelShader(vd, sys->psz_rgbaPxShader, &sys->pSPUPixelShader);
+        if (FAILED(hr))
+        {
+            ID3D11PixelShader_Release(pPicQuadShader);
+            msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
+            return VLC_EGENERIC;
+        }
+    }
+
+    ID3DBlob *pVSBlob = CompileShader(vd, globVertexShaderFlat , false);
+    if (!pVSBlob)
+        return VLC_EGENERIC;
 
     hr = ID3D11Device_CreateVertexShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
                                         ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->flatVSShader);
@@ -1620,14 +1669,10 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     }
     ID3D11DeviceContext_IASetInputLayout(sys->d3dcontext, pVertexLayout);
     ID3D11InputLayout_Release(pVertexLayout);
-    
-    hr = D3DCompile(globVertexShaderProjection, strlen(globVertexShaderProjection),
-                    NULL, NULL, NULL, "VS", "vs_4_0_level_9_1", 0, 0, &pVSBlob, NULL);
 
-    if( FAILED(hr)) {
-      msg_Err(vd, "The projection Vertex Shader is invalid. (hr=0x%lX)", hr);
-      return VLC_EGENERIC;
-    }
+    pVSBlob = CompileShader(vd, globVertexShaderProjection, false);
+    if (!pVSBlob)
+        return VLC_EGENERIC;
 
     hr = ID3D11Device_CreateVertexShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
                                         ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->projectionVSShader);
@@ -1639,53 +1684,6 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     }
     ID3D10Blob_Release(pVSBlob);
 
-    ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    ID3DBlob* pPSBlob = NULL;
-
-    /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    hr = D3DCompile(sys->d3dPxShader, strlen(sys->d3dPxShader),
-                    NULL, NULL, NULL, "PS", "ps_4_0_level_9_1", 0, 0, &pPSBlob, NULL);
-
-
-    if( FAILED(hr)) {
-      msg_Err(vd, "The Pixel Shader is invalid. (hr=0x%lX)", hr );
-      return VLC_EGENERIC;
-    }
-
-    ID3D11PixelShader *pPicQuadShader;
-    hr = ID3D11Device_CreatePixelShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pPSBlob),
-                                        ID3D10Blob_GetBufferSize(pPSBlob), NULL, &pPicQuadShader);
-
-    ID3D10Blob_Release(pPSBlob);
-
-    if(FAILED(hr)) {
-      msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
-      return VLC_EGENERIC;
-    }
-
-    if (sys->psz_rgbaPxShader != NULL)
-    {
-        hr = D3DCompile(sys->psz_rgbaPxShader, strlen(sys->psz_rgbaPxShader),
-                        NULL, NULL, NULL, "PS", "ps_4_0_level_9_1", 0, 0, &pPSBlob, NULL);
-        if( FAILED(hr)) {
-          ID3D11PixelShader_Release(pPicQuadShader);
-          msg_Err(vd, "The RGBA Pixel Shader is invalid. (hr=0x%lX)", hr );
-          return VLC_EGENERIC;
-        }
-
-        hr = ID3D11Device_CreatePixelShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pPSBlob),
-                                            ID3D10Blob_GetBufferSize(pPSBlob), NULL, &sys->pSPUPixelShader);
-
-        ID3D10Blob_Release(pPSBlob);
-
-        if(FAILED(hr)) {
-          ID3D11PixelShader_Release(pPicQuadShader);
-          msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
-          return VLC_EGENERIC;
-        }
-    }
-
     if (AllocQuad( vd, fmt, &sys->picQuad, sys->picQuadConfig, pPicQuadShader,
                    true, vd->fmt.projection_mode) != VLC_SUCCESS) {
         ID3D11PixelShader_Release(pPicQuadShader);
@@ -1693,6 +1691,8 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         return VLC_EGENERIC;
     }
     ID3D11PixelShader_Release(pPicQuadShader);
+
+    ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     video_format_t core_source;
     CropStagingFormat( vd, &core_source );
