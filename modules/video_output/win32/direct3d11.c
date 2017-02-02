@@ -574,6 +574,34 @@ static void Close(vlc_object_t *object)
     free(vd->sys);
 }
 
+static const d3d_format_t *GetOutputFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma,
+                                           uint8_t bits_per_channel, bool b_allow_opaque)
+{
+    vout_display_sys_t *sys = vd->sys;
+    UINT i_formatSupport;
+    UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+         output_format->name != NULL; ++output_format)
+    {
+        if (i_src_chroma && i_src_chroma != output_format->fourcc)
+            continue;
+        if (bits_per_channel && bits_per_channel > output_format->bitsPerChannel)
+            continue;
+        if (!b_allow_opaque && is_d3d11_opaque(output_format->fourcc))
+            continue;
+
+        if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
+                                                       output_format->formatTexture,
+                                                       &i_formatSupport)) &&
+                ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
+        {
+            return output_format;
+        }
+    }
+    return NULL;
+}
+
 static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 {
     if ( vd->sys->sys.pool != NULL )
@@ -1312,37 +1340,14 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 #endif
 
-    vlc_fourcc_t i_src_chroma = fmt->i_chroma;
-    fmt->i_chroma = 0;
-
     // look for the requested pixel format first
-    UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-    UINT i_formatSupport;
-    for (const d3d_format_t *output_format = GetRenderFormatList();
-         output_format->name != NULL; ++output_format)
-    {
-        if( i_src_chroma == output_format->fourcc )
-        {
-            if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
-                                                           output_format->formatTexture,
-                                                           &i_formatSupport)) &&
-                    ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
-            {
-                msg_Dbg( vd, "Using pixel format %s from chroma %4.4s", output_format->name,
-                             (char *)&i_src_chroma );
-                fmt->i_chroma = output_format->fourcc;
-                DxgiFormatMask( output_format->formatTexture, fmt );
-                sys->picQuadConfig = output_format;
-                break;
-            }
-        }
-    }
+    sys->picQuadConfig = GetOutputFormat(vd, fmt->i_chroma, 0, true);
 
     // look for any pixel format that we can handle with enough pixels per channel
-    if ( !fmt->i_chroma )
+    if ( !sys->picQuadConfig )
     {
         uint8_t bits_per_channel;
-        switch (i_src_chroma)
+        switch (fmt->i_chroma)
         {
         case VLC_CODEC_D3D11_OPAQUE:
             bits_per_channel = 8;
@@ -1352,62 +1357,33 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             break;
         default:
             {
-                const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(i_src_chroma);
+                const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
                 bits_per_channel = p_format == NULL || p_format->pixel_bits == 0 ? 8 : p_format->pixel_bits;
             }
             break;
         }
 
-        for (const d3d_format_t *output_format = GetRenderFormatList();
-             output_format->name != NULL; ++output_format)
-        {
-            if( bits_per_channel <= output_format->bitsPerChannel &&
-                !is_d3d11_opaque(output_format->fourcc) )
-            {
-                if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
-                                                               output_format->formatTexture,
-                                                               &i_formatSupport)) &&
-                        ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
-                {
-                    msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", output_format->name,
-                                 (char *)&i_src_chroma );
-                    fmt->i_chroma = output_format->fourcc;
-                    DxgiFormatMask( output_format->formatTexture, fmt );
-                    sys->picQuadConfig = output_format;
-                    break;
-                }
-            }
-        }
+        sys->picQuadConfig = GetOutputFormat(vd, 0, bits_per_channel, false);
     }
+
     // look for any pixel format that we can handle
-    if ( !fmt->i_chroma )
-    {
-        for (const d3d_format_t *output_format = GetRenderFormatList();
-             output_format->name != NULL; ++output_format)
-        {
-            if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
-                                                           output_format->formatTexture,
-                                                           &i_formatSupport)) &&
-                    ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags &&
-                    !is_d3d11_opaque(output_format->fourcc) )
-            {
-                msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", output_format->name,
-                             (char *)&i_src_chroma );
-                fmt->i_chroma = output_format->fourcc;
-                DxgiFormatMask( output_format->formatTexture, fmt );
-                sys->picQuadConfig = output_format;
-                break;
-            }
-        }
-    }
-    if ( !fmt->i_chroma )
+    if ( !sys->picQuadConfig )
+        sys->picQuadConfig = GetOutputFormat(vd, 0, 0, false);
+
+    if ( !sys->picQuadConfig )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
     }
+    msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuadConfig->name,
+                 (char *)&fmt->i_chroma );
+    fmt->i_chroma = sys->picQuadConfig->fourcc;
+    DxgiFormatMask( sys->picQuadConfig->formatTexture, fmt );
 
     /* check the region pixel format */
-    i_quadSupportFlags |= D3D11_FORMAT_SUPPORT_BLENDABLE;
+    UINT i_formatSupport;
+    UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D |
+            D3D11_FORMAT_SUPPORT_SHADER_LOAD| D3D11_FORMAT_SUPPORT_BLENDABLE;
     if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                    DXGI_FORMAT_R8G8B8A8_UNORM,
                                                    &i_formatSupport)) &&
