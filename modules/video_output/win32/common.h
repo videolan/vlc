@@ -45,6 +45,10 @@
 #include "events.h"
 
 #ifdef MODULE_NAME_IS_direct3d11
+#include "../../video_chroma/dxgi_fmt.h"
+#ifdef HAVE_ID3D11VIDEODECODER
+#include "../../video_chroma/d3d11_fmt.h"
+#endif
 typedef struct
 {
     DXGI_FORMAT   textureFormat;

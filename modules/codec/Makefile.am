@@ -396,7 +396,7 @@ endif
 
 libd3d11va_plugin_la_SOURCES = \
 	codec/avcodec/d3d11va.c codec/avcodec/directx_va.c codec/avcodec/directx_va.h \
-	video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
+	video_chroma/d3d11_fmt.h video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
 libd3d11va_plugin_la_LIBADD = $(LIBCOM) -luuid

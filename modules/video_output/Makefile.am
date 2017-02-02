@@ -196,7 +196,7 @@ EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
 endif
 
 libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
- video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
+ video_chroma/d3d11_fmt.h video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
  video_output/win32/common.c video_output/win32/common.h
 libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
  -DMODULE_NAME_IS_direct3d11

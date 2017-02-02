@@ -44,9 +44,12 @@
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
 # include <windows.ui.xaml.media.dxinterop.h> */
 
-#include "common.h"
-
+#ifdef HAVE_ID3D11VIDEODECODER
+#include "../../video_chroma/d3d11_fmt.h"
+#endif
 #include "../../video_chroma/dxgi_fmt.h"
+
+#include "common.h"
 
 #if !VLC_WINSTORE_APP
 # define D3D11CreateDevice(args...)             sys->OurD3D11CreateDevice(args)
@@ -83,17 +86,6 @@ vlc_module_begin ()
     add_shortcut("direct3d11")
     set_callbacks(Open, Close)
 vlc_module_end ()
-
-#ifdef HAVE_ID3D11VIDEODECODER
-/* VLC_CODEC_D3D11_OPAQUE */
-struct picture_sys_t
-{
-    ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
-    ID3D11Texture2D               *texture;
-    ID3D11DeviceContext           *context;
-    unsigned                      slice_index;
-};
-#endif
 
 /* internal picture_t pool  */
 typedef struct

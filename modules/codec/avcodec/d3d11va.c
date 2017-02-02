@@ -52,7 +52,7 @@
 #include <d3d11.h>
 #include <libavcodec/d3d11va.h>
 
-#include "../../video_chroma/dxgi_fmt.h"
+#include "../../video_chroma/d3d11_fmt.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
@@ -132,16 +132,6 @@ struct vlc_va_sys_t
     ID3D11VideoProcessorEnumerator *procEnumerator;
     ID3D11VideoProcessor           *videoProcessor;
     DXGI_FORMAT                    processorFormat;
-};
-
-/* VLC_CODEC_D3D11_OPAQUE */
-struct picture_sys_t
-{
-    ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
-    ID3D11Texture2D               *texture;
-    ID3D11DeviceContext           *context;
-    unsigned                      slice_index;
-    ID3D11VideoProcessorInputView *inputView; /* when used as processor input */
 };
 
 /* */

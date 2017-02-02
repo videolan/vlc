@@ -124,7 +124,7 @@ endif
 
 # D3D11VA
 libd3d11_surface_plugin_la_SOURCES = video_chroma/d3d11_surface.c \
-	video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
+	video_chroma/d3d11_fmt.h video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
 	video_chroma/copy.c video_chroma/copy.h
 
 if HAVE_AVCODEC_D3D11VA
