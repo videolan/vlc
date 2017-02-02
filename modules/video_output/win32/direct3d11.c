@@ -1245,6 +1245,24 @@ static HINSTANCE Direct3D11LoadShaderLibrary(void)
 #endif
 
 
+static const char *GetFormatPixelShader(const d3d_format_t *format)
+{
+    switch (format->formatTexture)
+    {
+    case DXGI_FORMAT_NV12:
+    case DXGI_FORMAT_P010:
+        return globPixelShaderBiplanarYUV_2RGB;
+    case DXGI_FORMAT_YUY2:
+        return globPixelShaderBiplanarYUYV_2RGB;
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B5G6R5_UNORM:
+        return globPixelShaderDefault;
+    default:
+        return NULL;
+    }
+}
+
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1387,35 +1405,24 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     fmt->i_chroma = sys->picQuadConfig->fourcc;
     DxgiFormatMask( sys->picQuadConfig->formatTexture, fmt );
 
+    sys->d3dPxShader = GetFormatPixelShader(sys->picQuadConfig);
+    if (sys->d3dPxShader == NULL)
+    {
+        msg_Err(vd, "Could not get a suitable pixel shader for %s", sys->picQuadConfig->name);
+        return VLC_EGENERIC;
+    }
+
     /* check the region pixel format */
     sys->d3dregion_format = GetOutputFormat(vd, VLC_CODEC_RGBA, 0, false, true);
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetOutputFormat(vd, VLC_CODEC_BGRA, 0, false, true);
 
-    switch (sys->picQuadConfig->formatTexture)
-    {
-    case DXGI_FORMAT_NV12:
-    case DXGI_FORMAT_P010:
-        sys->d3dPxShader = globPixelShaderBiplanarYUV_2RGB;
-        break;
-    case DXGI_FORMAT_YUY2:
-        sys->d3dPxShader = globPixelShaderBiplanarYUYV_2RGB;
-        break;
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B5G6R5_UNORM:
-        sys->d3dPxShader = globPixelShaderDefault;
-        break;
-    default:
-        msg_Err(vd, "Could not get a suitable pixel shader for %s", sys->picQuadConfig->name);
-        return VLC_EGENERIC;
-        break;
-    }
-
     if (sys->d3dregion_format != NULL)
-        sys->psz_rgbaPxShader = globPixelShaderDefault;
-    else
-        sys->psz_rgbaPxShader = NULL;
+    {
+        sys->psz_rgbaPxShader = GetFormatPixelShader(sys->d3dregion_format);
+        if (sys->psz_rgbaPxShader == NULL)
+            msg_Warn(vd, "Could not get a suitable SPU pixel shader for %s", sys->picQuadConfig->name);
+    }
 
     if ( fmt->i_height != fmt->i_visible_height || fmt->i_width != fmt->i_visible_width )
     {
