@@ -147,7 +147,9 @@ libwl_shell_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)
 libxdg_shell_plugin_la_SOURCES = video_output/wayland/xdg-shell.c
 nodist_libxdg_shell_plugin_la_SOURCES = \
 	video_output/wayland/xdg-shell-client-protocol.h \
-	video_output/wayland/xdg-shell-protocol.c
+	video_output/wayland/xdg-shell-protocol.c \
+	video_output/wayland/server-decoration-client-protocol.h \
+	video_output/wayland/server-decoration-protocol.c
 libxdg_shell_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(builddir)/video_output/wayland
 libxdg_shell_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
@@ -160,6 +162,12 @@ video_output/wayland/xdg-shell-client-protocol.h: \
 video_output/wayland/xdg-shell-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/unstable/xdg-shell/xdg-shell-unstable-v5.xml
 	$(AM_V_GEN)$(WAYLAND_SCANNER) code $< $@
+
+video_output/wayland/server-decoration-client-protocol.h: \
+		video_output/wayland/server-decoration.xml
+video_output/wayland/server-decoration-protocol.c: \
+		video_output/wayland/server-decoration.xml
+EXTRA_DIST += video_output/wayland/server-decoration.xml
 
 libegl_wl_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WAYLAND=1

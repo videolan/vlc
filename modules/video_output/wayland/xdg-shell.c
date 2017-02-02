@@ -32,6 +32,7 @@
 
 #include <wayland-client.h>
 #include "xdg-shell-client-protocol.h"
+#include "server-decoration-client-protocol.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -44,6 +45,8 @@ struct vout_window_sys_t
     struct wl_compositor *compositor;
     struct xdg_shell *shell;
     struct xdg_surface *surface;
+    struct org_kde_kwin_server_decoration_manager *deco_manager;
+    struct org_kde_kwin_server_decoration *deco;
 
     vlc_thread_t thread;
 };
@@ -201,6 +204,10 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
     else
     if (!strcmp(iface, "xdg_shell"))
         sys->shell = wl_registry_bind(registry, name, &xdg_shell_interface, 1);
+    else
+    if (!strcmp(iface, "org_kde_kwin_server_decoration_manager"))
+        sys->deco_manager = wl_registry_bind(registry, name,
+                         &org_kde_kwin_server_decoration_manager_interface, 1);
 }
 
 static void registry_global_remove_cb(void *data, struct wl_registry *registry,
@@ -234,6 +241,8 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->compositor = NULL;
     sys->shell = NULL;
     sys->surface = NULL;
+    sys->deco_manager = NULL;
+    sys->deco = NULL;
     wnd->sys = sys;
 
     /* Connect to the display server */
@@ -293,6 +302,19 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
                                     cfg->width, cfg->height);
     vout_window_ReportSize(wnd, cfg->width, cfg->height);
 
+    const uint_fast32_t deco_mode =
+        var_InheritBool(wnd, "video-deco")
+            ? ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER
+            : ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT;
+
+    if (sys->deco_manager != NULL)
+        sys->deco = org_kde_kwin_server_decoration_manager_create(
+                                                   sys->deco_manager, surface);
+    if (sys->deco != NULL)
+        org_kde_kwin_server_decoration_request_mode(sys->deco, deco_mode);
+    else if (deco_mode == ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER)
+        msg_Err(wnd, "server-side decoration not supported");
+
     //if (var_InheritBool (wnd, "keyboard-events"))
     //    do_something();
 
@@ -311,6 +333,10 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     return VLC_SUCCESS;
 
 error:
+    if (sys->deco != NULL)
+        org_kde_kwin_server_decoration_destroy(sys->deco);
+    if (sys->deco_manager != NULL)
+        org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
     if (sys->surface != NULL)
         xdg_surface_destroy(sys->surface);
     if (sys->shell != NULL)
@@ -332,6 +358,10 @@ static void Close(vout_window_t *wnd)
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
+    if (sys->deco != NULL)
+        org_kde_kwin_server_decoration_destroy(sys->deco);
+    if (sys->deco_manager != NULL)
+        org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
     xdg_surface_destroy(sys->surface);
     wl_surface_destroy(wnd->handle.wl);
     xdg_shell_destroy(sys->shell);
