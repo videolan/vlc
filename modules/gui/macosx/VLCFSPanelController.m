@@ -42,12 +42,26 @@
 
 @implementation VLCFSPanelController
 
+static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect";
+
++ (void)initialize
+{
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys: NSStringFromRect(NSZeroRect), kAssociatedFullscreenRect, nil];
+
+    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+}
+
+
 #pragma mark -
 #pragma mark Initialization
 
 - (id)init
 {
     self = [super initWithWindowNibName:@"VLCFullScreenPanel"];
+    if (self) {
+        NSString *rectStr = [[NSUserDefaults standardUserDefaults] stringForKey:kAssociatedFullscreenRect];
+        _associatedVoutFrame = NSRectFromString(rectStr);
+    }
     return self;
 }
 
@@ -370,6 +384,8 @@
     NSRect voutRect = voutWindow.frame;
     if (!NSEqualRects(_associatedVoutFrame, voutRect)) {
         _associatedVoutFrame = voutRect;
+        [[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect(_associatedVoutFrame) forKey:kAssociatedFullscreenRect];
+
         [self centerPanel];
     }
 
