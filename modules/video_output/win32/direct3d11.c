@@ -533,25 +533,23 @@ static int Open(vlc_object_t *object)
         goto error;
     }
 
-    vout_display_info_t info  = vd->info;
-    info.is_slow              = !is_d3d11_opaque(fmt.i_chroma);
-    info.has_double_click     = true;
-    info.has_hide_mouse       = false;
-    info.has_pictures_invalid = !is_d3d11_opaque(fmt.i_chroma);
+    video_format_Clean(&vd->fmt);
+    video_format_Copy(&vd->fmt, &fmt);
+
+    vd->info.is_slow              = !is_d3d11_opaque(fmt.i_chroma);
+    vd->info.has_double_click     = true;
+    vd->info.has_hide_mouse       = false;
+    vd->info.has_pictures_invalid = !is_d3d11_opaque(fmt.i_chroma);
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
         vd->sys->d3dregion_format != NULL)
     {
         vd->sys->pSubpictureChromas[0] = vd->sys->d3dregion_format->fourcc;
         vd->sys->pSubpictureChromas[1] = 0;
-        info.subpicture_chromas = vd->sys->pSubpictureChromas;
+        vd->info.subpicture_chromas = vd->sys->pSubpictureChromas;
     }
     else
-        info.subpicture_chromas = NULL;
-
-    video_format_Clean(&vd->fmt);
-    video_format_Copy(&vd->fmt, &fmt);
-    vd->info = info;
+        vd->info.subpicture_chromas = NULL;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
