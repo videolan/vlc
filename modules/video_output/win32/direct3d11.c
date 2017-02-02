@@ -135,7 +135,7 @@ struct vout_display_sys_t
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
     d3d_quad_t               picQuad;
-    d3d_quad_cfg_t       picQuadConfig;
+    const d3d_format_t       *picQuadConfig;
 
     /* staging quad to adjust visible borders */
     d3d_quad_t               stagingQuad;
@@ -225,7 +225,7 @@ static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
 static int AllocQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
-                     d3d_quad_cfg_t *, ID3D11PixelShader *, bool b_visible,
+                     const d3d_format_t *, ID3D11PixelShader *, bool b_visible,
                      video_projection_mode_t);
 static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
@@ -605,7 +605,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     texDesc.Width = vd->fmt.i_width;
     texDesc.Height = vd->fmt.i_height;
     texDesc.MipLevels = 1;
-    texDesc.Format = vd->sys->picQuadConfig.textureFormat;
+    texDesc.Format = vd->sys->picQuadConfig->formatTexture;
     texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -1332,9 +1332,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                              (char *)&i_src_chroma );
                 fmt->i_chroma = output_format->fourcc;
                 DxgiFormatMask( output_format->formatTexture, fmt );
-                sys->picQuadConfig.textureFormat = output_format->formatTexture;
-                sys->picQuadConfig.resourceFormatYRGB = output_format->resourceFormat[0];
-                sys->picQuadConfig.resourceFormatUV   = output_format->resourceFormat[1];
+                sys->picQuadConfig = output_format;
                 break;
             }
         }
@@ -1375,9 +1373,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                                  (char *)&i_src_chroma );
                     fmt->i_chroma = output_format->fourcc;
                     DxgiFormatMask( output_format->formatTexture, fmt );
-                    sys->picQuadConfig.textureFormat      = output_format->formatTexture;
-                    sys->picQuadConfig.resourceFormatYRGB = output_format->resourceFormat[0];
-                    sys->picQuadConfig.resourceFormatUV   = output_format->resourceFormat[1];
+                    sys->picQuadConfig = output_format;
                     break;
                 }
             }
@@ -1399,9 +1395,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                              (char *)&i_src_chroma );
                 fmt->i_chroma = output_format->fourcc;
                 DxgiFormatMask( output_format->formatTexture, fmt );
-                sys->picQuadConfig.textureFormat      = output_format->formatTexture;
-                sys->picQuadConfig.resourceFormatYRGB = output_format->resourceFormat[0];
-                sys->picQuadConfig.resourceFormatUV   = output_format->resourceFormat[1];
+                sys->picQuadConfig = output_format;
                 break;
             }
         }
@@ -1432,8 +1426,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         sys->d3dregion_format = DXGI_FORMAT_UNKNOWN;
     }
 
-    if (sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R8_UNORM ||
-        sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R16_UNORM)
+    if (sys->picQuadConfig->resourceFormat[0] == DXGI_FORMAT_R8_UNORM ||
+        sys->picQuadConfig->resourceFormat[0] == DXGI_FORMAT_R16_UNORM)
         sys->d3dPxShader = globPixelShaderBiplanarYUV_2RGB;
     else
     if (fmt->i_chroma == VLC_CODEC_YUYV)
@@ -1449,7 +1443,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     if ( fmt->i_height != fmt->i_visible_height || fmt->i_width != fmt->i_visible_width )
     {
         msg_Dbg( vd, "use a staging texture to crop to visible size" );
-        AllocQuad( vd, fmt, &sys->stagingQuad, &sys->picQuadConfig, NULL, false,
+        AllocQuad( vd, fmt, &sys->stagingQuad, sys->picQuadConfig, NULL, false,
                    PROJECTION_MODE_RECTANGULAR );
     }
 
@@ -1708,7 +1702,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         }
     }
 
-    if (AllocQuad( vd, fmt, &sys->picQuad, &sys->picQuadConfig, pPicQuadShader,
+    if (AllocQuad( vd, fmt, &sys->picQuad, sys->picQuadConfig, pPicQuadShader,
                    true, vd->fmt.projection_mode) != VLC_SUCCESS) {
         ID3D11PixelShader_Release(pPicQuadShader);
         msg_Err(vd, "Could not Create the main quad picture. (hr=0x%lX)", hr);
@@ -1975,7 +1969,7 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, video_projec
 }
 
 static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
-                     d3d_quad_cfg_t *cfg, ID3D11PixelShader *d3dpixelShader, bool b_visible,
+                     const d3d_format_t *cfg, ID3D11PixelShader *d3dpixelShader, bool b_visible,
                      video_projection_mode_t projection)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -2074,7 +2068,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     texDesc.Width  = b_visible ? fmt->i_visible_width  : fmt->i_width;
     texDesc.Height = b_visible ? fmt->i_visible_height : fmt->i_height;
     texDesc.MipLevels = texDesc.ArraySize = 1;
-    texDesc.Format = cfg->textureFormat;
+    texDesc.Format = cfg->formatTexture;
     texDesc.SampleDesc.Count = 1;
     texDesc.Usage = D3D11_USAGE_DYNAMIC;
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -2120,7 +2114,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     /* map texture planes to resource views */
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
     memset(&resviewDesc, 0, sizeof(resviewDesc));
-    resviewDesc.Format = cfg->resourceFormatYRGB;
+    resviewDesc.Format = cfg->resourceFormat[0];
     resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resviewDesc.Texture2D.MipLevels = texDesc.MipLevels;
 
@@ -2130,9 +2124,9 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
     }
 
-    if( cfg->resourceFormatUV )
+    if( cfg->resourceFormat[1] )
     {
-        resviewDesc.Format = cfg->resourceFormatUV;
+        resviewDesc.Format = cfg->resourceFormat[1];
         hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)quad->pTexture, &resviewDesc, &quad->picSys.resourceView[1]);
         if (FAILED(hr)) {
             msg_Err(vd, "Could not Create the UV D3d11 Texture ResourceView. (hr=0x%lX)", hr);
@@ -2356,9 +2350,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            d3d_quad_cfg_t rgbaCfg = {
-                .textureFormat      = sys->d3dregion_format,
-                .resourceFormatYRGB = sys->d3dregion_format,
+            d3d_format_t rgbaCfg = {
+                .formatTexture      = sys->d3dregion_format,
+                .resourceFormat[0]  = sys->d3dregion_format,
             };
             err = AllocQuad( vd, &r->fmt, d3dquad, &rgbaCfg, sys->pSPUPixelShader,
                              false, PROJECTION_MODE_RECTANGULAR );
