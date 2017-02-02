@@ -60,6 +60,17 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+struct vout_display_sys_t
+{
+    vout_display_sys_win32_t sys;
+
+    HDC                   hGLDC;
+    HGLRC                 hGLRC;
+    vlc_gl_t              *gl;
+    vout_display_opengl_t *vgl;
+    HDC                   affinityHDC; // DC for the selected GPU
+};
+
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *);

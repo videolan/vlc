@@ -40,6 +40,8 @@
 #define COBJMACROS
 #include <initguid.h>
 #include <d3d11.h>
+#include <dxgi1_2.h>
+#include <d3dcompiler.h>
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
 # include <windows.ui.xaml.media.dxinterop.h> */
@@ -86,6 +88,75 @@ vlc_module_begin ()
     add_shortcut("direct3d11")
     set_callbacks(Open, Close)
 vlc_module_end ()
+
+/* A Quad is texture that can be displayed in a rectangle */
+typedef struct
+{
+    DXGI_FORMAT   textureFormat;
+    DXGI_FORMAT   resourceFormatYRGB;
+    DXGI_FORMAT   resourceFormatUV;
+} d3d_quad_cfg_t;
+
+typedef struct
+{
+    ID3D11Buffer              *pVertexBuffer;
+    UINT                      vertexCount;
+    ID3D11VertexShader        *d3dvertexShader;
+    ID3D11Buffer              *pIndexBuffer;
+    UINT                      indexCount;
+    ID3D11Buffer              *pVertexShaderConstants;
+    picture_sys_t             picSys;
+    ID3D11Texture2D           *pTexture;
+    ID3D11Buffer              *pPixelShaderConstants[2];
+    UINT                       PSConstantsCount;
+    ID3D11ShaderResourceView  *d3dresViewY;
+    ID3D11ShaderResourceView  *d3dresViewUV;
+    ID3D11PixelShader         *d3dpixelShader;
+    D3D11_VIEWPORT            cropViewport;
+} d3d_quad_t;
+
+struct vout_display_sys_t
+{
+    vout_display_sys_win32_t sys;
+
+#if !VLC_WINSTORE_APP
+    HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
+    HINSTANCE                hd3d11_dll;       /* handle of the opened d3d11 dll */
+    HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
+    IDXGIFactory2            *dxgifactory;     /* DXGI 1.2 factory */
+    /* We should find a better way to store this or atleast a shorter name */
+    PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN OurD3D11CreateDeviceAndSwapChain;
+    PFN_D3D11_CREATE_DEVICE                OurD3D11CreateDevice;
+    pD3DCompile                            OurD3DCompile;
+#endif
+#if defined(HAVE_ID3D11VIDEODECODER)
+    HANDLE                   context_lock;     /* D3D11 Context lock necessary
+                                                  for hw decoding */
+#endif
+    IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.1 swap chain */
+    ID3D11Device             *d3ddevice;       /* D3D device */
+    ID3D11DeviceContext      *d3dcontext;      /* D3D context */
+    d3d_quad_t               picQuad;
+    d3d_quad_cfg_t       picQuadConfig;
+
+    /* staging quad to adjust visible borders */
+    d3d_quad_t               stagingQuad;
+
+    ID3D11RenderTargetView   *d3drenderTargetView;
+    ID3D11DepthStencilView   *d3ddepthStencilView;
+    const char               *d3dPxShader;
+
+    ID3D11VertexShader        *flatVSShader;
+    ID3D11VertexShader        *projectionVSShader;
+
+    // SPU
+    vlc_fourcc_t             pSubpictureChromas[2];
+    const char               *psz_rgbaPxShader;
+    ID3D11PixelShader        *pSPUPixelShader;
+    DXGI_FORMAT              d3dregion_format;
+    int                      d3dregion_count;
+    picture_t                **d3dregions;
+};
 
 /* internal picture_t pool  */
 typedef struct

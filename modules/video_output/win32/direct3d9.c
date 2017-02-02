@@ -47,6 +47,7 @@
 
 #include <windows.h>
 #include <d3d9.h>
+#include <d3dx9effect.h>
 
 #include "common.h"
 #include "builtin_shaders.h"
@@ -102,6 +103,49 @@ vlc_module_end ()
 static const vlc_fourcc_t d3d_subpicture_chromas[] = {
     VLC_CODEC_RGBA,
     0
+};
+
+struct vout_display_sys_t
+{
+    vout_display_sys_win32_t sys;
+
+    bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
+    struct {
+        bool is_fullscreen;
+        bool is_on_top;
+        RECT win;
+    } desktop_save;
+    vout_display_cfg_t cfg_saved; /* configuration used before going into desktop mode */
+
+    // core objects
+    HINSTANCE               hd3d9_dll;       /* handle of the opened d3d9 dll */
+    HINSTANCE               hd3d9x_dll;      /* handle of the opened d3d9x dll */
+    IDirect3DPixelShader9*  d3dx_shader;
+    LPDIRECT3D9             d3dobj;
+    D3DCAPS9                d3dcaps;
+    LPDIRECT3DDEVICE9       d3ddev;
+    D3DPRESENT_PARAMETERS   d3dpp;
+    bool                    use_d3d9ex;
+
+    // scene objects
+    LPDIRECT3DTEXTURE9      d3dtex;
+    LPDIRECT3DVERTEXBUFFER9 d3dvtc;
+    D3DFORMAT               d3dregion_format;
+    int                     d3dregion_count;
+    struct d3d_region_t     *d3dregion;
+
+    picture_sys_t           *picsys;
+
+    /* */
+    bool                    reset_device;
+    bool                    reopen_device;
+    bool                    lost_not_ready;
+    bool                    clear_scene;
+
+    /* It protects the following variables */
+    vlc_mutex_t    lock;
+    bool           ch_desktop;
+    bool           desktop_requested;
 };
 
 struct picture_sys_t

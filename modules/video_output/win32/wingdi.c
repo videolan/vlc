@@ -58,6 +58,25 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+struct vout_display_sys_t
+{
+    vout_display_sys_win32_t sys;
+
+    int  i_depth;
+
+    /* Our offscreen bitmap and its framebuffer */
+    HDC        off_dc;
+    HBITMAP    off_bitmap;
+
+    struct
+    {
+        BITMAPINFO bitmapinfo;
+        RGBQUAD    red;
+        RGBQUAD    green;
+        RGBQUAD    blue;
+    };
+};
+
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static int            Control(vout_display_t *, int, va_list);

@@ -58,6 +58,16 @@ vlc_module_end()
  * Local prototypes.
  *****************************************************************************/
 
+struct vout_display_sys_t
+{
+    vout_display_sys_win32_t sys;
+
+    HDC                   hGLDC;
+    HGLRC                 hGLRC;
+    vlc_gl_t              *gl;
+    HDC                   affinityHDC; // DC for the selected GPU
+};
+
 static void          Swap(vlc_gl_t *);
 static void          *OurGetProcAddress(vlc_gl_t *, const char *);
 static int           MakeCurrent(vlc_gl_t *gl);

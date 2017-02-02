@@ -129,6 +129,39 @@ struct picture_sys_t {
     picture_t            *fallback;
 };
 
+struct vout_display_sys_t
+{
+    vout_display_sys_win32_t sys;
+    /* Multi-monitor support */
+    HMONITOR             hmonitor;          /* handle of the current monitor */
+    GUID                 *display_driver;
+
+    bool   use_wallpaper;   /* show as desktop wallpaper ? */
+
+    bool   restore_overlay;
+
+    /* DDraw capabilities */
+    bool            can_blit_fourcc;
+
+    uint32_t        i_rgb_colorkey;      /* colorkey in RGB used by the overlay */
+    uint32_t        i_colorkey;                 /* colorkey used by the overlay */
+
+    COLORREF        color_bkg;
+    COLORREF        color_bkgtxt;
+
+    LPDIRECTDRAW2        ddobject;                    /* DirectDraw object */
+    LPDIRECTDRAWSURFACE2 display;                        /* Display device */
+    LPDIRECTDRAWCLIPPER  clipper;             /* clipper used for blitting */
+    HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
+
+    picture_sys_t        *picsys;
+
+    /* It protects the following variables */
+    vlc_mutex_t    lock;
+    bool           ch_wallpaper;
+    bool           wallpaper_requested;
+};
+
 /*****************************************************************************
  * DirectDraw GUIDs.
  * Defining them here allows us to get rid of the dxguid library during
