@@ -254,6 +254,9 @@ static const char* globVertexShaderFlat = "\
   }\
 ";
 
+#define STRINGIZE2(s) #s
+#define STRINGIZE(s) STRINGIZE2(s)
+
 static const char* globVertexShaderProjection = "\
   cbuffer VS_PROJECTION_CONST : register(b0)\
   {\
@@ -296,7 +299,14 @@ static const char* globPixelShaderDefault = "\
     float Opacity;\
     float opacityPadding[3];\
   };\
-  Texture2D shaderTexture;\
+  cbuffer PS_COLOR_TRANSFORM : register(b1)\
+  {\
+    float WhitePointX;\
+    float WhitePointY;\
+    float WhitePointZ;\
+    float whitePadding;\
+  };\
+  Texture2D shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
   SamplerState SampleType;\
   \
   struct PS_INPUT\
@@ -309,7 +319,7 @@ static const char* globPixelShaderDefault = "\
   {\
     float4 rgba; \
     \
-    rgba = shaderTexture.Sample(SampleType, In.Texture);\
+    rgba = shaderTexture[0].Sample(SampleType, In.Texture);\
     rgba.a = rgba.a * Opacity;\
     return rgba; \
   }\
@@ -330,8 +340,7 @@ static const char *globPixelShaderBiplanarYUV_2RGB = "\
     float whitePadding;\
     float4x4 Colorspace;\
   };\
-  Texture2D shaderTextureY;\
-  Texture2D shaderTextureUV;\
+  Texture2D shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
   SamplerState SampleType;\
   \
   struct PS_INPUT\
@@ -344,8 +353,8 @@ static const char *globPixelShaderBiplanarYUV_2RGB = "\
   {\
     float4 yuv;\
     float4 rgba;\
-    yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
-    yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
+    yuv.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
+    yuv.yz = shaderTexture[1].Sample(SampleType, In.Texture).xy;\
     yuv.a  = Opacity;\
     yuv.x  += WhitePointX;\
     yuv.y  += WhitePointY;\
@@ -369,7 +378,7 @@ static const char *globPixelShaderBiplanarYUYV_2RGB = "\
     float whitePadding;\
     float4x4 Colorspace;\
   };\
-  Texture2D shaderTextureYUYV;\
+  Texture2D shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
   SamplerState SampleType;\
   \
   struct PS_INPUT\
@@ -382,9 +391,9 @@ static const char *globPixelShaderBiplanarYUYV_2RGB = "\
   {\
     float4 yuv;\
     float4 rgba;\
-    yuv.x  = shaderTextureYUYV.Sample(SampleType, In.Texture).x;\
-    yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
-    yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
+    yuv.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
+    yuv.y  = shaderTexture[0].Sample(SampleType, In.Texture).y;\
+    yuv.z  = shaderTexture[0].Sample(SampleType, In.Texture).a;\
     yuv.a  = Opacity;\
     yuv.x  += WhitePointX;\
     yuv.y  += WhitePointY;\
@@ -673,6 +682,10 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = (picture_sys_t*) picture->p_sys;
 
+    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
+        if (p_sys->resourceView[i])
+            ID3D11ShaderResourceView_Release(p_sys->resourceView[i]);
+    }
     if (p_sys->texture)
         ID3D11Texture2D_Release(p_sys->texture);
     if (p_sys->context)
@@ -1075,7 +1088,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
 }
 
-static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[2])
+static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
 {
     UINT stride = sizeof(d3d_vertex_t);
     UINT offset = 0;
@@ -1093,7 +1106,7 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11S
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, quad->d3dpixelShader, NULL, 0);
 
     ID3D11DeviceContext_PSSetConstantBuffers(sys->d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
-    ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 2, resourceView);
+    ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, D3D11_MAX_SHADER_VIEW, resourceView);
 
     ID3D11DeviceContext_RSSetViewports(sys->d3dcontext, 1, &quad->cropViewport);
 
@@ -1319,9 +1332,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                              (char *)&i_src_chroma );
                 fmt->i_chroma = output_format->fourcc;
                 DxgiFormatMask( output_format->formatTexture, fmt );
-                sys->picQuadConfig.textureFormat      = output_format->formatTexture;
-                sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
-                sys->picQuadConfig.resourceFormatUV   = output_format->formatUV;
+                sys->picQuadConfig.textureFormat = output_format->formatTexture;
+                sys->picQuadConfig.resourceFormatYRGB = output_format->resourceFormat[0];
+                sys->picQuadConfig.resourceFormatUV   = output_format->resourceFormat[1];
                 break;
             }
         }
@@ -1363,8 +1376,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                     fmt->i_chroma = output_format->fourcc;
                     DxgiFormatMask( output_format->formatTexture, fmt );
                     sys->picQuadConfig.textureFormat      = output_format->formatTexture;
-                    sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
-                    sys->picQuadConfig.resourceFormatUV   = output_format->formatUV;
+                    sys->picQuadConfig.resourceFormatYRGB = output_format->resourceFormat[0];
+                    sys->picQuadConfig.resourceFormatUV   = output_format->resourceFormat[1];
                     break;
                 }
             }
@@ -1387,8 +1400,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                 fmt->i_chroma = output_format->fourcc;
                 DxgiFormatMask( output_format->formatTexture, fmt );
                 sys->picQuadConfig.textureFormat      = output_format->formatTexture;
-                sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
-                sys->picQuadConfig.resourceFormatUV   = output_format->formatUV;
+                sys->picQuadConfig.resourceFormatYRGB = output_format->resourceFormat[0];
+                sys->picQuadConfig.resourceFormatUV   = output_format->resourceFormat[1];
                 break;
             }
         }
@@ -2183,15 +2196,12 @@ static void ReleaseQuad(d3d_quad_t *quad)
         ID3D11Texture2D_Release(quad->pTexture);
         quad->pTexture = NULL;
     }
-    if (quad->picSys.resourceView[0])
-    {
-        ID3D11ShaderResourceView_Release(quad->picSys.resourceView[0]);
-        quad->picSys.resourceView[0] = NULL;
-    }
-    if (quad->picSys.resourceView[1])
-    {
-        ID3D11ShaderResourceView_Release(quad->picSys.resourceView[1]);
-        quad->picSys.resourceView[1] = NULL;
+    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
+        if (quad->picSys.resourceView[i])
+        {
+            ID3D11ShaderResourceView_Release(quad->picSys.resourceView[i]);
+            quad->picSys.resourceView[i] = NULL;
+        }
     }
     if (quad->d3dpixelShader)
     {

@@ -29,6 +29,8 @@
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 
+#define D3D11_MAX_SHADER_VIEW  2
+
 typedef struct
 {
     const char   *name;
@@ -37,8 +39,7 @@ typedef struct
     uint8_t      bitsPerChannel;
     uint8_t      widthDenominator;
     uint8_t      heightDenominator;
-    DXGI_FORMAT  formatY;
-    DXGI_FORMAT  formatUV;
+    DXGI_FORMAT  resourceFormat[D3D11_MAX_SHADER_VIEW];
 } d3d_format_t;
 
 extern const char *DxgiFormatToStr(DXGI_FORMAT format);
