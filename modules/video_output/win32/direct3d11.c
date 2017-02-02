@@ -1820,7 +1820,7 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, video_projec
     }
     else
     {
-        msg_Warn(vd, "Projection mode %s not handled", projection);
+        msg_Warn(vd, "Projection mode %d not handled", projection);
         return false;
     }
 
