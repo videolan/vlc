@@ -214,8 +214,7 @@ static int SyncInfo( const uint8_t *p_hdr, bool *pb_mlp, mlp_header_t *p_mlp )
             return 0;
     }
 
-    /* Check parity TODO even with major sync */
-    if( 1 )
+    if( !b_has_sync )
     {
         int i_tmp = 0 ^ p_hdr[0] ^ p_hdr[1] ^ p_hdr[2] ^ p_hdr[3];
         const uint8_t *p = &p_hdr[4 + ( b_has_sync ? 28 : 0 )];
