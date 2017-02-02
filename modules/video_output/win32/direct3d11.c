@@ -476,6 +476,30 @@ static bool is_d3d11_opaque(vlc_fourcc_t chroma)
     }
 }
 
+#if VLC_WINSTORE_APP
+static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
+{
+    const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
+    out->left   = 0;
+    out->top    = 0;
+    uint32_t i_width;
+    uint32_t i_height;
+    UINT dataSize = sizeof(i_width);
+    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
+    if (FAILED(hr)) {
+        return false;
+    }
+    dataSize = sizeof(i_height);
+    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
+    if (FAILED(hr)) {
+        return false;
+    }
+    out->right  = i_width;
+    out->bottom = i_height;
+    return true;
+}
+#endif
+
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
@@ -491,6 +515,10 @@ static int Open(vlc_object_t *object)
 
     if (CommonInit(vd))
         goto error;
+
+#if VLC_WINSTORE_APP
+    vd->sys->sys.pf_GetRect = GetRect;
+#endif
 
     video_format_t fmt;
     if (Direct3D11Open(vd, &fmt)) {
@@ -674,22 +702,13 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     HRESULT hr;
     ID3D11Texture2D* pDepthStencil;
     ID3D11Texture2D* pBackBuffer;
-    uint32_t i_width  = RECTWidth(sys->sys.rect_dest_clipped);
-    uint32_t i_height = RECTHeight(sys->sys.rect_dest_clipped);
+    RECT rect;
 #if VLC_WINSTORE_APP
-    UINT dataSize = sizeof(i_width);
-    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Can't get swapchain width, size %d. (hr=0x%lX)", hr, dataSize);
-        return hr;
-    }
-    dataSize = sizeof(i_height);
-    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Can't get swapchain height, size %d. (hr=0x%lX)", hr, dataSize);
-        return hr;
-    }
+    if (!GetRect(&sys->sys, &rect))
 #endif
+        rect = sys->sys.rect_dest_clipped;
+    uint32_t i_width = RECTWidth(rect);
+    uint32_t i_height = RECTHeight(rect);
 
     if (sys->d3drenderTargetView) {
         ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
@@ -700,6 +719,7 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
         sys->d3ddepthStencilView = NULL;
     }
 
+    /* TODO detect is the size is the same as the output and switch to fullscreen mode */
     hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
         DXGI_FORMAT_UNKNOWN, 0);
     if (FAILED(hr)) {

@@ -28,11 +28,6 @@
  *****************************************************************************/
 #include "events.h"
 
-#if VLC_WINSTORE_APP
-extern const GUID GUID_SWAPCHAIN_WIDTH;
-extern const GUID GUID_SWAPCHAIN_HEIGHT;
-#endif
-
 /*****************************************************************************
  * vout_sys_t: video output method descriptor
  *****************************************************************************
@@ -86,6 +81,8 @@ typedef struct vout_display_sys_win32_t
     int  i_align_src_size;
     int  i_align_dest_boundary;
     int  i_align_dest_size;
+
+    bool (*pf_GetRect)(const struct vout_display_sys_win32_t *p_sys, RECT *out);
 } vout_display_sys_win32_t;
 
 

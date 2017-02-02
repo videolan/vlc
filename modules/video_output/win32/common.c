@@ -56,6 +56,11 @@ static int  CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
 static void DisableScreensaver(vout_display_t *);
 static void RestoreScreensaver(vout_display_t *);
+
+static bool GetRect(const vout_display_sys_t *sys, RECT *out)
+{
+    return GetClientRect(sys->hwnd, out);
+}
 #endif
 
 /* */
@@ -72,6 +77,7 @@ int CommonInit(vout_display_t *vd)
     sys->is_on_top        = false;
 
 #if !VLC_WINSTORE_APP
+    sys->pf_GetRect = GetRect;
     SetRectEmpty(&sys->rect_display);
     SetRectEmpty(&sys->rect_parent);
 
@@ -157,28 +163,8 @@ void UpdateRects(vout_display_t *vd,
         source = &vd->source;
 
     /* Retrieve the window size */
-#if VLC_WINSTORE_APP && MODULE_NAME_IS_direct3d11
-    rect.left   = 0;
-    rect.top    = 0;
-    uint32_t i_width;
-    uint32_t i_height;
-    UINT dataSize = sizeof(i_width);
-    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Can't get swapchain width, size %d. (hr=0x%lX)", hr, dataSize);
+    if (!sys->pf_GetRect(sys, &rect))
         return;
-    }
-    dataSize = sizeof(i_height);
-    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Can't get swapchain height, size %d. (hr=0x%lX)", hr, dataSize);
-        return;
-    }
-    rect.right  = i_width;
-    rect.bottom = i_height;
-#else
-    GetClientRect(sys->hwnd, &rect);
-#endif
 
     /* Retrieve the window position */
     point.x = point.y = 0;
