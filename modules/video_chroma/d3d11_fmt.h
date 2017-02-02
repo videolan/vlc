@@ -31,7 +31,10 @@
 struct picture_sys_t
 {
     ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
-    ID3D11Texture2D               *texture;
+    union {
+        ID3D11Texture2D           *texture;
+        ID3D11Resource            *resource;
+    };
     ID3D11DeviceContext           *context;
     unsigned                      slice_index;
     ID3D11VideoProcessorInputView *inputView; /* when used as processor input */

@@ -1106,7 +1106,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
                                                   (ID3D11Resource*) sys->picQuad.pTexture,
                                                   0, 0, 0, 0,
-                                                  (ID3D11Resource*) p_sys->texture,
+                                                  p_sys->resource,
                                                   p_sys->slice_index, &box);
         if ( sys->context_lock != INVALID_HANDLE_VALUE)
             ReleaseMutex( sys->context_lock );

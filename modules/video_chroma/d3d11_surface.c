@@ -110,7 +110,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, (ID3D11Resource*) sys->staging,
                                               0, 0, 0, 0,
-                                              (ID3D11Resource*) p_sys->texture, viewDesc.Texture2D.ArraySlice,
+                                              p_sys->resource, viewDesc.Texture2D.ArraySlice,
                                               NULL);
 
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, (ID3D11Resource*) sys->staging,
@@ -191,7 +191,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, (ID3D11Resource*) sys->staging,
                                               0, 0, 0, 0,
-                                              (ID3D11Resource*) p_sys->texture, viewDesc.Texture2D.ArraySlice,
+                                              p_sys->resource, viewDesc.Texture2D.ArraySlice,
                                               NULL);
 
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, (ID3D11Resource*) sys->staging,
