@@ -1392,14 +1392,25 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetOutputFormat(vd, VLC_CODEC_BGRA, 0, false, true);
 
-    if (sys->picQuadConfig->resourceFormat[0] == DXGI_FORMAT_R8_UNORM ||
-        sys->picQuadConfig->resourceFormat[0] == DXGI_FORMAT_R16_UNORM)
+    switch (sys->picQuadConfig->formatTexture)
+    {
+    case DXGI_FORMAT_NV12:
+    case DXGI_FORMAT_P010:
         sys->d3dPxShader = globPixelShaderBiplanarYUV_2RGB;
-    else
-    if (fmt->i_chroma == VLC_CODEC_YUYV)
+        break;
+    case DXGI_FORMAT_YUY2:
         sys->d3dPxShader = globPixelShaderBiplanarYUYV_2RGB;
-    else
+        break;
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B5G6R5_UNORM:
         sys->d3dPxShader = globPixelShaderDefault;
+        break;
+    default:
+        msg_Err(vd, "Could not get a suitable pixel shader for %s", sys->picQuadConfig->name);
+        return VLC_EGENERIC;
+        break;
+    }
 
     if (sys->d3dregion_format != NULL)
         sys->psz_rgbaPxShader = globPixelShaderDefault;
