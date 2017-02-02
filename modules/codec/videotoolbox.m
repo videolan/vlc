@@ -125,6 +125,7 @@ struct decoder_sys_t
     bool                        b_enable_temporal_processing;
 
     bool                        b_format_propagated;
+    bool                        b_abort;
 };
 
 #pragma mark - start & stop
@@ -734,6 +735,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->i_pic_reorder = 0;
     p_sys->i_pic_reorder_max = 1; /* 1 == no reordering */
     p_sys->b_format_propagated = false;
+    p_sys->b_abort = false;
     vlc_mutex_init(&p_sys->lock);
 
     /* return our proper VLC internal state */
@@ -1050,6 +1052,13 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     if (p_block == NULL)
         return NULL; /* no need to be called again, pics are queued asynchronously */
 
+    vlc_mutex_lock(&p_sys->lock);
+    if (p_sys->b_abort) { /* abort from output thread (DecoderCallback) */
+        vlc_mutex_unlock(&p_sys->lock);
+        goto reload;
+    }
+    vlc_mutex_unlock(&p_sys->lock);
+
     if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
     {
         if (p_sys->b_vt_feed)
@@ -1221,6 +1230,7 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
             assert(CVPixelBufferIsPlanar(imageBuffer) == false);
             break;
         default:
+            p_dec->p_sys->b_abort = true;
             return -1;
     }
     return decoder_UpdateVideoFormat(p_dec);
@@ -1272,6 +1282,9 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     if (!p_pic)
         return;
     if (!p_pic->p_sys) {
+        vlc_mutex_lock(&p_sys->lock);
+        p_dec->p_sys->b_abort = true;
+        vlc_mutex_unlock(&p_sys->lock);
         picture_Release(p_pic);
         return;
     }
