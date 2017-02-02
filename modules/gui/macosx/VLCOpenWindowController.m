@@ -382,104 +382,105 @@ struct display_info_t
     // load window
     [self window];
 
-    int i_result;
-
     [_tabView selectTabViewItemAtIndex: i_type];
     [_fileSubCheckbox setState: NSOffState];
 
-    i_result = [NSApp runModalForWindow: self.window];
+    int i_result = [NSApp runModalForWindow: self.window];
     [self.window close];
 
-    if (i_result) {
-        NSMutableDictionary *itemOptionsDictionary;
-        NSMutableArray *options = [NSMutableArray array];
+    // Check if dialog was canceled or stopped (NSModalResponseStop)
+    if (i_result <= 0)
+        return;
 
-        itemOptionsDictionary = [NSMutableDictionary dictionaryWithObject: [self MRL] forKey: @"ITEM_URL"];
-        if ([_fileSubCheckbox state] == NSOnState) {
-            module_config_t * p_item;
 
-            [options addObject: [NSString stringWithFormat: @"sub-file=%@", _subPath]];
-            if ([_fileSubOverrideCheckbox state] == NSOnState) {
-                [options addObject: [NSString stringWithFormat: @"sub-delay=%f", ([self fileSubDelay] * 10)]];
-                [options addObject: [NSString stringWithFormat: @"sub-fps=%f", [self fileSubFps]]];
-            }
+    NSMutableDictionary *itemOptionsDictionary;
+    NSMutableArray *options = [NSMutableArray array];
+
+    itemOptionsDictionary = [NSMutableDictionary dictionaryWithObject: [self MRL] forKey: @"ITEM_URL"];
+    if ([_fileSubCheckbox state] == NSOnState) {
+        module_config_t * p_item;
+
+        [options addObject: [NSString stringWithFormat: @"sub-file=%@", _subPath]];
+        if ([_fileSubOverrideCheckbox state] == NSOnState) {
+            [options addObject: [NSString stringWithFormat: @"sub-delay=%f", ([self fileSubDelay] * 10)]];
+            [options addObject: [NSString stringWithFormat: @"sub-fps=%f", [self fileSubFps]]];
+        }
+        [options addObject: [NSString stringWithFormat:
+                             @"subsdec-encoding=%@", [[_fileSubEncodingPopup selectedItem] representedObject]]];
+        [options addObject: [NSString stringWithFormat:
+                             @"subsdec-align=%li", [_fileSubAlignPopup indexOfSelectedItem]]];
+
+        p_item = config_FindConfig(VLC_OBJECT(getIntf()),
+                                   "freetype-rel-fontsize");
+
+        if (p_item) {
             [options addObject: [NSString stringWithFormat:
-                                 @"subsdec-encoding=%@", [[_fileSubEncodingPopup selectedItem] representedObject]]];
-            [options addObject: [NSString stringWithFormat:
-                                 @"subsdec-align=%li", [_fileSubAlignPopup indexOfSelectedItem]]];
-
-            p_item = config_FindConfig(VLC_OBJECT(getIntf()),
-                                       "freetype-rel-fontsize");
-
-            if (p_item) {
-                [options addObject: [NSString stringWithFormat:
-                                       @"freetype-rel-fontsize=%i",
-                                       p_item->list.i[[_fileSubSizePopup indexOfSelectedItem]]]];
-            }
+                                 @"freetype-rel-fontsize=%i",
+                                 p_item->list.i[[_fileSubSizePopup indexOfSelectedItem]]]];
         }
-        if ([_fileCustomTimingCheckbox state] == NSOnState) {
-            NSArray *components = [[_fileStartTimeTextField stringValue] componentsSeparatedByString:@":"];
-            NSUInteger componentCount = [components count];
-            NSInteger tempValue = 0;
-            if (componentCount == 1)
-                tempValue = [[components firstObject] intValue];
-            else if (componentCount == 2)
-                tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
-            else if (componentCount == 3)
-                tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
-            if (tempValue > 0)
-                [options addObject: [NSString stringWithFormat:@"start-time=%li", tempValue]];
-            components = [[_fileStopTimeTextField stringValue] componentsSeparatedByString:@":"];
-            componentCount = [components count];
-            if (componentCount == 1)
-                tempValue = [[components firstObject] intValue];
-            else if (componentCount == 2)
-                tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
-            else if (componentCount == 3)
-                tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
-            if (tempValue != 0)
-                [options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
-        }
-        if ([_outputCheckbox state] == NSOnState) {
-            NSArray *soutMRL = [_output soutMRL];
-            NSUInteger count = [soutMRL count];
-            for (NSUInteger i = 0 ; i < count ; i++)
-                [options addObject: [NSString stringWithString: [soutMRL objectAtIndex:i]]];
-        }
-        if ([_fileSlaveCheckbox state] && _fileSlavePath)
-            [options addObject: [NSString stringWithFormat: @"input-slave=%@", _fileSlavePath]];
-        if ([[[_tabView selectedTabViewItem] label] isEqualToString: _NS("Capture")]) {
-            if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
-                int selected_index = [_screenPopup indexOfSelectedItem];
-                NSValue *v = [_displayInfos objectAtIndex:selected_index];
-                struct display_info_t *item = (struct display_info_t *)[v pointerValue];
+    }
+    if ([_fileCustomTimingCheckbox state] == NSOnState) {
+        NSArray *components = [[_fileStartTimeTextField stringValue] componentsSeparatedByString:@":"];
+        NSUInteger componentCount = [components count];
+        NSInteger tempValue = 0;
+        if (componentCount == 1)
+            tempValue = [[components firstObject] intValue];
+        else if (componentCount == 2)
+            tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
+        else if (componentCount == 3)
+            tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
+        if (tempValue > 0)
+            [options addObject: [NSString stringWithFormat:@"start-time=%li", tempValue]];
+        components = [[_fileStopTimeTextField stringValue] componentsSeparatedByString:@":"];
+        componentCount = [components count];
+        if (componentCount == 1)
+            tempValue = [[components firstObject] intValue];
+        else if (componentCount == 2)
+            tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
+        else if (componentCount == 3)
+            tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
+        if (tempValue != 0)
+            [options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
+    }
+    if ([_outputCheckbox state] == NSOnState) {
+        NSArray *soutMRL = [_output soutMRL];
+        NSUInteger count = [soutMRL count];
+        for (NSUInteger i = 0 ; i < count ; i++)
+            [options addObject: [NSString stringWithString: [soutMRL objectAtIndex:i]]];
+    }
+    if ([_fileSlaveCheckbox state] && _fileSlavePath)
+        [options addObject: [NSString stringWithFormat: @"input-slave=%@", _fileSlavePath]];
+    if ([[[_tabView selectedTabViewItem] label] isEqualToString: _NS("Capture")]) {
+        if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
+            int selected_index = [_screenPopup indexOfSelectedItem];
+            NSValue *v = [_displayInfos objectAtIndex:selected_index];
+            struct display_info_t *item = (struct display_info_t *)[v pointerValue];
 
-                [options addObject: [NSString stringWithFormat: @"screen-fps=%f", [_screenFPSTextField floatValue]]];
-                [options addObject: [NSString stringWithFormat: @"screen-display-id=%i", item->id]];
-                [options addObject: [NSString stringWithFormat: @"screen-left=%i", [_screenLeftTextField intValue]]];
-                [options addObject: [NSString stringWithFormat: @"screen-top=%i", [_screenTopTextField intValue]]];
-                [options addObject: [NSString stringWithFormat: @"screen-width=%i", [_screenWidthTextField intValue]]];
-                [options addObject: [NSString stringWithFormat: @"screen-height=%i", [_screenHeightTextField intValue]]];
-                if ([_screenFollowMouseCheckbox intValue] == YES)
-                    [options addObject: @"screen-follow-mouse"];
-                else
-                    [options addObject: @"no-screen-follow-mouse"];
-                if ([_screenqtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+            [options addObject: [NSString stringWithFormat: @"screen-fps=%f", [_screenFPSTextField floatValue]]];
+            [options addObject: [NSString stringWithFormat: @"screen-display-id=%i", item->id]];
+            [options addObject: [NSString stringWithFormat: @"screen-left=%i", [_screenLeftTextField intValue]]];
+            [options addObject: [NSString stringWithFormat: @"screen-top=%i", [_screenTopTextField intValue]]];
+            [options addObject: [NSString stringWithFormat: @"screen-width=%i", [_screenWidthTextField intValue]]];
+            [options addObject: [NSString stringWithFormat: @"screen-height=%i", [_screenHeightTextField intValue]]];
+            if ([_screenFollowMouseCheckbox intValue] == YES)
+                [options addObject: @"screen-follow-mouse"];
+            else
+                [options addObject: @"no-screen-follow-mouse"];
+            if ([_screenqtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+                [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
+        }
+        else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
+            if ([_qtkVideoCheckbox state]) {
+                if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
                     [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
             }
-            else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
-                if ([_qtkVideoCheckbox state]) {
-                    if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
-                        [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
-                }
-            }
         }
-
-        /* apply the options to our item(s) */
-        [itemOptionsDictionary setObject: (NSArray *)[options copy] forKey: @"ITEM_OPTIONS"];
-
-        [[[VLCMain sharedInstance] playlist] addPlaylistItems:[NSArray arrayWithObject:itemOptionsDictionary]];
     }
+
+    /* apply the options to our item(s) */
+    [itemOptionsDictionary setObject: (NSArray *)[options copy] forKey: @"ITEM_OPTIONS"];
+
+    [[[VLCMain sharedInstance] playlist] addPlaylistItems:[NSArray arrayWithObject:itemOptionsDictionary]];
 }
 
 - (IBAction)screenChanged:(id)sender
