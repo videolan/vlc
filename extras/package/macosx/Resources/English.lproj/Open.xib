@@ -197,7 +197,7 @@ Gw
                         <rect key="frame" x="13" y="96" width="548" height="278"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
-                            <tabViewItem label="File" identifier="1" id="680">
+                            <tabViewItem label="File" identifier="file" id="680">
                                 <view key="view" id="681">
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -432,7 +432,7 @@ Gw
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Disc" identifier="optical" id="679">
+                            <tabViewItem label="Disc" identifier="disc" id="679">
                                 <view key="view" wantsLayer="YES" id="677">
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -464,7 +464,7 @@ Gw
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Network" identifier="" id="682">
+                            <tabViewItem label="Network" identifier="network" id="682">
                                 <view key="view" id="683">
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -519,7 +519,7 @@ Gw
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Capture" identifier="" id="2257">
+                            <tabViewItem label="Capture" identifier="capture" id="2257">
                                 <view key="view" id="2258">
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

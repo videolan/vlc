@@ -80,6 +80,12 @@ struct display_info_t
 
 @implementation VLCOpenWindowController
 
+
+static NSString *kFileTabViewId     = @"file";
+static NSString *kDiscTabViewId     = @"disc";
+static NSString *kNetworkTabViewId  = @"network";
+static NSString *kCaptureTabViewId  = @"capture";
+
 #pragma mark -
 #pragma mark Init
 
@@ -373,7 +379,7 @@ struct display_info_t
     }
 }
 
-- (void)openTarget:(int)i_type
+- (void)openTarget:(NSString *)identifier
 {
     /* check whether we already run a modal dialog */
     if ([NSApp modalWindow] != nil)
@@ -382,7 +388,7 @@ struct display_info_t
     // load window
     [self window];
 
-    [_tabView selectTabViewItemAtIndex: i_type];
+    [_tabView selectTabViewItemWithIdentifier:identifier];
     [_fileSubCheckbox setState: NSOffState];
 
     int i_result = [NSApp runModalForWindow: self.window];
@@ -450,7 +456,7 @@ struct display_info_t
     }
     if ([_fileSlaveCheckbox state] && _fileSlavePath)
         [options addObject: [NSString stringWithFormat: @"input-slave=%@", _fileSlavePath]];
-    if ([[[_tabView selectedTabViewItem] label] isEqualToString: _NS("Capture")]) {
+    if ([[[_tabView selectedTabViewItem] identifier] isEqualToString: kCaptureTabViewId]) {
         if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
             int selected_index = [_screenPopup indexOfSelectedItem];
             NSValue *v = [_displayInfos objectAtIndex:selected_index];
@@ -530,17 +536,18 @@ struct display_info_t
 #pragma mark -
 #pragma mark Main Actions
 
+
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-    NSString *label = [tabViewItem label];
+    NSString *identifier = [tabViewItem identifier];
 
-    if ([label isEqualToString: _NS("File")])
+    if ([identifier isEqualToString: kFileTabViewId])
         [self openFilePathChanged: nil];
-    else if ([label isEqualToString: _NS("Disc")])
+    else if ([identifier isEqualToString: kDiscTabViewId])
         [self scanOpticalMedia: nil];
-    else if ([label isEqualToString: _NS("Network")])
+    else if ([identifier isEqualToString: kNetworkTabViewId])
         [self openNetInfoChanged: nil];
-    else if ([label isEqualToString: _NS("Capture")])
+    else if ([identifier isEqualToString: kCaptureTabViewId])
         [self openCaptureModeChanged: nil];
 }
 
@@ -578,7 +585,7 @@ struct display_info_t
 - (void)openFileGeneric
 {
     [self openFilePathChanged: nil];
-    [self openTarget: 0];
+    [self openTarget: kFileTabViewId];
 }
 
 - (void)openDisc
@@ -588,19 +595,19 @@ struct display_info_t
     }
 
     [self scanOpticalMedia: nil];
-    [self openTarget: 1];
+    [self openTarget: kDiscTabViewId];
 }
 
 - (void)openNet
 {
     [self openNetInfoChanged: nil];
-    [self openTarget: 2];
+    [self openTarget: kNetworkTabViewId];
 }
 
 - (void)openCapture
 {
     [self openCaptureModeChanged: nil];
-    [self openTarget: 3];
+    [self openTarget: kCaptureTabViewId];
 }
 
 - (void)openFile
@@ -750,11 +757,12 @@ struct display_info_t
     NSRect viewRect = [theView frame];
     [theView setFrame: NSMakeRect(233, 0, viewRect.size.width, viewRect.size.height)];
     [theView setAutoresizesSubviews: YES];
+    NSView *opticalTabView = [[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:kDiscTabViewId]] view];
     if (_currentOpticalMediaView) {
-        [[[[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] replaceSubview: _currentOpticalMediaView with: theView];
+        [[opticalTabView animator] replaceSubview: _currentOpticalMediaView with: theView];
     }
     else
-        [[[[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] addSubview: theView];
+        [[opticalTabView animator] addSubview: theView];
     _currentOpticalMediaView = theView;
 
     NSImageView *imageView = [[NSImageView alloc] init];
@@ -762,15 +770,15 @@ struct display_info_t
     [icon setSize: NSMakeSize(128,128)];
     [imageView setImage: icon];
     if (_currentOpticalMediaIconView) {
-        [[[[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] replaceSubview: _currentOpticalMediaIconView with: imageView];
+        [[opticalTabView animator] replaceSubview: _currentOpticalMediaIconView with: imageView];
     }
     else
-        [[[[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] addSubview: imageView];
+        [[opticalTabView animator] addSubview: imageView];
     _currentOpticalMediaIconView = imageView;
     [_currentOpticalMediaView setNeedsDisplay: YES];
     [_currentOpticalMediaIconView setNeedsDisplay: YES];
-    [[[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:@"optical"]] view] setNeedsDisplay: YES];
-    [[[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:@"optical"]] view] displayIfNeeded];
+    [opticalTabView setNeedsDisplay: YES];
+    [opticalTabView displayIfNeeded];
 }
 
 - (void)showOpticalAtPath: (NSDictionary *)valueDictionary
