@@ -536,10 +536,9 @@ static int Open(vlc_object_t *object)
     video_format_Clean(&vd->fmt);
     video_format_Copy(&vd->fmt, &fmt);
 
-    vd->info.is_slow              = !is_d3d11_opaque(fmt.i_chroma);
     vd->info.has_double_click     = true;
     vd->info.has_hide_mouse       = false;
-    vd->info.has_pictures_invalid = !is_d3d11_opaque(fmt.i_chroma);
+    vd->info.has_pictures_invalid = vd->info.is_slow;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
         vd->sys->d3dregion_format != NULL)
@@ -1618,6 +1617,8 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
+    vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma);
+
     ID3D11PixelShader *pPicQuadShader;
     hr = CompilePixelShader(vd, sys->d3dPxShader, &pPicQuadShader);
     if (FAILED(hr))
@@ -1717,7 +1718,9 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3D11DeviceContext_PSSetSamplers(sys->d3dcontext, 0, 1, &d3dsampState);
     ID3D11SamplerState_Release(d3dsampState);
 
-    if (Direct3D11CreatePool(vd, fmt))
+    /* a decoder pool will be created when needed with the right amount
+     * of pictures for 'slow' (non direct) vout */
+    if (vd->info.is_slow && Direct3D11CreatePool(vd, fmt))
     {
         msg_Err(vd, "Direct3D picture pool initialization failed");
         return VLC_EGENERIC;
@@ -1731,10 +1734,8 @@ static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if ( is_d3d11_opaque(fmt->i_chroma) )
-        /* a D3D11VA pool will be created when needed */
-        return VLC_SUCCESS;
-
+    /* we need to provide a single picture that the CPU can lock/unlock to write
+     * into, it's the picQuad used to display */
     picture_sys_pool_t *poolsys = calloc(1, sizeof(*poolsys));
     if (unlikely(poolsys == NULL)) {
         return VLC_ENOMEM;
