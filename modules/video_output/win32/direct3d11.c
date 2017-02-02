@@ -109,8 +109,6 @@ typedef struct
     ID3D11Texture2D           *pTexture;
     ID3D11Buffer              *pPixelShaderConstants[2];
     UINT                       PSConstantsCount;
-    ID3D11ShaderResourceView  *d3dresViewY;
-    ID3D11ShaderResourceView  *d3dresViewUV;
     ID3D11PixelShader         *d3dpixelShader;
     D3D11_VIEWPORT            cropViewport;
 } d3d_quad_t;
@@ -602,7 +600,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
-    texDesc.BindFlags = D3D11_BIND_DECODER;
+    texDesc.BindFlags = D3D11_BIND_DECODER | D3D11_BIND_SHADER_RESOURCE;
     texDesc.CPUAccessFlags = 0;
 
     texDesc.ArraySize = pool_size;
@@ -1095,9 +1093,7 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, quad->d3dpixelShader, NULL, 0);
 
     ID3D11DeviceContext_PSSetConstantBuffers(sys->d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
-    ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 1, &quad->d3dresViewY);
-    if( quad->d3dresViewUV )
-        ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 1, 1, &quad->d3dresViewUV);
+    ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 2, &quad->picSys.resourceView[0]);
 
     ID3D11DeviceContext_RSSetViewports(sys->d3dcontext, 1, &quad->cropViewport);
 
@@ -2112,7 +2108,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resviewDesc.Texture2D.MipLevels = texDesc.MipLevels;
 
-    hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)quad->pTexture, &resviewDesc, &quad->d3dresViewY);
+    hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)quad->pTexture, &resviewDesc, &quad->picSys.resourceView[0]);
     if (FAILED(hr)) {
         msg_Err(vd, "Could not Create the Y/RGB D3d11 Texture ResourceView. (hr=0x%lX)", hr);
         goto error;
@@ -2121,12 +2117,14 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     if( cfg->resourceFormatUV )
     {
         resviewDesc.Format = cfg->resourceFormatUV;
-        hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)quad->pTexture, &resviewDesc, &quad->d3dresViewUV);
+        hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)quad->pTexture, &resviewDesc, &quad->picSys.resourceView[1]);
         if (FAILED(hr)) {
             msg_Err(vd, "Could not Create the UV D3d11 Texture ResourceView. (hr=0x%lX)", hr);
             goto error;
         }
     }
+    else
+        quad->picSys.resourceView[1] = NULL;
 
     if ( d3dpixelShader != NULL )
     {
@@ -2182,15 +2180,15 @@ static void ReleaseQuad(d3d_quad_t *quad)
         ID3D11Texture2D_Release(quad->pTexture);
         quad->pTexture = NULL;
     }
-    if (quad->d3dresViewY)
+    if (quad->picSys.resourceView[0])
     {
-        ID3D11ShaderResourceView_Release(quad->d3dresViewY);
-        quad->d3dresViewY = NULL;
+        ID3D11ShaderResourceView_Release(quad->picSys.resourceView[0]);
+        quad->picSys.resourceView[0] = NULL;
     }
-    if (quad->d3dresViewUV)
+    if (quad->picSys.resourceView[1])
     {
-        ID3D11ShaderResourceView_Release(quad->d3dresViewUV);
-        quad->d3dresViewUV = NULL;
+        ID3D11ShaderResourceView_Release(quad->picSys.resourceView[1]);
+        quad->picSys.resourceView[1] = NULL;
     }
     if (quad->d3dpixelShader)
     {

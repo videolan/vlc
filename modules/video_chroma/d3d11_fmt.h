@@ -35,6 +35,7 @@ struct picture_sys_t
     ID3D11DeviceContext           *context;
     unsigned                      slice_index;
     ID3D11VideoProcessorInputView *inputView; /* when used as processor input */
+    ID3D11ShaderResourceView      *resourceView[2];
 };
 
 #endif /* include-guard */
