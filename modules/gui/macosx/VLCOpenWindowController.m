@@ -911,7 +911,9 @@ static NSString *kCaptureTabViewId  = @"capture";
         if (selection && [selection boolValue])
             [_discSelectorPopup selectItemAtIndex: [[_discSelectorPopup itemArray] count] - 1];
 
-        [self discSelectorChanged:nil];
+        // only trigger MRL update if the tab view is active
+        if ([[[_tabView selectedTabViewItem] identifier] isEqualToString:kDiscTabViewId])
+            [self discSelectorChanged:nil];
     } else {
         msg_Dbg(getIntf(), "no optical media found");
         [_discSelectorPopup setHidden: YES];
