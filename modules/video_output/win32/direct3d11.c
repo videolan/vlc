@@ -1075,7 +1075,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
 }
 
-static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
+static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[2])
 {
     UINT stride = sizeof(d3d_vertex_t);
     UINT offset = 0;
@@ -1093,7 +1093,7 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, quad->d3dpixelShader, NULL, 0);
 
     ID3D11DeviceContext_PSSetConstantBuffers(sys->d3dcontext, 0, quad->PSConstantsCount, quad->pPixelShaderConstants);
-    ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 2, &quad->picSys.resourceView[0]);
+    ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 2, resourceView);
 
     ID3D11DeviceContext_RSSetViewports(sys->d3dcontext, 1, &quad->cropViewport);
 
@@ -1124,13 +1124,16 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         Direct3D11UnmapTexture(picture);
 
     /* Render the quad */
-    DisplayD3DPicture(sys, &sys->picQuad);
+    DisplayD3DPicture(sys, &sys->picQuad, sys->picQuad.picSys.resourceView);
 
     if (subpicture) {
         // draw the additional vertices
         for (int i = 0; i < sys->d3dregion_count; ++i) {
             if (sys->d3dregions[i])
-                DisplayD3DPicture(sys, (d3d_quad_t *) sys->d3dregions[i]->p_sys);
+            {
+                d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
+                DisplayD3DPicture(sys, quad, quad->picSys.resourceView);
+            }
         }
     }
 
