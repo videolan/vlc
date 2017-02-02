@@ -906,6 +906,7 @@ struct display_info_t
     } else {
         msg_Dbg(getIntf(), "no optical media found");
         [_discSelectorPopup setHidden: YES];
+        [self setMRL:@""];
         [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
     }
 

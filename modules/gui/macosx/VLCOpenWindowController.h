@@ -26,7 +26,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCOpenWindowController : NSWindowController
+@interface VLCOpenWindowController : NSWindowController <NSTabViewDelegate>
 
 @property (readwrite, weak) IBOutlet NSTextField *mrlTextField;
 @property (readwrite, weak) IBOutlet NSTextField *mrlLabel;
