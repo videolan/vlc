@@ -130,8 +130,13 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     if (desc->plane_count == 3)
     {
         GLint internal = 0;
+        GLenum type = 0;
+
         if (desc->pixel_size == 1)
+        {
             internal = oneplane_texfmt;
+            type = GL_UNSIGNED_BYTE;
+        }
 #if !defined(USE_OPENGL_ES2)
         else if (desc->pixel_size == 2)
         {
@@ -141,6 +146,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
                 return VLC_EGENERIC;
 
             internal = oneplane16_texfmt;
+            type = GL_UNSIGNED_SHORT;
             yuv_range_correction = (float)((1 << 16) - 1)
                                  / ((1 << desc->pixel_bits) - 1);
         }
@@ -148,7 +154,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         else
             return VLC_EGENERIC;
 
-        assert(internal != 0);
+        assert(internal != 0 && type != 0);
 
         tc->tex_count = 3;
         for (unsigned i = 0; i < tc->tex_count; ++i )
@@ -156,7 +162,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             tc->texs[i] = (struct opengl_tex_cfg) {
                 { desc->p[i].w.num, desc->p[i].w.den },
                 { desc->p[i].h.num, desc->p[i].h.den },
-                internal, oneplane_texfmt, GL_UNSIGNED_BYTE
+                internal, oneplane_texfmt, type
             };
         }
 
