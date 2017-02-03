@@ -673,7 +673,12 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     /* Everything is ready. Let's rock baby */
     msg_Dbg( p_this, "Playing...");
-    p_sys->p_control->Run();
+    if( FAILED( p_sys->p_control->Run() ) )
+    {
+        msg_Err( p_this, "Failed to run graph. Capture device may be in use." );
+        CommonClose( p_this, p_sys );
+        return VLC_EGENERIC;
+    }
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = DemuxControl;
@@ -779,7 +784,12 @@ static int AccessOpen( vlc_object_t *p_this )
 
     /* Everything is ready. Let's rock baby */
     msg_Dbg( p_this, "Playing...");
-    p_sys->p_control->Run();
+    if( FAILED( p_sys->p_control->Run() ) )
+    {
+        msg_Err( p_this, "Failed to run graph. Capture device may be in use." );
+        CommonClose( p_this, p_sys );
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
