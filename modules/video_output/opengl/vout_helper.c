@@ -51,7 +51,6 @@
 static opengl_tex_converter_init_cb opengl_tex_converter_init_cbs[] =
 {
     opengl_tex_converter_generic_init,
-    opengl_tex_converter_xyz12_init,
 #ifdef __ANDROID__
     opengl_tex_converter_anop_init,
 #endif

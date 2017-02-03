@@ -323,10 +323,6 @@ extern GLuint
 opengl_tex_converter_generic_init(const video_format_t *,
                                   opengl_tex_converter_t *);
 
-extern GLuint
-opengl_tex_converter_xyz12_init(const video_format_t *,
-                                opengl_tex_converter_t *);
-
 #ifdef __ANDROID__
 extern GLuint
 opengl_tex_converter_anop_init(const video_format_t *,

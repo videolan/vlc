@@ -846,53 +846,6 @@ common_init(opengl_tex_converter_t *tc)
     return VLC_SUCCESS;
 }
 
-GLuint
-opengl_tex_converter_generic_init(const video_format_t *fmt,
-                                  opengl_tex_converter_t *tc)
-{
-    const vlc_chroma_description_t *desc =
-        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
-    if (!desc || desc->plane_count == 0)
-        return 0;
-
-    video_color_space_t space;
-    const vlc_fourcc_t *(*get_fallback)(vlc_fourcc_t i_fourcc);
-    if (vlc_fourcc_IsYUV(fmt->i_chroma))
-    {
-        GLint max_texture_units = 0;
-        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
-        if (max_texture_units < 3)
-            return 0;
-
-        get_fallback = vlc_fourcc_GetYUVFallback;
-        space = fmt->space;
-    }
-    else
-    {
-        get_fallback = vlc_fourcc_GetRGBFallback;
-        space = COLOR_SPACE_UNDEF;
-    }
-
-    const vlc_fourcc_t *list = get_fallback(fmt->i_chroma);
-    GLuint fragment_shader = 0;
-    while (*list && fragment_shader == 0)
-    {
-        fragment_shader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list,
-                                                      space);
-        list++;
-    }
-    if (fragment_shader == 0)
-        return 0;
-
-    if (common_init(tc) != VLC_SUCCESS)
-    {
-        tc->api->DeleteShader(fragment_shader);
-        return 0;
-    }
-
-    return fragment_shader;
-}
-
 static int
 tc_xyz12_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 {
@@ -909,13 +862,9 @@ tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
     tc->api->Uniform1i(tc->uloc.Texture[0], 0);
 }
 
-GLuint
-opengl_tex_converter_xyz12_init(const video_format_t *fmt,
-                                opengl_tex_converter_t *tc)
+static GLuint
+tc_xyz12_init(const video_format_t *fmt, opengl_tex_converter_t *tc)
 {
-    if (fmt->i_chroma != VLC_CODEC_XYZ12)
-        return 0;
-
     tc->chroma  = VLC_CODEC_XYZ12;
     tc->tex_count = 1;
     tc->tex_target = GL_TEXTURE_2D;
@@ -969,5 +918,55 @@ opengl_tex_converter_xyz12_init(const video_format_t *fmt,
     }
     tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
     tc->api->CompileShader(fragment_shader);
+    return fragment_shader;
+}
+
+GLuint
+opengl_tex_converter_generic_init(const video_format_t *fmt,
+                                  opengl_tex_converter_t *tc)
+{
+    const vlc_chroma_description_t *desc =
+        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+    if (!desc || desc->plane_count == 0)
+        return 0;
+
+    if (fmt->i_chroma == VLC_CODEC_XYZ12)
+        return tc_xyz12_init(fmt, tc);
+
+    video_color_space_t space;
+    const vlc_fourcc_t *(*get_fallback)(vlc_fourcc_t i_fourcc);
+    if (vlc_fourcc_IsYUV(fmt->i_chroma))
+    {
+        GLint max_texture_units = 0;
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+        if (max_texture_units < 3)
+            return 0;
+
+        get_fallback = vlc_fourcc_GetYUVFallback;
+        space = fmt->space;
+    }
+    else
+    {
+        get_fallback = vlc_fourcc_GetRGBFallback;
+        space = COLOR_SPACE_UNDEF;
+    }
+
+    const vlc_fourcc_t *list = get_fallback(fmt->i_chroma);
+    GLuint fragment_shader = 0;
+    while (*list && fragment_shader == 0)
+    {
+        fragment_shader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list,
+                                                      space);
+        list++;
+    }
+    if (fragment_shader == 0)
+        return 0;
+
+    if (common_init(tc) != VLC_SUCCESS)
+    {
+        tc->api->DeleteShader(fragment_shader);
+        return 0;
+    }
+
     return fragment_shader;
 }
