@@ -469,24 +469,24 @@ Gw
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="725">
-                                            <rect key="frame" x="17" y="192" width="39" height="17"/>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="725">
+                                            <rect key="frame" x="17" y="192" width="30" height="17"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="URL" id="2885">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="730" customClass="VLCOpenTextField">
-                                            <rect key="frame" x="61" y="190" width="447" height="22"/>
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="730" customClass="VLCOpenTextField">
+                                            <rect key="frame" x="52" y="190" width="456" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="2886">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2809">
-                                            <rect key="frame" x="17" y="126" width="494" height="51"/>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2809">
+                                            <rect key="frame" x="17" y="149" width="493" height="28"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2887">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <string key="title">To Open a usual network stream (HTTP, RTSP, MMS, FTP, etc.), just enter the URL in the field above. If you want to open a RTP or UDP stream, press the button below.</string>
@@ -494,8 +494,8 @@ Gw
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2810">
-                                            <rect key="frame" x="133" y="67" width="262" height="32"/>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2810">
+                                            <rect key="frame" x="175" y="69" width="179" height="32"/>
                                             <buttonCell key="cell" type="push" title="Open RTP/UDP Stream" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2888">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -1175,13 +1175,13 @@ Check the device's connection, make sure that the latest EyeTV software is insta
             <rect key="frame" x="0.0" y="0.0" width="528" height="222"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <box ambiguous="YES" misplaced="YES" title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3014">
+                <box title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3014">
                     <rect key="frame" x="17" y="87" width="494" height="117"/>
-                    <view key="contentView" ambiguous="YES" id="5ez-W4-Btp">
+                    <view key="contentView" id="5ez-W4-Btp">
                         <rect key="frame" x="2" y="2" width="490" height="113"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <popUpButton verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3071">
+                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3071">
                                 <rect key="frame" x="102" y="49" width="286" height="26"/>
                                 <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3074" id="3072">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1220,13 +1220,13 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                         <constraint firstAttribute="height" constant="111" id="Ve3-XM-YC4"/>
                     </constraints>
                 </box>
-                <box ambiguous="YES" misplaced="YES" title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3429">
+                <box title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3429">
                     <rect key="frame" x="18" y="16" width="492" height="71"/>
-                    <view key="contentView" ambiguous="YES" id="vMn-AX-cmE">
+                    <view key="contentView" id="vMn-AX-cmE">
                         <rect key="frame" x="2" y="2" width="488" height="67"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <popUpButton verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3438">
+                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3438">
                                 <rect key="frame" x="101" y="12" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="281" id="nyI-r0-6X3"/>
@@ -1276,6 +1276,7 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                 <constraint firstItem="3014" firstAttribute="centerX" secondItem="3013" secondAttribute="centerX" id="PSY-Rz-2Qk"/>
                 <constraint firstItem="vMn-AX-cmE" firstAttribute="top" secondItem="3014" secondAttribute="bottom" constant="6" id="iDU-uq-5S5"/>
                 <constraint firstItem="3429" firstAttribute="centerX" secondItem="3013" secondAttribute="centerX" id="mpu-JC-uWc"/>
+                <constraint firstItem="3014" firstAttribute="leading" secondItem="3013" secondAttribute="leading" constant="20" id="nXJ-jI-hdZ"/>
             </constraints>
         </customView>
         <window title="Open UDP/RTP Streams" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="2792" userLabel="Open RTP/UDP" customClass="NSPanel">
