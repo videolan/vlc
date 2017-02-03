@@ -395,8 +395,6 @@ GenTextures(const opengl_tex_converter_t *tc,
 
     for (unsigned i = 0; i < tc->tex_count; i++)
     {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glClientActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(tc->tex_target, textures[i]);
 
 #if !defined(USE_OPENGL_ES2)
