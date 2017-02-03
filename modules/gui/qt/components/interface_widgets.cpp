@@ -54,6 +54,10 @@
 # include <X11/Xlib.h>
 # include <QX11Info>
 #endif
+#ifdef QT5_HAS_WAYLAND
+# include QPNI_HEADER
+# include <QWindow>
+#endif
 
 #include <math.h>
 #include <assert.h>
@@ -148,6 +152,24 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
         case VOUT_WINDOW_TYPE_NSOBJECT:
             p_wnd->handle.nsobject = (void *)stable->winId();
             break;
+#ifdef QT5_HAS_WAYLAND
+        case VOUT_WINDOW_TYPE_WAYLAND:
+        {
+            QWindow *window = stable->windowHandle();
+            assert(window != NULL);
+            window->create();
+
+            QPlatformNativeInterface *qni = qApp->platformNativeInterface();
+            assert(qni != NULL);
+
+            p_wnd->handle.wl = reinterpret_cast<wl_surface*>(
+                qni->nativeResourceForWindow(QByteArrayLiteral("surface"),
+                                             window));
+            p_wnd->display.wl = reinterpret_cast<wl_display*>(
+                qni->nativeResourceForIntegration(QByteArrayLiteral("wl_display")));
+            break;
+        }
+#endif
         default:
             vlc_assert_unreachable();
     }
