@@ -217,7 +217,7 @@ static int SyncInfo( const uint8_t *p_hdr, bool *pb_mlp, mlp_header_t *p_mlp )
     if( !b_has_sync )
     {
         int i_tmp = 0 ^ p_hdr[0] ^ p_hdr[1] ^ p_hdr[2] ^ p_hdr[3];
-        const uint8_t *p = &p_hdr[4 + ( b_has_sync ? 28 : 0 )];
+        const uint8_t *p = &p_hdr[4];
 
         for( unsigned i = 0; i < p_mlp->i_substreams; i++ )
         {
