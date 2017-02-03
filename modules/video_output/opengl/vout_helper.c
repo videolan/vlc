@@ -560,29 +560,24 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    const video_format_t *fmts[2] = { fmt, &vgl->fmt };
-    for (size_t i = 0; i < 2 && fragment_shader == 0; ++i)
+    for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
     {
-        /* Try first the untouched fmt, then the rgba fmt */
-        for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
+        tex_conv = (opengl_tex_converter_t) {
+            .gl = vgl->gl,
+            .api = &vgl->api,
+            .glexts = extensions,
+            .orientation = fmt->orientation,
+        };
+        fragment_shader = opengl_tex_converter_init_cbs[j](fmt, &tex_conv);
+        if (fragment_shader != 0)
         {
-            tex_conv = (opengl_tex_converter_t) {
-                .gl = vgl->gl,
-                .api = &vgl->api,
-                .glexts = extensions,
-                .orientation = fmt->orientation,
-            };
-            fragment_shader = opengl_tex_converter_init_cbs[j](fmts[i], &tex_conv);
-            if (fragment_shader != 0)
-            {
-                assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
-                       tex_conv.tex_count > 0 &&  tex_conv.pf_update != NULL &&
-                       tex_conv.pf_fetch_locations != NULL &&
-                       tex_conv.pf_prepare_shader != NULL);
-                vgl->fmt = *fmt;
-                vgl->fmt.i_chroma = tex_conv.chroma;
-                break;
-            }
+            assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
+                   tex_conv.tex_count > 0 &&  tex_conv.pf_update != NULL &&
+                   tex_conv.pf_fetch_locations != NULL &&
+                   tex_conv.pf_prepare_shader != NULL);
+            vgl->fmt = *fmt;
+            vgl->fmt.i_chroma = tex_conv.chroma;
+            break;
         }
     }
     if (fragment_shader == 0)
