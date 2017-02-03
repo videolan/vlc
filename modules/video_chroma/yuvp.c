@@ -141,56 +141,29 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             }
         }
     }
-    else if( p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGBA )
-    {
-        video_palette_t rgbp;
-
-        /* Create a RGBA palette */
-        rgbp.i_entries = p_yuvp->i_entries;
-        for( int i = 0; i < p_yuvp->i_entries; i++ )
-        {
-            Yuv2Rgb( &rgbp.palette[i][0], &rgbp.palette[i][1], &rgbp.palette[i][2],
-                     p_yuvp->palette[i][0], p_yuvp->palette[i][1], p_yuvp->palette[i][2] );
-            rgbp.palette[i][3] = p_yuvp->palette[i][3];
-        }
-
-        for( unsigned int y = 0; y < p_filter->fmt_in.video.i_height; y++ )
-        {
-            const uint8_t *p_line = &p_pic->p->p_pixels[y*p_pic->p->i_pitch];
-            uint8_t *p_rgba = &p_out->p->p_pixels[y*p_out->p->i_pitch];
-
-            for( unsigned int x = 0; x < p_filter->fmt_in.video.i_width; x++ )
-            {
-                const int v = p_line[x];
-
-                if( v >= rgbp.i_entries )  /* maybe assert ? */
-                    continue;
-
-                p_rgba[4*x+0] = rgbp.palette[v][0];
-                p_rgba[4*x+1] = rgbp.palette[v][1];
-                p_rgba[4*x+2] = rgbp.palette[v][2];
-                p_rgba[4*x+3] = rgbp.palette[v][3];
-            }
-        }
-    }
     else
     {
         video_palette_t rgbp;
 
-        assert( p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB );
+        assert( p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ||
+                p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGBA );
         /* Create a RGBA palette */
         rgbp.i_entries = p_yuvp->i_entries;
+        const uint8_t r = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 1 : 0;
+        const uint8_t g = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 2 : 1;
+        const uint8_t b = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 3 : 2;
+        const uint8_t a = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 0 : 3;
         for( int i = 0; i < p_yuvp->i_entries; i++ )
         {
-            Yuv2Rgb( &rgbp.palette[i][1], &rgbp.palette[i][2], &rgbp.palette[i][3],
+            Yuv2Rgb( &rgbp.palette[i][r], &rgbp.palette[i][g], &rgbp.palette[i][b],
                      p_yuvp->palette[i][0], p_yuvp->palette[i][1], p_yuvp->palette[i][2] );
-            rgbp.palette[i][0] = p_yuvp->palette[i][3];
+            rgbp.palette[i][a] = p_yuvp->palette[i][3];
         }
 
         for( unsigned int y = 0; y < p_filter->fmt_in.video.i_height; y++ )
         {
             const uint8_t *p_line = &p_pic->p->p_pixels[y*p_pic->p->i_pitch];
-            uint8_t *p_rgba = &p_out->p->p_pixels[y*p_out->p->i_pitch];
+            uint8_t *p_pixels = &p_out->p->p_pixels[y*p_out->p->i_pitch];
 
             for( unsigned int x = 0; x < p_filter->fmt_in.video.i_width; x++ )
             {
@@ -199,10 +172,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 if( v >= rgbp.i_entries )  /* maybe assert ? */
                     continue;
 
-                p_rgba[4*x+0] = rgbp.palette[v][0];
-                p_rgba[4*x+1] = rgbp.palette[v][1];
-                p_rgba[4*x+2] = rgbp.palette[v][2];
-                p_rgba[4*x+3] = rgbp.palette[v][3];
+                p_pixels[4*x+0] = rgbp.palette[v][0];
+                p_pixels[4*x+1] = rgbp.palette[v][1];
+                p_pixels[4*x+2] = rgbp.palette[v][2];
+                p_pixels[4*x+3] = rgbp.palette[v][3];
             }
         }
 
