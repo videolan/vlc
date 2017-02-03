@@ -100,12 +100,12 @@ void VideoWidget::sync( void )
 /**
  * Request the video to avoid the conflicts
  **/
-WId VideoWidget::request( struct vout_window_t *p_wnd )
+bool VideoWidget::request( struct vout_window_t *p_wnd )
 {
     if( stable )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
-        return 0;
+        return false;
     }
     assert( !p_window );
 
@@ -134,7 +134,24 @@ WId VideoWidget::request( struct vout_window_t *p_wnd )
 
     sync();
     p_window = p_wnd;
-    return stable->winId();
+
+    p_wnd->type = p_intf->p_sys->voutWindowType;
+    switch( p_wnd->type )
+    {
+        case VOUT_WINDOW_TYPE_XID:
+            p_wnd->handle.xid = stable->winId();
+            p_wnd->display.x11 = NULL;
+            break;
+        case VOUT_WINDOW_TYPE_HWND:
+            p_wnd->handle.hwnd = (void *)stable->winId();
+            break;
+        case VOUT_WINDOW_TYPE_NSOBJECT:
+            p_wnd->handle.nsobject = (void *)stable->winId();
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+    return true;
 }
 
 /* Set the Widget to the correct Size */

@@ -191,8 +191,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(WId*, struct vout_window_t*, unsigned, unsigned, bool)),
-             this, SLOT(getVideoSlot(WId*, struct vout_window_t*, unsigned, unsigned, bool)),
+    connect( this, SIGNAL(askGetVideo(struct vout_window_t*, unsigned, unsigned, bool, bool*)),
+             this, SLOT(getVideoSlot(struct vout_window_t*, unsigned, unsigned, bool, bool*)),
              Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
@@ -703,32 +703,29 @@ void MainInterface::toggleFSC()
  * All window provider queries must be handled through signals or events.
  * That's why we have all those emit statements...
  */
-WId MainInterface::getVideo( struct vout_window_t *p_wnd,
-                             unsigned int i_width, unsigned int i_height,
-                             bool fullscreen )
+bool MainInterface::getVideo( struct vout_window_t *p_wnd,
+                              unsigned int i_width, unsigned int i_height,
+                              bool fullscreen )
 {
-    if( !videoWidget )
-        return 0;
+    bool result;
 
-    /* This is a blocking call signal. Results are returned through pointers.
-     * Beware of deadlocks! */
-    WId id;
-    emit askGetVideo( &id, p_wnd, i_width, i_height, fullscreen );
-    return id;
+    /* This is a blocking call signal. Results are stored directly in the
+     * vout_window_t and boolean pointers. Beware of deadlocks! */
+    emit askGetVideo( p_wnd, i_width, i_height, fullscreen, &result );
+    return result;
 }
 
-void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
+void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
                                   unsigned i_width, unsigned i_height,
-                                  bool fullscreen )
+                                  bool fullscreen, bool *res )
 {
     /* Hidden or minimized, activate */
     if( isHidden() || isMinimized() )
         toggleUpdateSystrayMenu();
 
     /* Request the videoWidget */
-    WId ret = videoWidget->request( p_wnd );
-    *p_id = ret;
-    if( ret ) /* The videoWidget is available */
+    *res = videoWidget->request( p_wnd );
+    if( *res ) /* The videoWidget is available */
     {
         setVideoFullScreen( fullscreen );
 

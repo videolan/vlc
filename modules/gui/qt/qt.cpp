@@ -749,27 +749,8 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     MainInterface *p_mi = p_intf->p_sys->p_mi;
     msg_Dbg( p_wnd, "requesting video window..." );
 
-    WId wid = p_mi->getVideo( p_wnd, cfg->width, cfg->height, cfg->is_fullscreen );
-    if( !wid )
+    if( !p_mi->getVideo( p_wnd, cfg->width, cfg->height, cfg->is_fullscreen ) )
         return VLC_EGENERIC;
-
-    p_wnd->type = p_intf->p_sys->voutWindowType;
-
-    switch( p_wnd->type )
-    {
-        case VOUT_WINDOW_TYPE_XID:
-            p_wnd->handle.xid = (uintptr_t)wid;
-            p_wnd->display.x11 = NULL;
-            break;
-        case VOUT_WINDOW_TYPE_HWND:
-            p_wnd->handle.hwnd = (void *)wid;
-            break;
-        case VOUT_WINDOW_TYPE_NSOBJECT:
-            p_wnd->handle.nsobject = (void *)wid;
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
 
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t*)p_mi;
