@@ -850,12 +850,13 @@ GLuint
 opengl_tex_converter_generic_init(const video_format_t *fmt,
                                   opengl_tex_converter_t *tc)
 {
-    GLuint fragment_shader = 0;
     const vlc_chroma_description_t *desc =
         vlc_fourcc_GetChromaDescription(fmt->i_chroma);
     if (!desc || desc->plane_count == 0)
         return 0;
 
+    video_color_space_t space;
+    const vlc_fourcc_t *(*get_fallback)(vlc_fourcc_t i_fourcc);
     if (vlc_fourcc_IsYUV(fmt->i_chroma))
     {
         GLint max_texture_units = 0;
@@ -863,25 +864,25 @@ opengl_tex_converter_generic_init(const video_format_t *fmt,
         if (max_texture_units < 3)
             return 0;
 
-        const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
-        while (*list && fragment_shader == 0)
-        {
-            fragment_shader =
-                opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list,
-                                            fmt->space);
-            list++;
-        }
-        if (fragment_shader == 0)
-            return 0;
+        get_fallback = vlc_fourcc_GetYUVFallback;
+        space = fmt->space;
     }
     else
     {
-        fragment_shader =
-            opengl_fragment_shader_init(tc, GL_TEXTURE_2D, fmt->i_chroma,
-                                       COLOR_SPACE_UNDEF);
-        if (fragment_shader == 0)
-            return 0;
+        get_fallback = vlc_fourcc_GetRGBFallback;
+        space = COLOR_SPACE_UNDEF;
     }
+
+    const vlc_fourcc_t *list = get_fallback(fmt->i_chroma);
+    GLuint fragment_shader = 0;
+    while (*list && fragment_shader == 0)
+    {
+        fragment_shader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list,
+                                                      space);
+        list++;
+    }
+    if (fragment_shader == 0)
+        return 0;
 
     if (common_init(tc) != VLC_SUCCESS)
     {
