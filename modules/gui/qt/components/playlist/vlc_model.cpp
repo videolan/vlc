@@ -25,6 +25,8 @@
 #include "input_manager.hpp"                            /* THEMIM */
 #include "pixmaps/types/type_unknown.xpm"
 
+#include <QImageReader>
+
 VLCModelSubInterface::VLCModelSubInterface()
 {
 }
@@ -83,24 +85,26 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
 
     if( !QPixmapCache::find( key, artPix ))
     {
-        if( artUrl.isEmpty() || !artPix.load( artUrl ) )
+        if( artUrl.isEmpty() == false )
         {
-            key = QString("noart%1%2").arg(size.width()).arg(size.height());
-            if( !QPixmapCache::find( key, artPix ) )
+            QImageReader reader( artUrl );
+            reader.setDecideFormatFromContent( true );
+            artPix = QPixmap::fromImageReader( &reader ).scaled( size );
+            if ( artPix.isNull() == false )
             {
-                artPix = QPixmap( ":/noart" ).scaled( size,
-                                                      Qt::KeepAspectRatio,
-                                                      Qt::SmoothTransformation );
                 QPixmapCache::insert( key, artPix );
+                return artPix;
             }
         }
-        else
+        key = QString("noart%1%2").arg(size.width()).arg(size.height());
+        if( !QPixmapCache::find( key, artPix ) )
         {
-            artPix = artPix.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+            artPix = QPixmap( ":/noart" ).scaled( size,
+                                          Qt::KeepAspectRatio,
+                                          Qt::SmoothTransformation );
             QPixmapCache::insert( key, artPix );
         }
     }
-
     return artPix;
 }
 
