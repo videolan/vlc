@@ -699,15 +699,16 @@ error:
 #endif /* VLCGL_HAS_PBO */
 
 static int
-tc_common_allocate_texture(const opengl_tex_converter_t *tc, GLuint texture,
-                           unsigned tex_idx, const GLsizei tex_width,
-                           const GLsizei tex_height)
+tc_common_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
+                            const GLsizei *tex_width, const GLsizei *tex_height)
 {
-    (void) texture;
-
-    glTexImage2D(tc->tex_target, 0, tc->texs[tex_idx].internal,
-                 tex_width, tex_height, 0, tc->texs[tex_idx].format,
-                 tc->texs[tex_idx].type, NULL);
+    for (unsigned i = 0; i < tc->tex_count; i++)
+    {
+        glBindTexture(tc->tex_target, textures[i]);
+        glTexImage2D(tc->tex_target, 0, tc->texs[i].internal,
+                     tex_width[i], tex_height[i], 0, tc->texs[i].format,
+                     tc->texs[i].type, NULL);
+    }
     return VLC_SUCCESS;
 }
 
@@ -820,7 +821,7 @@ common_init(opengl_tex_converter_t *tc)
 
     tc->pf_update       = tc_common_update;
     tc->pf_release      = tc_common_release;
-    tc->pf_allocate_texture = tc_common_allocate_texture;
+    tc->pf_allocate_textures = tc_common_allocate_textures;
 
 #ifdef VLCGL_HAS_PBO
     const bool supports_pbo = tc->api->BufferStorage

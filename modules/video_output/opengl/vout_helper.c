@@ -407,19 +407,16 @@ GenTextures(const opengl_tex_converter_t *tc,
         glTexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        if (tc->pf_allocate_texture != NULL)
+    }
+
+    if (tc->pf_allocate_textures != NULL)
+    {
+        int ret = tc->pf_allocate_textures(tc, textures, tex_width, tex_height);
+        if (ret != VLC_SUCCESS)
         {
-            int ret = tc->pf_allocate_texture(tc, textures[i], i, tex_width[i],
-                                              tex_height[i]);
-            if (ret != VLC_SUCCESS)
-            {
-                if (i > 0)
-                {
-                    glDeleteTextures(i, textures);
-                    memset(textures, 0, tc->tex_count * sizeof(GLuint));
-                }
-                return ret;
-            }
+            glDeleteTextures(tc->tex_count, textures);
+            memset(textures, 0, tc->tex_count * sizeof(GLuint));
+            return ret;
         }
     }
     return VLC_SUCCESS;

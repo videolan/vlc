@@ -212,22 +212,20 @@ struct opengl_tex_converter_t
     void *priv;
 
     /*
-     * Callback to allocate data for a bound texture
+     * Callback to allocate data for bound textures
      *
      * This function pointer can be NULL. Software converters should call
-     * glTexImage2D() to allocate texture data (it will be deallocated by the
+     * glTexImage2D() to allocate textures data (it will be deallocated by the
      * caller when calling glDeleteTextures()).
      *
      * \param fc OpenGL tex converter
-     * \param texture bound texture
-     * \param tex_idx texture index
-     * \param tex_width texture width
-     * \param tex_height texture height
+     * \param textures array of textures to bind (one per plane)
+     * \param tex_width array of tex width (one per plane)
+     * \param tex_height array of tex height (one per plane)
      * \return VLC_SUCCESS or a VLC error
      */
-    int (*pf_allocate_texture)(const opengl_tex_converter_t *fc, GLuint texture,
-                               unsigned tex_idx, const GLsizei tex_width,
-                               const GLsizei tex_height);
+    int (*pf_allocate_textures)(const opengl_tex_converter_t *tc, GLuint *textures,
+                                const GLsizei *tex_width, const GLsizei *tex_height);
 
     /*
      * Callback to allocate a picture pool
