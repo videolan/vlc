@@ -152,10 +152,7 @@
 @property (readwrite, weak) IBOutlet NSBox *fileSubFileBox;
 
 /* generic capturing stuff */
-@property (readwrite, weak) IBOutlet NSTextField *captureLabel;
-@property (readwrite, weak) IBOutlet NSTextField *captureLongLabel;
 @property (readwrite, weak) IBOutlet NSPopUpButton *captureModePopup;
-@property (readwrite, weak) IBOutlet NSView *captureView;
 
 /* screen support */
 @property (readwrite, weak) IBOutlet NSView *screenView;

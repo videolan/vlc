@@ -10,10 +10,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCOpenWindowController">
             <connections>
                 <outlet property="cancelButton" destination="641" id="QPb-Fs-uG1"/>
-                <outlet property="captureLabel" destination="2302" id="yA2-pt-LWQ"/>
-                <outlet property="captureLongLabel" destination="2303" id="g9x-RT-AOl"/>
                 <outlet property="captureModePopup" destination="2327" id="v7x-B4-tJK"/>
-                <outlet property="captureView" destination="2301" id="Pkb-rA-pl4"/>
                 <outlet property="discAudioCDLabel" destination="3084" id="qIb-o0-AKx"/>
                 <outlet property="discAudioCDTrackCountLabel" destination="3104" id="oKf-yd-oZG"/>
                 <outlet property="discAudioCDVideoTSButton" destination="3081" id="MRT-9B-eSa"/>
@@ -155,7 +152,7 @@
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="637">
                 <rect key="frame" x="0.0" y="0.0" width="574" height="380"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="929">
                         <rect key="frame" x="18" y="58" width="113" height="18"/>
@@ -863,39 +860,6 @@ DQ
             </view>
             <point key="canvasLocation" x="-421.5" y="467"/>
         </window>
-        <customView id="2301" userLabel="Capture Text Messaging">
-            <rect key="frame" x="0.0" y="0.0" width="528" height="222"/>
-            <autoresizingMask key="autoresizingMask"/>
-            <subviews>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2303">
-                    <rect key="frame" x="18" y="71" width="493" height="56"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2952">
-                        <font key="font" metaFont="smallSystem"/>
-                        <string key="title">VLC could not detect any EyeTV compatible device.
-
-Check the device's connection, make sure that the latest EyeTV software is installed and try again.</string>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2302">
-                    <rect key="frame" x="192" y="148" width="144" height="17"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="No device connected" id="2951">
-                        <font key="font" metaFont="systemBold"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-            </subviews>
-            <constraints>
-                <constraint firstItem="2303" firstAttribute="top" secondItem="2302" secondAttribute="bottom" constant="21" id="66i-fg-UEo"/>
-                <constraint firstItem="2303" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2301" secondAttribute="leading" constant="19" id="Akt-by-1ZO"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2303" secondAttribute="trailing" constant="19" id="FDe-cV-hev"/>
-                <constraint firstItem="2302" firstAttribute="centerX" secondItem="2301" secondAttribute="centerX" id="Jo8-M5-mAD"/>
-                <constraint firstItem="2302" firstAttribute="top" secondItem="2301" secondAttribute="top" constant="57" id="Ocl-0r-7UD"/>
-                <constraint firstItem="2303" firstAttribute="centerX" secondItem="2302" secondAttribute="centerX" id="aIP-lb-Lz5"/>
-            </constraints>
-        </customView>
         <customView id="2346" userLabel="Screen">
             <rect key="frame" x="0.0" y="0.0" width="528" height="222"/>
             <autoresizingMask key="autoresizingMask"/>
