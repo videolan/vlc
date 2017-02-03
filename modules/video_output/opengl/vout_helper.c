@@ -581,7 +581,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
     if (fragment_shader == 0)
     {
-        msg_Err(gl, "could not init tex converter");
+        msg_Warn(gl, "could not init tex converter for %4.4s",
+                 (const char *) &fmt->i_chroma);
         if (sub_tex_conv.pf_release != NULL)
             sub_tex_conv.pf_release(&sub_tex_conv);
         vgl->api.DeleteShader(sub_fragment_shader);
