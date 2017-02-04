@@ -826,47 +826,25 @@ int vlc_poll_os2( struct pollfd *fds, unsigned nfds, int timeout )
             FD_SET( fd, &exset );
     }
 
+    if( non_sockets > 0 )
+        timeout = 0;    /* Just check pending sockets */
+
     /* Sockets included ? */
-    if( val != -1 )
+    if( val != -1)
     {
-        fd_set saved_rdset = rdset;
-        fd_set saved_wrset = wrset;
-        fd_set saved_exset = exset;
+        struct timeval *ptv = NULL;
 
-        /* Check pending sockets */
-        switch( vlc_select( val + 1, &rdset, &wrset, &exset, &tv ))
+        if( timeout >= 0 )
         {
-            case -1 :   /* Error */
-                return -1;
+            div_t d    = div( timeout, 1000 );
+            tv.tv_sec  = d.quot;
+            tv.tv_usec = d.rem * 1000;
 
-            case 0 :    /* Timeout */
-                /* Socket only ? */
-                if( non_sockets == 0 )
-                {
-                    struct timeval *ptv = NULL;
-
-                    if( timeout >= 0 )
-                    {
-                        div_t d    = div( timeout, 1000 );
-                        tv.tv_sec  = d.quot;
-                        tv.tv_usec = d.rem * 1000;
-
-                        ptv = &tv;
-                    }
-
-                    rdset = saved_rdset;
-                    wrset = saved_wrset;
-                    exset = saved_exset;
-
-                    if( vlc_select( val + 1, &rdset, &wrset, &exset, ptv )
-                            == -1 )
-                        return -1;
-                }
-                break;
-
-            default:    /* Ready */
-                break;
+            ptv = &tv;
         }
+
+        if (vlc_select( val + 1, &rdset, &wrset, &exset, ptv ) == -1)
+            return -1;
     }
 
     val = 0;
