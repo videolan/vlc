@@ -24,6 +24,8 @@
 #ifndef VLC_CODEC_H
 #define VLC_CODEC_H 1
 
+#include <assert.h>
+
 #include <vlc_block.h>
 #include <vlc_es.h>
 #include <vlc_picture.h>
@@ -273,11 +275,7 @@ VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
  */
 static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 {
-    if( !dec->pf_queue_video )
-    {
-        picture_Release( p_pic );
-        return -1;
-    }
+    assert( dec->pf_queue_video != NULL );
     return dec->pf_queue_video( dec, p_pic );
 }
 
@@ -292,11 +290,7 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
  */
 static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
 {
-    if( !dec->pf_queue_audio )
-    {
-        block_Release( p_aout_buf );
-        return -1;
-    }
+    assert( dec->pf_queue_audio != NULL );
     return dec->pf_queue_audio( dec, p_aout_buf );
 }
 
@@ -311,11 +305,7 @@ static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
  */
 static inline int decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
 {
-    if( !dec->pf_queue_sub )
-    {
-        subpicture_Delete( p_spu );
-        return -1;
-    }
+    assert( dec->pf_queue_sub != NULL );
     return dec->pf_queue_sub( dec, p_spu );
 }
 

@@ -1704,9 +1704,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_attachments  = DecoderGetInputAttachments;
     p_dec->pf_get_display_date = DecoderGetDisplayDate;
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
-    p_dec->pf_queue_video = DecoderQueueVideo;
-    p_dec->pf_queue_audio = DecoderQueueAudio;
-    p_dec->pf_queue_sub = DecoderQueueSpu;
 
     /* Load a packetizer module if the input is not already packetized */
     if( p_sout == NULL && !fmt->b_packetized )
@@ -1732,6 +1729,18 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     if( LoadDecoder( p_dec, p_sout != NULL, fmt ) )
         return p_dec;
 
+    switch( p_dec->fmt_out.i_cat )
+    {
+        case VIDEO_ES:
+            p_dec->pf_queue_video = DecoderQueueVideo;
+            break;
+        case AUDIO_ES:
+            p_dec->pf_queue_audio = DecoderQueueAudio;
+            break;
+        case SPU_ES:
+            p_dec->pf_queue_sub = DecoderQueueSpu;
+            break;
+    }
     /* Copy ourself the input replay gain */
     if( fmt->i_cat == AUDIO_ES )
     {
