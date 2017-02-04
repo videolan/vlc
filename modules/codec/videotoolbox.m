@@ -327,7 +327,7 @@ static int StartVideoToolboxSession(decoder_t *p_dec)
                 break;
 
             default:
-                msg_Err(p_dec, "Decompression session creation failed (%i)", status);
+                msg_Err(p_dec, "Decompression session creation failed (%i)", (int)status);
                 break;
         }
         return VLC_EGENERIC;
@@ -575,7 +575,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                             &p_sys->videoFormatDescription);
     if (status) {
         CFRelease(p_sys->decoderConfiguration);
-        msg_Err(p_dec, "video format description creation failed (%i)", status);
+        msg_Err(p_dec, "video format description creation failed (%i)", (int)status);
         return VLC_EGENERIC;
     }
 
@@ -917,9 +917,9 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
                                       NULL,                 // sampleSizeArray
                                       &sample_buf);
         if (status != noErr)
-            msg_Warn(p_dec, "sample buffer creation failure %i", status);
+            msg_Warn(p_dec, "sample buffer creation failure %i", (int)status);
     } else
-        msg_Warn(p_dec, "cm block buffer creation failure %i", status);
+        msg_Warn(p_dec, "cm block buffer creation failure %i", (int)status);
 
     if (block_buf != nil)
         CFRelease(block_buf);
@@ -1115,16 +1115,16 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
             msg_Err(p_dec, "decoder failure: invalid argument");
             goto reload;
         } else if (status == -8969 || status == -12909) {
-            msg_Err(p_dec, "decoder failure: bad data (%i)", status);
+            msg_Err(p_dec, "decoder failure: bad data (%i)", (int)status);
             StopVideoToolbox(p_dec);
         } else if (status == -8960 || status == -12911) {
-            msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
+            msg_Err(p_dec, "decoder failure: internal malfunction (%i)", (int)status);
             RestartVideoToolbox(p_dec, true);
         } else if (status == -12903) {
             msg_Warn(p_dec, "decoder failure: session invalid");
             RestartVideoToolbox(p_dec, true);
         } else
-            msg_Dbg(p_dec, "decoding frame failed (%i)", status);
+            msg_Dbg(p_dec, "decoding frame failed (%i)", (int)status);
     }
 
 skip:
@@ -1250,7 +1250,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (status != noErr) {
-        msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", status, (unsigned int) infoFlags);
+        msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", (int)status, (unsigned int) infoFlags);
         return;
     }
     assert(imageBuffer);
