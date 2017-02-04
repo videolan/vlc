@@ -24,7 +24,7 @@
 
 #ifdef OS2_SKINS
 
-#include "os2/os2_dragdrop.hpp"
+#include "os2_dragdrop.hpp"
 #include "../commands/cmd_add_item.hpp"
 #include "../events/evt_dragndrop.hpp"
 #include <list>
