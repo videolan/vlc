@@ -362,8 +362,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                                &kCFTypeDictionaryKeyCallBacks,
                                                &kCFTypeDictionaryValueCallBacks);
 
-    unsigned i_video_width = 0, i_video_visible_width = 0;
-    unsigned i_video_height = 0, i_video_visible_height = 0;
+    unsigned i_video_width = 0;
+    unsigned i_video_height = 0;
     int i_sar_den = 0;
     int i_sar_num = 0;
 
@@ -436,11 +436,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         /* this data is more trust-worthy than what we receive
          * from the demuxer, so we will use it to over-write
          * the current values */
+        unsigned h264_width, h264_height;
         (void)
-        h264_get_picture_size( p_sps_data, &i_video_width,
-                              &i_video_height,
-                              &i_video_visible_width,
-                              &i_video_visible_height );
+        h264_get_picture_size( p_sps_data, &h264_width, &h264_height,
+                               &i_video_width, &i_video_height );
         i_sar_den = p_sps_data->vui.i_sar_den;
         i_sar_num = p_sps_data->vui.i_sar_num;
 
@@ -512,15 +511,18 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                                                         &kCFTypeDictionaryKeyCallBacks,
                                                                         &kCFTypeDictionaryValueCallBacks);
     /* fallback on the demuxer if we don't have better info */
-    /* FIXME ?: can't we skip temp storage using directly fmt_out */
     if (i_video_width == 0)
-        i_video_width = p_dec->fmt_in.video.i_width;
+    {
+        i_video_width = p_dec->fmt_in.video.i_visible_width;
+        if (i_video_width == 0)
+            i_video_width = p_dec->fmt_in.video.i_width;
+    }
     if (i_video_height == 0)
-        i_video_height = p_dec->fmt_in.video.i_height;
-    if(!i_video_visible_width)
-        i_video_visible_width = p_dec->fmt_in.video.i_visible_width;
-    if(!i_video_visible_height)
-        i_video_visible_height = p_dec->fmt_in.video.i_visible_height;
+    {
+        i_video_height = p_dec->fmt_in.video.i_visible_height;
+        if (i_video_height == 0)
+            i_video_height = p_dec->fmt_in.video.i_height;
+    }
     if (i_sar_num == 0)
         i_sar_num = p_dec->fmt_in.video.i_sar_num ? p_dec->fmt_in.video.i_sar_num : 1;
     if (i_sar_den == 0)
@@ -621,10 +623,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                          kCVPixelBufferBytesPerRowAlignmentKey,
                          i_video_width * 2);
 
+    p_dec->fmt_out.video.i_visible_width =
     p_dec->fmt_out.video.i_width = i_video_width;
+    p_dec->fmt_out.video.i_visible_height =
     p_dec->fmt_out.video.i_height = i_video_height;
-    p_dec->fmt_out.video.i_visible_width = i_video_visible_width;
-    p_dec->fmt_out.video.i_visible_height = i_video_visible_height;
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
     p_dec->fmt_out.video.i_sar_num = i_sar_num;
 
