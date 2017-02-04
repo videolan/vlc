@@ -36,6 +36,7 @@
 - (void)inputThreadChanged;
 
 - (void)playbackStatusUpdated;
+- (void)playbackPositionUpdated;
 
 - (void)resumeItunesPlayback:(id)sender;
 

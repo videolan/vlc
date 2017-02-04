@@ -49,6 +49,7 @@ static int InputThreadChanged(vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+static NSDate *lastPositionUpdate = nil;
 
 static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                       vlc_value_t oldval, vlc_value_t new_val, void *param)
@@ -64,8 +65,14 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 [[[VLCMain sharedInstance] mainMenu] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_POSITION:
-                [[[VLCMain sharedInstance] mainWindow] performSelectorOnMainThread:@selector(updateTimeSlider) withObject: nil waitUntilDone:NO];
-                [[[VLCMain sharedInstance] statusBarIcon] performSelectorOnMainThread:@selector(updateProgress) withObject:nil waitUntilDone:NO];
+
+                // Rate limit to 100 ms
+                if (lastPositionUpdate && fabs([lastPositionUpdate timeIntervalSinceNow]) < 0.1)
+                    break;
+
+                lastPositionUpdate = [NSDate date];
+
+                [inputManager performSelectorOnMainThread:@selector(playbackPositionUpdated) withObject:nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_TITLE:
             case INPUT_EVENT_CHAPTER:
@@ -242,6 +249,12 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if (p_input_changed)
             vlc_object_release(p_input_changed);
     });
+}
+
+- (void)playbackPositionUpdated
+{
+    [[[VLCMain sharedInstance] mainWindow] updateTimeSlider];
+    [[[VLCMain sharedInstance] statusBarIcon] updateProgress];
 }
 
 - (void)playbackStatusUpdated
