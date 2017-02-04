@@ -80,6 +80,8 @@ struct decoder_owner_sys_t
 
     vlc_thread_t     thread;
 
+    void (*pf_update_stat)( decoder_owner_sys_t *, unsigned decoded, unsigned lost );
+
     /* Some decoders require already packetized data (ie. not truncated) */
     decoder_t *p_packetizer;
     bool b_packetizer;
@@ -1000,10 +1002,9 @@ discard:
     return 0;
 }
 
-static void DecoderUpdateStatVideo( decoder_t *p_dec, unsigned decoded,
-                                    unsigned lost )
+static void DecoderUpdateStatVideo( decoder_owner_sys_t *p_owner,
+                                    unsigned decoded, unsigned lost )
 {
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
     unsigned displayed = 0;
 
@@ -1030,10 +1031,11 @@ static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
     unsigned i_lost = 0;
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     int ret = DecoderPlayVideo( p_dec, p_pic, &i_lost );
 
-    DecoderUpdateStatVideo( p_dec, 1, i_lost );
+    p_owner->pf_update_stat( p_owner, 1, i_lost );
     return ret;
 }
 
@@ -1042,6 +1044,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     picture_t      *p_pic;
     block_t **pp_block = p_block ? &p_block : NULL;
     unsigned i_lost = 0, i_decoded = 0;
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     while( (p_pic = p_dec->pf_decode_video( p_dec, pp_block ) ) )
     {
@@ -1050,7 +1053,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         DecoderPlayVideo( p_dec, p_pic, &i_lost );
     }
 
-    DecoderUpdateStatVideo( p_dec, i_decoded, i_lost );
+    p_owner->pf_update_stat( p_owner, i_decoded, i_lost );
 }
 
 /* This function process a video block
@@ -1194,10 +1197,9 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     return 0;
 }
 
-static void DecoderUpdateStatAudio( decoder_t *p_dec, unsigned decoded,
-                                    unsigned lost )
+static void DecoderUpdateStatAudio( decoder_owner_sys_t *p_owner,
+                                    unsigned decoded, unsigned lost )
 {
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
     unsigned played = 0;
 
@@ -1223,10 +1225,11 @@ static void DecoderUpdateStatAudio( decoder_t *p_dec, unsigned decoded,
 static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
     unsigned lost = 0;
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     int ret = DecoderPlayAudio( p_dec, p_aout_buf, &lost );
 
-    DecoderUpdateStatAudio( p_dec, 1, lost );
+    p_owner->pf_update_stat( p_owner, 1, lost );
 
     return ret;
 }
@@ -1236,6 +1239,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     block_t *p_aout_buf;
     block_t **pp_block = p_block ? &p_block : NULL;
     unsigned decoded = 0, lost = 0;
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, pp_block ) ) )
     {
@@ -1244,7 +1248,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         DecoderPlayAudio( p_dec, p_aout_buf, &lost );
     }
 
-    DecoderUpdateStatAudio( p_dec, decoded, lost );
+    p_owner->pf_update_stat( p_owner, decoded, lost );
 }
 
 /* This function process a audio block
@@ -1337,6 +1341,12 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
     }
 
     vout_PutSubpicture( p_vout, p_subpic );
+}
+
+static void DecoderUpdateStatSpu( decoder_owner_sys_t *p_owner,
+                                  unsigned decoded, unsigned lost )
+{
+    (void) p_owner; (void) decoded; (void) lost;
 }
 
 static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
@@ -1730,12 +1740,15 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     {
         case VIDEO_ES:
             p_dec->pf_queue_video = DecoderQueueVideo;
+            p_owner->pf_update_stat = DecoderUpdateStatVideo;
             break;
         case AUDIO_ES:
             p_dec->pf_queue_audio = DecoderQueueAudio;
+            p_owner->pf_update_stat = DecoderUpdateStatAudio;
             break;
         case SPU_ES:
             p_dec->pf_queue_sub = DecoderQueueSpu;
+            p_owner->pf_update_stat = DecoderUpdateStatSpu;
             break;
         default:
             msg_Err( p_dec, "unknown ES format" );
