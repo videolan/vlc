@@ -10,11 +10,9 @@
             <connections>
                 <outlet property="addFilesToPlaylistMenuItem" destination="lGc-nc-8Yq" id="joN-zx-w8u"/>
                 <outlet property="deletePlaylistMenuItem" destination="13" id="Qwn-a7-On0"/>
-                <outlet property="downloadCoverArtPlaylistMenuItem" destination="2" id="z0y-0U-uRz"/>
                 <outlet property="infoPlaylistMenuItem" destination="9" id="uIr-Np-fpB"/>
                 <outlet property="playPlaylistMenuItem" destination="12" id="Dv9-jX-Q4W"/>
                 <outlet property="playlistMenu" destination="1" id="i0k-dj-ZpJ"/>
-                <outlet property="preparsePlaylistMenuItem" destination="4" id="KRL-o9-2sq"/>
                 <outlet property="recursiveExpandPlaylistMenuItem" destination="5" id="vFK-br-qmx"/>
                 <outlet property="revealInFinderPlaylistMenuItem" destination="3" id="IrJ-gR-Zqp"/>
                 <outlet property="selectAllPlaylistMenuItem" destination="14" id="drx-ij-QhT"/>
@@ -56,16 +54,6 @@
                 <menuItem title="Media Information..." id="9">
                     <connections>
                         <action selector="showInfoPanel:" target="-2" id="36"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Preparse" id="4">
-                    <connections>
-                        <action selector="preparseItem:" target="-2" id="33"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Download Cover Art" id="2">
-                    <connections>
-                        <action selector="downloadCoverArt:" target="-2" id="34"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Reveal in Finder" id="3">

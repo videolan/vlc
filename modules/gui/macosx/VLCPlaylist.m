@@ -232,8 +232,6 @@
     [_recursiveExpandPlaylistMenuItem setTitle: _NS("Expand Node")];
     [_selectAllPlaylistMenuItem setTitle: _NS("Select All")];
     [_infoPlaylistMenuItem setTitle: _NS("Media Information...")];
-    [_downloadCoverArtPlaylistMenuItem setTitle: _NS("Download Cover Art")];
-    [_preparsePlaylistMenuItem setTitle: _NS("Fetch Meta Data")];
     [_revealInFinderPlaylistMenuItem setTitle: _NS("Reveal in Finder")];
     [_addFilesToPlaylistMenuItem setTitle: _NS("Add File...")];
 }
@@ -329,59 +327,6 @@
 
     msg_Dbg(getIntf(), "Reveal url %s in finder", [path UTF8String]);
     [[NSWorkspace sharedWorkspace] selectFile: path inFileViewerRootedAtPath: path];
-}
-
-/* When called retrieves the selected outlineview row and plays that node or item */
-- (IBAction)preparseItem:(id)sender
-{
-    int i_count;
-    NSIndexSet *o_selected_indexes;
-    intf_thread_t * p_intf = getIntf();
-    playlist_t * p_playlist = pl_Get(p_intf);
-    playlist_item_t *p_item = NULL;
-
-    o_selected_indexes = [_outlineView selectedRowIndexes];
-    i_count = [o_selected_indexes count];
-
-    NSUInteger indexes[i_count];
-    [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
-    for (int i = 0; i < i_count; i++) {
-        VLCPLItem *o_item = [_outlineView itemAtRow:indexes[i]];
-        [_outlineView deselectRow: indexes[i]];
-
-        if (![o_item isLeaf]) {
-            msg_Dbg(p_intf, "preparsing nodes not implemented");
-            continue;
-        }
-
-        libvlc_MetadataRequest(p_intf->obj.libvlc, [o_item input], META_REQUEST_OPTION_NONE, -1, NULL);
-
-    }
-    [self playlistUpdated];
-}
-
-- (IBAction)downloadCoverArt:(id)sender
-{
-    int i_count;
-    NSIndexSet *o_selected_indexes;
-    intf_thread_t * p_intf = getIntf();
-    playlist_t * p_playlist = pl_Get(p_intf);
-    playlist_item_t *p_item = NULL;
-
-    o_selected_indexes = [_outlineView selectedRowIndexes];
-    i_count = [o_selected_indexes count];
-
-    NSUInteger indexes[i_count];
-    [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
-    for (int i = 0; i < i_count; i++) {
-        VLCPLItem *o_item = [_outlineView itemAtRow: indexes[i]];
-
-        if (![o_item isLeaf])
-            continue;
-
-        libvlc_ArtRequest(p_intf->obj.libvlc, [o_item input], META_REQUEST_OPTION_NONE);
-    }
-    [self playlistUpdated];
 }
 
 - (IBAction)selectAll:(id)sender
@@ -736,9 +681,7 @@
 
     // TODO move other items to menu validation protocol
     [_infoPlaylistMenuItem setEnabled: b_item_sel];
-    [_preparsePlaylistMenuItem setEnabled: b_item_sel];
     [_recursiveExpandPlaylistMenuItem setEnabled: b_item_sel];
-    [_downloadCoverArtPlaylistMenuItem setEnabled: b_item_sel];
 
     return _playlistMenu;
 }

@@ -33,9 +33,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *playPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *deletePlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *infoPlaylistMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *preparsePlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *revealInFinderPlaylistMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *downloadCoverArtPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *selectAllPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *recursiveExpandPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *addFilesToPlaylistMenuItem;
@@ -58,8 +56,6 @@
 
 - (IBAction)playItem:(id)sender;
 - (IBAction)revealItemInFinder:(id)sender;
-- (IBAction)preparseItem:(id)sender;
-- (IBAction)downloadCoverArt:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
 - (IBAction)recursiveExpandNode:(id)sender;
