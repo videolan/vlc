@@ -37,8 +37,6 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *revealInFinderPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *downloadCoverArtPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *selectAllPlaylistMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *sortNamePlaylistMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *sortAuthorPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *recursiveExpandPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *addFilesToPlaylistMenuItem;
 
@@ -53,7 +51,6 @@
 
 - (void)playlistUpdated;
 - (void)playbackModeUpdated;
-- (void)sortNode:(int)i_mode;
 
 - (void)currentlyPlayingItemChanged;
 
@@ -65,8 +62,6 @@
 - (IBAction)downloadCoverArt:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
-- (IBAction)sortNodeByName:(id)sender;
-- (IBAction)sortNodeByAuthor:(id)sender;
 - (IBAction)recursiveExpandNode:(id)sender;
 - (IBAction)showInfoPanel:(id)sender;
 - (IBAction)addFilesToPlaylist:(id)sender;

@@ -235,8 +235,6 @@
     [_downloadCoverArtPlaylistMenuItem setTitle: _NS("Download Cover Art")];
     [_preparsePlaylistMenuItem setTitle: _NS("Fetch Meta Data")];
     [_revealInFinderPlaylistMenuItem setTitle: _NS("Reveal in Finder")];
-    [_sortNamePlaylistMenuItem setTitle: _NS("Sort Node by Name")];
-    [_sortAuthorPlaylistMenuItem setTitle: _NS("Sort Node by Author")];
     [_addFilesToPlaylistMenuItem setTitle: _NS("Add File...")];
 }
 
@@ -404,40 +402,6 @@
 - (IBAction)deleteItem:(id)sender
 {
     [_model deleteSelectedItem];
-}
-
-- (IBAction)sortNodeByName:(id)sender
-{
-    [self sortNode: SORT_TITLE];
-}
-
-- (IBAction)sortNodeByAuthor:(id)sender
-{
-    [self sortNode: SORT_ARTIST];
-}
-
-- (void)sortNode:(int)i_mode
-{
-    playlist_t * p_playlist = pl_Get(getIntf());
-    playlist_item_t * p_item;
-
-    // TODO why do we need this kind of sort? It looks crap and confusing...
-
-//    if ([_outlineView selectedRow] > -1) {
-//        p_item = [[_outlineView itemAtRow: [_outlineView selectedRow]] pointerValue];
-//        if (!p_item)
-//            return;
-//    } else
-//        p_item = [self currentPlaylistRoot]; // If no item is selected, sort the whole playlist
-//
-//    PL_LOCK;
-//    if (p_item->i_children > -1) // the item is a node
-//        playlist_RecursiveNodeSort(p_playlist, p_item, i_mode, ORDER_NORMAL);
-//    else
-//        playlist_RecursiveNodeSort(p_playlist, p_item->p_parent, i_mode, ORDER_NORMAL);
-//
-//    PL_UNLOCK;
-//    [self playlistUpdated];
 }
 
 // Actions for playlist column selections
@@ -774,8 +738,6 @@
     [_infoPlaylistMenuItem setEnabled: b_item_sel];
     [_preparsePlaylistMenuItem setEnabled: b_item_sel];
     [_recursiveExpandPlaylistMenuItem setEnabled: b_item_sel];
-    [_sortNamePlaylistMenuItem setEnabled: b_item_sel];
-    [_sortAuthorPlaylistMenuItem setEnabled: b_item_sel];
     [_downloadCoverArtPlaylistMenuItem setEnabled: b_item_sel];
 
     return _playlistMenu;
