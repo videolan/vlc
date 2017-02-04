@@ -1450,10 +1450,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
         case VIDEO_ES: DecoderProcessVideo( p_dec, p_block ); return;
         case AUDIO_ES: DecoderProcessAudio( p_dec, p_block ); return;
         case   SPU_ES: DecoderProcessSpu( p_dec, p_block ); return;
-
-        default:
-            msg_Err( p_dec, "unknown ES format" );
-            p_dec->b_error = true;
+        default:       vlc_assert_unreachable();
     }
 
 error:
@@ -1740,6 +1737,10 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
         case SPU_ES:
             p_dec->pf_queue_sub = DecoderQueueSpu;
             break;
+        default:
+            msg_Err( p_dec, "unknown ES format" );
+            UnloadDecoder( p_dec );
+            return p_dec;
     }
     /* Copy ourself the input replay gain */
     if( fmt->i_cat == AUDIO_ES )
