@@ -97,7 +97,7 @@ static int Activate( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    int i_ret;
+    int i_ret = VLC_EGENERIC;
 
     const bool b_chroma = p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma;
     const bool b_resize = p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
@@ -142,8 +142,6 @@ static int Activate( vlc_object_t *p_this )
         i_ret = BuildChromaResize( p_filter );
     else if( b_chroma )
         i_ret = BuildChromaChain( p_filter );
-    else
-        i_ret = VLC_EGENERIC;
 
     if( i_ret )
     {
