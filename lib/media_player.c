@@ -1027,8 +1027,6 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi )
 
 /**************************************************************************
  * Tells whether the media player is currently playing.
- *
- * Enter with lock held.
  **************************************************************************/
 int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi )
 {
