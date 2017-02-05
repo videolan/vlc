@@ -92,6 +92,7 @@ parts:
       - libpostproc-dev
       - libpulse-dev
       - libqt5x11extras5-dev
+      - qtbase5-private-dev
       - libraw1394-dev
       - libresid-builder-dev
       - librsvg2-dev
@@ -137,6 +138,7 @@ parts:
       - pkg-config
       - protobuf-compiler
       - qtbase5-dev
+      - wayland-protocols
       - zlib1g-dev
       - zsh
     after: [desktop-qt5]
