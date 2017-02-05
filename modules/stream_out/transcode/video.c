@@ -61,8 +61,8 @@ static int video_update_format_decoder( decoder_t *p_dec )
         (video_format_IsSimilar( &id->p_encoder->fmt_in.video, &p_dec->fmt_out.video )))
         return 0;
 
-    msg_Dbg( stream, "Checking filter chain for fourcc:%4.4s -> fourcc:%4.4s",
-                 (char *)&p_dec->fmt_out.video.i_chroma, (char*)&id->p_encoder->fmt_in.video.i_chroma );
+    msg_Dbg( stream, "Checking if filter chain %4.4s -> %4.4s is possible",
+                 (char *)&p_dec->fmt_out.i_codec, (char*)&id->p_encoder->fmt_in.i_codec );
     test_chain = filter_chain_NewVideo( stream, false, &filter_owner );
     filter_chain_Reset( test_chain, &p_dec->fmt_out, &p_dec->fmt_out );
 
@@ -71,7 +71,7 @@ static int video_update_format_decoder( decoder_t *p_dec )
     filter_chain_Delete( test_chain );
     msg_Dbg( stream, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
                      (char *)&p_dec->fmt_out.video.i_chroma,
-                     chain_works == 0 ? "working" : "not working");
+                     chain_works == 0 ? "possible" : "not possible");
     return chain_works;
 }
 
