@@ -57,8 +57,10 @@ static int video_update_format_decoder( decoder_t *p_dec )
         .sys = sys,
     };
 
-    if( id->p_encoder &&
-        (video_format_IsSimilar( &id->p_encoder->fmt_in.video, &p_dec->fmt_out.video )))
+    if( !id->b_transcode )
+        return 0;
+
+    if( id->p_encoder->fmt_in.i_codec == p_dec->fmt_out.i_codec )
         return 0;
 
     msg_Dbg( stream, "Checking if filter chain %4.4s -> %4.4s is possible",
