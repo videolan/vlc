@@ -378,6 +378,13 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
     return 1;
 }
 
+int MP4_ReadBoxContainerRestricted( stream_t *p_stream, MP4_Box_t *p_container,
+                                    const uint32_t stoplist[], const uint32_t excludelist[] )
+{
+    return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_container,
+                                                stoplist, excludelist, false );
+}
+
 int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
                                   const uint32_t stoplist[] )
 {

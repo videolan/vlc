@@ -1927,6 +1927,10 @@ MP4_Box_t * MP4_BoxExtract( MP4_Box_t **pp_chain, uint32_t i_type );
 /* Internal functions exposed for demuxers */
 int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
                                   const uint32_t stoplist[] );
+int MP4_ReadBoxContainerRestricted( stream_t *p_stream, MP4_Box_t *p_container,
+                                    const uint32_t stoplist[],
+                                    const uint32_t excludelist[] );
+
 int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box );
 
 #endif
