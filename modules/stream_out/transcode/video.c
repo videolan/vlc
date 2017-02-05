@@ -41,12 +41,38 @@
 struct decoder_owner_sys_t
 {
     sout_stream_sys_t *p_sys;
+    sout_stream_t *p_stream;
+    sout_stream_id_sys_t *id;
 };
 
 static int video_update_format_decoder( decoder_t *p_dec )
 {
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-    return 0;
+    decoder_owner_sys_t  *owner  = p_dec->p_owner;
+    sout_stream_sys_t    *sys    = owner->p_sys;
+    sout_stream_t        *stream = owner->p_stream;
+    sout_stream_id_sys_t *id     = owner->id;
+    filter_chain_t       *test_chain;
+
+    filter_owner_t filter_owner = {
+        .sys = sys,
+    };
+
+    if( id->p_encoder &&
+        (video_format_IsSimilar( &id->p_encoder->fmt_in.video, &p_dec->fmt_out.video )))
+        return 0;
+
+    msg_Dbg( stream, "Checking filter chain for fourcc:%4.4s -> fourcc:%4.4s",
+                 (char *)&p_dec->fmt_out.video.i_chroma, (char*)&id->p_encoder->fmt_in.video.i_chroma );
+    test_chain = filter_chain_NewVideo( stream, false, &filter_owner );
+    filter_chain_Reset( test_chain, &p_dec->fmt_out, &p_dec->fmt_out );
+
+    int chain_works = filter_chain_AppendConverter( test_chain, &p_dec->fmt_out,
+                                  &id->p_encoder->fmt_in );
+    filter_chain_Delete( test_chain );
+    msg_Dbg( stream, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
+                     (char *)&p_dec->fmt_out.video.i_chroma,
+                     chain_works == 0 ? "working" : "not working");
+    return chain_works;
 }
 
 static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
@@ -140,7 +166,8 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         return VLC_EGENERIC;
 
     id->p_decoder->p_owner->p_sys = p_sys;
-    /* id->p_decoder->p_cfg = p_sys->p_video_cfg; */
+    id->p_decoder->p_owner->p_stream = p_stream;
+    id->p_decoder->p_owner->id = id;
 
     id->p_decoder->p_module =
         module_need( id->p_decoder, "decoder", "$codec", false );
