@@ -70,6 +70,13 @@ vlc_module_end()
 #define pf_CreateDevice                 D3D11CreateDevice
 #endif
 
+/*
+ * In this mode libavcodec doesn't need the whole array on texture on startup
+ * So we get the surfaces from the decoder pool when needed. We don't need to
+ * extract the decoded surface into the decoder picture anymore.
+ */
+#define D3D11_DIRECT_DECODE  LIBAVCODEC_VERSION_CHECK( 57, 30, 3, 72, 101 )
+
 #include <initguid.h> /* must be last included to not redefine existing GUIDs */
 
 /* dxva2api.h GUIDs: http://msdn.microsoft.com/en-us/library/windows/desktop/ms697067(v=vs100).aspx
@@ -247,15 +254,15 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 
         assert(p_sys_out->texture != NULL);
 
-        if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
-            WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
-        }
-
 #ifdef ID3D11VideoContext_VideoProcessorBlt
         if (sys->videoProcessor)
         {
             picture_sys_t *p_sys_in = surface->p_pic->p_sys;
             assert(p_sys_in->decoder == src);
+
+            if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
+                WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
+            }
 
             // extract the decoded video to a the output Texture
             if (p_sys_out->decoder == NULL)
@@ -289,14 +296,24 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
             {
                 msg_Err(va, "Failed to process the video. (hr=0x%lX)", hr);
                 ret = VLC_EGENERIC;
-                goto done;
+            }
+done:
+            if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
+                ReleaseMutex( sys->context_mutex );
             }
         }
+#endif
+#if !D3D11_DIRECT_DECODE
+#ifdef ID3D11VideoContext_VideoProcessorBlt
         else
 #endif
         {
             picture_sys_t *p_sys_in = surface->p_pic->p_sys;
             assert(p_sys_in->decoder == src);
+
+            if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
+                WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
+            }
 
             D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
             ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
@@ -313,7 +330,11 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
                                                       p_sys_in->resource,
                                                       viewDesc.Texture2D.ArraySlice,
                                                       &copyBox);
+            if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
+                ReleaseMutex( sys->context_mutex );
+            }
         }
+#endif
     }
         break;
     case VLC_CODEC_YV12:
@@ -325,12 +346,6 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         msg_Err(va, "Unsupported output picture format %08X", output->format.i_chroma );
         ret = VLC_EGENERIC;
         break;
-    }
-
-
-done:
-    if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
-        ReleaseMutex( sys->context_mutex );
     }
 
     return ret;
@@ -356,7 +371,36 @@ static int CheckDevice(vlc_va_t *va)
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
+#if D3D11_DIRECT_DECODE
+    picture_sys_t *p_sys = pic->p_sys;
+    if (p_sys->decoder == NULL)
+    {
+        HRESULT hr;
+
+        directx_sys_t *dx_sys = &va->sys->dx_sys;
+
+        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+        ZeroMemory(&viewDesc, sizeof(viewDesc));
+        viewDesc.DecodeProfile = dx_sys->input;
+        viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
+        viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
+
+        hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( (ID3D11VideoDevice*) dx_sys->d3ddec,
+                                                             (ID3D11Resource*) p_sys->texture,
+                                                             &viewDesc,
+                                                             &p_sys->decoder );
+        if (FAILED(hr)) {
+            msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%0lx)", p_sys->slice_index, hr);
+            p_sys->decoder = NULL;
+        }
+    }
+    if (p_sys->decoder == NULL)
+        return VLC_EGENERIC;
+    *data = p_sys->decoder;
+    return VLC_SUCCESS;
+#else
     return directx_va_Get(va, &va->sys->dx_sys, pic, data);
+#endif
 }
 
 static void Close(vlc_va_t *va, AVCodecContext *ctx)
@@ -487,7 +531,11 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->description = DxDescribe(dx_sys);
     va->setup   = Setup;
     va->get     = Get;
+#if D3D11_DIRECT_DECODE
+    va->release = NULL;
+#else
     va->release = directx_va_Release;
+#endif
     va->extract = Extract;
 
     return VLC_SUCCESS;
@@ -962,6 +1010,9 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
 
     if (sys->b_extern_pool)
     {
+#if D3D11_DIRECT_DECODE
+        dx_sys->surface_count = 0;
+#else
         size_t surface_idx;
         for (surface_idx = 0; surface_idx < dx_sys->surface_count; surface_idx++) {
             picture_t *pic = decoder_NewPicture( (decoder_t*) va->obj.parent );
@@ -1027,6 +1078,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
             }
         }
         else
+#endif
             msg_Dbg(va, "using external surface pool");
     }
 
