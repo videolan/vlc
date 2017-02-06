@@ -137,9 +137,6 @@ struct vout_display_sys_t
     d3d_quad_t               picQuad;
     const d3d_format_t       *picQuadConfig;
 
-    /* staging quad to adjust visible borders */
-    d3d_quad_t               stagingQuad;
-
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
     const char               *d3dPxShader;
@@ -973,30 +970,8 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 #undef RAD
 }
 
-static void CropStagingFormat(vout_display_t *vd, video_format_t *backup_fmt)
-{
-    if ( vd->sys->stagingQuad.pTexture == NULL )
-        return;
-
-    video_format_Copy( backup_fmt, &vd->source );
-    /* the texture we display is a cropped version of the source */
-    vd->source.i_x_offset = 0;
-    vd->source.i_y_offset = 0;
-    vd->source.i_width  = vd->source.i_visible_width;
-    vd->source.i_height = vd->source.i_visible_height;
-}
-
-static void UncropStagingFormat(vout_display_t *vd, video_format_t *backup_fmt)
-{
-    if ( vd->sys->stagingQuad.pTexture == NULL )
-        return;
-    video_format_Copy( &vd->source, backup_fmt );
-}
-
 static int Control(vout_display_t *vd, int query, va_list args)
 {
-    video_format_t core_source;
-    CropStagingFormat( vd, &core_source );
     int res = CommonControl( vd, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
@@ -1009,7 +984,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
         }
     }
 
-    UncropStagingFormat( vd, &core_source );
     return res;
 }
 
@@ -1018,8 +992,6 @@ static void Manage(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     RECT size_before = sys->sys.rect_dest_clipped;
 
-    video_format_t core_source;
-    CropStagingFormat( vd, &core_source );
     CommonManage(vd);
 
     if (RECTWidth(size_before)  != RECTWidth(sys->sys.rect_dest_clipped) ||
@@ -1044,24 +1016,11 @@ static void Manage(vout_display_t *vd)
         }
 #endif
     }
-    UncropStagingFormat( vd, &core_source );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    if ( !is_d3d11_opaque(picture->format.i_chroma) &&
-         sys->stagingQuad.pTexture != NULL )
-    {
-        Direct3D11UnmapTexture(picture);
-
-        ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
-                                                  (ID3D11Resource*) sys->picQuad.pTexture,
-                                                  0, 0, 0, 0,
-                                                  (ID3D11Resource*) sys->stagingQuad.pTexture,
-                                                  0, NULL);
-    }
 
 #ifdef HAVE_ID3D11VIDEODECODER
     if (is_d3d11_opaque(picture->format.i_chroma)) {
@@ -1134,8 +1093,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    if ( !is_d3d11_opaque(picture->format.i_chroma) &&
-         sys->stagingQuad.pTexture == NULL )
+    if ( !is_d3d11_opaque(picture->format.i_chroma))
         Direct3D11UnmapTexture(picture);
 
     /* Render the quad */
@@ -1391,17 +1349,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             msg_Warn(vd, "Could not get a suitable SPU pixel shader for %s", sys->picQuadConfig->name);
     }
 
-    if ( fmt->i_height != fmt->i_visible_height || fmt->i_width != fmt->i_visible_width )
-    {
-        msg_Dbg( vd, "use a staging texture to crop to visible size" );
-        AllocQuad( vd, fmt, &sys->stagingQuad, sys->picQuadConfig, NULL,
-                   PROJECTION_MODE_RECTANGULAR );
-    }
-
-    video_format_t core_source;
-    CropStagingFormat( vd, &core_source );
     UpdateRects(vd, NULL, NULL, true);
-    UncropStagingFormat( vd, &core_source );
 
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->context_lock != INVALID_HANDLE_VALUE )
@@ -1654,10 +1602,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    video_format_t core_source;
-    CropStagingFormat( vd, &core_source );
     UpdatePicQuadPosition(vd);
-    UncropStagingFormat( vd, &core_source );
 
     D3D11_SAMPLER_DESC sampDesc;
     memset(&sampDesc, 0, sizeof(sampDesc));
@@ -2189,8 +2134,6 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 
     Direct3D11DestroyPool(vd);
 
-    if ( sys->stagingQuad.pTexture )
-        ReleaseQuad(&sys->stagingQuad);
     ReleaseQuad(&sys->picQuad);
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
     sys->d3dregion_count = 0;
