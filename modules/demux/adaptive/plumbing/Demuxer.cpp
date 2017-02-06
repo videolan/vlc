@@ -76,6 +76,7 @@ Demuxer::Demuxer(demux_t *p_realdemux_, const std::string &name_, es_out_t *out,
 
     if(name == "mp4")
     {
+        b_candetectswitches = false;
         b_startsfromzero = true;
     }
 }
