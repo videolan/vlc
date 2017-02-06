@@ -151,7 +151,7 @@ enum slave_priority
     "usf", "jss",  "cdg", \
     "psb", "mpsub","mpl2", \
     "pjs", "dks", "stl", \
-    "vtt", "sbv"
+    "vtt", "sbv", "ttml"
 #define SLAVE_AUDIO_EXTENSIONS \
     "ac3", "m4a", "aac", \
     "eac3",  "dtshd", "flac", \
