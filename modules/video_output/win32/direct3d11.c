@@ -2038,6 +2038,26 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
                 ppColorspace = COLORSPACE_BT601_TO_FULL;
             break;
     }
+
+#if VLC_WINSTORE_APP
+    if (isXboxHardware(sys->d3ddevice)) {
+        static const FLOAT FULL_TO_STUDIO_RATIO = (256.f - 16.f - 20.f) / 256.f;
+        /* limit to 16-235 range as it's expanded again by the hardware */
+        WHITE_POINT_D65_TO_FULL[0] += FULL_TO_STUDIO_SHIFT;
+        if (RGB_shader) {
+            WHITE_POINT_D65_TO_FULL[1] += FULL_TO_STUDIO_SHIFT;
+            WHITE_POINT_D65_TO_FULL[2] += FULL_TO_STUDIO_SHIFT;
+            ppColorspace[0 * 5] *= FULL_TO_STUDIO_RATIO;
+            ppColorspace[1 * 5] *= FULL_TO_STUDIO_RATIO;
+            ppColorspace[2 * 5] *= FULL_TO_STUDIO_RATIO;
+        } else {
+            ppColorspace[0 * 4] *= FULL_TO_STUDIO_RATIO;
+            ppColorspace[1 * 4] *= FULL_TO_STUDIO_RATIO;
+            ppColorspace[2 * 4] *= FULL_TO_STUDIO_RATIO;
+        }
+    }
+#endif
+
     memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
     memcpy(colorspace.WhitePoint, WHITE_POINT_D65_TO_FULL, sizeof(colorspace.WhitePoint));
     constantInit.pSysMem = &colorspace;
