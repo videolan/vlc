@@ -1978,22 +1978,22 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     }
 
 #define FULL_TO_STUDIO_SHIFT (16.f / 256.f)
-    static const FLOAT WHITE_POINT_D65_TO_FULL[4] = { -FULL_TO_STUDIO_SHIFT, -0.5f, -0.5f, 1.f };
+    FLOAT WHITE_POINT_D65_TO_FULL[4] = { -FULL_TO_STUDIO_SHIFT, -0.5f, -0.5f, 1.f };
 
-    static const FLOAT COLORSPACE_BT601_TO_FULL[4*4] = {
+    FLOAT COLORSPACE_BT601_TO_FULL[4*4] = {
         1.164383561643836f,                 0.f,  1.596026785714286f, 0.f,
         1.164383561643836f, -0.391762290094914f, -0.812967647237771f, 0.f,
         1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
-    static const FLOAT COLORSPACE_BT709_TO_FULL[4*4] = {
+    FLOAT COLORSPACE_BT709_TO_FULL[4*4] = {
         1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
         1.164383561643836f, -0.213248614273730f, -0.532909328559444f, 0.f,
         1.164383561643836f,  2.112401785714286f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
     /* RGB-709 to RGB-2020 based on https://www.researchgate.net/publication/258434326_Beyond_BT709 */
-    static const FLOAT COLORSPACE_BT2020_TO_FULL[4*4] = {
+    FLOAT COLORSPACE_BT2020_TO_FULL[4*4] = {
         1.163746465f, -0.028815145f,  2.823537589f, 0.f,
         1.164383561f, -0.258509894f,  0.379693635f, 0.f,
         1.164383561f,  2.385315708f,  0.021554502f, 0.f,
@@ -2001,7 +2001,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     };
 
     PS_COLOR_TRANSFORM colorspace;
-    const FLOAT *ppColorspace;
+    FLOAT *ppColorspace;
     switch (fmt->space){
         case COLOR_SPACE_BT709:
             ppColorspace = COLORSPACE_BT709_TO_FULL;
