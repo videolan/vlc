@@ -617,7 +617,6 @@ static int Demux( demux_t *p_demux )
     input_thread_t *p_input = p_demux->p_input;
     input_item_t *p_parent_input;
 
-    assert( p_input );
     if( !p_input )
     {
         msg_Err( p_demux, "parent input could not be found" );
