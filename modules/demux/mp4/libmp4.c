@@ -1104,7 +1104,7 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( p_box->data.p_tkhd->i_width );
     MP4_GET4BYTES( p_box->data.p_tkhd->i_height );
 
-    double rotation;    //angle in degrees to be rotated clockwise
+    double rotation = 0;//angle in degrees to be rotated clockwise
     double scale[2];    // scale factor; sx = scale[0] , sy = scale[1]
     int32_t *matrix = p_box->data.p_tkhd->i_matrix;
 
@@ -1113,10 +1113,13 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     scale[1] = sqrt(conv_fx(matrix[1]) * conv_fx(matrix[1]) +
                     conv_fx(matrix[4]) * conv_fx(matrix[4]));
 
-    rotation = atan2(conv_fx(matrix[1]) / scale[1], conv_fx(matrix[0]) / scale[0]) * 180 / M_PI;
-
-    if (rotation < 0)
-        rotation += 360.;
+    if( likely(scale[0] > 0 && scale[1] > 0) )
+    {
+        rotation = atan2(conv_fx(matrix[1]) / scale[1],
+                         conv_fx(matrix[0]) / scale[0]) * 180 / M_PI;
+        if (rotation < 0)
+            rotation += 360.;
+    }
 
     p_box->data.p_tkhd->f_rotation = rotation;
 
