@@ -421,7 +421,7 @@ static int Open( vlc_object_t * p_this )
         tk->i_rate  = p_strh->i_rate;
         tk->i_scale = p_strh->i_scale;
         tk->i_samplesize = p_strh->i_samplesize;
-        msg_Dbg( p_demux, "stream[%d] rate:%d scale:%d samplesize:%d",
+        msg_Dbg( p_demux, "stream[%u] rate:%u scale:%u samplesize:%u",
                 i, tk->i_rate, tk->i_scale, tk->i_samplesize );
 
         switch( p_strh->i_type )
@@ -449,7 +449,7 @@ static int Open( vlc_object_t * p_this )
                 }
                 else if( tk->i_samplesize != 0 && tk->i_samplesize != tk->i_blocksize )
                 {
-                    msg_Warn( p_demux, "track[%d] samplesize=%d and blocksize=%d are not equal."
+                    msg_Warn( p_demux, "track[%u] samplesize=%u and blocksize=%u are not equal."
                                        "Using blocksize as a workaround.",
                                        i, tk->i_samplesize, tk->i_blocksize );
                     tk->i_samplesize = tk->i_blocksize;
@@ -837,12 +837,12 @@ aviindex:
 
             if( i_length == 0 )
             {
-                msg_Warn( p_demux, "track[%d] cannot be fixed (BeOS MediaKit generated)", i );
+                msg_Warn( p_demux, "track[%u] cannot be fixed (BeOS MediaKit generated)", i );
                 continue;
             }
             tk->i_samplesize = 1;
             tk->i_rate       = i_track_length  * CLOCK_FREQ / i_length;
-            msg_Warn( p_demux, "track[%d] fixed with rate=%d scale=%d (BeOS MediaKit generated)", i, tk->i_rate, tk->i_scale );
+            msg_Warn( p_demux, "track[%u] fixed with rate=%u scale=%u (BeOS MediaKit generated)", i, tk->i_rate, tk->i_scale );
         }
     }
 
