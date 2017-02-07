@@ -41,7 +41,7 @@
 static int  OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
-static block_t *DecodeBlock( decoder_t *, block_t ** );
+static int DecodeAudio( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 vlc_module_begin ()
@@ -290,8 +290,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
     date_Set( &p_sys->end_date, 0 );
 
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeAudio;
+    p_dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }
@@ -314,7 +314,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys  = p_dec->p_sys;
     block_t *p_block;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if( !*pp_block ) return NULL;
 
     p_block = *pp_block;
 
@@ -388,6 +388,17 @@ drop:
     block_Release( p_block );
     *pp_block = NULL;
     return NULL;
+}
+
+static int DecodeAudio( decoder_t *p_dec, block_t *p_block )
+{
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
+
+    block_t **pp_block = &p_block, *p_out;
+    while( ( p_out = DecodeBlock( p_dec, pp_block ) ) != NULL )
+        decoder_QueueAudio( p_dec, p_out );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

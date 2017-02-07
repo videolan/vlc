@@ -38,18 +38,12 @@ vlc_module_begin()
     set_callbacks(OpenDecoder, NULL)
 vlc_module_end()
 
-static block_t *
-DecodeBlock(decoder_t *p_dec, block_t **pp_block)
+static int
+DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
-    (void) p_dec;
-    if (pp_block != NULL)
-    {
-        block_t *p_block = *pp_block;
-        *pp_block = NULL;
-        return p_block;
-    }
-    else
-        return NULL;
+    if (p_block != NULL)
+        decoder_QueueAudio( p_dec, p_block );
+    return VLCDEC_SUCCESS;
 }
 
 static int
@@ -91,8 +85,8 @@ OpenDecoder(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_dec->pf_flush        = NULL;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = NULL;
 
     return VLC_SUCCESS;
 }

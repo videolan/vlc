@@ -173,7 +173,7 @@ struct decoder_sys_t
     int               i_key[3];
 };
 
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int Decode( decoder_t *, block_t * );
 
 static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
                                  bool b_text,
@@ -275,7 +275,7 @@ static int Open( vlc_object_t *p_this )
     else
         p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBA;
 
-    p_dec->pf_decode_sub = Decode;
+    p_dec->pf_decode = Decode;
     return VLC_SUCCESS;
 }
 
@@ -307,20 +307,16 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t   *p_sys = p_dec->p_sys;
-    block_t         *p_block;
     subpicture_t    *p_spu = NULL;
     video_format_t  fmt;
     bool            b_cached = false;
     vbi_page        p_page;
 
-    if( (pp_block == NULL) || (*pp_block == NULL) )
-        return NULL;
-
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_buffer > 0 &&
         ( ( p_block->p_buffer[0] >= 0x10 && p_block->p_buffer[0] <= 0x1f ) ||
@@ -498,12 +494,14 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 exit:
     vbi_unref_page( &p_page );
     block_Release( p_block );
-    return p_spu;
+    if( p_spu )
+        decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
 
 error:
     vbi_unref_page( &p_page );
     block_Release( p_block );
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,

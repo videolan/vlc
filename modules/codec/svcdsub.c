@@ -62,7 +62,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int      Decode( decoder_t *, block_t * );
 static block_t *Packetize  ( decoder_t *, block_t ** );
 static block_t *Reassemble ( decoder_t *, block_t * );
 static void ParseHeader( decoder_t *, block_t * );
@@ -132,8 +132,8 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_CODEC_OGT );
 
-    p_dec->pf_decode_sub = Decode;
-    p_dec->pf_packetize  = Packetize;
+    p_dec->pf_decode    = Decode;
+    p_dec->pf_packetize = Packetize;
 
     return VLC_SUCCESS;
 }
@@ -163,23 +163,23 @@ void DecoderClose( vlc_object_t *p_this )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
-    block_t *p_block, *p_spu;
-
 #ifndef NDEBUG
     msg_Dbg( p_dec, "Decode" );
 #endif
 
-    if( pp_block == NULL || *pp_block == NULL ) return NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
-    p_block = *pp_block;
-    *pp_block = NULL;
-
-    if( !(p_spu = Reassemble( p_dec, p_block )) ) return NULL;
+    if( !(p_block = Reassemble( p_dec, p_block )) )
+        return VLCDEC_SUCCESS;
 
     /* Parse and decode */
-    return DecodePacket( p_dec, p_spu );
+    subpicture_t *p_spu = DecodePacket( p_dec, p_block );
+    if( p_spu != NULL )
+        decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

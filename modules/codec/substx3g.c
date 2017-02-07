@@ -33,8 +33,8 @@
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int Open ( vlc_object_t * );
+static int Decode( decoder_t *, block_t * );
 
 vlc_module_begin ()
     set_description( N_("tx3g subtitles decoder") )
@@ -59,7 +59,7 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec != VLC_CODEC_TX3G )
         return VLC_EGENERIC;
 
-    p_dec->pf_decode_sub = Decode;
+    p_dec->pf_decode = Decode;
 
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
@@ -300,20 +300,18 @@ static void FontSizeConvert( const text_style_t *p_default_style, text_style_t *
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
-    block_t       *p_block;
     subpicture_t  *p_spu = NULL;
 
-    if( ( pp_block == NULL ) || ( *pp_block == NULL ) ) return NULL;
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( ( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) ) ||
           p_block->i_buffer < sizeof(uint16_t) )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     uint8_t *p_buf = p_block->p_buffer;
@@ -327,12 +325,14 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
        )
     {
         psz_subtitle = FromCharset( "UTF-16", p_pszstart, i_psz_bytelength );
-        if ( !psz_subtitle ) return NULL;
+        if ( !psz_subtitle )
+            return VLCDEC_SUCCESS;
     }
     else
     {
         psz_subtitle = malloc( i_psz_bytelength + 1 );
-        if ( !psz_subtitle ) return NULL;
+        if ( !psz_subtitle )
+            return VLCDEC_SUCCESS;
         memcpy( psz_subtitle, p_pszstart, i_psz_bytelength );
         psz_subtitle[ i_psz_bytelength ] = '\0';
     }
@@ -352,7 +352,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     {
         text_segment_Delete( p_segment3g->s );
         free( p_segment3g );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     /* Create the subpicture unit */
@@ -361,7 +361,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     {
         text_segment_Delete( p_segment3g->s );
         free( p_segment3g );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
@@ -458,5 +458,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     block_Release( p_block );
 
-    return p_spu;
+    decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
 }

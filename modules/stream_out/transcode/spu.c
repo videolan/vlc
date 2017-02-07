@@ -45,6 +45,28 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
     return p_subpicture;
 }
 
+static int decoder_queue_sub( decoder_t *p_dec, subpicture_t *p_spu )
+{
+    sout_stream_id_sys_t *id = p_dec->p_queue_ctx;
+
+    vlc_mutex_lock(&id->fifo.lock);
+    *id->fifo.spu.last = p_spu;
+    id->fifo.spu.last = &p_spu->p_next;
+    vlc_mutex_unlock(&id->fifo.lock);
+    return 0;
+}
+
+static subpicture_t *transcode_dequeue_all_subs( sout_stream_id_sys_t *id )
+{
+    vlc_mutex_lock(&id->fifo.lock);
+    subpicture_t *p_subpics = id->fifo.spu.first;
+    id->fifo.spu.first = NULL;
+    id->fifo.spu.last = &id->fifo.spu.first;
+    vlc_mutex_unlock(&id->fifo.lock);
+
+    return p_subpics;
+}
+
 int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -54,8 +76,10 @@ int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
      */
 
     /* Initialization of decoder structures */
-    id->p_decoder->pf_decode_sub = NULL;
+    id->p_decoder->pf_decode = NULL;
     id->p_decoder->pf_spu_buffer_new = spu_new_buffer;
+    id->p_decoder->pf_queue_sub = decoder_queue_sub;
+    id->p_decoder->p_queue_ctx = id;
     id->p_decoder->p_owner = (decoder_owner_sys_t *)p_stream;
     /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
 
@@ -119,47 +143,59 @@ int transcode_spu_process( sout_stream_t *p_stream,
                                   block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    subpicture_t *p_subpic;
     *out = NULL;
+    bool b_error = false;
 
-    p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
-    if( !p_subpic )
-    {
-        /* We just don't have anything to handle now, go own*/
+    int ret = id->p_decoder->pf_decode( id->p_decoder, in );
+    if( ret != VLCDEC_SUCCESS )
+        return VLC_EGENERIC;
+
+    subpicture_t *p_subpics = transcode_dequeue_all_subs( id );
+    if( p_subpics == NULL )
         return VLC_SUCCESS;
-    }
-
-    if( p_sys->b_master_sync && p_sys->i_master_drift )
+    do
     {
-        p_subpic->i_start -= p_sys->i_master_drift;
-        if( p_subpic->i_stop ) p_subpic->i_stop -= p_sys->i_master_drift;
-    }
+        subpicture_t *p_subpic = p_subpics;
+        p_subpics = p_subpics->p_next;
+        p_subpic->p_next = NULL;
 
-    if( p_sys->b_soverlay )
-    {
-        spu_PutSubpicture( p_sys->p_spu, p_subpic );
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        block_t *p_block;
-
-        p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
-        subpicture_Delete( p_subpic );
-        if( p_block )
+        if( b_error )
         {
-            block_ChainAppend( out, p_block );
-            return VLC_SUCCESS;
+            subpicture_Delete( p_subpic );
+            continue;
         }
-    }
 
-    return VLC_EGENERIC;
+        if( p_sys->b_master_sync && p_sys->i_master_drift )
+        {
+            p_subpic->i_start -= p_sys->i_master_drift;
+            if( p_subpic->i_stop ) p_subpic->i_stop -= p_sys->i_master_drift;
+        }
+
+        if( p_sys->b_soverlay )
+            spu_PutSubpicture( p_sys->p_spu, p_subpic );
+        else
+        {
+            block_t *p_block;
+
+            p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
+            subpicture_Delete( p_subpic );
+            if( p_block )
+                block_ChainAppend( out, p_block );
+            else
+                b_error = true;
+        }
+    } while( p_subpics );
+
+    return b_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 bool transcode_spu_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
                         sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    id->fifo.spu.first = NULL;
+    id->fifo.spu.last = &id->fifo.spu.first;
 
     if( p_sys->i_scodec )
     {

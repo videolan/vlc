@@ -49,7 +49,7 @@
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int  Decode( decoder_t *, block_t * );
 
 #define OVERRIDE_PAGE_TEXT N_("Override page")
 #define OVERRIDE_PAGE_LONGTEXT N_("Override the indicated page, try this if " \
@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_sub = Decode;
+    p_dec->pf_decode = Decode;
     p_sys = p_dec->p_sys = calloc( 1, sizeof(*p_sys) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
@@ -428,10 +428,9 @@ static void decode_string( char * res, int res_len,
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block;
     subpicture_t  *p_spu = NULL;
     video_format_t fmt;
     /* int erase = 0; */
@@ -446,10 +445,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     char psz_line[256];
     int i, total;
 
-    if( pp_block == NULL || *pp_block == NULL )
-        return NULL;
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     dbg((p_dec, "start of telx packet with header %2x\n",
                 * (uint8_t *) p_block->p_buffer));
@@ -712,7 +709,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     dbg((p_dec, "%ld --> %ld\n", (long int) p_block->i_pts/100000, (long int)p_block->i_length/100000));
 
     block_Release( p_block );
-    return p_spu;
+    if( p_spu != NULL )
+        decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
 
 error:
     if ( p_spu != NULL )
@@ -722,5 +721,5 @@ error:
     }
 
     block_Release( p_block );
-    return NULL;
+    return VLCDEC_SUCCESS;
 }

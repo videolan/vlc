@@ -190,18 +190,15 @@ static int UpdateAudioFormat( decoder_t *p_dec )
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
-static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     int i_err;
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_out = NULL;
 
-    block_t *p_block = pp_block ? *pp_block : NULL;
-
     /* Feed input block */
     if( p_block != NULL )
     {
-        *pp_block = NULL; /* avoid being fed the same packet again */
         if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
         {
             /* We've just started the stream, wait for the first PTS. */
@@ -240,7 +237,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_sys->p_out = block_Alloc( mpg123_outblock( p_sys->p_handle ) );
 
         if( unlikely( !p_sys->p_out ) )
-            return NULL;
+            return VLCDEC_SUCCESS;
     }
 
     /* Do the actual decoding now */
@@ -256,7 +253,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                      mpg123_plain_strerror( i_err ) );
             block_Release( p_sys->p_out );
             p_sys->p_out = NULL;
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
 
         i_err = mpg123_decode_frame( p_sys->p_handle, NULL, NULL, &i_bytes );
@@ -307,7 +304,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 end:
     if( p_block )
         block_Release( p_block );
-    return p_out;
+    if( p_out != NULL )
+        decoder_QueueAudio( p_dec, p_out );
+    return VLCDEC_SUCCESS;
 }
 
 
@@ -378,8 +377,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_dec->fmt_in.i_codec,

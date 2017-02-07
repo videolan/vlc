@@ -86,6 +86,26 @@ struct sout_stream_id_sys_t
     /* Decoder */
     decoder_t       *p_decoder;
 
+    struct
+    {
+        vlc_mutex_t lock;
+        union
+        {
+            struct {
+                picture_t *first;
+                picture_t **last;
+            } pic;
+            struct {
+                subpicture_t *first;
+                subpicture_t **last;
+            } spu;
+            struct {
+                block_t *first;
+                block_t **last;
+            } audio;
+        };
+    } fifo;
+
     union
     {
          struct
@@ -110,6 +130,8 @@ struct sout_stream_id_sys_t
     date_t          next_output_pts; /**< output calculated PTS */
 
 };
+#define SOUT_ID_FROM_DEC(x) \
+    (void *) (((uintptr_t)x) - offsetof(sout_stream_id_sys_t, p_decoder))
 
 /* OSD */
 

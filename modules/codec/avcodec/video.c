@@ -98,7 +98,7 @@ static void ffmpeg_InitCodec      ( decoder_t * );
 static int lavc_GetFrame(struct AVCodecContext *, AVFrame *, int);
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
-static picture_t *DecodeVideo( decoder_t *, block_t ** );
+static int  DecodeVideo( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
@@ -554,8 +554,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_video = DecodeVideo;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeVideo;
+    p_dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }
@@ -706,9 +706,9 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t
 
 
 /*****************************************************************************
- * DecodeVideo: Called to decode one or more frames
+ * DecodeBlock: Called to decode one or more frames
  *****************************************************************************/
-static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
+static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
@@ -1016,6 +1016,15 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( p_block )
         block_Release( p_block );
     return NULL;
+}
+
+static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
+{
+    block_t **pp_block = p_block ? &p_block : NULL;
+    picture_t *p_pic;
+    while( ( p_pic = DecodeBlock( p_dec, pp_block ) ) != NULL )
+        decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

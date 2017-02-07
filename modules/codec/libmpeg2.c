@@ -110,7 +110,7 @@ struct decoder_sys_t
 static int  OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
-static picture_t *DecodeBlock( decoder_t *, block_t ** );
+static int DecodeVideo( decoder_t *, block_t *);
 #if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
 static block_t   *GetCc( decoder_t *p_dec, bool pb_present[4] );
 #endif
@@ -240,8 +240,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_sys->p_info = mpeg2_info( p_sys->p_mpeg2dec );
 
-    p_dec->pf_decode_video = DecodeBlock;
-    p_dec->pf_flush        = Reset;
+    p_dec->pf_decode = DecodeVideo;
+    p_dec->pf_flush  = Reset;
     p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = 0;
 
@@ -594,6 +594,18 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     /* Never reached */
     return NULL;
+}
+
+static int DecodeVideo( decoder_t *p_dec, block_t *p_block)
+{
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
+
+    block_t **pp_block = &p_block;
+    picture_t *p_pic;
+    while( ( p_pic = DecodeBlock( p_dec, pp_block ) ) != NULL )
+        decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

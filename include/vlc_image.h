@@ -25,6 +25,7 @@
 #define VLC_IMAGE_H 1
 
 # include <vlc_picture.h>
+# include <vlc_picture_fifo.h>
 
 /**
  * \file
@@ -55,6 +56,8 @@ struct image_handler_t
     decoder_t *p_dec;
     encoder_t *p_enc;
     filter_t  *p_filter;
+
+    picture_fifo_t *outfifo;
 };
 
 VLC_API image_handler_t * image_HandlerCreate( vlc_object_t * ) VLC_USED;

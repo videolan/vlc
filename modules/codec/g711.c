@@ -34,7 +34,7 @@
 
 static int  DecoderOpen ( vlc_object_t * );
 static void DecoderClose( vlc_object_t * );
-static block_t *DecodeBlock( decoder_t *, block_t ** );
+static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 #ifdef ENABLE_SOUT
@@ -184,8 +184,8 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Set output properties */
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
     p_dec->p_sys = p_sys;
 
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -221,21 +221,17 @@ static void Flush( decoder_t *p_dec )
     date_Set( &p_sys->end_date, 0 );
 }
 
-static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( pp_block == NULL )
-        return NULL;
-    block_t *p_block = *pp_block;
-    *pp_block = NULL;
-    if( p_block == NULL )
-        return NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block);
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
@@ -250,7 +246,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     /* Don't re-use the same pts twice */
@@ -260,19 +256,19 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( samples == 0 )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     if( decoder_UpdateAudioFormat( p_dec ) )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
     block_t *p_out = decoder_NewAudioBuffer( p_dec, samples );
     if( p_out == NULL )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     assert( p_out->i_nb_samples == samples );
@@ -291,7 +287,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
        *(dst++) = p_sys->table[*(src++)];
 
     block_Release( p_block );
-    return p_out;
+    decoder_QueueAudio( p_dec, p_out );
+    return VLCDEC_SUCCESS;
 }
 
 static void DecoderClose( vlc_object_t *p_this )

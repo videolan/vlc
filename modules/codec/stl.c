@@ -363,16 +363,10 @@ static void ResetGroups(decoder_sys_t *p_sys)
     memset(p_sys->groups, 0, sizeof(stl_sg_t) * (STL_GROUPS_MAX + 1));
 }
 
-static subpicture_t *Decode(decoder_t *p_dec, block_t **pp_block)
+static int Decode(decoder_t *p_dec, block_t *p_block)
 {
-    if (pp_block == NULL || *pp_block == NULL)
-        return NULL;
-
-    subpicture_t *p_sub_first = NULL;
-    subpicture_t **pp_sub_last = &p_sub_first;
-
-    block_t *p_block = *pp_block;
-    *pp_block = NULL;
+    if (p_block == NULL) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if(p_block->i_buffer < STL_TTI_SIZE)
         p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
@@ -384,7 +378,7 @@ static subpicture_t *Decode(decoder_t *p_dec, block_t **pp_block)
         if(p_block->i_flags & BLOCK_FLAG_CORRUPTED)
         {
             block_Release(p_block);
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
     }
 
@@ -414,15 +408,13 @@ static subpicture_t *Decode(decoder_t *p_dec, block_t **pp_block)
                     p_sub->i_stop     = p_block->i_pts + p_block->i_length;
                     p_sub->b_ephemer  = (p_block->i_length == 0);
                 }
-
-                *pp_sub_last = p_sub;
-                pp_sub_last = &p_sub->p_next;
+                decoder_QueueSub(p_dec, p_sub);
             }
         }
     }
 
     block_Release(p_block);
-    return p_sub_first;
+    return VLCDEC_SUCCESS;
 }
 
 static int ExtractCCT(const decoder_t *dec, cct_number_value_t *cct_number)
@@ -472,7 +464,7 @@ static int Open(vlc_object_t *object)
         sys->groups[i].pp_segment_last = &sys->groups[i].p_segment;
 
     dec->p_sys = sys;
-    dec->pf_decode_sub = Decode;
+    dec->pf_decode = Decode;
     dec->fmt_out.i_cat = SPU_ES;
     dec->fmt_out.i_codec = 0;
     return VLC_SUCCESS;

@@ -71,7 +71,7 @@ static unsigned int pi_channels_maps[7] =
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
-static block_t *DecodeFrame( decoder_t *, block_t ** );
+static int DecodeFrame( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 /*****************************************************************************
@@ -186,8 +186,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Set callback */
-    p_dec->pf_decode_audio = DecodeFrame;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeFrame;
+    p_dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }
@@ -205,15 +205,13 @@ static void Flush( decoder_t *p_dec )
 /*****************************************************************************
  * DecodeFrame: decodes a wma frame.
  *****************************************************************************/
-static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
+static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block;
     block_t       *p_aout_buffer = NULL;
 
-    if( !pp_block || !*pp_block ) return NULL;
-
-    p_block = *pp_block;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
@@ -221,24 +219,8 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED)
         {
             block_Release( p_block );
-            *pp_block = NULL;
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
-    }
-
-    if( p_block->i_buffer <= 0 )
-    {
-        /* we already decoded the samples, just feed a few to aout */
-        if( p_sys->i_samples )
-            p_aout_buffer = SplitBuffer( p_dec );
-        if( !p_sys->i_samples )
-        {   /* we need to decode new samples now */
-            free( p_sys->p_output );
-            p_sys->p_output = NULL;
-            block_Release( p_block );
-            *pp_block = NULL;
-        }
-        return p_aout_buffer;
     }
 
     /* Date management */
@@ -253,7 +235,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     if( wma_decode_superframe_init( &p_sys->wmadec, p_block->p_buffer,
@@ -261,16 +243,14 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Err( p_dec, "failed initializing wmafixed decoder" );
         block_Release( p_block );
-        *pp_block = NULL;
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     if( p_sys->wmadec.nb_frames <= 0 )
     {
         msg_Err( p_dec, "can not decode, invalid ASF packet ?" );
         block_Release( p_block );
-        *pp_block = NULL;
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     /* worst case */
@@ -283,7 +263,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     {
         /* OOM, will try a bit later if VLC hasn't been killed */
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     p_sys->i_samples = 0;
@@ -302,20 +282,26 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
                 "wma_decode_superframe_frame() failed for frame %d", i );
             free( p_sys->p_output );
             p_sys->p_output = NULL;
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
         p_sys->i_samples += i_samples; /* advance in the samples buffer */
     }
 
-    p_block->i_buffer = 0; /* this block has been decoded */
+    block_Release( p_block ); /* this block has been decoded */
 
     for( size_t s = 0 ; s < i_buffer; s++ )
         p_sys->p_output[s] <<= 2; /* Q30 -> Q32 translation */
 
-    p_aout_buffer = SplitBuffer( p_dec );
-    assert( p_aout_buffer );
+    while( ( p_aout_buffer = SplitBuffer( p_dec ) ) != NULL )
+        decoder_QueueAudio( p_dec, p_aout_buffer );
 
-    return p_aout_buffer;
+    if( !p_sys->i_samples )
+    {   /* we need to decode new samples now */
+        free( p_sys->p_output );
+        p_sys->p_output = NULL;
+    }
+
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

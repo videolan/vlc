@@ -222,41 +222,35 @@ static void textst_FillRegions(decoder_t *p_dec, const uint8_t *p_data, size_t i
     }
 }
 
-static subpicture_t *Decode(decoder_t *p_dec, block_t **pp_block)
+static int Decode(decoder_t *p_dec, block_t *p_block)
 {
     subpicture_t *p_sub = NULL;
-    if (pp_block == NULL || *pp_block == NULL)
-        return NULL;
+    if (p_block == NULL) /* No Drain */
+        return VLCDEC_SUCCESS;
 
-    block_t *p_block = *pp_block;
-    *pp_block = NULL;
-
-    if(p_block)
+    if (p_block->i_buffer > 18 &&
+        (p_block->i_flags & BLOCK_FLAG_CORRUPTED) == 0 &&
+        (p_sub = decoder_NewSubpictureText(p_dec)))
     {
-        if(p_block->i_buffer > 18 &&
-           (p_block->i_flags & BLOCK_FLAG_CORRUPTED) == 0 &&
-           (p_sub = decoder_NewSubpictureText(p_dec)))
+        p_sub->i_start = ((int64_t) (p_block->p_buffer[3] & 0x01) << 32) | GetDWBE(&p_block->p_buffer[4]);
+        p_sub->i_stop = ((int64_t) (p_block->p_buffer[8] & 0x01) << 32) | GetDWBE(&p_block->p_buffer[9]);
+        p_sub->i_start = VLC_TS_0 + p_sub->i_start * 100 / 9;
+        p_sub->i_stop = VLC_TS_0 + p_sub->i_stop * 100 / 9;
+        if (p_sub->i_start < p_block->i_dts)
         {
-            p_sub->i_start = ((int64_t) (p_block->p_buffer[3] & 0x01) << 32) | GetDWBE(&p_block->p_buffer[4]);
-            p_sub->i_stop = ((int64_t) (p_block->p_buffer[8] & 0x01) << 32) | GetDWBE(&p_block->p_buffer[9]);
-            p_sub->i_start = VLC_TS_0 + p_sub->i_start * 100 / 9;
-            p_sub->i_stop = VLC_TS_0 + p_sub->i_stop * 100 / 9;
-            if(p_sub->i_start < p_block->i_dts)
-            {
-                p_sub->i_stop += p_block->i_dts - p_sub->i_start;
-                p_sub->i_start = p_block->i_dts;
-            }
-
-            textst_FillRegions(p_dec, &p_block->p_buffer[13], p_block->i_buffer - 13,
-                               &p_sub->updater.p_sys->region);
-
-            p_sub->b_absolute = false;
+            p_sub->i_stop += p_block->i_dts - p_sub->i_start;
+            p_sub->i_start = p_block->i_dts;
         }
 
-        block_Release(p_block);
+        textst_FillRegions(p_dec, &p_block->p_buffer[13], p_block->i_buffer - 13,
+                           &p_sub->updater.p_sys->region);
+
+        p_sub->b_absolute = false;
+        decoder_QueueSub(p_dec, p_sub);
     }
 
-    return p_sub;
+    block_Release(p_block);
+    return VLCDEC_SUCCESS;
 }
 
 static void Close(vlc_object_t *object)
@@ -278,7 +272,7 @@ static int Open(vlc_object_t *object)
     memset(p_sys->palette, 0xFF, 256 * sizeof(uint32_t));
 
     p_dec->p_sys = p_sys;
-    p_dec->pf_decode_sub = Decode;
+    p_dec->pf_decode = Decode;
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
 

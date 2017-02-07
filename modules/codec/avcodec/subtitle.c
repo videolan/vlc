@@ -45,7 +45,7 @@ struct decoder_sys_t {
 
 static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts,
                                      AVCodecContext *avctx);
-static subpicture_t *DecodeSubtitle(decoder_t *, block_t **);
+static int  DecodeSubtitle(decoder_t *, block_t *);
 static void Flush(decoder_t *);
 
 /**
@@ -113,8 +113,8 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     /* */
     msg_Dbg(dec, "libavcodec codec (%s) started", codec->name);
     dec->fmt_out.i_cat = SPU_ES;
-    dec->pf_decode_sub = DecodeSubtitle;
-    dec->pf_flush      = Flush;
+    dec->pf_decode = DecodeSubtitle;
+    dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }
@@ -132,7 +132,7 @@ static void Flush(decoder_t *dec)
 /**
  * Decode one subtitle
  */
-static subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
+static subpicture_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
 {
     decoder_sys_t *sys = dec->p_sys;
 
@@ -201,6 +201,15 @@ static subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
     if (!spu)
         block_Release(block);
     return spu;
+}
+
+static int DecodeSubtitle(decoder_t *dec, block_t *block)
+{
+    block_t **block_ptr = block ? &block : NULL;
+    subpicture_t *spu;
+    while ((spu = DecodeBlock(dec, block_ptr)) != NULL)
+        decoder_QueueSub(dec, spu);
+    return VLCDEC_SUCCESS;
 }
 
 /**

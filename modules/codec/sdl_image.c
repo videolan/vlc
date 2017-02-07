@@ -49,7 +49,7 @@ struct decoder_sys_t
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
-static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
+static int DecodeBlock  ( decoder_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -116,7 +116,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
 
     return VLC_SUCCESS;
 }
@@ -126,21 +126,20 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function must be fed with a complete compressed frame.
  ****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
     picture_t *p_pic = NULL;
     SDL_Surface *p_surface;
     SDL_RWops *p_rw;
 
-    if( pp_block == NULL || *pp_block == NULL ) return NULL;
-    p_block = *pp_block;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
-        block_Release( p_block ); *pp_block = NULL;
-        return NULL;
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
     }
 
     p_rw = SDL_RWFromConstMem( p_block->p_buffer, p_block->i_buffer );
@@ -261,14 +260,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_pic->date = (p_block->i_pts > VLC_TS_INVALID) ?
         p_block->i_pts : p_block->i_dts;
 
-    SDL_FreeSurface( p_surface );
-    block_Release( p_block ); *pp_block = NULL;
-    return p_pic;
+    decoder_QueueVideo( p_dec, p_pic );
 
 error:
     if ( p_surface != NULL ) SDL_FreeSurface( p_surface );
-    block_Release( p_block ); *pp_block = NULL;
-    return NULL;
+    block_Release( p_block );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

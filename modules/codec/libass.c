@@ -64,7 +64,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
+static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 /* */
@@ -132,8 +132,8 @@ static int Create( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec != VLC_CODEC_SSA )
         return VLC_EGENERIC;
 
-    p_dec->pf_decode_sub = DecodeBlock;
-    p_dec->pf_flush      = Flush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_sys )
@@ -310,37 +310,33 @@ static void Flush( decoder_t *p_dec )
 /****************************************************************************
  * DecodeBlock:
  ****************************************************************************/
-static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     subpicture_t *p_spu = NULL;
-    block_t *p_block;
 
-    if( !pp_block || *pp_block == NULL )
-        return NULL;
-
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         Flush( p_dec );
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     subpicture_updater_sys_t *p_spu_sys = malloc( sizeof(*p_spu_sys) );
     if( !p_spu_sys )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     subpicture_updater_t updater = {
@@ -355,7 +351,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         msg_Warn( p_dec, "can't get spu buffer" );
         free( p_spu_sys );
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     p_spu_sys->p_img = NULL;
@@ -367,7 +363,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         subpicture_Delete( p_spu );
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
     memcpy( p_spu_sys->p_subs_data, p_block->p_buffer,
             p_block->i_buffer );
@@ -391,7 +387,8 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     block_Release( p_block );
 
-    return p_spu;
+    decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
 }
 
 /****************************************************************************

@@ -122,14 +122,13 @@ static void Exchange( float * p_out, const float * p_in )
     }
 }
 
-static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_in_buf )
 {
     decoder_sys_t  *p_sys = p_dec->p_sys;
 
-    if (pp_block == NULL || *pp_block == NULL)
-        return NULL;
+    if (p_in_buf == NULL) /* No Drain */
+        return VLCDEC_SUCCESS;
 
-    block_t *p_in_buf = *pp_block;
     sample_t i_sample_level = 1;
     int  i_flags = p_sys->i_flags;
     size_t i_bytes_per_block = 256 * p_sys->i_nb_channels * sizeof(float);
@@ -212,9 +211,10 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_in_buf->i_length;
 out:
+    if (p_out_buf != NULL)
+        decoder_QueueAudio(p_dec, p_out_buf);
     block_Release( p_in_buf );
-    *pp_block = NULL;
-    return p_out_buf;
+    return VLCDEC_SUCCESS;
 }
 
 static int channels_vlc2dca( const audio_format_t *p_audio, int *p_flags )
@@ -341,8 +341,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_audio = Decode;
-    p_dec->pf_flush        = NULL;
+    p_dec->pf_decode = Decode;
+    p_dec->pf_flush  = NULL;
     return VLC_SUCCESS;
 }
 

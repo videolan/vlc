@@ -405,16 +405,12 @@ error:
     return NULL;
 }
 
-static subpicture_t *Decode(decoder_t *dec, block_t **block)
+static int Decode(decoder_t *dec, block_t *b)
 {
     decoder_sys_t *sys = dec->p_sys;
 
-    if (block == NULL || *block == NULL)
-        return NULL;
-    block_t *b = *block; *block = NULL;
-
-    subpicture_t *sub_first = NULL;
-    subpicture_t **sub_last = &sub_first;
+    if (b == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if (b->i_flags & (BLOCK_FLAG_CORRUPTED))
         goto exit;
@@ -479,9 +475,8 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
                                         section_length - 1 - 4,
                                         b->i_pts > VLC_TS_INVALID ? b->i_pts : b->i_dts);
         }
-        *sub_last = sub;
-        if (*sub_last)
-            sub_last = &(*sub_last)->p_next;
+        if (sub != NULL)
+            decoder_QueueSub(dec, sub);
 
         b->i_buffer -= 3 + section_length;
         b->p_buffer += 3 + section_length;
@@ -490,7 +485,7 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
 
 exit:
     block_Release(b);
-    return sub_first;
+    return VLCDEC_SUCCESS;
 }
 
 static int Open(vlc_object_t *object)
@@ -507,7 +502,7 @@ static int Open(vlc_object_t *object)
     sys->segment_size = 0;
     sys->segment_buffer = NULL;
 
-    dec->pf_decode_sub = Decode;
+    dec->pf_decode = Decode;
     es_format_Init(&dec->fmt_out, SPU_ES, VLC_CODEC_SPU);
     dec->fmt_out.video.i_chroma = VLC_CODEC_YUVP;
 

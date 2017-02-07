@@ -74,7 +74,7 @@ struct decoder_sys_t
 static int Open( decoder_t *p_dec, bool b_packetizer );
 
 static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
-                       block_t **pp_block, bool b_packetizer );
+                       block_t *p_block, bool b_packetizer );
 
 /*****************************************************************************
  * OpenDecoder:
@@ -135,16 +135,15 @@ static const uint8_t reverse[256] = {
  ****************************************************************************
  * Beware, this function must be fed with complete frames (PES packet).
  *****************************************************************************/
-static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block;
     block_t       *p_aout_buffer;
     int            i_frame_length, i_bits;
 
-    p_block = Parse( p_dec, &i_frame_length, &i_bits, pp_block, false );
+    p_block = Parse( p_dec, &i_frame_length, &i_bits, p_block, false );
     if( !p_block )
-        return NULL;
+        return VLCDEC_SUCCESS;
 
     if( decoder_UpdateAudioFormat( p_dec ) )
     {
@@ -220,7 +219,9 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
 exit:
     block_Release( p_block );
-    return p_aout_buffer;
+    if( p_aout_buffer != NULL )
+        decoder_QueueAudio( p_dec, p_aout_buffer );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -244,7 +245,12 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     block_t       *p_block;
     int           i_frame_length, i_bits;
 
-    p_block = Parse( p_dec, &i_frame_length, &i_bits, pp_block, true );
+    if( !pp_block ) /* No Drain */
+        return NULL;
+    p_block = *pp_block;
+    *pp_block = NULL; /* So the packet doesn't get re-sent */
+
+    p_block = Parse( p_dec, &i_frame_length, &i_bits, p_block, true );
     if( !p_block )
         return NULL;
 
@@ -284,7 +290,7 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
     {
         p_dec->fmt_out.i_codec = VLC_CODEC_302M;
 
-        p_dec->pf_decode_audio = NULL;
+        p_dec->pf_decode       = NULL;
         p_dec->pf_packetize    = Packetize;
     }
     else
@@ -292,8 +298,8 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
         p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
         p_dec->fmt_out.audio.i_bitspersample = 16;
 
-        p_dec->pf_decode_audio = Decode;
-        p_dec->pf_packetize    = NULL;
+        p_dec->pf_decode    = Decode;
+        p_dec->pf_packetize = NULL;
     }
     p_dec->pf_flush            = Flush;
     return VLC_SUCCESS;
@@ -312,20 +318,17 @@ static const unsigned int pi_original_channels[4] = {
         AOUT_CHAN_CENTER | AOUT_CHAN_LFE,
 };
 
-static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
-                       block_t **pp_block, bool b_packetizer )
+static block_t * Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
+                        block_t *p_block, bool b_packetizer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block;
     uint32_t h;
     unsigned int i_size;
     int i_channels;
     int i_bits;
 
-    if( !pp_block || !*pp_block ) return NULL;
-
-    p_block = *pp_block;
-    *pp_block = NULL; /* So the packet doesn't get re-sent */
+    if( !p_block ) /* No drain */
+        return NULL;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {

@@ -81,7 +81,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /*****************************************************************************
- * DecodeBLock: decode an MPEG audio frame.
+ * DecodeBlock: decode an MPEG audio frame.
  *****************************************************************************/
 static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
@@ -216,6 +216,14 @@ reject:
     goto end;
 }
 
+static int DecodeAudio( decoder_t *p_dec, block_t *p_block )
+{
+    block_t **pp_block = p_block ? &p_block : NULL, *p_out;
+    while( ( p_out = DecodeBlock( p_dec, pp_block ) ) != NULL )
+        decoder_QueueAudio( p_dec, p_out );
+    return VLCDEC_SUCCESS;
+}
+
 static void DecodeFlush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -270,8 +278,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_dec->pf_flush = DecodeFlush;
+    p_dec->pf_decode = DecodeAudio;
+    p_dec->pf_flush  = DecodeFlush;
 
     return VLC_SUCCESS;
 }

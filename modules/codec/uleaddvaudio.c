@@ -61,11 +61,11 @@ static void Flush(decoder_t *dec)
     date_Set(&sys->end_date, 0);
 }
 
-static block_t *Decode(decoder_t *dec, block_t **block_ptr)
+static block_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
 {
     decoder_sys_t *sys  = dec->p_sys;
 
-    if (!block_ptr || !*block_ptr)
+    if (!*block_ptr)
         return NULL;
 
     block_t *block = *block_ptr;
@@ -122,6 +122,17 @@ static block_t *Decode(decoder_t *dec, block_t **block_ptr)
     return NULL;
 }
 
+static int DecodeAudio(decoder_t *dec, block_t *block)
+{
+    if (block == NULL) /* No Drain */
+        return VLCDEC_SUCCESS;
+
+    block_t **block_ptr = &block, *out;
+    while ((out = DecodeBlock(dec, block_ptr)) != NULL)
+        decoder_QueueAudio(dec,out);
+    return VLCDEC_SUCCESS;
+}
+
 static int Open(vlc_object_t *object)
 {
     decoder_t *dec = (decoder_t*)object;
@@ -159,8 +170,8 @@ static int Open(vlc_object_t *object)
     dec->fmt_out.audio.i_physical_channels =
     dec->fmt_out.audio.i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
 
-    dec->pf_decode_audio = Decode;
-    dec->pf_flush        = Flush;
+    dec->pf_decode = DecodeAudio;
+    dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }

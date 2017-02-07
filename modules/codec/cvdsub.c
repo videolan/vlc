@@ -60,7 +60,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int Decode( decoder_t *, block_t * );
 static block_t *Packetize  ( decoder_t *, block_t ** );
 static block_t *Reassemble ( decoder_t *, block_t * );
 static void ParseMetaInfo  ( decoder_t *, block_t * );
@@ -122,7 +122,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
     p_sys->p_spu   = NULL;
 
-    p_dec->pf_decode_sub = Decode;
+    p_dec->pf_decode     = Decode;
     p_dec->pf_packetize  = Packetize;
 
     p_dec->fmt_out.i_cat = SPU_ES;
@@ -160,25 +160,27 @@ void DecoderClose( vlc_object_t *p_this )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
-    block_t *p_block, *p_spu;
+    block_t *p_data;
 
-    if( pp_block == NULL || *pp_block == NULL ) return NULL;
-
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
-    if( !(p_spu = Reassemble( p_dec, p_block )) ) return NULL;
+    if( !(p_data = Reassemble( p_dec, p_block )) )
+        return VLCDEC_SUCCESS;
 
     /* Parse and decode */
-    return DecodePacket( p_dec, p_spu );
+    subpicture_t *p_spu = DecodePacket( p_dec, p_data );
+    if( p_spu != NULL )
+        decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

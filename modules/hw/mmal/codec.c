@@ -90,7 +90,7 @@ static int send_output_buffer(decoder_t *dec);
 static void fill_output_port(decoder_t *dec);
 
 /* VLC decoder callback */
-static picture_t *decode(decoder_t *dec, block_t **block);
+static int decode(decoder_t *dec, block_t *block);
 static void flush_decoder(decoder_t *dec);
 
 /* MMAL callbacks */
@@ -236,8 +236,8 @@ static int OpenDecoder(decoder_t *dec)
     }
 
     dec->fmt_out.i_cat = VIDEO_ES;
-    dec->pf_decode_video = decode;
-    dec->pf_flush        = flush_decoder;
+    dec->pf_decode = decode;
+    dec->pf_flush  = flush_decoder;
 
     vlc_mutex_init_recursive(&sys->mutex);
     vlc_sem_init(&sys->sem, 0);
@@ -593,16 +593,14 @@ static void flush_decoder(decoder_t *dec)
     msg_Dbg(dec, "Ports flushed, returning to normal operation");
 }
 
-static picture_t *decode(decoder_t *dec, block_t **pblock)
+static int decode(decoder_t *dec, block_t *block)
 {
     decoder_sys_t *sys = dec->p_sys;
-    block_t *block;
     MMAL_BUFFER_HEADER_T *buffer;
     bool need_flush = false;
     uint32_t len;
     uint32_t flags = 0;
     MMAL_STATUS_T status;
-    picture_t *ret = NULL;
 
     /*
      * Configure output port if necessary
@@ -612,23 +610,22 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
             msg_Err(dec, "Failed to change output port format");
     }
 
-    if (!pblock)
+    if (!block)
         goto out;
-
-    block = *pblock;
 
     /*
      * Check whether full flush is required
      */
     if (block && block->i_flags & BLOCK_FLAG_DISCONTINUITY) {
         flush_decoder(dec);
-        block_Release(*pblock);
-        return NULL;
+        block_Release(block);
+        return VLCDEC_SUCCESS;
     }
 
     /*
      * Send output buffers
      */
+    picture_t *ret = NULL;
     if (atomic_load(&sys->started)) {
         buffer = mmal_queue_get(sys->decoded_pictures);
         if (buffer) {
@@ -646,17 +643,12 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
 
         fill_output_port(dec);
     }
-
     if (ret)
-        goto out;
+        decoder_QueueVideo(dec, ret);
 
     /*
      * Process input
      */
-    if (!block)
-        goto out;
-
-    *pblock = NULL;
 
     if (block->i_flags & BLOCK_FLAG_CORRUPTED)
         flags |= MMAL_BUFFER_HEADER_FLAG_CORRUPTED;
@@ -701,7 +693,7 @@ out:
     if (need_flush)
         flush_decoder(dec);
 
-    return ret;
+    return VLCDEC_SUCCESS;
 }
 
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)

@@ -144,14 +144,9 @@ static void Flush( decoder_t *p_dec )
  ****************************************************************************
  * This function must be fed with complete frames.
  ****************************************************************************/
-static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( pp_block == NULL || *pp_block == NULL )
-        return NULL;
-
-    block_t *p_block = *pp_block;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         date_Set( &p_sys->pts, p_block->i_dts );
@@ -187,7 +182,6 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    *pp_block = NULL;
     return p_block;
 }
 
@@ -218,11 +212,14 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
 /*****************************************************************************
  * DecodeFrame: decodes a video frame.
  *****************************************************************************/
-static picture_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
+static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
 {
-    block_t *p_block = DecodeBlock( p_dec, pp_block );
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
+
+    p_block = DecodeBlock( p_dec, p_block );
     if( p_block == NULL )
-        return NULL;
+        return VLCDEC_SUCCESS;
 
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -233,7 +230,7 @@ static picture_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     if( p_pic == NULL )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     FillPicture( p_dec, p_block, p_pic );
@@ -255,7 +252,8 @@ static picture_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         p_pic->b_progressive = true;
 
     block_Release( p_block );
-    return p_pic;
+    decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 }
 
 static int OpenDecoder( vlc_object_t *p_this )
@@ -265,8 +263,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     int ret = OpenCommon( p_dec );
     if( ret == VLC_SUCCESS )
     {
-        p_dec->pf_decode_video = DecodeFrame;
-        p_dec->pf_flush        = Flush;
+        p_dec->pf_decode = DecodeFrame;
+        p_dec->pf_flush  = Flush;
     }
     return ret;
 }
@@ -276,7 +274,15 @@ static int OpenDecoder( vlc_object_t *p_this )
  *****************************************************************************/
 static block_t *SendFrame( decoder_t *p_dec, block_t **pp_block )
 {
-    block_t *p_block = DecodeBlock( p_dec, pp_block );
+    if( pp_block == NULL ) /* No Drain */
+        return NULL;
+
+    block_t *p_block = *pp_block;
+    if( p_block == NULL )
+        return NULL;
+    *pp_block = NULL;
+
+    p_block = DecodeBlock( p_dec, p_block );
     if( p_block == NULL )
         return NULL;
 

@@ -93,6 +93,8 @@ image_handler_t *image_HandlerCreate( vlc_object_t *p_this )
     p_image->pf_write_url = ImageWriteUrl;
     p_image->pf_convert = ImageConvert;
 
+    p_image->outfifo = picture_fifo_New();
+
     return p_image;
 }
 
@@ -108,6 +110,8 @@ void image_HandlerDelete( image_handler_t *p_image )
     if( p_image->p_enc ) DeleteEncoder( p_image->p_enc );
     if( p_image->p_filter ) DeleteFilter( p_image->p_filter );
 
+    picture_fifo_Delete( p_image->outfifo );
+
     free( p_image );
     p_image = NULL;
 }
@@ -117,11 +121,18 @@ void image_HandlerDelete( image_handler_t *p_image )
  *
  */
 
+static int ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic )
+{
+    image_handler_t *p_image = p_dec->p_queue_ctx;
+    picture_fifo_Push( p_image->outfifo, p_pic );
+    return 0;
+}
+
 static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
                              video_format_t *p_fmt_in,
                              video_format_t *p_fmt_out )
 {
-    picture_t *p_pic = NULL, *p_tmp;
+    picture_t *p_pic = NULL;
 
     /* Check if we can reuse the current decoder */
     if( p_image->p_dec &&
@@ -140,15 +151,36 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
             block_Release(p_block);
             return NULL;
         }
+        if( p_image->p_dec->fmt_out.i_cat != VIDEO_ES )
+        {
+            DeleteDecoder( p_image->p_dec );
+            p_image->p_dec = NULL;
+            block_Release(p_block);
+            return NULL;
+        }
+        p_image->p_dec->pf_queue_video = ImageQueueVideo;
+        p_image->p_dec->p_queue_ctx = p_image;
     }
 
     p_block->i_pts = p_block->i_dts = mdate();
-    while( (p_tmp = p_image->p_dec->pf_decode_video( p_image->p_dec, &p_block ))
-             != NULL )
+    int ret = p_image->p_dec->pf_decode( p_image->p_dec, p_block );
+    if( ret == VLCDEC_SUCCESS )
     {
-        if( p_pic != NULL )
-            picture_Release( p_pic );
-        p_pic = p_tmp;
+        /* Drain */
+        p_image->p_dec->pf_decode( p_image->p_dec, NULL );
+
+        p_pic = picture_fifo_Pop( p_image->outfifo );
+
+        unsigned lostcount = 0;
+        picture_t *lostpic;
+        while( ( lostpic = picture_fifo_Pop( p_image->outfifo ) ) != NULL )
+        {
+            picture_Release( lostpic );
+            lostcount++;
+        }
+        if( lostcount > 0 )
+            msg_Warn( p_image->p_parent, "Image decoder output more than one "
+                      "picture (%d)", lostcount );
     }
 
     if( p_pic == NULL )

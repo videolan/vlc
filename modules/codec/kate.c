@@ -156,11 +156,12 @@ static void CloseDecoder  ( vlc_object_t * );
 static int OpenPacketizer( vlc_object_t *p_this );
 #endif
 
-static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block );
+static int  DecodeSub( decoder_t *p_dec, block_t *p_block );
+static block_t * Packetize( decoder_t *p_dec, block_t **pp_block );
 static void Flush( decoder_t * );
 static int ProcessHeaders( decoder_t *p_dec );
-static subpicture_t *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
-                            block_t **pp_block );
+static void         *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
+                            block_t *p_block );
 static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp,
                             block_t *p_block );
 static void ParseKateComments( decoder_t * );
@@ -351,11 +352,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     msg_Dbg( p_dec, "kate: OpenDecoder");
 
     /* Set callbacks */
-    p_dec->pf_decode_sub = (subpicture_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode    = DecodeSub;
+    p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush     = Flush;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
@@ -476,17 +475,10 @@ static void Flush( decoder_t *p_dec )
  ****************************************************************************
  * This function must be fed with kate packets.
  ****************************************************************************/
-static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static void *DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
     kate_packet kp;
-
-    if( !pp_block || !*pp_block )
-        return NULL;
-
-    p_block = *pp_block;
-    *pp_block = NULL;
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
@@ -514,13 +506,34 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         if( ProcessHeaders( p_dec ) )
         {
-            block_Release( *pp_block );
+            block_Release( p_block );
             return NULL;
         }
         p_sys->b_has_headers = true;
     }
 
-    return ProcessPacket( p_dec, &kp, pp_block );
+    return ProcessPacket( p_dec, &kp, p_block );
+}
+
+static int DecodeSub( decoder_t *p_dec, block_t *p_block )
+{
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
+
+    subpicture_t *p_spu = DecodeBlock( p_dec, p_block );
+    if( p_spu != NULL )
+        decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
+}
+
+static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
+{
+    if( pp_block == NULL ) /* No Drain */
+        return NULL;
+    block_t *p_block = *pp_block; *pp_block = NULL;
+    if( p_block == NULL )
+        return NULL;
+    return DecodeBlock( p_dec, p_block );
 }
 
 /*****************************************************************************
@@ -611,20 +624,16 @@ static int ProcessHeaders( decoder_t *p_dec )
 /*****************************************************************************
  * ProcessPacket: processes a kate packet.
  *****************************************************************************/
-static subpicture_t *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
-                            block_t **pp_block )
+static void *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
+                            block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block = *pp_block;
-    subpicture_t *p_buf = NULL;
 
     /* Date management */
     if( p_block->i_pts > VLC_TS_INVALID && p_block->i_pts != p_sys->i_pts )
     {
         p_sys->i_pts = p_block->i_pts;
     }
-
-    *pp_block = NULL; /* To avoid being fed the same packet again */
 
 #ifdef ENABLE_PACKETIZER
     if( p_sys->b_packetizer )
@@ -636,19 +645,17 @@ static subpicture_t *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
             p_block->i_length = p_sys->i_pts - p_block->i_pts;
         else
             p_block->i_length = 0;
-
-        p_buf = p_block;
+        return p_block;
     }
     else
 #endif
     {
-        p_buf = DecodePacket( p_dec, p_kp, p_block );
+        subpicture_t *p_buf = DecodePacket( p_dec, p_kp, p_block );
 
         if( p_block )
             block_Release( p_block );
+        return p_buf;
     }
-
-    return p_buf;
 }
 
 /* nicked off blend.c */

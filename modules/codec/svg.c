@@ -45,7 +45,7 @@
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
-static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
+static int DecodeBlock  ( decoder_t *, block_t * );
 
 #define TEXT_WIDTH       N_("Image width")
 #define LONG_TEXT_WIDTH  N_("Specify the width to decode the image too")
@@ -112,7 +112,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_BGRA;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
 
     return VLC_SUCCESS;
 }
@@ -122,10 +122,9 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function must be fed with a complete image.
  ****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys  = (decoder_sys_t *) p_dec->p_sys;
-    block_t *p_block;
     picture_t *p_pic = NULL;
     int32_t i_width, i_height;
 
@@ -133,15 +132,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     cairo_surface_t *surface = NULL;
     cairo_t *cr = NULL;
 
-    if( !pp_block || !*pp_block ) return NULL;
-
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED)
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     rsvg = rsvg_handle_new_from_data( p_block->p_buffer, p_block->i_buffer, NULL );
@@ -259,7 +256,9 @@ done:
         cairo_surface_destroy( surface );
 
     block_Release( p_block );
-    return p_pic;
+    if( p_pic != NULL )
+        decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

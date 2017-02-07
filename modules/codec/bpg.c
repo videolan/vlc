@@ -37,7 +37,7 @@ struct decoder_sys_t
 static int  OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
-static picture_t *DecodeBlock(decoder_t *, block_t **);
+static int DecodeBlock(decoder_t *, block_t *);
 
 /*
  * Module descriptor
@@ -80,7 +80,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->fmt_out.i_cat = VIDEO_ES;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
 
     return VLC_SUCCESS;
 }
@@ -88,18 +88,14 @@ static int OpenDecoder(vlc_object_t *p_this)
 /*
  * This function must be fed with a complete compressed frame.
  */
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
     picture_t *p_pic = 0;
     BPGImageInfo img_info;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         goto error;
@@ -158,12 +154,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
 
-    block_Release( p_block );
-    return p_pic;
-
+    decoder_QueueVideo( p_dec, p_pic );
 error:
     block_Release( p_block );
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 static void CloseDecoder( vlc_object_t *p_this )

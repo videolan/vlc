@@ -40,13 +40,12 @@
 #include <vlc_demux.h>
 
 /*** Decoder ***/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
-    block_t *p_block;
     picture_t * p_pic = NULL;
 
-    if( !pp_block || !*pp_block ) return NULL;
-    p_block = *pp_block;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( !decoder_UpdateVideoFormat( p_dec ) )
         p_pic = decoder_NewPicture( p_dec );
@@ -73,8 +72,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
 error:
     block_Release( p_block );
-    *pp_block = NULL;
-    return p_pic;
+    decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 }
 
 static int OpenDecoder ( vlc_object_t *p_this )
@@ -84,9 +83,7 @@ static int OpenDecoder ( vlc_object_t *p_this )
     msg_Dbg( p_this, "opening stats decoder" );
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
-    p_dec->pf_decode_audio = NULL;
-    p_dec->pf_decode_sub = NULL;
+    p_dec->pf_decode = DecodeBlock;
 
     /* */
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_I420 );

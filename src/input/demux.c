@@ -504,9 +504,7 @@ decoder_t *demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char
     }
     p_fmt->b_packetized = false;
 
-    p_packetizer->pf_decode_audio = NULL;
-    p_packetizer->pf_decode_video = NULL;
-    p_packetizer->pf_decode_sub = NULL;
+    p_packetizer->pf_decode = NULL;
     p_packetizer->pf_packetize = NULL;
 
     p_packetizer->fmt_in = *p_fmt;

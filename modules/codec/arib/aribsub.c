@@ -41,7 +41,7 @@
  *****************************************************************************/
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int Decode( decoder_t *, block_t * );
 
 #define IGNORE_RUBY_TEXT N_("Ignore ruby(furigana)")
 #define IGNORE_RUBY_LONGTEXT N_("Ignore ruby(furigana) in the subtitle.")
@@ -117,7 +117,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_dec->p_sys = p_sys;
-    p_dec->pf_decode_sub = Decode;
+    p_dec->pf_decode = Decode;
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
 
@@ -161,22 +161,17 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block;
-    subpicture_t  *p_spu = NULL;
 
-    if( ( pp_block == NULL ) || ( *pp_block == NULL ) )
-    {
-        return NULL;
-    }
-    p_block = *pp_block;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     arib_parser_t *p_parser = arib_get_parser( p_sys->p_arib_instance );
@@ -184,13 +179,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if ( p_parser && p_decoder )
     {
         arib_parse_pes( p_parser, p_block->p_buffer, p_block->i_buffer );
-        p_spu = render( p_dec, p_parser, p_decoder, p_block );
+        subpicture_t *p_spu = render( p_dec, p_parser, p_decoder, p_block );
+        if( p_spu != NULL )
+            decoder_QueueSub( p_dec, p_spu );
     }
 
     block_Release( p_block );
-    *pp_block = NULL;
-
-    return p_spu;
+    return VLCDEC_SUCCESS;
 }
 
 /* following functions are local */

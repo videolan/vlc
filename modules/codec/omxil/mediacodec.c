@@ -61,7 +61,7 @@ struct csd
 #define DECODE_FLAG_RESTART (0x01)
 #define DECODE_FLASH_FLUSH (0x02)
 /**
- * Callback called when a new block is processed from DecodeCommon.
+ * Callback called when a new block is processed from DecodeBlock.
  * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
  */
 typedef int (*dec_on_new_block_cb)(decoder_t *, block_t **);
@@ -72,7 +72,7 @@ typedef int (*dec_on_new_block_cb)(decoder_t *, block_t **);
 typedef void (*dec_on_flush_cb)(decoder_t *);
 
 /**
- * Callback called when DecodeCommon try to get an output buffer (pic or block).
+ * Callback called when DecodeBlock try to get an output buffer (pic or block).
  * It returns -1 in case of error, or the number of output buffer returned.
  */
 typedef int (*dec_process_output_cb)(decoder_t *, mc_api_out *, picture_t **,
@@ -82,7 +82,7 @@ struct decoder_sys_t
 {
     mc_api api;
 
-    /* Codec Specific Data buffer: sent in DecodeCommon after a start or a flush
+    /* Codec Specific Data buffer: sent in DecodeBlock after a start or a flush
      * with the BUFFER_FLAG_CODEC_CONFIG flag.*/
     block_t **pp_csd;
     size_t i_csd_count;
@@ -154,13 +154,12 @@ static int VideoVC1_OnNewBlock(decoder_t *, block_t **);
 static void Video_OnFlush(decoder_t *);
 static int Video_ProcessOutput(decoder_t *, mc_api_out *, picture_t **,
                                block_t **);
-static picture_t *DecodeVideo(decoder_t *, block_t **);
+static int DecodeBlock(decoder_t *, block_t *);
 
 static int Audio_OnNewBlock(decoder_t *, block_t **);
 static void Audio_OnFlush(decoder_t *);
 static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **,
                                block_t **);
-static block_t *DecodeAudio(decoder_t *, block_t **);
 
 static void DecodeFlushLocked(decoder_t *);
 static void DecodeFlush(decoder_t *);
@@ -219,7 +218,7 @@ static void CSDFree(decoder_t *p_dec)
     p_sys->i_csd_count = 0;
 }
 
-/* Create the p_sys->p_csd that will be sent from DecodeCommon */
+/* Create the p_sys->p_csd that will be sent from DecodeBlock */
 static int CSDDup(decoder_t *p_dec, const struct csd *p_csd, size_t i_count)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -844,9 +843,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         goto bailout;
     }
 
-    p_dec->pf_decode_video = DecodeVideo;
-    p_dec->pf_decode_audio = DecodeAudio;
-    p_dec->pf_flush        = DecodeFlush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = DecodeFlush;
 
     return VLC_SUCCESS;
 
@@ -1354,39 +1352,31 @@ static block_t *GetNextBlock(decoder_sys_t *p_sys, block_t *p_block)
         return p_block;
 }
 
-/**
- * DecodeCommon called from DecodeVideo or DecodeAudio.
- * It returns -1 in case of error, 0 otherwise.
- */
-static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
+static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_ret;
     bool b_dequeue_timeout = false;
     bool b_draining;
 
-    if (pp_block != NULL && *pp_block == NULL)
-        return 0;
-
     vlc_mutex_lock(&p_sys->lock);
 
     if (p_sys->b_aborted)
         goto end;
 
-    if (pp_block != NULL)
+    if (p_in_block != NULL)
     {
-        block_t *p_block = *pp_block;
         b_draining = false;
-        if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
+        if (p_in_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
         {
             DecodeFlushLocked(p_dec);
             if (p_sys->b_aborted)
                 goto end;
-            if (p_block->i_flags & BLOCK_FLAG_CORRUPTED)
+            if (p_in_block->i_flags & BLOCK_FLAG_CORRUPTED)
                 goto end;
         }
 
-        if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
+        if (p_in_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
          && !(p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED))
         {
             /* Before Android 21 and depending on the vendor, MediaCodec can
@@ -1398,7 +1388,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
         }
 
         /* Parse input block */
-        if ((i_ret = p_sys->pf_on_new_block(p_dec, pp_block)) != 1)
+        if ((i_ret = p_sys->pf_on_new_block(p_dec, &p_in_block)) != 1)
         {
             if (i_ret != 0)
             {
@@ -1423,7 +1413,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
 
     if (p_sys->i_decode_flags & (DECODE_FLASH_FLUSH|DECODE_FLAG_RESTART))
     {
-        msg_Warn(p_dec, "Flushing from DecodeCommon");
+        msg_Warn(p_dec, "Flushing from DecodeBlock");
         const bool b_restart = p_sys->i_decode_flags & DECODE_FLAG_RESTART;
         p_sys->i_decode_flags = 0;
 
@@ -1448,7 +1438,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
             switch (i_ret)
             {
             case VLC_SUCCESS:
-                msg_Warn(p_dec, "Restarted from DecodeCommon");
+                msg_Warn(p_dec, "Restarted from DecodeBlock");
                 break;
             case VLC_ENOOBJ:
                 break;
@@ -1466,7 +1456,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
 
     /* Queue CSD blocks and input blocks */
     block_t *p_block = NULL;
-    while (b_draining || (p_block = GetNextBlock(p_sys, *pp_block)))
+    while (b_draining || (p_block = GetNextBlock(p_sys, p_in_block)))
     {
         int i_index;
 
@@ -1516,9 +1506,9 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
                     p_sys->b_output_ready = true;
                     vlc_cond_broadcast(&p_sys->cond);
 
-                    assert(p_block == *pp_block),
-                    block_Release(p_block);
-                    *pp_block = NULL;
+                    assert(p_block == p_in_block),
+                    block_Release(p_in_block);
+                    p_in_block = NULL;
                 }
                 b_dequeue_timeout = false;
                 if (b_draining)
@@ -1537,7 +1527,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
              * Vout is paused and when the Decoder is flushing. In that case,
              * the Vout won't release any output buffers, therefore MediaCodec
              * won't dequeue any input buffers. To work around this issue,
-             * release all output buffers if DecodeCommon is waiting more than
+             * release all output buffers if DecodeBlock is waiting more than
              * 1sec for a new input buffer. */
             if (!b_dequeue_timeout)
             {
@@ -1576,15 +1566,12 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
             msg_Err(p_dec, "OutThread timed out");
 
         vlc_mutex_unlock(&p_sys->lock);
-        return 0;
+        return VLCDEC_SUCCESS;
     }
 
 end:
-    if (pp_block && *pp_block)
-    {
-        block_Release(*pp_block);
-        *pp_block = NULL;
-    }
+    if (p_in_block)
+        block_Release(p_in_block);
     if (p_sys->b_aborted)
     {
         if (!p_sys->b_has_format)
@@ -1598,12 +1585,12 @@ end:
         else
             p_dec->b_error = true;
         vlc_mutex_unlock(&p_sys->lock);
-        return -1;
+        return VLCDEC_SUCCESS;
     }
     else
     {
         vlc_mutex_unlock(&p_sys->lock);
-        return 0;
+        return VLCDEC_SUCCESS;
     }
 }
 
@@ -1693,12 +1680,6 @@ static void Video_OnFlush(decoder_t *p_dec)
         InvalidateAllPictures(p_dec);
 }
 
-static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
-{
-    DecodeCommon(p_dec, pp_block);
-    return NULL;
-}
-
 static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1720,10 +1701,4 @@ static void Audio_OnFlush(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     date_Set(&p_sys->audio.i_end_date, VLC_TS_INVALID);
-}
-
-static block_t *DecodeAudio(decoder_t *p_dec, block_t **pp_block)
-{
-    DecodeCommon(p_dec, pp_block);
-    return NULL;
 }

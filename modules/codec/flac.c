@@ -102,7 +102,7 @@ static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
 #endif
 
-static block_t *DecodeBlock( decoder_t *, block_t ** );
+static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 /*****************************************************************************
@@ -361,8 +361,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
 
     /* Set callbacks */
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }
@@ -509,28 +509,26 @@ static void Flush( decoder_t *p_dec )
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
-static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-    if( (*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
     {
         Flush( p_dec );
-        if( (*pp_block)->i_flags & BLOCK_FLAG_CORRUPTED )
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
-            block_Release( *pp_block );
-            *pp_block = NULL;
-            return NULL;
+            block_Release( p_block );
+            return VLCDEC_SUCCESS;
         }
     }
 
     if( !p_sys->b_stream_info )
         ProcessHeader( p_dec );
 
-    p_sys->p_block = *pp_block;
-    *pp_block = NULL;
+    p_sys->p_block = p_block;
 
     if( p_sys->p_block->i_pts > VLC_TS_INVALID &&
         p_sys->p_block->i_pts != date_Get( &p_sys->end_date ) )
@@ -562,7 +560,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     block_Release( p_sys->p_block );
     p_sys->p_block = NULL;
 
-    return p_sys->p_aout_buffer;
+    if( p_sys->p_aout_buffer != NULL )
+        decoder_QueueAudio( p_dec, p_sys->p_aout_buffer );
+    return VLCDEC_SUCCESS;
 }
 
 #ifdef ENABLE_SOUT

@@ -705,11 +705,8 @@ static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, int64_t i_playback
     return p_regions;
 }
 
-static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
+static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 {
-    subpicture_t *p_spus_head = NULL;
-    subpicture_t **pp_spus_tail = &p_spus_head;
-
     int64_t *p_timings_array = NULL;
     size_t   i_timings_count = 0;
 
@@ -720,18 +717,18 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
     temporal_extent.i_dur = -1;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-        return NULL;
+        return VLCDEC_SUCCESS;
 
     /* We cannot display a subpicture with no date */
     if( p_block->i_pts <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "subtitle without a date" );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     tt_node_t *p_rootnode = ParseTTML( p_dec, p_block->p_buffer, p_block->i_buffer );
     if( !p_rootnode )
-        return NULL;
+        return VLCDEC_SUCCESS;
 
     tt_timings_Resolve( (tt_basenode_t *) p_rootnode, &temporal_extent,
                         &p_timings_array, &i_timings_count );
@@ -804,17 +801,14 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
         }
 
         if( p_spu )
-        {
-            *pp_spus_tail = p_spu;
-            pp_spus_tail = &p_spu->p_next;
-        }
+            decoder_QueueSub( p_dec, p_spu );
     }
 
     tt_node_RecursiveDelete( p_rootnode );
 
     free( p_timings_array );
 
-    return p_spus_head;
+    return VLCDEC_SUCCESS;
 }
 
 
@@ -822,18 +816,14 @@ static subpicture_t *ParseBlock( decoder_t *p_dec, const block_t *p_block )
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
-static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
-    if( !pp_block || *pp_block == NULL )
-        return NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
-    block_t* p_block = *pp_block;
-    subpicture_t *p_spu = ParseBlock( p_dec, p_block );
-
+    int ret = ParseBlock( p_dec, p_block );
     block_Release( p_block );
-    *pp_block = NULL;
-
-    return p_spu;
+    return ret;
 }
 
 /*****************************************************************************
@@ -852,7 +842,7 @@ int OpenDecoder( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_dec->pf_decode_sub = DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
     p_dec->fmt_out.i_cat = SPU_ES;
     p_sys->i_align = var_InheritInteger( p_dec, "ttml-align" );
 

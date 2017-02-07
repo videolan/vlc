@@ -86,7 +86,7 @@ vlc_module_end()
 #pragma mark - local prototypes
 
 static CFDataRef ESDSCreate(decoder_t *, uint8_t *, uint32_t);
-static picture_t *DecodeBlock(decoder_t *, block_t **);
+static int DecodeBlock(decoder_t *, block_t *);
 static void PicReorder_pushSorted(decoder_t *, picture_t *);
 static picture_t *PicReorder_pop(decoder_t *, bool);
 static void PicReorder_flush(decoder_t *);
@@ -752,8 +752,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         return i_ret;
     }
 
-    p_dec->pf_decode_video = DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
 
     msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'", (char *)&p_dec->fmt_in.i_codec);
 
@@ -1028,7 +1028,7 @@ static void Flush(decoder_t *p_dec)
     p_sys->b_vt_flush = p_sys->b_vt_feed;
 }
 
-static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
+static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1037,22 +1037,24 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
         p_sys->b_vt_flush = false;
     }
 
-    if (!pp_block)
+    if (!p_block)
     {
         /* draining: return last pictures of the reordered queue */
         if (p_sys->session)
             VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
-        vlc_mutex_lock(&p_sys->lock);
-        picture_t *p_pic = PicReorder_pop(p_dec, true);
-        vlc_mutex_unlock(&p_sys->lock);
-        return p_pic;
+        for (;;)
+        {
+            vlc_mutex_lock(&p_sys->lock);
+            picture_t *p_pic = PicReorder_pop(p_dec, true);
+            vlc_mutex_unlock(&p_sys->lock);
+
+            if (p_pic)
+                decoder_QueueVideo(p_dec, p_pic);
+            else
+                break;
+        }
+        return VLCDEC_SUCCESS;
     }
-
-    block_t *p_block = *pp_block;
-    *pp_block = NULL;
-
-    if (p_block == NULL)
-        return NULL; /* no need to be called again, pics are queued asynchronously */
 
     vlc_mutex_lock(&p_sys->lock);
     if (p_sys->b_abort) { /* abort from output thread (DecoderCallback) */
@@ -1089,7 +1091,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     if (p_sys->codec == kCMVideoCodecType_H264) {
         p_block = H264ProcessBlock(p_dec, p_block);
         if (!p_block)
-            return NULL;
+            return VLCDEC_SUCCESS;
     }
 
     CMSampleBufferRef sampleBuffer =
@@ -1131,7 +1133,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 
 skip:
     block_Release(p_block);
-    return NULL;
+    return VLCDEC_SUCCESS;
 
 reload:
     /* Add an empty variable so that videotoolbox won't be loaded again for
@@ -1141,7 +1143,7 @@ reload:
     else
         p_dec->b_error = true;
     block_Release(p_block);
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)

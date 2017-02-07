@@ -225,7 +225,7 @@ struct decoder_sys_t
     bool b_opaque;
 };
 
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int Decode( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 /*****************************************************************************
@@ -260,8 +260,8 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_sub = Decode;
-    p_dec->pf_flush      = Flush;
+    p_dec->pf_decode = Decode;
+    p_dec->pf_flush  = Flush;
 
     /* Allocate the memory needed to store the decoder's structure */
     p_dec->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
@@ -301,15 +301,12 @@ static void     Push( decoder_t *, block_t * );
 static block_t *Pop( decoder_t * );
 static subpicture_t *Convert( decoder_t *, block_t ** );
 
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( pp_block && *pp_block )
-    {
-        Push( p_dec, *pp_block );
-        *pp_block = NULL;
-    }
+    if( p_block )
+        Push( p_dec, p_block );
 
     for( ;; )
     {
@@ -331,9 +328,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         subpicture_t *p_spu = Convert( p_dec, &p_sys->p_block );
         if( p_spu )
-            return p_spu;
+            decoder_QueueSub( p_dec, p_spu );
     }
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

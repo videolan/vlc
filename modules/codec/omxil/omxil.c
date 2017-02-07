@@ -77,8 +77,8 @@ static int  OpenEncoder( vlc_object_t * );
 static int  OpenGeneric( vlc_object_t *, bool b_encode );
 static void CloseGeneric( vlc_object_t * );
 
-static picture_t *DecodeVideo( decoder_t *, block_t ** );
-static block_t *DecodeAudio ( decoder_t *, block_t ** );
+static int DecodeVideo( decoder_t *, block_t * );
+static int DecodeAudio ( decoder_t *, block_t * );
 static block_t *EncodeVideo( encoder_t *, picture_t * );
 static void Flush( decoder_t * );
 
@@ -1019,8 +1019,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     status = OpenGeneric( p_this, false );
     if(status != VLC_SUCCESS) return status;
 
-    p_dec->pf_decode_video = DecodeVideo;
-    p_dec->pf_decode_audio = DecodeAudio;
+    switch( p_dec->fmt_in.i_cat )
+    {
+        case AUDIO_ES: p_dec->pf_decode = DecodeAudio; break;
+        case VIDEO_ES: p_dec->pf_decode = DecodeVideo; break;
+        default: vlc_assert_unreachable();
+    }
     p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
@@ -1538,32 +1542,28 @@ static void Flush( decoder_t *p_dec )
 /*****************************************************************************
  * DecodeVideo: Called to decode one frame
  *****************************************************************************/
-static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
+static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    picture_t *p_pic = NULL;
     OMX_ERRORTYPE omx_error;
     unsigned int i;
-    block_t *p_block;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-
-    p_block = *pp_block;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     /* Check for errors from codec */
     if(p_sys->b_error)
     {
         msg_Dbg(p_dec, "error during decoding");
         block_Release( p_block );
-        return 0;
+        return VLCDEC_SUCCESS;
     }
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block );
         Flush( p_dec );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     /* Use the aspect ratio provided by the input (ie read from packetizer).
@@ -1579,22 +1579,19 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
     }
 
-    /* Take care of decoded frames first */
-    if( DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
-        goto error;
-
     /* Loop as long as we haven't either got an input buffer (and cleared
      * *pp_block) or got an output picture */
     int max_polling_attempts = 100;
     int attempts = 0;
-    while( *pp_block && !p_pic ) {
+    while( p_block ) {
         bool b_reconfig = false;
 
-        if( DecodeVideoInput( p_dec, &p_sys->in, pp_block, 0, &b_reconfig ) != 0 )
+        if( DecodeVideoInput( p_dec, &p_sys->in, &p_block, 0, &b_reconfig ) != 0 )
             goto error;
 
+        picture_t *p_pic = NULL;
         /* If we don't have a p_pic from the first try. Try again */
-        if( !b_reconfig && !p_pic &&
+        if( !b_reconfig &&
             DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
             goto error;
 
@@ -1616,6 +1613,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
+        if( p_pic != NULL )
+        {
+            decoder_QueueVideo( p_dec, p_pic );
+            continue;
+        }
         attempts++;
         /* With opaque DR the output buffers are released by the
            vout therefore we implement a timeout for polling in
@@ -1631,46 +1633,44 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 picture_sys_t *p_picsys = invalid_picture->p_sys;
                 p_picsys->hw.p_dec = NULL;
                 p_picsys->hw.i_index = -1;
+                return VLCDEC_SUCCESS;
             } else {
                 /* If we cannot return a picture we must free the
                    block since the decoder will proceed with the
                    next block. */
                 block_Release(p_block);
-                *pp_block = NULL;
+                p_block = NULL;
+                return VLCDEC_SUCCESS;
             }
-            return invalid_picture;
 #endif
         }
     }
 
-    return p_pic;
+    return VLCDEC_SUCCESS;
 error:
     p_sys->b_error = true;
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
+int DecodeAudio ( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_buffer = NULL;
     OMX_BUFFERHEADERTYPE *p_header;
     OMX_ERRORTYPE omx_error;
-    block_t *p_block;
     unsigned int i;
 
-    if( !pp_block || !*pp_block ) return NULL;
-
-    p_block = *pp_block;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     /* Check for errors from codec */
     if(p_sys->b_error)
     {
         msg_Dbg(p_dec, "error during decoding");
         block_Release( p_block );
-        return 0;
+        return VLCDEC_SUCCESS;
     }
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
@@ -1684,7 +1684,7 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
                              p_sys->in.definition.nPortIndex, 0 );
         }
         p_sys->in.b_flushed = true;
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     if( !date_Get( &p_sys->end_date ) )
@@ -1693,13 +1693,13 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         {
             /* We've just started the stream, wait for the first PTS. */
             block_Release( p_block );
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
 
     /* Take care of decoded frames first */
-    while(!p_buffer)
+    while (p_block != NULL)
     {
         unsigned int i_samples = 0;
 
@@ -1712,7 +1712,7 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         {
             if( decoder_UpdateAudioFormat( p_dec ) )
                 break;
-            p_buffer = decoder_NewAudioBuffer( p_dec, i_samples );
+            block_t *p_buffer = decoder_NewAudioBuffer( p_dec, i_samples );
             if( !p_buffer ) break; /* No audio buffer available */
 
             memcpy( p_buffer->p_buffer, p_header->pBuffer, p_buffer->i_buffer );
@@ -1726,25 +1726,25 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
             p_buffer->i_pts = date_Get( &p_sys->end_date );
             p_buffer->i_length = date_Increment( &p_sys->end_date, i_samples ) -
                 p_buffer->i_pts;
+            decoder_QueueAudio( p_dec, p_buffer );
         }
 
         OMX_DBG( "FillThisBuffer %p, %p", (void *)p_header,
                  (void *)p_header->pBuffer );
         OMX_FIFO_GET(&p_sys->out.fifo, p_header);
         OMX_FillThisBuffer(p_sys->omx_handle, p_header);
-    }
 
+        /* Send the input buffer to the component */
+        OMX_FIFO_GET_TIMEOUT(&p_sys->in.fifo, p_header, 200000);
 
-    /* Send the input buffer to the component */
-    OMX_FIFO_GET_TIMEOUT(&p_sys->in.fifo, p_header, 200000);
+        if (p_header && p_header->nFlags & SENTINEL_FLAG) {
+            free(p_header);
+            goto reconfig;
+        }
 
-    if (p_header && p_header->nFlags & SENTINEL_FLAG) {
-        free(p_header);
-        goto reconfig;
-    }
+        if (!p_header)
+            continue;
 
-    if(p_header)
-    {
         p_header->nFilledLen = p_block->i_buffer;
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
@@ -1775,7 +1775,7 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
                  (void *)p_header->pBuffer, (unsigned)p_header->nFilledLen );
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
         p_sys->in.b_flushed = false;
-        *pp_block = NULL; /* Avoid being fed the same packet again */
+        p_block = NULL;
     }
 
 reconfig:
@@ -1789,10 +1789,10 @@ reconfig:
         CHECK_ERROR(omx_error, "PortReconfigure failed");
     }
 
-    return p_buffer;
+    return VLCDEC_SUCCESS;
 error:
     p_sys->b_error = true;
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -509,6 +509,7 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
     if( !id )
         goto error;
 
+    vlc_mutex_init(&id->fifo.lock);
     id->id = NULL;
     id->p_decoder = NULL;
     id->p_encoder = NULL;
@@ -579,6 +580,7 @@ error:
             id->p_encoder = NULL;
         }
 
+        vlc_mutex_destroy(&id->fifo.lock);
         free( id );
     }
     return NULL;
@@ -623,6 +625,7 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         vlc_object_release( id->p_encoder );
         id->p_encoder = NULL;
     }
+    vlc_mutex_destroy(&id->fifo.lock);
     free( id );
 }
 

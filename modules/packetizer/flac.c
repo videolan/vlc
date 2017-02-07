@@ -811,9 +811,9 @@ static int Open(vlc_object_t *p_this)
     p_dec->fmt_out.i_codec = VLC_CODEC_FLAC;
 
     /* */
-    p_dec->pf_decode_audio = NULL;
-    p_dec->pf_packetize    = Packetize;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode    = NULL;
+    p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush     = Flush;
 
     return VLC_SUCCESS;
 }

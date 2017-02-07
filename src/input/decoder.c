@@ -156,9 +156,7 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
     p_dec->b_frame_drop_allowed = true;
     p_dec->i_extra_picture_buffers = 0;
 
-    p_dec->pf_decode_audio = NULL;
-    p_dec->pf_decode_video = NULL;
-    p_dec->pf_decode_sub = NULL;
+    p_dec->pf_decode = NULL;
     p_dec->pf_get_cc = NULL;
     p_dec->pf_packetize = NULL;
     p_dec->pf_flush = NULL;
@@ -1039,81 +1037,6 @@ static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
     return ret;
 }
 
-static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
-{
-    picture_t      *p_pic;
-    block_t **pp_block = p_block ? &p_block : NULL;
-    unsigned i_lost = 0, i_decoded = 0;
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    while( (p_pic = p_dec->pf_decode_video( p_dec, pp_block ) ) )
-    {
-        i_decoded++;
-
-        DecoderPlayVideo( p_dec, p_pic, &i_lost );
-    }
-
-    p_owner->pf_update_stat( p_owner, i_decoded, i_lost );
-}
-
-/* This function process a video block
- */
-static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    if( p_owner->p_packetizer )
-    {
-        block_t *p_packetized_block;
-        block_t **pp_block = p_block ? &p_block : NULL;
-        decoder_t *p_packetizer = p_owner->p_packetizer;
-
-        while( (p_packetized_block =
-                p_packetizer->pf_packetize( p_packetizer, pp_block ) ) )
-        {
-            if( !es_format_IsSimilar( &p_dec->fmt_in, &p_packetizer->fmt_out ) )
-            {
-                msg_Dbg( p_dec, "restarting module due to input format change");
-
-                /* Drain the decoder module */
-                DecoderDecodeVideo( p_dec, NULL );
-
-                if( ReloadDecoder( p_dec, false, &p_packetizer->fmt_out,
-                                   RELOAD_DECODER ) != VLC_SUCCESS )
-                {
-                    block_ChainRelease( p_packetized_block );
-                    return;
-                }
-            }
-
-            if( p_packetizer->pf_get_cc )
-                DecoderGetCc( p_dec, p_packetizer );
-
-            while( p_packetized_block )
-            {
-                block_t *p_next = p_packetized_block->p_next;
-                p_packetized_block->p_next = NULL;
-
-                DecoderDecodeVideo( p_dec, p_packetized_block );
-                if( p_dec->b_error )
-                {
-                    block_ChainRelease( p_next );
-                    return;
-                }
-
-                p_packetized_block = p_next;
-            }
-        }
-        /* Drain the decoder after the packetizer is drained */
-        if( !pp_block )
-            DecoderDecodeVideo( p_dec, NULL );
-    }
-    else
-    {
-        DecoderDecodeVideo( p_dec, p_block );
-    }
-}
-
 static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
                              unsigned *restrict pi_lost_sum )
 {
@@ -1234,78 +1157,6 @@ static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
     return ret;
 }
 
-static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
-{
-    block_t *p_aout_buf;
-    block_t **pp_block = p_block ? &p_block : NULL;
-    unsigned decoded = 0, lost = 0;
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, pp_block ) ) )
-    {
-        decoded++;
-
-        DecoderPlayAudio( p_dec, p_aout_buf, &lost );
-    }
-
-    p_owner->pf_update_stat( p_owner, decoded, lost );
-}
-
-/* This function process a audio block
- */
-static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    if( p_owner->p_packetizer )
-    {
-        block_t *p_packetized_block;
-        block_t **pp_block = p_block ? &p_block : NULL;
-        decoder_t *p_packetizer = p_owner->p_packetizer;
-
-        while( (p_packetized_block =
-                p_packetizer->pf_packetize( p_packetizer, pp_block ) ) )
-        {
-            if( !es_format_IsSimilar( &p_dec->fmt_in, &p_packetizer->fmt_out ) )
-            {
-                msg_Dbg( p_dec, "restarting module due to input format change");
-
-                /* Drain the decoder module */
-                DecoderDecodeAudio( p_dec, NULL );
-
-                if( ReloadDecoder( p_dec, false, &p_packetizer->fmt_out,
-                                   RELOAD_DECODER ) != VLC_SUCCESS )
-                {
-                    block_ChainRelease( p_packetized_block );
-                    return;
-                }
-            }
-
-            while( p_packetized_block )
-            {
-                block_t *p_next = p_packetized_block->p_next;
-                p_packetized_block->p_next = NULL;
-
-                DecoderDecodeAudio( p_dec, p_packetized_block );
-                if( p_dec->b_error )
-                {
-                    block_ChainRelease( p_next );
-                    return;
-                }
-
-                p_packetized_block = p_next;
-            }
-        }
-        /* Drain the decoder after the packetizer is drained */
-        if( !pp_block )
-            DecoderDecodeAudio( p_dec, NULL );
-    }
-    else
-    {
-        DecoderDecodeAudio( p_dec, p_block );
-    }
-}
-
 static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1391,22 +1242,19 @@ static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
     return i_ret;
 }
 
-/* This function process a subtitle block
- */
-static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
-{
-    subpicture_t *p_spu;
-    block_t **pp_block = p_block ? &p_block : NULL;
 
-    while( (p_spu = p_dec->pf_decode_sub( p_dec, pp_block ) ) )
+static void DecoderDecode( decoder_t *p_dec, block_t *p_block )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    int ret = p_dec->pf_decode( p_dec, p_block );
+    switch( ret )
     {
-        do
-        {
-            subpicture_t *p = p_spu;
-            p_spu = p_spu->p_next;
-            p->p_next = NULL;
-            DecoderQueueSpu( p_dec, p );
-        } while( p_spu );
+        case VLCDEC_SUCCESS:
+            p_owner->pf_update_stat( p_owner, 1, 0 );
+            break;
+        default:
+            vlc_assert_unreachable();
     }
 }
 
@@ -1424,7 +1272,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
         goto error;
 
     /* Here, the atomic doesn't prevent to miss a reload request.
-     * DecoderProcess*() can still be called after the decoder module or the
+     * DecoderProcess() can still be called after the decoder module or the
      * audio output requested a reload. This will only result in a drop of an
      * input block or an output buffer. */
     enum reload reload;
@@ -1455,13 +1303,55 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     }
 #endif
 
-    switch( p_dec->fmt_out.i_cat )
+    if( p_owner->p_packetizer )
     {
-        case VIDEO_ES: DecoderProcessVideo( p_dec, p_block ); return;
-        case AUDIO_ES: DecoderProcessAudio( p_dec, p_block ); return;
-        case   SPU_ES: DecoderProcessSpu( p_dec, p_block ); return;
-        default:       vlc_assert_unreachable();
+        block_t *p_packetized_block;
+        block_t **pp_block = p_block ? &p_block : NULL;
+        decoder_t *p_packetizer = p_owner->p_packetizer;
+
+        while( (p_packetized_block =
+                p_packetizer->pf_packetize( p_packetizer, pp_block ) ) )
+        {
+            if( !es_format_IsSimilar( &p_dec->fmt_in, &p_packetizer->fmt_out ) )
+            {
+                msg_Dbg( p_dec, "restarting module due to input format change");
+
+                /* Drain the decoder module */
+                DecoderDecode( p_dec, NULL );
+
+                if( ReloadDecoder( p_dec, false, &p_packetizer->fmt_out,
+                                   RELOAD_DECODER ) != VLC_SUCCESS )
+                {
+                    block_ChainRelease( p_packetized_block );
+                    return;
+                }
+            }
+
+            if( p_packetizer->pf_get_cc )
+                DecoderGetCc( p_dec, p_packetizer );
+
+            while( p_packetized_block )
+            {
+                block_t *p_next = p_packetized_block->p_next;
+                p_packetized_block->p_next = NULL;
+
+                DecoderDecode( p_dec, p_packetized_block );
+                if( p_dec->b_error )
+                {
+                    block_ChainRelease( p_next );
+                    return;
+                }
+
+                p_packetized_block = p_next;
+            }
+        }
+        /* Drain the decoder after the packetizer is drained */
+        if( !pp_block )
+            DecoderDecode( p_dec, NULL );
     }
+    else
+        DecoderDecode( p_dec, p_block );
+    return;
 
 error:
     if( p_block )

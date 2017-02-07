@@ -74,7 +74,7 @@ struct decoder_sys_t
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
 static block_t * ConvertAVFrame( decoder_t *p_dec, AVFrame *frame );
-static block_t *DecodeAudio( decoder_t *, block_t ** );
+static int  DecodeAudio( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
@@ -270,8 +270,8 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( p_dec->fmt_out.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
 
-    p_dec->pf_decode_audio = DecodeAudio;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeAudio;
+    p_dec->pf_flush  = Flush;
     return VLC_SUCCESS;
 }
 
@@ -299,9 +299,9 @@ static void Flush( decoder_t *p_dec )
 }
 
 /*****************************************************************************
- * DecodeAudio: Called to decode one frame
+ * DecodeBlock: Called to decode one frame
  *****************************************************************************/
-static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
@@ -464,6 +464,14 @@ drop:
     if( frame != NULL )
         av_frame_free( &frame );
     return NULL;
+}
+
+static int DecodeAudio( decoder_t *p_dec, block_t *p_block )
+{
+    block_t **pp_block = p_block ? &p_block : NULL, *p_out;
+    while( ( p_out = DecodeBlock( p_dec, pp_block ) ) != NULL )
+        decoder_QueueAudio( p_dec, p_out );
+    return VLCDEC_SUCCESS;
 }
 
 static block_t * ConvertAVFrame( decoder_t *p_dec, AVFrame *frame )

@@ -99,7 +99,7 @@ struct decoder_sys_t
     int                 i_images;
 };
 
-static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
+static int           DecodeBlock   ( decoder_t *, block_t * );
 static char         *CreatePlainText( char * );
 static int           ParseImageAttachments( decoder_t *p_dec );
 
@@ -126,7 +126,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( ( p_dec->p_sys = p_sys = calloc(1, sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
-    p_dec->pf_decode_sub = DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
 
@@ -154,22 +154,19 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function must be fed with complete subtitles units.
  ****************************************************************************/
-static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     subpicture_t *p_spu;
-    block_t *p_block;
 
-    if( !pp_block || *pp_block == NULL )
-        return NULL;
-
-    p_block = *pp_block;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     p_spu = ParseText( p_dec, p_block );
 
     block_Release( p_block );
-    *pp_block = NULL;
-
-    return p_spu;
+    if( p_spu != NULL )
+        decoder_QueueSub( p_dec, p_spu );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

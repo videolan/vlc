@@ -96,7 +96,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static picture_t *DecodeBlock   ( decoder_t *p_dec, block_t **pp_block );
+static int DecodeBlock   ( decoder_t *p_dec, block_t *p_block );
 // static void crystal_CopyPicture ( picture_t *, BC_DTS_PROC_OUT* );
 static int crystal_insert_sps_pps(decoder_t *, uint8_t *, uint32_t);
 
@@ -350,7 +350,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
 
     msg_Info( p_dec, "Opened CrystalHD hardware with success" );
     return VLC_SUCCESS;
@@ -431,20 +431,19 @@ static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block = NULL;
 
     BC_DTS_PROC_OUT proc_out;
     BC_DTS_STATUS driver_stat;
 
     /* First check the status of the decode to produce pictures */
     if( BC_FUNC_PSYS(DtsGetDriverStatus)( p_sys->bcm_handle, &driver_stat ) != BC_STS_SUCCESS )
-        return NULL;
-
-    if( pp_block )
-        p_block = *pp_block;
+    {
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
+    }
 
     if( p_block )
     {
@@ -457,10 +456,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                                             p_block->i_pts >= VLC_TS_INVALID ? TO_BC_PTS(p_block->i_pts) : 0, false );
 
             block_Release( p_block );
-            *pp_block = NULL;
 
             if( status != BC_STS_SUCCESS )
-                return NULL;
+                return VLCDEC_SUCCESS;
         }
     }
 #ifdef DEBUG_CRYSTALHD
@@ -472,7 +470,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 #endif
 
     if( driver_stat.ReadyListCount == 0 )
-        return NULL;
+        return VLCDEC_SUCCESS;
 
     /* Prepare the Output structure */
     /* We always expect and use YUY2 */
@@ -508,7 +506,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* In interlaced mode, do not push the first field in the pipeline */
             if( (proc_out.PicInfo.flags & VDEC_FLAG_INTERLACED_SRC) &&
                !(proc_out.PicInfo.flags & VDEC_FLAG_FIELDPAIR) )
-                return NULL;
+                return VLCDEC_SUCCESS;
 
             //  crystal_CopyPicture( p_pic, &proc_out );
             p_pic->date = proc_out.PicInfo.timeStamp > 0 ?
@@ -517,7 +515,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 #ifdef DEBUG_CRYSTALHD
             msg_Dbg( p_dec, "TS Output is %"PRIu64, p_pic->date);
 #endif
-            return p_pic;
+            decoder_QueueVideo( p_dec, p_pic );
+            return VLCDEC_SUCCESS;
 
         case BC_STS_DEC_NOT_OPEN:
         case BC_STS_DEC_NOT_STARTED:
@@ -585,7 +584,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     if( p_pic )
         picture_Release( p_pic );
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 #if 0

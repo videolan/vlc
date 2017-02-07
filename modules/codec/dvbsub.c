@@ -107,7 +107,7 @@ static const char *const ppsz_pos_descriptions[] =
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
-static subpicture_t *Decode( decoder_t *, block_t ** );
+static int Decode( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 #ifdef ENABLE_SOUT
@@ -334,8 +334,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_sub = Decode;
-    p_dec->pf_flush      = Flush;
+    p_dec->pf_decode = Decode;
+    p_dec->pf_flush  = Flush;
     p_sys = p_dec->p_sys = calloc( 1, sizeof(decoder_sys_t) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -404,15 +404,12 @@ static void Flush( decoder_t *p_dec )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block;
-    subpicture_t  *p_spu = NULL;
 
-    if( ( pp_block == NULL ) || ( *pp_block == NULL ) ) return NULL;
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( p_block == NULL ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
     {
@@ -420,7 +417,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
             block_Release( p_block );
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
     }
 
@@ -438,7 +435,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         msg_Warn( p_dec, "non dated subtitle" );
 #endif
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     bs_init( &p_sys->bs, p_block->p_buffer, p_block->i_buffer );
@@ -447,14 +444,14 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Dbg( p_dec, "invalid data identifier" );
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     if( bs_read( &p_sys->bs, 8 ) ) /* Subtitle stream id */
     {
         msg_Dbg( p_dec, "invalid subtitle stream id" );
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
 #ifdef DEBUG_DVBSUB
@@ -471,16 +468,20 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Warn( p_dec, "end marker not found (corrupted subtitle ?)" );
         block_Release( p_block );
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     /* Check if the page is to be displayed */
     if( p_sys->p_page && p_sys->b_page )
-        p_spu = render( p_dec );
+    {
+        subpicture_t *p_spu = render( p_dec );
+        if( p_spu != NULL )
+            decoder_QueueSub( p_dec, p_spu );
+    }
 
     block_Release( p_block );
 
-    return p_spu;
+    return VLCDEC_SUCCESS;
 }
 
 /* following functions are local */

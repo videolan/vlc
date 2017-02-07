@@ -154,13 +154,12 @@ static void Exchange( sample_t *restrict p_out, const sample_t *restrict p_in )
     }
 }
 
-static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_in_buf )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (pp_block == NULL || *pp_block == NULL)
-        return NULL;
-    block_t *p_in_buf = *pp_block;
+    if (p_in_buf == NULL) /* No drain */
+        return VLCDEC_SUCCESS;
 
 #ifdef LIBA52_FIXED
     sample_t i_sample_level = (1 << 24);
@@ -175,7 +174,10 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
      * samples for each channel. */
     block_t *p_out_buf = block_Alloc( 6 * i_bytes_per_block );
     if( unlikely(p_out_buf == NULL) )
-        goto out;
+    {
+        block_Release( p_in_buf );
+        return VLCDEC_SUCCESS;
+    }
 
     /* Do the actual decoding now. */
     a52_frame( p_sys->p_liba52, p_in_buf->p_buffer,
@@ -231,10 +233,9 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_out_buf->i_dts = p_in_buf->i_dts;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_in_buf->i_length;
-out:
     block_Release( p_in_buf );
-    *pp_block = NULL;
-    return p_out_buf;
+    decoder_QueueAudio( p_dec, p_out_buf );
+    return VLCDEC_SUCCESS;
 }
 
 static int channels_vlc2a52( const audio_format_t *p_audio, int *p_flags )
@@ -369,8 +370,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_decode_audio = Decode;
-    p_dec->pf_flush        = NULL;
+    p_dec->pf_decode = Decode;
+    p_dec->pf_flush  = NULL;
     return VLC_SUCCESS;
 }
 

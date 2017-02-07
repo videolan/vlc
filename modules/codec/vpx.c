@@ -159,25 +159,23 @@ static vlc_fourcc_t FindVlcChroma( struct vpx_image *img )
 /****************************************************************************
  * Decode: the whole thing
  ****************************************************************************/
-static picture_t *Decode(decoder_t *dec, block_t **pp_block)
+static int Decode(decoder_t *dec, block_t *block)
 {
     struct vpx_codec_ctx *ctx = &dec->p_sys->ctx;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-    block_t *block = *pp_block;
+    if (block == NULL) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if (block->i_flags & (BLOCK_FLAG_CORRUPTED)) {
         block_Release(block);
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     /* Associate packet PTS with decoded frame */
     mtime_t *pkt_pts = malloc(sizeof(*pkt_pts));
     if (!pkt_pts) {
         block_Release(block);
-        *pp_block = NULL;
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     *pkt_pts = block->i_pts ? block->i_pts : block->i_dts;
@@ -186,21 +184,20 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     err = vpx_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts, 0);
 
     block_Release(block);
-    *pp_block = NULL;
 
     if (err != VPX_CODEC_OK) {
         free(pkt_pts);
         VPX_ERR(dec, ctx, "Failed to decode frame");
         if (err == VPX_CODEC_UNSUP_BITSTREAM)
             dec->b_error = true;
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     const void *iter = NULL;
     struct vpx_image *img = vpx_codec_get_frame(ctx, &iter);
     if (!img) {
         free(pkt_pts);
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     /* fetches back the PTS */
@@ -212,7 +209,7 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
 
     if( dec->fmt_out.i_codec == 0 ) {
         msg_Err(dec, "Unsupported output colorspace %d", img->fmt);
-        return NULL;
+        return VLCDEC_SUCCESS;
     }
 
     video_format_t *v = &dec->fmt_out.video;
@@ -252,10 +249,10 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     dec->fmt_out.video.pose = dec->fmt_in.video.pose;
 
     if (decoder_UpdateVideoFormat(dec))
-        return NULL;
+        return VLCDEC_SUCCESS;
     picture_t *pic = decoder_NewPicture(dec);
     if (!pic)
-        return NULL;
+        return VLCDEC_SUCCESS;
 
     for (int plane = 0; plane < pic->i_planes; plane++ ) {
         uint8_t *src = img->planes[plane];
@@ -274,7 +271,8 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     pic->b_progressive = true; /* codec does not support interlacing */
     pic->date = pts;
 
-    return pic;
+    decoder_QueueVideo(dec, pic);
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -322,7 +320,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_EGENERIC;;
     }
 
-    dec->pf_decode_video = Decode;
+    dec->pf_decode = Decode;
 
     dec->fmt_out.i_cat = VIDEO_ES;
     dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;

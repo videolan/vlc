@@ -73,7 +73,7 @@ struct decoder_sys_t
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-static picture_t *Decode( decoder_t *, block_t ** );
+static int Decode( decoder_t *, block_t * );
 
 static int DecodePacket( decoder_sys_t *p_cdg, uint8_t *p_buffer, int i_buffer );
 static void Flush( decoder_t * );
@@ -124,8 +124,8 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.video.i_bmask = 0xff << CDG_COLOR_B_SHIFT;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = Decode;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = Decode;
+    p_dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }
@@ -145,15 +145,13 @@ static void Flush( decoder_t *p_dec )
  ****************************************************************************
  * This function must be fed with a complete compressed frame.
  ****************************************************************************/
-static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
+static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
     picture_t *p_pic = NULL;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-    p_block = *pp_block;
+    if( !p_block ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
@@ -185,8 +183,9 @@ static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
 exit:
     block_Release( p_block );
-    *pp_block = NULL;
-    return p_pic;
+    if( p_pic != NULL )
+        decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

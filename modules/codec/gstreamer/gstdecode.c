@@ -70,7 +70,7 @@ typedef struct
  *****************************************************************************/
 static int  OpenDecoder( vlc_object_t* );
 static void CloseDecoder( vlc_object_t* );
-static picture_t *DecodeBlock( decoder_t*, block_t** );
+static int  DecodeBlock( decoder_t*, block_t* );
 static void Flush( decoder_t * );
 
 #define MODULE_DESCRIPTION N_( "Uses GStreamer framework's plugins " \
@@ -609,8 +609,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_running = true;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 
@@ -648,21 +648,15 @@ static void Flush( decoder_t *p_dec )
 }
 
 /* Decode */
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
-    block_t *p_block;
     picture_t *p_pic = NULL;
     decoder_sys_t *p_sys = p_dec->p_sys;
     GstMessage *p_msg;
     GstBuffer *p_buf;
 
-    if( !pp_block )
-        return NULL;
-
-    p_block = *pp_block;
-
-    if( !p_block )
-        goto check_messages;
+    if( !p_block ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
     if( unlikely( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY |
                     BLOCK_FLAG_CORRUPTED ) ) )
@@ -736,7 +730,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     else
         block_Release( p_block );
 
-check_messages:
     /* Poll for any messages, errors */
     p_msg = gst_bus_pop_filtered( p_sys->p_bus,
             GST_MESSAGE_ASYNC_DONE | GST_MESSAGE_ERROR |
@@ -813,8 +806,9 @@ check_messages:
     }
 
 done:
-    *pp_block = NULL;
-    return p_pic;
+    if( p_pic != NULL )
+        decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 }
 
 /* Close the decoder instance */

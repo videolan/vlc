@@ -66,7 +66,7 @@ struct decoder_sys_t
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
-static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
+static int DecodeBlock  ( decoder_t *, block_t * );
 
 /*
  * png encoder descriptor
@@ -127,7 +127,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
 
     return VLC_SUCCESS;
 }
@@ -186,10 +186,9 @@ static void user_warning( png_structp p_png, png_const_charp warning_msg )
  ****************************************************************************
  * This function must be fed with a complete compressed frame.
  ****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
     picture_t *p_pic = 0;
 
     png_uint_32 i_width, i_height;
@@ -200,38 +199,38 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     png_infop p_info, p_end_info;
     png_bytep *volatile p_row_pointers = NULL;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if( !p_block ) /* No Drain */
+        return VLCDEC_SUCCESS;
 
-    p_block = *pp_block;
     p_sys->b_error = false;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
-        block_Release( p_block ); *pp_block = NULL;
-        return NULL;
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
     }
 
     p_png = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
     if( p_png == NULL )
     {
-        block_Release( p_block ); *pp_block = NULL;
-        return NULL;
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
     }
 
     p_info = png_create_info_struct( p_png );
     if( p_info == NULL )
     {
         png_destroy_read_struct( &p_png, NULL, NULL );
-        block_Release( p_block ); *pp_block = NULL;
-        return NULL;
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
     }
 
     p_end_info = png_create_info_struct( p_png );
     if( p_end_info == NULL )
     {
         png_destroy_read_struct( &p_png, &p_info, NULL );
-        block_Release( p_block ); *pp_block = NULL;
-        return NULL;
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
     }
 
     /* libpng longjmp's there in case of error */
@@ -298,15 +297,16 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
 
-    block_Release( p_block ); *pp_block = NULL;
-    return p_pic;
+    block_Release( p_block );
+    decoder_QueueVideo( p_dec, p_pic );
+    return VLCDEC_SUCCESS;
 
  error:
 
     free( p_row_pointers );
     png_destroy_read_struct( &p_png, &p_info, &p_end_info );
-    block_Release( p_block ); *pp_block = NULL;
-    return NULL;
+    block_Release( p_block );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

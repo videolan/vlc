@@ -524,7 +524,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static picture_t *DecodeBlock  ( decoder_t *p_dec, block_t **pp_block );
+static int DecodeBlock  ( decoder_t *p_dec, block_t *p_block );
 static void Flush( decoder_t * );
 
 struct picture_free_t
@@ -588,8 +588,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_I420;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = DecodeBlock;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
 
     return VLC_SUCCESS;
 }
@@ -758,20 +758,14 @@ static void Flush( decoder_t *p_dec )
  ****************************************************************************
  * Blocks need not be Dirac dataunit aligned.
  * If a block has a PTS signaled, it applies to the first picture at or after p_block
- *
- * If this function returns a picture (!NULL), it is called again and the
- * same block is resubmitted.  To avoid this, set *pp_block to NULL;
- * If this function returns NULL, the *pp_block is lost (and leaked).
- * This function must free all blocks when finished with them.
  ****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !pp_block ) return NULL;
-
-    if ( *pp_block ) {
-        block_t *p_block = *pp_block;
+    if( !p_block ) /* No Drain */
+        return VLCDEC_SUCCESS;
+    else {
 
         /* reset the decoder when seeking as the decode in progress is invalid */
         /* discard the block as it is just a null magic block */
@@ -779,8 +773,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             Flush( p_dec );
 
             block_Release( p_block );
-            *pp_block = NULL;
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
 
         SchroBuffer *p_schrobuffer;
@@ -798,7 +791,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* this stops the same block being fed back into this function if
          * we were on the next iteration of this loop to output a picture */
-        *pp_block = NULL;
         schro_decoder_autoparse_push( p_sys->p_schro, p_schrobuffer );
         /* DO NOT refer to p_block after this point, it may have been freed */
     }
@@ -816,7 +808,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             break;
 
         case SCHRO_DECODER_NEED_BITS:
-            return NULL;
+            return VLCDEC_SUCCESS;
 
         case SCHRO_DECODER_NEED_FRAME:
             p_schroframe = CreateSchroFrameFromPic( p_dec );
@@ -824,7 +816,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( !p_schroframe )
             {
                 msg_Err( p_dec, "Could not allocate picture for decoder");
-                return NULL;
+                return VLCDEC_SUCCESS;
             }
 
             schro_decoder_add_output_picture( p_sys->p_schro, p_schroframe);
@@ -862,7 +854,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_lastpts = p_pic->date;
 
             schro_frame_unref( p_schroframe );
-            return p_pic;
+            decoder_QueueVideo( p_dec, p_pic );
+            return VLCDEC_SUCCESS;
         }
         case SCHRO_DECODER_EOS:
             /* NB, the new api will not emit _EOS, it handles the reset internally */
@@ -870,7 +863,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         case SCHRO_DECODER_ERROR:
             msg_Err( p_dec, "SCHRO_DECODER_ERROR");
-            return NULL;
+            return VLCDEC_SUCCESS;
         }
     }
 }

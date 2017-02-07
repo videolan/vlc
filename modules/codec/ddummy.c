@@ -64,7 +64,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block );
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block );
 
 /*****************************************************************************
  * OpenDecoder: Open the decoder
@@ -93,12 +93,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
         p_dec->p_sys = NULL;
 
     /* Set callbacks */
-    p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_decode_audio = (block_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_decode_sub = (subpicture_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
+    p_dec->pf_decode = DecodeBlock;
 
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
@@ -120,14 +115,11 @@ static int  OpenDecoderDump( vlc_object_t *p_this )
  ****************************************************************************
  * This function must be fed with ogg packets.
  ****************************************************************************/
-static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     FILE *stream = (void *)p_dec->p_sys;
-    block_t *p_block;
 
-    if( !pp_block || !*pp_block ) return NULL;
-    p_block = *pp_block;
-    *pp_block = NULL;
+    if( !p_block ) return VLCDEC_SUCCESS;
 
     if( stream != NULL
      && p_block->i_buffer > 0
@@ -138,7 +130,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     block_Release( p_block );
 
-    return NULL;
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

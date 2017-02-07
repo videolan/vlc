@@ -178,7 +178,8 @@ typedef struct
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *DecodeFrame  ( decoder_t *, block_t ** );
+static int DecodeFrame    ( decoder_t *, block_t * );
+static block_t *Packetize ( decoder_t *, block_t ** );
 static void Flush( decoder_t * );
 
 /* */
@@ -297,9 +298,9 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     }
 
     /* Set callback */
-    p_dec->pf_decode_audio = DecodeFrame;
-    p_dec->pf_packetize    = DecodeFrame;
-    p_dec->pf_flush        = Flush;
+    p_dec->pf_decode    = DecodeFrame;
+    p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush     = Flush;
 
     return VLC_SUCCESS;
 }
@@ -327,7 +328,7 @@ static void Flush( decoder_t *p_dec )
  ****************************************************************************
  * Beware, this function must be fed with complete frames (PES packet).
  *****************************************************************************/
-static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
+static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;
@@ -509,6 +510,14 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         return p_aout_buffer;
     }
+}
+
+static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
+{
+    block_t *p_out = Packetize( p_dec, &p_block );
+    if( p_out != NULL )
+        decoder_QueueAudio( p_dec, p_out );
+    return VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************
