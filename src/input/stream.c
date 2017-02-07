@@ -364,7 +364,16 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
     if (s->pf_read != NULL)
     {
         assert(priv->block == NULL);
-        ret = s->pf_read(s, buf, len);
+        if (buf == NULL)
+        {
+            if (unlikely(len == 0))
+                return 0;
+
+            char dummy[(len <= 256 ? len : 256)];
+            ret = s->pf_read(s, dummy, sizeof (dummy));
+        }
+        else
+            ret = s->pf_read(s, buf, len);
         return ret;
     }
 
@@ -395,6 +404,7 @@ ssize_t vlc_stream_ReadPartial(stream_t *s, void *buf, size_t len)
     if (ret >= 0)
     {
         priv->offset += ret;
+        assert(ret <= (ssize_t)len);
         return ret;
     }
 
@@ -403,6 +413,7 @@ ssize_t vlc_stream_ReadPartial(stream_t *s, void *buf, size_t len)
         priv->offset += ret;
     if (ret == 0)
         priv->eof = len != 0;
+    assert(ret <= (ssize_t)len);
     return ret;
 }
 
@@ -420,6 +431,7 @@ ssize_t vlc_stream_Read(stream_t *s, void *buf, size_t len)
 
         if (buf != NULL)
             buf = (char *)buf + ret;
+        assert(len >= (size_t)ret);
         len -= ret;
         copied += ret;
     }
