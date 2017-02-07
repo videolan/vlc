@@ -150,7 +150,7 @@ typedef struct
     vlc_fourcc_t    i_codec;
 
     unsigned int    i_rate;
-    int             i_scale;
+    unsigned int    i_scale;
     unsigned int    i_samplesize;
 
     unsigned int    i_width_bytes;
