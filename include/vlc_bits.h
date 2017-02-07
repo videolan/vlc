@@ -162,10 +162,12 @@ static inline void bs_skip( bs_t *s, ssize_t i_count )
 
     if( s->i_left <= 0 )
     {
-        const int i_bytes = ( -s->i_left + 8 ) / 8;
-
+        const size_t i_bytes = 1 + s->i_left / -8;
         bs_forward( s, i_bytes );
-        s->i_left += 8 * i_bytes;
+        if( i_bytes * 8 < i_bytes /* ofw */ )
+            s->i_left = i_bytes;
+        else
+            s->i_left += 8 * i_bytes;
     }
 }
 
