@@ -551,6 +551,11 @@ static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
 {
     int i_bytes;
 
+    if( p_fmt->audio.i_rate > 352800
+     || p_fmt->audio.i_bitspersample > 64
+     || p_fmt->audio.i_channels > AOUT_CHAN_MAX )
+        return VLC_EGENERIC;
+
     /* read samples for 50ms of */
     *pi_samples = __MAX( p_fmt->audio.i_rate / 20, 1 );
 
