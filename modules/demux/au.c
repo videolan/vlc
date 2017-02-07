@@ -107,7 +107,6 @@ static int Open( vlc_object_t *p_this )
     uint8_t      hdr[20];
     const uint8_t *p_peek;
     int          i_cat;
-    int          i_samples, i_modulo;
 
     if( vlc_stream_Peek( p_demux->s , &p_peek, 4 ) < 4 )
         return VLC_EGENERIC;
@@ -272,14 +271,15 @@ static int Open( vlc_object_t *p_this )
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 
     /* calculate 50ms frame size/time */
-    i_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
+    unsigned i_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
     p_sys->i_frame_size = i_samples * p_sys->fmt.audio.i_channels *
                           ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
     if( p_sys->fmt.audio.i_blockalign > 0 )
     {
-        if( ( i_modulo = p_sys->i_frame_size % p_sys->fmt.audio.i_blockalign ) != 0 )
+        unsigned mod = p_sys->i_frame_size % p_sys->fmt.audio.i_blockalign;
+        if( mod != 0 )
         {
-            p_sys->i_frame_size += p_sys->fmt.audio.i_blockalign - i_modulo;
+            p_sys->i_frame_size += p_sys->fmt.audio.i_blockalign - mod;
         }
     }
     p_sys->i_frame_length = (mtime_t)1000000 *
