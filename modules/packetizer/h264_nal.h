@@ -91,6 +91,7 @@ struct h264_sequence_parameter_set_t
     uint8_t i_chroma_idc;
     uint8_t i_bit_depth_luma;
     uint8_t i_bit_depth_chroma;
+    uint8_t b_separate_colour_planes_flag;
 
     uint32_t pic_width_in_mbs_minus1;
     uint32_t pic_height_in_map_units_minus1;

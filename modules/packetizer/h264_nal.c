@@ -288,7 +288,9 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         /* chroma_format_idc */
         p_sps->i_chroma_idc = bs_read_ue( p_bs );
         if( p_sps->i_chroma_idc == 3 )
-            bs_skip( p_bs, 1 ); /* separate_colour_plane_flag */
+            p_sps->b_separate_colour_planes_flag = bs_read1( p_bs );
+        else
+            p_sps->b_separate_colour_planes_flag = 0;
         /* bit_depth_luma_minus8 */
         p_sps->i_bit_depth_luma = bs_read_ue( p_bs ) + 8;
         /* bit_depth_chroma_minus8 */
