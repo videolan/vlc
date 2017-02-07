@@ -385,7 +385,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     {
         p_sps->frame_crop.left_offset = bs_read_ue( p_bs );
         p_sps->frame_crop.right_offset = bs_read_ue( p_bs );
-        p_sps->frame_crop.right_offset = bs_read_ue( p_bs );
+        p_sps->frame_crop.top_offset = bs_read_ue( p_bs );
         p_sps->frame_crop.bottom_offset = bs_read_ue( p_bs );
     }
 
