@@ -330,12 +330,12 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->p_frame )
         block_ChainRelease( p_sys->p_frame );
-    for( i = 0; i < H264_SPS_ID_MAX; i++ )
+    for( i = 0; i <= H264_SPS_ID_MAX; i++ )
     {
         if( p_sys->pp_sps[i] )
             block_Release( p_sys->pp_sps[i] );
     }
-    for( i = 0; i < H264_PPS_ID_MAX; i++ )
+    for( i = 0; i <= H264_PPS_ID_MAX; i++ )
     {
         if( p_sys->pp_pps[i] )
             block_Release( p_sys->pp_pps[i] );
