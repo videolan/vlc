@@ -324,6 +324,10 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
             }
         }
     }
+    else
+    {
+        p_sps->i_chroma_idc = 1; /* Not present == inferred to 4:2:2 */
+    }
 
     /* Skip i_log2_max_frame_num */
     p_sps->i_log2_max_frame_num = bs_read_ue( p_bs );
