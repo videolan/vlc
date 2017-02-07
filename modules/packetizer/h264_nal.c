@@ -704,12 +704,31 @@ bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
 bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps, unsigned *p_w, unsigned *p_h,
                             unsigned *p_vw, unsigned *p_vh )
 {
+    unsigned CropUnitX = 1;
+    unsigned CropUnitY = 2 - p_sps->frame_mbs_only_flag;
+    if( p_sps->b_separate_colour_planes_flag != 1 )
+    {
+        if( p_sps->i_chroma_idc > 0 )
+        {
+            unsigned SubWidthC = 2;
+            unsigned SubHeightC = 2;
+            if( p_sps->i_chroma_idc > 1 )
+            {
+                SubHeightC = 1;
+                if( p_sps->i_chroma_idc > 2 )
+                    SubWidthC = 1;
+            }
+            CropUnitX *= SubWidthC;
+            CropUnitY *= SubHeightC;
+        }
+    }
+
     *p_w = 16 * p_sps->pic_width_in_mbs_minus1 + 16;
     *p_h = 16 * p_sps->pic_height_in_map_units_minus1 + 16;
     *p_h *= ( 2 - p_sps->frame_mbs_only_flag );
 
-    *p_vw = *p_w - p_sps->frame_crop.left_offset - p_sps->frame_crop.right_offset;
-    *p_vh = *p_h - p_sps->frame_crop.bottom_offset - p_sps->frame_crop.top_offset;
+    *p_vw = *p_w - ( p_sps->frame_crop.left_offset + p_sps->frame_crop.right_offset ) * CropUnitX;
+    *p_vh = *p_h - ( p_sps->frame_crop.bottom_offset + p_sps->frame_crop.top_offset ) * CropUnitY;
 
     return true;
 }
