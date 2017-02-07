@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -115,7 +116,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* skip signature */
-    vlc_stream_Read( p_demux->s, NULL, 4 );   /* cannot fail */
+    if( vlc_stream_Read( p_demux->s, NULL, 4 ) < 4 )
+        return VLC_EGENERIC;
 
     /* read header */
     if( vlc_stream_Read( p_demux->s, hdr, 20 ) < 20 )
@@ -137,7 +139,13 @@ static int Open( vlc_object_t *p_this )
     /* skip extra header data */
     if( p_sys->i_header_size > 24 )
     {
-        vlc_stream_Read( p_demux->s, NULL, p_sys->i_header_size - 24 );
+#if (SSIZE_MAX <= INT32_MAX)
+        if( p_sys->i_header_size > SSIZE_MAX )
+            return VLC_EGENERIC;
+#endif
+        size_t skip = p_sys->i_header_size - 24;
+        if( vlc_stream_Read( p_demux->s, NULL, skip ) < (ssize_t)skip )
+            return VLC_EGENERIC;
     }
 
     /* init fmt */
