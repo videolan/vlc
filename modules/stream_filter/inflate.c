@@ -45,13 +45,6 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     if (sys->eof || unlikely(buflen == 0))
         return 0;
 
-    if (buf == NULL)
-    {
-        char dummy[buflen > 4096 ? 4096 : buflen];
-
-        return Read(stream, dummy, sizeof (dummy));
-    }
-
     sys->zstream.next_out = buf;
     sys->zstream.avail_out = buflen;
 

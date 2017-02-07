@@ -192,20 +192,6 @@ static void *Thread (void *data)
 static ssize_t Read (stream_t *stream, void *buf, size_t buflen)
 {
     stream_sys_t *sys = stream->p_sys;
-
-    if (buf == NULL) /* caller skips data, get big enough peek buffer */
-    {
-        buf = malloc(buflen);
-        if (unlikely(buf == NULL))
-            return -1;
-
-        ssize_t val = Read(stream, buf, buflen);
-        free(buf);
-        return val;
-    }
-
-    assert ((buf != NULL) || (buflen == 0));
-
     ssize_t val = vlc_read_i11e (sys->read_fd, buf, buflen);
     return (val >= 0) ? val : 0;
 }

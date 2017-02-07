@@ -264,8 +264,7 @@ static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
 
     /* Read the buffer */
     size_t i_len = __MIN( i_read, p_sys->i_len - p_sys->i_pos );
-    if( p_read )
-        memcpy( p_read, p_sys->psz_xspf + p_sys->i_pos, i_len );
+    memcpy( p_read, p_sys->psz_xspf + p_sys->i_pos, i_len );
     p_sys->i_pos += i_len;
 
     return i_len;

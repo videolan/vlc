@@ -297,13 +297,6 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
         return buflen;
 
     vlc_mutex_lock(&sys->lock);
-    if (buf == NULL)
-    {
-        sys->stream_offset += buflen;
-        copy = buflen;
-        goto out;
-    }
-
     if (sys->paused)
     {
         msg_Err(stream, "reading while paused (buggy demux?)");
@@ -335,7 +328,6 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
 
     memcpy(buf, sys->buffer + offset, copy);
     sys->stream_offset += copy;
-out:
     vlc_cond_signal(&sys->wait_space);
     vlc_mutex_unlock(&sys->lock);
     return copy;

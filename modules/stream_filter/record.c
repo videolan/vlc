@@ -117,12 +117,6 @@ static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     void *p_record = p_read;
-
-    /* Allocate a temporary buffer for record when no p_read */
-    if( p_sys->f && !p_record )
-        p_record = malloc( i_read );
-
-    /* */
     const ssize_t i_record = vlc_stream_Read( s->p_source, p_record, i_read );
 
     /* Dump read data */
@@ -130,8 +124,6 @@ static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
     {
         if( p_record && i_record > 0 )
             Write( s, p_record, i_record );
-        if( !p_read )
-            free( p_record );
     }
 
     return i_record;

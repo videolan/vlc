@@ -244,7 +244,7 @@ static void AStreamControlReset(stream_t *s)
     AStreamPrebufferStream(s);
 }
 
-static ssize_t AStreamReadNoSeekStream(stream_t *s, void *buf, size_t len)
+static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 {
     stream_sys_t *sys = s->p_sys;
     stream_track_t *tk = &sys->tk[sys->i_tk];
@@ -400,7 +400,7 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
             {
                 const int i_read_max = __MIN(10 * STREAM_READ_ATONCE, i_skip);
                 int i_read = 0;
-                if ((i_read = AStreamReadNoSeekStream(s, NULL, i_read_max)) < 0)
+                if ((i_read = AStreamReadStream(s, NULL, i_read_max)) < 0)
                 {
                     msg_Err(s, "AStreamSeekStream: skip failed");
                     return VLC_EGENERIC;
@@ -443,24 +443,6 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
-}
-
-static ssize_t AStreamReadStream(stream_t *s, void *p_read, size_t i_read)
-{
-    stream_sys_t *sys = s->p_sys;
-
-    if (!p_read)
-    {
-        const uint64_t i_pos_wanted = sys->i_pos + i_read;
-
-        if (AStreamSeekStream(s, i_pos_wanted))
-        {
-            if (sys->i_pos != i_pos_wanted)
-                return 0;
-        }
-        return i_read;
-    }
-    return AStreamReadNoSeekStream(s, p_read, i_read);
 }
 
 /****************************************************************************

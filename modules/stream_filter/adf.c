@@ -51,7 +51,7 @@ static int Control( stream_t *p_stream, int i_query, va_list args )
 static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 {
     const ssize_t i_ret = vlc_stream_Read( s->p_source, buffer, i_read );
-    if( i_ret < 1 || !buffer ) return i_ret;
+    if( i_ret < 1 ) return i_ret;
 
     uint8_t *p_buffer = buffer;
     static const uint8_t ADF_XOR_MASK = 34;

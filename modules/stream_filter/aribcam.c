@@ -170,7 +170,7 @@ static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
     int i_total_read = 0;
     int i_ret;
 
-    if ( !p_dst || !i_toread )
+    if ( !i_toread )
         return -1;
 
     /* Use data from previous reads */

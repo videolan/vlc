@@ -360,21 +360,11 @@ static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
     if (sys->p_current == NULL)
         return 0;
 
-    if (buf == NULL)
-    {   /* seek if possible, else use plain old read and discard */
-        bool b_aseek;
-
-        vlc_stream_Control(s->p_source, STREAM_CAN_SEEK, &b_aseek);
-        if (b_aseek)
-            return AStreamSeekBlock(s, sys->i_pos + len) ? 0 : len;
-    }
-
     ssize_t i_current = sys->p_current->i_buffer - sys->i_offset;
     size_t i_copy = VLC_CLIP((size_t)i_current, 0, len);
 
     /* Copy data */
-    if (buf != NULL)
-        memcpy(buf, &sys->p_current->p_buffer[sys->i_offset], i_copy);
+    memcpy(buf, &sys->p_current->p_buffer[sys->i_offset], i_copy);
 
     sys->i_offset += i_copy;
     if (sys->i_offset >= sys->p_current->i_buffer)
