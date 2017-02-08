@@ -72,6 +72,7 @@ typedef struct
 struct demux_sys_t
 {
     bool  b_start;
+    int   i_next_block_flags;
     es_out_id_t *p_es;
 
     /* Packetizer */
@@ -136,6 +137,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys;
     p_sys->b_start = true;
+    p_sys->i_next_block_flags = 0;
     p_sys->p_packetizer = NULL;
     p_sys->p_meta = NULL;
     p_sys->i_length = 0;
@@ -220,6 +222,8 @@ static int Demux( demux_t *p_demux )
 
     if ( p_block_in )
     {
+        p_block_in->i_flags = p_sys->i_next_block_flags;
+        p_sys->i_next_block_flags = 0;
         p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TS_INVALID;
         p_sys->b_start = false;
     }
@@ -346,6 +350,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         if( vlc_stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos + i_delta_offset ) )
             return VLC_EGENERIC;
     }
+    p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
     return VLC_SUCCESS;
 }
 
