@@ -55,6 +55,7 @@ struct decoder_sys_t
     mpg123_handle * p_handle;
     date_t          end_date;
     block_t       * p_out;
+    bool            b_opened;
 };
 
 /*****************************************************************************
@@ -120,6 +121,7 @@ static int MPG123Open( decoder_t *p_dec )
         return VLC_EGENERIC;
     }
 
+    p_sys->b_opened = true;
     return VLC_SUCCESS;
 }
 
@@ -133,8 +135,8 @@ static void Flush( decoder_t *p_dec )
     date_Set( &p_sys->end_date, 0 );
 
     mpg123_close( p_sys->p_handle );
-    if( MPG123Open( p_dec ) )
-        p_dec->b_error = true;
+    p_sys->b_opened = false;
+    MPG123Open( p_dec );
 }
 
 static int UpdateAudioFormat( decoder_t *p_dec )
@@ -195,6 +197,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     int i_err;
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_out = NULL;
+
+    if( !p_sys->b_opened )
+    {
+        if( p_block )
+            block_Release( p_block );
+        return VLCDEC_ECRITICAL;
+    }
 
     /* Feed input block */
     if( p_block != NULL )

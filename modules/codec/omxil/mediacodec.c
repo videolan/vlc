@@ -1581,11 +1581,14 @@ end:
             if (var_Create(p_dec, "mediacodec-failed", VLC_VAR_VOID)
              == VLC_SUCCESS)
                 decoder_RequestReload(p_dec);
+            vlc_mutex_unlock(&p_sys->lock);
+            return VLCDEC_SUCCESS;
         }
         else
-            p_dec->b_error = true;
-        vlc_mutex_unlock(&p_sys->lock);
-        return VLCDEC_SUCCESS;
+        {
+            vlc_mutex_unlock(&p_sys->lock);
+            return VLCDEC_ECRITICAL;
+        }
     }
     else
     {

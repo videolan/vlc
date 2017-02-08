@@ -680,9 +680,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         if( unlikely( p_buf == NULL ) )
         {
             msg_Err( p_dec, "failed to create input gstbuffer" );
-            p_dec->b_error = true;
             block_Release( p_block );
-            goto done;
+            return VLCDEC_ECRITICAL;
         }
 
         if( p_block->i_dts > VLC_TS_INVALID )
@@ -722,9 +721,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         {
             /* block will be released internally,
              * when gst_buffer_unref() is called */
-            p_dec->b_error = true;
             msg_Err( p_dec, "failed to push buffer" );
-            goto done;
+            return VLCDEC_ECRITICAL;
         }
     }
     else
@@ -749,11 +747,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             msg_Dbg( p_dec, "Pipeline is prerolled" );
             break;
         default:
-            p_dec->b_error = default_msg_handler( p_dec, p_msg );
-            if( p_dec->b_error )
+            if( default_msg_handler( p_dec, p_msg ) )
             {
                 gst_message_unref( p_msg );
-                goto done;
+                return VLCDEC_ECRITICAL;
             }
             break;
         }
@@ -788,8 +785,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             {
                 msg_Err( p_dec, "failed to map gst video frame" );
                 gst_buffer_unref( p_buf );
-                p_dec->b_error = true;
-                goto done;
+                return VLCDEC_ECRITICAL;
             }
 
             gst_CopyPicture( p_pic, &frame );
@@ -841,9 +837,11 @@ static void CloseDecoder( vlc_object_t *p_this )
                 msg_Dbg( p_dec, "got eos" );
                 break;
             default:
-                p_dec->b_error = default_msg_handler( p_dec, p_msg );
-                if( p_dec->b_error )
+                if( default_msg_handler( p_dec, p_msg ) )
+                {
                     msg_Err( p_dec, "pipeline may not close gracefully" );
+                    return VLCDEC_ECRITICAL;
+                }
                 break;
             }
 

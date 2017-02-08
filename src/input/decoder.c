@@ -117,6 +117,8 @@ struct decoder_owner_sys_t
     unsigned frames_countdown;
     bool paused;
 
+    bool error;
+
     /* Waiting */
     bool b_waiting;
     bool b_first;
@@ -198,7 +200,6 @@ static void UnloadDecoder( decoder_t *p_dec )
 
     es_format_Clean( &p_dec->fmt_in );
     es_format_Clean( &p_dec->fmt_out );
-    p_dec->b_error = false;
 }
 
 static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
@@ -209,12 +210,13 @@ static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
     es_format_Init( &fmt_in, UNKNOWN_ES, 0 );
     if( es_format_Copy( &fmt_in, p_fmt ) != VLC_SUCCESS )
     {
-        p_dec->b_error = true;
+        p_dec->p_owner->error = true;
         return VLC_EGENERIC;
     }
 
     /* Restart the decoder module */
     UnloadDecoder( p_dec );
+    p_dec->p_owner->error = false;
 
     if( reload == RELOAD_DECODER_AOUT )
     {
@@ -234,7 +236,7 @@ static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
 
     if( LoadDecoder( p_dec, b_packetizer, &fmt_in ) )
     {
-        p_dec->b_error = true;
+        p_dec->p_owner->error = true;
         es_format_Clean( &fmt_in );
         return VLC_EGENERIC;
     }
@@ -513,7 +515,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     while( i_attempts-- )
     {
-        if( p_dec->b_error )
+        if( p_owner->error )
             break;
 
         p_vout = input_resource_HoldVout( p_owner->p_resource );
@@ -817,7 +819,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
             {
                 msg_Err( p_dec, "cannot create packetizer output (%4.4s)",
                          (char *)&p_owner->fmt.i_codec );
-                p_dec->b_error = true;
+                p_owner->error = true;
 
                 if(p_block)
                     block_Release(p_block);
@@ -837,7 +839,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
             {
                 msg_Err( p_dec, "cannot continue streaming due to errors" );
 
-                p_dec->b_error = true;
+                p_owner->error = true;
 
                 /* Cleanup */
 
@@ -1253,6 +1255,9 @@ static void DecoderDecode( decoder_t *p_dec, block_t *p_block )
         case VLCDEC_SUCCESS:
             p_owner->pf_update_stat( p_owner, 1, 0 );
             break;
+        case VLCDEC_ECRITICAL:
+            p_owner->error = true;
+            break;
         default:
             vlc_assert_unreachable();
     }
@@ -1268,7 +1273,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    if( p_dec->b_error )
+    if( p_owner->error )
         goto error;
 
     /* Here, the atomic doesn't prevent to miss a reload request.
@@ -1336,7 +1341,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
                 p_packetized_block->p_next = NULL;
 
                 DecoderDecode( p_dec, p_packetized_block );
-                if( p_dec->b_error )
+                if( p_owner->error )
                 {
                     block_ChainRelease( p_next );
                     return;
@@ -1363,7 +1368,7 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     decoder_t *p_packetizer = p_owner->p_packetizer;
 
-    if( p_dec->b_error )
+    if( p_owner->error )
         return;
 
     if( p_packetizer != NULL && p_packetizer->pf_flush != NULL )
@@ -1568,6 +1573,8 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_waiting = false;
     p_owner->b_first = true;
     p_owner->b_has_data = false;
+
+    p_owner->error = false;
 
     p_owner->flushing = false;
     p_owner->b_draining = false;

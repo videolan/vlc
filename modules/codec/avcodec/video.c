@@ -305,7 +305,7 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
  * Copies a picture from the libavcodec-allocate buffer to a picture_t.
  * This is used when not in direct rendering mode.
  */
-static void lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
+static int lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
 {
     decoder_sys_t *sys = dec->p_sys;
 
@@ -315,8 +315,7 @@ static void lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
 
         msg_Err(dec, "Unsupported decoded output format %d (%s)",
                 sys->p_context->pix_fmt, (name != NULL) ? name : "unknown");
-        dec->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
 
     for (int plane = 0; plane < pic->i_planes; plane++)
@@ -334,6 +333,7 @@ static void lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
             dst += dst_stride;
         }
     }
+    return VLC_SUCCESS;
 }
 
 static int OpenVideoCodec( decoder_t *p_dec )
@@ -708,7 +708,7 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t
 /*****************************************************************************
  * DecodeBlock: Called to decode one or more frames
  *****************************************************************************/
-static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
@@ -846,7 +846,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
             {
                 msg_Err(p_dec, "avcodec_send_packet critical error");
-                p_dec->b_error = true;
+                *error = true;
             }
             av_packet_unref( &pkt );
             break;
@@ -857,7 +857,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         AVFrame *frame = av_frame_alloc();
         if (unlikely(frame == NULL))
         {
-            p_dec->b_error = true;
+            *error = true;
             break;
         }
 
@@ -867,7 +867,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
             {
                 msg_Err(p_dec, "avcodec_receive_frame critical error");
-                p_dec->b_error = true;
+                *error = true;
             }
             av_frame_free(&frame);
             break;
@@ -936,7 +936,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                       = malloc( sizeof(video_palette_t) );
             if( !p_palette )
             {
-                p_dec->b_error = true;
+                *error = true;
                 av_frame_free(&frame);
                 break;
             }
@@ -970,7 +970,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             /* Fill picture_t from AVFrame */
-            lavc_CopyPicture(p_dec, p_pic, frame);
+            if( lavc_CopyPicture( p_dec, p_pic, frame ) != VLC_SUCCESS )
+            {
+                *error = true;
+                av_frame_free(&frame);
+                picture_Release( p_pic );
+                break;
+            }
         }
         else
         {
@@ -1022,9 +1028,10 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
     block_t **pp_block = p_block ? &p_block : NULL;
     picture_t *p_pic;
-    while( ( p_pic = DecodeBlock( p_dec, pp_block ) ) != NULL )
+    bool error = false;
+    while( ( p_pic = DecodeBlock( p_dec, pp_block, &error ) ) != NULL )
         decoder_QueueVideo( p_dec, p_pic );
-    return VLCDEC_SUCCESS;
+    return error ? VLCDEC_ECRITICAL : VLCDEC_SUCCESS;
 }
 
 /*****************************************************************************

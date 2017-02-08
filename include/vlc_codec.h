@@ -68,6 +68,7 @@ struct decoder_t
     bool                b_frame_drop_allowed;
 
 #   define VLCDEC_SUCCESS   VLC_SUCCESS
+#   define VLCDEC_ECRITICAL VLC_EGENERIC
     /* This function is called to decode one packetized block.
      *
      * The module implementation will own the input block (p_block) and should
@@ -78,6 +79,11 @@ struct decoder_t
      * If p_block is NULL, the decoder asks the module to drain itself. The
      * module should return all available output frames/block via the queue
      * functions.
+     *
+     * Return values can be:
+     *  VLCDEC_SUCCESS: pf_decode will be called again
+     *  VLCDEC_ECRITICAL: in case of critical error, pf_decode won't be called
+     *  again.
      */
     int                 ( * pf_decode )   ( decoder_t *, block_t *p_block );
 
@@ -171,8 +177,6 @@ struct decoder_t
 
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
-
-    bool                b_error;
 };
 
 /**

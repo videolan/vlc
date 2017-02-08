@@ -1136,13 +1136,13 @@ skip:
     return VLCDEC_SUCCESS;
 
 reload:
+    block_Release(p_block);
     /* Add an empty variable so that videotoolbox won't be loaded again for
      * this ES */
-     if (var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID) == VLC_SUCCESS)
+    if (var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID) == VLC_SUCCESS)
         decoder_RequestReload(p_dec);
     else
-        p_dec->b_error = true;
-    block_Release(p_block);
+        return VLCDEC_ECRITICAL;
     return VLCDEC_SUCCESS;
 }
 

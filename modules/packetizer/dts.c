@@ -283,7 +283,6 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_SEND_DATA:
             if( !(p_out_buffer = GetOutBuffer( p_dec )) )
             {
-                //p_dec->b_error = true;
                 return NULL;
             }
 

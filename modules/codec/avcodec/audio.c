@@ -301,7 +301,7 @@ static void Flush( decoder_t *p_dec )
 /*****************************************************************************
  * DecodeBlock: Called to decode one frame
  *****************************************************************************/
-static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
@@ -452,7 +452,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     return ( p_sys->p_decoded ) ? DequeueOneDecodedFrame( p_sys ) : NULL;
 
 end:
-    p_dec->b_error = true;
+    *error = true;
     if( pp_block )
     {
         assert( *pp_block == p_block );
@@ -468,10 +468,11 @@ drop:
 
 static int DecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
+    bool error = false;
     block_t **pp_block = p_block ? &p_block : NULL, *p_out;
-    while( ( p_out = DecodeBlock( p_dec, pp_block ) ) != NULL )
+    while( ( p_out = DecodeBlock( p_dec, pp_block, &error ) ) != NULL )
         decoder_QueueAudio( p_dec, p_out );
-    return VLCDEC_SUCCESS;
+    return error ? VLCDEC_ECRITICAL : VLCDEC_SUCCESS;
 }
 
 static block_t * ConvertAVFrame( decoder_t *p_dec, AVFrame *frame )

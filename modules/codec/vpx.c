@@ -189,8 +189,9 @@ static int Decode(decoder_t *dec, block_t *block)
         free(pkt_pts);
         VPX_ERR(dec, ctx, "Failed to decode frame");
         if (err == VPX_CODEC_UNSUP_BITSTREAM)
-            dec->b_error = true;
-        return VLCDEC_SUCCESS;
+            return VLCDEC_ECRITICAL;
+        else
+            return VLCDEC_SUCCESS;
     }
 
     const void *iter = NULL;
