@@ -658,7 +658,15 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.CPUAccessFlags = 0;
     texDesc.Format = cfg->formatTexture;
-    texDesc.BindFlags = D3D11_BIND_DECODER | D3D11_BIND_SHADER_RESOURCE;
+    texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    if (is_d3d11_opaque(fmt->i_chroma)) {
+        texDesc.BindFlags |= D3D11_BIND_DECODER;
+        texDesc.Usage = D3D11_USAGE_DEFAULT;
+        texDesc.CPUAccessFlags = 0;
+    } else {
+        texDesc.Usage = D3D11_USAGE_DYNAMIC;
+        texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    }
     texDesc.ArraySize = pool_size;
     texDesc.Height = fmt->i_height;
     texDesc.Width = fmt->i_width;
