@@ -94,6 +94,8 @@ struct decoder_sys_t
     unsigned int i_rate, i_channels, i_bits_per_sample;
     size_t i_buf;
     uint8_t *p_buf;
+
+    int i_next_block_flags;
 };
 
 static const int pi_channels_maps[9] =
@@ -544,6 +546,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
         if (in->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
             Flush(p_dec);
+            p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
             if (in->i_flags&BLOCK_FLAG_CORRUPTED) {
                 block_Release(*pp_block);
                 return NULL;
@@ -698,6 +701,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                 msg_Warn(p_dec, "Frame is too big (%zu > %d), couldn't find start code",
                         p_sys->i_frame_size, p_sys->stream_info.max_framesize);
                 p_sys->i_state = STATE_NOSYNC;
+                p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
                 return NULL;
             }
 
@@ -765,6 +769,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
         out->i_dts = out->i_pts = p_sys->i_pts;
         out->i_length = p_sys->i_duration;
+        out->i_flags = p_sys->i_next_block_flags;
+        p_sys->i_next_block_flags = 0;
 
         return out;
     }
@@ -792,6 +798,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_pts         = VLC_TS_INVALID;
     p_sys->i_buf         = 0;
     p_sys->p_buf         = NULL;
+    p_sys->i_next_block_flags = 0;
     block_BytestreamInit(&p_sys->bytestream);
 
     /* */
