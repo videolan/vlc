@@ -133,6 +133,7 @@ struct vout_display_sys_t
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
     d3d_quad_t               picQuad;
     const d3d_format_t       *picQuadConfig;
+    ID3D11PixelShader        *picQuadPixelShader;
 
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
@@ -1565,8 +1566,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma);
 
-    ID3D11PixelShader *pPicQuadShader;
-    hr = CompilePixelShader(vd, sys->d3dPxShader, &pPicQuadShader);
+    hr = CompilePixelShader(vd, sys->d3dPxShader, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
         msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
@@ -1578,7 +1578,8 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         hr = CompilePixelShader(vd, sys->psz_rgbaPxShader, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
-            ID3D11PixelShader_Release(pPicQuadShader);
+            ID3D11PixelShader_Release(sys->picQuadPixelShader);
+            sys->picQuadPixelShader = NULL;
             msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
         }
@@ -1629,13 +1630,12 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     }
     ID3D10Blob_Release(pVSBlob);
 
-    if (AllocQuad( vd, fmt, &sys->picQuad, sys->picQuadConfig, pPicQuadShader,
+    if (AllocQuad( vd, fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
                    vd->fmt.projection_mode) != VLC_SUCCESS) {
-        ID3D11PixelShader_Release(pPicQuadShader);
+        ID3D11PixelShader_Release(sys->picQuadPixelShader);
         msg_Err(vd, "Could not Create the main quad picture. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
-    ID3D11PixelShader_Release(pPicQuadShader);
 
     ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -2179,6 +2179,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     {
         ID3D11VertexShader_Release(sys->pSPUPixelShader);
         sys->pSPUPixelShader = NULL;
+    }
+    if (sys->picQuadPixelShader)
+    {
+        ID3D11PixelShader_Release(sys->picQuadPixelShader);
+        sys->picQuadPixelShader = NULL;
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->context_lock != INVALID_HANDLE_VALUE )
