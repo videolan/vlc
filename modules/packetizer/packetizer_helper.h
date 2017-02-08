@@ -169,7 +169,7 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
                  * the data extend up to the end */
                 block_ChainProperties( p_pack->bytestream.p_chain,
                                        NULL, &p_pack->i_offset, NULL );
-                p_pack->i_offset -= p_pack->bytestream .i_offset;
+                p_pack->i_offset -= p_pack->bytestream.i_block_offset;
 
                 if( p_pack->i_offset <= (size_t)p_pack->i_startcode )
                     return NULL;
