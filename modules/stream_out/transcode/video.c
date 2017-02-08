@@ -783,42 +783,14 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     *out = NULL;
     bool b_error = false;
 
-    if( unlikely( in == NULL ) )
-    {
-        if( p_sys->i_threads == 0 )
-        {
-            block_t *p_block;
-            do {
-                p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
-                block_ChainAppend( out, p_block );
-            } while( p_block );
-        }
-        else
-        {
-            msg_Dbg( p_stream, "Flushing thread and waiting that");
-            vlc_mutex_lock( &p_stream->p_sys->lock_out );
-            p_stream->p_sys->b_abort = true;
-            vlc_cond_signal( &p_stream->p_sys->cond );
-            vlc_mutex_unlock( &p_stream->p_sys->lock_out );
-
-            vlc_join( p_stream->p_sys->thread, NULL );
-            vlc_mutex_lock( &p_sys->lock_out );
-            *out = p_sys->p_buffers;
-            p_sys->p_buffers = NULL;
-            vlc_mutex_unlock( &p_sys->lock_out );
-
-            msg_Dbg( p_stream, "Flushing done");
-        }
-        return VLC_SUCCESS;
-    }
-
     int ret = id->p_decoder->pf_decode( id->p_decoder, in );
     if( ret != VLCDEC_SUCCESS )
         return VLC_EGENERIC;
 
     picture_t *p_pics = transcode_dequeue_all_pics( id );
     if( p_pics == NULL )
-        return VLC_SUCCESS;
+        goto end;
+
     do
     {
         picture_t *p_pic = p_pics;
@@ -922,6 +894,35 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         *out = p_sys->p_buffers;
         p_sys->p_buffers = NULL;
         vlc_mutex_unlock( &p_sys->lock_out );
+    }
+
+end:
+    if( unlikely( in == NULL ) )
+    {
+        if( p_sys->i_threads == 0 )
+        {
+            block_t *p_block;
+            do {
+                p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
+                block_ChainAppend( out, p_block );
+            } while( p_block );
+        }
+        else
+        {
+            msg_Dbg( p_stream, "Flushing thread and waiting that");
+            vlc_mutex_lock( &p_stream->p_sys->lock_out );
+            p_stream->p_sys->b_abort = true;
+            vlc_cond_signal( &p_stream->p_sys->cond );
+            vlc_mutex_unlock( &p_stream->p_sys->lock_out );
+
+            vlc_join( p_stream->p_sys->thread, NULL );
+            vlc_mutex_lock( &p_sys->lock_out );
+            *out = p_sys->p_buffers;
+            p_sys->p_buffers = NULL;
+            vlc_mutex_unlock( &p_sys->lock_out );
+
+            msg_Dbg( p_stream, "Flushing done");
+        }
     }
 
     return b_error ? VLC_EGENERIC : VLC_SUCCESS;
