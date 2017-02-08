@@ -214,8 +214,6 @@ static void Direct3D11DestroyPool(vout_display_t *);
 
 static void DestroyDisplayPicture(picture_t *);
 static void DestroyDisplayPoolPicture(picture_t *);
-static int  Direct3D11MapTexture(picture_t *);
-static int  Direct3D11UnmapTexture(picture_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
@@ -400,6 +398,28 @@ static const char *globPixelShaderBiplanarYUYV_2RGB = "\
     return rgba;\
   }\
 ";
+
+static int Direct3D11MapPoolTexture(picture_t *picture)
+{
+    picture_sys_pool_t *p_sys = (picture_sys_pool_t*) picture->p_sys;
+    vout_display_t     *vd = p_sys->vd;
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    HRESULT hr;
+    hr = ID3D11DeviceContext_Map(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if( FAILED(hr) )
+    {
+        msg_Dbg( vd, "failed to map the texture (hr=0x%lX)", hr );
+        return VLC_EGENERIC;
+    }
+    return CommonUpdatePicture(picture, NULL, mappedResource.pData, mappedResource.RowPitch);
+}
+
+static void Direct3D11UnmapPoolTexture(picture_t *picture)
+{
+    picture_sys_pool_t *p_sys = (picture_sys_pool_t*)picture->p_sys;
+    vout_display_t     *vd = p_sys->vd;
+    ID3D11DeviceContext_Unmap(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0);
+}
 
 #if !VLC_WINSTORE_APP
 static int OpenHwnd(vout_display_t *vd)
@@ -1175,7 +1195,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     if ( !is_d3d11_opaque(picture->format.i_chroma))
-        Direct3D11UnmapTexture(picture);
+        Direct3D11UnmapPoolTexture(picture);
 
     /* Render the quad */
     DisplayD3DPicture(sys, &sys->picQuad, sys->picQuad.picSys.resourceView);
@@ -1745,8 +1765,8 @@ static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
     memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = 1;
     pool_cfg.picture       = &picture;
-    pool_cfg.lock          = Direct3D11MapTexture;
-    //pool_cfg.unlock        = Direct3D11UnmapTexture;
+    pool_cfg.lock          = Direct3D11MapPoolTexture;
+    //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
 
     sys->sys.pool = picture_pool_NewExtended(&pool_cfg);
     if (!sys->sys.pool) {
@@ -2237,29 +2257,6 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 #endif
 
     msg_Dbg(vd, "Direct3D11 resources destroyed");
-}
-
-static int Direct3D11MapTexture(picture_t *picture)
-{
-    picture_sys_pool_t *p_sys = (picture_sys_pool_t*) picture->p_sys;
-    vout_display_t     *vd = p_sys->vd;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    HRESULT hr;
-    hr = ID3D11DeviceContext_Map(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    if( FAILED(hr) )
-    {
-        msg_Dbg( vd, "failed to map the texture (hr=0x%lX)", hr );
-        return VLC_EGENERIC;
-    }
-    return CommonUpdatePicture(picture, NULL, mappedResource.pData, mappedResource.RowPitch);
-}
-
-static int Direct3D11UnmapTexture(picture_t *picture)
-{
-    picture_sys_pool_t *p_sys = (picture_sys_pool_t*)picture->p_sys;
-    vout_display_t     *vd = p_sys->vd;
-    ID3D11DeviceContext_Unmap(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0);
-    return VLC_SUCCESS;
 }
 
 static void Direct3D11DeleteRegions(int count, picture_t **region)
