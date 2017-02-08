@@ -643,6 +643,56 @@ error:
     return VLC_EGENERIC;
 }
 
+static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
+                            const video_format_t *fmt, unsigned pool_size,
+                            ID3D11Texture2D *textures[])
+{
+    int plane;
+    HRESULT hr;
+    ID3D11Texture2D *slicedTexture = NULL;
+    D3D11_TEXTURE2D_DESC texDesc;
+    ZeroMemory(&texDesc, sizeof(texDesc));
+    texDesc.MipLevels = 1;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.Format = cfg->formatTexture;
+    texDesc.BindFlags = D3D11_BIND_DECODER | D3D11_BIND_SHADER_RESOURCE;
+    texDesc.ArraySize = pool_size;
+    texDesc.Height = fmt->i_height;
+    texDesc.Width = fmt->i_width;
+
+    hr = ID3D11Device_CreateTexture2D( vd->sys->d3ddevice, &texDesc, NULL, &slicedTexture );
+    if (FAILED(hr)) {
+        msg_Err(vd, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
+        goto error;
+    }
+
+    for (unsigned picture_count = 0; picture_count < pool_size; picture_count++) {
+        textures[picture_count * D3D11_MAX_SHADER_VIEW] = slicedTexture;
+        ID3D11Texture2D_AddRef(slicedTexture);
+
+        for (plane = 1; plane < D3D11_MAX_SHADER_VIEW; plane++) {
+            if (!cfg->resourceFormat[plane])
+                textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = NULL;
+            else
+            {
+                textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW];
+                ID3D11Texture2D_AddRef(textures[picture_count * D3D11_MAX_SHADER_VIEW + plane]);
+            }
+        }
+    }
+
+    if (slicedTexture)
+        ID3D11Texture2D_Release(slicedTexture);
+    return VLC_SUCCESS;
+error:
+    if (slicedTexture)
+        ID3D11Texture2D_Release(slicedTexture);
+    return VLC_EGENERIC;
+}
+
 static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 {
     if ( vd->sys->sys.pool != NULL )
@@ -656,6 +706,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 #ifdef HAVE_ID3D11VIDEODECODER
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
+    ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
     HRESULT           hr;
 
     ID3D10Multithread *pMultithread;
@@ -669,34 +720,19 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (!pictures)
         goto error;
 
-    D3D11_TEXTURE2D_DESC texDesc;
-    ZeroMemory(&texDesc, sizeof(texDesc));
-    texDesc.Width = vd->fmt.i_width;
-    texDesc.Height = vd->fmt.i_height;
-    texDesc.MipLevels = 1;
-    texDesc.Format = vd->sys->picQuadConfig->formatTexture;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
-    texDesc.Usage = D3D11_USAGE_DEFAULT;
-    texDesc.BindFlags = D3D11_BIND_DECODER | D3D11_BIND_SHADER_RESOURCE;
-    texDesc.CPUAccessFlags = 0;
-
-    texDesc.ArraySize = pool_size;
-
-    ID3D11Texture2D *texture;
-    hr = ID3D11Device_CreateTexture2D( vd->sys->d3ddevice, &texDesc, NULL, &texture );
-    if (FAILED(hr)) {
-        msg_Err(vd, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
+    if (AllocateTextures(vd, vd->sys->picQuadConfig, &vd->fmt, pool_size, textures))
         goto error;
-    }
 
     for (picture_count = 0; picture_count < pool_size; picture_count++) {
         picture_sys_t *picsys = calloc(1, sizeof(*picsys));
         if (unlikely(picsys == NULL))
             goto error;
 
-        ID3D11Texture2D_AddRef(texture);
-        picsys->texture = texture;
+        picsys->texture = textures[picture_count];
+
+        if (AllocateShaderView(vd, vd->sys->picQuadConfig, picsys->texture, picture_count, picsys->resourceView) != VLC_SUCCESS)
+            goto error;
+
         picsys->slice_index = picture_count;
         picsys->formatTexture = vd->sys->picQuadConfig->formatTexture;
         picsys->context = vd->sys->d3dcontext;
@@ -717,10 +753,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         /* each picture_t holds a ref to the context and release it on Destroy */
         ID3D11DeviceContext_AddRef(picsys->context);
     }
-    ID3D11Texture2D_Release(texture);
 
-    msg_Dbg(vd, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d) texture 0x%p context 0x%p",
-            pool_size, vd->fmt.i_width, vd->fmt.i_height, texture, vd->sys->d3dcontext);
+    msg_Dbg(vd, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d) context 0x%p",
+            pool_size, vd->fmt.i_width, vd->fmt.i_height, vd->sys->d3dcontext);
 
     picture_pool_configuration_t pool_cfg;
     memset(&pool_cfg, 0, sizeof(pool_cfg));
