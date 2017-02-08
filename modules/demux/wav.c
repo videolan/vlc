@@ -118,6 +118,7 @@ static int Open( vlc_object_t * p_this )
     if( unlikely(!p_sys) )
         return VLC_ENOMEM;
 
+    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
     p_sys->p_es           = NULL;
     p_sys->i_data_size    = 0;
     p_sys->i_chans_to_reorder = 0;
@@ -185,7 +186,6 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
     wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_sys->fmt.i_codec,
                       &psz_name );
     p_sys->fmt.audio.i_channels      = GetWLE ( &p_wf->nChannels );
@@ -428,6 +428,7 @@ static int Open( vlc_object_t * p_this )
 error:
     msg_Err( p_demux, "An error occurred during wav demuxing" );
     free( p_wf );
+    es_format_Clean( &p_sys->fmt );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -488,6 +489,7 @@ static void Close ( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys   = p_demux->p_sys;
 
+    es_format_Clean( &p_sys->fmt );
     free( p_sys );
 }
 
