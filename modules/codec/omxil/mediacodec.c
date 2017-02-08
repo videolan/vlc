@@ -1362,7 +1362,12 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
     vlc_mutex_lock(&p_sys->lock);
 
     if (p_sys->b_aborted)
-        goto end;
+    {
+        if (p_sys->b_has_format)
+            goto end;
+        else
+            goto reload;
+    }
 
     if (p_in_block != NULL)
     {
@@ -1572,29 +1577,19 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
 end:
     if (p_in_block)
         block_Release(p_in_block);
-    if (p_sys->b_aborted)
-    {
-        if (!p_sys->b_has_format)
-        {
-            /* Add an empty variable so that mediacodec won't be loaded again
-             * for this ES */
-            if (var_Create(p_dec, "mediacodec-failed", VLC_VAR_VOID)
-             == VLC_SUCCESS)
-                decoder_RequestReload(p_dec);
-            vlc_mutex_unlock(&p_sys->lock);
-            return VLCDEC_SUCCESS;
-        }
-        else
-        {
-            vlc_mutex_unlock(&p_sys->lock);
-            return VLCDEC_ECRITICAL;
-        }
-    }
-    else
-    {
-        vlc_mutex_unlock(&p_sys->lock);
-        return VLCDEC_SUCCESS;
-    }
+    /* Too late to reload here, we already modified/released the input block,
+     * do it next time. */
+    int ret = p_sys->b_aborted && p_sys->b_has_format ? VLCDEC_ECRITICAL
+                                                      : VLCDEC_SUCCESS;
+    vlc_mutex_unlock(&p_sys->lock);
+    return ret;
+
+reload:
+    vlc_mutex_unlock(&p_sys->lock);
+    /* Add an empty variable so that mediacodec won't be loaded again
+     * for this ES */
+    var_Create(p_dec, "mediacodec-failed", VLC_VAR_VOID);
+    return VLCDEC_RELOAD;
 }
 
 static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block)

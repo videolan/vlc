@@ -336,7 +336,7 @@ static int StartVideoToolboxSession(decoder_t *p_dec)
     return VLC_SUCCESS;
 }
 
-static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
+static int StartVideoToolbox(decoder_t *p_dec, const block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     OSStatus status;
@@ -1117,7 +1117,11 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             msg_Err(p_dec, "decoder failure: invalid SPS/PPS");
         else if (status == -6661) {
             msg_Err(p_dec, "decoder failure: invalid argument");
-            goto reload;
+            /* The decoder module will be reloaded next time since we already
+             * modified the input block */
+            vlc_mutex_lock(&p_sys->lock);
+            p_dec->p_sys->b_abort = true;
+            vlc_mutex_unlock(&p_sys->lock);
         } else if (status == -8969 || status == -12909) {
             msg_Err(p_dec, "decoder failure: bad data (%i)", (int)status);
             StopVideoToolbox(p_dec);
@@ -1136,14 +1140,10 @@ skip:
     return VLCDEC_SUCCESS;
 
 reload:
-    block_Release(p_block);
     /* Add an empty variable so that videotoolbox won't be loaded again for
      * this ES */
-    if (var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID) == VLC_SUCCESS)
-        decoder_RequestReload(p_dec);
-    else
-        return VLCDEC_ECRITICAL;
-    return VLCDEC_SUCCESS;
+    var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID);
+    return VLCDEC_RELOAD;
 }
 
 static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)

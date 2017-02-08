@@ -69,6 +69,7 @@ struct decoder_t
 
 #   define VLCDEC_SUCCESS   VLC_SUCCESS
 #   define VLCDEC_ECRITICAL VLC_EGENERIC
+#   define VLCDEC_RELOAD    (-100)
     /* This function is called to decode one packetized block.
      *
      * The module implementation will own the input block (p_block) and should
@@ -84,6 +85,11 @@ struct decoder_t
      *  VLCDEC_SUCCESS: pf_decode will be called again
      *  VLCDEC_ECRITICAL: in case of critical error, pf_decode won't be called
      *  again.
+     *  VLCDEC_RELOAD: Request that the decoder should be reloaded. The current
+     *  module will be unloaded. Reloading a module may cause a loss of frames.
+     *  When returning this status, the implementation shouldn't release or
+     *  modify the p_block in argument (The same p_block will be feed to the
+     *  next decoder module).
      */
     int                 ( * pf_decode )   ( decoder_t *, block_t *p_block );
 
@@ -351,13 +357,6 @@ VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
  * it to the caller as a decoder_QueueSub parameter.
  */
 VLC_API subpicture_t * decoder_NewSubpicture( decoder_t *, const subpicture_updater_t * ) VLC_USED;
-
-/*
- * Request that the decoder should be reloaded. The current module will be
- * unloaded. Reloading a module may cause a loss of frames. There is no
- * warranty that pf_decode_* callbacks won't be called again after this call.
- */
-VLC_API void decoder_RequestReload( decoder_t * );
 
 /**
  * This function gives all input attachments at once.

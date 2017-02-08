@@ -148,6 +148,7 @@ struct decoder_owner_sys_t
 
 /* */
 #define DECODER_SPU_VOUT_WAIT_DURATION ((int)(0.200*CLOCK_FREQ))
+#define BLOCK_FLAG_CORE_PRIVATE_RELOADED (1 << BLOCK_FLAG_CORE_PRIVATE_SHIFT)
 
 /**
  * Load a decoder module
@@ -620,7 +621,7 @@ subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder,
     return p_subpicture;
 }
 
-void decoder_RequestReload( decoder_t * p_dec )
+static void RequestReload( decoder_t * p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     /* Don't override reload if it's RELOAD_DECODER_AOUT */
@@ -1103,7 +1104,7 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         if( status == AOUT_DEC_CHANGED )
         {
             /* Only reload the decoder */
-            decoder_RequestReload( p_dec );
+            RequestReload( p_dec );
         }
         else if( status == AOUT_DEC_FAILED )
         {
@@ -1244,7 +1245,7 @@ static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
     return i_ret;
 }
 
-
+static void DecoderProcess( decoder_t *p_dec, block_t *p_block );
 static void DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1257,6 +1258,18 @@ static void DecoderDecode( decoder_t *p_dec, block_t *p_block )
             break;
         case VLCDEC_ECRITICAL:
             p_owner->error = true;
+            break;
+        case VLCDEC_RELOAD:
+            RequestReload( p_dec );
+            if( unlikely( p_block == NULL ) )
+                break;
+            if( !( p_block->i_flags & BLOCK_FLAG_CORE_PRIVATE_RELOADED ) )
+            {
+                p_block->i_flags |= BLOCK_FLAG_CORE_PRIVATE_RELOADED;
+                DecoderProcess( p_dec, p_block );
+            }
+            else /* We prefer loosing this block than an infinite recursion */
+                block_Release( p_block );
             break;
         default:
             vlc_assert_unreachable();
@@ -1307,8 +1320,8 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
         return;
     }
 #endif
-
-    if( p_owner->p_packetizer )
+    if( p_owner->p_packetizer
+     && !unlikely( p_block->i_flags & BLOCK_FLAG_CORE_PRIVATE_RELOADED ) )
     {
         block_t *p_packetized_block;
         block_t **pp_block = p_block ? &p_block : NULL;

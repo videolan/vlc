@@ -81,7 +81,6 @@ decoder_GetDisplayRate
 decoder_GetInputAttachments
 decoder_NewAudioBuffer
 decoder_NewSubpicture
-decoder_RequestReload
 decoder_SynchroChoose
 decoder_SynchroDate
 decoder_SynchroDecode
