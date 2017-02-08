@@ -46,10 +46,7 @@
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
 # include <windows.ui.xaml.media.dxinterop.h> */
 
-#ifdef HAVE_ID3D11VIDEODECODER
 #include "../../video_chroma/d3d11_fmt.h"
-#endif
-#include "../../video_chroma/dxgi_fmt.h"
 
 #include "common.h"
 
