@@ -39,6 +39,7 @@ struct picture_sys_t
     unsigned                      slice_index;
     ID3D11VideoProcessorInputView *inputView; /* when used as processor input */
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
+    DXGI_FORMAT                   formatTexture;
 };
 
 #endif /* include-guard */

@@ -697,6 +697,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         ID3D11Texture2D_AddRef(texture);
         picsys->texture = texture;
         picsys->slice_index = picture_count;
+        picsys->formatTexture = vd->sys->picQuadConfig->formatTexture;
         picsys->context = vd->sys->d3dcontext;
 
         picture_resource_t resource = {
@@ -2073,6 +2074,8 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     if (AllocateShaderView(vd, cfg, quad->pTexture, 0, quad->picSys.resourceView) != VLC_SUCCESS)
         goto error;
+
+    quad->picSys.formatTexture = cfg->formatTexture;
 
     if ( d3dpixelShader != NULL )
     {
