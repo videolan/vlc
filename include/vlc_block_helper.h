@@ -277,11 +277,13 @@ static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
 }
 
 typedef const uint8_t * (*block_startcode_helper_t)( const uint8_t *, const uint8_t * );
+typedef bool (*block_startcode_matcher_t)( uint8_t, size_t, const uint8_t * );
 
 static inline int block_FindStartcodeFromOffset(
     block_bytestream_t *p_bytestream, size_t *pi_offset,
     const uint8_t *p_startcode, int i_startcode_length,
-    block_startcode_helper_t p_startcode_helper )
+    block_startcode_helper_t p_startcode_helper,
+    block_startcode_matcher_t p_startcode_matcher )
 {
     block_t *p_block, *p_block_backup = 0;
     ssize_t i_size = 0;
@@ -328,9 +330,12 @@ static inline int block_FindStartcodeFromOffset(
                 i_offset = p_block->i_buffer - (i_startcode_length - 1);
             }
 
-            if( p_block->p_buffer[i_offset] == p_startcode[i_match] )
+            bool b_matched = ( p_startcode_matcher )
+                           ? p_startcode_matcher( p_block->p_buffer[i_offset], i_match, p_startcode )
+                           : p_block->p_buffer[i_offset] == p_startcode[i_match];
+            if( b_matched )
             {
-                if( !i_match )
+                if( i_match == 0 )
                 {
                     p_block_backup = p_block;
                     i_offset_backup = i_offset;
@@ -346,7 +351,7 @@ static inline int block_FindStartcodeFromOffset(
 
                 i_match++;
             }
-            else if ( i_match )
+            else if ( i_match > 0 )
             {
                 /* False positive */
                 p_block = p_block_backup;

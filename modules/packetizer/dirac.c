@@ -677,7 +677,8 @@ static block_t *dirac_DoSync( decoder_t *p_dec )
         case NOT_SYNCED:
         {
             if( VLC_SUCCESS !=
-                block_FindStartcodeFromOffset( &p_sys->bytestream, &p_sys->i_offset, p_parsecode, 4, NULL ) )
+                block_FindStartcodeFromOffset( &p_sys->bytestream, &p_sys->i_offset,
+                                               p_parsecode, 4, NULL, NULL ) )
             {
                 /* p_sys->i_offset will have been set to:
                  *   end of bytestream - amount of prefix found
