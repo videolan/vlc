@@ -621,7 +621,7 @@ static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
 {
     if (alpn != NULL) {
         msg_Warn(crd, "Ignoring ALPN request due to lack of support in the backend. Proxy behavior potentially undefined.");
-#warning ALPN support missing, proxy behavior potentially undefined (rdar://30366695, #17721)
+#warning ALPN support missing, proxy behavior potentially undefined (rdar://29127318, #17721)
     }
 
     msg_Dbg(crd, "open TLS session for %s", hostname);
