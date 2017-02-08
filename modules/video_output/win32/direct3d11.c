@@ -723,8 +723,9 @@ error:
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 {
-    if ( vd->sys->sys.pool != NULL )
-        return vd->sys->sys.pool;
+    vout_display_sys_t *sys = vd->sys;
+    if ( sys->sys.pool != NULL )
+        return sys->sys.pool;
 
     if (pool_size > 30) {
         msg_Err(vd, "Avoid crashing when using ID3D11VideoDecoderOutputView with too many slices (%d)", pool_size);
@@ -738,7 +739,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     HRESULT           hr;
 
     ID3D10Multithread *pMultithread;
-    hr = ID3D11Device_QueryInterface( vd->sys->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
+    hr = ID3D11Device_QueryInterface( sys->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
     if (SUCCEEDED(hr)) {
         ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
         ID3D10Multithread_Release(pMultithread);
@@ -748,7 +749,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (!pictures)
         goto error;
 
-    if (AllocateTextures(vd, vd->sys->picQuadConfig, &vd->fmt, pool_size, textures))
+    if (AllocateTextures(vd, sys->picQuadConfig, &vd->fmt, pool_size, textures))
         goto error;
 
     for (picture_count = 0; picture_count < pool_size; picture_count++) {
@@ -758,12 +759,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
         picsys->texture = textures[picture_count];
 
-        if (AllocateShaderView(vd, vd->sys->picQuadConfig, picsys->texture, picture_count, picsys->resourceView) != VLC_SUCCESS)
+        if (AllocateShaderView(vd, sys->picQuadConfig, picsys->texture, picture_count, picsys->resourceView) != VLC_SUCCESS)
             goto error;
 
         picsys->slice_index = picture_count;
-        picsys->formatTexture = vd->sys->picQuadConfig->formatTexture;
-        picsys->context = vd->sys->d3dcontext;
+        picsys->formatTexture = sys->picQuadConfig->formatTexture;
+        picsys->context = sys->d3dcontext;
 
         picture_resource_t resource = {
             .p_sys = picsys,
@@ -783,17 +784,17 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
     msg_Dbg(vd, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d) context 0x%p",
-            pool_size, vd->fmt.i_width, vd->fmt.i_height, vd->sys->d3dcontext);
+            pool_size, vd->fmt.i_width, vd->fmt.i_height, sys->d3dcontext);
 
     picture_pool_configuration_t pool_cfg;
     memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = pool_size;
     pool_cfg.picture       = pictures;
 
-    vd->sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
+    sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
 
 error:
-    if (vd->sys->sys.pool ==NULL && pictures) {
+    if (sys->sys.pool ==NULL && pictures) {
         msg_Dbg(vd, "Failed to create the picture d3d11 pool");
         for (unsigned i=0;i<picture_count; ++i)
             DestroyDisplayPoolPicture(pictures[i]);
@@ -804,10 +805,10 @@ error:
         memset( &pool_cfg, 0, sizeof( pool_cfg ) );
         pool_cfg.picture_count = 0;
 
-        vd->sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
+        sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
     }
 #endif
-    return vd->sys->sys.pool;
+    return sys->sys.pool;
 }
 
 #ifdef HAVE_ID3D11VIDEODECODER
