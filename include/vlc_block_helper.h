@@ -138,7 +138,8 @@ static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
     p_block = p_block->p_next;
     p_block_old->p_next = NULL;
     p_bytestream->pp_last = &p_block_old->p_next;
-    p_bytestream->i_total -= p_block->i_buffer;
+    if( p_block )
+        p_bytestream->i_total -= p_block->i_buffer;
 
     return p_block;
 }
