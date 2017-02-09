@@ -235,12 +235,13 @@ static int Demux( demux_t *p_demux )
         p_sys->i_next_block_flags = 0;
         p_sys->p_current_block->i_pts =
         p_sys->p_current_block->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TS_INVALID;
-        p_sys->b_start = false;
     }
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer,
                             (p_sys->p_current_block) ? &p_sys->p_current_block : NULL )) )
     {
+        /* Only clear on output when packet is accepted as sync #17111 */
+        p_sys->b_start = false;
         while( p_block_out )
         {
             block_t *p_next = p_block_out->p_next;
