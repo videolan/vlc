@@ -286,7 +286,7 @@ static inline picture_t *decoder_NewPicture( decoder_t *dec )
 VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
 
 /**
- * This function queues a picture to the video output.
+ * This function queues a single picture to the video output.
  *
  * \note
  * The caller doesn't own the picture anymore after this call (even in case of
@@ -297,12 +297,13 @@ VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
  */
 static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 {
+    assert( p_pic->p_next == NULL );
     assert( dec->pf_queue_video != NULL );
     return dec->pf_queue_video( dec, p_pic );
 }
 
 /**
- * This function queues an audio block to the audio output.
+ * This function queues a single audio block to the audio output.
  *
  * \note
  * The caller doesn't own the audio block anymore after this call (even in case
@@ -312,12 +313,13 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
  */
 static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
 {
+    assert( p_aout_buf->p_next == NULL );
     assert( dec->pf_queue_audio != NULL );
     return dec->pf_queue_audio( dec, p_aout_buf );
 }
 
 /**
- * This function queues a subtitle to the video output.
+ * This function queues a single subtitle to the video output.
  *
  * \note
  * The caller doesn't own the subtitle anymore after this call (even in case of
@@ -327,6 +329,7 @@ static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
  */
 static inline int decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
 {
+    assert( p_spu->p_next == NULL );
     assert( dec->pf_queue_sub != NULL );
     return dec->pf_queue_sub( dec, p_spu );
 }
