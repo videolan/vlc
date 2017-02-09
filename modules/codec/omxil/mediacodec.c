@@ -1389,7 +1389,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
              * videos. See OMXCodec_GetQuirks() for a white list of decoders
              * that supported interlaced videos before Android 21. */
             msg_Warn(p_dec, "codec doesn't support interlaced videos");
-            goto end;
+            goto reload;
         }
 
         /* Parse input block */
