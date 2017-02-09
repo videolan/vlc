@@ -74,6 +74,7 @@ struct demux_sys_t
     bool  b_start;
     int   i_next_block_flags;
     es_out_id_t *p_es;
+    block_t *p_current_block;
 
     /* Packetizer */
     decoder_t *p_packetizer;
@@ -143,6 +144,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_length = 0;
     p_sys->i_pts = 0;
     p_sys->p_es = NULL;
+    p_sys->p_current_block = NULL;
     TAB_INIT( p_sys->i_seekpoint, p_sys->seekpoint );
     TAB_INIT( p_sys->i_attachments, p_sys->attachments);
     TAB_INIT( p_sys->i_title_seekpoints, p_sys->pp_title_seekpoints );
@@ -186,6 +188,9 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    if( p_sys->p_current_block )
+        block_Release( p_sys->p_current_block );
+
     for( int i = 0; i < p_sys->i_seekpoint; i++ )
         free(p_sys->seekpoint[i]);
     TAB_CLEAN( p_sys->i_seekpoint, p_sys->seekpoint );
@@ -217,19 +222,24 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_out;
 
-    block_t *p_block_in = vlc_stream_Block( p_demux->s, FLAC_PACKET_SIZE );
-    bool b_eof = p_block_in == NULL;
-
-    if ( p_block_in )
+    bool b_eof = false;
+    if( p_sys->p_current_block == NULL )
     {
-        p_block_in->i_flags = p_sys->i_next_block_flags;
+        p_sys->p_current_block = vlc_stream_Block( p_demux->s, FLAC_PACKET_SIZE );
+        b_eof = (p_sys->p_current_block == NULL);
+    }
+
+    if ( p_sys->p_current_block )
+    {
+        p_sys->p_current_block->i_flags = p_sys->i_next_block_flags;
         p_sys->i_next_block_flags = 0;
-        p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TS_INVALID;
+        p_sys->p_current_block->i_pts =
+        p_sys->p_current_block->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TS_INVALID;
         p_sys->b_start = false;
     }
 
-    while( (p_block_out = p_sys->p_packetizer->pf_packetize(
-                p_sys->p_packetizer, (p_block_in) ? &p_block_in : NULL )) )
+    while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer,
+                            (p_sys->p_current_block) ? &p_sys->p_current_block : NULL )) )
     {
         while( p_block_out )
         {
@@ -252,8 +262,10 @@ static int Demux( demux_t *p_demux )
 
             p_block_out = p_next;
         }
+        break;
     }
-    return !b_eof;
+
+    return b_eof ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
