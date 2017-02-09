@@ -687,6 +687,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             break;
         }
         else if( p_sys->b_stream_info &&
+                 p_sys->stream_info.max_framesize > MIN_FLAC_FRAME_SIZE &&
                  p_sys->stream_info.max_framesize < p_sys->i_offset )
         {
             /* Something went wrong, truncate stream head and restart */
