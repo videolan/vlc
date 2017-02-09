@@ -142,7 +142,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_packetizer = NULL;
     p_sys->p_meta = NULL;
     p_sys->i_length = 0;
-    p_sys->i_pts = 0;
+    p_sys->i_pts = VLC_TS_INVALID;
     p_sys->p_es = NULL;
     p_sys->p_current_block = NULL;
     TAB_INIT( p_sys->i_seekpoint, p_sys->seekpoint );
@@ -253,12 +253,15 @@ static int Demux( demux_t *p_demux )
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 
+            /* set PCR */
+            if( unlikely(p_sys->i_pts == VLC_TS_INVALID) )
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, __MAX(p_block_out->i_dts - 1, VLC_TS_0) );
+
             p_sys->i_pts = p_block_out->i_dts;
 
-            /* set PCR */
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
-
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
 
             p_block_out = p_next;
         }
@@ -362,6 +365,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         if( vlc_stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos + i_delta_offset ) )
             return VLC_EGENERIC;
     }
+    p_sys->i_pts = VLC_TS_INVALID;
     p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
     return VLC_SUCCESS;
 }
