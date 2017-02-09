@@ -3867,6 +3867,7 @@ AC_ARG_ENABLE(macosx,
 if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
   VLC_ADD_PLUGIN([macosx])
+  AC_PATH_PROGS(XIB, [ibtool], ibtool, ["/usr/bin"])
 fi
 AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no"])
 
@@ -4260,8 +4261,8 @@ AM_COND_IF([HAVE_WIN32], [
 
 AM_COND_IF([HAVE_DARWIN], [
   AC_CONFIG_FILES([
-    extras/package/macosx/Info.plist
-    extras/package/macosx/Resources/English.lproj/InfoPlist.strings
+    modules/gui/macosx/Resources/InfoPlist.strings
+    modules/gui/macosx/Resources/Info.plist
   ])
 ])
 
