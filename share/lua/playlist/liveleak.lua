@@ -1,9 +1,10 @@
 --[[
  $Id$
 
- Copyright © 2012 VideoLAN and AUTHORS
+ Copyright © 2012, 2017 VideoLAN and AUTHORS
 
  Authors: Ludovic Fauvet <etix@videolan.org>
+          Pierre Ynard
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,7 +23,7 @@
 
 -- Probe function.
 function probe()
-    return vlc.access == "http"
+    return ( vlc.access == "http" or vlc.access == "https" )
         and string.match( vlc.path, "^www%.liveleak%.com/view" )
 end
 
@@ -46,18 +47,31 @@ function parse()
         -- Try to find the title
         if string.match( line, '<span class="section_title"' ) then
             title = find( line, '<span class="section_title"[^>]*>(.-)<' )
-            title = string.gsub( title, '&nbsp;', ' ' )
+            title = vlc.strings.resolve_xml_special_chars( title )
         end
 
         -- Try to find the art
-        if string.match( line, 'image:' ) then
-            art = find( line, 'image: "(.-)"' )
+        if not art then
+            art = string.match( line, '<meta property="og:image" content="([^"]+)"' )
         end
 
         -- Try to find the video
-        if string.match( line, 'file:' ) then
-            video = find( line, 'file: "(.-)"' )
+        if not video and string.match( line, '<source ' ) then
+            -- Apparently the two formats are listed HD first, SD second
+            local prefres = vlc.var.inherit( nil, 'preferred-resolution' )
+            for src in string.gmatch( line, '<source src="([^"]+)"' ) do
+                video = src
+
+                if prefres < 0 then
+                    break
+                end
+                local height = tonumber( string.match( src, '_(%d+)p%.mp4' ) )
+                if ( not height ) or height <= prefres then
+                    break
+                end
+            end
         end
+
     end
     if video then
         table.insert( p, { path = video; name = title; arturl = art; } )
