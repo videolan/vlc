@@ -125,11 +125,11 @@ struct decoder_t
     void                ( * pf_flush ) ( decoder_t * );
 
     /* Closed Caption (CEA 608/708) extraction.
-     * If set, it *may* be called after pf_decode/pf_packetize
-     * returned data. It should return CC for the pictures returned by the
-     * last pf_packetize/pf_decode call only,
+     * If set, it *may* be called after pf_packetize returned data. It should
+     * return CC for the pictures returned by the last pf_packetize call only,
      * pb_present will be used to known which cc channel are present (but
-     * globaly, not necessary for the current packet */
+     * globaly, not necessary for the current packet. Video decoders should use
+     * the decoder_QueueVideoWithCc() function to pass closed captions. */
     block_t *           ( * pf_get_cc )      ( decoder_t *, bool pb_present[4] );
 
     /* Meta data at codec level
@@ -173,8 +173,9 @@ struct decoder_t
      * XXX use decoder_GetDisplayRate */
     int             (*pf_get_display_rate)( decoder_t * );
 
-    /* XXX use decoder_QueueVideo */
-    int             (*pf_queue_video)( decoder_t *, picture_t * );
+    /* XXX use decoder_QueueVideo or decoder_QueueVideoWithCc */
+    int             (*pf_queue_video)( decoder_t *, picture_t *, block_t *p_cc,
+                                       bool p_cc_present[4] );
     /* XXX use decoder_QueueAudio */
     int             (*pf_queue_audio)( decoder_t *, block_t * );
     /* XXX use decoder_QueueSub */
@@ -299,7 +300,22 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 {
     assert( p_pic->p_next == NULL );
     assert( dec->pf_queue_video != NULL );
-    return dec->pf_queue_video( dec, p_pic );
+    return dec->pf_queue_video( dec, p_pic, NULL, NULL );
+}
+
+/**
+ * This function queues a single picture with CC to the video output
+ *
+ * This function also queues the Closed Captions associated with the picture.
+ *
+ * \return 0 if the picture is queued, -1 on error
+ */
+static inline int decoder_QueueVideoWithCc( decoder_t *dec, picture_t *p_pic,
+                                            block_t *p_cc, bool p_cc_present[4] )
+{
+    assert( p_pic->p_next == NULL );
+    assert( dec->pf_queue_video != NULL );
+    return dec->pf_queue_video( dec, p_pic, p_cc, p_cc_present );
 }
 
 /**

@@ -77,7 +77,8 @@ static sout_stream_id_sys_t *Add( sout_stream_t *, const es_format_t * );
 static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
-static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic );
+static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic,
+                                block_t *p_cc, bool p_cc_present[4] );
 inline static int video_update_format_decoder( decoder_t *p_dec );
 inline static picture_t *video_new_buffer_decoder( decoder_t * );
 inline static picture_t *video_new_buffer_filter( filter_t * );
@@ -484,11 +485,16 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     p_sys->b_inited = false;
 }
 
-static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
+static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic,
+                                block_t *p_cc, bool p_cc_present[4] )
 {
     sout_stream_t *p_stream = p_dec->p_queue_ctx;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     picture_t *p_new_pic;
+
+    (void) p_cc_present;
+    if( unlikely( p_cc != NULL ) )
+        block_Release( p_cc );
 
     if( p_sys->i_height || p_sys->i_width )
     {

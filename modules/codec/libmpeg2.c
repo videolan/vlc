@@ -112,7 +112,6 @@ static void CloseDecoder( vlc_object_t * );
 
 static int DecodeVideo( decoder_t *, block_t *);
 #if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
-static block_t   *GetCc( decoder_t *p_dec, bool pb_present[4] );
 #endif
 
 static picture_t *GetNewPicture( decoder_t * );
@@ -193,7 +192,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_cc_dts = 0;
     p_sys->i_cc_flags = 0;
 #if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
-    p_dec->pf_get_cc = GetCc;
     cc_Init( &p_sys->cc );
 #endif
     p_sys->p_gop_user_data = NULL;
@@ -598,13 +596,34 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
 static int DecodeVideo( decoder_t *p_dec, block_t *p_block)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
     block_t **pp_block = &p_block;
     picture_t *p_pic;
     while( ( p_pic = DecodeBlock( p_dec, pp_block ) ) != NULL )
-        decoder_QueueVideo( p_dec, p_pic );
+    {
+        block_t *p_cc = NULL;
+        bool *pb_present = NULL;
+#if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
+        pb_present = p_sys->cc.pb_present;
+        if( p_sys->cc.i_data > 0 )
+        {
+            p_cc = block_Alloc( p_sys->cc.i_data);
+            if( p_cc )
+            {
+                memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
+                p_cc->i_dts =
+                p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
+                p_cc->i_flags = ( p_sys->cc.b_reorder  ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & ( BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B);
+            }
+            cc_Flush( &p_sys->cc );
+        }
+#endif
+        decoder_QueueVideoWithCc( p_dec, p_pic, p_cc, pb_present );
+    }
     return VLCDEC_SUCCESS;
 }
 
@@ -686,34 +705,6 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
 
     return p_pic;
 }
-
-#if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
-/*****************************************************************************
- * GetCc: Retrieves the Closed Captions for the CC decoder.
- *****************************************************************************/
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
-{
-    decoder_sys_t   *p_sys = p_dec->p_sys;
-    block_t         *p_cc = NULL;
-
-    for( int i = 0; i < 4; i++ )
-        pb_present[i] = p_sys->cc.pb_present[i];
-
-    if( p_sys->cc.i_data <= 0 )
-        return NULL;
-
-    p_cc = block_Alloc( p_sys->cc.i_data);
-    if( p_cc )
-    {
-        memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
-        p_cc->i_dts =
-        p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
-        p_cc->i_flags = ( p_sys->cc.b_reorder  ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & ( BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B);
-    }
-    cc_Flush( &p_sys->cc );
-    return p_cc;
-}
-#endif
 
 /*****************************************************************************
  * GetAR: Get aspect ratio
