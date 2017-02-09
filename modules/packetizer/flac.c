@@ -566,12 +566,12 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
     if ( pp_block && *pp_block)
     {
         in = *pp_block;
-
+        *pp_block = NULL;
         if (in->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
             Flush(p_dec);
             p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
             if (in->i_flags&BLOCK_FLAG_CORRUPTED) {
-                block_Release(*pp_block);
+                block_Release(in);
                 return NULL;
             }
         }
