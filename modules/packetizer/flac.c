@@ -767,7 +767,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_dec->fmt_out.audio.i_original_channels = pi_channels_maps[p_sys->stream_info.channels];
 
         /* So p_block doesn't get re-added several times */
-        if ( in )
+        if ( pp_block )
             *pp_block = block_BytestreamPop(&p_sys->bytestream);
 
         p_sys->i_offset = 0;
