@@ -68,9 +68,12 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "rawaud" );
     add_integer( "rawaud-channels", 2, CHANNELS_TEXT, CHANNELS_LONGTEXT, false );
+        change_safe()
     add_integer( "rawaud-samplerate", 48000, SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT, false );
+        change_safe()
     add_string( "rawaud-fourcc", FOURCC_DEFAULT,
                 FOURCC_TEXT, FOURCC_LONGTEXT, false );
+        change_safe()
     add_string( "rawaud-lang", "eng", LANG_TEXT, LANG_LONGTEXT, false);
 vlc_module_end();
 
