@@ -759,12 +759,12 @@ DEPS_res = \
 	Resources/sidebar-icons_yosemite/ys-sidebar-playlist@2x.png \
 	Resources/sidebar-icons_yosemite/ys-sidebar-podcast.png \
 	Resources/sidebar-icons_yosemite/ys-sidebar-podcast@2x.png \
-	Resources/vlcmenubaricon/VLCNextTemplate.pdf \
-	Resources/vlcmenubaricon/VLCPauseTemplate.pdf \
-	Resources/vlcmenubaricon/VLCPlayTemplate.pdf \
-	Resources/vlcmenubaricon/VLCPreviousTemplate.pdf \
-	Resources/vlcmenubaricon/VLCShuffleTemplate.pdf \
-	Resources/vlcmenubaricon/VLCStatusBarIcon.pdf \
+	Resources/Button-Icons/VLCNextTemplate.pdf \
+	Resources/Button-Icons/VLCPauseTemplate.pdf \
+	Resources/Button-Icons/VLCPlayTemplate.pdf \
+	Resources/Button-Icons/VLCPreviousTemplate.pdf \
+	Resources/Button-Icons/VLCShuffleTemplate.pdf \
+	Resources/Button-Icons/VLCStatusBarIcon.pdf \
 	Resources/Button-Icons/VLCBackwardTemplate.pdf \
 	Resources/Button-Icons/VLCForwardTemplate.pdf \
 	Resources/Button-Icons/VLCFullscreenOnTemplate.pdf \

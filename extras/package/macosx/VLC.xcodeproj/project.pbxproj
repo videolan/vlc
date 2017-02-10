@@ -75,12 +75,11 @@
 		6B82243D1E4D2AFD00833BE1 /* VLCSaveTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCSaveTemplate.pdf; path = "Button-Icons/VLCSaveTemplate.pdf"; sourceTree = "<group>"; };
 		6B82243E1E4D2AFD00833BE1 /* VLCVolumeOffTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCVolumeOffTemplate.pdf; path = "Button-Icons/VLCVolumeOffTemplate.pdf"; sourceTree = "<group>"; };
 		6B82243F1E4D2AFD00833BE1 /* VLCVolumeOnTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCVolumeOnTemplate.pdf; path = "Button-Icons/VLCVolumeOnTemplate.pdf"; sourceTree = "<group>"; };
-		6B8224491E4D2B1C00833BE1 /* VLCNextTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCNextTemplate.pdf; path = vlcmenubaricon/VLCNextTemplate.pdf; sourceTree = "<group>"; };
-		6B82244A1E4D2B1C00833BE1 /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = vlcmenubaricon/VLCPauseTemplate.pdf; sourceTree = "<group>"; };
-		6B82244B1E4D2B1C00833BE1 /* VLCPlayTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPlayTemplate.pdf; path = vlcmenubaricon/VLCPlayTemplate.pdf; sourceTree = "<group>"; };
-		6B82244C1E4D2B1C00833BE1 /* VLCPreviousTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPreviousTemplate.pdf; path = vlcmenubaricon/VLCPreviousTemplate.pdf; sourceTree = "<group>"; };
-		6B82244D1E4D2B1C00833BE1 /* VLCShuffleTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCShuffleTemplate.pdf; path = vlcmenubaricon/VLCShuffleTemplate.pdf; sourceTree = "<group>"; };
-		6B82244E1E4D2B1C00833BE1 /* VLCStatusBarIcon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCStatusBarIcon.pdf; path = vlcmenubaricon/VLCStatusBarIcon.pdf; sourceTree = "<group>"; };
+		6B8224491E4D2B1C00833BE1 /* VLCNextTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCNextTemplate.pdf; path = "Button-Icons/VLCNextTemplate.pdf"; sourceTree = "<group>"; };
+		6B82244B1E4D2B1C00833BE1 /* VLCPlayTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPlayTemplate.pdf; path = "Button-Icons/VLCPlayTemplate.pdf"; sourceTree = "<group>"; };
+		6B82244C1E4D2B1C00833BE1 /* VLCPreviousTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPreviousTemplate.pdf; path = "Button-Icons/VLCPreviousTemplate.pdf"; sourceTree = "<group>"; };
+		6B82244D1E4D2B1C00833BE1 /* VLCShuffleTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCShuffleTemplate.pdf; path = "Button-Icons/VLCShuffleTemplate.pdf"; sourceTree = "<group>"; };
+		6B82244E1E4D2B1C00833BE1 /* VLCStatusBarIcon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCStatusBarIcon.pdf; path = "Button-Icons/VLCStatusBarIcon.pdf"; sourceTree = "<group>"; };
 		6B8224551E4D2B4700833BE1 /* aiff.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = aiff.icns; path = icons/aiff.icns; sourceTree = "<group>"; };
 		6B8224561E4D2B4700833BE1 /* audio.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = audio.icns; path = icons/audio.icns; sourceTree = "<group>"; };
 		6B8224571E4D2B4700833BE1 /* avi.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = avi.icns; path = icons/avi.icns; sourceTree = "<group>"; };
@@ -599,6 +598,7 @@
 		6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCRendererDiscovery.m; sourceTree = "<group>"; };
 		6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCFSPanelController.h; sourceTree = "<group>"; };
 		6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCFSPanelController.m; sourceTree = "<group>"; };
+		6BF557CF1E4E0E2500C03C9D /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = "Button-Icons/VLCPauseTemplate.pdf"; sourceTree = "<group>"; };
 		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWQuincyManager.h; sourceTree = "<group>"; };
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWQuincyManager.m; sourceTree = "<group>"; };
 		7D3F652818805297005776C4 /* BWQuincyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWQuincyUI.h; sourceTree = "<group>"; };
@@ -929,7 +929,7 @@
 				6B82243E1E4D2AFD00833BE1 /* VLCVolumeOffTemplate.pdf */,
 				6B82243F1E4D2AFD00833BE1 /* VLCVolumeOnTemplate.pdf */,
 				6B8224491E4D2B1C00833BE1 /* VLCNextTemplate.pdf */,
-				6B82244A1E4D2B1C00833BE1 /* VLCPauseTemplate.pdf */,
+				6BF557CF1E4E0E2500C03C9D /* VLCPauseTemplate.pdf */,
 				6B82244B1E4D2B1C00833BE1 /* VLCPlayTemplate.pdf */,
 				6B82244C1E4D2B1C00833BE1 /* VLCPreviousTemplate.pdf */,
 				6B82244D1E4D2B1C00833BE1 /* VLCShuffleTemplate.pdf */,
