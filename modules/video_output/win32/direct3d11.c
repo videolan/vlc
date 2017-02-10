@@ -154,13 +154,6 @@ struct vout_display_sys_t
     picture_t                **d3dregions;
 };
 
-/* internal picture_t pool  */
-typedef struct
-{
-    ID3D11Texture2D               *texture;
-    vout_display_t                *vd;
-} picture_sys_pool_t;
-
 /* matches the D3D11_INPUT_ELEMENT_DESC we setup */
 typedef struct d3d_vertex_t {
     struct {
@@ -215,7 +208,6 @@ static void Direct3D11DestroyResources(vout_display_t *);
 static int  Direct3D11CreatePool (vout_display_t *, video_format_t *);
 static void Direct3D11DestroyPool(vout_display_t *);
 
-static void DestroyDisplayPicture(picture_t *);
 static void DestroyDisplayPoolPicture(picture_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
@@ -404,14 +396,12 @@ static const char *globPixelShaderBiplanarYUYV_2RGB = "\
 
 static int Direct3D11MapPoolTexture(picture_t *picture)
 {
-    picture_sys_pool_t *p_sys = (picture_sys_pool_t*) picture->p_sys;
-    vout_display_t     *vd = p_sys->vd;
+    picture_sys_t *p_sys = picture->p_sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     HRESULT hr;
-    hr = ID3D11DeviceContext_Map(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    hr = ID3D11DeviceContext_Map(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if( FAILED(hr) )
     {
-        msg_Dbg( vd, "failed to map the texture (hr=0x%lX)", hr );
         return VLC_EGENERIC;
     }
     return CommonUpdatePicture(picture, NULL, mappedResource.pData, mappedResource.RowPitch);
@@ -419,9 +409,8 @@ static int Direct3D11MapPoolTexture(picture_t *picture)
 
 static void Direct3D11UnmapPoolTexture(picture_t *picture)
 {
-    picture_sys_pool_t *p_sys = (picture_sys_pool_t*)picture->p_sys;
-    vout_display_t     *vd = p_sys->vd;
-    ID3D11DeviceContext_Unmap(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0);
+    picture_sys_t *p_sys = picture->p_sys;
+    ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
 }
 
 #if !VLC_WINSTORE_APP
@@ -822,20 +811,29 @@ error:
     return sys->sys.pool;
 }
 
+static void ReleasePictureResources(picture_sys_t *p_sys)
+{
+    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
+        if (p_sys->resourceView[i]) {
+            ID3D11ShaderResourceView_Release(p_sys->resourceView[i]);
+            p_sys->resourceView[i] = NULL;
+        }
+        if (p_sys->texture[i]) {
+            ID3D11Texture2D_Release(p_sys->texture[i]);
+            p_sys->texture[i] = NULL;
+        }
+    }
+    if (p_sys->context) {
+        ID3D11DeviceContext_Release(p_sys->context);
+        p_sys->context = NULL;
+    }
+}
+
 #ifdef HAVE_ID3D11VIDEODECODER
 static void DestroyDisplayPoolPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = (picture_sys_t*) picture->p_sys;
-
-    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-        if (p_sys->resourceView[i])
-            ID3D11ShaderResourceView_Release(p_sys->resourceView[i]);
-        if (p_sys->texture[i])
-            ID3D11Texture2D_Release(p_sys->texture[i]);
-    }
-    if (p_sys->context)
-        ID3D11DeviceContext_Release(p_sys->context);
-
+    ReleasePictureResources(p_sys);
     free(p_sys);
     free(picture);
 }
@@ -843,12 +841,9 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
 
 static void DestroyDisplayPicture(picture_t *picture)
 {
-    picture_sys_pool_t *p_sys = (picture_sys_pool_t*) picture->p_sys;
-
-    if (p_sys->texture)
-        ID3D11Texture2D_Release(p_sys->texture);
-
-    free(p_sys);
+    /* belongs to the quad
+    ReleasePictureResources( picture->p_sys );
+    /* belongs to the quad free(p_sys);*/
     free(picture);
 }
 
@@ -1138,12 +1133,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #ifdef HAVE_ID3D11VIDEODECODER
     if (!is_d3d11_opaque(picture->format.i_chroma))
     {
-        picture_sys_pool_t *p_psys = (picture_sys_pool_t*)picture->p_sys;
+        picture_sys_t *p_sys = picture->p_sys;
         Direct3D11UnmapPoolTexture(picture);
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
                                                   sys->picQuad.picSys.resource[KNOWN_DXGI_INDEX],
                                                   0, 0, 0, 0,
-                                                  (ID3D11Resource*) p_psys->texture,
+                                                  p_sys->resource[KNOWN_DXGI_INDEX],
                                                   0, NULL);
     }
     else
@@ -1864,15 +1859,14 @@ static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
 
     /* we need to provide a single picture that the CPU can lock/unlock to write
      * into, it's the picQuad used to display */
-    picture_sys_pool_t *poolsys = calloc(1, sizeof(*poolsys));
+    picture_sys_t *poolsys = calloc(1, sizeof(*poolsys));
     if (unlikely(poolsys == NULL)) {
         return VLC_ENOMEM;
     }
-    poolsys->texture  = sys->picQuad.picSys.texture[KNOWN_DXGI_INDEX];
-    poolsys->vd       = vd;
+    memcpy(poolsys, &sys->picQuad.picSys, sizeof(*poolsys));
 
     picture_resource_t resource = {
-        .p_sys = (picture_sys_t*) poolsys,
+        .p_sys = &sys->picQuad.picSys,
         .pf_destroy = DestroyDisplayPicture,
     };
 
@@ -1881,7 +1875,6 @@ static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
         free(poolsys);
         return VLC_ENOMEM;
     }
-    ID3D11Texture2D_AddRef(poolsys->texture);
 
     picture_pool_configuration_t pool_cfg;
     memset(&pool_cfg, 0, sizeof(pool_cfg));
@@ -2270,6 +2263,8 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
 
     quad->picSys.formatTexture = cfg->formatTexture;
+    quad->picSys.context = sys->d3dcontext;
+    ID3D11DeviceContext_AddRef(quad->picSys.context);
 
     if ( d3dpixelShader != NULL )
     {
@@ -2320,18 +2315,7 @@ static void ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pVertexShaderConstants);
         quad->pVertexShaderConstants = NULL;
     }
-    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-        if (quad->picSys.texture[i])
-        {
-            ID3D11Texture2D_Release(quad->picSys.texture[i]);
-            quad->picSys.texture[i] = NULL;
-        }
-        if (quad->picSys.resourceView[i])
-        {
-            ID3D11ShaderResourceView_Release(quad->picSys.resourceView[i]);
-            quad->picSys.resourceView[i] = NULL;
-        }
-    }
+    ReleasePictureResources(&quad->picSys);
     if (quad->d3dpixelShader)
     {
         ID3D11VertexShader_Release(quad->d3dpixelShader);
