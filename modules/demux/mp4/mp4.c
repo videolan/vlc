@@ -1032,9 +1032,10 @@ error:
         vlc_stream_Seek( p_demux->s, 0 );
 
     if( p_sys->p_root )
-    {
         MP4_BoxFree( p_sys->p_root );
-    }
+
+    MP4_Fragments_Clean( &p_sys->fragments, MP4_BoxFree );
+
     free( p_sys );
     return VLC_EGENERIC;
 }
