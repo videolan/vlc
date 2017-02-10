@@ -32,8 +32,8 @@ struct picture_sys_t
 {
     ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
     union {
-        ID3D11Texture2D           *texture;
-        ID3D11Resource            *resource;
+        ID3D11Texture2D           *texture[D3D11_MAX_SHADER_VIEW];
+        ID3D11Resource            *resource[D3D11_MAX_SHADER_VIEW];
     };
     ID3D11DeviceContext           *context;
     unsigned                      slice_index;
@@ -41,5 +41,9 @@ struct picture_sys_t
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
     DXGI_FORMAT                   formatTexture;
 };
+
+/* index to use for texture/resource that use a known DXGI format
+ * (ie not DXGI_FORMAT_UNKNWON) */
+#define KNOWN_DXGI_INDEX   0
 
 #endif /* include-guard */

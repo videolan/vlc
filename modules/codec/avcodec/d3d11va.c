@@ -252,7 +252,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
     {
         picture_sys_t *p_sys_out = output->p_sys;
 
-        assert(p_sys_out->texture != NULL);
+        assert(p_sys_out->texture[KNOWN_DXGI_INDEX] != NULL);
 
 #ifdef ID3D11VideoContext_VideoProcessorBlt
         if (sys->videoProcessor)
@@ -272,7 +272,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
                 };
 
                 HRESULT hr = ID3D11VideoDevice_CreateVideoProcessorOutputView((ID3D11VideoDevice*) sys->dx_sys.d3ddec,
-                                                                 p_sys_out->resource,
+                                                                 p_sys_out->resource[KNOWN_DXGI_INDEX],
                                                                  sys->procEnumerator,
                                                                  &outDesc,
                                                                  (ID3D11VideoProcessorOutputView**) &p_sys_out->decoder);
@@ -319,15 +319,15 @@ done:
             ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
 
             D3D11_TEXTURE2D_DESC dstDesc;
-            ID3D11Texture2D_GetDesc( p_sys_out->texture, &dstDesc);
+            ID3D11Texture2D_GetDesc( p_sys_out->texture[KNOWN_DXGI_INDEX], &dstDesc);
 
             /* copy decoder slice to surface */
             D3D11_BOX copyBox = {
                 .right = dstDesc.Width, .bottom = dstDesc.Height, .back = 1,
             };
-            ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, p_sys_out->resource,
+            ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, p_sys_out->resource[KNOWN_DXGI_INDEX],
                                                       p_sys_out->slice_index, 0, 0, 0,
-                                                      p_sys_in->resource,
+                                                      p_sys_in->resource[KNOWN_DXGI_INDEX],
                                                       viewDesc.Texture2D.ArraySlice,
                                                       &copyBox);
             if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
@@ -386,7 +386,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
 
         hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( (ID3D11VideoDevice*) dx_sys->d3ddec,
-                                                             (ID3D11Resource*) p_sys->texture,
+                                                             p_sys->resource[KNOWN_DXGI_INDEX],
                                                              &viewDesc,
                                                              &p_sys->decoder );
         if (FAILED(hr)) {
@@ -494,9 +494,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             sys->d3dvidctx = d3dvidctx;
             sys->b_extern_pool = true;
 
-            assert(p_sys->texture != NULL);
+            assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);
             D3D11_TEXTURE2D_DESC dstDesc;
-            ID3D11Texture2D_GetDesc( p_sys->texture, &dstDesc);
+            ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
             sys->render = dstDesc.Format;
         }
     }
@@ -1026,7 +1026,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
             }
 
             D3D11_TEXTURE2D_DESC texDesc;
-            ID3D11Texture2D_GetDesc(pic->p_sys->texture, &texDesc);
+            ID3D11Texture2D_GetDesc(pic->p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
             if (texDesc.ArraySize < dx_sys->surface_count)
             {
                 msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
@@ -1049,7 +1049,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
 
             viewDesc.Texture2D.ArraySlice = pic->p_sys->slice_index;
             hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( (ID3D11VideoDevice*) dx_sys->d3ddec,
-                                                                 pic->p_sys->resource,
+                                                                 pic->p_sys->resource[KNOWN_DXGI_INDEX],
                                                                  &viewDesc,
                                                                  &pic->p_sys->decoder );
             if (FAILED(hr)) {
@@ -1208,7 +1208,7 @@ static void DxDestroySurfaces(vlc_va_t *va)
 static void DestroyPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
-    ID3D11Texture2D_Release( p_sys->texture );
+    ID3D11Texture2D_Release( p_sys->texture[KNOWN_DXGI_INDEX] );
     if (p_sys->inputView)
         ID3D11View_Release( (ID3D11View*) p_sys->inputView );
 
@@ -1229,7 +1229,7 @@ static picture_t *DxAllocPicture(vlc_va_t *va, const video_format_t *fmt, unsign
         return NULL;
 
     pic_sys->decoder  = (ID3D11VideoDecoderOutputView*) sys->dx_sys.hw_surface[index];
-    ID3D11VideoDecoderOutputView_GetResource(pic_sys->decoder, &pic_sys->resource);
+    ID3D11VideoDecoderOutputView_GetResource(pic_sys->decoder, &pic_sys->resource[KNOWN_DXGI_INDEX]);
     pic_sys->context  = sys->d3dctx;
 
     if (sys->procEnumerator)
@@ -1242,7 +1242,7 @@ static picture_t *DxAllocPicture(vlc_va_t *va, const video_format_t *fmt, unsign
         };
 
         HRESULT hr = ID3D11VideoDevice_CreateVideoProcessorInputView((ID3D11VideoDevice*) sys->dx_sys.d3ddec,
-                                                        pic_sys->resource,
+                                                        pic_sys->resource[KNOWN_DXGI_INDEX],
                                                         sys->procEnumerator,
                                                         &inDesc,
                                                         &pic_sys->inputView);

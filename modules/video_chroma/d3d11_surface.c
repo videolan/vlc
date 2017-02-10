@@ -70,7 +70,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
         goto ok;
 
     D3D11_TEXTURE2D_DESC texDesc;
-    ID3D11Texture2D_GetDesc( p_sys->texture, &texDesc);
+    ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
 
     texDesc.MipLevels = 1;
     //texDesc.SampleDesc.Count = 1;
@@ -113,7 +113,8 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, sys->staging_resource,
                                               0, 0, 0, 0,
-                                              p_sys->resource, viewDesc.Texture2D.ArraySlice,
+                                              p_sys->resource[KNOWN_DXGI_INDEX],
+                                              viewDesc.Texture2D.ArraySlice,
                                               NULL);
 
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
@@ -194,7 +195,8 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, sys->staging_resource,
                                               0, 0, 0, 0,
-                                              p_sys->resource, viewDesc.Texture2D.ArraySlice,
+                                              p_sys->resource[KNOWN_DXGI_INDEX],
+                                              viewDesc.Texture2D.ArraySlice,
                                               NULL);
 
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
