@@ -2077,7 +2077,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
                      video_projection_mode_t projection)
 {
     vout_display_sys_t *sys = vd->sys;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW];
     HRESULT hr;
     const bool RGB_shader = cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
         cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
@@ -2202,61 +2202,46 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         SetQuadVSProjection( vd, quad, &vd->cfg->viewpoint );
     }
 
-    D3D11_TEXTURE2D_DESC texDesc;
-    memset(&texDesc, 0, sizeof(texDesc));
-    texDesc.Width  = fmt->i_width;
-    texDesc.Height = fmt->i_height;
-    texDesc.MipLevels = texDesc.ArraySize = 1;
-    texDesc.Format = cfg->formatTexture;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.Usage = D3D11_USAGE_DYNAMIC;
-    texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    texDesc.MiscFlags = 0;
-
-    /* remove half pixels, we don't want green lines */
-    const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
-    for (unsigned plane = 0; plane < p_chroma_desc->plane_count; ++plane)
-    {
-        unsigned i_extra;
-        i_extra = (texDesc.Width  * p_chroma_desc->p[plane].w.num) % p_chroma_desc->p[plane].w.den;
-        if ( i_extra )
-            texDesc.Width -= p_chroma_desc->p[plane].w.den / p_chroma_desc->p[plane].w.num - i_extra;
-        i_extra = (texDesc.Height  * p_chroma_desc->p[plane].h.num) % p_chroma_desc->p[plane].h.den;
-        if ( i_extra )
-            texDesc.Height -= p_chroma_desc->p[plane].h.den / p_chroma_desc->p[plane].h.num - i_extra;
-    }
-    if (texDesc.Format == DXGI_FORMAT_NV12 || texDesc.Format == DXGI_FORMAT_P010)
-    {
-        texDesc.Width  &= ~1;
-        texDesc.Height &= ~1;
-    }
-
-    hr = ID3D11Device_CreateTexture2D(sys->d3ddevice, &texDesc, NULL, &quad->picSys.texture[KNOWN_DXGI_INDEX]);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Could not Create the D3d11 Texture. (hr=0x%lX)", hr);
+    if (AllocateTextures(vd, cfg, fmt, 1, textures))
         goto error;
-    }
-    for (int i=KNOWN_DXGI_INDEX+1; i<D3D11_MAX_SHADER_VIEW; i++) {
-        if (!cfg->resourceFormat[i])
-            quad->picSys.texture[i] = NULL;
-        else
+
+    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+        quad->picSys.texture[i] = textures[i];
+
+    if (!is_d3d11_opaque(fmt->i_chroma)) {
+        D3D11_MAPPED_SUBRESOURCE mappedResource;
+        int Width  = fmt->i_width;
+        int Height = fmt->i_height;
+
+        /* remove half pixels, we don't want green lines */
+        const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
+        for (unsigned plane = 0; plane < p_chroma_desc->plane_count; ++plane)
         {
-            quad->picSys.texture[i] = quad->picSys.texture[KNOWN_DXGI_INDEX];
-            ID3D11Texture2D_AddRef(quad->picSys.texture[i]);
+            unsigned i_extra;
+            i_extra = (Width  * p_chroma_desc->p[plane].w.num) % p_chroma_desc->p[plane].w.den;
+            if ( i_extra )
+                Width -= p_chroma_desc->p[plane].w.den / p_chroma_desc->p[plane].w.num - i_extra;
+            i_extra = (Height  * p_chroma_desc->p[plane].h.num) % p_chroma_desc->p[plane].h.den;
+            if ( i_extra )
+                Height -= p_chroma_desc->p[plane].h.den / p_chroma_desc->p[plane].h.num - i_extra;
         }
-    }
+        if (cfg->formatTexture == DXGI_FORMAT_NV12 || cfg->formatTexture == DXGI_FORMAT_P010)
+        {
+            Width  &= ~1;
+            Height &= ~1;
+        }
 
-    hr = ID3D11DeviceContext_Map(sys->d3dcontext, quad->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    if( FAILED(hr) ) {
-        msg_Err(vd, "The texture cannot be mapped. (hr=0x%lX)", hr);
-        goto error;
-    }
-    ID3D11DeviceContext_Unmap(sys->d3dcontext, quad->picSys.resource[KNOWN_DXGI_INDEX], 0);
-    if (mappedResource.RowPitch < p_chroma_desc->pixel_size * texDesc.Width) {
-        msg_Err( vd, "The texture row pitch is too small (%d instead of %d)", mappedResource.RowPitch,
-                 p_chroma_desc->pixel_size * texDesc.Width );
-        goto error;
+        hr = ID3D11DeviceContext_Map(sys->d3dcontext, quad->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        if( FAILED(hr) ) {
+            msg_Err(vd, "The texture cannot be mapped. (hr=0x%lX)", hr);
+            goto error;
+        }
+        ID3D11DeviceContext_Unmap(sys->d3dcontext, quad->picSys.resource[KNOWN_DXGI_INDEX], 0);
+        if (mappedResource.RowPitch < p_chroma_desc->pixel_size * Width) {
+            msg_Err( vd, "The texture row pitch is too small (%d instead of %d)", mappedResource.RowPitch,
+                     p_chroma_desc->pixel_size * Width );
+            goto error;
+        }
     }
 
     if (AllocateShaderView(vd, cfg, 0, &quad->picSys) != VLC_SUCCESS)
