@@ -277,17 +277,17 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     NSToolbarItem *toolbarItem = nil;
 
     if ([itemIdent isEqual: VLCIntfSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Interface"), _NS("Interface Settings"), @"spref_cone_Interface_64", showInterfaceSettings);
+        CreateToolbarItem(_NS("Interface"), _NS("Interface Settings"), @"VLCInterfaceCone", showInterfaceSettings);
     } else if ([itemIdent isEqual: VLCAudioSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Audio"), _NS("Audio Settings"), @"spref_cone_Audio_64", showAudioSettings);
+        CreateToolbarItem(_NS("Audio"), _NS("Audio Settings"), @"VLCAudioCone", showAudioSettings);
     } else if ([itemIdent isEqual: VLCVideoSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Video"), _NS("Video Settings"), @"spref_cone_Video_64", showVideoSettings);
+        CreateToolbarItem(_NS("Video"), _NS("Video Settings"), @"VLCVideoCone", showVideoSettings);
     } else if ([itemIdent isEqual: VLCOSDSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS(SUBPIC_TITLE), _NS("Subtitle & On Screen Display Settings"), @"spref_cone_Subtitles_64", showOSDSettings);
+        CreateToolbarItem(_NS(SUBPIC_TITLE), _NS("Subtitle & On Screen Display Settings"), @"VLCSubtitleCone", showOSDSettings);
     } else if ([itemIdent isEqual: VLCInputSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS(INPUT_TITLE), _NS("Input & Codec Settings"), @"spref_cone_Input_64", showInputSettings);
+        CreateToolbarItem(_NS(INPUT_TITLE), _NS("Input & Codec Settings"), @"VLCInputCone", showInputSettings);
     } else if ([itemIdent isEqual: VLCHotkeysSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Hotkeys"), _NS("Hotkeys settings"), @"spref_cone_Hotkeys_64", showHotkeySettings);
+        CreateToolbarItem(_NS("Hotkeys"), _NS("Hotkeys settings"), @"VLCHotkeysCone", showHotkeySettings);
     }
 
     return toolbarItem;

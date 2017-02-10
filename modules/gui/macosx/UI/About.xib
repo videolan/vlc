@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -30,7 +30,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="173" y="74" width="721" height="356"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <value key="minSize" type="size" width="231.86799999999999" height="107"/>
             <view key="contentView" id="1344">
                 <rect key="frame" x="0.0" y="0.0" width="721" height="356"/>
@@ -42,15 +42,13 @@
                             <rect key="frame" x="0.0" y="0.0" width="430" height="204"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textView editable="NO" selectable="NO" importsGraphics="NO" richText="NO" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" smartInsertDelete="YES" id="1342">
+                                <textView editable="NO" selectable="NO" importsGraphics="NO" richText="NO" usesFontPanel="YES" usesRuler="YES" smartInsertDelete="YES" id="1342">
                                     <rect key="frame" x="0.0" y="0.0" width="415" height="204"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
-                                    <size key="minSize" width="430" height="204"/>
+                                    <size key="minSize" width="415" height="204"/>
                                     <size key="maxSize" width="564" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="430" height="204"/>
-                                    <size key="maxSize" width="564" height="10000000"/>
                                 </textView>
                             </subviews>
                             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -76,7 +74,7 @@
                             <constraint firstAttribute="height" constant="240" id="JQt-Up-e0A"/>
                             <constraint firstAttribute="width" constant="240" id="k85-B9-511"/>
                         </constraints>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="vlc" id="2269"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="VLC" id="2269"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2232">
                         <rect key="frame" x="269" y="274" width="248" height="16"/>
@@ -125,7 +123,7 @@ Help and join us!.</string>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="2313">
+                    <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="2313">
                         <rect key="frame" x="-13" y="-9" width="747" height="90"/>
                         <view key="contentView" id="Ioe-L7-TBi">
                             <rect key="frame" x="1" y="1" width="745" height="88"/>
@@ -185,8 +183,6 @@ Help and join us!.</string>
                             <constraint firstAttribute="width" constant="741" id="7L8-Ze-VYg"/>
                             <constraint firstAttribute="height" constant="84" id="OTP-sG-AIS"/>
                         </constraints>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.90000000000000002" alpha="1" colorSpace="calibratedWhite"/>
                     </box>
                 </subviews>
                 <constraints>
@@ -215,6 +211,6 @@ Help and join us!.</string>
         </window>
     </objects>
     <resources>
-        <image name="vlc" width="512" height="512"/>
+        <image name="VLC" width="512" height="512"/>
     </resources>
 </document>

@@ -173,28 +173,28 @@ xib_verbose__0 = $(xib_verbose_0)
 	  --compile $@ $<
 
 DEPS_res = \
-	Resources/icons/aiff.icns \
-	Resources/icons/audio.icns \
-	Resources/icons/avi.icns \
-	Resources/icons/flv.icns \
-	Resources/icons/generic.icns \
-	Resources/icons/m4a.icns \
-	Resources/icons/m4v.icns \
-	Resources/icons/mkv.icns \
-	Resources/icons/mov.icns \
-	Resources/icons/movie.icns \
-	Resources/icons/mp3.icns \
-	Resources/icons/mpeg.icns \
-	Resources/icons/ogg.icns \
-	Resources/icons/playlist.icns \
-	Resources/icons/rm.icns \
-	Resources/icons/subtitle.icns \
-	Resources/icons/vlc-xmas.icns \
-	Resources/icons/vlc.icns \
-	Resources/icons/vob.icns \
-	Resources/icons/wav.icns \
-	Resources/icons/wma.icns \
-	Resources/icons/wmv.icns \
+	Resources/App-Icons/VLC-Xmas.icns \
+	Resources/App-Icons/VLC.icns \
+	Resources/File-Icons/aiff.icns \
+	Resources/File-Icons/audio.icns \
+	Resources/File-Icons/avi.icns \
+	Resources/File-Icons/flv.icns \
+	Resources/File-Icons/generic.icns \
+	Resources/File-Icons/m4a.icns \
+	Resources/File-Icons/m4v.icns \
+	Resources/File-Icons/mkv.icns \
+	Resources/File-Icons/mov.icns \
+	Resources/File-Icons/movie.icns \
+	Resources/File-Icons/mp3.icns \
+	Resources/File-Icons/mpeg.icns \
+	Resources/File-Icons/ogg.icns \
+	Resources/File-Icons/playlist.icns \
+	Resources/File-Icons/rm.icns \
+	Resources/File-Icons/subtitle.icns \
+	Resources/File-Icons/vob.icns \
+	Resources/File-Icons/wav.icns \
+	Resources/File-Icons/wma.icns \
+	Resources/File-Icons/wmv.icns \
 	Resources/mainwindow/backward-3btns-pressed.png \
 	Resources/mainwindow/backward-3btns-pressed@2x.png \
 	Resources/mainwindow/backward-3btns.png \
@@ -729,12 +729,12 @@ DEPS_res = \
 	Resources/mainwindow_yosemite/ys-volume-slider-track.png \
 	Resources/mainwindow_yosemite/ys-volume-slider-track@2x.png \
 	Resources/noart.png \
-	Resources/prefs/spref_cone_Audio_64.png \
-	Resources/prefs/spref_cone_Hotkeys_64.png \
-	Resources/prefs/spref_cone_Input_64.png \
-	Resources/prefs/spref_cone_Interface_64.png \
-	Resources/prefs/spref_cone_Subtitles_64.png \
-	Resources/prefs/spref_cone_Video_64.png \
+	Resources/Pref-Icons/VLCAudioCone.png \
+	Resources/Pref-Icons/VLCHotkeysCone.png \
+	Resources/Pref-Icons/VLCInputCone.png \
+	Resources/Pref-Icons/VLCInterfaceCone.png \
+	Resources/Pref-Icons/VLCSubtitleCone.png \
+	Resources/Pref-Icons/VLCVideoCone.png \
 	Resources/sidebar-icons/sidebar-local.png \
 	Resources/sidebar-icons/sidebar-local@2x.png \
 	Resources/sidebar-icons/sidebar-movie.png \

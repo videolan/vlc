@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G24b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCStatusBarIcon">
@@ -72,7 +71,7 @@
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="0kw-t4-DcN">
                     <rect key="frame" x="6" y="4" width="48" height="62"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="vlc" id="7Ns-2s-EgU"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="VLC" id="7Ns-2s-EgU"/>
                 </imageView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Byt-pH-60l">
                     <rect key="frame" x="60" y="42" width="183" height="17"/>
@@ -195,11 +194,11 @@
         </customView>
     </objects>
     <resources>
+        <image name="VLC" width="512" height="512"/>
         <image name="VLCNextTemplate" width="128" height="128"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
         <image name="VLCPlayTemplate" width="128" height="128"/>
         <image name="VLCPreviousTemplate" width="128" height="128"/>
         <image name="VLCShuffleTemplate" width="128" height="128"/>
-        <image name="vlc" width="512" height="512"/>
     </resources>
 </document>

@@ -168,7 +168,7 @@
         NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSDayCalendarUnit inUnit:NSYearCalendarUnit forDate:[NSDate date]];
 
         if (dayOfYear >= 354)
-            [o_icon_view setImage: [NSImage imageNamed:@"vlc-xmas"]];
+            [o_icon_view setImage: [NSImage imageNamed:@"VLC-Xmas"]];
     }
 }
 
