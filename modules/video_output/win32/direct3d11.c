@@ -141,6 +141,10 @@ struct vout_display_sys_t
     ID3D11VertexShader        *flatVSShader;
     ID3D11VertexShader        *projectionVSShader;
 
+    /* copy from the decoder pool into picSquad before display
+     * Uses a Texture2D with slices rather than a Texture2DArray for the decoder */
+    bool                     legacy_shader;
+
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2];
     const char               *psz_rgbaPxShader;
@@ -298,7 +302,7 @@ static const char* globPixelShaderDefault = "\
     float whitePadding;\
     float4x4 Colorspace;\
   };\
-  Texture2D shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
+  Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
   SamplerState SampleType;\
   \
   struct PS_INPUT\
@@ -335,7 +339,7 @@ static const char *globPixelShaderBiplanarYUV_2RGB = "\
     float whitePadding;\
     float4x4 Colorspace;\
   };\
-  Texture2D shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
+  Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
   SamplerState SampleType;\
   \
   struct PS_INPUT\
@@ -373,7 +377,7 @@ static const char *globPixelShaderBiplanarYUYV_2RGB = "\
     float whitePadding;\
     float4x4 Colorspace;\
   };\
-  Texture2D shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
+  Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
   SamplerState SampleType;\
   \
   struct PS_INPUT\
@@ -632,9 +636,19 @@ static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc = {
         .Format = format->resourceFormat[0],
     };
-    resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    resviewDesc.Texture2D.MipLevels = 1;
 
+    if (sys->legacy_shader)
+    {
+        resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        resviewDesc.Texture2D.MipLevels = 1;
+    }
+    else
+    {
+        resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+        resviewDesc.Texture2DArray.MipLevels = -1;
+        resviewDesc.Texture2DArray.ArraySize = 1;
+        resviewDesc.Texture2DArray.FirstArraySlice = slice_index;
+    }
     hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, picsys->resource, &resviewDesc, &picsys->resourceView[0]);
     if (FAILED(hr)) {
         msg_Err(vd, "Could not Create the Y/RGB Texture ResourceView slice %d. (hr=0x%lX)", slice_index, hr);
@@ -1119,7 +1133,19 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     vout_display_sys_t *sys = vd->sys;
 
 #ifdef HAVE_ID3D11VIDEODECODER
-    if (is_d3d11_opaque(picture->format.i_chroma)) {
+    if (!is_d3d11_opaque(picture->format.i_chroma))
+    {
+        picture_sys_pool_t *p_psys = (picture_sys_pool_t*)picture->p_sys;
+        Direct3D11UnmapPoolTexture(picture);
+        ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
+                                                  sys->picQuad.picSys.resource,
+                                                  0, 0, 0, 0,
+                                                  (ID3D11Resource*) p_psys->texture,
+                                                  0, NULL);
+    }
+    else
+    if (sys->legacy_shader)
+    {
         picture_sys_t *p_sys = picture->p_sys;
         if( sys->context_lock != INVALID_HANDLE_VALUE )
         {
@@ -1189,11 +1215,11 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    if ( !is_d3d11_opaque(picture->format.i_chroma))
-        Direct3D11UnmapPoolTexture(picture);
-
     /* Render the quad */
-    DisplayD3DPicture(sys, &sys->picQuad, sys->picQuad.picSys.resourceView);
+    if (sys->legacy_shader || !is_d3d11_opaque(picture->format.i_chroma))
+        DisplayD3DPicture(sys, &sys->picQuad, sys->picQuad.picSys.resourceView);
+    else
+        DisplayD3DPicture(sys, &sys->picQuad, picture->p_sys->resourceView);
 
     if (subpicture) {
         // draw the additional vertices
@@ -1347,7 +1373,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     for (UINT driver = 0; driver < ARRAYSIZE(driverAttempts); driver++) {
         D3D_FEATURE_LEVEL i_feature_level;
         hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
-                    featureLevels, 9, D3D11_SDK_VERSION,
+                    featureLevels, 6, D3D11_SDK_VERSION,
                     &sys->d3ddevice, &i_feature_level, &sys->d3dcontext);
         if (SUCCEEDED(hr)) {
 #ifndef NDEBUG
@@ -1527,12 +1553,28 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
 {
     vout_display_sys_t *sys = vd->sys;
     ID3DBlob* pShaderBlob = NULL, *pErrBlob;
+    char *shader;
+    if (!pixel)
+        shader = (char*)psz_shader;
+    else
+    {
+        shader = malloc(strlen(psz_shader) + 32);
+        if (!shader)
+        {
+            msg_Err(vd, "no room for the Pixel Shader");
+            return NULL;
+        }
+        sprintf(shader, psz_shader, sys->legacy_shader ? "" : "Array", sys->legacy_shader ? "" : "Array");
+    }
 
     /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
+    HRESULT hr = D3DCompile(shader, strlen(shader),
                             NULL, NULL, NULL, pixel ? "PS" : "VS",
-                            pixel ? "ps_4_0_level_9_1" : "vs_4_0_level_9_1",
+                            pixel ? (sys->legacy_shader ? "ps_4_0_level_9_1" : "ps_4_0") :
+                                    (sys->legacy_shader ? "vs_4_0_level_9_1" : "vs_4_0"),
                             0, 0, &pShaderBlob, &pErrBlob);
+    if (pixel)
+        free(shader);
 
     if (FAILED(hr)) {
         char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
@@ -1557,6 +1599,76 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const char *psz_shader, ID
 
     ID3D10Blob_Release(pPSBlob);
     return hr;
+}
+
+#if !VLC_WINSTORE_APP
+static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
+{
+    HKEY hKey;
+    TCHAR key[128];
+    TCHAR szData[256], lookup[256];
+    DWORD len = 256;
+
+    _sntprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x&rev_cf"), adapterDesc->VendorId, adapterDesc->DeviceId);
+    for (int i=0;;i++)
+    {
+        _sntprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
+        if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey) != ERROR_SUCCESS )
+            return NULL;
+
+        if( RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
+            if (_tcscmp(lookup, szData) == 0)
+                return hKey;
+        }
+
+        RegCloseKey(hKey);
+    }
+    return NULL;
+}
+#endif
+
+static bool CanUseTextureArray(vout_display_t *vd)
+{
+#ifndef HAVE_ID3D11VIDEODECODER
+    return false;
+#else
+    vout_display_sys_t *sys = vd->sys;
+    TCHAR szData[256];
+    DWORD len = 256;
+    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(sys->d3ddevice);
+    if (!pAdapter)
+        return false;
+
+    DXGI_ADAPTER_DESC adapterDesc;
+    HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
+    IDXGIAdapter_Release(pAdapter);
+    if (FAILED(hr))
+        return false;
+
+    /* ATI/AMD hardware has issues with pixel shaders with Texture2DArray */
+    if (adapterDesc.VendorId != 0x1002)
+        return true;
+
+#if !VLC_WINSTORE_APP
+    HKEY hKey = GetAdapterRegistry(&adapterDesc);
+    if (hKey == NULL)
+        return false;
+
+    LONG err = RegQueryValueEx( hKey, TEXT("DriverVersion"), NULL, NULL, (LPBYTE) &szData, &len );
+    RegCloseKey(hKey);
+
+    if (err == ERROR_SUCCESS )
+    {
+        int wddm, d3d_features, revision, build;
+        /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
+        if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) == 4)
+            /* it should be OK starting from driver 22.19.128.xxx */
+            return wddm > 22 || (wddm == 22 && (d3d_features > 19 || (d3d_features == 19 && revision >= 128)));
+    }
+#endif
+    msg_Dbg(vd, "fallback to legacy shader mode for old AMD drivers");
+    return false;
+#endif
 }
 
 /* TODO : handle errors better
@@ -1622,13 +1734,25 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
+    sys->legacy_shader = !CanUseTextureArray(vd);
     vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma);
 
     hr = CompilePixelShader(vd, sys->d3dPxShader, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
-        msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
-        return VLC_EGENERIC;
+#ifdef HAVE_ID3D11VIDEODECODER
+        if (!sys->legacy_shader)
+        {
+            sys->legacy_shader = true;
+            msg_Dbg(vd, "fallback to legacy shader mode");
+            hr = CompilePixelShader(vd, sys->d3dPxShader, &sys->picQuadPixelShader);
+        }
+#endif
+        if (FAILED(hr))
+        {
+            msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
+            return VLC_EGENERIC;
+        }
     }
 
     if (sys->psz_rgbaPxShader != NULL)
