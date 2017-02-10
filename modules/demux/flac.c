@@ -506,15 +506,15 @@ static inline int Get24bBE( const uint8_t *p )
 }
 
 static void ParseStreamInfo( es_format_t *, uint64_t *pi_count );
-static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
-                            int i_sample_rate );
-static void ParseComment( demux_t *, const uint8_t *p_data, int i_data );
-static void ParsePicture( demux_t *, const uint8_t *p_data, int i_data );
+static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, size_t i_data,
+                            unsigned i_sample_rate );
+static void ParseComment( demux_t *, const uint8_t *p_data, size_t i_data );
+static void ParsePicture( demux_t *, const uint8_t *p_data, size_t i_data );
 
 static int  ParseHeaders( demux_t *p_demux, es_format_t *p_fmt )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int     i_peek;
+    ssize_t i_peek;
     const uint8_t *p_peek;
     bool b_last;
     uint64_t i_sample_count;
@@ -614,14 +614,14 @@ static void ParseStreamInfo( es_format_t *p_fmt, uint64_t *pi_count )
     *pi_count = GetQWBE(&p_data[4+6]) &  ((INT64_C(1)<<36)-1);
 }
 
-static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
-                            int i_sample_rate )
+static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, size_t i_data,
+                            unsigned i_sample_rate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     flac_seekpoint_t *s;
-    int i;
+    size_t i;
 
-    if( i_sample_rate <= 0 )
+    if( i_sample_rate == 0 )
         return;
 
     /* */
@@ -656,7 +656,7 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
     /* TODO sort it by size and remove wrong seek entry (time not increasing) */
 }
 
-static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
+static void ParseComment( demux_t *p_demux, const uint8_t *p_data, size_t i_data )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -669,7 +669,7 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
         &p_sys->i_title_seekpoints, &p_sys->pp_title_seekpoints, NULL, NULL );
 }
 
-static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
+static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, size_t i_data )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
