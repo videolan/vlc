@@ -114,7 +114,6 @@ struct vout_display_sys_t
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
     HINSTANCE                hd3d11_dll;       /* handle of the opened d3d11 dll */
     HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
-    IDXGIFactory2            *dxgifactory;     /* DXGI 1.2 factory */
     /* We should find a better way to store this or atleast a shorter name */
     PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN OurD3D11CreateDeviceAndSwapChain;
     PFN_D3D11_CREATE_DEVICE                OurD3D11CreateDevice;
@@ -1382,6 +1381,8 @@ static const char *GetFormatPixelShader(const d3d_format_t *format)
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
+    IDXGIFactory2 *dxgifactory;
+
     *fmt = vd->source;
 
 #if !VLC_WINSTORE_APP
@@ -1465,16 +1466,16 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&sys->dxgifactory);
+    hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
     IDXGIAdapter_Release(dxgiadapter);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
 
-    hr = IDXGIFactory2_CreateSwapChainForHwnd(sys->dxgifactory, (IUnknown *)sys->d3ddevice,
+    hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3ddevice,
                                               sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
-    IDXGIFactory2_Release(sys->dxgifactory);
+    IDXGIFactory2_Release(dxgifactory);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
