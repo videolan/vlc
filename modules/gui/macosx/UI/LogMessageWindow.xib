@@ -35,14 +35,14 @@
                                 <rect key="frame" x="0.0" y="0.0" width="480" height="231"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
-                                    <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" translatesAutoresizingMaskIntoConstraints="NO" id="yUO-yn-8Au">
+                                    <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" translatesAutoresizingMaskIntoConstraints="NO" id="yUO-yn-8Au">
                                         <rect key="frame" x="0.0" y="0.0" width="480" height="231"/>
                                         <clipView key="contentView" wantsLayer="YES" id="jLc-G4-HUQ">
-                                            <rect key="frame" x="1" y="0.0" width="478" height="230"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="480" height="231"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" rowSizeStyle="automatic" headerView="XuL-0o-TLH" viewBased="YES" id="Cpc-IS-2Wn">
-                                                    <rect key="frame" x="0.0" y="0.0" width="478" height="207"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="480" height="208"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -128,7 +128,7 @@
                                                                 </tableCellView>
                                                             </prototypeCellViews>
                                                         </tableColumn>
-                                                        <tableColumn identifier="" width="319" minWidth="40" maxWidth="3.4028234663852886e+38" id="B4u-CM-hUN">
+                                                        <tableColumn identifier="" width="321" minWidth="40" maxWidth="3.4028234663852886e+38" id="B4u-CM-hUN">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Message">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -142,11 +142,11 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                             <prototypeCellViews>
                                                                 <tableCellView id="mKk-vl-YgV">
-                                                                    <rect key="frame" x="157" y="1" width="319" height="17"/>
+                                                                    <rect key="frame" x="157" y="1" width="321" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hdT-qU-xRy">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="319" height="17"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="321" height="17"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" sendsActionOnEndEditing="YES" title="Placeholder for the actual log message, this can be quite long, so let's see how this will look." id="ed5-yc-Kp5">
                                                                                 <font key="font" metaFont="system"/>
                                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -186,7 +186,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <tableHeaderView key="headerView" id="XuL-0o-TLH">
-                                            <rect key="frame" x="0.0" y="0.0" width="478" height="23"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="480" height="23"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableHeaderView>
                                     </scrollView>
