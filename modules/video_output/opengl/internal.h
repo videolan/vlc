@@ -343,4 +343,10 @@ opengl_tex_converter_cvpx_init(video_format_t *fmt,
                                opengl_tex_converter_t *tc);
 #endif
 
+#ifdef VLCGL_CONV_VA
+GLuint
+opengl_tex_converter_vaapi_init(video_format_t *fmt,
+                                opengl_tex_converter_t *tc);
+#endif
+
 #endif /* include-guard */

@@ -22,6 +22,24 @@ if HAVE_IOS
 OPENGL_COMMONSOURCES += video_output/opengl/converter_cvpx.c
 OPENGL_COMMONCFLAGS += -DVLCGL_CONV_CVPX
 endif
+if HAVE_EGL
+if HAVE_VAAPI
+OPENGL_COMMONLIBS += $(LIBVA_LIBS) $(LIBVA_EGL_LIBS) libvlc_vaapi_instance.la
+OPENGL_COMMONSOURCES += video_output/opengl/converter_vaapi.c \
+	hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
+OPENGL_COMMONCFLAGS += -DVLCGL_CONV_VA
+if HAVE_WAYLAND_EGL
+if HAVE_VAAPI_WL
+OPENGL_COMMONLIBS += $(LIBVA_WL_LIBS)
+OPENGL_COMMONCFLAGS += -DHAVE_VA_WL
+endif
+endif
+if HAVE_VAAPI_X11
+OPENGL_COMMONLIBS += $(LIBVA_X11_LIBS)
+OPENGL_COMMONCFLAGS += -DHAVE_VA_X11
+endif
+endif
+endif
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp

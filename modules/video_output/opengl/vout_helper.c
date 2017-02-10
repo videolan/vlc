@@ -50,6 +50,9 @@
 
 static opengl_tex_converter_init_cb opengl_tex_converter_init_cbs[] =
 {
+#ifdef VLCGL_CONV_VA
+    opengl_tex_converter_vaapi_init,
+#endif
 #ifdef __ANDROID__
     opengl_tex_converter_anop_init,
 #endif
