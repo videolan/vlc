@@ -205,7 +205,7 @@ static void Direct3D11Close(vout_display_t *);
 static int  Direct3D11CreateResources (vout_display_t *, video_format_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
 
-static int  Direct3D11CreatePool (vout_display_t *, video_format_t *);
+static void DestroyQuadPicture(picture_t *);
 static void Direct3D11DestroyPool(vout_display_t *);
 
 static void DestroyDisplayPoolPicture(picture_t *);
@@ -727,21 +727,45 @@ error:
 static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 {
     vout_display_sys_t *sys = vd->sys;
-    if ( sys->sys.pool != NULL )
+    ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
+    picture_t **pictures = NULL;
+    picture_t *picture;
+    unsigned  plane;
+    unsigned  picture_count = 0;
+    picture_pool_configuration_t pool_cfg = {};
+
+    if (sys->sys.pool)
         return sys->sys.pool;
 
-#ifdef HAVE_ID3D11VIDEODECODER
-    picture_t**       pictures = NULL;
-    unsigned          picture_count = 0;
-    unsigned          plane;
-    ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
-    HRESULT           hr;
+    if (vd->info.is_slow)
+        pool_size = 1;
 
-    ID3D10Multithread *pMultithread;
-    hr = ID3D11Device_QueryInterface( sys->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
-    if (SUCCEEDED(hr)) {
-        ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
-        ID3D10Multithread_Release(pMultithread);
+    if (AllocQuad( vd, &vd->fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
+                   vd->fmt.projection_mode) != VLC_SUCCESS) {
+        msg_Err(vd, "Could not Create the main quad picture.");
+        return NULL;
+    }
+
+    if (vd->info.is_slow) {
+        picture_resource_t resource = {
+            .p_sys = &sys->picQuad.picSys,
+            .pf_destroy = DestroyDisplayPoolPicture,
+        };
+
+        picture = picture_NewFromResource(&vd->fmt, &resource);
+        if (likely(picture != NULL)) {
+            pool_cfg.picture       = &picture;
+            pool_cfg.lock          = Direct3D11MapPoolTexture;
+            //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
+        }
+    } else {
+        HRESULT           hr;
+        ID3D10Multithread *pMultithread;
+        hr = ID3D11Device_QueryInterface( sys->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
+        if (SUCCEEDED(hr)) {
+            ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
+            ID3D10Multithread_Release(pMultithread);
+        }
     }
 
     pictures = calloc(pool_size, sizeof(*pictures));
@@ -759,7 +783,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         for (plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
             picsys->texture[plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW + plane];
 
-        if (AllocateShaderView(vd, sys->picQuadConfig, picture_count, picsys) != VLC_SUCCESS)
+        if (AllocateShaderView(vd, sys->picQuadConfig, picture_count, picsys))
             goto error;
 
         picsys->slice_index = picture_count;
@@ -771,7 +795,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             .pf_destroy = DestroyDisplayPoolPicture,
         };
 
-        picture_t *picture = picture_NewFromResource(&vd->fmt, &resource);
+        picture = picture_NewFromResource(&vd->fmt, &resource);
         if (unlikely(picture == NULL)) {
             free(picsys);
             msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
@@ -783,31 +807,26 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         ID3D11DeviceContext_AddRef(picsys->context);
     }
 
+    pool_cfg.picture       = pictures;
     msg_Dbg(vd, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d) context 0x%p",
             pool_size, vd->fmt.i_width, vd->fmt.i_height, sys->d3dcontext);
 
-    picture_pool_configuration_t pool_cfg;
-    memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = pool_size;
-    pool_cfg.picture       = pictures;
-
     sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
 
 error:
-    if (sys->sys.pool ==NULL && pictures) {
-        msg_Dbg(vd, "Failed to create the picture d3d11 pool");
-        for (unsigned i=0;i<picture_count; ++i)
-            DestroyDisplayPoolPicture(pictures[i]);
-        free(pictures);
+    if (sys->sys.pool == NULL) {
+        if (pictures) {
+            msg_Dbg(vd, "Failed to create the picture d3d11 pool");
+            for (unsigned i=0;i<picture_count; ++i)
+                picture_Release(pictures[i]);
+            free(pictures);
+        }
 
         /* create an empty pool to avoid crashing */
-        picture_pool_configuration_t pool_cfg;
-        memset( &pool_cfg, 0, sizeof( pool_cfg ) );
         pool_cfg.picture_count = 0;
-
         sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
     }
-#endif
     return sys->sys.pool;
 }
 
@@ -832,9 +851,8 @@ static void ReleasePictureResources(picture_sys_t *p_sys)
 #ifdef HAVE_ID3D11VIDEODECODER
 static void DestroyDisplayPoolPicture(picture_t *picture)
 {
-    picture_sys_t *p_sys = (picture_sys_t*) picture->p_sys;
-    ReleasePictureResources(p_sys);
-    free(p_sys);
+    ReleasePictureResources( picture->p_sys );
+    /* belongs to the quad free(p_sys);*/
     free(picture);
 }
 #endif
@@ -1810,13 +1828,6 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     }
     ID3D10Blob_Release(pVSBlob);
 
-    if (AllocQuad( vd, fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
-                   vd->fmt.projection_mode) != VLC_SUCCESS) {
-        ID3D11PixelShader_Release(sys->picQuadPixelShader);
-        msg_Err(vd, "Could not Create the main quad picture. (hr=0x%lX)", hr);
-        return VLC_EGENERIC;
-    }
-
     ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     UpdatePicQuadPosition(vd);
@@ -1841,54 +1852,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3D11DeviceContext_PSSetSamplers(sys->d3dcontext, 0, 1, &d3dsampState);
     ID3D11SamplerState_Release(d3dsampState);
 
-    /* a decoder pool will be created when needed with the right amount
-     * of pictures for 'slow' (non direct) vout */
-    if (vd->info.is_slow && Direct3D11CreatePool(vd, fmt))
-    {
-        msg_Err(vd, "Direct3D picture pool initialization failed");
-        return VLC_EGENERIC;
-    }
-
     msg_Dbg(vd, "Direct3D11 resources created");
-    return VLC_SUCCESS;
-}
-
-static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* we need to provide a single picture that the CPU can lock/unlock to write
-     * into, it's the picQuad used to display */
-    picture_sys_t *poolsys = calloc(1, sizeof(*poolsys));
-    if (unlikely(poolsys == NULL)) {
-        return VLC_ENOMEM;
-    }
-    memcpy(poolsys, &sys->picQuad.picSys, sizeof(*poolsys));
-
-    picture_resource_t resource = {
-        .p_sys = &sys->picQuad.picSys,
-        .pf_destroy = DestroyDisplayPicture,
-    };
-
-    picture_t *picture = picture_NewFromResource(fmt, &resource);
-    if (!picture) {
-        free(poolsys);
-        return VLC_ENOMEM;
-    }
-
-    picture_pool_configuration_t pool_cfg;
-    memset(&pool_cfg, 0, sizeof(pool_cfg));
-    pool_cfg.picture_count = 1;
-    pool_cfg.picture       = &picture;
-    pool_cfg.lock          = Direct3D11MapPoolTexture;
-    //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
-
-    sys->sys.pool = picture_pool_NewExtended(&pool_cfg);
-    if (!sys->sys.pool) {
-        picture_Release(picture);
-        return VLC_ENOMEM;
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -2251,19 +2215,14 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     quad->picSys.context = sys->d3dcontext;
     ID3D11DeviceContext_AddRef(quad->picSys.context);
 
-    if ( d3dpixelShader != NULL )
-    {
-        if (!AllocQuadVertices(vd, quad, fmt, projection))
-            goto error;
+    if (!AllocQuadVertices(vd, quad, fmt, projection))
+        goto error;
 
-        if (projection == PROJECTION_MODE_RECTANGULAR)
-            quad->d3dvertexShader = sys->flatVSShader;
-        else
-            quad->d3dvertexShader = sys->projectionVSShader;
-
-        quad->d3dpixelShader = d3dpixelShader;
-        ID3D11PixelShader_AddRef(quad->d3dpixelShader);
-    }
+    quad->d3dpixelShader = d3dpixelShader;
+    if (projection == PROJECTION_MODE_RECTANGULAR)
+        quad->d3dvertexShader = sys->flatVSShader;
+    else
+        quad->d3dvertexShader = sys->projectionVSShader;
 
     return VLC_SUCCESS;
 
@@ -2301,11 +2260,6 @@ static void ReleaseQuad(d3d_quad_t *quad)
         quad->pVertexShaderConstants = NULL;
     }
     ReleasePictureResources(&quad->picSys);
-    if (quad->d3dpixelShader)
-    {
-        ID3D11VertexShader_Release(quad->d3dpixelShader);
-        quad->d3dpixelShader = NULL;
-    }
 }
 
 static void Direct3D11DestroyResources(vout_display_t *vd)
@@ -2340,7 +2294,7 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     }
     if (sys->pSPUPixelShader)
     {
-        ID3D11VertexShader_Release(sys->pSPUPixelShader);
+        ID3D11PixelShader_Release(sys->pSPUPixelShader);
         sys->pSPUPixelShader = NULL;
     }
     if (sys->picQuadPixelShader)
