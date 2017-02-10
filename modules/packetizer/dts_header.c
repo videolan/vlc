@@ -288,6 +288,10 @@ static int dts_header_ParseCore( vlc_dts_header_t *p_header,
     p_header->i_frame_length = (i_nblks + 1) * 32;
     p_header->i_original_channels = dca_get_channels( i_amode, b_lfe );
 
+    if( !p_header->i_rate || !p_header->i_frame_size ||
+        !p_header->i_frame_length || !p_header->i_original_channels )
+        return VLC_EGENERIC;
+
     return VLC_SUCCESS;
 }
 
