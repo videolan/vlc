@@ -399,16 +399,8 @@ AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
     CONTRIB_DIR="${srcdir}/contrib/`$CC -dumpmachine`"
     AS_IF([test ! -d "${CONTRIB_DIR}"], [
       echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-      CONTRIB_DIR="${srcdir}/extras/contrib/hosts/${host}"
-      AS_IF([test ! -d "${CONTRIB_DIR}"], [
-        echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-        CONTRIB_DIR="${srcdir}/extras/contrib/hosts/`$CC -dumpmachine`"
-        AS_IF([test ! -d "${CONTRIB_DIR}"], [
-          echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-          CONTRIB_DIR=""
-          AC_MSG_RESULT([not found])
-        ])
-      ])
+      CONTRIB_DIR=""
+      AC_MSG_RESULT([not found])
     ])
   ])
 ], [
