@@ -150,10 +150,18 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_cover_score = 0;
 
     es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_FLAC );
+    fmt.b_packetized = true;
 
     /* We need to read and store the STREAMINFO metadata into fmt extra */
     if( ParseHeaders( p_demux, &fmt ) )
         goto error;
+
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
+    if( !p_sys->p_es )
+    {
+        es_format_Clean( &fmt );
+        goto error;
+    }
 
     /* Load the FLAC packetizer */
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "flac" );
@@ -242,12 +250,6 @@ static int Demux( demux_t *p_demux )
             block_t *p_next = p_block_out->p_next;
 
             p_block_out->p_next = NULL;
-
-            if( p_sys->p_es == NULL )
-            {
-                p_sys->p_packetizer->fmt_out.b_packetized = true;
-                p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
-            }
 
             /* set PCR */
             if( unlikely(p_sys->i_pts == VLC_TS_INVALID) )
@@ -611,6 +613,8 @@ static void ParseStreamInfo( es_format_t *p_fmt, uint64_t *pi_count )
 {
     uint8_t *p_data = p_fmt->p_extra;
     p_fmt->audio.i_rate = GetDWBE(&p_data[4+6]) >> 12;
+    p_fmt->audio.i_channels = (p_data[12] & 0x0F >> 1) + 1;
+    p_fmt->audio.i_bitspersample = ((p_data[12] & 0x01) << 4) | p_data[13] >> 4;
     *pi_count = GetQWBE(&p_data[4+6]) &  ((INT64_C(1)<<36)-1);
 }
 
