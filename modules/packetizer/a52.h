@@ -260,12 +260,14 @@ static inline int vlc_a52_header_Parse( vlc_a52_header_t *p_header,
     const int bsid = p_buffer[5] >> 3;
 
     /* cf. Annex E 2.3.1.6 of AC3 spec */
-    if( bsid > 10 && bsid <= 16 )
+    if( bsid <= 10 )
+        return vlc_a52_header_ParseAc3( p_header, p_buffer,
+                                        p_acmod, pi_fscod_samplerates );
+    else if( bsid <= 16 )
         return vlc_a52_header_ParseEac3( p_header, p_buffer,
                                          p_acmod, pi_fscod_samplerates );
     else
-        return vlc_a52_header_ParseAc3( p_header, p_buffer,
-                                        p_acmod, pi_fscod_samplerates );
+        return VLC_EGENERIC;
 }
 
 #endif
