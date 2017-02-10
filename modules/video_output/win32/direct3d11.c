@@ -213,7 +213,7 @@ static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
 static int AllocQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
-                     const d3d_format_t *, ID3D11PixelShader *, video_projection_mode_t);
+                     const d3d_format_t *, ID3D11PixelShader *, video_projection_mode_t, unsigned);
 static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 static void UpdateQuadOpacity(vout_display_t *, const d3d_quad_t *, float);
@@ -741,7 +741,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         pool_size = 1;
 
     if (AllocQuad( vd, &vd->fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
-                   vd->fmt.projection_mode) != VLC_SUCCESS) {
+                   vd->fmt.projection_mode, pool_size) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
     }
@@ -2038,10 +2038,10 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_
 
 static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
                      const d3d_format_t *cfg, ID3D11PixelShader *d3dpixelShader,
-                     video_projection_mode_t projection)
+                     video_projection_mode_t projection, unsigned pool_size)
 {
     vout_display_sys_t *sys = vd->sys;
-    ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW];
+    ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
     HRESULT hr;
     const bool RGB_shader = cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
         cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
@@ -2166,7 +2166,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         SetQuadVSProjection( vd, quad, &vd->cfg->viewpoint );
     }
 
-    if (AllocateTextures(vd, cfg, fmt, 1, textures))
+    if (AllocateTextures(vd, cfg, fmt, pool_size, textures))
         goto error;
 
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
@@ -2392,7 +2392,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             err = AllocQuad( vd, &r->fmt, d3dquad, sys->d3dregion_format, sys->pSPUPixelShader,
-                             PROJECTION_MODE_RECTANGULAR );
+                             PROJECTION_MODE_RECTANGULAR, 1 );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to create %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
