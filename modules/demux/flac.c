@@ -61,7 +61,7 @@ vlc_module_end ()
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );
 
-static int  ReadMeta( demux_t *, uint8_t **pp_streaminfo, int *pi_streaminfo );
+static int  ParseHeaders( demux_t *, es_format_t * );
 
 typedef struct
 {
@@ -112,8 +112,6 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
-    uint8_t     *p_streaminfo;
-    int         i_streaminfo;
     es_format_t fmt;
 
     /* Have a peep at the show. */
@@ -151,16 +149,13 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_cover_idx = 0;
     p_sys->i_cover_score = 0;
 
-    /* We need to read and store the STREAMINFO metadata */
-    if( ReadMeta( p_demux, &p_streaminfo, &i_streaminfo ) )
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_FLAC );
+
+    /* We need to read and store the STREAMINFO metadata into fmt extra */
+    if( ParseHeaders( p_demux, &fmt ) )
         goto error;
 
     /* Load the FLAC packetizer */
-    /* Store STREAMINFO for the decoder and packetizer */
-    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_FLAC );
-    fmt.i_extra = i_streaminfo;
-    fmt.p_extra = p_streaminfo;
-
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "flac" );
     if( !p_sys->p_packetizer )
         goto error;
@@ -510,22 +505,19 @@ static inline int Get24bBE( const uint8_t *p )
     return (p[0] << 16)|(p[1] << 8)|(p[2]);
 }
 
-static void ParseStreamInfo( int *pi_rate, int64_t *pi_count, uint8_t *p_data );
+static void ParseStreamInfo( es_format_t *, uint64_t *pi_count );
 static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
                             int i_sample_rate );
 static void ParseComment( demux_t *, const uint8_t *p_data, int i_data );
 static void ParsePicture( demux_t *, const uint8_t *p_data, int i_data );
 
-static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streaminfo )
+static int  ParseHeaders( demux_t *p_demux, es_format_t *p_fmt )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int     i_peek;
     const uint8_t *p_peek;
     bool b_last;
-    int i_sample_rate = 0;
-    int64_t i_sample_count;
-
-    *pp_streaminfo = NULL;
+    uint64_t i_sample_count;
 
     /* Be sure we have seekpoint 0 */
     flac_seekpoint_t *s = xmalloc( sizeof (*s) );
@@ -553,42 +545,42 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
         i_type = p_peek[0]&0x7f;
         i_len  = Get24bBE( &p_peek[1] );
 
-        if( i_type == META_STREAMINFO && !*pp_streaminfo )
+        if( i_type == META_STREAMINFO && p_fmt->p_extra == NULL )
         {
             if( i_len != STREAMINFO_SIZE ) {
                 msg_Err( p_demux, "invalid size %d for a STREAMINFO metadata block", i_len );
                 return VLC_EGENERIC;
             }
 
-            *pi_streaminfo = STREAMINFO_SIZE;
-            *pp_streaminfo = malloc( STREAMINFO_SIZE);
-            if( *pp_streaminfo == NULL )
+            p_fmt->p_extra = malloc( STREAMINFO_SIZE);
+            if( p_fmt->p_extra == NULL )
                 return VLC_EGENERIC;
 
             if( vlc_stream_Read( p_demux->s, NULL, 4) < 4)
             {
-                free( *pp_streaminfo );
+                FREENULL( p_fmt->p_extra );
                 return VLC_EGENERIC;
             }
-            if( vlc_stream_Read( p_demux->s, *pp_streaminfo,
+            if( vlc_stream_Read( p_demux->s, p_fmt->p_extra,
                                  STREAMINFO_SIZE ) != STREAMINFO_SIZE )
             {
                 msg_Err( p_demux, "failed to read STREAMINFO metadata block" );
-                free( *pp_streaminfo );
+                FREENULL( p_fmt->p_extra );
                 return VLC_EGENERIC;
             }
+            p_fmt->i_extra = STREAMINFO_SIZE;
 
             /* */
-            ParseStreamInfo( &i_sample_rate, &i_sample_count, *pp_streaminfo );
-            if( i_sample_rate > 0 )
-                p_sys->i_length = i_sample_count * CLOCK_FREQ /i_sample_rate;
+            ParseStreamInfo( p_fmt, &i_sample_count );
+            if( p_fmt->audio.i_rate > 0 )
+                p_sys->i_length = i_sample_count * CLOCK_FREQ / p_fmt->audio.i_rate;
             continue;
         }
         else if( i_type == META_SEEKTABLE )
         {
             i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4+i_len );
             if( i_peek == 4+i_len )
-                ParseSeekTable( p_demux, p_peek, i_peek, i_sample_rate );
+                ParseSeekTable( p_demux, p_peek, i_peek, p_fmt->audio.i_rate );
         }
         else if( i_type == META_COMMENT )
         {
@@ -610,14 +602,15 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     /* */
     p_sys->i_data_pos = vlc_stream_Tell( p_demux->s );
 
-    if (!*pp_streaminfo)
+    if ( p_fmt->p_extra == NULL )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
-static void ParseStreamInfo( int *pi_rate, int64_t *pi_count, uint8_t *p_data )
+static void ParseStreamInfo( es_format_t *p_fmt, uint64_t *pi_count )
 {
-    *pi_rate = GetDWBE(&p_data[4+6]) >> 12;
+    uint8_t *p_data = p_fmt->p_extra;
+    p_fmt->audio.i_rate = GetDWBE(&p_data[4+6]) >> 12;
     *pi_count = GetQWBE(&p_data[4+6]) &  ((INT64_C(1)<<36)-1);
 }
 
