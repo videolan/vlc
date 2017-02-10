@@ -556,7 +556,6 @@ static int D3dCreateDevice(vlc_va_t *va)
     if (dx_sys->d3ddev && va->sys->d3dctx) {
         msg_Dbg(va, "Reusing Direct3D11 device");
         ID3D11DeviceContext_AddRef(va->sys->d3dctx);
-        ID3D11Device_AddRef(dx_sys->d3ddev);
         return VLC_SUCCESS;
     }
 
