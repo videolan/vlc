@@ -100,6 +100,10 @@ typedef struct
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader;
     D3D11_VIEWPORT            cropViewport;
+    unsigned int              i_x_offset;
+    unsigned int              i_y_offset;
+    unsigned int              i_width;
+    unsigned int              i_height;
 } d3d_quad_t;
 
 struct vout_display_sys_t
@@ -661,7 +665,7 @@ static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
 }
 
 static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
-                            const video_format_t *fmt, unsigned pool_size,
+                            video_format_t *fmt, unsigned pool_size,
                             ID3D11Texture2D *textures[])
 {
     vout_display_sys_t *sys = vd->sys;
@@ -688,24 +692,15 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
     texDesc.ArraySize = pool_size;
     texDesc.Height = fmt->i_height;
     texDesc.Width = fmt->i_width;
-
-    /* remove half pixels, we don't want green lines */
-    const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
-    for (unsigned plane = 0; plane < p_chroma_desc->plane_count; ++plane)
-    {
-        unsigned i_extra;
-        i_extra = (texDesc.Width  * p_chroma_desc->p[plane].w.num) % p_chroma_desc->p[plane].w.den;
-        if ( i_extra )
-            texDesc.Width -= p_chroma_desc->p[plane].w.den / p_chroma_desc->p[plane].w.num - i_extra;
-        i_extra = (texDesc.Height  * p_chroma_desc->p[plane].h.num) % p_chroma_desc->p[plane].h.den;
-        if ( i_extra )
-            texDesc.Height -= p_chroma_desc->p[plane].h.den / p_chroma_desc->p[plane].h.num - i_extra;
-    }
+    /* add an extra line if needed, it will be cropped on display */
     if (cfg->formatTexture == DXGI_FORMAT_NV12 || cfg->formatTexture == DXGI_FORMAT_P010)
     {
-        texDesc.Width  &= ~1;
-        texDesc.Height &= ~1;
+        texDesc.Width  = (texDesc.Width + 1) & ~1;
+        texDesc.Height = (texDesc.Height + 1) & ~1;
     }
+    /* this is the actual decoding size that will be used */
+    fmt->i_height = texDesc.Height;
+    fmt->i_width = texDesc.Width;
 
     hr = ID3D11Device_CreateTexture2D( sys->d3ddevice, &texDesc, NULL, &slicedTexture );
     if (FAILED(hr)) {
@@ -730,6 +725,7 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
 
     if (!is_d3d11_opaque(fmt->i_chroma)) {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
+        const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
 
         hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource*)textures[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
         if( FAILED(hr) ) {
@@ -771,12 +767,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
     if (AllocateTextures(vd, sys->picQuadConfig, &vd->fmt, pool_size, textures))
         goto error;
-
-    if (SetupQuad( vd, &vd->fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
-                   vd->fmt.projection_mode) != VLC_SUCCESS) {
-        msg_Err(vd, "Could not Create the main quad picture.");
-        return NULL;
-    }
 
     if (vd->info.is_slow) {
         picture_resource_t resource = {
@@ -844,6 +834,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures))
             goto error;
 
+        sys->picQuad.i_x_offset = 0;
+        sys->picQuad.i_y_offset = 0;
+        sys->picQuad.i_width    = staging_fmt.i_width;
+        sys->picQuad.i_height   = staging_fmt.i_height;
+
         for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
             sys->stagingSys.texture[plane] = textures[plane];
 
@@ -851,9 +846,22 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             goto error;
     } else
 #endif
-    for (picture_count = 0; picture_count < pool_size; picture_count++) {
-        if (AllocateShaderView(vd, sys->picQuadConfig, picture_count, pictures[picture_count]->p_sys))
-            goto error;
+    {
+        sys->picQuad.i_x_offset = vd->fmt.i_x_offset;
+        sys->picQuad.i_y_offset = vd->fmt.i_y_offset;
+        sys->picQuad.i_width    = vd->fmt.i_width;
+        sys->picQuad.i_height   = vd->fmt.i_height;
+
+        for (picture_count = 0; picture_count < pool_size; picture_count++) {
+            if (AllocateShaderView(vd, sys->picQuadConfig, picture_count, pictures[picture_count]->p_sys))
+                goto error;
+        }
+    }
+
+    if (SetupQuad( vd, &vd->fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
+                   vd->fmt.projection_mode) != VLC_SUCCESS) {
+        msg_Err(vd, "Could not Create the main quad picture.");
+        return NULL;
     }
 
     if (vd->info.is_slow) {
@@ -1203,8 +1211,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             Direct3D11UnmapPoolTexture(picture);
         ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
         D3D11_BOX box = {
-            .bottom = texDesc.Height,
-            .right = texDesc.Width,
+            .top = picture->format.i_y_offset,
+            .bottom = picture->format.i_y_offset + texDesc.Height,
+            .left = picture->format.i_x_offset,
+            .right = picture->format.i_x_offset + texDesc.Width,
             .back = 1,
         };
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
@@ -1904,12 +1914,27 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
     sys->sys.pool = NULL;
 }
 
-static void SetupQuadFlat(d3d_vertex_t *dst_data, const video_format_t *fmt, WORD *triangle_pos)
+static void SetupQuadFlat(d3d_vertex_t *dst_data, const video_format_t *fmt, d3d_quad_t *quad, WORD *triangle_pos)
 {
-    float right  =  (float) (2*fmt->i_width-fmt->i_visible_width-2*fmt->i_x_offset) / (float) fmt->i_visible_width;
-    float left   = -(float) (2*fmt->i_x_offset + fmt->i_visible_width) / (float) fmt->i_visible_width;
-    float top    =  (float) (2*fmt->i_y_offset + fmt->i_visible_height) / (float) fmt->i_visible_height;
-    float bottom = -(float) (2*fmt->i_height-fmt->i_visible_height-2*fmt->i_y_offset) / (float) fmt->i_visible_height;
+    unsigned int dst_width = fmt->i_visible_width;
+    unsigned int dst_height = fmt->i_visible_height;
+    unsigned int src_x = quad->i_x_offset;
+    unsigned int src_y = quad->i_y_offset;
+    unsigned int src_width = quad->i_width;
+    unsigned int src_height = quad->i_height;
+
+    /* the clamping will not work properly on the side of the texture as it
+     * will have decoder pixels not mean to be displayed but used for interpolation
+     * So we lose the last line that will be partially green */
+    if (src_width != dst_width)
+        dst_width -= 1;
+    if (src_height != dst_height)
+        dst_height -= 1;
+
+    float right  =  (float) (2*src_width - dst_width - 2*src_x) / (float) dst_width;
+    float left   = -(float) (2*src_x + dst_width) / (float) dst_width;
+    float top    =  (float) (2*src_x + dst_height) / (float) dst_height;
+    float bottom = -(float) (2*src_height - dst_height - 2*src_y) / (float) dst_height;
 
     // bottom left
     dst_data[0].position.x = left;
@@ -2065,7 +2090,7 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_
     WORD *triangle_pos = mappedResource.pData;
 
     if ( projection == PROJECTION_MODE_RECTANGULAR )
-        SetupQuadFlat(dst_data, fmt, triangle_pos);
+        SetupQuadFlat(dst_data, fmt, quad, triangle_pos);
     else
         SetupQuadSphere(dst_data, triangle_pos);
 
@@ -2406,6 +2431,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 free(d3dquad);
                 continue;
             }
+            d3dquad->i_x_offset = r->fmt.i_x_offset;
+            d3dquad->i_y_offset = r->fmt.i_y_offset;
+            d3dquad->i_width    = r->fmt.i_width;
+            d3dquad->i_height   = r->fmt.i_height;
             err = SetupQuad( vd, &r->fmt, d3dquad, sys->d3dregion_format, sys->pSPUPixelShader,
                              PROJECTION_MODE_RECTANGULAR );
             if (err != VLC_SUCCESS) {
