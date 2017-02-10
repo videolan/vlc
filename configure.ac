@@ -2360,6 +2360,7 @@ AS_IF([test "${enable_libva}" != "no"], [
     AC_MSG_WARN([${LIBVA_X11_PKG_ERRORS}.])
   ])
 ])
+AM_CONDITIONAL([HAVE_VAAPI], [test "${have_vaapi}" = "yes"])
 AM_CONDITIONAL([HAVE_VAAPI_DRM], [test "${have_vaapi_drm}" = "yes"])
 AM_CONDITIONAL([HAVE_VAAPI_X11], [test "${have_vaapi_x11}" = "yes"])
 
