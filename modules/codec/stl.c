@@ -355,12 +355,25 @@ static void ResetGroups(decoder_sys_t *p_sys)
 {
     for(size_t i=0; i<=STL_GROUPS_MAX; i++)
     {
-        if(p_sys->groups[i].p_segment)
-            text_segment_ChainDelete(p_sys->groups[i].p_segment);
-        if(p_sys->groups[i].p_style)
-            text_style_Delete(p_sys->groups[i].p_style);
+        stl_sg_t *p_group = &p_sys->groups[i];
+        if(p_group->p_segment)
+        {
+            text_segment_ChainDelete(p_group->p_segment);
+            p_group->p_segment = NULL;
+            p_group->pp_segment_last = &p_group->p_segment;
+        }
+
+        if(p_group->p_style)
+        {
+            text_style_Delete(p_group->p_style);
+            p_group->p_style = NULL;
+        }
+
+        p_group->i_accumulating = false;
+        p_group->i_end = 0;
+        p_group->i_start = 0;
+        p_group->i_justify = 0;
     }
-    memset(p_sys->groups, 0, sizeof(stl_sg_t) * (STL_GROUPS_MAX + 1));
 }
 
 static int Decode(decoder_t *p_dec, block_t *p_block)
@@ -412,6 +425,8 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
             }
         }
     }
+
+    ResetGroups(p_dec->p_sys);
 
     block_Release(p_block);
     return VLCDEC_SUCCESS;
