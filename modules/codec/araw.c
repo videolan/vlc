@@ -252,7 +252,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_dec->fmt_in.audio.i_rate <= 0 )
+    if( p_dec->fmt_in.audio.i_rate <= 0 || p_dec->fmt_in.audio.i_rate > 384000 )
     {
         msg_Err( p_dec, "bad samplerate: %d Hz", p_dec->fmt_in.audio.i_rate );
         return VLC_EGENERIC;
