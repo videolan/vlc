@@ -1074,7 +1074,9 @@
 
 - (IBAction)intfOpenFile:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openFile];
+    [[[VLCMain sharedInstance] open] openFileWithAction:^(NSArray *files) {
+        [[[VLCMain sharedInstance] playlist] addPlaylistItems:files];
+    }];
 }
 
 - (IBAction)intfOpenFileGeneric:(id)sender

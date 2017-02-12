@@ -230,5 +230,6 @@
 - (IBAction)panelCancel:(id)sender;
 - (IBAction)panelOk:(id)sender;
 
-- (void)openFile;
+- (void)openFileWithAction:(void (^)(NSArray *files))action;
+
 @end

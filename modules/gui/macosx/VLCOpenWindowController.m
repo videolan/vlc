@@ -610,7 +610,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [self openTarget: kCaptureTabViewId];
 }
 
-- (void)openFile
+- (void)openFileWithAction:(void (^)(NSArray *files))action;
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setAllowsMultipleSelection: YES];
@@ -633,13 +633,11 @@ static NSString *kCaptureTabViewId  = @"capture";
             if (!psz_uri)
                 continue;
             dictionary = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
-            NSLog(@"dict: %@", dictionary);
             free(psz_uri);
             [array addObject: dictionary];
         }
 
-        NSLog(@"adding %@", array);
-        [[[VLCMain sharedInstance] playlist] addPlaylistItems:array];
+        action(array);
     }
 }
 

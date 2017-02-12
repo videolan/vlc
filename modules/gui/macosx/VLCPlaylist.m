@@ -341,7 +341,24 @@
 
 - (IBAction)addFilesToPlaylist:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openFile];
+    NSIndexSet *selectedRows = [_outlineView selectedRowIndexes];
+
+    NSInteger position = -1;
+    VLCPLItem *parentItem = [[self model] rootItem];
+
+    if (selectedRows.count >= 1) {
+        position = selectedRows.firstIndex + 1;
+        parentItem = [_outlineView itemAtRow:selectedRows.firstIndex];
+        if ([parentItem parent] != nil)
+            parentItem = [parentItem parent];
+    }
+
+    [[[VLCMain sharedInstance] open] openFileWithAction:^(NSArray *files) {
+        [self addPlaylistItems:files
+              withParentItemId:[parentItem plItemId]
+                         atPos:position
+                 startPlayback:NO];
+    }];
 }
 
 - (IBAction)deleteItem:(id)sender

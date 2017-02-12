@@ -74,9 +74,9 @@
 
 /**
  * Simplified version to add new items at the end of the current playlist
- * @param o_array array of items. Each item is a Dictionary with meta info.
+ * @param array array of items. Each item is a Dictionary with meta info.
  */
-- (void)addPlaylistItems:(NSArray*)o_array;
+- (void)addPlaylistItems:(NSArray*)array;
 
 /**
  * Add new items to playlist, with the possibility to check if an item can be added
