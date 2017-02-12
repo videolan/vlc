@@ -194,12 +194,19 @@ static int Demux(demux_t *demux)
             return VLC_DEMUXER_EOF;
 
         block_t *b = vlc_stream_Block(demux->s, 128);
-        if (b){
+        if (b && b->i_buffer == 128)
+        {
             b->i_dts =
             b->i_pts = VLC_TS_0 + s->start;
             if (s->stop > s->start)
                 b->i_length = s->stop - s->start;
             es_out_Send(demux->out, sys->es, b);
+        }
+        else
+        {
+            if(b)
+                block_Release(b);
+            return VLC_DEMUXER_EOF;
         }
         sys->current++;
     }
