@@ -164,7 +164,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->fmt.audio.i_channels = var_CreateGetInteger( p_demux, "rawaud-channels" );
     p_sys->fmt.audio.i_rate = var_CreateGetInteger( p_demux, "rawaud-samplerate" );
 
-    if( p_sys->fmt.audio.i_rate <= 0 )
+    if( p_sys->fmt.audio.i_rate <= 0 || p_sys->fmt.audio.i_rate > 384000 )
     {
       msg_Err( p_demux, "invalid sample rate");
       es_format_Clean( &p_sys->fmt );
@@ -172,7 +172,7 @@ static int Open( vlc_object_t * p_this )
       return VLC_EGENERIC;
     }
 
-    if( p_sys->fmt.audio.i_channels <= 0 )
+    if( p_sys->fmt.audio.i_channels <= 0 || p_sys->fmt.audio.i_channels > 32 )
     {
       msg_Err( p_demux, "invalid number of channels");
       es_format_Clean( &p_sys->fmt );
