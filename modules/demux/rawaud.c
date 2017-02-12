@@ -184,6 +184,14 @@ static int Open( vlc_object_t * p_this )
                            p_sys->fmt.audio.i_channels *
                            p_sys->fmt.audio.i_bitspersample;
 
+    if( p_sys->fmt.i_bitrate > 50000000)
+    {
+        msg_Err( p_demux, "invalid bitrate");
+        es_format_Clean( &p_sys->fmt );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     msg_Dbg( p_demux,
      "format initialized: channels=%d , samplerate=%d Hz, fourcc=%4.4s, bits per sample = %d, bitrate = %d bit/s",
      p_sys->fmt.audio.i_channels,
