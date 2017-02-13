@@ -1051,16 +1051,34 @@ static int DemuxInit( demux_t *p_demux )
             msg_Dbg( p_demux, "added new video stream(ID:%d)",
                      p_sp->i_stream_number );
         }
-        else if( guidcmp( &p_sp->i_stream_type, &asf_object_extended_stream_header ) &&
+        else if( guidcmp( &p_sp->i_stream_type, &asf_object_stream_type_binary ) &&
             p_sp->i_type_specific_data_length >= 64 )
         {
-            /* Now follows a 64 byte header of which we don't know much */
-            guid_t  *p_ref  = (guid_t *)p_sp->p_type_specific_data;
+            guid_t i_major_media_type;
+            ASF_GetGUID( &i_major_media_type, p_sp->p_type_specific_data );
+            msg_Dbg( p_demux, "stream(ID:%d) major type " GUID_FMT, p_sp->i_stream_number,
+                     GUID_PRINT(i_major_media_type) );
+
+            guid_t i_media_subtype;
+            ASF_GetGUID( &i_media_subtype, &p_sp->p_type_specific_data[16] );
+            msg_Dbg( p_demux, "stream(ID:%d) subtype " GUID_FMT, p_sp->i_stream_number,
+                     GUID_PRINT(i_media_subtype) );
+
+            //uint32_t i_fixed_size_samples = GetDWBE( &p_sp->p_type_specific_data[32] );
+            //uint32_t i_temporal_compression = GetDWBE( &p_sp->p_type_specific_data[36] );
+            //uint32_t i_sample_size = GetDWBE( &p_sp->p_type_specific_data[40] );
+
+            guid_t i_format_type;
+            ASF_GetGUID( &i_format_type, &p_sp->p_type_specific_data[44] );
+            msg_Dbg( p_demux, "stream(ID:%d) format type " GUID_FMT, p_sp->i_stream_number,
+                     GUID_PRINT(i_format_type) );
+
+            //uint32_t i_format_data_size = GetDWBE( &p_sp->p_type_specific_data[60] );
             uint8_t *p_data = p_sp->p_type_specific_data + 64;
             unsigned int i_data = p_sp->i_type_specific_data_length - 64;
 
             msg_Dbg( p_demux, "Ext stream header detected. datasize = %d", p_sp->i_type_specific_data_length );
-            if( guidcmp( p_ref, &asf_object_extended_stream_type_audio ) &&
+            if( guidcmp( &i_major_media_type, &asf_object_extended_stream_type_audio ) &&
                 i_data >= sizeof( WAVEFORMATEX ) - 2)
             {
                 uint16_t i_format;
