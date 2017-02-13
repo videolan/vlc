@@ -122,6 +122,6 @@ EXTRA_DIST += \
 	extras/package/macosx/vlc_status_icon.svg \
 	extras/package/macosx/vlc_app_icon.svg \
 	extras/package/macosx/VLC.entitlements \
-	extras/package/macosx/vlc.xcodeproj/project.pbxproj
+	extras/package/macosx/VLC.xcodeproj/project.pbxproj
 
 
