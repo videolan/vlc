@@ -946,6 +946,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
                 ASF_SKIP( p_ext->i_info_length );
             }
         }
+        p_esp->i_payload_extension_system_count = i;
     } else p_esp->i_payload_extension_system_count = 0;
 
     p_esp->p_sp = NULL;
