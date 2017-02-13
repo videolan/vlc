@@ -343,12 +343,14 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         SkipBytes( p_demux->s, pkt->i_skip );
 
         mtime_t i_payload_pts;
+#if 0
         if( i_extension_pts != -1 )
         {
             i_payload_pts = i_extension_pts * 1000;
             b_ignore_pts = false;
         }
         else
+#endif
         {
             i_payload_pts = i_pkt_time + (mtime_t)i_pkt_time_delta * i_subpayload_count * 1000;
             if ( p_tkinfo->p_sp )
