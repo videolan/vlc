@@ -1318,6 +1318,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
             goto error;
     }
 
+    bool packetize = p_owner->p_packetizer != NULL;
     if( p_block )
     {
         if( p_block->i_buffer <= 0 )
@@ -1326,6 +1327,11 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
         vlc_mutex_lock( &p_owner->lock );
         DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
         vlc_mutex_unlock( &p_owner->lock );
+        if( unlikely( p_block->i_flags & BLOCK_FLAG_CORE_PRIVATE_RELOADED ) )
+        {
+            /* This block has already been packetized */
+            packetize = false;
+        }
     }
 
 #ifdef ENABLE_SOUT
@@ -1335,8 +1341,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
         return;
     }
 #endif
-    if( p_owner->p_packetizer
-     && !unlikely( p_block->i_flags & BLOCK_FLAG_CORE_PRIVATE_RELOADED ) )
+    if( packetize )
     {
         block_t *p_packetized_block;
         block_t **pp_block = p_block ? &p_block : NULL;
