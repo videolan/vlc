@@ -1460,6 +1460,22 @@ static const struct
     { &asf_object_null_guid, 0, NULL, NULL }
 };
 
+static void ASF_ParentObject( asf_object_t *p_father, asf_object_t *p_obj )
+{
+    if( p_father )
+    {
+        if( p_father->common.p_first )
+        {
+            p_father->common.p_last->common.p_next = p_obj;
+        }
+        else
+        {
+            p_father->common.p_first = p_obj;
+        }
+        p_father->common.p_last = p_obj;
+    }
+}
+
 static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
                            asf_object_t *p_father )
 {
@@ -1517,18 +1533,8 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     }
 
     /* link this object with father */
-    if( p_father && ! i_result )
-    {
-        if( p_father->common.p_first )
-        {
-            p_father->common.p_last->common.p_next = p_obj;
-        }
-        else
-        {
-            p_father->common.p_first = p_obj;
-        }
-        p_father->common.p_last = p_obj;
-    }
+    if ( i_result == VLC_SUCCESS )
+        ASF_ParentObject( p_father, p_obj );
 
     return i_result;
 }
