@@ -172,7 +172,7 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_dec->fmt_out.audio.i_channels <= 0 ||
+    if( p_dec->fmt_out.audio.i_channels == 0 ||
         p_dec->fmt_out.audio.i_channels > 8 )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
     if( date_Get( &p_sys->end_date ) <= VLC_TS_INVALID )

@@ -393,7 +393,7 @@ static int Open( vlc_object_t * p_this )
                                                        p_sys->i_frame_samples );
         goto error;
     }
-    if( p_sys->fmt.audio.i_rate <= 0 )
+    if( p_sys->fmt.audio.i_rate == 0 )
     {
         msg_Dbg( p_demux, "invalid sample rate: %i", p_sys->fmt.audio.i_rate );
         goto error;
@@ -578,7 +578,7 @@ static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
 static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
                                const es_format_t *p_fmt )
 {
-    if( p_fmt->audio.i_channels <= 0 )
+    if( p_fmt->audio.i_channels == 0 )
         return VLC_EGENERIC;
 
     *pi_samples = 2 + 2 * ( p_fmt->audio.i_blockalign -
@@ -591,7 +591,7 @@ static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
 static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, int *pi_samples,
                                 const es_format_t *p_fmt )
 {
-    if( p_fmt->audio.i_channels <= 0 )
+    if( p_fmt->audio.i_channels == 0 )
         return VLC_EGENERIC;
 
     *pi_samples = 2 * ( p_fmt->audio.i_blockalign -
@@ -604,7 +604,7 @@ static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, int *pi_samples,
 static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, int *pi_samples,
                                      const es_format_t *p_fmt )
 {
-    if( p_fmt->audio.i_channels <= 0 )
+    if( p_fmt->audio.i_channels == 0 )
         return VLC_EGENERIC;
 
     /* 4 bits / sample */

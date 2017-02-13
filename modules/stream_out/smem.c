@@ -395,7 +395,7 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     int i_samples = 0;
 
     i_size = p_buffer->i_buffer;
-    if (id->format->audio.i_channels <= 0)
+    if (id->format->audio.i_channels == 0)
     {
         msg_Warn( p_stream, "No buffer given!" );
         block_ChainRelease( p_buffer );

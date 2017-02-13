@@ -244,7 +244,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_dec->fmt_in.audio.i_channels <= 0 ||
+    if( p_dec->fmt_in.audio.i_channels == 0 ||
         p_dec->fmt_in.audio.i_channels > AOUT_CHAN_MAX )
     {
         msg_Err( p_dec, "bad channels count (1-%i): %i",
@@ -252,7 +252,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_dec->fmt_in.audio.i_rate <= 0 || p_dec->fmt_in.audio.i_rate > 384000 )
+    if( p_dec->fmt_in.audio.i_rate == 0 || p_dec->fmt_in.audio.i_rate > 384000 )
     {
         msg_Err( p_dec, "bad samplerate: %d Hz", p_dec->fmt_in.audio.i_rate );
         return VLC_EGENERIC;

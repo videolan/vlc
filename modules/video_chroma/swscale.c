@@ -375,8 +375,8 @@ static int Init( filter_t *p_filter )
         msg_Err( p_filter, "format not supported" );
         return VLC_EGENERIC;
     }
-    if( p_fmti->i_visible_width <= 0 || p_fmti->i_visible_height <= 0 ||
-        p_fmto->i_visible_width <= 0 || p_fmto->i_visible_height <= 0 )
+    if( p_fmti->i_visible_width == 0 || p_fmti->i_visible_height == 0 ||
+        p_fmto->i_visible_width == 0 || p_fmto->i_visible_height == 0 )
     {
         msg_Err( p_filter, "invalid scaling: %ix%i -> %ix%i",
                  p_fmti->i_visible_width, p_fmti->i_visible_height,
