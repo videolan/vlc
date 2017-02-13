@@ -493,6 +493,7 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
     else
     {
         p_he->p_header_extension_data = NULL;
+        p_he->i_header_extension_size = 0;
     }
 
 #ifdef ASF_DEBUG
