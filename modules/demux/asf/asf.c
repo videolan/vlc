@@ -1192,7 +1192,8 @@ static int DemuxInit( demux_t *p_demux )
     }
 
     /* go to first packet */
-    vlc_stream_Seek( p_demux->s, p_sys->i_data_begin );
+    if( vlc_stream_Seek( p_demux->s, p_sys->i_data_begin ) != VLC_SUCCESS )
+        goto error;
 
     /* try to calculate movie time */
     if( p_sys->p_fp->i_data_packets_count > 0 )

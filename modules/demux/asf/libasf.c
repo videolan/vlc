@@ -202,8 +202,8 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
              p_hdr->i_reserved2 );
 #endif
 
-    /* Cannot fail as peek succeed */
-    vlc_stream_Read( s, NULL, 30 );
+    if( vlc_stream_Read( s, NULL, 30 ) != 30 )
+        return VLC_EGENERIC;
 
     /* Now load sub object */
     for( ; ; )
@@ -507,7 +507,12 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
     if( !p_he->i_header_extension_size ) return VLC_SUCCESS;
 
     /* Read the extension objects */
-    vlc_stream_Read( s, NULL, 46 );
+    if( vlc_stream_Read( s, NULL, 46 ) != 46 )
+    {
+        free( p_he->p_header_extension_data );
+        return VLC_EGENERIC;
+    }
+
     for( ; ; )
     {
         asf_object_t *p_obj = malloc( sizeof( asf_object_t ) );
