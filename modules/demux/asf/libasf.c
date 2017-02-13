@@ -872,6 +872,22 @@ static void ASF_FreeObject_stream_bitrate_properties( asf_object_t *p_obj)
     VLC_UNUSED(p_obj);
 }
 
+static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
+{
+    asf_object_extended_stream_properties_t *p_esp = &p_obj->ext_stream;
+
+    if ( p_esp->p_ext )
+    {
+        for( uint16_t i = 0; i < p_esp->i_payload_extension_system_count; i++ )
+            free( p_esp->p_ext[i].pi_info );
+        FREENULL( p_esp->p_ext );
+    }
+    for( uint16_t i = 0; i < p_esp->i_stream_name_count; i++ )
+        FREENULL( p_esp->ppsz_stream_name[i] );
+    FREENULL( p_esp->pi_stream_name_language );
+    FREENULL( p_esp->ppsz_stream_name );
+}
+
 static int ASF_ReadObject_extended_stream_properties( stream_t *s,
                                                       asf_object_t *p_obj)
 {
@@ -950,14 +966,17 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
     } else p_esp->i_payload_extension_system_count = 0;
 
     p_esp->p_sp = NULL;
+
+    /* Read tail objects */
     if( p_data < &p_peek[i_peek] )
     {
-        asf_object_t *p_sp;
-        /* Cannot fail as peek succeed */
-        vlc_stream_Read( s, NULL, p_data - p_peek );
+        if( vlc_stream_Read( s, NULL, p_data - p_peek ) != (p_data - p_peek) )
+        {
+            ASF_FreeObject_extended_stream_properties( p_obj );
+            return VLC_EGENERIC;
+        }
 
-        p_sp = malloc( sizeof( asf_object_t ) );
-
+        asf_object_t *p_sp = malloc( sizeof( asf_object_t ) );
         if( !p_sp || ASF_ReadObject( s, p_sp, NULL ) )
         {
             free( p_sp );
@@ -1000,22 +1019,6 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 #endif
     return VLC_SUCCESS;
 }
-static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
-{
-    asf_object_extended_stream_properties_t *p_esp = &p_obj->ext_stream;
-
-    if ( p_esp->p_ext )
-    {
-        for( uint16_t i = 0; i < p_esp->i_payload_extension_system_count; i++ )
-            free( p_esp->p_ext[i].pi_info );
-        FREENULL( p_esp->p_ext );
-    }
-    for( uint16_t i = 0; i < p_esp->i_stream_name_count; i++ )
-        FREENULL( p_esp->ppsz_stream_name[i] );
-    FREENULL( p_esp->pi_stream_name_language );
-    FREENULL( p_esp->ppsz_stream_name );
-}
-
 
 static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
                                                      asf_object_t *p_obj)
