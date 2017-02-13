@@ -858,6 +858,7 @@ static int DemuxInit( demux_t *p_demux )
     }
 
     const bool b_mms = !strncmp( p_demux->psz_access, "mms", 3 );
+    bool b_dvrms = false;
 
     if( b_mms )
     {
@@ -922,6 +923,11 @@ static int DemuxInit( demux_t *p_demux )
                 }
             }
         }
+
+        /* Check for DVR-MS */
+        if( p_esp )
+            for( uint16_t i=0; i<p_esp->i_payload_extension_system_count && !b_dvrms; i++ )
+                b_dvrms = guidcmp( &p_esp->p_ext[i].i_extension_id, &asf_dvr_sampleextension_timing_rep_data_guid );
 
         es_format_t fmt;
 
@@ -990,7 +996,6 @@ static int DemuxInit( demux_t *p_demux )
             {
                 /* DVR-MS special ASF */
                 fmt.i_codec = VLC_CODEC_MPGV;
-                fmt.b_packetized = false;
             }
 
             if( p_sp->i_type_specific_data_length > 11 +
@@ -1060,11 +1065,13 @@ static int DemuxInit( demux_t *p_demux )
             {
                 uint16_t i_format;
                 es_format_Init( &fmt, AUDIO_ES, 0 );
+
                 i_format = GetWLE( &p_data[0] );
                 if( i_format == 0 )
                     fmt.i_codec = VLC_CODEC_A52;
                 else
                     wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
+
                 GET_CHECKED( fmt.audio.i_channels,      GetWLE( &p_data[2] ),
                                                             255, uint16_t );
                 GET_CHECKED( fmt.audio.i_rate,          GetDWLE( &p_data[4] ),
@@ -1073,7 +1080,6 @@ static int DemuxInit( demux_t *p_demux )
                                                             UINT_MAX, uint32_t );
                 fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
                 fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
-                fmt.b_packetized = true;
 
                 if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) &&
                     i_format != WAVE_FORMAT_MPEGLAYER3 &&
@@ -1101,6 +1107,7 @@ static int DemuxInit( demux_t *p_demux )
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
         }
 
+        fmt.b_packetized = !b_dvrms;
         tk->i_cat = tk->info.i_cat = fmt.i_cat;
         if( fmt.i_cat != UNKNOWN_ES )
         {
