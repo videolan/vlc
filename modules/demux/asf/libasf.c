@@ -1399,7 +1399,7 @@ static void ASF_FreeObject_XXX( asf_object_t *p_obj)
 
 
 /* */
-static const struct
+static const struct ASF_Object_Function_entry
 {
     const guid_t  *p_id;
     int     i_type;
@@ -1456,8 +1456,6 @@ static const struct
       ASF_ReadObject_Raw, ASF_FreeObject_Null },
     { &asf_object_extended_content_encryption_guid, ASF_OBJECT_OTHER,
       ASF_ReadObject_Raw, ASF_FreeObject_Null },
-
-    { &asf_object_null_guid, 0, NULL, NULL }
 };
 
 static void ASF_ParentObject( asf_object_t *p_father, asf_object_t *p_obj )
@@ -1476,14 +1474,23 @@ static void ASF_ParentObject( asf_object_t *p_father, asf_object_t *p_obj )
     }
 }
 
+static const struct ASF_Object_Function_entry * ASF_GetObject_Function( const guid_t *id )
+{
+    for( size_t i = 0; i < ARRAY_SIZE(ASF_Object_Function); i++ )
+    {
+        if( guidcmp( ASF_Object_Function[i].p_id, id ) )
+            return &ASF_Object_Function[i];
+    }
+    return NULL;
+}
+
 static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
                            asf_object_t *p_father )
 {
-    int i_result;
-    int i_index;
+    int i_result = VLC_SUCCESS;
 
     if( !p_obj )
-        return 0;
+        return VLC_SUCCESS;
 
     memset( p_obj, 0, sizeof( *p_obj ) );
 
@@ -1496,6 +1503,7 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     p_obj->common.p_first = NULL;
     p_obj->common.p_next = NULL;
     p_obj->common.p_last = NULL;
+    p_obj->common.i_type = 0;
 
     if( p_obj->common.i_object_size < ASF_OBJECT_COMMON_SIZE )
     {
@@ -1503,33 +1511,20 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
         return VLC_EGENERIC;
     }
 
-    /* find this object */
-    for( i_index = 0; ; i_index++ )
+    const struct ASF_Object_Function_entry *p_reader =
+            ASF_GetObject_Function( &p_obj->common.i_object_id );
+    if( p_reader )
     {
-        if( guidcmp( ASF_Object_Function[i_index].p_id,
-                         &p_obj->common.i_object_id ) ||
-            guidcmp( ASF_Object_Function[i_index].p_id,
-                         &asf_object_null_guid ) )
-        {
-            break;
-        }
-    }
-    p_obj->common.i_type = ASF_Object_Function[i_index].i_type;
+        p_obj->common.i_type = p_reader->i_type;
 
-    if( i_index == sizeof(ASF_Object_Function)/sizeof(ASF_Object_Function[0]) - 1 )
-        msg_Warn( s, "unknown asf object (not loaded): " GUID_FMT,
-                GUID_PRINT( p_obj->common.i_object_id ) );
-
-    /* Now load this object */
-    if( ASF_Object_Function[i_index].ASF_ReadObject_function == NULL )
-    {
-        i_result = VLC_SUCCESS;
+        /* Now load this object */
+        if( p_reader->ASF_ReadObject_function != NULL )
+            i_result = p_reader->ASF_ReadObject_function( s, p_obj );
     }
     else
     {
-        /* XXX ASF_ReadObject_function realloc *pp_obj XXX */
-        i_result =
-          (ASF_Object_Function[i_index].ASF_ReadObject_function)( s, p_obj );
+        msg_Warn( s, "unknown asf object (not loaded): " GUID_FMT,
+                GUID_PRINT( p_obj->common.i_object_id ) );
     }
 
     /* link this object with father */
@@ -1541,7 +1536,6 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
 
 static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
 {
-    int i_index;
     asf_object_t *p_child;
 
     if( !p_obj )
@@ -1558,27 +1552,19 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
     }
 
     /* find this object */
-    for( i_index = 0; ; i_index++ )
+    const struct ASF_Object_Function_entry *p_entry =
+            ASF_GetObject_Function( &p_obj->common.i_object_id );
+    if( p_entry && p_entry->ASF_FreeObject_function )
     {
-        if( guidcmp( ASF_Object_Function[i_index].p_id,
-                     &p_obj->common.i_object_id )||
-            guidcmp( ASF_Object_Function[i_index].p_id,
-                     &asf_object_null_guid ) )
-        {
-            break;
-        }
-    }
-
-    /* Now free this object */
-    if( ASF_Object_Function[i_index].ASF_FreeObject_function != NULL )
-    {
+        /* Now free this object */
 #ifdef ASF_DEBUG
         msg_Dbg( s,
-                  "free asf object " GUID_FMT,
+                  "freing asf object " GUID_FMT,
                   GUID_PRINT( p_obj->common.i_object_id ) );
 #endif
-        (ASF_Object_Function[i_index].ASF_FreeObject_function)( p_obj );
+        p_entry->ASF_FreeObject_function( p_obj );
     }
+
     free( p_obj );
 }
 
