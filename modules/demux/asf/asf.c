@@ -1108,8 +1108,10 @@ static int DemuxInit( demux_t *p_demux )
                                          sizeof( WAVEFORMATEX ) ),
                                  INT_MAX, uint32_t );
                     fmt.p_extra = malloc( fmt.i_extra );
-                    memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
-                        fmt.i_extra );
+                    if ( fmt.p_extra )
+                        memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )], fmt.i_extra );
+                    else
+                        fmt.i_extra = 0;
                 }
 
                 msg_Dbg( p_demux, "added new audio stream (codec:0x%x,ID:%d)",
