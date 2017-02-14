@@ -127,12 +127,9 @@ private:
 
     IMediaControl*  p_media_control;
     IGraphBuilder*  p_filter_graph;
-    ITuningSpaceContainer*      p_tuning_space_container;
     ITuningSpace*               p_tuning_space;
     ITuneRequest*               p_tune_request;
 
-    IDVBTuningSpace*            p_dvb_tuning_space;
-    IDVBSTuningSpace*           p_dvbs_tuning_space;
 #if 0
     IDigitalCableTuningSpace*   p_cqam_tuning_space;
     IATSCTuningSpace*           p_atsc_tuning_space;
