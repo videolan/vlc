@@ -72,9 +72,9 @@ void WINAPI FreeMediaType( AM_MEDIA_TYPE& mt )
 HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
                               const AM_MEDIA_TYPE *pmtSource )
 {
-    *pmtTarget = *pmtSource;
-
     if( !pmtSource || !pmtTarget ) return S_FALSE;
+
+    *pmtTarget = *pmtSource;
 
     if( pmtSource->cbFormat && pmtSource->pbFormat )
     {
