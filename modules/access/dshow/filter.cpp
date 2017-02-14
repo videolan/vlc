@@ -210,13 +210,8 @@ CapturePin::CapturePin( vlc_object_t *_p_input, access_sys_t *_p_sys,
                         AM_MEDIA_TYPE *mt, size_t mt_count )
   : p_input( _p_input ), p_sys( _p_sys ), p_filter( _p_filter ),
     p_connected_pin( NULL ),  media_types(mt), media_type_count(mt_count),
-    i_ref( 0 )
+    cx_media_type(), i_ref( 0 )
 {
-    cx_media_type.majortype = mt[0].majortype;
-    cx_media_type.subtype   = GUID_NULL;
-    cx_media_type.pbFormat  = NULL;
-    cx_media_type.cbFormat  = 0;
-    cx_media_type.pUnk      = NULL;
 }
 
 CapturePin::~CapturePin()
