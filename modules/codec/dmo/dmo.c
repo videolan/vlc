@@ -1438,7 +1438,7 @@ static int EncOpen( vlc_object_t *p_this )
     }
 
     /* Set output properties */
-    p_enc->fmt_out.i_cat = p_enc->fmt_out.i_cat;
+    p_enc->fmt_out.i_cat = p_enc->fmt_in.i_cat;
     if( p_enc->fmt_out.i_cat == AUDIO_ES )
         date_Init( &p_sys->end_date, p_enc->fmt_out.audio.i_rate, 1 );
     else
