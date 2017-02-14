@@ -413,25 +413,22 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
 #if !VLC_WINSTORE_APP
 static int OpenHwnd(vout_display_t *vd)
 {
-    HINSTANCE hd3d11_dll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (!hd3d11_dll) {
-        msg_Warn(vd, "cannot load d3d11.dll, aborting");
-        return VLC_EGENERIC;
-    }
-
-    HINSTANCE hd3dcompiler_dll = Direct3D11LoadShaderLibrary();
-    if (!hd3dcompiler_dll) {
-        msg_Err(vd, "cannot load d3dcompiler.dll, aborting");
-        Direct3D11Destroy(vd);
-        return VLC_EGENERIC;
-    }
-
     vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->hd3d11_dll       = hd3d11_dll;
-    sys->hd3dcompiler_dll = hd3dcompiler_dll;
+    sys->hd3d11_dll = LoadLibrary(TEXT("D3D11.DLL"));
+    if (!sys->hd3d11_dll) {
+        msg_Warn(vd, "cannot load d3d11.dll, aborting");
+        return VLC_EGENERIC;
+    }
+
+    sys->hd3dcompiler_dll = Direct3D11LoadShaderLibrary();
+    if (!sys->hd3dcompiler_dll) {
+        msg_Err(vd, "cannot load d3dcompiler.dll, aborting");
+        Direct3D11Destroy(vd);
+        return VLC_EGENERIC;
+    }
 
     sys->OurD3DCompile = (void *)GetProcAddress(sys->hd3dcompiler_dll, "D3DCompile");
     if (!sys->OurD3DCompile) {
@@ -441,7 +438,7 @@ static int OpenHwnd(vout_display_t *vd)
     }
 
     sys->OurD3D11CreateDevice =
-        (void *)GetProcAddress(hd3d11_dll, "D3D11CreateDevice");
+        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDevice");
     if (!sys->OurD3D11CreateDevice) {
         msg_Err(vd, "Cannot locate reference to D3D11CreateDevice in d3d11 DLL");
         Direct3D11Destroy(vd);
