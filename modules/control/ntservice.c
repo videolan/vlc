@@ -197,12 +197,12 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     sprintf( psz_path, "\"%s\" -I "MODULE_STRING, FromT(psz_pathtmp) );
 
     psz_extra = var_InheritString( p_intf, "ntservice-extraintf" );
-    if( psz_extra )
+    if( psz_extra && *psz_extra )
     {
         strcat( psz_path, " --ntservice-extraintf " );
         strncat( psz_path, psz_extra, MAX_PATH - strlen( psz_path ) - 1 );
-        free( psz_extra );
     }
+    free( psz_extra );
 
     psz_extra = var_InheritString( p_intf, "ntservice-options" );
     if( psz_extra && *psz_extra )
