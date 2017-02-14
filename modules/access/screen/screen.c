@@ -160,13 +160,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_left = var_CreateGetInteger( p_demux, "screen-left" );
     p_sys->i_width = var_CreateGetInteger( p_demux, "screen-width" );
     p_sys->i_height = var_CreateGetInteger( p_demux, "screen-height" );
-    if( p_sys->i_width > 0 && p_sys->i_height > 0 )
-        msg_Dbg( p_demux, "capturing subscreen top: %d, left: %d, "
-                          "width: %d, height: %d",
-                          p_sys->i_top,
-                          p_sys->i_left,
-                          p_sys->i_width,
-                          p_sys->i_height );
 #endif
 
 #ifdef SCREEN_DISPLAY_ID
@@ -185,29 +178,41 @@ static int Open( vlc_object_t *p_this )
              p_sys->fmt.video.i_bits_per_pixel );
 
 #ifdef SCREEN_SUBSCREEN
-    if( p_sys->i_width > 0 && p_sys->i_height > 0 )
+    if( p_sys->i_left >= p_sys->fmt.video.i_width
+     || p_sys->i_top >= p_sys->fmt.video.i_height )
     {
-        if( p_sys->i_left + p_sys->i_width > p_sys->fmt.video.i_width ||
-            p_sys->i_top + p_sys->i_height > p_sys->fmt.video.i_height )
-        {
-            msg_Err( p_demux, "subscreen region overflows the screen" );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-        else
-        {
-            p_sys->i_screen_width = p_sys->fmt.video.i_width;
-            p_sys->i_screen_height = p_sys->fmt.video.i_height;
-            p_sys->fmt.video.i_visible_width =
-            p_sys->fmt.video.i_width = p_sys->i_width;
-            p_sys->fmt.video.i_visible_height =
-            p_sys->fmt.video.i_height = p_sys->i_height;
-            p_sys->b_follow_mouse = var_CreateGetBool( p_demux,
-                                                "screen-follow-mouse" );
-            if( p_sys->b_follow_mouse )
-                msg_Dbg( p_demux, "mouse following enabled" );
-        }
+        msg_Err( p_demux, "subscreen left/top out of range" );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
+
+    if( p_sys->i_width == 0 )
+        p_sys->i_width = p_sys->fmt.video.i_width - p_sys->i_left;
+    if( p_sys->i_height == 0 )
+        p_sys->i_height = p_sys->fmt.video.i_height - p_sys->i_top;
+
+    if( p_sys->i_left + p_sys->i_width > p_sys->fmt.video.i_width ||
+        p_sys->i_top + p_sys->i_height > p_sys->fmt.video.i_height )
+    {
+        msg_Err( p_demux, "subscreen region overflows the screen" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    else
+    {
+        p_sys->i_screen_width = p_sys->fmt.video.i_width;
+        p_sys->i_screen_height = p_sys->fmt.video.i_height;
+        p_sys->fmt.video.i_visible_width =
+        p_sys->fmt.video.i_width = p_sys->i_width;
+        p_sys->fmt.video.i_visible_height =
+        p_sys->fmt.video.i_height = p_sys->i_height;
+        p_sys->b_follow_mouse = var_CreateGetBool( p_demux, "screen-follow-mouse" );
+        if( p_sys->b_follow_mouse )
+            msg_Dbg( p_demux, "mouse following enabled" );
+    }
+
+    msg_Dbg( p_demux, "capturing subscreen top: %d, left: %d, width: %d, height: %d",
+             p_sys->i_top, p_sys->i_left, p_sys->i_width, p_sys->i_height );
 #endif
 
 #ifdef SCREEN_MOUSE
@@ -350,6 +355,16 @@ void RenderCursor( demux_t *p_demux, int i_x, int i_y,
     demux_sys_t *p_sys = p_demux->p_sys;
     if( !p_sys->dst.i_planes )
         picture_Setup( &p_sys->dst, &p_sys->fmt.video );
+
+    if( !p_sys->dst.i_planes )
+        return;
+
+#ifdef _WIN32
+    /* Bitmaps here created by CreateDIBSection: stride rounded up to the nearest DWORD */
+    p_sys->dst.p[ 0 ].i_pitch = p_sys->dst.p[ 0 ].i_visible_pitch =
+        ( ( ( ( p_sys->fmt.video.i_width * p_sys->fmt.video.i_bits_per_pixel ) + 31 ) & ~31 ) >> 3 );
+#endif
+
     if( !p_sys->p_blend )
     {
         p_sys->p_blend = vlc_object_create( p_demux, sizeof(filter_t) );
