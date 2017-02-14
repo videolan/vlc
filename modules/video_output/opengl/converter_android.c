@@ -61,19 +61,27 @@ pool_unlock_pic(picture_t *p_pic)
     }
 }
 
-static picture_pool_t *
-tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                 unsigned requested_count, GLuint *textures)
+static int
+tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
+                          const GLsizei *tex_width, const GLsizei *tex_height)
 {
+    (void) tex_width; (void) tex_height;
     struct priv *priv = tc->priv;
     assert(textures[0] != 0);
     priv->stex = SurfaceTexture_create(VLC_OBJECT(tc->gl), textures[0]);
     if (priv->stex == NULL)
     {
         msg_Err(tc->gl, "tc_anop_get_pool: SurfaceTexture_create failed");
-        return NULL;
+        return VLC_EGENERIC;
     }
+    return VLC_SUCCESS;
+}
 
+static picture_pool_t *
+tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
+                 unsigned requested_count, GLuint *textures)
+{
+    struct priv *priv = tc->priv;
 #define FORCED_COUNT 31
     requested_count = FORCED_COUNT;
     picture_t *picture[FORCED_COUNT] = {NULL, };
@@ -118,7 +126,6 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
 error:
     for (unsigned i = 0; i < count; i++)
         picture_Release(picture[i]);
-    SurfaceTexture_release(priv->stex);
     return NULL;
 }
 
@@ -198,6 +205,7 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
     priv->stex = NULL;
     priv->transform_mtx = NULL;
 
+    tc->pf_allocate_textures = tc_anop_allocate_textures;
     tc->pf_get_pool       = tc_anop_get_pool;
     tc->pf_update         = tc_anop_update;
     tc->pf_fetch_locations = tc_anop_fetch_locations;
