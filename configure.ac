@@ -3879,6 +3879,22 @@ then
 fi
 AM_CONDITIONAL(HAVE_SPARKLE, [test "$enable_sparkle" != "no"])
 
+dnl
+dnl  MacOS X breakpad creash reporter support
+dnl
+AC_ARG_ENABLE(breakpad,
+  [  --enable-breakpad       Breakpad crash reporter support for OS X (default enabled on Mac OS X)])
+if test "x${enable_breakpad}" != "xno" -a "${HAVE_OSX}" = "1"
+then
+  if test ! -d ${CONTRIB_DIR}/Breakpad.framework
+  then
+    AC_MSG_ERROR([Breakpad framework is required and was not found in ${CONTRIB_DIR}])
+  fi
+
+  AC_DEFINE([HAVE_BREAKPAD], [1], [Define to 1 if breakpad is enabled.])
+fi
+AM_CONDITIONAL(HAVE_BREAKPAD, [test "$enable_breakpad" != "no"])
+
 
 dnl
 dnl  Minimal Mac OS X module

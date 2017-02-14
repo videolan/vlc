@@ -46,6 +46,9 @@ VLC-tmp:
 if HAVE_SPARKLE
 	cp -R $(CONTRIB_DIR)/Sparkle.framework $@/Contents/Frameworks/
 endif
+if HAVE_BREAKPAD
+	cp -R $(CONTRIB_DIR)/Breakpad.framework $@/Contents/Frameworks/
+endif
 if BUILD_LUA
 	## Copy lua scripts
 	cp -r "$(prefix)/lib/vlc/lua" "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
@@ -123,5 +126,3 @@ EXTRA_DIST += \
 	extras/package/macosx/vlc_app_icon.svg \
 	extras/package/macosx/VLC.entitlements \
 	extras/package/macosx/VLC.xcodeproj/project.pbxproj
-
-
