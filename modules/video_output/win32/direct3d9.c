@@ -363,6 +363,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
                                                           NULL);
         if (FAILED(hr)) {
            msg_Err(vd, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
+           free(picsys);
            goto error;
         }
 
