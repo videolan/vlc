@@ -464,13 +464,10 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
             const struct rr_data_txt *p_txt = p_entry->data.TXT;
             while( p_txt && ( psz_model == NULL || psz_icon == NULL ) )
             {
-                if( p_txt->txt )
-                {
-                    if( !strncmp("md=", p_txt->txt, 3) )
-                        psz_model = p_txt->txt + 3;
-                    else if( !strncmp("ic=", p_txt->txt, 3) )
-                        psz_icon = p_txt->txt + 3;
-                }
+                if( !strncmp("md=", p_txt->txt, 3) )
+                    psz_model = p_txt->txt + 3;
+                else if( !strncmp("ic=", p_txt->txt, 3) )
+                    psz_icon = p_txt->txt + 3;
                 p_txt = p_txt->next;
             }
         }
