@@ -25,7 +25,7 @@
 #ifdef _WIN32
 # include <errno.h>
 # include <stdlib.h>
-# include <mswsock.h>
+# include <winsock2.h>
 
 ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
 {
