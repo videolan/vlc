@@ -77,6 +77,13 @@ enum
     UNICODE_BIDI_OVERRIDE = 4,
 };
 
+/*
+ * TTML Parsing and inheritance order:
+ * Each time a text node is found and belongs to out time interval,
+ * we backward merge attributes dictionnary up to root.
+ * Then we convert attributes, merging with style by id or region
+ * style, and sets from parent node.
+ */
 static tt_node_t *ParseTTML( decoder_t *, const uint8_t *, size_t );
 
 static void ttml_style_Delete( ttml_style_t* p_ttml_style )
