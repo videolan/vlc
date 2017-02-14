@@ -209,8 +209,8 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     {
         strcat( psz_path, " " );
         strcat( psz_path, psz_extra );
-        free( psz_extra );
     }
+    free( psz_extra );
 
     SC_HANDLE service =
         CreateServiceA( handle, p_sys->psz_service, p_sys->psz_service,
