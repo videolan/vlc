@@ -200,7 +200,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     if( psz_extra )
     {
         strcat( psz_path, " --ntservice-extraintf " );
-        strcat( psz_path, psz_extra );
+        strncat( psz_path, psz_extra, MAX_PATH - strlen( psz_path ) - 1 );
         free( psz_extra );
     }
 
@@ -208,7 +208,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     if( psz_extra && *psz_extra )
     {
         strcat( psz_path, " " );
-        strcat( psz_path, psz_extra );
+        strncat( psz_path, psz_extra, MAX_PATH - strlen( psz_path ) - 1 );
     }
     free( psz_extra );
 
