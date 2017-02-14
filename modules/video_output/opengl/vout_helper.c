@@ -343,7 +343,8 @@ static inline GLsizei GetAlignedSize(unsigned size)
     return ((align >> 1) == size) ? size : align;
 }
 
-static GLuint BuildVertexShader(vout_display_opengl_t *vgl, unsigned plane_count)
+static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
+                                unsigned plane_count)
 {
     /* Basic vertex shader */
     static const char *template =
@@ -378,9 +379,9 @@ static GLuint BuildVertexShader(vout_display_opengl_t *vgl, unsigned plane_count
                  coord1_code, coord2_code) < 0)
         return 0;
 
-    GLuint shader = vgl->api.CreateShader(GL_VERTEX_SHADER);
-    vgl->api.ShaderSource(shader, 1, (const char **) &code, NULL);
-    vgl->api.CompileShader(shader);
+    GLuint shader = tc->api->CreateShader(GL_VERTEX_SHADER);
+    tc->api->ShaderSource(shader, 1, (const char **) &code, NULL);
+    tc->api->CompileShader(shader);
     free(code);
     return shader;
 }
@@ -426,6 +427,121 @@ DelTextures(const opengl_tex_converter_t *tc, GLuint *textures)
 {
     glDeleteTextures(tc->tex_count, textures);
     memset(textures, 0, tc->tex_count * sizeof(GLuint));
+}
+
+static int
+opengl_link_program(struct prgm *prgm, GLuint fragment_shader)
+{
+    if (fragment_shader == 0)
+        return VLC_EGENERIC;
+
+    opengl_tex_converter_t *tc = &prgm->tc;
+
+    assert(tc->tex_target != 0 && tc->tex_count > 0);
+
+    GLuint vertex_shader = BuildVertexShader(tc, tc->tex_count);
+    GLuint shaders[] = { fragment_shader, vertex_shader };
+
+    /* Check shaders messages */
+    for (unsigned i = 0; i < 2; i++) {
+        int infoLength;
+        tc->api->GetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &infoLength);
+        if (infoLength <= 1)
+            continue;
+
+        char *infolog = malloc(infoLength);
+        if (infolog != NULL)
+        {
+            int charsWritten;
+            tc->api->GetShaderInfoLog(shaders[i], infoLength, &charsWritten,
+                                      infolog);
+            msg_Err(tc->gl, "shader %d: %s", i, infolog);
+            free(infolog);
+        }
+    }
+
+    prgm->id = tc->api->CreateProgram();
+    tc->api->AttachShader(prgm->id, fragment_shader);
+    tc->api->AttachShader(prgm->id, vertex_shader);
+    tc->api->LinkProgram(prgm->id);
+
+    tc->api->DeleteShader(vertex_shader);
+    tc->api->DeleteShader(fragment_shader);
+
+    /* Check program messages */
+    int infoLength = 0;
+    tc->api->GetProgramiv(prgm->id, GL_INFO_LOG_LENGTH, &infoLength);
+    if (infoLength > 1)
+    {
+        char *infolog = malloc(infoLength);
+        if (infolog != NULL)
+        {
+            int charsWritten;
+            tc->api->GetProgramInfoLog(prgm->id, infoLength, &charsWritten,
+                                       infolog);
+            msg_Err(tc->gl, "shader program %4.4s: %s",
+                    (const char *) &tc->chroma, infolog);
+            free(infolog);
+        }
+
+        /* If there is some message, better to check linking is ok */
+        GLint link_status = GL_TRUE;
+        tc->api->GetProgramiv(prgm->id, GL_LINK_STATUS, &link_status);
+        if (link_status == GL_FALSE)
+        {
+            msg_Err(tc->gl, "Unable to use program %4.4s\n",
+                    (const char *) &tc->chroma);
+            goto error;
+        }
+    }
+
+    /* Fetch UniformLocations and AttribLocations */
+#define GET_LOC(type, x, str) do { \
+    x = tc->api->Get##type##Location(prgm->id, str); \
+    assert(x != -1); \
+    if (x == -1) { \
+        msg_Err(tc->gl, "Unable to Get"#type"Location(%s)\n", str); \
+        goto error; \
+    } \
+} while (0)
+#define GET_ULOC(x, str) GET_LOC(Uniform, prgm->uloc.x, str)
+#define GET_ALOC(x, str) GET_LOC(Attrib, prgm->aloc.x, str)
+    GET_ULOC(OrientationMatrix, "OrientationMatrix");
+    GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
+    GET_ULOC(ZRotMatrix, "ZRotMatrix");
+    GET_ULOC(YRotMatrix, "YRotMatrix");
+    GET_ULOC(XRotMatrix, "XRotMatrix");
+    GET_ULOC(ZoomMatrix, "ZoomMatrix");
+
+    GET_ALOC(VertexPosition, "VertexPosition");
+    GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
+    /* MultiTexCoord 1 and 2 can be optimized out if not used */
+    if (prgm->tc.tex_count > 1)
+        GET_ALOC(MultiTexCoord[1], "MultiTexCoord1");
+    else
+        prgm->aloc.MultiTexCoord[1] = -1;
+    if (prgm->tc.tex_count > 2)
+        GET_ALOC(MultiTexCoord[2], "MultiTexCoord2");
+    else
+        prgm->aloc.MultiTexCoord[2] = -1;
+#undef GET_LOC
+#undef GET_ULOC
+#undef GET_ALOC
+    int ret = prgm->tc.pf_fetch_locations(&prgm->tc, prgm->id);
+    assert(ret == VLC_SUCCESS);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Err(tc->gl, "Unable to get locations from %4.4s tex_conv\n",
+                (const char *) &tc->chroma);
+        goto error;
+    }
+
+    return VLC_SUCCESS;
+
+error:
+    tc->api->DeleteProgram(prgm->id);
+    prgm->id = 0;
+    return VLC_EGENERIC;
 }
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
@@ -541,9 +657,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->fmt.i_gmask  = 0x0000ff00;
     vgl->fmt.i_bmask  = 0x00ff0000;
 #   endif
-    GLuint fragment_shader = 0, sub_fragment_shader;
-    opengl_tex_converter_t tex_conv;
-    opengl_tex_converter_t sub_tex_conv = {
+
+    vgl->prgm = &vgl->prgms[0];
+    vgl->sub_prgm = &vgl->prgms[1];
+
+    vgl->sub_prgm->tc = (opengl_tex_converter_t) {
         .gl = vgl->gl,
         .api = &vgl->api,
         .glexts = extensions,
@@ -551,8 +669,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    sub_fragment_shader = opengl_tex_converter_generic_init(&vgl->fmt, &sub_tex_conv);
-    if (sub_fragment_shader == 0)
+    GLuint fshader = opengl_tex_converter_generic_init(&vgl->fmt,
+                                                       &vgl->sub_prgm->tc);
+    int ret = opengl_link_program(vgl->sub_prgm, fshader);
+    if (ret != VLC_SUCCESS)
     {
         msg_Err(gl, "RGBA shader failed");
         free(vgl);
@@ -561,158 +681,37 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
     {
-        tex_conv = (opengl_tex_converter_t) {
+        vgl->prgm->tc = (opengl_tex_converter_t) {
             .gl = vgl->gl,
             .api = &vgl->api,
             .glexts = extensions,
             .orientation = fmt->orientation,
         };
-        fragment_shader = opengl_tex_converter_init_cbs[j](fmt, &tex_conv);
-        if (fragment_shader != 0)
+        fshader = opengl_tex_converter_init_cbs[j](fmt, &vgl->prgm->tc);
+        ret = opengl_link_program(vgl->prgm, fshader);
+        if (ret == VLC_SUCCESS)
         {
-            assert(tex_conv.chroma != 0 && tex_conv.tex_target != 0 &&
-                   tex_conv.tex_count > 0 &&  tex_conv.pf_update != NULL &&
-                   tex_conv.pf_fetch_locations != NULL &&
-                   tex_conv.pf_prepare_shader != NULL);
+            assert(vgl->prgm->tc.chroma != 0 && vgl->prgm->tc.tex_target != 0 &&
+                   vgl->prgm->tc.tex_count > 0 &&  vgl->prgm->tc.pf_update != NULL &&
+                   vgl->prgm->tc.pf_fetch_locations != NULL &&
+                   vgl->prgm->tc.pf_prepare_shader != NULL);
             vgl->fmt = *fmt;
-            vgl->fmt.i_chroma = tex_conv.chroma;
+            vgl->fmt.i_chroma = vgl->prgm->tc.chroma;
             break;
         }
     }
-    if (fragment_shader == 0)
+    if (ret != VLC_SUCCESS)
     {
         msg_Warn(gl, "could not init tex converter for %4.4s",
                  (const char *) &fmt->i_chroma);
-        if (sub_tex_conv.pf_release != NULL)
-            sub_tex_conv.pf_release(&sub_tex_conv);
-        vgl->api.DeleteShader(sub_fragment_shader);
+        if (vgl->sub_prgm->tc.pf_release != NULL)
+            vgl->sub_prgm->tc.pf_release(&vgl->sub_prgm->tc);
+        if (vgl->sub_prgm->id != 0)
+            vgl->api.DeleteProgram(vgl->sub_prgm->id);
         free(vgl);
         return NULL;
     }
 
-    /* Build program if needed */
-    GLuint vertex_shader, sub_vertex_shader;
-    vertex_shader = BuildVertexShader(vgl, tex_conv.tex_count);
-    sub_vertex_shader = BuildVertexShader(vgl, sub_tex_conv.tex_count);
-
-    const GLuint shaders[] = {
-        fragment_shader,
-        sub_fragment_shader,
-        vertex_shader,
-        sub_vertex_shader
-    };
-
-    /* Check shaders messages */
-    for (unsigned j = 0; j < 4; j++) {
-        int infoLength;
-        vgl->api.GetShaderiv(shaders[j], GL_INFO_LOG_LENGTH, &infoLength);
-        if (infoLength <= 1)
-            continue;
-
-        char *infolog = malloc(infoLength);
-        if (infolog != NULL)
-        {
-            int charsWritten;
-            vgl->api.GetShaderInfoLog(shaders[j], infoLength, &charsWritten,
-                                      infolog);
-            msg_Err(gl, "shader %d: %s", j, infolog);
-            free(infolog);
-        }
-    }
-
-    /* Main picture vertex shaders */
-    vgl->prgm = &vgl->prgms[0];
-    vgl->prgm->tc = tex_conv;
-    vgl->prgm->id = vgl->api.CreateProgram();
-    vgl->api.AttachShader(vgl->prgm->id, fragment_shader);
-    vgl->api.AttachShader(vgl->prgm->id, vertex_shader);
-    vgl->api.LinkProgram(vgl->prgm->id);
-
-    /* Subpicture Vertex shaders */
-    vgl->sub_prgm = &vgl->prgms[1];
-    vgl->sub_prgm->tc = sub_tex_conv;
-    vgl->sub_prgm->id = vgl->api.CreateProgram();
-    vgl->api.AttachShader(vgl->sub_prgm->id, sub_fragment_shader);
-    vgl->api.AttachShader(vgl->sub_prgm->id, sub_vertex_shader);
-    vgl->api.LinkProgram(vgl->sub_prgm->id);
-
-    vgl->api.DeleteShader(vertex_shader);
-    vgl->api.DeleteShader(fragment_shader);
-    vgl->api.DeleteShader(sub_vertex_shader);
-    vgl->api.DeleteShader(sub_fragment_shader);
-
-    /* Check program messages */
-    for (GLuint i = 0; i < 2; i++) {
-        int infoLength = 0;
-        vgl->api.GetProgramiv(vgl->prgms[i].id, GL_INFO_LOG_LENGTH, &infoLength);
-        if (infoLength <= 1)
-            continue;
-        char *infolog = malloc(infoLength);
-        if (infolog != NULL)
-        {
-            int charsWritten;
-            vgl->api.GetProgramInfoLog(vgl->prgms[i].id, infoLength, &charsWritten,
-                                       infolog);
-            msg_Err(gl, "shader program %d: %s", i, infolog);
-            free(infolog);
-        }
-
-        /* If there is some message, better to check linking is ok */
-        GLint link_status = GL_TRUE;
-        vgl->api.GetProgramiv(vgl->prgms[i].id, GL_LINK_STATUS, &link_status);
-        if (link_status == GL_FALSE) {
-            msg_Err(gl, "Unable to use program %d\n", i);
-            vout_display_opengl_Delete(vgl);
-            return NULL;
-        }
-    }
-
-    /* Fetch UniformLocations and AttribLocations */
-    for (GLuint i = 0; i < 2; i++)
-    {
-#define GET_LOC(type, x, str) do { \
-    x = vgl->api.Get##type##Location(prgm->id, str); \
-    assert(x != -1); \
-    if (x == -1) { \
-        msg_Err(gl, "Unable to Get"#type"Location(%s)\n", str); \
-        vout_display_opengl_Delete(vgl); \
-        return NULL; \
-    } \
-} while (0)
-#define GET_ULOC(x, str) GET_LOC(Uniform, prgm->uloc.x, str)
-#define GET_ALOC(x, str) GET_LOC(Attrib, prgm->aloc.x, str)
-        struct prgm *prgm = &vgl->prgms[i];
-        GET_ULOC(OrientationMatrix, "OrientationMatrix");
-        GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
-        GET_ULOC(ZRotMatrix, "ZRotMatrix");
-        GET_ULOC(YRotMatrix, "YRotMatrix");
-        GET_ULOC(XRotMatrix, "XRotMatrix");
-        GET_ULOC(ZoomMatrix, "ZoomMatrix");
-
-        GET_ALOC(VertexPosition, "VertexPosition");
-        GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
-        /* MultiTexCoord 1 and 2 can be optimized out if not used */
-        if (prgm->tc.tex_count > 1)
-            GET_ALOC(MultiTexCoord[1], "MultiTexCoord1");
-        else
-            prgm->aloc.MultiTexCoord[1] = -1;
-        if (prgm->tc.tex_count > 2)
-            GET_ALOC(MultiTexCoord[2], "MultiTexCoord2");
-        else
-            prgm->aloc.MultiTexCoord[2] = -1;
-#undef GET_LOC
-#undef GET_ULOC
-#undef GET_ALOC
-        int ret = prgm->tc.pf_fetch_locations(&prgm->tc, prgm->id);
-        assert(ret == VLC_SUCCESS);
-        if (ret != VLC_SUCCESS)
-        {
-            msg_Err(gl, "Unable to get locations from %4.4s tex_conv\n",
-                    (const char *) &prgm->tc.chroma);
-            vout_display_opengl_Delete(vgl);
-            return NULL;
-        }
-    }
     getOrientationTransformMatrix(vgl->prgm->tc.orientation,
                                   vgl->prgm->var.OrientationMatrix);
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
