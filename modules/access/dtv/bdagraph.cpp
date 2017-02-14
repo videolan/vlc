@@ -2558,7 +2558,6 @@ HRESULT BDAGraph::FindFilter( REFCLSID this_clsid, long* i_moniker_used,
         IBindCtx*      p_bind_context;
         IPropertyBag*  p_property_bag;
         char*          psz_upstream;
-        int            i_upstream_len;
 
         char*          psz_downstream;
         VARIANT        var_bstr;
