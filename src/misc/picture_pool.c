@@ -127,7 +127,10 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     pool->pic_unlock = cfg->unlock;
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
-    pool->available = (1ULL << cfg->picture_count) - 1;
+    if (cfg->picture_count == pool_max)
+        pool->available = ~0ULL;
+    else
+        pool->available = (1ULL << cfg->picture_count) - 1;
     atomic_init(&pool->refs,  1);
     pool->picture_count = cfg->picture_count;
     memcpy(pool->picture, cfg->picture,
