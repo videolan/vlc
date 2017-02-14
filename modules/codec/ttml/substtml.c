@@ -113,6 +113,37 @@ static void ttml_region_Delete( ttml_region_t *p_region )
     free( p_region );
 }
 
+static ttml_style_t * ttml_style_Duplicate( const ttml_style_t *p_src )
+{
+    ttml_style_t *p_dup = ttml_style_New( );
+    if( p_dup )
+    {
+        *p_dup = *p_src;
+        p_dup->font_style = text_style_Duplicate( p_src->font_style );
+    }
+    return p_dup;
+}
+
+static void ttml_style_Merge( const ttml_style_t *p_src, ttml_style_t *p_dst )
+{
+    if( p_src && p_dst )
+    {
+        if( p_src->font_style )
+        {
+            if( p_dst->font_style )
+                text_style_Merge( p_dst->font_style, p_src->font_style, true );
+            else
+                p_dst->font_style = text_style_Duplicate( p_src->font_style );
+        }
+
+        if( p_src->b_direction_set )
+        {
+            p_dst->b_direction_set = true;
+            p_dst->i_direction = p_src->i_direction;
+        }
+    }
+}
+
 static ttml_region_t *ttml_region_New( )
 {
     ttml_region_t *p_ttml_region = calloc( 1, sizeof( ttml_region_t ) );
@@ -410,6 +441,18 @@ static void DictMergeWithRegionID( ttml_context_t *p_ctx, const char *psz_id,
     }
 }
 
+static void DictToTTMLStyle( const vlc_dictionary_t *p_dict, ttml_style_t *p_ttml_style )
+{
+    for( int i = 0; i < p_dict->i_size; ++i )
+    {
+        for ( vlc_dictionary_entry_t* p_entry = p_dict->p_entries[i];
+              p_entry != NULL; p_entry = p_entry->p_next )
+        {
+            FillTTMLStyle( p_entry->psz_key, p_entry->p_value, p_ttml_style );
+        }
+    }
+}
+
 static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_node )
 {
     assert( p_node );
@@ -435,14 +478,7 @@ static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_nod
 
     if( merged.i_size && merged.p_entries[0] && (p_ttml_style = ttml_style_New()) )
     {
-        for( int i = 0; i < merged.i_size; ++i )
-        {
-            for ( vlc_dictionary_entry_t* p_entry = merged.p_entries[i];
-                  p_entry != NULL; p_entry = p_entry->p_next )
-            {
-                FillTTMLStyle( p_entry->psz_key, p_entry->p_value, p_ttml_style );
-            }
-        }
+        DictToTTMLStyle( &merged, p_ttml_style );
     }
 
     vlc_dictionary_clear( &merged, NULL, NULL );
@@ -576,7 +612,7 @@ static void AppendLineBreakToRegion( ttml_region_t *p_region )
 }
 
 static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_ttnode,
-                                ttml_region_t *p_region )
+                                const ttml_style_t *p_set_styles, ttml_region_t *p_region )
 {
     text_segment_t *p_segment;
 
@@ -589,6 +625,9 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
         ttml_style_t *s = InheritTTMLStyles( p_ctx, p_ttnode->p_parent );
         if( s )
         {
+            if( p_set_styles )
+                ttml_style_Merge( p_set_styles, s );
+
             p_segment->style = s->font_style;
             s->font_style = NULL;
 
@@ -606,7 +645,9 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
 }
 
 static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t *p_node,
-                                         ttml_region_t *p_region, int64_t i_playbacktime )
+                                         ttml_region_t *p_region,
+                                         const ttml_style_t *p_upper_set_styles,
+                                         int64_t i_playbacktime )
 {
     if( i_playbacktime != -1 &&
        !tt_timings_Contains( &p_node->timings, i_playbacktime ) )
@@ -626,12 +667,31 @@ static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t 
         AppendLineBreakToRegion( p_region );
     }
 
+    /* Styles from <set> element */
+    ttml_style_t *p_set_styles = (p_upper_set_styles)
+                               ? ttml_style_Duplicate( p_upper_set_styles )
+                               : NULL;
+
     for( const tt_basenode_t *p_child = p_node->p_child;
                               p_child; p_child = p_child->p_next )
     {
         if( p_child->i_type == TT_NODE_TYPE_TEXT )
         {
-            AppendTextToRegion( p_ctx, (const tt_textnode_t *) p_child, p_region );
+            AppendTextToRegion( p_ctx, (const tt_textnode_t *) p_child,
+                                p_set_styles, p_region );
+        }
+        else if( !tt_node_NameCompare( ((const tt_node_t *)p_child)->psz_node_name, "set" ) )
+        {
+            const tt_node_t *p_set = (const tt_node_t *)p_child;
+            if( i_playbacktime == -1 ||
+                tt_timings_Contains( &p_set->timings, i_playbacktime ) )
+            {
+                if( p_set_styles != NULL || (p_set_styles = ttml_style_New()) )
+                {
+                    /* Merge with or create a local set of styles to apply to following childs */
+                    DictToTTMLStyle( &p_set->attr_dict, p_set_styles );
+                }
+            }
         }
         else if( !tt_node_NameCompare( ((const tt_node_t *)p_child)->psz_node_name, "br" ) )
         {
@@ -640,9 +700,12 @@ static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t 
         else
         {
             ConvertNodesToRegionContent( p_ctx, (const tt_node_t *) p_child,
-                                         p_region, i_playbacktime );
+                                         p_region, p_set_styles, i_playbacktime );
         }
     }
+
+    if( p_set_styles )
+        ttml_style_Delete( p_set_styles );
 }
 
 static tt_node_t *ParseTTML( decoder_t *p_dec, const uint8_t *p_buffer, size_t i_buffer )
@@ -688,7 +751,7 @@ static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, int64_t i_playback
             ttml_context_t context;
             context.p_rootnode = p_rootnode;
             vlc_dictionary_init( &context.regions, 1 );
-            ConvertNodesToRegionContent( &context, p_bodynode, NULL, i_playbacktime );
+            ConvertNodesToRegionContent( &context, p_bodynode, NULL, NULL, i_playbacktime );
 
             for( int i = 0; i < context.regions.i_size; ++i )
             {
