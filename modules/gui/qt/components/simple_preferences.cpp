@@ -1230,7 +1230,10 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
     const char* psz_VLC = "VLC";
     current = new QTreeWidgetItem( parent, QStringList( psz_ext ) );
 
-    if( strstr( qvReg->ReadRegistry( psz_ext, "", "" ), psz_VLC ) )
+    char* psz_reg = qvReg->ReadRegistry( psz_ext, "", "" );
+    if( psz_reg == NULL )
+        return false;
+    if( strstr( psz_reg, psz_VLC ) )
     {
         current->setCheckState( 0, Qt::Checked );
         b_temp = true;
@@ -1240,6 +1243,7 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
         current->setCheckState( 0, Qt::Unchecked );
         b_temp = false;
     }
+    free( psz_reg );
     listAsso.append( current );
     return b_temp;
 }
