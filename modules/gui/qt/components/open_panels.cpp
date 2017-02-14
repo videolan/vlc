@@ -380,7 +380,7 @@ void DiscOpenPanel::onFocus()
 {
     ui.deviceCombo->clear();
     wchar_t szDrives[512];
-    szDrives[0] = '\0';
+    szDrives[0] = L'\0';
     if( GetLogicalDriveStringsW( sizeof( szDrives ) / sizeof( *szDrives ) - 1, szDrives ) )
     {
         wchar_t *drive = szDrives;
