@@ -2246,7 +2246,7 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
     hr = p_TV->GetAvailableModes( &l_modes );
     if( SUCCEEDED(hr) && (l_modes & i_amtuner_mode) )
     {
-        hr = p_TV->put_Mode( (AMTunerModeType)i_amtuner_mode );
+        p_TV->put_Mode( (AMTunerModeType)i_amtuner_mode );
     }
 
     if( i_input == 1 ) p_TV->put_InputType( 0, TunerInputCable );
