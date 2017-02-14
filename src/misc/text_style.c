@@ -233,46 +233,49 @@ unsigned int vlc_html_color( const char *psz_value, bool* ok )
 {
     unsigned int color = 0;
     char* psz_end;
+    bool b_ret = false;
 
-    if ( ok != NULL )
-        *ok = false;
+    const char *psz_hex = (*psz_value == '#') ? psz_value + 1 : psz_value;
 
-    if( *psz_value == '#' )
+    if( psz_hex != psz_value ||
+        (*psz_hex >= '0' && *psz_hex <= '9') ||
+        (*psz_hex >= 'A' && *psz_hex <= 'F') )
     {
-        color = strtol( psz_value + 1, &psz_end, 16 );
-        if ( psz_end - ( psz_value + 1 ) <= 6 && *psz_end == 0 )
-        {
-            color |= 0xFF000000;
-        }
-        if ( ok != NULL && ( *psz_end == 0 || isspace( *psz_end ) ) )
-            *ok = true;
-    }
-    else
-    {
-        uint32_t i_value = strtol( psz_value, &psz_end, 16 );
+        uint32_t i_value = strtol( psz_hex, &psz_end, 16 );
         if( *psz_end == 0 || isspace( *psz_end ) )
         {
-            color = i_value;
-            // Assume RRGGBB has an alpha component of 0xFF
-            if ( psz_end - psz_value <= 6 )
-                color |= 0xFF000000;
-            if ( ok != NULL )
-                *ok = true;
-        }
-        else
-        {
-            for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
+            switch( psz_end - psz_hex )
             {
-                if( !strcasecmp( psz_value, p_html_colors[i].psz_name ) )
-                {
-                    // Assume opaque color since the table doesn't specify an alpha
-                    color = p_html_colors[i].i_value | 0xFF000000;
-                    if ( ok != NULL )
-                        *ok = true;
+                case 8:
+                    color = (i_value << 24) | (i_value >> 8);
+                    b_ret = true;
                     break;
-                }
+                case 6:
+                    color = i_value | 0xFF000000;
+                    b_ret = true;
+                    break;
+                default:
+                    break;
             }
         }
     }
+
+    if( !b_ret && psz_hex == psz_value )
+    {
+        for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
+        {
+            if( !strcasecmp( psz_value, p_html_colors[i].psz_name ) )
+            {
+                // Assume opaque color since the table doesn't specify an alpha
+                color = p_html_colors[i].i_value | 0xFF000000;
+                b_ret = true;
+                break;
+            }
+        }
+    }
+
+    if ( ok != NULL )
+        *ok = b_ret;
+
     return color;
 }
