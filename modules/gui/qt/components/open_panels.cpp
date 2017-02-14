@@ -381,7 +381,7 @@ void DiscOpenPanel::onFocus()
     ui.deviceCombo->clear();
     wchar_t szDrives[512];
     szDrives[0] = '\0';
-    if( GetLogicalDriveStringsW( sizeof( szDrives ) - 1, szDrives ) )
+    if( GetLogicalDriveStringsW( sizeof( szDrives ) / sizeof( *szDrives ) - 1, szDrives ) )
     {
         wchar_t *drive = szDrives;
         UINT oldMode = SetErrorMode( SEM_FAILCRITICALERRORS );
