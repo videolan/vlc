@@ -87,6 +87,7 @@ static char *tt_genTiming( int64_t i_time )
 
 static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node )
 {
+    bool b_timed_node = false;
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
     for( int i = 0; i < p_attr_dict->i_size; ++i )
     {
@@ -94,21 +95,18 @@ static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_n
                                       p_entry != NULL; p_entry = p_entry->p_next )
         {
             const char *psz_value = NULL;
-            char *psz_alloc = NULL;
 
-            if( !strcmp(p_entry->psz_key, "begin") )
+            if( !strcmp(p_entry->psz_key, "begin") ||
+                !strcmp(p_entry->psz_key, "end") ||
+                !strcmp(p_entry->psz_key, "dur") )
             {
-                if( p_node->timings.i_begin != -1 )
-                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_begin );
+                b_timed_node = true;
+                /* will remove duration */
+                continue;
             }
-            else if( !strcmp(p_entry->psz_key, "end") )
+            else if( !strcmp(p_entry->psz_key, "timeContainer") )
             {
-                if( p_node->timings.i_end != -1 )
-                    psz_value = psz_alloc = tt_genTiming( p_node->timings.i_end );
-            }
-            else if( !strcmp(p_entry->psz_key, "dur") )
-            {
-                /* remove */
+                /* also remove sequential timings info (all abs now) */
                 continue;
             }
             else
@@ -121,8 +119,23 @@ static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_n
 
             vlc_memstream_printf( p_stream, " %s=\"%s\"",
                                   p_entry->psz_key, psz_value );
+        }
+    }
 
-            free( psz_alloc );
+    if( b_timed_node )
+    {
+        if( p_node->timings.i_begin != -1 )
+        {
+            char *psz = tt_genTiming( p_node->timings.i_begin );
+            vlc_memstream_printf( p_stream, " begin=\"%s\"", psz );
+            free( psz );
+        }
+
+        if( p_node->timings.i_end != -1 )
+        {
+            char *psz = tt_genTiming( p_node->timings.i_end );
+            vlc_memstream_printf( p_stream, " end=\"%s\"", psz );
+            free( psz );
         }
     }
 }
