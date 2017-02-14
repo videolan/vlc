@@ -710,9 +710,10 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
     int64_t *p_timings_array = NULL;
     size_t   i_timings_count = 0;
 
+    /* We Only support absolute timings */
     tt_timings_t temporal_extent;
     temporal_extent.i_type = TT_TIMINGS_PARALLEL;
-    temporal_extent.i_begin = -1;
+    temporal_extent.i_begin = 0;
     temporal_extent.i_end = -1;
     temporal_extent.i_dur = -1;
 
@@ -741,21 +742,21 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 
     for( size_t i=0; i+1 < i_timings_count; i++ )
     {
+        /* We Only support absolute timings (2) */
+        if( p_timings_array[i] + VLC_TS_0 < p_block->i_dts )
+            continue;
+
+        if( p_timings_array[i] + VLC_TS_0 > p_block->i_dts + p_block->i_length )
+            break;
+
         subpicture_t *p_spu = NULL;
         ttml_region_t *p_regions = GenerateRegions( p_rootnode, p_timings_array[i] );
         if( p_regions && ( p_spu = decoder_NewSubpictureText( p_dec ) ) )
         {
             p_spu->i_start    = VLC_TS_0 + p_timings_array[i];
             p_spu->i_stop     = VLC_TS_0 + p_timings_array[i+1] - 1;
-            p_spu->b_ephemer  = false;
+            p_spu->b_ephemer  = true;
             p_spu->b_absolute = false;
-
-            mtime_t i_reftime = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
-            if( p_spu->i_start < i_reftime - VLC_TS_0 ) /* relative timings have been sent */
-            {
-                p_spu->i_start += i_reftime - VLC_TS_0;
-                p_spu->i_stop += i_reftime - VLC_TS_0;
-            }
 
             subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
             subpicture_updater_sys_region_t *p_updtregion = NULL;
