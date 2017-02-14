@@ -20,6 +20,7 @@ asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz .sum-asdcplib
 	$(APPLY) $(SRC)/asdcplib/static-programs.patch
 	$(APPLY) $(SRC)/asdcplib/adding-pkg-config-file.patch
 	$(APPLY) $(SRC)/asdcplib/win32-cross-compilation.patch
+	$(APPLY) $(SRC)/asdcplib/win32-dirent.patch
 	$(MOVE)
 
 .asdcplib: asdcplib
