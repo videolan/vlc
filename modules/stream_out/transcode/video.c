@@ -709,7 +709,6 @@ void transcode_video_close( sout_stream_t *p_stream,
 static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_id_sys_t *id, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    picture_t *p_pic2 = NULL;
 
     /*
      * Encoding
@@ -770,9 +769,7 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
         vlc_mutex_unlock( &p_sys->lock_out );
     }
 
-    if( p_sys->i_threads && p_pic2 )
-        picture_Release( p_pic2 );
-    else if ( p_sys->i_threads == 0 )
+    if ( p_sys->i_threads == 0 )
         picture_Release( p_pic );
 }
 
