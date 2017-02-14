@@ -375,6 +375,7 @@ void BDAOutput::Empty()
 * Constructor
 *****************************************************************************/
 BDAGraph::BDAGraph( vlc_object_t *p_this ):
+    ul_cbrc( 0 ),
     p_access( p_this ),
     guid_network_type(GUID_NULL),
     l_tuner_used(-1),
