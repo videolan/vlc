@@ -260,6 +260,17 @@ unsigned int vlc_html_color( const char *psz_value, bool* ok )
         }
     }
 
+    if( !b_ret && psz_hex == psz_value &&
+        !strncmp( "rgb", psz_value, 3 ) )
+    {
+        unsigned r,g,b,a = 0xFF;
+        if( psz_value[3] == 'a' )
+            b_ret = (sscanf( psz_value, "rgba(%3u,%3u,%3u,%3u)", &r, &g, &b, &a ) == 4);
+        else
+            b_ret = (sscanf( psz_value, "rgb(%3u,%3u,%3u)", &r, &g, &b ) == 3);
+        color = (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
     if( !b_ret && psz_hex == psz_value )
     {
         for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
