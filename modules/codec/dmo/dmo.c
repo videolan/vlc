@@ -724,7 +724,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
         if( CoCreateInstance( &clsid_dmo, NULL, CLSCTX_INPROC,
                               &IID_IMediaObject, (void **)pp_dmo ) )
         {
-            msg_Warn( p_this, "can't create DMO: %ls", psz_dmo_name );
+            msg_Warn( p_this, "can't create DMO" );
             *pp_dmo = 0;
         }
         else
