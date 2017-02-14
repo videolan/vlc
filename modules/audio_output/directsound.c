@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>
+#include <vlc_memory.h>
 
 #include "audio_output/windows_audio_common.h"
 #include "audio_output/mmdevice.h"
@@ -1010,12 +1011,17 @@ static int CALLBACK DeviceEnumCallback( LPGUID guid, LPCWSTR desc,
         return true;
 
     list->count++;
-    list->ids = xrealloc( list->ids, list->count * sizeof(char *) );
-    list->names = xrealloc( list->names, list->count * sizeof(char *) );
+    list->ids = realloc_or_free( list->ids, list->count * sizeof(char *) );
+    if( list->ids == NULL )
+        return false;
+    list->names = realloc_or_free( list->names, list->count * sizeof(char *) );
+    if( list->names == NULL )
+    {
+        free( list->ids );
+        return false;
+    }
     list->ids[list->count - 1] = FromWide( buf );
     list->names[list->count - 1] = FromWide( desc );
-    if( list->ids == NULL || list->names == NULL )
-        abort();
 
     (void) mod;
     return true;
