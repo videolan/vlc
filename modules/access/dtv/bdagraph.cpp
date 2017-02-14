@@ -1801,6 +1801,7 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
             p_tuning_space->Release();
         p_tuning_space = NULL;
         SysFreeString( l.bstr_name );
+        l.bstr_name = NULL;
         msg_Dbg( p_access, "SetUpTuner: need good TS enum" );
         if( !l.p_tuning_space_enum ) break;
         msg_Dbg( p_access, "SetUpTuner: next tuning space" );
