@@ -50,6 +50,12 @@ typedef struct
     int             i_direction;
     bool            b_direction_set;
     bool            b_preserve_space;
+    enum
+    {
+        TTML_DISPLAY_UNKNOWN = 0,
+        TTML_DISPLAY_AUTO,
+        TTML_DISPLAY_NONE,
+    } display;
 }  ttml_style_t;
 
 typedef struct
@@ -141,6 +147,9 @@ static void ttml_style_Merge( const ttml_style_t *p_src, ttml_style_t *p_dst )
             p_dst->b_direction_set = true;
             p_dst->i_direction = p_src->i_direction;
         }
+
+        if( p_src->display != TTML_DISPLAY_UNKNOWN )
+            p_dst->display = p_src->display;
     }
 }
 
@@ -375,6 +384,13 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_val,
             //p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
             p_ttml_style->b_direction_set = true;
         }
+    }
+    else if( !strcmp( "tts:display", psz_attr ) )
+    {
+        if( !strcmp( "none", psz_val ) )
+            p_ttml_style->display = TTML_DISPLAY_NONE;
+        else
+            p_ttml_style->display = TTML_DISPLAY_AUTO;
     }
     else if( !strcasecmp( "xml:space", psz_attr ) )
     {
@@ -635,6 +651,14 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
                 StripSpacing( p_segment );
             if( s->b_direction_set )
                 BIDIConvert( p_segment, s->i_direction );
+
+            if( s->display == TTML_DISPLAY_NONE )
+            {
+                /* Must not display, but still occupies space */
+                p_segment->style->i_features &= ~(STYLE_BACKGROUND|STYLE_OUTLINE|STYLE_STRIKEOUT|STYLE_SHADOW);
+                p_segment->style->i_font_alpha = STYLE_ALPHA_TRANSPARENT;
+                p_segment->style->i_features |= STYLE_HAS_FONT_ALPHA;
+            }
 
             ttml_style_Delete( s );
         }
