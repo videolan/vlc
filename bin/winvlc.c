@@ -68,7 +68,7 @@ static BOOL SetDefaultDllDirectories_(DWORD flags)
     if (h == NULL)
         return FALSE;
 
-    BOOL WINAPI (*SetDefaultDllDirectoriesReal)(DWORD);
+    BOOL (WINAPI * SetDefaultDllDirectoriesReal)(DWORD);
 
     SetDefaultDllDirectoriesReal = GetProcAddress(h,
                                                   "SetDefaultDllDirectories");

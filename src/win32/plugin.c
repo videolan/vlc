@@ -43,7 +43,7 @@ static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
     if (unlikely(h == NULL))
         return FALSE;
 
-    BOOL WINAPI (*SetThreadErrorModeReal)(DWORD, DWORD *);
+    BOOL (WINAPI *SetThreadErrorModeReal)(DWORD, DWORD *);
 
     SetThreadErrorModeReal = GetProcAddress(h, "SetThreadErrorMode");
     if (SetThreadErrorModeReal != NULL)
@@ -53,7 +53,7 @@ static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
     /* As per libvlc_new() documentation, the calling process is responsible
      * for setting a proper error mode on Windows 2008 and earlier versions.
      * This is only a sanity check. */
-    UINT WINAPI (*GetErrorModeReal)(void);
+    UINT (WINAPI *GetErrorModeReal)(void);
     DWORD curmode = 0;
 
     GetErrorModeReal = (void *)GetProcAddress(h, "GetErrorMode");
