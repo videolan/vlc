@@ -88,9 +88,9 @@ vlc_module_begin()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_integer_with_range( CFG_PREFIX "rows", 4, 2, 16,
+    add_integer_with_range( CFG_PREFIX "rows", 4, 2, 42,
                             ROWS_TEXT, ROWS_LONGTEXT, false )
-    add_integer_with_range( CFG_PREFIX "cols", 4, 2, 16,
+    add_integer_with_range( CFG_PREFIX "cols", 4, 2, 42,
                             COLS_TEXT, COLS_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "border", 3, 0, 40,
               BORDER_TEXT, BORDER_LONGTEXT, false )
