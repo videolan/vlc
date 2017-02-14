@@ -25,6 +25,7 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_MP1V, "MPEG-1 Video"),
         A("mp1v"),
+        A("m1v "),
         A("mpg1"),
         A("BW10"),
         E("XMPG", "Xing MPEG-1 Intra"),
