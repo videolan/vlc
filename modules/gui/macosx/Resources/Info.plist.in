@@ -1477,6 +1477,14 @@
 	<string>@VERSION@</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
+	<key>BreakpadProduct</key>
+	<string>VLC-macOS</string>
+	<key>BreakpadVendor</key>
+	<string>VideoLAN</string>
+	<key>BreakpadRequestComments</key>
+	<string>1</string>
+	<key>BreakpadURL</key>
+	<string>https://crashes.videolan.org/crashreports</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

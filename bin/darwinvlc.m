@@ -35,6 +35,10 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import <Cocoa/Cocoa.h>
 
+#ifdef HAVE_BREAKPAD
+#import <Breakpad/Breakpad.h>
+#endif
+
 
 /**
  * Handler called when VLC asks to terminate the program.
@@ -74,6 +78,36 @@ static void vlc_terminate(void *data)
 
     });
 }
+
+#ifdef HAVE_BREAKPAD
+BreakpadRef initBreakpad()
+{
+    BreakpadRef bp = nil;
+
+    /* Create caches directory in case it does not exist */
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *cachePath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *bundleName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+    NSString *cacheAppPath = [cachePath stringByAppendingPathComponent:bundleName];
+    if (![fileManager fileExistsAtPath:cacheAppPath]) {
+        [fileManager createDirectoryAtPath:cacheAppPath withIntermediateDirectories:NO attributes:nil error:nil];
+    }
+
+    /* Get Info.plist config */
+    NSMutableDictionary *breakpad_config = [[[NSBundle mainBundle] infoDictionary] mutableCopy];
+
+    /* Use in-process reporting */
+    [breakpad_config setObject:[NSNumber numberWithBool:YES]
+                        forKey:@BREAKPAD_IN_PROCESS];
+
+    /* Set dump location */
+    [breakpad_config setObject:cacheAppPath
+                        forKey:@BREAKPAD_DUMP_DIRECTORY];
+
+    bp = BreakpadCreate(breakpad_config);
+    return bp;
+}
+#endif
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
@@ -259,6 +293,10 @@ int main(int i_argc, const char *ppsz_argv[])
      * runloop is used. Otherwise, [NSApp run] needs to be called, which setups more stuff
      * before actually starting the loop.
      */
+#ifdef HAVE_BREAKPAD
+    BreakpadRef breakpad;
+    breakpad = initBreakpad();
+#endif
     @autoreleasepool {
         if(NSApp == nil) {
             CFRunLoopRun();
@@ -276,6 +314,10 @@ out:
     dispatch_release(sigChldSource);
 
     libvlc_release(vlc);
+
+#ifdef HAVE_BREAKPAD
+    BreakpadRelease(breakpad);
+#endif
 
     return ret;
 }
