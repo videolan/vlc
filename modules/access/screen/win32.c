@@ -68,8 +68,8 @@ int screen_InitCapture( demux_t *p_demux )
     if( !p_data->hdc_dst )
     {
         msg_Err( p_demux, "cannot get compat device context" );
-        free( p_data );
         ReleaseDC( 0, p_data->hdc_src );
+        free( p_data );
         return VLC_EGENERIC;
     }
 
