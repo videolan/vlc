@@ -335,8 +335,10 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     case AV_CODEC_ID_VP9:
         if (ctx->profile == FF_PROFILE_VP9_0)
             i_profile = VAProfileVP9Profile0;
+#if VA_CHECK_VERSION( 0, 39, 0 )
         else if (ctx->profile == FF_PROFILE_VP9_2)
             i_profile = VAProfileVP9Profile2;
+#endif
         else
             return VLC_EGENERIC;
         count = 10;
