@@ -198,23 +198,19 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 
 bool sout_stream_sys_t::canDecodeVideo( int i_codec ) const
 {
-    if (i_codec == VLC_CODEC_H264 || i_codec == VLC_CODEC_VP8)
-        return true;
-    return false;
+    return i_codec == VLC_CODEC_H264 || i_codec == VLC_CODEC_VP8;
 }
 
 bool sout_stream_sys_t::canDecodeAudio( int i_codec ) const
 {
-    if (i_codec == VLC_CODEC_VORBIS ||
+    return i_codec == VLC_CODEC_VORBIS ||
         i_codec == VLC_CODEC_MP4A ||
         i_codec == VLC_FOURCC('h', 'a', 'a', 'c') ||
         i_codec == VLC_FOURCC('l', 'a', 'a', 'c') ||
         i_codec == VLC_FOURCC('s', 'a', 'a', 'c') ||
         i_codec == VLC_CODEC_MP3 ||
         i_codec == VLC_CODEC_A52 ||
-        i_codec == VLC_CODEC_EAC3)
-        return true;
-    return false;
+        i_codec == VLC_CODEC_EAC3;
 }
 
 int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
