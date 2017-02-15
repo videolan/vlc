@@ -192,8 +192,8 @@ static int Open( vlc_object_t * p_this )
                             continue; // don't reuse the original opened file
                         }
 
-                        if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") ||
-                            !s_filename.compare(s_filename.length() - 3, 3, "mka"))
+                        if (!strncasecmp(s_filename.c_str() + s_filename.length() - 3, "mkv", 3) ||
+                            !strncasecmp(s_filename.c_str() + s_filename.length() - 3, "mka", 3))
                         {
                             // test whether this file belongs to our family
                             const uint8_t *p_peek;
@@ -760,7 +760,7 @@ static int Demux( demux_t *p_demux)
         for( tracks_map_t::iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
         {
             tracks_map_t::mapped_type& track = it->second;
-      
+
             if( track.i_last_dts == VLC_TS_INVALID )
                 continue;
 
