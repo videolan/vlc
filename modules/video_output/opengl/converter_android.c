@@ -79,7 +79,7 @@ tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
 
 static picture_pool_t *
 tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                 unsigned requested_count, GLuint *textures)
+                 unsigned requested_count)
 {
     struct priv *priv = tc->priv;
 #define FORCED_COUNT 31

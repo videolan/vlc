@@ -236,13 +236,11 @@ struct opengl_tex_converter_t
      * \param fc OpenGL tex converter
      * \param fmt video format
      * \param requested_count number of pictures to allocate
-     * \param textures textures generated (and allocated by pf_allocate_texture)
      * \return the picture pool or NULL in case of error
      */
     picture_pool_t *(*pf_get_pool)(const opengl_tex_converter_t *fc,
                                    const video_format_t *fmt,
-                                   unsigned requested_count,
-                                   GLuint *textures);
+                                   unsigned requested_count);
 
     /*
      * Callback to update a picture

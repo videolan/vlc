@@ -623,12 +623,11 @@ picture_destroy_cb(picture_t *pic)
 
 static picture_pool_t *
 tc_common_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                   unsigned requested_count, GLuint *textures)
+                   unsigned requested_count)
 {
     struct priv *priv = tc->priv;
     picture_t *pictures[VLCGL_PICTURE_MAX];
     unsigned count;
-    (void) textures;
 
     priv->ongpu.list = 0;
 

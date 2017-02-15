@@ -901,8 +901,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     /* Allocate with tex converter pool callback if it exists */
     if (tc->pf_get_pool != NULL)
     {
-        vgl->pool = tc->pf_get_pool(tc, &vgl->fmt, requested_count,
-                                    vgl->texture);
+        vgl->pool = tc->pf_get_pool(tc, &vgl->fmt, requested_count);
         if (!vgl->pool)
             goto error;
         return vgl->pool;
