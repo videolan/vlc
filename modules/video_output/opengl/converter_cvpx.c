@@ -162,11 +162,11 @@ opengl_tex_converter_cvpx_init(const video_format_t *fmt,
      && fmt->i_chroma != VLC_CODEC_CVPX_NV12
      && fmt->i_chroma != VLC_CODEC_CVPX_I420
      && fmt->i_chroma != VLC_CODEC_CVPX_BGRA)
-        return VLC_EGENERIC;
+        return 0;
 
     struct priv *priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
-        return VLC_ENOMEM;
+        return 0;
 
     GLenum tex_target = GL_TEXTURE_RECTANGLE;
 
