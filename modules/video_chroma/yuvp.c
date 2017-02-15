@@ -155,6 +155,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const uint8_t a = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 0 : 3;
         for( int i = 0; i < p_yuvp->i_entries; i++ )
         {
+            if( p_yuvp->palette[i][3] == 0 )
+            {
+                memset( rgbp.palette[i], 0, sizeof( rgbp.palette[i] ) );
+                continue;
+            }
             Yuv2Rgb( &rgbp.palette[i][r], &rgbp.palette[i][g], &rgbp.palette[i][b],
                      p_yuvp->palette[i][0], p_yuvp->palette[i][1], p_yuvp->palette[i][2] );
             rgbp.palette[i][a] = p_yuvp->palette[i][3];
