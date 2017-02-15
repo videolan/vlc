@@ -317,15 +317,17 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         }
 
         /* check the streams we can actually add */
-        for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); ++it)
+        for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); )
         {
             sout_stream_id_sys_t *p_sys_id = *it;
             p_sys_id->p_sub_id = sout_StreamIdAdd( p_out, &p_sys_id->fmt );
             if ( p_sys_id->p_sub_id == NULL )
             {
                 msg_Err( p_stream, "can't handle %4.4s stream", (char *)&p_sys_id->fmt.i_codec );
-                streams.erase( it, it );
+                it = streams.erase( it );
             }
+            else
+                ++it;
         }
 
         if ( !streams.empty() )
