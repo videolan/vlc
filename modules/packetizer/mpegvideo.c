@@ -439,6 +439,12 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             }
         }
 
+        if( p_sys->i_picture_structure == 0x03 && !p_sys->b_seq_progressive )
+        {
+            p_pic->i_flags |= (p_sys->i_top_field_first) ? BLOCK_FLAG_TOP_FIELD_FIRST
+                                                         : BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+        }
+
         if( p_sys->b_low_delay || p_sys->i_picture_type == 0x03 )
         {
             /* Trivial case (DTS == PTS) */
