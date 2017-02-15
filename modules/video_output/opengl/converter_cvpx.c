@@ -23,22 +23,35 @@
 #endif
 
 #include "internal.h"
-#include <IOSurface/IOSurface.h>
 #include <VideoToolbox/VideoToolbox.h>
+
+#if TARGET_OS_IPHONE
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
+#include <CoreVideo/CVOpenGLESTextureCache.h>
+struct gl_sys
+{
+    CVEAGLContext locked_ctx;
+};
+#else
+#include <IOSurface/IOSurface.h>
+struct gl_sys
+{
+    CGLContextObj locked_ctx;
+};
+#endif
 
 struct picture_sys_t
 {
     CVPixelBufferRef pixelBuffer;
 };
 
-struct gl_sys
-{
-    CGLContextObj locked_ctx;
-};
-
 struct priv
 {
     picture_t *last_pic;
+#if TARGET_OS_IPHONE
+    CVOpenGLESTextureCacheRef cache;
+#endif
 };
 
 static void
@@ -93,6 +106,63 @@ error:
     return NULL;
 }
 
+#if TARGET_OS_IPHONE
+/* CVOpenGLESTextureCache version (ios) */
+static int
+tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
+               const GLsizei *tex_width, const GLsizei *tex_height,
+               picture_t *pic, const size_t *plane_offset)
+{
+    (void) plane_offset;
+    struct priv *priv = tc->priv;
+    picture_sys_t *picsys = pic->p_sys;
+
+    assert(picsys->pixelBuffer != NULL);
+
+    for (unsigned i = 0; i < tc->tex_count; ++i)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glClientActiveTexture(GL_TEXTURE0 + i);
+
+        CVOpenGLESTextureRef texture;
+        CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(
+            kCFAllocatorDefault, priv->cache, picsys->pixelBuffer, NULL,
+            tc->tex_target, tc->texs[i].internal, tex_width[i], tex_height[i],
+            tc->texs[i].format, tc->texs[i].type, i, &texture);
+        if (err != noErr)
+        {
+            msg_Err(tc->gl,
+                    "CVOpenGLESTextureCacheCreateTextureFromImage failed: %d",
+                    err);
+            return VLC_EGENERIC;
+        }
+
+        textures[i] = CVOpenGLESTextureGetName(texture);
+        glBindTexture(tc->tex_target, textures[i]);
+        glTexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        CFRelease(texture);
+    }
+
+    if (priv->last_pic != pic)
+    {
+        if (priv->last_pic != NULL)
+        {
+            picture_sys_t *picsys = priv->last_pic->p_sys;
+            assert(picsys->pixelBuffer != NULL);
+            CFRelease(picsys->pixelBuffer);
+            picsys->pixelBuffer = NULL;
+            picture_Release(priv->last_pic);
+        }
+        priv->last_pic = picture_Hold(pic);
+    }
+    return VLC_SUCCESS;
+}
+
+#else
+/* IOSurface version (macos) */
 static int
 tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
                const GLsizei *tex_width, const GLsizei *tex_height,
@@ -143,6 +213,7 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     return VLC_SUCCESS;
 }
+#endif
 
 static void
 tc_cvpx_release(const opengl_tex_converter_t *tc)
@@ -151,6 +222,9 @@ tc_cvpx_release(const opengl_tex_converter_t *tc)
 
     if (priv->last_pic != NULL)
         picture_Release(priv->last_pic);
+#if TARGET_OS_IPHONE
+    CFRelease(priv->cache);
+#endif
     free(tc->priv);
 }
 
@@ -168,7 +242,25 @@ opengl_tex_converter_cvpx_init(const video_format_t *fmt,
     if (unlikely(priv == NULL))
         return 0;
 
-    GLenum tex_target = GL_TEXTURE_RECTANGLE;
+#if TARGET_OS_IPHONE
+    const GLenum tex_target = GL_TEXTURE_2D;
+
+    {
+        struct gl_sys *glsys = tc->gl->sys;
+        CVReturn err =
+            CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL,
+                                         glsys->locked_ctx, NULL, &priv->cache);
+        if (err != noErr)
+        {
+            msg_Err(tc->gl, "CVOpenGLESTextureCacheCreate failed: %d", err);
+            free(priv);
+            return 0;
+        }
+    }
+    tc->handle_texs_gen = true;
+#else
+    const GLenum tex_target = GL_TEXTURE_RECTANGLE;
+#endif
 
     GLuint fragment_shader;
     switch (fmt->i_chroma)
@@ -199,7 +291,11 @@ opengl_tex_converter_cvpx_init(const video_format_t *fmt,
                                             COLOR_SPACE_UNDEF);
             tc->texs[0].internal = GL_RGBA;
             tc->texs[0].format = GL_BGRA;
+#if TARGET_OS_IPHONE
+            tc->texs[0].type = GL_UNSIGNED_BYTE;
+#else
             tc->texs[0].type = GL_UNSIGNED_INT_8_8_8_8_REV;
+#endif
             break;
         default:
             vlc_assert_unreachable();

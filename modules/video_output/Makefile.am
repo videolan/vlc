@@ -17,6 +17,10 @@ OPENGL_COMMONSOURCES += video_output/opengl/converter_cvpx.c
 OPENGL_COMMONCFLAGS += -DVLCGL_CONV_CVPX
 OPENGL_COMMONLDFLAGS += -Wl,-framework,IOSurface -Wl,-framework,CoreVideo
 endif
+if HAVE_IOS
+OPENGL_COMMONSOURCES += video_output/opengl/converter_cvpx.c
+OPENGL_COMMONCFLAGS += -DVLCGL_CONV_CVPX
+endif
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
