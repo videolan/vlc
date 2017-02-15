@@ -965,7 +965,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
         case ATOM_in24:
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
-                                    VLC_FOURCC('4','2','n','i') : VLC_FOURCC('i','n','2','4');
+                                    VLC_CODEC_S24L : VLC_CODEC_S24B;
             break;
         case ATOM_in32:
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
