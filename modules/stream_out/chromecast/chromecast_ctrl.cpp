@@ -557,7 +557,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 }
                 if (session_id[0] && mediaSessionId != session_id) {
                     if (!mediaSessionId.empty())
-                        msg_Warn( p_module, "different mediaSessionId detected %s was %s", mediaSessionId.c_str(), this->mediaSessionId.c_str());
+                        msg_Warn( p_module, "different mediaSessionId detected %s was %s", session_id, this->mediaSessionId.c_str());
                     mediaSessionId = session_id;
                 }
             }
