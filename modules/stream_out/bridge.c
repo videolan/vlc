@@ -310,7 +310,7 @@ static void DelOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 
     p_es->b_empty = true;
     block_ChainRelease( p_es->p_block );
-    p_es->p_block = false;
+    p_es->p_block = NULL;
 
     p_es->b_changed = true;
     vlc_mutex_unlock( &lock );
