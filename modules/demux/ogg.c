@@ -2228,10 +2228,10 @@ static void Ogg_CleanSpecificData( logical_stream_t *p_stream )
     {
         if( p_stream->special.vorbis.p_info )
             vorbis_info_clear( p_stream->special.vorbis.p_info );
-        p_stream->special.vorbis.p_info = NULL;
+        FREENULL( p_stream->special.vorbis.p_info );
         if( p_stream->special.vorbis.p_comment )
             vorbis_comment_clear( p_stream->special.vorbis.p_comment );
-        p_stream->special.vorbis.p_comment = NULL;
+        FREENULL( p_stream->special.vorbis.p_comment );
         p_stream->special.vorbis.i_headers_flags = 0;
     }
 #else
