@@ -125,7 +125,8 @@ struct decoder_sys_t
 
     /* Sync behaviour */
     bool  b_sync_on_intra_frame;
-    bool  b_discontinuity;
+    bool  b_waiting_iframe;
+    int   i_next_block_flags;
 
     /* */
     bool b_cc_reset;
@@ -199,7 +200,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_last_ref_pts = VLC_TS_INVALID;
     p_sys->b_second_field = 0;
 
-    p_sys->b_discontinuity = false;
+    p_sys->i_next_block_flags = 0;
+
+    p_sys->b_waiting_iframe =
     p_sys->b_sync_on_intra_frame = var_CreateGetBool( p_dec, "packetizer-mpegvideo-sync-iframe" );
     if( p_sys->b_sync_on_intra_frame )
         msg_Dbg( p_dec, "syncing on intra frame now" );
@@ -293,14 +296,14 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
  *****************************************************************************/
 static void PacketizeReset( void *p_private, bool b_broken )
 {
+    VLC_UNUSED(b_broken);
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( b_broken )
+    p_sys->i_next_block_flags = BLOCK_FLAG_DISCONTINUITY;
+    if( p_sys->p_frame )
     {
-        p_sys->b_discontinuity = true;
-        if( p_sys->p_frame )
-            block_ChainRelease( p_sys->p_frame );
+        block_ChainRelease( p_sys->p_frame );
         p_sys->p_frame = NULL;
         p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = false;
@@ -309,16 +312,24 @@ static void PacketizeReset( void *p_private, bool b_broken )
     p_sys->i_pts =
     p_sys->i_interpolated_dts =
     p_sys->i_last_ref_pts = VLC_TS_INVALID;
+    p_sys->b_waiting_iframe = p_sys->b_sync_on_intra_frame;
 }
 
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
 {
     decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Check if we have a picture start code */
     *pb_ts_used = p_block->p_buffer[3] == 0x00;
 
-    return ParseMPEGBlock( p_dec, p_block );
+    p_block = ParseMPEGBlock( p_dec, p_block );
+    if( p_block )
+    {
+        p_block->i_flags |= p_sys->i_next_block_flags;
+        p_sys->i_next_block_flags = 0;
+    }
+    return p_block;
 }
 
 
@@ -327,10 +338,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* If a discontinuity has been encountered, then wait till
-     * the next Intra frame before continuing with packetizing */
-    if( unlikely( p_sys->b_discontinuity &&
-        p_sys->b_sync_on_intra_frame ) )
+    if( unlikely( p_sys->b_waiting_iframe ) )
     {
         if( (p_au->i_flags & BLOCK_FLAG_TYPE_I) == 0 )
         {
@@ -338,8 +346,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
             return VLC_EGENERIC;
         }
         msg_Dbg( p_dec, "synced on intra frame" );
-        p_sys->b_discontinuity = false;
-        p_au->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+        p_sys->b_waiting_iframe = false;
     }
 
     /* We've just started the stream, wait for the first PTS.
