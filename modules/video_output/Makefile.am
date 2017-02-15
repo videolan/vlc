@@ -12,6 +12,11 @@ OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
 if HAVE_ANDROID
 OPENGL_COMMONSOURCES += video_output/opengl/converter_android.c
 endif
+if HAVE_OSX
+OPENGL_COMMONSOURCES += video_output/opengl/converter_cvpx.c
+OPENGL_COMMONCFLAGS += -DVLCGL_CONV_CVPX
+OPENGL_COMMONLDFLAGS += -Wl,-framework,IOSurface -Wl,-framework,CoreVideo
+endif
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
@@ -21,12 +26,10 @@ vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
 if HAVE_OSX
-libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_COMMONSOURCES) \
-	video_output/opengl/converter_cvpx.c
-libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) -DVLCGL_CONV_CVPX $(OPENGL_COMMONCFLAGS)
+libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_COMMONSOURCES)
+libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
 libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
-	-Wl,-framework,OpenGL,-framework,Cocoa -Wl,-framework,IOSurface \
-	-Wl,-framework,CoreVideo $(OPENGL_COMMONLDFLAGS)
+	-Wl,-framework,OpenGL,-framework,Cocoa $(OPENGL_COMMONLDFLAGS)
 
 libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m $(OPENGL_COMMONSOURCES)
 libcaopengllayer_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
