@@ -3468,6 +3468,14 @@ static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
         case ATOM_twos:
         case ATOM_sowt:
         case ATOM_raw:
+        case VLC_CODEC_S24L:
+        case VLC_CODEC_S24B:
+        case VLC_CODEC_S32L:
+        case VLC_CODEC_S32B:
+        case VLC_CODEC_F32L:
+        case VLC_CODEC_F32B:
+        case VLC_CODEC_F64L:
+        case VLC_CODEC_F64B:
             i_size = ((p_soun->i_samplesize+7)/8) * p_soun->i_channelcount;
             break;
         case VLC_CODEC_ALAW:
