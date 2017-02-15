@@ -124,7 +124,6 @@ x-content/video-svcd
 x-content/video-dvd
 x-content/audio-cdda
 x-content/audio-player
-application/x-cd-image
 
 # Playlists / text/xml list with URLs
 application/ram                # Realaudio Metadata
