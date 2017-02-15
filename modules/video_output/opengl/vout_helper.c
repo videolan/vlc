@@ -737,6 +737,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
+    /* Allocates our textures */
+    ret = GenTextures(&vgl->prgm->tc, vgl->tex_width, vgl->tex_height,
+                      vgl->texture);
+    if (ret != VLC_SUCCESS)
+    {
+        vout_display_opengl_Delete(vgl);
+        return NULL;
+    }
+
     /* */
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -760,8 +769,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->api.GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
 
     /* */
-    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++)
-        vgl->texture[i] = 0;
     vgl->region_count = 0;
     vgl->region = NULL;
     vgl->pool = NULL;
@@ -891,12 +898,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     if (vgl->pool)
         return vgl->pool;
 
-    /* Allocates our textures */
     opengl_tex_converter_t *tc = &vgl->prgm->tc;
-    int ret = GenTextures(tc, vgl->tex_width, vgl->tex_height, vgl->texture);
-    if (ret != VLC_SUCCESS)
-        return NULL;
-
     requested_count = __MIN(VLCGL_PICTURE_MAX, requested_count);
     /* Allocate with tex converter pool callback if it exists */
     if (tc->pf_get_pool != NULL)
