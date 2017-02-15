@@ -265,15 +265,19 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 i_codec_video = DEFAULT_TRANSCODE_VIDEO;
 
             /* TODO: provide audio samplerate and channels */
-            ssout << "transcode{acodec=";
+            ssout << "transcode{";
             char s_fourcc[5];
-            vlc_fourcc_to_char( i_codec_audio, s_fourcc );
-            s_fourcc[4] = '\0';
-            ssout << s_fourcc;
-            if ( b_has_video )
+            if ( canDecodeAudio( i_codec_audio ) == false )
+            {
+                ssout << "acodec=";
+                vlc_fourcc_to_char( i_codec_audio, s_fourcc );
+                s_fourcc[4] = '\0';
+                ssout << s_fourcc << ',';
+            }
+            if ( b_has_video && canDecodeVideo( i_codec_video ) == false )
             {
                 /* TODO: provide maxwidth,maxheight */
-                ssout << ",vcodec=";
+                ssout << "vcodec=";
                 vlc_fourcc_to_char( i_codec_video, s_fourcc );
                 s_fourcc[4] = '\0';
                 ssout << s_fourcc;
