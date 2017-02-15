@@ -306,9 +306,11 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 sout = "";
             }
 
-            p_out = sout_StreamChainNew( p_stream->p_sout, ssout.str().c_str(), NULL, NULL);
+            const std::string chain = ssout.str();
+            msg_Dbg( p_stream, "Creating chain %s", chain.c_str() );
+            p_out = sout_StreamChainNew( p_stream->p_sout, chain.c_str(), NULL, NULL);
             if (p_out == NULL) {
-                msg_Dbg(p_stream, "could not create sout chain:%s", ssout.str().c_str());
+                msg_Dbg(p_stream, "could not create sout chain:%s", chain.c_str());
                 return VLC_EGENERIC;
             }
             sout = ssout.str();
