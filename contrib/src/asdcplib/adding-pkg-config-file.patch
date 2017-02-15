@@ -21,7 +21,7 @@ index 0000000..36fdd12
 +
 +Name: asdcplib
 +Description: The asdcp library
-+Version: 2.5.14
++Version: 2.7.19
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lasdcp -lkumu -lnettle -lgmp
 -- 
