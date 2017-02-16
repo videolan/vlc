@@ -175,10 +175,10 @@ opengl_tex_converter_cvpx_init(const video_format_t *fmt,
     {
         case VLC_CODEC_CVPX_UYVY:
             fragment_shader =
-                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_RGB32,
-                                            COLOR_SPACE_UNDEF);
+                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_UYVY,
+                                            fmt->space);
             tc->texs[0].internal = GL_RGB;
-            tc->texs[0].format = GL_YCBCR_422_APPLE;
+            tc->texs[0].format = GL_RGB_422_APPLE;
             tc->texs[0].type = GL_UNSIGNED_SHORT_8_8_APPLE;
             break;
         case VLC_CODEC_CVPX_NV12:
