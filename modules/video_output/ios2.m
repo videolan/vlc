@@ -52,77 +52,9 @@
  * Forward declarations
  */
 
-enum
-{
-    UNIFORM_Y,
-    UNIFORM_UV,
-    UNIFORM_COLOR_CONVERSION_MATRIX,
-    UNIFORM_TRANSFORM_MATRIX,
-    NUM_UNIFORMS
-};
-GLint uniforms[NUM_UNIFORMS];
-
-// Attribute index.
-enum
-{
-    ATTRIB_VERTEX,
-    ATTRIB_TEXCOORD,
-    NUM_ATTRIBUTES
-};
-
 struct picture_sys_t {
     CVPixelBufferRef pixelBuffer;
 };
-
-// BT.601, which is the standard for SDTV.
-static const GLfloat kColorConversion601[] = {
-    1.164383561643836,  1.164383561643836, 1.164383561643836,
-                  0.0, -0.391762290094914, 2.017232142857142,
-    1.596026785714286, -0.812967647237771,               0.0,
-};
-
-// BT.709, which is the standard for HDTV.
-static const GLfloat kColorConversion709[] = {
-    1.164383561643836,  1.164383561643836, 1.164383561643836,
-                  0.0,  -0.21324861427373, 2.112401785714286,
-    1.792741071428571, -0.532909328559444,               0.0,
-};
-
-static NSString *const fragmentShaderString = @" \
- varying highp vec2 texCoordVarying; \
- precision mediump float; \
-\
- uniform sampler2D SamplerY; \
- uniform sampler2D SamplerUV; \
- uniform mat3 colorConversionMatrix; \
-\
- void main() \
- { \
-    mediump vec3 yuv; \
-    lowp vec3 rgb; \
-\
-    yuv.x = (texture2D(SamplerY, texCoordVarying).r - (16.0/255.0)); \
-    yuv.yz = (texture2D(SamplerUV, texCoordVarying).rg - vec2(0.5, 0.5)); \
-\
-    rgb = colorConversionMatrix * yuv; \
-\
-    gl_FragColor = vec4(rgb,1); \
- } \
-";
-
-static NSString *const vertexShaderString = @" \
- attribute vec4 position; \
- attribute vec2 texCoord; \
- uniform mat4 transformMatrix; \
-\
- varying vec2 texCoordVarying; \
-\
- void main() \
- { \
-    gl_Position = transformMatrix * position; \
-    texCoordVarying = texCoord; \
- } \
-";
 
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -134,14 +66,9 @@ static int Control(vout_display_t*, int, va_list);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
-static int OpenglESClean(vlc_gl_t *);
+static int OpenglESLock(vlc_gl_t *);
 static void OpenglESSwap(vlc_gl_t *);
-static void OpenglESNoop(vlc_gl_t *);
-
-static picture_pool_t *ZeroCopyPicturePool(vout_display_t *, unsigned);
-static void DestroyZeroCopyPoolPicture(picture_t *);
-static void ZeroCopyClean(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
-static void ZeroCopyDisplay(vout_display_t *, picture_t *, subpicture_t *);
+static void OpenglESUnlock(vlc_gl_t *);
 
 /**
  * Module declaration
@@ -160,18 +87,12 @@ vlc_module_end ()
 @interface VLCOpenGLES2VideoView : UIView {
     vout_display_t *_voutDisplay;
     EAGLContext *_eaglContext;
+    EAGLContext *_previousEaglContext;
     GLuint _renderBuffer;
     GLuint _frameBuffer;
 
     BOOL _bufferNeedReset;
     BOOL _appActive;
-    bool _zeroCopy;
-
-    CVOpenGLESTextureCacheRef _videoTextureCache;
-    CVOpenGLESTextureRef _lumaTexture;
-    CVOpenGLESTextureRef _chromaTexture;
-
-    const GLfloat *_preferredConversion;
 }
 @property (readonly) GLuint renderBuffer;
 @property (readonly) GLuint frameBuffer;
@@ -180,16 +101,15 @@ vlc_module_end ()
 @property (readonly) BOOL isAppActive;
 @property GLuint shaderProgram;
 
-- (id)initWithFrame:(CGRect)frame zeroCopy:(bool)zero_copy voutDisplay:(vout_display_t *)vd;
+- (id)initWithFrame:(CGRect)frame voutDisplay:(vout_display_t *)vd;
 
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (void)resetBuffers;
+- (void)lock;
+- (void)unlock;
 
 - (void)reshape;
-
-- (void)setupZeroCopyGL;
-- (void)displayPixelBuffer:(CVPixelBufferRef)pixelBuffer;
 @end
 
 struct vout_display_sys_t
@@ -203,9 +123,14 @@ struct vout_display_sys_t
 
     picture_pool_t *picturePool;
     bool has_first_frame;
-    bool zero_copy;
 
     vout_display_place_t place;
+};
+
+struct gl_sys
+{
+    CVEAGLContext locked_ctx;
+    VLCOpenGLES2VideoView *glESView;
 };
 
 static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
@@ -232,13 +157,8 @@ static int Open(vlc_object_t *this)
     sys->gl = NULL;
 
     @autoreleasepool {
-        if (vd->fmt.i_chroma == VLC_CODEC_CVPX_NV12) {
-            msg_Dbg(vd, "will use zero-copy rendering");
-            sys->zero_copy = true;
-        }
-
         /* setup the actual OpenGL ES view */
-        sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) zeroCopy:sys->zero_copy voutDisplay:vd];
+        sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) voutDisplay:vd];
         sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
         if (!sys->glESView) {
@@ -254,48 +174,41 @@ static int Open(vlc_object_t *this)
 
         const vlc_fourcc_t *subpicture_chromas;
         video_format_t fmt = vd->fmt;
-        if (!sys->zero_copy) {
-            msg_Dbg(vd, "will use regular OpenGL rendering");
 
-            sys->gl = vlc_object_create(this, sizeof(*sys->gl));
-            if (!sys->gl)
-                goto bailout;
-            /* Initialize common OpenGL video display */
-            sys->gl->makeCurrent = OpenglESClean;
-            sys->gl->releaseCurrent = OpenglESNoop;
-            sys->gl->swap = OpenglESSwap;
-            sys->gl->getProcAddress = OurGetProcAddress;
-            sys->gl->sys = sys;
+        sys->gl = vlc_object_create(this, sizeof(*sys->gl));
+        if (!sys->gl)
+            goto bailout;
 
-            vlc_gl_MakeCurrent(sys->gl);
-            sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
-                                               sys->gl, &vd->cfg->viewpoint);
-            vlc_gl_ReleaseCurrent(sys->gl);
-            if (!sys->vgl)
-                goto bailout;
-        } else {
-            subpicture_chromas = gl_subpicture_chromas;
-        }
+        struct gl_sys *glsys = sys->gl->sys = malloc(sizeof(struct gl_sys));
+        if (unlikely(!sys->gl->sys))
+            goto bailout;
+        glsys->locked_ctx = NULL;
+        glsys->glESView = sys->glESView;
+        /* Initialize common OpenGL video display */
+        sys->gl->makeCurrent = OpenglESLock;
+        sys->gl->releaseCurrent = OpenglESUnlock;
+        sys->gl->swap = OpenglESSwap;
+        sys->gl->getProcAddress = OurGetProcAddress;
+
+        vlc_gl_MakeCurrent(sys->gl);
+        sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
+                                           sys->gl, &vd->cfg->viewpoint);
+        vlc_gl_ReleaseCurrent(sys->gl);
+        if (!sys->vgl)
+            goto bailout;
 
         /* */
         vout_display_info_t info = vd->info;
         info.has_pictures_invalid = false;
         info.subpicture_chromas = subpicture_chromas;
-        info.is_slow = !sys->zero_copy;
         info.has_hide_mouse = false;
 
         /* Setup vout_display_t once everything is fine */
         vd->info = info;
 
-        if (sys->zero_copy) {
-            vd->pool = ZeroCopyPicturePool;
-            vd->prepare = ZeroCopyClean;
-            vd->display = ZeroCopyDisplay;
-        } else {
-            vd->pool = PicturePool;
-            vd->prepare = PictureRender;
-            vd->display = PictureDisplay;
-        }
+        vd->pool = PicturePool;
+        vd->prepare = PictureRender;
+        vd->display = PictureDisplay;
         vd->control = Control;
         vd->manage = NULL;
 
@@ -350,7 +263,7 @@ void Close (vlc_object_t *this)
             @synchronized (sys->glESView) {
                 msg_Dbg(this, "deleting display");
 
-                if (likely([sys->glESView isAppActive]))
+                if (likely([sys->glESView isAppActive]) && sys->vgl)
                 {
                     vlc_gl_MakeCurrent(sys->gl);
                     vout_display_opengl_Delete(sys->vgl);
@@ -362,13 +275,6 @@ void Close (vlc_object_t *this)
 
         [sys->glESView release];
 
-        /* when using the traditional pipeline, the cross-platform code will free the the pool */
-        if (sys->zero_copy) {
-            if (sys->picturePool)
-                picture_pool_Release(sys->picturePool);
-            sys->picturePool = NULL;
-        }
-        
         free(sys);
     }
 }
@@ -499,190 +405,32 @@ static picture_pool_t *PicturePool(vout_display_t *vd, unsigned requested_count)
 /*****************************************************************************
  * vout opengl callbacks
  *****************************************************************************/
-static int OpenglESClean(vlc_gl_t *gl)
+static int OpenglESLock(vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
+    struct gl_sys *sys = gl->sys;
 
+    [sys->glESView lock];
     if (likely([sys->glESView isAppActive]))
         [sys->glESView resetBuffers];
+    sys->locked_ctx = (__bridge CVEAGLContext) ((__bridge void *) [sys->glESView eaglContext]);
     return 0;
 }
 
-static void OpenglESNoop(vlc_gl_t *gl)
+static void OpenglESUnlock(vlc_gl_t *gl)
 {
-    (void) gl;
+    struct gl_sys *sys = gl->sys;
+
+    [sys->glESView unlock];
 }
 
 static void OpenglESSwap(vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
+    struct gl_sys *sys = gl->sys;
 
     if (likely([sys->glESView isAppActive]))
         [[sys->glESView eaglContext] presentRenderbuffer:GL_RENDERBUFFER];
 }
 
-
-/*****************************************************************************
- * zero copy display callbacks
- *****************************************************************************/
-
-static picture_pool_t *ZeroCopyPicturePool(vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (sys->picturePool != NULL)
-        return sys->picturePool;
-
-    picture_t** pictures = calloc(requested_count, sizeof(*pictures));
-    if (!pictures)
-        goto bailout;
-
-    for (unsigned x = 0; x < requested_count; x++) {
-        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
-        if (unlikely(!picsys)) {
-            goto bailout;
-        }
-
-        picture_resource_t picture_resource;
-        picture_resource.p_sys = picsys;
-        picture_resource.pf_destroy = DestroyZeroCopyPoolPicture;
-
-        picture_t *picture = picture_NewFromResource(&vd->fmt, &picture_resource);
-        if (unlikely(picture == NULL)) {
-            free(picsys);
-            goto bailout;
-        }
-
-        pictures[x] = picture;
-    }
-
-    picture_pool_configuration_t pool_config;
-    memset(&pool_config, 0, sizeof(pool_config));
-    pool_config.picture_count = requested_count;
-    pool_config.picture = pictures;
-
-    sys->picturePool = picture_pool_NewExtended(&pool_config);
-
-bailout:
-    if (sys->picturePool == NULL && pictures) {
-        for (unsigned x = 0; x < requested_count; x++)
-            DestroyZeroCopyPoolPicture(pictures[x]);
-        free(pictures);
-    }
-
-    return sys->picturePool;
-}
-
-static void DestroyZeroCopyPoolPicture(picture_t *picture)
-{
-    picture_sys_t *p_sys = (picture_sys_t *)picture->p_sys;
-
-    if (p_sys->pixelBuffer != nil) {
-        CFRelease(p_sys->pixelBuffer);
-        p_sys->pixelBuffer = nil;
-    }
-
-    free(p_sys);
-    free(picture);
-}
-
-static void ZeroCopyClean(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (likely([sys->glESView isAppActive]))
-        [sys->glESView resetBuffers];
-}
-
-static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
-{
-    vout_display_sys_t *sys = vd->sys;
-    sys->has_first_frame = true;
-    @synchronized (sys->glESView) {
-        if (likely([sys->glESView isAppActive])) {
-            if (pic->p_sys != NULL) {
-                picture_sys_t *picsys = pic->p_sys;
-
-                if (picsys->pixelBuffer != nil) {
-                    [sys->glESView displayPixelBuffer: picsys->pixelBuffer];
-                }
-            }
-        }
-    }
-
-    picture_Release(pic);
-
-    if (subpicture)
-        subpicture_Delete(subpicture);
-}
-
-static void orientationTransformMatrix(GLfloat matrix[static 16],
-                                       video_orientation_t orientation)
-{
-    static const GLfloat identity[] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-    memcpy(matrix, identity, sizeof(identity));
-
-    const int k_cos_pi = -1;
-    const int k_cos_pi_2 = 0;
-    const int k_cos_n_pi_2 = 0;
-
-    const int k_sin_pi = 0;
-    const int k_sin_pi_2 = 1;
-    const int k_sin_n_pi_2 = -1;
-
-    bool rotate = false;
-    int cos = 0, sin = 0;
-
-    switch (orientation) {
-
-        case ORIENT_ROTATED_90:
-            cos = k_cos_pi_2;
-            sin = k_sin_pi_2;
-            rotate = true;
-            break;
-        case ORIENT_ROTATED_180:
-            cos = k_cos_pi;
-            sin = k_sin_pi;
-            rotate = true;
-            break;
-        case ORIENT_ROTATED_270:
-            cos = k_cos_n_pi_2;
-            sin = k_sin_n_pi_2;
-            rotate = true;
-            break;
-        case ORIENT_HFLIPPED:
-            matrix[0 * 4 + 0] = -1;
-            break;
-        case ORIENT_VFLIPPED:
-            matrix[1 * 4 + 1] = -1;
-            break;
-        case ORIENT_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[0 * 4 + 1] = -1;
-            matrix[1 * 4 + 0] = -1;
-            matrix[1 * 4 + 1] = 0;
-            break;
-        case ORIENT_ANTI_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[0 * 4 + 1] = 1;
-            matrix[1 * 4 + 0] = 1;
-            matrix[1 * 4 + 1] = 0;
-            break;
-        default:
-            break;
-    }
-
-    if (rotate) {
-
-        matrix[0 * 4 + 0] = cos;
-        matrix[0 * 4 + 1] = -sin;
-        matrix[1 * 4 + 0] = sin;
-        matrix[1 * 4 + 1] = cos;
-    }
-}
 
 /*****************************************************************************
  * Our UIView object
@@ -695,7 +443,7 @@ static void orientationTransformMatrix(GLfloat matrix[static 16],
     return [CAEAGLLayer class];
 }
 
-- (id)initWithFrame:(CGRect)frame zeroCopy:(bool)zero_copy voutDisplay:(vout_display_t *)vd
+- (id)initWithFrame:(CGRect)frame voutDisplay:(vout_display_t *)vd
 {
     self = [super initWithFrame:frame];
 
@@ -720,15 +468,9 @@ static void orientationTransformMatrix(GLfloat matrix[static 16],
     _voutDisplay = vd;
 
     [self createBuffers];
-    if (zero_copy) {
-        _preferredConversion = kColorConversion709;
-        [self setupZeroCopyGL];
-    }
 
     [self reshape];
     [self setAutoresizingMask: UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-
-    _zeroCopy = zero_copy;
 
     return self;
 }
@@ -789,12 +531,6 @@ static void orientationTransformMatrix(GLfloat matrix[static 16],
 
 - (void)dealloc
 {
-    if (_zeroCopy) {
-        [self cleanUpTextures];
-
-        if(likely(_videoTextureCache))
-            CFRelease(_videoTextureCache);
-    }
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_eaglContext release];
@@ -810,12 +546,6 @@ static void orientationTransformMatrix(GLfloat matrix[static 16],
 - (void)createBuffers
 {
     glDisable(GL_DEPTH_TEST);
-
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-
-    glEnableVertexAttribArray(ATTRIB_TEXCOORD);
-    glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 
     glGenFramebuffers(1, &_frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
@@ -851,15 +581,21 @@ static void orientationTransformMatrix(GLfloat matrix[static 16],
 - (void)resetBuffers
 {
     if (unlikely(_bufferNeedReset)) {
-        EAGLContext *previousContext = [EAGLContext currentContext];
-        [EAGLContext setCurrentContext:_eaglContext];
-
         [self destroyBuffers];
         [self createBuffers];
         _bufferNeedReset = NO;
-
-        [EAGLContext setCurrentContext:previousContext];
     }
+}
+
+- (void)lock
+{
+    _previousEaglContext = [EAGLContext currentContext];
+    [EAGLContext setCurrentContext:_eaglContext];
+}
+
+- (void)unlock
+{
+    [EAGLContext setCurrentContext:_previousEaglContext];
 }
 
 - (void)layoutSubviews
@@ -936,329 +672,6 @@ static void orientationTransformMatrix(GLfloat matrix[static 16],
 
 - (BOOL)acceptsFirstResponder
 {
-    return YES;
-}
-
-- (void)displayPixelBuffer:(CVPixelBufferRef)pixelBuffer
-{
-    /* the currently current context may not be ours, so cache it and restore it later */
-    EAGLContext *previousContext = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_eaglContext];
-
-    CVReturn err;
-    if (pixelBuffer != NULL) {
-        int frameWidth = (int)CVPixelBufferGetWidth(pixelBuffer);
-        int frameHeight = (int)CVPixelBufferGetHeight(pixelBuffer);
-
-        if (!_videoTextureCache) {
-            if (_voutDisplay)
-                msg_Err(_voutDisplay, "No video texture cache");
-            goto done;
-        }
-
-        [self cleanUpTextures];
-
-        /* Use the color attachment of the pixel buffer to determine the appropriate color conversion matrix. */
-        CFTypeRef colorAttachments = CVBufferGetAttachment(pixelBuffer, kCVImageBufferYCbCrMatrixKey, NULL);
-
-        if (colorAttachments == kCVImageBufferYCbCrMatrix_ITU_R_601_4)
-            _preferredConversion = kColorConversion601;
-        else
-            _preferredConversion = kColorConversion709;
-
-        /* Create Y and UV textures from the pixel buffer.
-         * These textures will be drawn on the frame buffer Y-plane. */
-        glActiveTexture(GL_TEXTURE0);
-
-        err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                                                           _videoTextureCache,
-                                                           pixelBuffer,
-                                                           NULL,
-                                                           GL_TEXTURE_2D,
-                                                           GL_RED_EXT,
-                                                           frameWidth,
-                                                           frameHeight,
-                                                           GL_RED_EXT,
-                                                           GL_UNSIGNED_BYTE,
-                                                           0,
-                                                           &_lumaTexture);
-        if (err) {
-            if (_voutDisplay)
-                msg_Err(_voutDisplay, "Error at CVOpenGLESTextureCacheCreateTextureFromImage %d", err);
-        }
-
-        glBindTexture(CVOpenGLESTextureGetTarget(_lumaTexture), CVOpenGLESTextureGetName(_lumaTexture));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        // UV-plane.
-        glActiveTexture(GL_TEXTURE1);
-        err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                                                           _videoTextureCache,
-                                                           pixelBuffer,
-                                                           NULL,
-                                                           GL_TEXTURE_2D,
-                                                           GL_RG_EXT,
-                                                           frameWidth / 2,
-                                                           frameHeight / 2,
-                                                           GL_RG_EXT,
-                                                           GL_UNSIGNED_BYTE,
-                                                           1,
-                                                           &_chromaTexture);
-        if (err) {
-            if (_voutDisplay)
-                msg_Err(_voutDisplay, "Error at CVOpenGLESTextureCacheCreateTextureFromImage %d", err);
-        }
-
-        glBindTexture(CVOpenGLESTextureGetTarget(_chromaTexture), CVOpenGLESTextureGetName(_chromaTexture));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
-    }
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // Use shader program.
-    glUseProgram(self.shaderProgram);
-    glUniformMatrix3fv(uniforms[UNIFORM_COLOR_CONVERSION_MATRIX], 1, GL_FALSE, _preferredConversion);
-
-    GLfloat transformMatrix[16];
-    orientationTransformMatrix(transformMatrix, _voutDisplay->fmt.orientation);
-    glUniformMatrix4fv(uniforms[UNIFORM_TRANSFORM_MATRIX], 1, GL_FALSE, transformMatrix);
-
-    // Set up the quad vertices with respect to the orientation and aspect ratio of the video.
-    CGRect vertexSamplingRect = self.bounds;
-
-    // Compute normalized quad coordinates to draw the frame into.
-    CGSize normalizedSamplingSize = CGSizeMake(0.0, 0.0);
-    CGSize cropScaleAmount = CGSizeMake(vertexSamplingRect.size.width/self.bounds.size.width, vertexSamplingRect.size.height/self.bounds.size.height);
-
-    // Normalize the quad vertices.
-    if (cropScaleAmount.width > cropScaleAmount.height) {
-        normalizedSamplingSize.width = 1.0;
-        normalizedSamplingSize.height = cropScaleAmount.height/cropScaleAmount.width;
-    }
-    else {
-        normalizedSamplingSize.width = 1.0;
-        normalizedSamplingSize.height = cropScaleAmount.width/cropScaleAmount.height;
-    }
-
-    /*
-     The quad vertex data defines the region of 2D plane onto which we draw our pixel buffers.
-     Vertex data formed using (-1,-1) and (1,1) as the bottom left and top right coordinates respectively, covers the entire screen.
-     */
-    GLfloat quadVertexData [] = {
-        -1 * normalizedSamplingSize.width, -1 * normalizedSamplingSize.height,
-        normalizedSamplingSize.width, -1 * normalizedSamplingSize.height,
-        -1 * normalizedSamplingSize.width, normalizedSamplingSize.height,
-        normalizedSamplingSize.width, normalizedSamplingSize.height,
-    };
-
-    // Update attribute values.
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, quadVertexData);
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-
-    /*
-     The texture vertices are set up such that we flip the texture vertically. This is so that our top left origin buffers match OpenGL's bottom left texture coordinate system.
-     */
-    CGRect textureSamplingRect = CGRectMake(0, 0, 1, 1);
-    GLfloat quadTextureData[] =  {
-        CGRectGetMinX(textureSamplingRect), CGRectGetMaxY(textureSamplingRect),
-        CGRectGetMaxX(textureSamplingRect), CGRectGetMaxY(textureSamplingRect),
-        CGRectGetMinX(textureSamplingRect), CGRectGetMinY(textureSamplingRect),
-        CGRectGetMaxX(textureSamplingRect), CGRectGetMinY(textureSamplingRect)
-    };
-
-    glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, 0, 0, quadTextureData);
-    glEnableVertexAttribArray(ATTRIB_TEXCOORD);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
-    [_eaglContext presentRenderbuffer:GL_RENDERBUFFER];
-
-    glFlush();
-
-done:
-    /* restore previous eagl context which we cached on entry */
-    [EAGLContext setCurrentContext:previousContext];
-}
-
-- (void)setupZeroCopyGL
-{
-    EAGLContext *previousContext = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_eaglContext];
-    [self loadShaders];
-
-    glUseProgram(self.shaderProgram);
-
-    // 0 and 1 are the texture IDs of _lumaTexture and _chromaTexture respectively.
-    glUniform1i(uniforms[UNIFORM_Y], 0);
-    glUniform1i(uniforms[UNIFORM_UV], 1);
-
-    GLfloat transformMatrix[16];
-    orientationTransformMatrix(transformMatrix, _voutDisplay->fmt.orientation);
-    glUniformMatrix4fv(uniforms[UNIFORM_TRANSFORM_MATRIX], 1, GL_FALSE, transformMatrix);
-
-    glUniformMatrix3fv(uniforms[UNIFORM_COLOR_CONVERSION_MATRIX], 1, GL_FALSE, _preferredConversion);
-
-    if (!_videoTextureCache) {
-        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, _eaglContext, NULL, &_videoTextureCache);
-        if (err != noErr) {
-            if (_voutDisplay)
-                msg_Err(_voutDisplay, "Error at CVOpenGLESTextureCacheCreate %d", err);
-        }
-    }
-    [EAGLContext setCurrentContext:previousContext];
-}
-
-- (void)cleanUpTextures
-{
-    if (_lumaTexture) {
-        CFRelease(_lumaTexture);
-        _lumaTexture = NULL;
-    }
-
-    if (_chromaTexture) {
-        CFRelease(_chromaTexture);
-        _chromaTexture = NULL;
-    }
-
-    // Periodic texture cache flush every frame
-    CVOpenGLESTextureCacheFlush(_videoTextureCache, 0);
-}
-
-- (BOOL)loadShaders
-{
-    GLuint vertShader, fragShader;
-    NSURL *vertShaderURL, *fragShaderURL;
-
-    // Create the shader program.
-    self.shaderProgram = glCreateProgram();
-
-    // Create and compile the vertex shader.
-    if (![self compileShader:&vertShader type:GL_VERTEX_SHADER sourceString:vertexShaderString]) {
-        if (_voutDisplay)
-            msg_Err(_voutDisplay, "Failed to compile vertex shader");
-        return NO;
-    }
-
-    // Create and compile fragment shader.
-    if (![self compileShader:&fragShader type:GL_FRAGMENT_SHADER sourceString:fragmentShaderString]) {
-        if (_voutDisplay)
-            msg_Err(_voutDisplay, "Failed to compile fragment shader");
-        return NO;
-    }
-
-    // Attach vertex shader to program.
-    glAttachShader(self.shaderProgram, vertShader);
-
-    // Attach fragment shader to program.
-    glAttachShader(self.shaderProgram, fragShader);
-
-    // Bind attribute locations. This needs to be done prior to linking.
-    glBindAttribLocation(self.shaderProgram, ATTRIB_VERTEX, "position");
-    glBindAttribLocation(self.shaderProgram, ATTRIB_TEXCOORD, "texCoord");
-
-    // Link the program.
-    if (![self linkProgram:self.shaderProgram]) {
-        if (_voutDisplay)
-            msg_Err(_voutDisplay, "Failed to link program: %d", self.shaderProgram);
-
-        if (vertShader) {
-            glDeleteShader(vertShader);
-            vertShader = 0;
-        }
-        if (fragShader) {
-            glDeleteShader(fragShader);
-            fragShader = 0;
-        }
-        if (self.shaderProgram) {
-            glDeleteProgram(self.shaderProgram);
-            self.shaderProgram = 0;
-        }
-
-        return NO;
-    }
-
-    // Get uniform locations.
-    uniforms[UNIFORM_Y] = glGetUniformLocation(self.shaderProgram, "SamplerY");
-    uniforms[UNIFORM_UV] = glGetUniformLocation(self.shaderProgram, "SamplerUV");
-    uniforms[UNIFORM_COLOR_CONVERSION_MATRIX] = glGetUniformLocation(self.shaderProgram, "colorConversionMatrix");
-    uniforms[UNIFORM_TRANSFORM_MATRIX] = glGetUniformLocation(self.shaderProgram, "transformMatrix");
-
-    // Release vertex and fragment shaders.
-    if (vertShader) {
-        glDetachShader(self.shaderProgram, vertShader);
-        glDeleteShader(vertShader);
-    }
-    if (fragShader) {
-        glDetachShader(self.shaderProgram, fragShader);
-        glDeleteShader(fragShader);
-    }
-
-    return YES;
-}
-
-- (BOOL)compileShader:(GLuint *)shader type:(GLenum)type sourceString:sourceString
-{
-    GLint status;
-    const GLchar *source;
-    source = (GLchar *)[sourceString UTF8String];
-
-    *shader = glCreateShader(type);
-    glShaderSource(*shader, 1, &source, NULL);
-    glCompileShader(*shader);
-
-#ifndef NDEBUG
-    GLint logLength;
-    glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 0) {
-        GLchar *log = (GLchar *)malloc(logLength);
-        glGetShaderInfoLog(*shader, logLength, &logLength, log);
-        if (_voutDisplay)
-            msg_Dbg(_voutDisplay, "Shader compile log:\n%s", log);
-        free(log);
-    }
-#endif
-
-    glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
-    if (status == 0) {
-        glDeleteShader(*shader);
-        return NO;
-    }
-
-    return YES;
-}
-
-- (BOOL)linkProgram:(GLuint)prog
-{
-    GLint status;
-    glLinkProgram(prog);
-
-#ifndef NDEBUG
-    GLint logLength;
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 0) {
-        GLchar *log = (GLchar *)malloc(logLength);
-        glGetProgramInfoLog(prog, logLength, &logLength, log);
-        if (_voutDisplay)
-            msg_Dbg(_voutDisplay, "Program link log:\n%s", log);
-        free(log);
-    }
-#endif
-
-    glGetProgramiv(prog, GL_LINK_STATUS, &status);
-    if (status == 0) {
-        return NO;
-    }
-
     return YES;
 }
 

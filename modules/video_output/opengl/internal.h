@@ -331,7 +331,7 @@ opengl_tex_converter_anop_init(const video_format_t *,
                                opengl_tex_converter_t *);
 #endif
 
-#ifdef __APPLE__
+#ifdef VLCGL_CONV_CVPX
 GLuint
 opengl_tex_converter_cvpx_init(const video_format_t *fmt,
                                opengl_tex_converter_t *tc);
