@@ -631,7 +631,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 #endif
 
         }
-        else if( i_type == 0x08 )
+        else if( i_type == 0x08 && p_frag->i_buffer > 8 )
         {
             /* picture extension */
             p_sys->i_picture_structure = p_frag->p_buffer[6]&0x03;
