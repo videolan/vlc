@@ -193,6 +193,31 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             swizzle_per_tex[1] = "xa";
         }
     }
+    else if (desc->plane_count == 1)
+    {
+        tc->tex_count = 1;
+        tc->texs[0] = (struct opengl_tex_cfg) {
+            { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE
+        };
+        switch (chroma)
+        {
+            case VLC_CODEC_UYVY:
+                swizzle_per_tex[0] = "gbr";
+                break;
+            case VLC_CODEC_YUYV:
+                swizzle_per_tex[0] = "rgb";
+                break;
+            case VLC_CODEC_VYUY:
+                swizzle_per_tex[0] = "bgr";
+                break;
+            case VLC_CODEC_YVYU:
+                swizzle_per_tex[0] = "rbg";
+                break;
+            default:
+                assert(!"missing chroma");
+                return VLC_EGENERIC;
+        }
+    }
     else
         return VLC_EGENERIC;
 
