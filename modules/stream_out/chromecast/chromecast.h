@@ -228,7 +228,7 @@ private:
         return i_ts_local_start;
     }
 
-    double getPlaybackPosition( mtime_t i_length ) const
+    double getPlaybackPosition() const
     {
         if( i_length > 0 && m_time_playback_started != VLC_TS_INVALID)
             return (double) getPlaybackTimestamp() / (double)( i_length );

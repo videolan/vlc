@@ -1105,7 +1105,7 @@ double intf_sys_t::get_position(void *pt)
 {
     intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
     vlc_mutex_locker locker( &p_this->lock );
-    return p_this->getPlaybackPosition( p_this->i_length );
+    return p_this->getPlaybackPosition();
 }
 
 void intf_sys_t::set_length(void *pt, mtime_t length)
