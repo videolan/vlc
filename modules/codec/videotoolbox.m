@@ -64,9 +64,7 @@ const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDec
 const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
 #endif
 
-#if !TARGET_OS_IPHONE
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
-#endif
 #define VT_TEMPO_DEINTERLACE N_("Deinterlacing")
 #define VT_TEMPO_DEINTERLACE_LONG N_("If interlaced content is detected, temporal deinterlacing is enabled at the expense of a pipeline delay.")
 
@@ -78,9 +76,7 @@ set_capability("decoder",800)
 set_callbacks(OpenDecoder, CloseDecoder)
 
 add_bool("videotoolbox-temporal-deinterlacing", true, VT_TEMPO_DEINTERLACE, VT_TEMPO_DEINTERLACE_LONG, false)
-#if !TARGET_OS_IPHONE
 add_bool("videotoolbox-hw-decoder-only", false, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
-#endif
 vlc_module_end()
 
 #pragma mark - local prototypes
@@ -539,7 +535,6 @@ static int StartVideoToolbox(decoder_t *p_dec, const block_t *p_block)
                          pixelaspectratio);
     CFRelease(pixelaspectratio);
 
-#if !TARGET_OS_IPHONE
     /* enable HW accelerated playback, since this is optional on OS X
      * note that the backend may still fallback on software mode if no
      * suitable hardware is available */
@@ -553,7 +548,6 @@ static int StartVideoToolbox(decoder_t *p_dec, const block_t *p_block)
         CFDictionarySetValue(p_sys->decoderConfiguration,
                              kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
                              kCFBooleanTrue);
-#endif
 
     p_sys->b_enable_temporal_processing = false;
     if (var_InheritInteger(p_dec, "videotoolbox-temporal-deinterlacing")) {
@@ -595,22 +589,6 @@ static int StartVideoToolbox(decoder_t *p_dec, const block_t *p_block)
     CFDictionarySetValue(p_sys->destinationPixelBufferAttributes,
                          kCVPixelBufferOpenGLESCompatibilityKey,
                          kCFBooleanTrue);
-#endif
-
-#if TARGET_OS_IPHONE
-    /* FIXME: we should let vt decide its preferred format on IOS too */
-    /* full range allows a broader range of colors but is H264 only */
-    if (p_dec->fmt_out.i_codec == VLC_CODEC_I420) {
-        if (p_sys->codec == kCMVideoCodecType_H264) {
-            VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
-                                 kCVPixelBufferPixelFormatTypeKey,
-                                 kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
-        } else {
-            VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
-                                 kCVPixelBufferPixelFormatTypeKey,
-                                 kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange);
-        }
-    }
 #endif
 
     VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
