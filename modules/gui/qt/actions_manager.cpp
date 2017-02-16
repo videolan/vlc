@@ -288,8 +288,6 @@ void ActionsManager::renderer_event_received( const vlc_event_t * p_event, void 
                 action->setChecked( true );
             free( psz_renderer );
         }
-
-        CONNECT( VLCMenuBar::rendererGroup, triggered(QAction*), ActionsManager::getInstance( p_intf ), RendererSelected( QAction* ) );
     }
 }
 

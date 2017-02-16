@@ -1649,6 +1649,7 @@ QMenu *VLCMenuBar::RendererMenu( intf_thread_t *p_intf )
     submenu->addAction( action );
 
     CONNECT( action, triggered(bool), ActionsManager::getInstance( p_intf ), ScanRendererAction( bool ) );
+    CONNECT( rendererGroup, triggered(QAction*), ActionsManager::getInstance( p_intf ), RendererSelected( QAction* ) );
 
     return submenu;
 }
