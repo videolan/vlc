@@ -639,13 +639,13 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->i_repeat_first_field= (p_frag->p_buffer[7]>>1)&0x01;
             p_sys->i_progressive_frame = p_frag->p_buffer[8] >> 7;
         }
-        if( p_frag->i_buffer >= 10 )
+        else if( i_type == 0x02 && p_frag->i_buffer > 8 )
         {
             /* Sequence display extension */
             bool contains_color_description = (p_frag->p_buffer[4] & 0x01);
             //uint8_t video_format = (p_frag->p_buffer[4] & 0x0f) >> 1;
 
-            if( contains_color_description )
+            if( contains_color_description && p_frag->i_buffer > 11 )
             {
                 uint8_t color_primaries = p_frag->p_buffer[5];
                 uint8_t color_transfer  = p_frag->p_buffer[6];
