@@ -35,101 +35,109 @@ extern "C" {
  *
  * A \em stream-extractor can do one of two things;
  *
- *  - either it lists the logical entries within a stream, or;
- *  - it extracts the data associated with one of those entries based
- *    on a unique identifier.
+ *  - lists the logical entries within a stream:
+ *    - type = \ref stream_directory_t
+ *    - capability = "stream_directory"
+ *
+ *  - extract data associated with one specific entry within a stream:
+ *    - type = \ref stream_extractor_t
+ *    - capability = "stream_extractor"
  *
  * @{
  *
  **/
-struct stream_extractor_t {
+
+typedef struct stream_extractor_t {
     VLC_COMMON_MEMBERS
 
-    union {
-        /**
-         * Callbacks for entity extraction
-         *
-         * The following callbacks shall be populated if the stream_extractor is
-         * used to extract a specific entity from the source-stream. Each
-         * callback shall behave as those, with the same name, specified in \ref
-         * stream_t.
-         *
-         **/
-        struct {
-            ssize_t  (*pf_read)(struct stream_extractor_t *, void *buf, size_t len);
-            block_t* (*pf_block)(struct stream_extractor_t *, bool *eof);
-            int      (*pf_seek)(struct stream_extractor_t *, uint64_t);
-            int      (*pf_control)(struct stream_extractor_t *, int i_query, va_list);
+    /**
+     * \name Callbacks for entity extraction
+     *
+     * The following members shall be populated as specified by the
+     * documentation associated with \ref stream_t for the equivalent name.
+     *
+     * @{
+     **/
+    ssize_t  (*pf_read)(struct stream_extractor_t*, void* buf, size_t len);
+    block_t* (*pf_block)(struct stream_extractor_t*, bool* eof);
+    int      (*pf_seek)(struct stream_extractor_t*, uint64_t);
+    int      (*pf_control)(struct stream_extractor_t*, int request, va_list args);
+    /** @} */
 
-        } stream;
+    char const* identifier; /**< the name of the entity to be extracted */
+    stream_t* source; /**< the source stream to be consumed */
+    void* p_sys;      /**< private opaque handle to be used by the module */
 
-        /**
-         * Callbacks for stream directory listing
-         *
-         * These callbacks are used when a stream is to be treated as a
-         * directory, it shall behave as those, with the same name, specified
-         * in \ref stream_t.
-         *
-         **/
-        struct {
-            int (*pf_readdir)(struct stream_extractor_t *, input_item_node_t *);
+} stream_extractor_t;
 
-        } directory;
+typedef struct stream_directory_t {
+    VLC_COMMON_MEMBERS;
 
-    };
+    /**
+     * \name Callbacks for stream directories
+     *
+     * The following members shall be populated as specified by the
+     * documentation associated with \ref stream_t for the equivalent name.
+     *
+     * @{
+     **/
+    int (*pf_readdir)(struct stream_directory_t*, input_item_node_t* );
+    /** @} */
 
-    void* p_sys; /**< Private data pointer */
-    stream_t* source; /**< The source stream */
-    char* identifier; /**< name of requested entity to extract, or NULL
-                       **  when requested to list directories */
-};
+    stream_t* source; /**< the source stream to be consumed */
+    void* p_sys; /**< private opaque handle to be used by the module */
 
-typedef struct stream_extractor_t stream_extractor_t;
+} stream_directory_t;
 
 /**
  * Create a relative MRL for the associated entity
  *
- * This function shall be used by stream_extractor_t's in order to
- * generate a MRL that refers to an entity within the stream. Normally
+ * This function shall be used by stream_directory_t's in order to
+ * generate an MRL that refers to an entity within the stream. Normally
  * this function will only be invoked within `pf_readdir` in order to
  * get the virtual path of the listed items.
  *
  * \warning the returned value is to be freed by the caller
  *
- * \param extractor the stream_extractor_t in which the entity belongs
+ * \param extractor the stream_directory_t for which the entity belongs
  * \param subentry the name of the entity in question
  *
  * \return a pointer to the resulting MRL on success, NULL on failure
  **/
-VLC_API char* vlc_stream_extractor_CreateMRL( stream_extractor_t*,
+VLC_API char* vlc_stream_extractor_CreateMRL( stream_directory_t*,
                                               char const* subentry );
 
 /**
- * Construct a new stream_extractor-based stream
+ * \name Attach a stream-extractor to the passed stream
  *
- * This function is used to attach a stream extractor to an already
- * existing stream.
- *
- * If \p identifier is `NULL`, `*stream` is guaranteed to refer to a
- * directory, otherwise \p identifier denotes the specific subentry
- * that one would like to access within the stream.
- *
- * If \p identifier is not NULL, `*stream` will refer to data for the
- * entity in question.
+ * These functions are used to attach a stream extractor to an already existing
+ * stream. As hinted by their names, \ref vlc_stream_extractor_Attach will
+ * attach an \em entity-extractor, whereas \ref vlc_stream_directory_Attach
+ * will attach a \em stream-directory.
  *
  * \param[out] stream a pointer-to-pointer to stream, `*stream` will
  *             refer to the attached stream on success, and left
  *             untouched on failure.
- * \param identifier NULL or a c-style string referring to the desired entity
+ * \param identifier (if present) NULL or a c-style string referring to the
+ *                   desired entity
  * \param module_name NULL or an explicit stream-extractor module name
  *
  * \return VLC_SUCCESS if a stream-extractor was successfully
  *         attached, an error-code on failure.
+ *
+ * @{
  **/
 
 VLC_API int vlc_stream_extractor_Attach( stream_t** source,
                                          char const* identifier,
                                          char const* module_name );
+
+VLC_API int vlc_stream_directory_Attach( stream_t** source,
+                                         char const* module_name );
+/**
+ * @}
+ */
+
 /**
  * @}
  */

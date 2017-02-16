@@ -2299,7 +2299,7 @@ InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
 
     if( remaining == 0 )
     {
-        if( vlc_stream_extractor_Attach( stream, NULL, NULL ) )
+        if( vlc_stream_directory_Attach( stream, NULL ) )
             msg_Dbg( source, "attach of directory extractor failed" );
 
         return VLC_SUCCESS;
