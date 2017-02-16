@@ -179,6 +179,9 @@ struct opengl_tex_converter_t
     /* Texture mapping (usually: GL_TEXTURE_2D), cannot be 0 */
     GLenum tex_target;
 
+    /* Set to true if textures are generated from pf_update() */
+    bool handle_texs_gen;
+
     struct opengl_tex_cfg {
         /* Texture scale factor, cannot be 0 */
         struct {
@@ -216,7 +219,8 @@ struct opengl_tex_converter_t
      *
      * This function pointer can be NULL. Software converters should call
      * glTexImage2D() to allocate textures data (it will be deallocated by the
-     * caller when calling glDeleteTextures()).
+     * caller when calling glDeleteTextures()). Won't be called if
+     * handle_texs_gen is true.
      *
      * \param fc OpenGL tex converter
      * \param textures array of textures to bind (one per plane)

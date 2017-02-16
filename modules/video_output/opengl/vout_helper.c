@@ -678,6 +678,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         free(vgl);
         return NULL;
     }
+    assert(!vgl->sub_prgm->tc.handle_texs_gen);
 
     for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
     {
@@ -738,12 +739,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     /* Allocates our textures */
-    ret = GenTextures(&vgl->prgm->tc, vgl->tex_width, vgl->tex_height,
-                      vgl->texture);
-    if (ret != VLC_SUCCESS)
+    if (!vgl->prgm->tc.handle_texs_gen)
     {
-        vout_display_opengl_Delete(vgl);
-        return NULL;
+        ret = GenTextures(&vgl->prgm->tc, vgl->tex_width, vgl->tex_height,
+                          vgl->texture);
+        if (ret != VLC_SUCCESS)
+        {
+            vout_display_opengl_Delete(vgl);
+            return NULL;
+        }
     }
 
     /* */
@@ -794,7 +798,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     glFlush();
 
     opengl_tex_converter_t *tc = &vgl->prgm->tc;
-    DelTextures(tc, vgl->texture);
+    if (!tc->handle_texs_gen)
+        DelTextures(tc, vgl->texture);
 
     tc = &vgl->sub_prgm->tc;
     for (int i = 0; i < vgl->region_count; i++)
