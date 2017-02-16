@@ -553,8 +553,8 @@ void puzzle_draw_pieces( filter_t *p_filter, picture_t *p_pic_in, picture_t *p_p
             {
                 puzzle_drw_basic_pce_in_plane(p_filter, p_pic_in, p_pic_out, i_plane, ps_piece);
             }
-            else if ( ( p_sys->s_current_param.i_shape_size == 0)  || !p_sys->b_shape_init
-                    || (p_sys->ps_pieces_shapes == NULL) || (!p_sys->b_shape_init) )
+            else if ( ( p_sys->s_current_param.i_shape_size == 0) ||
+                      (p_sys->ps_pieces_shapes == NULL) || (!p_sys->b_shape_init) )
             {
                 puzzle_drw_adv_pce_in_plane(p_filter, p_pic_in, p_pic_out, i_plane, ps_piece);
             }
