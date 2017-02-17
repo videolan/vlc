@@ -4189,11 +4189,6 @@ AC_ARG_ENABLE(vlc,
   [  --enable-vlc            build the VLC media player (default enabled)])
 AM_CONDITIONAL(BUILD_VLC, [test "${enable_vlc}" != "no"])
 
-AC_ARG_ENABLE(macosx-vlc-app,
-  [  --enable-macosx-vlc-app build the VLC media player (default enabled on Mac OS X)])
-AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
-    (test "${SYS}" = "darwin" || test "${enable_macosx_vlc_app}" = "yes") ])
-
 dnl
 dnl  Stuff used by the program
 dnl

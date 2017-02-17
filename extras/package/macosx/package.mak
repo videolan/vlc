@@ -1,10 +1,3 @@
-if HAVE_DARWIN
-if BUILD_MACOSX_VLC_APP
-# Create the MacOS X app
-noinst_DATA = VLC.app
-endif
-endif
-
 # This is just for development purposes.
 # The resulting VLC-dev.app will only run in this tree.
 VLC-dev.app: VLC-tmp
