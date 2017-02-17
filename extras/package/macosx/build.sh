@@ -169,3 +169,6 @@ fi
 
 info "Running make -j$jobs"
 make -j$jobs
+
+info "Preparing VLC.app"
+make VLC.app
