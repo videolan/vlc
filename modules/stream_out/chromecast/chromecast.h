@@ -46,9 +46,23 @@
 static const std::string DEFAULT_CHOMECAST_RECEIVER = "receiver-0";
 /* see https://developers.google.com/cast/docs/reference/messages */
 static const std::string NAMESPACE_MEDIA            = "urn:x-cast:com.google.cast.media";
+static const std::string NAMESPACE_DEVICEAUTH       = "urn:x-cast:com.google.cast.tp.deviceauth";
+static const std::string NAMESPACE_CONNECTION       = "urn:x-cast:com.google.cast.tp.connection";
+static const std::string NAMESPACE_HEARTBEAT        = "urn:x-cast:com.google.cast.tp.heartbeat";
+static const std::string NAMESPACE_RECEIVER         = "urn:x-cast:com.google.cast.receiver";
+
 
 #define CHROMECAST_CONTROL_PORT 8009
 #define HTTP_PORT               8010
+
+/* deadline regarding pings sent from receiver */
+#define PING_WAIT_TIME 6000
+#define PING_WAIT_RETRIES 0
+
+#define PACKET_MAX_LEN 10 * 1024
+
+// Media player Chromecast app id
+#define APP_ID "CC1AD845" // Default media player aka DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
 
 // Status
 enum connection_status
