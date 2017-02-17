@@ -54,8 +54,6 @@
 
 static const mtime_t SEEK_FORWARD_OFFSET = 1000000;
 
-#define CONTROL_CFG_PREFIX "chromecast-"
-
 static const std::string NAMESPACE_DEVICEAUTH       = "urn:x-cast:com.google.cast.tp.deviceauth";
 static const std::string NAMESPACE_CONNECTION       = "urn:x-cast:com.google.cast.tp.connection";
 static const std::string NAMESPACE_HEARTBEAT        = "urn:x-cast:com.google.cast.tp.heartbeat";
