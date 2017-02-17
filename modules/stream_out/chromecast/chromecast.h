@@ -91,7 +91,7 @@ enum receiver_state {
 class ChromecastCommunication
 {
 public:
-    ChromecastCommunication( vlc_object_t* p_module );
+    ChromecastCommunication( vlc_object_t* m_module );
     bool connect( const char* targetIP, unsigned int devicePort );
     ~ChromecastCommunication();
     /**
@@ -132,13 +132,13 @@ private:
                           const std::string& artwork, const std::string& mime );
 
 private:
-    vlc_object_t* p_module;
-    int i_sock_fd;
-    vlc_tls_creds_t *p_creds;
-    vlc_tls_t *p_tls;
-    unsigned i_receiver_requestId;
-    unsigned i_requestId;
-    std::string serverIp;
+    vlc_object_t* m_module;
+    int m_sock_fd;
+    vlc_tls_creds_t *m_creds;
+    vlc_tls_t *m_tls;
+    unsigned m_receiver_requestId;
+    unsigned m_requestId;
+    std::string m_serverIp;
 };
 
 /*****************************************************************************
