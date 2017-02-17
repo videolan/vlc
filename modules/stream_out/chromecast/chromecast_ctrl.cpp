@@ -486,19 +486,22 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 void* intf_sys_t::ChromecastThread(void* p_data)
 {
     intf_sys_t *p_sys = reinterpret_cast<intf_sys_t*>(p_data);
-
-    vlc_interrupt_set( p_sys->p_ctl_thread_interrupt );
-    vlc_interrupt_set( p_sys->p_ctl_thread_interrupt );
-
-    vlc_mutex_lock(&p_sys->lock);
-    p_sys->setConnectionStatus(CHROMECAST_TLS_CONNECTED);
-    vlc_mutex_unlock(&p_sys->lock);
-
-    p_sys->m_communication.msgAuth();
-
-    while ( !vlc_killed() && p_sys->handleMessages() );
-
+    p_sys->mainLoop();
     return NULL;
+}
+
+void intf_sys_t::mainLoop()
+{
+    vlc_interrupt_set( p_ctl_thread_interrupt );
+
+    vlc_mutex_lock(&lock);
+    setConnectionStatus(CHROMECAST_TLS_CONNECTED);
+    vlc_mutex_unlock(&lock);
+
+    m_communication.msgAuth();
+
+    while ( !vlc_killed() && handleMessages() )
+        ;
 }
 
 bool intf_sys_t::handleMessages()
@@ -710,7 +713,6 @@ double intf_sys_t::getPlaybackPosition() const
         return (double) getPlaybackTimestamp() / (double)( i_length );
     return 0.0;
 }
-
 
 mtime_t intf_sys_t::get_time(void *pt)
 {

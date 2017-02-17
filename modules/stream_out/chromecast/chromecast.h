@@ -182,6 +182,8 @@ private:
 
     double getPlaybackPosition() const;
 
+    void mainLoop();
+
 private:
     static void* ChromecastThread(void* p_data);
 
