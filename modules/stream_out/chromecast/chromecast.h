@@ -180,6 +180,11 @@ private:
     double getPlaybackPosition() const;
 
     void mainLoop();
+    void processAuthMessage( const castchannel::CastMessage& msg );
+    void processHeartBeatMessage( const castchannel::CastMessage& msg );
+    void processReceiverMessage( const castchannel::CastMessage& msg );
+    void processMediaMessage( const castchannel::CastMessage& msg );
+    void processConnectionMessage( const castchannel::CastMessage& msg );
 
 private:
     static void* ChromecastThread(void* p_data);
