@@ -74,6 +74,58 @@ enum receiver_state {
     RECEIVER_PAUSED,
 };
 
+class ChromecastCommunication
+{
+public:
+    ChromecastCommunication( vlc_object_t* p_module );
+    bool connect( const char* targetIP, unsigned int devicePort );
+    ~ChromecastCommunication();
+    /**
+     * @brief disconnect close the connection with the chromecast
+     */
+    void disconnect();
+
+    void msgPing();
+    void msgPong();
+    void msgConnect( const std::string& destinationId );
+
+    void msgReceiverLaunchApp();
+    void msgReceiverGetStatus();
+    void msgReceiverClose(const std::string& destinationId);
+    void msgAuth();
+    void msgPlayerLoad( const std::string& destinationId, unsigned int i_port, const std::string& title,
+                        const std::string& artwork, const std::string& mime );
+    void msgPlayerPlay( const std::string& destinationId, const std::string& mediaSessionId );
+    void msgPlayerStop( const std::string& destinationId, const std::string& mediaSessionId );
+    void msgPlayerPause( const std::string& destinationId, const std::string& mediaSessionId );
+    void msgPlayerGetStatus( const std::string& destinationId );
+    void msgPlayerSeek( const std::string& destinationId, const std::string& mediaSessionId,
+                        const std::string & currentTime );
+    void msgPlayerSetVolume( const std::string& destinationId, const std::string& mediaSessionId,
+                             float volume, bool mute);
+    int recvPacket( bool *b_msgReceived, uint32_t &i_payloadSize,
+                   unsigned *pi_received, uint8_t *p_data, bool *pb_pingTimeout,
+                   int *pi_wait_delay, int *pi_wait_retries );
+private:
+    int sendMessage(const castchannel::CastMessage &msg);
+
+    void buildMessage(const std::string & namespace_,
+                      const std::string & payload,
+                      const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
+                      castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
+    void pushMediaPlayerMessage( const std::string& destinationId, const std::stringstream & payload );
+    std::string GetMedia( unsigned int i_port, const std::string& title,
+                          const std::string& artwork, const std::string& mime );
+
+private:
+    vlc_object_t* p_module;
+    int i_sock_fd;
+    vlc_tls_creds_t *p_creds;
+    vlc_tls_t *p_tls;
+    unsigned i_receiver_requestId;
+    unsigned i_requestId;
+    std::string serverIp;
+};
 
 /*****************************************************************************
  * intf_sys_t: description and status of interface
@@ -96,7 +148,6 @@ struct intf_sys_t
 private:
     vlc_object_t  * const p_module;
     const int      i_port;
-    std::string    serverIP;
     const int      i_target_port;
     std::string    targetIP;
     std::string    mime;
@@ -105,16 +156,11 @@ private:
     std::string mediaSessionId;
     receiver_state receiverState;
 
-    int i_sock_fd;
-    vlc_tls_creds_t *p_creds;
-    vlc_tls_t *p_tls;
-
     vlc_mutex_t  lock;
     vlc_cond_t   loadCommandCond;
     vlc_thread_t chromecastThread;
 
-    void msgAuth();
-    void msgReceiverClose(std::string destinationId);
+    ChromecastCommunication m_communication;
 
     bool handleMessages();
 
@@ -136,21 +182,6 @@ private:
 
     int connectChromecast();
     void disconnectChromecast();
-
-    void msgPing();
-    void msgPong();
-    void msgConnect(const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER);
-
-    void msgReceiverLaunchApp();
-    void msgReceiverGetStatus();
-
-    void msgPlayerLoad();
-    void msgPlayerPlay();
-    void msgPlayerStop();
-    void msgPlayerPause();
-    void msgPlayerGetStatus();
-    void msgPlayerSeek(const std::string & currentTime);
-    void msgPlayerSetVolume(float volume, bool mute);
 
     void processMessage(const castchannel::CastMessage &msg);
 
@@ -176,15 +207,6 @@ private:
             artwork = "";
     }
 
-    int sendMessage(const castchannel::CastMessage &msg);
-
-    void buildMessage(const std::string & namespace_,
-                      const std::string & payload,
-                      const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
-                      castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
-
-    void pushMediaPlayerMessage(const std::stringstream & payload);
-
     void setPlayerStatus(enum command_status status) {
         if (cmd_status != status)
         {
@@ -195,9 +217,6 @@ private:
 
     enum connection_status conn_status;
     enum command_status    cmd_status;
-
-    unsigned i_receiver_requestId;
-    unsigned i_requestId;
 
     bool           has_input;
 
@@ -247,10 +266,6 @@ private:
     mtime_t           m_seek_request_time;
 
     vlc_cond_t   seekCommandCond;
-
-    int recvPacket(bool &b_msgReceived, uint32_t &i_payloadSize,
-                   unsigned *pi_received, uint8_t *p_data, bool *pb_pingTimeout,
-                   int *pi_wait_delay, int *pi_wait_retries);
 
     /* shared structure with the demux-filter */
     chromecast_common      common;
