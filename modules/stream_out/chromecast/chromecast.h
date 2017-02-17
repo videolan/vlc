@@ -91,7 +91,7 @@ enum receiver_state {
 class ChromecastCommunication
 {
 public:
-    ChromecastCommunication( vlc_object_t* m_module, const char* targetIP, unsigned int devicePort );
+    ChromecastCommunication( vlc_object_t* module, const char* targetIP, unsigned int devicePort );
     ~ChromecastCommunication();
     /**
      * @brief disconnect close the connection with the chromecast
@@ -203,46 +203,46 @@ private:
 
 
 private:
-    vlc_object_t  * const p_module;
-    const int      i_port;
-    std::string    mime;
+    vlc_object_t  * const m_module;
+    const int      m_streaming_port;
+    std::string    m_mime;
 
-    std::string appTransportId;
-    std::string mediaSessionId;
-    receiver_state receiverState;
+    std::string m_appTransportId;
+    std::string m_mediaSessionId;
+    receiver_state m_receiverState;
 
-    vlc_mutex_t  lock;
-    vlc_cond_t   loadCommandCond;
-    vlc_thread_t chromecastThread;
+    vlc_mutex_t  m_lock;
+    vlc_cond_t   m_loadCommandCond;
+    vlc_thread_t m_chromecastThread;
 
     ChromecastCommunication m_communication;
-    enum connection_status conn_status;
-    enum command_status    cmd_status;
-    std::atomic_bool requested_stop;
-    std::atomic_bool requested_seek;
+    connection_status m_conn_status;
+    command_status    m_cmd_status;
+    std::atomic_bool m_requested_stop;
+    std::atomic_bool m_requested_seek;
 
-    bool           has_input;
+    bool           m_has_input;
 
-    std::string artwork;
-    std::string title;
+    std::string m_artwork;
+    std::string m_title;
 
-    vlc_interrupt_t *p_ctl_thread_interrupt;
+    vlc_interrupt_t *m_ctl_thread_interrupt;
 
     /* local date when playback started/resumed, used by monotone clock */
     mtime_t           m_time_playback_started;
     /* local playback time of the input when playback started/resumed */
-    mtime_t           i_ts_local_start;
-    mtime_t           i_length;
+    mtime_t           m_ts_local_start;
+    mtime_t           m_length;
 
     /* playback time reported by the receiver, used to wait for seeking point */
     mtime_t           m_chromecast_start_time;
     /* seek time with Chromecast relative timestamp */
     mtime_t           m_seek_request_time;
 
-    vlc_cond_t   seekCommandCond;
+    vlc_cond_t   m_seekCommandCond;
 
     /* shared structure with the demux-filter */
-    chromecast_common      common;
+    chromecast_common      m_common;
 };
 
 #endif /* VLC_CHROMECAST_H */
