@@ -442,6 +442,8 @@ static int Demux( demux_t *p_demux)
 
             /* h264 packetizer does merge multiple NAL into AU, but slice flag persists */
             bool frame = p_block_out->i_flags & BLOCK_FLAG_TYPE_MASK;
+            const mtime_t i_frame_dts = p_block_out->i_dts;
+            const mtime_t i_frame_length = p_block_out->i_length;
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
             if( frame )
             {
@@ -459,13 +461,23 @@ static int Demux( demux_t *p_demux)
                         p_sys->frame_rate_num = 25000;
                         p_sys->frame_rate_den = 1000;
                     }
-                    date_Init( &p_sys->dts, p_sys->frame_rate_num, p_sys->frame_rate_den );
+                    date_Init( &p_sys->dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
                     date_Set( &p_sys->dts, VLC_TS_0 );
                     msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
                 }
 
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, date_Get( &p_sys->dts ) );
-                date_Increment( &p_sys->dts, 1 );
+                unsigned i_nb_fields;
+                if( i_frame_length > 0 )
+                {
+                    i_nb_fields = 3 * i_frame_length * p_sys->frame_rate_num /
+                                  ( p_sys->frame_rate_den * CLOCK_FREQ);
+                }
+                else i_nb_fields = 2;
+                if( i_nb_fields <= 6 ) /* in the legit range */
+                    date_Increment( &p_sys->dts, i_nb_fields );
+                else /* Somehow some discontinuity */
+                    date_Set( &p_sys->dts, i_frame_dts );
             }
 
             p_block_out = p_next;
