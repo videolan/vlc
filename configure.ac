@@ -426,7 +426,7 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
   CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
   CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
   CXXFLAGS="${CXXFLAGS} -I${CONTRIB_DIR}/include"
-  OBJCFLAGS="${OBJCFLAGS} -I${CONTRIB_DIR}/include"
+  OBJCFLAGS="${OBJCFLAGS} -I${CONTRIB_DIR}/include -F${CONTRIB_DIR} -F${CONTRIB_DIR}/Frameworks"
   export PKG_CONFIG_PATH="${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
   LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
 
@@ -4134,8 +4134,7 @@ AS_IF([test "${enable_osx_notifications}" != "no"], [
   if test ! -d ${CONTRIB_DIR}/Growl.framework -a ! -d ${CONTRIB_DIR}/Frameworks/Growl.framework
   then
       VLC_ADD_PLUGIN([osx_notifications])
-      VLC_ADD_LIBS([osx_notifications], [-F${CONTRIB_DIR} -Wl,-framework,Growl,-framework,Foundation])
-      VLC_ADD_OBJCFLAGS([osx_notifications], [-F${CONTRIB_DIR}])
+      VLC_ADD_LIBS([osx_notifications], [-Wl,-framework,Growl,-framework,Foundation])
       VLC_ADD_OBJCFLAGS([osx_notifications], [-fobjc-exceptions] )
   fi
 ])
