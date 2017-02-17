@@ -37,7 +37,6 @@
 #include <time.h>                                                 /* ctime() */
 #include <limits.h>
 #include <assert.h>
-#include <time.h>
 
 #include <vlc_vlm.h>
 #include <vlc_modules.h>
