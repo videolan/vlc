@@ -406,14 +406,16 @@ static int Demux( demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
+    bool b_eof = false;
 
     p_block_in = vlc_stream_Block( p_demux->s, H26X_PACKET_SIZE );
     if( p_block_in == NULL )
     {
-        return VLC_DEMUXER_EOF;
+        b_eof = true;
     }
 
-    while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
+    while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer,
+                                                             p_block_in ? &p_block_in : NULL )) )
     {
         while( p_block_out )
         {
@@ -421,8 +423,11 @@ static int Demux( demux_t *p_demux)
 
             p_block_out->p_next = NULL;
 
-            p_block_in->i_dts = date_Get( &p_sys->dts );
-            p_block_in->i_pts = VLC_TS_INVALID;
+            if( p_block_in )
+            {
+                p_block_in->i_dts = date_Get( &p_sys->dts );
+                p_block_in->i_pts = VLC_TS_INVALID;
+            }
 
             if( p_sys->p_es == NULL )
             {
@@ -466,7 +471,7 @@ static int Demux( demux_t *p_demux)
             p_block_out = p_next;
         }
     }
-    return VLC_DEMUXER_SUCCESS;
+    return (b_eof) ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
