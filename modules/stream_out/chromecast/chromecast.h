@@ -91,8 +91,7 @@ enum receiver_state {
 class ChromecastCommunication
 {
 public:
-    ChromecastCommunication( vlc_object_t* m_module );
-    bool connect( const char* targetIP, unsigned int devicePort );
+    ChromecastCommunication( vlc_object_t* m_module, const char* targetIP, unsigned int devicePort );
     ~ChromecastCommunication();
     /**
      * @brief disconnect close the connection with the chromecast
@@ -162,8 +161,6 @@ struct intf_sys_t
 private:
     vlc_object_t  * const p_module;
     const int      i_port;
-    const int      i_target_port;
-    std::string    targetIP;
     std::string    mime;
 
     std::string appTransportId;

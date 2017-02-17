@@ -49,10 +49,8 @@ static const mtime_t SEEK_FORWARD_OFFSET = 1000000;
 intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device_addr, int device_port, vlc_interrupt_t *p_interrupt)
  : p_module(p_this)
  , i_port(port)
- , i_target_port(device_port)
- , targetIP(device_addr)
  , receiverState(RECEIVER_IDLE)
- , m_communication( p_this )
+ , m_communication( p_this, device_addr.c_str(), device_port )
  , requested_stop(false)
  , requested_seek(false)
  , conn_status(CHROMECAST_DISCONNECTED)
@@ -132,8 +130,7 @@ intf_sys_t::~intf_sys_t()
 void intf_sys_t::setHasInput( bool b_has_input, const std::string mime_type )
 {
     vlc_mutex_locker locker(&lock);
-    msg_Dbg( p_module, "setHasInput %s device:%s session:%s",b_has_input ? "true":"false",
-             targetIP.c_str(), mediaSessionId.c_str() );
+    msg_Dbg( p_module, "setHasInput %s session:%s",b_has_input ? "true":"false", mediaSessionId.c_str() );
 
     this->has_input = b_has_input;
     this->mime = mime_type;
@@ -489,16 +486,8 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 void* intf_sys_t::ChromecastThread(void* p_data)
 {
     intf_sys_t *p_sys = reinterpret_cast<intf_sys_t*>(p_data);
-    p_sys->setConnectionStatus( CHROMECAST_DISCONNECTED );
 
-    if ( p_sys->m_communication.connect( p_sys->targetIP.c_str(), p_sys->i_target_port ) == false )
-    {
-        msg_Err( p_sys->p_module, "Could not connect the Chromecast" );
-        vlc_mutex_locker locker(&p_sys->lock);
-        p_sys->setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
-        return NULL;
-    }
-
+    vlc_interrupt_set( p_sys->p_ctl_thread_interrupt );
     vlc_interrupt_set( p_sys->p_ctl_thread_interrupt );
 
     vlc_mutex_lock(&p_sys->lock);

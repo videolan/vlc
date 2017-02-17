@@ -36,7 +36,7 @@
 #define PONG_WAIT_TIME 500
 #define PONG_WAIT_RETRIES 2
 
-ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module )
+ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module, const char* targetIP, unsigned int devicePort )
     : m_module( p_module )
     , m_sock_fd( -1 )
     , m_creds( NULL )
@@ -44,42 +44,32 @@ ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module )
     , m_receiver_requestId( 0 )
     , m_requestId( 0 )
 {
-}
-
-bool ChromecastCommunication::connect( const char* targetIP, unsigned int devicePort )
-{
     if (devicePort == 0)
         devicePort = CHROMECAST_CONTROL_PORT;
     m_sock_fd = net_ConnectTCP( m_module, targetIP, devicePort);
     if (m_sock_fd < 0)
-        return false;
+        throw std::runtime_error( "Failed to connect to the chromecast" );
 
     char psz_localIP[NI_MAXNUMERICHOST];
     if ( net_GetSockAddress( m_sock_fd, psz_localIP, NULL ) )
-    {
-        msg_Err( m_module, "Cannot get local IP address" );
-        return false;
-    }
+        throw std::runtime_error( "Cannot get local IP address" );
     m_serverIp = psz_localIP;
 
     m_creds = vlc_tls_ClientCreate( m_module->obj.parent );
     if (m_creds == NULL)
     {
-        msg_Err( m_module, "Failed to create TLS client" );
         net_Close(m_sock_fd);
-        return false;
+        throw std::runtime_error( "Failed to create TLS client" );
     }
 
     m_tls = vlc_tls_ClientSessionCreateFD( m_creds, m_sock_fd, targetIP, "tcps", NULL, NULL );
 
     if (m_tls == NULL)
     {
-        msg_Err( m_module, "Failed to create client session" );
         net_Close(m_sock_fd);
         vlc_tls_Delete(m_creds);
-        return false;
+        throw std::runtime_error( "Failed to create client session" );
     }
-    return true;
 }
 
 ChromecastCommunication::~ChromecastCommunication()

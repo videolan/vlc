@@ -445,12 +445,20 @@ static int Open(vlc_object_t *p_this)
     i_device_port = var_InheritInteger(p_stream, SOUT_CFG_PREFIX "port");
     i_local_server_port = var_InheritInteger(p_stream, SOUT_CFG_PREFIX "http-port");
 
-    p_intf = new(std::nothrow) intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port, p_interrupt );
-    if ( p_intf == NULL)
+    try
     {
-        msg_Err( p_this, "cannot load the Chromecast controler" );
+        p_intf = new intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port, p_interrupt );
+    }
+    catch (const std::runtime_error& err )
+    {
+        msg_Err( p_this, "cannot load the Chromecast controler (%s)", err.what() );
         goto error;
     }
+    catch (const std::bad_alloc& )
+    {
+        goto error;
+    }
+
     p_interrupt = NULL;
 
     psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
