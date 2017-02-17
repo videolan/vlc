@@ -640,6 +640,78 @@ void intf_sys_t::waitSeekDone()
     }
 }
 
+void intf_sys_t::setConnectionStatus(connection_status status)
+{
+    if (conn_status != status)
+    {
+#ifndef NDEBUG
+        msg_Dbg(p_module, "change Chromecast connection status from %d to %d", conn_status, status);
+#endif
+        conn_status = status;
+        vlc_cond_broadcast(&loadCommandCond);
+        vlc_cond_signal(&seekCommandCond);
+    }
+}
+
+bool intf_sys_t::isFinishedPlaying()
+{
+    vlc_mutex_locker locker(&lock);
+    return conn_status == CHROMECAST_CONNECTION_DEAD || (receiverState == RECEIVER_BUFFERING && cmd_status != CMD_SEEK_SENT);
+}
+
+void intf_sys_t::setTitle(const char* psz_title)
+{
+    if ( psz_title )
+        title = psz_title;
+    else
+        title = "";
+}
+
+void intf_sys_t::setArtwork(const char* psz_artwork)
+{
+    if ( psz_artwork )
+        artwork = psz_artwork;
+    else
+        artwork = "";
+}
+
+void intf_sys_t::setPlayerStatus(command_status status)
+{
+    if (cmd_status != status)
+    {
+        msg_Dbg(p_module, "change Chromecast command status from %d to %d", cmd_status, status);
+        cmd_status = status;
+    }
+}
+
+mtime_t intf_sys_t::getPlaybackTimestamp() const
+{
+    switch( receiverState )
+    {
+    case RECEIVER_PLAYING:
+        return ( mdate() - m_time_playback_started ) + i_ts_local_start;
+
+    case RECEIVER_IDLE:
+        msg_Dbg(p_module, "receiver idle using buffering time %" PRId64, i_ts_local_start);
+        break;
+    case RECEIVER_BUFFERING:
+        msg_Dbg(p_module, "receiver buffering using buffering time %" PRId64, i_ts_local_start);
+        break;
+    case RECEIVER_PAUSED:
+        msg_Dbg(p_module, "receiver paused using buffering time %" PRId64, i_ts_local_start);
+        break;
+    }
+    return i_ts_local_start;
+}
+
+double intf_sys_t::getPlaybackPosition() const
+{
+    if( i_length > 0 && m_time_playback_started != VLC_TS_INVALID)
+        return (double) getPlaybackTimestamp() / (double)( i_length );
+    return 0.0;
+}
+
+
 mtime_t intf_sys_t::get_time(void *pt)
 {
     intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
