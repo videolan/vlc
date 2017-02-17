@@ -122,7 +122,6 @@ struct vout_display_sys_t
     vout_display_opengl_t *vgl;
 
     picture_pool_t *picturePool;
-    bool has_first_frame;
 
     vout_display_place_t place;
 };
@@ -232,7 +231,7 @@ static int Open(vlc_object_t *this)
                                                    object:nil];
         [sys->glESView reshape];
         return VLC_SUCCESS;
-        
+
     bailout:
         Close(this);
         return VLC_EGENERIC;
@@ -362,7 +361,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    sys->has_first_frame = true;
     @synchronized (sys->glESView) {
         if (likely([sys->glESView isAppActive])) {
             vlc_gl_MakeCurrent(sys->gl);
