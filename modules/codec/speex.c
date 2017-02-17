@@ -878,10 +878,6 @@ static block_t *SendPacket( decoder_t *p_dec, block_t *p_block )
 /*****************************************************************************
  * ParseSpeexComments:
  *****************************************************************************/
-#define readint(buf, base) (((buf[base+3]<<24)&0xff000000)| \
-                           ((buf[base+2]<<16)&0xff0000)| \
-                           ((buf[base+1]<<8)&0xff00)| \
-                            (buf[base]&0xff))
 
 static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
@@ -934,7 +930,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * encoder_sys_t: encoder descriptor
  *****************************************************************************/
-#define MAX_FRAME_SIZE  2000
 #define MAX_FRAME_BYTES 2000
 
 struct encoder_sys_t
