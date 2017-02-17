@@ -162,19 +162,6 @@ void intf_sys_t::setHasInput( bool b_has_input, const std::string mime_type )
 }
 
 /**
- * @brief Disconnect from the Chromecast
- */
-void intf_sys_t::disconnectChromecast()
-{
-    m_communication.disconnect();
-    setConnectionStatus(CHROMECAST_DISCONNECTED);
-    m_appTransportId = "";
-    m_mediaSessionId = ""; // this session is not valid anymore
-    setPlayerStatus(NO_CMD_PENDING);
-    m_receiverState = RECEIVER_IDLE;
-}
-
-/**
  * @brief Process a message received from the Chromecast
  * @param msg the CastMessage to process
  * @return 0 if the message has been successfuly processed else -1

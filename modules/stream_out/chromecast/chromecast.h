@@ -163,9 +163,6 @@ private:
     void waitAppStarted();
     void waitSeekDone();
 
-    int connectChromecast();
-    void disconnectChromecast();
-
     void processMessage(const castchannel::CastMessage &msg);
 
     void notifySendRequest();
