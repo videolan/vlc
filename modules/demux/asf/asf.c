@@ -996,6 +996,7 @@ static int DemuxInit( demux_t *p_demux )
             {
                 /* DVR-MS special ASF */
                 fmt.i_codec = VLC_CODEC_MPGV;
+                fmt.i_original_fourcc = VLC_FOURCC( 'D','V','R',' ');
             }
 
             if( p_sp->i_type_specific_data_length > 11 +
