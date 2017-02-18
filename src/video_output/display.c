@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <stdnoreturn.h>
 
 #include <vlc_common.h>
 #include <vlc_video_splitter.h>
@@ -599,8 +600,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
     vlc_mutex_unlock(&osys->lock);
 }
 
-VLC_NORETURN
-static void *VoutDisplayEventKeyDispatch(void *data)
+noreturn static void *VoutDisplayEventKeyDispatch(void *data)
 {
     vout_display_owner_sys_t *osys = data;
 

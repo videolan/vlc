@@ -36,6 +36,7 @@
 #include <vlc_network.h>
 
 #include <assert.h>
+#include <stdnoreturn.h>
 #include <unistd.h>
 
 /************************************************************************
@@ -205,8 +206,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
-VLC_NORETURN
-static void *Run( void *data )
+noreturn static void *Run( void *data )
 {
     services_discovery_t *p_sd = data;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;

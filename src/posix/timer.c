@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 
+#include <stdnoreturn.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
@@ -49,8 +50,7 @@ struct vlc_timer
     atomic_uint  overruns;
 };
 
-VLC_NORETURN
-static void *vlc_timer_thread (void *data)
+noreturn static void *vlc_timer_thread (void *data)
 {
     struct vlc_timer *timer = data;
 

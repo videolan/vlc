@@ -34,6 +34,7 @@
 
 #include <errno.h>
 #include <assert.h>
+#include <stdnoreturn.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -1598,8 +1599,7 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
     return -1;
 }
 
-VLC_NORETURN
-static void *KeepAliveThread( void *p_data )
+noreturn static void *KeepAliveThread( void *p_data )
 {
     access_t *p_access = p_data;
 

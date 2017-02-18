@@ -28,6 +28,7 @@
 
 #include <vlc_common.h>
 
+#include <stdnoreturn.h>
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
@@ -130,8 +131,7 @@ static void AddressDestroy (sap_address_t *addr)
  * \param p_this the SAP Handler object
  * \return nothing
  */
-VLC_NORETURN
-static void *RunThread (void *self)
+noreturn static void *RunThread (void *self)
 {
     sap_address_t *addr = self;
 
