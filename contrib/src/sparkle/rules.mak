@@ -20,5 +20,5 @@ sparkle: Sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
 	cd $< && xcodebuild $(XCODE_FLAGS) WARNING_CFLAGS=-Wno-error
 	cd $< && install_name_tool -id @executable_path/../Frameworks/Sparkle.framework/Versions/A/Sparkle build/Release/Sparkle.framework/Sparkle
 	install -d $(PREFIX)
-	cd $< && cp -R build/Release/Sparkle.framework "$(PREFIX)"
+	cd $< && mkdir -p "$(PREFIX)/Frameworks" && cp -R build/Release/Sparkle.framework "$(PREFIX)/Frameworks"
 	touch $@

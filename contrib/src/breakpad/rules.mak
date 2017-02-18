@@ -22,6 +22,6 @@ breakpad: breakpad-$(BREAKPAD_HASH).tar.gz
 	cd $</src/client/mac/ && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error
 	cd $</src/tools/mac/dump_syms && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error
 	install -d $(PREFIX)
-	cd $</src/client/mac/ && cp -R build/Release/Breakpad.framework "$(PREFIX)"
+	cd $</src/client/mac/ && mkdir -p "$(PREFIX)/Frameworks" && cp -R build/Release/Breakpad.framework "$(PREFIX)/Frameworks"
 	cd $</src/tools/mac/dump_syms && cp -R build/Release/dump_syms "$(PREFIX)/bin"
 	touch $@
