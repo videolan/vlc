@@ -3886,7 +3886,7 @@ AC_ARG_ENABLE(breakpad,
   [  --enable-breakpad       Breakpad crash reporter support for OS X (default enabled on Mac OS X)])
 if test "x${enable_breakpad}" != "xno" -a "${HAVE_OSX}" = "1"
 then
-  if test ! -d ${CONTRIB_DIR}/Breakpad.framework
+  if test ! -d ${CONTRIB_DIR}/Breakpad.framework -a ! -d ${CONTRIB_DIR}/Frameworks/Breakpad.framework
   then
     AC_MSG_ERROR([Breakpad framework is required and was not found in ${CONTRIB_DIR}])
   fi
