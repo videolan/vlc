@@ -244,7 +244,7 @@ void input_ControlVarStop( input_thread_t *p_input )
 
     if( !demux_Control( p_demux, DEMUX_GET_TITLE, &i_cur_title ) )
     {
-        input_title_t* t = input_priv(p_input)->title[ i_cur_title ];
+        const input_title_t* t = input_priv(p_input)->title[ i_cur_title ];
 
         if( t->i_seekpoint > 1 )
             InputDelCallbacks( p_input, p_input_seekpoint_navigation_callbacks );
@@ -367,7 +367,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarTitle( input_thread_t *p_input, int i_title )
 {
-    input_title_t *t = input_priv(p_input)->title[i_title];
+    const input_title_t *t = input_priv(p_input)->title[i_title];
     vlc_value_t text;
     int  i;
 
