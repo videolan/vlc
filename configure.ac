@@ -4131,14 +4131,14 @@ AC_ARG_ENABLE(osx_notifications,
   [  --enable-osx-notifications          osx notification plugin (default disabled)],,
   [enable_osx_notifications=no])
 AS_IF([test "${enable_osx_notifications}" != "no"], [
-    AC_CHECK_HEADERS(${CONTRIB_DIR}/Growl.framework/Versions/A/Headers/Growl.h, [
+  if test ! -d ${CONTRIB_DIR}/Growl.framework -a ! -d ${CONTRIB_DIR}/Frameworks/Growl.framework
+  then
       VLC_ADD_PLUGIN([osx_notifications])
       VLC_ADD_LIBS([osx_notifications], [-F${CONTRIB_DIR} -Wl,-framework,Growl,-framework,Foundation])
       VLC_ADD_OBJCFLAGS([osx_notifications], [-F${CONTRIB_DIR}])
       VLC_ADD_OBJCFLAGS([osx_notifications], [-fobjc-exceptions] )
-    ])
-  ]
-)
+  fi
+])
 
 dnl
 dnl Libnotify notification plugin
