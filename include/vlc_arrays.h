@@ -280,19 +280,20 @@ static inline void *realloc_down( void *ptr, size_t size )
  ************************************************************************/
 typedef struct vlc_array_t
 {
-    int i_count;
+    size_t i_count;
     void ** pp_elems;
 } vlc_array_t;
 
 static inline void vlc_array_init( vlc_array_t * p_array )
 {
-    memset( p_array, 0, sizeof(vlc_array_t) );
+    p_array->i_count = 0;
+    p_array->pp_elems = NULL;
 }
 
 static inline void vlc_array_clear( vlc_array_t * p_array )
 {
     free( p_array->pp_elems );
-    memset( p_array, 0, sizeof(vlc_array_t) );
+    vlc_array_init( p_array );
 }
 
 static inline vlc_array_t * vlc_array_new( void )
@@ -306,66 +307,94 @@ static inline void vlc_array_destroy( vlc_array_t * p_array )
 {
     if( !p_array )
         return;
-    vlc_array_clear( p_array );
+    free( p_array->pp_elems );
     free( p_array );
 }
 
 
 /* Read */
-static inline int
-vlc_array_count( vlc_array_t * p_array )
+static inline size_t vlc_array_count( vlc_array_t * p_array )
 {
     return p_array->i_count;
 }
 
-static inline void *
-vlc_array_item_at_index( vlc_array_t * p_array, int i_index )
+#if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+# define vlc_array_item_at_index(ar, idx) \
+    _Generic((ar), \
+        const vlc_array_t *: ((ar)->pp_elems[idx]), \
+        vlc_array_t *: ((ar)->pp_elems[idx]))
+#elif defined (__cplusplus)
+static inline void *vlc_array_item_at_index( vlc_array_t *ar, size_t idx )
 {
-    return p_array->pp_elems[i_index];
+    return ar->pp_elems[idx];
 }
 
-static inline int
-vlc_array_index_of_item( vlc_array_t * p_array, void * item )
+static inline const void *vlc_array_item_at_index( const vlc_array_t *ar,
+                                                   size_t idx )
 {
-    int i;
-    for( i = 0; i < p_array->i_count; i++)
+    return ar->pp_elems[idx];
+}
+#endif
+
+static inline ssize_t vlc_array_index_of_item( const vlc_array_t *ar,
+                                               const void *elem )
+{
+    for( size_t i = 0; i < ar->i_count; i++ )
     {
-        if( p_array->pp_elems[i] == item )
+        if( ar->pp_elems[i] == elem )
             return i;
     }
     return -1;
 }
 
 /* Write */
-static inline void
-vlc_array_insert( vlc_array_t * p_array, void * p_elem, int i_index )
+static inline void vlc_array_insert( vlc_array_t *ar, void *elem, int idx )
 {
-    TAB_INSERT_CAST( (void **), p_array->i_count, p_array->pp_elems, p_elem, i_index );
+    void **pp = (void **)realloc( ar->pp_elems,
+                                  sizeof( void * ) * (ar->i_count + 1) );
+    if( unlikely(pp == NULL) )
+        abort();
+
+    size_t tail = ar->i_count - idx;
+    if( tail > 0 )
+        memmove( pp + idx + 1, pp + idx, sizeof( void * ) * tail );
+
+    pp[idx] = elem;
+    ar->i_count++;
+    ar->pp_elems = pp;
 }
 
-static inline void
-vlc_array_append( vlc_array_t * p_array, void * p_elem )
+static inline void vlc_array_append( vlc_array_t *ar, void *elem )
 {
-    vlc_array_insert( p_array, p_elem, p_array->i_count );
+    void **pp = (void **)realloc( ar->pp_elems,
+                                  sizeof( void * ) * (ar->i_count + 1) );
+    if( unlikely(pp == NULL) )
+        abort();
+
+    pp[ar->i_count++] = elem;
+    ar->pp_elems = pp;
 }
 
-static inline void
-vlc_array_remove( vlc_array_t * p_array, int i_index )
+static inline void vlc_array_remove( vlc_array_t *ar, size_t idx )
 {
-    if( i_index >= 0 )
+    void **pp = ar->pp_elems;
+    size_t tail = ar->i_count - idx - 1;
+
+    if( tail > 0 )
+        memmove( pp + idx, pp + idx + 1, sizeof( void * ) * tail );
+
+    ar->i_count--;
+
+    if( ar->i_count > 0 )
     {
-        if( p_array->i_count > 1 )
-        {
-            memmove( p_array->pp_elems + i_index,
-                     p_array->pp_elems + i_index+1,
-                     ( p_array->i_count - i_index - 1 ) * sizeof( void* ) );
-        }
-        p_array->i_count--;
-        if( p_array->i_count == 0 )
-        {
-            free( p_array->pp_elems );
-            p_array->pp_elems = NULL;
-        }
+        pp = (void **)realloc( pp, sizeof( void * ) * ar->i_count );
+        if( likely(pp != NULL) )
+            ar->pp_elems = pp;
+    }
+    else
+    {
+        free( pp );
+        ar->pp_elems = NULL;
     }
 }
 

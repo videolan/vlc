@@ -91,7 +91,7 @@ static void EnqueueRequest( fingerprinter_thread_t *f, fingerprint_request_t *r 
 static void QueueIncomingRequests( fingerprinter_sys_t *p_sys )
 {
     vlc_mutex_lock( &p_sys->incoming.lock );
-    int i = vlc_array_count( p_sys->incoming.queue );
+    size_t i = vlc_array_count( p_sys->incoming.queue );
     if ( i == 0 ) goto end;
     while( i )
         vlc_array_append( p_sys->processing.queue,

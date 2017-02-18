@@ -121,7 +121,7 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
 {
     vlc_mutex_destroy(&p_em->lock);
 
-    for (int i = 0; i < vlc_array_count(&p_em->listeners); i++)
+    for (size_t i = 0; i < vlc_array_count(&p_em->listeners); i++)
         free(vlc_array_item_at_index(&p_em->listeners, i));
 
     vlc_array_clear(&p_em->listeners);
@@ -140,7 +140,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     p_event->p_obj = p_em->p_obj;
 
     vlc_mutex_lock(&p_em->lock);
-    for (int i = 0; i < vlc_array_count(&p_em->listeners); i++)
+    for (size_t i = 0; i < vlc_array_count(&p_em->listeners); i++)
     {
         libvlc_event_listener_t *listener;
 
@@ -283,7 +283,7 @@ void libvlc_event_detach(libvlc_event_manager_t *em, libvlc_event_type_t type,
                          libvlc_callback_t callback, void *opaque)
 {
     vlc_mutex_lock(&em->lock);
-    for (int i = 0; i < vlc_array_count(&em->listeners); i++)
+    for (size_t i = 0; i < vlc_array_count(&em->listeners); i++)
     {
          libvlc_event_listener_t *listener;
 

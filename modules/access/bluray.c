@@ -920,7 +920,7 @@ typedef struct  fmt_es_pair {
 
 static int  findEsPairIndex(demux_sys_t *p_sys, int i_id)
 {
-    for (int i = 0; i < vlc_array_count(&p_sys->es); ++i)
+    for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
         if (((fmt_es_pair_t*)vlc_array_item_at_index(&p_sys->es, i))->i_id == i_id)
             return i;
 
@@ -929,7 +929,7 @@ static int  findEsPairIndex(demux_sys_t *p_sys, int i_id)
 
 static int  findEsPairIndexByEs(demux_sys_t *p_sys, es_out_id_t *p_es)
 {
-    for (int i = 0; i < vlc_array_count(&p_sys->es); ++i)
+    for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
         if (((fmt_es_pair_t*)vlc_array_item_at_index(&p_sys->es, i))->p_es == p_es)
             return i;
 
@@ -1067,7 +1067,7 @@ static int esOutControl(es_out_t *p_out, int i_query, va_list args)
 
 static void esOutDestroy(es_out_t *p_out)
 {
-    for (int i = 0; i < vlc_array_count(&p_out->p_sys->p_demux->p_sys->es); ++i)
+    for (size_t i = 0; i < vlc_array_count(&p_out->p_sys->p_demux->p_sys->es); ++i)
         free(vlc_array_item_at_index(&p_out->p_sys->p_demux->p_sys->es, i));
     vlc_array_clear(&p_out->p_sys->p_demux->p_sys->es);
     free(p_out->p_sys);

@@ -357,7 +357,7 @@ exit:
     unzClose( file );
     p_sys->zipFile = NULL;
 
-    for( int i = 0; i < vlc_array_count( p_filenames ); i++ )
+    for( size_t i = 0; i < vlc_array_count( p_filenames ); i++ )
     {
         free( vlc_array_item_at_index( p_filenames, i ) );
     }
@@ -558,7 +558,7 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
     }
 
     int i_track = 0;
-    for( int i = 0; i < vlc_array_count( p_filenames ); ++i )
+    for( size_t i = 0; i < vlc_array_count( p_filenames ); ++i )
     {
         char *psz_name = (char*) vlc_array_item_at_index( p_filenames, i );
         int i_len = strlen( psz_name );

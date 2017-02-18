@@ -204,7 +204,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
 
     libvlc_media_release( p_mlist->p_md );
 
-    for ( int i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
     {
         libvlc_media_t* p_md = vlc_array_item_at_index( &p_mlist->items, i );
         libvlc_media_release( p_md );

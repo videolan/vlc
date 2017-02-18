@@ -87,7 +87,7 @@ void FingerprintDialog::handleResults()
 
     ui->stackedWidget->setCurrentWidget( ui->results );
 
-    for ( int i=0; i< vlc_array_count( & p_r->results.metas_array ) ; i++ )
+    for ( size_t i = 0; i< vlc_array_count( & p_r->results.metas_array ) ; i++ )
     {
         vlc_meta_t *p_meta =
                 (vlc_meta_t *) vlc_array_item_at_index( & p_r->results.metas_array, i );
