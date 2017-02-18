@@ -1203,10 +1203,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
         picture_sys_t *p_sys = picture->p_sys;
         D3D11_TEXTURE2D_DESC texDesc;
+#if defined(HAVE_ID3D11VIDEODECODER)
         if( sys->context_lock != INVALID_HANDLE_VALUE )
         {
             WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
         }
+#endif
         if (!is_d3d11_opaque(picture->format.i_chroma))
             Direct3D11UnmapPoolTexture(picture);
         ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
@@ -1222,8 +1224,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                                   0, 0, 0, 0,
                                                   p_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_sys->slice_index, &box);
+#if defined(HAVE_ID3D11VIDEODECODER)
         if ( sys->context_lock != INVALID_HANDLE_VALUE)
             ReleaseMutex( sys->context_lock );
+#endif
     }
 
     if (subpicture) {
