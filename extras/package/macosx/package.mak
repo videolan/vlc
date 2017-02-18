@@ -5,11 +5,11 @@ endif
 # Symlink a pseudo-bundle
 pseudo-bundle:
 	$(MKDIR_P) $(top_builddir)/bin/Contents/Resources/
-	$(LN_S) -f ../../../modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/English.lproj
-	$(LN_S) -f ../../../../modules/gui/macosx/Resources/InfoPlist.strings $(top_builddir)/bin/Contents/Resources/English.lproj/InfoPlist.strings
-	$(LN_S) -f ../../modules/gui/macosx/Resources/Info.plist $(top_builddir)/bin/Contents/Info.plist
+	$(LN_S) -f $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/English.lproj
+	$(LN_S) -f $(abs_top_builddir)/modules/gui/macosx/Resources/InfoPlist.strings $(top_builddir)/bin/Contents/Resources/English.lproj/InfoPlist.strings
+	$(LN_S) -f $(abs_top_builddir)/modules/gui/macosx/Resources/Info.plist $(top_builddir)/bin/Contents/Info.plist
 	$(LN_S) -f $(CONTRIB_DIR)/Frameworks
-	cd $(top_builddir)/bin/Contents/Resources/ && find ../../../$(top_srcdir)/modules/gui/macosx/Resources/ -type f -exec $(LN_S) -f {} \;
+	cd $(top_builddir)/bin/Contents/Resources/ && find $(abs_top_srcdir)/modules/gui/macosx/Resources/ -type f -exec $(LN_S) -f {} \;
 
 # This is just for development purposes.
 # The resulting VLC-dev.app will only run in this tree.
