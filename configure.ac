@@ -3870,7 +3870,7 @@ AC_ARG_ENABLE(sparkle,
   [  --enable-sparkle        Sparkle update support for OS X (default enabled on Mac OS X)])
 if test "x${enable_sparkle}" != "xno" -a "${HAVE_OSX}" = "1"
 then
-  if test ! -d ${CONTRIB_DIR}/Sparkle.framework
+  if test ! -d ${CONTRIB_DIR}/Sparkle.framework -a ! -d ${CONTRIB_DIR}/Frameworks/Sparkle.framework
   then
     AC_MSG_ERROR([Sparkle framework is required and was not found in ${CONTRIB_DIR}])
   fi
