@@ -1,3 +1,16 @@
+if HAVE_DARWIN
+noinst_DATA = pseudo-bundle
+endif
+
+# Symlink a pseudo-bundle
+pseudo-bundle:
+	$(MKDIR_P) $(top_builddir)/bin/Contents/Resources/
+	$(LN_S) -f ../../../modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/English.lproj
+	$(LN_S) -f ../../../../modules/gui/macosx/Resources/InfoPlist.strings $(top_builddir)/bin/Contents/Resources/English.lproj/InfoPlist.strings
+	$(LN_S) -f ../../modules/gui/macosx/Resources/Info.plist $(top_builddir)/bin/Contents/Info.plist
+	$(LN_S) -f $(CONTRIB_DIR)/Frameworks
+	cd $(top_builddir)/bin/Contents/Resources/ && find ../../../$(top_srcdir)/modules/gui/macosx/Resources/ -type f -exec $(LN_S) -f {} \;
+
 # This is just for development purposes.
 # The resulting VLC-dev.app will only run in this tree.
 VLC-dev.app: VLC-tmp
@@ -102,7 +115,7 @@ package-translations:
 	$(AMTAR) chof - $(srcdir)/vlc-translations-$(VERSION) \
 	  | GZIP=$(GZIP_ENV) gzip -c >$(srcdir)/vlc-translations-$(VERSION).tar.gz
 
-.PHONY: package-macosx package-macosx-zip package-translations
+.PHONY: package-macosx package-macosx-zip package-translations pseudo-bundle
 
 ###############################################################################
 # Mac OS X project
