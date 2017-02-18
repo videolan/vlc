@@ -178,6 +178,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".divx"
   !insertmacro ${_action} Video ".drc"
   !insertmacro ${_action} Video ".dv"
+  !insertmacro ${_action} Video ".dvr-ms"
   !insertmacro ${_action} Video ".evo"
   !insertmacro ${_action} Video ".f4v"
   !insertmacro ${_action} Video ".flv"
@@ -223,6 +224,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".vro"
   !insertmacro ${_action} Video ".webm"
   !insertmacro ${_action} Video ".wmv"
+  !insertmacro ${_action} Video ".wtv"
   !insertmacro ${_action} Video ".xesc"
 !macroend
 
