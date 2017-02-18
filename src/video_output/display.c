@@ -330,7 +330,7 @@ void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, video_ori
     }
 }
 
-struct vout_display_owner_sys_t {
+typedef struct {
     vout_thread_t   *vout;
     bool            is_wrapper;  /* Is the current display a wrapper */
     vout_display_t  *wrapper; /* Vout display wrapper */
@@ -421,7 +421,7 @@ struct vout_display_owner_sys_t {
         vlc_thread_t thread;
         block_fifo_t *fifo;
     } event;
-};
+} vout_display_owner_sys_t;
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
 {

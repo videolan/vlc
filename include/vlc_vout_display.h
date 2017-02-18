@@ -51,7 +51,6 @@
 typedef struct vout_display_t vout_display_t;
 typedef struct vout_display_sys_t vout_display_sys_t;
 typedef struct vout_display_owner_t vout_display_owner_t;
-typedef struct vout_display_owner_sys_t vout_display_owner_sys_t;
 
 /**
  * Possible alignments for vout_display.
@@ -226,7 +225,7 @@ enum {
 struct vout_display_owner_t {
     /* Private place holder for the vout_display_t creator
      */
-    vout_display_owner_sys_t *sys;
+    void *sys;
 
     /* Event coming from the module
      *
