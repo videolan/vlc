@@ -65,16 +65,16 @@ httpd_file_t *httpd_FileNew (httpd_host_t *host,
     vlc_assert_unreachable ();
 }
 
-httpd_handler_sys_t *httpd_HandlerDelete (httpd_handler_t *handler)
+void *httpd_HandlerDelete(httpd_handler_t *handler)
 {
     (void) handler;
     vlc_assert_unreachable ();
 }
 
-httpd_handler_t *httpd_HandlerNew (httpd_host_t *host, const char *url,
-                                   const char *login, const char *password,
-                                   httpd_handler_callback_t cb,
-                                   httpd_handler_sys_t *data)
+httpd_handler_t *httpd_HandlerNew(httpd_host_t *host, const char *url,
+                                  const char *login, const char *password,
+                                  httpd_handler_callback_t cb,
+                                  void *data)
 {
     (void) host; (void) url;
     (void) login; (void) password;

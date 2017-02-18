@@ -408,7 +408,7 @@ struct httpd_handler_t
     httpd_url_t *url;
 
     httpd_handler_callback_t pf_fill;
-    httpd_handler_sys_t      *p_sys;
+    void                    *p_sys;
 
 };
 
@@ -483,10 +483,10 @@ httpd_HandlerCallBack(httpd_callback_sys_t *p_sys, httpd_client_t *cl,
 }
 
 httpd_handler_t *httpd_HandlerNew(httpd_host_t *host, const char *psz_url,
-                                   const char *psz_user,
-                                   const char *psz_password,
-                                   httpd_handler_callback_t pf_fill,
-                                   httpd_handler_sys_t *p_sys)
+                                  const char *psz_user,
+                                  const char *psz_password,
+                                  httpd_handler_callback_t pf_fill,
+                                  void *p_sys)
 {
     httpd_handler_t *handler = malloc(sizeof(*handler));
     if (!handler)
@@ -511,9 +511,9 @@ httpd_handler_t *httpd_HandlerNew(httpd_host_t *host, const char *psz_url,
     return handler;
 }
 
-httpd_handler_sys_t *httpd_HandlerDelete(httpd_handler_t *handler)
+void *httpd_HandlerDelete(httpd_handler_t *handler)
 {
-    httpd_handler_sys_t *p_sys = handler->p_sys;
+    void *p_sys = handler->p_sys;
     httpd_UrlDelete(handler->url);
     free(handler);
     return p_sys;
