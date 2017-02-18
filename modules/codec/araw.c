@@ -321,11 +321,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
-    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-        goto skip;
-
-    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    if( p_block->i_flags & (BLOCK_FLAG_CORRUPTED|BLOCK_FLAG_DISCONTINUITY) )
+    {
         Flush( p_dec );
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+            goto skip;
+    }
 
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )

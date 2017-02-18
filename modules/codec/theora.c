@@ -457,16 +457,17 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     decoder_sys_t *p_sys = p_dec->p_sys;
     void *p_buf;
 
-    if( ( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY ) != 0 )
-        p_sys->i_pts = p_block->i_pts;
-
-    if( ( p_block->i_flags & BLOCK_FLAG_CORRUPTED ) != 0 )
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        /* Don't send the a corrupted packet to
-         * theora_decode, otherwise we get purple/green display artifacts
-         * appearing in the video output */
-        block_Release(p_block);
-        return NULL;
+        Flush( p_dec );
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            /* Don't send the a corrupted packet to
+             * theora_decode, otherwise we get purple/green display artifacts
+             * appearing in the video output */
+            block_Release(p_block);
+            return NULL;
+        }
     }
 
     /* Date management */
