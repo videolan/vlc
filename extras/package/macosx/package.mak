@@ -5,60 +5,40 @@ endif
 # Symlink a pseudo-bundle
 pseudo-bundle:
 	$(MKDIR_P) $(top_builddir)/bin/Contents/Resources/
-	$(LN_S) -f $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/English.lproj
-	$(LN_S) -f $(abs_top_builddir)/modules/gui/macosx/Resources/InfoPlist.strings $(top_builddir)/bin/Contents/Resources/English.lproj/InfoPlist.strings
-	$(LN_S) -f $(abs_top_builddir)/modules/gui/macosx/Resources/Info.plist $(top_builddir)/bin/Contents/Info.plist
-	$(LN_S) -f $(CONTRIB_DIR)/Frameworks
+	$(LN_S) -hf $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/English.lproj
+	$(LN_S) -hf $(abs_top_builddir)/share/macosx/Info.plist $(top_builddir)/bin/Contents/Info.plist
+	$(LN_S) -hf $(CONTRIB_DIR)/Frameworks
 	cd $(top_builddir)/bin/Contents/Resources/ && find $(abs_top_srcdir)/modules/gui/macosx/Resources/ -type f -exec $(LN_S) -f {} \;
-
-# This is just for development purposes.
-# The resulting VLC-dev.app will only run in this tree.
-VLC-dev.app: VLC-tmp
-	rm -Rf $@
-	cp -R VLC-tmp $@
-	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc-osx $@/Contents/MacOS/VLC
-	$(LN_S) -f ../../../modules $@/Contents/MacOS/plugins
 
 # VLC.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
-VLC.app: VLC-tmp
+VLC.app: install
 	rm -Rf $@
-	cp -R VLC-tmp $@
-	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
-	bin/vlc-cache-gen $@/Contents/MacOS/plugins
-	find $@ -type d -exec chmod ugo+rx '{}' \;
-	find $@ -type f -exec chmod ugo+r '{}' \;
-
-VLC-tmp:
-	$(AM_V_GEN)for i in src lib share modules/gui/macosx; do \
-		(cd $$i && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd)); \
-	done
-	## Create directories
-	mkdir -p $@/Contents/Resources/English.lproj
-	mkdir -p $@/Contents/MacOS/share/locale/
-	mkdir -p $@/Contents/MacOS/include/
-	mkdir -p $@/Contents/Frameworks/
+	## Copy Contents
+	cp -R $(prefix)/share/macosx/ $@
+	## Copy .strings file
+	cp -R $(top_builddir)/modules/gui/macosx/UI/InfoPlist.strings $@/Contents/Resources/UI
+	## Rename interface files (UI) folder
+	mv $@/Contents/Resources/UI $@/Contents/Resources/English.lproj
 	## Copy Info.plist and convert to binary
-	cp -R $(top_builddir)/modules/gui/macosx/Resources/Info.plist $@/Contents/
+	cp -R $(top_builddir)/share/macosx/Info.plist $@/Contents/
 	xcrun plutil -convert binary1 $@/Contents/Info.plist
-	## Copy interface files (NIBs)
-	cp -R $(top_builddir)/modules/gui/macosx/UI/ $@/Contents/Resources/English.lproj
-	## Copy resources
-	cp -R $(prefix)/share/macosx/ $@/Contents/Resources
-	## Copy InfoPlist.strings file
-	cp $(top_builddir)/modules/gui/macosx/Resources/InfoPlist.strings $@/Contents/Resources/English.lproj/
-	## Copy frameworks
-	cp -R $(CONTRIB_DIR)/Growl.framework $@/Contents/Frameworks/
+	## Create Frameworks dir and copy required ones
+	mkdir -p $@/Contents/Frameworks
+	cp -R $(CONTRIB_DIR)/Frameworks/Growl.framework $@/Contents/Frameworks
 if HAVE_SPARKLE
-	cp -R $(CONTRIB_DIR)/Sparkle.framework $@/Contents/Frameworks/
+	cp -R $(CONTRIB_DIR)/Frameworks/Sparkle.framework $@/Contents/Frameworks
 endif
 if HAVE_BREAKPAD
-	cp -R $(CONTRIB_DIR)/Breakpad.framework $@/Contents/Frameworks/
+	cp -R $(CONTRIB_DIR)/Frameworks/Breakpad.framework $@/Contents/Frameworks
 endif
+	mkdir -p $@/Contents/MacOS/share/locale/
 if BUILD_LUA
 	## Copy lua scripts
 	cp -r "$(prefix)/lib/vlc/lua" "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
 endif
+	## Copy some other stuff (?)
+	mkdir -p $@/Contents/MacOS/include/
 	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
 	## Copy translations
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
@@ -69,6 +49,12 @@ endif
 		$@/Contents/Resources/$${i}.lproj/ ; \
 	done
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
+	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
+	## Generate plugin cache
+	bin/vlc-cache-gen $@/Contents/MacOS/plugins
+	find $@ -type d -exec chmod ugo+rx '{}' \;
+	find $@ -type f -exec chmod ugo+r '{}' \;
+
 
 package-macosx: VLC.app
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/Goodies/"

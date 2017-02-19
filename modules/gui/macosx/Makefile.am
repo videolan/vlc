@@ -95,7 +95,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCDefaultValueSliderCell.h VLCDefaultValueSliderCell.m
 
 if HAVE_DARWIN
-libmacosx_plugin_la_DATA = \
+nobase_libmacosx_plugin_la_DATA = \
 	UI/About.nib \
 	UI/AddonManager.nib \
 	UI/AudioEffects.nib \
@@ -780,5 +780,6 @@ DEPS_res += \
 	Resources/vlc.scriptSuite \
 	Resources/vlc.scriptTerminology
 
-libmacosx_plugin_ladir = $(prefix)/share/macosx
+libmacosx_plugin_ladir = $(prefix)/share/macosx/Contents/Resources
+
 dist_libmacosx_plugin_la_DATA = $(DEPS_res)
