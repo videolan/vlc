@@ -227,9 +227,9 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys = p_sys;
     p_sys->p_conn = p_conn;
-    p_sys->p_events = vlc_array_new();
-    p_sys->p_timeouts = vlc_array_new();
-    p_sys->p_watches = vlc_array_new();
+    vlc_array_init( &p_sys->events );
+    vlc_array_init( &p_sys->timeouts );
+    vlc_array_init( &p_sys->watches );
     vlc_mutex_init( &p_sys->lock );
 
     p_playlist = pl_Get( p_intf );
@@ -270,10 +270,6 @@ error:
      * XXX: Does this make sense when OOM ? */
     dbus_connection_close( p_sys->p_conn );
     dbus_connection_unref( p_conn );
-
-    vlc_array_destroy( p_sys->p_events );
-    vlc_array_destroy( p_sys->p_timeouts );
-    vlc_array_destroy( p_sys->p_watches );
 
     vlc_mutex_destroy( &p_sys->lock );
 
@@ -320,15 +316,15 @@ static void Close   ( vlc_object_t *p_this )
     dbus_connection_unref( p_sys->p_conn );
 
     // Free the events array
-    for( size_t i = 0; i < vlc_array_count( p_sys->p_events ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->events ); i++ )
     {
-        callback_info_t* info = vlc_array_item_at_index( p_sys->p_events, i );
+        callback_info_t* info = vlc_array_item_at_index( &p_sys->events, i );
         free( info );
     }
     vlc_mutex_destroy( &p_sys->lock );
-    vlc_array_destroy( p_sys->p_events );
-    vlc_array_destroy( p_sys->p_timeouts );
-    vlc_array_destroy( p_sys->p_watches );
+    vlc_array_clear( &p_sys->events );
+    vlc_array_clear( &p_sys->timeouts );
+    vlc_array_clear( &p_sys->watches );
     vlc_close( p_sys->p_pipe_fds[1] );
     vlc_close( p_sys->p_pipe_fds[0] );
     free( p_sys );
@@ -346,7 +342,7 @@ static dbus_bool_t add_timeout(DBusTimeout *to, void *data)
     dbus_timeout_set_data(to, expiry, free);
 
     vlc_mutex_lock(&sys->lock);
-    vlc_array_append(sys->p_timeouts, to);
+    vlc_array_append(&sys->timeouts, to);
     vlc_mutex_unlock(&sys->lock);
 
     return TRUE;
@@ -356,10 +352,11 @@ static void remove_timeout(DBusTimeout *to, void *data)
 {
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
-    unsigned idx = vlc_array_index_of_item(sys->p_timeouts, to);
+    size_t idx;
 
     vlc_mutex_lock(&sys->lock);
-    vlc_array_remove(sys->p_timeouts, idx);
+    idx = vlc_array_index_of_item(&sys->timeouts, to);
+    vlc_array_remove(&sys->timeouts, idx);
     vlc_mutex_unlock(&sys->lock);
 }
 
@@ -387,11 +384,11 @@ static int next_timeout(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
     mtime_t next_timeout = LAST_MDATE;
-    unsigned count = vlc_array_count(sys->p_timeouts);
+    unsigned count = vlc_array_count(&sys->timeouts);
 
     for (unsigned i = 0; i < count; i++)
     {
-        DBusTimeout *to = vlc_array_item_at_index(sys->p_timeouts, i);
+        DBusTimeout *to = vlc_array_item_at_index(&sys->timeouts, i);
 
         if (!dbus_timeout_get_enabled(to))
             continue;
@@ -422,9 +419,9 @@ static void process_timeouts(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
 
-    for (size_t i = 0; i < vlc_array_count(sys->p_timeouts); i++)
+    for (size_t i = 0; i < vlc_array_count(&sys->timeouts); i++)
     {
-        DBusTimeout *to = vlc_array_item_at_index(sys->p_timeouts, i);
+        DBusTimeout *to = vlc_array_item_at_index(&sys->timeouts, i);
 
         if (!dbus_timeout_get_enabled(to))
             continue;
@@ -450,7 +447,7 @@ static dbus_bool_t add_watch( DBusWatch *p_watch, void *p_data )
     intf_sys_t    *p_sys  = (intf_sys_t*) p_intf->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
-    vlc_array_append( p_sys->p_watches, p_watch );
+    vlc_array_append( &p_sys->watches, p_watch );
     vlc_mutex_unlock( &p_sys->lock );
 
     return TRUE;
@@ -460,12 +457,11 @@ static void remove_watch( DBusWatch *p_watch, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_data;
     intf_sys_t    *p_sys  = (intf_sys_t*) p_intf->p_sys;
+    size_t idx;
 
     vlc_mutex_lock( &p_sys->lock );
-
-    vlc_array_remove( p_sys->p_watches,
-                      vlc_array_index_of_item( p_sys->p_watches, p_watch ) );
-
+    idx = vlc_array_index_of_item( &p_sys->watches, p_watch );
+    vlc_array_remove( &p_sys->watches, idx );
     vlc_mutex_unlock( &p_sys->lock );
 }
 
@@ -493,7 +489,7 @@ static void watch_toggled( DBusWatch *p_watch, void *p_data )
 static int GetPollFds( intf_thread_t *p_intf, struct pollfd *p_fds )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    size_t i_watches = vlc_array_count( p_sys->p_watches );
+    size_t i_watches = vlc_array_count( &p_sys->watches );
     int i_fds = 1;
 
     p_fds[0].fd = p_sys->p_pipe_fds[PIPE_OUT];
@@ -502,7 +498,7 @@ static int GetPollFds( intf_thread_t *p_intf, struct pollfd *p_fds )
     for( size_t i = 0; i < i_watches; i++ )
     {
         DBusWatch *p_watch = NULL;
-        p_watch = vlc_array_item_at_index( p_sys->p_watches, i );
+        p_watch = vlc_array_item_at_index( &p_sys->watches, i );
         if( !dbus_watch_get_enabled( p_watch ) )
             continue;
 
@@ -776,7 +772,7 @@ static void *Run( void *data )
     {
         vlc_mutex_lock( &p_sys->lock );
 
-        size_t i_watches = vlc_array_count( p_sys->p_watches );
+        size_t i_watches = vlc_array_count( &p_sys->watches );
         struct pollfd fds[i_watches];
         memset(fds, 0, sizeof fds);
 
@@ -817,22 +813,22 @@ static void *Run( void *data )
         process_timeouts(p_intf);
 
         /* Get the list of watches to process */
-        i_watches = vlc_array_count( p_sys->p_watches );
+        i_watches = vlc_array_count( &p_sys->watches );
         DBusWatch *p_watches[i_watches ? i_watches : 1];
         for( size_t i = 0; i < i_watches; i++ )
         {
-            p_watches[i] = vlc_array_item_at_index( p_sys->p_watches, i );
+            p_watches[i] = vlc_array_item_at_index( &p_sys->watches, i );
         }
 
         /* Get the list of events to process */
-        size_t i_events = vlc_array_count( p_intf->p_sys->p_events );
+        size_t i_events = vlc_array_count( &p_sys->events );
         callback_info_t* p_info[i_events ? i_events : 1];
         for( size_t i = 0; i < i_events; i++ )
         {
-            p_info[i] = vlc_array_item_at_index( p_intf->p_sys->p_events, i );
+            p_info[i] = vlc_array_item_at_index( &p_sys->events, i );
         }
 
-        vlc_array_clear( p_intf->p_sys->p_events );
+        vlc_array_clear( &p_sys->events );
 
         /* now we can release the lock and process what's pending */
         vlc_mutex_unlock( &p_intf->p_sys->lock );
@@ -946,7 +942,7 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
         p_info->signal = SIGNAL_STATE;
     }
     if( p_info->signal )
-        vlc_array_append( p_intf->p_sys->p_events, p_info );
+        vlc_array_append( &p_sys->events, p_info );
     else
         free( p_info );
     vlc_mutex_unlock( &p_intf->p_sys->lock );
@@ -1007,7 +1003,7 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
     // Append the event
     *p_info = info;
     vlc_mutex_lock( &p_intf->p_sys->lock );
-    vlc_array_append( p_intf->p_sys->p_events, p_info );
+    vlc_array_append( &p_intf->p_sys->events, p_info );
     vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     wakeup_main_loop( p_intf );
