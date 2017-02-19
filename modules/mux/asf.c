@@ -141,7 +141,7 @@ struct sout_mux_sys_t
     int64_t         i_bitrate;
     int64_t         i_bitrate_override;
 
-    vlc_array_t     *p_tracks;
+    vlc_array_t     tracks;
 
     bool            b_write_header;
 
@@ -216,7 +216,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_bitrate    = 0;
     p_sys->i_bitrate_override = 0;
     p_sys->i_seq        = 0;
-    p_sys->p_tracks     = vlc_array_new();
+    vlc_array_init( &p_sys->tracks );
 
     p_sys->b_write_header = true;
     p_sys->i_packet_size = var_InheritInteger( p_mux, "sout-asf-packet-size" );
@@ -277,18 +277,15 @@ static void Close( vlc_object_t * p_this )
     }
 
 
-    for( int i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        asf_track_t *track = vlc_array_item_at_index( p_sys->p_tracks, i );
+        asf_track_t *track = vlc_array_item_at_index( &p_sys->tracks, i );
         free( track->p_extra );
         es_format_Clean( &track->fmt );
         free( track );
     }
 
-    vlc_array_clear( p_sys->p_tracks );
-
-    vlc_array_destroy( p_sys->p_tracks );
-
+    vlc_array_clear( &p_sys->tracks );
     free( p_sys->psz_title );
     free( p_sys->psz_author );
     free( p_sys->psz_copyright );
@@ -342,7 +339,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     bo_t             bo;
 
     msg_Dbg( p_mux, "adding input" );
-    if( vlc_array_count( p_sys->p_tracks ) >= MAX_ASF_TRACKS )
+    if( vlc_array_count( &p_sys->tracks ) >= MAX_ASF_TRACKS )
     {
         msg_Dbg( p_mux, "cannot add this track (too much tracks)" );
         return VLC_EGENERIC;
@@ -623,9 +620,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     es_format_Copy( &tk->fmt, p_input->p_fmt );
 
-    vlc_array_append( p_sys->p_tracks, (void *)tk);
-    tk->i_id = vlc_array_index_of_item( p_sys->p_tracks, tk ) + 1;
-
+    vlc_array_append( &p_sys->tracks, tk );
+    tk->i_id = vlc_array_index_of_item( &p_sys->tracks, tk ) + 1;
 
     if( p_sys->b_asf_http )
         p_sys->b_write_header = true;
@@ -663,7 +659,7 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( p_sys->b_asf_http )
     {
-        vlc_array_remove( p_sys->p_tracks, vlc_array_index_of_item( p_sys->p_tracks, (void *)tk ) );
+        vlc_array_remove( &p_sys->tracks, vlc_array_index_of_item( &p_sys->tracks, tk ) );
         p_sys->b_write_header = true;
     }
 }
@@ -842,7 +838,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     asf_track_t    *tk;
     mtime_t i_duration = 0;
-    int i_size, i_header_ext_size, i;
+    int i_size, i_header_ext_size;
     int i_ci_size, i_cm_size = 0, i_cd_size = 0;
     block_t *out;
     bo_t bo;
@@ -859,9 +855,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     /* calculate header size */
     i_size = 30 + 104;
     i_ci_size = 44;
-    for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        tk = vlc_array_item_at_index( p_sys->p_tracks, i );
+        tk = vlc_array_item_at_index( &p_sys->tracks, i );
         /* update also track-id */
         tk->i_id = i + 1;
 
@@ -888,9 +884,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     i_header_ext_size = 46;
 
     /* size of the metadata object */
-    for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        const asf_track_t *p_track = vlc_array_item_at_index( p_sys->p_tracks, i );
+        const asf_track_t *p_track = vlc_array_item_at_index( &p_sys->tracks, i );
         if( p_track->i_cat == VIDEO_ES &&
             p_track->fmt.video.i_sar_num != 0 &&
             p_track->fmt.video.i_sar_den != 0 )
@@ -921,7 +917,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     /* header object */
     bo_add_guid ( &bo, &asf_object_header_guid );
     bo_addle_u64( &bo, i_size );
-    bo_addle_u32( &bo, 2 + vlc_array_count( p_sys->p_tracks ) + 1 +
+    bo_addle_u32( &bo, 2 + vlc_array_count( &p_sys->tracks ) + 1 +
                   (i_cd_size ? 1 : 0) + (i_cm_size ? 1 : 0) );
     bo_add_u8   ( &bo, 1 );
     bo_add_u8   ( &bo, 2 );
@@ -955,9 +951,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     bo_addle_u32( &bo, i_header_ext_size - 46 );
 
     /* extended stream properties */
-    for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        const asf_track_t *p_track = vlc_array_item_at_index( p_sys->p_tracks, i );
+        const asf_track_t *p_track = vlc_array_item_at_index( &p_sys->tracks, i );
         const es_format_t *p_fmt = &p_track->fmt;
 
         if( !p_track->b_extended )
@@ -994,9 +990,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         unsigned int i_dst_num, i_dst_den;
 
         asf_track_t *tk = NULL;
-        for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+        for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
         {
-            tk = vlc_array_item_at_index( p_sys->p_tracks, i );
+            tk = vlc_array_item_at_index( &p_sys->tracks, i );
             if( tk->i_cat == VIDEO_ES &&
                 tk->fmt.video.i_sar_num != 0 &&
                 tk->fmt.video.i_sar_den != 0 )
@@ -1050,9 +1046,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     }
 
     /* stream properties */
-    for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        tk = vlc_array_item_at_index( p_sys->p_tracks, i);
+        tk = vlc_array_item_at_index( &p_sys->tracks, i);
 
         bo_add_guid ( &bo, &asf_object_stream_properties_guid );
         bo_addle_u64( &bo, 78 + tk->i_extra + (tk->b_audio_correction ? 8:0) );
@@ -1093,10 +1089,10 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     bo_add_guid ( &bo, &asf_object_codec_list_guid );
     bo_addle_u64( &bo, i_ci_size );
     bo_add_guid ( &bo, &asf_guid_reserved_2 );
-    bo_addle_u32( &bo, vlc_array_count( p_sys->p_tracks ) );
-    for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+    bo_addle_u32( &bo, vlc_array_count( &p_sys->tracks ) );
+    for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        tk = vlc_array_item_at_index( p_sys->p_tracks ,i);
+        tk = vlc_array_item_at_index( &p_sys->tracks ,i);
 
         if( tk->i_cat == VIDEO_ES ) bo_addle_u16( &bo, 1 /* video */ );
         else if( tk->i_cat == AUDIO_ES ) bo_addle_u16( &bo, 2 /* audio */ );
