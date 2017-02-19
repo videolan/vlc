@@ -840,7 +840,7 @@ static void CloseDecoder( vlc_object_t *p_this )
                 if( default_msg_handler( p_dec, p_msg ) )
                 {
                     msg_Err( p_dec, "pipeline may not close gracefully" );
-                    return VLCDEC_ECRITICAL;
+                    return;
                 }
                 break;
             }
