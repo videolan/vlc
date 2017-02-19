@@ -46,13 +46,13 @@ struct fingerprinter_sys_t
 
     struct
     {
-        vlc_array_t         *queue;
+        vlc_array_t         queue;
         vlc_mutex_t         lock;
     } incoming, results;
 
     struct
     {
-        vlc_array_t         *queue;
+        vlc_array_t         queue;
         vlc_mutex_t         lock;
         vlc_cond_t          cond;
         bool                b_working;
@@ -84,20 +84,19 @@ static void EnqueueRequest( fingerprinter_thread_t *f, fingerprint_request_t *r 
 {
     fingerprinter_sys_t *p_sys = f->p_sys;
     vlc_mutex_lock( &p_sys->incoming.lock );
-    vlc_array_append( p_sys->incoming.queue, r );
+    vlc_array_append( &p_sys->incoming.queue, r );
     vlc_mutex_unlock( &p_sys->incoming.lock );
 }
 
 static void QueueIncomingRequests( fingerprinter_sys_t *p_sys )
 {
     vlc_mutex_lock( &p_sys->incoming.lock );
-    size_t i = vlc_array_count( p_sys->incoming.queue );
-    if ( i == 0 ) goto end;
+    size_t i = vlc_array_count( &p_sys->incoming.queue );
+
     while( i )
-        vlc_array_append( p_sys->processing.queue,
-                          vlc_array_item_at_index( p_sys->incoming.queue, --i ) );
-    vlc_array_clear( p_sys->incoming.queue );
-end:
+        vlc_array_append( &p_sys->processing.queue,
+                          vlc_array_item_at_index( &p_sys->incoming.queue, --i ) );
+    vlc_array_clear( &p_sys->incoming.queue );
     vlc_mutex_unlock(&p_sys->incoming.lock);
 }
 
@@ -106,10 +105,10 @@ static fingerprint_request_t * GetResult( fingerprinter_thread_t *f )
     fingerprint_request_t *r = NULL;
     fingerprinter_sys_t *p_sys = f->p_sys;
     vlc_mutex_lock( &p_sys->results.lock );
-    if ( vlc_array_count( p_sys->results.queue ) )
+    if ( vlc_array_count( &p_sys->results.queue ) )
     {
-        r = vlc_array_item_at_index( p_sys->results.queue, 0 );
-        vlc_array_remove( p_sys->results.queue, 0 );
+        r = vlc_array_item_at_index( &p_sys->results.queue, 0 );
+        vlc_array_remove( &p_sys->results.queue, 0 );
     }
     vlc_mutex_unlock( &p_sys->results.lock );
     return r;
@@ -236,14 +235,14 @@ static int Open(vlc_object_t *p_this)
 
     p_fingerprinter->p_sys = p_sys;
 
-    p_sys->incoming.queue = vlc_array_new();
+    vlc_array_init( &p_sys->incoming.queue );
     vlc_mutex_init( &p_sys->incoming.lock );
 
-    p_sys->processing.queue = vlc_array_new();
+    vlc_array_init( &p_sys->processing.queue );
     vlc_mutex_init( &p_sys->processing.lock );
     vlc_cond_init( &p_sys->processing.cond );
 
-    p_sys->results.queue = vlc_array_new();
+    vlc_array_init( &p_sys->results.queue );
     vlc_mutex_init( &p_sys->results.lock );
 
     p_fingerprinter->pf_enqueue = EnqueueRequest;
@@ -283,20 +282,20 @@ static void Close(vlc_object_t *p_this)
 
 static void CleanSys( fingerprinter_sys_t *p_sys )
 {
-    for ( int i = 0; i < vlc_array_count( p_sys->incoming.queue ); i++ )
-        fingerprint_request_Delete( vlc_array_item_at_index( p_sys->incoming.queue, i ) );
-    vlc_array_destroy( p_sys->incoming.queue );
+    for ( size_t i = 0; i < vlc_array_count( &p_sys->incoming.queue ); i++ )
+        fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->incoming.queue, i ) );
+    vlc_array_clear( &p_sys->incoming.queue );
     vlc_mutex_destroy( &p_sys->incoming.lock );
 
-    for ( int i = 0; i < vlc_array_count( p_sys->processing.queue ); i++ )
-        fingerprint_request_Delete( vlc_array_item_at_index( p_sys->processing.queue, i ) );
-    vlc_array_destroy( p_sys->processing.queue );
+    for ( size_t i = 0; i < vlc_array_count( &p_sys->processing.queue ); i++ )
+        fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->processing.queue, i ) );
+    vlc_array_clear( &p_sys->processing.queue );
     vlc_mutex_destroy( &p_sys->processing.lock );
     vlc_cond_destroy( &p_sys->processing.cond );
 
-    for ( int i = 0; i < vlc_array_count( p_sys->results.queue ); i++ )
-        fingerprint_request_Delete( vlc_array_item_at_index( p_sys->results.queue, i ) );
-    vlc_array_destroy( p_sys->results.queue );
+    for ( size_t i = 0; i < vlc_array_count( &p_sys->results.queue ); i++ )
+        fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->results.queue, i ) );
+    vlc_array_clear( &p_sys->results.queue );
     vlc_mutex_destroy( &p_sys->results.lock );
 }
 
@@ -340,10 +339,10 @@ static void *Run( void *opaque )
 
         vlc_testcancel();
 
-        for ( int i = 0 ; i < vlc_array_count( p_sys->processing.queue ); i++ )
+        for ( size_t i = 0 ; i < vlc_array_count( &p_sys->processing.queue ); i++ )
         {
             int canc = vlc_savecancel();
-            fingerprint_request_t *p_data = vlc_array_item_at_index( p_sys->processing.queue, i );
+            fingerprint_request_t *p_data = vlc_array_item_at_index( &p_sys->processing.queue, i );
 
             char *psz_uri = input_item_GetURI( p_data->p_item );
             if ( psz_uri != NULL )
@@ -371,16 +370,16 @@ static void *Run( void *opaque )
 
             /* copy results */
             vlc_mutex_lock( &p_sys->results.lock );
-            vlc_array_append( p_sys->results.queue, p_data );
+            vlc_array_append( &p_sys->results.queue, p_data );
             vlc_mutex_unlock( &p_sys->results.lock );
 
             vlc_testcancel();
         }
 
-        if ( vlc_array_count( p_sys->processing.queue ) )
+        if ( vlc_array_count( &p_sys->processing.queue ) )
         {
             var_TriggerCallback( p_fingerprinter, "results-available" );
-            vlc_array_clear( p_sys->processing.queue );
+            vlc_array_clear( &p_sys->processing.queue );
         }
     }
 
