@@ -49,7 +49,7 @@ endif
 		$@/Contents/Resources/$${i}.lproj/ ; \
 	done
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
-	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
+	PRODUCT="$@" build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
 	## Generate plugin cache
 	bin/vlc-cache-gen $@/Contents/MacOS/plugins
 	find $@ -type d -exec chmod ugo+rx '{}' \;
