@@ -55,10 +55,6 @@ static const std::string NAMESPACE_RECEIVER         = "urn:x-cast:com.google.cas
 #define CHROMECAST_CONTROL_PORT 8009
 #define HTTP_PORT               8010
 
-/* deadline regarding pings sent from receiver */
-#define PING_WAIT_TIME 6000
-#define PING_WAIT_RETRIES 0
-
 #define PACKET_MAX_LEN 10 * 1024
 
 // Media player Chromecast app id
@@ -114,9 +110,7 @@ public:
                         const std::string & currentTime );
     void msgPlayerSetVolume( const std::string& destinationId, const std::string& mediaSessionId,
                              float volume, bool mute);
-    int recvPacket( bool *b_msgReceived, uint32_t &i_payloadSize,
-                   unsigned *pi_received, uint8_t *p_data, bool *pb_pingTimeout,
-                   int *pi_wait_delay, int *pi_wait_retries );
+    ssize_t recvPacket( uint8_t *p_data);
 private:
     int sendMessage(const castchannel::CastMessage &msg);
 
@@ -240,6 +234,9 @@ private:
 
     /* shared structure with the demux-filter */
     chromecast_common      m_common;
+
+    /* Heartbeat */
+    uint8_t m_pingRetriesLeft;
 };
 
 #endif /* VLC_CHROMECAST_H */

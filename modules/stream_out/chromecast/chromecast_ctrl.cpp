@@ -40,7 +40,7 @@
 
 /* deadline regarding pings sent from receiver */
 #define PING_WAIT_TIME 6000
-#define PING_WAIT_RETRIES 0
+#define PING_WAIT_RETRIES 1
 
 static const mtime_t SEEK_FORWARD_OFFSET = 1000000;
 
@@ -91,6 +91,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_length( VLC_TS_INVALID )
  , m_chromecast_start_time( VLC_TS_INVALID )
  , m_seek_request_time( VLC_TS_INVALID )
+ , m_pingRetriesLeft( PING_WAIT_RETRIES )
 {
     vlc_mutex_init(&m_lock);
     vlc_cond_init( &m_stateChangedCond );
@@ -279,6 +280,7 @@ void intf_sys_t::processHeartBeatMessage( const castchannel::CastMessage& msg )
     else if (type == "PONG")
     {
         msg_Dbg( m_module, "PONG received from the Chromecast");
+        m_pingRetriesLeft = PING_WAIT_RETRIES;
     }
     else
     {
@@ -544,15 +546,8 @@ void intf_sys_t::processConnectionMessage( const castchannel::CastMessage& msg )
 
 bool intf_sys_t::handleMessages()
 {
-    unsigned i_received = 0;
     uint8_t p_packet[PACKET_MAX_LEN];
-    bool b_pingTimeout = false;
-
-    int i_waitdelay = PING_WAIT_TIME;
-    int i_retries = PING_WAIT_RETRIES;
-
-    bool b_msgReceived = false;
-    uint32_t i_payloadSize = 0;
+    ssize_t i_payloadSize = 0;
 
     if ( m_requested_stop.exchange(false) && !m_mediaSessionId.empty() )
     {
@@ -573,35 +568,40 @@ bool intf_sys_t::handleMessages()
         m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
     }
 
-    int i_ret = m_communication.recvPacket( &b_msgReceived, i_payloadSize,
-                            &i_received, p_packet, &b_pingTimeout,
-                            &i_waitdelay, &i_retries);
-
-
+    i_payloadSize = m_communication.recvPacket( p_packet );
 #if defined(_WIN32)
-    if ((i_ret < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_ret == 0))
+    if ( i_payloadSize < 0 && WSAGetLastError() != WSAEWOULDBLOCK )
 #else
-    if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
+    if ( i_payloadSize < 0 )
 #endif
     {
+        // An error occured, we give up
         msg_Err( m_module, "The connection to the Chromecast died (receiving).");
         vlc_mutex_locker locker(&m_lock);
         setState( Dead );
         return false;
     }
-
-    if (b_pingTimeout)
+    if ( i_payloadSize == 0 )
     {
-        m_communication.msgPing();
-        m_communication.msgReceiverGetStatus();
+        // If no commands were queued to be sent, we timed out. Let's ping the chromecast
+        if ( m_requested_seek == false && m_requested_stop == false )
+        {
+            if ( m_pingRetriesLeft == 0 )
+            {
+                vlc_mutex_locker locker(&m_lock);
+                m_state = Dead;
+                msg_Warn( m_module, "No PING response from the chromecast" );
+                return false;
+            }
+            --m_pingRetriesLeft;
+            m_communication.msgPing();
+            m_communication.msgReceiverGetStatus();
+        }
+        return true;
     }
-
-    if (b_msgReceived)
-    {
-        castchannel::CastMessage msg;
-        msg.ParseFromArray(p_packet + PACKET_HEADER_LEN, i_payloadSize);
-        processMessage(msg);
-    }
+    castchannel::CastMessage msg;
+    msg.ParseFromArray(p_packet + PACKET_HEADER_LEN, i_payloadSize);
+    processMessage(msg);
     return true;
 }
 

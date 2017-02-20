@@ -32,9 +32,8 @@
 # include <poll.h>
 #endif
 
-/* deadline regarding pong we expect after pinging the receiver */
-#define PONG_WAIT_TIME 500
-#define PONG_WAIT_RETRIES 2
+/* deadline regarding pings sent from receiver */
+#define PING_WAIT_TIME 6000
 
 ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module, const char* targetIP, unsigned int devicePort )
     : m_module( p_module )
@@ -123,11 +122,10 @@ void ChromecastCommunication::buildMessage(const std::string & namespace_,
  * @param i_payloadSize returns the payload size of the message received
  * @return the number of bytes received of -1 on error
  */
-int ChromecastCommunication::recvPacket(bool *b_msgReceived,
-                          uint32_t &i_payloadSize,
-                          unsigned *pi_received, uint8_t *p_data, bool *pb_pingTimeout,
-                          int *pi_wait_delay, int *pi_wait_retries)
+ssize_t ChromecastCommunication::recvPacket( uint8_t *p_data )
 {
+    uint32_t i_received = 0;
+    ssize_t i_payloadSize = -1;
     struct pollfd ufd[1];
     ufd[0].fd = m_sock_fd;
     ufd[0].events = POLLIN;
@@ -136,37 +134,15 @@ int ChromecastCommunication::recvPacket(bool *b_msgReceived,
      * If we do not receive one after 6 seconds, we send a PING.
      * If after this PING, we do not receive a PONG, then we consider the
      * connection as dead. */
-    ssize_t val = vlc_poll_i11e(ufd, 1, *pi_wait_delay);
-    if ( val == -1 && errno != EINTR )
-        return -1;
-
-    if (val == 0)
+    ssize_t val = vlc_poll_i11e(ufd, 1, PING_WAIT_TIME);
+    if ( val == -1 )
     {
-        if (*pb_pingTimeout)
-        {
-            if (!*pi_wait_retries)
-            {
-                msg_Err( m_module, "No PONG answer received from the Chromecast");
-                return 0; // Connection died
-            }
-            (*pi_wait_retries)--;
-        }
-        else
-        {
-            /* now expect a pong */
-            *pi_wait_delay = PONG_WAIT_TIME;
-            *pi_wait_retries = PONG_WAIT_RETRIES;
-            msg_Warn( m_module, "No PING received from the Chromecast, sending a PING");
-        }
-        *pb_pingTimeout = true;
+        if ( errno != EINTR )
+            return -1;
+        return 0;
     }
-    else
-    {
-        *pb_pingTimeout = false;
-        /* reset to default ping waiting */
-        *pi_wait_delay = PING_WAIT_TIME;
-        *pi_wait_retries = PING_WAIT_RETRIES;
-    }
+    if ( val == 0 )
+        return 0;
 
     int i_ret = 0;
     if ( ufd[0].revents & POLLIN )
@@ -177,13 +153,13 @@ int ChromecastCommunication::recvPacket(bool *b_msgReceived,
          * +------------------------------------+------------------------------+
          * | Payload size (uint32_t big endian) |         Payload data         |
          * +------------------------------------+------------------------------+ */
-        while (*pi_received < PACKET_HEADER_LEN)
+        while (i_received < PACKET_HEADER_LEN)
         {
             // We receive the header.
-            i_ret = tls_Recv(m_tls, p_data + *pi_received, PACKET_HEADER_LEN - *pi_received);
+            i_ret = tls_Recv(m_tls, p_data + i_received, PACKET_HEADER_LEN - i_received);
             if (i_ret <= 0)
-                return i_ret;
-            *pi_received += i_ret;
+                return -1;
+            i_received += i_ret;
         }
 
         // We receive the payload.
@@ -197,42 +173,34 @@ int ChromecastCommunication::recvPacket(bool *b_msgReceived,
             // Error case: the packet sent by the Chromecast is too long: we drop it.
             msg_Err( m_module, "Packet too long: droping its data");
 
-            uint32_t i_size = i_payloadSize - (*pi_received - PACKET_HEADER_LEN);
+            uint32_t i_size = i_payloadSize - (i_received - PACKET_HEADER_LEN);
             if (i_size > i_maxPayloadSize)
                 i_size = i_maxPayloadSize;
 
             i_ret = tls_Recv(m_tls, p_data + PACKET_HEADER_LEN, i_size);
             if (i_ret <= 0)
-                return i_ret;
-            *pi_received += i_ret;
+                return -1;
+            i_received += i_ret;
 
-            if (*pi_received < i_payloadSize + PACKET_HEADER_LEN)
+            if (i_received < i_payloadSize + PACKET_HEADER_LEN)
                 return i_ret;
 
-            *pi_received = 0;
             return -1;
         }
 
         // Normal case
-        i_ret = tls_Recv(m_tls, p_data + *pi_received,
-                         i_payloadSize - (*pi_received - PACKET_HEADER_LEN));
+        i_ret = tls_Recv(m_tls, p_data + i_received,
+                         i_payloadSize - (i_received - PACKET_HEADER_LEN));
         if (i_ret <= 0)
-            return i_ret;
-        *pi_received += i_ret;
+            return -1;
+        i_received += i_ret;
 
-        if (*pi_received < i_payloadSize + PACKET_HEADER_LEN)
-            return i_ret;
+        if (i_received < i_payloadSize + PACKET_HEADER_LEN)
+            return -1;
 
-        assert(*pi_received == i_payloadSize + PACKET_HEADER_LEN);
-        *pi_received = 0;
-        *b_msgReceived = true;
+        assert(i_received == i_payloadSize + PACKET_HEADER_LEN);
     }
-
-    if ( val == -1 && errno == EINTR )
-        /* we have stuff to send */
-        i_ret = 1;
-
-    return i_ret;
+    return i_payloadSize;
 }
 
 
