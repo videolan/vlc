@@ -329,7 +329,7 @@ download_git = \
 	$(GIT) remote add origin "$(1)" && \
 	$(GIT) fetch origin "$(2)") && \
 	(cd "$(@:.tar.xz=)" && \
-	$(GIT) archive --prefix="$(notdir $(@:.tar.xz=))" \
+	$(GIT) archive --prefix="$(notdir $(@:.tar.xz=))/" \
 		--format=tar "$(3)") > "$(@:.xz=)" && \
 	echo "$(3) $(@)" > "$(@:.tar.xz=.githash)" && \
 	rm -Rf -- "$(@:.tar.xz)" && \
