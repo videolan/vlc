@@ -121,8 +121,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
 
 intf_sys_t::~intf_sys_t()
 {
-    setHasInput( false );
-
     var_Destroy( m_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME );
 
     switch ( m_state )
@@ -160,31 +158,27 @@ intf_sys_t::~intf_sys_t()
     vlc_mutex_destroy(&m_lock);
 }
 
-void intf_sys_t::setHasInput( bool b_has_input, const std::string mime_type )
+void intf_sys_t::setHasInput( const std::string mime_type )
 {
     vlc_mutex_locker locker(&m_lock);
-    msg_Dbg( m_module, "setHasInput %s session:%s",b_has_input ? "true":"false", m_mediaSessionId.c_str() );
+    msg_Dbg( m_module, "Loading content for session:%s", m_mediaSessionId.c_str() );
 
     this->m_mime = mime_type;
 
-    if( b_has_input )
+    mutex_cleanup_push(&m_lock);
+    waitAppStarted();
+    vlc_cleanup_pop();
+    if ( m_state == Dead )
     {
-        mutex_cleanup_push(&m_lock);
-        waitAppStarted();
-        vlc_cleanup_pop();
-
-        if ( m_state == Dead )
-        {
-            msg_Warn( m_module, "no Chromecast hook possible");
-            return;
-        }
-        // We should now be in the ready state, and therefor have a valid transportId
-        assert( m_state == Ready && m_appTransportId.empty() == false );
-        // we cannot start a new load when the last one is still processing
-        m_ts_local_start = VLC_TS_0;
-        m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, m_title, m_artwork, mime_type );
-        setState( Loading );
+        msg_Warn( m_module, "no Chromecast hook possible");
+        return;
     }
+    // We should now be in the ready state, and therefor have a valid transportId
+    assert( m_state == Ready && m_appTransportId.empty() == false );
+    // we cannot start a new load when the last one is still processing
+    m_ts_local_start = VLC_TS_0;
+    m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, m_title, m_artwork, mime_type );
+    setState( Loading );
 }
 
 /**
@@ -526,7 +520,6 @@ void intf_sys_t::processConnectionMessage( const castchannel::CastMessage& msg )
     {
         // Close message indicates an application is being closed, not the connection.
         // From this point on, we need to relaunch the media receiver app
-        setHasInput( false );
         vlc_mutex_locker locker(&m_lock);
         m_appTransportId = "";
         m_mediaSessionId = "";
@@ -611,7 +604,6 @@ void intf_sys_t::notifySendRequest()
 void intf_sys_t::requestPlayerStop()
 {
     m_requested_stop = true;
-    setHasInput(false);
     notifySendRequest();
 }
 

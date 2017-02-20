@@ -333,7 +333,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         if ( !streams.empty() )
         {
             /* tell the chromecast to load the content */
-            p_intf->setHasInput( true, mime );
+            p_intf->setHasInput( mime );
         }
         else
         {
