@@ -27,11 +27,11 @@ $(TARBALLS)/d3d9.h:
 
 .sum-d3d9: $(TARBALLS)/d3d9caps.h $(TARBALLS)/d3d9.h
 
-$(DST_D3D9CAPS_H): $(TARBALLS)/d3d9caps.h
+$(DST_D3D9CAPS_H): $(TARBALLS)/d3d9caps.h .sum-d3d9
 	mkdir -p -- "$(PREFIX)/include/"
 	cp $(TARBALLS)/d3d9caps.h $@ && cd "$(PREFIX)/include/" && patch -fp1 < ../$(SRC)/d3d9/d3d9caps.patch
 
-$(DST_D3D9_H): $(TARBALLS)/d3d9.h
+$(DST_D3D9_H): $(TARBALLS)/d3d9.h .sum-d3d9
 	mkdir -p -- "$(PREFIX)/include/"
 	cp $(TARBALLS)/d3d9.h $@ && cd "$(PREFIX)/include/" && patch -fp1 < ../$(SRC)/d3d9/d3d9.patch
 
