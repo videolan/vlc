@@ -387,7 +387,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 p_sys->p_current_vsegment->i_current_edition = i_idx;
                 p_sys->i_current_title = i_idx;
-                p_sys->p_current_vsegment->p_current_vchapter = p_sys->p_current_vsegment->veditions[p_sys->p_current_vsegment->i_current_edition]->getChapterbyTimecode(0);
 
                 Seek( p_demux, static_cast<int64_t>( p_sys->titles[i_idx]->seekpoint[0]->i_time_offset ), -1, NULL);
                 p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
