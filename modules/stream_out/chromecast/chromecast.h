@@ -64,28 +64,26 @@ static const std::string NAMESPACE_RECEIVER         = "urn:x-cast:com.google.cas
 // Media player Chromecast app id
 #define APP_ID "CC1AD845" // Default media player aka DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
 
-// Status
-enum connection_status
+enum States
 {
-    CHROMECAST_DISCONNECTED,
-    CHROMECAST_TLS_CONNECTED,
-    CHROMECAST_AUTHENTICATED,
-    CHROMECAST_APP_STARTED,
-    CHROMECAST_CONNECTION_DEAD,
-};
-
-enum command_status {
-    NO_CMD_PENDING,
-    CMD_LOAD_SENT,
-    CMD_PLAYBACK_SENT,
-    CMD_SEEK_SENT,
-};
-
-enum receiver_state {
-    RECEIVER_IDLE,
-    RECEIVER_PLAYING,
-    RECEIVER_BUFFERING,
-    RECEIVER_PAUSED,
+    // An authentication request has been sent
+    Authenticating,
+    // We are sending a connection request
+    Connecting,
+    // We are connected to the chromecast but the receiver app is not running.
+    Connected,
+    // We are launching the media receiver app
+    Launching,
+    // The application is ready, but idle
+    Ready,
+    // A media session is being initiated
+    Loading,
+    Buffering,
+    Playing,
+    Paused,
+    Seeking,
+    // Something went wrong and the connection is dead.
+    Dead,
 };
 
 class ChromecastCommunication
@@ -158,8 +156,6 @@ struct intf_sys_t
 private:
     bool handleMessages();
 
-    void setConnectionStatus(connection_status status);
-
     void waitAppStarted();
     void waitSeekDone();
 
@@ -173,11 +169,12 @@ private:
 
     void setArtwork( const char *psz_artwork );
 
-    void setPlayerStatus(enum command_status status);
-
     mtime_t getPlaybackTimestamp() const;
 
     double getPlaybackPosition() const;
+    // Sets the current state and signal the associated wait cond.
+    // This must be called with the lock held
+    void setState( States state );
 
     void mainLoop();
     void processAuthMessage( const castchannel::CastMessage& msg );
@@ -211,15 +208,13 @@ private:
 
     std::string m_appTransportId;
     std::string m_mediaSessionId;
-    receiver_state m_receiverState;
 
     vlc_mutex_t  m_lock;
-    vlc_cond_t   m_loadCommandCond;
+    vlc_cond_t   m_stateChangedCond;
     vlc_thread_t m_chromecastThread;
 
     ChromecastCommunication m_communication;
-    connection_status m_conn_status;
-    command_status    m_cmd_status;
+    States m_state;
     std::atomic_bool m_requested_stop;
     std::atomic_bool m_requested_seek;
 
