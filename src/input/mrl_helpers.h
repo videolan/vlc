@@ -147,7 +147,7 @@ mrl_FragmentSplit( vlc_array_t** out_items,
     return VLC_SUCCESS;
 
 error:
-    for( int i = 0; i < vlc_array_count( items ); ++i )
+    for( size_t i = 0; i < vlc_array_count( items ); ++i )
         free( vlc_array_item_at_index( items, i ) );
     vlc_array_destroy( items );
     return VLC_EGENERIC;;
