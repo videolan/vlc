@@ -1,7 +1,7 @@
 # fluidlite
 
 FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
-FLUID_HASH := a95c0303
+FLUID_HASH := a95c0303a40deb335dd3e51a8a783bb99a403c31
 
 ifdef HAVE_WIN32
 PKGS += fluidlite
@@ -19,7 +19,7 @@ $(TARBALLS)/fluidlite-git.tar.xz:
 	$(call download_git,$(FLUID_GITURL),,$(FLUID_HASH))
 
 .sum-fluidlite: fluidlite-git.tar.xz
-	$(warning $@ not implemented)
+	$(call check_githash,$(FLUID_HASH))
 	touch $@
 
 DEPS_fluidlite = ogg $(DEPS_ogg)
