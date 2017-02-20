@@ -2355,7 +2355,7 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
 
     /* handle anchors */
     if( InputStreamHandleAnchor( p_source, &p_stream, psz_anchor ) )
-        return NULL;
+        goto error;
 
     /* attach conditional record stream-filter */
     if( var_InheritBool( p_source, "input-record-native" ) )
