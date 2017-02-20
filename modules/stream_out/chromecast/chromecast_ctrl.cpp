@@ -84,7 +84,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_state( Authenticating )
  , m_requested_stop(false)
  , m_requested_seek(false)
- , m_has_input(false)
  , m_ctl_thread_interrupt(p_interrupt)
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
@@ -166,10 +165,9 @@ void intf_sys_t::setHasInput( bool b_has_input, const std::string mime_type )
     vlc_mutex_locker locker(&m_lock);
     msg_Dbg( m_module, "setHasInput %s session:%s",b_has_input ? "true":"false", m_mediaSessionId.c_str() );
 
-    this->m_has_input = b_has_input;
     this->m_mime = mime_type;
 
-    if( this->m_has_input )
+    if( b_has_input )
     {
         mutex_cleanup_push(&m_lock);
         waitAppStarted();

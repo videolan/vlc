@@ -212,8 +212,6 @@ private:
     std::atomic_bool m_requested_stop;
     std::atomic_bool m_requested_seek;
 
-    bool           m_has_input;
-
     std::string m_artwork;
     std::string m_title;
 
