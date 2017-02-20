@@ -252,6 +252,12 @@ else
 XZCAT ?= $(error xz and lzma client not found!)
 endif
 
+ifeq ($(shell which xz >/dev/null 2>&1 || echo FAIL),)
+XZ = xz
+else
+XZ ?= $(error XZ (LZMA) compressor not found!)
+endif
+
 ifeq ($(shell which bzcat >/dev/null 2>&1 || echo FAIL),)
 BZCAT = bzcat
 else
@@ -317,13 +323,23 @@ HOSTVARS_PIC := $(HOSTTOOLS) \
 	LDFLAGS="$(LDFLAGS)"
 
 download_git = \
-	rm -Rf $(@:.tar.xz=) && \
-	$(GIT) clone $(subst HEAD, --depth 1,$(findstring HEAD, $3)) $(2:%=--branch %) $(1) $(@:.tar.xz=) && \
-	(cd $(@:.tar.xz=) && $(GIT) checkout $(3:%= %)) && \
-	rm -Rf $(@:%.tar.xz=%)/.git && \
-	(cd $(dir $@) && \
-	tar cvJ $(notdir $(@:.tar.xz=))) > $@ && \
-	rm -Rf $(@:.tar.xz=)
+	rm -Rf -- "$(@:.tar.xz=)" && \
+	$(GIT) init --bare "$(@:.tar.xz=)" && \
+	(cd "$(@:.tar.xz=)" && \
+	$(GIT) remote add origin "$(1)" && \
+	$(GIT) fetch origin "$(2)") && \
+	(cd "$(@:.tar.xz=)" && \
+	$(GIT) archive --prefix="$(notdir $(@:.tar.xz=))" \
+		--format=tar "$(3)") > "$(@:.xz=)" && \
+	echo "$(3) $(@)" > "$(@:.tar.xz=.githash)" && \
+	rm -Rf -- "$(@:.tar.xz)" && \
+	$(XZ) --stdout "$(@:.xz=)" > "$@.tmp" && \
+	mv -f -- "$@.tmp" "$@"
+check_githash = \
+	h=`sed -n -e "s,^\([0-9a-fA-F]\{40\}\) $<,\1,p" \
+		< "$(<:.tar.xz=.githash)"` && \
+	test "$$h" = "$1"
+
 checksum = \
 	$(foreach f,$(filter $(TARBALLS)/%,$^), \
 		grep -- " $(f:$(TARBALLS)/%=%)$$" \
