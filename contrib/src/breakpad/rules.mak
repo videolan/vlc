@@ -14,7 +14,7 @@ $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz:
 	$(warning $@ not implemented)
 	touch $@
 
-breakpad: breakpad-$(BREAKPAD_HASH).tar.gz
+breakpad: breakpad-$(BREAKPAD_HASH).tar.gz .sum-breakpad
 	mkdir $@
 	tar xvzf $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz -C breakpad
 
