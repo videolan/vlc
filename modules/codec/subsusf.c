@@ -630,12 +630,17 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
                         {
                             ssa_style_t *p_default_style = p_sys->pp_ssa_styles[i];
+                            text_style_t *p_orig_text_style = p_ssa_style->p_style;
 
                             memcpy( p_ssa_style, p_default_style, sizeof( ssa_style_t ) );
+
+                            // reset data-members that are not to be overwritten
+                            p_ssa_style->p_style = p_orig_text_style;
+                            p_ssa_style->psz_stylename = NULL;
+
                             //FIXME: Make font_style a pointer. Actually we double copy some data here,
                             //   we use text_style_Copy to avoid copying psz_fontname, though .
                             text_style_Copy( p_ssa_style->p_style, p_default_style->p_style );
-                            p_ssa_style->psz_stylename = NULL;
                         }
                     }
 
