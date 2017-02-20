@@ -509,8 +509,12 @@ bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
         while (payload.stop_parsing == false)
         {
             EbmlParser parser ( &es, segment, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+            EbmlElement* el = parser.Get();
 
-            ClusterHandler::Dispatcher().send( parser.Get(), ClusterHandler::Payload( payload ) );
+            if( el == NULL )
+                break;
+
+            ClusterHandler::Dispatcher().send( el, ClusterHandler::Payload( payload ) );
         }
     }
 
