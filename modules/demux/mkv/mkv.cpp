@@ -192,8 +192,8 @@ static int Open( vlc_object_t * p_this )
                             continue; // don't reuse the original opened file
                         }
 
-                        if (!strncasecmp(s_filename.c_str() + s_filename.length() - 3, "mkv", 3) ||
-                            !strncasecmp(s_filename.c_str() + s_filename.length() - 3, "mka", 3))
+                        if (!strcasecmp(s_filename.c_str() + s_filename.length() - 4, ".mkv") ||
+                            !strcasecmp(s_filename.c_str() + s_filename.length() - 4, ".mka"))
                         {
                             // test whether this file belongs to our family
                             const uint8_t *p_peek;
