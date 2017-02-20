@@ -1828,8 +1828,8 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
     /* Parse the directives */
     if( isalpha( (unsigned char)*psz_text ) || *psz_text == '[' )
     {
-        while( *psz_text != ' ' )
-        { psz_text++ ;};
+        while( *psz_text && *psz_text != ' ' )
+            ++psz_text;
 
         /* Directives are NOT parsed yet */
         /* This has probably a better place in a decoder ? */
