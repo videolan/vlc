@@ -996,7 +996,6 @@ static int DemuxInit( demux_t *p_demux )
             {
                 /* DVR-MS special ASF */
                 fmt.i_codec = VLC_CODEC_MPGV;
-                fmt.i_original_fourcc = VLC_FOURCC( 'D','V','R',' ');
             }
 
             if( p_sp->i_type_specific_data_length > 11 +
@@ -1128,7 +1127,16 @@ static int DemuxInit( demux_t *p_demux )
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
         }
 
-        fmt.b_packetized = !b_dvrms;
+        if( b_dvrms )
+        {
+            fmt.i_original_fourcc = VLC_FOURCC( 'D','V','R',' ');
+            fmt.b_packetized = false;
+        }
+        else
+        {
+            fmt.b_packetized = true;
+        }
+
         tk->i_cat = tk->info.i_cat = fmt.i_cat;
         if( fmt.i_cat != UNKNOWN_ES )
         {
