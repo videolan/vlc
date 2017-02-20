@@ -252,30 +252,28 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         std::stringstream ssout;
         if ( !canRemux )
         {
-            if ( i_codec_audio == 0 )
-                i_codec_audio = DEFAULT_TRANSCODE_AUDIO;
-            /* avcodec AAC encoder is experimental */
-            if ( i_codec_audio == VLC_CODEC_MP4A ||
-                 i_codec_audio == VLC_FOURCC('h', 'a', 'a', 'c') ||
-                 i_codec_audio == VLC_FOURCC('l', 'a', 'a', 'c') ||
-                 i_codec_audio == VLC_FOURCC('s', 'a', 'a', 'c'))
-                i_codec_audio = DEFAULT_TRANSCODE_AUDIO;
-
-            if ( i_codec_video == 0 )
-                i_codec_video = DEFAULT_TRANSCODE_VIDEO;
-
             /* TODO: provide audio samplerate and channels */
             ssout << "transcode{";
             char s_fourcc[5];
-            if ( canDecodeAudio( i_codec_audio ) == false )
+            if ( i_codec_audio == 0 )
             {
+                /* avcodec AAC encoder is experimental */
+                if ( i_codec_audio == 0 ||
+                        i_codec_audio == VLC_CODEC_MP4A ||
+                        i_codec_audio == VLC_FOURCC('h', 'a', 'a', 'c') ||
+                        i_codec_audio == VLC_FOURCC('l', 'a', 'a', 'c') ||
+                        i_codec_audio == VLC_FOURCC('s', 'a', 'a', 'c'))
+                    i_codec_audio = DEFAULT_TRANSCODE_AUDIO;
+                msg_Dbg( p_stream, "Converting audio to %.4s", (const char*)&i_codec_audio );
                 ssout << "acodec=";
                 vlc_fourcc_to_char( i_codec_audio, s_fourcc );
                 s_fourcc[4] = '\0';
                 ssout << s_fourcc << ',';
             }
-            if ( b_has_video && canDecodeVideo( i_codec_video ) == false )
+            if ( b_has_video && i_codec_video == 0 )
             {
+                i_codec_video = DEFAULT_TRANSCODE_VIDEO;
+                msg_Dbg( p_stream, "Converting video to %.4s", (const char*)&i_codec_video );
                 /* TODO: provide maxwidth,maxheight */
                 ssout << "vcodec=";
                 vlc_fourcc_to_char( i_codec_video, s_fourcc );
