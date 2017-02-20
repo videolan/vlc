@@ -14,6 +14,8 @@ FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(FFMPEG_HASH);
 FFMPEG_GITURL := git://git.libav.org/libav.git
 endif
 
+FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
+
 FFMPEGCONF = \
 	--cc="$(CC)" \
 	--pkg-config="$(PKG_CONFIG)" \
@@ -213,17 +215,17 @@ endif
 
 FFMPEGCONF += --nm="$(NM)" --ar="$(AR)"
 
-$(TARBALLS)/ffmpeg-$(FFMPEG_HASH).tar.xz:
+$(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 	$(call download_git,$(FFMPEG_GITURL),,$(FFMPEG_HASH))
 
-.sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_HASH).tar.xz
+.sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz
 	$(warning Not implemented.)
 	touch $@
 
-ffmpeg: ffmpeg-$(FFMPEG_HASH).tar.xz .sum-ffmpeg
-	rm -Rf $@ $@-$(FFMPEG_HASH)
-	mkdir -p $@-$(FFMPEG_HASH)
-	$(XZCAT) "$<" | (cd $@-$(FFMPEG_HASH) && tar xv --strip-components=1)
+ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
+	rm -Rf $@ $@-$(FFMPEG_BASENAME)
+	mkdir -p $@-$(FFMPEG_BASENAME)
+	$(XZCAT) "$<" | (cd $@-$(FFMPEG_BASENAME) && tar xv --strip-components=1)
 	$(MOVE)
 
 .ffmpeg: ffmpeg
