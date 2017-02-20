@@ -1624,7 +1624,6 @@ static void parse_master(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t mst_buf[32];
-    uint32_t i, i_map_size;
     int64_t i_save_pos = vlc_stream_Tell(p_demux->s);
     int64_t i_pts_secs;
 
@@ -1639,10 +1638,18 @@ static void parse_master(demux_t *p_demux)
 
     /* parse header info */
     vlc_stream_Read(p_demux->s, mst_buf, 32);
-    i_map_size = U32_AT(&mst_buf[20]);  /* size of bitmask, in bytes */
+
+    uint32_t i_map_size = U32_AT(&mst_buf[20]);  /* size of bitmask, in bytes */
+    uint32_t i = U32_AT(&mst_buf[28]);   /* size of SEQ table, in bytes */
+
     p_sys->i_bits_per_seq_entry = i_map_size * 8;
-    i = U32_AT(&mst_buf[28]);   /* size of SEQ table, in bytes */
     p_sys->i_seq_table_size = i / (8 + i_map_size);
+
+    if(p_sys->i_seq_table_size == 0)
+    {
+        p_sys->seq_table = NULL;
+        return;
+    }
 
     /* parse all the entries */
     p_sys->seq_table = calloc(p_sys->i_seq_table_size, sizeof(ty_seq_table_t));
