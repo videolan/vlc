@@ -15,15 +15,20 @@ $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz:
 	touch $@
 
 breakpad: breakpad-$(BREAKPAD_HASH).tar.gz .sum-breakpad
-	rm -Rf $@ $@.tmp
-	mkdir $@.tmp
-	tar xvzf $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz -C $@.tmp
-	mv -f $@.tmp $@
+	rm -Rf $@ breakpad-$(BREAKPAD_HASH)
+	mkdir breakpad-$(BREAKPAD_HASH)
+	tar xvzf $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz -C breakpad-$(BREAKPAD_HASH)
+	$(MOVE)
 
 .breakpad: breakpad
+	# Framework
 	cd $</src/client/mac/ && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error
-	cd $</src/tools/mac/dump_syms && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error
-	install -d $(PREFIX)
-	cd $</src/client/mac/ && mkdir -p "$(PREFIX)/Frameworks" && cp -R build/Release/Breakpad.framework "$(PREFIX)/Frameworks"
-	cd $</src/tools/mac/dump_syms && cp -R build/Release/dump_syms "$(PREFIX)/bin"
+	cd $</src/client/mac/ && \
+		mkdir -p "$(PREFIX)/Frameworks" && \
+		rm -Rf $(PREFIX)/Frameworks/Breakpad.framework && \
+		cp -R build/Release/Breakpad.framework "$(PREFIX)/Frameworks"
+	# Tools
+	cd $</src/tools/mac/dump_syms && \
+		xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error && \
+		cp -R build/Release/dump_syms "$(PREFIX)/bin"
 	touch $@
