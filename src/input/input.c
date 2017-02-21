@@ -2261,7 +2261,7 @@ static int
 InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
                          char const *anchor )
 {
-    vlc_array_t* identifiers = NULL;
+    vlc_array_t identifiers;
     char const* extra;
 
     if( mrl_FragmentSplit( &identifiers, &extra, anchor ) )
@@ -2274,9 +2274,9 @@ InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
         &source->i_title_start, &source->i_title_end,
         &source->i_seekpoint_start, &source->i_seekpoint_end );
 
-    while( vlc_array_count( identifiers ) )
+    while( vlc_array_count( &identifiers ) )
     {
-        char* id = vlc_array_item_at_index( identifiers, 0 );
+        char* id = vlc_array_item_at_index( &identifiers, 0 );
 
         if( vlc_stream_extractor_Attach( stream, id, NULL ) )
         {
@@ -2286,16 +2286,16 @@ InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
         else
             msg_Dbg( source, "successfully located entity '%s' within stream", id );
 
-        vlc_array_remove( identifiers, 0 );
+        vlc_array_remove( &identifiers, 0 );
         free( id );
     }
 
-    int remaining = vlc_array_count( identifiers );
+    int remaining = vlc_array_count( &identifiers );
 
     for( int i = 0; i < remaining; ++i )
-        free( vlc_array_item_at_index( identifiers, i ) );
+        free( vlc_array_item_at_index( &identifiers, i ) );
 
-    vlc_array_destroy( identifiers );
+    vlc_array_clear( &identifiers );
 
     if( remaining == 0 )
     {

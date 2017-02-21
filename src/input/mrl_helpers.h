@@ -101,21 +101,24 @@ mrl_EscapeFragmentIdentifier( char** out, char const* payload )
  * See the \link mrl MRL-specification\endlink for detailed
  * information regarding how `payload` will be interpreted.
  *
- * \param[out] out_items `*out_items` contains the individual entries on success
+ * \warning On success, the caller has ownership of the contents of *out_items
+ *          which means that it is responsible for freeing the individual
+ *          elements, as well as cleaning the array itself.
+ *
+ * \param[out] out_items storage for a vlc_array_t that will contain the
+ *                       parsed identifiers on success.
  * \param[out] out_extra `*out_extra` will point to any remaining data (if any)
  * \param[in] payload the data to parse
  * \return VLC_SUCCESS on success, an error-code on failure
  **/
 static inline int
-mrl_FragmentSplit( vlc_array_t** out_items,
+mrl_FragmentSplit( vlc_array_t* out_items,
                    char const** out_extra,
                    char const* payload )
 {
-    vlc_array_t* items = vlc_array_new();
     char const* extra = NULL;
 
-    if( unlikely( !items ) )
-        return VLC_ENOMEM;
+    vlc_array_init( out_items );
 
     while( strncmp( payload, "!/", 2 ) == 0 )
     {
@@ -127,7 +130,7 @@ mrl_FragmentSplit( vlc_array_t** out_items,
         if( unlikely( !decoded ) || !vlc_uri_decode( decoded ) )
             goto error;
 
-        vlc_array_append( items, decoded );
+        vlc_array_append( out_items, decoded );
         payload += len;
     }
 
@@ -136,20 +139,19 @@ mrl_FragmentSplit( vlc_array_t** out_items,
         if( *payload == '!' )
             goto error;
 
-        if( *payload == '?' && vlc_array_count( items ) )
+        if( *payload == '?' && vlc_array_count( out_items ) )
             ++payload;
 
         extra = payload;
     }
 
-    *out_items = items;
     *out_extra = extra;
     return VLC_SUCCESS;
 
 error:
-    for( size_t i = 0; i < vlc_array_count( items ); ++i )
-        free( vlc_array_item_at_index( items, i ) );
-    vlc_array_destroy( items );
+    for( size_t i = 0; i < vlc_array_count( out_items ); ++i )
+        free( vlc_array_item_at_index( out_items, i ) );
+    vlc_array_clear( out_items );
     return VLC_EGENERIC;;
 }
 
