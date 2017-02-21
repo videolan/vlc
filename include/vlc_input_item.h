@@ -104,8 +104,6 @@ struct input_item_t
                                           preparsing.*/
 };
 
-TYPEDEF_ARRAY(input_item_t*, input_item_array_t)
-
 enum input_item_type_e
 {
     ITEM_TYPE_UNKNOWN,
