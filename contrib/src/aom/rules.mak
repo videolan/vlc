@@ -19,7 +19,7 @@ $(TARBALLS)/aom-$(AOM_VERSION).tar.gz:
 aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 	rm -Rf $@-$(AOM_VERSION) $@
 	mkdir -p $@-$(AOM_VERSION)
-	$(ZCAT) "$<" | (cd $@-$(AOM_VERSION) && tar xv)
+	tar xvzf "$<" -C $@-$(AOM_VERSION)
 	$(MOVE)
 
 DEPS_aom =
