@@ -83,7 +83,7 @@ x26410b: x26410b-git.tar.bz2 .sum-x26410b
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-x262: x262-git.tar.gz .sum-x26410b
+x262: x262-git.tar.gz .sum-x262
 	rm -Rf $@-git
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
