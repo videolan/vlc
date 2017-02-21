@@ -45,12 +45,6 @@ $(TARBALLS)/x262-git.tar.xz:
 $(TARBALLS)/x262-git.tar.gz:
 	$(call download,$(X262_SNAPURL))
 
-$(TARBALLS)/x26410b-git.tar.xz:
-	$(call download_git,$(X264_GITURL))
-
-$(TARBALLS)/x26410b-git.tar.bz2:
-	$(call download,$(X264_SNAPURL))
-
 $(TARBALLS)/x264-git.tar.xz:
 	$(call download_git,$(X264_GITURL))
 
@@ -61,20 +55,19 @@ $(TARBALLS)/x264-git.tar.bz2:
 	$(warning $@ not implemented)
 	touch $@
 
-.sum-x26410b: x26410b-git.tar.bz2
-	$(warning $@ not implemented)
+.sum-x26410b: .sum-x264
 	touch $@
 
 .sum-x264: x264-git.tar.bz2
 	$(warning $@ not implemented)
 	touch $@
 
-x264 x26410b: %: %-git.tar.bz2 .sum-%
+x264 x26410b: %: x264-git.tar.bz2 .sum-%
 	rm -Rf $*-git
 	mkdir -p $*-git
 	tar xvjf "$<" --strip-components=1 -C $*-git
 	$(UPDATE_AUTOCONFIG)
-	$(MOVE)
+	mv $*-git $*
 
 x262: x262-git.tar.gz .sum-x262
 	rm -Rf $@-git
