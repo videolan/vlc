@@ -219,7 +219,7 @@ $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 	$(call download_git,$(FFMPEG_GITURL),,$(FFMPEG_HASH))
 
 .sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz
-	$(warning Not implemented.)
+	$(call check_githash,$(FFMPEG_HASH))
 	touch $@
 
 ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
