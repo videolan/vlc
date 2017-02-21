@@ -53,7 +53,7 @@ struct entry_item
 struct services_discovery_sys_t
 {
     netbios_ns      *p_ns;
-    vlc_array_t     *p_entry_item_list;
+    vlc_array_t      entry_item_list;
 };
 
 static void entry_item_append( services_discovery_t *p_sd,
@@ -68,7 +68,7 @@ static void entry_item_append( services_discovery_t *p_sd,
     p_entry_item->p_entry = p_entry;
     p_entry_item->p_item = p_item;
     vlc_gc_incref( p_item );
-    vlc_array_append( p_sys->p_entry_item_list, p_entry_item );
+    vlc_array_append( &p_sys->entry_item_list, p_entry_item );
     services_discovery_AddItem( p_sd, p_item, NULL );
 }
 
@@ -77,16 +77,16 @@ static void entry_item_remove( services_discovery_t *p_sd,
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    for( size_t i = 0; i < vlc_array_count( p_sys->p_entry_item_list ); i++ )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->entry_item_list ); i++ )
     {
         struct entry_item *p_entry_item;
 
-        p_entry_item = vlc_array_item_at_index( p_sys->p_entry_item_list, i );
+        p_entry_item = vlc_array_item_at_index( &p_sys->entry_item_list, i );
         if( p_entry_item->p_entry == p_entry  )
         {
             services_discovery_RemoveItem( p_sd, p_entry_item->p_item );
             vlc_gc_decref( p_entry_item->p_item );
-            vlc_array_remove(  p_sys->p_entry_item_list, i );
+            vlc_array_remove( &p_sys->entry_item_list, i );
             free( p_entry_item );
             break;
         }
@@ -137,9 +137,7 @@ int bdsm_SdOpen (vlc_object_t *p_this)
 
     p_sd->description = _("Windows networks");
     p_sd->p_sys = p_sys;
-    p_sys->p_entry_item_list = vlc_array_new();
-    if ( p_sys->p_entry_item_list == NULL )
-        return VLC_ENOMEM;
+    vlc_array_init( &p_sys->entry_item_list );
 
     p_sys->p_ns = netbios_ns_new();
     if( p_sys->p_ns == NULL )
@@ -174,19 +172,15 @@ void bdsm_SdClose (vlc_object_t *p_this)
         netbios_ns_destroy( p_sys->p_ns );
     }
 
-    if( p_sys->p_entry_item_list )
+    for( size_t i = 0; i < vlc_array_count( &p_sys->entry_item_list ); i++ )
     {
-        for( size_t i = 0; i < vlc_array_count( p_sys->p_entry_item_list ); i++ )
-        {
-            struct entry_item *p_entry_item;
+        struct entry_item *p_entry_item;
 
-            p_entry_item = vlc_array_item_at_index( p_sys->p_entry_item_list,
-                                                    i );
-            vlc_gc_decref( p_entry_item->p_item );
-            free( p_entry_item );
-        }
-        vlc_array_destroy( p_sys->p_entry_item_list );
+        p_entry_item = vlc_array_item_at_index( &p_sys->entry_item_list, i );
+        vlc_gc_decref( p_entry_item->p_item );
+        free( p_entry_item );
     }
+    vlc_array_clear( &p_sys->entry_item_list );
 
     free( p_sys );
 }
