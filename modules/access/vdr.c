@@ -188,8 +188,12 @@ static int Open( vlc_object_t *p_this )
         !S_ISDIR( st.st_mode ) )
         return VLC_EGENERIC;
 
-    access_sys_t *p_sys;
-    STANDARD_READ_ACCESS_INIT;
+    access_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
+
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
+
+    p_access->p_sys = p_sys;
     p_sys->fd = -1;
     p_sys->cur_seekpoint = 0;
     p_sys->fps = var_InheritFloat( p_access, "vdr-fps" );
@@ -203,6 +207,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
     return VLC_SUCCESS;
 }
 
