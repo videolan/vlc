@@ -730,14 +730,14 @@ static int Demux( demux_t *p_demux )
     }
     if( pkt.stream_index < 0 || pkt.stream_index >= p_sys->i_tk )
     {
-        av_free_packet( &pkt );
+        av_packet_unref( &pkt );
         return 1;
     }
     const AVStream *p_stream = p_sys->ic->streams[pkt.stream_index];
     if( p_stream->time_base.den <= 0 )
     {
         msg_Warn( p_demux, "Invalid time base for the stream %d", pkt.stream_index );
-        av_free_packet( &pkt );
+        av_packet_unref( &pkt );
         return 1;
     }
     if( p_stream->codecpar->codec_id == AV_CODEC_ID_SSA )
@@ -745,7 +745,7 @@ static int Demux( demux_t *p_demux )
         p_frame = BuildSsaFrame( &pkt, p_sys->i_ssa_order++ );
         if( !p_frame )
         {
-            av_free_packet( &pkt );
+            av_packet_unref( &pkt );
             return 1;
         }
     }
@@ -753,7 +753,7 @@ static int Demux( demux_t *p_demux )
     {
         if( ( p_frame = block_Alloc( pkt.size ) ) == NULL )
         {
-            av_free_packet( &pkt );
+            av_packet_unref( &pkt );
             return 0;
         }
         memcpy( p_frame->p_buffer, pkt.data, pkt.size );
@@ -834,7 +834,7 @@ static int Demux( demux_t *p_demux )
     else
         block_Release( p_frame );
 
-    av_free_packet( &pkt );
+    av_packet_unref( &pkt );
     return 1;
 }
 
