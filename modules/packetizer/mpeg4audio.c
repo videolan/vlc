@@ -314,16 +314,19 @@ static block_t *PacketizeRawBlock(decoder_t *p_dec, block_t **pp_block)
     if (!pp_block || !*pp_block)
         return NULL;
 
-    if ((*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED)) {
+    p_block = *pp_block;
+    *pp_block = NULL; /* Don't reuse this block */
+
+    if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED))
+    {
         FlushRawBlock(p_dec);
-        if ((*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED)) {
-            block_Release(*pp_block);
+        if (p_block->i_flags&(BLOCK_FLAG_CORRUPTED))
+        {
+            block_Release(p_block);
             return NULL;
         }
     }
 
-    p_block = *pp_block;
-    *pp_block = NULL; /* Don't reuse this block */
 
     if (!date_Get(&p_sys->end_date) && p_block->i_pts <= VLC_TS_INVALID) {
         /* We've just started the stream, wait for the first PTS. */
