@@ -74,20 +74,6 @@ VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va
         p_access->pf_seek = (seek); \
     } while(0)
 
-#define STANDARD_READ_ACCESS_INIT \
-    do { \
-        ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
-        p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) ); \
-        if( !p_sys ) return VLC_ENOMEM;\
-    } while(0);
-
-#define STANDARD_BLOCK_ACCESS_INIT \
-    do { \
-        ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek ); \
-        p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) ); \
-        if( !p_sys ) return VLC_ENOMEM; \
-    } while(0);
-
 /**
  * Access pf_readdir helper struct
  * \see access_fsdir_init()
