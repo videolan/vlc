@@ -75,11 +75,13 @@ static int Reset( access_t * );
  ****************************************************************************/
 int MMSHOpen( access_t *p_access )
 {
-    access_sys_t    *p_sys;
+    access_sys_t    *p_sys = calloc( 1, sizeof( *p_sys ) );
     char            *psz_location = NULL;
 
-    STANDARD_BLOCK_ACCESS_INIT
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
 
+    p_access->p_sys = p_sys;
     p_sys->i_proto= MMS_PROTO_HTTP;
     p_sys->fd     = -1;
     p_sys->i_position = 0;
@@ -144,6 +146,7 @@ int MMSHOpen( access_t *p_access )
         goto error;
     }
 
+    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
     return VLC_SUCCESS;
 
 error:
