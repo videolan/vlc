@@ -22,6 +22,7 @@ ifeq ($(call need_pkg,"x262"),)
 PKGS_FOUND += x262
 endif
 
+PKGS_ALL += x26410b
 
 X264CONF = --prefix="$(PREFIX)" --host="$(HOST)" \
 	--enable-static \
