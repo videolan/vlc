@@ -133,7 +133,7 @@ struct stream_sys_t
      * the downstream system dies in case of playback */
     uint64_t     chunk_count;
 
-    vlc_array_t  *hds_streams; /* available streams */
+    vlc_array_t  hds_streams; /* available streams */
 
     /* Buffer that holds the very first bytes of the stream: the FLV
      * file header and a possible metadata packet.
@@ -256,10 +256,10 @@ static uint64_t get_stream_size( stream_t* s )
     if ( p_sys->live )
         return 0;
 
-    if ( vlc_array_count( p_sys->hds_streams ) == 0 )
+    if ( vlc_array_count( &p_sys->hds_streams ) == 0 )
         return 0;
 
-    hds_stream_t* hds_stream = p_sys->hds_streams->pp_elems[0];
+    hds_stream_t* hds_stream = p_sys->hds_streams.pp_elems[0];
 
     if ( hds_stream->bitrate == 0 )
         return 0;
@@ -856,11 +856,11 @@ static void* download_thread( void* p )
     stream_t* s = (stream_t*) p_this;
     stream_sys_t* sys = s->p_sys;
 
-    if ( vlc_array_count( sys->hds_streams ) == 0 )
+    if ( vlc_array_count( &sys->hds_streams ) == 0 )
         return NULL;
 
     // TODO: Change here for selectable stream
-    hds_stream_t* hds_stream = sys->hds_streams->pp_elems[0];
+    hds_stream_t* hds_stream = sys->hds_streams.pp_elems[0];
 
     int canc = vlc_savecancel();
 
@@ -1102,11 +1102,11 @@ static void* live_thread( void* p )
     stream_t* s = (stream_t*) p_this;
     stream_sys_t* sys = s->p_sys;
 
-    if ( vlc_array_count( sys->hds_streams ) == 0 )
+    if ( vlc_array_count( &sys->hds_streams ) == 0 )
         return NULL;
 
     // TODO: Change here for selectable stream
-    hds_stream_t* hds_stream = sys->hds_streams->pp_elems[0];
+    hds_stream_t* hds_stream = sys->hds_streams.pp_elems[0];
 
     int canc = vlc_savecancel();
 
@@ -1566,7 +1566,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
 
                 new_stream->bitrate = medias[i].bitrate;
 
-                vlc_array_append( sys->hds_streams, new_stream );
+                vlc_array_append( &sys->hds_streams, new_stream );
 
                 msg_Info( (vlc_object_t*)s, "New track with quality_segment(%s), bitrate(%u), timescale(%u), movie_id(%s), segment_run_count(%d), fragment_run_count(%u)",
                           new_stream->quality_segment_modifier?new_stream->quality_segment_modifier:"", new_stream->bitrate, new_stream->timescale,
@@ -1612,12 +1612,9 @@ static void hds_free( hds_stream_t *p_stream )
 
 static void SysCleanup( stream_sys_t *p_sys )
 {
-    if ( p_sys->hds_streams )
-    {
-        for ( int i=0; i< p_sys->hds_streams->i_count ; i++ )
-            hds_free( p_sys->hds_streams->pp_elems[i] );
-        vlc_array_destroy( p_sys->hds_streams );
-    }
+    for( size_t i = 0; i < p_sys->hds_streams.i_count ; i++ )
+        hds_free( p_sys->hds_streams.pp_elems[i] );
+    vlc_array_clear( &p_sys->hds_streams );
     free( p_sys->base_url );
 }
 
@@ -1650,7 +1647,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->flv_header_bytes_sent = 0;
 
-    p_sys->hds_streams = vlc_array_new();
+    vlc_array_init( &p_sys->hds_streams );
 
     manifest_t m;
     if( init_Manifest( s, &m ) || parse_Manifest( s, &m ) )
@@ -1691,8 +1688,8 @@ static void Close( vlc_object_t *p_this )
     stream_sys_t *p_sys = s->p_sys;
 
     // TODO: Change here for selectable stream
-    hds_stream_t *stream = vlc_array_count(p_sys->hds_streams) ?
-        p_sys->hds_streams->pp_elems[0] : NULL;
+    hds_stream_t *stream = vlc_array_count(&p_sys->hds_streams) ?
+        p_sys->hds_streams.pp_elems[0] : NULL;
 
     p_sys->closed = true;
     if (stream)
@@ -1833,13 +1830,13 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    if ( vlc_array_count( p_sys->hds_streams ) == 0 )
+    if ( vlc_array_count( &p_sys->hds_streams ) == 0 )
         return 0;
     if( unlikely(i_read == 0) )
         return 0;
 
     // TODO: change here for selectable stream
-    hds_stream_t *stream = p_sys->hds_streams->pp_elems[0];
+    hds_stream_t *stream = p_sys->hds_streams.pp_elems[0];
 
     if ( header_unfinished( p_sys ) )
         return send_flv_header( stream, p_sys, buffer, i_read );
