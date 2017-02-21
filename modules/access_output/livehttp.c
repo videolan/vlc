@@ -205,7 +205,7 @@ struct sout_access_out_sys_t
     char *key_uri;
     uint8_t stuffing_bytes[16];
     ssize_t stuffing_size;
-    vlc_array_t *segments_t;
+    vlc_array_t segments_t;
 };
 
 static int LoadCryptFile( sout_access_out_t *p_access);
@@ -252,7 +252,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_generate_iv = var_GetBool( p_access, SOUT_CFG_PREFIX "generate-iv") ;
     p_sys->b_segment_has_data = false;
 
-    p_sys->segments_t = vlc_array_new();
+    vlc_array_init( &p_sys->segments_t );
 
     p_sys->stuffing_size = 0;
     p_sys->i_opendts = VLC_TS_INVALID;
@@ -522,15 +522,15 @@ static void destroySegment( output_segment_t *segment )
 static uint32_t segmentAmountNeeded( sout_access_out_sys_t *p_sys )
 {
     float duration = .0f;
-    for( size_t index = 1; index <= vlc_array_count( p_sys->segments_t ); index++ )
+    for( size_t index = 1; index <= vlc_array_count( &p_sys->segments_t ); index++ )
     {
-        output_segment_t* segment = vlc_array_item_at_index( p_sys->segments_t, vlc_array_count( p_sys->segments_t ) - index );
+        output_segment_t* segment = vlc_array_item_at_index( &p_sys->segments_t, vlc_array_count( &p_sys->segments_t ) - index );
         duration += segment->f_seglength;
 
         if( duration >= (float)( 3 * p_sys->i_seglen ) )
             return __MAX(index, p_sys->i_numsegs);
     }
-    return vlc_array_count( p_sys->segments_t )-1;
+    return vlc_array_count( &p_sys->segments_t ) - 1;
 
 }
 
@@ -549,10 +549,10 @@ static bool isFirstItemRemovable( sout_access_out_sys_t *p_sys, uint32_t i_first
      */
     for( unsigned int index = 0; index < i_index_offset; index++ )
     {
-        output_segment_t *segment = vlc_array_item_at_index( p_sys->segments_t, p_sys->i_segment - i_firstseg + index );
+        output_segment_t *segment = vlc_array_item_at_index( &p_sys->segments_t, p_sys->i_segment - i_firstseg + index );
         duration += segment->f_seglength;
     }
-    output_segment_t *first = vlc_array_item_at_index( p_sys->segments_t, 0 );
+    output_segment_t *first = vlc_array_item_at_index( &p_sys->segments_t, 0 );
 
     return duration >= (first->f_seglength + (float)(p_sys->i_numsegs * p_sys->i_seglen));
 }
@@ -575,7 +575,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
     {
         unsigned numsegs = segmentAmountNeeded( p_sys );
         i_firstseg = ( p_sys->i_segment - numsegs ) + 1;
-        i_index_offset = vlc_array_count( p_sys->segments_t ) - numsegs;
+        i_index_offset = vlc_array_count( &p_sys->segments_t ) - numsegs;
     }
 
     // First update index
@@ -614,7 +614,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             //scale to i_index_offset..numsegs + i_index_offset
             uint32_t index = i - i_firstseg + i_index_offset;
 
-            output_segment_t *segment = vlc_array_item_at_index( p_sys->segments_t, index );
+            output_segment_t *segment = vlc_array_item_at_index( &p_sys->segments_t, index );
             if( p_sys->key_uri &&
                 ( !psz_current_uri ||  strcmp( psz_current_uri, segment->psz_key_uri ) )
               )
@@ -690,9 +690,9 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
            isFirstItemRemovable( p_sys, i_firstseg, i_index_offset )
          )
     {
-         output_segment_t *segment = vlc_array_item_at_index( p_sys->segments_t, 0 );
+         output_segment_t *segment = vlc_array_item_at_index( &p_sys->segments_t, 0 );
          msg_Dbg( p_access, "Removing segment number %d", segment->i_segment_number );
-         vlc_array_remove( p_sys->segments_t, 0 );
+         vlc_array_remove( &p_sys->segments_t, 0 );
 
          if ( segment->psz_filename )
          {
@@ -714,7 +714,7 @@ static void closeCurrentSegment( sout_access_out_t *p_access, sout_access_out_sy
 {
     if ( p_sys->i_handle >= 0 )
     {
-        output_segment_t *segment = vlc_array_item_at_index( p_sys->segments_t, vlc_array_count( p_sys->segments_t ) - 1 );
+        output_segment_t *segment = vlc_array_item_at_index( &p_sys->segments_t, vlc_array_count( &p_sys->segments_t ) - 1 );
 
         if( p_sys->key_uri )
         {
@@ -806,10 +806,10 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->key_uri );
     }
 
-    while( vlc_array_count( p_sys->segments_t ) > 0 )
+    while( vlc_array_count( &p_sys->segments_t ) > 0 )
     {
-        output_segment_t *segment = vlc_array_item_at_index( p_sys->segments_t, 0 );
-        vlc_array_remove( p_sys->segments_t, 0 );
+        output_segment_t *segment = vlc_array_item_at_index( &p_sys->segments_t, 0 );
+        vlc_array_remove( &p_sys->segments_t, 0 );
         if( p_sys->b_delsegs && p_sys->i_numsegs && segment->psz_filename )
         {
             msg_Dbg( p_access, "Removing segment number %d name %s", segment->i_segment_number, segment->psz_filename );
@@ -818,7 +818,6 @@ static void Close( vlc_object_t * p_this )
 
         destroySegment( segment );
     }
-    vlc_array_destroy( p_sys->segments_t );
 
     free( p_sys->psz_indexUrl );
     free( p_sys->psz_indexPath );
@@ -883,7 +882,7 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
         return -1;
     }
 
-    vlc_array_append( p_sys->segments_t, segment);
+    vlc_array_append( &p_sys->segments_t, segment );
 
     if( p_sys->psz_keyfile )
     {
