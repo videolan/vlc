@@ -223,7 +223,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
 
     msg_Dbg(p_dec, "running MPEG4 audio packetizer");
 
-    if (p_dec->fmt_in.i_extra > 0) {
+    if (p_dec->fmt_in.i_extra > 1) {
         uint8_t *p_config = (uint8_t*)p_dec->fmt_in.p_extra;
         int     i_index;
 
@@ -232,16 +232,15 @@ static int OpenPacketizer(vlc_object_t *p_this)
             p_dec->fmt_out.audio.i_rate = pi_sample_rates[i_index];
             p_dec->fmt_out.audio.i_frame_length =
                 ((p_config[1] >> 2) & 0x01) ? 960 : 1024;
-        } else {
+            p_dec->fmt_out.audio.i_channels = (p_config[1] >> 3) & 0x0f;
+        } else if( p_dec->fmt_in.i_extra > 4 ) {
             p_dec->fmt_out.audio.i_rate = ((p_config[1] & 0x7f) << 17) |
                 (p_config[2] << 9) | (p_config[3] << 1) |
                 (p_config[4] >> 7);
             p_dec->fmt_out.audio.i_frame_length =
                 ((p_config[4] >> 2) & 0x01) ? 960 : 1024;
+            p_dec->fmt_out.audio.i_channels = (p_config[4] >> 3) & 0x0f;
         }
-
-        p_dec->fmt_out.audio.i_channels =
-            (p_config[i_index == 0x0f ? 4 : 1] >> 3) & 0x0f;
 
         msg_Dbg(p_dec, "AAC %dHz %d samples/frame",
                  p_dec->fmt_out.audio.i_rate,
