@@ -37,6 +37,9 @@
 #include <atomic>
 #include <sstream>
 
+#ifndef PROTOBUF_INLINE_NOT_IN_HEADERS
+# define PROTOBUF_INLINE_NOT_IN_HEADERS 0
+#endif
 #include "cast_channel.pb.h"
 #include "chromecast_common.h"
 
