@@ -223,7 +223,32 @@ static int OpenPacketizer(vlc_object_t *p_this)
 
     msg_Dbg(p_dec, "running MPEG4 audio packetizer");
 
-    if (p_dec->fmt_in.i_extra > 1) {
+    switch (p_dec->fmt_in.i_original_fourcc)
+    {
+        case VLC_FOURCC('L','A','T','M'):
+            p_sys->i_type = TYPE_LOAS;
+            msg_Dbg(p_dec, "LOAS/LATM Mode");
+            break;
+
+        case VLC_FOURCC('A','D','T','S'):
+            p_sys->i_type = TYPE_ADTS;
+            msg_Dbg(p_dec, "ADTS Mode");
+            break;
+
+        default:
+            if (p_dec->fmt_in.i_extra > 1)
+            {
+                msg_Dbg(p_dec, "RAW AAC Mode");
+                p_sys->i_type = TYPE_RAW;
+            } else {
+                p_sys->i_type = TYPE_NONE;
+                msg_Dbg(p_dec, "no decoder specific info, must be an ADTS or LOAS stream");
+            }
+            break;
+    }
+
+    if(p_sys->i_type == TYPE_RAW)
+    {
         uint8_t *p_config = (uint8_t*)p_dec->fmt_in.p_extra;
         int     i_index;
 
@@ -257,23 +282,21 @@ static int OpenPacketizer(vlc_object_t *p_this)
         memcpy(p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
                 p_dec->fmt_in.i_extra);
 
-        /* Set callback */
+        /* Set callbacks */
         p_dec->pf_packetize = PacketizeRawBlock;
         p_dec->pf_flush = FlushRawBlock;
-        p_sys->i_type = TYPE_RAW;
-    } else {
-        msg_Dbg(p_dec, "no decoder specific info, must be an ADTS or LOAS stream");
-
+    }
+    else
+    {
         date_Init(&p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1);
 
         /* We will try to create a AAC Config from adts/loas */
         p_dec->fmt_out.i_extra = 0;
         p_dec->fmt_out.p_extra = NULL;
 
-        /* Set callback */
+        /* Set callbacks */
         p_dec->pf_packetize = PacketizeStreamBlock;
         p_dec->pf_flush = FlushStreamBlock;
-        p_sys->i_type = TYPE_NONE;
     }
 
     return VLC_SUCCESS;
