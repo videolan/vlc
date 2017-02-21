@@ -18,9 +18,9 @@ ifeq ($(call need_pkg,"x26410b"),)
 PKGS_FOUND += x26410b
 endif
 
-ifeq ($(call need_pkg,"x262"),)
-PKGS_FOUND += x262
-endif
+#ifeq ($(call need_pkg,"x262"),)
+#PKGS_FOUND += x262
+#endif
 
 PKGS_ALL += x26410b
 
