@@ -24,10 +24,8 @@ $(TARBALLS)/fluidlite-$(FLUID_HASH).tar.xz:
 
 DEPS_fluidlite = ogg $(DEPS_ogg)
 
-fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
-	rm -Rf $@-$(FLUID_HASH)
-	mkdir -p $@-$(FLUID_HASH)
-	$(XZCAT) "$<" | (cd $@-$(FLUID_HASH) && tar xv --strip-components=1)
+fluidlite: fluidlite-git.tar.xz .sum-fluidlite
+	$(UNPACK)
 	$(MOVE)
 
 .fluidlite: fluidlite toolchain.cmake
