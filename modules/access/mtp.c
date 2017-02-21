@@ -95,6 +95,8 @@ static int Open( vlc_object_t *p_this )
     if( i_ret != 0 || i_numrawdevices <= 0 || !p_rawdevices )
         return VLC_EGENERIC;
 
+    char *path;
+
     for( int i = 0; i < i_numrawdevices; i++ )
     {
         if( i_bus == p_rawdevices[i].bus_location &&
@@ -104,10 +106,9 @@ static int Open( vlc_object_t *p_this )
             if( ( p_device = LIBMTP_Open_Raw_Device( &p_rawdevices[i] )
                 ) != NULL )
             {
-                free( p_access->psz_filepath );
 #warning Oooh no! Not tempnam()!
-                p_access->psz_filepath = tempnam( NULL, "vlc" );
-                if( p_access->psz_filepath == NULL )
+                path = tempnam( NULL, "vlc" );
+                if( path == NULL )
                 {
                     LIBMTP_Release_Device( p_device );
                     free( p_rawdevices );
@@ -115,11 +116,9 @@ static int Open( vlc_object_t *p_this )
                 }
                 else
                 {
-                    msg_Dbg( p_access, "About to write %s",
-                             p_access->psz_filepath );
-                    LIBMTP_Get_File_To_File( p_device, i_track_id,
-                                             p_access->psz_filepath, NULL,
-                                             NULL );
+                    msg_Dbg( p_access, "About to write %s", path );
+                    LIBMTP_Get_File_To_File( p_device, i_track_id, path,
+                                             NULL, NULL );
                     LIBMTP_Release_Device( p_device );
                     i = i_numrawdevices;
                 }
@@ -134,8 +133,14 @@ static int Open( vlc_object_t *p_this )
     free( p_rawdevices );
 
     /* Open file */
-    msg_Dbg( p_access, "opening file `%s'", p_access->psz_filepath );
-    int fd = open_file( p_access, p_access->psz_filepath );
+    msg_Dbg( p_access, "opening file `%s'", path );
+    int fd = open_file( p_access, path );
+
+    if( vlc_unlink( path ) != 0 )
+        msg_Err( p_access, "Error deleting file %s, %s", path,
+                 vlc_strerror_c(errno) );
+    free( path );
+
     if( fd == -1 )
         return VLC_EGENERIC;
 
@@ -153,9 +158,6 @@ static void Close( vlc_object_t * p_this )
     int fd = (intptr_t)p_access->p_sys;
 
     vlc_close ( fd );
-    if( vlc_unlink( p_access->psz_filepath ) != 0 )
-        msg_Err( p_access, "Error deleting file %s, %s",
-                 p_access->psz_filepath, vlc_strerror_c(errno) );
 }
 
 /*****************************************************************************
