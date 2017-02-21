@@ -1,6 +1,5 @@
-DAALA_VERSION := git
-DAALA_HASH := HEAD
-DAALA_GITURL := http://git.xiph.org/?p=daala.git;a=snapshot;h=$(DAALA_HASH);sf=tgz
+DAALA_VERSION := e248823a04292a8c2f56aa260f5c0b369d41d64e
+DAALA_GITURL := http://git.xiph.org/daala.git
 
 # Default disabled for now
 # PKGS += daala
@@ -8,14 +7,14 @@ ifeq ($(call need_pkg,"daala"),)
 PKGS_FOUND += daala
 endif
 
-$(TARBALLS)/daala-git.tar.gz:
-	$(call download,$(DAALA_GITURL))
+$(TARBALLS)/daala-$(DAALA_VERSION).tar.xz:
+	$(call download_git,$(DAALA_GITURL),,$(DAALA_VERSION))
 
-.sum-daala: daala-$(DAALA_VERSION).tar.gz
-	$(warning $@ not implemented)
+.sum-daala: daala-$(DAALA_VERSION).tar.xz
+	$(call check_githash,$(DAALA_VERSION))
 	touch $@
 
-daala: daala-$(DAALA_VERSION).tar.gz .sum-daala
+daala: daala-$(DAALA_VERSION).tar.xz .sum-daala
 	$(UNPACK)
 	$(call pkg_static,"daaladec.pc.in")
 	$(call pkg_static,"daalaenc.pc.in")
