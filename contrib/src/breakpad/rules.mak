@@ -15,8 +15,10 @@ $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz:
 	touch $@
 
 breakpad: breakpad-$(BREAKPAD_HASH).tar.gz .sum-breakpad
-	mkdir $@
-	tar xvzf $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz -C breakpad
+	rm -Rf $@ $@.tmp
+	mkdir $@.tmp
+	tar xvzf $(TARBALLS)/breakpad-$(BREAKPAD_HASH).tar.gz -C $@.tmp
+	mv -f $@.tmp $@
 
 .breakpad: breakpad
 	cd $</src/client/mac/ && xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ WARNING_CFLAGS=-Wno-error
