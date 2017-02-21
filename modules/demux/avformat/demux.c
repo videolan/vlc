@@ -370,13 +370,13 @@ int OpenDemux( vlc_object_t *p_this )
     for( i = 0; i < p_sys->ic->nb_streams; i++ )
     {
         AVStream *s = p_sys->ic->streams[i];
-        AVCodecContext *cc = s->codec;
+        const AVCodecParameters *cp = s->codecpar;
         es_out_id_t  *es = NULL;
         es_format_t  fmt;
         vlc_fourcc_t fcc;
         const char *psz_type = "unknown";
 
-        if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
+        if( !GetVlcFourcc( cp->codec_id, NULL, &fcc, NULL ) )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
 #if LIBAVFORMAT_VERSION_INT >= ((54<<16)+(2<<8)+0)
@@ -390,29 +390,29 @@ int OpenDemux( vlc_object_t *p_this )
             continue;
         }
 
-        switch( cc->codec_type )
+        switch( cp->codec_type )
         {
         case AVMEDIA_TYPE_AUDIO:
             es_format_Init( &fmt, AUDIO_ES, fcc );
-            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
-            fmt.i_bitrate = cc->bit_rate;
-            fmt.audio.i_channels = cc->channels;
-            fmt.audio.i_rate = cc->sample_rate;
-            fmt.audio.i_bitspersample = cc->bits_per_coded_sample;
-            fmt.audio.i_blockalign = cc->block_align;
+            fmt.i_original_fourcc = CodecTagToFourcc( cp->codec_tag );
+            fmt.i_bitrate = cp->bit_rate;
+            fmt.audio.i_channels = cp->channels;
+            fmt.audio.i_rate = cp->sample_rate;
+            fmt.audio.i_bitspersample = cp->bits_per_coded_sample;
+            fmt.audio.i_blockalign = cp->block_align;
             psz_type = "audio";
             break;
 
         case AVMEDIA_TYPE_VIDEO:
             es_format_Init( &fmt, VIDEO_ES, fcc );
-            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
+            fmt.i_original_fourcc = CodecTagToFourcc( cp->codec_tag );
 
-            fmt.video.i_bits_per_pixel = cc->bits_per_coded_sample;
+            fmt.video.i_bits_per_pixel = cp->bits_per_coded_sample;
             /* Special case for raw video data */
-            if( cc->codec_id == AV_CODEC_ID_RAWVIDEO )
+            if( cp->codec_id == AV_CODEC_ID_RAWVIDEO )
             {
-                msg_Dbg( p_demux, "raw video, pixel format: %i", cc->pix_fmt );
-                if( GetVlcChroma( &fmt.video, cc->pix_fmt ) != VLC_SUCCESS)
+                msg_Dbg( p_demux, "raw video, pixel format: %i", cp->format );
+                if( GetVlcChroma( &fmt.video, cp->format ) != VLC_SUCCESS)
                 {
                     msg_Err( p_demux, "was unable to find a FourCC match for raw video" );
                 }
@@ -420,12 +420,12 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.i_codec = fmt.video.i_chroma;
             }
             /* We need this for the h264 packetizer */
-            else if( cc->codec_id == AV_CODEC_ID_H264 && ( p_sys->fmt == av_find_input_format("flv") ||
+            else if( cp->codec_id == AV_CODEC_ID_H264 && ( p_sys->fmt == av_find_input_format("flv") ||
                 p_sys->fmt == av_find_input_format("matroska") || p_sys->fmt == av_find_input_format("mp4") ) )
                 fmt.i_original_fourcc = VLC_FOURCC( 'a', 'v', 'c', '1' );
 
-            fmt.video.i_width = cc->width;
-            fmt.video.i_height = cc->height;
+            fmt.video.i_width = cp->width;
+            fmt.video.i_height = cp->height;
             fmt.video.i_visible_width = fmt.video.i_width;
             fmt.video.i_visible_height = fmt.video.i_height;
 
@@ -433,8 +433,8 @@ int OpenDemux( vlc_object_t *p_this )
 
 # warning FIXME: implement palette transmission
             psz_type = "video";
-            fmt.video.i_frame_rate = cc->time_base.den;
-            fmt.video.i_frame_rate_base = cc->time_base.num * __MAX( cc->ticks_per_frame, 1 );
+            fmt.video.i_frame_rate = s->codec->time_base.num;
+            fmt.video.i_frame_rate_base = s->codec->time_base.den * __MAX( s->codec->ticks_per_frame, 1 );
             fmt.video.i_sar_num = s->sample_aspect_ratio.num;
             if (s->sample_aspect_ratio.num > 0)
                 fmt.video.i_sar_den = s->sample_aspect_ratio.den;
@@ -444,18 +444,18 @@ int OpenDemux( vlc_object_t *p_this )
 
         case AVMEDIA_TYPE_SUBTITLE:
             es_format_Init( &fmt, SPU_ES, fcc );
-            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
+            fmt.i_original_fourcc = CodecTagToFourcc( cp->codec_tag );
             if( strncmp( p_sys->ic->iformat->name, "matroska", 8 ) == 0 &&
-                cc->codec_id == AV_CODEC_ID_DVD_SUBTITLE &&
-                cc->extradata != NULL &&
-                cc->extradata_size > 0 )
+                cp->codec_id == AV_CODEC_ID_DVD_SUBTITLE &&
+                cp->extradata != NULL &&
+                cp->extradata_size > 0 )
             {
                 char *psz_start;
-                char *psz_buf = malloc( cc->extradata_size + 1);
+                char *psz_buf = malloc( cp->extradata_size + 1);
                 if( psz_buf != NULL )
                 {
-                    memcpy( psz_buf, cc->extradata , cc->extradata_size );
-                    psz_buf[cc->extradata_size] = '\0';
+                    memcpy( psz_buf, cp->extradata , cp->extradata_size );
+                    psz_buf[cp->extradata_size] = '\0';
 
                     psz_start = strstr( psz_buf, "size:" );
                     if( psz_start &&
@@ -492,35 +492,35 @@ int OpenDemux( vlc_object_t *p_this )
 
         default:
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
-            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
+            fmt.i_original_fourcc = CodecTagToFourcc( cp->codec_tag );
 #ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
-            if( cc->codec_type == AVMEDIA_TYPE_ATTACHMENT )
+            if( cp->codec_type == AVMEDIA_TYPE_ATTACHMENT )
             {
                 input_attachment_t *p_attachment;
 
                 psz_type = "attachment";
-                if( cc->codec_id == AV_CODEC_ID_TTF )
+                if( cp->codec_id == AV_CODEC_ID_TTF )
                 {
                     AVDictionaryEntry *filename = av_dict_get( s->metadata, "filename", NULL, 0 );
                     if( filename && filename->value )
                     {
                         p_attachment = vlc_input_attachment_New(
                                 filename->value, "application/x-truetype-font",
-                                NULL, cc->extradata, (int)cc->extradata_size );
+                                NULL, cp->extradata, (int)cp->extradata_size );
                         if( p_attachment )
                             TAB_APPEND( p_sys->i_attachments, p_sys->attachments,
                                         p_attachment );
                     }
                 }
-                else msg_Warn( p_demux, "unsupported attachment type (%u) in avformat demux", cc->codec_id );
+                else msg_Warn( p_demux, "unsupported attachment type (%u) in avformat demux", cp->codec_id );
             }
             else
 #endif
             {
-                if( cc->codec_type == AVMEDIA_TYPE_DATA )
+                if( cp->codec_type == AVMEDIA_TYPE_DATA )
                     psz_type = "data";
 
-                msg_Warn( p_demux, "unsupported track type (%u:%u) in avformat demux", cc->codec_type, cc->codec_id );
+                msg_Warn( p_demux, "unsupported track type (%u:%u) in avformat demux", cp->codec_type, cp->codec_id );
             }
             break;
         }
@@ -533,15 +533,15 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1000;
 
 #ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
-        if( cc->codec_type != AVMEDIA_TYPE_ATTACHMENT )
+        if( cp->codec_type != AVMEDIA_TYPE_ATTACHMENT )
 #endif
-        if( cc->codec_type != AVMEDIA_TYPE_DATA )
+        if( cp->codec_type != AVMEDIA_TYPE_DATA )
         {
             const bool    b_ogg = !strcmp( p_sys->fmt->name, "ogg" );
-            const uint8_t *p_extra = cc->extradata;
-            unsigned      i_extra  = cc->extradata_size;
+            const uint8_t *p_extra = cp->extradata;
+            unsigned      i_extra  = cp->extradata_size;
 
-            if( cc->codec_id == AV_CODEC_ID_THEORA && b_ogg )
+            if( cp->codec_id == AV_CODEC_ID_THEORA && b_ogg )
             {
                 unsigned pi_size[3];
                 const void *pp_data[3];
@@ -565,7 +565,7 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.p_extra = NULL;
                 }
             }
-            else if( cc->codec_id == AV_CODEC_ID_SPEEX && b_ogg )
+            else if( cp->codec_id == AV_CODEC_ID_SPEEX && b_ogg )
             {
                 const uint8_t p_dummy_comment[] = {
                     0, 0, 0, 0,
@@ -587,7 +587,7 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.p_extra = NULL;
                 }
             }
-            else if( cc->codec_id == AV_CODEC_ID_OPUS )
+            else if( cp->codec_id == AV_CODEC_ID_OPUS )
             {
                 const uint8_t p_dummy_comment[] = {
                     'O', 'p', 'u', 's',
@@ -613,7 +613,7 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.p_extra = NULL;
                 }
             }
-            else if( cc->extradata_size > 0 )
+            else if( cp->extradata_size > 0 )
             {
                 fmt.p_extra = malloc( i_extra );
                 if( fmt.p_extra )
@@ -628,7 +628,7 @@ int OpenDemux( vlc_object_t *p_this )
             es_format_Clean( &fmt );
 
             msg_Dbg( p_demux, "adding es: %s codec = %4.4s (%d)",
-                     psz_type, (char*)&fcc, cc->codec_id  );
+                     psz_type, (char*)&fcc, cp->codec_id  );
         }
         TAB_APPEND( p_sys->i_tk, p_sys->tk, es );
     }
@@ -740,7 +740,7 @@ static int Demux( demux_t *p_demux )
         av_free_packet( &pkt );
         return 1;
     }
-    if( p_stream->codec->codec_id == AV_CODEC_ID_SSA )
+    if( p_stream->codecpar->codec_id == AV_CODEC_ID_SSA )
     {
         p_frame = BuildSsaFrame( &pkt, p_sys->i_ssa_order++ );
         if( !p_frame )
@@ -799,7 +799,7 @@ static int Demux( demux_t *p_demux )
             p_stream->time_base.den;
 
     if( pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts == pkt.pts &&
-        p_stream->codec->codec_type == AVMEDIA_TYPE_VIDEO )
+        p_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO )
     {
         /* Add here notoriously bugged file formats/samples regarding PTS */
         if( !strcmp( p_sys->fmt->name, "flv" ) )
