@@ -116,11 +116,9 @@ static inline void *realloc_down( void *ptr, size_t size )
 #define TAB_ERASE( count, tab, index )      \
   do {                                      \
         if( (count) > 1 )                   \
-        {                                   \
-            memmove( ((void**)(tab) + index),    \
-                     ((void**)(tab) + index+1),  \
-                     ( (count) - index - 1 ) * sizeof( *(tab) ) );\
-        }                                   \
+            memmove( (tab) + (index),       \
+                     (tab) + (index) + 1,   \
+                     ((count) - (index) - 1 ) * sizeof( *(tab) ) );\
         (count)--;                          \
         if( (count) == 0 )                  \
         {                                   \
@@ -144,9 +142,9 @@ static inline void *realloc_down( void *ptr, size_t size )
         (tab) = cast malloc( sizeof( *(tab) ) );       \
     if( !(tab) ) abort();                       \
     if( (count) - (index) > 0 )                 \
-        memmove( (void**)(tab) + (index) + 1,   \
-                 (void**)(tab) + (index),       \
-                 ((count) - (index)) * sizeof(*(tab)) );\
+        memmove( (tab) + (index) + 1,           \
+                 (tab) + (index),               \
+                 ((count) - (index)) * sizeof( *(tab) ) );\
     (tab)[(index)] = (p);                       \
     (count)++;                                  \
 } while(0)
