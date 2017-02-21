@@ -24,7 +24,7 @@ $(TARBALLS)/fluidlite-$(FLUID_HASH).tar.xz:
 
 DEPS_fluidlite = ogg $(DEPS_ogg)
 
-fluidlite: fluidlite-git.tar.xz .sum-fluidlite
+fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
 	$(UNPACK)
 	$(MOVE)
 
