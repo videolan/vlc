@@ -37,45 +37,6 @@ static inline void *realloc_down( void *ptr, size_t size )
     return ret ? ret : ptr;
 }
 
-/**
- * Simple dynamic array handling. Array is realloced at each insert/removal
- */
-#define INSERT_ELEM( p_ar, i_oldsize, i_pos, elem )                           \
-    do                                                                        \
-    {                                                                         \
-        if( !(i_oldsize) ) (p_ar) = NULL;                                       \
-        (p_ar) = realloc( p_ar, ((i_oldsize) + 1) * sizeof(*(p_ar)) ); \
-        if( !(p_ar) ) abort();                                                \
-        if( (i_oldsize) - (i_pos) )                                           \
-        {                                                                     \
-            memmove( (p_ar) + (i_pos) + 1, (p_ar) + (i_pos),                  \
-                     ((i_oldsize) - (i_pos)) * sizeof( *(p_ar) ) );           \
-        }                                                                     \
-        (p_ar)[(i_pos)] = elem;                                                 \
-        (i_oldsize)++;                                                        \
-    }                                                                         \
-    while( 0 )
-
-#define REMOVE_ELEM( p_ar, i_size, i_pos )                                    \
-    do                                                                        \
-    {                                                                         \
-        if( (i_size) - (i_pos) - 1 )                                          \
-        {                                                                     \
-            memmove( (p_ar) + (i_pos),                                        \
-                     (p_ar) + (i_pos) + 1,                                    \
-                     ((i_size) - (i_pos) - 1) * sizeof( *(p_ar) ) );          \
-        }                                                                     \
-        if( i_size > 1 )                                                      \
-            (p_ar) = realloc_down( p_ar, ((i_size) - 1) * sizeof( *(p_ar) ) );\
-        else                                                                  \
-        {                                                                     \
-            free( p_ar );                                                     \
-            (p_ar) = NULL;                                                    \
-        }                                                                     \
-        (i_size)--;                                                           \
-    }                                                                         \
-    while( 0 )
-
 #define TAB_INIT( count, tab )                  \
   do {                                          \
     (count) = 0;                                \
@@ -151,6 +112,12 @@ static inline void *realloc_down( void *ptr, size_t size )
 
 #define TAB_INSERT( count, tab, p, index )      \
     TAB_INSERT_CAST( , count, tab, p, index )
+
+#define INSERT_ELEM( p_ar, i_oldsize, i_pos, elem ) \
+    TAB_INSERT( i_oldsize, p_ar, elem, i_pos )
+
+#define REMOVE_ELEM( p_ar, i_size, i_pos )  \
+    TAB_ERASE( i_size, p_ar, i_pos )
 
 /**
  * Binary search in a sorted array. The key must be comparable by < and >
