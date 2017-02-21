@@ -77,10 +77,18 @@ static int MPG123Open( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    /* Create our mpg123 handle */
+    if( ( p_sys->p_handle = mpg123_new( NULL, NULL ) ) == NULL )
+    {
+        msg_Err( p_dec, "mpg123 error: can't create handle" );
+        return VLC_EGENERIC;
+    }
+
     /* Open a new bitstream */
     if( mpg123_open_feed( p_sys->p_handle ) != MPG123_OK )
     {
         msg_Err( p_dec, "mpg123 error: can't open feed" );
+        mpg123_delete( p_sys->p_handle );
         return VLC_EGENERIC;
     }
 
@@ -118,6 +126,7 @@ static int MPG123Open( decoder_t *p_dec )
         msg_Err( p_dec, "mpg123 error: %s",
                  mpg123_strerror( p_sys->p_handle ) );
         mpg123_close( p_sys->p_handle );
+        mpg123_delete( p_sys->p_handle );
         return VLC_EGENERIC;
     }
 
@@ -135,6 +144,7 @@ static void Flush( decoder_t *p_dec )
     date_Set( &p_sys->end_date, 0 );
 
     mpg123_close( p_sys->p_handle );
+    mpg123_delete( p_sys->p_handle );
     p_sys->b_opened = false;
     MPG123Open( p_dec );
 }
@@ -377,10 +387,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_out = NULL;
     date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
-    /* Create our mpg123 handle */
-    if( ( p_sys->p_handle = mpg123_new( NULL, NULL ) ) == NULL )
-        goto error;
-
     if( MPG123Open( p_dec ) )
         goto error;
 
@@ -396,7 +402,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 error:
-    mpg123_delete( p_sys->p_handle );
     ExitMPG123();
     free( p_sys );
     return VLC_EGENERIC;
