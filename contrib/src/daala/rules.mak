@@ -22,12 +22,12 @@ daala: daala-$(DAALA_VERSION).tar.gz .sum-daala
 	$(call pkg_static,"daaladec.pc.in")
 	$(call pkg_static,"daalaenc.pc.in")
 	$(MOVE)
-	mkdir -p $@/m4
 
 DAALACONF := $(HOSTCONF) \
 	--disable-tools --disable-unit-tests --disable-examples
 
 .daala: daala
+	mkdir -p daala/m4
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(DAALACONF)
 	cd $< && $(MAKE) install
