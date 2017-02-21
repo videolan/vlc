@@ -15,10 +15,10 @@ ifeq ($(call need_pkg,"fluidlite"),)
 PKGS_FOUND += fluidlite
 endif
 
-$(TARBALLS)/fluidlite-git.tar.xz:
+$(TARBALLS)/fluidlite-$(FLUID_HASH).tar.xz:
 	$(call download_git,$(FLUID_GITURL),,$(FLUID_HASH))
 
-.sum-fluidlite: fluidlite-git.tar.xz
+.sum-fluidlite: fluidlite-$(FLUID_HASH).tar.xz
 	$(call check_githash,$(FLUID_HASH))
 	touch $@
 
