@@ -21,7 +21,10 @@ daala: daala-$(DAALA_VERSION).tar.xz .sum-daala
 	$(MOVE)
 
 DAALACONF := $(HOSTCONF) \
-	--disable-tools --disable-unit-tests --disable-examples
+	--disable-tools \
+	--disable-unit-tests \
+	--disable-examples \
+	--disable-player
 
 .daala: daala
 	mkdir -p daala/m4
