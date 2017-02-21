@@ -73,18 +73,12 @@ static int  Control( access_t *, int, va_list );
 
 static int  open_file( access_t *, const char * );
 
-struct access_sys_t
-{
-    int fd;
-};
-
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = ( access_t* )p_this;
-    access_sys_t *p_sys;
     uint32_t i_bus;
     uint8_t i_dev;
     uint16_t i_product_id;
@@ -139,20 +133,14 @@ static int Open( vlc_object_t *p_this )
     }
     free( p_rawdevices );
 
-    STANDARD_READ_ACCESS_INIT;
-    int fd = p_sys->fd = -1;
-
     /* Open file */
     msg_Dbg( p_access, "opening file `%s'", p_access->psz_filepath );
-    fd = open_file( p_access, p_access->psz_filepath );
-
+    int fd = open_file( p_access, p_access->psz_filepath );
     if( fd == -1 )
-    {
-        free( p_sys );
         return VLC_EGENERIC;
-    }
-    p_sys->fd = fd;
 
+    p_access->p_sys = (void *)(intptr_t)fd;
+    ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
     return VLC_SUCCESS;
 }
 
@@ -161,14 +149,13 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    access_t     *p_access = ( access_t* )p_this;
-    access_sys_t *p_sys = p_access->p_sys;
+    access_t *p_access = ( access_t* )p_this;
+    int fd = (intptr_t)p_access->p_sys;
 
-    vlc_close ( p_sys->fd );
+    vlc_close ( fd );
     if( vlc_unlink( p_access->psz_filepath ) != 0 )
         msg_Err( p_access, "Error deleting file %s, %s",
                  p_access->psz_filepath, vlc_strerror_c(errno) );
-    free( p_sys );
 }
 
 /*****************************************************************************
@@ -176,11 +163,8 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    ssize_t i_ret;
-    int fd = p_sys->fd;
-
-    i_ret = read( fd, p_buffer, i_len );
+    int fd = (intptr_t)p_access->p_sys;
+    ssize_t i_ret = read( fd, p_buffer, i_len );
 
     if( i_ret < 0 )
     {
@@ -208,9 +192,9 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
-    access_sys_t *sys = p_access->p_sys;
+    int fd = (intptr_t)p_access->p_sys;
 
-    if (lseek( sys->fd, i_pos, SEEK_SET ) == (off_t)-1)
+    if (lseek( fd, i_pos, SEEK_SET ) == (off_t)-1)
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -220,7 +204,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_sys_t *sys = p_access->p_sys;
+    int fd = (intptr_t)p_access->p_sys;
     bool   *pb_bool;
     int64_t      *pi_64;
 
@@ -242,7 +226,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         {
             uint64_t *s = va_arg( args, uint64_t * );
             struct stat st;
-            if( fstat( sys->fd, &st ) )
+            if( fstat( fd, &st ) )
             {
                 msg_Err( p_access, "fstat error: %s", vlc_strerror_c(errno) );
                 return VLC_EGENERIC;
