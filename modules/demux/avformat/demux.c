@@ -401,6 +401,18 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.audio.i_bitspersample = cp->bits_per_coded_sample;
             fmt.audio.i_blockalign = cp->block_align;
             psz_type = "audio";
+
+            if(cp->codec_id == AV_CODEC_ID_AAC_LATM)
+            {
+                fmt.i_original_fourcc = VLC_FOURCC('L','A','T','M');
+                fmt.b_packetized = false;
+            }
+            else if(cp->codec_id == AV_CODEC_ID_AAC &&
+                    strstr(p_sys->fmt->long_name, "raw ADTS AAC"))
+            {
+                fmt.i_original_fourcc = VLC_FOURCC('A','D','T','S');
+                fmt.b_packetized = false;
+            }
             break;
 
         case AVMEDIA_TYPE_VIDEO:
