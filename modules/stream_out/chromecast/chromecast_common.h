@@ -31,7 +31,7 @@
 extern "C" {
 # endif
 
-static const char *CC_SHARED_VAR_NAME = "cc_sout";
+#define CC_SHARED_VAR_NAME "cc_sout"
 
 typedef struct
 {
