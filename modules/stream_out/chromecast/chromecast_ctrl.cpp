@@ -720,7 +720,7 @@ mtime_t intf_sys_t::getPlaybackTimestamp() const
 
 double intf_sys_t::getPlaybackPosition() const
 {
-    if( m_length > 0 && m_time_playback_started != VLC_TS_INVALID)
+    if( m_length > 0 )
         return (double) getPlaybackTimestamp() / (double)( m_length );
     return 0.0;
 }
