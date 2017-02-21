@@ -1,4 +1,4 @@
-# sparkle
+# Sparkle
 
 SPARKLE_VERSION := 1.13.1
 SPARKLE_URL := https://github.com/sparkle-project/Sparkle/archive/$(SPARKLE_VERSION).zip
@@ -17,8 +17,11 @@ sparkle: Sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
 	$(MOVE)
 
 .sparkle: sparkle
+	# Build Sparkle and change the @rpath
 	cd $< && xcodebuild $(XCODE_FLAGS) WARNING_CFLAGS=-Wno-error
 	cd $< && install_name_tool -id @executable_path/../Frameworks/Sparkle.framework/Versions/A/Sparkle build/Release/Sparkle.framework/Sparkle
-	install -d $(PREFIX)
-	cd $< && mkdir -p "$(PREFIX)/Frameworks" && cp -R build/Release/Sparkle.framework "$(PREFIX)/Frameworks"
+	# Install
+	cd $< && mkdir -p "$(PREFIX)/Frameworks" && \
+		rm -Rf "$(PREFIX)/Frameworks/Sparkle.framework" && \
+		cp -R build/Release/Sparkle.framework "$(PREFIX)/Frameworks"
 	touch $@
