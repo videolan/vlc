@@ -225,7 +225,7 @@ $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	rm -Rf $@ $@-$(FFMPEG_BASENAME)
 	mkdir -p $@-$(FFMPEG_BASENAME)
-	$(XZCAT) "$<" | (cd $@-$(FFMPEG_BASENAME) && tar xv --strip-components=1)
+	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
 	$(MOVE)
 
 .ffmpeg: ffmpeg
