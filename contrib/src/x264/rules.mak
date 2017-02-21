@@ -69,24 +69,17 @@ $(TARBALLS)/x264-git.tar.bz2:
 	$(warning $@ not implemented)
 	touch $@
 
-x264: x264-git.tar.bz2 .sum-x264
-	rm -Rf $@-git
-	mkdir -p $@-git
-	$(BZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
-	$(UPDATE_AUTOCONFIG)
-	$(MOVE)
-
-x26410b: x26410b-git.tar.bz2 .sum-x26410b
-	rm -Rf $@-git
-	mkdir -p $@-git
-	$(BZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
+x264 x26410b: %: %-git.tar.bz2 .sum-%
+	rm -Rf $*-git
+	mkdir -p $*-git
+	tar xvjf "$<" --strip-components=1 -C $*-git
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 x262: x262-git.tar.gz .sum-x262
 	rm -Rf $@-git
 	mkdir -p $@-git
-	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
+	tar xvzf "$<" --strip-components=1 -C $@-git
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
