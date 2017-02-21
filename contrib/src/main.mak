@@ -246,30 +246,10 @@ endif
 download_pkg = $(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) || \
 	( $(call download,$(1)) && echo "Please upload this package $(lastword $(subst /, ,$(@))) to our FTP" )
 
-ifeq ($(shell which xzcat >/dev/null 2>&1 || echo FAIL),)
-XZCAT = xzcat
-else
-XZCAT ?= $(error xz and lzma client not found!)
-endif
-
 ifeq ($(shell which xz >/dev/null 2>&1 || echo FAIL),)
 XZ = xz
 else
 XZ ?= $(error XZ (LZMA) compressor not found!)
-endif
-
-ifeq ($(shell which bzcat >/dev/null 2>&1 || echo FAIL),)
-BZCAT = bzcat
-else
-BZCAT ?= $(error Bunzip2 client (bzcat) not found!)
-endif
-
-ifeq ($(shell gzcat --version >/dev/null 2>&1 || echo FAIL),)
-ZCAT = gzcat
-else ifeq ($(shell zcat --version >/dev/null 2>&1 || echo FAIL),)
-ZCAT = zcat
-else
-ZCAT ?= $(error Gunzip client (zcat) not found!)
 endif
 
 ifeq ($(shell sha512sum --version >/dev/null 2>&1 || echo FAIL),)
