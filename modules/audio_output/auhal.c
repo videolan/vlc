@@ -131,7 +131,8 @@ struct aout_sys_t
 
     /* media sample rate */
     int                         i_rate;
-    int                         i_bytes_per_sample;
+    unsigned int                i_bytes_per_frame;
+    unsigned int                i_frame_length;
 
     CFArrayRef                  device_list;
     /* protects access to device_list */
@@ -941,6 +942,18 @@ MuteSet(audio_output_t * p_aout, bool mute)
 #pragma mark -
 #pragma mark actual playback
 
+static inline uint64_t
+BytesToFrames(aout_sys_t *p_sys, size_t i_bytes)
+{
+    return i_bytes * p_sys->i_frame_length / p_sys->i_bytes_per_frame;
+}
+
+static inline mtime_t
+FramesToUs(aout_sys_t *p_sys, uint64_t i_nb_frames)
+{
+    return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
+}
+
 static void
 CopyOutput(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
 {
@@ -1027,14 +1040,11 @@ TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
-    if (!p_sys->i_bytes_per_sample)
-        return -1;
+    int32_t i_bytes;
+    TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes);
 
-    int32_t availableBytes;
-    TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
-
-    *delay = ((availableBytes / p_sys->i_bytes_per_sample)
-           + p_sys->i_device_latency) * CLOCK_FREQ / p_sys->i_rate;
+    int64_t i_frames = BytesToFrames(p_sys, i_bytes) + p_sys->i_device_latency;
+    *delay = FramesToUs(p_sys, i_frames);
 
     return 0;
 }
@@ -1099,10 +1109,6 @@ Play(audio_output_t * p_aout, block_t * p_block)
                                                    p_block->p_buffer,
                                                    p_block->i_buffer)))
             msg_Warn(p_aout, "dropped buffer");
-
-        if (!p_sys->i_bytes_per_sample)
-            p_sys->i_bytes_per_sample = p_block->i_buffer
-                                      / p_block->i_nb_samples;
     }
 
     block_Release(p_block);
@@ -1509,7 +1515,6 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     /* Set up the format to be used */
     DeviceFormat.mSampleRate = fmt->i_rate;
     DeviceFormat.mFormatID = kAudioFormatLinearPCM;
-    p_sys->i_rate = fmt->i_rate;
 
     /* We use float 32 since this is VLC's endorsed format */
     fmt->i_format = VLC_CODEC_FL32;
@@ -1807,7 +1812,6 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
     fmt->i_frame_length = A52_FRAME_NB;
     fmt->i_rate = (unsigned int)desired_stream_format.mSampleRate;
-    p_sys->i_rate = fmt->i_rate;
     aout_FormatPrepare(fmt);
 
     /* Add IOProc callback */
@@ -1927,7 +1931,6 @@ Stop(audio_output_t *p_aout)
                       kAudioDevicePropertyDeviceIsAlive,
                       kAudioObjectPropertyScopeGlobal);
 
-    p_sys->i_bytes_per_sample = 0;
     p_sys->b_digital = false;
 
     /* clean-up circular buffer */
@@ -1956,7 +1959,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
-    p_sys->i_bytes_per_sample = 0;
     p_sys->b_paused = false;
     p_sys->i_device_latency = 0;
 
@@ -2096,6 +2098,10 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     if (b_success)
     {
+        p_sys->i_rate = fmt->i_rate;
+        p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
+        p_sys->i_frame_length = fmt->i_frame_length;
+
         p_aout->play = Play;
         p_aout->flush = Flush;
         p_aout->time_get = TimeGet;
