@@ -259,7 +259,9 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
     const char *errp;
     int val;
 
-    val = gnutls_init (&session, type);
+    type |= GNUTLS_NONBLOCK;
+
+    val = gnutls_init(&session, type);
     if (val != 0)
     {
         msg_Err(creds, "cannot initialize TLS session: %s",
