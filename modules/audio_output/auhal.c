@@ -941,6 +941,40 @@ MuteSet(audio_output_t * p_aout, bool mute)
 #pragma mark -
 #pragma mark actual playback
 
+static void
+CopyOutput(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    vlc_mutex_lock(&p_sys->lock);
+    /* Pull audio from buffer */
+    if (!p_sys->b_paused)
+    {
+        int32_t i_available;
+        void *p_data = TPCircularBufferTail(&p_sys->circular_buffer,
+                                            &i_available);
+        if (i_available < 0)
+            i_available = 0;
+
+        size_t i_tocopy = __MIN(i_requested, (size_t) i_available);
+
+        if (i_tocopy > 0)
+        {
+            memcpy(p_output, p_data, i_tocopy);
+            TPCircularBufferConsume(&p_sys->circular_buffer, i_tocopy);
+        }
+
+        /* Pad with 0 */
+        if (i_requested > i_tocopy)
+            memset(&p_output[i_tocopy], 0, i_requested - i_tocopy);
+
+        vlc_cond_signal(&p_sys->cond);
+        vlc_mutex_unlock(&p_sys->lock);
+    }
+    else
+         memset(p_output, 0, i_requested);
+}
+
 /*****************************************************************************
  * RenderCallbackAnalog: This function is called everytime the AudioUnit wants
  * us to provide some more audio data.
@@ -958,37 +992,8 @@ RenderCallbackAnalog(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     VLC_UNUSED(inBusNumber);
     VLC_UNUSED(inNumberFrames);
 
-    audio_output_t *p_aout = p_data;
-    struct aout_sys_t *p_sys = p_aout->sys;
-
-    int bytesRequested = ioData->mBuffers[0].mDataByteSize;
-    Float32 *targetBuffer = (Float32*)ioData->mBuffers[0].mData;
-    if (unlikely(bytesRequested == 0)) /* cannot be negative */
-        return noErr;
-
-    vlc_mutex_lock(&p_sys->lock);
-    /* Pull audio from buffer */
-    int32_t availableBytes;
-    Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer,
-                                           &availableBytes);
-
-    /* check if we have enough data */
-    if (!availableBytes || p_sys->b_paused)
-    {
-        /* return an empty buffer so silence is played until we have data */
-        memset(targetBuffer, 0, bytesRequested);
-    }
-    else
-    {
-        int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
-
-        memcpy(targetBuffer, buffer, bytesToCopy);
-        TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
-        ioData->mBuffers[0].mDataByteSize = bytesToCopy;
-    }
-
-    vlc_cond_signal(&p_sys->cond);
-    vlc_mutex_unlock(&p_sys->lock);
+    CopyOutput(p_data, ioData->mBuffers[0].mData,
+               ioData->mBuffers[0].mDataByteSize);
 
     return noErr;
 }
@@ -1010,37 +1015,9 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
     VLC_UNUSED(inOutputTime);
 
     audio_output_t * p_aout = p_data;
-    struct aout_sys_t * p_sys = p_aout->sys;
-
-    int bytesRequested =
-        outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
-    char *targetBuffer = outOutputData->mBuffers[p_sys->i_stream_index].mData;
-    if (unlikely(bytesRequested == 0)) /* cannot be negative */
-        return noErr;
-
-    vlc_mutex_lock(&p_sys->lock);
-    /* Pull audio from buffer */
-    int32_t availableBytes;
-    char *buffer = TPCircularBufferTail(&p_sys->circular_buffer,
-                                        &availableBytes);
-
-    /* check if we have enough data */
-    if (!availableBytes || p_sys->b_paused)
-    {
-        /* return an empty buffer so silence is played until we have data */
-        memset(targetBuffer, 0, bytesRequested);
-    }
-    else
-    {
-        int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
-
-        memcpy(targetBuffer, buffer, bytesToCopy);
-        TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
-        outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize = bytesToCopy;
-    }
-
-    vlc_cond_signal(&p_sys->cond);
-    vlc_mutex_unlock(&p_sys->lock);
+    aout_sys_t *p_sys = p_aout->sys;
+    CopyOutput(p_aout, outOutputData->mBuffers[p_sys->i_stream_index].mData,
+               outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize);
 
     return noErr;
 }
