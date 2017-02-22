@@ -75,7 +75,7 @@ struct decoder_sys_t
 
     /* temporary buffer */
     uint8_t *p_buffer;
-    int     i_buffer;
+    size_t  i_buffer;
     size_t  i_buffer_size;
 
     /* Channel positions of the current stream (for re-ordering) */
@@ -208,6 +208,27 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     date_Set( &p_sys->date, 0 );
+}
+
+/*****************************************************************************
+ * FlushBuffer:
+ *****************************************************************************/
+static void FlushBuffer( decoder_sys_t *p_sys, size_t i_used )
+{
+    if( i_used > p_sys->i_buffer )
+    {
+        /* Drop padding */
+        if(p_sys->p_buffer[i_used] == 0x00)
+            i_used++;
+
+        p_sys->i_buffer -= i_used;
+        if( p_sys->i_buffer > 0 )
+        {
+            memmove( p_sys->p_buffer, &p_sys->p_buffer[i_used],
+                     p_sys->i_buffer );
+        }
+    }
+    else p_sys->i_buffer = 0;
 }
 
 /*****************************************************************************
@@ -390,14 +411,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         if( frame.channels <= 0 || frame.channels > 8 || frame.channels == 7 )
         {
             msg_Warn( p_dec, "invalid channels count: %i", frame.channels );
-
-            /* Flush the buffer */
-            p_sys->i_buffer -= frame.bytesconsumed;
-            if( p_sys->i_buffer > 0 )
-            {
-                memmove( p_sys->p_buffer,&p_sys->p_buffer[frame.bytesconsumed],
-                         p_sys->i_buffer );
-            }
+            FlushBuffer( p_sys, frame.bytesconsumed );
             block_Release( p_block );
             return VLCDEC_SUCCESS;
         }
@@ -405,19 +419,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         if( frame.samples <= 0 )
         {
             msg_Warn( p_dec, "decoded zero sample" );
-
-            /* Flush the buffer */
-            p_sys->i_buffer -= frame.bytesconsumed;
-            if( p_sys->i_buffer > 1 )
-            {
-                memmove( p_sys->p_buffer,&p_sys->p_buffer[frame.bytesconsumed],
-                         p_sys->i_buffer );
-            }
-            else
-            {
-                /* Drop byte of padding */
-                p_sys->i_buffer = 0;
-            }
+            FlushBuffer( p_sys, frame.bytesconsumed );
             block_Release( p_block );
             return VLCDEC_SUCCESS;
         }
@@ -509,12 +511,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                       frame.samples / nbChannels, nbChannels,
                       p_sys->pi_channel_positions );
 
-        p_sys->i_buffer -= frame.bytesconsumed;
-        if( p_sys->i_buffer > 0 )
-        {
-            memmove( p_sys->p_buffer, &p_sys->p_buffer[frame.bytesconsumed],
-                     p_sys->i_buffer );
-        }
+        FlushBuffer( p_sys, frame.bytesconsumed );
 
         block_Release( p_block );
         decoder_QueueAudio( p_dec, p_out );
