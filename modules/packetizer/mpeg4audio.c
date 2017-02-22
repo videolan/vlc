@@ -157,8 +157,9 @@ enum
     } while(0)
 
 enum {
-    TYPE_NONE,
-    TYPE_RAW,
+    TYPE_UNKNOWN, /* AAC samples with[out] headers */
+    TYPE_UNKNOWN_NONRAW, /* [un]packetized ADTS or LOAS */
+    TYPE_RAW,    /* RAW AAC frames */
     TYPE_ADTS,
     TYPE_LOAS
 };
@@ -178,10 +179,8 @@ static const int pi_sample_rates[16] =
 static int  OpenPacketizer(vlc_object_t *);
 static void ClosePacketizer(vlc_object_t *);
 
-static block_t *PacketizeRawBlock    (decoder_t *, block_t **);
-static void     FlushRawBlock( decoder_t * );
-static block_t *PacketizeStreamBlock(decoder_t *, block_t **);
-static void     FlushStreamBlock( decoder_t * );
+static block_t *Packetize    (decoder_t *, block_t **);
+static void     Flush( decoder_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -223,6 +222,18 @@ static int OpenPacketizer(vlc_object_t *p_this)
 
     msg_Dbg(p_dec, "running MPEG4 audio packetizer");
 
+    /*
+     * We need to handle 3 cases.
+     * Case 1 : RAW AAC samples without sync header
+     *          The demuxer shouldn't need packetizer, see next case.
+     * Case 2 : AAC samples with ADTS or LOAS/LATM header
+     *          Some mux (avi) can't distinguish the both
+     *          cases above, and then forwards to packetizer
+     *          which should check for header and rewire to case below
+     * Case 3 : Non packetized ADTS or LOAS/LATM
+     *          The demuxer needs to set original_codec for hardwiring
+     */
+
     switch (p_dec->fmt_in.i_original_fourcc)
     {
         case VLC_FOURCC('L','A','T','M'):
@@ -235,19 +246,20 @@ static int OpenPacketizer(vlc_object_t *p_this)
             msg_Dbg(p_dec, "ADTS Mode");
             break;
 
+        case VLC_FOURCC('H','E','A','D'):
+            p_sys->i_type = TYPE_UNKNOWN_NONRAW;
+            break;
+
         default:
-            if (p_dec->fmt_in.i_extra > 1)
-            {
-                msg_Dbg(p_dec, "RAW AAC Mode");
-                p_sys->i_type = TYPE_RAW;
-            } else {
-                p_sys->i_type = TYPE_NONE;
-                msg_Dbg(p_dec, "no decoder specific info, must be an ADTS or LOAS stream");
-            }
+            p_sys->i_type = TYPE_UNKNOWN;
             break;
     }
 
-    if(p_sys->i_type == TYPE_RAW)
+    /* Some mux (avi) do send RAW AAC without extradata,
+       and LATM can be sent with out-of-band audioconfig,
+       (avformat sets m4a extradata in both cases)
+       so we can't rely on extradata to guess multiplexing */
+    if(p_sys->i_type == TYPE_UNKNOWN && p_dec->fmt_in.i_extra > 1)
     {
         uint8_t *p_config = (uint8_t*)p_dec->fmt_in.p_extra;
         int     i_index;
@@ -267,11 +279,10 @@ static int OpenPacketizer(vlc_object_t *p_this)
             p_dec->fmt_out.audio.i_channels = (p_config[4] >> 3) & 0x0f;
         }
 
+        /* This is not 100% guaranteed (overriden by ext) */
         msg_Dbg(p_dec, "AAC %dHz %d samples/frame",
                  p_dec->fmt_out.audio.i_rate,
                  p_dec->fmt_out.audio.i_frame_length);
-
-        date_Init(&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);
 
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         p_dec->fmt_out.p_extra = malloc(p_dec->fmt_in.i_extra);
@@ -281,23 +292,21 @@ static int OpenPacketizer(vlc_object_t *p_this)
         }
         memcpy(p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
                 p_dec->fmt_in.i_extra);
-
-        /* Set callbacks */
-        p_dec->pf_packetize = PacketizeRawBlock;
-        p_dec->pf_flush = FlushRawBlock;
     }
     else
     {
-        date_Init(&p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1);
+        p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
 
         /* We will try to create a AAC Config from adts/loas */
         p_dec->fmt_out.i_extra = 0;
         p_dec->fmt_out.p_extra = NULL;
-
-        /* Set callbacks */
-        p_dec->pf_packetize = PacketizeStreamBlock;
-        p_dec->pf_flush = FlushStreamBlock;
     }
+
+    date_Init(&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);
+
+    /* Set callbacks */
+    p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush = Flush;
 
     return VLC_SUCCESS;
 }
@@ -314,22 +323,12 @@ static void ClosePacketizer(vlc_object_t *p_this)
     free(p_sys);
 }
 
-/*****************************************************************************
- * FlushRawBlock:
- *****************************************************************************/
-static void FlushRawBlock(decoder_t *p_dec)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    p_sys->b_discontuinity = true;
-    date_Set(&p_sys->end_date, 0);
-}
-
 /****************************************************************************
- * PacketizeRawBlock: the whole thing
+ * ForwardRawBlock:
  ****************************************************************************
  * This function must be fed with complete frames.
  ****************************************************************************/
-static block_t *PacketizeRawBlock(decoder_t *p_dec, block_t **pp_block)
+static block_t *ForwardRawBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
@@ -340,38 +339,21 @@ static block_t *PacketizeRawBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
     *pp_block = NULL; /* Don't reuse this block */
 
-    if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED))
+    if (p_block->i_pts > VLC_TS_INVALID &&
+        p_block->i_pts != date_Get(&p_sys->end_date))
     {
-        FlushRawBlock(p_dec);
-        if (p_block->i_flags&(BLOCK_FLAG_CORRUPTED))
-        {
-            block_Release(p_block);
-            return NULL;
-        }
-    }
-
-
-    if (!date_Get(&p_sys->end_date) && p_block->i_pts <= VLC_TS_INVALID) {
-        /* We've just started the stream, wait for the first PTS. */
-        block_Release(p_block);
-        return NULL;
-    } else if (p_block->i_pts > VLC_TS_INVALID &&
-             p_block->i_pts != date_Get(&p_sys->end_date)) {
-        if(date_Get(&p_sys->end_date) > 0)
+        if(date_Get(&p_sys->end_date) > VLC_TS_INVALID)
             p_sys->b_discontuinity = true;
         date_Set(&p_sys->end_date, p_block->i_pts);
     }
 
     p_block->i_pts = p_block->i_dts = date_Get(&p_sys->end_date);
 
-    p_block->i_length = date_Increment(&p_sys->end_date,
-        p_dec->fmt_out.audio.i_frame_length) - p_block->i_pts;
-
-    if(p_sys->b_discontuinity)
-    {
-        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        p_sys->b_discontuinity = false;
-    }
+    /* Might not be known due to missing extradata,
+       will be set to block pts above */
+    if(p_dec->fmt_out.audio.i_frame_length)
+        p_block->i_length = date_Increment(&p_sys->end_date,
+            p_dec->fmt_out.audio.i_frame_length) - p_block->i_pts;
 
     return p_block;
 }
@@ -983,7 +965,7 @@ static void SetupOutput(decoder_t *p_dec, block_t *p_block)
 /*****************************************************************************
  * FlushStreamBlock:
  *****************************************************************************/
-static void FlushStreamBlock(decoder_t *p_dec)
+static void Flush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1007,27 +989,8 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
 
     if(p_block)
     {
-        if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-            /* First always drain complete blocks before discontinuity */
-            block_t *p_drain = PacketizeStreamBlock(p_dec, NULL);
-            if(p_drain)
-                return p_drain;
-
-            FlushStreamBlock(p_dec);
-
-            if (p_block->i_flags & BLOCK_FLAG_CORRUPTED) {
-                block_Release(p_block);
-                return NULL;
-            }
-        }
-
-        if (!date_Get(&p_sys->end_date) && p_block->i_pts <= VLC_TS_INVALID) {
-            /* We've just started the stream, wait for the first PTS. */
-            block_Release(p_block);
-            return NULL;
-        }
-
         block_BytestreamPush(&p_sys->bytestream, p_block);
+        *pp_block = NULL;
     }
 
     for (;;) switch(p_sys->i_state) {
@@ -1181,14 +1144,76 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
 
         p_sys->i_state = STATE_NOSYNC;
 
-        if(p_sys->b_discontuinity)
-        {
-            p_out_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-            p_sys->b_discontuinity = false;
-        }
-
         return p_out_buffer;
     }
 
     return NULL;
+}
+
+/****************************************************************************
+ * Packetize: just forwards raw blocks, or packetizes LOAS/ADTS
+ *            and strips headers
+ ****************************************************************************/
+static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = pp_block ? *pp_block : NULL;
+
+    if(p_block)
+    {
+        if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
+        {
+            if(p_sys->i_type == TYPE_ADTS || p_sys->i_type == TYPE_LOAS)
+            {
+                /* First always drain complete blocks before discontinuity */
+                block_t *p_drain = PacketizeStreamBlock(p_dec, NULL);
+                if(p_drain)
+                    return p_drain;
+            }
+
+            Flush(p_dec);
+
+            if (p_block->i_flags & BLOCK_FLAG_CORRUPTED)
+            {
+                block_Release(p_block);
+                return NULL;
+            }
+        }
+
+        if (!date_Get(&p_sys->end_date) && p_block->i_pts <= VLC_TS_INVALID)
+        {
+            /* We've just started the stream, wait for the first PTS. */
+            block_Release(p_block);
+            return NULL;
+        }
+    }
+
+    if(p_block && p_sys->i_type == TYPE_UNKNOWN)
+    {
+        p_sys->i_type = TYPE_RAW;
+        if(p_block->i_buffer > 1)
+        {
+            if(p_block->p_buffer[0] == 0xff && (p_block->p_buffer[1] & 0xf6) == 0xf0)
+            {
+                p_sys->i_type = TYPE_ADTS;
+            }
+            else if(p_block->p_buffer[0] == 0x56 && (p_block->p_buffer[1] & 0xe0) == 0xe0)
+            {
+                p_sys->i_type = TYPE_LOAS;
+            }
+        }
+    }
+
+    if(p_sys->i_type == TYPE_RAW)
+        p_block = ForwardRawBlock(p_dec, pp_block);
+    else
+        p_block = PacketizeStreamBlock(p_dec, pp_block);
+
+    if(p_block && p_sys->b_discontuinity)
+    {
+        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+        p_sys->b_discontuinity = false;
+    }
+
+    return p_block;
 }
