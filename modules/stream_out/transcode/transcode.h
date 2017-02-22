@@ -130,8 +130,6 @@ struct sout_stream_id_sys_t
     date_t          next_output_pts; /**< output calculated PTS */
 
 };
-#define SOUT_ID_FROM_DEC(x) \
-    (void *) (((uintptr_t)x) - offsetof(sout_stream_id_sys_t, p_decoder))
 
 /* OSD */
 
