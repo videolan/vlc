@@ -28,6 +28,7 @@
 # import "config.h"
 #endif
 
+#import <vlc_atomic.h>
 #import <vlc_common.h>
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>                      // vlc_dialog_display_error
@@ -146,10 +147,7 @@ struct aout_sys_t
 
     float                       f_volume;
     bool                        b_mute;
-    bool                        b_paused;
-
-    vlc_mutex_t                 lock;
-    vlc_cond_t                  cond;
+    atomic_bool                 b_paused;
 
     bool                        b_ignore_streams_changed_callback;
 
@@ -954,14 +952,14 @@ FramesToUs(aout_sys_t *p_sys, uint64_t i_nb_frames)
     return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
 }
 
+/* Called from AudioUnit render callbacks. No lock, wait, and IO here */
 static void
 CopyOutput(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    vlc_mutex_lock(&p_sys->lock);
     /* Pull audio from buffer */
-    if (!p_sys->b_paused)
+    if (!atomic_load(&p_sys->b_paused))
     {
         int32_t i_available;
         void *p_data = TPCircularBufferTail(&p_sys->circular_buffer,
@@ -980,9 +978,6 @@ CopyOutput(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
         /* Pad with 0 */
         if (i_requested > i_tocopy)
             memset(&p_output[i_tocopy], 0, i_requested - i_tocopy);
-
-        vlc_cond_signal(&p_sys->cond);
-        vlc_mutex_unlock(&p_sys->lock);
     }
     else
          memset(p_output, 0, i_requested);
@@ -1055,9 +1050,7 @@ Pause(audio_output_t *p_aout, bool pause, mtime_t date)
     struct aout_sys_t * p_sys = p_aout->sys;
     VLC_UNUSED(date);
 
-    vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_paused = pause;
-    vlc_mutex_unlock(&p_sys->lock);
+    atomic_store(&p_sys->b_paused, pause);
 }
 
 static void
@@ -1065,26 +1058,26 @@ Flush(audio_output_t *p_aout, bool wait)
 {
     struct aout_sys_t *p_sys = p_aout->sys;
 
-    int32_t availableBytes;
-    vlc_mutex_lock(&p_sys->lock);
-    TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
-
     if (wait)
     {
-        while (availableBytes > 0)
+        int32_t i_bytes;
+
+        while (TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes) != NULL)
         {
-            vlc_cond_wait(&p_sys->cond, &p_sys->lock);
-            TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
+            /* Calculate the duration of the circular buffer, in order to wait
+             * for the render thread to play it all */
+            const mtime_t i_frame_us =
+                FramesToUs(p_sys, BytesToFrames(p_sys, i_bytes)) + 10000;
+
+            /* Don't sleep less than 10ms */
+            msleep(__MAX(i_frame_us, 10000));
         }
     }
     else
     {
         /* flush circular buffer if data is left */
-        if (availableBytes > 0)
-            TPCircularBufferClear(&p_aout->sys->circular_buffer);
+        TPCircularBufferClear(&p_aout->sys->circular_buffer);
     }
-
-    vlc_mutex_unlock(&p_sys->lock);
 }
 
 static void
@@ -2168,8 +2161,6 @@ static void Close(vlc_object_t *obj)
 
     vlc_mutex_destroy(&p_sys->selected_device_lock);
     vlc_mutex_destroy(&p_sys->device_list_lock);
-    vlc_mutex_destroy(&p_sys->lock);
-    vlc_cond_destroy(&p_sys->cond);
 
     free(p_sys);
 }
@@ -2183,14 +2174,12 @@ static int Open(vlc_object_t *obj)
 
     vlc_mutex_init(&p_sys->device_list_lock);
     vlc_mutex_init(&p_sys->selected_device_lock);
-    vlc_mutex_init(&p_sys->lock);
-    vlc_cond_init(&p_sys->cond);
     p_sys->b_digital = false;
     p_sys->b_ignore_streams_changed_callback = false;
     p_sys->b_selected_dev_is_default = false;
-    p_sys->b_paused = false;
     memset(&p_sys->sfmt_revert, 0, sizeof(p_sys->sfmt_revert));
     p_sys->i_stream_id = 0;
+    atomic_init(&p_sys->b_paused, false);
 
     p_aout->sys = p_sys;
     p_aout->start = Start;
