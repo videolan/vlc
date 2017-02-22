@@ -526,7 +526,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            p_sys->i_state = STATE_SEND_DATA;
+            p_sys->i_state = STATE_GET_DATA;
             break;
 
         case STATE_GET_DATA:
