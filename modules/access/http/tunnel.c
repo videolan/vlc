@@ -151,8 +151,8 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
         sock = vlc_https_connect(creds, url.psz_host, url.i_port, &ptwo);
     else
     if (!strcasecmp(url.psz_protocol, "http"))
-        sock = vlc_http_connect(creds ? creds->obj.parent : NULL,
-                                url.psz_host, url.i_port);
+        sock = vlc_tls_SocketOpenTCP(creds ? creds->obj.parent : NULL,
+                                     url.psz_host, url.i_port);
     else
         sock = NULL;
 

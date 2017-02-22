@@ -28,14 +28,6 @@
 
 #include "transport.h"
 
-vlc_tls_t *vlc_http_connect(vlc_object_t *obj, const char *name, unsigned port)
-{
-    if (port == 0)
-        port = 80;
-
-    return vlc_tls_SocketOpenTCP(obj, name, port);
-}
-
 vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
                              unsigned port, bool *restrict two)
 {
