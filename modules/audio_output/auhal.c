@@ -111,6 +111,7 @@ struct aout_sys_t
 
     /* circular buffer to swap the audio data */
     TPCircularBuffer            circular_buffer;
+    atomic_uint                 i_underrun_size;
 
     /* AUHAL specific */
     AudioComponent              au_component;
@@ -977,7 +978,10 @@ CopyOutput(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
 
         /* Pad with 0 */
         if (i_requested > i_tocopy)
+        {
+            atomic_fetch_add(&p_sys->i_underrun_size, i_requested - i_tocopy);
             memset(&p_output[i_tocopy], 0, i_requested - i_tocopy);
+        }
     }
     else
          memset(p_output, 0, i_requested);
@@ -1103,6 +1107,10 @@ Play(audio_output_t * p_aout, block_t * p_block)
                                                    p_block->i_buffer)))
             msg_Warn(p_aout, "dropped buffer");
     }
+
+    unsigned i_underrun_size = atomic_exchange(&p_sys->i_underrun_size, 0);
+    if (i_underrun_size > 0)
+        msg_Warn(p_aout, "underrun of %u bytes", i_underrun_size);
 
     block_Release(p_block);
 }
@@ -2179,6 +2187,7 @@ static int Open(vlc_object_t *obj)
     p_sys->b_selected_dev_is_default = false;
     memset(&p_sys->sfmt_revert, 0, sizeof(p_sys->sfmt_revert));
     p_sys->i_stream_id = 0;
+    atomic_init(&p_sys->i_underrun_size, 0);
     atomic_init(&p_sys->b_paused, false);
 
     p_aout->sys = p_sys;
