@@ -352,7 +352,7 @@ ManageAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_dev_id,
  * AudioStreamSupportsDigital: Checks if audio stream is compatible with raw
  * bitstreams
  */
-static int
+static bool
 AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_stream_id)
 {
     bool b_return = false;
@@ -388,7 +388,7 @@ AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_stream_id)
 /*
  * AudioDeviceSupportsDigital: Checks if device supports raw bitstreams
  */
-static int
+static bool
 AudioDeviceSupportsDigital(audio_output_t *p_aout, AudioDeviceID i_dev_id)
 {
     size_t i_streams;
@@ -397,7 +397,7 @@ AudioDeviceSupportsDigital(audio_output_t *p_aout, AudioDeviceID i_dev_id)
                           kAudioDevicePropertyStreams,
                           kAudioObjectPropertyScopeOutput);
     if (ret != VLC_SUCCESS)
-        return ret;
+        return false;
 
     for (size_t i = 0; i < i_streams; i++)
     {
@@ -1166,7 +1166,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     if (p_sys->au_component == NULL)
     {
         msg_Err(p_aout, "cannot find any HAL component, PCM output failed");
-        return false;
+        return VLC_EGENERIC;
     }
 
     err = AudioComponentInstanceNew(p_sys->au_component, &p_sys->au_unit);
@@ -1174,7 +1174,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     {
         msg_Err(p_aout, "cannot open HAL component, PCM output failed [%4.4s]",
                 (const char *)&err);
-        return false;
+        return VLC_EGENERIC;
     }
 
     /* Set the device we will use for this output unit */
@@ -1187,7 +1187,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     {
         msg_Err(p_aout, "cannot select audio output device, PCM output failed "
                 "[%4.4s]", (const char *)&err);
-        return false;
+        return VLC_EGENERIC;
     }
 
     /* Get the current format */
@@ -1201,7 +1201,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     {
         msg_Err(p_aout, "failed to detect supported stream formats [%4.4s]",
                 (const char *)&err);
-        return false;
+        return VLC_EGENERIC;
     }
     else
         msg_Dbg(p_aout, STREAM_FORMAT_MSG("current format is: ", DeviceFormat));
@@ -1224,7 +1224,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                  &i_param_size);
 
         if (err != noErr)
-            return false;
+            return VLC_EGENERIC;
 
         /* We need to "fill out" the ChannelLayout, because there are multiple
          * ways that it can be set */
@@ -1252,7 +1252,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         {
             msg_Err(p_aout, "insufficient number of output channels");
             free(layout);
-            return false;
+            return VLC_EGENERIC;
         }
 
         msg_Dbg(p_aout, "layout of AUHAL has %i channels" ,
@@ -1599,7 +1599,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     VolumeSet(p_aout, p_sys->f_volume);
     MuteSet(p_aout, p_sys->b_mute);
 
-    return true;
+    return VLC_SUCCESS;
 }
 
 /*
@@ -1630,7 +1630,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     p_sys->b_ignore_streams_changed_callback = false;
 
     if (ret != VLC_SUCCESS)
-        return false;
+        return ret;
 
     if (AO_HASPROP(p_sys->i_selected_dev, kAudioDevicePropertySupportsMixing,
                    kAudioObjectPropertyScopeGlobal))
@@ -1656,7 +1656,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
         if (ret != VLC_SUCCESS)
         {
             msg_Err(p_aout, "failed to set mixmode");
-            return false;
+            return ret;
         }
     }
 
@@ -1667,7 +1667,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
                      &p_streams, kAudioDevicePropertyStreams,
                      kAudioObjectPropertyScopeOutput);
     if (ret != VLC_SUCCESS)
-        return false;
+        return ret;
 
     for (unsigned i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++)
     {
@@ -1800,7 +1800,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     if (!AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, desired_stream_format))
     {
         msg_Err(p_aout, "failed to change stream format for SPDIF output");
-        return false;
+        return VLC_EGENERIC;
     }
 
     /* Set the format flags */
@@ -1823,7 +1823,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     {
         msg_Err(p_aout, "Failed to create Process ID [%4.4s]",
                 (const char *)&err);
-        return false;
+        return VLC_EGENERIC;
     }
 
     /* Start device */
@@ -1838,13 +1838,13 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
             msg_Err(p_aout, "Failed to destroy process ID [%4.4s]",
                     (const char *)&err);
 
-        return false;
+        return VLC_EGENERIC;
     }
 
     /* setup circular buffer */
     TPCircularBufferInit(&p_sys->circular_buffer, 200 * AOUT_SPDIF_SIZE);
 
-    return true;
+    return VLC_SUCCESS;
 }
 
 static void
@@ -2083,7 +2083,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     /* Check for Digital mode or Analog output mode */
     if (AOUT_FMT_SPDIF (fmt) && b_start_digital)
     {
-        if (StartSPDIF (p_aout, fmt))
+        if (StartSPDIF (p_aout, fmt) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "digital output successfully opened");
             b_success = true;
@@ -2091,7 +2091,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
     else
     {
-        if (StartAnalog(p_aout, fmt))
+        if (StartAnalog(p_aout, fmt) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "analog output successfully opened");
             b_success = true;
