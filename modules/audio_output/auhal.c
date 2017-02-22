@@ -73,10 +73,6 @@ vlc_module_end ()
 #pragma mark -
 #pragma mark private declarations
 
-#ifndef verify_noerr
-# define verify_noerr(a) assert((a) == noErr)
-#endif
-
 #define STREAM_FORMAT_MSG(pre, sfm) \
     pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \
     sfm.mSampleRate, (char *)&sfm.mFormatID, \
@@ -1108,36 +1104,40 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     if (err == noErr) {
         layout = (AudioChannelLayout *)malloc(i_param_size);
 
-        verify_noerr(AudioUnitGetProperty(p_sys->au_unit,
-                                       kAudioDevicePropertyPreferredChannelLayout,
-                                       kAudioUnitScope_Output,
-                                       0,
-                                       layout,
-                                       &i_param_size));
+        OSStatus err =
+            AudioUnitGetProperty(p_sys->au_unit,
+                                 kAudioDevicePropertyPreferredChannelLayout,
+                                 kAudioUnitScope_Output, 0, layout,
+                                 &i_param_size);
+
+        if (err != noErr)
+            return false;
 
         /* We need to "fill out" the ChannelLayout, because there are multiple ways that it can be set */
         if (layout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap) {
             /* bitmap defined channellayout */
-            verify_noerr(AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForBitmap,
+
+            err =
+             AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForBitmap,
                                     sizeof(UInt32), &layout->mChannelBitmap,
-                                    &i_param_size,
-                                    layout));
+                                    &i_param_size, layout);
         } else if (layout->mChannelLayoutTag != kAudioChannelLayoutTag_UseChannelDescriptions)
         {
             /* layouttags defined channellayout */
-            verify_noerr(AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForTag,
-                                    sizeof(AudioChannelLayoutTag), &layout->mChannelLayoutTag,
-                                    &i_param_size,
-                                    layout));
+            err =
+                AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForTag,
+                                       sizeof(AudioChannelLayoutTag),
+                                       &layout->mChannelLayoutTag, &i_param_size,
+                                       layout);
         }
 
-        msg_Dbg(p_aout, "layout of AUHAL has %i channels" , layout->mNumberChannelDescriptions);
-
-        if (layout->mNumberChannelDescriptions == 0) {
+        if (err != noErr || layout->mNumberChannelDescriptions == 0) {
             msg_Err(p_aout, "insufficient number of output channels");
             free(layout);
             return false;
         }
+
+        msg_Dbg(p_aout, "layout of AUHAL has %i channels" , layout->mNumberChannelDescriptions);
 
         /* Initialize the VLC core channel count */
         fmt->i_physical_channels = 0;
@@ -1375,22 +1375,18 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     /* Set the desired format */
     i_param_size = sizeof(AudioStreamBasicDescription);
-    verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
-                                   kAudioUnitProperty_StreamFormat,
-                                   kAudioUnitScope_Input,
-                                   0,
-                                   &DeviceFormat,
-                                   i_param_size));
+    /* TODO: check error, clean and return on error */
+    AudioUnitSetProperty(p_sys->au_unit, kAudioUnitProperty_StreamFormat,
+                         kAudioUnitScope_Input, 0, &DeviceFormat,
+                         i_param_size);
 
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("we set the AU format: " , DeviceFormat));
 
     /* Retrieve actual format */
-    verify_noerr(AudioUnitGetProperty(p_sys->au_unit,
-                                   kAudioUnitProperty_StreamFormat,
-                                   kAudioUnitScope_Input,
-                                   0,
-                                   &DeviceFormat,
-                                   &i_param_size));
+    /* TODO: check error, clean and return on error */
+    AudioUnitGetProperty(p_sys->au_unit, kAudioUnitProperty_StreamFormat,
+                         kAudioUnitScope_Input, 0, &DeviceFormat,
+                         &i_param_size);
 
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("the actual set AU format is " , DeviceFormat));
 
@@ -1401,25 +1397,27 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     input.inputProc = (AURenderCallback) RenderCallbackAnalog;
     input.inputProcRefCon = p_aout;
 
-    verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
-                            kAudioUnitProperty_SetRenderCallback,
-                            kAudioUnitScope_Input,
-                            0, &input, sizeof(input)));
+    /* TODO: check error, clean and return on error */
+    AudioUnitSetProperty(p_sys->au_unit, kAudioUnitProperty_SetRenderCallback,
+                         kAudioUnitScope_Input, 0, &input, sizeof(input));
 
-    /* Set the input_layout as the layout VLC will use to feed the AU unit */
-    verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
-                            kAudioUnitProperty_AudioChannelLayout,
-                            kAudioUnitScope_Input, /* yes, it must be the INPUT scope */
-                            0, &input_layout, sizeof(input_layout)));
+    /* Set the input_layout as the layout VLC will use to feed the AU unit.
+     * Yes, it must be the INPUT scope */
+    /* TODO: check error, clean and return on error */
+    AudioUnitSetProperty(p_sys->au_unit, kAudioUnitProperty_AudioChannelLayout,
+                        kAudioUnitScope_Input, 0, &input_layout,
+                        sizeof(input_layout));
 
     /* AU initiliaze */
-    verify_noerr(AudioUnitInitialize(p_sys->au_unit));
+    /* TODO: check error, clean and return on error */
+    AudioUnitInitialize(p_sys->au_unit);
 
     /* setup circular buffer */
     TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS *
                          fmt->i_rate * fmt->i_bytes_per_frame);
 
-    verify_noerr(AudioOutputUnitStart(p_sys->au_unit));
+    /* TODO: check error, clean and return on error */
+    AudioOutputUnitStart(p_sys->au_unit);
 
     /* Set volume for output unit */
     VolumeSet(p_aout, p_sys->f_volume);
@@ -1634,9 +1632,9 @@ static void Stop(audio_output_t *p_aout)
     msg_Dbg(p_aout, "Stopping the auhal module");
 
     if (p_sys->au_unit) {
-        verify_noerr(AudioOutputUnitStop(p_sys->au_unit));
-        verify_noerr(AudioUnitUninitialize(p_sys->au_unit));
-        verify_noerr(AudioComponentInstanceDispose(p_sys->au_unit));
+        AudioOutputUnitStop(p_sys->au_unit);
+        AudioUnitUninitialize(p_sys->au_unit);
+        AudioComponentInstanceDispose(p_sys->au_unit);
     }
 
     if (p_sys->b_digital) {
