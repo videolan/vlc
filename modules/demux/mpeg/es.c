@@ -122,6 +122,7 @@ typedef struct
 struct demux_sys_t
 {
     codec_t codec;
+    vlc_fourcc_t i_original;
 
     es_out_id_t *p_es;
 
@@ -235,6 +236,7 @@ static int OpenCommon( demux_t *p_demux,
 
     /* Load the audio packetizer */
     es_format_Init( &fmt, i_cat, p_sys->codec.i_codec );
+    fmt.i_original_fourcc = p_sys->i_original;
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, p_sys->codec.psz_name );
     if( !p_sys->p_packetizer )
     {
@@ -1077,6 +1079,7 @@ static int AacInit( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     p_sys->i_packet_size = 4096;
+    p_sys->i_original = VLC_FOURCC('H','E','A','D');
 
     return VLC_SUCCESS;
 }
