@@ -3857,7 +3857,7 @@ then
   VLC_ADD_PLUGIN([macosx])
   AC_PATH_PROGS(XIB, [ibtool], ibtool, ["/usr/bin"])
 fi
-AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no"])
+AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no" -a "${SYS}" = "darwin"])
 
 dnl
 dnl  MacOS X sparkle update support
