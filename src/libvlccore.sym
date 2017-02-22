@@ -443,6 +443,7 @@ vlc_tls_Read
 vlc_tls_Write
 vlc_tls_GetLine
 vlc_tls_SocketOpen
+vlc_tls_SocketOpenTCP
 ToCharset
 update_Check
 update_Delete

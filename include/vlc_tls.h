@@ -232,6 +232,26 @@ VLC_API void vlc_tls_Delete (vlc_tls_creds_t *);
  */
 VLC_API vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd);
 
+struct addrinfo;
+
+/**
+ * Creates a transport-layer stream from a struct addrinfo.
+ *
+ * This is convenience wrapper for vlc_tls_SocketOpen().
+ * \note The function currently iterates through the addrinfo linked list.
+ * Future versions may implement different behaviour (e.g. RFC6555).
+ */
+vlc_tls_t *vlc_tls_SocketOpenAddrInfo(vlc_object_t *obj,
+                                      const struct addrinfo *);
+
+/**
+ * Creates a transport-layer TCP stream from a name and port.
+ *
+ * This is a convenience wrapper for vlc_tls_SocketOpenAddrInfo().
+ */
+VLC_API vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj,
+                                         const char *hostname, unsigned port);
+
 VLC_DEPRECATED
 static inline vlc_tls_t *
 vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,

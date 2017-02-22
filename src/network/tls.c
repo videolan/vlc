@@ -404,3 +404,107 @@ vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd)
     session->p = NULL;
     return session;
 }
+
+static vlc_tls_t *vlc_tls_SocketOpenAddrInfoSingle(vlc_object_t *obj,
+                                          const struct addrinfo *restrict info)
+{
+    int fd = vlc_socket(info->ai_family, info->ai_socktype, info->ai_protocol,
+                        true /* nonblocking */);
+    if (fd == -1)
+    {
+        msg_Warn(obj, "socket error: %s", vlc_strerror_c(errno));
+        return NULL;
+    }
+
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
+
+    int val = connect(fd, info->ai_addr, info->ai_addrlen);
+    if (val != 0)
+    {
+        if (errno != EINPROGRESS)
+        {
+            msg_Err(obj, "connection error: %s", vlc_strerror_c(errno));
+            goto giveup;
+        }
+
+        struct pollfd ufd;
+
+        ufd.fd = fd;
+        ufd.events = POLLOUT;
+
+        do
+        {
+            if (vlc_killed())
+            {
+                errno = EINTR;
+                goto giveup;
+            }
+        }
+        while (vlc_poll_i11e(&ufd, 1, -1) <= 0);
+
+        socklen_t len = sizeof (val);
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &val, &len))
+        {
+            msg_Err(obj, "socket option error: %s",
+                    vlc_strerror_c(errno));
+            goto giveup;
+        }
+
+        if (val != 0)
+        {
+            msg_Err(obj, "connection error: %s", vlc_strerror_c(val));
+            errno = val;
+            goto giveup;
+        }
+    }
+
+    vlc_tls_t *tls = vlc_tls_SocketOpen(obj, fd);
+    if (unlikely(tls == NULL))
+        goto giveup;
+
+    return tls;
+
+giveup:
+    net_Close(fd);
+    return NULL;
+}
+
+vlc_tls_t *vlc_tls_SocketOpenAddrInfo(vlc_object_t *obj,
+                                      const struct addrinfo *restrict info)
+{
+    /* TODO: implement RFC6555 */
+    for (const struct addrinfo *p = info; p != NULL; p = p->ai_next)
+    {
+        vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfoSingle(obj, p);
+        if (tls != NULL)
+            return tls;
+    }
+    return NULL;
+}
+
+vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj, const char *name,
+                                 unsigned port)
+{
+    struct addrinfo hints =
+    {
+        .ai_socktype = SOCK_STREAM,
+        .ai_protocol = IPPROTO_TCP,
+    }, *res;
+
+    assert(name != NULL);
+    msg_Dbg(obj, "resolving %s ...", name);
+
+    int val = vlc_getaddrinfo_i11e(name, port, &hints, &res);
+    if (val != 0)
+    {   /* TODO: C locale for gai_strerror() */
+        msg_Err(obj, "cannot resolve %s port %u: %s", name, port,
+                gai_strerror(val));
+        return NULL;
+    }
+
+    msg_Dbg(obj, "connecting to %s port %u ...", name, port);
+
+    vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfo(obj, res);
+    freeaddrinfo(res);
+    return tls;
+}
