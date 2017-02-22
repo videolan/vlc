@@ -782,4 +782,6 @@ DEPS_res += \
 
 libmacosx_plugin_ladir = $(prefix)/share/macosx/Contents/Resources
 
+if HAVE_DARWIN
 dist_libmacosx_plugin_la_DATA = $(DEPS_res)
+endif
