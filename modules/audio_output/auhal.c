@@ -948,8 +948,7 @@ MuteSet(audio_output_t * p_aout, bool mute)
  * this callback is not allowed.
  *****************************************************************************/
 static OSStatus
-RenderCallbackAnalog(vlc_object_t *p_obj,
-                     AudioUnitRenderActionFlags *ioActionFlags,
+RenderCallbackAnalog(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
                      const AudioTimeStamp *inTimeStamp,
                      UInt32 inBusNumber, UInt32 inNumberFrames,
                      AudioBufferList *ioData)
@@ -959,8 +958,8 @@ RenderCallbackAnalog(vlc_object_t *p_obj,
     VLC_UNUSED(inBusNumber);
     VLC_UNUSED(inNumberFrames);
 
-    audio_output_t * p_aout = (audio_output_t *)p_obj;
-    struct aout_sys_t * p_sys = p_aout->sys;
+    audio_output_t *p_aout = p_data;
+    struct aout_sys_t *p_sys = p_aout->sys;
 
     int bytesRequested = ioData->mBuffers[0].mDataByteSize;
     Float32 *targetBuffer = (Float32*)ioData->mBuffers[0].mData;
@@ -999,10 +998,10 @@ RenderCallbackAnalog(vlc_object_t *p_obj,
  */
 static OSStatus
 RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
-                    const void * inInputData,
+                    const AudioBufferList * inInputData,
                     const AudioTimeStamp * inInputTime,
                     AudioBufferList * outOutputData,
-                    const AudioTimeStamp * inOutputTime, void * threadGlobals)
+                    const AudioTimeStamp * inOutputTime, void *p_data)
 {
     VLC_UNUSED(inNow);
     VLC_UNUSED(inDevice);
@@ -1010,7 +1009,7 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
     VLC_UNUSED(inInputTime);
     VLC_UNUSED(inOutputTime);
 
-    audio_output_t * p_aout = (audio_output_t *)threadGlobals;
+    audio_output_t * p_aout = p_data;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     int bytesRequested =
@@ -1572,7 +1571,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     aout_FormatPrepare(fmt);
 
     /* set the IOproc callback */
-    input.inputProc = (AURenderCallback) RenderCallbackAnalog;
+    input.inputProc = RenderCallbackAnalog;
     input.inputProcRefCon = p_aout;
 
     err = AudioUnitSetProperty(p_sys->au_unit,
@@ -1837,7 +1836,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     /* Add IOProc callback */
     OSStatus err =
         AudioDeviceCreateIOProcID(p_sys->i_selected_dev,
-                                  (AudioDeviceIOProc)RenderCallbackSPDIF,
+                                  RenderCallbackSPDIF,
                                   p_aout, &p_sys->i_procID);
     if (err != noErr)
     {
