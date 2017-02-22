@@ -94,7 +94,6 @@ libmacosx_plugin_la_SOURCES = \
 	VLCDefaultValueSlider.h VLCDefaultValueSlider.m \
 	VLCDefaultValueSliderCell.h VLCDefaultValueSliderCell.m
 
-if HAVE_DARWIN
 nobase_libmacosx_plugin_la_DATA = \
 	UI/About.nib \
 	UI/AddonManager.nib \
@@ -125,7 +124,6 @@ nobase_libmacosx_plugin_la_DATA = \
 	UI/VLCFullScreenPanel.nib \
 	UI/VLCRendererDialog.nib \
 	UI/VLCStatusBarIconMainMenu.nib
-endif
 
 libmacosx_plugin_la_SOURCES += \
 	UI/About.xib \
@@ -782,6 +780,4 @@ DEPS_res += \
 
 libmacosx_plugin_ladir = $(prefix)/share/macosx/Contents/Resources
 
-if HAVE_DARWIN
 dist_libmacosx_plugin_la_DATA = $(DEPS_res)
-endif
