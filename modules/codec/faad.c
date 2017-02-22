@@ -74,9 +74,7 @@ struct decoder_sys_t
     date_t date;
 
     /* temporary buffer */
-    uint8_t *p_buffer;
-    size_t  i_buffer;
-    size_t  i_buffer_size;
+    block_t *p_block;
 
     /* Channel positions of the current stream (for re-ordering) */
     uint32_t pi_channel_positions[MAX_CHANNEL_POSITIONS];
@@ -190,8 +188,7 @@ static int Open( vlc_object_t *p_this )
     NeAACDecSetConfiguration( p_sys->hfaad, cfg );
 
     /* buffer */
-    p_sys->i_buffer = p_sys->i_buffer_size = 0;
-    p_sys->p_buffer = NULL;
+    p_sys->p_block = NULL;
 
     p_sys->b_sbr = p_sys->b_ps = false;
 
@@ -215,20 +212,25 @@ static void Flush( decoder_t *p_dec )
  *****************************************************************************/
 static void FlushBuffer( decoder_sys_t *p_sys, size_t i_used )
 {
-    if( i_used > p_sys->i_buffer )
+    block_t *p_block = p_sys->p_block;
+    if( p_block )
     {
-        /* Drop padding */
-        if(p_sys->p_buffer[i_used] == 0x00)
-            i_used++;
-
-        p_sys->i_buffer -= i_used;
-        if( p_sys->i_buffer > 0 )
+        if( i_used < p_block->i_buffer )
         {
-            memmove( p_sys->p_buffer, &p_sys->p_buffer[i_used],
-                     p_sys->i_buffer );
+            /* Drop padding */
+            if( p_block->p_buffer[i_used] == 0x00 )
+                i_used++;
+
+            p_block->i_buffer -= i_used;
+            p_block->p_buffer += i_used;
+        }
+        else p_block->i_buffer = 0;
+        if( p_block->i_buffer == 0 )
+        {
+            block_Release( p_block );
+            p_sys->p_block = NULL;
         }
     }
-    else p_sys->i_buffer = 0;
 }
 
 /*****************************************************************************
@@ -268,29 +270,23 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         }
     }
 
-    /* Append the block to the temporary buffer */
-    if( p_sys->i_buffer_size < p_sys->i_buffer + p_block->i_buffer )
+    const mtime_t i_pts = p_block->i_pts;
+
+    /* Append block as temporary buffer */
+    if( p_sys->p_block == NULL )
     {
-        size_t  i_buffer_size = p_sys->i_buffer + p_block->i_buffer;
-        uint8_t *p_buffer     = realloc( p_sys->p_buffer, i_buffer_size );
-        if( p_buffer )
-        {
-            p_sys->i_buffer_size = i_buffer_size;
-            p_sys->p_buffer      = p_buffer;
-        }
-        else
-        {
-            p_block->i_buffer = 0;
-        }
+        p_sys->p_block = p_block;
+    }
+    else
+    {
+        p_sys->p_block->p_next = p_block;
+        block_t *p_prev = p_sys->p_block;
+        p_sys->p_block = block_ChainGather( p_sys->p_block );
+        if( p_sys->p_block == NULL )
+            block_ChainRelease( p_prev );
     }
 
-    if( p_block->i_buffer > 0 )
-    {
-        memcpy( &p_sys->p_buffer[p_sys->i_buffer],
-                     p_block->p_buffer, p_block->i_buffer );
-        p_sys->i_buffer += p_block->i_buffer;
-        p_block->i_buffer = 0;
-    }
+    /* !Warn: do not use p_block beyond this point */
 
     if( p_dec->fmt_out.audio.i_rate == 0 && p_dec->fmt_in.i_extra > 0 )
     {
@@ -312,17 +308,16 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         }
     }
 
-    if( p_dec->fmt_out.audio.i_rate == 0 && p_sys->i_buffer )
+    if( p_dec->fmt_out.audio.i_rate == 0 && p_sys->p_block && p_sys->p_block->i_buffer )
     {
         unsigned long i_rate;
         unsigned char i_channels;
 
         /* Init faad with the first frame */
         if( NeAACDecInit( p_sys->hfaad,
-                          p_sys->p_buffer, p_sys->i_buffer,
+                          p_sys->p_block->p_buffer, p_sys->p_block->i_buffer,
                           &i_rate, &i_channels ) < 0 )
         {
-            block_Release( p_block );
             return VLCDEC_SUCCESS;
         }
 
@@ -334,27 +329,27 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         date_Init( &p_sys->date, i_rate, 1 );
     }
 
-    if( p_block->i_pts > VLC_TS_INVALID && p_block->i_pts != date_Get( &p_sys->date ) )
+    if( i_pts > VLC_TS_INVALID && i_pts != date_Get( &p_sys->date ) )
     {
-        date_Set( &p_sys->date, p_block->i_pts );
+        date_Set( &p_sys->date, i_pts );
     }
     else if( !date_Get( &p_sys->date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
-        block_Release( p_block );
-        p_sys->i_buffer = 0;
+        FlushBuffer( p_sys, SIZE_MAX );
         return VLCDEC_SUCCESS;
     }
 
     /* Decode all data */
-    if( p_sys->i_buffer > 1)
+    if( p_sys->p_block && p_sys->p_block->i_buffer > 1 )
     {
         void *samples;
         NeAACDecFrameInfo frame;
         block_t *p_out;
 
         samples = NeAACDecDecode( p_sys->hfaad, &frame,
-                                  p_sys->p_buffer, p_sys->i_buffer );
+                                  p_sys->p_block->p_buffer,
+                                  p_sys->p_block->i_buffer );
 
         if( frame.error > 0 )
         {
@@ -382,7 +377,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 cfg->outputFormat = oldcfg->outputFormat;
                 NeAACDecSetConfiguration( hfaad, cfg );
 
-                if( NeAACDecInit( hfaad, p_sys->p_buffer, p_sys->i_buffer,
+                if( NeAACDecInit( hfaad,
+                                  p_sys->p_block->p_buffer,
+                                  p_sys->p_block->i_buffer,
                                   &i_rate,&i_channels ) < 0 )
                 {
                     /* reinitialization failed */
@@ -403,8 +400,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             }
 
             /* Flush the buffer */
-            p_sys->i_buffer = 0;
-            block_Release( p_block );
+            FlushBuffer( p_sys, SIZE_MAX );
             return VLCDEC_SUCCESS;
         }
 
@@ -412,7 +408,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         {
             msg_Warn( p_dec, "invalid channels count: %i", frame.channels );
             FlushBuffer( p_sys, frame.bytesconsumed );
-            block_Release( p_block );
             return VLCDEC_SUCCESS;
         }
 
@@ -420,7 +415,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         {
             msg_Warn( p_dec, "decoded zero sample" );
             FlushBuffer( p_sys, frame.bytesconsumed );
-            block_Release( p_block );
             return VLCDEC_SUCCESS;
         }
 
@@ -428,9 +422,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         if( p_dec->fmt_out.audio.i_rate != frame.samplerate )
         {
             date_Init( &p_sys->date, frame.samplerate, 1 );
-            date_Set( &p_sys->date, p_block->i_pts );
+            date_Set( &p_sys->date, i_pts );
         }
-        p_block->i_pts = VLC_TS_INVALID;  /* PTS is valid only once */
 
         p_dec->fmt_out.audio.i_rate = frame.samplerate;
         p_dec->fmt_out.audio.i_channels = frame.channels;
@@ -497,8 +490,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             p_out = decoder_NewAudioBuffer( p_dec, frame.samples / nbChannels );
         if( p_out == NULL )
         {
-            p_sys->i_buffer = 0;
-            block_Release( p_block );
+            FlushBuffer( p_sys, SIZE_MAX );
             return VLCDEC_SUCCESS;
         }
 
@@ -513,17 +505,15 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
         FlushBuffer( p_sys, frame.bytesconsumed );
 
-        block_Release( p_block );
         decoder_QueueAudio( p_dec, p_out );
         return VLCDEC_SUCCESS;
     }
     else
     {
         /* Drop byte of padding */
-        p_sys->i_buffer = 0;
+        FlushBuffer( p_sys, 0 );
     }
 
-    block_Release( p_block );
     return VLCDEC_SUCCESS;
 }
 
@@ -536,7 +526,7 @@ static void Close( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     NeAACDecClose( p_sys->hfaad );
-    free( p_sys->p_buffer );
+    FlushBuffer( p_sys, SIZE_MAX );
     free( p_sys );
 }
 
