@@ -869,7 +869,7 @@ sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, const char *psz_chai
         vlc_array_append(&name, psz_name);
     }
 
-    int i = vlc_array_count(&name);
+    size_t i = vlc_array_count(&name);
     vlc_array_t module;
     vlc_array_init(&module);
     while(i--)
