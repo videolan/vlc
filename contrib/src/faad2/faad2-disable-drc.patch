@@ -1,0 +1,35 @@
+diff -Naur faad2-2.7.orig/libfaad/specrec.c faad2-2.7/libfaad/specrec.c
+--- faad2-2.7.orig/libfaad/specrec.c	2009-01-27 00:51:15.000000000 +0100
++++ faad2-2.7/libfaad/specrec.c	2017-02-23 10:31:40.527397266 +0100
+@@ -1000,12 +1000,13 @@
+         spec_coef, hDecoder->frameLength);
+ 
+     /* drc decoding */
++#if 0
+     if (hDecoder->drc->present)
+     {
+         if (!hDecoder->drc->exclude_mask[sce->channel] || !hDecoder->drc->excluded_chns_present)
+             drc_decode(hDecoder->drc, spec_coef);
+     }
+-
++#endif
+     /* filter bank */
+ #ifdef SSR_DEC
+     if (hDecoder->object_type != SSR)
+@@ -1241,6 +1242,7 @@
+         spec_coef2, hDecoder->frameLength);
+ 
+     /* drc decoding */
++#if 0
+     if (hDecoder->drc->present)
+     {
+         if (!hDecoder->drc->exclude_mask[cpe->channel] || !hDecoder->drc->excluded_chns_present)
+@@ -1248,7 +1250,7 @@
+         if (!hDecoder->drc->exclude_mask[cpe->paired_channel] || !hDecoder->drc->excluded_chns_present)
+             drc_decode(hDecoder->drc, spec_coef2);
+     }
+-
++#endif
+     /* filter bank */
+ #ifdef SSR_DEC
+     if (hDecoder->object_type != SSR)
