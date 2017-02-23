@@ -22,13 +22,9 @@
 
 #pragma mark includes
 
-#ifdef HAVE_CONFIG_H
-# import "config.h"
-#endif
+#import "coreaudio_common.h"
 
-#import <vlc_common.h>
 #import <vlc_plugin.h>
-#import <vlc_aout.h>
 
 #import <AudioUnit/AudioUnit.h>
 #import <CoreAudio/CoreAudioTypes.h>
@@ -36,8 +32,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <mach/mach_time.h>
-
-#import "TPCircularBuffer.h"
 
 #pragma mark -
 #pragma mark local prototypes & module descriptor
@@ -55,16 +49,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 #pragma mark -
-
-#pragma mark -
 #pragma mark private declarations
-
-#define STREAM_FORMAT_MSG(pre, sfm) \
-    pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \
-    sfm.mSampleRate, (char *)&sfm.mFormatID, \
-    (unsigned int)sfm.mFormatFlags, (unsigned int)sfm.mBytesPerPacket, \
-    (unsigned int)sfm.mFramesPerPacket, (unsigned int)sfm.mBytesPerFrame, \
-    (unsigned int)sfm.mChannelsPerFrame, (unsigned int)sfm.mBitsPerChannel
 
 #define AUDIO_BUFFER_SIZE_IN_SECONDS (AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ)
 
@@ -76,47 +61,19 @@ vlc_module_end ()
  *****************************************************************************/
 struct aout_sys_t
 {
-    TPCircularBuffer            circular_buffer;    /* circular buffer to swap the audio data */
+    struct aout_sys_common c;
 
-    /* AUHAL specific */
-    AudioUnit                   au_unit;            /* The AudioUnit we use */
-
-    int                         i_rate;             /* media sample rate */
-    int                         i_bytes_per_sample;
-
-    bool                        b_paused;
-
-    vlc_mutex_t                 lock;
-    vlc_cond_t                  cond;
+    /* The AudioUnit we use */
+    AudioUnit au_unit;
 };
 
 #pragma mark -
 #pragma mark actual playback
 
-static void Play (audio_output_t * p_aout, block_t * p_block)
-{
-    struct aout_sys_t *p_sys = p_aout->sys;
-
-    if (p_block->i_nb_samples > 0) {
-        /* move data to buffer */
-        if (unlikely(!TPCircularBufferProduceBytes(&p_sys->circular_buffer, p_block->p_buffer, p_block->i_buffer)))
-            msg_Warn(p_aout, "Audio buffer was dropped");
-
-        if (!p_sys->i_bytes_per_sample)
-            p_sys->i_bytes_per_sample = p_block->i_buffer / p_block->i_nb_samples;
-    }
-
-    block_Release(p_block);
-}
-
 static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     VLC_UNUSED(date);
-
-    vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_paused = pause;
-    vlc_mutex_unlock(&p_sys->lock);
 
     /* we need to start / stop the audio unit here because otherwise
      * the OS won't believe us that we stopped the audio output
@@ -148,43 +105,6 @@ static int MuteSet(audio_output_t *p_aout, bool mute)
     return VLC_SUCCESS;
 }
 
-static void Flush(audio_output_t *p_aout, bool wait)
-{
-    struct aout_sys_t *p_sys = p_aout->sys;
-
-    int32_t availableBytes;
-    vlc_mutex_lock(&p_sys->lock);
-    TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
-
-    if (wait) {
-        while (availableBytes > 0) {
-            vlc_cond_wait(&p_sys->cond, &p_sys->lock);
-            TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
-        }
-    } else {
-        /* flush circular buffer if data is left */
-        if (availableBytes > 0)
-            TPCircularBufferClear(&p_aout->sys->circular_buffer);
-    }
-
-    vlc_mutex_unlock(&p_sys->lock);
-}
-
-static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
-{
-    struct aout_sys_t * p_sys = p_aout->sys;
-
-    if (!p_sys->i_bytes_per_sample)
-        return -1;
-
-    int32_t availableBytes;
-    TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
-
-    *delay = (availableBytes / p_sys->i_bytes_per_sample) * CLOCK_FREQ / p_sys->i_rate;
-
-    return 0;
-}
-
 /*****************************************************************************
  * RenderCallback: This function is called everytime the AudioUnit wants
  * us to provide some more audio data.
@@ -202,35 +122,8 @@ static OSStatus RenderCallback(void *p_data,
     VLC_UNUSED(inBusNumber);
     VLC_UNUSED(inNumberFrames);
 
-    audio_output_t * p_aout = p_data;
-    struct aout_sys_t * p_sys = p_aout->sys;
-
-    int bytesRequested = ioData->mBuffers[0].mDataByteSize;
-    Float32 *targetBuffer = (Float32*)ioData->mBuffers[0].mData;
-
-    vlc_mutex_lock(&p_sys->lock);
-    /* Pull audio from buffer */
-    int32_t availableBytes;
-    Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
-    if (unlikely(bytesRequested == 0)) /* cannot be negative */
-        return noErr;
-
-    /* check if we have enough data */
-    if (!availableBytes || p_sys->b_paused) {
-        /* return an empty buffer so silence is played until we have data */
-        memset(targetBuffer, 0, bytesRequested);
-    } else {
-        int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
-
-        if (likely(bytesToCopy > 0)) {
-            memcpy(targetBuffer, buffer, bytesToCopy);
-            TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
-            ioData->mBuffers[0].mDataByteSize = bytesToCopy;
-        }
-    }
-
-    vlc_cond_signal(&p_sys->cond);
-    vlc_mutex_unlock(&p_sys->lock);
+    ca_Render(p_data, ioData->mBuffers[0].mData,
+              ioData->mBuffers[0].mDataByteSize);
 
     return noErr;
 }
@@ -290,7 +183,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     streamDescription.mBytesPerFrame = streamDescription.mBitsPerChannel * streamDescription.mChannelsPerFrame / 8;
     streamDescription.mBytesPerPacket = streamDescription.mBytesPerFrame * streamDescription.mFramesPerPacket;
     i_param_size = sizeof(streamDescription);
-    p_sys->i_rate = fmt->i_rate;
 
     /* Set the desired format */
     i_param_size = sizeof(AudioStreamBasicDescription);
@@ -340,8 +232,13 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         goto error;
     }
 
-    /* setup circular buffer */
-    TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate * fmt->i_bytes_per_frame);
+    int ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
+                      fmt->i_bytes_per_frame);
+    if (ret != VLC_SUCCESS)
+    {
+        AudioUnitUninitialize(p_sys->au_unit);
+        goto error;
+    }
 
     /* start audio session so playback continues if mute switch is on */
     AVAudioSession *instance = [AVAudioSession sharedInstance];
@@ -381,12 +278,10 @@ static void Stop(audio_output_t *p_aout)
         if (status != noErr)
             msg_Warn(p_aout, "failed to dispose Audio Component instance (%i)", (int)status);
     }
-    p_sys->i_bytes_per_sample = 0;
 
     [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
 
-    /* clean-up circular buffer */
-    TPCircularBufferCleanup(&p_sys->circular_buffer);
+    ca_Clean(p_aout);
 }
 
 static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
@@ -398,16 +293,12 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     p_sys = p_aout->sys;
     p_sys->au_unit = NULL;
-    p_sys->i_bytes_per_sample = 0;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
     if (StartAnalog(p_aout, fmt) == VLC_SUCCESS) {
         msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
-        p_aout->play = Play;
-        p_aout->flush = Flush;
         p_aout->mute_set  = MuteSet;
-        p_aout->time_get = TimeGet;
         p_aout->pause = Pause;
 
         return VLC_SUCCESS;
@@ -423,23 +314,16 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
-    vlc_mutex_destroy(&sys->lock);
-    vlc_cond_destroy(&sys->cond);
-
     free(sys);
 }
 
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = malloc(sizeof (*sys));
+    aout_sys_t *sys = calloc(1, sizeof (*sys));
 
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-
-    vlc_mutex_init(&sys->lock);
-    vlc_cond_init(&sys->cond);
-    sys->b_paused = false;
 
     aout->sys = sys;
     aout->start = Start;

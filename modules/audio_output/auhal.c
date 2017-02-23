@@ -24,22 +24,15 @@
 
 #pragma mark includes
 
-#ifdef HAVE_CONFIG_H
-# import "config.h"
-#endif
+#import "coreaudio_common.h"
 
-#import <vlc_atomic.h>
-#import <vlc_common.h>
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>                      // vlc_dialog_display_error
-#import <vlc_aout.h>                        // aout_*
 
 #import <AudioUnit/AudioUnit.h>             // AudioUnit
 #import <CoreAudio/CoreAudio.h>             // AudioDeviceID
 #import <AudioToolbox/AudioFormat.h>        // AudioFormatGetProperty
 #import <CoreServices/CoreServices.h>
-
-#import "TPCircularBuffer.h"
 
 #pragma mark -
 #pragma mark local prototypes & module descriptor
@@ -74,13 +67,6 @@ vlc_module_end ()
 #pragma mark -
 #pragma mark private declarations
 
-#define STREAM_FORMAT_MSG(pre, sfm) \
-    pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \
-    sfm.mSampleRate, (char *)&sfm.mFormatID, \
-    (unsigned int)sfm.mFormatFlags, (unsigned int)sfm.mBytesPerPacket, \
-    (unsigned int)sfm.mFramesPerPacket, (unsigned int)sfm.mBytesPerFrame, \
-    (unsigned int)sfm.mChannelsPerFrame, (unsigned int)sfm.mBitsPerChannel
-
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
 
 #define AUDIO_BUFFER_SIZE_IN_SECONDS ((AOUT_MAX_ADVANCE_TIME + CLOCK_FREQ) / CLOCK_FREQ)
@@ -93,6 +79,8 @@ vlc_module_end ()
  *****************************************************************************/
 struct aout_sys_t
 {
+    struct aout_sys_common c;
+
     /* DeviceID of the selected device */
     AudioObjectID               i_selected_dev;
     /* DeviceID of device which will be selected on start */
@@ -105,13 +93,6 @@ struct aout_sys_t
     AudioDeviceIOProcID         i_procID;
     /* Are we running in digital mode? */
     bool                        b_digital;
-
-    uint8_t                     chans_to_reorder;
-    uint8_t                     chan_table[AOUT_CHAN_MAX];
-
-    /* circular buffer to swap the audio data */
-    TPCircularBuffer            circular_buffer;
-    atomic_uint                 i_underrun_size;
 
     /* AUHAL specific */
     AudioUnit                   au_unit;
@@ -130,11 +111,6 @@ struct aout_sys_t
     /* Whether we need to set the mixing mode back */
     bool                        b_changed_mixing;
 
-    /* media sample rate */
-    int                         i_rate;
-    unsigned int                i_bytes_per_frame;
-    unsigned int                i_frame_length;
-
     CFArrayRef                  device_list;
     /* protects access to device_list */
     vlc_mutex_t                 device_list_lock;
@@ -150,9 +126,6 @@ struct aout_sys_t
     atomic_bool                 b_paused;
 
     bool                        b_ignore_streams_changed_callback;
-
-    /* The time the device needs to process the data. In samples. */
-    UInt32                      i_device_latency;
 };
 
 #pragma mark -
@@ -940,52 +913,6 @@ MuteSet(audio_output_t * p_aout, bool mute)
 #pragma mark -
 #pragma mark actual playback
 
-static inline uint64_t
-BytesToFrames(aout_sys_t *p_sys, size_t i_bytes)
-{
-    return i_bytes * p_sys->i_frame_length / p_sys->i_bytes_per_frame;
-}
-
-static inline mtime_t
-FramesToUs(aout_sys_t *p_sys, uint64_t i_nb_frames)
-{
-    return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
-}
-
-/* Called from AudioUnit render callbacks. No lock, wait, and IO here */
-static void
-CopyOutput(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
-{
-    aout_sys_t *p_sys = p_aout->sys;
-
-    /* Pull audio from buffer */
-    if (!atomic_load(&p_sys->b_paused))
-    {
-        int32_t i_available;
-        void *p_data = TPCircularBufferTail(&p_sys->circular_buffer,
-                                            &i_available);
-        if (i_available < 0)
-            i_available = 0;
-
-        size_t i_tocopy = __MIN(i_requested, (size_t) i_available);
-
-        if (i_tocopy > 0)
-        {
-            memcpy(p_output, p_data, i_tocopy);
-            TPCircularBufferConsume(&p_sys->circular_buffer, i_tocopy);
-        }
-
-        /* Pad with 0 */
-        if (i_requested > i_tocopy)
-        {
-            atomic_fetch_add(&p_sys->i_underrun_size, i_requested - i_tocopy);
-            memset(&p_output[i_tocopy], 0, i_requested - i_tocopy);
-        }
-    }
-    else
-         memset(p_output, 0, i_requested);
-}
-
 /*****************************************************************************
  * RenderCallbackAnalog: This function is called everytime the AudioUnit wants
  * us to provide some more audio data.
@@ -1003,8 +930,15 @@ RenderCallbackAnalog(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     VLC_UNUSED(inBusNumber);
     VLC_UNUSED(inNumberFrames);
 
-    CopyOutput(p_data, ioData->mBuffers[0].mData,
-               ioData->mBuffers[0].mDataByteSize);
+    audio_output_t * p_aout = p_data;
+    aout_sys_t *p_sys = p_aout->sys;
+    uint8_t *p_output = ioData->mBuffers[0].mData;
+    size_t i_size = ioData->mBuffers[0].mDataByteSize;
+
+    if (!atomic_load(&p_sys->b_paused))
+        ca_Render(p_aout, p_output, i_size);
+    else
+        memset(p_output, 0, i_size);
 
     return noErr;
 }
@@ -1027,25 +961,19 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
 
     audio_output_t * p_aout = p_data;
     aout_sys_t *p_sys = p_aout->sys;
-    CopyOutput(p_aout, outOutputData->mBuffers[p_sys->i_stream_index].mData,
-               outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize);
+    uint8_t *p_output = outOutputData->mBuffers[p_sys->i_stream_index].mData;
+    size_t i_size = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
+
+    if (!atomic_load(&p_sys->b_paused))
+        ca_Render(p_data, p_output, i_size);
+    else
+        memset(p_output, 0, i_size);
 
     return noErr;
 }
 
-static int
-TimeGet(audio_output_t *p_aout, mtime_t *delay)
-{
-    struct aout_sys_t * p_sys = p_aout->sys;
-
-    int32_t i_bytes;
-    TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes);
-
-    int64_t i_frames = BytesToFrames(p_sys, i_bytes) + p_sys->i_device_latency;
-    *delay = FramesToUs(p_sys, i_frames);
-
-    return 0;
-}
+#pragma mark -
+#pragma mark initialization
 
 static void
 Pause(audio_output_t *p_aout, bool pause, mtime_t date)
@@ -1055,89 +983,6 @@ Pause(audio_output_t *p_aout, bool pause, mtime_t date)
 
     atomic_store(&p_sys->b_paused, pause);
 }
-
-static void
-Flush(audio_output_t *p_aout, bool wait)
-{
-    struct aout_sys_t *p_sys = p_aout->sys;
-
-    if (wait)
-    {
-        int32_t i_bytes;
-
-        while (TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes) != NULL)
-        {
-            /* Calculate the duration of the circular buffer, in order to wait
-             * for the render thread to play it all */
-            const mtime_t i_frame_us =
-                FramesToUs(p_sys, BytesToFrames(p_sys, i_bytes)) + 10000;
-
-            /* Don't sleep less than 10ms */
-            msleep(__MAX(i_frame_us, 10000));
-        }
-    }
-    else
-    {
-        /* flush circular buffer if data is left */
-        TPCircularBufferClear(&p_aout->sys->circular_buffer);
-    }
-}
-
-static void
-Play(audio_output_t * p_aout, block_t * p_block)
-{
-    struct aout_sys_t *p_sys = p_aout->sys;
-
-    if (p_block->i_nb_samples > 0)
-    {
-        /* Do the channel reordering */
-        if (p_sys->chans_to_reorder && !p_sys->b_digital)
-        {
-           aout_ChannelReorder(p_block->p_buffer,
-                               p_block->i_buffer,
-                               p_sys->chans_to_reorder,
-                               p_sys->chan_table,
-                               VLC_CODEC_FL32);
-        }
-
-        /* move data to buffer */
-        while (!TPCircularBufferProduceBytes(&p_sys->circular_buffer,
-                                             p_block->p_buffer,
-                                             p_block->i_buffer))
-        {
-            if (unlikely(p_block->i_buffer >
-                (uint32_t) p_sys->circular_buffer.length))
-            {
-                msg_Err(p_aout, "the block is too big for the circular buffer");
-                assert(false);
-                break;
-            }
-
-            /* Wait for the render buffer to play the remaining data */
-            int32_t i_avalaible_bytes;
-            TPCircularBufferTail(&p_sys->circular_buffer, &i_avalaible_bytes);
-            assert(i_avalaible_bytes >= 0);
-            if (unlikely((size_t) i_avalaible_bytes >= p_block->i_buffer))
-                continue;
-            int32_t i_waiting_bytes = p_block->i_buffer - i_avalaible_bytes;
-
-            const mtime_t i_frame_us =
-                FramesToUs(p_sys, BytesToFrames(p_sys, i_waiting_bytes));
-
-            /* Don't sleep less than 10ms */
-            msleep(__MAX(i_frame_us, 10000));
-        }
-    }
-
-    unsigned i_underrun_size = atomic_exchange(&p_sys->i_underrun_size, 0);
-    if (i_underrun_size > 0)
-        msg_Warn(p_aout, "underrun of %u bytes", i_underrun_size);
-
-    block_Release(p_block);
-}
-
-#pragma mark -
-#pragma mark initialization
 
 /*
  * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
@@ -1153,7 +998,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AudioStreamBasicDescription DeviceFormat;
     AudioChannelLayout          *layout;
     AURenderCallbackStruct      input;
-    p_aout->sys->chans_to_reorder = 0;
+    p_sys->c.chans_to_reorder = 0;
 
     SInt32 currentMinorSystemVersion;
     if (Gestalt(gestaltSystemVersionMinor, &currentMinorSystemVersion) != noErr)
@@ -1410,11 +1255,11 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 chans_out[4] = AOUT_CHAN_CENTER;
                 chans_out[5] = AOUT_CHAN_LFE;
 
-                p_aout->sys->chans_to_reorder =
+                p_sys->c.chans_to_reorder =
                     aout_CheckChannelReorder(NULL, chans_out,
                                              fmt->i_physical_channels,
-                                             p_aout->sys->chan_table);
-                if (p_aout->sys->chans_to_reorder)
+                                             p_sys->c.chan_table);
+                if (p_sys->c.chans_to_reorder)
                     msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
             }
             else
@@ -1430,11 +1275,11 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 chans_out[4] = AOUT_CHAN_CENTER;
                 chans_out[5] = AOUT_CHAN_REARCENTER;
 
-                p_aout->sys->chans_to_reorder =
+                p_sys->c.chans_to_reorder =
                     aout_CheckChannelReorder(NULL, chans_out,
                                              fmt->i_physical_channels,
-                                             p_aout->sys->chan_table);
-                if (p_aout->sys->chans_to_reorder)
+                                             p_sys->c.chan_table);
+                if (p_sys->c.chans_to_reorder)
                     msg_Dbg(p_aout, "channel reordering needed for 6.0 output");
             }
             break;
@@ -1450,11 +1295,11 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             chans_out[5] = AOUT_CHAN_REARRIGHT;
             chans_out[6] = AOUT_CHAN_REARCENTER;
 
-            p_aout->sys->chans_to_reorder =
+            p_sys->c.chans_to_reorder =
                 aout_CheckChannelReorder(NULL, chans_out,
                                          fmt->i_physical_channels,
-                                         p_aout->sys->chan_table);
-            if (p_aout->sys->chans_to_reorder)
+                                         p_sys->c.chan_table);
+            if (p_sys->c.chans_to_reorder)
                 msg_Dbg(p_aout, "channel reordering needed for 6.1 output");
 
             break;
@@ -1497,11 +1342,11 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 chans_out[7] = AOUT_CHAN_REARRIGHT;
             }
 #endif
-            p_aout->sys->chans_to_reorder =
+            p_sys->c.chans_to_reorder =
                 aout_CheckChannelReorder(NULL, chans_out,
                                          fmt->i_physical_channels,
-                                         p_aout->sys->chan_table);
-            if (p_aout->sys->chans_to_reorder)
+                                         p_sys->c.chan_table);
+            if (p_sys->c.chans_to_reorder)
                 msg_Dbg(p_aout, "channel reordering needed for 7.1 / 8.0 output");
             break;
         case 9:
@@ -1525,11 +1370,11 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             chans_out[7] = AOUT_CHAN_REARRIGHT;
             chans_out[8] = AOUT_CHAN_LFE;
 
-            p_aout->sys->chans_to_reorder =
+            p_sys->c.chans_to_reorder =
                 aout_CheckChannelReorder(NULL, chans_out,
                                          fmt->i_physical_channels,
-                                         p_aout->sys->chan_table);
-            if (p_aout->sys->chans_to_reorder)
+                                         p_sys->c.chan_table);
+            if (p_sys->c.chans_to_reorder)
                 msg_Dbg(p_aout, "channel reordering needed for 8.1 output");
 #endif
             break;
@@ -1603,9 +1448,13 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         goto error;
     }
 
-    /* setup circular buffer */
-    TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS *
-                         fmt->i_rate * fmt->i_bytes_per_frame);
+    int ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
+                      fmt->i_bytes_per_frame);
+    if (ret != VLC_SUCCESS)
+    {
+        AudioUnitUninitialize(p_sys->au_unit);
+        goto error;
+    }
 
     err = AudioOutputUnitStart(p_sys->au_unit);
     if (err != noErr)
@@ -1849,6 +1698,13 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
         return VLC_EGENERIC;
     }
 
+    ret = ca_Init(p_aout, fmt, 200 * AOUT_SPDIF_SIZE);
+    if (ret != VLC_SUCCESS)
+    {
+        AudioDeviceDestroyIOProcID(p_sys->i_selected_dev, p_sys->i_procID);
+        return VLC_EGENERIC;
+    }
+
     /* Start device */
     err = AudioDeviceStart(p_sys->i_selected_dev, p_sys->i_procID);
     if (err != noErr)
@@ -1863,9 +1719,6 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
 
         return VLC_EGENERIC;
     }
-
-    /* setup circular buffer */
-    TPCircularBufferInit(&p_sys->circular_buffer, 200 * AOUT_SPDIF_SIZE);
 
     return VLC_SUCCESS;
 }
@@ -1954,10 +1807,9 @@ Stop(audio_output_t *p_aout)
                       kAudioDevicePropertyDeviceIsAlive,
                       kAudioObjectPropertyScopeGlobal);
 
-    p_sys->b_digital = false;
+    ca_Clean(p_aout);
 
-    /* clean-up circular buffer */
-    TPCircularBufferCleanup(&p_sys->circular_buffer);
+    p_sys->b_digital = false;
 }
 
 static int
@@ -1982,7 +1834,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
     p_sys->b_paused = false;
-    p_sys->i_device_latency = 0;
+    p_sys->c.i_device_latency = 0;
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
     p_sys->i_selected_dev = p_sys->i_new_selected_dev;
@@ -2085,17 +1937,17 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
 
     /* get device latency */
-    AO_GET1PROP(p_sys->i_selected_dev, UInt32, &p_sys->i_device_latency,
+    AO_GET1PROP(p_sys->i_selected_dev, UInt32, &p_sys->c.i_device_latency,
                 kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
-    float f_latency_in_sec = (float)p_sys->i_device_latency / (float)fmt->i_rate;
+    float f_latency_in_sec = (float)p_sys->c.i_device_latency / (float)fmt->i_rate;
     msg_Dbg(p_aout, "Current device has a latency of %u frames (%f sec)",
-            p_sys->i_device_latency, f_latency_in_sec);
+            p_sys->c.i_device_latency, f_latency_in_sec);
 
     /* Ignore long Airplay latency as this is not correctly working yet */
     if (f_latency_in_sec > 0.5f)
     {
         msg_Info(p_aout, "Ignore high latency as it causes problems currently.");
-        p_sys->i_device_latency = 0;
+        p_sys->c.i_device_latency = 0;
     }
 
     bool b_success = false;
@@ -2120,13 +1972,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     if (b_success)
     {
-        p_sys->i_rate = fmt->i_rate;
-        p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
-        p_sys->i_frame_length = fmt->i_frame_length;
-
-        p_aout->play = Play;
-        p_aout->flush = Flush;
-        p_aout->time_get = TimeGet;
         p_aout->pause = Pause;
         return VLC_SUCCESS;
     }
@@ -2197,7 +2042,7 @@ static void Close(vlc_object_t *obj)
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *p_aout = (audio_output_t *)obj;
-    aout_sys_t *p_sys = malloc(sizeof (*p_sys));
+    aout_sys_t *p_sys = calloc(1, sizeof (*p_sys));
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
@@ -2208,7 +2053,6 @@ static int Open(vlc_object_t *obj)
     p_sys->b_selected_dev_is_default = false;
     memset(&p_sys->sfmt_revert, 0, sizeof(p_sys->sfmt_revert));
     p_sys->i_stream_id = 0;
-    atomic_init(&p_sys->i_underrun_size, 0);
     atomic_init(&p_sys->b_paused, false);
 
     p_aout->sys = p_sys;

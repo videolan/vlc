@@ -102,14 +102,18 @@ aout_LTLIBRARIES += libwaveout_plugin.la
 endif
 
 libauhal_plugin_la_SOURCES = audio_output/auhal.c \
+	audio_output/coreaudio_common.c audio_output/coreaudio_common.h \
 	audio_output/TPCircularBuffer.h audio_output/TPCircularBuffer.c
-libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices -rpath '$(aoutdir)'
+libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
+	-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices
 if HAVE_OSX
 aout_LTLIBRARIES += libauhal_plugin.la
 endif
 libaudiounit_ios_plugin_la_SOURCES = audio_output/audiounit_ios.m \
-        audio_output/TPCircularBuffer.h audio_output/TPCircularBuffer.c
-libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices,-framework,UIKit,-framework,AVFoundation -rpath '$(aoutdir)'
+	audio_output/coreaudio_common.c audio_output/coreaudio_common.h \
+	audio_output/TPCircularBuffer.h audio_output/TPCircularBuffer.c
+libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
+	-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices,-framework,UIKit,-framework,AVFoundation
 if HAVE_IOS
 aout_LTLIBRARIES += libaudiounit_ios_plugin.la
 endif
