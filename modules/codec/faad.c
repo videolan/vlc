@@ -410,6 +410,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         {
             msg_Warn( p_dec, "invalid channels count: %i", frame.channels );
             FlushBuffer( p_sys, frame.bytesconsumed );
+            date_Set( &p_sys->date, VLC_TS_INVALID );
             return VLCDEC_SUCCESS;
         }
 
