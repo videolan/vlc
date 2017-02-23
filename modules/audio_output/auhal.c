@@ -1102,10 +1102,32 @@ Play(audio_output_t * p_aout, block_t * p_block)
         }
 
         /* move data to buffer */
-        if (unlikely(!TPCircularBufferProduceBytes(&p_sys->circular_buffer,
-                                                   p_block->p_buffer,
-                                                   p_block->i_buffer)))
-            msg_Warn(p_aout, "dropped buffer");
+        while (!TPCircularBufferProduceBytes(&p_sys->circular_buffer,
+                                             p_block->p_buffer,
+                                             p_block->i_buffer))
+        {
+            if (unlikely(p_block->i_buffer >
+                (uint32_t) p_sys->circular_buffer.length))
+            {
+                msg_Err(p_aout, "the block is too big for the circular buffer");
+                assert(false);
+                break;
+            }
+
+            /* Wait for the render buffer to play the remaining data */
+            int32_t i_avalaible_bytes;
+            TPCircularBufferTail(&p_sys->circular_buffer, &i_avalaible_bytes);
+            assert(i_avalaible_bytes >= 0);
+            if (unlikely((size_t) i_avalaible_bytes >= p_block->i_buffer))
+                continue;
+            int32_t i_waiting_bytes = p_block->i_buffer - i_avalaible_bytes;
+
+            const mtime_t i_frame_us =
+                FramesToUs(p_sys, BytesToFrames(p_sys, i_waiting_bytes));
+
+            /* Don't sleep less than 10ms */
+            msleep(__MAX(i_frame_us, 10000));
+        }
     }
 
     unsigned i_underrun_size = atomic_exchange(&p_sys->i_underrun_size, 0);
