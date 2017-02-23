@@ -41,17 +41,17 @@ static void assert_current( const vlc_epg_t *p_epg, const char *psz_name )
 static void print_order( const vlc_epg_t *p_epg )
 {
     printf("order: ");
-    for( int i=0; i<p_epg->i_event; i++ )
+    for( size_t i = 0; i < p_epg->i_event; i++ )
         printf("%s ", p_epg->pp_event[i]->psz_name );
     if( p_epg->p_current )
         printf(" current %s", p_epg->p_current->psz_name );
     printf("\n");
 }
 
-static void assert_events( const vlc_epg_t *p_epg, const char *psz_names, int i_names )
+static void assert_events( const vlc_epg_t *p_epg, const char *psz_names, size_t i_names )
 {
     assert( p_epg->i_event == i_names );
-    for( int i=0; i<p_epg->i_event; i++ )
+    for( size_t i = 0; i < p_epg->i_event; i++ )
     {
         assert( p_epg->pp_event[i]->psz_name &&
                 p_epg->pp_event[i]->psz_name[0] == psz_names[i] );
