@@ -260,6 +260,9 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
     int val;
 
     type |= GNUTLS_NONBLOCK;
+#if (GNUTLS_VERSION_NUMBER >= 0x030500)
+    type |= GNUTLS_ENABLE_FALSE_START;
+#endif
 
     val = gnutls_init(&session, type);
     if (val != 0)
@@ -380,6 +383,10 @@ done:
         msg_Dbg(crd, " - extended master secret (RFC7627) enabled");
     if (flags & GNUTLS_SFLAGS_ETM)
         msg_Dbg(crd, " - encrypt then MAC (RFC7366) enabled");
+#endif
+#if (GNUTLS_VERSION_NUMBER >= 0x030500)
+    if (flags & GNUTLS_SFLAGS_FALSE_START)
+        msg_Dbg(crd, " - false start (RFC7918) enabled");
 #endif
 
     if (alp != NULL)
