@@ -218,8 +218,9 @@ static void FlushBuffer( decoder_sys_t *p_sys, size_t i_used )
         if( i_used < p_block->i_buffer )
         {
             /* Drop padding */
-            if( p_block->p_buffer[i_used] == 0x00 )
-                i_used++;
+            for( ; i_used < p_block->i_buffer; i_used++ )
+                if( p_block->p_buffer[i_used] != 0x00 )
+                    break;
 
             p_block->i_buffer -= i_used;
             p_block->p_buffer += i_used;
