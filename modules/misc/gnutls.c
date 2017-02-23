@@ -39,7 +39,6 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-#if (GNUTLS_VERSION_NUMBER >= 0x030300)
 static int gnutls_Init (vlc_object_t *obj)
 {
     const char *version = gnutls_check_version ("3.3.0");
@@ -51,53 +50,6 @@ static int gnutls_Init (vlc_object_t *obj)
     msg_Dbg (obj, "using GnuTLS version %s", version);
     return 0;
 }
-
-# define gnutls_Deinit() (void)0
-#else
-#define GNUTLS_SEC_PARAM_MEDIUM GNUTLS_SEC_PARAM_NORMAL
-static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;
-
-/**
- * Initializes GnuTLS with proper locking.
- * @return VLC_SUCCESS on success, a VLC error code otherwise.
- */
-static int gnutls_Init (vlc_object_t *obj)
-{
-    const char *version = gnutls_check_version ("3.1.11");
-    if (version == NULL)
-    {
-        msg_Err (obj, "unsupported GnuTLS version");
-        return -1;
-    }
-    msg_Dbg (obj, "using GnuTLS version %s", version);
-
-    if (gnutls_check_version ("3.3.0") == NULL)
-    {
-         int val;
-
-         vlc_mutex_lock (&gnutls_mutex);
-         val = gnutls_global_init ();
-         vlc_mutex_unlock (&gnutls_mutex);
-
-         if (val)
-         {
-             msg_Err (obj, "cannot initialize GnuTLS");
-             return -1;
-         }
-    }
-    return 0;
-}
-
-/**
- * Deinitializes GnuTLS.
- */
-static void gnutls_Deinit (void)
-{
-    vlc_mutex_lock (&gnutls_mutex);
-    gnutls_global_deinit ();
-    vlc_mutex_unlock (&gnutls_mutex);
-}
-#endif
 
 static int gnutls_Error(vlc_tls_t *tls, int val)
 {
@@ -575,7 +527,6 @@ static int OpenClient (vlc_tls_creds_t *crd)
     {
         msg_Err (crd, "cannot allocate credentials: %s",
                  gnutls_strerror (val));
-        gnutls_Deinit ();
         return VLC_EGENERIC;
     }
 
@@ -601,7 +552,6 @@ static void CloseClient (vlc_tls_creds_t *crd)
     gnutls_certificate_credentials_t x509 = crd->sys;
 
     gnutls_certificate_free_credentials (x509);
-    gnutls_Deinit ();
 }
 
 #ifdef ENABLE_SOUT
@@ -648,10 +598,7 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
 
     vlc_tls_creds_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
-    {
-        gnutls_Deinit ();
         return VLC_ENOMEM;
-    }
 
     /* Sets server's credentials */
     val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
@@ -660,7 +607,6 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
         msg_Err (crd, "cannot allocate credentials: %s",
                  gnutls_strerror (val));
         free (sys);
-        gnutls_Deinit ();
         return VLC_ENOMEM;
     }
 
@@ -732,7 +678,6 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
 error:
     gnutls_certificate_free_credentials (sys->x509_cred);
     free (sys);
-    gnutls_Deinit ();
     return VLC_EGENERIC;
 }
 
@@ -747,7 +692,6 @@ static void CloseServer (vlc_tls_creds_t *crd)
     gnutls_certificate_free_credentials (sys->x509_cred);
     gnutls_dh_params_deinit (sys->dh_params);
     free (sys);
-    gnutls_Deinit ();
 }
 #endif
 
