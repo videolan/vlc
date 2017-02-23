@@ -1131,10 +1131,6 @@ static int DemuxInit( demux_t *p_demux )
             fmt.i_original_fourcc = VLC_FOURCC( 'D','V','R',' ');
             fmt.b_packetized = false;
         }
-        else
-        {
-            fmt.b_packetized = true;
-        }
 
         tk->i_cat = tk->info.i_cat = fmt.i_cat;
         if( fmt.i_cat != UNKNOWN_ES )
