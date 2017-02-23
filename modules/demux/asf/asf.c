@@ -1132,6 +1132,9 @@ static int DemuxInit( demux_t *p_demux )
             fmt.b_packetized = false;
         }
 
+        if( fmt.i_codec == VLC_CODEC_MP4A )
+            fmt.b_packetized = false;
+
         tk->i_cat = tk->info.i_cat = fmt.i_cat;
         if( fmt.i_cat != UNKNOWN_ES )
         {
