@@ -82,7 +82,7 @@ int main (void)
                 assert(testcase[i].extra == NULL);
 
             const char *p = testcase[i].payload + 2;
-            for (int j = 0; testcase[i].results[j] != NULL; ++j)
+            for (size_t j = 0; testcase[i].results[j] != NULL; ++j)
             {
                 assert(j < vlc_array_count(&out) && j < MAX_RESULT);
                 char *res = vlc_array_item_at_index(&out, j);
