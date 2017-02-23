@@ -962,9 +962,8 @@ static int DemuxInit( demux_t *p_demux )
                 memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
                         fmt.i_extra );
             }
-
-            msg_Dbg( p_demux, "added new audio stream(codec:0x%x,ID:%d)",
-                    GetWLE( p_data ), p_sp->i_stream_number );
+            msg_Dbg( p_demux, "added new audio stream (codec:%4.4s(0x%x),ID:%d)",
+                (char*)&fmt.i_codec, GetWLE( p_data ), p_sp->i_stream_number );
         }
         else if( guidcmp( &p_sp->i_stream_type,
                               &asf_object_stream_type_video ) &&
@@ -1048,8 +1047,8 @@ static int DemuxInit( demux_t *p_demux )
             /* If there is a video track then use the index for seeking */
             p_sys->b_index = b_index;
 
-            msg_Dbg( p_demux, "added new video stream(ID:%d)",
-                     p_sp->i_stream_number );
+            msg_Dbg( p_demux, "added new video stream(codec:%4.4s,ID:%d)",
+                     (char*)&fmt.i_codec, p_sp->i_stream_number );
         }
         else if( guidcmp( &p_sp->i_stream_type, &asf_object_stream_type_binary ) &&
             p_sp->i_type_specific_data_length >= 64 )
@@ -1114,8 +1113,8 @@ static int DemuxInit( demux_t *p_demux )
                         fmt.i_extra = 0;
                 }
 
-                msg_Dbg( p_demux, "added new audio stream (codec:0x%x,ID:%d)",
-                    i_format, p_sp->i_stream_number );
+                msg_Dbg( p_demux, "added new audio stream (codec:%4.4s(0x%x),ID:%d)",
+                    (char*)&fmt.i_codec, i_format, p_sp->i_stream_number );
             }
             else
             {
