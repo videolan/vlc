@@ -198,16 +198,6 @@ static int Open( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Flush:
- *****************************************************************************/
-static void Flush( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    date_Set( &p_sys->date, 0 );
-}
-
-/*****************************************************************************
  * FlushBuffer:
  *****************************************************************************/
 static void FlushBuffer( decoder_sys_t *p_sys, size_t i_used )
@@ -232,6 +222,17 @@ static void FlushBuffer( decoder_sys_t *p_sys, size_t i_used )
             p_sys->p_block = NULL;
         }
     }
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->date, VLC_TS_INVALID );
+    FlushBuffer( p_sys, SIZE_MAX );
 }
 
 /*****************************************************************************
@@ -400,8 +401,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 }
             }
 
-            /* Flush the buffer */
-            FlushBuffer( p_sys, SIZE_MAX );
+            Flush( p_dec );
+
             return VLCDEC_SUCCESS;
         }
 
