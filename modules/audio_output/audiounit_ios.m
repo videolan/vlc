@@ -1,8 +1,7 @@
 /*****************************************************************************
  * audiounit_ios.m: AudioUnit output plugin for iOS
  *****************************************************************************
- * Copyright (C) 2012 - 2015 VLC authors and VideoLAN
- * $Id$
+ * Copyright (C) 2012 - 2017 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
  *
@@ -63,7 +62,6 @@ struct aout_sys_t
     TPCircularBuffer            circular_buffer;    /* circular buffer to swap the audio data */
 
     /* AUHAL specific */
-    AudioComponent              au_component;       /* The AudioComponent we use */
     AudioUnit                   au_unit;            /* The AudioUnit we use */
 
     int                         i_rate;             /* media sample rate */
@@ -142,7 +140,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
 
     p_sys = p_aout->sys;
-    p_sys->au_component = NULL;
     p_sys->au_unit = NULL;
     p_sys->i_bytes_per_sample = 0;
 
@@ -182,13 +179,13 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     desc.componentFlags = 0;
     desc.componentFlagsMask = 0;
 
-    p_sys->au_component = AudioComponentFindNext(NULL, &desc);
-    if (p_sys->au_component == NULL) {
+    AudioComponent au_component = AudioComponentFindNext(NULL, &desc);
+    if (au_component == NULL) {
         msg_Warn(p_aout, "we cannot find our audio component");
         return false;
     }
 
-    status = AudioComponentInstanceNew(p_sys->au_component, &p_sys->au_unit);
+    status = AudioComponentInstanceNew(au_component, &p_sys->au_unit);
     if (status != noErr) {
         msg_Warn(p_aout, "we cannot open our audio component (%i)", (int)status);
         return false;
