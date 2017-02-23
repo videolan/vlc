@@ -2290,9 +2290,9 @@ InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
         free( id );
     }
 
-    int remaining = vlc_array_count( &identifiers );
+    size_t remaining = vlc_array_count( &identifiers );
 
-    for( int i = 0; i < remaining; ++i )
+    for( size_t i = 0; i < remaining; ++i )
         free( vlc_array_item_at_index( &identifiers, i ) );
 
     vlc_array_clear( &identifiers );
