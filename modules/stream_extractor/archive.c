@@ -378,7 +378,7 @@ static int archive_seek_subentry( private_sys_t* p_sys, char const* psz_subentry
 static private_sys_t* setup( vlc_object_t* obj, stream_t* source )
 {
     private_sys_t* p_sys  = calloc( 1, sizeof( *p_sys ) );
-    char* psz_files = var_InheritString( p_sys->p_obj, "concat-list" );
+    char* psz_files = var_InheritString( obj, "concat-list" );
 
     if( unlikely( !p_sys ) )
         goto error;
