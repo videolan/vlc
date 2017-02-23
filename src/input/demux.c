@@ -680,7 +680,7 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
         config_ChainDestroy(p_cfg);
     }
 
-    int i = vlc_array_count(&name);
+    size_t i = vlc_array_count(&name);
     vlc_array_t module;
     vlc_array_init(&module);
     while(i--)
