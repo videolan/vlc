@@ -166,17 +166,6 @@ libvlc_InternalDialogInit(libvlc_int_t *p_libvlc)
     return VLC_SUCCESS;
 }
 
-static int
-dialog_get_idx_locked(vlc_dialog_provider *p_provider, vlc_dialog_id *p_id)
-{
-    for (size_t i = 0; i < vlc_array_count(&p_provider->dialog_array); ++i)
-    {
-        if (p_id == vlc_array_item_at_index(&p_provider->dialog_array, i))
-            return i;
-    }
-    return -1;
-}
-
 static void
 dialog_cancel_locked(vlc_dialog_provider *p_provider, vlc_dialog_id *p_id)
 {
@@ -212,10 +201,9 @@ dialog_add_locked(vlc_dialog_provider *p_provider, enum dialog_type i_type)
 static void
 dialog_remove_locked(vlc_dialog_provider *p_provider, vlc_dialog_id *p_id)
 {
-    int i_array_idx = dialog_get_idx_locked(p_provider, p_id);
-    assert(i_array_idx >= 0);
-
-    vlc_array_remove(&p_provider->dialog_array, i_array_idx);
+    ssize_t i_idx = vlc_array_index_of_item(&p_provider->dialog_array, p_id);
+    assert(i_idx >= 0);
+    vlc_array_remove(&p_provider->dialog_array, i_idx);
 
     vlc_mutex_lock(&p_id->lock);
     p_id->i_refcount--;
