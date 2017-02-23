@@ -79,7 +79,7 @@ struct decoder_sys_t
     /* Channel positions of the current stream (for re-ordering) */
     uint32_t pi_channel_positions[MAX_CHANNEL_POSITIONS];
 
-    bool b_sbr, b_ps;
+    bool b_sbr, b_ps, b_discontinuity;
 };
 
 static const uint32_t pi_channels_in[MAX_CHANNEL_POSITIONS] =
@@ -190,6 +190,7 @@ static int Open( vlc_object_t *p_this )
     /* buffer */
     p_sys->p_block = NULL;
 
+    p_sys->b_discontinuity =
     p_sys->b_sbr = p_sys->b_ps = false;
 
     p_dec->pf_decode = DecodeBlock;
@@ -402,6 +403,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             }
 
             Flush( p_dec );
+            p_sys->b_discontinuity = true;
 
             return VLCDEC_SUCCESS;
         }
@@ -411,6 +413,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             msg_Warn( p_dec, "invalid channels count: %i", frame.channels );
             FlushBuffer( p_sys, frame.bytesconsumed );
             date_Set( &p_sys->date, VLC_TS_INVALID );
+            p_sys->b_discontinuity = true;
             return VLCDEC_SUCCESS;
         }
 
@@ -507,6 +510,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                       p_sys->pi_channel_positions );
 
         FlushBuffer( p_sys, frame.bytesconsumed );
+
+        if( p_sys->b_discontinuity )
+        {
+            p_out->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+            p_sys->b_discontinuity = false;
+        }
 
         decoder_QueueAudio( p_dec, p_out );
         return VLCDEC_SUCCESS;
