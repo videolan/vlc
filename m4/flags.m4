@@ -48,7 +48,7 @@ AC_DEFUN([RDC_PROG_CXX_FLAGS_IFELSE],
   CXXFLAGS_save="${CXXFLAGS}"
   as_ac_var=`echo "ac_cv_prog_cxx_flags_$1" | $as_tr_sh`
   AC_CACHE_CHECK([if $CXX accepts $1], [$as_ac_var], [
-    CXXFLAGS="${CXXFLAGS} $1"
+    CXXFLAGS="${CXXFLAGS} -Werror $1"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
       eval "$as_ac_var=yes"
     ],[
