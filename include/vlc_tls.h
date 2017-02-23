@@ -47,7 +47,7 @@ struct vlc_tls
     int (*shutdown)(struct vlc_tls *, bool duplex);
     void (*close)(struct vlc_tls *);
 
-    void *p;
+    struct vlc_tls *p;
 };
 
 /**
@@ -162,11 +162,14 @@ static inline int vlc_tls_Shutdown(vlc_tls_t *tls, bool duplex)
  */
 static inline void vlc_tls_Close(vlc_tls_t *session)
 {
-    int fd = vlc_tls_GetFD(session);
+    do
+    {
+        vlc_tls_t *p = session->p;
 
-    vlc_tls_SessionDelete(session);
-    shutdown(fd, SHUT_RDWR);
-    net_Close(fd);
+        vlc_tls_SessionDelete(session);
+        session = p;
+    }
+    while (session != NULL);
 }
 
 /** TLS credentials (certificate, private and trust settings) */
@@ -263,7 +266,7 @@ vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,
 
     vlc_tls_t *tls = vlc_tls_ClientSessionCreate(crd, sock, host, srv, lp, p);
     if (unlikely(tls == NULL))
-        vlc_tls_SessionDelete(sock);
+        free(sock);
     else
         tls->p = sock;
     return tls;

@@ -155,17 +155,10 @@ static vlc_tls_t *vlc_tls_SessionCreate(vlc_tls_creds_t *crd,
 
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
-    do
-    {
-        int canc = vlc_savecancel();
-        session->close(session);
-        vlc_restorecancel(canc);
-
-        vlc_tls_t *sock = session->p;
-        free(session);
-        session = sock;
-    }
-    while (session != NULL);
+    int canc = vlc_savecancel();
+    session->close(session);
+    vlc_restorecancel(canc);
+    free(session);
 }
 
 static void cleanup_tls(void *data)
@@ -185,6 +178,8 @@ vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *crd, vlc_tls_t *sock,
     vlc_tls_t *session = vlc_tls_SessionCreate(crd, sock, host, alpn);
     if (session == NULL)
         return NULL;
+
+    session->p = sock;
 
     int canc = vlc_savecancel();
     mtime_t deadline = mdate ();
@@ -379,13 +374,9 @@ static int vlc_tls_SocketShutdown(vlc_tls_t *tls, bool duplex)
 
 static void vlc_tls_SocketClose(vlc_tls_t *tls)
 {
-#if 0
     int fd = (intptr_t)tls->sys;
 
     net_Close(fd);
-#else
-    (void) tls;
-#endif
 }
 
 vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd)
