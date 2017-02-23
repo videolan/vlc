@@ -114,7 +114,6 @@ struct aout_sys_t
     atomic_uint                 i_underrun_size;
 
     /* AUHAL specific */
-    AudioComponent              au_component;
     AudioUnit                   au_unit;
 
     /* CoreAudio SPDIF mode specific */
@@ -1167,14 +1166,15 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     desc.componentFlags = 0;
     desc.componentFlagsMask = 0;
 
-    p_sys->au_component = AudioComponentFindNext(NULL, &desc);
-    if (p_sys->au_component == NULL)
+    AudioComponent au_component;
+    au_component = AudioComponentFindNext(NULL, &desc);
+    if (au_component == NULL)
     {
         msg_Err(p_aout, "cannot find any HAL component, PCM output failed");
         return VLC_EGENERIC;
     }
 
-    err = AudioComponentInstanceNew(p_sys->au_component, &p_sys->au_unit);
+    err = AudioComponentInstanceNew(au_component, &p_sys->au_unit);
     if (err != noErr)
     {
         msg_Err(p_aout, "cannot open HAL component, PCM output failed [%4.4s]",
@@ -1976,7 +1976,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     p_sys = p_aout->sys;
     p_sys->b_digital = false;
-    p_sys->au_component = NULL;
     p_sys->au_unit = NULL;
     p_sys->i_hog_pid = -1;
     p_sys->i_stream_index = -1;
