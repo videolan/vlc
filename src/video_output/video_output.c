@@ -747,7 +747,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
                                          vout->p->filter.chain_interactive;
 
         filter_chain_Reset(chain, &fmt_current, &fmt_current);
-        for (int i = 0; i < vlc_array_count(array); i++) {
+        for (size_t i = 0; i < vlc_array_count(array); i++) {
             vout_filter_t *e = vlc_array_item_at_index(array, i);
             msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
             if (!filter_chain_AppendFilter(chain, e->name, e->cfg, NULL, NULL)) {
