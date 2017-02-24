@@ -262,13 +262,13 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AudioComponent au_component = AudioComponentFindNext(NULL, &desc);
     if (au_component == NULL) {
         msg_Warn(p_aout, "we cannot find our audio component");
-        return false;
+        return VLC_EGENERIC;
     }
 
     status = AudioComponentInstanceNew(au_component, &p_sys->au_unit);
     if (status != noErr) {
         msg_Warn(p_aout, "we cannot open our audio component (%i)", (int)status);
-        return false;
+        return VLC_EGENERIC;
     }
 
     UInt32 flag = 1;
@@ -306,7 +306,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                   i_param_size);
     if (status != noErr) {
         msg_Err(p_aout, "failed to set stream format (%i)", (int)status);
-        return false;
+        return VLC_EGENERIC;
     }
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("we set the AU format: " , streamDescription));
 
@@ -334,14 +334,14 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                             0, &callback, sizeof(callback));
     if (status != noErr) {
         msg_Err(p_aout, "render callback setup failed (%i)", (int)status);
-        return false;
+        return VLC_EGENERIC;
     }
 
     /* AU init */
     status = AudioUnitInitialize(p_sys->au_unit);
     if (status != noErr) {
         msg_Err(p_aout, "failed to init AudioUnit (%i)", (int)status);
-        return false;
+        return VLC_EGENERIC;
     }
 
     /* setup circular buffer */
@@ -360,7 +360,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     status = AudioOutputUnitStart(p_sys->au_unit);
     msg_Dbg(p_aout, "audio output unit started: %i", (int)status);
 
-    return true;
+    return VLC_SUCCESS;
 }
 
 static void Stop(audio_output_t *p_aout)
@@ -402,7 +402,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
-    if (StartAnalog(p_aout, fmt)) {
+    if (StartAnalog(p_aout, fmt) == VLC_SUCCESS) {
         msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
         p_aout->play = Play;
         p_aout->flush = Flush;
