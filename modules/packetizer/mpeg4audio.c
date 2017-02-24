@@ -109,7 +109,7 @@ typedef struct
     int i_streams;
     latm_stream_t stream[LATM_MAX_PROGRAM*LATM_MAX_LAYER];
 
-    int i_other_data;
+    uint32_t i_other_data;
     int i_crc;  /* -1 if not set */
 } latm_mux_t;
 
@@ -535,7 +535,7 @@ static int Mpeg4ReadAudioSamplerate(bs_t *s)
     return bs_read(s, 24);
 }
 
-static int Mpeg4ReadAudioSpecificInfo(mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t *p_extra, bs_t *s, int i_max_size)
+static int Mpeg4ReadAudioSpecificInfo(mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t *p_extra, bs_t *s, uint32_t i_max_size)
 {
 #if 0
     static const char *ppsz_otype[] = {
@@ -676,13 +676,11 @@ static int Mpeg4ReadAudioSpecificInfo(mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t
     return i_bits;
 }
 
-static int LatmGetValue(bs_t *s)
+static uint32_t LatmGetValue(bs_t *s)
 {
-    int i_bytes = bs_read(s, 2);
-    int v = 0;
-    for (int i = 0; i < i_bytes; i++)
+    uint32_t v = 0;
+    for (int i = 1 + bs_read(s, 2); i > 0; i--)
         v = (v << 8) + bs_read(s, 8);
-
     return v;
 }
 
@@ -728,7 +726,7 @@ static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
                 assert(m->i_streams > 0);
                 st->cfg = m->stream[m->i_streams-1].cfg;
             } else {
-                int i_cfg_size = 0;
+                uint32_t i_cfg_size = 0;
                 if (i_mux_version == 1)
                     i_cfg_size = LatmGetValue(s);
                 i_cfg_size -= Mpeg4ReadAudioSpecificInfo(&st->cfg, &st->i_extra, st->extra, s, i_cfg_size);
