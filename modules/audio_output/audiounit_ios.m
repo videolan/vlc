@@ -306,7 +306,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                   i_param_size);
     if (status != noErr) {
         msg_Err(p_aout, "failed to set stream format (%i)", (int)status);
-        return VLC_EGENERIC;
+        goto error;
     }
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("we set the AU format: " , streamDescription));
 
@@ -334,14 +334,14 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                             0, &callback, sizeof(callback));
     if (status != noErr) {
         msg_Err(p_aout, "render callback setup failed (%i)", (int)status);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* AU init */
     status = AudioUnitInitialize(p_sys->au_unit);
     if (status != noErr) {
         msg_Err(p_aout, "failed to init AudioUnit (%i)", (int)status);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* setup circular buffer */
@@ -361,6 +361,10 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     msg_Dbg(p_aout, "audio output unit started: %i", (int)status);
 
     return VLC_SUCCESS;
+
+error:
+    AudioComponentInstanceDispose(p_sys->au_unit);
+    return VLC_EGENERIC;
 }
 
 static void Stop(audio_output_t *p_aout)
