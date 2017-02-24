@@ -121,7 +121,6 @@ struct aout_sys_t
 
     float                       f_volume;
     bool                        b_mute;
-    atomic_bool                 b_paused;
 
     bool                        b_ignore_streams_changed_callback;
 };
@@ -928,15 +927,8 @@ RenderCallbackAnalog(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     VLC_UNUSED(inBusNumber);
     VLC_UNUSED(inNumberFrames);
 
-    audio_output_t * p_aout = p_data;
-    aout_sys_t *p_sys = p_aout->sys;
-    uint8_t *p_output = ioData->mBuffers[0].mData;
-    size_t i_size = ioData->mBuffers[0].mDataByteSize;
-
-    if (!atomic_load(&p_sys->b_paused))
-        ca_Render(p_aout, p_output, i_size);
-    else
-        memset(p_output, 0, i_size);
+    ca_Render(p_data, ioData->mBuffers[0].mData,
+              ioData->mBuffers[0].mDataByteSize);
 
     return noErr;
 }
@@ -962,25 +954,13 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
     uint8_t *p_output = outOutputData->mBuffers[p_sys->i_stream_index].mData;
     size_t i_size = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
 
-    if (!atomic_load(&p_sys->b_paused))
-        ca_Render(p_data, p_output, i_size);
-    else
-        memset(p_output, 0, i_size);
+    ca_Render(p_aout, p_output, i_size);
 
     return noErr;
 }
 
 #pragma mark -
 #pragma mark initialization
-
-static void
-Pause(audio_output_t *p_aout, bool pause, mtime_t date)
-{
-    struct aout_sys_t * p_sys = p_aout->sys;
-    VLC_UNUSED(date);
-
-    atomic_store(&p_sys->b_paused, pause);
-}
 
 /*
  * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
@@ -1811,7 +1791,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
-    p_sys->b_paused = false;
     p_sys->c.i_device_latency = 0;
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
@@ -1928,15 +1907,13 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         p_sys->c.i_device_latency = 0;
     }
 
-    bool b_success = false;
-
     /* Check for Digital mode or Analog output mode */
     if (AOUT_FMT_SPDIF (fmt) && b_start_digital)
     {
         if (StartSPDIF (p_aout, fmt) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "digital output successfully opened");
-            b_success = true;
+            return VLC_SUCCESS;
         }
     }
     else
@@ -1944,14 +1921,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         if (StartAnalog(p_aout, fmt) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "analog output successfully opened");
-            b_success = true;
+            return VLC_SUCCESS;
         }
-    }
-
-    if (b_success)
-    {
-        p_aout->pause = Pause;
-        return VLC_SUCCESS;
     }
 
 error:
@@ -2031,7 +2002,6 @@ static int Open(vlc_object_t *obj)
     p_sys->b_selected_dev_is_default = false;
     memset(&p_sys->sfmt_revert, 0, sizeof(p_sys->sfmt_revert));
     p_sys->i_stream_id = 0;
-    atomic_init(&p_sys->b_paused, false);
 
     p_aout->sys = p_sys;
     p_aout->start = Start;

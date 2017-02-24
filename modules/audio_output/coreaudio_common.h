@@ -49,6 +49,7 @@ struct aout_sys_common
     /* circular buffer to swap the audio data */
     TPCircularBuffer    circular_buffer;
     atomic_uint         i_underrun_size;
+    atomic_bool         b_paused;
     int                 i_rate;
     unsigned int        i_bytes_per_frame;
     unsigned int        i_frame_length;
@@ -66,6 +67,8 @@ void ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested);
 int  ca_TimeGet(audio_output_t *p_aout, mtime_t *delay);
 
 void ca_Flush(audio_output_t *p_aout, bool wait);
+
+void ca_Pause(audio_output_t * p_aout, bool pause, mtime_t date);
 
 void ca_Play(audio_output_t * p_aout, block_t * p_block);
 

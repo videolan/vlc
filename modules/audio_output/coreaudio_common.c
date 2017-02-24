@@ -42,6 +42,12 @@ ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
+    if (atomic_load_explicit(&p_sys->b_paused, memory_order_relaxed))
+    {
+        memset(p_output, 0, i_requested);
+        return;
+    }
+
     /* Pull audio from buffer */
     int32_t i_available;
     void *p_data = TPCircularBufferTail(&p_sys->circular_buffer,
@@ -107,6 +113,15 @@ ca_Flush(audio_output_t *p_aout, bool wait)
 }
 
 void
+ca_Pause(audio_output_t * p_aout, bool pause, mtime_t date)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+    VLC_UNUSED(date);
+
+    atomic_store_explicit(&p_sys->b_paused, pause, memory_order_relaxed);
+}
+
+void
 ca_Play(audio_output_t * p_aout, block_t * p_block)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
@@ -126,6 +141,12 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
         {
             msg_Err(p_aout, "the block is too big for the circular buffer");
             assert(false);
+            break;
+        }
+        if (atomic_load_explicit(&p_sys->b_paused, memory_order_relaxed))
+        {
+            msg_Warn(p_aout, "dropping block because the circular buffer is "
+                     "full and paused");
             break;
         }
 
@@ -162,12 +183,14 @@ ca_Init(audio_output_t *p_aout, const audio_sample_format_t *fmt,
         return VLC_EGENERIC;
 
     atomic_init(&p_sys->i_underrun_size, 0);
+    atomic_init(&p_sys->b_paused, false);
 
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
 
     p_aout->play = ca_Play;
+    p_aout->pause = ca_Pause;
     p_aout->flush = ca_Flush;
     p_aout->time_get = ca_TimeGet;
     return VLC_SUCCESS;

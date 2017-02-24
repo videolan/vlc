@@ -103,7 +103,6 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 static void
 Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
-    VLC_UNUSED(date);
     struct aout_sys_t * p_sys = p_aout->sys;
 
     /* We need to start / stop the audio unit here because otherwise the OS
@@ -127,10 +126,16 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
         {
             err = AudioOutputUnitStart(p_sys->au_unit);
             if (err != noErr)
+            {
                 msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
                         (const char *) &err);
+                /* Do not un-pause, the Render Callback won't run, and next call
+                 * of ca_Play will deadlock */
+                return;
+            }
         }
     }
+    ca_Pause(p_aout, pause, date);
 }
 
 static int
