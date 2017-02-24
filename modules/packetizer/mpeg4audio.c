@@ -69,6 +69,7 @@ typedef struct
     {
         int i_object_type;
         int i_samplerate;
+        int i_channel;
     } extension;
 
     /* GASpecific */
@@ -522,6 +523,16 @@ static int Mpeg4ReadAudioSamplerate(bs_t *s)
     return bs_read(s, 24);
 }
 
+static int Mpeg4ReadAudioChannelConfiguration(bs_t *s)
+{
+    int i_channel = bs_read(s, 4);
+    if (i_channel == 7)
+        i_channel = 8; // 7.1
+    else if (i_channel >= 8)
+        i_channel = -1;
+    return i_channel;
+}
+
 static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_withext)
 {
 #if 0
@@ -548,17 +559,13 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
 
     p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
     p_cfg->i_samplerate = Mpeg4ReadAudioSamplerate(s);
-
-    p_cfg->i_channel = bs_read(s, 4);
-    if (p_cfg->i_channel == 7)
-        p_cfg->i_channel = 8; // 7.1
-    else if (p_cfg->i_channel >= 8)
-        p_cfg->i_channel = -1;
+    p_cfg->i_channel = Mpeg4ReadAudioChannelConfiguration(s);
 
     p_cfg->i_sbr = -1;
     p_cfg->i_ps  = -1;
     p_cfg->extension.i_object_type = 0;
     p_cfg->extension.i_samplerate = 0;
+    p_cfg->extension.i_channel = -1;
     if (p_cfg->i_object_type == 5 || p_cfg->i_object_type == 29) {
         p_cfg->i_sbr = 1;
         if (p_cfg->i_object_type == 29)
@@ -567,6 +574,8 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
         p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
 
         p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
+        if(p_cfg->i_object_type == 22)
+            p_cfg->extension.i_channel = Mpeg4ReadAudioChannelConfiguration(s);
     }
 
     switch(p_cfg->i_object_type)
@@ -630,13 +639,21 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
     if (b_withext && p_cfg->extension.i_object_type != 5 && bs_remain(s) >= 16 &&
         bs_read(s, 11) == 0x2b7) {
         p_cfg->extension.i_object_type = Mpeg4ReadAudioObjectType(s);
-        if (p_cfg->extension.i_object_type == 5) {
+        if (p_cfg->extension.i_object_type == 5)
+        {
             p_cfg->i_sbr  = bs_read1(s);
             if (p_cfg->i_sbr == 1) {
                 p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
                 if (bs_remain(s) >= 12 && bs_read(s, 11) == 0x548)
                    p_cfg->i_ps = bs_read1(s);
             }
+        }
+        else if (p_cfg->extension.i_object_type == 22)
+        {
+            p_cfg->i_sbr  = bs_read1(s);
+            if(p_cfg->i_sbr)
+                p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
+            p_cfg->extension.i_channel = Mpeg4ReadAudioChannelConfiguration(s);
         }
     }
 
