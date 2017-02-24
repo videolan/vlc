@@ -817,6 +817,18 @@ static int Demux( demux_t *p_demux )
         if( p_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
             pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts == pkt.pts )
                 p_frame->i_pts = VLC_TS_INVALID;
+
+        /* Handle broken dts/pts increase with AAC. Duration is correct.
+         * sky_the80s_aacplus.flv #8195 */
+        if( p_stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO &&
+            p_stream->codecpar->codec_id == AV_CODEC_ID_AAC )
+        {
+            if( p_sys->tk_pcr[pkt.stream_index] != VLC_TS_INVALID &&
+                p_sys->tk_pcr[pkt.stream_index] + p_frame->i_length > p_frame->i_dts )
+            {
+                p_frame->i_dts = p_frame->i_pts = p_sys->tk_pcr[pkt.stream_index] + p_frame->i_length;
+            }
+        }
     }
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
