@@ -810,12 +810,13 @@ static int Demux( demux_t *p_demux )
             p_stream->time_base.num /
             p_stream->time_base.den;
 
-    if( pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts == pkt.pts &&
-        p_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO )
+    /* Add here notoriously bugged file formats/samples */
+    if( !strcmp( p_sys->fmt->name, "flv" ) )
     {
-        /* Add here notoriously bugged file formats/samples regarding PTS */
-        if( !strcmp( p_sys->fmt->name, "flv" ) )
-            p_frame->i_pts = VLC_TS_INVALID;
+        /* FLV and video PTS */
+        if( p_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
+            pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts == pkt.pts )
+                p_frame->i_pts = VLC_TS_INVALID;
     }
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
