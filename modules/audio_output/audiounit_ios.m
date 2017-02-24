@@ -118,10 +118,6 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
     p_sys->b_paused = pause;
     vlc_mutex_unlock(&p_sys->lock);
 
-    if (p_sys->au_unit == NULL) {
-        return;
-    }
-
     /* we need to start / stop the audio unit here because otherwise
      * the OS won't believe us that we stopped the audio output
      * so in case of an interruption, our unit would be permanently
