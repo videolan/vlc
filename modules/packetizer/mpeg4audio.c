@@ -74,7 +74,7 @@ typedef struct
     /* GASpecific */
     int i_frame_length;   // 1024 or 960
 
-} mpeg4_cfg_t;
+} mpeg4_asc_t;
 
 #define LATM_MAX_EXTRA_SIZE 64
 typedef struct
@@ -86,7 +86,7 @@ typedef struct
     int i_frame_length;         // type 1
     int i_frame_length_index;   // type 3 4 5 6 7
 
-    mpeg4_cfg_t cfg;
+    mpeg4_asc_t cfg;
 
     /* Raw configuration */
     int     i_extra;
@@ -182,6 +182,8 @@ static void ClosePacketizer(vlc_object_t *);
 static block_t *Packetize    (decoder_t *, block_t **);
 static void     Flush( decoder_t * );
 
+static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool);
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -259,48 +261,33 @@ static int OpenPacketizer(vlc_object_t *p_this)
        and LATM can be sent with out-of-band audioconfig,
        (avformat sets m4a extradata in both cases)
        so we can't rely on extradata to guess multiplexing */
-    if(p_sys->i_type == TYPE_UNKNOWN && p_dec->fmt_in.i_extra > 1)
+    p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
+
+    if(p_dec->fmt_in.i_extra)
     {
-        uint8_t *p_config = (uint8_t*)p_dec->fmt_in.p_extra;
-        int     i_index;
+        mpeg4_asc_t asc;
+        bs_t s;
+        bs_init(&s, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+        if(Mpeg4ReadAudioSpecificConfig(&s, &asc, true) == VLC_SUCCESS)
+        {
+            p_dec->fmt_out.audio.i_rate = asc.i_samplerate;
+            p_dec->fmt_out.audio.i_frame_length = asc.i_frame_length;
+            p_dec->fmt_out.audio.i_channels = asc.i_channel;
 
-        i_index = ((p_config[0] << 1) | (p_config[1] >> 7)) & 0x0f;
-        if (i_index != 0x0f) {
-            p_dec->fmt_out.audio.i_rate = pi_sample_rates[i_index];
-            p_dec->fmt_out.audio.i_frame_length =
-                ((p_config[1] >> 2) & 0x01) ? 960 : 1024;
-            p_dec->fmt_out.audio.i_channels = (p_config[1] >> 3) & 0x0f;
-        } else if( p_dec->fmt_in.i_extra > 4 ) {
-            p_dec->fmt_out.audio.i_rate = ((p_config[1] & 0x7f) << 17) |
-                (p_config[2] << 9) | (p_config[3] << 1) |
-                (p_config[4] >> 7);
-            p_dec->fmt_out.audio.i_frame_length =
-                ((p_config[4] >> 2) & 0x01) ? 960 : 1024;
-            p_dec->fmt_out.audio.i_channels = (p_config[4] >> 3) & 0x0f;
+            /* This is not 100% guaranteed (overriden by ext) */
+            msg_Err(p_dec, "AAC %dHz %d samples/frame",
+                    p_dec->fmt_out.audio.i_rate,
+                    p_dec->fmt_out.audio.i_frame_length);
         }
 
-        /* This is not 100% guaranteed (overriden by ext) */
-        msg_Dbg(p_dec, "AAC %dHz %d samples/frame",
-                 p_dec->fmt_out.audio.i_rate,
-                 p_dec->fmt_out.audio.i_frame_length);
-
-        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         p_dec->fmt_out.p_extra = malloc(p_dec->fmt_in.i_extra);
-        if (!p_dec->fmt_out.p_extra) {
-            p_dec->fmt_out.i_extra = 0;
+        if (!p_dec->fmt_out.p_extra)
             return VLC_ENOMEM;
-        }
+        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         memcpy(p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
                 p_dec->fmt_in.i_extra);
     }
-    else
-    {
-        p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
-
-        /* We will try to create a AAC Config from adts/loas */
-        p_dec->fmt_out.i_extra = 0;
-        p_dec->fmt_out.p_extra = NULL;
-    }
+    /* else() We will try to create a AAC Config from adts/loas */
 
     date_Init(&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);
 
@@ -494,7 +481,7 @@ static int Mpeg4GAProgramConfigElement(bs_t *s)
     return 0;
 }
 
-static int Mpeg4GASpecificConfig(mpeg4_cfg_t *p_cfg, bs_t *s)
+static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
 {
     p_cfg->i_frame_length = bs_read1(s) ? 960 : 1024;
 
