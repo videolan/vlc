@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_http.h>
 #include <vlc_strings.h>
+#include <vlc_memstream.h>
 #include "message.h"
 #include "h2frame.h"
 
@@ -297,52 +298,33 @@ block_t *vlc_http_msg_read(struct vlc_http_msg *m)
 char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
                           bool proxied)
 {
-    size_t len;
+    struct vlc_memstream stream;
+
+    vlc_memstream_open(&stream);
 
     if (m->status < 0)
     {
-        len = sizeof ("  HTTP/1.1\r\nHost: \r\n\r\n");
-        len += strlen(m->method);
-        len += strlen(m->path ? m->path : m->authority);
-        len += strlen(m->authority);
-
+        vlc_memstream_printf(&stream, "%s ", m->method);
         if (proxied)
-        {
-            assert(m->scheme != NULL && m->path != NULL);
-            len += strlen(m->scheme) + 3 + strlen(m->authority);
-        }
+            vlc_memstream_printf(&stream, "%s://%s", m->scheme, m->authority);
+        vlc_memstream_printf(&stream, "%s HTTP/1.1\r\nHost: %s\r\n",
+                             m->path ? m->path : m->authority, m->authority);
     }
     else
-        len = sizeof ("HTTP/1.1 123 .\r\n\r\n");
+        vlc_memstream_printf(&stream, "HTTP/1.1 %03hd .\r\n", m->status);
 
     for (unsigned i = 0; i < m->count; i++)
-        len += 4 + strlen(m->headers[i][0]) + strlen(m->headers[i][1]);
+        vlc_memstream_printf(&stream, "%s: %s\r\n",
+                             m->headers[i][0], m->headers[i][1]);
 
-    char *buf = malloc(len + 1);
-    if (unlikely(buf == NULL))
+    vlc_memstream_puts(&stream, "\r\n");
+
+    if (vlc_memstream_close(&stream))
         return NULL;
 
-    len = 0;
-
-    if (m->status < 0)
-    {
-        len += sprintf(buf, "%s ", m->method);
-        if (proxied)
-            len += sprintf(buf + len, "%s://%s", m->scheme, m->authority);
-        len += sprintf(buf + len, "%s HTTP/1.1\r\nHost: %s\r\n",
-                       m->path ? m->path : m->authority, m->authority);
-    }
-    else
-        len += sprintf(buf, "HTTP/1.1 %03hd .\r\n", m->status);
-
-    for (unsigned i = 0; i < m->count; i++)
-        len += sprintf(buf + len, "%s: %s\r\n",
-                       m->headers[i][0], m->headers[i][1]);
-
-    len += sprintf(buf + len, "\r\n");
     if (lenp != NULL)
-        *lenp = len;
-    return buf;
+        *lenp = stream.length;
+    return stream.ptr;
 }
 
 struct vlc_http_msg *vlc_http_msg_headers(const char *msg)
