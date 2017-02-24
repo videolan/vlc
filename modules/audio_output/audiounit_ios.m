@@ -70,9 +70,55 @@ struct aout_sys_t
 #pragma mark -
 #pragma mark actual playback
 
-static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
+static int SetPlayback(audio_output_t *p_aout, bool start)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
+
+    AVAudioSession *instance = [AVAudioSession sharedInstance];
+    OSStatus err;
+    BOOL ret = false;
+    NSError *error = nil;
+
+    if (start)
+    {
+        err = AudioOutputUnitStart(p_sys->au_unit);
+        if (err != noErr)
+            goto error;
+
+        ret = [instance setCategory:AVAudioSessionCategoryPlayback error:&error];
+        ret = ret && [instance setMode:AVAudioSessionModeMoviePlayback error:&error];
+        ret = ret && [instance setActive:YES error:&error];
+    }
+    else
+    {
+        err = AudioOutputUnitStop(p_sys->au_unit);
+        if (err != noErr)
+            goto error;
+        ret = [instance setActive:NO error:&error];
+    }
+    if (!ret)
+        goto error;
+
+    return VLC_SUCCESS;
+
+error:
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "AudioOutputUnit%s failed [%4.4s]",
+                start ? "Start" : "Stop", (const char *) &err);
+    }
+    else
+    {
+        if (start)
+            AudioOutputUnitStop(p_sys->au_unit);
+        msg_Err(p_aout, "AVAudioSession playback change failed: %s(%d)",
+                error.domain.UTF8String, (int)error.code);
+    }
+    return VLC_EGENERIC;
+}
+
+static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
+{
     VLC_UNUSED(date);
 
     /* we need to start / stop the audio unit here because otherwise
@@ -81,16 +127,8 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
      * silenced.
      * in case of multi-tasking, the multi-tasking view would still
      * show a playing state despite we are paused, same for lock screen */
-    if (pause) {
-        AudioOutputUnitStop(p_sys->au_unit);
-    } else {
-        AudioOutputUnitStart(p_sys->au_unit);
 
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        [[AVAudioSession sharedInstance] setMode:AVAudioSessionModeMoviePlayback error:nil];
-    }
-
-    [[AVAudioSession sharedInstance] setActive:!pause error:nil];
+    SetPlayback(p_aout, !pause);
 }
 
 static int MuteSet(audio_output_t *p_aout, bool mute)
@@ -240,18 +278,13 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         goto error;
     }
 
-    /* start audio session so playback continues if mute switch is on */
-    AVAudioSession *instance = [AVAudioSession sharedInstance];
-
-    /* Set audio session to mediaplayback */
-    NSError *error = nil;
-    [instance setCategory:AVAudioSessionCategoryPlayback error:&error];
-    [instance setMode:AVAudioSessionModeMoviePlayback error:&error];
-    [instance setActive:YES error:&error];
-
     /* start the unit */
-    status = AudioOutputUnitStart(p_sys->au_unit);
-    msg_Dbg(p_aout, "audio output unit started: %i", (int)status);
+    if (SetPlayback(p_aout, true) != VLC_SUCCESS)
+    {
+        AudioUnitUninitialize(p_sys->au_unit);
+        ca_Clean(p_aout);
+        goto error;
+    }
 
     return VLC_SUCCESS;
 
