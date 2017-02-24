@@ -578,45 +578,41 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
         break;
     case 8:
         // CelpSpecificConfig();
-        break;
     case 9:
         // HvxcSpecificConfig();
-        break;
     case 12:
         // TTSSSpecificConfig();
-        break;
     case 13: case 14: case 15: case 16:
         // StructuredAudioSpecificConfig();
-        break;
     case 24:
         // ERCelpSpecificConfig();
-        break;
     case 25:
         // ERHvxcSpecificConfig();
-        break;
     case 26: case 27:
         // ParametricSpecificConfig();
-        break;
     case 28:
         // SSCSpecificConfig();
-        break;
     case 32: case 33: case 34:
         // MPEG_1_2_SpecificConfig();
-        break;
     case 35:
         // DSTSpecificConfig();
-        break;
     case 36:
         // ALSSpecificConfig();
-        break;
+    case 37: case 38:
+        // SLSSpecificConfig();
+    case 39:
+        // ELDSpecificConfig();
+    case 40: case 41:
+        // SymbolicMusicSpecificConfig();
     default:
         // error
-        break;
+        return VLC_EGENERIC;
     }
+
     switch(p_cfg->i_object_type)
     {
     case 17: case 19: case 20: case 21: case 22: case 23:
-    case 24: case 25: case 26: case 27:
+    case 24: case 25: case 26: case 27: case 39:
     {
         int epConfig = bs_read(s, 2);
         if (epConfig == 2 || epConfig == 3)
