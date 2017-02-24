@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_cpu.h>
+#include <vlc_memstream.h>
 #include "libvlc.h"
 
 #include <assert.h>
@@ -279,36 +280,57 @@ unsigned vlc_CPU (void)
 
 void vlc_CPU_dump (vlc_object_t *obj)
 {
-    char buf[200], *p = buf;
+    struct vlc_memstream stream;
+
+    vlc_memstream_open(&stream);
 
 #if defined (__i386__) || defined (__x86_64__)
-    if (vlc_CPU_MMX()) p += sprintf (p, "MMX ");
-    if (vlc_CPU_MMXEXT()) p += sprintf (p, "MMXEXT ");
-    if (vlc_CPU_SSE()) p += sprintf (p, "SSE ");
-    if (vlc_CPU_SSE2()) p += sprintf (p, "SSE2 ");
-    if (vlc_CPU_SSE3()) p += sprintf (p, "SSE3 ");
-    if (vlc_CPU_SSSE3()) p += sprintf (p, "SSSE3 ");
-    if (vlc_CPU_SSE4_1()) p += sprintf (p, "SSE4.1 ");
-    if (vlc_CPU_SSE4_2()) p += sprintf (p, "SSE4.2 ");
-    if (vlc_CPU_SSE4A()) p += sprintf (p, "SSE4A ");
-    if (vlc_CPU_AVX()) p += sprintf (p, "AVX ");
-    if (vlc_CPU_AVX2()) p += sprintf (p, "AVX2 ");
-    if (vlc_CPU_3dNOW()) p += sprintf (p, "3DNow! ");
-    if (vlc_CPU_XOP()) p += sprintf (p, "XOP ");
-    if (vlc_CPU_FMA4()) p += sprintf (p, "FMA4 ");
+    if (vlc_CPU_MMX())
+        vlc_memstream_puts(&stream, "MMX ");
+    if (vlc_CPU_MMXEXT())
+        vlc_memstream_puts(&stream, "MMXEXT ");
+    if (vlc_CPU_SSE())
+        vlc_memstream_puts(&stream, "SSE ");
+    if (vlc_CPU_SSE2())
+        vlc_memstream_puts(&stream, "SSE2 ");
+    if (vlc_CPU_SSE3())
+        vlc_memstream_puts(&stream, "SSE3 ");
+    if (vlc_CPU_SSSE3())
+        vlc_memstream_puts(&stream, "SSSE3 ");
+    if (vlc_CPU_SSE4_1())
+        vlc_memstream_puts(&stream, "SSE4.1 ");
+    if (vlc_CPU_SSE4_2())
+        vlc_memstream_puts(&stream, "SSE4.2 ");
+    if (vlc_CPU_SSE4A())
+        vlc_memstream_puts(&stream, "SSE4A ");
+    if (vlc_CPU_AVX())
+        vlc_memstream_puts(&stream, "AVX ");
+    if (vlc_CPU_AVX2())
+        vlc_memstream_puts(&stream, "AVX2 ");
+    if (vlc_CPU_3dNOW())
+        vlc_memstream_puts(&stream, "3DNow! ");
+    if (vlc_CPU_XOP())
+        vlc_memstream_puts(&stream, "XOP ");
+    if (vlc_CPU_FMA4())
+        vlc_memstream_puts(&stream, "FMA4 ");
 
 #elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
-    if (vlc_CPU_ALTIVEC())  p += sprintf (p, "AltiVec");
+    if (vlc_CPU_ALTIVEC())
+        vlc_memstream_puts(&stream, "AltiVec");
 
 #elif defined (__arm__)
-    if (vlc_CPU_ARM_NEON()) p += sprintf (p, "ARM_NEON ");
+    if (vlc_CPU_ARM_NEON())
+        vlc_memstream_puts(&stream, "ARM_NEON ");
 
 #endif
 
 #if HAVE_FPU
-    p += sprintf (p, "FPU ");
+    vlc_memstream_puts(&stream, "FPU ");
 #endif
 
-    if (p > buf)
-        msg_Dbg (obj, "CPU has capabilities %s", buf);
+    if (vlc_memstream_close(&stream) == 0)
+    {
+        msg_Dbg (obj, "CPU has capabilities %s", stream.ptr);
+        free(stream.ptr);
+    }
 }
