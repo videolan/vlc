@@ -25,6 +25,7 @@
 #import "coreaudio_common.h"
 
 #import <vlc_plugin.h>
+#import <vlc_memory.h>
 
 #import <CoreAudio/CoreAudioTypes.h>
 #import <Foundation/Foundation.h>
@@ -66,8 +67,113 @@ struct aout_sys_t
     bool      b_muted;
 };
 
+enum dev_type {
+    DEV_TYPE_DEFAULT,
+    DEV_TYPE_USB,
+    DEV_TYPE_HDMI
+};
+
 #pragma mark -
 #pragma mark AVAudioSession route and output handling
+
+static int
+avas_GetOptimalChannelLayout(audio_output_t *p_aout, unsigned channel_count,
+                             enum dev_type *pdev_type,
+                             AudioChannelLayout **playout)
+{
+    AVAudioSession *instance = [AVAudioSession sharedInstance];
+
+    AudioChannelLayout *layout = NULL;
+    *pdev_type = DEV_TYPE_DEFAULT;
+    NSInteger max_channel_count = [instance maximumOutputNumberOfChannels];
+
+    /* Increase the preferred number of output channels if possible */
+    if (channel_count > 2 && max_channel_count > 2)
+    {
+        channel_count = __MIN(channel_count, max_channel_count);
+        bool success = [instance setPreferredOutputNumberOfChannels:channel_count
+                        error:nil];
+        if (!success || [instance outputNumberOfChannels] != channel_count)
+        {
+            /* Not critical, output channels layout will be Stereo */
+            msg_Warn(p_aout, "setPreferredOutputNumberOfChannels failed");
+        }
+    }
+
+    long last_channel_count = 0;
+    for (AVAudioSessionPortDescription *out in [[instance currentRoute] outputs])
+    {
+        /* Choose the layout with the biggest number of channels or the HDMI
+         * one */
+
+        enum dev_type dev_type;
+        if ([out.portType isEqualToString: AVAudioSessionPortUSBAudio])
+            dev_type = DEV_TYPE_USB;
+        else if ([out.portType isEqualToString: AVAudioSessionPortHDMI])
+            dev_type = DEV_TYPE_HDMI;
+        else
+            dev_type = DEV_TYPE_DEFAULT;
+
+        NSArray<AVAudioSessionChannelDescription *> *chans = [out channels];
+
+        if (chans.count > last_channel_count || dev_type == DEV_TYPE_HDMI)
+        {
+            /* We don't need a layout specification for stereo */
+            if (chans.count > 2)
+            {
+                bool labels_valid = false;
+                for (AVAudioSessionChannelDescription *chan in chans)
+                {
+                    if ([chan channelLabel] != kAudioChannelLabel_Unknown)
+                    {
+                        labels_valid = true;
+                        break;
+                    }
+                }
+                if (!labels_valid)
+                {
+                    /* TODO: Guess labels ? */
+                    msg_Warn(p_aout, "no valid channel labels");
+                    continue;
+                }
+                assert(max_channel_count >= chans.count);
+
+                if (layout == NULL
+                 || layout->mNumberChannelDescriptions < chans.count)
+                {
+                    const size_t layout_size = sizeof(AudioChannelLayout)
+                        + chans.count * sizeof(AudioChannelDescription);
+                    layout = realloc_or_free(layout, layout_size);
+                    if (layout == NULL)
+                        return VLC_ENOMEM;
+                }
+
+                layout->mChannelLayoutTag =
+                    kAudioChannelLayoutTag_UseChannelDescriptions;
+                layout->mNumberChannelDescriptions = chans.count;
+
+                unsigned i = 0;
+                for (AVAudioSessionChannelDescription *chan in chans)
+                    layout->mChannelDescriptions[i++].mChannelLabel
+                        = [chan channelLabel];
+
+                last_channel_count = chans.count;
+            }
+            *pdev_type = dev_type;
+        }
+
+        if (dev_type == DEV_TYPE_HDMI) /* Prefer HDMI */
+            break;
+    }
+
+    msg_Dbg(p_aout, "Output on %s, channel count: %u",
+            *pdev_type == DEV_TYPE_HDMI ? "HDMI" :
+            *pdev_type == DEV_TYPE_USB ? "USB" : "Default",
+            layout ? layout->mNumberChannelDescriptions : 2);
+
+    *playout = layout;
+    return VLC_SUCCESS;
+}
 
 static int
 avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
@@ -199,6 +305,9 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
     struct aout_sys_t *p_sys = p_aout->sys;
     OSStatus err;
+    OSStatus status;
+    AudioChannelLayout *layout = NULL;
+    AVAudioSession *instance = [AVAudioSession sharedInstance];
 
     if (aout_FormatNbChannels(fmt) == 0
      || aout_BitsPerSample(fmt->i_format) == 0 /* No Passthrough support */)
@@ -208,12 +317,11 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     p_sys->au_unit = NULL;
 
+    fmt->i_format = VLC_CODEC_FL32;
+
     /* Activate the AVAudioSession */
     if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
         return VLC_EGENERIC;
-
-    fmt->i_format = VLC_CODEC_FL32;
-    fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_STEREO;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
     if (p_sys->au_unit == NULL)
@@ -226,7 +334,15 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (err != noErr)
         msg_Warn(p_aout, "failed to set IO mode [%4.4s]", (const char *)&err);
 
-    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL);
+    enum dev_type dev_type;
+    int ret = avas_GetOptimalChannelLayout(p_aout, aout_FormatNbChannels(fmt),
+                                           &dev_type, &layout);
+    if (ret != VLC_SUCCESS)
+        goto error;
+
+    /* TODO: Do passthrough if dev_type allows it */
+
+    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -254,6 +370,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (p_sys->b_muted)
         Pause(p_aout, true, 0);
 
+    free(layout);
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
     msg_Dbg(p_aout, "analog AudioUnit output successfully opened "
@@ -261,6 +378,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 
 error:
+    free(layout);
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
     AudioComponentInstanceDispose(p_sys->au_unit);
