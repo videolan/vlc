@@ -195,7 +195,7 @@ static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
  * Don't print anything during normal playback, calling blocking function from
  * this callback is not allowed.
  *****************************************************************************/
-static OSStatus RenderCallback(vlc_object_t *p_obj,
+static OSStatus RenderCallback(void *p_data,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
                                UInt32 inBusNumber,
@@ -206,7 +206,7 @@ static OSStatus RenderCallback(vlc_object_t *p_obj,
     VLC_UNUSED(inBusNumber);
     VLC_UNUSED(inNumberFrames);
 
-    audio_output_t * p_aout = (audio_output_t *)p_obj;
+    audio_output_t * p_aout = p_data;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     int bytesRequested = ioData->mBuffers[0].mDataByteSize;
@@ -325,7 +325,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     aout_FormatPrepare(fmt);
 
     /* set the IOproc callback */
-    callback.inputProc = (AURenderCallback) RenderCallback;
+    callback.inputProc = RenderCallback;
     callback.inputProcRefCon = p_aout;
 
     status = AudioUnitSetProperty(p_sys->au_unit,
