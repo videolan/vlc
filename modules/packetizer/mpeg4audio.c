@@ -535,7 +535,7 @@ static int Mpeg4ReadAudioSamplerate(bs_t *s)
     return bs_read(s, 24);
 }
 
-static int Mpeg4ReadAudioSpecificInfo(mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t *p_extra, bs_t *s, uint32_t i_max_size)
+static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_withext)
 {
 #if 0
     static const char *ppsz_otype[] = {
@@ -557,13 +557,7 @@ static int Mpeg4ReadAudioSpecificInfo(mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t
         "DST",
     };
 #endif
-    const int i_pos_start = bs_pos(s);
-    bs_t s_sav = *s;
-    int i_bits;
-    int i;
-
     memset(p_cfg, 0, sizeof(*p_cfg));
-    *pi_extra = 0;
 
     p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
     p_cfg->i_samplerate = Mpeg4ReadAudioSamplerate(s);
@@ -650,14 +644,14 @@ static int Mpeg4ReadAudioSpecificInfo(mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t
         break;
     }
 
-    if (p_cfg->extension.i_object_type != 5 && i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 16 &&
+    if (b_withext && p_cfg->extension.i_object_type != 5 && bs_remain(s) >= 16 &&
         bs_read(s, 11) == 0x2b7) {
         p_cfg->extension.i_object_type = Mpeg4ReadAudioObjectType(s);
         if (p_cfg->extension.i_object_type == 5) {
             p_cfg->i_sbr  = bs_read1(s);
             if (p_cfg->i_sbr == 1) {
                 p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
-                if (i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 12 && bs_read(s, 11) == 0x548)
+                if (bs_remain(s) >= 12 && bs_read(s, 11) == 0x548)
                    p_cfg->i_ps = bs_read1(s);
             }
         }
@@ -666,14 +660,7 @@ static int Mpeg4ReadAudioSpecificInfo(mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t
     //fprintf(stderr, "Mpeg4ReadAudioSpecificInfo: t=%s(%d)f=%d c=%d sbr=%d\n",
     //         ppsz_otype[p_cfg->i_object_type], p_cfg->i_object_type, p_cfg->i_samplerate, p_cfg->i_channel, p_cfg->i_sbr);
 
-    i_bits = bs_pos(s) - i_pos_start;
-
-    *pi_extra = __MIN((i_bits + 7) / 8, LATM_MAX_EXTRA_SIZE);
-    for (i = 0; i < *pi_extra; i++) {
-        const int i_read = __MIN(8, i_bits - 8*i);
-        p_extra[i] = bs_read(&s_sav, i_read) << (8-i_read);
-    }
-    return i_bits;
+    return VLC_SUCCESS;
 }
 
 static uint32_t LatmGetValue(bs_t *s)
@@ -682,6 +669,16 @@ static uint32_t LatmGetValue(bs_t *s)
     for (int i = 1 + bs_read(s, 2); i > 0; i--)
         v = (v << 8) + bs_read(s, 8);
     return v;
+}
+
+static uint32_t AudioSpecificConfigBitsToBytes(bs_t *s, uint32_t i_bits, uint8_t *p_data)
+{
+    uint32_t i_extra = __MIN((i_bits + 7) / 8, LATM_MAX_EXTRA_SIZE);
+    for (uint32_t i = 0; i < i_extra; i++) {
+        const uint32_t i_read = __MIN(8, i_bits - 8*i);
+        p_data[i] = bs_read(s, i_read) << (8-i_read);
+    }
+    return i_extra;
 }
 
 static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
@@ -726,12 +723,16 @@ static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
                 assert(m->i_streams > 0);
                 st->cfg = m->stream[m->i_streams-1].cfg;
             } else {
-                uint32_t i_cfg_size = 0;
-                if (i_mux_version == 1)
-                    i_cfg_size = LatmGetValue(s);
-                i_cfg_size -= Mpeg4ReadAudioSpecificInfo(&st->cfg, &st->i_extra, st->extra, s, i_cfg_size);
-                if (i_cfg_size > 0)
-                    bs_skip(s, i_cfg_size);
+                uint32_t asc_size = 0;
+                if(i_mux_version > 0)
+                    asc_size = LatmGetValue(s);
+                bs_t asc_bs = *s;
+                Mpeg4ReadAudioSpecificConfig(&asc_bs, &st->cfg, i_mux_version > 0);
+                if (i_mux_version == 0)
+                    asc_size = bs_pos(&asc_bs) - bs_pos(s);
+                asc_bs = *s;
+                st->i_extra = AudioSpecificConfigBitsToBytes(&asc_bs, asc_size, st->extra);
+                bs_skip(s, asc_size);
             }
 
             st->i_frame_length_type = bs_read(s, 3);
