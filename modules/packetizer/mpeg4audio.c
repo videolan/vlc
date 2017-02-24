@@ -486,6 +486,10 @@ static int Mpeg4GAProgramConfigElement(bs_t *s)
 static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
 {
     p_cfg->i_frame_length = bs_read1(s) ? 960 : 1024;
+    if(p_cfg->i_object_type == 23) /* 14496-3 4.5.1.1 */
+        p_cfg->i_frame_length >>= 1;
+    else if(p_cfg->i_object_type == 3)
+        p_cfg->i_frame_length = 256;
 
     if (bs_read1(s))     // depend on core coder
         bs_skip(s, 14);   // core coder delay
