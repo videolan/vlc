@@ -67,60 +67,44 @@ struct aout_sys_t
 };
 
 #pragma mark -
-#pragma mark actual playback
+#pragma mark AVAudioSession route and output handling
 
 static int
-SetPlayback(audio_output_t *p_aout, bool start)
+avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
     AVAudioSession *instance = [AVAudioSession sharedInstance];
-    OSStatus err;
     BOOL ret = false;
     NSError *error = nil;
 
-    if (start)
+    if (active)
     {
-        err = AudioOutputUnitStart(p_sys->au_unit);
-        if (err != noErr)
-            goto error;
-
         ret = [instance setCategory:AVAudioSessionCategoryPlayback error:&error];
         ret = ret && [instance setMode:AVAudioSessionModeMoviePlayback error:&error];
-        ret = ret && [instance setActive:YES error:&error];
+        ret = ret && [instance setActive:YES withOptions:options error:&error];
     }
     else
-    {
-        err = AudioOutputUnitStop(p_sys->au_unit);
-        if (err != noErr)
-            goto error;
-        ret = [instance setActive:NO error:&error];
-    }
+        ret = [instance setActive:NO withOptions:options error:&error];
+
     if (!ret)
-        goto error;
-
-    return VLC_SUCCESS;
-
-error:
-    if (err != noErr)
     {
-        msg_Err(p_aout, "AudioOutputUnit%s failed [%4.4s]",
-                start ? "Start" : "Stop", (const char *) &err);
-    }
-    else
-    {
-        if (start)
-            AudioOutputUnitStop(p_sys->au_unit);
         msg_Err(p_aout, "AVAudioSession playback change failed: %s(%d)",
                 error.domain.UTF8String, (int)error.code);
+        return VLC_EGENERIC;
     }
-    return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
 }
+
+#pragma mark -
+#pragma mark actual playback
 
 static void
 Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
     VLC_UNUSED(date);
+    struct aout_sys_t * p_sys = p_aout->sys;
 
     /* We need to start / stop the audio unit here because otherwise the OS
      * won't believe us that we stopped the audio output so in case of an
@@ -128,7 +112,25 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
      * multi-tasking, the multi-tasking view would still show a playing state
      * despite we are paused, same for lock screen */
 
-    SetPlayback(p_aout, !pause);
+    OSStatus err;
+    if (pause)
+    {
+        err = AudioOutputUnitStop(p_sys->au_unit);
+        if (err != noErr)
+            msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
+                    (const char *) &err);
+        avas_SetActive(p_aout, false, 0);
+    }
+    else
+    {
+        if (avas_SetActive(p_aout, true, 0) == VLC_SUCCESS)
+        {
+            err = AudioOutputUnitStart(p_sys->au_unit);
+            if (err != noErr)
+                msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
+                        (const char *) &err);
+        }
+    }
 }
 
 static int
@@ -139,7 +141,7 @@ MuteSet(audio_output_t *p_aout, bool mute)
     p_sys->b_muted = mute;
     if (p_sys->au_unit != NULL)
     {
-        SetPlayback(p_aout, !mute);
+        Pause(p_aout, mute, 0);
         if (mute)
             ca_Flush(p_aout, false);
     }
@@ -192,9 +194,13 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AURenderCallbackStruct      callback;
     OSStatus status;
 
+    /* Activate the AVAudioSession */
+    if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
+        return VLC_EGENERIC;
+
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
     if (p_sys->au_unit == NULL)
-        return VLC_EGENERIC;
+        goto error;
 
     status = AudioUnitSetProperty(p_sys->au_unit,
                                   kAudioOutputUnitProperty_EnableIO,
@@ -268,24 +274,24 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     }
     p_aout->play = Play;
 
-    /* start the unit */
-    if (SetPlayback(p_aout, true) != VLC_SUCCESS)
+    status = AudioOutputUnitStart(p_sys->au_unit);
+    if (status != noErr)
     {
+        msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
+                (const char *) &status);
         AudioUnitUninitialize(p_sys->au_unit);
         ca_Clean(p_aout);
         goto error;
     }
 
     if (p_sys->b_muted)
-    {
-        /* Stop playback after Starting it, this is not optimized, but this
-         * allow more error checking from the Start function */
-        SetPlayback(p_aout, false);
-    }
+        Pause(p_aout, true, 0);
 
     return VLC_SUCCESS;
 
 error:
+    avas_SetActive(p_aout, false,
+                   AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
     AudioComponentInstanceDispose(p_sys->au_unit);
     return VLC_EGENERIC;
 }
@@ -311,9 +317,8 @@ Stop(audio_output_t *p_aout)
         msg_Warn(p_aout, "AudioComponentInstanceDispose failed [%4.4s]",
                  (const char *)&err);
 
-    [[AVAudioSession sharedInstance] setActive:NO
-        withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
-        error:nil];
+    avas_SetActive(p_aout, false,
+                   AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
 
     ca_Clean(p_aout);
 }
