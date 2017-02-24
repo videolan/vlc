@@ -290,7 +290,8 @@ static int OpenPacketizer(vlc_object_t *p_this)
     }
     /* else() We will try to create a AAC Config from adts/loas */
 
-    date_Init(&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);
+    date_Init(&p_sys->end_date, p_dec->fmt_out.audio.i_rate ?
+                                p_dec->fmt_out.audio.i_rate : 48000, 1);
 
     /* Set callbacks */
     p_dec->pf_packetize = Packetize;
@@ -797,6 +798,9 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             p_sys->latm.i_streams > 0) {
         const latm_stream_t *st = &p_sys->latm.stream[0];
 
+        if(st->cfg.i_samplerate <= 0 || st->cfg.i_channel <=0 || st->cfg.i_frame_length <= 0)
+            return 0;
+
         p_sys->i_channels = st->cfg.i_channel;
         p_sys->i_rate = st->cfg.i_samplerate;
         p_sys->i_frame_length = st->cfg.i_frame_length;
@@ -936,7 +940,8 @@ static void SetupOutput(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_dec->fmt_out.audio.i_rate != p_sys->i_rate) {
+    if (p_dec->fmt_out.audio.i_rate != p_sys->i_rate && p_sys->i_rate > 0)
+    {
         msg_Info(p_dec, "AAC channels: %d samplerate: %d",
                   p_sys->i_channels, p_sys->i_rate);
 
@@ -1122,7 +1127,8 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
         if (p_sys->i_type != TYPE_ADTS) { /* parse/extract the whole frame */
             assert(p_sys->i_type == TYPE_LOAS);
             p_out_buffer->i_buffer = LOASParse(p_dec, p_buf, p_sys->i_frame_size);
-            if (p_out_buffer->i_buffer <= 0) {
+            if (p_out_buffer->i_buffer <= 0)
+            {
                 if (!p_sys->b_latm_cfg)
                     msg_Warn(p_dec, "waiting for header");
 
