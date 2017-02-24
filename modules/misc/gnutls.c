@@ -326,17 +326,15 @@ static int gnutls_ContinueHandshake(vlc_tls_creds_t *crd, vlc_tls_t *tls,
 
     unsigned flags;
 done:
+#if (GNUTLS_VERSION_NUMBER >= 0x030500)
     flags = gnutls_session_get_flags(session);
 
     if (flags & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)
         msg_Dbg(crd, " - safe renegotiation (RFC5746) enabled");
-#if (GNUTLS_VERSION_NUMBER >= 0x030400)
     if (flags & GNUTLS_SFLAGS_EXT_MASTER_SECRET)
         msg_Dbg(crd, " - extended master secret (RFC7627) enabled");
     if (flags & GNUTLS_SFLAGS_ETM)
         msg_Dbg(crd, " - encrypt then MAC (RFC7366) enabled");
-#endif
-#if (GNUTLS_VERSION_NUMBER >= 0x030500)
     if (flags & GNUTLS_SFLAGS_FALSE_START)
         msg_Dbg(crd, " - false start (RFC7918) enabled");
 #endif
