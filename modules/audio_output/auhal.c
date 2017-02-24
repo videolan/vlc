@@ -29,9 +29,7 @@
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>                      // vlc_dialog_display_error
 
-#import <AudioUnit/AudioUnit.h>             // AudioUnit
 #import <CoreAudio/CoreAudio.h>             // AudioDeviceID
-#import <AudioToolbox/AudioFormat.h>        // AudioFormatGetProperty
 #import <CoreServices/CoreServices.h>
 
 #pragma mark -
@@ -994,7 +992,6 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
     int                         i_original;
-    AudioComponentDescription   desc;
     AudioStreamBasicDescription DeviceFormat;
     AudioChannelLayout          *layout;
     AURenderCallbackStruct      input;
@@ -1004,28 +1001,9 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     if (Gestalt(gestaltSystemVersionMinor, &currentMinorSystemVersion) != noErr)
         msg_Err(p_aout, "failed to check OSX version");
 
-    /* Lets go find our Component */
-    desc.componentType = kAudioUnitType_Output;
-    desc.componentSubType = kAudioUnitSubType_HALOutput;
-    desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-    desc.componentFlags = 0;
-    desc.componentFlagsMask = 0;
-
-    AudioComponent au_component;
-    au_component = AudioComponentFindNext(NULL, &desc);
-    if (au_component == NULL)
-    {
-        msg_Err(p_aout, "cannot find any HAL component, PCM output failed");
+    p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_HALOutput);
+    if (p_sys->au_unit == NULL)
         return VLC_EGENERIC;
-    }
-
-    err = AudioComponentInstanceNew(au_component, &p_sys->au_unit);
-    if (err != noErr)
-    {
-        msg_Err(p_aout, "cannot open HAL component, PCM output failed [%4.4s]",
-                (const char *)&err);
-        return VLC_EGENERIC;
-    }
 
     /* Set the device we will use for this output unit */
     err = AudioUnitSetProperty(p_sys->au_unit,

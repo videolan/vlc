@@ -181,3 +181,33 @@ ca_Clean(audio_output_t *p_aout)
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
 }
+
+AudioUnit
+au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type)
+{
+    AudioComponentDescription desc = {
+        .componentType = kAudioUnitType_Output,
+        .componentSubType = comp_sub_type,
+        .componentManufacturer = kAudioUnitManufacturer_Apple,
+        .componentFlags = 0,
+        .componentFlagsMask = 0,
+    };
+
+    AudioComponent au_component;
+    au_component = AudioComponentFindNext(NULL, &desc);
+    if (au_component == NULL)
+    {
+        msg_Err(p_aout, "cannot find any AudioComponent, PCM output failed");
+        return NULL;
+    }
+
+    AudioUnit au;
+    OSStatus err = AudioComponentInstanceNew(au_component, &au);
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "cannot open AudioComponent, PCM output failed [%4.4s]",
+                (const char *)&err);
+        return NULL;
+    }
+    return au;
+}

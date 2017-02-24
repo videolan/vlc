@@ -30,6 +30,8 @@
 #import <vlc_atomic.h>
 #import <vlc_aout.h>
 
+#import <AudioUnit/AudioUnit.h>
+#import <AudioToolbox/AudioToolbox.h>
 #import "TPCircularBuffer.h"
 
 #define STREAM_FORMAT_MSG(pre, sfm) \
@@ -71,3 +73,5 @@ int  ca_Init(audio_output_t *p_aout, const audio_sample_format_t *fmt,
              size_t i_audio_buffer_size);
 
 void ca_Clean(audio_output_t *p_aout);
+
+AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);

@@ -26,11 +26,9 @@
 
 #import <vlc_plugin.h>
 
-#import <AudioUnit/AudioUnit.h>
 #import <CoreAudio/CoreAudioTypes.h>
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import <AudioToolbox/AudioToolbox.h>
 #import <mach/mach_time.h>
 
 #pragma mark -
@@ -191,28 +189,12 @@ static int
 StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t           *p_sys = p_aout->sys;
-    AudioComponentDescription   desc;
     AURenderCallbackStruct      callback;
     OSStatus status;
 
-    /* Lets go find our Component */
-    desc.componentType = kAudioUnitType_Output;
-    desc.componentSubType = kAudioUnitSubType_RemoteIO;
-    desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-    desc.componentFlags = 0;
-    desc.componentFlagsMask = 0;
-
-    AudioComponent au_component = AudioComponentFindNext(NULL, &desc);
-    if (au_component == NULL) {
-        msg_Warn(p_aout, "we cannot find our audio component");
+    p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
+    if (p_sys->au_unit == NULL)
         return VLC_EGENERIC;
-    }
-
-    status = AudioComponentInstanceNew(au_component, &p_sys->au_unit);
-    if (status != noErr) {
-        msg_Warn(p_aout, "we cannot open our audio component (%i)", (int)status);
-        return VLC_EGENERIC;
-    }
 
     status = AudioUnitSetProperty(p_sys->au_unit,
                                   kAudioOutputUnitProperty_EnableIO,
