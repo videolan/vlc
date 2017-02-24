@@ -1001,14 +1001,19 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
     case STATE_NOSYNC:
         while (block_PeekBytes(&p_sys->bytestream, p_header, 2) == VLC_SUCCESS) {
             /* Look for sync word - should be 0xfff(adts) or 0x2b7(loas) */
-            if (p_header[0] == 0xff && (p_header[1] & 0xf6) == 0xf0) {
+            if ((p_sys->i_type == TYPE_ADTS || p_sys->i_type == TYPE_UNKNOWN_NONRAW) &&
+                p_header[0] == 0xff && (p_header[1] & 0xf6) == 0xf0)
+            {
                 if (p_sys->i_type != TYPE_ADTS)
                     msg_Dbg(p_dec, "detected ADTS format");
 
                 p_sys->i_state = STATE_SYNC;
                 p_sys->i_type = TYPE_ADTS;
                 break;
-            } else if (p_header[0] == 0x56 && (p_header[1] & 0xe0) == 0xe0) {
+            }
+            else if ((p_sys->i_type == TYPE_LOAS || p_sys->i_type == TYPE_UNKNOWN_NONRAW) &&
+                      p_header[0] == 0x56 && (p_header[1] & 0xe0) == 0xe0)
+            {
                 if (p_sys->i_type != TYPE_LOAS)
                     msg_Dbg(p_dec, "detected LOAS format");
 
