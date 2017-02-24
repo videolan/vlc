@@ -65,6 +65,7 @@ struct aout_sys_t
 
     /* The AudioUnit we use */
     AudioUnit au_unit;
+    bool      b_muted;
 };
 
 #pragma mark -
@@ -135,12 +136,25 @@ static int MuteSet(audio_output_t *p_aout, bool mute)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
-    if (p_sys != NULL && p_sys->au_unit != NULL) {
-        msg_Dbg(p_aout, "audio output mute set to %d", mute?1:0);
-        Pause(p_aout, mute, 0);
+    p_sys->b_muted = mute;
+    if (p_sys->au_unit != NULL)
+    {
+        SetPlayback(p_aout, !mute);
+        if (mute)
+            ca_Flush(p_aout, false);
     }
 
     return VLC_SUCCESS;
+}
+
+static void Play(audio_output_t * p_aout, block_t * p_block)
+{
+    struct aout_sys_t * p_sys = p_aout->sys;
+
+    if (p_sys->b_muted)
+        block_Release(p_block);
+    else
+        ca_Play(p_aout, p_block);
 }
 
 /*****************************************************************************
@@ -277,6 +291,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         AudioUnitUninitialize(p_sys->au_unit);
         goto error;
     }
+    p_aout->play = Play;
 
     /* start the unit */
     if (SetPlayback(p_aout, true) != VLC_SUCCESS)
@@ -284,6 +299,13 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         AudioUnitUninitialize(p_sys->au_unit);
         ca_Clean(p_aout);
         goto error;
+    }
+
+    if (p_sys->b_muted)
+    {
+        /* Stop playback after Starting it, this is not optimized, but this
+         * allow more error checking from the Start function */
+        SetPlayback(p_aout, false);
     }
 
     return VLC_SUCCESS;
@@ -358,6 +380,7 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    sys->b_muted = false;
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
