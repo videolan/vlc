@@ -103,7 +103,7 @@ class ExtraMetaPanel: public QWidget
 public:
     ExtraMetaPanel( QWidget * );
 private:
-    QTreeWidget *extraMetaTree;
+    QTreeWidget *extraMeta;
 public slots:
     void update( input_item_t * );
     void clear();

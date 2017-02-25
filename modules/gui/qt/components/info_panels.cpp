@@ -396,12 +396,12 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
-     extraMetaTree = new QTreeWidget( this );
-     extraMetaTree->setAlternatingRowColors( true );
-     extraMetaTree->setColumnCount( 2 );
-     extraMetaTree->resizeColumnToContents( 0 );
-     extraMetaTree->setHeaderHidden( true );
-     layout->addWidget( extraMetaTree, 1, 0 );
+     extraMeta = new QTreeWidget( this );
+     extraMeta->setAlternatingRowColors( true );
+     extraMeta->setColumnCount( 2 );
+     extraMeta->resizeColumnToContents( 0 );
+     extraMeta->setHeaderHidden( true );
+     layout->addWidget( extraMeta, 1, 0 );
 }
 
 /**
@@ -417,7 +417,7 @@ void ExtraMetaPanel::update( input_item_t *p_item )
 
     QList<QTreeWidgetItem *> items;
 
-    extraMetaTree->clear();
+    extraMeta->clear();
 
     vlc_mutex_lock( &p_item->lock );
     vlc_meta_t *p_meta = p_item->p_meta;
@@ -433,7 +433,7 @@ void ExtraMetaPanel::update( input_item_t *p_item )
         QStringList tempItem;
         tempItem.append( VLC_META_DISCNUMBER );
         tempItem.append( qfu( psz_disc_number ) );
-        items.append( new QTreeWidgetItem ( extraMetaTree, tempItem ) );
+        items.append( new QTreeWidgetItem ( extraMeta, tempItem ) );
     }
 
     char ** ppsz_allkey = vlc_meta_CopyExtraNames( p_meta);
@@ -444,14 +444,14 @@ void ExtraMetaPanel::update( input_item_t *p_item )
         QStringList tempItem;
         tempItem.append( qfu( ppsz_allkey[i] ) + " : ");
         tempItem.append( qfu( psz_value ) );
-        items.append( new QTreeWidgetItem ( extraMetaTree, tempItem ) );
+        items.append( new QTreeWidgetItem ( extraMeta, tempItem ) );
         free( ppsz_allkey[i] );
     }
     vlc_mutex_unlock( &p_item->lock );
     free( ppsz_allkey );
 
-    extraMetaTree->addTopLevelItems( items );
-    extraMetaTree->resizeColumnToContents( 0 );
+    extraMeta->addTopLevelItems( items );
+    extraMeta->resizeColumnToContents( 0 );
 }
 
 /**
@@ -459,7 +459,7 @@ void ExtraMetaPanel::update( input_item_t *p_item )
  **/
 void ExtraMetaPanel::clear()
 {
-    extraMetaTree->clear();
+    extraMeta->clear();
 }
 
 /**
