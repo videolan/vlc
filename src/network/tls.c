@@ -35,6 +35,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #ifdef HAVE_SYS_UIO_H
 # include <sys/uio.h>
 #endif
@@ -328,6 +329,8 @@ typedef struct vlc_tls_socket
 {
     struct vlc_tls tls;
     int fd;
+    socklen_t peerlen;
+    struct sockaddr peer[];
 } vlc_tls_socket_t;
 
 static int vlc_tls_SocketGetFD(vlc_tls_t *tls)
@@ -372,9 +375,11 @@ static void vlc_tls_SocketClose(vlc_tls_t *tls)
     free(tls);
 }
 
-vlc_tls_t *vlc_tls_SocketOpen(int fd)
+static vlc_tls_t *vlc_tls_SocketAlloc(int fd,
+                                      const struct sockaddr *restrict peer,
+                                      socklen_t peerlen)
 {
-    vlc_tls_socket_t *sock = malloc(sizeof (*sock));
+    vlc_tls_socket_t *sock = malloc(sizeof (*sock) + peerlen);
     if (unlikely(sock == NULL))
         return NULL;
 
@@ -386,72 +391,115 @@ vlc_tls_t *vlc_tls_SocketOpen(int fd)
     tls->shutdown = vlc_tls_SocketShutdown;
     tls->close = vlc_tls_SocketClose;
     tls->p = NULL;
+
     sock->fd = fd;
+    sock->peerlen = peerlen;
+    if (peerlen > 0)
+        memcpy(sock->peer, peer, peerlen);
     return tls;
 }
 
-static vlc_tls_t *vlc_tls_SocketOpenAddrInfoSingle(vlc_object_t *obj,
-                                          const struct addrinfo *restrict info)
+vlc_tls_t *vlc_tls_SocketOpen(int fd)
+{
+    return vlc_tls_SocketAlloc(fd, NULL, 0);
+}
+
+/**
+ * Allocates an unconnected transport layer socket.
+ */
+static vlc_tls_t *vlc_tls_SocketAddrInfo(const struct addrinfo *restrict info)
 {
     int fd = vlc_socket(info->ai_family, info->ai_socktype, info->ai_protocol,
                         true /* nonblocking */);
     if (fd == -1)
-    {
-        msg_Warn(obj, "socket error: %s", vlc_strerror_c(errno));
         return NULL;
-    }
 
     setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
 
-    int val = connect(fd, info->ai_addr, info->ai_addrlen);
-    if (val != 0)
+    vlc_tls_t *sk = vlc_tls_SocketAlloc(fd, info->ai_addr, info->ai_addrlen);
+    if (unlikely(sk == NULL))
+        net_Close(fd);
+    return sk;
+}
+
+/**
+ * Waits for pending transport layer socket connection.
+ */
+static int vlc_tls_WaitConnect(vlc_tls_t *tls)
+{
+    const int fd = vlc_tls_GetFD(tls);
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLOUT;
+
+    do
     {
-        if (errno != EINPROGRESS)
+        if (vlc_killed())
         {
-            msg_Err(obj, "connection error: %s", vlc_strerror_c(errno));
-            goto giveup;
-        }
-
-        struct pollfd ufd;
-
-        ufd.fd = fd;
-        ufd.events = POLLOUT;
-
-        do
-        {
-            if (vlc_killed())
-            {
-                errno = EINTR;
-                goto giveup;
-            }
-        }
-        while (vlc_poll_i11e(&ufd, 1, -1) <= 0);
-
-        socklen_t len = sizeof (val);
-        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &val, &len))
-        {
-            msg_Err(obj, "socket option error: %s",
-                    vlc_strerror_c(errno));
-            goto giveup;
-        }
-
-        if (val != 0)
-        {
-            msg_Err(obj, "connection error: %s", vlc_strerror_c(val));
-            errno = val;
-            goto giveup;
+            errno = EINTR;
+            return -1;
         }
     }
+    while (vlc_poll_i11e(&ufd, 1, -1) <= 0);
 
-    vlc_tls_t *tls = vlc_tls_SocketOpen(fd);
-    if (unlikely(tls == NULL))
-        goto giveup;
+    int val;
+    socklen_t len = sizeof (val);
 
+    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &val, &len))
+        return -1;
+
+    if (val != 0)
+    {
+        errno = val;
+        return -1;
+    }
+    return 0;
+}
+
+/**
+ * Connects a transport layer socket.
+ */
+static ssize_t vlc_tls_Connect(vlc_tls_t *tls)
+{
+    const vlc_tls_socket_t *sock = (vlc_tls_socket_t *)tls;
+
+    if (connect(sock->fd, sock->peer, sock->peerlen) == 0)
+        return 0;
+#ifndef _WIN32
+    if (errno != EINPROGRESS)
+        return -1;
+#else
+    if (WSAGetLastError() != WSAEWOULDBLOCK)
+        return -1;
+#endif
+    return vlc_tls_WaitConnect(tls);
+}
+
+/* Callback for combined connection establishment and initial send */
+static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
+                                    const struct iovec *iov,unsigned count)
+{
+    if (vlc_tls_Connect(tls))
+        return -1;
+
+    /* Next time, write directly. Do not retry to connect. */
+    tls->writev = vlc_tls_SocketWrite;
+    return vlc_tls_SocketWrite(tls, iov, count);
+}
+
+static vlc_tls_t *vlc_tls_ConnectAddrInfo(const struct addrinfo *info)
+{
+    vlc_tls_t *tls = vlc_tls_SocketAddrInfo(info);
+    if (tls == NULL)
+        return NULL;
+
+    if (vlc_tls_Connect(tls))
+    {
+        vlc_tls_SessionDelete(tls);
+        tls = NULL;
+    }
     return tls;
-
-giveup:
-    net_Close(fd);
-    return NULL;
 }
 
 vlc_tls_t *vlc_tls_SocketOpenAddrInfo(vlc_object_t *obj,
@@ -460,9 +508,11 @@ vlc_tls_t *vlc_tls_SocketOpenAddrInfo(vlc_object_t *obj,
     /* TODO: implement RFC6555 */
     for (const struct addrinfo *p = info; p != NULL; p = p->ai_next)
     {
-        vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfoSingle(obj, p);
+        vlc_tls_t *tls = vlc_tls_ConnectAddrInfo(p);
         if (tls != NULL)
             return tls;
+
+        msg_Err(obj, "connection error: %s", vlc_strerror_c(errno));
     }
     return NULL;
 }
@@ -498,13 +548,48 @@ vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *creds, const char *name,
                                  unsigned port, const char *service,
                                  const char *const *alpn, char **alp)
 {
-    vlc_tls_t *tcp = vlc_tls_SocketOpenTCP(VLC_OBJECT(creds), name, port);
-    if (tcp == NULL)
-        return NULL;
+    struct addrinfo hints =
+    {
+        .ai_socktype = SOCK_STREAM,
+        .ai_protocol = IPPROTO_TCP,
+    }, *res;
 
-    vlc_tls_t *tls = vlc_tls_ClientSessionCreate(creds, tcp, name, service,
-                                                 alpn, alp);
-    if (tls == NULL)
+    msg_Dbg(creds, "resolving %s ...", name);
+
+    int val = vlc_getaddrinfo_i11e(name, port, &hints, &res);
+    if (val != 0)
+    {   /* TODO: C locale for gai_strerror() */
+        msg_Err(creds, "cannot resolve %s port %u: %s", name, port,
+                gai_strerror(val));
+        return NULL;
+    }
+
+    for (const struct addrinfo *p = res; p != NULL; p = p->ai_next)
+    {
+        vlc_tls_t *tcp = vlc_tls_SocketAddrInfo(p);
+        if (tcp == NULL)
+        {
+            msg_Err(creds, "socket error: %s", vlc_strerror_c(errno));
+            continue;
+        }
+
+        /* The socket is not connected yet.
+         * The connection will be triggered on the first send. */
+        tcp->writev = vlc_tls_ConnectWrite;
+
+        vlc_tls_t *tls = vlc_tls_ClientSessionCreate(creds, tcp, name, service,
+                                                     alpn, alp);
+        if (tls != NULL)
+        {   /* Success! */
+            freeaddrinfo(res);
+            return tls;
+        }
+
+        msg_Err(creds, "connection error: %s", vlc_strerror_c(errno));
         vlc_tls_SessionDelete(tcp);
-    return tls;
+    }
+
+    /* Failure! */
+    freeaddrinfo(res);
+    return NULL;
 }
