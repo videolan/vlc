@@ -1640,7 +1640,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("A_ALAC") {
             vars.p_tk->fmt.i_codec = VLC_CODEC_ALAC;
-            fill_extra_data( vars.p_tk, 0);
+            fill_extra_data_alac( vars.p_tk );
         }
         S_CASE("A_WAVPACK4") {
             vars.p_tk->fmt.i_codec = VLC_CODEC_WAVPACK;
