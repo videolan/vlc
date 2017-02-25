@@ -41,6 +41,7 @@
 #include <vlc_network.h>
 #include <vlc_fs.h>
 #include <vlc_rand.h>
+#include <vlc_memstream.h>
 #ifdef HAVE_SRTP
 # include <srtp.h>
 # include <gcrypt.h>
@@ -780,8 +781,9 @@ out:
 char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char *psz_sdp = NULL;
+    struct vlc_memstream sdp;
     struct sockaddr_storage dst;
+    char *psz_sdp = NULL;
     socklen_t dstlen;
     int i;
     /*
@@ -836,17 +838,16 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
 #endif
     }
 
-    psz_sdp = vlc_sdp_Start( VLC_OBJECT( p_stream ), SOUT_CFG_PREFIX,
-                             NULL, 0, (struct sockaddr *)&dst, dstlen );
-    if( psz_sdp == NULL )
+    if( vlc_sdp_Start( &sdp, VLC_OBJECT( p_stream ), SOUT_CFG_PREFIX,
+                       NULL, 0, (struct sockaddr *)&dst, dstlen ) )
         goto out;
 
     /* TODO: a=source-filter */
     if( p_sys->rtcp_mux )
-        sdp_AddAttribute( &psz_sdp, "rtcp-mux", NULL );
+        sdp_AddAttribute( &sdp, "rtcp-mux", NULL );
 
     if( rtsp_url != NULL )
-        sdp_AddAttribute ( &psz_sdp, "control", "%s", rtsp_url );
+        sdp_AddAttribute ( &sdp, "control", "%s", rtsp_url );
 
     const char *proto = "RTP/AVP"; /* protocol */
     if( rtsp_url == NULL )
@@ -887,34 +888,36 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
                 continue;
         }
 
-        sdp_AddMedia( &psz_sdp, mime_major, proto, inclport * id->i_port,
+        sdp_AddMedia( &sdp, mime_major, proto, inclport * id->i_port,
                       rtp_fmt->payload_type, false, rtp_fmt->bitrate,
                       rtp_fmt->ptname, rtp_fmt->clock_rate, rtp_fmt->channels,
                       rtp_fmt->fmtp);
 
         /* cf RFC4566 §5.14 */
         if( inclport && !p_sys->rtcp_mux && (id->i_port & 1) )
-            sdp_AddAttribute ( &psz_sdp, "rtcp", "%u", id->i_port + 1 );
+            sdp_AddAttribute( &sdp, "rtcp", "%u", id->i_port + 1 );
 
         if( rtsp_url != NULL )
         {
             char *track_url = RtspAppendTrackPath( id->rtsp_id, rtsp_url );
             if( track_url != NULL )
             {
-                sdp_AddAttribute ( &psz_sdp, "control", "%s", track_url );
+                sdp_AddAttribute( &sdp, "control", "%s", track_url );
                 free( track_url );
             }
         }
         else
         {
             if( id->listen.fd != NULL )
-                sdp_AddAttribute( &psz_sdp, "setup", "passive" );
+                sdp_AddAttribute( &sdp, "setup", "passive" );
             if( p_sys->proto == IPPROTO_DCCP )
-                sdp_AddAttribute( &psz_sdp, "dccp-service-code",
-                                  "SC:RTP%c",
+                sdp_AddAttribute( &sdp, "dccp-service-code", "SC:RTP%c",
                                   toupper( (unsigned char)mime_major[0] ) );
         }
     }
+
+    if( vlc_memstream_close( &sdp ) == 0 )
+        psz_sdp = sdp.ptr;
 out:
     vlc_mutex_unlock( &p_sys->lock_es );
     return psz_sdp;

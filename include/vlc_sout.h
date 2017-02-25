@@ -280,10 +280,19 @@ VLC_API void sout_AnnounceUnRegister(vlc_object_t *,session_descriptor_t* );
 /** SDP */
 
 struct sockaddr;
+struct vlc_memstream;
 
-VLC_API char * vlc_sdp_Start( vlc_object_t *obj, const char *cfgpref, const struct sockaddr *src, size_t srclen, const struct sockaddr *addr, size_t addrlen ) VLC_USED;
-VLC_API char * sdp_AddMedia(char **sdp, const char *type, const char *protocol, int dport, unsigned pt, bool bw_indep, unsigned bw, const char *ptname, unsigned clockrate, unsigned channels, const char *fmtp);
-VLC_API char * sdp_AddAttribute(char **sdp, const char *name, const char *fmt, ...) VLC_FORMAT( 3, 4 );
+VLC_API int vlc_sdp_Start(struct vlc_memstream *, vlc_object_t *obj,
+                          const char *cfgpref,
+                          const struct sockaddr *src, size_t slen,
+                          const struct sockaddr *addr, size_t alen) VLC_USED;
+VLC_API void sdp_AddMedia(struct vlc_memstream *, const char *type,
+                          const char *protocol, int dport, unsigned pt,
+                          bool bw_indep, unsigned bw, const char *ptname,
+                          unsigned clockrate, unsigned channels,
+                          const char *fmtp);
+VLC_API void sdp_AddAttribute(struct vlc_memstream *, const char *name,
+                              const char *fmt, ...) VLC_FORMAT(3, 4);
 
 /** Description module */
 typedef struct sout_description_data_t

@@ -34,6 +34,7 @@
 
 #include <vlc_network.h>
 #include <vlc_url.h>
+#include <vlc_memstream.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -179,29 +180,25 @@ static void create_SDP(sout_stream_t *p_stream, sout_access_out_t *p_access)
         freeaddrinfo (res);
     }
 
-    char *head = vlc_sdp_Start (VLC_OBJECT (p_stream), SOUT_CFG_PREFIX,
-            (struct sockaddr *)&src, srclen,
-            (struct sockaddr *)&dst, dstlen);
-    free (shost);
+    struct vlc_memstream sdp;
 
-    if (head != NULL)
+    if (vlc_sdp_Start(&sdp, VLC_OBJECT (p_stream), SOUT_CFG_PREFIX,
+                      (struct sockaddr *)&src, srclen,
+                      (struct sockaddr *)&dst, dstlen) == 0)
     {
-        char *psz_sdp = NULL;
-        if (asprintf (&psz_sdp, "%s"
-                    "m=video %d udp mpeg\r\n", head, dport) == -1)
-            psz_sdp = NULL;
-        free (head);
+        vlc_memstream_printf(&sdp, "m=video %d udp mpeg\r\n", dport);
 
         /* Register the SDP with the SAP thread */
-        if (psz_sdp)
+        if (vlc_memstream_close(&sdp))
         {
-            msg_Dbg (p_stream, "Generated SDP:\n%s", psz_sdp);
+            msg_Dbg(p_stream, "Generated SDP:\n%s", sdp.ptr);
             p_sys->p_session =
-                sout_AnnounceRegisterSDP (p_stream, psz_sdp, dhost);
-            free( psz_sdp );
+                sout_AnnounceRegisterSDP(p_stream, sdp.ptr, dhost);
+            free(sdp.ptr);
         }
     }
-    free (dhost);
+    free(shost);
+    free(dhost);
 }
 
 static const char *getMuxFromAlias( const char *psz_alias )

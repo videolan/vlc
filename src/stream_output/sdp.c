@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <vlc_network.h>
 #include <vlc_charset.h>
+#include <vlc_memstream.h>
 
 #include "stream_output.h"
 
@@ -90,217 +91,186 @@ static bool IsSDPString (const char *str)
     return true;
 }
 
-
-static
-char *sdp_Start (const char *name, const char *description, const char *url,
-                 const char *email, const char *phone,
-                 const struct sockaddr *src, size_t srclen,
-                 const struct sockaddr *addr, size_t addrlen)
+static void vsdp_AddAttribute(struct vlc_memstream *restrict stream,
+                              const char *name, const char *fmt, va_list ap)
 {
-    uint64_t now = NTPtime64 ();
-    char *sdp;
-    char connection[MAXSDPADDRESS], hostname[256],
-         sfilter[MAXSDPADDRESS + sizeof ("\r\na=source-filter: incl * ")];
-    const char *preurl = "\r\nu=", *premail = "\r\ne=", *prephone = "\r\np=";
-
-    gethostname (hostname, sizeof (hostname));
-
-    if (name == NULL)
-        name = "Unnamed";
-    if (description == NULL)
-        description = "N/A";
-    if (url == NULL)
-        preurl = url = "";
-    if (email == NULL)
-        premail = email = "";
-    if (phone == NULL)
-        prephone = phone = "";
-
-    if (!IsSDPString (name) || !IsSDPString (description)
-     || !IsSDPString (url) || !IsSDPString (email) || !IsSDPString (phone)
-     || (AddressToSDP (addr, addrlen, connection) == NULL))
-        return NULL;
-
-    strcpy (sfilter, "");
-    if (srclen > 0)
-    {
-        char machine[MAXSDPADDRESS];
-
-        if (AddressToSDP (src, srclen, machine) != NULL)
-            sprintf (sfilter, "\r\na=source-filter: incl IN IP%c * %s",
-                     machine[5], machine + 7);
-    }
-
-    if (asprintf (&sdp, "v=0"
-                    "\r\no=- %"PRIu64" %"PRIu64" IN IP%c %s"
-                    "\r\ns=%s"
-                    "\r\ni=%s"
-                    "%s%s" // optional URL
-                    "%s%s" // optional email
-                    "%s%s" // optional phone number
-                    "\r\nc=%s"
-                        // bandwidth not specified
-                    "\r\nt=0 0" // one dummy time span
-                        // no repeating
-                        // no time zone adjustment (silly idea anyway)
-                        // no encryption key (deprecated)
-                    "\r\na=tool:"PACKAGE_STRING
-                    "\r\na=recvonly"
-                    "\r\na=type:broadcast"
-                    "\r\na=charset:UTF-8"
-                    "%s" // optional source filter
-                    "\r\n",
-               /* o= */ now, now, connection[5], hostname,
-               /* s= */ name,
-               /* i= */ description,
-               /* u= */ preurl, url,
-               /* e= */ premail, email,
-               /* p= */ prephone, phone,
-               /* c= */ connection,
-    /* source-filter */ sfilter) == -1)
-        return NULL;
-    return sdp;
+    vlc_memstream_printf(stream, "a=%s:", name);
+    vlc_memstream_vprintf(stream, fmt, ap);
+    vlc_memstream_puts(stream, "\r\n");
 }
 
-
-static char *
-vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
+void sdp_AddAttribute(struct vlc_memstream *restrict stream, const char *name,
+                      const char *fmt, ...)
 {
-    size_t oldlen = strlen (*sdp);
-    size_t addlen = sizeof ("a=\r\n") + strlen (name);
-
-    if (fmt != NULL)
-    {
-        va_list aq;
-
-        va_copy (aq, ap);
-        addlen += 1 + vsnprintf (NULL, 0, fmt, aq);
-        va_end (aq);
-    }
-
-    char *ret = realloc (*sdp, oldlen + addlen);
-    if (ret == NULL)
-        return NULL;
-
-    oldlen += sprintf (ret + oldlen, "a=%s", name);
-    if (fmt != NULL)
-    {
-        ret[oldlen++] = ':';
-        oldlen += vsprintf (ret + oldlen, fmt, ap);
-    }
-
-    strcpy (ret + oldlen, "\r\n");
-    return *sdp = ret;
-}
-
-
-char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
-{
-    char *ret;
     va_list ap;
 
-    va_start (ap, fmt);
-    ret = vsdp_AddAttribute (sdp, name, fmt, ap);
-    va_end (ap);
-
-    return ret;
+    va_start(ap, fmt);
+    vsdp_AddAttribute(stream, name, fmt, ap);
+    va_end(ap);
 }
 
-
-char *sdp_AddMedia (char **sdp,
-                    const char *type, const char *protocol, int dport,
-                    unsigned pt, bool bw_indep, unsigned bw,
-                    const char *ptname, unsigned clock, unsigned chans,
-                    const char *fmtp)
+void sdp_AddMedia(struct vlc_memstream *restrict stream,
+                  const char *type, const char *proto, int dport,
+                  unsigned pt, bool bw_indep, unsigned bw,
+                  const char *ptname, unsigned clock, unsigned chans,
+                  const char *fmtp)
 {
-    char *newsdp, *ptr;
-    size_t inlen = strlen (*sdp), outlen = inlen;
-
     /* Some default values */
     if (type == NULL)
         type = "video";
-    if (protocol == NULL)
-        protocol = "RTP/AVP";
+    if (proto == NULL)
+        proto = "RTP/AVP";
     assert (pt < 128u);
 
-    outlen += snprintf (NULL, 0,
-                        "m=%s %u %s %d\r\n"
-                        "b=TIAS:%u\r\n"
-                        "b=RR:0\r\n",
-                        type, dport, protocol, pt, bw);
+    vlc_memstream_printf(stream, "m=%s %u %s %u\r\n", type, dport, proto, pt);
 
-    newsdp = realloc (*sdp, outlen + 1);
-    if (newsdp == NULL)
-        return NULL;
-
-    *sdp = newsdp;
-    ptr = newsdp + inlen;
-
-    ptr += sprintf (ptr, "m=%s %u %s %u\r\n",
-                         type, dport, protocol, pt);
     if (bw > 0)
-        ptr += sprintf (ptr, "b=%s:%u\r\n", bw_indep ? "TIAS" : "AS", bw);
-    ptr += sprintf (ptr, "b=RR:0\r\n");
+        vlc_memstream_printf(stream, "b=%s:%u\r\n",
+                             bw_indep ? "TIAS" : "AS", bw);
+    vlc_memstream_printf(stream, "b=%s:%u\r\n", "RR", 0);
 
     /* RTP payload type map */
     if (ptname != NULL)
     {
-        if ((strcmp (type, "audio") == 0) && (chans != 1))
-            sdp_AddAttribute (sdp, "rtpmap", "%u %s/%u/%u", pt, ptname, clock,
-                              chans);
-        else
-            sdp_AddAttribute (sdp, "rtpmap", "%u %s/%u", pt, ptname, clock);
+        vlc_memstream_printf(stream, "a=rtpmap:%u %s/%u", pt, ptname, clock);
+        if ((strcmp(type, "audio") == 0) && (chans != 1))
+            vlc_memstream_printf(stream, "/%u", chans);
+        vlc_memstream_puts(stream, "\r\n");
     }
+
     /* Format parameters */
     if (fmtp != NULL)
-        sdp_AddAttribute (sdp, "fmtp", "%u %s", pt, fmtp);
-
-    return newsdp;
+        vlc_memstream_printf(stream, "a=fmtp:%u %s\r\n", pt, fmtp);
 }
 
-
-char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
-                     const struct sockaddr *src, size_t srclen,
-                     const struct sockaddr *addr, size_t addrlen)
+int vlc_sdp_Start(struct vlc_memstream *restrict stream,
+                  vlc_object_t *obj, const char *cfgpref,
+                  const struct sockaddr *src, size_t srclen,
+                  const struct sockaddr *addr, size_t addrlen)
 {
-    size_t cfglen = strlen (cfgpref);
-    if (cfglen > 100)
-        return NULL;
+    char connection[MAXSDPADDRESS];
+    char *str = NULL;
 
-    char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
-    strcpy (varname, cfgpref);
+    size_t cfglen = strlen(cfgpref);
+    if (cfglen >= 128)
+        return -1;
 
-    strcpy (subvar, "name");
-    char *name = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "description");
-    char *description = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "url");
-    char *url = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "email");
-    char *email = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "phone");
-    char *phone = var_GetNonEmptyString (obj, varname);
+    char varname[cfglen + sizeof ("description")];
+    char *subvar = varname + cfglen;
 
-    char *sdp = sdp_Start (name, description, url, email, phone,
-                           src, srclen, addr, addrlen);
-    free (name);
-    free (description);
-    free (url);
-    free (email);
-    free (phone);
+    strcpy(varname, cfgpref);
 
-    if (sdp == NULL)
-        return NULL;
+    vlc_memstream_open(stream);
+    vlc_memstream_puts(stream, "v=0\r\n");
 
-    strcpy (subvar, "cat");
-    char *cat = var_GetNonEmptyString (obj, varname);
-    if (cat != NULL)
+    if (AddressToSDP(addr, addrlen, connection) == NULL)
+        goto error;
     {
-        sdp_AddAttribute (&sdp, "cat", "%s", cat);
-        /* Totally non-standard */
-        sdp_AddAttribute (&sdp, "x-plgroup", "%s", cat);
-        free (cat);
+        const uint_fast64_t now = NTPtime64();
+        char hostname[256];
+
+        gethostname(hostname, sizeof (hostname));
+
+        vlc_memstream_printf(stream, "o=- %"PRIu64" %"PRIu64" IN IP%c %s\r\n",
+                             now, now, connection[5], hostname);
     }
 
-    return sdp;
+    strcpy(subvar, "name");
+    str = var_GetNonEmptyString(obj, varname);
+    if (str != NULL)
+    {
+        if (!IsSDPString(str))
+            goto error;
+
+        vlc_memstream_printf(stream, "s=%s\r\n", str);
+        free(str);
+    }
+    else
+        vlc_memstream_printf(stream, "s=%s\r\n", "Unnamed");
+
+    strcpy(subvar, "description");
+    str = var_GetNonEmptyString(obj, varname);
+    if (str != NULL)
+    {
+        if (!IsSDPString(str))
+            goto error;
+
+        vlc_memstream_printf(stream, "i=%s\r\n", str);
+        free(str);
+    }
+    else
+        vlc_memstream_printf(stream, "i=%s\r\n", "N/A");
+
+    strcpy(subvar, "url");
+    str = var_GetNonEmptyString(obj, varname);
+    if (str != NULL)
+    {
+        if (!IsSDPString(str))
+            goto error;
+
+        vlc_memstream_printf(stream, "u=%s\r\n", str);
+        free(str);
+    }
+
+    strcpy(subvar, "email");
+    str = var_GetNonEmptyString(obj, varname);
+    if (str != NULL)
+    {
+        if (!IsSDPString(str))
+            goto error;
+
+        vlc_memstream_printf(stream, "e=%s\r\n", str);
+        free(str);
+    }
+
+    strcpy(subvar, "phone");
+    str = var_GetNonEmptyString(obj, varname);
+    if (str != NULL)
+    {
+        if (!IsSDPString(str))
+            goto error;
+
+        vlc_memstream_printf(stream, "p=%s\r\n", str);
+        free(str);
+    }
+
+    vlc_memstream_printf(stream, "c=%s\r\n", connection);
+    // bandwidth not specified
+    vlc_memstream_puts(stream, "t=0 0\r\n"); // one dummy time span
+    // no repeating
+    // no time zone adjustment (silly idea anyway)
+    // no encryption key (deprecated)
+
+    vlc_memstream_printf(stream, "a=tool:%s\r\n", PACKAGE_STRING);
+    vlc_memstream_puts(stream, "a=recvonly\r\n");
+    vlc_memstream_puts(stream, "a=type:broadcast\r\n");
+    vlc_memstream_puts(stream, "a=charset:UTF-8\r\n");
+
+    if (srclen > 0)
+    {
+        char machine[MAXSDPADDRESS];
+
+        if (AddressToSDP(src, srclen, machine) != NULL)
+            vlc_memstream_printf(stream,
+                                 "a=source-filter: incl IN IP%c * %s\r\n",
+                                 machine[5], machine + 7);
+    }
+
+    strcpy(subvar, "cat");
+    str = var_GetNonEmptyString(obj, varname);
+    if (str != NULL)
+    {
+        if (IsSDPString(str))
+            goto error;
+
+        vlc_memstream_printf(stream, "a=cat:%s\r\n", str);
+        vlc_memstream_printf(stream, "a=x-plgroup:%s\r\n", str);
+        free(str);
+    }
+    return 0;
+error:
+    free(str);
+    if (vlc_memstream_close(stream) == 0)
+        free(stream->ptr);
+    return -1;
 }
