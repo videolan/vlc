@@ -46,7 +46,6 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QLabel>
-#include <QSpinBox>
 #include <QTextEdit>
 
 /************************************************************************

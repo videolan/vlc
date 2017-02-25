@@ -38,7 +38,6 @@
 class QTreeWidget;
 class QTreeWidgetItem;
 class QTableWidget;
-class QSpinBox;
 class QLineEdit;
 class CoverArtLabel;
 class QTextEdit;
