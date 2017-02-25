@@ -32,12 +32,23 @@
 #include <string.h>
 
 #include "h2frame.h"
+#include <vlc_common.h>
+#include "conn.h"
 
 #define CTX ((void *)(uintptr_t)0x44556677)
 
 static unsigned settings;
 
 /* Callbacks */
+void vlc_http_dbg(void *stream, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    vfprintf(stream, fmt, ap);
+    va_end(ap);
+}
+
 static void vlc_h2_setting(void *ctx, uint_fast16_t id, uint_fast32_t value)
 {
     assert(ctx == CTX);

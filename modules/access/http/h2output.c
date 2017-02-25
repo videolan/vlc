@@ -258,8 +258,6 @@ static void *vlc_h2_output_thread(void *data)
 
     while ((frame = vlc_h2_output_dequeue(out)) != NULL)
     {
-        vlc_h2_frame_dump(out->tls->obj, frame, "out");
-
         if (vlc_h2_frame_send(out->tls, frame))
         {   /* The connection failed asynchronously. The caller will be
              * notified at the next attempt to queue (as with TCP sockets). */

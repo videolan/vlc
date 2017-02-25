@@ -39,7 +39,7 @@
 #include "conn.h"
 #include "message.h"
 
-#define CO(c) ((c)->conn.tls->obj)
+#define CO(c) ((c)->opaque)
 #define SO(s) CO((s)->conn)
 
 /** HTTP/2 connection */
@@ -47,6 +47,7 @@ struct vlc_h2_conn
 {
     struct vlc_http_conn conn;
     struct vlc_h2_output *out; /**< Send thread */
+    void *opaque;
 
     struct vlc_h2_stream *streams; /**< List of open streams */
     uint32_t next_id; /**< Next free stream identifier */
@@ -80,6 +81,20 @@ struct vlc_h2_stream
     vlc_cond_t recv_wait;
 };
 
+static int vlc_h2_conn_queue(struct vlc_h2_conn *conn, struct vlc_h2_frame *f)
+{
+    vlc_h2_frame_dump(conn->opaque, f, "out");
+    return vlc_h2_output_send(conn->out, f);
+}
+
+static int vlc_h2_conn_queue_prio(struct vlc_h2_conn *conn,
+                                  struct vlc_h2_frame *f)
+{
+    vlc_h2_frame_dump(conn->opaque, f, "out (priority)");
+    return vlc_h2_output_send_prio(conn->out, f);
+}
+
+
 /* Stream callbacks */
 
 /** Looks a stream up by ID. */
@@ -100,11 +115,11 @@ static int vlc_h2_stream_error(void *ctx, uint_fast32_t id, uint_fast32_t code)
 
     /* NOTE: This function is used both w/ and w/o conn->lock. Care. */
     if (code != VLC_H2_NO_ERROR)
-        msg_Err(CO(conn), "local stream %"PRIuFAST32" error: "
-                "%s (0x%"PRIXFAST32")", id, vlc_h2_strerror(code), code);
+        vlc_http_err(CO(conn), "local stream %"PRIuFAST32" error: "
+                     "%s (0x%"PRIXFAST32")", id, vlc_h2_strerror(code), code);
     else
-        msg_Dbg(CO(conn), "local stream %"PRIuFAST32" shut down", id);
-    return vlc_h2_output_send(conn->out, vlc_h2_frame_rst_stream(id, code));
+        vlc_http_dbg(CO(conn), "local stream %"PRIuFAST32" shut down", id);
+    return vlc_h2_conn_queue(conn, vlc_h2_frame_rst_stream(id, code));
 }
 
 static int vlc_h2_stream_fatal(struct vlc_h2_stream *s, uint_fast32_t code)
@@ -125,15 +140,15 @@ static void vlc_h2_stream_headers(void *ctx, unsigned count,
      * Then it is safe to discard the existing header. */
     if (s->recv_hdr != NULL)
     {
-        msg_Dbg(SO(s), "stream %"PRIu32" discarding old headers", s->id);
+        vlc_http_dbg(SO(s), "stream %"PRIu32" discarding old headers", s->id);
         vlc_http_msg_destroy(s->recv_hdr);
         s->recv_hdr = NULL;
     }
 
-    msg_Dbg(SO(s), "stream %"PRIu32" %u headers:", s->id, count);
+    vlc_http_dbg(SO(s), "stream %"PRIu32" %u headers:", s->id, count);
 
     for (unsigned i = 0; i < count; i++)
-        msg_Dbg(SO(s), " %s: \"%s\"", hdrs[i][0], hdrs[i][1]);
+        vlc_http_dbg(SO(s), " %s: \"%s\"", hdrs[i][0], hdrs[i][1]);
 
     s->recv_hdr = vlc_http_msg_h2_headers(count, hdrs);
     if (unlikely(s->recv_hdr == NULL))
@@ -173,7 +188,7 @@ static void vlc_h2_stream_end(void *ctx)
 {
     struct vlc_h2_stream *s = ctx;
 
-    msg_Dbg(SO(s), "stream %"PRIu32" closed by peer", s->id);
+    vlc_http_dbg(SO(s), "stream %"PRIu32" closed by peer", s->id);
 
     s->recv_end = true;
     vlc_cond_broadcast(&s->recv_wait);
@@ -184,8 +199,8 @@ static int vlc_h2_stream_reset(void *ctx, uint_fast32_t code)
 {
     struct vlc_h2_stream *s = ctx;
 
-    msg_Err(SO(s), "peer stream %"PRIu32" error: %s (0x%"PRIXFAST32")",
-            s->id, vlc_h2_strerror(code), code);
+    vlc_http_err(SO(s), "peer stream %"PRIu32" error: %s (0x%"PRIXFAST32")",
+                 s->id, vlc_h2_strerror(code), code);
 
     s->recv_end = true;
     s->recv_err = ECONNRESET;
@@ -289,8 +304,7 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
     /* Credit the receive window if missing credit exceeds 50%. */
     uint_fast32_t credit = VLC_H2_INIT_WINDOW - s->recv_cwnd;
     if (credit >= (VLC_H2_INIT_WINDOW / 2)
-     && !vlc_h2_output_send(conn->out,
-                            vlc_h2_frame_window_update(s->id, credit)))
+     && !vlc_h2_conn_queue(conn, vlc_h2_frame_window_update(s->id, credit)))
         s->recv_cwnd += credit;
 
     vlc_h2_stream_unlock(s);
@@ -405,7 +419,7 @@ static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
 
     if (conn->next_id > 0x7ffffff)
     {   /* Out of stream identifiers */
-        msg_Dbg(CO(conn), "no more stream identifiers");
+        vlc_http_dbg(CO(conn), "no more stream identifiers");
         goto error;
     }
 
@@ -416,7 +430,7 @@ static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
     if (f == NULL)
         goto error;
 
-    vlc_h2_output_send(conn->out, f);
+    vlc_h2_conn_queue(conn, f);
 
     s->older = conn->streams;
     if (s->older != NULL)
@@ -439,8 +453,8 @@ static void vlc_h2_setting(void *ctx, uint_fast16_t id, uint_fast32_t value)
 {
     struct vlc_h2_conn *conn = ctx;
 
-    msg_Dbg(CO(conn), "setting: %s (0x%04"PRIxFAST16"): %"PRIuFAST32,
-            vlc_h2_setting_name(id), id, value);
+    vlc_http_dbg(CO(conn), "setting: %s (0x%04"PRIxFAST16"): %"PRIuFAST32,
+                 vlc_h2_setting_name(id), id, value);
 }
 
 /** Reports end of HTTP/2 peer settings */
@@ -448,7 +462,7 @@ static int vlc_h2_settings_done(void *ctx)
 {
     struct vlc_h2_conn *conn = ctx;
 
-    return vlc_h2_output_send(conn->out, vlc_h2_frame_settings_ack());
+    return vlc_h2_conn_queue(conn, vlc_h2_frame_settings_ack());
 }
 
 /** Reports a ping received from HTTP/2 peer */
@@ -456,7 +470,7 @@ static int vlc_h2_ping(void *ctx, uint_fast64_t opaque)
 {
     struct vlc_h2_conn *conn = ctx;
 
-    return vlc_h2_output_send_prio(conn->out, vlc_h2_frame_pong(opaque));
+    return vlc_h2_conn_queue_prio(conn, vlc_h2_frame_pong(opaque));
 }
 
 /** Reports a local HTTP/2 connection failure */
@@ -466,12 +480,12 @@ static void vlc_h2_error(void *ctx, uint_fast32_t code)
 
     /* NOTE: This function is used both w/ and w/o conn->lock. Care. */
     if (code != VLC_H2_NO_ERROR)
-        msg_Err(CO(conn), "local error: %s (0x%"PRIxFAST32")",
-                vlc_h2_strerror(code), code);
+        vlc_http_err(CO(conn), "local error: %s (0x%"PRIxFAST32")",
+                     vlc_h2_strerror(code), code);
     else
-        msg_Dbg(CO(conn), "local shutdown");
+        vlc_http_dbg(CO(conn), "local shutdown");
     /* NOTE: currently, the peer cannot create a stream, so ID=0 */
-    vlc_h2_output_send(conn->out, vlc_h2_frame_goaway(0, code));
+    vlc_h2_conn_queue(conn, vlc_h2_frame_goaway(0, code));
 }
 
 /** Reports a remote HTTP/2 connection error */
@@ -479,12 +493,12 @@ static int vlc_h2_reset(void *ctx, uint_fast32_t last_seq, uint_fast32_t code)
 {
     struct vlc_h2_conn *conn = ctx;
 
-    msg_Err(CO(conn), "peer error: %s (0x%"PRIxFAST32")",
-            vlc_h2_strerror(code), code);
-    msg_Dbg(CO(conn), "last stream: %"PRIuFAST32, last_seq);
+    vlc_http_err(CO(conn), "peer error: %s (0x%"PRIxFAST32")",
+                 vlc_h2_strerror(code), code);
+    vlc_http_dbg(CO(conn), "last stream: %"PRIuFAST32, last_seq);
 
     /* NOTE: currently, the peer cannot create a stream, so ID=0 */
-    vlc_h2_output_send(conn->out, vlc_h2_frame_goaway(0, VLC_H2_NO_ERROR));
+    vlc_h2_conn_queue(conn, vlc_h2_frame_goaway(0, VLC_H2_NO_ERROR));
 
     /* Prevent adding new streams on this end. */
     conn->next_id = 0x80000000;
@@ -504,8 +518,8 @@ static void vlc_h2_window_status(void *ctx, uint32_t *restrict rcwd)
     /* Maintain connection receive window to insanely large values.
      * Congestion control is done per stream instead. */
     if (*rcwd < (1 << 30)
-     && vlc_h2_output_send_prio(conn->out,
-                                vlc_h2_frame_window_update(0, 1 << 30)) == 0)
+     && vlc_h2_conn_queue_prio(conn,
+                               vlc_h2_frame_window_update(0, 1 << 30)) == 0)
         *rcwd += 1 << 30;
 }
 
@@ -641,7 +655,7 @@ static void *vlc_h2_recv_thread(void *data)
 
         if (frame == NULL)
         {
-            msg_Dbg(CO(conn), "connection shutdown");
+            vlc_http_dbg(CO(conn), "connection shutdown");
             break;
         }
 
@@ -700,7 +714,7 @@ static const struct vlc_http_conn_cbs vlc_h2_conn_callbacks =
     vlc_h2_conn_release,
 };
 
-struct vlc_http_conn *vlc_h2_conn_create(struct vlc_tls *tls)
+struct vlc_http_conn *vlc_h2_conn_create(void *ctx, struct vlc_tls *tls)
 {
     struct vlc_h2_conn *conn = malloc(sizeof (*conn));
     if (unlikely(conn == NULL))
@@ -709,6 +723,7 @@ struct vlc_http_conn *vlc_h2_conn_create(struct vlc_tls *tls)
     conn->conn.cbs = &vlc_h2_conn_callbacks;
     conn->conn.tls = tls;
     conn->out = vlc_h2_output_create(tls, true);
+    conn->opaque = ctx;
     conn->streams = NULL;
     conn->next_id = 1; /* TODO: server side */
     conn->released = false;
@@ -718,7 +733,7 @@ struct vlc_http_conn *vlc_h2_conn_create(struct vlc_tls *tls)
 
     vlc_mutex_init(&conn->lock);
 
-    if (vlc_h2_output_send(conn->out, vlc_h2_frame_settings())
+    if (vlc_h2_conn_queue(conn, vlc_h2_frame_settings())
      || vlc_clone(&conn->thread, vlc_h2_recv_thread, conn,
                   VLC_THREAD_PRIORITY_INPUT))
     {

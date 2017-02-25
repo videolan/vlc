@@ -116,9 +116,10 @@ struct vlc_h1_conn
     bool active;
     bool released;
     bool proxy;
+    void *opaque;
 };
 
-#define CO(conn) ((conn)->conn.tls->obj)
+#define CO(conn) ((conn)->opaque)
 
 static void vlc_h1_conn_destroy(struct vlc_h1_conn *conn);
 
@@ -126,7 +127,7 @@ static void *vlc_h1_stream_fatal(struct vlc_h1_conn *conn)
 {
     if (conn->conn.tls != NULL)
     {
-        msg_Dbg(CO(conn), "connection failed");
+        vlc_http_dbg(CO(conn), "connection failed");
         vlc_tls_Shutdown(conn->conn.tls, true);
         vlc_tls_Close(conn->conn.tls);
         conn->conn.tls = NULL;
@@ -155,7 +156,7 @@ static struct vlc_http_stream *vlc_h1_stream_open(struct vlc_http_conn *c,
     if (unlikely(payload == NULL))
         return NULL;
 
-    msg_Dbg(CO(conn), "outgoing request:\n%.*s", (int)len, payload);
+    vlc_http_dbg(CO(conn), "outgoing request:\n%.*s", (int)len, payload);
     val = vlc_tls_Write(conn->conn.tls, payload, len);
     free(payload);
 
@@ -185,7 +186,7 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
     if (payload == NULL)
         return vlc_h1_stream_fatal(conn);
 
-    msg_Dbg(CO(conn), "incoming response:\n%.*s", (int)len, payload);
+    vlc_http_dbg(CO(conn), "incoming response:\n%.*s", (int)len, payload);
 
     resp = vlc_http_msg_headers(payload);
     minor = vlc_http_minor(payload);
@@ -321,7 +322,7 @@ static const struct vlc_http_conn_cbs vlc_h1_conn_callbacks =
     vlc_h1_conn_release,
 };
 
-struct vlc_http_conn *vlc_h1_conn_create(vlc_tls_t *tls, bool proxy)
+struct vlc_http_conn *vlc_h1_conn_create(void *ctx, vlc_tls_t *tls, bool proxy)
 {
     struct vlc_h1_conn *conn = malloc(sizeof (*conn));
     if (unlikely(conn == NULL))
@@ -333,6 +334,7 @@ struct vlc_http_conn *vlc_h1_conn_create(vlc_tls_t *tls, bool proxy)
     conn->active = false;
     conn->released = false;
     conn->proxy = proxy;
+    conn->opaque = ctx;
 
     return &conn->conn;
 }

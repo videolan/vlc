@@ -98,7 +98,7 @@ static void conn_create(void)
 
     external_fd = fds[0];
 
-    conn = vlc_h2_conn_create(tls);
+    conn = vlc_h2_conn_create(NULL, tls);
     assert(conn != NULL);
     conn_send(vlc_h2_frame_settings());
 

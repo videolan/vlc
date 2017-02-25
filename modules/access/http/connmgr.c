@@ -34,6 +34,24 @@
 
 #pragma GCC visibility push(default)
 
+void vlc_http_err(void *ctx, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_GenericVa((vlc_object_t *)ctx, VLC_MSG_ERR, fmt, ap);
+    va_end(ap);
+}
+
+void vlc_http_dbg(void *ctx, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_GenericVa((vlc_object_t *)ctx, VLC_MSG_DBG, fmt, ap);
+    va_end(ap);
+}
+
 static char *vlc_http_proxy_find(const char *hostname, unsigned port,
                                  bool secure)
 {
@@ -62,7 +80,8 @@ static vlc_tls_t *vlc_https_connect_i11e(vlc_tls_creds_t *creds,
     char *proxy = vlc_http_proxy_find(host, port, true);
     if (proxy != NULL)
     {
-        tls = vlc_https_connect_proxy(creds, host, port, http_two, proxy);
+        tls = vlc_https_connect_proxy(creds->obj.parent, creds, host, port,
+                                      http_two, proxy);
         free(proxy);
     }
     else
@@ -186,9 +205,9 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
      * NOTE: We do not enforce TLS version 1.2 for HTTP 2.0 explicitly.
      */
     if (http2)
-        conn = vlc_h2_conn_create(tls);
+        conn = vlc_h2_conn_create(mgr->obj, tls);
     else
-        conn = vlc_h1_conn_create(tls, false);
+        conn = vlc_h1_conn_create(mgr->obj, tls, false);
 
     if (unlikely(conn == NULL))
     {
@@ -220,9 +239,9 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
     struct vlc_http_conn *conn;
 
     if (mgr->use_h2c)
-        conn = vlc_h2_conn_create(tls);
+        conn = vlc_h2_conn_create(mgr->obj, tls);
     else
-        conn = vlc_h1_conn_create(tls, proxy);
+        conn = vlc_h1_conn_create(mgr->obj, tls, proxy);
 
     if (unlikely(conn == NULL))
     {

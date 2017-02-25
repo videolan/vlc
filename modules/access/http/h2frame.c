@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 
+#include "conn.h"
 #include "hpack.h"
 #include "h2frame.h"
 
@@ -403,8 +404,8 @@ const char *vlc_h2_strerror(uint_fast32_t code)
     return names[code];
 }
 
-void (vlc_h2_frame_dump)(vlc_object_t *obj, const struct vlc_h2_frame *f,
-                         const char *msg)
+void vlc_h2_frame_dump(void *opaque, const struct vlc_h2_frame *f,
+                       const char *msg)
 {
     size_t len = vlc_h2_frame_length(f);
     uint_fast8_t type = vlc_h2_frame_type(f);
@@ -412,13 +413,13 @@ void (vlc_h2_frame_dump)(vlc_object_t *obj, const struct vlc_h2_frame *f,
     uint_fast32_t sid = vlc_h2_frame_id(f);
 
     if (sid != 0)
-        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %zu bytes, "
-                "flags 0x%02"PRIxFAST8", stream %"PRIuFAST32, msg,
-                vlc_h2_type_name(type), type, len,  flags, sid);
+        vlc_http_dbg(opaque, "%s %s (0x%02"PRIxFAST8") frame of %zu bytes, "
+                     "flags 0x%02"PRIxFAST8", stream %"PRIuFAST32, msg,
+                     vlc_h2_type_name(type), type, len,  flags, sid);
     else
-        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %zu bytes, "
-                "flags 0x%02"PRIxFAST8", global", msg,
-                vlc_h2_type_name(type), type, len,  flags);
+        vlc_http_dbg(opaque, "%s %s (0x%02"PRIxFAST8") frame of %zu bytes, "
+                     "flags 0x%02"PRIxFAST8", global", msg,
+                     vlc_h2_type_name(type), type, len,  flags);
 }
 
 const uint8_t *(vlc_h2_frame_data_get)(const struct vlc_h2_frame *f,

@@ -25,7 +25,7 @@
 #undef NDEBUG
 
 #include <assert.h>
-#include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -52,7 +52,7 @@ static void conn_create(void)
 
     external_fd = fds[0];
 
-    conn = vlc_h1_conn_create(tls, false);
+    conn = vlc_h1_conn_create(NULL, tls, false);
     assert(conn != NULL);
 }
 

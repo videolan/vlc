@@ -138,9 +138,9 @@ int main(void)
     bool two = false;
 
     /* Test bad URLs */
-    vlc_https_connect_proxy(NULL, "www.example.com", 0, &two,
+    vlc_https_connect_proxy(NULL, NULL, "www.example.com", 0, &two,
                             "/test");
-    vlc_https_connect_proxy(NULL, "www.example.com", 0, &two,
+    vlc_https_connect_proxy(NULL, NULL, "www.example.com", 0, &two,
                             "ftp://proxy.example.com/");
 
     int lfd = server_socket(&port);
@@ -153,7 +153,7 @@ int main(void)
     assert(url != NULL);
 
     /* Test connection failure */
-    vlc_https_connect_proxy(NULL, "www.example.com", 0, &two, url);
+    vlc_https_connect_proxy(NULL, NULL, "www.example.com", 0, &two, url);
 
     if (listen(lfd, 255))
     {
@@ -167,7 +167,7 @@ int main(void)
         assert(!"Thread error");
 
     /* Test proxy error */
-    vlc_https_connect_proxy(NULL, "www.example.com", 0, &two, url);
+    vlc_https_connect_proxy(NULL, NULL, "www.example.com", 0, &two, url);
 
     vlc_cancel(th);
     vlc_join(th, NULL);
