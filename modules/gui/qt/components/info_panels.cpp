@@ -39,6 +39,7 @@
 #include <vlc_meta.h>
 
 #include <QTreeWidget>
+#include <QTableWidget>
 #include <QHeaderView>
 #include <QList>
 #include <QStringList>
@@ -396,11 +397,11 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
-     extraMeta = new QTreeWidget( this );
+     extraMeta = new QTableWidget( this );
      extraMeta->setAlternatingRowColors( true );
      extraMeta->setColumnCount( 2 );
-     extraMeta->resizeColumnToContents( 0 );
-     extraMeta->setHeaderHidden( true );
+     extraMeta->horizontalHeader()->hide();
+     extraMeta->verticalHeader()->hide();
      layout->addWidget( extraMeta, 1, 0 );
 }
 
@@ -409,49 +410,46 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
  **/
 void ExtraMetaPanel::update( input_item_t *p_item )
 {
+    extraMeta->setRowCount(0);
+
     if( !p_item )
-    {
-        clear();
         return;
-    }
 
-    QList<QTreeWidgetItem *> items;
-
-    extraMeta->clear();
-
-    vlc_mutex_lock( &p_item->lock );
+    vlc_mutex_locker meta_lock( &p_item->lock );
     vlc_meta_t *p_meta = p_item->p_meta;
+
     if( !p_meta )
-    {
-        vlc_mutex_unlock( &p_item->lock );
         return;
-    }
 
-    const char *psz_disc_number = vlc_meta_Get( p_meta, vlc_meta_DiscNumber);
-    if( psz_disc_number )
+    struct AddRowHelper {
+        AddRowHelper( QTableWidget* target ) : target( target ) { }
+
+        void operator()( char const* psz_key, char const* psz_value )
+        {
+            int idx = target->rowCount();
+
+            target->insertRow( idx );
+
+            target->setItem( idx, 0, new QTableWidgetItem( qfu( psz_key ) ) );
+            target->setItem( idx, 1, new QTableWidgetItem( qfu( psz_value ) ) );
+        }
+
+        QTableWidget* target;
+
+    } add_row ( extraMeta );
+
+    if( char const* psz_disc = vlc_meta_Get( p_meta,  vlc_meta_DiscNumber ) )
+        add_row( VLC_META_DISCNUMBER, psz_disc );
+
+    char ** ppsz_keys = vlc_meta_CopyExtraNames( p_meta );
+
+    for( int i = 0; ppsz_keys[i]; ++i )
     {
-        QStringList tempItem;
-        tempItem.append( VLC_META_DISCNUMBER );
-        tempItem.append( qfu( psz_disc_number ) );
-        items.append( new QTreeWidgetItem ( extraMeta, tempItem ) );
+        add_row( ppsz_keys[i], vlc_meta_GetExtra( p_meta, ppsz_keys[i] ) );
+        free( ppsz_keys[i] );
     }
 
-    char ** ppsz_allkey = vlc_meta_CopyExtraNames( p_meta);
-
-    for( int i = 0; ppsz_allkey[i] ; i++ )
-    {
-        const char * psz_value = vlc_meta_GetExtra( p_meta, ppsz_allkey[i] );
-        QStringList tempItem;
-        tempItem.append( qfu( ppsz_allkey[i] ) + " : ");
-        tempItem.append( qfu( psz_value ) );
-        items.append( new QTreeWidgetItem ( extraMeta, tempItem ) );
-        free( ppsz_allkey[i] );
-    }
-    vlc_mutex_unlock( &p_item->lock );
-    free( ppsz_allkey );
-
-    extraMeta->addTopLevelItems( items );
-    extraMeta->resizeColumnToContents( 0 );
+    extraMeta->verticalHeader()->resizeSections( QHeaderView::ResizeToContents );
 }
 
 /**
