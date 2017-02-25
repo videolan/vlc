@@ -3911,8 +3911,8 @@ then
   AS_IF([test "x${DMGBUILD}" = "xno"], [
     AC_MSG_WARN([dmgbuild not found -- unable to build fancy DMGs])
   ])
-  AM_CONDITIONAL(HAVE_DMGBUILD, [test "x$DMGBUILD" != "xno"])
 fi
+AM_CONDITIONAL(HAVE_DMGBUILD, [test "x$DMGBUILD" != "xno" -a "${HAVE_OSX}" = "1"])
 
 dnl
 dnl  VideoToolbox plugins
