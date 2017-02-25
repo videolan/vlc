@@ -281,8 +281,9 @@ static int
 StreamExtractorAttach( stream_t** source, char const* identifier,
     char const* module_name )
 {
-    char const* capability = identifier ? "stream_extractor"
-                                        : "stream_directory";
+    const bool extractor = identifier != NULL;
+    char const* capability = extractor ? "stream_extractor"
+                                       : "stream_directory";
 
     struct stream_extractor_private* priv = vlc_custom_create(
         (*source)->obj.parent, sizeof( *priv ), capability );
@@ -290,7 +291,7 @@ StreamExtractorAttach( stream_t** source, char const* identifier,
     if( unlikely( !priv ) )
         return VLC_ENOMEM;
 
-    if( strcmp( capability, "stream_extractor" ) == 0 )
+    if( extractor )
     {
         priv->object = VLC_OBJECT( &priv->extractor );
 
