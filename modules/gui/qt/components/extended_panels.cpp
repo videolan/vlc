@@ -52,7 +52,7 @@
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 
-static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add );
+static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add );
 static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 
@@ -257,7 +257,7 @@ void ExtVideo::clean()
     ui.cropRightPx->setValue( 0 );
 }
 
-static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
+static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
 {
     char* psz_chain = config_GetPsz( p_intf, psz_filter_type );
 
@@ -269,13 +269,11 @@ static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_
 
     free( psz_chain );
 
-    return strdup( qtu( list.join( ':' ) ) );
+    return list.join( ':' );
 }
 
 static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
 {
-    char *psz_string;
-
     module_t *p_obj = module_find( psz_name );
     if( !p_obj )
     {
@@ -283,13 +281,8 @@ static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_
         return;
     }
 
-    psz_string = ChangeFiltersString( p_intf, "audio-filter", psz_name, b_add );
-    if( !psz_string )
-        return;
-
-    config_PutPsz( p_intf, "audio-filter", psz_string );
-
-    free( psz_string );
+    QString result = ChangeFiltersString( p_intf, "audio-filteR", psz_name, b_add );
+    config_PutPsz( p_intf, "audio-filter", qtu( result ) );
 }
 
 static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz_name )
@@ -318,33 +311,28 @@ static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz
 
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
 {
-    char *psz_string;
     const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
 
-    psz_string = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
-    if( !psz_string )
-        return;
+    QString result = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
 
     /* Vout is not kept, so put that in the config */
-    config_PutPsz( p_intf, psz_filter_type, psz_string );
+    config_PutPsz( p_intf, psz_filter_type, qtu( result ) );
 
     /* Try to set on the fly */
     if( !strcmp( psz_filter_type, "video-splitter" ) )
     {
         playlist_t *p_playlist = THEPL;
-        var_SetString( p_playlist, psz_filter_type, psz_string );
+        var_SetString( p_playlist, psz_filter_type, qtu( result ) );
     }
     else
     {
         vout_thread_t *p_vout = THEMIM->getVout();
         if( p_vout )
         {
-            var_SetString( p_vout, psz_filter_type, psz_string );
+            var_SetString( p_vout, psz_filter_type, qtu( result ) );
             vlc_object_release( p_vout );
         }
     }
-
-    free( psz_string );
 }
 
 void ExtVideo::updateFilters()
