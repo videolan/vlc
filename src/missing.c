@@ -196,7 +196,7 @@ httpd_url_t *httpd_UrlNew (httpd_host_t *host, const char *url,
 #ifndef ENABLE_SOUT
 # include <vlc_sout.h>
 
-char *sdp_AddMedia (char **sdp, const char *type, const char *protocol,
+void sdp_AddMedia (struct vlc_memstream *sdp, const char *type, const char *protocol,
                     int dport, unsigned pt, bool bw_indep, unsigned bw,
                     const char *ptname, unsigned clockrate, unsigned channels,
                     const char *fmtp)
@@ -205,13 +205,13 @@ char *sdp_AddMedia (char **sdp, const char *type, const char *protocol,
     VLC_UNUSED (dport); VLC_UNUSED (pt); VLC_UNUSED (bw_indep);
     VLC_UNUSED (bw); VLC_UNUSED (ptname); VLC_UNUSED (clockrate);
     VLC_UNUSED (channels); VLC_UNUSED (fmtp);
-    assert (*sdp == NULL);
+    assert (sdp == NULL);
 }
 
-char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
+void sdp_AddAttribute (struct vlc_memstream *sdp, const char *name, const char *fmt, ...)
 {
     VLC_UNUSED (sdp); VLC_UNUSED (name); VLC_UNUSED (fmt);
-    assert (*sdp == NULL);
+    assert (sdp == NULL);
 }
 
 int sout_AccessOutControl (sout_access_out_t *out, int query, ...)
@@ -335,13 +335,13 @@ sout_stream_t *sout_StreamChainNew (sout_instance_t *p_sout, const char *psz_cha
     vlc_assert_unreachable ();
 }
 
-char *vlc_sdp_Start (vlc_object_t *obj, const char *cfg,
+int vlc_sdp_Start (struct vlc_memstream *sdp, vlc_object_t *obj, const char *cfg,
                      const struct sockaddr *src, size_t srclen,
                      const struct sockaddr *addr, size_t addrlen)
 {
     VLC_UNUSED (obj); VLC_UNUSED (cfg); VLC_UNUSED (src); VLC_UNUSED (srclen);
     VLC_UNUSED (addr); VLC_UNUSED (addrlen);
-    return NULL;
+    return 0;
 }
 #endif /* !ENABLE_SOUT */
 
