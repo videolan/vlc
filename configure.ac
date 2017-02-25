@@ -3903,6 +3903,18 @@ then
 fi
 
 dnl
+dnl Mac OS X fancy dmg build tool
+dnl
+if test "${HAVE_OSX}" = "1"
+then
+  AC_PATH_PROG(DMGBUILD, dmgbuild, no)
+  AS_IF([test "x${DMGBUILD}" = "xno"], [
+    AC_MSG_WARN([dmgbuild not found -- unable to build fancy DMGs])
+  ])
+  AM_CONDITIONAL(HAVE_DMGBUILD, [test "x$DMGBUILD" != "xno"])
+fi
+
+dnl
 dnl  VideoToolbox plugins
 AC_CHECK_HEADERS(VideoToolbox/VideoToolbox.h, [
     VLC_ADD_PLUGIN([videotoolbox])
