@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -79,6 +80,8 @@ typedef struct xa_header_t
     uint16_t wBitsPerSample;
 } xa_header_t;
 
+static_assert(offsetof(xa_header_t, wBitsPerSample) == 22, "Bad padding");
+
 #define FRAME_LENGTH 28 /* samples per frame */
 
 /*****************************************************************************
@@ -87,46 +90,46 @@ typedef struct xa_header_t
 static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys;
-    xa_header_t p_xa;
-    const uint8_t *p_buf;
+    const uint8_t *peek;
 
     /* XA file heuristic */
-    if( vlc_stream_Peek( p_demux->s, &p_buf, sizeof( p_xa ) )
-            < (signed)sizeof( p_xa ) )
+    if( vlc_stream_Peek( p_demux->s, &peek, 10 ) < 10 )
+        return VLC_EGENERIC;
+    if( memcmp( peek, "XAI", 4 ) && memcmp( peek, "XAJ", 4 ) )
+        return VLC_EGENERIC;
+    if( GetWLE( peek + 8 ) != 1 ) /* format tag */
         return VLC_EGENERIC;
 
-    memcpy( &p_xa, p_buf, sizeof( p_xa ) );
-    if( ( strncmp( p_xa.xa_id, "XAI", 4 )
-       && strncmp( p_xa.xa_id, "XAJ", 4 ) )
-     || ( GetWLE( &p_xa.wFormatTag  ) != 0x0001)
-     || ( GetWLE( &p_xa.wBitsPerSample ) != 16) )
-        return VLC_EGENERIC;
-
-    p_sys = malloc( sizeof( demux_sys_t ) );
+    demux_sys_t *p_sys = malloc( sizeof( demux_sys_t ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    /* skip XA header -- cannot fail */
-    vlc_stream_Read( p_demux->s, NULL, sizeof( p_xa ) );
+    /* read XA header*/
+    xa_header_t xa;
+
+    if( vlc_stream_Read( p_demux->s, &xa, 24 ) < 24 )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     es_format_t fmt;
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('X','A','J',0) );
 
     msg_Dbg( p_demux, "assuming EA ADPCM audio codec" );
-    fmt.audio.i_rate = GetDWLE( &p_xa.nSamplesPerSec );
-    fmt.audio.i_bytes_per_frame = 15 * GetWLE( &p_xa.nChannels );
+    fmt.audio.i_rate = GetDWLE( &xa.nSamplesPerSec );
+    fmt.audio.i_bytes_per_frame = 15 * GetWLE( &xa.nChannels );
     fmt.audio.i_frame_length = FRAME_LENGTH;
 
-    fmt.audio.i_channels = GetWLE ( &p_xa.nChannels );
+    fmt.audio.i_channels = GetWLE ( &xa.nChannels );
     fmt.audio.i_blockalign = fmt.audio.i_bytes_per_frame;
-    fmt.audio.i_bitspersample = 16;
+    fmt.audio.i_bitspersample = GetWLE( &xa.wBitsPerSample );
     fmt.i_bitrate = (fmt.audio.i_rate * fmt.audio.i_bytes_per_frame * 8)
                     / fmt.audio.i_frame_length;
 
     p_sys->i_data_offset = vlc_stream_Tell( p_demux->s );
     /* FIXME: better computation */
-    p_sys->i_data_size = p_xa.iSize * 15 / 56;
+    p_sys->i_data_size = xa.iSize * 15 / 56;
     /* How many frames per block (1:1 is too CPU intensive) */
     p_sys->i_block_frames = fmt.audio.i_rate / (FRAME_LENGTH * 20) + 1;
     p_sys->i_frame_size = fmt.audio.i_bytes_per_frame;
@@ -137,7 +140,8 @@ static int Open( vlc_object_t * p_this )
              (char *)&fmt.i_codec, fmt.audio.i_channels, fmt.audio.i_rate,
              fmt.i_bitrate / 8192, fmt.audio.i_blockalign );
 
-    if( fmt.audio.i_rate == 0 || fmt.audio.i_channels == 0 )
+    if( fmt.audio.i_rate == 0 || fmt.audio.i_channels == 0
+     || fmt.audio.i_bitspersample != 16 )
     {
         free( p_sys );
         return VLC_EGENERIC;
