@@ -39,7 +39,7 @@ class chapter_edition_c;
 class chapter_translation_c;
 class chapter_item_c;
 
-struct mkv_track_t;
+class mkv_track_t;
 struct mkv_index_t;
 
 typedef enum
