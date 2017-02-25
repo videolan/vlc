@@ -107,11 +107,6 @@ static int Open( vlc_object_t * p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys;
-    p_sys->p_es         = NULL;
-
     /* skip XA header -- cannot fail */
     vlc_stream_Read( p_demux->s, NULL, sizeof( p_xa ) );
 
@@ -153,6 +148,9 @@ static int Open( vlc_object_t * p_this )
     date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
     date_Set( &p_sys->pts, VLC_TS_0 );
 
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys      = p_sys;
     return VLC_SUCCESS;
 }
 
