@@ -82,7 +82,7 @@ int vlc_memstream_putc(struct vlc_memstream *ms, int c)
     return fputc(c, ms->stream);
 }
 
-int vlc_memstream_puts(struct vlc_memstream *ms, const char *str)
+int (vlc_memstream_puts)(struct vlc_memstream *ms, const char *str)
 {
     if (unlikely(ms->stream == NULL))
         return EOF;
@@ -145,7 +145,7 @@ int vlc_memstream_putc(struct vlc_memstream *ms, int c)
     return (vlc_memstream_write(ms, &(unsigned char){ c }, 1u) == 1) ? c : EOF;
 }
 
-int vlc_memstream_puts(struct vlc_memstream *ms, const char *str)
+int (vlc_memstream_puts)(struct vlc_memstream *ms, const char *str)
 {
     size_t len = strlen(str);
     return (vlc_memstream_write(ms, str, len) == len) ? 0 : EOF;

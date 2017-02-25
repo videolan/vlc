@@ -62,4 +62,15 @@ VLC_API
 int vlc_memstream_printf(struct vlc_memstream *s, const char *fmt,
                          ...) VLC_FORMAT(2,3);
 
+# ifdef __GNUC__
+static inline int vlc_memstream_puts_len(struct vlc_memstream *ms,
+                                         const char *str, size_t len)
+{
+    return (vlc_memstream_write(ms, str, len) == len) ? (int)len : EOF;
+}
+#  define vlc_memstream_puts(ms,s) \
+    (__builtin_constant_p(__builtin_strlen(s)) ? \
+        vlc_memstream_puts_len(ms,s,__builtin_strlen(s)) : \
+        vlc_memstream_puts(ms,s))
+# endif
 #endif /* VLC_MEMSTREAM_H */
