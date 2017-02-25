@@ -221,7 +221,7 @@ enum vlc_module_properties
 #   define DLL_SYMBOL              __declspec(dllexport)
 #   undef CDECL_SYMBOL
 #   define CDECL_SYMBOL            __cdecl
-# elif VLC_GCC_VERSION(4,0)
+# elif defined (__GNUC__)
 #   define DLL_SYMBOL              __attribute__((visibility("default")))
 # else
 #  define DLL_SYMBOL

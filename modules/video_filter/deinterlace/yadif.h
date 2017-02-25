@@ -24,11 +24,7 @@
 
 #if defined(__GNUC__)
 #  define DECLARE_ALIGNED(n,t,v)      t __attribute__ ((aligned (n))) v
-#  if VLC_GCC_VERSION(3,1)
-#    define DECLARE_ASM_CONST(n,t,v)    static const t __attribute__((used)) __attribute__ ((aligned (n))) v
-#  else
-#    define DECLARE_ASM_CONST(n,t,v)    static const t __attribute__ ((aligned (n))) v
-#  endif
+#  define DECLARE_ASM_CONST(n,t,v)    static const t __attribute__((used)) __attribute__ ((aligned (n))) v
 #elif defined(_MSC_VER)
 #    define DECLARE_ASM_CONST(n,t,v)    __declspec(align(n)) static const t v
 #endif
@@ -41,7 +37,7 @@ DECLARE_ASM_CONST(16, xmm_reg, pw_1) = {0x0001000100010001ULL, 0x000100010001000
 
 
 #ifdef CAN_COMPILE_SSSE3
-#if defined(__SSE__) || VLC_GCC_VERSION(4, 4) || defined(__clang__)
+#if defined(__SSE__) || defined(__GNUC__) || defined(__clang__)
 // ================ SSSE3 =================
 #define HAVE_YADIF_SSSE3
 #define COMPILE_TEMPLATE_SSE 1
@@ -57,7 +53,7 @@ DECLARE_ASM_CONST(16, xmm_reg, pw_1) = {0x0001000100010001ULL, 0x000100010001000
 #endif
 
 #ifdef CAN_COMPILE_SSE2
-#if defined(__SSE__) || VLC_GCC_VERSION(4, 4) || defined(__clang__)
+#if defined(__SSE__) || defined(__GNUC__) || defined(__clang__)
 // ================= SSE2 =================
 #define HAVE_YADIF_SSE2
 #define COMPILE_TEMPLATE_SSE 1
@@ -71,7 +67,7 @@ DECLARE_ASM_CONST(16, xmm_reg, pw_1) = {0x0001000100010001ULL, 0x000100010001000
 #endif
 
 #ifdef CAN_COMPILE_MMX
-#if defined(__MMX__) || VLC_GCC_VERSION(4, 4) || defined(__clang__)
+#if defined(__MMX__) || defined(__GNUC__) || defined(__clang__)
 // ================ MMX =================
 #define HAVE_YADIF_MMX
 #define VLC_TARGET VLC_MMX

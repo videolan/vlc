@@ -84,20 +84,14 @@
 #ifdef __GNUC__
 # define VLC_DEPRECATED __attribute__((deprecated))
 
-# if defined( _WIN32 ) && VLC_GCC_VERSION(4,4)
+# if defined( _WIN32 )
 #  define VLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
 # else
 #  define VLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
 # endif
 # define VLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
-
 # define VLC_MALLOC __attribute__ ((malloc))
-
-# if VLC_GCC_VERSION(3,4)
-#  define VLC_USED __attribute__ ((warn_unused_result))
-# else
-#  define VLC_USED
-# endif
+# define VLC_USED __attribute__ ((warn_unused_result))
 
 #else
 # define VLC_DEPRECATED
@@ -130,7 +124,7 @@
 
 #if defined (_WIN32) && defined (DLL_EXPORT)
 # define VLC_EXPORT __declspec(dllexport)
-#elif VLC_GCC_VERSION(4,0)
+#elif defined (__GNUC__)
 # define VLC_EXPORT __attribute__((visibility("default")))
 #else
 # define VLC_EXPORT
@@ -477,7 +471,7 @@ struct vlc_common_members
         struct vlc_common_members: (vlc_object_t *)(&(x)->obj), \
         const struct vlc_common_members: (const vlc_object_t *)(&(x)->obj) \
     )
-#elif VLC_GCC_VERSION(4,0)
+#elif defined (__GNUC__)
 # ifndef __cplusplus
 #  define VLC_OBJECT( x ) \
     __builtin_choose_expr( \
@@ -537,7 +531,7 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 VLC_USED
 static inline unsigned (clz)(unsigned x)
 {
-#if VLC_GCC_VERSION(3,4)
+#ifdef __GNUC__
     return __builtin_clz (x);
 #else
     unsigned i = sizeof (x) * 8;
@@ -560,7 +554,7 @@ static inline unsigned (clz)(unsigned x)
 VLC_USED
 static inline unsigned (ctz)(unsigned x)
 {
-#if VLC_GCC_VERSION(3,4)
+#ifdef __GNUC__
     return __builtin_ctz (x);
 #else
     unsigned i = sizeof (x) * 8;
@@ -578,7 +572,7 @@ static inline unsigned (ctz)(unsigned x)
 VLC_USED
 static inline unsigned (popcount)(unsigned x)
 {
-#if VLC_GCC_VERSION(3,4)
+#ifdef __GNUC__
     return __builtin_popcount (x);
 #else
     unsigned count = 0;
@@ -595,7 +589,7 @@ static inline unsigned (popcount)(unsigned x)
 VLC_USED
 static inline int (popcountll)(unsigned long long x)
 {
-#if VLC_GCC_VERSION(3,4)
+#ifdef __GNUC__
     return __builtin_popcountll(x);
 #else
     int count = 0;
@@ -611,7 +605,7 @@ static inline int (popcountll)(unsigned long long x)
 VLC_USED
 static inline unsigned (parity)(unsigned x)
 {
-#if VLC_GCC_VERSION(3,4)
+#ifdef __GNUC__
     return __builtin_parity (x);
 #else
     for (unsigned i = 4 * sizeof (x); i > 0; i /= 2)
@@ -631,7 +625,7 @@ static inline uint16_t (bswap16)(uint16_t x)
 VLC_USED
 static inline uint32_t (bswap32)(uint32_t x)
 {
-#if VLC_GCC_VERSION(4,3) || defined(__clang__)
+#if defined (__GNUC__) || defined(__clang__)
     return __builtin_bswap32 (x);
 #else
     return ((x & 0x000000FF) << 24)
@@ -645,7 +639,7 @@ static inline uint32_t (bswap32)(uint32_t x)
 VLC_USED
 static inline uint64_t (bswap64)(uint64_t x)
 {
-#if VLC_GCC_VERSION(4,3) || defined(__clang__)
+#if defined (__GNUC__) || defined(__clang__)
     return __builtin_bswap64 (x);
 #elif !defined (__cplusplus)
     return ((x & 0x00000000000000FF) << 56)
