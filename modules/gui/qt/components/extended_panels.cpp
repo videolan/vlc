@@ -56,12 +56,12 @@ static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_
 static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 
-const QString ModuleFromWidgetName( QObject *obj )
+static const QString ModuleFromWidgetName( QObject *obj )
 {
     return obj->objectName().replace( "Enable","" );
 }
 
-QString OptionFromWidgetName( QObject *obj )
+static QString OptionFromWidgetName( QObject *obj )
 {
     /* Gruik ? ... nah */
     QString option = obj->objectName().replace( "Slider", "" )
