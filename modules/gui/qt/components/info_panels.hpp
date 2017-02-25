@@ -70,7 +70,6 @@ private:
     QLineEdit *seqtot_text;
 
     QTextEdit *description_text;
-//    QSpinBox *rating_text;
     QLineEdit *date_text;
 //    QLineEdit *setting_text;
     QLineEdit *language_text;

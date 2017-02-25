@@ -122,13 +122,6 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( seqtot_text, line, 9, 1, 1 );
     line++;
 
-    /* Rating - on the same line */
-    /*
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) ), line, 4, 1, 2 );
-    rating_text = new QSpinBox; setSpinBounds( rating_text );
-    metaLayout->addWidget( rating_text, line, 6, 1, 1 );
-    */
-
     /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
     ADD_META( VLC_META_NOW_PLAYING, nowplaying_text, 0, 7 );
     nowplaying_text->setReadOnly( true ); line--;
@@ -182,7 +175,6 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
 //    CONNECT( THEMIM->getIM(), artChanged( QString ), this, enterEditMode() );
-/*    CONNECT( rating_text, valueChanged( QString ), this, enterEditMode( QString ) );*/
 
     /* We are not yet in Edit Mode */
     b_inEditMode = false;
@@ -249,7 +241,6 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( TrackNum, seqnum_text );
     UPDATE_META( TrackTotal, seqtot_text );
 //    UPDATE_META( Setting, setting_text );
-//    UPDATE_META_INT( Rating, rating_text );
 
     /* Now Playing || ES Now Playing */
     psz_meta = input_item_GetNowPlayingFb( p_item );
