@@ -402,6 +402,18 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
      extraMeta->setColumnCount( 2 );
      extraMeta->horizontalHeader()->hide();
      extraMeta->verticalHeader()->hide();
+
+     extraMeta->horizontalHeader()->setStretchLastSection(true);
+     extraMeta->resizeRowsToContents();
+
+     extraMeta->setVerticalScrollMode( QAbstractItemView::ScrollPerPixel );
+     extraMeta->setHorizontalScrollMode( QAbstractItemView::ScrollPerPixel );
+
+     extraMeta->setSelectionBehavior( QAbstractItemView::SelectRows );
+
+     extraMeta->setEditTriggers( QAbstractItemView::NoEditTriggers );
+     extraMeta->setSelectionMode( QAbstractItemView::SingleSelection );
+
      layout->addWidget( extraMeta, 1, 0 );
 }
 
@@ -430,7 +442,12 @@ void ExtraMetaPanel::update( input_item_t *p_item )
 
             target->insertRow( idx );
 
-            target->setItem( idx, 0, new QTableWidgetItem( qfu( psz_key ) ) );
+            QTableWidgetItem *key = new QTableWidgetItem( qfu( psz_key ) );
+
+            key->setTextAlignment( Qt::AlignRight );
+            key->setFlags( key->flags() ^ Qt::ItemIsSelectable );
+
+            target->setItem( idx, 0, key );
             target->setItem( idx, 1, new QTableWidgetItem( qfu( psz_value ) ) );
         }
 
