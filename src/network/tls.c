@@ -480,6 +480,31 @@ static ssize_t vlc_tls_Connect(vlc_tls_t *tls)
 static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
                                     const struct iovec *iov,unsigned count)
 {
+#ifdef MSG_FASTOPEN
+    vlc_tls_socket_t *sock = (vlc_tls_socket_t *)tls;
+    const struct msghdr msg =
+    {
+        .msg_name = sock->peer,
+        .msg_namelen = sock->peerlen,
+        .msg_iov = (struct iovec *)iov,
+        .msg_iovlen = count,
+    };
+    ssize_t ret;
+
+    ret = sendmsg(vlc_tls_SocketGetFD(tls), &msg, MSG_NOSIGNAL|MSG_FASTOPEN);
+    if (ret >= 0)
+    {   /* Fast open in progress */
+        tls->writev = vlc_tls_SocketWrite;
+        return ret;
+    }
+
+    if (errno == EINPROGRESS)
+        return vlc_tls_WaitConnect(tls);
+    if (errno != EOPNOTSUPP)
+        return -1;
+    /* Fast open not supported or disabled... fallback to normal mode */
+#endif
+
     if (vlc_tls_Connect(tls))
         return -1;
 
