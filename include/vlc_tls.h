@@ -232,6 +232,11 @@ VLC_API void vlc_tls_Delete (vlc_tls_creds_t *);
  */
 VLC_API vlc_tls_t *vlc_tls_SocketOpen(int fd);
 
+/**
+ * Creates a connected pair of transport-layer sockets.
+ */
+VLC_API int vlc_tls_SocketPair(int family, int protocol, vlc_tls_t *[2]);
+
 struct addrinfo;
 
 /**

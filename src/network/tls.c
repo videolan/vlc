@@ -404,6 +404,32 @@ vlc_tls_t *vlc_tls_SocketOpen(int fd)
     return vlc_tls_SocketAlloc(fd, NULL, 0);
 }
 
+int vlc_tls_SocketPair(int family, int protocol, vlc_tls_t *pair[2])
+{
+    int fds[2];
+
+    if (vlc_socketpair(family, SOCK_STREAM, protocol, fds, true))
+        return -1;
+
+    for (size_t i = 0; i < 2; i++)
+    {
+        setsockopt(fds[i], SOL_SOCKET, SO_REUSEADDR,
+                   &(int){ 1 }, sizeof (int));
+
+        pair[i] = vlc_tls_SocketAlloc(fds[i], NULL, 0);
+        if (unlikely(pair[i] == NULL))
+        {
+            net_Close(fds[i]);
+            if (i)
+                vlc_tls_SessionDelete(pair[0]);
+            else
+                net_Close(fds[1]);
+            return -1;
+        }
+    }
+    return 0;
+}
+
 /**
  * Allocates an unconnected transport layer socket.
  */
