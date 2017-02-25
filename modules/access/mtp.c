@@ -71,8 +71,6 @@ static int  Seek( access_t *, uint64_t );
 static ssize_t Read( access_t *, void *, size_t );
 static int  Control( access_t *, int, va_list );
 
-static int  open_file( access_t *, const char * );
-
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -84,18 +82,16 @@ static int Open( vlc_object_t *p_this )
     uint16_t i_product_id;
     int i_track_id;
     LIBMTP_raw_device_t *p_rawdevices;
-    LIBMTP_mtpdevice_t *p_device;
     int i_numrawdevices;
-    int i_ret;
 
     if( sscanf( p_access->psz_location, "%"SCNu32":%"SCNu8":%"SCNu16":%d",
                 &i_bus, &i_dev, &i_product_id, &i_track_id ) != 4 )
         return VLC_EGENERIC;
-    i_ret = LIBMTP_Detect_Raw_Devices( &p_rawdevices, &i_numrawdevices );
-    if( i_ret != 0 || i_numrawdevices <= 0 || !p_rawdevices )
+
+    if( LIBMTP_Detect_Raw_Devices( &p_rawdevices, &i_numrawdevices ) )
         return VLC_EGENERIC;
 
-    char *path;
+    int fd = -1;
 
     for( int i = 0; i < i_numrawdevices; i++ )
     {
@@ -103,46 +99,36 @@ static int Open( vlc_object_t *p_this )
             i_dev == p_rawdevices[i].devnum &&
             i_product_id == p_rawdevices[i].device_entry.product_id )
         {
-            if( ( p_device = LIBMTP_Open_Raw_Device( &p_rawdevices[i] )
-                ) != NULL )
-            {
-#warning Oooh no! Not tempnam()!
-                path = tempnam( NULL, "vlc" );
-                if( path == NULL )
-                {
-                    LIBMTP_Release_Device( p_device );
-                    free( p_rawdevices );
-                    return VLC_ENOMEM;
-                }
-                else
-                {
-                    msg_Dbg( p_access, "About to write %s", path );
-                    LIBMTP_Get_File_To_File( p_device, i_track_id, path,
-                                             NULL, NULL );
-                    LIBMTP_Release_Device( p_device );
-                    i = i_numrawdevices;
-                }
-            }
-            else
-            {
-                free( p_rawdevices );
-                return VLC_EGENERIC;
-            }
+            LIBMTP_mtpdevice_t *p_device;
+
+            p_device = LIBMTP_Open_Raw_Device( &p_rawdevices[i] );
+            if( p_device == NULL )
+                break;
+
+            fd = vlc_memfd();
+            if( unlikely(fd == -1) )
+                break;
+
+            msg_Dbg( p_access, "copying to memory" );
+            LIBMTP_Get_File_To_File_Descriptor( p_device, i_track_id, fd,
+                                                NULL, NULL );
+            LIBMTP_Release_Device( p_device );
+            break;
         }
     }
     free( p_rawdevices );
 
-    /* Open file */
-    msg_Dbg( p_access, "opening file `%s'", path );
-    int fd = open_file( p_access, path );
-
-    if( vlc_unlink( path ) != 0 )
-        msg_Err( p_access, "Error deleting file %s, %s", path,
-                 vlc_strerror_c(errno) );
-    free( path );
-
     if( fd == -1 )
+    {
+        msg_Err( p_access, "cannot find %s", p_access->psz_location );
         return VLC_EGENERIC;
+    }
+
+    if( lseek( fd, 0, SEEK_SET ) ) /* Reset file descriptor offset */
+    {
+        close( fd );
+        return VLC_EGENERIC;
+    }
 
     p_access->p_sys = (void *)(intptr_t)fd;
     ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
@@ -252,28 +238,4 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     }
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * open_file: Opens a specific file
- *****************************************************************************/
-static int open_file( access_t *p_access, const char *path )
-{
-    int fd = vlc_open( path, O_RDONLY | O_NONBLOCK );
-    if( fd == -1 )
-    {
-        msg_Err( p_access, "cannot open file %s: %s", path,
-                 vlc_strerror_c(errno) );
-        vlc_dialog_display_error( p_access, _( "File reading failed" ),
-            _( "VLC could not open the file \"%s\": %s" ), path,
-            vlc_strerror(errno) );
-        return -1;
-    }
-#ifdef F_RDAHEAD
-    fcntl( fd, F_RDAHEAD, 1 );
-#endif
-#ifdef F_NOCACHE
-    fcntl( fd, F_NOCACHE, 0 );
-#endif
-    return fd;
 }
