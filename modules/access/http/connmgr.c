@@ -52,6 +52,26 @@ void vlc_http_dbg(void *ctx, const char *fmt, ...)
     va_end(ap);
 }
 
+vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
+                             unsigned port, bool *restrict two)
+{
+    if (port == 0)
+        port = 443;
+
+    /* TLS with ALPN */
+    const char *alpn[] = { "h2", "http/1.1", NULL };
+    char *alp;
+
+    vlc_tls_t *tls = vlc_tls_SocketOpenTLS(creds, name, port, "https",
+                                           alpn + !*two, &alp);
+    if (tls != NULL)
+    {
+        *two = (alp != NULL) && !strcmp(alp, "h2");
+        free(alp);
+    }
+    return tls;
+}
+
 static char *vlc_http_proxy_find(const char *hostname, unsigned port,
                                  bool secure)
 {

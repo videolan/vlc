@@ -3,7 +3,7 @@ libhttps_plugin_la_LIBADD = libvlc_http.la
 access_LTLIBRARIES += libhttps_plugin.la
 
 libvlc_http_la_SOURCES = \
-	access/http/transport.c access/http/transport.h \
+	access/http/transport.h \
 	access/http/message.c access/http/message.h \
 	access/http/resource.c access/http/resource.h \
 	access/http/file.c access/http/file.h \
