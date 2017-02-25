@@ -327,7 +327,7 @@ int AESKey::decryptRSA( string s_cipher_text_b64 )
             if( this->extractInfo( ps_plain_text, false ) )
                 goto end;
             break;
-        case -1:
+        case static_cast<size_t>( -1 ):
             msg_Err( this->p_demux, "could not decrypt" );
             goto end;
         default:
