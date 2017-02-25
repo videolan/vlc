@@ -485,7 +485,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static inline const char *strempty( const char *s ) { return s?s:""; }
 static inline Boolean toBool( bool b ) { return b?True:False; } // silly, no?
 
 static void default_live555_callback( RTSPClient* client, int result_code, char* result_string )
