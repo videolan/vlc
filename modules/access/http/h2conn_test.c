@@ -39,14 +39,14 @@
 #include "message.h"
 
 static struct vlc_http_conn *conn;
-static int external_fd;
+static struct vlc_tls *external_tls;
 
 static void conn_send(struct vlc_h2_frame *f)
 {
     assert(f != NULL);
 
     size_t len = vlc_h2_frame_size(f);
-    ssize_t val = write(external_fd, f->data, len);
+    ssize_t val = vlc_tls_Write(external_tls, f->data, len);
     assert((size_t)val == len);
     free(f);
 }
@@ -64,7 +64,7 @@ static void conn_expect(uint_fast8_t wanted)
     uint8_t got;
 
     do {
-        val = recv(external_fd, hdr, 9, MSG_WAITALL);
+        val = vlc_tls_Read(external_tls, hdr, 9, true);
         assert(val == 9);
         assert(hdr[0] == 0);
 
@@ -77,7 +77,7 @@ static void conn_expect(uint_fast8_t wanted)
         {
             char buf[len];
 
-            val = recv(external_fd, buf, len, MSG_WAITALL);
+            val = vlc_tls_Read(external_tls, buf, len, true);
             assert(val == (ssize_t)len);
         }
     }
@@ -87,22 +87,19 @@ static void conn_expect(uint_fast8_t wanted)
 static void conn_create(void)
 {
     ssize_t val;
-    int fds[2];
+    vlc_tls_t *tlsv[2];
     char hello[24];
 
-    if (vlc_socketpair(PF_LOCAL, SOCK_STREAM, 0, fds, false))
+    if (vlc_tls_SocketPair(PF_LOCAL, 0, tlsv))
         assert(!"socketpair");
 
-    struct vlc_tls *tls = vlc_tls_SocketOpen(fds[1]);
-    assert(tls != NULL);
+    external_tls = tlsv[0];
 
-    external_fd = fds[0];
-
-    conn = vlc_h2_conn_create(NULL, tls);
+    conn = vlc_h2_conn_create(NULL, tlsv[1]);
     assert(conn != NULL);
     conn_send(vlc_h2_frame_settings());
 
-    val = recv(external_fd, hello, 24, MSG_WAITALL);
+    val = vlc_tls_Read(external_tls, hello, 24, true);
     assert(val == 24);
     assert(!memcmp(hello, "PRI * HTTP/2.0\r\n", 16));
     conn_expect(SETTINGS);
@@ -111,9 +108,9 @@ static void conn_create(void)
 
 static void conn_destroy(void)
 {
-    shutdown(external_fd, SHUT_WR);
+    vlc_tls_Shutdown(external_tls, false);
     vlc_http_conn_release(conn);
-    vlc_close(external_fd);
+    vlc_tls_SessionDelete(external_tls);
 }
 
 static struct vlc_http_stream *stream_open(void)
