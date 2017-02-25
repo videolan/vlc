@@ -93,7 +93,7 @@ static void conn_create(void)
     if (vlc_socketpair(PF_LOCAL, SOCK_STREAM, 0, fds, false))
         assert(!"socketpair");
 
-    struct vlc_tls *tls = vlc_tls_SocketOpen(NULL, fds[1]);
+    struct vlc_tls *tls = vlc_tls_SocketOpen(fds[1]);
     assert(tls != NULL);
 
     external_fd = fds[0];

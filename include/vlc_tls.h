@@ -230,7 +230,7 @@ VLC_API void vlc_tls_Delete (vlc_tls_creds_t *);
  *
  * This function is not a cancellation point.
  */
-VLC_API vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd);
+VLC_API vlc_tls_t *vlc_tls_SocketOpen(int fd);
 
 struct addrinfo;
 
@@ -257,7 +257,7 @@ static inline vlc_tls_t *
 vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,
                               const char *srv, const char *const *lp, char **p)
 {
-    vlc_tls_t *sock = vlc_tls_SocketOpen(VLC_OBJECT(crd), fd);
+    vlc_tls_t *sock = vlc_tls_SocketOpen(fd);
     if (unlikely(sock == NULL))
         return NULL;
 

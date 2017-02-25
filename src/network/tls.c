@@ -211,7 +211,7 @@ error:
 vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *crd, int fd,
                                        const char *const *alpn)
 {
-    vlc_tls_t *sock = vlc_tls_SocketOpen(VLC_OBJECT(crd), fd);
+    vlc_tls_t *sock = vlc_tls_SocketOpen(fd);
     if (unlikely(sock == NULL))
         return NULL;
 
@@ -372,7 +372,7 @@ static void vlc_tls_SocketClose(vlc_tls_t *tls)
     free(tls);
 }
 
-vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd)
+vlc_tls_t *vlc_tls_SocketOpen(int fd)
 {
     vlc_tls_socket_t *sock = malloc(sizeof (*sock));
     if (unlikely(sock == NULL))
@@ -443,7 +443,7 @@ static vlc_tls_t *vlc_tls_SocketOpenAddrInfoSingle(vlc_object_t *obj,
         }
     }
 
-    vlc_tls_t *tls = vlc_tls_SocketOpen(obj, fd);
+    vlc_tls_t *tls = vlc_tls_SocketOpen(fd);
     if (unlikely(tls == NULL))
         goto giveup;
 
