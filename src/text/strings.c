@@ -295,7 +295,7 @@ char *vlc_xml_encode (const char *str)
     {
         if (unlikely(n == (size_t)-1))
         {
-            if (vlc_memstream_close(&stream))
+            if (vlc_memstream_close(&stream) == 0)
                 free(stream.ptr);
             errno = EILSEQ;
             return NULL;
