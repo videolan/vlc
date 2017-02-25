@@ -57,23 +57,24 @@ endif
 
 
 package-macosx: VLC.app
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/Goodies/"
+if HAVE_DMGBUILD
+	@echo "Packaging fancy DMG using dmgbuild"
+	cd "$(top_srcdir)/extras/package/macosx/dmg" && dmgbuild -s "dmg_settings.py" \
+		-D app="$(abs_top_builddir)/VLC.app" "VLC Media Player" "$(abs_top_builddir)/vlc-$(VERSION).dmg"
+else !HAVE_DMGBUILD
+	@echo "Packaging non-fancy DMG"
+	## Create directory for DMG contents
+	mkdir -p "$(top_builddir)/vlc-$(VERSION)"
+	## Copy contents
 	cp -R "$(top_builddir)/VLC.app" "$(top_builddir)/vlc-$(VERSION)/VLC.app"
-	cd $(srcdir); cp AUTHORS COPYING README THANKS NEWS $(abs_top_builddir)/vlc-$(VERSION)/Goodies/
-	$(LN_S) -f /Applications $(top_builddir)/vlc-$(VERSION)/
-	rm -f "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
-	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -scrub -format UDRW
-	mkdir -p ./mount
-	hdiutil attach -readwrite -noverify -noautoopen -mountRoot ./mount "vlc-$(VERSION)-rw.dmg"
-	-osascript "$(srcdir)"/extras/package/macosx/dmg_setup.scpt "vlc-$(VERSION)"
-	hdiutil detach ./mount/"vlc-$(VERSION)"
-# Make sure the image is not writable
-# Note: We can't directly create a read only dmg as we do the bless stuff
-	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
-	hdiutil convert "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
-	ls -l "$(top_builddir)/vlc-$(VERSION).dmg"
-	rm -f "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
+	## Symlink to Applications so users can easily drag-and-drop the App to it
+	$(LN_S) -f /Applications "$(top_builddir)/vlc-$(VERSION)/"
+	## Create DMG
+	hdiutil create -srcfolder "$(top_builddir)/vlc-$(VERSION)" -volname "VLC Media Player" \
+		-format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
+	## Cleanup
 	rm -rf "$(top_builddir)/vlc-$(VERSION)"
+endif
 
 package-macosx-zip: VLC.app
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
@@ -112,7 +113,9 @@ EXTRA_DIST += \
 	extras/package/macosx/build.sh \
 	extras/package/macosx/codesign.sh \
 	extras/package/macosx/configure.sh \
-	extras/package/macosx/dmg_setup.scpt \
+	extras/package/macosx/dmg/dmg_settings.py \
+	extras/package/macosx/dmg/disk_image.icns \
+	extras/package/macosx/dmg/background.tiff \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/vlc_status_icon.svg \
 	extras/package/macosx/vlc_app_icon.svg \
