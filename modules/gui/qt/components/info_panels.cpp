@@ -240,7 +240,6 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( Date, date_text );
     UPDATE_META( TrackNum, seqnum_text );
     UPDATE_META( TrackTotal, seqtot_text );
-//    UPDATE_META( Setting, setting_text );
 
     /* Now Playing || ES Now Playing */
     psz_meta = input_item_GetNowPlayingFb( p_item );

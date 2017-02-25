@@ -71,7 +71,6 @@ private:
 
     QTextEdit *description_text;
     QLineEdit *date_text;
-//    QLineEdit *setting_text;
     QLineEdit *language_text;
     QLineEdit *nowplaying_text;
     QLineEdit *publisher_text;
