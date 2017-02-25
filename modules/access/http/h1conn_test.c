@@ -38,27 +38,24 @@
 #include "message.h"
 
 static struct vlc_http_conn *conn;
-static int external_fd;
+static struct vlc_tls *external_tls;
 
 static void conn_create(void)
 {
-    int fds[2];
+    vlc_tls_t *tlsv[2];
 
-    if (vlc_socketpair(PF_LOCAL, SOCK_STREAM, 0, fds, false))
-        assert(!"socketpair");
+    if (vlc_tls_SocketPair(PF_LOCAL, 0, tlsv))
+        assert(!"vlc_tls_SocketPair");
 
-    struct vlc_tls *tls = vlc_tls_SocketOpen(fds[1]);
-    assert(tls != NULL);
+    external_tls = tlsv[0];
 
-    external_fd = fds[0];
-
-    conn = vlc_h1_conn_create(NULL, tls, false);
+    conn = vlc_h1_conn_create(NULL, tlsv[1], false);
     assert(conn != NULL);
 }
 
 static void conn_send_raw(const void *buf, size_t len)
 {
-    ssize_t val = write(external_fd, buf, len);
+    ssize_t val = vlc_tls_Write(external_tls, buf, len);
     assert((size_t)val == len);
 }
 
@@ -67,16 +64,16 @@ static void conn_send(const char *str)
     return conn_send_raw(str, strlen(str));
 }
 
-static void conn_shutdown(int how)
+static void conn_shutdown(bool duplex)
 {
-    shutdown(external_fd, how);
+    vlc_tls_Shutdown(external_tls, duplex);
 }
 
 static void conn_destroy(void)
 {
-    conn_shutdown(SHUT_WR);
+    conn_shutdown(false);
     vlc_http_conn_release(conn);
-    vlc_close(external_fd);
+    vlc_tls_SessionDelete(external_tls);
 }
 
 static struct vlc_http_stream *stream_open(void)
