@@ -134,21 +134,9 @@ static vlc_tls_t *vlc_tls_SessionCreate(vlc_tls_creds_t *crd,
                                         const char *host,
                                         const char *const *alpn)
 {
-    vlc_tls_t *session = malloc(sizeof (*session));
-    if (unlikely(session == NULL))
-        return NULL;
-
-    session->obj = crd->obj.parent;
-    session->p = NULL;
-
+    vlc_tls_t *session;
     int canc = vlc_savecancel();
-
-    if (crd->open(crd, session, sock, host, alpn) != VLC_SUCCESS)
-    {
-        free(session);
-        session = NULL;
-    }
-
+    session = crd->open(crd, sock, host, alpn);
     vlc_restorecancel(canc);
     return session;
 }
@@ -158,7 +146,6 @@ void vlc_tls_SessionDelete (vlc_tls_t *session)
     int canc = vlc_savecancel();
     session->close(session);
     vlc_restorecancel(canc);
-    free(session);
 }
 
 static void cleanup_tls(void *data)
@@ -337,63 +324,70 @@ error:
     return NULL;
 }
 
+typedef struct vlc_tls_socket
+{
+    struct vlc_tls tls;
+    int fd;
+} vlc_tls_socket_t;
+
 static int vlc_tls_SocketGetFD(vlc_tls_t *tls)
 {
-    return (intptr_t)tls->sys;
+    vlc_tls_socket_t *sock = (struct vlc_tls_socket *)tls;
+
+    return sock->fd;
 }
 
 static ssize_t vlc_tls_SocketRead(vlc_tls_t *tls, struct iovec *iov,
                                   unsigned count)
 {
-    int fd = (intptr_t)tls->sys;
     struct msghdr msg =
     {
         .msg_iov = iov,
         .msg_iovlen = count,
     };
-    return recvmsg(fd, &msg, 0);
+
+    return recvmsg(vlc_tls_SocketGetFD(tls), &msg, 0);
 }
 
 static ssize_t vlc_tls_SocketWrite(vlc_tls_t *tls, const struct iovec *iov,
                                    unsigned count)
 {
-    int fd = (intptr_t)tls->sys;
     const struct msghdr msg =
     {
         .msg_iov = (struct iovec *)iov,
         .msg_iovlen = count,
     };
-    return sendmsg(fd, &msg, MSG_NOSIGNAL);
+
+    return sendmsg(vlc_tls_SocketGetFD(tls), &msg, MSG_NOSIGNAL);
 }
 
 static int vlc_tls_SocketShutdown(vlc_tls_t *tls, bool duplex)
 {
-    int fd = (intptr_t)tls->sys;
-    return shutdown(fd, duplex ? SHUT_RDWR : SHUT_WR);
+    return shutdown(vlc_tls_SocketGetFD(tls), duplex ? SHUT_RDWR : SHUT_WR);
 }
 
 static void vlc_tls_SocketClose(vlc_tls_t *tls)
 {
-    int fd = (intptr_t)tls->sys;
-
-    net_Close(fd);
+    net_Close(vlc_tls_SocketGetFD(tls));
+    free(tls);
 }
 
 vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd)
 {
-    vlc_tls_t *session = malloc(sizeof (*session));
-    if (unlikely(session == NULL))
+    vlc_tls_socket_t *sock = malloc(sizeof (*sock));
+    if (unlikely(sock == NULL))
         return NULL;
 
-    session->obj = obj;
-    session->sys = (void *)(intptr_t)fd;
-    session->get_fd = vlc_tls_SocketGetFD;
-    session->readv = vlc_tls_SocketRead;
-    session->writev = vlc_tls_SocketWrite;
-    session->shutdown = vlc_tls_SocketShutdown;
-    session->close = vlc_tls_SocketClose;
-    session->p = NULL;
-    return session;
+    vlc_tls_t *tls = &sock->tls;
+
+    tls->get_fd = vlc_tls_SocketGetFD;
+    tls->readv = vlc_tls_SocketRead;
+    tls->writev = vlc_tls_SocketWrite;
+    tls->shutdown = vlc_tls_SocketShutdown;
+    tls->close = vlc_tls_SocketClose;
+    tls->p = NULL;
+    sock->fd = fd;
+    return tls;
 }
 
 static vlc_tls_t *vlc_tls_SocketOpenAddrInfoSingle(vlc_object_t *obj,

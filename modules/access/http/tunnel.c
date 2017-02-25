@@ -88,17 +88,24 @@ static struct vlc_http_msg *vlc_http_tunnel_open(struct vlc_http_conn *conn,
     return resp;
 }
 
+typedef struct vlc_tls_proxy
+{
+    vlc_tls_t tls;
+    vlc_tls_t *sock;
+} vlc_tls_proxy_t;
+
 static int vlc_tls_ProxyGetFD(vlc_tls_t *tls)
 {
-    struct vlc_tls *sock = tls->sys;
+    vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
 
-    return vlc_tls_GetFD(sock);
+    return vlc_tls_GetFD(proxy->sock);
 }
 
 static ssize_t vlc_tls_ProxyRead(vlc_tls_t *tls, struct iovec *iov,
                                  unsigned count)
 {
-    struct vlc_tls *sock = tls->sys;
+    vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
+    vlc_tls_t *sock = proxy->sock;
 
     return sock->readv(sock, iov, count);
 }
@@ -106,21 +113,24 @@ static ssize_t vlc_tls_ProxyRead(vlc_tls_t *tls, struct iovec *iov,
 static ssize_t vlc_tls_ProxyWrite(vlc_tls_t *tls, const struct iovec *iov,
                                   unsigned count)
 {
-    struct vlc_tls *sock = tls->sys;
+    vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
+    vlc_tls_t *sock = proxy->sock;
 
     return sock->writev(sock, iov, count);
 }
 
 static int vlc_tls_ProxyShutdown(vlc_tls_t *tls, bool duplex)
 {
-    struct vlc_tls *sock = tls->sys;
+    vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
 
-    return vlc_tls_Shutdown(sock, duplex);
+    return vlc_tls_Shutdown(proxy->sock, duplex);
 }
 
 static void vlc_tls_ProxyClose(vlc_tls_t *tls)
 {
-    (void) tls;
+    vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
+
+    free(proxy);
 }
 
 vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_creds_t *creds,
@@ -164,27 +174,26 @@ vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_creds_t *creds,
 
     assert(!ptwo); /* HTTP/2 proxy not supported yet */
 
-    struct vlc_tls *psock = malloc(sizeof (*psock));
+    vlc_tls_proxy_t *psock = malloc(sizeof (*psock));
     if (unlikely(psock == NULL))
     {
         vlc_UrlClean(&url);
         goto error;
     }
 
-    psock->obj = VLC_OBJECT(creds);
-    psock->sys = sock;
-    psock->get_fd = vlc_tls_ProxyGetFD;
-    psock->readv = vlc_tls_ProxyRead;
-    psock->writev = vlc_tls_ProxyWrite;
-    psock->shutdown = vlc_tls_ProxyShutdown;
-    psock->close = vlc_tls_ProxyClose;
-    psock->p = NULL;
+    psock->tls.get_fd = vlc_tls_ProxyGetFD;
+    psock->tls.readv = vlc_tls_ProxyRead;
+    psock->tls.writev = vlc_tls_ProxyWrite;
+    psock->tls.shutdown = vlc_tls_ProxyShutdown;
+    psock->tls.close = vlc_tls_ProxyClose;
+    psock->tls.p = NULL;
+    psock->sock = sock;
 
-    struct vlc_http_conn *conn = /*ptwo ? vlc_h2_conn_create(ctx, psock)
-                                     :*/ vlc_h1_conn_create(ctx, psock, false);
+    struct vlc_http_conn *conn = /*ptwo ? vlc_h2_conn_create(ctx, &psock->tls)
+                               :*/ vlc_h1_conn_create(ctx, &psock->tls, false);
     if (unlikely(conn == NULL))
     {
-        vlc_tls_Close(psock);
+        vlc_tls_Close(&psock->tls);
         vlc_UrlClean(&url);
         goto error;
     }
