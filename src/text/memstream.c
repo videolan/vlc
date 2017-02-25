@@ -137,7 +137,7 @@ size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
 
 error:
     ms->error = EOF;
-    return EOF;
+    return 0;
 }
 
 int vlc_memstream_putc(struct vlc_memstream *ms, int c)
