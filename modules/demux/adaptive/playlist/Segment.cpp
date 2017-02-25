@@ -259,7 +259,7 @@ IndexSegment::IndexSegment(ICanonicalUrl *parent) :
 }
 
 SubSegment::SubSegment(ISegment *main, size_t start, size_t end) :
-    ISegment(main), parent(main)
+    ISegment(main)
 {
     setByteRange(start, end);
     debugName = "SubSegment";

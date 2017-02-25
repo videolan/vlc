@@ -130,8 +130,6 @@ namespace adaptive
                 virtual std::vector<ISegment*> subSegments();
                 virtual void addSubSegment(SubSegment *);
                 static const int CLASSID_SUBSEGMENT = 4;
-            private:
-                ISegment *parent;
         };
     }
 }
