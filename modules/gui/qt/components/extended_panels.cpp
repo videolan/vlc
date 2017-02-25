@@ -39,6 +39,7 @@
 #include <QFileDialog>
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QRegExp>
 
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
@@ -64,18 +65,10 @@ static const QString ModuleFromWidgetName( QObject *obj )
 static QString OptionFromWidgetName( QObject *obj )
 {
     /* Gruik ? ... nah */
-    QString option = obj->objectName().replace( "Slider", "" )
-                                      .replace( "Combo" , "" )
-                                      .replace( "Dial"  , "" )
-                                      .replace( "Check" , "" )
-                                      .replace( "Spin"  , "" )
-                                      .replace( "Text"  , "" );
-    for( char a = 'A'; a <= 'Z'; a++ )
-    {
-        option = option.replace( QString( a ),
-                                 QString( '-' ) + QString( a + 'a' - 'A' ) );
-    }
-    return option;
+    return obj->objectName()
+        .remove( QRegExp( "Slider|Combo|Dial|Check|Spin|Text" ) )
+        .replace( QRegExp( "([A-Z])" ), "-\\1" )
+        .toLower();
 }
 
 static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, QWidget *widget )
