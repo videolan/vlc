@@ -493,3 +493,18 @@ vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj, const char *name,
     freeaddrinfo(res);
     return tls;
 }
+
+vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *creds, const char *name,
+                                 unsigned port, const char *service,
+                                 const char *const *alpn, char **alp)
+{
+    vlc_tls_t *tcp = vlc_tls_SocketOpenTCP(VLC_OBJECT(creds), name, port);
+    if (tcp == NULL)
+        return NULL;
+
+    vlc_tls_t *tls = vlc_tls_ClientSessionCreate(creds, tcp, name, service,
+                                                 alpn, alp);
+    if (tls == NULL)
+        vlc_tls_SessionDelete(tcp);
+    return tls;
+}

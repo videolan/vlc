@@ -252,6 +252,14 @@ vlc_tls_t *vlc_tls_SocketOpenAddrInfo(vlc_object_t *obj,
 VLC_API vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj,
                                          const char *hostname, unsigned port);
 
+/**
+ * Initiates a TLS session over TCP.
+ */
+VLC_API vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *crd,
+                                         const char *hostname, unsigned port,
+                                         const char *service,
+                                         const char *const *alpn, char **alp);
+
 VLC_DEPRECATED
 static inline vlc_tls_t *
 vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,
