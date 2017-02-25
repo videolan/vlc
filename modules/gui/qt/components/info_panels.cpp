@@ -49,14 +49,6 @@
 #include <QSpinBox>
 #include <QTextEdit>
 
-static inline void setSpinBounds( QSpinBox *spinbox ) {
-    spinbox->setRange( 0, INT_MAX );
-    spinbox->setAccelerated( true );
-    spinbox->setAlignment( Qt::AlignRight );
-    spinbox->setSpecialValueText("");
-}
-
-
 /************************************************************************
  * Single panels
  ************************************************************************/
