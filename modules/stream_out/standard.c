@@ -73,11 +73,6 @@
 #define EMAIL_LONGTEXT N_( \
     "This allows you to give a contact mail address for the stream, that will " \
     "be announced in the SDP (Session Descriptor)." )
-#define PHONE_TEXT N_("Session phone number")
-#define PHONE_LONGTEXT N_( \
-    "This allows you to give a contact telephone number for the stream, that will " \
-    "be announced in the SDP (Session Descriptor)." )
-
 
 #define SAP_TEXT N_("SAP announcing")
 #define SAP_LONGTEXT N_("Announce this session with SAP.")
@@ -106,7 +101,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "description", "", DESC_TEXT, DESC_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "url", "", URL_TEXT, URL_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "email", "", EMAIL_TEXT, EMAIL_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "phone", "", PHONE_TEXT, PHONE_LONGTEXT, true )
+    add_obsolete_string( SOUT_CFG_PREFIX "phone" ) /* since 3.0.0 */
 
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -117,7 +112,7 @@ vlc_module_end ()
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
     "access", "mux", "url", "dst",
-    "sap", "name", "description", "url", "email", "phone",
+    "sap", "name", "description", "url", "email",
     "bind", "path", NULL
 };
 

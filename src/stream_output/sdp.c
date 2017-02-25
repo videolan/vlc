@@ -223,16 +223,7 @@ int vlc_sdp_Start(struct vlc_memstream *restrict stream,
         free(str);
     }
 
-    strcpy(subvar, "phone");
-    str = var_GetNonEmptyString(obj, varname);
-    if (str != NULL)
-    {
-        if (!IsSDPString(str))
-            goto error;
-
-        vlc_memstream_printf(stream, "p=%s\r\n", str);
-        free(str);
-    }
+    // no phone (useless)
 
     vlc_memstream_printf(stream, "c=%s\r\n", connection);
     // bandwidth not specified

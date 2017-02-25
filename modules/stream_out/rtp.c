@@ -110,10 +110,6 @@
 #define EMAIL_LONGTEXT N_( \
     "This allows you to give a contact mail address for the stream, that will " \
     "be announced in the SDP (Session Descriptor)." )
-#define PHONE_TEXT N_("Session phone number")
-#define PHONE_LONGTEXT N_( \
-    "This allows you to give a contact telephone number for the stream, that will " \
-    "be announced in the SDP (Session Descriptor)." )
 
 #define PORT_TEXT N_("Port")
 #define PORT_LONGTEXT N_( \
@@ -213,8 +209,7 @@ vlc_module_begin ()
                 URL_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "email", "", EMAIL_TEXT,
                 EMAIL_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "phone", "", PHONE_TEXT,
-                PHONE_LONGTEXT, true )
+    add_obsolete_string( SOUT_CFG_PREFIX "phone" ) /* since 3.0.0 */
 
     add_string( SOUT_CFG_PREFIX "proto", "udp", PROTO_TEXT,
                 PROTO_LONGTEXT, false )
@@ -267,7 +262,7 @@ vlc_module_end ()
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
     "dst", "name", "cat", "port", "port-audio", "port-video", "*sdp", "ttl",
-    "mux", "sap", "description", "url", "email", "phone",
+    "mux", "sap", "description", "url", "email",
     "proto", "rtcp-mux", "caching",
 #ifdef HAVE_SRTP
     "key", "salt",
