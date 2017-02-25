@@ -306,6 +306,9 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
 {
     const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
 
+    if( psz_filter_type == NULL )
+        return;
+
     QString result = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
 
     /* Vout is not kept, so put that in the config */
