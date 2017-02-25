@@ -1634,6 +1634,8 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         S_CASE("A_AAC/MPEG4/LTP")    { A_AAC_MPEG__helper( vars, 3 ); }
         S_CASE("A_AAC/MPEG2/LC/SBR") { A_AAC_MPEG__helper( vars, 1, true ); }
         S_CASE("A_AAC/MPEG4/LC/SBR") { A_AAC_MPEG__helper( vars, 1, true ); }
+        S_CASE("A_AAC/MPEG4/") { A_AAC_MPEG__helper( vars, 3 ); } // see #4250
+        S_CASE("A_AAC/MPEG2/") { A_AAC_MPEG__helper( vars, 3 ); } // backward compatibility
         S_CASE("A_AAC") {
             vars.p_tk->fmt.i_codec = VLC_CODEC_MP4A;
             fill_extra_data( vars.p_tk, 0 );
