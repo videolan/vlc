@@ -142,10 +142,9 @@ enum
 struct httpd_client_t
 {
     httpd_url_t *url;
+    vlc_tls_t   *sock;
 
     int     i_ref;
-
-    int     fd;
 
     bool    b_stream_mode;
     uint8_t i_state;
@@ -169,8 +168,6 @@ struct httpd_client_t
     httpd_message_t query;  /* client -> httpd */
     httpd_message_t answer; /* httpd -> client */
 
-    /* TLS data */
-    vlc_tls_t *p_tls;
 };
 
 
@@ -1208,21 +1205,17 @@ static void httpd_ClientInit(httpd_client_t *cl, mtime_t now)
 
 char* httpd_ClientIP(const httpd_client_t *cl, char *ip, int *port)
 {
-    return net_GetPeerAddress(cl->fd, ip, port) ? NULL : ip;
+    return net_GetPeerAddress(vlc_tls_GetFD(cl->sock), ip, port) ? NULL : ip;
 }
 
 char* httpd_ServerIP(const httpd_client_t *cl, char *ip, int *port)
 {
-    return net_GetSockAddress(cl->fd, ip, port) ? NULL : ip;
+    return net_GetSockAddress(vlc_tls_GetFD(cl->sock), ip, port) ? NULL : ip;
 }
 
 static void httpd_ClientDestroy(httpd_client_t *cl)
 {
-    if (cl->p_tls != NULL)
-        vlc_tls_Close(cl->p_tls);
-    else
-        net_Close(cl->fd);
-
+    vlc_tls_Close(cl->sock);
     httpd_MsgClean(&cl->answer);
     httpd_MsgClean(&cl->query);
 
@@ -1230,50 +1223,34 @@ static void httpd_ClientDestroy(httpd_client_t *cl)
     free(cl);
 }
 
-static httpd_client_t *httpd_ClientNew(int fd, vlc_tls_t *p_tls, mtime_t now)
+static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock, mtime_t now)
 {
     httpd_client_t *cl = malloc(sizeof(httpd_client_t));
 
     if (!cl) return NULL;
 
     cl->i_ref   = 0;
-    cl->fd      = fd;
+    cl->sock    = sock;
     cl->url     = NULL;
-    cl->p_tls = p_tls;
 
     httpd_ClientInit(cl, now);
-    if (p_tls)
-        cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
-
     return cl;
 }
 
 static
 ssize_t httpd_NetRecv (httpd_client_t *cl, uint8_t *p, size_t i_len)
 {
-    vlc_tls_t *p_tls;
-    ssize_t val;
-
-    p_tls = cl->p_tls;
-    do
-        val = p_tls ? vlc_tls_Read(p_tls, p, i_len, false)
-                    : recv (cl->fd, p, i_len, 0);
-    while (val == -1 && errno == EINTR);
-    return val;
+    vlc_tls_t *sock = cl->sock;
+    struct iovec iov = { p, i_len };
+    return sock->readv(sock, &iov, 1);
 }
 
 static
 ssize_t httpd_NetSend (httpd_client_t *cl, const uint8_t *p, size_t i_len)
 {
-    vlc_tls_t *p_tls;
-    ssize_t val;
-
-    p_tls = cl->p_tls;
-    do
-        val = p_tls ? vlc_tls_Write(p_tls, p, i_len)
-                    : send (cl->fd, p, i_len, MSG_NOSIGNAL);
-    while (val == -1 && errno == EINTR);
-    return val;
+    vlc_tls_t *sock = cl->sock;
+    const struct iovec iov = { (void *)p, i_len };
+    return sock->writev(sock, &iov, 1);
 }
 
 
@@ -1660,7 +1637,7 @@ static void httpd_ClientSend(httpd_client_t *cl)
 
 static void httpd_ClientTlsHandshake(httpd_host_t *host, httpd_client_t *cl)
 {
-    switch (vlc_tls_SessionHandshake(host->p_tls, cl->p_tls))
+    switch (vlc_tls_SessionHandshake(host->p_tls, cl->sock))
     {
         case -1: cl->i_state = HTTPD_CLIENT_DEAD;       break;
         case 0:  cl->i_state = HTTPD_CLIENT_RECEIVING;  break;
@@ -1746,7 +1723,7 @@ static void httpdLoop(httpd_host_t *host)
         struct pollfd *pufd = ufd + nfd;
         assert (pufd < ufd + (sizeof (ufd) / sizeof (ufd[0])));
 
-        pufd->fd = cl->fd;
+        pufd->fd = vlc_tls_GetFD(cl->sock);
         pufd->events = pufd->revents = 0;
 
         switch (cl->i_state) {
@@ -2001,7 +1978,7 @@ static void httpdLoop(httpd_host_t *host)
 
         assert(pufd < &ufd[sizeof(ufd) / sizeof(ufd[0])]);
 
-        if (cl->fd != pufd->fd)
+        if (vlc_tls_GetFD(cl->sock) != pufd->fd)
             continue; // we were not waiting for this client
         ++nfd;
         if (pufd->revents == 0)
@@ -2036,18 +2013,31 @@ static void httpdLoop(httpd_host_t *host)
         setsockopt (fd, SOL_SOCKET, SO_REUSEADDR,
                 &(int){ 1 }, sizeof(int));
 
-        vlc_tls_t *p_tls;
+        vlc_tls_t *sk = vlc_tls_SocketOpen(fd);
+        if (unlikely(sk == NULL))
+        {
+            vlc_close(fd);
+            continue;
+        }
 
         if (host->p_tls != NULL)
         {
             const char *alpn[] = { "http/1.1", NULL };
+            vlc_tls_t *tls;
 
-            p_tls = vlc_tls_ServerSessionCreateFD(host->p_tls, fd, alpn);
+            tls = vlc_tls_ServerSessionCreate(host->p_tls, sk, alpn);
+            if (tls == NULL)
+            {
+                vlc_tls_SessionDelete(sk);
+                continue;
+            }
+            sk = tls;
         }
-        else
-            p_tls = NULL;
 
-        cl = httpd_ClientNew(fd, p_tls, now);
+        cl = httpd_ClientNew(sk, now);
+
+        if (host->p_tls != NULL)
+            cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
 
         TAB_APPEND(host->i_client, host->client, cl);
     }
