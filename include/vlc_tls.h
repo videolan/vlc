@@ -241,9 +241,6 @@ static inline int vlc_tls_Shutdown(vlc_tls_t *tls, bool duplex)
     return tls->shutdown(tls, duplex);
 }
 
-# define tls_Recv(a,b,c) vlc_tls_Read(a,b,c,false)
-# define tls_Send(a,b,c) vlc_tls_Write(a,b,c)
-
 /**
  * Closes a connection and its underlying resources.
  *

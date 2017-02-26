@@ -1256,7 +1256,7 @@ ssize_t httpd_NetRecv (httpd_client_t *cl, uint8_t *p, size_t i_len)
 
     p_tls = cl->p_tls;
     do
-        val = p_tls ? tls_Recv (p_tls, p, i_len)
+        val = p_tls ? vlc_tls_Read(p_tls, p, i_len, false)
                     : recv (cl->fd, p, i_len, 0);
     while (val == -1 && errno == EINTR);
     return val;
@@ -1270,7 +1270,7 @@ ssize_t httpd_NetSend (httpd_client_t *cl, const uint8_t *p, size_t i_len)
 
     p_tls = cl->p_tls;
     do
-        val = p_tls ? tls_Send(p_tls, p, i_len)
+        val = p_tls ? vlc_tls_Write(p_tls, p, i_len)
                     : send (cl->fd, p, i_len, MSG_NOSIGNAL);
     while (val == -1 && errno == EINTR);
     return val;
