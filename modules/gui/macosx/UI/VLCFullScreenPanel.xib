@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1217" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12100" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12100"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
@@ -42,7 +42,7 @@
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="VLH-qy-cwr">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="42"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="YSL-bH-k6U">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="YSL-bH-k6U" customClass="VLCHUDToggleButton">
                                 <rect key="frame" x="226" y="7" width="35" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="YSL-bH-k6U" secondAttribute="height" multiplier="1:1" constant="6" id="2if-S8-t0u"/>
@@ -55,7 +55,7 @@
                                     <action selector="togglePlayPause:" target="-2" id="9os-DP-jAN"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="jSN-hV-r5D">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="jSN-hV-r5D" customClass="VLCHUDImageButton">
                                 <rect key="frame" x="263" y="7" width="34" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="jSN-hV-r5D" secondAttribute="height" multiplier="19:16" id="m1w-9i-bkp"/>
@@ -68,7 +68,7 @@
                                     <action selector="jumpForward:" target="-2" id="bjn-qc-BJ7"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="7QH-jb-QdM">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="7QH-jb-QdM" customClass="VLCHUDImageButton">
                                 <rect key="frame" x="189" y="7" width="35" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="7QH-jb-QdM" secondAttribute="height" multiplier="19:16" id="isk-o2-kZY"/>
@@ -93,7 +93,7 @@
                                     <action selector="volumeSliderUpdate:" target="-2" id="doI-qM-Pde"/>
                                 </connections>
                             </slider>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2ai-dB-Wpq">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2ai-dB-Wpq" customClass="VLCHUDImageButton">
                                 <rect key="frame" x="299" y="7" width="34" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="2ai-dB-Wpq" secondAttribute="height" multiplier="19:16" id="Itj-7f-YDa"/>
@@ -106,7 +106,7 @@
                                     <action selector="gotoNext:" target="-2" id="flJ-52-Pcb"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="TVM-DT-2yo">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="TVM-DT-2yo" customClass="VLCHUDImageButton">
                                 <rect key="frame" x="153" y="7" width="34" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="TVM-DT-2yo" secondAttribute="height" multiplier="19:16" id="oKb-iw-6S1"/>
@@ -130,7 +130,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="C5K-aX-3aJ">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="C5K-aX-3aJ" customClass="VLCHUDImageButton">
                                 <rect key="frame" x="438" y="10" width="22" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="C5K-aX-3aJ" secondAttribute="height" multiplier="1:1" id="VWl-0x-p1I"/>

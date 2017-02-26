@@ -92,10 +92,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [self injectBackgroundView];
 #endif
 
-    /* TODO: Write custom Image-only button subclass to behave properly */
-    [(NSButtonCell*)[_playPauseButton cell] setHighlightsBy:NSPushInCellMask];
-    [(NSButtonCell*)[_playPauseButton cell] setShowsStateBy:NSContentsCellMask];
-
     [self setupControls];
 }
 

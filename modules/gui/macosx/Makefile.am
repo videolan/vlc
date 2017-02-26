@@ -92,7 +92,9 @@ libmacosx_plugin_la_SOURCES = \
 	VLCFSPanelController.h VLCFSPanelController.m \
 	VLCFSPanelDraggableView.h VLCFSPanelDraggableView.m \
 	VLCDefaultValueSlider.h VLCDefaultValueSlider.m \
-	VLCDefaultValueSliderCell.h VLCDefaultValueSliderCell.m
+	VLCDefaultValueSliderCell.h VLCDefaultValueSliderCell.m \
+	VLCHUDImageButton.h VLCHUDImageButton.m \
+	VLCHUDToggleButton.h VLCHUDToggleButton.m
 
 nobase_libmacosx_plugin_la_DATA = \
 	UI/About.nib \

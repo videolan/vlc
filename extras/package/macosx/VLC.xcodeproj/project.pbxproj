@@ -165,6 +165,8 @@
 		1C3114281E508D1B00D4DD76 /* VLCFullScreenPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */; };
 		1C3114291E508D1B00D4DD76 /* VLCRendererDialog.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224191E4D2A9000833BE1 /* VLCRendererDialog.xib */; };
 		1C31142A1E508D1B00D4DD76 /* VLCStatusBarIconMainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */; };
+		6B3BE42C1E6217CB008D098A /* VLCHUDImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */; };
+		6B3BE4321E621F24008D098A /* VLCHUDToggleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -195,6 +197,10 @@
 		633121CB1B51122700E636DA /* VLCResumeDialogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCResumeDialogController.m; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCScrollingClipView.m; sourceTree = "<group>"; };
+		6B3BE42A1E6217CB008D098A /* VLCHUDImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDImageButton.h; sourceTree = "<group>"; };
+		6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDImageButton.m; sourceTree = "<group>"; };
+		6B3BE4301E621F24008D098A /* VLCHUDToggleButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDToggleButton.h; sourceTree = "<group>"; };
+		6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDToggleButton.m; sourceTree = "<group>"; };
 		6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSlider.h; sourceTree = "<group>"; };
 		6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCDefaultValueSlider.m; sourceTree = "<group>"; };
 		6B6A499C1DFD9B23009128AC /* VLCDefaultValueSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSliderCell.h; sourceTree = "<group>"; };
@@ -922,6 +928,10 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				6B3BE42A1E6217CB008D098A /* VLCHUDImageButton.h */,
+				6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */,
+				6B3BE4301E621F24008D098A /* VLCHUDToggleButton.h */,
+				6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */,
 				1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */,
 				1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */,
 				1C67C8A31D58C0980079E1C1 /* VLCHelpWindowController.h */,
@@ -1879,7 +1889,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1905,6 +1915,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1C31140E1E508D1B00D4DD76 /* About.xib in Sources */,
+				6B3BE42C1E6217CB008D098A /* VLCHUDImageButton.m in Sources */,
 				1C31140F1E508D1B00D4DD76 /* AddonManager.xib in Sources */,
 				1C3114101E508D1B00D4DD76 /* AudioEffects.xib in Sources */,
 				1C3114111E508D1B00D4DD76 /* Bookmarks.xib in Sources */,
@@ -1954,6 +1965,7 @@
 				1C3113F01E508C7600D4DD76 /* VLCRendererItem.h in Sources */,
 				1C3113F11E508C7600D4DD76 /* VLCRendererItem.m in Sources */,
 				1C3113F21E508C7600D4DD76 /* VLCRendererDialog.h in Sources */,
+				6B3BE4321E621F24008D098A /* VLCHUDToggleButton.m in Sources */,
 				1C3113F31E508C7600D4DD76 /* VLCRendererDialog.m in Sources */,
 				1C3113F41E508C7600D4DD76 /* VLCHUDTextFieldCell.h in Sources */,
 				1C3113F51E508C7600D4DD76 /* VLCHUDTextFieldCell.m in Sources */,
@@ -2218,7 +2230,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,
