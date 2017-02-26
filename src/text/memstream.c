@@ -105,7 +105,9 @@ int vlc_memstream_vprintf(struct vlc_memstream *ms, const char *fmt,
 int vlc_memstream_open(struct vlc_memstream *ms)
 {
     ms->error = 0;
-    ms->ptr = NULL;
+    ms->ptr = calloc(1, 1);
+    if (unlikely(ms->ptr == NULL))
+        ms->error = EOF;
     ms->length = 0;
     return 0;
 }
