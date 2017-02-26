@@ -31,41 +31,14 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <poll.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_tls.h>
-#include <vlc_dialog.h>
 #include "../../../lib/libvlc_internal.h"
 
 #include <vlc/vlc.h>
 
-static void
-dialog_display_question_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
-                           const char *psz_text, vlc_dialog_question_type i_type,
-                           const char *psz_cancel, const char *psz_action1,
-                           const char *psz_action2)
-{
-    (void) psz_title;
-    (void) psz_text;
-    (void) i_type;
-    (void) psz_cancel;
-    (void) psz_action1;
-    (void) psz_action2;
-    int *value = p_data;
-    vlc_dialog_id_post_action(p_id, *value);
-}
-
-static void dialog_cancel_cb(void *p_data, vlc_dialog_id *id)
-{
-    (void)p_data;
-    vlc_dialog_id_dismiss(id);
-}
-
-static libvlc_instance_t *vlc;
-static vlc_object_t *obj;
 static vlc_tls_creds_t *server_creds;
 static vlc_tls_creds_t *client_creds;
 
@@ -106,54 +79,57 @@ error:
     return NULL;
 }
 
-static int securepair(vlc_thread_t *th, vlc_tls_t **restrict client,
-                      const char *const *alpnv[2], char **restrict alp)
+static vlc_tls_t *securepair(vlc_thread_t *th,
+                             const char *const salpnv[],
+                             const char *const calpnv[],
+                             char **restrict alp)
 {
-    vlc_tls_t *server;
+    vlc_tls_t *socks[2];
+    vlc_tls_t *server, *client;
     int val;
-    vlc_tls_t *insecurev[2];
 
-    val = vlc_tls_SocketPair(PF_LOCAL, 0, insecurev);
+    val = vlc_tls_SocketPair(PF_LOCAL, 0, socks);
     assert(val == 0);
 
-    server = vlc_tls_ServerSessionCreate(server_creds, insecurev[0], alpnv[0]);
+    server = vlc_tls_ServerSessionCreate(server_creds, socks[0], salpnv);
     assert(server != NULL);
 
     val = vlc_clone(th, tls_echo, server, VLC_THREAD_PRIORITY_LOW);
     assert(val == 0);
 
-    *client = vlc_tls_ClientSessionCreate(client_creds, insecurev[1],
-                                          "localhost", "vlc-tls-test",
-                                          alpnv[1], alp);
-    if (*client == NULL)
+    client = vlc_tls_ClientSessionCreate(client_creds, socks[1],
+                                         "localhost", "vlc-tls-test",
+                                         calpnv, alp);
+    if (client == NULL)
     {
-        vlc_tls_SessionDelete(insecurev[1]);
+        vlc_tls_SessionDelete(socks[1]);
         vlc_join(*th, NULL);
-        return -1;
+        return NULL;
     }
-    return 0;
+    return client;
 }
 
-static const char certpath[] = SRCDIR"/modules/misc/certkey.pem";
+#define CERTDIR SRCDIR "/samples/certs"
+#define CERTFILE CERTDIR "/certkey.pem"
+
+static const char *const test_cert_argv[] = {
+    "--no-gnutls-system-trust", "--gnutls-dir-trust=" CERTDIR, NULL };
 static const char *const alpn[] = { "foo", "bar", NULL };
+static const char *const alpn_bad[] = { "baz", NULL };
 
 int main(void)
 {
+    libvlc_instance_t *vlc;
+    vlc_object_t *obj;
+    vlc_thread_t th;
+    void *p;
+    vlc_tls_t *tls;
+    char *alp;
     int val;
-    int answer = 0;
 
-    /* Create fake home for stored keys */
-    char homedir[] = "/tmp/vlc-test-XXXXXX";
-    if (mkdtemp(homedir) != homedir)
-    {
-        perror("Temporary directory");
-        return 77;
-    }
-
-    assert(!strncmp(homedir, "/tmp/vlc-test-", 14));
-    setenv("HOME", homedir, 1);
     setenv("VLC_PLUGIN_PATH", "../modules", 1);
 
+    /*** Tests with normal certs database - server cert not acceptable. ***/
     vlc = libvlc_new(0, NULL);
     assert(vlc != NULL);
     obj = VLC_OBJECT(vlc->p_libvlc_int);
@@ -162,41 +138,50 @@ int main(void)
     assert(server_creds == NULL);
     server_creds = vlc_tls_ServerCreate(obj, SRCDIR"/samples/empty.voc", NULL);
     assert(server_creds == NULL);
-    server_creds = vlc_tls_ServerCreate(obj, certpath, SRCDIR"/nonexistent");
+    server_creds = vlc_tls_ServerCreate(obj, CERTFILE, SRCDIR"/nonexistent");
     assert(server_creds == NULL);
-    server_creds = vlc_tls_ServerCreate(obj, certpath, NULL);
+    server_creds = vlc_tls_ServerCreate(obj, CERTFILE, NULL);
     if (server_creds == NULL)
     {
         libvlc_release(vlc);
         return 77;
     }
+    vlc_tls_Delete(server_creds);
 
+    server_creds = vlc_tls_ServerCreate(obj, CERTFILE, CERTFILE);
+    assert(server_creds != NULL);
     client_creds = vlc_tls_ClientCreate(obj);
     assert(client_creds != NULL);
 
-    vlc_dialog_cbs cbs = {
-        .pf_display_question = dialog_display_question_cb,
-        .pf_cancel = dialog_cancel_cb,
-    };
-    vlc_dialog_provider_set_callbacks(obj, &cbs, &answer);
-
-    vlc_thread_t th;
-    vlc_tls_t *tls;
-    const char *const *alpnv[2] = { alpn + 1, alpn };
-    char *alp;
-    void *p;
-
     /* Test unknown certificate */
-    answer = 0;
-    val = securepair(&th, &tls, alpnv, &alp);
-    assert(val == -1);
+    tls = securepair(&th, alpn, alpn, &alp);
+    assert(tls == NULL);
+    tls = securepair(&th, alpn, alpn, NULL);
+    assert(tls == NULL);
 
-    /* Accept unknown certificate */
-    answer = 1;
-    val = securepair(&th, &tls, alpnv, &alp);
-    assert(val == 0);
+    vlc_tls_Delete(client_creds);
+    vlc_tls_Delete(server_creds);
+    libvlc_release(vlc);
+
+    /*** Tests with test certs database - server cert accepted. ***/
+    vlc = libvlc_new(ARRAY_SIZE(test_cert_argv) - 1, test_cert_argv);
+    if (vlc == NULL)
+    {
+        libvlc_release(vlc);
+        return 77;
+    }
+    obj = VLC_OBJECT(vlc->p_libvlc_int);
+
+    server_creds = vlc_tls_ServerCreate(obj, CERTFILE, NULL);
+    assert(server_creds != NULL);
+    client_creds = vlc_tls_ClientCreate(obj);
+    assert(client_creds != NULL);
+
+    /* Test known certificate */
+    tls = securepair(&th, alpn, alpn, &alp);
+    assert(tls != NULL);
     assert(alp != NULL);
-    assert(!strcmp(alp, "bar"));
+    assert(strcmp(alp, alpn[0]) == 0);
     free(alp);
 
     /* Do some I/O */
@@ -226,9 +211,8 @@ int main(void)
     vlc_tls_Close(tls);
 
     /* Test known certificate, ignore ALPN result */
-    answer = 0;
-    val = securepair(&th, &tls, alpnv, NULL);
-    assert(val == 0);
+    tls = securepair(&th, alpn, alpn, NULL);
+    assert(tls != NULL);
 
     /* Do a lot of I/O, test congestion handling */
     static unsigned char data[16184];
@@ -267,18 +251,45 @@ int main(void)
     vlc_join(th, NULL);
 
     /* Test known certificate, no ALPN */
-    alpnv[0] = alpnv[1] = NULL;
-    val = securepair(&th, &tls, alpnv, NULL);
-    assert(val == 0);
+    tls = securepair(&th, alpn, NULL, &alp);
+    assert(tls != NULL);
+    assert(alp == NULL);
     vlc_tls_Close(tls);
     vlc_join(th, NULL);
 
-    vlc_dialog_provider_set_callbacks(obj, NULL, NULL);
+    tls = securepair(&th, NULL, alpn, NULL);
+    assert(tls != NULL);
+    assert(alp == NULL);
+    vlc_tls_Close(tls);
+    vlc_join(th, NULL);
+
+    /* Test ALPN combinations */
+    tls = securepair(&th, alpn, alpn + 1, &alp);
+    assert(tls != NULL);
+    assert(alp != NULL);
+    assert(strcmp(alp, alpn[1]) == 0);
+    free(alp);
+    vlc_tls_Close(tls);
+    vlc_join(th, NULL);
+
+    tls = securepair(&th, alpn + 1, alpn, &alp);
+    assert(tls != NULL);
+    assert(alp != NULL);
+    assert(strcmp(alp, alpn[1]) == 0);
+    free(alp);
+    vlc_tls_Close(tls);
+    vlc_join(th, NULL);
+
+    /* Test ALPN mismatch */
+    tls = securepair(&th, alpn, alpn_bad, &alp);
+    assert(tls != NULL);
+    assert(alp == NULL); /* currently, ALPN is marked optional in hello */
+    vlc_tls_Close(tls);
+    vlc_join(th, NULL);
+
     vlc_tls_Delete(client_creds);
     vlc_tls_Delete(server_creds);
     libvlc_release(vlc);
 
-    if (fork() == 0)
-        execlp("rm", "rm", "-rf", homedir, (char *)NULL);
     return 0;
 }
