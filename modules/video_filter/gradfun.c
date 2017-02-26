@@ -96,6 +96,7 @@ vlc_module_end()
 #   define HAVE_6REGS 0
 #endif
 #define av_clip_uint8 clip_uint8_vlc
+#include <stdalign.h>
 #include "gradfun.h"
 
 static picture_t *Filter(filter_t *, picture_t *);

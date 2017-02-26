@@ -38,9 +38,9 @@ struct vf_priv_s {
                       uint8_t *src, int sstride, int width);
 };
 
-static const uint16_t __attribute__((aligned(16))) pw_7f[8] = {127,127,127,127,127,127,127,127};
-static const uint16_t __attribute__((aligned(16))) pw_ff[8] = {255,255,255,255,255,255,255,255};
-static const uint16_t __attribute__((aligned(16))) dither[8][8] = {
+static alignas (16) const uint16_t pw_7f[8] = {127,127,127,127,127,127,127,127};
+static alignas (16) const uint16_t pw_ff[8] = {255,255,255,255,255,255,255,255};
+static alignas (16) const uint16_t dither[8][8] = {
     {  0, 96, 24,120,  6,102, 30,126 },
     { 64, 32, 88, 56, 70, 38, 94, 62 },
     { 16,112,  8,104, 22,118, 14,110 },
