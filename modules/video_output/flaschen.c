@@ -204,14 +204,14 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         src += picture->p->i_pitch;
     }
 
-    struct msghdr hdr;
-    hdr.msg_name = NULL;
-    hdr.msg_namelen = 0;
-    hdr.msg_iov = iov;
-    hdr.msg_iovlen = iovcnt;
-    hdr.msg_control = NULL;
-    hdr.msg_controllen = 0;
-    hdr.msg_flags = 0;
+    struct msghdr hdr = {
+        .msg_name = NULL,
+        .msg_namelen = 0,
+        .msg_iov = iov,
+        .msg_iovlen = iovcnt,
+        .msg_control = NULL,
+        .msg_controllen = 0,
+        .msg_flags = 0 };
 
     result = sendmsg(sys->fd, &hdr, 0);
     if (result < 0)
