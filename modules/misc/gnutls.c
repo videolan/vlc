@@ -566,6 +566,19 @@ static int OpenClient (vlc_tls_creds_t *crd)
             msg_Dbg(crd, "loaded %d trusted CAs from %s", val, "system");
     }
 
+    char *dir = var_InheritString(crd, "gnutls-dir-trust");
+    if (dir != NULL)
+    {
+        val = gnutls_certificate_set_x509_trust_dir(x509, dir,
+                                                    GNUTLS_X509_FMT_PEM);
+        if (val < 0)
+            msg_Err(crd, "cannot load trusted Certificate Authorities "
+                    "from %s: %s", dir, gnutls_strerror(val));
+        else
+            msg_Dbg(crd, "loaded %d trusted CAs from %s", val, dir);
+        free(dir);
+    }
+
     gnutls_certificate_set_verify_flags (x509,
                                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
@@ -732,6 +745,11 @@ static void CloseServer (vlc_tls_creds_t *crd)
     "Trust the root certificates of Certificate Authorities stored in " \
     "the operating system trust database to authenticate TLS sessions.")
 
+#define DIR_TRUST_TEXT N_("Trust directory")
+#define DIR_TRUST_LONGTEXT N_( \
+    "Trust the root certificates of Certificate Authorities stored in " \
+    "the specified directory to authenticate TLS sessions.")
+
 #define PRIORITIES_TEXT N_("TLS cipher priorities")
 #define PRIORITIES_LONGTEXT N_("Ciphers, key exchange methods, " \
     "hash functions and compression methods can be selected. " \
@@ -760,6 +778,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_ADVANCED_NETWORK )
     add_bool("gnutls-system-trust", true, SYSTEM_TRUST_TEXT,
              SYSTEM_TRUST_LONGTEXT, true)
+    add_string("gnutls-dir-trust", NULL, DIR_TRUST_TEXT,
+               DIR_TRUST_TEXT, true)
     add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
                 PRIORITIES_LONGTEXT, false)
         change_string_list (priorities_values, priorities_text)
