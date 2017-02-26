@@ -21,10 +21,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -34,123 +30,14 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
-#include <vlc_network.h>
-#include <vlc_interrupt.h>
+#include <vlc_url.h>
+#include <vlc_tls.h>
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
-
-vlc_module_begin ()
-    set_shortname( N_("TCP") )
-    set_description( N_("TCP input") )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_ACCESS )
-
-    set_capability( "access", 0 )
-    add_shortcut( "tcp" )
-    set_callbacks( Open, Close )
-vlc_module_end ()
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-struct access_sys_t
+static ssize_t Read(access_t *access, void *buf, size_t len)
 {
-    int        fd;
-};
-
-static ssize_t Read( access_t *, void *, size_t );
-static int Control( access_t *, int, va_list );
-
-/*****************************************************************************
- * Open: open the socket
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    access_t     *p_access = (access_t *)p_this;
-    access_sys_t *p_sys;
-
-    char         *psz_dup = strdup(p_access->psz_location);
-    char         *psz_parser = psz_dup;
-
-    /* Parse server:port */
-    if( *psz_parser == '[' )
-    {
-        psz_parser = strchr( psz_parser, ']' );
-        if( psz_parser == NULL )
-            psz_parser = psz_dup;
-    }
-    psz_parser = strchr( psz_parser, ':' );
-
-    if( psz_parser == NULL )
-    {
-        msg_Err( p_access, "missing port number : %s", psz_dup );
-        free( psz_dup );
-        return VLC_EGENERIC;
-    }
-
-    *psz_parser++ = '\0';
-
-    /* Init p_access */
-    ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL );
-    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );
-    if( !p_sys )
-    {
-        free( psz_dup );
-        return VLC_ENOMEM;
-    }
-
-    p_sys->fd = net_ConnectTCP( p_access, psz_dup, atoi( psz_parser ) );
-    free( psz_dup );
-
-    if( p_sys->fd < 0 )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
+    return vlc_tls_Read(access->p_sys, buf, len, false);
 }
 
-/*****************************************************************************
- * Close: free unused data structures
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    access_t     *p_access = (access_t *)p_this;
-    access_sys_t *p_sys = p_access->p_sys;
-
-    net_Close( p_sys->fd );
-    free( p_sys );
-}
-
-/*****************************************************************************
- * Read: read on a file descriptor
- *****************************************************************************/
-static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_read;
-
-    i_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
-    if( i_read < 0 )
-    {
-        if( errno != EINTR && errno != EAGAIN )
-        {
-            msg_Err( p_access, "receive error: %s", vlc_strerror_c(errno) );
-            i_read = 0;
-        }
-    }
-
-    return i_read;
-}
-
-/*****************************************************************************
- * Control:
- *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     bool    *pb_bool;
@@ -187,3 +74,51 @@ static int Control( access_t *p_access, int i_query, va_list args )
     }
     return VLC_SUCCESS;
 }
+
+static int Open(vlc_object_t *obj)
+{
+    access_t *access = (access_t *)obj;
+    vlc_tls_t *sock;
+    vlc_url_t url;
+
+    if (vlc_UrlParse(&url, access->psz_url)
+     || url.psz_host == NULL || url.i_port == 0)
+    {
+        msg_Err(access, "invalid location: %s", access->psz_location);
+        vlc_UrlClean(&url);
+        return VLC_EGENERIC;
+    }
+
+    sock = vlc_tls_SocketOpenTCP(obj, url.psz_host, url.i_port);
+    vlc_UrlClean(&url);
+    if (sock == NULL)
+        return VLC_EGENERIC;
+
+    access->p_sys = sock;
+    access->pf_read = Read;
+    access->pf_block = NULL;
+    access->pf_control = Control;
+    access->pf_seek = NULL;
+    return VLC_SUCCESS;
+}
+
+static void Close( vlc_object_t *p_this )
+{
+    access_t *access = (access_t *)p_this;
+
+    vlc_tls_SessionDelete(access->p_sys);
+}
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin ()
+    set_shortname( N_("TCP") )
+    set_description( N_("TCP input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+
+    set_capability( "access", 0 )
+    add_shortcut( "tcp" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
