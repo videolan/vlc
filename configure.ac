@@ -1099,23 +1099,6 @@ AC_CACHE_CHECK([if linker supports -z,defs], [ac_cv_ld_z_defs], [
 ])
 AS_IF([test "${ac_cv_ld_z_defs}" = "no"], [VLC_RESTORE_FLAGS])
 
-dnl Checks for __attribute__(aligned()) directive
-VLC_SAVE_FLAGS
-CFLAGS="${CFLAGS} -Werror"
-AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
-    [ac_cv_c_attribute_aligned],
-    [ac_cv_c_attribute_aligned=0
-    for ac_cv_c_attr_align_try in 2 4 8 16 32 64; do
-        AC_TRY_COMPILE([],
-        [static char c __attribute__ ((aligned(${ac_cv_c_attr_align_try}))) = 0; return c;],
-        [ac_cv_c_attribute_aligned="${ac_cv_c_attr_align_try}"])
-    done])
-VLC_RESTORE_FLAGS
-if test "${ac_cv_c_attribute_aligned}" != "0"; then
-    AC_DEFINE_UNQUOTED([ATTRIBUTE_ALIGNED_MAX],
-        [${ac_cv_c_attribute_aligned}],[Maximum supported data alignment])
-fi
-
 dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
   [ac_cv_c_attribute_packed],

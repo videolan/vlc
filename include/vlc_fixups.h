@@ -311,13 +311,6 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 # define static_assert _Static_assert
 #endif
 
-/* Alignment of critical static data structures */
-#ifdef ATTRIBUTE_ALIGNED_MAX
-#   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
-#else
-#   define ATTR_ALIGN(align)
-#endif
-
 /* libintl support */
 #define _(str)            vlc_gettext (str)
 #define N_(str)           gettext_noop (str)
