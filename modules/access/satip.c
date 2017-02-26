@@ -435,7 +435,7 @@ static void *satip_thread(void *data) {
         memset(&msgs[i], 0, sizeof (msgs[i]));
         msgs[i].msg_hdr.msg_iov = &iovecs[i];
         msgs[i].msg_hdr.msg_iovlen = 1;
-        memset(&iovecs[i], 0, sizeof (iovecs[i]));
+        iovecs[i].iov_base = NULL;
         iovecs[i].iov_len = RTSP_RECEIVE_BUFFER;
         input_blocks[i] = NULL;
     }
