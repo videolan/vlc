@@ -51,6 +51,12 @@ static void encode (const char *in, const char *out)
     printf ("\"%s\" -> \"%s\" ?\n", in, out);
     buf = vlc_xml_encode (in);
 
+    if (buf == NULL)
+    {
+        puts(" ERROR: got NULL");
+        exit(2);
+    }
+
     if (strcmp (buf, out))
     {
         printf (" ERROR: got \"%s\"\n", buf);
