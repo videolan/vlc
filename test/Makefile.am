@@ -30,8 +30,10 @@ check_PROGRAMS = \
 	test_src_misc_epg \
 	test_src_misc_keystore \
 	test_modules_packetizer_hxxx \
-	test_modules_keystore \
-	test_modules_tls
+	test_modules_keystore
+if ENABLE_SOUT
+check_PROGRAMS += test_modules_tls
+endif
 if UPDATE_CHECK
 check_PROGRAMS += test_src_crypto_update
 endif
