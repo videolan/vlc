@@ -27,6 +27,7 @@
 
 #ifdef CAN_COMPILE_MMXEXT
 #   include "mmx.h"
+#   include <stdalign.h>
 #endif
 
 #include <stdint.h>
@@ -183,7 +184,7 @@ static int TestForMotionInBlockMMX( uint8_t *p_pix_p, uint8_t *p_pix_c,
     int32_t i_top_motion = 0;
     int32_t i_bot_motion = 0;
 
-    static const mmx_t bT   = { .ub = { T, T, T, T, T, T, T, T } };
+    static alignas (8) const mmx_t bT   = { .ub = { T, T, T, T, T, T, T, T } };
     pxor_r2r( mm6, mm6 ); /* zero, used in psadbw */
     movq_m2r( bT,  mm5 );
 
@@ -500,9 +501,12 @@ static int CalculateInterlaceScoreMMX( const picture_t* p_pic_top,
                             # of pixels < (2^32)/255
                Note: calculates score * 255
             */
-            static const mmx_t b0   = { .uq = 0x0000000000000000ULL };
-            static const mmx_t b128 = { .uq = 0x8080808080808080ULL };
-            static const mmx_t bT   = { .ub = { T, T, T, T, T, T, T, T } };
+            static alignas (8) const mmx_t b0 = {
+                .uq = 0x0000000000000000ULL };
+            static alignas (8) const mmx_t b128 = {
+                .uq = 0x8080808080808080ULL };
+            static alignas (8) const mmx_t bT = {
+                .ub = { T, T, T, T, T, T, T, T } };
 
             for( ; x < w8; x += 8 )
             {

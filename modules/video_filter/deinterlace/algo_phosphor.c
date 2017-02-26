@@ -27,6 +27,7 @@
 
 #ifdef CAN_COMPILE_MMXEXT
 #   include "mmx.h"
+#   include <stdalign.h>
 #endif
 
 #include <stdint.h>
@@ -228,7 +229,10 @@ static void DarkenFieldMMX( picture_t *p_dst,
                 int x = 0;
 
                 /* See also easy-to-read C version below. */
-                static const mmx_t b128 = { .uq = 0x8080808080808080ULL };
+                static alignas (8) const mmx_t b128 = {
+                    .uq = 0x8080808080808080ULL
+                };
+
                 movq_m2r( b128, mm5 );
                 movq_m2r( i_strength_u64,  mm6 );
                 movq_m2r( remove_high_u64, mm7 );
