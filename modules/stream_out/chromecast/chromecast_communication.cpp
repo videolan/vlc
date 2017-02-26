@@ -124,7 +124,6 @@ void ChromecastCommunication::buildMessage(const std::string & namespace_,
  */
 ssize_t ChromecastCommunication::recvPacket( uint8_t *p_data )
 {
-    uint32_t i_received = 0;
     ssize_t i_payloadSize = -1;
     struct pollfd ufd[1];
     ufd[0].fd = m_sock_fd;
@@ -144,7 +143,6 @@ ssize_t ChromecastCommunication::recvPacket( uint8_t *p_data )
     if ( val == 0 )
         return 0;
 
-    int i_ret = 0;
     if ( ufd[0].revents & POLLIN )
     {
         /* we have received stuff */
@@ -153,14 +151,10 @@ ssize_t ChromecastCommunication::recvPacket( uint8_t *p_data )
          * +------------------------------------+------------------------------+
          * | Payload size (uint32_t big endian) |         Payload data         |
          * +------------------------------------+------------------------------+ */
-        while (i_received < PACKET_HEADER_LEN)
-        {
-            // We receive the header.
-            i_ret = tls_Recv(m_tls, p_data + i_received, PACKET_HEADER_LEN - i_received);
-            if (i_ret <= 0)
-                return -1;
-            i_received += i_ret;
-        }
+        // We receive the header.
+        ssize_t i_ret = vlc_tls_Read(m_tls, p_data, PACKET_HEADER_LEN, true);
+        if (i_ret < PACKET_HEADER_LEN)
+            return -1;
 
         // We receive the payload.
 
@@ -171,34 +165,18 @@ ssize_t ChromecastCommunication::recvPacket( uint8_t *p_data )
         if (i_payloadSize > i_maxPayloadSize)
         {
             // Error case: the packet sent by the Chromecast is too long: we drop it.
-            msg_Err( m_module, "Packet too long: droping its data");
+            msg_Err( m_module, "Packet too long: dropping its data");
 
-            uint32_t i_size = i_payloadSize - (i_received - PACKET_HEADER_LEN);
-            if (i_size > i_maxPayloadSize)
-                i_size = i_maxPayloadSize;
-
-            i_ret = tls_Recv(m_tls, p_data + PACKET_HEADER_LEN, i_size);
-            if (i_ret <= 0)
-                return -1;
-            i_received += i_ret;
-
-            if (i_received < i_payloadSize + PACKET_HEADER_LEN)
-                return i_ret;
-
-            return -1;
+            i_ret = vlc_tls_Read(m_tls, p_data + PACKET_HEADER_LEN,
+                                 i_maxPayloadSize, false);
+            return i_ret ? i_ret : -1;
         }
 
         // Normal case
-        i_ret = tls_Recv(m_tls, p_data + i_received,
-                         i_payloadSize - (i_received - PACKET_HEADER_LEN));
-        if (i_ret <= 0)
+        i_ret = vlc_tls_Read(m_tls, p_data + PACKET_HEADER_LEN, i_payloadSize,
+                             false);
+        if (i_ret < i_payloadSize)
             return -1;
-        i_received += i_ret;
-
-        if (i_received < i_payloadSize + PACKET_HEADER_LEN)
-            return -1;
-
-        assert(i_received == i_payloadSize + PACKET_HEADER_LEN);
     }
     return i_payloadSize;
 }
