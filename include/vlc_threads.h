@@ -825,7 +825,7 @@ VLC_API void msleep(mtime_t delay);
 #define VLC_HARD_MIN_SLEEP   10000 /* 10 milliseconds = 1 tick at 100Hz */
 #define VLC_SOFT_MIN_SLEEP 9000000 /* 9 seconds */
 
-#ifdef __GNUC__
+#if defined (__GNUC__) && !defined (__clang__)
 /* Linux has 100, 250, 300 or 1000Hz
  *
  * HZ=100 by default on FreeBSD, but some architectures use a 1000Hz timer
