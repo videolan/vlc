@@ -35,22 +35,29 @@
  * Definitions for sockets and low-level networking
  */
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #if defined( _WIN32 )
 #   define _NO_OLDNAMES 1
-#   include <io.h>
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   define net_errno (WSAGetLastError())
+#   define net_Close(fd) ((void)closesocket((SOCKET)fd))
 #   ifndef IPV6_V6ONLY
 #       define IPV6_V6ONLY 27
 #   endif
 #else
-#   include <sys/types.h>
-#   include <unistd.h>
 #   include <sys/socket.h>
 #   include <netinet/in.h>
 #   include <netdb.h>
 #   define net_errno errno
+#   define net_Close(fd) ((void)vlc_close(fd))
+#   ifdef __OS2__
+#       define SHUT_RD    0
+#       define SHUT_WR    1
+#       define SHUT_RDWR  2
+#   endif
 #endif
 
 #ifndef MSG_NOSIGNAL
@@ -128,22 +135,7 @@ VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, .
 VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const char *psz_fmt, va_list args );
 #define net_vaPrintf(a,b,c,d) net_vaPrintf(VLC_OBJECT(a),b,c,d)
 
-#ifdef _WIN32
-/* Microsoft: same semantic, same value, different name... go figure */
-# define SHUT_RD SD_RECEIVE
-# define SHUT_WR SD_SEND
-# define SHUT_RDWR SD_BOTH
-# define net_Close( fd ) closesocket ((SOCKET)fd)
-#else
-# ifdef __OS2__
-#  define SHUT_RD    0
-#  define SHUT_WR    1
-#  define SHUT_RDWR  2
-# endif
-
 VLC_API int vlc_close(int);
-# define net_Close( fd ) (void)vlc_close (fd)
-#endif
 
 /* Portable network names/addresses resolution layer */
 
