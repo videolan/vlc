@@ -150,7 +150,10 @@ static void *Thread (void *data)
                 j = write (fd, buf + i, len - i);
             else
             {
-                struct iovec iov = { buf + i, (len - i) & ~page_mask, };
+                struct iovec iov = {
+                    .iov_base = buf + i,
+                    .iov_len = (len - i) & ~page_mask };
+
                 j = vmsplice (fd, &iov, 1, SPLICE_F_GIFT);
             }
             if (j == -1 && errno == ENOSYS) /* vmsplice() not supported */

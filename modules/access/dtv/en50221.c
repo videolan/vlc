@@ -244,8 +244,8 @@ static int TPDUSend( cam_t * p_cam, uint8_t i_slot, uint8_t i_tag,
     Dump( true, p_data, p - p_data );
 
     const struct iovec iov[2] = {
-        { p_data, p - p_data },
-        { (void *)p_content, i_length },
+        { .iov_base = p_data, .iov_len = p - p_data },
+        { .iov_base = (void *)p_content, .iov_len = i_length },
     };
 
     if ( writev( p_cam->fd, iov, 2 ) <= 0 )
