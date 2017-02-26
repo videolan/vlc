@@ -17,7 +17,7 @@ $(TARBALLS)/mfx-$(MFX_GITHASH).tar.xz:
 	$(call check_githash,$(MFX_GITHASH))
 	touch $@
 
-mfx: mfx-git.tar.xz .sum-mfx
+mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 	$(UNPACK)
 	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
