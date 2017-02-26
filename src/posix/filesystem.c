@@ -293,15 +293,6 @@ static void vlc_socket_setup(int fd, bool nonblock)
 }
 #endif
 
-/**
- * Creates a socket file descriptor. The new file descriptor has the
- * close-on-exec flag set.
- * @param pf protocol family
- * @param type socket type
- * @param proto network protocol
- * @param nonblock true to create a non-blocking socket
- * @return a new file descriptor or -1
- */
 int vlc_socket (int pf, int type, int proto, bool nonblock)
 {
 #ifdef SOCK_CLOEXEC
@@ -348,15 +339,6 @@ int vlc_socketpair(int pf, int type, int proto, int fds[2], bool nonblock)
     return ret;
 }
 
-/**
- * Accepts an inbound connection request on a listening socket.
- * The new file descriptor has the close-on-exec flag set.
- * @param lfd listening socket file descriptor
- * @param addr pointer to the peer address or NULL [OUT]
- * @param alen pointer to the length of the peer address or NULL [OUT]
- * @param nonblock whether to put the new socket in non-blocking mode
- * @return a new file descriptor, or -1 on error.
- */
 int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
 {
 #ifdef HAVE_ACCEPT4
