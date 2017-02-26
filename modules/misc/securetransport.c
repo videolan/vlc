@@ -570,7 +570,7 @@ static void st_SessionClose (vlc_tls_t *session) {
 static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
                                        bool b_server)
 {
-    vlc_tls_st_t *sys = malloc(sizeof (*st));
+    vlc_tls_st_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return NULL;
 
@@ -643,7 +643,7 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_creds_t *crd, vlc_tls_t *sock,
 
     vlc_tls_st_t *sys = (vlc_tls_st_t *)tls;
 
-    ret = SSLSetPeerDomainName(sys->p_context, hostname, strlen(hostname));
+    OSStatus ret = SSLSetPeerDomainName(sys->p_context, hostname, strlen(hostname));
     if (ret != noErr) {
         msg_Err(crd, "cannot set peer domain name");
         goto error;
@@ -726,7 +726,7 @@ static vlc_tls_t *st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *sock,
     vlc_tls_st_t *sys = (vlc_tls_st_t *)tls;
     vlc_tls_creds_sys_t *p_cred_sys = crd->sys;
 
-    ret = SSLSetCertificate(sys->p_context, p_cred_sys->server_cert_chain);
+    OSStatus ret = SSLSetCertificate(sys->p_context, p_cred_sys->server_cert_chain);
     if (ret != noErr) {
         msg_Err(crd, "cannot set server certificate");
         goto error;
