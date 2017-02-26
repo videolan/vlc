@@ -121,7 +121,7 @@ static int securepair(vlc_thread_t *th, vlc_tls_t **restrict client,
     val = tlspair(insecurev);
     assert(val == 0);
 
-    server = vlc_tls_ServerSessionCreate(server_creds, insecurev[0], alpnv[0]);
+    server = vlc_tls_ServerSessionCreateFD(server_creds, insecurev[0], alpnv[0]);
     assert(server != NULL);
 
     val = vlc_clone(th, tls_echo, server, VLC_THREAD_PRIORITY_LOW);

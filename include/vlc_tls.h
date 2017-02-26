@@ -163,7 +163,8 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *creds,
  *
  * @return TLS session, or NULL on error.
  */
-VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds, int fd,
+VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds,
+                                               vlc_tls_t *sock,
                                                const char *const *alpn);
 
 /** @} */
@@ -331,8 +332,21 @@ vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,
     vlc_tls_t *tls = vlc_tls_ClientSessionCreate(crd, sock, host, srv, lp, p);
     if (unlikely(tls == NULL))
         free(sock);
-    else
-        tls->p = sock;
+    return tls;
+}
+
+VLC_DEPRECATED
+static inline vlc_tls_t *
+vlc_tls_ServerSessionCreateFD(vlc_tls_creds_t *crd, int fd,
+                              const char *const *alp)
+{
+    vlc_tls_t *sock = vlc_tls_SocketOpen(fd);
+    if (unlikely(sock == NULL))
+        return NULL;
+
+    vlc_tls_t *tls = vlc_tls_ServerSessionCreate(crd, sock, alp);
+    if (unlikely(tls == NULL))
+        free(sock);
     return tls;
 }
 
