@@ -109,7 +109,7 @@ int vlc_memstream_open(struct vlc_memstream *ms)
     if (unlikely(ms->ptr == NULL))
         ms->error = EOF;
     ms->length = 0;
-    return 0;
+    return ms->error;
 }
 
 int vlc_memstream_flush(struct vlc_memstream *ms)
