@@ -335,21 +335,6 @@ vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,
     return tls;
 }
 
-VLC_DEPRECATED
-static inline vlc_tls_t *
-vlc_tls_ServerSessionCreateFD(vlc_tls_creds_t *crd, int fd,
-                              const char *const *alp)
-{
-    vlc_tls_t *sock = vlc_tls_SocketOpen(fd);
-    if (unlikely(sock == NULL))
-        return NULL;
-
-    vlc_tls_t *tls = vlc_tls_ServerSessionCreate(crd, sock, alp);
-    if (unlikely(tls == NULL))
-        free(sock);
-    return tls;
-}
-
 /** @} */
 
 #endif
