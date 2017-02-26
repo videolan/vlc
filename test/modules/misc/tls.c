@@ -42,11 +42,6 @@
 
 #include <vlc/vlc.h>
 
-static int tlspair(int fds[2])
-{
-    return vlc_socketpair(PF_LOCAL, SOCK_STREAM, 0, fds, true);
-}
-
 static void
 dialog_display_question_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                            const char *psz_text, vlc_dialog_question_type i_type,
@@ -116,24 +111,23 @@ static int securepair(vlc_thread_t *th, vlc_tls_t **restrict client,
 {
     vlc_tls_t *server;
     int val;
-    int insecurev[2];
+    vlc_tls_t *insecurev[2];
 
-    val = tlspair(insecurev);
+    val = vlc_tls_SocketPair(PF_LOCAL, 0, insecurev);
     assert(val == 0);
 
-    server = vlc_tls_ServerSessionCreateFD(server_creds, insecurev[0], alpnv[0]);
+    server = vlc_tls_ServerSessionCreate(server_creds, insecurev[0], alpnv[0]);
     assert(server != NULL);
 
     val = vlc_clone(th, tls_echo, server, VLC_THREAD_PRIORITY_LOW);
     assert(val == 0);
 
-    *client = vlc_tls_ClientSessionCreateFD(client_creds, insecurev[1],
+    *client = vlc_tls_ClientSessionCreate(client_creds, insecurev[1],
                                           "localhost", "vlc-tls-test",
                                           alpnv[1], alp);
     if (*client == NULL)
     {
-        val = vlc_close(insecurev[1]);
-        assert(val == 0);
+        vlc_tls_SessionDelete(insecurev[1]);
         vlc_join(*th, NULL);
         return -1;
     }
