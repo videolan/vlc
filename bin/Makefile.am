@@ -36,6 +36,8 @@ endif
 if HAVE_DARWIN
 vlc_osx_SOURCES = darwinvlc.m
 vlc_osx_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,CoreFoundation,-framework,Cocoa
+vlc_osx_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/lib/"
+vlc_osx_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/plugins/"
 if HAVE_BREAKPAD
 vlc_osx_LDFLAGS += -Wl,-framework,Breakpad
 vlc_osx_OBJCFLAGS = -F$(CONTRIB_DIR)/Frameworks
@@ -48,6 +50,8 @@ vlc_osx_static_OBJCFLAGS = $(AM_OBJCFLAGS) \
 	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\" \
 	$(NULL)
 vlc_osx_static_LDFLAGS = $(vlc_osx_LDFLAGS) -static
+vlc_osx_static_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../lib/.libs/"
+vlc_osx_static_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../src/.libs/"
 vlc_osx_static_LDADD = $(vlc_osx_LDADD)
 if HAVE_BREAKPAD
 vlc_osx_static_LDFLAGS += -Wl,-framework,Breakpad

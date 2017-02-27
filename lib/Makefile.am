@@ -71,6 +71,9 @@ endif
 if HAVE_OS2
 libvlc_la_LDFLAGS += -avoid-version
 endif
+if HAVE_DARWIN
+libvlc_la_LDFLAGS += -Xlinker -install_name -Xlinker @rpath/libvlc.dylib
+endif
 
 pkgconfig_DATA = libvlc.pc
 

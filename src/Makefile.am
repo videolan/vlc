@@ -464,6 +464,9 @@ endif
 if HAVE_DBUS
 libvlccore_la_LIBADD += $(DBUS_LIBS)
 endif
+if HAVE_DARWIN
+libvlccore_la_LDFLAGS += -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib
+endif
 
 libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
