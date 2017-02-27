@@ -58,7 +58,7 @@ text_LTLIBRARIES += $(LTLIBsvg)
 
 # OS X TTS
 libnsspeechsynthesizer_plugin_la_SOURCES = text_renderer/nsspeechsynthesizer.m
-libnsspeechsynthesizer_plugin_la_LDFLAGS = -Wl,-framework,Cocoa
+libnsspeechsynthesizer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,Cocoa
 if HAVE_OSX
 text_LTLIBRARIES += libnsspeechsynthesizer_plugin.la
 endif
