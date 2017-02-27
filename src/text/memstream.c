@@ -164,6 +164,9 @@ int vlc_memstream_vprintf(struct vlc_memstream *ms, const char *fmt,
     len = vsnprintf(NULL, 0, fmt, ap);
     va_end(ap);
 
+    if (len < 0)
+        goto error;
+
     ptr = realloc(ms->ptr, ms->length + len + 1);
     if (ptr == NULL)
         goto error;
