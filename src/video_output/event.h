@@ -52,6 +52,14 @@ static inline void vout_SendEventMouseMoved(vout_thread_t *vout, int x, int y)
 {
     var_SetCoords(vout, "mouse-moved", x, y);
 }
+static inline void vout_SendEventViewpointMoved(vout_thread_t *vout,
+                                                const vlc_viewpoint_t *p_viewpoint)
+{
+    var_SetAddress(vout, "viewpoint-moved", (void *) p_viewpoint);
+    /* This variable can only be read from callbacks */
+    var_Change(vout, "viewpoint-moved", VLC_VAR_SETVALUE,
+               &(vlc_value_t) { .p_address = NULL }, NULL);
+}
 static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 {
     int key = KEY_UNSET;

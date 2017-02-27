@@ -369,6 +369,7 @@ typedef struct {
 
     bool ch_viewpoint;
     vlc_viewpoint_t viewpoint;
+    vlc_viewpoint_t display_viewpoint;
 
     /* */
     video_format_t source;
@@ -652,6 +653,11 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
     case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
         VoutDisplayEventMouse(vd, event, args);
+        break;
+
+    case VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED:
+        vout_SendEventViewpointMoved(osys->vout,
+                                     va_arg(args, const vlc_viewpoint_t *));
         break;
 
     case VOUT_DISPLAY_EVENT_FULLSCREEN: {
