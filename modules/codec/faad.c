@@ -394,16 +394,18 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             return VLCDEC_SUCCESS;
         }
 
-        if( frame.channels <= 0 || frame.channels > 8 || frame.channels == 7 )
+        if( frame.channels == 0 || frame.channels >= 64 )
         {
             msg_Warn( p_dec, "invalid channels count: %i", frame.channels );
             FlushBuffer( p_sys, frame.bytesconsumed );
-            date_Set( &p_sys->date, VLC_TS_INVALID );
-            p_sys->b_discontinuity = true;
-            return VLCDEC_SUCCESS;
+            if( frame.channels == 0 )
+            {
+                p_sys->b_discontinuity = true;
+                return VLCDEC_SUCCESS;
+            }
         }
 
-        if( frame.samples <= 0 )
+        if( frame.samples == 0 )
         {
             msg_Warn( p_dec, "decoded zero sample" );
             FlushBuffer( p_sys, frame.bytesconsumed );
