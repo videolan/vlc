@@ -3538,16 +3538,6 @@ AS_IF([test "$enable_wasapi" != "no"], [
 AM_CONDITIONAL([HAVE_WASAPI], [test "${have_wasapi}" = "yes"])
 
 dnl
-dnl  AudioQueue plugin
-dnl
-AC_ARG_ENABLE(audioqueue,
-  [  --enable-audioqueue     AudioQueue audio module (default disabled)])
-if test "${enable_audioqueue}" = "yes"
-then
-  VLC_ADD_PLUGIN([audioqueue])
-fi
-
-dnl
 dnl  JACK modules
 dnl
 AC_ARG_ENABLE(jack,

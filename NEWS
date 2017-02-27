@@ -282,6 +282,7 @@ Removed modules
  * EyeTV access module
  * Rar access and stream filter: use libarchive
  * VDA decoder: use VT
+ * Audioqueue: use audiounit
 
 
 Changes between 2.2.0 and 2.2.1:

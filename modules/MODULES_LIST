@@ -49,7 +49,6 @@ $Id$
  * audio_format: helper module for audio transcoding
  * audiobargraph_a: audiobargraph audio plugin
  * audiobargraph_v: audiobargraph video plugin
- * audioqueue: Audio Output based on AudioQueue API for iOS
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
  * audiounit_ios: AudioUnit output plugin for iOS
  * auhal: Audio output for Mac OS X based on the AUHAL API
