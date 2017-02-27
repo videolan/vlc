@@ -228,7 +228,10 @@ static int archive_push_resource( private_sys_t* p_sys,
     p_callback_data->p_sys    = p_sys;
 
     if( unlikely( !p_callback_data->psz_url && psz_url ) )
+    {
+        free( p_callback_data );
         goto error;
+    }
 
     pp_callback_data[ p_sys->i_callback_data++ ] = p_callback_data;
     p_sys->pp_callback_data = pp_callback_data;
