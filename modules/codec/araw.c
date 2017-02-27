@@ -274,6 +274,7 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = format;
+    p_dec->fmt_out.audio.channel_type = p_dec->fmt_in.audio.channel_type;
     p_dec->fmt_out.audio.i_format = format;
     p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
     if( p_dec->fmt_in.audio.i_channels <= ARRAY_SIZE( pi_channels_maps ) - 1 )
