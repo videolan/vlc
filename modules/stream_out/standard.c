@@ -184,7 +184,7 @@ static void create_SDP(sout_stream_t *p_stream, sout_access_out_t *p_access)
         vlc_memstream_printf(&sdp, "m=video %d udp mpeg\r\n", dport);
 
         /* Register the SDP with the SAP thread */
-        if (vlc_memstream_close(&sdp))
+        if (vlc_memstream_close(&sdp) == 0)
         {
             msg_Dbg(p_stream, "Generated SDP:\n%s", sdp.ptr);
             p_sys->p_session =
