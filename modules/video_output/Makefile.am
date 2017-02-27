@@ -43,16 +43,16 @@ libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la
 endif
 
-libvout_ios2_plugin_la_SOURCES = video_output/ios2.m $(OPENGL_COMMONSOURCES)
-libvout_ios2_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
-libvout_ios2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libvout_ios_plugin_la_SOURCES = video_output/ios.m $(OPENGL_COMMONSOURCES)
+libvout_ios_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
+libvout_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit \
 	$(OPENGL_COMMONLDFLAGS)
 if HAVE_IOS
-vout_LTLIBRARIES += libvout_ios2_plugin.la
+vout_LTLIBRARIES += libvout_ios_plugin.la
 endif
 if HAVE_TVOS
-vout_LTLIBRARIES += libvout_ios2_plugin.la
+vout_LTLIBRARIES += libvout_ios_plugin.la
 endif
 
 ### OpenGL ###
