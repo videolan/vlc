@@ -105,6 +105,10 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
  *****************************************************************************/
 const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
 {
+    if (p_format->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+        return "Ambisonics";
+
+    /* AUDIO_CHANNEL_TYPE_BITMAP */
     switch ( p_format->i_physical_channels )
     {
     case AOUT_CHAN_LEFT:
