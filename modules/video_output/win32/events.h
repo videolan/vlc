@@ -62,3 +62,12 @@ void            EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
 void            EventThreadUseOverlay( event_thread_t *, bool b_used );
 bool            EventThreadGetAndResetHasMoved( event_thread_t * );
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+void* HookWindowsSensors(vout_display_t*, HWND);
+void UnhookWindowsSensors(void*);
+# ifdef __cplusplus
+}
+# endif
+

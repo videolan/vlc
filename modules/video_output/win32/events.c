@@ -76,6 +76,9 @@ struct event_thread_t
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
 
+    /* Sensors */
+    void *p_sensors;
+
     /* Title */
     char *psz_title;
 
@@ -802,6 +805,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     InitGestures( p_event->hwnd, &p_event->p_gesture );
 
+    p_event->p_sensors = HookWindowsSensors(vd, p_event->hwnd);
+
     if( p_event->hparent )
     {
         LONG i_style;
@@ -890,6 +895,8 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
         DestroyIcon( p_event->vlc_icon );
 
     DestroyCursor( p_event->cursor_empty );
+
+    UnhookWindowsSensors(p_event->p_sensors);
 
     CloseGestures( p_event->p_gesture);
 }
