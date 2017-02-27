@@ -41,6 +41,7 @@
 #include <vlc_cpu.h>
 
 #include <neaacdec.h>
+#include "../packetizer/mpeg4audio.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -63,8 +64,6 @@ static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 static void DoReordering( uint32_t *, uint32_t *, int, int, uint32_t * );
 
-#define MAX_CHANNEL_POSITIONS 9
-
 struct decoder_sys_t
 {
     /* faad handler */
@@ -77,42 +76,27 @@ struct decoder_sys_t
     block_t *p_block;
 
     /* Channel positions of the current stream (for re-ordering) */
-    uint32_t pi_channel_positions[MAX_CHANNEL_POSITIONS];
+    uint32_t pi_channel_positions[MPEG4_ASC_MAX_INDEXEDPOS];
 
     bool b_sbr, b_ps, b_discontinuity;
 };
 
-static const uint32_t pi_channels_in[MAX_CHANNEL_POSITIONS] =
+/* Channels positions values as output by faad */
+static const uint32_t pi_channels_in[MPEG4_ASC_MAX_INDEXEDPOS] =
     { FRONT_CHANNEL_CENTER, FRONT_CHANNEL_LEFT, FRONT_CHANNEL_RIGHT,
       SIDE_CHANNEL_LEFT, SIDE_CHANNEL_RIGHT,
       BACK_CHANNEL_LEFT, BACK_CHANNEL_RIGHT,
       BACK_CHANNEL_CENTER, LFE_CHANNEL };
-static const uint32_t pi_channels_out[MAX_CHANNEL_POSITIONS] =
+static const uint32_t pi_channels_out[MPEG4_ASC_MAX_INDEXEDPOS] =
     { AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
       AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
       AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
       AOUT_CHAN_REARCENTER, AOUT_CHAN_LFE };
-static const uint32_t pi_channels_ordered[MAX_CHANNEL_POSITIONS] =
+static const uint32_t pi_channels_ordered[MPEG4_ASC_MAX_INDEXEDPOS] =
     { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
       AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
       AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
       AOUT_CHAN_CENTER, AOUT_CHAN_REARCENTER, AOUT_CHAN_LFE
-    };
-static const uint32_t pi_channels_guessed[MAX_CHANNEL_POSITIONS] =
-    { 0, AOUT_CHAN_CENTER, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_LFE,
-      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-          | AOUT_CHAN_REARRIGHT,
-      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-          | AOUT_CHAN_REARRIGHT | AOUT_CHAN_CENTER,
-      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-          | AOUT_CHAN_REARRIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_LFE,
-      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_MIDDLELEFT
-          | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-          | AOUT_CHAN_CENTER,
-      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_MIDDLELEFT
-          | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-          | AOUT_CHAN_CENTER | AOUT_CHAN_LFE
     };
 
 /*****************************************************************************
@@ -170,7 +154,7 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.audio.i_channels = i_channels;
         p_dec->fmt_out.audio.i_physical_channels
             = p_dec->fmt_out.audio.i_original_channels
-            = pi_channels_guessed[i_channels];
+            = mpeg4_asc_channelsbyindex[i_channels];
         date_Init( &p_sys->date, i_rate, 1 );
     }
     else
@@ -305,7 +289,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             p_dec->fmt_out.audio.i_channels = i_channels;
             p_dec->fmt_out.audio.i_physical_channels
                 = p_dec->fmt_out.audio.i_original_channels
-                = pi_channels_guessed[i_channels];
+                = mpeg4_asc_channelsbyindex[i_channels];
 
             date_Init( &p_sys->date, i_rate, 1 );
         }
@@ -328,7 +312,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         p_dec->fmt_out.audio.i_channels = i_channels;
         p_dec->fmt_out.audio.i_physical_channels
             = p_dec->fmt_out.audio.i_original_channels
-            = pi_channels_guessed[i_channels];
+            = mpeg4_asc_channelsbyindex[i_channels];
         date_Init( &p_sys->date, i_rate, 1 );
     }
 
@@ -397,7 +381,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                     p_dec->fmt_out.audio.i_channels = i_channels;
                     p_dec->fmt_out.audio.i_physical_channels
                         = p_dec->fmt_out.audio.i_original_channels
-                        = pi_channels_guessed[i_channels];
+                        = mpeg4_asc_channelsbyindex[i_channels];
                     date_Init( &p_sys->date, i_rate, 1 );
                 }
             }
@@ -460,12 +444,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         for( unsigned i = 0; i < nbChannels; i++ )
         {
             /* Find the channel code */
-            for( j = 0; j < MAX_CHANNEL_POSITIONS; j++ )
+            for( j = 0; j < MPEG4_ASC_MAX_INDEXEDPOS; j++ )
             {
                 if( frame.channel_position[i] == pi_channels_in[j] )
                     break;
             }
-            if( j >= MAX_CHANNEL_POSITIONS )
+            if( j >= MPEG4_ASC_MAX_INDEXEDPOS )
             {
                 msg_Warn( p_dec, "unknown channel ordering" );
                 /* Invent something */
@@ -482,7 +466,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         {
             p_dec->fmt_out.audio.i_physical_channels
                 = p_dec->fmt_out.audio.i_original_channels
-                = pi_channels_guessed[nbChannels];
+                = mpeg4_asc_channelsbyindex[nbChannels];
         }
         else
         {
@@ -549,11 +533,11 @@ static void Close( vlc_object_t *p_this )
 static void DoReordering( uint32_t *p_out, uint32_t *p_in, int i_samples,
                           int i_nb_channels, uint32_t *pi_chan_positions )
 {
-    int pi_chan_table[MAX_CHANNEL_POSITIONS] = {0};
+    int pi_chan_table[MPEG4_ASC_MAX_INDEXEDPOS] = {0};
     int i, j, k;
 
     /* Find the channels mapping */
-    for( i = 0, j = 0; i < MAX_CHANNEL_POSITIONS; i++ )
+    for( i = 0, j = 0; i < MPEG4_ASC_MAX_INDEXEDPOS; i++ )
     {
         for( k = 0; k < i_nb_channels; k++ )
         {
