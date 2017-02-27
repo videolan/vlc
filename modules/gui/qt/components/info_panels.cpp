@@ -440,11 +440,15 @@ void ExtraMetaPanel::update( input_item_t *p_item )
         add_row( VLC_META_DISCNUMBER, psz_disc );
 
     char ** ppsz_keys = vlc_meta_CopyExtraNames( p_meta );
-
-    for( int i = 0; ppsz_keys[i]; ++i )
+    if( ppsz_keys )
     {
-        add_row( ppsz_keys[i], vlc_meta_GetExtra( p_meta, ppsz_keys[i] ) );
-        free( ppsz_keys[i] );
+        for( int i = 0; ppsz_keys[i]; ++i )
+        {
+            add_row( ppsz_keys[i], vlc_meta_GetExtra( p_meta, ppsz_keys[i] ) );
+            free( ppsz_keys[i] );
+        }
+
+        free( ppsz_keys );
     }
 
     extraMeta->verticalHeader()->resizeSections( QHeaderView::ResizeToContents );
