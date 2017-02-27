@@ -4119,6 +4119,23 @@ static int MP4_ReadBox_pnot( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_SA3D( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_SA3D_t, NULL );
+
+    uint8_t i_version;
+    MP4_GET1BYTE( i_version );
+    if ( i_version != 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET1BYTE( p_box->data.p_SA3D->i_ambisonic_type );
+    MP4_GET4BYTES( p_box->data.p_SA3D->i_ambisonic_order );
+    MP4_GET1BYTE( p_box->data.p_SA3D->i_ambisonic_channel_ordering );
+    MP4_GET1BYTE( p_box->data.p_SA3D->i_ambisonic_normalization );
+    MP4_GET4BYTES( p_box->data.p_SA3D->i_num_channels );
+    MP4_READBOX_EXIT( 1 );
+}
+
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -4560,6 +4577,9 @@ static const struct
     { ATOM_prhd,    MP4_ReadBox_prhd,        ATOM_proj },
     { ATOM_equi,    MP4_ReadBox_equi,        ATOM_proj },
     { ATOM_cbmp,    MP4_ReadBox_cbmp,        ATOM_proj },
+
+    /* Ambisonics */
+    { ATOM_SA3D,    MP4_ReadBox_SA3D,        0 },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,   0 }

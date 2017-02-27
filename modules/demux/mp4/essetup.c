@@ -1183,6 +1183,11 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
     }
 
+    /* Ambisonics */
+    const MP4_Box_t *p_SA3D = MP4_BoxGet(p_sample, "SA3D");
+    if (p_SA3D && BOXDATA(p_SA3D))
+        p_track->fmt.audio.channel_type = AUDIO_CHANNEL_TYPE_AMBISONICS;
+
     /* Late fixes */
     if ( p_soun->i_qt_version == 0 && p_track->fmt.i_codec == VLC_CODEC_QCELP )
     {
