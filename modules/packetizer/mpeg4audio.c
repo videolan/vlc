@@ -276,7 +276,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
             p_dec->fmt_out.audio.i_channels = asc.i_channel;
 
             /* This is not 100% guaranteed (overriden by ext) */
-            msg_Err(p_dec, "AAC %dHz %d samples/frame",
+            msg_Dbg(p_dec, "AAC %dHz %d samples/frame",
                     p_dec->fmt_out.audio.i_rate,
                     p_dec->fmt_out.audio.i_frame_length);
         }
