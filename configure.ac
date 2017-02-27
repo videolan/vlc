@@ -2450,45 +2450,6 @@ dnl
 AC_CHECK_HEADERS(dxgidebug.h)
 
 dnl
-dnl vda needs avcodec
-dnl
-AC_ARG_ENABLE(vda,
-  [  --enable-vda          VDA  support (default auto)])
-
-have_avcodec_vda="no"
-AS_IF([test "${enable_vda}" != "no"], [
-  if test "${SYS}" = "darwin"; then
-  AS_IF([test "x${have_avcodec}" = "xyes"], [
-    AC_CHECK_HEADERS(VideoDecodeAcceleration/VDADecoder.h,
-      [
-        AC_CHECK_HEADERS(libavcodec/vda.h, [
-           have_avcodec_vda="yes"
-        ],[
-	AS_IF([test "${enable_vda}" = "yes"],
-	      [AC_MSG_ERROR([vda is present but libavcodec/vda.h is missing])],
-              [AC_MSG_WARN([vda is present but libavcodec/vda.h is missing ])])
-        ])
-  ],[
-	AS_IF([test "${enable_vda}" = "yes"],
-              [AC_MSG_ERROR([Could not find required VideoDecodeAcceleration/VDADecoder.h])],
-              [AC_MSG_WARN([VideoDecodeAcceleration/VDADecoder.h not found])])
-      ])
-  ],[
-    AS_IF([test "x${enable_vda}" != "x"], [
-      AC_MSG_ERROR([--enable-vda and --disable-avcodec options are mutually exclusive.])
-    ])
- ])
- AS_IF([test "${have_avcodec_vda}" = "yes"], [
-     SAVE_LIBS=$LIBS
-     LIBS="$LIBS $AVCODEC_LIBS"
-     AC_CHECK_FUNCS([av_vda_alloc_context])
-     LIBS=$SAVE_LIBS
- ])
- fi
-])
-AM_CONDITIONAL([HAVE_AVCODEC_VDA], [test "${have_avcodec_vda}" = "yes"])
-
-dnl
 dnl  avformat demuxer/muxer plugin
 dnl
 

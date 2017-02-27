@@ -110,9 +110,6 @@ void ffmpeg_CloseCodec( decoder_t *p_dec );
 #define HW_TEXT N_("Hardware decoding")
 #define HW_LONGTEXT N_("This allows hardware decoding when available.")
 
-#define VDA_PIX_FMT_TEXT N_("VDA output pixel format")
-#define VDA_PIX_FMT_LONGTEXT N_("The pixel format for output image buffers.")
-
 #define THREADS_TEXT N_( "Threads" )
 #define THREADS_LONGTEXT N_( "Number of threads used for decoding, 0 meaning auto" )
 

@@ -336,7 +336,6 @@ modules/codec/avcodec/dxva2.c
 modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
 modules/codec/avcodec/vaapi.c
-modules/codec/avcodec/vda.c
 modules/codec/avcodec/video.c
 modules/codec/bpg.c
 modules/codec/cc.c

@@ -413,17 +413,6 @@ if HAVE_AVCODEC_D3D11VA
 codec_LTLIBRARIES += libd3d11va_plugin.la
 endif
 
-libvda_plugin_la_SOURCES = \
-	video_chroma/copy.c video_chroma/copy.h \
-	codec/avcodec/vda.c
-libvda_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
-libvda_plugin_la_LDFLAGS = -Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore
-libvda_plugin_la_LIBADD = $(AVCODEC_LIBS)
-if HAVE_AVCODEC_VDA
-codec_LTLIBRARIES += libvda_plugin.la
-endif
-
-
 ### OpenMAX ###
 
 noinst_HEADERS += \

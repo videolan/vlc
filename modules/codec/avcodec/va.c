@@ -61,10 +61,6 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
             }
         break;
 #endif
-#if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(53, 14, 0))
-        case AV_PIX_FMT_VDA:
-            return VLC_CODEC_I420;
-#endif
 #if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(52, 4, 0))
         case AV_PIX_FMT_VDPAU:
             switch (swfmt)

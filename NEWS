@@ -281,6 +281,7 @@ Removed modules
  * Direct2D module (use Direct3D11)
  * EyeTV access module
  * Rar access and stream filter: use libarchive
+ * VDA decoder: use VT
 
 
 Changes between 2.2.0 and 2.2.1:

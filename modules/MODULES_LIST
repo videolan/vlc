@@ -419,7 +419,6 @@ $Id$
  * vaapi_x11: VAAPI hardware-accelerated decoding with x11 backend
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
- * vda: VDADecoder hardware-accelerated decoding
  * vdpau_adjust: VDPAU color adjust video filter
  * vdpau_avcodec: VDPAU hardware-accelerated decoding
  * vdpau_chroma: VDPAU hardware surfaces conversion and rendering
