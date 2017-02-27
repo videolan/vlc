@@ -39,6 +39,7 @@
 #include <vlc_input.h>
 #include <vlc_codec.h>
 #include <vlc_cpu.h>
+#include <vlc_aout.h>
 
 #include <neaacdec.h>
 #include "../packetizer/mpeg4audio.h"
@@ -62,7 +63,7 @@ vlc_module_end ()
  ****************************************************************************/
 static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
-static void DoReordering( uint32_t *, uint32_t *, int, int, uint32_t * );
+static void DoReordering( uint32_t *, uint32_t *, int, int, uint8_t * );
 
 struct decoder_sys_t
 {
@@ -81,23 +82,24 @@ struct decoder_sys_t
     bool b_sbr, b_ps, b_discontinuity;
 };
 
-/* Channels positions values as output by faad */
-static const uint32_t pi_channels_in[MPEG4_ASC_MAX_INDEXEDPOS] =
-    { FRONT_CHANNEL_CENTER, FRONT_CHANNEL_LEFT, FRONT_CHANNEL_RIGHT,
-      SIDE_CHANNEL_LEFT, SIDE_CHANNEL_RIGHT,
-      BACK_CHANNEL_LEFT, BACK_CHANNEL_RIGHT,
-      BACK_CHANNEL_CENTER, LFE_CHANNEL };
-static const uint32_t pi_channels_out[MPEG4_ASC_MAX_INDEXEDPOS] =
-    { AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-      AOUT_CHAN_REARCENTER, AOUT_CHAN_LFE };
-static const uint32_t pi_channels_ordered[MPEG4_ASC_MAX_INDEXEDPOS] =
-    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-      AOUT_CHAN_CENTER, AOUT_CHAN_REARCENTER, AOUT_CHAN_LFE
-    };
+#if MPEG4_ASC_MAX_INDEXEDPOS != LFE_CHANNEL
+    #error MPEG4_ASC_MAX_INDEXEDPOS != LFE_CHANNEL
+#endif
+
+#define FAAD_CHANNEL_ID_COUNT (LFE_CHANNEL + 1)
+static const uint32_t pi_tovlcmapping[FAAD_CHANNEL_ID_COUNT] =
+{
+    [UNKNOWN_CHANNEL]      = 0,
+    [FRONT_CHANNEL_CENTER] = AOUT_CHAN_CENTER,
+    [FRONT_CHANNEL_LEFT]   = AOUT_CHAN_LEFT,
+    [FRONT_CHANNEL_RIGHT]  = AOUT_CHAN_RIGHT,
+    [SIDE_CHANNEL_LEFT]    = AOUT_CHAN_MIDDLELEFT,
+    [SIDE_CHANNEL_RIGHT]   = AOUT_CHAN_MIDDLERIGHT,
+    [BACK_CHANNEL_LEFT]    = AOUT_CHAN_REARLEFT,
+    [BACK_CHANNEL_RIGHT]   = AOUT_CHAN_REARRIGHT,
+    [BACK_CHANNEL_CENTER]  = AOUT_CHAN_REARCENTER,
+    [LFE_CHANNEL]          = AOUT_CHAN_LFE
+};
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -332,7 +334,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     {
         void *samples;
         NeAACDecFrameInfo frame;
-        block_t *p_out;
+        block_t *p_out = NULL;
 
         samples = NeAACDecDecode( p_sys->hfaad, &frame,
                                   p_sys->p_block->p_buffer,
@@ -416,7 +418,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         }
 
         p_dec->fmt_out.audio.i_rate = frame.samplerate;
-        p_dec->fmt_out.audio.i_channels = frame.channels;
 
         /* Adjust stream info when dealing with SBR/PS */
         bool b_sbr = (frame.sbr == 1) || (frame.sbr == 2);
@@ -439,69 +440,56 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
         /* Convert frame.channel_position to our own channel values */
         p_dec->fmt_out.audio.i_physical_channels = 0;
-        const uint32_t nbChannels = frame.channels;
-        unsigned j;
-        for( unsigned i = 0; i < nbChannels; i++ )
+        uint32_t pi_faad_channels_positions[FAAD_CHANNEL_ID_COUNT] = {0};
+        uint8_t  pi_neworder_table[AOUT_CHAN_MAX];
+        for( size_t i = 0; i < frame.channels; i++ )
         {
-            /* Find the channel code */
-            for( j = 0; j < MPEG4_ASC_MAX_INDEXEDPOS; j++ )
+            unsigned pos = frame.channel_position[i];
+            if( likely(pos < FAAD_CHANNEL_ID_COUNT) )
             {
-                if( frame.channel_position[i] == pi_channels_in[j] )
-                    break;
+                pi_faad_channels_positions[i] = pi_tovlcmapping[pos];
+                p_dec->fmt_out.audio.i_physical_channels |= pi_faad_channels_positions[i];
             }
-            if( j >= MPEG4_ASC_MAX_INDEXEDPOS )
-            {
-                msg_Warn( p_dec, "unknown channel ordering" );
-                /* Invent something */
-                j = i;
-            }
-            /* */
-            p_sys->pi_channel_positions[i] = pi_channels_out[j];
-            if( p_dec->fmt_out.audio.i_physical_channels & pi_channels_out[j] )
-                frame.channels--; /* We loose a duplicated channel */
-            else
-                p_dec->fmt_out.audio.i_physical_channels |= pi_channels_out[j];
+            else pi_faad_channels_positions[i] = 0;
         }
-        if ( nbChannels != frame.channels )
+
+        aout_CheckChannelReorder( pi_faad_channels_positions, NULL,
+                                  p_dec->fmt_out.audio.i_physical_channels, pi_neworder_table );
+
+
+        p_dec->fmt_out.audio.i_original_channels = p_dec->fmt_out.audio.i_physical_channels;
+        p_dec->fmt_out.audio.i_channels = popcount(p_dec->fmt_out.audio.i_physical_channels);
+
+        if( !decoder_UpdateAudioFormat( p_dec ) && p_dec->fmt_out.audio.i_channels > 0 )
+            p_out = decoder_NewAudioBuffer( p_dec, frame.samples / p_dec->fmt_out.audio.i_channels );
+
+        if( p_out )
         {
-            p_dec->fmt_out.audio.i_physical_channels
-                = p_dec->fmt_out.audio.i_original_channels
-                = mpeg4_asc_channelsbyindex[nbChannels];
+            p_out->i_pts = date_Get( &p_sys->date );
+            p_out->i_length = date_Increment( &p_sys->date,
+                                              frame.samples / frame.channels )
+                              - p_out->i_pts;
+
+            /* FIXME: replace when aout_channel_reorder can take samples from a different buffer */
+            DoReordering( (uint32_t *)p_out->p_buffer, samples,
+                          frame.samples / frame.channels, frame.channels,
+                          pi_neworder_table );
+
+            if( p_sys->b_discontinuity )
+            {
+                p_out->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                p_sys->b_discontinuity = false;
+            }
+
+            decoder_QueueAudio( p_dec, p_out );
         }
         else
         {
-            p_dec->fmt_out.audio.i_original_channels =
-                p_dec->fmt_out.audio.i_physical_channels;
+            date_Increment( &p_sys->date, frame.samples / frame.channels );
         }
-        p_dec->fmt_out.audio.i_channels = nbChannels;
-        if( decoder_UpdateAudioFormat( p_dec ) )
-            p_out = NULL;
-        else
-            p_out = decoder_NewAudioBuffer( p_dec, frame.samples / nbChannels );
-        if( p_out == NULL )
-        {
-            FlushBuffer( p_sys, SIZE_MAX );
-            return VLCDEC_SUCCESS;
-        }
-
-        p_out->i_pts = date_Get( &p_sys->date );
-        p_out->i_length = date_Increment( &p_sys->date,
-                                          frame.samples / nbChannels )
-                          - p_out->i_pts;
-
-        DoReordering( (uint32_t *)p_out->p_buffer, samples,
-                      frame.samples / nbChannels, nbChannels,
-                      p_sys->pi_channel_positions );
 
         FlushBuffer( p_sys, frame.bytesconsumed );
 
-        if( p_sys->b_discontinuity )
-        {
-            p_out->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-            p_sys->b_discontinuity = false;
-        }
-
-        decoder_QueueAudio( p_dec, p_out );
         return VLCDEC_SUCCESS;
     }
     else
@@ -531,34 +519,21 @@ static void Close( vlc_object_t *p_this )
  *   different from the aac one).
  *****************************************************************************/
 static void DoReordering( uint32_t *p_out, uint32_t *p_in, int i_samples,
-                          int i_nb_channels, uint32_t *pi_chan_positions )
+                          int i_nb_channels, uint8_t *pi_chan_positions )
 {
-    int pi_chan_table[MPEG4_ASC_MAX_INDEXEDPOS] = {0};
-    int i, j, k;
-
-    /* Find the channels mapping */
-    for( i = 0, j = 0; i < MPEG4_ASC_MAX_INDEXEDPOS; i++ )
+#if HAVE_FPU
+    #define CAST_SAMPLE(a) a
+#else
+    #define CAST_SAMPLE(a) ((uint16_t *)a)
+#endif
+    /* Do the actual reordering */
+    for( int i = 0; i < i_samples; i++ )
     {
-        for( k = 0; k < i_nb_channels; k++ )
+        for( int j = 0; j < i_nb_channels; j++ )
         {
-            if( pi_channels_ordered[i] == pi_chan_positions[k] )
-            {
-                pi_chan_table[k] = j++;
-                break;
-            }
+            CAST_SAMPLE(p_out)[i * i_nb_channels + pi_chan_positions[j]] =
+                CAST_SAMPLE(p_in)[i * i_nb_channels + j];
         }
     }
-
-    /* Do the actual reordering */
-    if( HAVE_FPU )
-        for( i = 0; i < i_samples; i++ )
-            for( j = 0; j < i_nb_channels; j++ )
-                p_out[i * i_nb_channels + pi_chan_table[j]] =
-                    p_in[i * i_nb_channels + j];
-    else
-        for( i = 0; i < i_samples; i++ )
-            for( j = 0; j < i_nb_channels; j++ )
-                ((uint16_t *)p_out)[i * i_nb_channels + pi_chan_table[j]] =
-                    ((uint16_t *)p_in)[i * i_nb_channels + j];
 }
 
