@@ -582,6 +582,7 @@ bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
         if( a1.i_format && a2.i_format && a1.i_format != a2.i_format )
             return false;
         if( a1.i_rate != a2.i_rate ||
+            a1.i_channels != a2.i_channels ||
             a1.i_physical_channels != a2.i_physical_channels ||
             a1.i_original_channels != a2.i_original_channels )
             return false;
