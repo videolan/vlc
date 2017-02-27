@@ -49,7 +49,14 @@ endif
 		$@/Contents/Resources/$${i}.lproj/ ; \
 	done
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
-	PRODUCT="$@" build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
+	## Copy libs
+	mkdir -p $@/Contents/MacOS/lib
+	find $(prefix)/lib -name 'libvlc*.dylib' -maxdepth 1 -exec cp -a {} $@/Contents/MacOS/lib \;
+	## Copy plugins
+	mkdir -p $@/Contents/MacOS/plugins
+	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/MacOS/plugins \;
+	## Install binary
+	cp $(prefix)/bin/vlc $@/Contents/MacOS/VLC
 	## Generate plugin cache
 	bin/vlc-cache-gen $@/Contents/MacOS/plugins
 	find $@ -type d -exec chmod ugo+rx '{}' \;
