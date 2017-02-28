@@ -294,7 +294,23 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
         i_object_type_indication = 0x00;
         break;
     }
-    int i_stream_type = p_track->fmt.i_cat == VIDEO_ES ? 0x04 : 0x05;
+
+    uint8_t i_stream_type;
+    switch(p_track->fmt.i_cat)
+    {
+        case VIDEO_ES:
+            i_stream_type = 0x04;
+            break;
+        case AUDIO_ES:
+            i_stream_type = 0x05;
+            break;
+        case SPU_ES:
+            i_stream_type = 0x0D;
+            break;
+        default:
+            i_stream_type = 0x20; /* Private */
+            break;
+    }
 
     bo_add_8   (esds, i_object_type_indication);
     bo_add_8   (esds, (i_stream_type << 2) | 1);
