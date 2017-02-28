@@ -291,7 +291,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
         i_object_type_indication = 0xa9;
         break;
     default:
-        i_object_type_indication = 0x00;
+        i_object_type_indication = 0xFE; /* No profile specified */
         break;
     }
 
