@@ -53,11 +53,11 @@ struct aout_sys_common
     int                 i_rate;
     unsigned int        i_bytes_per_frame;
     unsigned int        i_frame_length;
+    uint8_t             chans_to_reorder;
+    uint8_t             chan_table[AOUT_CHAN_MAX];
 
     /* The following need to set by the caller */
 
-    uint8_t             chans_to_reorder;
-    uint8_t             chan_table[AOUT_CHAN_MAX];
     /* The time the device needs to process the data. In samples. */
     uint32_t            i_device_latency;
 };
@@ -78,3 +78,7 @@ int  ca_Init(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 void ca_Clean(audio_output_t *p_aout);
 
 AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);
+
+int  au_Initialize(audio_output_t *p_aout, AudioUnit au,
+                   audio_sample_format_t *fmt,
+                   const AudioChannelLayout *outlayout);

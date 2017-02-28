@@ -165,28 +165,6 @@ Play(audio_output_t * p_aout, block_t * p_block)
         ca_Play(p_aout, p_block);
 }
 
-/*****************************************************************************
- * RenderCallback: This function is called everytime the AudioUnit wants
- * us to provide some more audio data.
- * Don't print anything during normal playback, calling blocking function from
- * this callback is not allowed.
- *****************************************************************************/
-static OSStatus
-RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
-               const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber,
-               UInt32 inNumberFrames, AudioBufferList *ioData)
-{
-    VLC_UNUSED(ioActionFlags);
-    VLC_UNUSED(inTimeStamp);
-    VLC_UNUSED(inBusNumber);
-    VLC_UNUSED(inNumberFrames);
-
-    ca_Render(p_data, ioData->mBuffers[0].mData,
-              ioData->mBuffers[0].mDataByteSize);
-
-    return noErr;
-}
-
 #pragma mark initialization
 
 /*
@@ -196,12 +174,14 @@ static int
 StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t           *p_sys = p_aout->sys;
-    AURenderCallbackStruct      callback;
     OSStatus status;
 
     /* Activate the AVAudioSession */
     if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
         return VLC_EGENERIC;
+
+    fmt->i_format = VLC_CODEC_FL32;
+    fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_STEREO;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
     if (p_sys->au_unit == NULL)
@@ -214,64 +194,12 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     if (status != noErr)
         msg_Warn(p_aout, "failed to set IO mode (%i)", (int)status);
 
-    /* Get the current format */
-    AudioStreamBasicDescription streamDescription;
-    streamDescription.mSampleRate = fmt->i_rate;
-    fmt->i_format = VLC_CODEC_FL32;
-    fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_STEREO;
-    streamDescription.mFormatID = kAudioFormatLinearPCM;
-    streamDescription.mFormatFlags = kAudioFormatFlagsNativeFloatPacked; // FL32
-    streamDescription.mChannelsPerFrame = aout_FormatNbChannels(fmt);
-    streamDescription.mFramesPerPacket = 1;
-    streamDescription.mBitsPerChannel = 32;
-    streamDescription.mBytesPerFrame = streamDescription.mBitsPerChannel * streamDescription.mChannelsPerFrame / 8;
-    streamDescription.mBytesPerPacket = streamDescription.mBytesPerFrame * streamDescription.mFramesPerPacket;
-
-    /* Set the desired format */
-    status = AudioUnitSetProperty(p_sys->au_unit,
-                                  kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Input, 0, &streamDescription,
-                                  sizeof(streamDescription));
-    if (status != noErr) {
-        msg_Err(p_aout, "failed to set stream format (%i)", (int)status);
+    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL);
+    if (ret != VLC_SUCCESS)
         goto error;
-    }
-    msg_Dbg(p_aout, STREAM_FORMAT_MSG("we set the AU format: " , streamDescription));
 
-    /* Retrieve actual format */
-    status = AudioUnitGetProperty(p_sys->au_unit,
-                                  kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Input, 0, &streamDescription,
-                                  & (UInt32) { sizeof(streamDescription) });
-    if (status != noErr)
-        msg_Warn(p_aout, "failed to verify stream format (%i)", (int)status);
-    msg_Dbg(p_aout, STREAM_FORMAT_MSG("the actual set AU format is " , streamDescription));
-
-    /* Do the last VLC aout setups */
-    aout_FormatPrepare(fmt);
-
-    /* set the IOproc callback */
-    callback.inputProc = RenderCallback;
-    callback.inputProcRefCon = p_aout;
-
-    status = AudioUnitSetProperty(p_sys->au_unit,
-                                  kAudioUnitProperty_SetRenderCallback,
-                                  kAudioUnitScope_Input, 0, &callback,
-                                  sizeof(callback));
-    if (status != noErr) {
-        msg_Err(p_aout, "render callback setup failed (%i)", (int)status);
-        goto error;
-    }
-
-    /* AU init */
-    status = AudioUnitInitialize(p_sys->au_unit);
-    if (status != noErr) {
-        msg_Err(p_aout, "failed to init AudioUnit (%i)", (int)status);
-        goto error;
-    }
-
-    int ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
-                      fmt->i_bytes_per_frame);
+    ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
+                  fmt->i_bytes_per_frame);
     if (ret != VLC_SUCCESS)
     {
         AudioUnitUninitialize(p_sys->au_unit);

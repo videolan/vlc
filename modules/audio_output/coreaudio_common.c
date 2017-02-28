@@ -23,6 +23,12 @@
  *****************************************************************************/
 
 #import "coreaudio_common.h"
+#import <CoreAudio/CoreAudioTypes.h>
+
+#if !TARGET_OS_IPHONE
+#import <CoreServices/CoreServices.h>
+#import <vlc_dialog.h>
+#endif
 
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
@@ -188,6 +194,7 @@ ca_Init(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
+    p_sys->chans_to_reorder = 0;
 
     p_aout->play = ca_Play;
     p_aout->pause = ca_Pause;
@@ -233,4 +240,466 @@ au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type)
         return NULL;
     }
     return au;
+}
+
+/*****************************************************************************
+ * RenderCallback: This function is called everytime the AudioUnit wants
+ * us to provide some more audio data.
+ * Don't print anything during normal playback, calling blocking function from
+ * this callback is not allowed.
+ *****************************************************************************/
+static OSStatus
+RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
+               const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber,
+               UInt32 inNumberFrames, AudioBufferList *ioData)
+{
+    VLC_UNUSED(ioActionFlags);
+    VLC_UNUSED(inTimeStamp);
+    VLC_UNUSED(inBusNumber);
+    VLC_UNUSED(inNumberFrames);
+
+    ca_Render(p_data, ioData->mBuffers[0].mData,
+              ioData->mBuffers[0].mDataByteSize);
+
+    return noErr;
+}
+
+static AudioChannelLayout *
+GetLayoutDescription(audio_output_t *p_aout,
+                     const AudioChannelLayout *outlayout)
+{
+    AudioFormatPropertyID id;
+    UInt32 size;
+    const void *data;
+    /* We need to "fill out" the ChannelLayout, because there are multiple
+     * ways that it can be set */
+    if (outlayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
+    {
+        id = kAudioFormatProperty_ChannelLayoutForBitmap;
+        size = sizeof(UInt32);
+        data = &outlayout->mChannelBitmap;
+    }
+    else
+    {
+        id = kAudioFormatProperty_ChannelLayoutForTag;
+        size = sizeof(AudioChannelLayoutTag);
+        data = &outlayout->mChannelLayoutTag;
+    }
+
+    UInt32 param_size;
+    OSStatus err = AudioFormatGetPropertyInfo(id, size, data, &param_size);
+    if (err != noErr)
+        return NULL;
+
+    AudioChannelLayout *reslayout = malloc(param_size);
+    if (reslayout == NULL)
+        return NULL;
+
+    err = AudioFormatGetProperty(id, size, data, &param_size, reslayout);
+    if (err != noErr || reslayout->mNumberChannelDescriptions == 0)
+    {
+        msg_Err(p_aout, "insufficient number of output channels");
+        free(reslayout);
+        return NULL;
+    }
+
+    return reslayout;
+}
+
+static int
+MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
+                const AudioChannelLayout *outlayout)
+{
+    /* Fill VLC physical_channels from output layout */
+    fmt->i_physical_channels = 0;
+    uint32_t i_original = fmt->i_original_channels & AOUT_CHAN_PHYSMASK;
+    AudioChannelLayout *reslayout = NULL;
+
+    if (outlayout == NULL)
+    {
+        msg_Dbg(p_aout, "not output layout, default to Stereo");
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+        goto end;
+    }
+
+    if (outlayout->mChannelLayoutTag !=
+        kAudioChannelLayoutTag_UseChannelDescriptions)
+    {
+        reslayout = GetLayoutDescription(p_aout, outlayout);
+        if (reslayout == NULL)
+            return VLC_EGENERIC;
+        outlayout = reslayout;
+    }
+
+    if (i_original == AOUT_CHAN_CENTER
+     || outlayout->mNumberChannelDescriptions < 2)
+    {
+        /* We only need Mono or cannot output more than 1 channel */
+        fmt->i_physical_channels = AOUT_CHAN_CENTER;
+        msg_Dbg(p_aout, "output layout of AUHAL has 1 channel");
+    }
+    else if (i_original == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
+          || outlayout->mNumberChannelDescriptions < 3)
+    {
+        /* We only need Stereo or cannot output more than 2 channels */
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+        msg_Dbg(p_aout, "output layout of AUHAL is Stereo");
+    }
+    else
+    {
+        assert(outlayout->mNumberChannelDescriptions > 0);
+
+        msg_Dbg(p_aout, "output layout of AUHAL has %i channels",
+                outlayout->mNumberChannelDescriptions);
+
+        /* maps auhal channels to vlc ones */
+        static const unsigned i_auhal_channel_mapping[] = {
+            [kAudioChannelLabel_Left]           = AOUT_CHAN_LEFT,
+            [kAudioChannelLabel_Right]          = AOUT_CHAN_RIGHT,
+            [kAudioChannelLabel_Center]         = AOUT_CHAN_CENTER,
+            [kAudioChannelLabel_LFEScreen]      = AOUT_CHAN_LFE,
+            [kAudioChannelLabel_LeftSurround]   = AOUT_CHAN_REARLEFT,
+            [kAudioChannelLabel_RightSurround]  = AOUT_CHAN_REARRIGHT,
+            /* needs to be swapped with rear */
+            [kAudioChannelLabel_RearSurroundLeft]  = AOUT_CHAN_MIDDLELEFT,
+            /* needs to be swapped with rear */
+            [kAudioChannelLabel_RearSurroundRight] = AOUT_CHAN_MIDDLERIGHT,
+            [kAudioChannelLabel_CenterSurround] = AOUT_CHAN_REARCENTER
+        };
+        static const size_t i_auhal_size = sizeof(i_auhal_channel_mapping)
+                                         / sizeof(i_auhal_channel_mapping[0]);
+
+        /* We want more than stereo and we can do that */
+        for (unsigned i = 0; i < outlayout->mNumberChannelDescriptions; i++)
+        {
+            AudioChannelLabel chan =
+                outlayout->mChannelDescriptions[i].mChannelLabel;
+#ifndef NDEBUG
+            msg_Dbg(p_aout, "this is channel: %d", (int) chan);
+#endif
+            if (chan < i_auhal_size && i_auhal_channel_mapping[chan] > 0)
+                fmt->i_physical_channels |= i_auhal_channel_mapping[chan];
+            else
+                msg_Dbg(p_aout, "found nonrecognized channel %d at index "
+                        "%d", chan, i);
+        }
+        if (fmt->i_physical_channels == 0)
+        {
+            fmt->i_physical_channels = AOUT_CHANS_STEREO;
+            msg_Err(p_aout, "You should configure your speaker layout with "
+                    "Audio Midi Setup in /Applications/Utilities. VLC will "
+                    "output Stereo only.");
+#if !TARGET_OS_IPHONE
+            vlc_dialog_display_error(p_aout,
+                _("Audio device is not configured"), "%s",
+                _("You should configure your speaker layout with "
+                "\"Audio Midi Setup\" in /Applications/"
+                "Utilities. VLC will output Stereo only."));
+#endif
+        }
+    }
+
+end:
+    free(reslayout);
+    fmt->i_original_channels = fmt->i_physical_channels;
+    aout_FormatPrepare(fmt);
+
+    msg_Dbg(p_aout, "selected %d physical channels for device output",
+            aout_FormatNbChannels(fmt));
+    msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(fmt));
+
+    return VLC_SUCCESS;
+}
+
+static int
+SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
+                 AudioChannelLayoutTag *inlayout_tag)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+    uint32_t chans_out[AOUT_CHAN_MAX];
+
+#if TARGET_OS_IPHONE
+    const bool b_8x_support = false;
+#else
+    SInt32 osx_min_version;
+    if (Gestalt(gestaltSystemVersionMinor, &osx_min_version) != noErr)
+        msg_Err(p_aout, "failed to check OSX version");
+    const bool b_8x_support = osx_min_version >= 7;
+#endif
+
+    /* Some channel abbreviations used below:
+     * L - left
+     * R - right
+     * C - center
+     * Ls - left surround
+     * Rs - right surround
+     * Cs - center surround
+     * Rls - rear left surround
+     * Rrs - rear right surround
+     * Lw - left wide
+     * Rw - right wide
+     * Lsd - left surround direct
+     * Rsd - right surround direct
+     * Lc - left center
+     * Rc - right center
+     * Ts - top surround
+     * Vhl - vertical height left
+     * Vhc - vertical height center
+     * Vhr - vertical height right
+     * Lt - left matrix total. for matrix encoded stereo.
+     * Rt - right matrix total. for matrix encoded stereo. */
+
+    switch (aout_FormatNbChannels(fmt))
+    {
+        case 1:
+            *inlayout_tag = kAudioChannelLayoutTag_Mono;
+            break;
+        case 2:
+            *inlayout_tag = kAudioChannelLayoutTag_Stereo;
+            break;
+        case 3:
+            if (fmt->i_physical_channels & AOUT_CHAN_CENTER) /* L R C */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_7;
+            else if (fmt->i_physical_channels & AOUT_CHAN_LFE) /* L R LFE */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_4;
+            break;
+        case 4:
+            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_LFE)) /* L R C LFE */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_10;
+            else if (fmt->i_physical_channels & AOUT_CHANS_REAR) /* L R Ls Rs */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_3;
+            else if (fmt->i_physical_channels & AOUT_CHANS_CENTER) /* L R C Cs */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_3;
+            break;
+        case 5:
+            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER)) /* L R Ls Rs C */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_19;
+            else if (fmt->i_physical_channels & (AOUT_CHAN_LFE)) /* L R Ls Rs LFE */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_18;
+            break;
+        case 6:
+            if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
+            {
+                /* L R Ls Rs C LFE */
+                *inlayout_tag = kAudioChannelLayoutTag_DVD_20;
+
+                chans_out[0] = AOUT_CHAN_LEFT;
+                chans_out[1] = AOUT_CHAN_RIGHT;
+                chans_out[2] = AOUT_CHAN_REARLEFT;
+                chans_out[3] = AOUT_CHAN_REARRIGHT;
+                chans_out[4] = AOUT_CHAN_CENTER;
+                chans_out[5] = AOUT_CHAN_LFE;
+
+                p_sys->chans_to_reorder =
+                    aout_CheckChannelReorder(NULL, chans_out,
+                                             fmt->i_physical_channels,
+                                             p_sys->chan_table);
+                if (p_sys->chans_to_reorder)
+                    msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
+            }
+            else
+            {
+                /* L R Ls Rs C Cs */
+                *inlayout_tag = kAudioChannelLayoutTag_AudioUnit_6_0;
+
+                chans_out[0] = AOUT_CHAN_LEFT;
+                chans_out[1] = AOUT_CHAN_RIGHT;
+                chans_out[2] = AOUT_CHAN_REARLEFT;
+                chans_out[3] = AOUT_CHAN_REARRIGHT;
+                chans_out[4] = AOUT_CHAN_CENTER;
+                chans_out[5] = AOUT_CHAN_REARCENTER;
+
+                p_sys->chans_to_reorder =
+                    aout_CheckChannelReorder(NULL, chans_out,
+                                             fmt->i_physical_channels,
+                                             p_sys->chan_table);
+                if (p_sys->chans_to_reorder)
+                    msg_Dbg(p_aout, "channel reordering needed for 6.0 output");
+            }
+            break;
+        case 7:
+            /* L R C LFE Ls Rs Cs */
+            *inlayout_tag = kAudioChannelLayoutTag_MPEG_6_1_A;
+
+            chans_out[0] = AOUT_CHAN_LEFT;
+            chans_out[1] = AOUT_CHAN_RIGHT;
+            chans_out[2] = AOUT_CHAN_CENTER;
+            chans_out[3] = AOUT_CHAN_LFE;
+            chans_out[4] = AOUT_CHAN_REARLEFT;
+            chans_out[5] = AOUT_CHAN_REARRIGHT;
+            chans_out[6] = AOUT_CHAN_REARCENTER;
+
+            p_sys->chans_to_reorder =
+                aout_CheckChannelReorder(NULL, chans_out,
+                                         fmt->i_physical_channels,
+                                         p_sys->chan_table);
+            if (p_sys->chans_to_reorder)
+                msg_Dbg(p_aout, "channel reordering needed for 6.1 output");
+
+            break;
+        case 8:
+            if (fmt->i_physical_channels & (AOUT_CHAN_LFE) || !b_8x_support)
+            {
+                /* L R C LFE Ls Rs Rls Rrs */
+                *inlayout_tag = kAudioChannelLayoutTag_MPEG_7_1_C;
+
+                chans_out[0] = AOUT_CHAN_LEFT;
+                chans_out[1] = AOUT_CHAN_RIGHT;
+                chans_out[2] = AOUT_CHAN_CENTER;
+                chans_out[3] = AOUT_CHAN_LFE;
+                chans_out[4] = AOUT_CHAN_MIDDLELEFT;
+                chans_out[5] = AOUT_CHAN_MIDDLERIGHT;
+                chans_out[6] = AOUT_CHAN_REARLEFT;
+                chans_out[7] = AOUT_CHAN_REARRIGHT;
+
+                if (!(fmt->i_physical_channels & (AOUT_CHAN_LFE)))
+                    msg_Warn(p_aout, "8.0 audio output not supported on this "
+                             "device, layout will be incorrect");
+            }
+#ifdef MAC_OS_X_VERSION_10_7
+            else
+            {
+                /* Lc C Rc L R Ls Cs Rs */
+                *inlayout_tag = kAudioChannelLayoutTag_DTS_8_0_B;
+
+                chans_out[0] = AOUT_CHAN_MIDDLELEFT;
+                chans_out[1] = AOUT_CHAN_CENTER;
+                chans_out[2] = AOUT_CHAN_MIDDLERIGHT;
+                chans_out[3] = AOUT_CHAN_LEFT;
+                chans_out[4] = AOUT_CHAN_RIGHT;
+                chans_out[5] = AOUT_CHAN_REARLEFT;
+                chans_out[6] = AOUT_CHAN_REARCENTER;
+                chans_out[7] = AOUT_CHAN_REARRIGHT;
+            }
+#endif
+            p_sys->chans_to_reorder =
+                aout_CheckChannelReorder(NULL, chans_out,
+                                         fmt->i_physical_channels,
+                                         p_sys->chan_table);
+            if (p_sys->chans_to_reorder)
+                msg_Dbg(p_aout, "channel reordering needed for 7.1 / 8.0 output");
+            break;
+        case 9:
+            if (!b_8x_support)
+            {
+                msg_Warn(p_aout, "8.1 audio output not supported on this device");
+                break;
+            }
+
+#ifdef MAC_OS_X_VERSION_10_7
+            /* Lc C Rc L R Ls Cs Rs LFE */
+            *inlayout_tag = kAudioChannelLayoutTag_DTS_8_1_B;
+            chans_out[0] = AOUT_CHAN_MIDDLELEFT;
+            chans_out[1] = AOUT_CHAN_CENTER;
+            chans_out[2] = AOUT_CHAN_MIDDLERIGHT;
+            chans_out[3] = AOUT_CHAN_LEFT;
+            chans_out[4] = AOUT_CHAN_RIGHT;
+            chans_out[5] = AOUT_CHAN_REARLEFT;
+            chans_out[6] = AOUT_CHAN_REARCENTER;
+            chans_out[7] = AOUT_CHAN_REARRIGHT;
+            chans_out[8] = AOUT_CHAN_LFE;
+
+            p_sys->chans_to_reorder =
+                aout_CheckChannelReorder(NULL, chans_out,
+                                         fmt->i_physical_channels,
+                                         p_sys->chan_table);
+            if (p_sys->chans_to_reorder)
+                msg_Dbg(p_aout, "channel reordering needed for 8.1 output");
+#endif
+            break;
+    }
+
+    return VLC_SUCCESS;
+}
+
+int
+au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
+              const AudioChannelLayout *outlayout)
+{
+    assert(fmt->i_format == VLC_CODEC_FL32);
+
+    int ret = MapOutputLayout(p_aout, fmt, outlayout);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    AudioChannelLayoutTag inlayout_tag;
+    ret = SetupInputLayout(p_aout, fmt, &inlayout_tag);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    /* Set the desired format */
+    AudioStreamBasicDescription desc;
+    desc.mSampleRate = fmt->i_rate;
+    desc.mFormatID = kAudioFormatLinearPCM;
+    desc.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
+    desc.mChannelsPerFrame = aout_FormatNbChannels(fmt);
+    desc.mFramesPerPacket = 1;
+    desc.mBitsPerChannel = 32;
+    desc.mBytesPerFrame = desc.mBitsPerChannel * desc.mChannelsPerFrame / 8;
+    desc.mBytesPerPacket = desc.mBytesPerFrame * desc.mFramesPerPacket;
+
+    OSStatus err = AudioUnitSetProperty(au, kAudioUnitProperty_StreamFormat,
+                                        kAudioUnitScope_Input, 0, &desc,
+                                        sizeof(desc));
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "failed to set stream format [%4.4s]",
+                (const char *)&err);
+        return VLC_EGENERIC;
+    }
+    msg_Dbg(p_aout, STREAM_FORMAT_MSG("Current AU format: " , desc));
+
+    /* Retrieve actual format */
+    err = AudioUnitGetProperty(au, kAudioUnitProperty_StreamFormat,
+                               kAudioUnitScope_Input, 0, &desc,
+                               &(UInt32) { sizeof(desc) });
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "failed to verify stream format [%4.4s]",
+                (const char *)&err);
+        return VLC_EGENERIC;
+    }
+
+    /* Set the IOproc callback */
+    const AURenderCallbackStruct callback = {
+        .inputProc = RenderCallback,
+        .inputProcRefCon = p_aout,
+    };
+
+    err = AudioUnitSetProperty(au, kAudioUnitProperty_SetRenderCallback,
+                               kAudioUnitScope_Input, 0, &callback,
+                               sizeof(callback));
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "failed to setup render callback [%4.4s]",
+                (const char *)&err);
+        return VLC_EGENERIC;
+    }
+
+    /* Set the input_layout as the layout VLC will use to feed the AU unit.
+     * Yes, it must be the INPUT scope */
+    AudioChannelLayout inlayout = {
+        .mChannelLayoutTag = inlayout_tag,
+    };
+    err = AudioUnitSetProperty(au, kAudioUnitProperty_AudioChannelLayout,
+                               kAudioUnitScope_Input, 0, &inlayout,
+                               sizeof(inlayout));
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "failed to setup input layout [%4.4s]",
+                (const char *)&err);
+        return VLC_EGENERIC;
+    }
+
+    /* AU init */
+    err = AudioUnitInitialize(au);
+
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "AudioUnitInitialize failed: [%4.4s]",
+                (const char *)&err);
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
