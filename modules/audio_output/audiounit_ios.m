@@ -71,7 +71,8 @@ struct aout_sys_t
 #pragma mark -
 #pragma mark actual playback
 
-static int SetPlayback(audio_output_t *p_aout, bool start)
+static int
+SetPlayback(audio_output_t *p_aout, bool start)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
@@ -118,21 +119,22 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
+static void
+Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
     VLC_UNUSED(date);
 
-    /* we need to start / stop the audio unit here because otherwise
-     * the OS won't believe us that we stopped the audio output
-     * so in case of an interruption, our unit would be permanently
-     * silenced.
-     * in case of multi-tasking, the multi-tasking view would still
-     * show a playing state despite we are paused, same for lock screen */
+    /* We need to start / stop the audio unit here because otherwise the OS
+     * won't believe us that we stopped the audio output so in case of an
+     * interruption, our unit would be permanently silenced. In case of
+     * multi-tasking, the multi-tasking view would still show a playing state
+     * despite we are paused, same for lock screen */
 
     SetPlayback(p_aout, !pause);
 }
 
-static int MuteSet(audio_output_t *p_aout, bool mute)
+static int
+MuteSet(audio_output_t *p_aout, bool mute)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
@@ -147,7 +149,8 @@ static int MuteSet(audio_output_t *p_aout, bool mute)
     return VLC_SUCCESS;
 }
 
-static void Play(audio_output_t * p_aout, block_t * p_block)
+static void
+Play(audio_output_t * p_aout, block_t * p_block)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
@@ -163,12 +166,11 @@ static void Play(audio_output_t * p_aout, block_t * p_block)
  * Don't print anything during normal playback, calling blocking function from
  * this callback is not allowed.
  *****************************************************************************/
-static OSStatus RenderCallback(void *p_data,
-                               AudioUnitRenderActionFlags *ioActionFlags,
-                               const AudioTimeStamp *inTimeStamp,
-                               UInt32 inBusNumber,
-                               UInt32 inNumberFrames,
-                               AudioBufferList *ioData) {
+static OSStatus
+RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
+               const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber,
+               UInt32 inNumberFrames, AudioBufferList *ioData)
+{
     VLC_UNUSED(ioActionFlags);
     VLC_UNUSED(inTimeStamp);
     VLC_UNUSED(inBusNumber);
@@ -185,10 +187,10 @@ static OSStatus RenderCallback(void *p_data,
 /*
  * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
  */
-static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
+static int
+StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t           *p_sys = p_aout->sys;
-    UInt32                      i_param_size = 0;
     AudioComponentDescription   desc;
     AURenderCallbackStruct      callback;
     OSStatus status;
@@ -212,13 +214,10 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    UInt32 flag = 1;
     status = AudioUnitSetProperty(p_sys->au_unit,
                                   kAudioOutputUnitProperty_EnableIO,
-                                  kAudioUnitScope_Output,
-                                  0,
-                                  &flag,
-                                  sizeof(flag));
+                                  kAudioUnitScope_Output, 0,
+                                  &(UInt32){ 1 }, sizeof(UInt32));
     if (status != noErr)
         msg_Warn(p_aout, "failed to set IO mode (%i)", (int)status);
 
@@ -234,16 +233,12 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     streamDescription.mBitsPerChannel = 32;
     streamDescription.mBytesPerFrame = streamDescription.mBitsPerChannel * streamDescription.mChannelsPerFrame / 8;
     streamDescription.mBytesPerPacket = streamDescription.mBytesPerFrame * streamDescription.mFramesPerPacket;
-    i_param_size = sizeof(streamDescription);
 
     /* Set the desired format */
-    i_param_size = sizeof(AudioStreamBasicDescription);
     status = AudioUnitSetProperty(p_sys->au_unit,
                                   kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Input,
-                                  0,
-                                  &streamDescription,
-                                  i_param_size);
+                                  kAudioUnitScope_Input, 0, &streamDescription,
+                                  sizeof(streamDescription));
     if (status != noErr) {
         msg_Err(p_aout, "failed to set stream format (%i)", (int)status);
         goto error;
@@ -253,10 +248,8 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     /* Retrieve actual format */
     status = AudioUnitGetProperty(p_sys->au_unit,
                                   kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Input,
-                                  0,
-                                  &streamDescription,
-                                  &i_param_size);
+                                  kAudioUnitScope_Input, 0, &streamDescription,
+                                  & (UInt32) { sizeof(streamDescription) });
     if (status != noErr)
         msg_Warn(p_aout, "failed to verify stream format (%i)", (int)status);
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("the actual set AU format is " , streamDescription));
@@ -269,9 +262,9 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     callback.inputProcRefCon = p_aout;
 
     status = AudioUnitSetProperty(p_sys->au_unit,
-                            kAudioUnitProperty_SetRenderCallback,
-                            kAudioUnitScope_Input,
-                            0, &callback, sizeof(callback));
+                                  kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitScope_Input, 0, &callback,
+                                  sizeof(callback));
     if (status != noErr) {
         msg_Err(p_aout, "render callback setup failed (%i)", (int)status);
         goto error;
@@ -315,7 +308,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Stop(audio_output_t *p_aout)
+static void
+Stop(audio_output_t *p_aout)
 {
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus err;
@@ -335,12 +329,15 @@ static void Stop(audio_output_t *p_aout)
         msg_Warn(p_aout, "AudioComponentInstanceDispose failed [%4.4s]",
                  (const char *)&err);
 
-    [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+    [[AVAudioSession sharedInstance] setActive:NO
+        withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
+        error:nil];
 
     ca_Clean(p_aout);
 }
 
-static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
+static int
+Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
     struct aout_sys_t *p_sys = NULL;
 
@@ -365,7 +362,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *obj)
+static void
+Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
@@ -373,7 +371,8 @@ static void Close(vlc_object_t *obj)
     free(sys);
 }
 
-static int Open(vlc_object_t *obj)
+static int
+Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = calloc(1, sizeof (*sys));
