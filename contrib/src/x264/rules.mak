@@ -1,7 +1,7 @@
 # x264
 
 X264_GITURL := git://git.videolan.org/x264.git
-X264_SNAPURL := ftp://ftp.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar.bz2
+X264_SNAPURL := http://download.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar.bz2
 X262_GITURL := git://git.videolan.org/x262.git
 
 ifdef BUILD_ENCODERS
