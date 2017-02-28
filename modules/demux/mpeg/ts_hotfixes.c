@@ -68,7 +68,7 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
         {
             if( i_data < len )
                 return;
-            if( len >= 7 && (p_pes[1] & 0x10) )
+            if( len >= 7 && (p_pes[0] & 0x10) )
                 pid->probed.i_pcr_count++;
             p_pes += len;
             i_data -= len;
