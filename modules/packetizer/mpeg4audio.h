@@ -39,6 +39,14 @@ enum
     AAC_PROFILE_LC,
     AAC_PROFILE_SSR,
     AAC_PROFILE_LTP,
+    AAC_PROFILE_HE,
+    AAC_PROFILE_LD   = AOT_ER_AAC_LD - 1,
+    AAC_PROFILE_HEv2 = AOT_AAC_PS - 1,
+    AAC_PROFILE_ELD  = AOT_ER_AAC_ELD - 1,
+    /* Similar shift signaling as avcodec, as signaling should have been
+       done in ADTS header. Values defaults to MPEG4 */
+    AAC_PROFILE_MPEG2_LC = AAC_PROFILE_LC + 128,
+    AAC_PROFILE_MPEG2_HE = AAC_PROFILE_HE + 128,
 };
 
 #define MPEG4_ASC_MAX_INDEXEDPOS 9
