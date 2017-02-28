@@ -59,6 +59,7 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
         p_track->fmt.i_codec = VLC_CODEC_H264;
         break;
     case( 0x40):
+    case( 0x41):
         p_track->fmt.i_codec = VLC_CODEC_MP4A;
         if( p_decconfig->i_decoder_specific_info_len >= 2 &&
                 p_decconfig->p_decoder_specific_info[0]       == 0xF8 &&
