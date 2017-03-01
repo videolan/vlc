@@ -50,6 +50,14 @@ int Export_M3U8( vlc_object_t * );
 static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root,
                         int (*pf_fprintf) (FILE *, const char *, ...) )
 {
+    size_t prefix_len = -1;
+    if( likely(p_export->base_url != NULL) )
+    {
+        const char *p = strrchr( p_export->base_url, '/' );
+        assert(p != NULL);
+        prefix_len = (p + 1) - p_export->base_url;
+    }
+
     /* Write header */
     fputs( "#EXTM3U\n", p_export->p_file );
 
@@ -104,7 +112,15 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root,
         }
         vlc_mutex_unlock( &p_current->p_input->lock );
 
-        fprintf( p_export->p_file, "%s\n", psz_uri );
+        /* We cannot really know if relative or absolute URL is better. As a
+         * heuristic, we write a relative URL if the item is in the same
+         * directory as the playlist, or a sub-directory thereof. */
+        size_t skip = 0;
+        if( likely(prefix_len != (size_t)-1)
+         && !strncmp( p_export->base_url, psz_uri, prefix_len ) )
+            skip = prefix_len;
+
+        fprintf( p_export->p_file, "%s\n", psz_uri + skip );
         free( psz_uri );
     }
 }
