@@ -52,6 +52,12 @@ vlc_module_end ()
 
 #define AUDIO_BUFFER_SIZE_IN_SECONDS (AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ)
 
+/* aout wrapper: used as observer for notifications */
+@interface AoutWrapper : NSObject
+- (instancetype)initWithAout:(audio_output_t *)aout;
+@property (readonly, assign) audio_output_t* aout;
+@end
+
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
  *****************************************************************************
@@ -62,6 +68,7 @@ struct aout_sys_t
 {
     struct aout_sys_common c;
 
+    AoutWrapper *aoutWrapper;
     /* The AudioUnit we use */
     AudioUnit au_unit;
     bool      b_muted;
@@ -75,6 +82,32 @@ enum dev_type {
 
 #pragma mark -
 #pragma mark AVAudioSession route and output handling
+
+@implementation AoutWrapper
+
+- (instancetype)initWithAout:(audio_output_t *)aout
+{
+    self = [super init];
+    if (self)
+        _aout = aout;
+    return self;
+}
+
+- (void)audioSessionRouteChange:(NSNotification *)notification
+{
+    audio_output_t *p_aout = [self aout];
+    NSDictionary *userInfo = notification.userInfo;
+    NSInteger routeChangeReason =
+        [[userInfo valueForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+
+    msg_Dbg(p_aout, "Audio route changed: %ld", (long) routeChangeReason);
+
+    if (routeChangeReason == AVAudioSessionRouteChangeReasonNewDeviceAvailable
+     || routeChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
+        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+}
+
+@end
 
 static int
 avas_GetOptimalChannelLayout(audio_output_t *p_aout, unsigned channel_count,
@@ -370,6 +403,10 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (p_sys->b_muted)
         Pause(p_aout, true, 0);
 
+    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
+           selector:@selector(audioSessionRouteChange:)
+           name:AVAudioSessionRouteChangeNotification object:nil];
+
     free(layout);
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
@@ -392,6 +429,8 @@ Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
+    [sys->aoutWrapper release];
+
     free(sys);
 }
 
@@ -403,6 +442,13 @@ Open(vlc_object_t *obj)
 
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
+    sys->aoutWrapper = [[AoutWrapper alloc] initWithAout:aout];
+    if (sys->aoutWrapper == NULL)
+    {
+        free(sys);
+        return VLC_ENOMEM;
+    }
 
     sys->b_muted = false;
     aout->sys = sys;
