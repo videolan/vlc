@@ -178,50 +178,6 @@ ATTR_PACKED
 } VIDEOINFOHEADER;
 #endif
 
-#ifndef _RGBQUAD_
-#define _RGBQUAD_
-typedef struct
-ATTR_PACKED
-{
-    uint8_t rgbBlue;
-    uint8_t rgbGreen;
-    uint8_t rgbRed;
-    uint8_t rgbReserved;
-} RGBQUAD1;
-#endif
-
-#ifndef _TRUECOLORINFO_
-#define _TRUECOLORINFO_
-typedef struct
-ATTR_PACKED
-{
-    uint32_t dwBitMasks[3];
-    RGBQUAD1 bmiColors[256];
-} TRUECOLORINFO;
-#endif
-
-#ifndef _VIDEOINFO_
-#define _VIDEOINFO_
-typedef struct
-ATTR_PACKED
-{
-    RECT32                  rcSource;
-    RECT32                  rcTarget;
-    uint32_t                dwBitRate;
-    uint32_t                dwBitErrorRate;
-    REFERENCE_TIME          AvgTimePerFrame;
-    VLC_BITMAPINFOHEADER    bmiHeader;
-
-    union
-    {
-        RGBQUAD1 bmiColors[256]; /* Colour palette */
-        uint32_t dwBitMasks[3]; /* True colour masks */
-        TRUECOLORINFO TrueColorInfo; /* Both of the above */
-    };
-
-} VIDEOINFO;
-#endif
-
 #if defined(__SUNPRO_C) || defined(_MSC_VER)
 #   pragma pack()
 #elif defined(__APPLE__) && !HAVE_ATTRIBUTE_PACKED
