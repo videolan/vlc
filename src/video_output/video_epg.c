@@ -311,7 +311,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
                     else vlc_epg_SetCurrent(epg, p_event->i_start);
                 }
             }
-            if(tmp->psz_name)
+            if(epg && tmp->psz_name)
                 epg->psz_name = strdup(tmp->psz_name);
         }
     }
