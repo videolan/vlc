@@ -167,68 +167,6 @@ Play(audio_output_t * p_aout, block_t * p_block)
 
 #pragma mark initialization
 
-/*
- * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
- */
-static int
-StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
-{
-    struct aout_sys_t           *p_sys = p_aout->sys;
-    OSStatus status;
-
-    /* Activate the AVAudioSession */
-    if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
-        return VLC_EGENERIC;
-
-    fmt->i_format = VLC_CODEC_FL32;
-    fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_STEREO;
-
-    p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
-    if (p_sys->au_unit == NULL)
-        goto error;
-
-    status = AudioUnitSetProperty(p_sys->au_unit,
-                                  kAudioOutputUnitProperty_EnableIO,
-                                  kAudioUnitScope_Output, 0,
-                                  &(UInt32){ 1 }, sizeof(UInt32));
-    if (status != noErr)
-        msg_Warn(p_aout, "failed to set IO mode (%i)", (int)status);
-
-    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL);
-    if (ret != VLC_SUCCESS)
-        goto error;
-
-    ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
-                  fmt->i_bytes_per_frame);
-    if (ret != VLC_SUCCESS)
-    {
-        AudioUnitUninitialize(p_sys->au_unit);
-        goto error;
-    }
-    p_aout->play = Play;
-
-    status = AudioOutputUnitStart(p_sys->au_unit);
-    if (status != noErr)
-    {
-        msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
-                (const char *) &status);
-        AudioUnitUninitialize(p_sys->au_unit);
-        ca_Clean(p_aout);
-        goto error;
-    }
-
-    if (p_sys->b_muted)
-        Pause(p_aout, true, 0);
-
-    return VLC_SUCCESS;
-
-error:
-    avas_SetActive(p_aout, false,
-                   AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
-    AudioComponentInstanceDispose(p_sys->au_unit);
-    return VLC_EGENERIC;
-}
-
 static void
 Stop(audio_output_t *p_aout)
 {
@@ -259,25 +197,69 @@ Stop(audio_output_t *p_aout)
 static int
 Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
-    struct aout_sys_t *p_sys = NULL;
+    struct aout_sys_t *p_sys = p_aout->sys;
+    OSStatus err;
 
     if (aout_FormatNbChannels(fmt) == 0)
         return VLC_EGENERIC;
 
-    p_sys = p_aout->sys;
-    p_sys->au_unit = NULL;
-
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
-    if (StartAnalog(p_aout, fmt) == VLC_SUCCESS) {
-        msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
-        p_aout->mute_set  = MuteSet;
-        p_aout->pause = Pause;
+    p_sys->au_unit = NULL;
 
-        return VLC_SUCCESS;
+    /* Activate the AVAudioSession */
+    if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
+        return VLC_EGENERIC;
+
+    fmt->i_format = VLC_CODEC_FL32;
+    fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_STEREO;
+
+    p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
+    if (p_sys->au_unit == NULL)
+        goto error;
+
+    err = AudioUnitSetProperty(p_sys->au_unit,
+                               kAudioOutputUnitProperty_EnableIO,
+                               kAudioUnitScope_Output, 0,
+                               &(UInt32){ 1 }, sizeof(UInt32));
+    if (err != noErr)
+        msg_Warn(p_aout, "failed to set IO mode [%4.4s]", (const char *)&err);
+
+    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL);
+    if (ret != VLC_SUCCESS)
+        goto error;
+
+    ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
+                  fmt->i_bytes_per_frame);
+    if (ret != VLC_SUCCESS)
+    {
+        AudioUnitUninitialize(p_sys->au_unit);
+        goto error;
+    }
+    p_aout->play = Play;
+
+    err = AudioOutputUnitStart(p_sys->au_unit);
+    if (err != noErr)
+    {
+        msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
+                (const char *) &err);
+        AudioUnitUninitialize(p_sys->au_unit);
+        ca_Clean(p_aout);
+        goto error;
     }
 
-    /* If we reach this, this aout has failed */
+    if (p_sys->b_muted)
+        Pause(p_aout, true, 0);
+
+    p_aout->mute_set  = MuteSet;
+    p_aout->pause = Pause;
+    msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
+    return VLC_SUCCESS;
+
+error:
+    avas_SetActive(p_aout, false,
+                   AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
+    AudioComponentInstanceDispose(p_sys->au_unit);
     msg_Err(p_aout, "opening AudioUnit output failed");
     return VLC_EGENERIC;
 }
