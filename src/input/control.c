@@ -399,7 +399,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            input_title_t *p_title = vlc_input_title_Duplicate( priv->title[*pi_title_to_fetch] );
+            input_title_t *p_title = priv->title[*pi_title_to_fetch];
 
             /* set arg2 to the number of seekpoints we found */
             const int i_chapters = p_title->i_seekpoint;
