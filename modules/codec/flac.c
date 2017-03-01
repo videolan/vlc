@@ -395,35 +395,29 @@ static void ProcessHeader( decoder_t *p_dec )
 
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
-    size_t i_extra = p_dec->fmt_in.i_extra;
+    int i_extra = p_dec->fmt_in.i_extra;
+
     static const char header[4] = { 'f', 'L', 'a', 'C' };
 
-    if (i_extra > 42 && !memcmp(p_dec->fmt_in.p_extra, header, 4))
-        i_extra = 42;
-    else if (i_extra > 34 && memcmp(p_dec->fmt_in.p_extra, header, 4))
-        i_extra = 34;
+    if( memcmp( p_dec->fmt_in.p_extra, header, 4 ) )
+        i_extra += 8;
 
-    switch (i_extra) {
-    case 34:
-        p_sys->p_block = block_Alloc( 8 + i_extra );
-        if( p_sys->p_block == NULL ) return;
-        memcpy( p_sys->p_block->p_buffer + 8, p_dec->fmt_in.p_extra, i_extra );
-        memcpy( p_sys->p_block->p_buffer, header, 4);
-        uint8_t *p = p_sys->p_block->p_buffer;
-        p[4] = 0x80 | 0; /* STREAMINFO faked as last block */
-        p[5] = 0;
-        p[6] = 0;
-        p[7] = 34; /* block size */
-        break;
-    case 42:
-        p_sys->p_block = block_Alloc( i_extra );
-        if( p_sys->p_block == NULL ) return;
-        memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra, i_extra );
-        break;
-    default:
-        msg_Err(p_dec, "Invalid flac header size %zu", i_extra);
+    p_sys->p_block = block_Alloc( i_extra );
+    if( p_sys->p_block == NULL )
         return;
+
+    uint8_t *p_data = p_sys->p_block->p_buffer;
+    if( i_extra != p_dec->fmt_in.i_extra )
+    {
+        memcpy( p_data, header, 4);
+        p_data[4] = 0x80 | 0; /* STREAMINFO faked as last block */
+        p_data[5] = 0;
+        p_data[6] = 0;
+        p_data[7] = 34; /* block size */
+        p_data += 8;
     }
+    memcpy( p_data, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
     msg_Dbg( p_dec, "STREAMINFO decoded" );
 
