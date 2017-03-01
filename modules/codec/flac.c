@@ -243,9 +243,12 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
     /* Setup the format */
     p_dec->fmt_out.audio.i_rate     = metadata->data.stream_info.sample_rate;
     p_dec->fmt_out.audio.i_channels = metadata->data.stream_info.channels;
-    p_dec->fmt_out.audio.i_physical_channels =
+    if( metadata->data.stream_info.channels < 9 )
+    {
+        p_dec->fmt_out.audio.i_physical_channels =
         p_dec->fmt_out.audio.i_original_channels =
             pi_channels_maps[metadata->data.stream_info.channels];
+    }
     if (!p_dec->fmt_out.audio.i_bitspersample)
         p_dec->fmt_out.audio.i_bitspersample =
             metadata->data.stream_info.bits_per_sample;
