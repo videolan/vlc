@@ -210,8 +210,11 @@ text_segment_t *text_segment_Copy( text_segment_t *p_src )
 
     while( p_src ) {
         text_segment_t *p_new = text_segment_New( p_src->psz_text );
-        if( p_new )
-            p_new->style = text_style_Duplicate( p_src->style );
+
+        if( unlikely( !p_new ) )
+            break;
+
+        p_new->style = text_style_Duplicate( p_src->style );
 
         if( p_dst == NULL )
         {
