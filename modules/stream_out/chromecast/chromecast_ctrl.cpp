@@ -538,7 +538,10 @@ void intf_sys_t::processConnectionMessage( const castchannel::CastMessage& msg )
 bool intf_sys_t::handleMessages()
 {
     uint8_t p_packet[PACKET_MAX_LEN];
-    ssize_t i_payloadSize = 0;
+    size_t i_payloadSize = 0;
+    size_t i_received = 0;
+    bool b_timeout = false;
+    mtime_t i_begin_time = mdate();
 
     if ( m_requested_stop.exchange(false) && !m_mediaSessionId.empty() )
     {
@@ -559,24 +562,33 @@ bool intf_sys_t::handleMessages()
         m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
     }
 
-    i_payloadSize = m_communication.recvPacket( p_packet );
-#if defined(_WIN32)
-    if ( i_payloadSize < 0 && WSAGetLastError() != WSAEWOULDBLOCK )
-#else
-    if ( i_payloadSize < 0 )
-#endif
+    /* Packet structure:
+     * +------------------------------------+------------------------------+
+     * | Payload size (uint32_t big endian) |         Payload data         |
+     * +------------------------------------+------------------------------+
+     */
+    while ( true )
     {
-        // An error occured, we give up
-        msg_Err( m_module, "The connection to the Chromecast died (receiving).");
-        vlc_mutex_locker locker(&m_lock);
-        setState( Dead );
-        return false;
-    }
-    if ( i_payloadSize == 0 )
-    {
-        // If no commands were queued to be sent, we timed out. Let's ping the chromecast
-        if ( m_requested_seek == false && m_requested_stop == false )
+        // If we haven't received the payload size yet, let's wait for it. Otherwise, we know
+        // how many bytes to read
+        ssize_t i_ret = m_communication.receive( p_packet + i_received,
+                                        i_payloadSize + PACKET_HEADER_LEN - i_received,
+                                        PING_WAIT_TIME - ( mdate() - i_begin_time ) / CLOCK_FREQ,
+                                        &b_timeout );
+        if ( i_ret < 0 )
         {
+            // If we need to process a command, let it happen at next iteration
+            if ( errno == EINTR )
+                return true;
+            // An error occured, we give up
+            msg_Err( m_module, "The connection to the Chromecast died (receiving).");
+            vlc_mutex_locker locker(&m_lock);
+            setState( Dead );
+            return false;
+        }
+        else if ( b_timeout == true )
+        {
+            // If no commands were queued to be sent, we timed out. Let's ping the chromecast
             if ( m_pingRetriesLeft == 0 )
             {
                 vlc_mutex_locker locker(&m_lock);
@@ -587,8 +599,25 @@ bool intf_sys_t::handleMessages()
             --m_pingRetriesLeft;
             m_communication.msgPing();
             m_communication.msgReceiverGetStatus();
+            return true;
         }
-        return true;
+        assert( i_ret != 0 );
+        i_received += i_ret;
+        if ( i_payloadSize == 0 )
+        {
+            i_payloadSize = U32_AT( p_packet );
+            if ( i_payloadSize > PACKET_MAX_LEN - PACKET_HEADER_LEN )
+            {
+                msg_Err( m_module, "Payload size is too long: dropping conection" );
+                vlc_mutex_locker locker(&m_lock);
+                m_state = Dead;
+                return false;
+            }
+            continue;
+        }
+        assert( i_received <= i_payloadSize + PACKET_HEADER_LEN );
+        if ( i_received == i_payloadSize + PACKET_HEADER_LEN )
+            break;
     }
     castchannel::CastMessage msg;
     msg.ParseFromArray(p_packet + PACKET_HEADER_LEN, i_payloadSize);

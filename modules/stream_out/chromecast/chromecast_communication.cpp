@@ -117,68 +117,60 @@ void ChromecastCommunication::buildMessage(const std::string & namespace_,
 
 /**
  * @brief Receive a data packet from the Chromecast
- * @param p_module the module to log with
- * @param b_msgReceived returns true if a message has been entirely received else false
- * @param i_payloadSize returns the payload size of the message received
+ * @param p_data the buffer in which to store the data
+ * @param i_size the size of the buffer
+ * @param i_timeout maximum time to wait for a packet, in millisecond
+ * @param pb_timeout Output parameter that will contain true if no packet was received due to a timeout
  * @return the number of bytes received of -1 on error
  */
-ssize_t ChromecastCommunication::recvPacket( uint8_t *p_data )
+ssize_t ChromecastCommunication::receive( uint8_t *p_data, size_t i_size, int i_timeout, bool *pb_timeout )
 {
-    ssize_t i_payloadSize = -1;
+    ssize_t i_received = 0;
     struct pollfd ufd[1];
     ufd[0].fd = m_sock_fd;
     ufd[0].events = POLLIN;
+
+    struct iovec iov;
+    iov.iov_base = p_data;
+    iov.iov_len = i_size;
 
     /* The Chromecast normally sends a PING command every 5 seconds or so.
      * If we do not receive one after 6 seconds, we send a PING.
      * If after this PING, we do not receive a PONG, then we consider the
      * connection as dead. */
-    ssize_t val = vlc_poll_i11e(ufd, 1, PING_WAIT_TIME);
-    if ( val == -1 )
+    do
     {
-        if ( errno != EINTR )
-            return -1;
-        return 0;
-    }
-    if ( val == 0 )
-        return 0;
-
-    if ( ufd[0].revents & POLLIN )
-    {
-        /* we have received stuff */
-
-        /* Packet structure:
-         * +------------------------------------+------------------------------+
-         * | Payload size (uint32_t big endian) |         Payload data         |
-         * +------------------------------------+------------------------------+ */
-        // We receive the header.
-        ssize_t i_ret = vlc_tls_Read(m_tls, p_data, PACKET_HEADER_LEN, true);
-        if (i_ret < PACKET_HEADER_LEN)
-            return -1;
-
-        // We receive the payload.
-
-        // Get the size of the payload
-        i_payloadSize = U32_AT( p_data );
-        const uint32_t i_maxPayloadSize = PACKET_MAX_LEN - PACKET_HEADER_LEN;
-
-        if (i_payloadSize > i_maxPayloadSize)
+        ssize_t i_ret = m_tls->readv( m_tls, &iov, 1 );
+        if ( i_ret < 0 )
         {
-            // Error case: the packet sent by the Chromecast is too long: we drop it.
-            msg_Err( m_module, "Packet too long: dropping its data");
-
-            i_ret = vlc_tls_Read(m_tls, p_data + PACKET_HEADER_LEN,
-                                 i_maxPayloadSize, false);
-            return i_ret ? i_ret : -1;
+#ifdef _WIN32
+            if ( WSAGetLastError() != WSAEWOULDBLOCK )
+#else
+            if ( errno != EAGAIN )
+#endif
+            {
+                return -1;
+            }
+            ssize_t val = vlc_poll_i11e(ufd, 1, i_timeout);
+            if ( val < 0 )
+                return -1;
+            else if ( val == 0 )
+            {
+                *pb_timeout = true;
+                return i_received;
+            }
+            assert( ufd[0].revents & POLLIN );
+            continue;
         }
-
-        // Normal case
-        i_ret = vlc_tls_Read(m_tls, p_data + PACKET_HEADER_LEN, i_payloadSize,
-                             false);
-        if (i_ret < i_payloadSize)
+        else if ( i_ret == 0 )
             return -1;
-    }
-    return i_payloadSize;
+        assert( i_size >= (size_t)i_ret );
+        i_size -= i_ret;
+        i_received += i_ret;
+        iov.iov_base = (uint8_t*)iov.iov_base + i_ret;
+        iov.iov_len = i_size;
+    } while ( i_size > 0 );
+    return i_received;
 }
 
 
