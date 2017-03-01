@@ -116,7 +116,7 @@ struct intf_thread_t;
 typedef struct playlist_export_t
 {
     VLC_COMMON_MEMBERS
-    const char *psz_filename;
+    char *base_url;
     FILE *p_file;
     playlist_item_t *p_root;
 } playlist_export_t;

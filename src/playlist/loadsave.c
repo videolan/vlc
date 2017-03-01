@@ -52,7 +52,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
     int ret = VLC_EGENERIC;
 
     /* Prepare the playlist_export_t structure */
-    p_export->psz_filename = psz_filename;
+    p_export->base_url = vlc_path2uri( psz_filename, NULL );
     p_export->p_file = vlc_fopen( psz_filename, "wt" );
     if( p_export->p_file == NULL )
     {
@@ -84,6 +84,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
         msg_Err( p_playlist, "could not export playlist" );
    fclose( p_export->p_file );
 out:
+   free( p_export->base_url );
    vlc_object_release( p_export );
    return ret;
 }
