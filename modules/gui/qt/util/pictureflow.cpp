@@ -257,7 +257,7 @@ PictureFlowSoftwareRenderer::PictureFlowSoftwareRenderer():
 PictureFlowSoftwareRenderer::~PictureFlowSoftwareRenderer()
 {
     buffer = QImage();
-    cache.clear();
+    qDeleteAll( cache.values() );
     delete blankSurface;
 }
 
