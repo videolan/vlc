@@ -141,7 +141,7 @@ libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi, const char *psz_sub
  * \return always 0.
  */
 LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_audio_output_device_count( libvlc_instance_t *, const char * );
+int libvlc_audio_output_device_count( libvlc_instance_t *p_instance, const char *psz_audio_output );
 
 /**
  * Backward compatibility stub. Do not use in new code.
@@ -149,8 +149,8 @@ int libvlc_audio_output_device_count( libvlc_instance_t *, const char * );
  * \return always NULL.
  */
 LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_longname( libvlc_instance_t *, const char *,
-                                           int );
+char *libvlc_audio_output_device_longname( libvlc_instance_t *p_instance, const char *psz_output,
+                                           int i_device );
 
 /**
  * Backward compatibility stub. Do not use in new code.
@@ -158,7 +158,7 @@ char *libvlc_audio_output_device_longname( libvlc_instance_t *, const char *,
  * \return always NULL.
  */
 LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_id( libvlc_instance_t *, const char *, int );
+char *libvlc_audio_output_device_id( libvlc_instance_t *p_instance, const char *psz_audio_output, int i_device );
 
 /**
  * Stub for backward compatibility.
@@ -171,8 +171,8 @@ LIBVLC_API int libvlc_audio_output_get_device_type( libvlc_media_player_t *p_mi 
  * Stub for backward compatibility.
  */
 LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *,
-                                                     int );
+LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *p_mp,
+                                                     int device_type );
 
 /** @}*/
 

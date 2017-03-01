@@ -298,8 +298,8 @@ LIBVLC_API int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *p_instance
  * \param i_instance instance id
  * \return title as number or -1 on error
  */
-LIBVLC_API int libvlc_vlm_get_media_instance_title( libvlc_instance_t *,
-                                                        const char *, int );
+LIBVLC_API int libvlc_vlm_get_media_instance_title( libvlc_instance_t *p_instance,
+                                                        const char *psz_name, int i_instance );
 
 /**
  * Get vlm_media instance chapter number by name or instance id
@@ -309,8 +309,8 @@ LIBVLC_API int libvlc_vlm_get_media_instance_title( libvlc_instance_t *,
  * \param i_instance instance id
  * \return chapter as number or -1 on error
  */
-LIBVLC_API int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *,
-                                                          const char *, int );
+LIBVLC_API int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *p_instance,
+                                                          const char *psz_name, int i_instance );
 
 /**
  * Is libvlc instance seekable ?
@@ -320,8 +320,8 @@ LIBVLC_API int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *,
  * \param i_instance instance id
  * \return 1 if seekable, 0 if not, -1 if media does not exist
  */
-LIBVLC_API int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *,
-                                                           const char *, int );
+LIBVLC_API int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
+                                                           const char *psz_name, int i_instance );
 #endif
 /**
  * Get libvlc_event_manager from a vlm media.

@@ -308,7 +308,7 @@ typedef int libvlc_event_type_t;
  * Callback function notification
  * \param p_event the event triggering the callback
  */
-typedef void ( *libvlc_callback_t )( const struct libvlc_event_t *, void * );
+typedef void ( *libvlc_callback_t )( const struct libvlc_event_t *p_event, void *p_data );
 
 /**
  * Register for an event notification.
@@ -447,7 +447,7 @@ typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx,
  * \param p_instance libvlc instance
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_unset( libvlc_instance_t * );
+LIBVLC_API void libvlc_log_unset( libvlc_instance_t *p_instance );
 
 /**
  * Sets the logging callback for a LibVLC instance.
@@ -466,7 +466,7 @@ LIBVLC_API void libvlc_log_unset( libvlc_instance_t * );
  * \param p_instance libvlc instance
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_set( libvlc_instance_t *,
+LIBVLC_API void libvlc_log_set( libvlc_instance_t *p_instance,
                                 libvlc_log_cb cb, void *data );
 
 
@@ -477,7 +477,7 @@ LIBVLC_API void libvlc_log_set( libvlc_instance_t *,
  *         (the FILE pointer must remain valid until libvlc_log_unset())
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_set_file( libvlc_instance_t *, FILE *stream );
+LIBVLC_API void libvlc_log_set_file( libvlc_instance_t *p_instance, FILE *stream );
 
 /** @} */
 
