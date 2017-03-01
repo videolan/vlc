@@ -58,8 +58,10 @@ struct aout_sys_common
 
     /* The following need to set by the caller */
 
-    /* The time the device needs to process the data. In samples. */
-    uint32_t            i_device_latency;
+    /* ca_TimeGet extra latency, in samples. */
+    uint32_t            i_latency_samples;
+    /* ca_TimeGet extra latency, in micro-seconds */
+    mtime_t             i_latency_us;
 };
 
 void ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested);

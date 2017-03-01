@@ -85,8 +85,8 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
     int32_t i_bytes;
     TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes);
 
-    int64_t i_frames = BytesToFrames(p_sys, i_bytes) + p_sys->i_device_latency;
-    *delay = FramesToUs(p_sys, i_frames);
+    int64_t i_frames = BytesToFrames(p_sys, i_bytes) + p_sys->i_latency_samples;
+    *delay = FramesToUs(p_sys, i_frames) + p_sys->i_latency_us;
 
     return 0;
 }

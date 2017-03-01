@@ -1385,7 +1385,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
-    p_sys->c.i_device_latency = 0;
+    p_sys->c.i_latency_samples = 0;
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
     p_sys->i_selected_dev = p_sys->i_new_selected_dev;
@@ -1488,17 +1488,18 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
 
     /* get device latency */
-    AO_GET1PROP(p_sys->i_selected_dev, UInt32, &p_sys->c.i_device_latency,
+    AO_GET1PROP(p_sys->i_selected_dev, UInt32, &p_sys->c.i_latency_samples,
                 kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
-    float f_latency_in_sec = (float)p_sys->c.i_device_latency / (float)fmt->i_rate;
+    float f_latency_in_sec = (float)p_sys->c.i_latency_samples
+                           / (float)fmt->i_rate;
     msg_Dbg(p_aout, "Current device has a latency of %u frames (%f sec)",
-            p_sys->c.i_device_latency, f_latency_in_sec);
+            p_sys->c.i_latency_samples, f_latency_in_sec);
 
     /* Ignore long Airplay latency as this is not correctly working yet */
     if (f_latency_in_sec > 0.5f)
     {
         msg_Info(p_aout, "Ignore high latency as it causes problems currently.");
-        p_sys->c.i_device_latency = 0;
+        p_sys->c.i_latency_samples = 0;
     }
 
     /* Check for Digital mode or Analog output mode */
