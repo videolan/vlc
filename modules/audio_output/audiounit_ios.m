@@ -318,21 +318,22 @@ error:
 static void Stop(audio_output_t *p_aout)
 {
     struct aout_sys_t   *p_sys = p_aout->sys;
-    OSStatus status;
+    OSStatus err;
 
-    if (p_sys->au_unit) {
-        status = AudioOutputUnitStop(p_sys->au_unit);
-        if (status != noErr)
-            msg_Warn(p_aout, "failed to stop AudioUnit (%i)", (int)status);
+    err = AudioOutputUnitStop(p_sys->au_unit);
+    if (err != noErr)
+        msg_Warn(p_aout, "AudioOutputUnitStop failed [%4.4s]",
+                 (const char *)&err);
 
-        status = AudioUnitUninitialize(p_sys->au_unit);
-        if (status != noErr)
-            msg_Warn(p_aout, "failed to uninit AudioUnit (%i)", (int)status);
+    err = AudioUnitUninitialize(p_sys->au_unit);
+    if (err != noErr)
+        msg_Warn(p_aout, "AudioUnitUninitialize failed [%4.4s]",
+                 (const char *)&err);
 
-        status = AudioComponentInstanceDispose(p_sys->au_unit);
-        if (status != noErr)
-            msg_Warn(p_aout, "failed to dispose Audio Component instance (%i)", (int)status);
-    }
+    err = AudioComponentInstanceDispose(p_sys->au_unit);
+    if (err != noErr)
+        msg_Warn(p_aout, "AudioComponentInstanceDispose failed [%4.4s]",
+                 (const char *)&err);
 
     [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
 
