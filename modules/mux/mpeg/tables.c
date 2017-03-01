@@ -374,7 +374,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
     if( p_sdt )
     {
         dvbpsi_sdt_init( &sdtpsi, 0x42, i_tsid, 1, true, p_sdt->i_netid );
-        pi_service_types = calloc( i_programs * 2, sizeof(uint8_t *) );
+        pi_service_types = calloc( i_programs * 2, sizeof *pi_service_types );
         if( !pi_service_types )
         {
             free( dvbpmt );
