@@ -248,12 +248,15 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         goto error;
     }
 
+    p_sys->c.i_latency_us = [instance outputLatency] * CLOCK_FREQ;
+
     if (p_sys->b_muted)
         Pause(p_aout, true, 0);
 
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
-    msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
+    msg_Dbg(p_aout, "analog AudioUnit output successfully opened "
+            "(latency: %lld us)", p_sys->c.i_latency_us);
     return VLC_SUCCESS;
 
 error:
