@@ -122,8 +122,8 @@ EXTRA_DIST += \
 	extras/package/macosx/dmg/dmg_settings.py \
 	extras/package/macosx/dmg/disk_image.icns \
 	extras/package/macosx/dmg/background.tiff \
-	extras/package/macosx/fullscreen_panel.svg \
-	extras/package/macosx/vlc_status_icon.svg \
-	extras/package/macosx/vlc_app_icon.svg \
+	extras/package/macosx/asset_sources/fullscreen_panel.svg \
+	extras/package/macosx/asset_sources/vlc_status_icon.svg \
+	extras/package/macosx/asset_sources/vlc_app_icon.svg \
 	extras/package/macosx/VLC.entitlements \
 	extras/package/macosx/VLC.xcodeproj/project.pbxproj
