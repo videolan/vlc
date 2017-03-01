@@ -68,6 +68,8 @@ struct decoder_sys_t
      */
     FLAC__StreamDecoder *p_flac;
     FLAC__StreamMetadata_StreamInfo stream_info;
+
+    uint8_t rgi_channels_reorder[AOUT_CHAN_MAX];
     bool b_stream_info;
 };
 
@@ -181,8 +183,6 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     if( date_Get( &p_sys->end_date ) <= VLC_TS_INVALID )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 
-    const uint8_t *pi_reorder = ppi_reorder[p_dec->fmt_out.audio.i_channels];
-
     if( decoder_UpdateAudioFormat( p_dec ) )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 
@@ -192,7 +192,8 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     if( p_sys->p_aout_buffer == NULL )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 
-    Interleave( (int32_t *)p_sys->p_aout_buffer->p_buffer, buffer, pi_reorder,
+    Interleave( (int32_t *)p_sys->p_aout_buffer->p_buffer, buffer,
+                 p_sys->rgi_channels_reorder,
                  frame->header.channels, frame->header.blocksize,
                  frame->header.bits_per_sample );
 
@@ -251,6 +252,9 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
         p_dec->fmt_out.audio.i_physical_channels =
         p_dec->fmt_out.audio.i_original_channels =
             pi_channels_maps[metadata->data.stream_info.channels];
+        memcpy( p_sys->rgi_channels_reorder,
+                ppi_reorder[metadata->data.stream_info.channels],
+                metadata->data.stream_info.channels );
     }
     if (!p_dec->fmt_out.audio.i_bitspersample)
         p_dec->fmt_out.audio.i_bitspersample =
@@ -320,6 +324,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->b_stream_info = false;
+    memset(p_sys->rgi_channels_reorder, 0, AOUT_CHAN_MAX);
     p_sys->p_block = NULL;
 
     /* Take care of flac init */
