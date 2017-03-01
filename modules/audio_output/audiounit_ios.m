@@ -200,7 +200,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     struct aout_sys_t *p_sys = p_aout->sys;
     OSStatus err;
 
-    if (aout_FormatNbChannels(fmt) == 0)
+    if (aout_FormatNbChannels(fmt) == 0
+     || aout_BitsPerSample(fmt->i_format) == 0 /* No Passthrough support */)
         return VLC_EGENERIC;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
