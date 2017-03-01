@@ -393,7 +393,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if ( *pi_title_to_fetch < 0 ) /* query current title if -1 */
                 *pi_title_to_fetch = var_GetInteger( p_input, "title" );
 
-            if( !priv->i_title || priv->i_title < *pi_title_to_fetch )
+            if( priv->i_title == 0 || priv->i_title <= *pi_title_to_fetch )
             {
                 vlc_mutex_unlock( &priv->p_item->lock );
                 return VLC_EGENERIC;
