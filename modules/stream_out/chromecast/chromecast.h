@@ -131,7 +131,7 @@ private:
     vlc_tls_creds_t *m_creds;
     vlc_tls_t *m_tls;
     unsigned m_receiver_requestId;
-    unsigned m_requestId;
+    std::atomic_uint m_requestId;
     std::string m_serverIp;
 };
 
@@ -157,8 +157,6 @@ private:
     void waitSeekDone();
 
     void processMessage(const castchannel::CastMessage &msg);
-
-    void notifySendRequest();
 
     void setPauseState(bool paused);
 
@@ -212,8 +210,6 @@ private:
 
     ChromecastCommunication m_communication;
     States m_state;
-    std::atomic_bool m_requested_stop;
-    std::atomic_bool m_requested_seek;
 
     std::string m_artwork;
     std::string m_title;
