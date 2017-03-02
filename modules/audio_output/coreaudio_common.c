@@ -30,8 +30,6 @@
 #import <vlc_dialog.h>
 #endif
 
-#define AUDIO_BUFFER_SIZE_IN_SECONDS ((AOUT_MAX_ADVANCE_TIME + CLOCK_FREQ) / CLOCK_FREQ)
-
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
 {
@@ -700,7 +698,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         return VLC_EGENERIC;
     }
 
-    ret = ca_Initialize(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS *
+    ret = ca_Initialize(p_aout, fmt, AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ *
                         fmt->i_rate * fmt->i_bytes_per_frame);
     if (ret != VLC_SUCCESS)
     {
