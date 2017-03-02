@@ -134,7 +134,6 @@ struct vout_display_sys_t
 
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
-    const char               *d3dPxShader;
 
     ID3D11VertexShader        *flatVSShader;
     ID3D11VertexShader        *projectionVSShader;
@@ -145,7 +144,6 @@ struct vout_display_sys_t
 
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2];
-    const char               *psz_rgbaPxShader;
     ID3D11PixelShader        *pSPUPixelShader;
     const d3d_format_t       *d3dregion_format;
     int                      d3dregion_count;
@@ -302,92 +300,15 @@ static const char* globPixelShaderDefault = "\
   \
   float4 main( PS_INPUT In ) : SV_TARGET\
   {\
-    float4 rgba; \
+    float4 sample;\
     \
-    rgba = shaderTexture[0].Sample(SampleType, In.Texture);\
-    rgba.x += WhitePointX;\
-    rgba.y += WhitePointY;\
-    rgba.z += WhitePointZ;\
-    rgba.a = rgba.a * Opacity;\
+    %s /* sampling routine in sample */\
+    float4 rgba;\
+    rgba.x = sample.x + WhitePointX;\
+    rgba.y = sample.y + WhitePointY;\
+    rgba.z = sample.z + WhitePointZ;\
+    rgba.a = sample.a * Opacity;\
     return saturate(mul(rgba, Colorspace));\
-  }\
-";
-
-/* for NV12/P010 source */
-static const char *globPixelShaderBiplanarYUV_2RGB = "\
-  cbuffer PS_CONSTANT_BUFFER : register(b0)\
-  {\
-    float Opacity;\
-    float opacityPadding[3];\
-  };\
-  cbuffer PS_COLOR_TRANSFORM : register(b1)\
-  {\
-    float WhitePointX;\
-    float WhitePointY;\
-    float WhitePointZ;\
-    float whitePadding;\
-    float4x4 Colorspace;\
-  };\
-  Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
-  SamplerState SampleType;\
-  \
-  struct PS_INPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float4 Texture    : TEXCOORD0;\
-  };\
-  \
-  float4 main( PS_INPUT In ) : SV_TARGET\
-  {\
-    float4 yuv;\
-    float4 rgba;\
-    yuv.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
-    yuv.yz = shaderTexture[1].Sample(SampleType, In.Texture).xy;\
-    yuv.a  = Opacity;\
-    yuv.x  += WhitePointX;\
-    yuv.y  += WhitePointY;\
-    yuv.z  += WhitePointZ;\
-    rgba = saturate(mul(yuv, Colorspace));\
-    return rgba;\
-  }\
-";
-
-static const char *globPixelShaderBiplanarYUYV_2RGB = "\
-  cbuffer PS_CONSTANT_BUFFER : register(b0)\
-  {\
-    float Opacity;\
-    float opacityPadding[3];\
-  };\
-  cbuffer PS_COLOR_TRANSFORM : register(b1)\
-  {\
-    float WhitePointX;\
-    float WhitePointY;\
-    float WhitePointZ;\
-    float whitePadding;\
-    float4x4 Colorspace;\
-  };\
-  Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
-  SamplerState SampleType;\
-  \
-  struct PS_INPUT\
-  {\
-    float4 Position   : SV_POSITION;\
-    float4 Texture    : TEXCOORD0;\
-  };\
-  \
-  float4 main( PS_INPUT In ) : SV_TARGET\
-  {\
-    float4 yuv;\
-    float4 rgba;\
-    yuv.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
-    yuv.y  = shaderTexture[0].Sample(SampleType, In.Texture).y;\
-    yuv.z  = shaderTexture[0].Sample(SampleType, In.Texture).a;\
-    yuv.a  = Opacity;\
-    yuv.x  += WhitePointX;\
-    yuv.y  += WhitePointY;\
-    yuv.z  += WhitePointZ;\
-    rgba = saturate(mul(yuv, Colorspace));\
-    return rgba;\
   }\
 ";
 
@@ -1361,24 +1282,6 @@ static HINSTANCE Direct3D11LoadShaderLibrary(void)
 #endif
 
 
-static const char *GetFormatPixelShader(const d3d_format_t *format)
-{
-    switch (format->formatTexture)
-    {
-    case DXGI_FORMAT_NV12:
-    case DXGI_FORMAT_P010:
-        return globPixelShaderBiplanarYUV_2RGB;
-    case DXGI_FORMAT_YUY2:
-        return globPixelShaderBiplanarYUYV_2RGB;
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B5G6R5_UNORM:
-        return globPixelShaderDefault;
-    default:
-        return NULL;
-    }
-}
-
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1523,24 +1426,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     fmt->i_chroma = sys->picQuadConfig->fourcc;
     DxgiFormatMask( sys->picQuadConfig->formatTexture, fmt );
 
-    sys->d3dPxShader = GetFormatPixelShader(sys->picQuadConfig);
-    if (sys->d3dPxShader == NULL)
-    {
-        msg_Err(vd, "Could not get a suitable pixel shader for %s", sys->picQuadConfig->name);
-        return VLC_EGENERIC;
-    }
-
     /* check the region pixel format */
     sys->d3dregion_format = GetOutputFormat(vd, VLC_CODEC_RGBA, 0, false, true);
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetOutputFormat(vd, VLC_CODEC_BGRA, 0, false, true);
-
-    if (sys->d3dregion_format != NULL)
-    {
-        sys->psz_rgbaPxShader = GetFormatPixelShader(sys->d3dregion_format);
-        if (sys->psz_rgbaPxShader == NULL)
-            msg_Warn(vd, "Could not get a suitable SPU pixel shader for %s", sys->picQuadConfig->name);
-    }
 
     UpdateRects(vd, NULL, NULL, true);
 
@@ -1642,16 +1531,45 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
     return pShaderBlob;
 }
 
-static HRESULT CompilePixelShader(vout_display_t *vd, const char *psz_shader, ID3D11PixelShader **output)
+static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format, ID3D11PixelShader **output)
 {
     vout_display_sys_t *sys = vd->sys;
-    char *shader = malloc(strlen(psz_shader) + 32);
+
+    const char *psz_sampler;
+    switch (format->formatTexture)
+    {
+    case DXGI_FORMAT_NV12:
+    case DXGI_FORMAT_P010:
+        psz_sampler =
+                "sample.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
+                sample.yz = shaderTexture[1].Sample(SampleType, In.Texture).xy;\
+                sample.a  = 1;";
+        break;
+    case DXGI_FORMAT_YUY2:
+        psz_sampler =
+                "sample.x  = shaderTexture[0].Sample(SampleType, In.Texture).x;\
+                sample.y  = shaderTexture[0].Sample(SampleType, In.Texture).y;\
+                sample.z  = shaderTexture[0].Sample(SampleType, In.Texture).a;\
+                sample.a  = 1;";
+        break;
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B5G6R5_UNORM:
+        psz_sampler =
+                "sample = shaderTexture[0].Sample(SampleType, In.Texture);";
+        break;
+    default:
+        vlc_assert_unreachable();
+
+    }
+
+    char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler));
     if (!shader)
     {
         msg_Err(vd, "no room for the Pixel Shader");
         return E_OUTOFMEMORY;
     }
-    sprintf(shader, psz_shader, sys->legacy_shader ? "" : "Array");
+    sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_sampler);
 
     ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
     free(shader);
@@ -1802,7 +1720,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     sys->legacy_shader = !CanUseTextureArray(vd);
     vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma);
 
-    hr = CompilePixelShader(vd, sys->d3dPxShader, &sys->picQuadPixelShader);
+    hr = CompilePixelShader(vd, sys->picQuadConfig, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
 #ifdef HAVE_ID3D11VIDEODECODER
@@ -1810,7 +1728,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         {
             sys->legacy_shader = true;
             msg_Dbg(vd, "fallback to legacy shader mode");
-            hr = CompilePixelShader(vd, sys->d3dPxShader, &sys->picQuadPixelShader);
+            hr = CompilePixelShader(vd, sys->picQuadConfig, &sys->picQuadPixelShader);
         }
 #endif
         if (FAILED(hr))
@@ -1820,9 +1738,9 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         }
     }
 
-    if (sys->psz_rgbaPxShader != NULL)
+    if (sys->d3dregion_format != NULL)
     {
-        hr = CompilePixelShader(vd, sys->psz_rgbaPxShader, &sys->pSPUPixelShader);
+        hr = CompilePixelShader(vd, sys->d3dregion_format, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
             ID3D11PixelShader_Release(sys->picQuadPixelShader);
