@@ -68,6 +68,7 @@ struct aout_sys_t
 {
     struct aout_sys_common c;
 
+    AVAudioSession *avInstance;
     AoutWrapper *aoutWrapper;
     /* The AudioUnit we use */
     AudioUnit au_unit;
@@ -114,8 +115,8 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, unsigned channel_count,
                              enum dev_type *pdev_type,
                              AudioChannelLayout **playout)
 {
-    AVAudioSession *instance = [AVAudioSession sharedInstance];
-
+    struct aout_sys_t * p_sys = p_aout->sys;
+    AVAudioSession *instance = p_sys->avInstance;
     AudioChannelLayout *layout = NULL;
     *pdev_type = DEV_TYPE_DEFAULT;
     NSInteger max_channel_count = [instance maximumOutputNumberOfChannels];
@@ -212,8 +213,7 @@ static int
 avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
-
-    AVAudioSession *instance = [AVAudioSession sharedInstance];
+    AVAudioSession *instance = p_sys->avInstance;
     BOOL ret = false;
     NSError *error = nil;
 
@@ -340,7 +340,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     OSStatus err;
     OSStatus status;
     AudioChannelLayout *layout = NULL;
-    AVAudioSession *instance = [AVAudioSession sharedInstance];
 
     if (aout_FormatNbChannels(fmt) == 0
      || aout_BitsPerSample(fmt->i_format) == 0 /* No Passthrough support */)
@@ -398,7 +397,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         goto error;
     }
 
-    p_sys->c.i_latency_us = [instance outputLatency] * CLOCK_FREQ;
+    p_sys->c.i_latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
 
     if (p_sys->b_muted)
         Pause(p_aout, true, 0);
@@ -442,6 +441,9 @@ Open(vlc_object_t *obj)
 
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
+    sys->avInstance = [AVAudioSession sharedInstance];
+    assert(sys->avInstance != NULL);
 
     sys->aoutWrapper = [[AoutWrapper alloc] initWithAout:aout];
     if (sys->aoutWrapper == NULL)
