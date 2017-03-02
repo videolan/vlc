@@ -81,7 +81,6 @@ struct aout_sys_t
     AudioObjectID               i_selected_dev;
     /* DeviceID of device which will be selected on start */
     AudioObjectID               i_new_selected_dev;
-    bool                        b_selected_dev_is_digital;
     /* true if the user selected the default audio device (id 0) */
     bool                        b_selected_dev_is_default;
 
@@ -838,12 +837,6 @@ SwitchAudioDevice(audio_output_t *p_aout, const char *name)
     else
         p_sys->i_new_selected_dev = 0;
 
-    bool b_supports_digital = (p_sys->i_new_selected_dev & AOUT_VAR_SPDIF_FLAG);
-    if (b_supports_digital)
-        p_sys->b_selected_dev_is_digital = true;
-    else
-        p_sys->b_selected_dev_is_digital = false;
-
     p_sys->i_new_selected_dev = p_sys->i_new_selected_dev & ~AOUT_VAR_SPDIF_FLAG;
 
     aout_DeviceReport(p_aout, name);
@@ -1437,14 +1430,11 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
             msg_Dbg(p_aout, "using default audio device %i", defaultDeviceID);
 
         p_sys->i_selected_dev = defaultDeviceID;
-        p_sys->b_selected_dev_is_digital = true;
     }
     vlc_mutex_unlock(&p_sys->selected_device_lock);
 
-    /* recheck if device still supports digital */
-    b_start_digital = p_sys->b_selected_dev_is_digital;
-    if(!AudioDeviceSupportsDigital(p_aout, p_sys->i_selected_dev))
-        b_start_digital = false;
+    /* Check if device supports digital */
+    b_start_digital = AudioDeviceSupportsDigital(p_aout, p_sys->i_selected_dev);
 
     if (b_start_digital)
         msg_Dbg(p_aout, "Using audio device for digital output");
