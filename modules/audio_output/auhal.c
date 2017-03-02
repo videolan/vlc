@@ -1364,7 +1364,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     int                     b_alive = false;
     bool                    b_start_digital = false;
 
-    if (aout_FormatNbChannels(fmt) == 0)
+    if (aout_FormatNbChannels(fmt) == 0 || AOUT_FMT_HDMI(fmt))
         return VLC_EGENERIC;
 
     p_sys = p_aout->sys;
