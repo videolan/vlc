@@ -77,8 +77,9 @@ static inline bool tt_ScanReset( unsigned *a, unsigned *b, unsigned *c, unsigned
     return false;
 }
 
-static int64_t tt_ParseTime( const char *s )
+static tt_time_t tt_ParseTime( const char *s )
 {
+    tt_time_t t = {-1, 0};
     unsigned h1 = 0, m1 = 0, s1 = 0, d1 = 0;
 
     if( sscanf( s, "%u:%u:%u%*[,.]%u", &h1, &m1, &s1, &d1 ) == 4 ||
@@ -89,21 +90,21 @@ static int64_t tt_ParseTime( const char *s )
                          tt_ScanReset( &h1, &m1, &s1, &d1 )      ||
         sscanf( s, "%us",                        &s1      ) == 1 )
     {
-        return ( (int64_t)h1 * 3600 * 1000 +
-                 (int64_t)m1 * 60 * 1000 +
-                 (int64_t)s1 * 1000 +
-                 (int64_t)d1 ) * 1000;
+        t.base = h1 * 3600 + m1 * 60 + s1;
+        t.frames = d1;
     }
 
-    return -1;
+    return t;
 }
 
-bool tt_timings_Contains( const tt_timings_t *p_range, int64_t i_time )
+bool tt_timings_Contains( const tt_timings_t *p_range, const tt_time_t *time )
 {
-    if( p_range->i_end != -1 && p_range->i_end <= i_time )
+    if( tt_time_Valid( &p_range->end ) &&
+        tt_time_Compare( &p_range->end, time ) <= 0 )
         return false;
 
-    if( p_range->i_begin != -1 && p_range->i_begin > i_time )
+    if( tt_time_Valid( &p_range->begin ) &&
+        tt_time_Compare( &p_range->begin, time ) > 0 )
         return false;
 
     return true;
@@ -178,9 +179,9 @@ tt_node_t * tt_node_New( xml_reader_t* reader, tt_node_t* p_parent, const char* 
         return NULL;
     }
     vlc_dictionary_init( &p_node->attr_dict, 0 );
-    p_node->timings.i_begin = -1;
-    p_node->timings.i_end = -1;
-    p_node->timings.i_dur = -1;
+    tt_time_Init( &p_node->timings.begin );
+    tt_time_Init( &p_node->timings.end );
+    tt_time_Init( &p_node->timings.dur );
     p_node->p_parent = p_parent;
     if( p_parent )
         tt_node_ParentAddChild( p_parent, (tt_basenode_t *) p_node );
@@ -196,11 +197,11 @@ tt_node_t * tt_node_New( xml_reader_t* reader, tt_node_t* p_parent, const char* 
             vlc_dictionary_insert( &p_node->attr_dict, psz_key, psz_val );
 
             if( !strcasecmp( psz_key, "begin" ) )
-                p_node->timings.i_begin = tt_ParseTime( psz_val );
+                p_node->timings.begin = tt_ParseTime( psz_val );
             else if( ! strcasecmp( psz_key, "end" ) )
-                p_node->timings.i_end = tt_ParseTime( psz_val );
+                p_node->timings.end = tt_ParseTime( psz_val );
             else if( ! strcasecmp( psz_key, "dur" ) )
-                p_node->timings.i_dur = tt_ParseTime( psz_val );
+                p_node->timings.dur = tt_ParseTime( psz_val );
             else if( ! strcasecmp( psz_key, "timeContainer" ) )
                 p_node->timings.i_type = strcmp( psz_val, "seq" ) ? TT_TIMINGS_PARALLEL
                                                                   : TT_TIMINGS_SEQUENTIAL;
@@ -332,46 +333,46 @@ int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node )
 static int tt_bsearch_searchkey_Compare( const void *key, const void *other )
 {
     struct tt_searchkey *p_key = (struct tt_searchkey *) key;
-    int64_t i_time = *((int64_t *) other);
-    p_key->p_last = (int64_t *) other;
-    return ( p_key->i_time >= i_time ) ? p_key->i_time - i_time : -1;
+    tt_time_t time = *((tt_time_t *) other);
+    p_key->p_last = (tt_time_t *) other;
+    return tt_time_Compare( &p_key->time, &time );
 }
 
-size_t tt_timings_FindLowerIndex( const int64_t *p_times, size_t i_times, int64_t i_time, bool *pb_found )
+size_t tt_timings_FindLowerIndex( const tt_time_t *p_times, size_t i_times, tt_time_t time, bool *pb_found )
 {
     size_t i_index = 0;
     if( p_times )
     {
         struct tt_searchkey key;
-        key.i_time = i_time;
+        key.time = time;
         key.p_last = NULL;
 
-        int64_t *lookup = bsearch( &key, p_times, i_times,
-                                   sizeof(int64_t), tt_bsearch_searchkey_Compare );
+        tt_time_t *lookup = bsearch( &key, p_times, i_times,
+                                     sizeof(tt_time_t), tt_bsearch_searchkey_Compare );
         if( lookup )
             key.p_last = lookup;
         *pb_found = !!lookup;
 
         /* Compute index from last visited */
         i_index = (key.p_last - p_times);
-        if( p_times[i_index] < i_time )
+        if( tt_time_Compare( &p_times[i_index], &time ) < 0 )
             i_index++;
     }
     else *pb_found = false;
     return i_index;
 }
 
-static void tt_bsearch_Insert( int64_t **pp_times, size_t *pi_times, int64_t i_time )
+static void tt_bsearch_Insert( tt_time_t **pp_times, size_t *pi_times, tt_time_t time )
 {
     bool b_exists;
-    size_t i_index = tt_timings_FindLowerIndex( *pp_times, *pi_times, i_time, &b_exists );
+    size_t i_index = tt_timings_FindLowerIndex( *pp_times, *pi_times, time, &b_exists );
     if( b_exists )
         return;
 
-    if( SIZE_MAX / sizeof(int64_t) < (*pi_times + 1) )
+    if( SIZE_MAX / sizeof(tt_time_t) < (*pi_times + 1) )
         return;
 
-    int64_t *p_array = realloc( *pp_times, (*pi_times + 1) * sizeof(int64_t) );
+    tt_time_t *p_array = realloc( *pp_times, (*pi_times + 1) * sizeof(tt_time_t) );
     if( !p_array )
         return;
     *pp_times = p_array;
@@ -380,10 +381,10 @@ static void tt_bsearch_Insert( int64_t **pp_times, size_t *pi_times, int64_t i_t
     {
         memmove( &p_array[i_index + 1],
                  &p_array[i_index],
-                 (*pi_times - i_index) * sizeof(int64_t) );
+                 (*pi_times - i_index) * sizeof(tt_time_t) );
     }
 
-    p_array[i_index] = i_time;
+    p_array[i_index] = time;
     *pi_times += 1;
 }
 
@@ -391,58 +392,59 @@ static void tt_bsearch_Insert( int64_t **pp_times, size_t *pi_times, int64_t i_t
 /* Timings storage */
 static void tt_timings_MergeParallel( const tt_timings_t *p_ref, tt_timings_t *p_local )
 {
-    if( p_local->i_begin != -1 )
-        p_local->i_begin += p_ref->i_begin;
+    if( tt_time_Valid( &p_local->begin ) )
+        p_local->begin = tt_time_Add( p_local->begin, p_ref->begin );
     else
-        p_local->i_begin = p_ref->i_begin;
+        p_local->begin = p_ref->begin;
 
-    if( p_local->i_end != -1 )
+    if( tt_time_Valid( &p_local->end ) )
     {
-        p_local->i_end += p_ref->i_begin;
+        p_local->end = tt_time_Add( p_local->end, p_ref->begin );
     }
-    else if( p_local->i_dur != -1 && p_local->i_begin != -1 )
+    else if( tt_time_Valid( &p_local->dur ) && tt_time_Valid( &p_local->begin ) )
     {
-        p_local->i_end = p_local->i_begin + p_local->i_dur;
+        p_local->end = tt_time_Add( p_local->begin, p_local->dur );
     }
-    else p_local->i_end = p_ref->i_end;
+    else p_local->end = p_ref->end;
 
     /* Enforce contained duration */
-    if( p_ref->i_end != -1 && p_local->i_end > p_ref->i_end )
-        p_local->i_end = p_ref->i_end;
+
+    if( tt_time_Valid( &p_ref->end ) && tt_time_Compare( &p_local->end, &p_ref->end ) > 0 )
+        p_local->end = p_ref->end;
 
     /* Just for consistency */
-    if( p_local->i_begin != -1 && p_local->i_end != -1 )
-        p_local->i_dur = p_local->i_end - p_local->i_begin;
+    if( tt_time_Valid( &p_local->begin ) && tt_time_Valid( &p_local->end ) )
+        p_local->dur = tt_time_Sub( p_local->end, p_local->begin );
 }
 
 static void tt_timings_MergeSequential( const tt_timings_t *p_restrict,
                                        const tt_timings_t *p_prevref, tt_timings_t *p_local )
 {
-    if( p_local->i_begin != -1 )
-        p_local->i_begin += p_prevref->i_end;
+    if( tt_time_Valid( &p_local->begin ) )
+        p_local->begin = tt_time_Add( p_local->begin, p_prevref->end );
     else
-        p_local->i_begin = p_prevref->i_end;
+        p_local->begin = p_prevref->end;
 
-    if( p_local->i_end != -1 )
+    if( tt_time_Valid( &p_local->end ) )
     {
-        p_local->i_end += p_prevref->i_end;
+        p_local->end = tt_time_Add( p_local->end, p_prevref->end );
     }
-    else if( p_local->i_dur != -1 && p_local->i_begin != -1 )
+    else if( tt_time_Valid( &p_local->dur ) && tt_time_Valid( &p_local->begin ) )
     {
-        p_local->i_end = p_local->i_begin + p_local->i_dur;
+        p_local->end = tt_time_Add( p_local->begin, p_local->dur );
     }
 
     /* Enforce contained duration */
-    if( p_restrict->i_end != -1 && p_local->i_end > p_restrict->i_end )
-        p_local->i_end = p_restrict->i_end;
+    if( tt_time_Valid( &p_restrict->end ) && tt_time_Compare( &p_local->end, &p_restrict->end ) > 0 )
+        p_local->end = p_restrict->end;
 
     /* Just for consistency */
-    if( p_local->i_begin != -1 && p_local->i_end != -1 )
-        p_local->i_dur = p_local->i_end - p_local->i_begin;
+    if( tt_time_Valid( &p_local->begin ) && tt_time_Valid( &p_local->end ) )
+        p_local->dur = tt_time_Sub( p_local->end, p_local->begin );
 }
 
 void tt_timings_Resolve( tt_basenode_t *p_child, const tt_timings_t *p_container_timings,
-                         int64_t **pp_array, size_t *pi_count )
+                         tt_time_t **pp_array, size_t *pi_count )
 {
     const tt_node_t *p_prevnode = NULL;
     for(  ; p_child; p_child = p_child->p_next )
@@ -464,11 +466,11 @@ void tt_timings_Resolve( tt_basenode_t *p_child, const tt_timings_t *p_container
             tt_timings_MergeParallel( p_container_timings, &p_childnode->timings );
         }
 
-        if( p_childnode->timings.i_begin != -1 )
-            tt_bsearch_Insert( pp_array, pi_count, p_childnode->timings.i_begin );
+        if( tt_time_Valid( &p_childnode->timings.begin ) )
+            tt_bsearch_Insert( pp_array, pi_count, p_childnode->timings.begin );
 
-        if( p_childnode->timings.i_end != -1 )
-            tt_bsearch_Insert( pp_array, pi_count, p_childnode->timings.i_end );
+        if( tt_time_Valid( &p_childnode->timings.end ) )
+            tt_bsearch_Insert( pp_array, pi_count, p_childnode->timings.end );
 
         p_prevnode = p_childnode;
 

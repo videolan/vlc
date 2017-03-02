@@ -671,10 +671,10 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
 static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t *p_node,
                                          ttml_region_t *p_region,
                                          const ttml_style_t *p_upper_set_styles,
-                                         int64_t i_playbacktime )
+                                         tt_time_t playbacktime )
 {
-    if( i_playbacktime != -1 &&
-       !tt_timings_Contains( &p_node->timings, i_playbacktime ) )
+    if( tt_time_Valid( &playbacktime ) &&
+       !tt_timings_Contains( &p_node->timings, &playbacktime ) )
         return;
 
     const char *psz_regionid = (const char *)
@@ -707,8 +707,8 @@ static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t 
         else if( !tt_node_NameCompare( ((const tt_node_t *)p_child)->psz_node_name, "set" ) )
         {
             const tt_node_t *p_set = (const tt_node_t *)p_child;
-            if( i_playbacktime == -1 ||
-                tt_timings_Contains( &p_set->timings, i_playbacktime ) )
+            if( !tt_time_Valid( &playbacktime ) ||
+                tt_timings_Contains( &p_set->timings, &playbacktime ) )
             {
                 if( p_set_styles != NULL || (p_set_styles = ttml_style_New()) )
                 {
@@ -724,7 +724,7 @@ static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t 
         else
         {
             ConvertNodesToRegionContent( p_ctx, (const tt_node_t *) p_child,
-                                         p_region, p_set_styles, i_playbacktime );
+                                         p_region, p_set_styles, playbacktime );
         }
     }
 
@@ -762,7 +762,7 @@ static tt_node_t *ParseTTML( decoder_t *p_dec, const uint8_t *p_buffer, size_t i
     return p_rootnode;
 }
 
-static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, int64_t i_playbacktime )
+static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, tt_time_t playbacktime )
 {
     ttml_region_t*  p_regions = NULL;
     ttml_region_t** pp_region_last = &p_regions;
@@ -775,7 +775,7 @@ static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, int64_t i_playback
             ttml_context_t context;
             context.p_rootnode = p_rootnode;
             vlc_dictionary_init( &context.regions, 1 );
-            ConvertNodesToRegionContent( &context, p_bodynode, NULL, NULL, i_playbacktime );
+            ConvertNodesToRegionContent( &context, p_bodynode, NULL, NULL, playbacktime );
 
             for( int i = 0; i < context.regions.i_size; ++i )
             {
@@ -801,15 +801,16 @@ static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, int64_t i_playback
 
 static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 {
-    int64_t *p_timings_array = NULL;
+    tt_time_t *p_timings_array = NULL;
     size_t   i_timings_count = 0;
 
     /* We Only support absolute timings */
     tt_timings_t temporal_extent;
     temporal_extent.i_type = TT_TIMINGS_PARALLEL;
-    temporal_extent.i_begin = 0;
-    temporal_extent.i_end = -1;
-    temporal_extent.i_dur = -1;
+    tt_time_Init( &temporal_extent.begin );
+    tt_time_Init( &temporal_extent.end );
+    tt_time_Init( &temporal_extent.dur );
+    temporal_extent.begin.base = 0;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         return VLCDEC_SUCCESS;
@@ -830,25 +831,25 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 
 #ifdef TTML_DEBUG
     for( size_t i=0; i<i_timings_count; i++ )
-        printf("%ld ", p_timings_array[i]);
+        printf("%ld ", tt_time_Convert( &p_timings_array[i] ) );
     printf("\n");
 #endif
 
     for( size_t i=0; i+1 < i_timings_count; i++ )
     {
         /* We Only support absolute timings (2) */
-        if( p_timings_array[i] + VLC_TS_0 < p_block->i_dts )
+        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TS_0 < p_block->i_dts )
             continue;
 
-        if( p_timings_array[i] + VLC_TS_0 > p_block->i_dts + p_block->i_length )
+        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TS_0 > p_block->i_dts + p_block->i_length )
             break;
 
         subpicture_t *p_spu = NULL;
         ttml_region_t *p_regions = GenerateRegions( p_rootnode, p_timings_array[i] );
         if( p_regions && ( p_spu = decoder_NewSubpictureText( p_dec ) ) )
         {
-            p_spu->i_start    = VLC_TS_0 + p_timings_array[i];
-            p_spu->i_stop     = VLC_TS_0 + p_timings_array[i+1] - 1;
+            p_spu->i_start    = VLC_TS_0 + tt_time_Convert( &p_timings_array[i] );
+            p_spu->i_stop     = VLC_TS_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = false;
 

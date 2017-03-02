@@ -31,18 +31,27 @@ enum
     TT_TIMINGS_SEQUENTIAL,
 };
 
+#define TT_FRAME_RATE 30
+
+typedef struct
+{
+    time_t base;
+    unsigned frames;
+    //unsigned ticks;
+} tt_time_t;
+
 typedef struct
 {
     uint8_t i_type;
-    int64_t i_begin;
-    int64_t i_end;
-    int64_t i_dur;
+    tt_time_t begin;
+    tt_time_t end;
+    tt_time_t dur;
 } tt_timings_t;
 
 struct tt_searchkey
 {
-    int64_t i_time;
-    int64_t *p_last;
+    tt_time_t time;
+    tt_time_t *p_last;
 };
 
 enum
@@ -87,10 +96,60 @@ bool tt_node_HasChild( const tt_node_t *p_node );
 int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node );
 
 void tt_timings_Resolve( tt_basenode_t *p_child, const tt_timings_t *p_container_timings,
-                         int64_t **pp_array, size_t *pi_count );
-bool tt_timings_Contains( const tt_timings_t *p_range, int64_t i_time );
-size_t tt_timings_FindLowerIndex( const int64_t *p_times, size_t i_times, int64_t i_time, bool *pb_found );
+                         tt_time_t **pp_array, size_t *pi_count );
+bool tt_timings_Contains( const tt_timings_t *p_range, const tt_time_t * );
+size_t tt_timings_FindLowerIndex( const tt_time_t *p_times, size_t i_times, tt_time_t time, bool *pb_found );
 
+static inline void tt_time_Init( tt_time_t *t )
+{
+    t->base = -1;
+    t->frames = 0;
+}
 
+static inline tt_time_t tt_time_Create( mtime_t i )
+{
+    tt_time_t t;
+    t.base = i / CLOCK_FREQ;
+    t.frames = (i % CLOCK_FREQ) * TT_FRAME_RATE / CLOCK_FREQ;
+    return t;
+}
 
+static inline bool tt_time_Valid( const tt_time_t *t )
+{
+    return t->base != -1;
+}
 
+static inline mtime_t tt_time_Convert( const tt_time_t *t )
+{
+    if( !tt_time_Valid( t ) )
+        return -1;
+    else
+        return CLOCK_FREQ * t->base + CLOCK_FREQ * t->frames / TT_FRAME_RATE;
+}
+
+static inline mtime_t tt_time_Compare( const tt_time_t *t1, const tt_time_t *t2 )
+{
+    return tt_time_Convert( t1 ) - tt_time_Convert( t2 );
+}
+
+static inline tt_time_t tt_time_Add( tt_time_t t1, tt_time_t t2 )
+{
+    t1.base += t2.base;
+    t1.frames += t2.frames;
+    t1.base += t1.frames / TT_FRAME_RATE;
+    t1.frames = t1.frames % TT_FRAME_RATE;
+    return t1;
+}
+
+static inline tt_time_t tt_time_Sub( tt_time_t t1, tt_time_t t2 )
+{
+    if( t2.frames > t1.frames )
+    {
+        unsigned diff = 1 + (t2.frames - t1.frames) / TT_FRAME_RATE;
+        t1.base -= diff;
+        t1.frames += diff * TT_FRAME_RATE;
+    }
+    t1.frames -= t2.frames;
+    t1.base -= t2.base;
+    return t1;
+}
