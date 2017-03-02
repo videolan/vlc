@@ -697,6 +697,9 @@ static int satip_open(vlc_object_t *obj)
     }
 
     char *psz_setup_url = vlc_uri_compose(&setup_url);
+    if( psz_setup_url == NULL )
+        goto error;
+
     if (multicast) {
         net_Printf(access, sys->tcp_sock,
                 "SETUP %s RTSP/1.0\r\n"
