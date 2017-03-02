@@ -45,6 +45,12 @@ static const char* cover_files[] = {
     "Album.jpg",
     ".folder.png",          /* KDE?    */
     "cover.jpg",            /* rockbox */
+    "cover.png",
+    "cover.gif",
+    "front.jpg",
+    "front.png",
+    "front.gif",
+    "front.bmp",
     "thumb.jpg",
 };
 
