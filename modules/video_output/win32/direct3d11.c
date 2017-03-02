@@ -1651,7 +1651,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const char *psz_shader, ID
         msg_Err(vd, "no room for the Pixel Shader");
         return E_OUTOFMEMORY;
     }
-    sprintf(shader, psz_shader, sys->legacy_shader ? "" : "Array", sys->legacy_shader ? "" : "Array");
+    sprintf(shader, psz_shader, sys->legacy_shader ? "" : "Array");
 
     ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
     free(shader);
