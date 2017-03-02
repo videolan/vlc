@@ -1624,28 +1624,13 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
 {
     vout_display_sys_t *sys = vd->sys;
     ID3DBlob* pShaderBlob = NULL, *pErrBlob;
-    char *shader;
-    if (!pixel)
-        shader = (char*)psz_shader;
-    else
-    {
-        shader = malloc(strlen(psz_shader) + 32);
-        if (!shader)
-        {
-            msg_Err(vd, "no room for the Pixel Shader");
-            return NULL;
-        }
-        sprintf(shader, psz_shader, sys->legacy_shader ? "" : "Array", sys->legacy_shader ? "" : "Array");
-    }
 
     /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    HRESULT hr = D3DCompile(shader, strlen(shader),
+    HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
                             NULL, NULL, NULL, "main",
                             pixel ? (sys->legacy_shader ? "ps_4_0_level_9_1" : "ps_4_0") :
                                     (sys->legacy_shader ? "vs_4_0_level_9_1" : "vs_4_0"),
                             0, 0, &pShaderBlob, &pErrBlob);
-    if (pixel)
-        free(shader);
 
     if (FAILED(hr)) {
         char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
@@ -1660,7 +1645,16 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
 static HRESULT CompilePixelShader(vout_display_t *vd, const char *psz_shader, ID3D11PixelShader **output)
 {
     vout_display_sys_t *sys = vd->sys;
-    ID3DBlob *pPSBlob = CompileShader(vd, psz_shader, true);
+    char *shader = malloc(strlen(psz_shader) + 32);
+    if (!shader)
+    {
+        msg_Err(vd, "no room for the Pixel Shader");
+        return E_OUTOFMEMORY;
+    }
+    sprintf(shader, psz_shader, sys->legacy_shader ? "" : "Array", sys->legacy_shader ? "" : "Array");
+
+    ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
+    free(shader);
     if (!pPSBlob)
         return E_INVALIDARG;
 
