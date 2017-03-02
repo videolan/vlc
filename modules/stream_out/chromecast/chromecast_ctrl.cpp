@@ -163,9 +163,7 @@ void intf_sys_t::setHasInput( const std::string mime_type )
 
     this->m_mime = mime_type;
 
-    mutex_cleanup_push(&m_lock);
     waitAppStarted();
-    vlc_cleanup_pop();
     if ( m_state == Dead )
     {
         msg_Warn( m_module, "no Chromecast hook possible");
@@ -222,6 +220,7 @@ void* intf_sys_t::ChromecastThread(void* p_data)
 
 void intf_sys_t::mainLoop()
 {
+    vlc_savecancel();
     vlc_interrupt_set( m_ctl_thread_interrupt );
 
     // State was already initialized as Authenticating
@@ -672,7 +671,6 @@ void intf_sys_t::waitSeekDone()
     vlc_mutex_locker locker(&m_lock);
     if ( m_seek_request_time != VLC_TS_INVALID )
     {
-        mutex_cleanup_push(&m_lock);
         while ( m_state == Seeking )
         {
 #ifndef NDEBUG
@@ -683,7 +681,6 @@ void intf_sys_t::waitSeekDone()
             msg_Dbg( m_module, "finished waiting for Chromecast seek" );
 #endif
         }
-        vlc_cleanup_pop();
         m_seek_request_time = VLC_TS_INVALID;
     }
 }
@@ -774,9 +771,7 @@ void intf_sys_t::wait_app_started(void *pt)
 {
     intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
     vlc_mutex_locker locker( &p_this->m_lock);
-    mutex_cleanup_push( &p_this->m_lock );
     p_this->waitAppStarted();
-    vlc_cleanup_pop();
 }
 
 void intf_sys_t::request_seek(void *pt, mtime_t pos)
