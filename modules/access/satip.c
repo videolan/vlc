@@ -658,6 +658,12 @@ static int satip_open(vlc_object_t *obj)
     if (psz_host == NULL )
         goto error;
 
+    if (url.psz_host == NULL || url.psz_host[0] == '\0')
+    {
+        msg_Dbg(access, "malformed URL: %s", psz_lower_url);
+        goto error;
+    }
+
     msg_Dbg(access, "connect to host '%s'", psz_host);
     sys->tcp_sock = net_ConnectTCP(access, psz_host, url.i_port);
     if (sys->tcp_sock < 0) {
