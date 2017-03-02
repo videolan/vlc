@@ -1302,9 +1302,10 @@ Stop(audio_output_t *p_aout)
         au_Uninitialize(p_aout, p_sys->au_unit);
         AudioComponentInstanceDispose(p_sys->au_unit);
     }
-
-    if (p_sys->b_digital)
+    else
     {
+        assert(p_sys->b_digital);
+
         /* Stop device */
         err = AudioDeviceStop(p_sys->i_selected_dev,
                                p_sys->i_procID);
@@ -1350,30 +1351,30 @@ Stop(audio_output_t *p_aout)
                         (const char *)&err);
         }
         ca_Uninitialize(p_aout);
-    }
 
-    if (p_sys->i_hog_pid == getpid())
-    {
-        p_sys->i_hog_pid = -1;
+        if (p_sys->i_hog_pid == getpid())
+        {
+            p_sys->i_hog_pid = -1;
 
-        /*
-         * HACK: On 10.6, auhal will trigger the streams changed callback when
-         * calling below line, directly in the same thread. This call needs to
-         * be ignored to avoid endless restarting.
-         */
-        p_sys->b_ignore_streams_changed_callback = true;
-        AO_SETPROP(p_sys->i_selected_dev, sizeof(p_sys->i_hog_pid),
-                   &p_sys->i_hog_pid, kAudioDevicePropertyHogMode,
-                   kAudioObjectPropertyScopeOutput);
-        p_sys->b_ignore_streams_changed_callback = false;
+            /*
+             * HACK: On 10.6, auhal will trigger the streams changed callback
+             * when calling below line, directly in the same thread. This call
+             * needs to be ignored to avoid endless restarting.
+             */
+            p_sys->b_ignore_streams_changed_callback = true;
+            AO_SETPROP(p_sys->i_selected_dev, sizeof(p_sys->i_hog_pid),
+                       &p_sys->i_hog_pid, kAudioDevicePropertyHogMode,
+                       kAudioObjectPropertyScopeOutput);
+            p_sys->b_ignore_streams_changed_callback = false;
+        }
+
+        p_sys->b_digital = false;
     }
 
     /* remove audio device alive callback */
     AO_UPDATELISTENER(p_sys->i_selected_dev, false, DeviceAliveListener, p_aout,
                       kAudioDevicePropertyDeviceIsAlive,
                       kAudioObjectPropertyScopeGlobal);
-
-    p_sys->b_digital = false;
 }
 
 static int
