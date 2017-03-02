@@ -841,11 +841,12 @@ static int TextLoad( text_t *txt, stream_t *s )
 }
 static void TextUnload( text_t *txt )
 {
-    for( size_t i = 0; i < txt->i_line_count; i++ )
+    if( txt->i_line_count )
     {
-        free( txt->line[i] );
+        for( size_t i = 0; i < txt->i_line_count; i++ )
+            free( txt->line[i] );
+        free( txt->line );
     }
-    free( txt->line );
     txt->i_line       = 0;
     txt->i_line_count = 0;
 }
