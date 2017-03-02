@@ -690,7 +690,9 @@ static int satip_open(vlc_object_t *obj)
     }
 
     // reverse the satip protocol trick, as SAT>IP believes to be RTSP
-    if( !strncasecmp( setup_url.psz_protocol, "satip", 5 ) ) {
+    if( setup_url.psz_protocol == NULL ||
+        strncasecmp( setup_url.psz_protocol, "satip", 5 ) == 0 )
+    {
         setup_url.psz_protocol = (char *)"rtsp";
     }
 
