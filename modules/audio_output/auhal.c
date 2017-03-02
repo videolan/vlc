@@ -1016,7 +1016,36 @@ error:
 static int
 StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
 {
-    struct aout_sys_t       *p_sys = p_aout->sys;
+    struct aout_sys_t *p_sys = p_aout->sys;
+    int ret;
+
+    /* Check if device supports digital */
+    if (!AudioDeviceSupportsDigital(p_aout, p_sys->i_selected_dev))
+    {
+        msg_Dbg(p_aout, "Audio device supports PCM mode only");
+        return VLC_EGENERIC;
+    }
+
+    ret = AO_GET1PROP(p_sys->i_selected_dev, pid_t, &p_sys->i_hog_pid,
+                      kAudioDevicePropertyHogMode,
+                      kAudioObjectPropertyScopeOutput);
+    if (ret != VLC_SUCCESS)
+    {
+        /* This is not a fatal error. Some drivers simply don't support this
+         * property */
+        p_sys->i_hog_pid = -1;
+    }
+
+    if (p_sys->i_hog_pid != -1 && p_sys->i_hog_pid != getpid())
+    {
+        msg_Err(p_aout, "Selected audio device is exclusively in use by another"
+                " program.");
+        vlc_dialog_display_error(p_aout, _("Audio output failed"), "%s",
+            _("The selected audio output device is exclusively in "
+            "use by another program."));
+        return VLC_EGENERIC;
+    }
+
     AudioStreamBasicDescription desired_stream_format;
     memset(&desired_stream_format, 0, sizeof(desired_stream_format));
 
@@ -1032,9 +1061,9 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
      * ignored to avoid endless restarting.
      */
     p_sys->b_ignore_streams_changed_callback = true;
-    int ret = AO_SETPROP(p_sys->i_selected_dev, sizeof(p_sys->i_hog_pid),
-                         &p_sys->i_hog_pid, kAudioDevicePropertyHogMode,
-                         kAudioObjectPropertyScopeOutput);
+    ret = AO_SETPROP(p_sys->i_selected_dev, sizeof(p_sys->i_hog_pid),
+                     &p_sys->i_hog_pid, kAudioDevicePropertyHogMode,
+                     kAudioObjectPropertyScopeOutput);
     p_sys->b_ignore_streams_changed_callback = false;
 
     if (ret != VLC_SUCCESS)
@@ -1255,6 +1284,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
         return VLC_EGENERIC;
     }
 
+    msg_Dbg(p_aout, "Using audio device for digital output");
     return VLC_SUCCESS;
 }
 
@@ -1355,7 +1385,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
      * property size */
     int                     b_alive = false;
-    bool                    b_start_digital = false;
 
     if (aout_FormatNbChannels(fmt) == 0 || AOUT_FMT_HDMI(fmt))
         return VLC_EGENERIC;
@@ -1363,7 +1392,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys = p_aout->sys;
     p_sys->b_digital = false;
     p_sys->au_unit = NULL;
-    p_sys->i_hog_pid = -1;
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
@@ -1433,38 +1461,10 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
     vlc_mutex_unlock(&p_sys->selected_device_lock);
 
-    /* Check if device supports digital */
-    b_start_digital = AudioDeviceSupportsDigital(p_aout, p_sys->i_selected_dev);
-
-    if (b_start_digital)
-        msg_Dbg(p_aout, "Using audio device for digital output");
-    else
-        msg_Dbg(p_aout, "Audio device supports PCM mode only");
-
     /* add a callback to see if the device dies later on */
     AO_UPDATELISTENER(p_sys->i_selected_dev, true, DeviceAliveListener, p_aout,
                       kAudioDevicePropertyDeviceIsAlive,
                       kAudioObjectPropertyScopeGlobal);
-
-    int ret = AO_GET1PROP(p_sys->i_selected_dev, pid_t, &p_sys->i_hog_pid,
-                          kAudioDevicePropertyHogMode,
-                          kAudioObjectPropertyScopeOutput);
-    if (ret != VLC_SUCCESS)
-    {
-        /* This is not a fatal error. Some drivers simply don't support this
-         * property */
-        p_sys->i_hog_pid = -1;
-    }
-
-    if (p_sys->i_hog_pid != -1 && p_sys->i_hog_pid != getpid())
-    {
-        msg_Err(p_aout, "Selected audio device is exclusively in use by another"
-                " program.");
-        vlc_dialog_display_error(p_aout, _("Audio output failed"), "%s",
-            _("The selected audio output device is exclusively in "
-            "use by another program."));
-        goto error;
-    }
 
     /* get device latency */
     AO_GET1PROP(p_sys->i_selected_dev, UInt32, &p_sys->c.i_latency_samples,
@@ -1482,7 +1482,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Check for Digital mode or Analog output mode */
-    if (AOUT_FMT_SPDIF (fmt) && b_start_digital)
+    if (AOUT_FMT_SPDIF (fmt))
     {
         if (StartSPDIF (p_aout, fmt) == VLC_SUCCESS)
         {
