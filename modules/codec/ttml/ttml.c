@@ -25,6 +25,7 @@
 #include <vlc_plugin.h>
 #include <vlc_xml.h>
 #include <vlc_strings.h>
+#include <vlc_charset.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -71,9 +72,10 @@ bool tt_node_HasChild( const tt_node_t *p_node )
     return p_node->p_child;
 }
 
-static inline bool tt_ScanReset( unsigned *a, unsigned *b, unsigned *c, unsigned *d )
+static inline bool tt_ScanReset( unsigned *a, unsigned *b, unsigned *c,
+                                 char *d,  unsigned *e )
 {
-    *a = *b = *c = *d = 0;
+    *a = *b = *c = *d = *e = 0;
     return false;
 }
 
@@ -81,17 +83,55 @@ static tt_time_t tt_ParseTime( const char *s )
 {
     tt_time_t t = {-1, 0};
     unsigned h1 = 0, m1 = 0, s1 = 0, d1 = 0;
+    char c = 0;
 
-    if( sscanf( s, "%u:%u:%u%*[,.]%u", &h1, &m1, &s1, &d1 ) == 4 ||
-                         tt_ScanReset( &h1, &m1, &s1, &d1 )      ||
-        sscanf( s, "%u:%u:%u",         &h1, &m1, &s1      ) == 3 ||
-                         tt_ScanReset( &h1, &m1, &s1, &d1 )      ||
-        sscanf( s, "%u.%us",                     &s1, &d1 ) == 2 ||
-                         tt_ScanReset( &h1, &m1, &s1, &d1 )      ||
-        sscanf( s, "%us",                        &s1      ) == 1 )
+    /* Clock time */
+    if( sscanf( s, "%u:%u:%u%c%u",     &h1, &m1, &s1, &c, &d1 ) == 5 ||
+                         tt_ScanReset( &h1, &m1, &s1, &c, &d1 )      ||
+        sscanf( s, "%u:%u:%u",         &h1, &m1, &s1          ) == 3 ||
+                         tt_ScanReset( &h1, &m1, &s1, &c, &d1 ) )
     {
-        t.base = h1 * 3600 + m1 * 60 + s1;
-        t.frames = d1;
+        t.base = CLOCK_FREQ * (h1 * 3600 + m1 * 60 + s1);
+        if( c == '.' && d1 > 0 )
+        {
+            unsigned i_den = 1;
+            for( const char *p = strchr( s, '.' ) + 1; *p; p++ )
+                i_den *= 10;
+            t.base += CLOCK_FREQ * d1 / i_den;
+        }
+        else if( c == ':' )
+        {
+            t.frames = d1;
+        }
+    }
+    else /* Offset Time */
+    {
+        char *psz_end = (char *) s;
+        double v = us_strtod( s, &psz_end );
+        if( psz_end != s && *psz_end )
+        {
+            if( *psz_end == 'm' )
+            {
+                if( *(psz_end + 1) == 's' )
+                    t.base = 1000 * v;
+                else
+                    t.base = CLOCK_FREQ * 60 * v;
+            }
+            else if( *psz_end == 's' )
+            {
+                t.base = CLOCK_FREQ * v;
+            }
+            else if( *psz_end == 'h' )
+            {
+                t.base = CLOCK_FREQ * v * 3600;
+            }
+            else if( *psz_end == 'f' )
+            {
+                t.base = 0;
+                t.frames = v;
+            }
+            //else if( *psz_end == 't' );
+        }
     }
 
     return t;
