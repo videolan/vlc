@@ -402,7 +402,7 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
          && fmt->i_physical_channels != AOUT_CHANS_7_1)
         {
 #if TARGET_OS_IPHONE
-            const bool b_8x_support = false;
+            const bool b_8x_support = true;
 #else
             SInt32 osx_min_version;
             if (Gestalt(gestaltSystemVersionMinor, &osx_min_version) != noErr)
