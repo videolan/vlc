@@ -1454,7 +1454,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         if (ret != VLC_SUCCESS)
         {
             vlc_mutex_unlock(&p_sys->selected_device_lock);
-            goto error;
+            return VLC_EGENERIC;
         }
         else
             msg_Dbg(p_aout, "using default audio device %i", defaultDeviceID);
@@ -1492,9 +1492,10 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         }
     }
 
-error:
-    /* If we reach this, this aout has failed */
     msg_Err(p_aout, "opening auhal output failed");
+    AO_UPDATELISTENER(p_sys->i_selected_dev, false, DeviceAliveListener, p_aout,
+                      kAudioDevicePropertyDeviceIsAlive,
+                      kAudioObjectPropertyScopeGlobal);
     return VLC_EGENERIC;
 }
 
