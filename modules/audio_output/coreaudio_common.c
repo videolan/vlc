@@ -397,6 +397,27 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 "Utilities. VLC will output Stereo only."));
 #endif
         }
+
+        if (aout_FormatNbChannels(fmt) >= 8
+         && fmt->i_physical_channels != AOUT_CHANS_7_1)
+        {
+#if TARGET_OS_IPHONE
+            const bool b_8x_support = false;
+#else
+            SInt32 osx_min_version;
+            if (Gestalt(gestaltSystemVersionMinor, &osx_min_version) != noErr)
+                msg_Err(p_aout, "failed to check OSX version");
+            const bool b_8x_support = osx_min_version >= 7;
+#endif
+
+            if (!b_8x_support)
+            {
+                msg_Warn(p_aout, "8.0 audio output not supported on this "
+                         "device, layout will be incorrect");
+                fmt->i_physical_channels = AOUT_CHANS_7_1;
+            }
+        }
+
     }
 
 end:
@@ -417,15 +438,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     uint32_t chans_out[AOUT_CHAN_MAX];
-
-#if TARGET_OS_IPHONE
-    const bool b_8x_support = false;
-#else
-    SInt32 osx_min_version;
-    if (Gestalt(gestaltSystemVersionMinor, &osx_min_version) != noErr)
-        msg_Err(p_aout, "failed to check OSX version");
-    const bool b_8x_support = osx_min_version >= 7;
-#endif
 
     /* Some channel abbreviations used below:
      * L - left
@@ -538,7 +550,7 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
             break;
         case 8:
-            if (fmt->i_physical_channels & (AOUT_CHAN_LFE) || !b_8x_support)
+            if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
             {
                 /* L R C LFE Ls Rs Rls Rrs */
                 *inlayout_tag = kAudioChannelLayoutTag_MPEG_7_1_C;
@@ -551,12 +563,7 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                 chans_out[5] = AOUT_CHAN_MIDDLERIGHT;
                 chans_out[6] = AOUT_CHAN_REARLEFT;
                 chans_out[7] = AOUT_CHAN_REARRIGHT;
-
-                if (!(fmt->i_physical_channels & (AOUT_CHAN_LFE)))
-                    msg_Warn(p_aout, "8.0 audio output not supported on this "
-                             "device, layout will be incorrect");
             }
-#ifdef MAC_OS_X_VERSION_10_7
             else
             {
                 /* Lc C Rc L R Ls Cs Rs */
@@ -571,7 +578,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                 chans_out[6] = AOUT_CHAN_REARCENTER;
                 chans_out[7] = AOUT_CHAN_REARRIGHT;
             }
-#endif
             p_sys->chans_to_reorder =
                 aout_CheckChannelReorder(NULL, chans_out,
                                          fmt->i_physical_channels,
@@ -580,13 +586,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                 msg_Dbg(p_aout, "channel reordering needed for 7.1 / 8.0 output");
             break;
         case 9:
-            if (!b_8x_support)
-            {
-                msg_Warn(p_aout, "8.1 audio output not supported on this device");
-                break;
-            }
-
-#ifdef MAC_OS_X_VERSION_10_7
             /* Lc C Rc L R Ls Cs Rs LFE */
             *inlayout_tag = kAudioChannelLayoutTag_DTS_8_1_B;
             chans_out[0] = AOUT_CHAN_MIDDLELEFT;
@@ -605,7 +604,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                                          p_sys->chan_table);
             if (p_sys->chans_to_reorder)
                 msg_Dbg(p_aout, "channel reordering needed for 8.1 output");
-#endif
             break;
     }
 
