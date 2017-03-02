@@ -232,7 +232,7 @@ static const char* globVertexShaderFlat = "\
     float4 Texture    : TEXCOORD0;\
   };\
   \
-  VS_OUTPUT VS( VS_INPUT In )\
+  VS_OUTPUT main( VS_INPUT In )\
   {\
     return In;\
   }\
@@ -262,7 +262,7 @@ static const char* globVertexShaderProjection = "\
     float4 Texture    : TEXCOORD0;\
   };\
   \
-  VS_OUTPUT VS( VS_INPUT In )\
+  VS_OUTPUT main( VS_INPUT In )\
   {\
     VS_OUTPUT Output;\
     float4 pos = In.Position;\
@@ -300,7 +300,7 @@ static const char* globPixelShaderDefault = "\
     float4 Texture    : TEXCOORD0;\
   };\
   \
-  float4 PS( PS_INPUT In ) : SV_TARGET\
+  float4 main( PS_INPUT In ) : SV_TARGET\
   {\
     float4 rgba; \
     \
@@ -337,7 +337,7 @@ static const char *globPixelShaderBiplanarYUV_2RGB = "\
     float4 Texture    : TEXCOORD0;\
   };\
   \
-  float4 PS( PS_INPUT In ) : SV_TARGET\
+  float4 main( PS_INPUT In ) : SV_TARGET\
   {\
     float4 yuv;\
     float4 rgba;\
@@ -375,7 +375,7 @@ static const char *globPixelShaderBiplanarYUYV_2RGB = "\
     float4 Texture    : TEXCOORD0;\
   };\
   \
-  float4 PS( PS_INPUT In ) : SV_TARGET\
+  float4 main( PS_INPUT In ) : SV_TARGET\
   {\
     float4 yuv;\
     float4 rgba;\
@@ -1640,7 +1640,7 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
 
     /* TODO : Match the version to the D3D_FEATURE_LEVEL */
     HRESULT hr = D3DCompile(shader, strlen(shader),
-                            NULL, NULL, NULL, pixel ? "PS" : "VS",
+                            NULL, NULL, NULL, "main",
                             pixel ? (sys->legacy_shader ? "ps_4_0_level_9_1" : "ps_4_0") :
                                     (sys->legacy_shader ? "vs_4_0_level_9_1" : "vs_4_0"),
                             0, 0, &pShaderBlob, &pErrBlob);
