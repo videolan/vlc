@@ -224,10 +224,6 @@ private:
 
     /* playback time reported by the receiver, used to wait for seeking point */
     mtime_t           m_chromecast_start_time;
-    /* seek time with Chromecast relative timestamp */
-    mtime_t           m_seek_request_time;
-
-    vlc_cond_t   m_seekCommandCond;
 
     /* shared structure with the demux-filter */
     chromecast_common      m_common;
