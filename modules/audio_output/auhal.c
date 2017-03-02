@@ -67,8 +67,6 @@ vlc_module_end ()
 
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
 
-#define AUDIO_BUFFER_SIZE_IN_SECONDS ((AOUT_MAX_ADVANCE_TIME + CLOCK_FREQ) / CLOCK_FREQ)
-
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
  *****************************************************************************
@@ -998,20 +996,12 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     if (ret != VLC_SUCCESS)
         goto error;
 
-    ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
-                  fmt->i_bytes_per_frame);
-    if (ret != VLC_SUCCESS)
-    {
-        AudioUnitUninitialize(p_sys->au_unit);
-        goto error;
-    }
-
     err = AudioOutputUnitStart(p_sys->au_unit);
     if (err != noErr)
     {
-        AudioUnitUninitialize(p_sys->au_unit);
         msg_Err(p_aout, "AudioUnitInitialize failed: [%4.4s]",
                 (const char *)&err);
+        au_Uninitialize(p_aout, p_sys->au_unit);
         goto error;
     }
 
@@ -1250,7 +1240,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    ret = ca_Init(p_aout, fmt, 200 * AOUT_SPDIF_SIZE);
+    ret = ca_Initialize(p_aout, fmt, 200 * AOUT_SPDIF_SIZE);
     if (ret != VLC_SUCCESS)
     {
         AudioDeviceDestroyIOProcID(p_sys->i_selected_dev, p_sys->i_procID);
@@ -1286,7 +1276,7 @@ Stop(audio_output_t *p_aout)
     if (p_sys->au_unit)
     {
         AudioOutputUnitStop(p_sys->au_unit);
-        AudioUnitUninitialize(p_sys->au_unit);
+        au_Uninitialize(p_aout, p_sys->au_unit);
         AudioComponentInstanceDispose(p_sys->au_unit);
     }
 
@@ -1336,6 +1326,7 @@ Stop(audio_output_t *p_aout)
                 msg_Err(p_aout, "failed to re-set mixmode [%4.4s]",
                         (const char *)&err);
         }
+        ca_Uninitialize(p_aout);
     }
 
     if (p_sys->i_hog_pid == getpid())
@@ -1358,8 +1349,6 @@ Stop(audio_output_t *p_aout)
     AO_UPDATELISTENER(p_sys->i_selected_dev, false, DeviceAliveListener, p_aout,
                       kAudioDevicePropertyDeviceIsAlive,
                       kAudioObjectPropertyScopeGlobal);
-
-    ca_Clean(p_aout);
 
     p_sys->b_digital = false;
 }

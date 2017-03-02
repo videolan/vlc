@@ -50,8 +50,6 @@ vlc_module_end ()
 #pragma mark -
 #pragma mark private declarations
 
-#define AUDIO_BUFFER_SIZE_IN_SECONDS (AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ)
-
 /* aout wrapper: used as observer for notifications */
 @interface AoutWrapper : NSObject
 - (instancetype)initWithAout:(audio_output_t *)aout;
@@ -317,10 +315,7 @@ Stop(audio_output_t *p_aout)
         msg_Warn(p_aout, "AudioOutputUnitStop failed [%4.4s]",
                  (const char *)&err);
 
-    err = AudioUnitUninitialize(p_sys->au_unit);
-    if (err != noErr)
-        msg_Warn(p_aout, "AudioUnitUninitialize failed [%4.4s]",
-                 (const char *)&err);
+    au_Uninitialize(p_aout, p_sys->au_unit);
 
     err = AudioComponentInstanceDispose(p_sys->au_unit);
     if (err != noErr)
@@ -329,8 +324,6 @@ Stop(audio_output_t *p_aout)
 
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
-
-    ca_Clean(p_aout);
 }
 
 static int
@@ -378,13 +371,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (ret != VLC_SUCCESS)
         goto error;
 
-    ret = ca_Init(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate *
-                  fmt->i_bytes_per_frame);
-    if (ret != VLC_SUCCESS)
-    {
-        AudioUnitUninitialize(p_sys->au_unit);
-        goto error;
-    }
     p_aout->play = Play;
 
     err = AudioOutputUnitStart(p_sys->au_unit);
@@ -392,8 +378,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     {
         msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
                 (const char *) &err);
-        AudioUnitUninitialize(p_sys->au_unit);
-        ca_Clean(p_aout);
+        au_Uninitialize(p_aout, p_sys->au_unit);
         goto error;
     }
 

@@ -30,6 +30,8 @@
 #import <vlc_dialog.h>
 #endif
 
+#define AUDIO_BUFFER_SIZE_IN_SECONDS ((AOUT_MAX_ADVANCE_TIME + CLOCK_FREQ) / CLOCK_FREQ)
+
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
 {
@@ -179,8 +181,8 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
 }
 
 int
-ca_Init(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-        size_t i_audio_buffer_size)
+ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
+              size_t i_audio_buffer_size)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -204,7 +206,7 @@ ca_Init(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 }
 
 void
-ca_Clean(audio_output_t *p_aout)
+ca_Uninitialize(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -699,5 +701,24 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         return VLC_EGENERIC;
     }
 
+    ret = ca_Initialize(p_aout, fmt, AUDIO_BUFFER_SIZE_IN_SECONDS *
+                        fmt->i_rate * fmt->i_bytes_per_frame);
+    if (ret != VLC_SUCCESS)
+    {
+        AudioUnitUninitialize(au);
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
+}
+
+void
+au_Uninitialize(audio_output_t *p_aout, AudioUnit au)
+{
+    OSStatus err = AudioUnitUninitialize(au);
+    if (err != noErr)
+        msg_Warn(p_aout, "AudioUnitUninitialize failed [%4.4s]",
+                 (const char *)&err);
+
+    ca_Uninitialize(p_aout);
 }

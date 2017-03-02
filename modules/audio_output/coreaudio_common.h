@@ -74,13 +74,15 @@ void ca_Pause(audio_output_t * p_aout, bool pause, mtime_t date);
 
 void ca_Play(audio_output_t * p_aout, block_t * p_block);
 
-int  ca_Init(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-             size_t i_audio_buffer_size);
+int  ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
+                   size_t i_audio_buffer_size);
 
-void ca_Clean(audio_output_t *p_aout);
+void ca_Uninitialize(audio_output_t *p_aout);
 
 AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);
 
 int  au_Initialize(audio_output_t *p_aout, AudioUnit au,
                    audio_sample_format_t *fmt,
                    const AudioChannelLayout *outlayout);
+
+void au_Uninitialize(audio_output_t *p_aout, AudioUnit au);
