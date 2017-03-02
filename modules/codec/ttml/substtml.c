@@ -917,6 +917,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
 
     int ret = ParseBlock( p_dec, p_block );
+#ifdef TTML_DEBUG
+    if( p_block->i_buffer )
+    {
+        p_block->p_buffer[p_block->i_buffer - 1] = 0;
+        msg_Dbg(p_dec,"time %ld %s", p_block->i_dts, p_block->p_buffer);
+    }
+#endif
     block_Release( p_block );
     return ret;
 }
