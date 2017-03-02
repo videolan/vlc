@@ -110,6 +110,8 @@ struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
 
+    video_transfer_func_t    display_transfer; /* TODO may go in vout_display_info_t */
+
 #if !VLC_WINSTORE_APP
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
     HINSTANCE                hd3d11_dll;       /* handle of the opened d3d11 dll */
@@ -298,6 +300,31 @@ static const char* globPixelShaderDefault = "\
     float4 Texture    : TEXCOORD0;\
   };\
   \
+  /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\
+  inline float hable(float x) {\
+      const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\
+      return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\
+  }\
+  \
+  inline float3 hable(float3 x) {\
+      x.r = hable(x.r);\
+      x.g = hable(x.g);\
+      x.b = hable(x.b);\
+      return x;\
+  }\
+  \
+  inline float3 sourceToLinear(float3 rgb) {\
+      %s;\
+  }\
+  \
+  inline float3 linearToDisplay(float3 rgb) {\
+      %s;\
+  }\
+  \
+  inline float3 toneMapping(float3 rgb) {\
+      %s;\
+  }\
+  \
   float4 main( PS_INPUT In ) : SV_TARGET\
   {\
     float4 sample;\
@@ -308,7 +335,13 @@ static const char* globPixelShaderDefault = "\
     rgba.y = sample.y + WhitePointY;\
     rgba.z = sample.z + WhitePointZ;\
     rgba.a = sample.a * Opacity;\
-    return saturate(mul(rgba, Colorspace));\
+    rgba = mul(rgba, Colorspace);\
+    float opacity = rgba.a * Opacity;\
+    float3 rgb = float3(rgba.r, rgba.g, rgba.b);\
+    rgb = sourceToLinear(rgb);\
+    rgb = toneMapping(rgb);\
+    rgb = linearToDisplay(saturate(rgb));\
+    return float4(rgb, saturate(opacity));\
   }\
 ";
 
@@ -1385,6 +1418,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 #endif
+    /* TODO adjust the swapchain transfer function based on the source */
+    sys->display_transfer = TRANSFER_FUNC_SRGB;
 
     // look for the requested pixel format first
     sys->picQuadConfig = GetOutputFormat(vd, fmt->i_chroma, 0, true, false);
@@ -1531,11 +1566,16 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
     return pShaderBlob;
 }
 
-static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format, ID3D11PixelShader **output)
+static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format,
+                                  video_transfer_func_t transfer, ID3D11PixelShader **output)
 {
     vout_display_sys_t *sys = vd->sys;
 
     const char *psz_sampler;
+    const char *psz_src_transform     = "return rgb";
+    const char *psz_display_transform = "return rgb";
+    const char *psz_tone_mapping      = "return rgb";
+
     switch (format->formatTexture)
     {
     case DXGI_FORMAT_NV12:
@@ -1560,16 +1600,61 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         break;
     default:
         vlc_assert_unreachable();
-
     }
 
-    char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler));
+    video_transfer_func_t src_transfer;
+    switch (transfer)
+    {
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            /* ST2084 to Linear */
+            psz_src_transform =
+                    "rgb = pow(rgb, 1.0/78.843750);\
+                    rgb = max(rgb - 0.835938, 0.0) / (18.851562 - 18.687500 * rgb);\
+                    rgb = pow(rgb, 1.0/0.159302);\
+                    return rgb";
+            src_transfer = TRANSFER_FUNC_LINEAR;
+            break;
+        default:
+            src_transfer = transfer;
+            break;
+    }
+
+    if (src_transfer != sys->display_transfer)
+    {
+        switch (sys->display_transfer)
+        {
+            case TRANSFER_FUNC_SRGB:
+                if (src_transfer == TRANSFER_FUNC_LINEAR)
+                {
+                    /* Linear to sRGB */
+                    psz_display_transform = "return pow(rgb, 1.0 / 2.2)";
+
+                    if (transfer == TRANSFER_FUNC_SMPTE_ST2084)
+                    {
+                        /* HDR tone mapping */
+                        psz_tone_mapping =
+                            "static const float3 HABLE_DIV = hable(11.2);\
+                            rgb = hable(32.0 * rgb) / HABLE_DIV;\
+                            return rgb";
+                    }
+                    break;
+                }
+            default:
+                msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, sys->display_transfer);
+                break;
+        }
+    }
+
+    char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
+                          strlen(psz_src_transform) + strlen(psz_display_transform) +
+                          strlen(psz_tone_mapping));
     if (!shader)
     {
         msg_Err(vd, "no room for the Pixel Shader");
         return E_OUTOFMEMORY;
     }
-    sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_sampler);
+    sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_src_transform,
+            psz_display_transform, psz_tone_mapping, psz_sampler);
 
     ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
     free(shader);
@@ -1720,7 +1805,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     sys->legacy_shader = !CanUseTextureArray(vd);
     vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma);
 
-    hr = CompilePixelShader(vd, sys->picQuadConfig, &sys->picQuadPixelShader);
+    hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
 #ifdef HAVE_ID3D11VIDEODECODER
@@ -1728,7 +1813,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         {
             sys->legacy_shader = true;
             msg_Dbg(vd, "fallback to legacy shader mode");
-            hr = CompilePixelShader(vd, sys->picQuadConfig, &sys->picQuadPixelShader);
+            hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, &sys->picQuadPixelShader);
         }
 #endif
         if (FAILED(hr))
@@ -1740,7 +1825,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     if (sys->d3dregion_format != NULL)
     {
-        hr = CompilePixelShader(vd, sys->d3dregion_format, &sys->pSPUPixelShader);
+        hr = CompilePixelShader(vd, sys->d3dregion_format, TRANSFER_FUNC_SRGB, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
             ID3D11PixelShader_Release(sys->picQuadPixelShader);
