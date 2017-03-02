@@ -934,7 +934,8 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
  * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
  */
 static int
-StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
+StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
+            mtime_t i_latency_us)
 {
     struct aout_sys_t           *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
@@ -985,7 +986,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     /* Do the last VLC aout setups */
     fmt->i_format = VLC_CODEC_FL32;
-    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout);
+    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, i_latency_us);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -1014,7 +1015,8 @@ error:
  * StartSPDIF: Setup an encoded digital stream (SPDIF) output
  */
 static int
-StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
+StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
+           mtime_t i_latency_us)
 {
     struct aout_sys_t *p_sys = p_aout->sys;
     int ret;
@@ -1262,7 +1264,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    ret = ca_Initialize(p_aout, fmt, 200 * AOUT_SPDIF_SIZE);
+    ret = ca_Initialize(p_aout, fmt, i_latency_us);
     if (ret != VLC_SUCCESS)
     {
         AudioDeviceDestroyIOProcID(p_sys->i_selected_dev, p_sys->i_procID);
@@ -1396,7 +1398,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
-    p_sys->c.i_latency_samples = 0;
 
     vlc_mutex_lock(&p_sys->selected_device_lock);
     p_sys->i_selected_dev = p_sys->i_new_selected_dev;
@@ -1468,24 +1469,15 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                       kAudioObjectPropertyScopeGlobal);
 
     /* get device latency */
-    AO_GET1PROP(p_sys->i_selected_dev, UInt32, &p_sys->c.i_latency_samples,
+    UInt32 i_latency_samples;
+    AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
                 kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
-    float f_latency_in_sec = (float)p_sys->c.i_latency_samples
-                           / (float)fmt->i_rate;
-    msg_Dbg(p_aout, "Current device has a latency of %u frames (%f sec)",
-            p_sys->c.i_latency_samples, f_latency_in_sec);
-
-    /* Ignore long Airplay latency as this is not correctly working yet */
-    if (f_latency_in_sec > 0.5f)
-    {
-        msg_Info(p_aout, "Ignore high latency as it causes problems currently.");
-        p_sys->c.i_latency_samples = 0;
-    }
+    mtime_t i_latency_us = i_latency_samples * CLOCK_FREQ / fmt->i_rate;
 
     /* Check for Digital mode or Analog output mode */
     if (AOUT_FMT_SPDIF (fmt))
     {
-        if (StartSPDIF (p_aout, fmt) == VLC_SUCCESS)
+        if (StartSPDIF (p_aout, fmt, i_latency_us) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "digital output successfully opened");
             return VLC_SUCCESS;
@@ -1493,7 +1485,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
     else
     {
-        if (StartAnalog(p_aout, fmt) == VLC_SUCCESS)
+        if (StartAnalog(p_aout, fmt, i_latency_us) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "analog output successfully opened");
             return VLC_SUCCESS;

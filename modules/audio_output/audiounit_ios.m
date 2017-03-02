@@ -367,7 +367,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     /* TODO: Do passthrough if dev_type allows it */
 
-    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout);
+    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout,
+                        [p_sys->avInstance outputLatency] * CLOCK_FREQ);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -382,8 +383,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         goto error;
     }
 
-    p_sys->c.i_latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
-
     if (p_sys->b_muted)
         Pause(p_aout, true, 0);
 
@@ -394,8 +393,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     free(layout);
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
-    msg_Dbg(p_aout, "analog AudioUnit output successfully opened "
-            "(latency: %lld us)", p_sys->c.i_latency_us);
+    msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
     return VLC_SUCCESS;
 
 error:

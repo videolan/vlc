@@ -55,13 +55,8 @@ struct aout_sys_common
     unsigned int        i_frame_length;
     uint8_t             chans_to_reorder;
     uint8_t             chan_table[AOUT_CHAN_MAX];
-
-    /* The following need to set by the caller */
-
-    /* ca_TimeGet extra latency, in samples. */
-    uint32_t            i_latency_samples;
     /* ca_TimeGet extra latency, in micro-seconds */
-    mtime_t             i_latency_us;
+    mtime_t             i_dev_latency_us;
 };
 
 void ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested);
@@ -75,7 +70,7 @@ void ca_Pause(audio_output_t * p_aout, bool pause, mtime_t date);
 void ca_Play(audio_output_t * p_aout, block_t * p_block);
 
 int  ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-                   size_t i_audio_buffer_size);
+                   mtime_t i_dev_latency_us);
 
 void ca_Uninitialize(audio_output_t *p_aout);
 
@@ -83,6 +78,6 @@ AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);
 
 int  au_Initialize(audio_output_t *p_aout, AudioUnit au,
                    audio_sample_format_t *fmt,
-                   const AudioChannelLayout *outlayout);
+                   const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us);
 
 void au_Uninitialize(audio_output_t *p_aout, AudioUnit au);

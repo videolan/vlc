@@ -85,8 +85,8 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
     int32_t i_bytes;
     TPCircularBufferTail(&p_sys->circular_buffer, &i_bytes);
 
-    int64_t i_frames = BytesToFrames(p_sys, i_bytes) + p_sys->i_latency_samples;
-    *delay = FramesToUs(p_sys, i_frames) + p_sys->i_latency_us;
+    int64_t i_frames = BytesToFrames(p_sys, i_bytes);
+    *delay = FramesToUs(p_sys, i_frames) + p_sys->i_dev_latency_us;
 
     return 0;
 }
@@ -179,13 +179,9 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
 
 int
 ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-              size_t i_audio_buffer_size)
+              mtime_t i_dev_latency_us)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-
-    /* setup circular buffer */
-    if (!TPCircularBufferInit(&p_sys->circular_buffer, i_audio_buffer_size))
-        return VLC_EGENERIC;
 
     atomic_init(&p_sys->i_underrun_size, 0);
     atomic_init(&p_sys->b_paused, false);
@@ -194,6 +190,24 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
     p_sys->chans_to_reorder = 0;
+
+    msg_Dbg(p_aout, "Current device has a latency of %lld us",
+            i_dev_latency_us);
+
+    /* TODO VLC can't handle latency higher than 1 seconds */
+    if (i_dev_latency_us > 1000000)
+    {
+        i_dev_latency_us = 1000000;
+        msg_Warn(p_aout, "VLC can't handle this device latency, lowering it to "
+                 "%lld", i_dev_latency_us);
+    }
+    p_sys->i_dev_latency_us = i_dev_latency_us;
+
+    /* setup circular buffer */
+    const size_t i_audiobuffer_size = AOUT_MAX_ADVANCE_TIME * fmt->i_rate *
+        fmt->i_bytes_per_frame / p_sys->i_frame_length / CLOCK_FREQ;
+    if (!TPCircularBufferInit(&p_sys->circular_buffer, i_audiobuffer_size))
+        return VLC_EGENERIC;
 
     p_aout->play = ca_Play;
     p_aout->pause = ca_Pause;
@@ -611,7 +625,7 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
 int
 au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
-              const AudioChannelLayout *outlayout)
+              const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us)
 {
     assert(fmt->i_format == VLC_CODEC_FL32);
 
@@ -698,8 +712,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         return VLC_EGENERIC;
     }
 
-    ret = ca_Initialize(p_aout, fmt, AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ *
-                        fmt->i_rate * fmt->i_bytes_per_frame);
+    ret = ca_Initialize(p_aout, fmt, i_dev_latency_us);
     if (ret != VLC_SUCCESS)
     {
         AudioUnitUninitialize(au);
