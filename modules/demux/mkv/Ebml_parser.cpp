@@ -253,6 +253,8 @@ EbmlElement *EbmlParser::Get( int n_call )
             }
 
             delete m_el[mi_level];
+            delete p_prev;
+
             m_el[mi_level] = NULL;
             m_el[mi_level - 1]->SkipData( *m_es, EBML_CONTEXT(m_el[mi_level - 1]) );
             return Get();
