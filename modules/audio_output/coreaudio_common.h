@@ -41,6 +41,9 @@
     (unsigned int)sfm.mFramesPerPacket, (unsigned int)sfm.mBytesPerFrame, \
     (unsigned int)sfm.mChannelsPerFrame, (unsigned int)sfm.mBitsPerChannel
 
+#define ca_LogErr(fmt) msg_Err(p_aout, fmt ", OSStatus: %d", (int) err)
+#define ca_LogWarn(fmt) msg_Warn(p_aout, fmt ", OSStatus: %d", (int) err)
+
 struct aout_sys_common
 {
     /* The following is owned by common.c (initialized from ca_Init, cleaned

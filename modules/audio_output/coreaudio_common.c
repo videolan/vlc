@@ -248,8 +248,7 @@ au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type)
     OSStatus err = AudioComponentInstanceNew(au_component, &au);
     if (err != noErr)
     {
-        msg_Err(p_aout, "cannot open AudioComponent, PCM output failed [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("cannot open AudioComponent, PCM output failed");
         return NULL;
     }
     return au;
@@ -654,8 +653,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
                                         sizeof(desc));
     if (err != noErr)
     {
-        msg_Err(p_aout, "failed to set stream format [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("failed to set stream format");
         return VLC_EGENERIC;
     }
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("Current AU format: " , desc));
@@ -666,8 +664,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
                                &(UInt32) { sizeof(desc) });
     if (err != noErr)
     {
-        msg_Err(p_aout, "failed to verify stream format [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("failed to set stream format");
         return VLC_EGENERIC;
     }
 
@@ -682,8 +679,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
                                sizeof(callback));
     if (err != noErr)
     {
-        msg_Err(p_aout, "failed to setup render callback [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("failed to setup render callback");
         return VLC_EGENERIC;
     }
 
@@ -697,8 +693,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
                                sizeof(inlayout));
     if (err != noErr)
     {
-        msg_Err(p_aout, "failed to setup input layout [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("failed to setup input layout");
         return VLC_EGENERIC;
     }
 
@@ -707,8 +702,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
 
     if (err != noErr)
     {
-        msg_Err(p_aout, "AudioUnitInitialize failed: [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("AudioUnitInitialize failed");
         return VLC_EGENERIC;
     }
 
@@ -727,8 +721,7 @@ au_Uninitialize(audio_output_t *p_aout, AudioUnit au)
 {
     OSStatus err = AudioUnitUninitialize(au);
     if (err != noErr)
-        msg_Warn(p_aout, "AudioUnitUninitialize failed [%4.4s]",
-                 (const char *)&err);
+        ca_LogWarn("AudioUnitUninitialize failed");
 
     ca_Uninitialize(p_aout);
 }

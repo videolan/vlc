@@ -140,8 +140,8 @@ AoGetProperty(audio_output_t *p_aout, AudioObjectID id,
     if (err != noErr)
     {
         msg_Err(p_aout, "AudioObjectGetPropertyDataSize failed, device id: %i, "
-                "prop: [%4.4s], err: [%4.4s]", id, (const char *) &p_address[0],
-                (const char *)&err);
+                "prop: [%4.4s], OSStatus: %d", id, (const char *) &p_address[0],
+                (int)err);
         return VLC_EGENERIC;
     }
 
@@ -188,8 +188,8 @@ AoGetProperty(audio_output_t *p_aout, AudioObjectID id,
     if (err != noErr)
     {
         msg_Err(p_aout, "AudioObjectGetPropertyData failed, device id: %i, "
-                "prop: [%4.4s], err: [%4.4s]", id, (const char *) &p_address[0],
-                (const char *)&err);
+                "prop: [%4.4s], OSStatus: %d", id, (const char *) &p_address[0],
+                (int) err);
 
         if (pp_out_data != NULL)
             free(*pp_out_data);
@@ -221,8 +221,8 @@ AoIsPropertySettable(audio_output_t *p_aout, AudioObjectID id,
     if (err != noErr)
     {
         msg_Warn(p_aout, "AudioObjectIsPropertySettable failed, device id: %i, "
-                 "prop: [%4.4s], err: [%4.4s]", id, (const char *)&p_address[0],
-                 (const char *)&err);
+                 "prop: [%4.4s], OSStatus: %d", id, (const char *)&p_address[0],
+                 (int)err);
         return false;
     }
     return b_settable;
@@ -246,8 +246,8 @@ AoSetProperty(audio_output_t *p_aout, AudioObjectID id,
     if (err != noErr)
     {
         msg_Err(p_aout, "AudioObjectSetPropertyData failed, device id: %i, "
-                 "prop: [%4.4s], err: [%4.4s]", id, (const char *)&p_address[0],
-                 (const char *)&err);
+                 "prop: [%4.4s], OSStatus: %d", id, (const char *)&p_address[0],
+                 (int)err);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -270,8 +270,8 @@ AoUpdateListener(audio_output_t *p_aout, bool add, AudioObjectID id,
     if (err != noErr)
     {
         msg_Err(p_aout, "AudioObject%sPropertyListener failed, device id %i, "
-                "prop: [%4.4s], err: [%4.4s]", add ? "Add" : "Remove", id,
-                (const char *)&p_address[0], (const char *)&err);
+                "prop: [%4.4s], OSStatus: %d", add ? "Add" : "Remove", id,
+                (const char *)&p_address[0], (int)err);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -954,8 +954,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
 
     if (err != noErr)
     {
-        msg_Err(p_aout, "cannot select audio output device, PCM output failed "
-                "[%4.4s]", (const char *)&err);
+        ca_LogErr("cannot select audio output device, PCM output failed");
         goto error;
     }
 
@@ -980,9 +979,8 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
             goto error;
     }
     else
-        msg_Warn(p_aout, "device driver does not support "
-                 "kAudioDevicePropertyPreferredChannelLayout - using stereo "
-                 "fallback [%4.4s]", (const char *)&err);
+        ca_LogWarn("device driver does not support "
+                   "kAudioDevicePropertyPreferredChannelLayout - using stereo");
 
     /* Do the last VLC aout setups */
     fmt->i_format = VLC_CODEC_FL32;
@@ -993,8 +991,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
     err = AudioOutputUnitStart(p_sys->au_unit);
     if (err != noErr)
     {
-        msg_Err(p_aout, "AudioUnitInitialize failed: [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("AudioUnitStart failed");
         au_Uninitialize(p_aout, p_sys->au_unit);
         goto error;
     }
@@ -1259,8 +1256,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
                                   p_aout, &p_sys->i_procID);
     if (err != noErr)
     {
-        msg_Err(p_aout, "Failed to create Process ID [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("Failed to create Process ID");
         return VLC_EGENERIC;
     }
 
@@ -1275,13 +1271,11 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
     err = AudioDeviceStart(p_sys->i_selected_dev, p_sys->i_procID);
     if (err != noErr)
     {
-        msg_Err(p_aout, "Failed to start audio device [%4.4s]",
-                (const char *)&err);
+        ca_LogErr("Failed to start audio device");
 
         err = AudioDeviceDestroyIOProcID(p_sys->i_selected_dev, p_sys->i_procID);
         if (err != noErr)
-            msg_Err(p_aout, "Failed to destroy process ID [%4.4s]",
-                    (const char *)&err);
+            ca_LogErr("Failed to destroy process ID");
 
         return VLC_EGENERIC;
     }
@@ -1312,15 +1306,13 @@ Stop(audio_output_t *p_aout)
         err = AudioDeviceStop(p_sys->i_selected_dev,
                                p_sys->i_procID);
         if (err != noErr)
-            msg_Err(p_aout, "Failed to stop audio device [%4.4s]",
-                    (const char *)&err);
+            ca_LogErr("AudioDeviceStop failed");
 
         /* Remove IOProc callback */
         err = AudioDeviceDestroyIOProcID(p_sys->i_selected_dev,
                                           p_sys->i_procID);
         if (err != noErr)
-            msg_Err(p_aout, "Failed to destroy Process ID [%4.4s]",
-                    (const char *)&err);
+            ca_LogErr("Failed to destroy Process ID");
 
         if (p_sys->b_revert
          && !AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, p_sys->sfmt_revert))
@@ -1349,8 +1341,7 @@ Stop(audio_output_t *p_aout)
             }
 
             if (ret != VLC_SUCCESS)
-                msg_Err(p_aout, "failed to re-set mixmode [%4.4s]",
-                        (const char *)&err);
+                msg_Err(p_aout, "failed to re-set mixmode");
         }
         ca_Uninitialize(p_aout);
 

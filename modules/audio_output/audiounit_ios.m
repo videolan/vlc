@@ -253,8 +253,7 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
     {
         err = AudioOutputUnitStop(p_sys->au_unit);
         if (err != noErr)
-            msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
-                    (const char *) &err);
+            ca_LogErr("AudioOutputUnitStart failed");
         avas_SetActive(p_aout, false, 0);
     }
     else
@@ -264,8 +263,7 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
             err = AudioOutputUnitStart(p_sys->au_unit);
             if (err != noErr)
             {
-                msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
-                        (const char *) &err);
+                ca_LogErr("AudioOutputUnitStart failed");
                 /* Do not un-pause, the Render Callback won't run, and next call
                  * of ca_Play will deadlock */
                 return;
@@ -312,15 +310,13 @@ Stop(audio_output_t *p_aout)
 
     err = AudioOutputUnitStop(p_sys->au_unit);
     if (err != noErr)
-        msg_Warn(p_aout, "AudioOutputUnitStop failed [%4.4s]",
-                 (const char *)&err);
+        ca_LogWarn("AudioOutputUnitStop failed");
 
     au_Uninitialize(p_aout, p_sys->au_unit);
 
     err = AudioComponentInstanceDispose(p_sys->au_unit);
     if (err != noErr)
-        msg_Warn(p_aout, "AudioComponentInstanceDispose failed [%4.4s]",
-                 (const char *)&err);
+        ca_LogWarn("AudioComponentInstanceDispose failed");
 
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
@@ -357,7 +353,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                                kAudioUnitScope_Output, 0,
                                &(UInt32){ 1 }, sizeof(UInt32));
     if (err != noErr)
-        msg_Warn(p_aout, "failed to set IO mode [%4.4s]", (const char *)&err);
+        ca_LogWarn("failed to set IO mode");
 
     enum dev_type dev_type;
     int ret = avas_GetOptimalChannelLayout(p_aout, aout_FormatNbChannels(fmt),
@@ -377,8 +373,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     err = AudioOutputUnitStart(p_sys->au_unit);
     if (err != noErr)
     {
-        msg_Err(p_aout, "AudioOutputUnitStart failed [%4.4s]",
-                (const char *) &err);
+        ca_LogErr("AudioOutputUnitStart failed");
         au_Uninitialize(p_aout, p_sys->au_unit);
         goto error;
     }
