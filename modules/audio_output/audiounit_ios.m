@@ -74,10 +74,11 @@ struct aout_sys_t
     bool      b_preferred_channels_set;
 };
 
-enum dev_type {
-    DEV_TYPE_DEFAULT,
-    DEV_TYPE_USB,
-    DEV_TYPE_HDMI
+enum port_type
+{
+    PORT_TYPE_DEFAULT,
+    PORT_TYPE_USB,
+    PORT_TYPE_HDMI
 };
 
 #pragma mark -
@@ -148,13 +149,13 @@ avas_resetPreferredNumberOfChannels(audio_output_t *p_aout)
 }
 
 static int
-avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum dev_type *pdev_type,
+avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
                              AudioChannelLayout **playout)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     AVAudioSession *instance = p_sys->avInstance;
     AudioChannelLayout *layout = NULL;
-    *pdev_type = DEV_TYPE_DEFAULT;
+    *pport_type = PORT_TYPE_DEFAULT;
 
     long last_channel_count = 0;
     for (AVAudioSessionPortDescription *out in [[instance currentRoute] outputs])
@@ -162,17 +163,17 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum dev_type *pdev_type,
         /* Choose the layout with the biggest number of channels or the HDMI
          * one */
 
-        enum dev_type dev_type;
+        enum port_type port_type;
         if ([out.portType isEqualToString: AVAudioSessionPortUSBAudio])
-            dev_type = DEV_TYPE_USB;
+            port_type = PORT_TYPE_USB;
         else if ([out.portType isEqualToString: AVAudioSessionPortHDMI])
-            dev_type = DEV_TYPE_HDMI;
+            port_type = PORT_TYPE_HDMI;
         else
-            dev_type = DEV_TYPE_DEFAULT;
+            port_type = PORT_TYPE_DEFAULT;
 
         NSArray<AVAudioSessionChannelDescription *> *chans = [out channels];
 
-        if (chans.count > last_channel_count || dev_type == DEV_TYPE_HDMI)
+        if (chans.count > last_channel_count || port_type == PORT_TYPE_HDMI)
         {
             /* We don't need a layout specification for stereo */
             if (chans.count > 2)
@@ -214,16 +215,16 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum dev_type *pdev_type,
 
                 last_channel_count = chans.count;
             }
-            *pdev_type = dev_type;
+            *pport_type = port_type;
         }
 
-        if (dev_type == DEV_TYPE_HDMI) /* Prefer HDMI */
+        if (port_type == PORT_TYPE_HDMI) /* Prefer HDMI */
             break;
     }
 
     msg_Dbg(p_aout, "Output on %s, channel count: %u",
-            *pdev_type == DEV_TYPE_HDMI ? "HDMI" :
-            *pdev_type == DEV_TYPE_USB ? "USB" : "Default",
+            *pport_type == PORT_TYPE_HDMI ? "HDMI" :
+            *pport_type == PORT_TYPE_USB ? "USB" : "Default",
             layout ? layout->mNumberChannelDescriptions : 2);
 
     *playout = layout;
@@ -371,8 +372,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
      * should correspond to this number */
     avas_setPreferredNumberOfChannels(p_aout, fmt);
 
-    enum dev_type dev_type;
-    int ret = avas_GetOptimalChannelLayout(p_aout, &dev_type, &layout);
+    enum port_type port_type;
+    int ret = avas_GetOptimalChannelLayout(p_aout, &port_type, &layout);
     if (ret != VLC_SUCCESS)
         goto error;
 
