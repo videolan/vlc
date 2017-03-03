@@ -130,9 +130,7 @@ static void MP4_TrackDestroy( demux_t *, mp4_track_t * );
 
 static void MP4_Block_Send( demux_t *, mp4_track_t *, block_t * );
 
-static int  MP4_TrackSelect ( demux_t *, mp4_track_t *, mtime_t );
-static void MP4_TrackUnselect(demux_t *, mp4_track_t * );
-
+static void MP4_TrackSelect  ( demux_t *, mp4_track_t *, bool );
 static int  MP4_TrackSeek   ( demux_t *, mp4_track_t *, mtime_t );
 
 static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
@@ -1216,7 +1214,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
                     msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)"
                                        ": Failed to seek to %"PRIu64,
                               tk->i_track_ID, i_readpos );
-                    MP4_TrackUnselect( p_demux, tk );
+                    MP4_TrackSelect( p_demux, tk, false );
                     goto end;
                 }
             }
@@ -1227,7 +1225,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
                 msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)"
                                    ": Failed to read %d bytes sample at %"PRIu64,
                           tk->i_track_ID, i_samplessize, i_readpos );
-                MP4_TrackUnselect( p_demux, tk );
+                MP4_TrackSelect( p_demux, tk, false );
                 goto end;
             }
 
@@ -1283,11 +1281,11 @@ static int Demux( demux_t *p_demux )
 
         if( tk->b_selected && !b )
         {
-            MP4_TrackUnselect( p_demux, tk );
+            MP4_TrackSelect( p_demux, tk, false );
         }
         else if( !tk->b_selected && b)
         {
-            MP4_TrackSelect( p_demux, tk, MP4_GetMoviePTS( p_sys ) );
+            MP4_TrackSeek( p_demux, tk, MP4_GetMoviePTS( p_sys ) );
         }
     }
 
@@ -3324,44 +3322,21 @@ static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
         block_ChainRelease( p_track->asfinfo.p_frame );
 }
 
-static int MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track,
-                            mtime_t i_start )
+static void MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track, bool b_select )
 {
     if( !p_track->b_ok || p_track->b_chapters_source )
-    {
-        return VLC_EGENERIC;
-    }
-
-    if( p_track->b_selected )
-    {
-        msg_Warn( p_demux, "track[Id 0x%x] already selected",
-                  p_track->i_track_ID );
-        return VLC_SUCCESS;
-    }
-
-    return MP4_TrackSeek( p_demux, p_track, i_start );
-}
-
-static void MP4_TrackUnselect( demux_t *p_demux, mp4_track_t *p_track )
-{
-    if( !p_track->b_ok || p_track->b_chapters_source )
-    {
         return;
-    }
 
-    if( !p_track->b_selected )
-    {
-        msg_Warn( p_demux, "track[Id 0x%x] already unselected",
-                  p_track->i_track_ID );
+    if( b_select == p_track->b_selected )
         return;
-    }
-    if( p_track->p_es )
+
+    if( !b_select && p_track->p_es )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE,
                         p_track->p_es, false );
     }
 
-    p_track->b_selected = false;
+    p_track->b_selected = b_select;
 }
 
 static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
@@ -3667,7 +3642,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t
         {
             msg_Warn( p_demux, "track[0x%x] will be disabled "
                       "(cannot restart decoder)", p_track->i_track_ID );
-            MP4_TrackUnselect( p_demux, p_track );
+            MP4_TrackSelect( p_demux, p_track, false );
             return VLC_EGENERIC;
         }
     }
@@ -3762,24 +3737,6 @@ static int ReInitDecoder( demux_t *p_demux, const MP4_Box_t *p_root,
     return VLC_SUCCESS;
 }
 #endif
-
-static int MP4_frg_TrackSelect( demux_t *p_demux, mp4_track_t *p_track )
-{
-    if( !p_track->b_ok || p_track->b_chapters_source )
-    {
-        return VLC_EGENERIC;
-    }
-
-    if( p_track->b_selected )
-    {
-        msg_Warn( p_demux, "track[Id 0x%x] already selected", p_track->i_track_ID );
-        return VLC_SUCCESS;
-    }
-
-    msg_Dbg( p_demux, "Select track id %u", p_track->i_track_ID );
-    p_track->b_selected = true;
-    return VLC_SUCCESS;
-}
 
 static mtime_t SumFragmentsDurations( demux_t *p_demux )
 {
@@ -4824,12 +4781,10 @@ static int DemuxAsLeaf( demux_t *p_demux )
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
 
         if(tk->b_selected != b)
+        {
             msg_Dbg( p_demux, "track %u %s!", tk->i_track_ID, b ? "enabled" : "disabled" );
-
-        if( tk->b_selected && !b )
-            MP4_TrackUnselect( p_demux, tk );
-        else if( !tk->b_selected && b)
-            MP4_frg_TrackSelect( p_demux, tk );
+            MP4_TrackSelect( p_demux, tk, b );
+        }
 
         if( tk->b_selected )
             i_track_selected++;
