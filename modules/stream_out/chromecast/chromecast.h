@@ -127,7 +127,6 @@ private:
 
 private:
     vlc_object_t* m_module;
-    int m_sock_fd;
     vlc_tls_creds_t *m_creds;
     vlc_tls_t *m_tls;
     unsigned m_receiver_requestId;
