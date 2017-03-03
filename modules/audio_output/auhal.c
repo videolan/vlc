@@ -294,6 +294,7 @@ IsAudioFormatDigital(AudioFormatID id)
         case 'iac3':
         case kAudioFormat60958AC3:
         case kAudioFormatAC3:
+        case kAudioFormatEnhancedAC3:
             return true;
         default:
             return false;
