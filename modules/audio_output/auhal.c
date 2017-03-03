@@ -955,6 +955,9 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
     UInt32                      i_param_size;
     AudioChannelLayout          *layout = NULL;
 
+    if (aout_FormatNbChannels(fmt) == 0)
+        return VLC_EGENERIC;
+
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_HALOutput);
     if (p_sys->au_unit == NULL)
         return VLC_EGENERIC;
@@ -1387,7 +1390,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
      * property size */
     int                     b_alive = false;
 
-    if (aout_FormatNbChannels(fmt) == 0 || AOUT_FMT_HDMI(fmt))
+    if (AOUT_FMT_HDMI(fmt))
         return VLC_EGENERIC;
 
     p_sys = p_aout->sys;
