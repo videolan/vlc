@@ -226,6 +226,11 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
         case AVCOL_TRC_BT2020_12:
             fmt->transfer = TRANSFER_FUNC_BT2020;
             break;
+#if LIBAVUTIL_VERSION_CHECK( 55, 14, 0, 31, 100)
+        case AVCOL_TRC_ARIB_STD_B67:
+            fmt->transfer = TRANSFER_FUNC_ARIB_B67;
+            break;
+#endif
 #if LIBAVUTIL_VERSION_CHECK( 55, 17, 0, 37, 100)
         case AVCOL_TRC_SMPTE2084:
             fmt->transfer = TRANSFER_FUNC_SMPTE_ST2084;
