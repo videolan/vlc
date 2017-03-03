@@ -116,6 +116,9 @@ hxxx_transfer_characteristics_to_vlc( enum hxxx_transfer_characteristics i_trans
     case HXXX_TRANSFER_SMPTE_ST_2084:
         return TRANSFER_FUNC_SMPTE_ST2084;
 
+    case HXXX_TRANSFER_ARIB_STD_B67:
+        return TRANSFER_FUNC_ARIB_B67;
+
     case HXXX_TRANSFER_RESERVED0:
     case HXXX_TRANSFER_UNSPECIFIED:
     case HXXX_TRANSFER_RESERVED3:
