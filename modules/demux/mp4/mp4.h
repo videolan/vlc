@@ -55,7 +55,6 @@ typedef struct
     uint32_t     *p_sample_count_pts;
     int32_t      *p_sample_offset_pts;  /* pts-dts */
 
-    uint8_t      **p_sample_data;     /* set when b_fragmented is true */
     uint32_t     *p_sample_size;
     /* TODO if needed add pts
         but quickly *add* support for edts and seeking */
@@ -110,7 +109,6 @@ typedef struct
     uint32_t         i_sample_count;
 
     mp4_chunk_t    *chunk; /* always defined  for each chunk */
-    mp4_chunk_t    *cchunk; /* current chunk if b_fragmented is true */
 
     /* sample size, p_sample_size defined only if i_sample_size == 0
         else i_sample_size is size for all sample */
@@ -128,8 +126,9 @@ typedef struct
     const MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     const MP4_Box_t *p_sample;/* point on actual sdsd */
 
-    bool b_has_non_empty_cchunk;
+#if 0
     bool b_codec_need_restart;
+#endif
 
     mtime_t i_time; // track scaled
 
