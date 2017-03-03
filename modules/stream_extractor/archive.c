@@ -36,6 +36,11 @@
 #include <archive.h>
 #include <archive_entry.h>
 
+#if ARCHIVE_VERSION_NUMBER < 3002000
+typedef __LA_INT64_T la_int64_t;
+typedef __LA_SSIZE_T la_ssize_t;
+#endif
+
 static  int ExtractorOpen( vlc_object_t* );
 static void ExtractorClose( vlc_object_t* );
 
