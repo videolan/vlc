@@ -56,6 +56,22 @@ vlc_module_end ()
 @property (readonly, assign) audio_output_t* aout;
 @end
 
+enum au_dev
+{
+    AU_DEV_PCM,
+    AU_DEV_ENCODED,
+};
+
+static const struct {
+    const char *psz_id;
+    const char *psz_name;
+    enum au_dev au_dev;
+} au_devs[] = {
+    { "PCM", "Up to 9 channels PCM output", AU_DEV_PCM },
+    { "ENCODED", "Encoded output if available (via HDMI/SPDIF) or PCM output",
+      AU_DEV_ENCODED },
+};
+
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
  *****************************************************************************
@@ -72,6 +88,7 @@ struct aout_sys_t
     AudioUnit au_unit;
     bool      b_muted;
     bool      b_preferred_channels_set;
+    enum au_dev au_dev;
 };
 
 enum port_type
@@ -115,6 +132,10 @@ avas_setPreferredNumberOfChannels(audio_output_t *p_aout,
                                   const audio_sample_format_t *fmt)
 {
     struct aout_sys_t *p_sys = p_aout->sys;
+
+    if (aout_BitsPerSample(fmt->i_format) == 0)
+        return; /* Don't touch the number of channels for passthrough */
+
     AVAudioSession *instance = p_sys->avInstance;
     NSInteger max_channel_count = [instance maximumOutputNumberOfChannels];
     unsigned channel_count = aout_FormatNbChannels(fmt);
@@ -356,8 +377,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     OSStatus status;
     AudioChannelLayout *layout = NULL;
 
-    if (aout_FormatNbChannels(fmt) == 0
-     || aout_BitsPerSample(fmt->i_format) == 0 /* No Passthrough support */)
+    if (aout_FormatNbChannels(fmt) == 0 || AOUT_FMT_HDMI(fmt))
         return VLC_EGENERIC;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
@@ -377,8 +397,20 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (ret != VLC_SUCCESS)
         goto error;
 
-    /* TODO: Do passthrough if dev_type allows it */
-    fmt->i_format = VLC_CODEC_FL32;
+    if (AOUT_FMT_SPDIF(fmt))
+    {
+        if (p_sys->au_dev != AU_DEV_ENCODED
+         || (port_type != PORT_TYPE_USB && port_type != PORT_TYPE_HDMI))
+            goto error;
+
+        fmt->i_format = VLC_CODEC_SPDIFL;
+        fmt->i_bytes_per_frame = 4;
+        fmt->i_frame_length = 1;
+        free(layout);
+        layout = NULL;
+    }
+    else
+        fmt->i_format = VLC_CODEC_FL32;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
     if (p_sys->au_unit == NULL)
@@ -416,7 +448,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     free(layout);
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
-    msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
+    msg_Dbg(p_aout, "analog AudioUnit output successfully opened for %4.4s %s",
+            (const char *)&fmt->i_format, aout_FormatPrintChannels(fmt));
     return VLC_SUCCESS;
 
 error:
@@ -428,6 +461,33 @@ error:
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
     msg_Err(p_aout, "opening AudioUnit output failed");
     return VLC_EGENERIC;
+}
+
+static int DeviceSelect(audio_output_t *p_aout, const char *psz_id)
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    enum au_dev au_dev = AU_DEV_PCM;
+
+    if (psz_id)
+    {
+        for (unsigned int i = 0; i < sizeof(au_devs) / sizeof(au_devs[0]); ++i)
+        {
+            if (!strcmp(psz_id, au_devs[i].psz_id))
+            {
+                au_dev = au_devs[i].au_dev;
+                break;
+            }
+        }
+    }
+
+    if (au_dev != p_sys->au_dev)
+    {
+        p_sys->au_dev = au_dev;
+        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+        msg_Dbg(p_aout, "selected audiounit device: %s", psz_id);
+    }
+    aout_DeviceReport(p_aout, psz_id);
+    return VLC_SUCCESS;
 }
 
 static void
@@ -462,9 +522,14 @@ Open(vlc_object_t *obj)
 
     sys->b_muted = false;
     sys->b_preferred_channels_set = false;
+    sys->au_dev = AU_DEV_PCM;
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
+    aout->device_select = DeviceSelect;
+
+    for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
+        aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
 
     return VLC_SUCCESS;
 }

@@ -626,25 +626,40 @@ int
 au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
               const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us)
 {
-    assert(fmt->i_format == VLC_CODEC_FL32);
-
-    int ret = MapOutputLayout(p_aout, fmt, outlayout);
-    if (ret != VLC_SUCCESS)
-        return ret;
-
+    int ret;
     AudioChannelLayoutTag inlayout_tag;
-    ret = SetupInputLayout(p_aout, fmt, &inlayout_tag);
-    if (ret != VLC_SUCCESS)
-        return ret;
 
     /* Set the desired format */
     AudioStreamBasicDescription desc;
+    if (fmt->i_format == VLC_CODEC_FL32)
+    {
+        ret = MapOutputLayout(p_aout, fmt, outlayout);
+        if (ret != VLC_SUCCESS)
+            return ret;
+
+        ret = SetupInputLayout(p_aout, fmt, &inlayout_tag);
+        if (ret != VLC_SUCCESS)
+            return ret;
+
+        desc.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
+        desc.mChannelsPerFrame = aout_FormatNbChannels(fmt);
+        desc.mBitsPerChannel = 32;
+    }
+    else
+    {
+        /* Passthrough */
+        assert(fmt->i_format == VLC_CODEC_SPDIFL);
+
+        inlayout_tag = kAudioChannelLayoutTag_Stereo;
+
+        desc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger |
+                            kLinearPCMFormatFlagIsPacked; /* S16LE */
+        desc.mChannelsPerFrame = 2;
+        desc.mBitsPerChannel = 16;
+    }
     desc.mSampleRate = fmt->i_rate;
     desc.mFormatID = kAudioFormatLinearPCM;
-    desc.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
-    desc.mChannelsPerFrame = aout_FormatNbChannels(fmt);
     desc.mFramesPerPacket = 1;
-    desc.mBitsPerChannel = 32;
     desc.mBytesPerFrame = desc.mBitsPerChannel * desc.mChannelsPerFrame / 8;
     desc.mBytesPerPacket = desc.mBytesPerFrame * desc.mFramesPerPacket;
 
