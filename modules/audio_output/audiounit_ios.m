@@ -402,15 +402,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         if (p_sys->au_dev != AU_DEV_ENCODED
          || (port_type != PORT_TYPE_USB && port_type != PORT_TYPE_HDMI))
             goto error;
-
-        fmt->i_format = VLC_CODEC_SPDIFL;
-        fmt->i_bytes_per_frame = 4;
-        fmt->i_frame_length = 1;
-        free(layout);
-        layout = NULL;
     }
-    else
-        fmt->i_format = VLC_CODEC_FL32;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
     if (p_sys->au_unit == NULL)

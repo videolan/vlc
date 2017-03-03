@@ -999,7 +999,6 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
                    "kAudioDevicePropertyPreferredChannelLayout - using stereo");
 
     /* Do the last VLC aout setups */
-    fmt->i_format = VLC_CODEC_FL32;
     int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, i_latency_us);
     if (ret != VLC_SUCCESS)
         goto error;

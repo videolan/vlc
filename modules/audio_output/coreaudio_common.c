@@ -631,8 +631,10 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
 
     /* Set the desired format */
     AudioStreamBasicDescription desc;
-    if (fmt->i_format == VLC_CODEC_FL32)
+    if (aout_BitsPerSample(fmt->i_format) != 0)
     {
+        /* PCM */
+        fmt->i_format = VLC_CODEC_FL32;
         ret = MapOutputLayout(p_aout, fmt, outlayout);
         if (ret != VLC_SUCCESS)
             return ret;
@@ -645,10 +647,12 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         desc.mChannelsPerFrame = aout_FormatNbChannels(fmt);
         desc.mBitsPerChannel = 32;
     }
-    else
+    else if (AOUT_FMT_SPDIF(fmt))
     {
         /* Passthrough */
-        assert(fmt->i_format == VLC_CODEC_SPDIFL);
+        fmt->i_format = VLC_CODEC_SPDIFL;
+        fmt->i_bytes_per_frame = 4;
+        fmt->i_frame_length = 1;
 
         inlayout_tag = kAudioChannelLayoutTag_Stereo;
 
@@ -657,6 +661,9 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         desc.mChannelsPerFrame = 2;
         desc.mBitsPerChannel = 16;
     }
+    else
+        return VLC_EGENERIC;
+
     desc.mSampleRate = fmt->i_rate;
     desc.mFormatID = kAudioFormatLinearPCM;
     desc.mFramesPerPacket = 1;
