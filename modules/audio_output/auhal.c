@@ -285,6 +285,21 @@ AoUpdateListener(audio_output_t *p_aout, bool add, AudioObjectID id,
 #pragma mark -
 #pragma mark Stream / Hardware Listeners
 
+static bool
+IsAudioFormatDigital(AudioFormatID id)
+{
+    switch (id)
+    {
+        case 'IAC3':
+        case 'iac3':
+        case kAudioFormat60958AC3:
+        case kAudioFormatAC3:
+            return true;
+        default:
+            return false;
+    }
+}
+
 static OSStatus
 StreamsChangedListener(AudioObjectID, UInt32,
                        const AudioObjectPropertyAddress [], void *);
@@ -340,10 +355,7 @@ AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_stream_id)
                 p_format_list[i].mFormat));
 #endif
 
-        if (p_format_list[i].mFormat.mFormatID == 'IAC3' ||
-            p_format_list[i].mFormat.mFormatID == 'iac3' ||
-            p_format_list[i].mFormat.mFormatID == kAudioFormat60958AC3 ||
-            p_format_list[i].mFormat.mFormatID == kAudioFormatAC3)
+        if (IsAudioFormatDigital(p_format_list[i].mFormat.mFormatID))
             b_return = true;
     }
 
@@ -1123,10 +1135,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
         /* Check if one of the supported formats is a digital format */
         for (size_t j = 0; j < i_formats; j++)
         {
-            if (p_format_list[j].mFormat.mFormatID == 'IAC3' ||
-               p_format_list[j].mFormat.mFormatID == 'iac3' ||
-               p_format_list[j].mFormat.mFormatID == kAudioFormat60958AC3 ||
-               p_format_list[j].mFormat.mFormatID == kAudioFormatAC3)
+            if (IsAudioFormatDigital(p_format_list[j].mFormat.mFormatID))
             {
                 b_digital = true;
                 break;
@@ -1181,10 +1190,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
 
             for (size_t j = 0; j < i_formats; j++)
             {
-                if (p_format_list[j].mFormat.mFormatID == 'IAC3' ||
-                   p_format_list[j].mFormat.mFormatID == 'iac3' ||
-                   p_format_list[j].mFormat.mFormatID == kAudioFormat60958AC3 ||
-                   p_format_list[j].mFormat.mFormatID == kAudioFormatAC3)
+                if (IsAudioFormatDigital(p_format_list[j].mFormat.mFormatID))
                 {
                     if (p_format_list[j].mFormat.mSampleRate == fmt->i_rate)
                     {
