@@ -338,11 +338,18 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     p_sys->au_unit = NULL;
 
-    fmt->i_format = VLC_CODEC_FL32;
-
     /* Activate the AVAudioSession */
     if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
         return VLC_EGENERIC;
+
+    enum dev_type dev_type;
+    int ret = avas_GetOptimalChannelLayout(p_aout, aout_FormatNbChannels(fmt),
+                                           &dev_type, &layout);
+    if (ret != VLC_SUCCESS)
+        goto error;
+
+    /* TODO: Do passthrough if dev_type allows it */
+    fmt->i_format = VLC_CODEC_FL32;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
     if (p_sys->au_unit == NULL)
@@ -354,14 +361,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                                &(UInt32){ 1 }, sizeof(UInt32));
     if (err != noErr)
         ca_LogWarn("failed to set IO mode");
-
-    enum dev_type dev_type;
-    int ret = avas_GetOptimalChannelLayout(p_aout, aout_FormatNbChannels(fmt),
-                                           &dev_type, &layout);
-    if (ret != VLC_SUCCESS)
-        goto error;
-
-    /* TODO: Do passthrough if dev_type allows it */
 
     ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout,
                         [p_sys->avInstance outputLatency] * CLOCK_FREQ);
@@ -395,7 +394,8 @@ error:
     free(layout);
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
-    AudioComponentInstanceDispose(p_sys->au_unit);
+    if (p_sys->au_unit != NULL)
+        AudioComponentInstanceDispose(p_sys->au_unit);
     msg_Err(p_aout, "opening AudioUnit output failed");
     return VLC_EGENERIC;
 }
