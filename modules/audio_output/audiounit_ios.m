@@ -71,6 +71,7 @@ struct aout_sys_t
     /* The AudioUnit we use */
     AudioUnit au_unit;
     bool      b_muted;
+    bool      b_preferred_channels_set;
 };
 
 enum dev_type {
@@ -108,16 +109,14 @@ enum dev_type {
 
 @end
 
-static int
-avas_GetOptimalChannelLayout(audio_output_t *p_aout, unsigned channel_count,
-                             enum dev_type *pdev_type,
-                             AudioChannelLayout **playout)
+static void
+avas_setPreferredNumberOfChannels(audio_output_t *p_aout,
+                                  const audio_sample_format_t *fmt)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    struct aout_sys_t *p_sys = p_aout->sys;
     AVAudioSession *instance = p_sys->avInstance;
-    AudioChannelLayout *layout = NULL;
-    *pdev_type = DEV_TYPE_DEFAULT;
     NSInteger max_channel_count = [instance maximumOutputNumberOfChannels];
+    unsigned channel_count = aout_FormatNbChannels(fmt);
 
     /* Increase the preferred number of output channels if possible */
     if (channel_count > 2 && max_channel_count > 2)
@@ -125,12 +124,37 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, unsigned channel_count,
         channel_count = __MIN(channel_count, max_channel_count);
         bool success = [instance setPreferredOutputNumberOfChannels:channel_count
                         error:nil];
-        if (!success || [instance outputNumberOfChannels] != channel_count)
+        if (success && [instance outputNumberOfChannels] == channel_count)
+            p_sys->b_preferred_channels_set = true;
+        else
         {
             /* Not critical, output channels layout will be Stereo */
             msg_Warn(p_aout, "setPreferredOutputNumberOfChannels failed");
         }
     }
+}
+
+static void
+avas_resetPreferredNumberOfChannels(audio_output_t *p_aout)
+{
+    struct aout_sys_t *p_sys = p_aout->sys;
+    AVAudioSession *instance = p_sys->avInstance;
+
+    if (p_sys->b_preferred_channels_set)
+    {
+        [instance setPreferredOutputNumberOfChannels:2 error:nil];
+        p_sys->b_preferred_channels_set = false;
+    }
+}
+
+static int
+avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum dev_type *pdev_type,
+                             AudioChannelLayout **playout)
+{
+    struct aout_sys_t * p_sys = p_aout->sys;
+    AVAudioSession *instance = p_sys->avInstance;
+    AudioChannelLayout *layout = NULL;
+    *pdev_type = DEV_TYPE_DEFAULT;
 
     long last_channel_count = 0;
     for (AVAudioSessionPortDescription *out in [[instance currentRoute] outputs])
@@ -168,7 +192,6 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, unsigned channel_count,
                     msg_Warn(p_aout, "no valid channel labels");
                     continue;
                 }
-                assert(max_channel_count >= chans.count);
 
                 if (layout == NULL
                  || layout->mNumberChannelDescriptions < chans.count)
@@ -318,6 +341,8 @@ Stop(audio_output_t *p_aout)
     if (err != noErr)
         ca_LogWarn("AudioComponentInstanceDispose failed");
 
+    avas_resetPreferredNumberOfChannels(p_aout);
+
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
 }
@@ -342,9 +367,12 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
+    /* Set the preferred number of channels, then fetch the channel layout that
+     * should correspond to this number */
+    avas_setPreferredNumberOfChannels(p_aout, fmt);
+
     enum dev_type dev_type;
-    int ret = avas_GetOptimalChannelLayout(p_aout, aout_FormatNbChannels(fmt),
-                                           &dev_type, &layout);
+    int ret = avas_GetOptimalChannelLayout(p_aout, &dev_type, &layout);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -392,10 +420,11 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
 error:
     free(layout);
-    avas_SetActive(p_aout, false,
-                   AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
     if (p_sys->au_unit != NULL)
         AudioComponentInstanceDispose(p_sys->au_unit);
+    avas_resetPreferredNumberOfChannels(p_aout);
+    avas_SetActive(p_aout, false,
+                   AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
     msg_Err(p_aout, "opening AudioUnit output failed");
     return VLC_EGENERIC;
 }
@@ -431,6 +460,7 @@ Open(vlc_object_t *obj)
     }
 
     sys->b_muted = false;
+    sys->b_preferred_channels_set = false;
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
