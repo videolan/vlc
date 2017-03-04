@@ -178,9 +178,7 @@ static int Open(vlc_object_t *obj)
     vlc_UrlParse(&crd_url, access->psz_url);
     vlc_credential_init(&crd, &crd_url);
 
-    bool h2c = var_InheritBool(obj, "http2");
-
-    sys->manager = vlc_http_mgr_create(obj, jar, h2c);
+    sys->manager = vlc_http_mgr_create(obj, jar);
     if (sys->manager == NULL)
         goto error;
 
@@ -294,9 +292,6 @@ vlc_module_begin()
     set_capability("access", 2)
     add_shortcut("https", "http")
     set_callbacks(Open, Close)
-
-    add_bool("http2", false, N_("Force HTTP/2"),
-             N_("Force HTTP version 2.0 over TCP."), true)
 
     add_bool("http-continuous", false, N_("Continuous stream"),
              N_("Keep reading a resource that keeps being updated."), true)

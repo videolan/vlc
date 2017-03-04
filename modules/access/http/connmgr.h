@@ -60,11 +60,9 @@ struct vlc_http_cookie_jar_t *vlc_http_mgr_get_jar(struct vlc_http_mgr *);
  *
  * @param obj parent VLC object
  * @param jar HTTP cookies jar (NULL to disable cookies)
- * @param h2c Favor unencrypted HTTP/2 over HTTP/1.1
  */
 struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
-                                         struct vlc_http_cookie_jar_t *jar,
-                                         bool h2c);
+                                         struct vlc_http_cookie_jar_t *jar);
 
 /**
  * Destroys an HTTP connection manager

@@ -117,7 +117,6 @@ struct vlc_http_mgr
     vlc_tls_creds_t *creds;
     struct vlc_http_cookie_jar_t *jar;
     struct vlc_http_conn *conn;
-    bool use_h2c;
 };
 
 static struct vlc_http_conn *vlc_http_mgr_find(struct vlc_http_mgr *mgr,
@@ -273,8 +272,7 @@ struct vlc_http_cookie_jar_t *vlc_http_mgr_get_jar(struct vlc_http_mgr *mgr)
 }
 
 struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
-                                         struct vlc_http_cookie_jar_t *jar,
-                                         bool h2c)
+                                         struct vlc_http_cookie_jar_t *jar)
 {
     struct vlc_http_mgr *mgr = malloc(sizeof (*mgr));
     if (unlikely(mgr == NULL))
@@ -284,7 +282,6 @@ struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
     mgr->creds = NULL;
     mgr->jar = jar;
     mgr->conn = NULL;
-    mgr->use_h2c = h2c;
     return mgr;
 }
 
