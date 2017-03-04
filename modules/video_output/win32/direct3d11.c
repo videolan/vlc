@@ -1669,7 +1669,8 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     return hr;
 }
 
-#if !VLC_WINSTORE_APP
+#if (!VLC_WINSTORE_APP) && defined (HAVE_ID3D11VIDEODECODER)
+
 static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
 {
     HKEY hKey;
@@ -1698,6 +1699,7 @@ static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
 static bool CanUseTextureArray(vout_display_t *vd)
 {
 #ifndef HAVE_ID3D11VIDEODECODER
+    (void) vd;
     return false;
 #else
     vout_display_sys_t *sys = vd->sys;
