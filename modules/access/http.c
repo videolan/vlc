@@ -45,6 +45,7 @@
 #include <vlc_http.h>
 #include <vlc_interrupt.h>
 #include <vlc_keystore.h>
+#include <vlc_memstream.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -142,8 +143,6 @@ static int Connect( access_t * );
 static void Disconnect( access_t * );
 
 
-static void AuthReply( access_t *p_acces, const char *psz_prefix,
-                       vlc_url_t *p_url, vlc_http_auth_t *p_auth );
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
                            vlc_url_t *p_url, vlc_http_auth_t *p_auth );
 
@@ -633,25 +632,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-static int WriteHeaders( access_t *access, const char *fmt, ... )
-{
-    access_sys_t *sys = access->p_sys;
-    char *str;
-    va_list args;
-    int len;
-
-    va_start( args, fmt );
-    len = vasprintf( &str, fmt, args );
-    if( likely(len >= 0) )
-    {
-        if( net_Write( access, sys->fd, str, len ) < len )
-            len = -1;
-        free( str );
-    }
-    va_end( args );
-    return len;
-}
-
 /*****************************************************************************
  * Connect:
  *****************************************************************************/
@@ -659,6 +639,7 @@ static int Connect( access_t *p_access )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     vlc_url_t      srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
+    ssize_t val;
 
     /* Clean info */
     free( p_sys->psz_location );
@@ -680,52 +661,87 @@ static int Connect( access_t *p_access )
     p_sys->offset = 0;
     p_sys->size = 0;
 
+    struct vlc_memstream stream;
+
+    vlc_memstream_open(&stream);
+
+    vlc_memstream_puts(&stream, "GET ");
+    if( p_sys->b_proxy )
+        vlc_memstream_printf( &stream, "http://%s:%d",
+                              p_sys->url.psz_host, p_sys->url.i_port );
+    if( p_sys->url.psz_path == NULL || p_sys->url.psz_path[0] == '\0' )
+        vlc_memstream_putc( &stream, '/' );
+    else
+        vlc_memstream_puts( &stream, p_sys->url.psz_path );
+    if( p_sys->url.psz_option != NULL )
+        vlc_memstream_printf( &stream, "?%s", p_sys->url.psz_option );
+    vlc_memstream_puts( &stream, " HTTP/1.0\r\n" );
+
+    vlc_memstream_printf( &stream, "Host: %s", p_sys->url.psz_host );
+    if( p_sys->url.i_port != 80 )
+        vlc_memstream_printf( &stream, ":%d", p_sys->url.i_port );
+    vlc_memstream_puts( &stream, "\r\n" );
+
+    /* User Agent */
+    vlc_memstream_printf( &stream, "User-Agent: %s\r\n",
+                          p_sys->psz_user_agent );
+    /* Referrer */
+    if (p_sys->psz_referrer)
+        vlc_memstream_printf( &stream, "Referer: %s\r\n",
+                              p_sys->psz_referrer );
+
+    /* Authentication */
+    if( p_sys->url.psz_username != NULL && p_sys->url.psz_password != NULL )
+    {
+        char *auth;
+
+        auth = vlc_http_auth_FormatAuthorizationHeader( VLC_OBJECT(p_access),
+                            &p_sys->auth, "GET", p_sys->url.psz_path,
+                            p_sys->url.psz_username, p_sys->url.psz_password );
+        if( auth != NULL )
+             vlc_memstream_printf( &stream, "Authorization: %s\r\n", auth );
+        free( auth );
+    }
+
+    /* Proxy Authentication */
+    if( p_sys->b_proxy && p_sys->proxy.psz_username != NULL
+     && p_sys->proxy.psz_password != NULL )
+    {
+        char *auth;
+
+        auth = vlc_http_auth_FormatAuthorizationHeader( VLC_OBJECT(p_access),
+                            &p_sys->proxy_auth, "GET", p_sys->url.psz_path,
+                            p_sys->url.psz_username, p_sys->url.psz_password );
+        if( auth != NULL )
+             vlc_memstream_printf( &stream, "Proxy-Authorization: %s\r\n",
+                                   auth );
+        free( auth );
+    }
+
+    /* ICY meta data request */
+    vlc_memstream_puts( &stream, "Icy-MetaData: 1\r\n" );
+
+    vlc_memstream_puts( &stream, "\r\n" );
+
+    if( vlc_memstream_close( &stream ) )
+        return -1;
+
     /* Open connection */
     assert( p_sys->fd == -1 ); /* No open sockets (leaking fds is BAD) */
     p_sys->fd = net_ConnectTCP( p_access, srv.psz_host, srv.i_port );
     if( p_sys->fd == -1 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", srv.psz_host, srv.i_port );
+        free( stream.ptr );
         return -1;
     }
     setsockopt (p_sys->fd, SOL_SOCKET, SO_KEEPALIVE, &(int){ 1 }, sizeof (int));
 
-    const char *psz_path = p_sys->url.psz_path;
-    if( !psz_path || !*psz_path )
-        psz_path = "/";
-    if( p_sys->b_proxy )
-        WriteHeaders( p_access, "GET http://%s:%d%s%s%s HTTP/1.0\r\n",
-                      p_sys->url.psz_host, p_sys->url.i_port,
-                      psz_path, p_sys->url.psz_option ? "?" : "",
-                      p_sys->url.psz_option ? p_sys->url.psz_option : "" );
-    else
-        WriteHeaders( p_access, "GET %s%s%s HTTP/1.0\r\n",
-                      psz_path, p_sys->url.psz_option ? "?" : "",
-                      p_sys->url.psz_option ? p_sys->url.psz_option : "" );
-    if( p_sys->url.i_port != 80 )
-        WriteHeaders( p_access, "Host: %s:%d\r\n",
-                      p_sys->url.psz_host, p_sys->url.i_port );
-    else
-        WriteHeaders( p_access, "Host: %s\r\n", p_sys->url.psz_host );
-    /* User Agent */
-    WriteHeaders( p_access, "User-Agent: %s\r\n", p_sys->psz_user_agent );
-    /* Referrer */
-    if (p_sys->psz_referrer)
-        WriteHeaders( p_access, "Referer: %s\r\n", p_sys->psz_referrer );
+    msg_Dbg( p_access, "sending request:\n%s", stream.ptr );
+    val = net_Write( p_access, p_sys->fd, stream.ptr, stream.length );
+    free( stream.ptr );
 
-    /* Authentication */
-    if( p_sys->url.psz_username && p_sys->url.psz_password )
-        AuthReply( p_access, "", &p_sys->url, &p_sys->auth );
-
-    /* Proxy Authentication */
-    if( p_sys->b_proxy && p_sys->proxy.psz_username != NULL
-     && p_sys->proxy.psz_password != NULL )
-        AuthReply( p_access, "Proxy-", &p_sys->proxy, &p_sys->proxy_auth );
-
-    /* ICY meta data request */
-    WriteHeaders( p_access, "Icy-MetaData: 1\r\n" );
-
-    if( WriteHeaders( p_access, "\r\n" ) < 0 )
+    if( val < (ssize_t)stream.length )
     {
         msg_Err( p_access, "failed to send request" );
         Disconnect( p_access );
@@ -983,23 +999,6 @@ static void Disconnect( access_t *p_access )
 /*****************************************************************************
  * HTTP authentication
  *****************************************************************************/
-
-static void AuthReply( access_t *p_access, const char *psz_prefix,
-                       vlc_url_t *p_url, vlc_http_auth_t *p_auth )
-{
-    char *psz_value;
-
-    psz_value =
-        vlc_http_auth_FormatAuthorizationHeader( VLC_OBJECT(p_access), p_auth,
-                                                 "GET", p_url->psz_path,
-                                                 p_url->psz_username,
-                                                 p_url->psz_password );
-    if ( psz_value == NULL )
-        return;
-
-    WriteHeaders( p_access, "%sAuthorization: %s\r\n", psz_prefix, psz_value );
-    free( psz_value );
-}
 
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
                            vlc_url_t *p_url, vlc_http_auth_t *p_auth )
