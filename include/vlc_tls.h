@@ -288,18 +288,17 @@ struct addrinfo;
 
 /**
  * Creates a transport-layer stream from a struct addrinfo.
- *
- * \note The function currently iterates through the addrinfo linked list.
- * Future versions may implement different behaviour (e.g. RFC6555).
  */
-vlc_tls_t *vlc_tls_SocketOpenAddrInfo(vlc_object_t *obj,
-                                      const struct addrinfo *);
+vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *);
 
 /**
  * Creates a transport-layer TCP stream from a name and port.
  *
  * This function resolves a hostname, and attempts to establish a TCP/IP
  * connection to the specified host and port number.
+ *
+ * @note The function currently iterates through the addrinfo linked list.
+ * Future versions may implement different behaviour (e.g. RFC6555).
  *
  * @return a transport layer socket on success or NULL on error
  */

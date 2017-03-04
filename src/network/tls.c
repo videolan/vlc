@@ -537,33 +537,18 @@ static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
     return vlc_tls_SocketWrite(tls, iov, count);
 }
 
-static vlc_tls_t *vlc_tls_ConnectAddrInfo(const struct addrinfo *info)
+vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *restrict info)
 {
-    vlc_tls_t *tls = vlc_tls_SocketAddrInfo(info);
-    if (tls == NULL)
+    vlc_tls_t *sock = vlc_tls_SocketAddrInfo(info);
+    if (sock == NULL)
         return NULL;
 
-    if (vlc_tls_Connect(tls))
+    if (vlc_tls_Connect(sock))
     {
-        vlc_tls_SessionDelete(tls);
-        tls = NULL;
+        vlc_tls_SessionDelete(sock);
+        sock = NULL;
     }
-    return tls;
-}
-
-vlc_tls_t *vlc_tls_SocketOpenAddrInfo(vlc_object_t *obj,
-                                      const struct addrinfo *restrict info)
-{
-    /* TODO: implement RFC6555 */
-    for (const struct addrinfo *p = info; p != NULL; p = p->ai_next)
-    {
-        vlc_tls_t *tls = vlc_tls_ConnectAddrInfo(p);
-        if (tls != NULL)
-            return tls;
-
-        msg_Err(obj, "connection error: %s", vlc_strerror_c(errno));
-    }
-    return NULL;
+    return sock;
 }
 
 vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj, const char *name,
@@ -588,9 +573,22 @@ vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj, const char *name,
 
     msg_Dbg(obj, "connecting to %s port %u ...", name, port);
 
-    vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfo(obj, res);
+    /* TODO: implement RFC6555 */
+    for (const struct addrinfo *p = res; p != NULL; p = p->ai_next)
+    {
+        vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfo(p);
+        if (tls == NULL)
+        {
+            msg_Err(obj, "connection error: %s", vlc_strerror_c(errno));
+            continue;
+        }
+
+        freeaddrinfo(res);
+        return tls;
+    }
+
     freeaddrinfo(res);
-    return tls;
+    return NULL;
 }
 
 vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *creds, const char *name,
