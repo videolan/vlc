@@ -110,35 +110,6 @@ static vlc_tls_t *vlc_https_connect_i11e(vlc_tls_creds_t *creds,
     return tls;
 }
 
-static vlc_tls_t *vlc_http_connect_i11e(vlc_object_t *obj,
-                                        const char *host, unsigned port,
-                                        bool *restrict proxied)
-{
-    vlc_tls_t *tls;
-
-    char *proxy = vlc_http_proxy_find(host, port, false);
-    if (proxy != NULL)
-    {
-        vlc_url_t url;
-
-        vlc_UrlParse(&url, proxy);
-        free(proxy);
-
-        if (url.psz_host != NULL)
-            tls =vlc_tls_SocketOpenTCP(obj, url.psz_host,
-                                       url.i_port ? url.i_port : 80);
-        else
-            tls = NULL;
-
-        vlc_UrlClean(&url);
-    }
-    else
-        tls = vlc_tls_SocketOpenTCP(obj, host, port ? port : 80);
-
-    *proxied = proxy != NULL;
-    return tls;
-}
-
 
 struct vlc_http_mgr
 {
@@ -251,27 +222,42 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
     if (resp != NULL)
         return resp;
 
-    bool proxy;
-    vlc_tls_t *tls = vlc_http_connect_i11e(mgr->obj, host, port, &proxy);
-    if (tls == NULL)
+    struct vlc_http_conn *conn;
+    struct vlc_http_stream *stream;
+
+    char *proxy = vlc_http_proxy_find(host, port, false);
+    if (proxy != NULL)
+    {
+        vlc_url_t url;
+
+        vlc_UrlParse(&url, proxy);
+        free(proxy);
+
+        if (url.psz_host != NULL)
+            stream = vlc_h1_request(mgr->obj, url.psz_host,
+                                    url.i_port ? url.i_port : 80, true, req,
+                                    true, &conn);
+        else
+            stream = NULL;
+
+        vlc_UrlClean(&url);
+    }
+    else
+        stream = vlc_h1_request(mgr->obj, host, port ? port : 80, false, req,
+                                true, &conn);
+
+    if (stream == NULL)
         return NULL;
 
-    struct vlc_http_conn *conn;
-
-    if (mgr->use_h2c)
-        conn = vlc_h2_conn_create(mgr->obj, tls);
-    else
-        conn = vlc_h1_conn_create(mgr->obj, tls, proxy);
-
-    if (unlikely(conn == NULL))
+    resp = vlc_http_msg_get_initial(stream);
+    if (resp == NULL)
     {
-        vlc_tls_Close(tls);
+        vlc_http_conn_release(conn);
         return NULL;
     }
 
     mgr->conn = conn;
-
-    return vlc_http_mgr_reuse(mgr, host, port, req);
+    return resp;
 }
 
 struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
