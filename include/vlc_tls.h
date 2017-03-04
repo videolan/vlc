@@ -288,8 +288,20 @@ struct addrinfo;
 
 /**
  * Creates a transport-layer stream from a struct addrinfo.
+ *
+ * This function tries to allocate a socket using the specified addrinfo
+ * structure. Normally, the vlc_tls_SocketOpenTCP() function takes care of
+ * this. But in some cases, it cannot be used, notably:
+ * - if the remote destination is not resolved (directly) from getaddrinfo(),
+ * - if the socket type is not SOCK_STREAM,
+ * - if the transport protocol is not TCP (IPPROTO_TCP), or
+ * - if TCP Fast Open should be attempted.
+ *
+ * @param ai a filled addrinfo structure (the ai_next member is ignored)
+ * @param defer_connect whether to attempt a TCP Fast Open connection or not
  */
-vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *);
+VLC_API vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *ai,
+                                              bool defer_connect);
 
 /**
  * Creates a transport-layer TCP stream from a name and port.

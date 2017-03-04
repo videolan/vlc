@@ -537,16 +537,25 @@ static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
     return vlc_tls_SocketWrite(tls, iov, count);
 }
 
-vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *restrict info)
+vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *restrict info,
+                                      bool defer_connect)
 {
     vlc_tls_t *sock = vlc_tls_SocketAddrInfo(info);
     if (sock == NULL)
         return NULL;
 
-    if (vlc_tls_Connect(sock))
+    if (defer_connect)
+    {   /* The socket is not connected yet.
+         * The connection will be triggered on the first send. */
+        sock->writev = vlc_tls_ConnectWrite;
+    }
+    else
     {
-        vlc_tls_SessionDelete(sock);
-        sock = NULL;
+        if (vlc_tls_Connect(sock))
+        {
+            vlc_tls_SessionDelete(sock);
+            sock = NULL;
+        }
     }
     return sock;
 }
@@ -576,7 +585,7 @@ vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj, const char *name,
     /* TODO: implement RFC6555 */
     for (const struct addrinfo *p = res; p != NULL; p = p->ai_next)
     {
-        vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfo(p);
+        vlc_tls_t *tls = vlc_tls_SocketOpenAddrInfo(p, false);
         if (tls == NULL)
         {
             msg_Err(obj, "connection error: %s", vlc_strerror_c(errno));
@@ -613,16 +622,12 @@ vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *creds, const char *name,
 
     for (const struct addrinfo *p = res; p != NULL; p = p->ai_next)
     {
-        vlc_tls_t *tcp = vlc_tls_SocketAddrInfo(p);
+        vlc_tls_t *tcp = vlc_tls_SocketOpenAddrInfo(p, true);
         if (tcp == NULL)
         {
             msg_Err(creds, "socket error: %s", vlc_strerror_c(errno));
             continue;
         }
-
-        /* The socket is not connected yet.
-         * The connection will be triggered on the first send. */
-        tcp->writev = vlc_tls_ConnectWrite;
 
         vlc_tls_t *tls = vlc_tls_ClientSessionCreate(creds, tcp, name, service,
                                                      alpn, alp);
