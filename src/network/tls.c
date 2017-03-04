@@ -509,25 +509,31 @@ static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
     };
     ssize_t ret;
 
+    /* Next time, write directly. Do not retry to connect. */
+    tls->writev = vlc_tls_SocketWrite;
+
     ret = sendmsg(vlc_tls_SocketGetFD(tls), &msg, MSG_NOSIGNAL|MSG_FASTOPEN);
     if (ret >= 0)
     {   /* Fast open in progress */
-        tls->writev = vlc_tls_SocketWrite;
         return ret;
     }
 
     if (errno == EINPROGRESS)
-        return vlc_tls_WaitConnect(tls);
+    {
+        if (vlc_tls_WaitConnect(tls))
+            return -1;
+    }
+    else
     if (errno != EOPNOTSUPP)
         return -1;
     /* Fast open not supported or disabled... fallback to normal mode */
+#else
+    tls->writev = vlc_tls_SocketWrite;
 #endif
 
     if (vlc_tls_Connect(tls))
         return -1;
 
-    /* Next time, write directly. Do not retry to connect. */
-    tls->writev = vlc_tls_SocketWrite;
     return vlc_tls_SocketWrite(tls, iov, count);
 }
 
