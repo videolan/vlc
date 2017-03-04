@@ -581,6 +581,7 @@ vlc_fourcc_GetYUVFallback
 vlc_fourcc_AreUVPlanesSwapped
 vlc_GetActionId
 vlc_getaddrinfo
+vlc_getaddrinfo_i11e
 vlc_getnameinfo
 vlc_getProxyUrl
 vlc_gettext
