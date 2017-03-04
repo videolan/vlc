@@ -342,6 +342,9 @@ static int Demux( demux_t *p_demux )
     do
     {
         i_type = xml_ReaderNextNode( p_xml_reader, &psz_node );
+        if( i_type == XML_READER_ERROR )
+            break;
+
         if( i_type == XML_READER_STARTELEM )
         {
             if( !b_first_node )
