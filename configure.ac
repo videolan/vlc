@@ -817,7 +817,7 @@ AC_CHECK_HEADER([syslog.h], [have_syslog="yes"], [have_syslog="no"])
 AM_CONDITIONAL([HAVE_SYSLOG], [test "$have_syslog" = "yes"])
 
 dnl  BSD
-AC_CHECK_HEADERS([netinet/udplite.h sys/param.h sys/mount.h])
+AC_CHECK_HEADERS([netinet/tcp.h netinet/udplite.h sys/param.h sys/mount.h])
 
 dnl  GNU/Linux
 AC_CHECK_HEADERS([features.h getopt.h linux/dccp.h linux/magic.h mntent.h sys/eventfd.h])

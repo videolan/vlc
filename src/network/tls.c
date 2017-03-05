@@ -39,6 +39,12 @@
 #ifdef HAVE_SYS_UIO_H
 # include <sys/uio.h>
 #endif
+#ifdef HAVE_NETINET_TCP_H
+# include <netinet/tcp.h>
+#endif
+#ifndef SOL_TCP
+# define SOL_TCP IPPROTO_TCP
+#endif
 
 #include <vlc_common.h>
 #include "libvlc.h"
@@ -433,6 +439,9 @@ static vlc_tls_t *vlc_tls_SocketAddrInfo(const struct addrinfo *restrict info)
         return NULL;
 
     setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
+
+    if (info->ai_socktype == SOCK_STREAM && info->ai_protocol == IPPROTO_TCP)
+        setsockopt(fd, SOL_TCP, TCP_NODELAY, &(int){ 1 }, sizeof (int));
 
     vlc_tls_t *sk = vlc_tls_SocketAlloc(fd, info->ai_addr, info->ai_addrlen);
     if (unlikely(sk == NULL))
