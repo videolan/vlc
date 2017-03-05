@@ -44,6 +44,7 @@
 #include <vlc_es.h>
 #include <vlc_http.h>
 #include <vlc_memory.h>
+#include <vlc_memstream.h>
 
 #define RAOP_PORT 5000
 #define RAOP_USER_AGENT "VLC " VERSION
@@ -717,39 +718,20 @@ error:
     return i_err;
 }
 
-static int WriteAuxHeaders( vlc_object_t *p_this,
-                            vlc_dictionary_t *p_req_headers )
+static void WriteAuxHeaders( struct vlc_memstream *restrict stream,
+                             vlc_dictionary_t *p_req_headers )
 {
-    sout_stream_t *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char **ppsz_keys = NULL;
-    char *psz_key;
-    char *psz_value;
-    int i_err = VLC_SUCCESS;
-    int i_rc;
-    size_t i;
-
-    ppsz_keys = vlc_dictionary_all_keys( p_req_headers );
-    for ( i = 0; ppsz_keys[i]; ++i )
+    char **ppsz_keys = vlc_dictionary_all_keys( p_req_headers );
+    for( size_t i = 0; ppsz_keys[i] != NULL; i++ )
     {
-        psz_key = ppsz_keys[i];
-        psz_value = vlc_dictionary_value_for_key( p_req_headers, psz_key );
+        char *name = ppsz_keys[i];
+        char *value = vlc_dictionary_value_for_key( p_req_headers, name );
 
-        i_rc = net_Printf( p_this, p_sys->i_control_fd,
-                           "%s: %s\r\n", psz_key, psz_value );
-        if ( i_rc < 0 )
-        {
-            i_err = VLC_EGENERIC;
-            goto error;
-        }
+        vlc_memstream_printf( stream, "%s: %s\r\n", name, value );
+        free( name );
     }
 
-error:
-    for ( i = 0; ppsz_keys[i]; ++i )
-        free( ppsz_keys[i] );
     free( ppsz_keys );
-
-    return i_err;
 }
 
 static int SendRequest( vlc_object_t *p_this, const char *psz_method,
@@ -758,67 +740,45 @@ static int SendRequest( vlc_object_t *p_this, const char *psz_method,
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    const unsigned char psz_headers_end[] = "\r\n";
-    size_t i_body_length = 0;
-    int i_err = VLC_SUCCESS;
-    int i_rc;
+    struct vlc_memstream stream;
+    ssize_t val;
 
-    i_rc = net_Printf( p_this, p_sys->i_control_fd,
-                       "%s %s RTSP/1.0\r\n"
-                       "User-Agent: " RAOP_USER_AGENT "\r\n"
-                       "Client-Instance: %s\r\n"
-                       "CSeq: %d\r\n",
-                       psz_method, p_sys->psz_url,
-                       p_sys->psz_client_instance,
-                       ++p_sys->i_cseq );
-    if ( i_rc < 0 )
+    vlc_memstream_open( &stream );
+
+    vlc_memstream_printf( &stream, "%s %s RTSP/1.0\r\n", psz_method,
+                          p_sys->psz_url );
+    vlc_memstream_puts( &stream, "User-Agent: " RAOP_USER_AGENT "\r\n" );
+    vlc_memstream_printf( &stream, "Client-Instance: %s\r\n",
+                          p_sys->psz_client_instance );
+    vlc_memstream_printf( &stream, "CSeq: %u\r\n", ++p_sys->i_cseq );
+
+    if( psz_content_type != NULL )
+        vlc_memstream_printf( &stream, "Content-Type: %s\r\n",
+                              psz_content_type );
+
+    WriteAuxHeaders( &stream, p_req_headers );
+
+    if( psz_body != NULL )
     {
-        i_err = VLC_EGENERIC;
-        goto error;
+        size_t i_body_length = strlen( psz_body );
+
+        vlc_memstream_printf( &stream, "Content-Length: %zu\r\n",
+                              i_body_length );
+        vlc_memstream_puts( &stream, "\r\n" );
+        vlc_memstream_write( &stream, psz_body, i_body_length );
     }
+    else
+        vlc_memstream_puts( &stream, "\r\n" );
 
-    if ( psz_content_type )
-    {
-        i_rc = net_Printf( p_this, p_sys->i_control_fd,
-                           "Content-Type: %s\r\n", psz_content_type );
-        if ( i_rc < 0 )
-        {
-            i_err = VLC_ENOMEM;
-            goto error;
-        }
-    }
+    if( vlc_memstream_close( &stream ) )
+        return VLC_ENOMEM;
 
-    if ( psz_body )
-    {
-        i_body_length = strlen( psz_body );
+    val = net_Write( p_this, p_sys->i_control_fd, stream.ptr, stream.length );
+    free( stream.ptr );
 
-        i_rc = net_Printf( p_this, p_sys->i_control_fd,
-                           "Content-Length: %u\r\n",
-                           (unsigned int)i_body_length );
-        if ( i_rc < 0 )
-        {
-            i_err = VLC_ENOMEM;
-            goto error;
-        }
-    }
-
-    i_err = WriteAuxHeaders( p_this, p_req_headers );
-    if ( i_err != VLC_SUCCESS )
-        goto error;
-
-    i_rc = net_Write( p_this, p_sys->i_control_fd,
-                      psz_headers_end, sizeof( psz_headers_end ) - 1 );
-    if ( i_rc < 0 )
-    {
-        i_err = VLC_ENOMEM;
-        goto error;
-    }
-
-    if ( psz_body )
-        net_Write( p_this, p_sys->i_control_fd, psz_body, i_body_length );
-
-error:
-    return i_err;
+    if( val < (ssize_t)stream.length )
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static int ParseAuthenticateHeader( vlc_object_t *p_this,
