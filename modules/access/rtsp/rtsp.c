@@ -111,14 +111,13 @@ static char *rtsp_get( rtsp_client_t *rtsp )
 static int rtsp_put( rtsp_client_t *rtsp, const char *psz_string )
 {
     unsigned int i_buffer = strlen( psz_string );
-    char *psz_buffer = xmalloc( i_buffer + 3 );
+    uint8_t *psz_buffer = xmalloc( i_buffer + 2 );
     int i_ret;
 
-    strcpy( psz_buffer, psz_string );
+    memcpy( psz_buffer, psz_string, i_buffer );
     psz_buffer[i_buffer] = '\r'; psz_buffer[i_buffer+1] = '\n';
-    psz_buffer[i_buffer+2] = 0;
 
-    i_ret = rtsp->pf_write( rtsp->p_userdata, (uint8_t*)psz_buffer, i_buffer + 2 );
+    i_ret = rtsp->pf_write( rtsp->p_userdata, psz_buffer, i_buffer + 2 );
 
     free( psz_buffer );
     return i_ret;
