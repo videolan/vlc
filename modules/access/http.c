@@ -710,8 +710,8 @@ static int Connect( access_t *p_access )
         char *auth;
 
         auth = vlc_http_auth_FormatAuthorizationHeader( VLC_OBJECT(p_access),
-                            &p_sys->proxy_auth, "GET", p_sys->url.psz_path,
-                            p_sys->url.psz_username, p_sys->url.psz_password );
+                        &p_sys->proxy_auth, "GET", p_sys->url.psz_path,
+                        p_sys->proxy.psz_username, p_sys->proxy.psz_password );
         if( auth != NULL )
              vlc_memstream_printf( &stream, "Proxy-Authorization: %s\r\n",
                                    auth );
