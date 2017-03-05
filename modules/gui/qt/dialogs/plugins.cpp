@@ -1243,9 +1243,15 @@ void AddonItemDelegate::paint( QPainter *painter,
                 progressbar->setGeometry(
                     newopt.rect.adjusted( adjustment.width(), adjustment.height(),
                                           -adjustment.width(), -adjustment.height() ) );
+#if HAS_QT5
+                painter->drawPixmap( newopt.rect.left() + adjustment.width(),
+                                     newopt.rect.top() + adjustment.height(),
+                                     progressbar->grab() );
+#else
                 painter->drawPixmap( newopt.rect.left() + adjustment.width(),
                                      newopt.rect.top() + adjustment.height(),
                                      QPixmap::grabWidget( progressbar ) );
+#endif
             }
             painter->restore();
         }

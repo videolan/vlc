@@ -315,7 +315,11 @@ void PreviewWidget::paintEvent( QPaintEvent * )
     QPixmap pixmaps[3];
     for( int i=0; i<3; i++ )
     {
+#if HAS_QT5
+        pixmaps[i] = bars[i]->grab( bars[i]->contentsRect() );
+#else
         pixmaps[i] = QPixmap::grabWidget( bars[i], bars[i]->contentsRect() );
+#endif
         for( int j=0; j < bars[i]->layout()->count(); j++ )
         {
             QLayoutItem *item = bars[i]->layout()->itemAt( j );
@@ -573,7 +577,11 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
         if( widget == NULL ) continue;
 
 
+#if HAS_QT5
+        widgetItem->setIcon( QIcon( widget->grab() ) );
+#else
         widgetItem->setIcon( QIcon( QPixmap::grabWidget( widget ) ) );
+#endif
         widgetItem->setToolTip( widgetItem->text() );
         widget->hide();
         widgetItem->setData( Qt::UserRole, QVariant( i ) );
