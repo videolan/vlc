@@ -473,15 +473,11 @@ static int Reset( access_t *p_access )
 static int OpenConnection( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_url_t    srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
+    const vlc_url_t *srv = p_sys->b_proxy ? &p_sys->proxy : &p_sys->url;
 
     if( ( p_sys->fd = net_ConnectTCP( p_access,
-                                      srv.psz_host, srv.i_port ) ) < 0 )
-    {
-        msg_Err( p_access, "cannot connect to %s:%d",
-                 srv.psz_host, srv.i_port );
+                                      srv->psz_host, srv->i_port ) ) < 0 )
         return VLC_EGENERIC;
-    }
 
     if( p_sys->b_proxy )
     {
