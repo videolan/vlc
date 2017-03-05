@@ -361,6 +361,13 @@ static int SocksNegotiate( vlc_object_t *p_obj,
     }
     else if( buffer[1] == 0x02 )
     {
+        if( psz_socks_user == NULL || psz_socks_passwd == NULL )
+        {
+            msg_Err( p_obj, "socks: server mandates authentication but "
+                            "a username and/or password was not supplied" );
+            return VLC_EGENERIC;
+        }
+
         int i_len1 = __MIN( strlen(psz_socks_user), 255 );
         int i_len2 = __MIN( strlen(psz_socks_passwd), 255 );
         msg_Dbg( p_obj, "socks: username/password authentication" );
