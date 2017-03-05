@@ -36,6 +36,7 @@
 
 #include <vlc_network.h>
 #include <vlc_url.h>
+#include <vlc_memstream.h>
 #include "asf.h"
 #include "buffer.h"
 
@@ -470,55 +471,85 @@ static int Reset( access_t *p_access )
     return VLC_SUCCESS;
 }
 
-static int OpenConnection( access_t *p_access )
+static void WriteRequestLine( const access_sys_t *sys,
+                              struct vlc_memstream *restrict stream )
+{
+    vlc_memstream_open( stream );
+
+    vlc_memstream_puts( stream, "GET " );
+    if( sys->b_proxy )
+        vlc_memstream_printf( stream, "http://%s:%d", sys->url.psz_host,
+                              sys->url.i_port );
+    if( (sys->url.psz_path == NULL) || (sys->url.psz_path[0] == '\0') )
+        vlc_memstream_putc( stream, '/' );
+    else
+        vlc_memstream_puts( stream, sys->url.psz_path );
+    if( sys->url.psz_option != NULL )
+        vlc_memstream_printf( stream, "?%s", sys->url.psz_option );
+    vlc_memstream_puts( stream, " HTTP/1.0\r\n" );
+
+    vlc_memstream_printf( stream, "Host: %s:%d\r\n", sys->url.psz_host,
+                          sys->url.i_port );
+
+    /* Proxy Authentication */
+    const vlc_url_t *proxy = &sys->proxy;
+
+    if( sys->b_proxy && proxy->psz_username != NULL )
+    {
+        const char *pw = proxy->psz_password ? proxy->psz_password : "";
+        char *buf;
+
+        if( asprintf( &buf, "%s:%s", proxy->psz_username, pw ) != -1 )
+        {
+            char *b64 = vlc_b64_encode( buf );
+            free( buf );
+            if( b64 != NULL )
+            {
+                vlc_memstream_printf( stream, "Proxy-Authorization: "
+                                      "Basic %s\r\n", b64 );
+                free( b64 );
+            }
+        }
+    }
+
+    vlc_memstream_puts( stream, "Accept: */*\r\n" );
+    vlc_memstream_printf( stream, "User-Agent: %s\r\n", MMSH_USER_AGENT );
+}
+
+static int OpenConnection( access_t *p_access,
+                           struct vlc_memstream *restrict stream )
 {
     access_sys_t *p_sys = p_access->p_sys;
     const vlc_url_t *srv = p_sys->b_proxy ? &p_sys->proxy : &p_sys->url;
 
-    if( ( p_sys->fd = net_ConnectTCP( p_access,
-                                      srv->psz_host, srv->i_port ) ) < 0 )
+    /* XXX: This is useless: HTTP/1.0 closes connection by default */
+    vlc_memstream_puts( stream, "Connection: Close\r\n" );
+
+    vlc_memstream_puts( stream, "\r\n" ); /* end of HTTP request header */
+
+    if( vlc_memstream_close( stream ) )
+        return VLC_ENOMEM;
+
+    int fd = net_ConnectTCP( p_access, srv->psz_host, srv->i_port );
+    if( fd < 0 )
+    {
+        free( stream->ptr );
         return VLC_EGENERIC;
-
-    if( p_sys->b_proxy )
-    {
-        net_Printf( p_access, p_sys->fd, "GET http://%s:%d%s%s%s HTTP/1.0\r\n",
-                    p_sys->url.psz_host, p_sys->url.i_port,
-                    ( (p_sys->url.psz_path == NULL) ||
-                      (*p_sys->url.psz_path == '\0') ) ?
-                         "/" : p_sys->url.psz_path,
-                    p_sys->url.psz_option ? "?" : "",
-                    p_sys->url.psz_option ? p_sys->url.psz_option : "" );
-
-        /* Proxy Authentication */
-        if( p_sys->proxy.psz_username && *p_sys->proxy.psz_username )
-        {
-            char *buf;
-            char *b64;
-
-            if( asprintf( &buf, "%s:%s", p_sys->proxy.psz_username,
-                       p_sys->proxy.psz_password ? p_sys->proxy.psz_password : "" ) == -1 )
-                return VLC_ENOMEM;
-
-            b64 = vlc_b64_encode( buf );
-            free( buf );
-
-            net_Printf( p_access, p_sys->fd,
-                        "Proxy-Authorization: Basic %s\r\n", b64 );
-            free( b64 );
-        }
     }
-    else
+
+    msg_Dbg( p_access, "sending request:\n%s", stream->ptr );
+
+    ssize_t val = net_Write( p_access, fd, stream->ptr, stream->length );
+    free( stream->ptr );
+    if( val < (ssize_t)stream->length )
     {
-        net_Printf( p_access, p_sys->fd, "GET %s%s%s HTTP/1.0\r\n"
-                    "Host: %s:%d\r\n",
-                    ( (p_sys->url.psz_path == NULL) ||
-                      (*p_sys->url.psz_path == '\0') ) ?
-                            "/" : p_sys->url.psz_path,
-                    p_sys->url.psz_option ? "?" : "",
-                    p_sys->url.psz_option ? p_sys->url.psz_option : "",
-                    p_sys->url.psz_host, p_sys->url.i_port );
+        msg_Err( p_access, "failed to send request" );
+        net_Close( fd );
+        fd = -1;
     }
-    return VLC_SUCCESS;
+
+    p_sys->fd = fd;
+    return (fd >= 0) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -532,6 +563,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     bool         b_keepalive = false;
     char         *psz;
     int          i_code;
+    struct vlc_memstream stream;
 
     /* Reinit context */
     p_sys->b_broadcast = true;
@@ -543,23 +575,17 @@ static int Describe( access_t  *p_access, char **ppsz_location )
 
     GenerateGuid ( &p_sys->guid );
 
-    if( OpenConnection( p_access ) )
+    WriteRequestLine( p_sys, &stream );
+
+    vlc_memstream_printf( &stream, "Pragma: no-cache,rate=1.000000,"
+                          "stream-time=0,stream-offset=0:0,"
+                          "request-context=%d,max-duration=0\r\n",
+                          p_sys->i_request_context++ );
+    vlc_memstream_printf( &stream, "Pragma: xClientGUID={"GUID_FMT"}\r\n",
+                          GUID_PRINT(p_sys->guid) );
+
+    if( OpenConnection( p_access, &stream ) )
         return VLC_EGENERIC;
-
-    net_Printf( p_access, p_sys->fd,
-                "Accept: */*\r\n"
-                "User-Agent: "MMSH_USER_AGENT"\r\n"
-                "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=0:0,request-context=%d,max-duration=0\r\n"
-                "Pragma: xClientGUID={"GUID_FMT"}\r\n"
-                "Connection: Close\r\n",
-                p_sys->i_request_context++,
-                GUID_PRINT( p_sys->guid ) );
-
-    if( net_Printf( p_access, p_sys->fd, "\r\n" ) < 0 )
-    {
-        msg_Err( p_access, "failed to send request" );
-        goto error;
-    }
 
     /* Receive the http header */
     if( ( psz = net_Gets( p_access, p_sys->fd ) ) == NULL )
@@ -750,12 +776,12 @@ static int Start( access_t *p_access, uint64_t i_pos )
     access_sys_t *p_sys = p_access->p_sys;
     int  i_streams = 0;
     int  i_streams_selected = 0;
-    int  i;
     char *psz = NULL;
+    struct vlc_memstream stream;
 
     msg_Dbg( p_access, "starting stream" );
 
-    for( i = 1; i < 128; i++ )
+    for( unsigned i = 1; i < 128; i++ )
     {
         if( p_sys->asfh.stream[i].i_cat == ASF_CODEC_TYPE_UNKNOWN )
             continue;
@@ -769,54 +795,38 @@ static int Start( access_t *p_access, uint64_t i_pos )
         return VLC_EGENERIC;
     }
 
-    if( OpenConnection( p_access ) )
-        return VLC_EGENERIC;
+    WriteRequestLine( p_sys, &stream );
 
-    net_Printf( p_access, p_sys->fd,
-                "Accept: */*\r\n"
-                "User-Agent: "MMSH_USER_AGENT"\r\n" );
-    if( p_sys->b_broadcast )
-    {
-        net_Printf( p_access, p_sys->fd,
-                    "Pragma: no-cache,rate=1.000000,request-context=%d\r\n",
-                    p_sys->i_request_context++ );
-    }
-    else
-    {
-        net_Printf( p_access, p_sys->fd,
-                    "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=%u:%u,request-context=%d,max-duration=0\r\n",
-                    (uint32_t)((i_pos >> 32)&0xffffffff),
-                    (uint32_t)(i_pos&0xffffffff),
-                    p_sys->i_request_context++ );
-    }
-    net_Printf( p_access, p_sys->fd,
-                "Pragma: xPlayStrm=1\r\n"
-                "Pragma: xClientGUID={"GUID_FMT"}\r\n"
-                "Pragma: stream-switch-count=%d\r\n"
-                "Pragma: stream-switch-entry=",
-                GUID_PRINT( p_sys->guid ),
-                i_streams);
+    vlc_memstream_puts( &stream, "Pragma: no-cache,rate=1.000000" );
+    if( !p_sys->b_broadcast )
+        vlc_memstream_printf( &stream, ",stream-time=0,stream-offset="
+                              "%"PRIu32":%"PRIu32, (uint32_t)(i_pos >> 32),
+                              (uint32_t)i_pos );
+    vlc_memstream_printf( &stream, ",request-context=%d",
+                          p_sys->i_request_context++ );
+    if( !p_sys->b_broadcast )
+        vlc_memstream_puts( &stream, ",max-duration=0" );
+    vlc_memstream_puts( &stream, "\r\n" );
 
-    for( i = 1; i < 128; i++ )
+    vlc_memstream_puts( &stream, "Pragma: xPlayStrm=1\r\n" );
+    vlc_memstream_printf( &stream, "Pragma: xClientGUID={"GUID_FMT"}\r\n",
+                          GUID_PRINT(p_sys->guid) );
+    vlc_memstream_printf( &stream, "Pragma: stream-switch-count=%d\r\n",
+                          i_streams );
+
+    vlc_memstream_puts( &stream, "Pragma: stream-switch-entry=" );
+    for( unsigned i = 1; i < 128; i++ )
     {
         if( p_sys->asfh.stream[i].i_cat != ASF_CODEC_TYPE_UNKNOWN )
         {
-            int i_select = 2;
-            if( p_sys->asfh.stream[i].i_selected )
-            {
-                i_select = 0;
-            }
-            net_Printf( p_access, p_sys->fd, "ffff:%x:%d ", i, i_select );
+            int i_select = p_sys->asfh.stream[i].i_selected ? 0 : 2;
+            vlc_memstream_printf( &stream, "ffff:%x:%d ", i, i_select );
         }
     }
-    net_Printf( p_access, p_sys->fd, "\r\n" );
-    net_Printf( p_access, p_sys->fd, "Connection: Close\r\n" );
+    vlc_memstream_puts( &stream, "\r\n" );
 
-    if( net_Printf( p_access, p_sys->fd, "\r\n" ) < 0 )
-    {
-        msg_Err( p_access, "failed to send request" );
+    if( OpenConnection( p_access, &stream ) )
         return VLC_EGENERIC;
-    }
 
     psz = net_Gets( p_access, p_sys->fd );
     if( psz == NULL )
