@@ -289,9 +289,7 @@ char *vlc_xml_encode (const char *str)
     uint32_t cp;
 
     assert(str != NULL);
-
-    if (vlc_memstream_open(&stream))
-        return NULL;
+    vlc_memstream_open(&stream);
 
     while ((n = vlc_towc (str, &cp)) != 0)
     {
