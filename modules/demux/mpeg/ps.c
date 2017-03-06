@@ -93,6 +93,7 @@ struct demux_sys_t
 
     bool  b_lost_sync;
     bool  b_have_pack;
+    bool  b_bad_scr;
     bool  b_seekable;
 };
 
@@ -145,6 +146,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
 
     p_sys->b_lost_sync = false;
     p_sys->b_have_pack = false;
+    p_sys->b_bad_scr   = false;
     p_sys->b_seekable  = false;
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
@@ -412,15 +414,19 @@ static int Demux( demux_t *p_demux )
                 p_sys->i_last_scr = -1;
             }
 
-            if( p_sys->i_scr >= 0 )
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_scr );
-
+            if( p_sys->i_scr >= 0 && !p_sys->b_bad_scr )
+            {
+                if( tk->i_first_pts > VLC_TS_INVALID && tk->i_first_pts - p_sys->i_scr > CLOCK_FREQ )
+                    p_sys->b_bad_scr = true; /* Disable Offset SCR */
+                else
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_scr );
+            }
             p_sys->i_scr = -1;
 
             if( tk->b_seen && tk->es &&
                 !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
             {
-                if( !b_new && !p_sys->b_have_pack &&
+                if( ((!b_new && !p_sys->b_have_pack) || p_sys->b_bad_scr) &&
                     (tk->fmt.i_cat == AUDIO_ES) &&
                     (p_pkt->i_pts > VLC_TS_INVALID) )
                 {
