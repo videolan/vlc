@@ -440,10 +440,28 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             p_sys->b_ps = frame.ps;
         }
 
+        /* PS Enabled FAAD PCA bug hotfix (contribs has patch) */
+        if( frame.channels == 8 )
+        {
+            const uint8_t psbugconfig[3][8] = { { 2, 3, 2, 3, 2, 3, 6, 7 },  /* fdk 7.1 (4 Front) */
+                                                { 2, 3, 2, 3, 2, 3, 4, 5 },  /* 7.1 */
+                                                { 1, 2, 3, 4, 5, 6, 7, 9 } };/* fixed */
+            for( size_t i=0; i<2; i++ )
+            {
+                if( !memcmp( frame.channel_position, psbugconfig[i], 8 ) )
+                {
+                    msg_Warn( p_dec, "Unpatched FAAD2 library with PS Bug. Trying to workaround !" );
+                    memcpy( frame.channel_position, psbugconfig[2], 8 );
+                    break;
+                }
+            }
+        }
+
         /* Hotfix channels misdetection/repetition for FDK 7.1 */
         const uint8_t fdk71config[] = { 1, 2, 3, 6, 7, 6, 7, 9 };
         if( frame.channels == 8 && !memcmp( frame.channel_position, fdk71config, 8 ) )
         {
+            msg_Warn( p_dec, "Patching for FDK encoded 7.1 4 Front channel repeat bug" );
             frame.channel_position[3] = 4;
             frame.channel_position[4] = 5;
         }
