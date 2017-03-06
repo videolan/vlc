@@ -440,6 +440,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             p_sys->b_ps = frame.ps;
         }
 
+        /* Hotfix channels misdetection/repetition for FDK 7.1 */
+        const uint8_t fdk71config[] = { 1, 2, 3, 6, 7, 6, 7, 9 };
+        if( frame.channels == 8 && !memcmp( frame.channel_position, fdk71config, 8 ) )
+        {
+            frame.channel_position[3] = 4;
+            frame.channel_position[4] = 5;
+        }
+
         /* Convert frame.channel_position to our own channel values */
         p_dec->fmt_out.audio.i_physical_channels = 0;
         uint32_t pi_faad_channels_positions[FAAD_CHANNEL_ID_COUNT] = {0};
