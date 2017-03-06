@@ -426,11 +426,19 @@ static int Demux( demux_t *p_demux )
                 else
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_scr );
             }
-            p_sys->i_scr = -1;
 
             if( tk->b_seen && tk->es &&
                 !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
             {
+                if( (tk->fmt.i_cat == AUDIO_ES || tk->fmt.i_cat == VIDEO_ES) &&
+                    !p_sys->b_bad_scr && p_sys->i_scr > 0 && p_pkt->i_pts > 0 &&
+                    p_sys->i_scr > p_pkt->i_pts + CLOCK_FREQ / 4 )
+                {
+                    msg_Warn( p_demux, "Incorrect SCR timing in advance of %ld ms, disabling",
+                                       p_sys->i_scr - p_pkt->i_pts / 1000 );
+                    p_sys->b_bad_scr = true;
+                }
+
                 if( ((!b_new && !p_sys->b_have_pack) || p_sys->b_bad_scr) &&
                     (tk->fmt.i_cat == AUDIO_ES) &&
                     (p_pkt->i_pts > VLC_TS_INVALID) )
@@ -458,6 +466,8 @@ static int Demux( demux_t *p_demux )
             {
                 block_Release( p_pkt );
             }
+
+            p_sys->i_scr = -1;
         }
         else
         {
