@@ -121,6 +121,7 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     ARRAY_INIT( pmt->od.objects );
 
     pmt->i_last_dts = -1;
+    pmt->i_last_dts_byte = 0;
 
     pmt->p_atsc_si_basepid      = NULL;
     pmt->p_si_sdt_pid = NULL;

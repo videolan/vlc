@@ -2025,6 +2025,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                         if( b_end )
                         {
                             p_pmt->i_last_dts = *pi_pcr;
+                            p_pmt->i_last_dts_byte = vlc_stream_Tell( p_sys->stream );
                         }
                         /* Start, only keep first */
                         else if( b_pcrresult && p_pmt->pcr.i_first == -1 )
@@ -2154,6 +2155,12 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
     if ( p_sys->i_pmt_es )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR, p_pmt->i_number, FROM_SCALE(i_pcr) );
+        /* growing files/named fifo handling */
+        if( vlc_stream_Tell( p_sys->stream ) > p_pmt->i_last_dts_byte )
+        {
+            p_pmt->i_last_dts = i_pcr;
+            p_pmt->i_last_dts_byte = vlc_stream_Tell( p_sys->stream );
+        }
     }
 }
 
