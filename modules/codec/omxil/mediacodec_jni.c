@@ -755,7 +755,7 @@ static int DequeueOutput(mc_api *api, mtime_t i_timeout)
                                     p_sys->buffer_info, i_timeout);
     if (CHECK_EXCEPTION())
     {
-        msg_Err(api->p_obj, "Exception in MediaCodec.dequeueOutputBuffer");
+        msg_Warn(api->p_obj, "Exception in MediaCodec.dequeueOutputBuffer");
         return MC_API_ERROR;
     }
     if (i_index >= 0)

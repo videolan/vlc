@@ -1326,7 +1326,6 @@ static void *OutThread(void *data)
         }
         else
         {
-            msg_Err(p_dec, "dequeue_out failed");
             vlc_restorecancel(canc);
             break;
         }
