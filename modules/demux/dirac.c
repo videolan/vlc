@@ -156,6 +156,8 @@ static int Demux( demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
 
+    bool b_eof = false;
+
     if( p_sys->i_state == DIRAC_DEMUX_DISCONT )
     {
         p_sys->i_state++;
@@ -170,9 +172,9 @@ static int Demux( demux_t *p_demux)
         p_block_in = vlc_stream_Block( p_demux->s, DIRAC_PACKET_SIZE );
         if( !p_block_in )
         {
-            return 0;
+            b_eof = true;
         }
-        if ( p_sys->i_state == DIRAC_DEMUX_FIRST)
+        else if ( p_sys->i_state == DIRAC_DEMUX_FIRST)
         {
             p_sys->i_state++;
             /* by default, timestamps are invalid.
@@ -181,7 +183,8 @@ static int Demux( demux_t *p_demux)
         }
     }
 
-    while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
+    while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer,
+                                                             (p_block_in) ? &p_block_in : NULL )) )
     {
         while( p_block_out )
         {
@@ -208,7 +211,8 @@ static int Demux( demux_t *p_demux)
             p_block_out = p_next;
         }
     }
-    return 1;
+
+    return b_eof ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
