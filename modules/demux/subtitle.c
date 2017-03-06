@@ -1296,6 +1296,7 @@ static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
 
     i_text = 0;
     text[0] = '\0';
+    const char *psz_startline = s;
     /* now get all txt until  a "Start=" line */
     for( ;; )
     {
@@ -1312,7 +1313,8 @@ static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
             {
                 c = '\n';
             }
-            else if( strcasestr( s, "Start=" ) )
+            else if( strcasestr( s, "Start=" ) &&
+                     psz_startline != s )
             {
                 TextPreviousLine( txt );
                 break;
