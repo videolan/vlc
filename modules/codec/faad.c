@@ -472,6 +472,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                                               frame.samples / frame.channels )
                               - p_out->i_pts;
 
+            /* Don't kill speakers if some weird mapping does not gets 1:1 */
+            if( popcount(p_dec->fmt_out.audio.i_physical_channels) != frame.channels )
+                memset( p_out->p_buffer, 0, p_out->i_buffer );
+
             /* FIXME: replace when aout_channel_reorder can take samples from a different buffer */
             DoReordering( (uint32_t *)p_out->p_buffer, samples,
                           frame.samples / frame.channels, frame.channels,
