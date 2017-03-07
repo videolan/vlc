@@ -95,12 +95,13 @@ struct demux_sys_t
     bool  b_have_pack;
     bool  b_bad_scr;
     bool  b_seekable;
+    bool  b_cdxa;
 };
 
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static int      ps_pkt_resynch( stream_t *, uint32_t *pi_code );
+static int      ps_pkt_resynch( stream_t *, uint32_t *pi_code, bool );
 static block_t *ps_pkt_read   ( stream_t *, uint32_t i_code );
 
 /*****************************************************************************
@@ -112,8 +113,9 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     demux_sys_t *p_sys;
 
     const uint8_t *p_peek;
+    bool b_cdxa = false;
 
-    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
     {
         msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
@@ -121,11 +123,18 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
 
     if( memcmp( p_peek, "\x00\x00\x01", 3 ) || ( p_peek[3] < 0xb9 ) )
     {
-        if( !b_force )
-            return VLC_EGENERIC;
-
-        msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
-                  "continuing anyway" );
+        if( memcmp( p_peek, "RIFF", 4 ) || memcmp( &p_peek[8], "CDXA", 4 ) )
+        {
+            if( !b_force )
+                return VLC_EGENERIC;
+            msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
+                      "continuing anyway" );
+        }
+        else
+        {
+            b_cdxa = true;
+            msg_Info( p_demux, "Detected CDXA-PS" );
+        }
     }
 
     /* Fill p_demux field */
@@ -148,6 +157,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->b_have_pack = false;
     p_sys->b_bad_scr   = false;
     p_sys->b_seekable  = false;
+    p_sys->b_cdxa      = b_cdxa;
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
@@ -200,7 +210,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
     uint32_t i_code;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, &i_code );
+    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa );
     if( i_ret < 0 )
     {
         return 0;
@@ -300,7 +310,7 @@ static int Demux( demux_t *p_demux )
     uint32_t i_code;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, &i_code );
+    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa );
     if( i_ret < 0 )
     {
         return VLC_DEMUXER_EOF;
@@ -602,7 +612,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *  It doesn't skip more than 512 bytes
  *  -1 -> error, 0 -> not synch, 1 -> ok
  */
-static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
+static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa )
 {
     const uint8_t *p_peek;
     int     i_peek;
@@ -630,6 +640,26 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
         if( i_peek < 4 )
         {
             break;
+        }
+        /* Handle mid stream 24 bytes padding+CRC creating emulated sync codes with incorrect
+           PES sizes and frelling up to UINT16_MAX bytes followed by 24 bytes CDXA Header */
+        if( b_cdxa && i_skip == 0 && i_peek >= 48 )
+        {
+            size_t i = 0;
+            while( i<24 && p_peek[i] == 0 )
+                i++;
+            if( i == 20 )
+            {
+                const uint8_t cdxasynccode[12] = { 0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
+                                                   0xff, 0xff, 0xff, 0xff, 0xff, 0x00 };
+                if( !memcmp( &p_peek[24], cdxasynccode, 12 ) )
+                {
+                    i_peek -= 48;
+                    p_peek += 48;
+                    i_skip += 48;
+                    continue;
+                }
+            }
         }
         if( p_peek[0] == 0 && p_peek[1] == 0 && p_peek[2] == 1 &&
             p_peek[3] >= PS_STREAM_ID_END_STREAM )
