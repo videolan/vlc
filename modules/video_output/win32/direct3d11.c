@@ -2190,12 +2190,16 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f,
     };
+
+    /* matrices for studio range */
+    /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion, in studio range */
     static const FLOAT COLORSPACE_BT601_TO_FULL[4*4] = {
         1.164383561643836f,                 0.f,  1.596026785714286f, 0.f,
         1.164383561643836f, -0.391762290094914f, -0.812967647237771f, 0.f,
         1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
+    /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.709_conversion, in studio range */
     static const FLOAT COLORSPACE_BT709_TO_FULL[4*4] = {
         1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
         1.164383561643836f, -0.213248614273730f, -0.532909328559444f, 0.f,
