@@ -345,6 +345,12 @@ static const char* globPixelShaderDefault = "\
   }\
 ";
 
+#define ST2084_PQ_CONSTANTS  "const float ST2084_m1 = 2610.0 / (4096.0 * 4);\
+const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\
+const float ST2084_c1 = 3424.0 / 4096.0;\
+const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;\
+const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;"
+
 static int Direct3D11MapPoolTexture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
@@ -1608,9 +1614,10 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         case TRANSFER_FUNC_SMPTE_ST2084:
             /* ST2084 to Linear */
             psz_src_transform =
-                    "rgb = pow(rgb, 1.0/78.843750);\
-                    rgb = max(rgb - 0.835938, 0.0) / (18.851562 - 18.687500 * rgb);\
-                    rgb = pow(rgb, 1.0/0.159302);\
+                   ST2084_PQ_CONSTANTS
+                   "rgb = pow(rgb, 1.0/ST2084_m2);\
+                    rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\
+                    rgb = pow(rgb, 1.0/ST2084_m1);\
                     return rgb";
             src_transfer = TRANSFER_FUNC_LINEAR;
             break;
