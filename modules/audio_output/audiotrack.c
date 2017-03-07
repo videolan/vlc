@@ -55,6 +55,7 @@ static void *AudioTrack_Thread( void * );
  * per default */
 enum at_dev {
     AT_DEV_STEREO = 0,
+    AT_DEV_PCM,
     AT_DEV_ENCODED,
 };
 #define AT_DEV_DEFAULT AT_DEV_STEREO
@@ -66,6 +67,7 @@ static const struct {
     enum at_dev at_dev;
 } at_devs[] = {
     { "stereo", "Up to 2 channels (compat mode).", AT_DEV_STEREO },
+    { "pcm", "Up to 8 channels.", AT_DEV_PCM },
     { "encoded", "Up to 8 channels, passthrough if available.", AT_DEV_ENCODED },
     {  NULL, NULL, AT_DEV_DEFAULT },
 };
@@ -1096,7 +1098,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     else
     {
         b_try_passthrough = var_InheritBool( p_aout, "spdif" );
-        i_max_channels = 2;
+        i_max_channels = p_sys->at_dev == AT_DEV_STEREO ? 2 : AT_DEV_MAX_CHANNELS;
     }
 
     if( !( env = GET_ENV() ) )
