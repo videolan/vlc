@@ -300,6 +300,21 @@ static bool FindLength( demux_t *p_demux )
     return true;
 }
 
+static void NotifyDiscontinuity( ps_track_t *p_tk, es_out_t *out )
+{
+    bool b_selected;
+    for( size_t i = 0; i < PS_TK_COUNT; i++ )
+    {
+        ps_track_t *tk = &p_tk[i];
+        if( tk->b_seen && tk->es &&
+                es_out_Control( out, ES_OUT_GET_ES_STATE, tk->es, &b_selected ) == VLC_SUCCESS
+                && b_selected )
+        {
+            tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+        }
+    }
+}
+
 /*****************************************************************************
  * Demux:
  *****************************************************************************/
@@ -318,7 +333,11 @@ static int Demux( demux_t *p_demux )
     else if( i_ret == 0 )
     {
         if( !p_sys->b_lost_sync )
-            msg_Warn( p_demux, "garbage at input, trying to resync..." );
+        {
+            msg_Warn( p_demux, "garbage at input from %"PRIu64", trying to resync...",
+                                vlc_stream_Tell(p_demux->s) );
+            NotifyDiscontinuity( p_sys->tk, p_demux->out );
+        }
 
         p_sys->b_lost_sync = true;
         return VLC_DEMUXER_SUCCESS;
@@ -470,6 +489,12 @@ static int Demux( demux_t *p_demux )
                     p_sys->i_current_pts = (int64_t)p_pkt->i_pts;
                 }
 
+                if( tk->i_next_block_flags )
+                {
+                    p_pkt->i_flags = tk->i_next_block_flags;
+                    tk->i_next_block_flags = 0;
+                }
+
                 es_out_Send( p_demux->out, tk->es, p_pkt );
             }
             else
@@ -498,6 +523,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
     int64_t i64, *pi64;
+    int i_ret;
 
     switch( i_query )
     {
@@ -525,7 +551,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_current_pts = 0;
             p_sys->i_last_scr = -1;
 
-            return vlc_stream_Seek( p_demux->s, (int64_t)(i64 * f) );
+            i_ret = vlc_stream_Seek( p_demux->s, (int64_t)(i64 * f) );
+            if( i_ret == VLC_SUCCESS )
+            {
+                NotifyDiscontinuity( p_sys->tk, p_demux->out );
+                return i_ret;
+            }
+            break;
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
@@ -541,7 +573,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
-            return VLC_EGENERIC;
+            break;
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
@@ -557,7 +589,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
-            return VLC_EGENERIC;
+            break;
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
@@ -573,9 +605,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_last_scr = -1;
                 i_pos *= (float)i64 / (float)i_now;
 
-                return vlc_stream_Seek( p_demux->s, i_pos );
+                i_ret = vlc_stream_Seek( p_demux->s, i_pos );
+                if( i_ret == VLC_SUCCESS )
+                {
+                    NotifyDiscontinuity( p_sys->tk, p_demux->out );
+                    return i_ret;
+                }
             }
-            return VLC_EGENERIC;
+            break;
 
         case DEMUX_GET_TITLE_INFO:
         {
@@ -600,8 +637,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_FPS:
         default:
-            return VLC_EGENERIC;
+            break;
     }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

@@ -61,6 +61,7 @@ typedef struct
     bool  b_seen;
     int         i_skip;
     int         i_id;
+    int         i_next_block_flags;
     es_out_id_t *es;
     es_format_t fmt;
     mtime_t     i_first_pts;
@@ -77,6 +78,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
         tk[i].b_seen = false;
         tk[i].i_skip = 0;
         tk[i].i_id   = 0;
+        tk[i].i_next_block_flags = 0;
         tk[i].es     = NULL;
         tk[i].i_first_pts = -1;
         tk[i].i_last_pts = -1;
