@@ -2184,26 +2184,26 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     if (RGB_shader)
         WHITE_POINT_D65_TO_FULL[0] = WHITE_POINT_D65_TO_FULL[1] = WHITE_POINT_D65_TO_FULL[2] = 0.f;
 
-    FLOAT COLORSPACE_RGB_FULL[4 * 4] = {
+    static const FLOAT COLORSPACE_RGB_FULL[4 * 4] = {
         1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f,
     };
-    FLOAT COLORSPACE_BT601_TO_FULL[4*4] = {
+    static const FLOAT COLORSPACE_BT601_TO_FULL[4*4] = {
         1.164383561643836f,                 0.f,  1.596026785714286f, 0.f,
         1.164383561643836f, -0.391762290094914f, -0.812967647237771f, 0.f,
         1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
-    FLOAT COLORSPACE_BT709_TO_FULL[4*4] = {
+    static const FLOAT COLORSPACE_BT709_TO_FULL[4*4] = {
         1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
         1.164383561643836f, -0.213248614273730f, -0.532909328559444f, 0.f,
         1.164383561643836f,  2.112401785714286f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
     /* RGB-709 to RGB-2020 based on https://www.researchgate.net/publication/258434326_Beyond_BT709 */
-    FLOAT COLORSPACE_BT2020_TO_FULL[4*4] = {
+    static const FLOAT COLORSPACE_BT2020_TO_FULL[4*4] = {
         1.163746465f, -0.028815145f,  2.823537589f, 0.f,
         1.164383561f, -0.258509894f,  0.379693635f, 0.f,
         1.164383561f,  2.385315708f,  0.021554502f, 0.f,
@@ -2211,7 +2211,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     };
 
     PS_COLOR_TRANSFORM colorspace;
-    FLOAT *ppColorspace;
+    const FLOAT *ppColorspace;
     if (RGB_shader)
         ppColorspace = COLORSPACE_RGB_FULL;
     else
@@ -2234,6 +2234,9 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
             break;
     }
 
+    memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
+    memcpy(colorspace.WhitePoint, WHITE_POINT_D65_TO_FULL, sizeof(colorspace.WhitePoint));
+
 #if VLC_WINSTORE_APP
     if (isXboxHardware(sys->d3ddevice)) {
         static const FLOAT FULL_TO_STUDIO_RATIO = (256.f - 16.f - 20.f) / 256.f;
@@ -2242,19 +2245,17 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         if (RGB_shader) {
             WHITE_POINT_D65_TO_FULL[1] += FULL_TO_STUDIO_SHIFT;
             WHITE_POINT_D65_TO_FULL[2] += FULL_TO_STUDIO_SHIFT;
-            ppColorspace[0 * 5] *= FULL_TO_STUDIO_RATIO;
-            ppColorspace[1 * 5] *= FULL_TO_STUDIO_RATIO;
-            ppColorspace[2 * 5] *= FULL_TO_STUDIO_RATIO;
+            colorspace.Colorspace[0 * 5] *= FULL_TO_STUDIO_RATIO;
+            colorspace.Colorspace[1 * 5] *= FULL_TO_STUDIO_RATIO;
+            colorspace.Colorspace[2 * 5] *= FULL_TO_STUDIO_RATIO;
         } else {
-            ppColorspace[0 * 4] *= FULL_TO_STUDIO_RATIO;
-            ppColorspace[1 * 4] *= FULL_TO_STUDIO_RATIO;
-            ppColorspace[2 * 4] *= FULL_TO_STUDIO_RATIO;
+            colorspace.Colorspace[0 * 4] *= FULL_TO_STUDIO_RATIO;
+            colorspace.Colorspace[1 * 4] *= FULL_TO_STUDIO_RATIO;
+            colorspace.Colorspace[2 * 4] *= FULL_TO_STUDIO_RATIO;
         }
     }
 #endif
 
-    memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
-    memcpy(colorspace.WhitePoint, WHITE_POINT_D65_TO_FULL, sizeof(colorspace.WhitePoint));
     constantInit.pSysMem = &colorspace;
 
     static_assert((sizeof(PS_COLOR_TRANSFORM)%16)==0,"Constant buffers require 16-byte alignment");
