@@ -342,28 +342,29 @@ static inline int ps_pkt_id( block_t *p_pkt )
 static inline int ps_pkt_size( const uint8_t *p, int i_peek )
 {
     if( unlikely(i_peek < 4) )
-    {
         return -1;
-    }
-    else if( p[3] == PS_STREAM_ID_END_STREAM )
+
+    switch( p[3] )
     {
-        return 4;
-    }
-    else if( p[3] == PS_STREAM_ID_PACK_HEADER )
-    {
-        if( i_peek >= 14 && (p[4] >> 6) == 0x01 )
-        {
-            return 14 + (p[13]&0x07);
-        }
-        else if( i_peek >= 12 && (p[4] >> 4) == 0x02 )
-        {
-            return 12;
-        }
-        return -1;
-    }
-    else if( i_peek >= 6 )
-    {
-        return 6 + ((p[4]<<8) | p[5] );
+        case PS_STREAM_ID_END_STREAM:
+            return 4;
+
+        case PS_STREAM_ID_PACK_HEADER:
+            if( i_peek > 4 )
+            {
+                if( i_peek >= 14 && (p[4] >> 6) == 0x01 )
+                    return 14 + (p[13]&0x07);
+                else if( i_peek >= 12 && (p[4] >> 4) == 0x02 )
+                    return 12;
+            }
+            break;
+
+        case PS_STREAM_ID_SYSTEM_HEADER:
+        case PS_STREAM_ID_MAP:
+        case PS_STREAM_ID_DIRECTORY:
+        default:
+            if( i_peek >= 6 )
+                return 6 + ((p[4]<<8) | p[5] );
     }
     return -1;
 }
