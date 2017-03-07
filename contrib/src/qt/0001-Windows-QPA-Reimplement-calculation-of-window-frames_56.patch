@@ -1,0 +1,271 @@
+From 81ead1ff68711fed609cb47b33b3906c14ed95d5 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Mon, 14 Nov 2016 16:08:51 +0100
+Subject: [PATCH 1/2] Windows QPA: Reimplement calculation of window frames
+
+Instead of relying on AdjustWindowRectEx() and dirty-handling,
+capture the rectangles before and after the processing of
+WM_NCCALCSIZE and calculate the frame from that. This allows
+for changing window frames by handling WM_NCCALCSIZE and
+monitor-dependent window frames when using High DPI scaling.
+
+Task-number: QTBUG-53255
+Task-number: QTBUG-40578
+Task-number: QTBUG-56591
+Change-Id: If8364a5440a6324ea5d470bf5b74e68942285abe
+Reviewed-by: Tim Jenssen <tim.jenssen@qt.io>
+Reviewed-by: Oliver Wolff <oliver.wolff@qt.io>
+---
+ src/plugins/platforms/windows/qwindowscontext.cpp | 66 +++++++++++++++++++++--
+ src/plugins/platforms/windows/qwindowscontext.h   |  4 +-
+ src/plugins/platforms/windows/qwindowswindow.cpp  | 30 ++++-------
+ src/plugins/platforms/windows/qwindowswindow.h    |  2 +-
+ 4 files changed, 74 insertions(+), 28 deletions(-)
+
+diff --git a/src/plugins/platforms/windows/qwindowscontext.cpp b/src/plugins/platforms/windows/qwindowscontext.cpp
+index b611843..9058993 100644
+--- a/src/plugins/platforms/windows/qwindowscontext.cpp
++++ b/src/plugins/platforms/windows/qwindowscontext.cpp
+@@ -453,6 +453,11 @@ void QWindowsContext::setWindowCreationContext(const QSharedPointer<QWindowCreat
+     d->m_creationContext = ctx;
+ }
+ 
++QSharedPointer<QWindowCreationContext> QWindowsContext::windowCreationContext() const
++{
++    return d->m_creationContext;
++}
++
+ int QWindowsContext::defaultDPI() const
+ {
+     return d->m_defaultDPI;
+@@ -916,7 +921,9 @@ static inline QWindowsInputContext *windowsInputContext()
+ 
+ bool QWindowsContext::windowsProc(HWND hwnd, UINT message,
+                                   QtWindows::WindowsEventType et,
+-                                  WPARAM wParam, LPARAM lParam, LRESULT *result)
++                                  WPARAM wParam, LPARAM lParam,
++                                  LRESULT *result,
++                                  QWindowsWindow **platformWindowPtr)
+ {
+     *result = 0;
+ 
+@@ -949,6 +956,7 @@ bool QWindowsContext::windowsProc(HWND hwnd, UINT message,
+     }
+ 
+     QWindowsWindow *platformWindow = findPlatformWindow(hwnd);
++    *platformWindowPtr = platformWindow;
+     if (platformWindow) {
+         filterResult = 0;
+         if (QWindowSystemInterface::handleNativeEvent(platformWindow->window(), d->m_eventType, &msg, &filterResult)) {
+@@ -1144,9 +1152,6 @@ bool QWindowsContext::windowsProc(HWND hwnd, UINT message,
+         return true;
+     case QtWindows::ThemeChanged: {
+         // Switch from Aero to Classic changes margins.
+-        const Qt::WindowFlags flags = platformWindow->window()->flags();
+-        if ((flags & Qt::WindowType_Mask) != Qt::Desktop && !(flags & Qt::FramelessWindowHint))
+-            platformWindow->setFlag(QWindowsWindow::FrameDirty);
+         if (QWindowsTheme *theme = QWindowsTheme::instance())
+             theme->windowsThemeChanged(platformWindow->window());
+         return true;
+@@ -1318,6 +1323,37 @@ QTouchDevice *QWindowsContext::touchDevice() const
+     return d->m_mouseHandler.touchDevice();
+ }
+ 
++static inline bool isEmptyRect(const RECT &rect)
++{
++    return rect.right - rect.left == 0 && rect.bottom - rect.top == 0;
++}
++
++static inline QMargins marginsFromRects(const RECT &frame, const RECT &client)
++{
++    return QMargins(client.left - frame.left, client.top - frame.top,
++                    frame.right - client.right, frame.bottom - client.bottom);
++}
++
++static RECT rectFromNcCalcSize(UINT message, WPARAM wParam, LPARAM lParam, int n)
++{
++    RECT result = {0, 0, 0, 0};
++    if (message == WM_NCCALCSIZE && wParam)
++        result = reinterpret_cast<const NCCALCSIZE_PARAMS *>(lParam)->rgrc[n];
++    return result;
++}
++
++static inline bool isMinimized(HWND hwnd)
++{
++    WINDOWPLACEMENT windowPlacement;
++    windowPlacement.length = sizeof(WINDOWPLACEMENT);
++    return GetWindowPlacement(hwnd, &windowPlacement) && windowPlacement.showCmd == SW_SHOWMINIMIZED;
++}
++
++static inline bool isTopLevel(HWND hwnd)
++{
++    return (GetWindowLongPtr(hwnd, GWL_STYLE) & WS_CHILD) == 0;
++}
++
+ /*!
+     \brief Windows functions for actual windows.
+ 
+@@ -1331,7 +1367,9 @@ extern "C" LRESULT QT_WIN_CALLBACK qWindowsWndProc(HWND hwnd, UINT message, WPAR
+ {
+     LRESULT result;
+     const QtWindows::WindowsEventType et = windowsEventType(message, wParam, lParam);
+-    const bool handled = QWindowsContext::instance()->windowsProc(hwnd, message, et, wParam, lParam, &result);
++    QWindowsWindow *platformWindow = nullptr;
++    const RECT ncCalcSizeFrame = rectFromNcCalcSize(message, wParam, lParam, 0);
++    const bool handled = QWindowsContext::instance()->windowsProc(hwnd, message, et, wParam, lParam, &result, &platformWindow);
+     if (QWindowsContext::verbose > 1 && lcQpaEvents().isDebugEnabled()) {
+         if (const char *eventName = QWindowsGuiEventDispatcher::windowsMessageName(message)) {
+             qCDebug(lcQpaEvents) << "EVENT: hwd=" << hwnd << eventName << hex << "msg=0x"  << message
+@@ -1341,6 +1379,24 @@ extern "C" LRESULT QT_WIN_CALLBACK qWindowsWndProc(HWND hwnd, UINT message, WPAR
+     }
+     if (!handled)
+         result = DefWindowProc(hwnd, message, wParam, lParam);
++
++    // Capture WM_NCCALCSIZE on top level windows and obtain the window margins by
++    // subtracting the rectangles before and after processing. This will correctly
++    // capture client code overriding the message and allow for per-monitor margins
++    // for High DPI (QTBUG-53255, QTBUG-40578).
++    if (message == WM_NCCALCSIZE && !isEmptyRect(ncCalcSizeFrame) && isTopLevel(hwnd) && !isMinimized(hwnd)) {
++        const QMargins margins =
++            marginsFromRects(ncCalcSizeFrame, rectFromNcCalcSize(message, wParam, lParam, 0));
++        if (margins.left() >= 0) {
++            if (platformWindow) {
++                platformWindow->setFrameMargins(margins);
++            } else {
++                const QSharedPointer<QWindowCreationContext> ctx = QWindowsContext::instance()->windowCreationContext();
++                if (!ctx.isNull())
++                    ctx->margins = margins;
++            }
++        }
++    }
+     return result;
+ }
+ 
+diff --git a/src/plugins/platforms/windows/qwindowscontext.h b/src/plugins/platforms/windows/qwindowscontext.h
+index 14baec9..dcac77c 100644
+--- a/src/plugins/platforms/windows/qwindowscontext.h
++++ b/src/plugins/platforms/windows/qwindowscontext.h
+@@ -210,12 +210,14 @@ public:
+ 
+     inline bool windowsProc(HWND hwnd, UINT message,
+                             QtWindows::WindowsEventType et,
+-                            WPARAM wParam, LPARAM lParam, LRESULT *result);
++                            WPARAM wParam, LPARAM lParam, LRESULT *result,
++                            QWindowsWindow **platformWindowPtr);
+ 
+     QWindow *keyGrabber() const;
+     void setKeyGrabber(QWindow *hwnd);
+ 
+     void setWindowCreationContext(const QSharedPointer<QWindowCreationContext> &ctx);
++    QSharedPointer<QWindowCreationContext> windowCreationContext() const;
+ 
+     void setTabletAbsoluteRange(int a);
+     void setProcessDpiAwareness(QtWindows::ProcessDpiAwareness dpiAwareness);
+diff --git a/src/plugins/platforms/windows/qwindowswindow.cpp b/src/plugins/platforms/windows/qwindowswindow.cpp
+index b38d7c2..11ba9c1 100644
+--- a/src/plugins/platforms/windows/qwindowswindow.cpp
++++ b/src/plugins/platforms/windows/qwindowswindow.cpp
+@@ -1630,7 +1630,6 @@ QWindowsWindowData QWindowsWindow::setWindowFlags_sys(Qt::WindowFlags wt,
+     QWindowsWindowData result = m_data;
+     result.flags = creationData.flags;
+     result.embedded = creationData.embedded;
+-    setFlag(FrameDirty);
+     return result;
+ }
+ 
+@@ -1638,7 +1637,6 @@ void QWindowsWindow::handleWindowStateChange(Qt::WindowState state)
+ {
+     qCDebug(lcQpaWindows) << __FUNCTION__ << this << window()
+                  << "\n    from " << m_windowState << " to " << state;
+-    setFlag(FrameDirty);
+     m_windowState = state;
+     QWindowSystemInterface::handleWindowStateChanged(window(), state);
+     switch (state) {
+@@ -1715,8 +1713,6 @@ void QWindowsWindow::setWindowState_sys(Qt::WindowState newState)
+ 
+     const bool visible = isVisible();
+ 
+-    setFlag(FrameDirty);
+-
+     if ((oldState == Qt::WindowFullScreen) != (newState == Qt::WindowFullScreen)) {
+ #ifdef Q_OS_WINCE
+         HWND handle = FindWindow(L"HHTaskBar", L"");
+@@ -1826,7 +1822,6 @@ void QWindowsWindow::setStyle(unsigned s) const
+ {
+     qCDebug(lcQpaWindows) << __FUNCTION__ << this << window() << debugWinStyle(s);
+     setFlag(WithinSetStyle);
+-    setFlag(FrameDirty);
+     SetWindowLongPtr(m_data.hwnd, GWL_STYLE, s);
+     clearFlag(WithinSetStyle);
+ }
+@@ -1835,7 +1830,6 @@ void QWindowsWindow::setExStyle(unsigned s) const
+ {
+     qCDebug(lcQpaWindows).nospace() << __FUNCTION__ << ' ' << this << ' ' << window()
+         << " 0x" << QByteArray::number(s, 16);
+-    setFlag(FrameDirty);
+     SetWindowLongPtr(m_data.hwnd, GWL_EXSTYLE, s);
+ }
+ 
+@@ -1909,22 +1903,17 @@ bool QWindowsWindow::handleGeometryChanging(MSG *message) const
+     return QWindowsWindow::handleGeometryChangingMessage(message, window(), margins);
+ }
+ 
+-QMargins QWindowsWindow::frameMargins() const
++void QWindowsWindow::setFrameMargins(const QMargins &newMargins)
+ {
+-    // Frames are invalidated by style changes (window state, flags).
+-    // As they are also required for geometry calculations in resize
+-    // event sequences, introduce a dirty flag mechanism to be able
+-    // to cache results.
+-    if (testFlag(FrameDirty)) {
+-        // Always skip calculating style-dependent margins for windows claimed to be frameless.
+-        // This allows users to remove the margins by handling WM_NCCALCSIZE with WS_THICKFRAME set
+-        // to ensure Areo snap still works (QTBUG-40578).
+-        m_data.frame = m_data.flags & Qt::FramelessWindowHint
+-            ? QMargins(0, 0, 0, 0)
+-            : QWindowsGeometryHint::frame(style(), exStyle());
+-        clearFlag(FrameDirty);
++    if (m_data.frame != newMargins) {
++        qCDebug(lcQpaWindows) << __FUNCTION__ << window() <<  m_data.frame  << "->" << newMargins;
++        m_data.frame = newMargins;
+     }
+-    return m_data.frame + m_data.customMargins;
++}
++
++QMargins QWindowsWindow::frameMargins() const
++{
++    return m_data.frame;
+ }
+ 
+ void QWindowsWindow::setOpacity(qreal level)
+@@ -2322,7 +2311,6 @@ void QWindowsWindow::setCustomMargins(const QMargins &newCustomMargins)
+         const QPoint topLeft = currentFrameGeometry.topLeft();
+         QRect newFrame = currentFrameGeometry.marginsRemoved(oldCustomMargins) + m_data.customMargins;
+         newFrame.moveTo(topLeft);
+-        setFlag(FrameDirty);
+         qCDebug(lcQpaWindows) << __FUNCTION__ << oldCustomMargins << "->" << newCustomMargins
+             << currentFrameGeometry << "->" << newFrame;
+         SetWindowPos(m_data.hwnd, 0, newFrame.x(), newFrame.y(), newFrame.width(), newFrame.height(), SWP_NOZORDER | SWP_FRAMECHANGED);
+diff --git a/src/plugins/platforms/windows/qwindowswindow.h b/src/plugins/platforms/windows/qwindowswindow.h
+index 6fffa1e..0e150a8 100644
+--- a/src/plugins/platforms/windows/qwindowswindow.h
++++ b/src/plugins/platforms/windows/qwindowswindow.h
+@@ -119,7 +119,6 @@ public:
+     {
+         AutoMouseCapture = 0x1, //! Automatic mouse capture on button press.
+         WithinSetParent = 0x2,
+-        FrameDirty = 0x4,            //! Frame outdated by setStyle, recalculate in next query.
+         OpenGLSurface = 0x10,
+         OpenGL_ES2 = 0x20,
+         OpenGLDoubleBuffered = 0x40,
+@@ -177,6 +176,7 @@ public:
+     static bool handleGeometryChangingMessage(MSG *message, const QWindow *qWindow, const QMargins &marginsDp);
+     bool handleGeometryChanging(MSG *message) const;
+     QMargins frameMargins() const Q_DECL_OVERRIDE;
++    void setFrameMargins(const QMargins &newMargins);
+ 
+     void setOpacity(qreal level) Q_DECL_OVERRIDE;
+     void setMask(const QRegion &region) Q_DECL_OVERRIDE;
+-- 
+2.9.0.windows.1
+

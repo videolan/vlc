@@ -1,0 +1,135 @@
+From 8f39b5247c4f7766553131688f5d5b7193327336 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Mon, 7 Nov 2016 14:22:37 +0100
+Subject: [PATCH 2/2] Windows QPA: Use new EnableNonClientDpiScaling() for
+ Windows decoration
+
+Use newly introduced EnableNonClientDpiScaling() function to fix
+the decoration having the wrong size in multimonitor setups with
+per-monitor DPI awareness.
+
+Task-number: QTBUG-53255
+Change-Id: Ic6e2f2a92f790259107d2a0837b96177cf3adb5f
+Reviewed-by: Tim Jenssen <tim.jenssen@qt.io>
+---
+ src/plugins/platforms/windows/qtwindowsglobal.h   |  3 ++
+ src/plugins/platforms/windows/qwindowscontext.cpp | 35 ++++++++++++++++++++++-
+ src/plugins/platforms/windows/qwindowscontext.h   |  7 +++++
+ 3 files changed, 44 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/platforms/windows/qtwindowsglobal.h b/src/plugins/platforms/windows/qtwindowsglobal.h
+index 63c083d..e7e010d 100644
+--- a/src/plugins/platforms/windows/qtwindowsglobal.h
++++ b/src/plugins/platforms/windows/qtwindowsglobal.h
+@@ -87,6 +87,7 @@ enum WindowsEventType // Simplify event types
+     TouchEvent = TouchEventFlag + 1,
+     NonClientMouseEvent = NonClientEventFlag + MouseEventFlag + 1,
+     NonClientHitTest = NonClientEventFlag + 2,
++    NonClientCreate = NonClientEventFlag + 3,
+     KeyEvent = KeyEventFlag + 1,
+     KeyDownEvent = KeyEventFlag + KeyDownEventFlag + 1,
+     KeyboardLayoutChangeEvent = KeyEventFlag + 2,
+@@ -164,6 +165,8 @@ inline QtWindows::WindowsEventType windowsEventType(UINT message, WPARAM wParamI
+         return QtWindows::HideEvent;
+     case WM_SIZE:
+         return QtWindows::ResizeEvent;
++    case WM_NCCREATE:
++        return QtWindows::NonClientCreate;
+     case WM_NCCALCSIZE:
+         return QtWindows::CalculateSize;
+ #ifndef Q_OS_WINCE
+diff --git a/src/plugins/platforms/windows/qwindowscontext.cpp b/src/plugins/platforms/windows/qwindowscontext.cpp
+index 9058993..ab0b3da 100644
+--- a/src/plugins/platforms/windows/qwindowscontext.cpp
++++ b/src/plugins/platforms/windows/qwindowscontext.cpp
+@@ -140,6 +140,28 @@ static inline QWindowsSessionManager *platformSessionManager() {
+ }
+ #endif
+ 
++static inline int windowDpiAwareness(HWND hwnd)
++{
++    return QWindowsContext::user32dll.getWindowDpiAwarenessContext && QWindowsContext::user32dll.getWindowDpiAwarenessContext
++        ? QWindowsContext::user32dll.getAwarenessFromDpiAwarenessContext(QWindowsContext::user32dll.getWindowDpiAwarenessContext(hwnd))
++        : -1;
++}
++
++// Note: This only works within WM_NCCREATE
++static bool enableNonClientDpiScaling(HWND hwnd)
++{
++    bool result = false;
++    if (QWindowsContext::user32dll.enableNonClientDpiScaling && windowDpiAwareness(hwnd) == 2) {
++        result = QWindowsContext::user32dll.enableNonClientDpiScaling(hwnd) != FALSE;
++        if (!result) {
++            const DWORD errorCode = GetLastError();
++            qErrnoWarning(int(errorCode), "EnableNonClientDpiScaling() failed for HWND %p (%lu)",
++                          hwnd, errorCode);
++        }
++    }
++    return result;
++}
++
+ /*!
+     \class QWindowsUser32DLL
+     \brief Struct that contains dynamically resolved symbols of User32.dll.
+@@ -165,7 +187,8 @@ QWindowsUser32DLL::QWindowsUser32DLL() :
+     registerTouchWindow(0), unregisterTouchWindow(0),
+     getTouchInputInfo(0), closeTouchInputHandle(0), setProcessDPIAware(0),
+     addClipboardFormatListener(0), removeClipboardFormatListener(0),
+-    getDisplayAutoRotationPreferences(0), setDisplayAutoRotationPreferences(0)
++    getDisplayAutoRotationPreferences(0), setDisplayAutoRotationPreferences(0),
++    enableNonClientDpiScaling(0), getWindowDpiAwarenessContext(0), getAwarenessFromDpiAwarenessContext(0)
+ {
+ }
+ 
+@@ -188,6 +211,12 @@ void QWindowsUser32DLL::init()
+     }
+     getDisplayAutoRotationPreferences = (GetDisplayAutoRotationPreferences)library.resolve("GetDisplayAutoRotationPreferences");
+     setDisplayAutoRotationPreferences = (SetDisplayAutoRotationPreferences)library.resolve("SetDisplayAutoRotationPreferences");
++
++    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS10) { // Appears in 10.0.14393, October 2016
++        enableNonClientDpiScaling = (EnableNonClientDpiScaling)library.resolve("EnableNonClientDpiScaling");
++        getWindowDpiAwarenessContext = (GetWindowDpiAwarenessContext)library.resolve("GetWindowDpiAwarenessContext");
++        getAwarenessFromDpiAwarenessContext = (GetAwarenessFromDpiAwarenessContext)library.resolve("GetAwarenessFromDpiAwarenessContext");
++    }
+ }
+ 
+ bool QWindowsUser32DLL::initTouch()
+@@ -1040,6 +1069,10 @@ bool QWindowsContext::windowsProc(HWND hwnd, UINT message,
+         case QtWindows::MoveEvent:
+             d->m_creationContext->obtainedGeometry.moveTo(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+             return true;
++        case QtWindows::NonClientCreate:
++            if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS10 && d->m_creationContext->window->isTopLevel())
++                enableNonClientDpiScaling(msg.hwnd);
++            return false;
+         case QtWindows::CalculateSize:
+             return QWindowsGeometryHint::handleCalculateSize(d->m_creationContext->customMargins, msg, result);
+         case QtWindows::GeometryChangingEvent:
+diff --git a/src/plugins/platforms/windows/qwindowscontext.h b/src/plugins/platforms/windows/qwindowscontext.h
+index dcac77c..156ede5 100644
+--- a/src/plugins/platforms/windows/qwindowscontext.h
++++ b/src/plugins/platforms/windows/qwindowscontext.h
+@@ -96,6 +96,9 @@ struct QWindowsUser32DLL
+     typedef BOOL (WINAPI *RemoveClipboardFormatListener)(HWND);
+     typedef BOOL (WINAPI *GetDisplayAutoRotationPreferences)(DWORD *);
+     typedef BOOL (WINAPI *SetDisplayAutoRotationPreferences)(DWORD);
++    typedef BOOL (WINAPI *EnableNonClientDpiScaling)(HWND);
++    typedef int  (WINAPI *GetWindowDpiAwarenessContext)(HWND);
++    typedef int  (WINAPI *GetAwarenessFromDpiAwarenessContext)(int);
+ 
+     // Functions missing in Q_CC_GNU stub libraries.
+     SetLayeredWindowAttributes setLayeredWindowAttributes;
+@@ -122,6 +125,10 @@ struct QWindowsUser32DLL
+     // Rotation API
+     GetDisplayAutoRotationPreferences getDisplayAutoRotationPreferences;
+     SetDisplayAutoRotationPreferences setDisplayAutoRotationPreferences;
++
++    EnableNonClientDpiScaling enableNonClientDpiScaling;
++    GetWindowDpiAwarenessContext getWindowDpiAwarenessContext;
++    GetAwarenessFromDpiAwarenessContext getAwarenessFromDpiAwarenessContext;
+ };
+ 
+ struct QWindowsShell32DLL
+-- 
+2.9.0.windows.1
+

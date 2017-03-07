@@ -22,6 +22,8 @@ $(TARBALLS)/qt-$(QT_VERSION).tar.xz:
 qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(UNPACK)
 	mv qtbase-opensource-src-$(QT_VERSION) qt-$(QT_VERSION)
+	$(APPLY) $(SRC)/qt/0001-Windows-QPA-Reimplement-calculation-of-window-frames_56.patch  
+	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Use-new-EnableNonClientDpiScaling-for-Wi_56.patch
 	$(MOVE)
 
 ifdef HAVE_MACOSX
