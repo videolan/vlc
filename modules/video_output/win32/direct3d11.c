@@ -2179,8 +2179,41 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
     }
 
-#define FULL_TO_STUDIO_SHIFT (16.f / 256.f)
-    FLOAT WHITE_POINT_D65_TO_FULL[4] = { -FULL_TO_STUDIO_SHIFT, -0.5f, -0.5f, 1.f };
+    FLOAT itu_black_level = 0.f;
+    FLOAT itu_achromacy = 0.f;
+    FLOAT itu_range_factor = 1.0f;
+    if (!RGB_shader)
+    {
+        switch (cfg->bitsPerChannel)
+        {
+        case 8:
+            /* Rec. ITU-R BT.709-6 §4.6 */
+            itu_black_level  =              16.f / 255.f;
+            itu_achromacy    =             128.f / 255.f;
+            itu_range_factor = (float)(235 - 16) / 255.f;
+            break;
+        case 10:
+            /* Rec. ITU-R BT.709-6 §4.6 */
+            itu_black_level  =              64.f / 1023.f;
+            itu_achromacy    =             512.f / 1023.f;
+            itu_range_factor = (float)(940 - 64) / 1023.f;
+            break;
+        case 12:
+            /* Rec. ITU-R BT.2020-2 Table 5 */
+            itu_black_level  =               256.f / 4095.f;
+            itu_achromacy    =              2048.f / 4095.f;
+            itu_range_factor = (float)(3760 - 256) / 4095.f;
+            break;
+        default:
+            /* unknown bitdepth, use approximation for infinite bit depth */
+            itu_black_level  =              16.f / 256.f;
+            itu_achromacy    =             128.f / 256.f;
+            itu_range_factor = (float)(235 - 16) / 256.f;
+            break;
+        }
+    }
+
+    FLOAT WHITE_POINT_D65_TO_FULL[4] = { -itu_black_level, -itu_achromacy, -itu_achromacy, 1.f };
     if (RGB_shader)
         WHITE_POINT_D65_TO_FULL[0] = WHITE_POINT_D65_TO_FULL[1] = WHITE_POINT_D65_TO_FULL[2] = 0.f;
 
@@ -2243,19 +2276,18 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
 #if VLC_WINSTORE_APP
     if (isXboxHardware(sys->d3ddevice)) {
-        static const FLOAT FULL_TO_STUDIO_RATIO = (256.f - 16.f - 20.f) / 256.f;
         /* limit to 16-235 range as it's expanded again by the hardware */
-        WHITE_POINT_D65_TO_FULL[0] += FULL_TO_STUDIO_SHIFT;
+        WHITE_POINT_D65_TO_FULL[0] += itu_black_level;
         if (RGB_shader) {
-            WHITE_POINT_D65_TO_FULL[1] += FULL_TO_STUDIO_SHIFT;
-            WHITE_POINT_D65_TO_FULL[2] += FULL_TO_STUDIO_SHIFT;
-            colorspace.Colorspace[0 * 5] *= FULL_TO_STUDIO_RATIO;
-            colorspace.Colorspace[1 * 5] *= FULL_TO_STUDIO_RATIO;
-            colorspace.Colorspace[2 * 5] *= FULL_TO_STUDIO_RATIO;
+            WHITE_POINT_D65_TO_FULL[1] += itu_black_level;
+            WHITE_POINT_D65_TO_FULL[2] += itu_black_level;
+            colorspace.Colorspace[0 * 5] *= itu_range_factor;
+            colorspace.Colorspace[1 * 5] *= itu_range_factor;
+            colorspace.Colorspace[2 * 5] *= itu_range_factor;
         } else {
-            colorspace.Colorspace[0 * 4] *= FULL_TO_STUDIO_RATIO;
-            colorspace.Colorspace[1 * 4] *= FULL_TO_STUDIO_RATIO;
-            colorspace.Colorspace[2 * 4] *= FULL_TO_STUDIO_RATIO;
+            colorspace.Colorspace[0 * 4] *= itu_range_factor;
+            colorspace.Colorspace[1 * 4] *= itu_range_factor;
+            colorspace.Colorspace[2 * 4] *= itu_range_factor;
         }
     }
 #endif
