@@ -111,6 +111,7 @@ struct vout_display_sys_t
     vout_display_sys_win32_t sys;
 
     video_transfer_func_t    display_transfer; /* TODO may go in vout_display_info_t */
+    bool                     display_is_limited_range;
 
 #if !VLC_WINSTORE_APP
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
@@ -1440,6 +1441,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     /* TODO adjust the swapchain transfer function based on the source */
     sys->display_transfer = TRANSFER_FUNC_SRGB;
 
+#if VLC_WINSTORE_APP
+    if (isXboxHardware(sys->d3ddevice)) {
+        sys->display_is_limited_range = 1;
+    }
+#endif
+
     // look for the requested pixel format first
     sys->picQuadConfig = GetOutputFormat(vd, fmt->i_chroma, 0, true, false);
 
@@ -2274,23 +2281,23 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
     memcpy(colorspace.WhitePoint, WHITE_POINT_D65_TO_FULL, sizeof(colorspace.WhitePoint));
 
-#if VLC_WINSTORE_APP
-    if (isXboxHardware(sys->d3ddevice)) {
+    if (sys->display_is_limited_range) {
         /* limit to 16-235 range as it's expanded again by the hardware */
         WHITE_POINT_D65_TO_FULL[0] += itu_black_level;
         if (RGB_shader) {
             WHITE_POINT_D65_TO_FULL[1] += itu_black_level;
             WHITE_POINT_D65_TO_FULL[2] += itu_black_level;
+            /* expand each color's range */
             colorspace.Colorspace[0 * 5] *= itu_range_factor;
             colorspace.Colorspace[1 * 5] *= itu_range_factor;
             colorspace.Colorspace[2 * 5] *= itu_range_factor;
         } else {
+            /* expand the luminance range */
             colorspace.Colorspace[0 * 4] *= itu_range_factor;
             colorspace.Colorspace[1 * 4] *= itu_range_factor;
             colorspace.Colorspace[2 * 4] *= itu_range_factor;
         }
     }
-#endif
 
     constantInit.pSysMem = &colorspace;
 
