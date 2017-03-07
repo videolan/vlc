@@ -172,8 +172,7 @@ typedef struct {
 } PS_CONSTANT_BUFFER;
 
 typedef struct {
-    FLOAT WhitePoint[3];
-    FLOAT whitePadding;
+    FLOAT WhitePoint[4*4];
     FLOAT Colorspace[4*4];
 } PS_COLOR_TRANSFORM;
 
@@ -286,10 +285,7 @@ static const char* globPixelShaderDefault = "\
   };\
   cbuffer PS_COLOR_TRANSFORM : register(b1)\
   {\
-    float WhitePointX;\
-    float WhitePointY;\
-    float WhitePointZ;\
-    float whitePadding;\
+    float4x4 WhitePoint;\
     float4x4 Colorspace;\
   };\
   Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\
@@ -344,12 +340,7 @@ static const char* globPixelShaderDefault = "\
     float4 sample;\
     \
     %s /* sampling routine in sample */\
-    float4 rgba;\
-    rgba.x = sample.x + WhitePointX;\
-    rgba.y = sample.y + WhitePointY;\
-    rgba.z = sample.z + WhitePointZ;\
-    rgba.a = sample.a * Opacity;\
-    rgba = mul(rgba, Colorspace);\
+    float4 rgba = mul(mul(sample, WhitePoint), Colorspace);\
     float opacity = rgba.a * Opacity;\
     float3 rgb = (float3)rgba;\
     rgb = sourceToLinear(rgb);\
@@ -2220,10 +2211,6 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         }
     }
 
-    FLOAT WHITE_POINT_D65_TO_FULL[4] = { -itu_black_level, -itu_achromacy, -itu_achromacy, 1.f };
-    if (RGB_shader)
-        WHITE_POINT_D65_TO_FULL[0] = WHITE_POINT_D65_TO_FULL[1] = WHITE_POINT_D65_TO_FULL[2] = 0.f;
-
     static const FLOAT COLORSPACE_RGB_FULL[4 * 4] = {
         1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
@@ -2279,14 +2266,25 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     }
 
     memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
-    memcpy(colorspace.WhitePoint, WHITE_POINT_D65_TO_FULL, sizeof(colorspace.WhitePoint));
+    memcpy(colorspace.WhitePoint, COLORSPACE_RGB_FULL, sizeof(colorspace.WhitePoint));
+
+    if (!RGB_shader)
+    {
+        colorspace.WhitePoint[0*4 + 3] = -itu_black_level;
+        colorspace.WhitePoint[1*4 + 3] = -itu_achromacy;
+        colorspace.WhitePoint[2*4 + 3] = -itu_achromacy;
+    }
 
     if (sys->display_is_limited_range) {
-        /* limit to 16-235 range as it's expanded again by the hardware */
-        WHITE_POINT_D65_TO_FULL[0] += itu_black_level;
+        /* get to the limited/studio range */
+        colorspace.WhitePoint[0*4 + 3] += itu_black_level;
+        if (RGB_shader)
+        {
+            colorspace.WhitePoint[1*4 + 3] += itu_black_level;
+            colorspace.WhitePoint[2*4 + 3] += itu_black_level;
+        }
+
         if (RGB_shader) {
-            WHITE_POINT_D65_TO_FULL[1] += itu_black_level;
-            WHITE_POINT_D65_TO_FULL[2] += itu_black_level;
             /* expand each color's range */
             colorspace.Colorspace[0 * 5] *= itu_range_factor;
             colorspace.Colorspace[1 * 5] *= itu_range_factor;
