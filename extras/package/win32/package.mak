@@ -94,7 +94,8 @@ package-win-strip: package-win-common package-win-npapi
 	if test -n "$(SIGNATURE)"; then \
 	  cd $(win32_destdir); find . -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
 	  do if test -n "$$i" ; then \
-	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -in "$$i" -out "$$i.sign"; \
+	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -h sha1 -in "$$i" -out "$$i.sign"; \
+	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -nest -h sha2 -in "$$i" -out "$$i.sign"; \
 	    mv "$$i.sign" "$$i" ; \
 	  fi ; \
 	  done \
