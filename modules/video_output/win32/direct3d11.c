@@ -1644,8 +1644,25 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                             rgb = hable(32.0 * rgb) / HABLE_DIV;\
                             return rgb";
                     }
-                    break;
                 }
+                else
+                    msg_Warn(vd, "don't know how to transfer from %d to sRGB", src_transfer);
+                break;
+
+            case TRANSFER_FUNC_SMPTE_ST2084:
+                if (src_transfer == TRANSFER_FUNC_LINEAR)
+                {
+                    /* Linear to ST2084 */
+                    psz_src_transform =
+                           ST2084_PQ_CONSTANTS
+                           "rgb = pow(rgb, m1);\
+                            rgb = (ST2084_c1 + ST2084_c2 * rgb) / (1 + ST2084_c3 * rgb);\
+                            rgb = pow(rgb, ST2084_m3);\
+                            return rgb";
+                }
+                else
+                    msg_Warn(vd, "don't know how to transfer from %d to SMPTE ST 2084", src_transfer);
+                break;
             default:
                 msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, sys->display_transfer);
                 break;
