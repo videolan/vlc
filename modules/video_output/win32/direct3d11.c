@@ -313,6 +313,19 @@ static const char* globPixelShaderDefault = "\
       return x;\
   }\
   \
+  /* https://en.wikipedia.org/wiki/Hybrid_Log-Gamma#Technical_details */\
+  inline float inverse_HLG(float x){\
+      const float B67_a = 0.17883277;\
+      const float B67_b = 0.28466892;\
+      const float B67_c = 0.55991073;\
+      const float B67_inv_r2 = 4.0; /* 1/0.5² */\
+      if (x <= 0.5)\
+          x = x * x * B67_inv_r2;\
+      else\
+          x = exp((x - B67_c) / B67_a) + B67_b;\
+      return x;\
+  }\
+  \
   inline float3 sourceToLinear(float3 rgb) {\
       %s;\
   }\
@@ -1619,6 +1632,15 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                     rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\
                     rgb = pow(rgb, 1.0/ST2084_m1);\
                     return rgb";
+            src_transfer = TRANSFER_FUNC_LINEAR;
+            break;
+        case TRANSFER_FUNC_HLG:
+            /* HLG to Linear */
+            psz_src_transform =
+                   "rgb.r = inverse_HLG(rgb.r);\
+                    rgb.g = inverse_HLG(rgb.g);\
+                    rgb.b = inverse_HLG(rgb.b);\
+                    return rgb / 6.0";
             src_transfer = TRANSFER_FUNC_LINEAR;
             break;
         default:
