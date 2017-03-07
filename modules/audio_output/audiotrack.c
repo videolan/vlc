@@ -68,6 +68,13 @@ static const struct {
 } at_devs[] = {
     { "stereo", "Up to 2 channels (compat mode).", AT_DEV_STEREO },
     { "pcm", "Up to 8 channels.", AT_DEV_PCM },
+
+    /* With "encoded", the module will try to play every audio codecs via
+     * passthrough.
+     *
+     * With "encoded:ENCODING_FLAGS_MASK", the module will try to play only
+     * codecs specified by ENCODING_FLAGS_MASK. This extra value is a long long
+     * that contains binary-shifted AudioFormat.ENCODING_* values. */
     { "encoded", "Up to 8 channels, passthrough if available.", AT_DEV_ENCODED },
     {  NULL, NULL, AT_DEV_DEFAULT },
 };
@@ -116,6 +123,7 @@ struct aout_sys_t {
     } smoothpos;
 
     uint32_t i_max_audiotrack_samples;
+    long long i_encoding_flags;
     bool b_passthrough;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
     uint8_t p_chan_table[AOUT_CHAN_MAX];
@@ -218,11 +226,13 @@ static struct
         jint ENCODING_PCM_FLOAT;
         bool has_ENCODING_PCM_FLOAT;
         jint ENCODING_AC3;
-        jint ENCODING_E_AC3;
         bool has_ENCODING_AC3;
+        jint ENCODING_E_AC3;
+        bool has_ENCODING_E_AC3;
         jint ENCODING_DTS;
-        jint ENCODING_DTS_HD;
         bool has_ENCODING_DTS;
+        jint ENCODING_DTS_HD;
+        bool has_ENCODING_DTS_HD;
         jint ENCODING_IEC61937;
         bool has_ENCODING_IEC61937;
         jint CHANNEL_OUT_MONO;
@@ -394,24 +404,16 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     }
     else
         jfields.AudioFormat.has_ENCODING_IEC61937 = false;
-    if( !jfields.AudioFormat.has_ENCODING_IEC61937 )
-    {
-        GET_CONST_INT( AudioFormat.ENCODING_AC3, "ENCODING_AC3", false );
-        if( field != NULL )
-        {
-            GET_CONST_INT( AudioFormat.ENCODING_E_AC3, "ENCODING_E_AC3", false );
-            jfields.AudioFormat.has_ENCODING_AC3 = field != NULL;
-        } else
-            jfields.AudioFormat.has_ENCODING_AC3 = false;
-        GET_CONST_INT( AudioFormat.ENCODING_DTS, "ENCODING_DTS", false );
-        if ( field != NULL )
-        {
-            GET_CONST_INT( AudioFormat.ENCODING_DTS_HD, "ENCODING_DTS_HD", false );
-            jfields.AudioFormat.has_ENCODING_DTS = field != NULL;
-        }
-        else
-            jfields.AudioFormat.has_ENCODING_DTS = false;
-    }
+
+    GET_CONST_INT( AudioFormat.ENCODING_AC3, "ENCODING_AC3", false );
+    jfields.AudioFormat.has_ENCODING_AC3 = field != NULL;
+    GET_CONST_INT( AudioFormat.ENCODING_E_AC3, "ENCODING_E_AC3", false );
+    jfields.AudioFormat.has_ENCODING_E_AC3 = field != NULL;
+
+    GET_CONST_INT( AudioFormat.ENCODING_DTS, "ENCODING_DTS", false );
+    jfields.AudioFormat.has_ENCODING_DTS = field != NULL;
+    GET_CONST_INT( AudioFormat.ENCODING_DTS_HD, "ENCODING_DTS_HD", false );
+    jfields.AudioFormat.has_ENCODING_DTS_HD = field != NULL;
 
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
@@ -907,6 +909,34 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
     return 0;
 }
 
+static bool
+AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format,
+                        bool *p_dtshd )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+#define MATCH_ENCODING_FLAG(x) jfields.AudioFormat.has_##x && \
+    ( p_sys->i_encoding_flags == 0 || p_sys->i_encoding_flags & (1 << jfields.AudioFormat.x) )
+
+    *p_dtshd = false;
+    switch( i_format )
+    {
+        case VLC_CODEC_DTS:
+            if( MATCH_ENCODING_FLAG( ENCODING_DTS_HD ) )
+            {
+                *p_dtshd = true;
+                return true;
+            }
+            return MATCH_ENCODING_FLAG( ENCODING_DTS );
+        case VLC_CODEC_A52:
+            return MATCH_ENCODING_FLAG( ENCODING_AC3 );
+        case VLC_CODEC_EAC3:
+            return MATCH_ENCODING_FLAG( ENCODING_E_AC3 );
+        default:
+            return false;
+    }
+}
+
 static int
 StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
 {
@@ -915,6 +945,9 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
 
     if( jfields.AudioFormat.has_ENCODING_IEC61937 )
     {
+        bool b_dtshd;
+        if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format, &b_dtshd ) )
+            return VLC_EGENERIC;
         i_at_format = jfields.AudioFormat.ENCODING_IEC61937;
         switch( p_sys->fmt.i_format )
         {
@@ -1831,7 +1864,7 @@ static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
     {
         for( unsigned int i = 0; at_devs[i].id; ++i )
         {
-            if( !strcmp( p_id, at_devs[i].id ) )
+            if( strncmp( p_id, at_devs[i].id, strlen( at_devs[i].id ) ) == 0 )
             {
                 at_dev = at_devs[i].at_dev;
                 break;
@@ -1839,11 +1872,35 @@ static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
         }
     }
 
-    if( at_dev != p_sys->at_dev )
+    long long i_encoding_flags = 0;
+    if( at_dev == AT_DEV_ENCODED )
+    {
+        const size_t i_prefix_size = strlen( "encoded:" );
+        if( strncmp( p_id, "encoded:", i_prefix_size ) == 0 )
+            i_encoding_flags = atoll( p_id + i_prefix_size );
+    }
+
+    if( at_dev != p_sys->at_dev || i_encoding_flags != p_sys->i_encoding_flags )
     {
         p_sys->at_dev = at_dev;
+        p_sys->i_encoding_flags = i_encoding_flags;
         aout_RestartRequest( p_aout, AOUT_RESTART_OUTPUT );
-        msg_Dbg(p_aout, "selected audiotrack device: %s", p_id);
+        msg_Dbg( p_aout, "selected device: %s", p_id );
+
+        if( at_dev == AT_DEV_ENCODED )
+        {
+            static const vlc_fourcc_t enc_fourccs[] = {
+                VLC_CODEC_DTS, VLC_CODEC_A52, VLC_CODEC_EAC3
+            };
+            for( size_t i = 0;
+                 i < sizeof( enc_fourccs ) / sizeof( enc_fourccs[0] ); ++i )
+            {
+                bool b_dtshd;
+                if( AudioTrack_HasEncoding( p_aout, enc_fourccs[i], &b_dtshd ) )
+                    msg_Dbg( p_aout, "device has %4.4s passthrough support",
+                             b_dtshd ? "dtsh" : (const char *)&enc_fourccs[i] );
+            }
+        }
     }
     aout_DeviceReport( p_aout, p_id );
     return VLC_SUCCESS;
