@@ -101,7 +101,7 @@ struct demux_sys_t
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static int      ps_pkt_resynch( stream_t *, uint32_t *pi_code, bool );
+static int      ps_pkt_resynch( stream_t *, uint32_t *pi_code, bool, bool );
 static block_t *ps_pkt_read   ( stream_t *, uint32_t i_code );
 
 /*****************************************************************************
@@ -210,7 +210,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
     uint32_t i_code;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa );
+    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa, p_sys->b_have_pack );
     if( i_ret < 0 )
     {
         return 0;
@@ -246,6 +246,9 @@ static int Demux2( demux_t *p_demux, bool b_end )
                 tk->i_first_pts = p_pkt->i_pts;
             }
         }
+
+        if( i_id == PS_STREAM_ID_PACK_HEADER )
+            p_sys->b_have_pack = true;
     }
     block_Release( p_pkt );
     return 1;
@@ -325,7 +328,7 @@ static int Demux( demux_t *p_demux )
     uint32_t i_code;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa );
+    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa, p_sys->b_have_pack );
     if( i_ret < 0 )
     {
         return VLC_DEMUXER_EOF;
@@ -650,7 +653,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *  It doesn't skip more than 512 bytes
  *  -1 -> error, 0 -> not synch, 1 -> ok
  */
-static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa )
+static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa, bool b_pack )
 {
     const uint8_t *p_peek;
     int     i_peek;
@@ -699,8 +702,10 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa )
                 }
             }
         }
+
         if( p_peek[0] == 0 && p_peek[1] == 0 && p_peek[2] == 1 &&
-            p_peek[3] >= PS_STREAM_ID_END_STREAM )
+            ( b_pack ) ? ( p_peek[3] == PS_STREAM_ID_PACK_HEADER )
+                       : ( p_peek[3] >= PS_STREAM_ID_END_STREAM ) )
         {
             *pi_code = 0x100 | p_peek[3];
             return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 1 : -1;
