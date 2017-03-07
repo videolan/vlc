@@ -42,7 +42,7 @@
  * This has no effects if thread cancellation is disabled.
  * This can be called when there is a rather slow non-sleeping operation.
  * This is also used to force a cancellation point in a function that would
- * otherwise <em>not always</em> be a one (block_FifoGet() is an example).
+ * otherwise <em>not always</em> be one (block_FifoGet() is an example).
  */
 VLC_API void vlc_testcancel(void);
 
