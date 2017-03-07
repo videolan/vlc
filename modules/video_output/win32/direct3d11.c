@@ -2206,12 +2206,12 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         1.164383561643836f,  2.112401785714286f,                 0.f, 0.f,
                        0.f,                 0.f,                 0.f, 1.f,
     };
-    /* RGB-709 to RGB-2020 based on https://www.researchgate.net/publication/258434326_Beyond_BT709 */
+    /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.2020_conversion, in studio range */
     static const FLOAT COLORSPACE_BT2020_TO_FULL[4*4] = {
-        1.163746465f, -0.028815145f,  2.823537589f, 0.f,
-        1.164383561f, -0.258509894f,  0.379693635f, 0.f,
-        1.164383561f,  2.385315708f,  0.021554502f, 0.f,
-                 0.f,           0.f,           0.f, 1.f,
+        1.164383561643836f,  0.000000000000f,  1.678674107143f, 0.f,
+        1.164383561643836f, -0.127007098661f, -0.440987687946f, 0.f,
+        1.164383561643836f,  2.141772321429f,  0.000000000000f, 0.f,
+                       0.f,              0.f,              0.f, 1.f,
     };
 
     PS_COLOR_TRANSFORM colorspace;
