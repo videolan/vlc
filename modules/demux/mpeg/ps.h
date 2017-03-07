@@ -26,6 +26,12 @@
 #include <vlc_memory.h>
 #include "timestamps.h"
 
+#define PS_STREAM_ID_END_STREAM       0xB9
+#define PS_STREAM_ID_PACK_HEADER      0xBA
+#define PS_STREAM_ID_SYSTEM_HEADER    0xBB
+#define PS_STREAM_ID_MAP              0xBC
+#define PS_STREAM_ID_DIRECTORY        0xFF
+
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
 #if 0
@@ -339,11 +345,11 @@ static inline int ps_pkt_size( const uint8_t *p, int i_peek )
     {
         return -1;
     }
-    else if( p[3] == 0xb9 )
+    else if( p[3] == PS_STREAM_ID_END_STREAM )
     {
         return 4;
     }
-    else if( p[3] == 0xba )
+    else if( p[3] == PS_STREAM_ID_PACK_HEADER )
     {
         if( i_peek >= 14 && (p[4] >> 6) == 0x01 )
         {

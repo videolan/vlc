@@ -330,11 +330,11 @@ static int Demux( demux_t *p_demux )
 
     switch( i_code )
     {
-    case 0x1b9:
+    case PS_STREAM_ID_END_STREAM|0x100:
         block_Release( p_pkt );
         break;
 
-    case 0x1ba:
+    case PS_STREAM_ID_PACK_HEADER|0x100:
         if( !ps_pkt_parse_pack( p_pkt, &p_sys->i_scr, &i_mux_rate ) )
         {
             p_sys->i_last_scr = p_sys->i_scr;
@@ -346,7 +346,7 @@ static int Demux( demux_t *p_demux )
         block_Release( p_pkt );
         break;
 
-    case 0x1bb:
+    case PS_STREAM_ID_SYSTEM_HEADER|0x100:
         if( !ps_pkt_parse_system( p_pkt, &p_sys->psm, p_sys->tk ) )
         {
             int i;
@@ -363,7 +363,7 @@ static int Demux( demux_t *p_demux )
         block_Release( p_pkt );
         break;
 
-    case 0x1bc:
+    case PS_STREAM_ID_MAP|0x100:
         if( p_sys->psm.i_version == 0xFFFF )
             msg_Dbg( p_demux, "contains a PSM");
 
@@ -613,7 +613,7 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
         return -1;
     }
     if( p_peek[0] == 0 && p_peek[1] == 0 && p_peek[2] == 1 &&
-        p_peek[3] >= 0xb9 )
+        p_peek[3] >= PS_STREAM_ID_END_STREAM )
     {
         *pi_code = 0x100 | p_peek[3];
         return 1;
@@ -632,7 +632,7 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
             break;
         }
         if( p_peek[0] == 0 && p_peek[1] == 0 && p_peek[2] == 1 &&
-            p_peek[3] >= 0xb9 )
+            p_peek[3] >= PS_STREAM_ID_END_STREAM )
         {
             *pi_code = 0x100 | p_peek[3];
             return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 1 : -1;
@@ -653,7 +653,7 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
         return NULL;
 
     int i_size = ps_pkt_size( p_peek, i_peek );
-    if( i_size <= 6 && p_peek[3] > 0xba )
+    if( i_size <= 6 && p_peek[3] > PS_STREAM_ID_PACK_HEADER )
     {
         /* Special case, search the next start code */
         i_size = 6;
@@ -667,7 +667,7 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
             while( i_size <= i_peek - 4 )
             {
                 if( p_peek[i_size] == 0x00 && p_peek[i_size+1] == 0x00 &&
-                    p_peek[i_size+2] == 0x01 && p_peek[i_size+3] >= 0xb9 )
+                    p_peek[i_size+2] == 0x01 && p_peek[i_size+3] >= PS_STREAM_ID_END_STREAM )
                 {
                     return vlc_stream_Block( s, i_size );
                 }
