@@ -114,7 +114,7 @@ struct aout_sys_t {
     } smoothpos;
 
     uint32_t i_max_audiotrack_samples;
-    bool b_spdif;
+    bool b_passthrough;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
     uint8_t p_chan_table[AOUT_CHAN_MAX];
 
@@ -702,7 +702,7 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
     mtime_t i_audiotrack_us;
     JNIEnv *env;
 
-    if( p_sys->b_spdif )
+    if( p_sys->b_passthrough )
         return -1;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -906,43 +906,95 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
 }
 
 static int
-Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
+StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    JNIEnv *env;
-    int i_nb_channels, i_max_channels, i_ret;
-    bool b_spdif;
     int i_at_format;
 
-    if( p_sys->at_dev == AT_DEV_HDMI )
+    if( jfields.AudioFormat.has_ENCODING_IEC61937 )
     {
-        b_spdif = true;
-        i_max_channels = AT_DEV_MAX_CHANNELS;
+        i_at_format = jfields.AudioFormat.ENCODING_IEC61937;
+        switch( p_sys->fmt.i_format )
+        {
+#if 0
+            case VLC_CODEC_TRUEHD:
+            case VLC_CODEC_MLP:
+                p_sys->fmt.i_rate = 192000;
+                p_sys->fmt.i_bytes_per_frame = 16;
+                break;
+#endif
+            case VLC_CODEC_EAC3:
+                p_sys->fmt.i_rate = 192000;
+            case VLC_CODEC_DTS:
+            case VLC_CODEC_A52:
+                p_sys->fmt.i_bytes_per_frame = 4;
+                break;
+            default:
+                return VLC_EGENERIC;
+        }
+        p_sys->fmt.i_frame_length = 1;
+        p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
+        p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
+        p_sys->fmt.i_channels = aout_FormatNbChannels( &p_sys->fmt );
+        p_sys->fmt.i_format = VLC_CODEC_SPDIFL;
     }
     else
     {
-        b_spdif = var_InheritBool( p_aout, "spdif" );
-        i_max_channels = 2;
+        switch( p_sys->fmt.i_format )
+        {
+            case VLC_CODEC_A52:
+                if( !jfields.AudioFormat.has_ENCODING_AC3 )
+                    return VLC_EGENERIC;
+                i_at_format = jfields.AudioFormat.ENCODING_AC3;
+                break;
+            case VLC_CODEC_EAC3:
+                if( !jfields.AudioFormat.has_ENCODING_AC3 )
+                    return VLC_EGENERIC;
+                i_at_format = jfields.AudioFormat.ENCODING_E_AC3;
+                p_sys->fmt.i_rate = 192000;
+                break;
+            case VLC_CODEC_DTS:
+                if( !jfields.AudioFormat.has_ENCODING_DTS )
+                    return VLC_EGENERIC;
+                i_at_format = jfields.AudioFormat.ENCODING_DTS;
+                break;
+            default:
+                return VLC_EGENERIC;
+        }
+        p_sys->fmt.i_bytes_per_frame = 4;
+        p_sys->fmt.i_frame_length = 1;
+        p_sys->fmt.i_physical_channels =
+        p_sys->fmt.i_original_channels = AOUT_CHANS_STEREO;
+        p_sys->fmt.i_channels = 2;
+        p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
     }
 
-    if( !( env = GET_ENV() ) )
-        return VLC_EGENERIC;
-
-    p_sys->fmt = *p_fmt;
-
-    aout_FormatPrint( p_aout, "VLC is looking for:", &p_sys->fmt );
-
-    p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
-
-    if( !b_spdif )
+    int i_ret = AudioTrack_Create( env, p_aout, p_sys->fmt.i_rate, i_at_format,
+                                   p_sys->fmt.i_physical_channels );
+    if( i_ret != VLC_SUCCESS )
+        msg_Warn( p_aout, "SPDIF configuration failed" );
+    else
     {
-        int i_rate = 0;
-        if (jfields.AudioTrack.getNativeOutputSampleRate)
-            i_rate = JNI_AT_CALL_STATIC_INT( getNativeOutputSampleRate,
-                                             jfields.AudioManager.STREAM_MUSIC );
-        p_sys->fmt.i_rate = i_rate > 0 ? i_rate
-                          : VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
+        p_sys->b_passthrough = true;
+        p_sys->i_chans_to_reorder = 0;
     }
+
+    return i_ret;
+}
+
+static int
+StartPCM( JNIEnv *env, audio_output_t *p_aout, unsigned i_max_channels )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    unsigned i_nb_channels;
+    int i_at_format, i_ret;
+
+    if (jfields.AudioTrack.getNativeOutputSampleRate)
+        p_sys->fmt.i_rate =
+            JNI_AT_CALL_STATIC_INT( getNativeOutputSampleRate,
+                                    jfields.AudioManager.STREAM_MUSIC );
+    else
+        p_sys->fmt.i_rate = VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
 
     do
     {
@@ -964,74 +1016,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                 i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
             }
             break;
-        case VLC_CODEC_A52:
-        case VLC_CODEC_EAC3:
-#if 0
-        case VLC_CODEC_TRUEHD:
-        case VLC_CODEC_MLP:
-#endif
-        case VLC_CODEC_DTS:
-            if( !b_spdif )
-                return VLC_EGENERIC;
-            if( jfields.AudioFormat.has_ENCODING_IEC61937 )
-            {
-                i_at_format = jfields.AudioFormat.ENCODING_IEC61937;
-                switch( p_sys->fmt.i_format )
-                {
-                    /* Not supported yet */
-#if 0
-                    case VLC_CODEC_TRUEHD:
-                    case VLC_CODEC_MLP:
-                        p_sys->fmt.i_rate = 192000;
-                        p_sys->fmt.i_bytes_per_frame = 16;
-                        break;
-#endif
-                    case VLC_CODEC_EAC3:
-                        p_sys->fmt.i_rate = 192000;
-                    default:
-                        p_sys->fmt.i_bytes_per_frame = 4;
-                        break;
-                }
-                p_sys->fmt.i_frame_length = 1;
-                p_sys->fmt.i_physical_channels =
-                p_sys->fmt.i_original_channels = AOUT_CHANS_STEREO;
-                p_sys->fmt.i_channels = 2;
-                p_sys->fmt.i_format = VLC_CODEC_SPDIFL;
-            }
-            else
-            {
-                switch( p_sys->fmt.i_format )
-                {
-                    case VLC_CODEC_A52:
-                        if( jfields.AudioFormat.has_ENCODING_AC3 )
-                            i_at_format = jfields.AudioFormat.ENCODING_AC3;
-                        else
-                            return VLC_EGENERIC;
-                        break;
-                    case VLC_CODEC_EAC3:
-                        if( jfields.AudioFormat.has_ENCODING_AC3 )
-                            i_at_format = jfields.AudioFormat.ENCODING_E_AC3;
-                        else
-                            return VLC_EGENERIC;
-                        p_sys->fmt.i_rate = 192000;
-                        break;
-                    case VLC_CODEC_DTS:
-                        if( jfields.AudioFormat.has_ENCODING_DTS )
-                            i_at_format = jfields.AudioFormat.ENCODING_DTS;
-                        else
-                            return VLC_EGENERIC;
-                        break;
-                    default:
-                        return VLC_EGENERIC;
-                }
-                p_sys->fmt.i_bytes_per_frame = 4;
-                p_sys->fmt.i_frame_length = 1;
-                p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
-            }
-            break;
         default:
-            if( !AOUT_FMT_LINEAR( &p_sys->fmt ) )
-                return VLC_EGENERIC;
             p_sys->fmt.i_format = VLC_CODEC_S16N;
             i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
             break;
@@ -1069,13 +1054,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                                    p_sys->fmt.i_physical_channels );
         if( i_ret != 0 )
         {
-            if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB
-             || p_sys->fmt.i_format == VLC_CODEC_SPDIFL )
-            {
-                msg_Warn( p_aout, "SPDIF configuration failed" );
-                return VLC_EGENERIC;
-            }
-            else if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
+            if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
             {
                 msg_Warn( p_aout, "FL32 configuration failed, "
                                   "fallback to S16N PCM" );
@@ -1092,23 +1071,59 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         }
     } while( i_ret != 0 );
 
+    if( i_ret != VLC_SUCCESS )
+        return i_ret;
+
+    uint32_t p_chans_out[AOUT_CHAN_MAX];
+    memset( p_chans_out, 0, sizeof(p_chans_out) );
+    AudioTrack_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out );
+    p_sys->i_chans_to_reorder =
+        aout_CheckChannelReorder( NULL, p_chans_out,
+                                  p_sys->fmt.i_physical_channels,
+                                  p_sys->p_chan_table );
+    aout_FormatPrepare( &p_sys->fmt );
+    return VLC_SUCCESS;
+}
+
+static int
+Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
+    int i_ret;
+    bool b_try_passthrough;
+    unsigned i_max_channels;
+
+    if( p_sys->at_dev == AT_DEV_HDMI )
+    {
+        b_try_passthrough = true;
+        i_max_channels = AT_DEV_MAX_CHANNELS;
+    }
+    else
+    {
+        b_try_passthrough = var_InheritBool( p_aout, "spdif" );
+        i_max_channels = 2;
+    }
+
+    if( !( env = GET_ENV() ) )
+        return VLC_EGENERIC;
+
+    p_sys->fmt = *p_fmt;
+
+    aout_FormatPrint( p_aout, "VLC is looking for:", &p_sys->fmt );
+
+    p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
+
+    if( AOUT_FMT_LINEAR( &p_sys->fmt ) )
+        i_ret = StartPCM( env, p_aout, i_max_channels );
+    else if( b_try_passthrough )
+        i_ret = StartPassthrough( env, p_aout );
+    else
+        return VLC_EGENERIC;
+
     if( i_ret != 0 )
         return VLC_EGENERIC;
 
-    p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB ||
-                     p_sys->fmt.i_format == VLC_CODEC_SPDIFL;
-    if( !p_sys->b_spdif )
-    {
-        uint32_t p_chans_out[AOUT_CHAN_MAX];
-
-        memset( p_chans_out, 0, sizeof(p_chans_out) );
-        AudioTrack_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out );
-        p_sys->i_chans_to_reorder =
-            aout_CheckChannelReorder( NULL, p_chans_out,
-                                      p_sys->fmt.i_physical_channels,
-                                      p_sys->p_chan_table );
-        aout_FormatPrepare( &p_sys->fmt );
-    }
     p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( p_sys->audiotrack_args.i_size );
 
 #ifdef AUDIOTRACK_HW_LATENCY
@@ -1134,9 +1149,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         msg_Dbg( p_aout, "using WRITE_FLOATARRAY");
         p_sys->i_write_type = WRITE_FLOATARRAY;
     }
-    else if( jfields.AudioFormat.has_ENCODING_IEC61937
-          && i_at_format == jfields.AudioFormat.ENCODING_IEC61937 )
+    else if( p_sys->fmt.i_format == VLC_CODEC_SPDIFL )
     {
+        assert( jfields.AudioFormat.has_ENCODING_IEC61937 );
         msg_Dbg( p_aout, "using WRITE_SHORTARRAYV23");
         p_sys->i_write_type = WRITE_SHORTARRAYV23;
     }
@@ -1330,6 +1345,7 @@ Stop( audio_output_t *p_aout )
 
     p_sys->b_audiotrack_exception = false;
     p_sys->b_error = false;
+    p_sys->b_passthrough = false;
 }
 
 /**
