@@ -712,8 +712,8 @@ static int ps_pkt_resynch( stream_t *s, bool b_cdxa, bool b_pack )
         }
 
         if( p_peek[0] == 0 && p_peek[1] == 0 && p_peek[2] == 1 &&
-            ( b_pack ) ? ( p_peek[3] == PS_STREAM_ID_PACK_HEADER )
-                       : ( p_peek[3] >= PS_STREAM_ID_END_STREAM ) )
+            p_peek[3] >= PS_STREAM_ID_END_STREAM &&
+            ( !b_pack || p_peek[3] == PS_STREAM_ID_PACK_HEADER ) )
         {
             return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 1 : -1;
         }
