@@ -229,6 +229,8 @@ static struct
         bool has_ENCODING_AC3;
         jint ENCODING_E_AC3;
         bool has_ENCODING_E_AC3;
+        jint ENCODING_DOLBY_TRUEHD;
+        bool has_ENCODING_DOLBY_TRUEHD;
         jint ENCODING_DTS;
         bool has_ENCODING_DTS;
         jint ENCODING_DTS_HD;
@@ -414,6 +416,10 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     jfields.AudioFormat.has_ENCODING_DTS = field != NULL;
     GET_CONST_INT( AudioFormat.ENCODING_DTS_HD, "ENCODING_DTS_HD", false );
     jfields.AudioFormat.has_ENCODING_DTS_HD = field != NULL;
+
+    GET_CONST_INT( AudioFormat.ENCODING_DOLBY_TRUEHD, "ENCODING_DOLBY_TRUEHD",
+                   false );
+    jfields.AudioFormat.has_ENCODING_DOLBY_TRUEHD = field != NULL;
 
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
@@ -932,6 +938,9 @@ AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format,
             return MATCH_ENCODING_FLAG( ENCODING_AC3 );
         case VLC_CODEC_EAC3:
             return MATCH_ENCODING_FLAG( ENCODING_E_AC3 );
+        case VLC_CODEC_TRUEHD:
+        case VLC_CODEC_MLP:
+            return MATCH_ENCODING_FLAG( ENCODING_DOLBY_TRUEHD );
         default:
             return false;
     }
@@ -951,13 +960,16 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
         i_at_format = jfields.AudioFormat.ENCODING_IEC61937;
         switch( p_sys->fmt.i_format )
         {
-#if 0
             case VLC_CODEC_TRUEHD:
             case VLC_CODEC_MLP:
                 p_sys->fmt.i_rate = 192000;
                 p_sys->fmt.i_bytes_per_frame = 16;
+
+                /* AudioFormat.ENCODING_IEC61937 documentation says that the
+                 * channel layout must be stereo. Well, not for TrueHD
+                 * apparently */
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_7_1;
                 break;
-#endif
             case VLC_CODEC_DTS:
                 if( b_dtshd && p_sys->fmt.i_rate >= 48000 )
                 {
@@ -966,17 +978,18 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
                 }
                 else
                     p_sys->fmt.i_bytes_per_frame = 4;
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
                 break;
             case VLC_CODEC_EAC3:
                 p_sys->fmt.i_rate = 192000;
             case VLC_CODEC_A52:
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
                 p_sys->fmt.i_bytes_per_frame = 4;
                 break;
             default:
                 return VLC_EGENERIC;
         }
         p_sys->fmt.i_frame_length = 1;
-        p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
         p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
         p_sys->fmt.i_channels = aout_FormatNbChannels( &p_sys->fmt );
         p_sys->fmt.i_format = VLC_CODEC_SPDIFL;
@@ -1898,7 +1911,7 @@ static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
         if( at_dev == AT_DEV_ENCODED )
         {
             static const vlc_fourcc_t enc_fourccs[] = {
-                VLC_CODEC_DTS, VLC_CODEC_A52, VLC_CODEC_EAC3
+                VLC_CODEC_DTS, VLC_CODEC_A52, VLC_CODEC_EAC3, VLC_CODEC_TRUEHD,
             };
             for( size_t i = 0;
                  i < sizeof( enc_fourccs ) / sizeof( enc_fourccs[0] ); ++i )
