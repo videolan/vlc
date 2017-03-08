@@ -101,8 +101,8 @@ struct demux_sys_t
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static int      ps_pkt_resynch( stream_t *, uint32_t *pi_code, bool, bool );
-static block_t *ps_pkt_read   ( stream_t *, uint32_t i_code );
+static int      ps_pkt_resynch( stream_t *, bool, bool );
+static block_t *ps_pkt_read   ( stream_t * );
 
 /*****************************************************************************
  * Open
@@ -207,10 +207,9 @@ static int Demux2( demux_t *p_demux, bool b_end )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_ret, i_id;
-    uint32_t i_code;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa, p_sys->b_have_pack );
+    i_ret = ps_pkt_resynch( p_demux->s, p_sys->b_cdxa, p_sys->b_have_pack );
     if( i_ret < 0 )
     {
         return 0;
@@ -227,7 +226,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
     if( p_sys->b_lost_sync ) msg_Warn( p_demux, "found sync code" );
     p_sys->b_lost_sync = false;
 
-    if( ( p_pkt = ps_pkt_read( p_demux->s, i_code ) ) == NULL )
+    if( ( p_pkt = ps_pkt_read( p_demux->s ) ) == NULL )
     {
         return 0;
     }
@@ -324,11 +323,10 @@ static void NotifyDiscontinuity( ps_track_t *p_tk, es_out_t *out )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i_ret, i_id, i_mux_rate;
-    uint32_t i_code;
+    int i_ret, i_mux_rate;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, &i_code, p_sys->b_cdxa, p_sys->b_have_pack );
+    i_ret = ps_pkt_resynch( p_demux->s, p_sys->b_cdxa, p_sys->b_have_pack );
     if( i_ret < 0 )
     {
         return VLC_DEMUXER_EOF;
@@ -355,18 +353,25 @@ static int Demux( demux_t *p_demux )
             return VLC_DEMUXER_EGENERIC;
     }
 
-    if( ( p_pkt = ps_pkt_read( p_demux->s, i_code ) ) == NULL )
+    if( ( p_pkt = ps_pkt_read( p_demux->s ) ) == NULL )
     {
         return VLC_DEMUXER_EOF;
     }
 
-    switch( i_code )
+    if( p_pkt->i_buffer < 4 )
     {
-    case PS_STREAM_ID_END_STREAM|0x100:
+        block_Release( p_pkt );
+        return VLC_DEMUXER_EGENERIC;
+    }
+
+    const uint8_t i_stream_id = p_pkt->p_buffer[3];
+    switch( i_stream_id )
+    {
+    case PS_STREAM_ID_END_STREAM:
         block_Release( p_pkt );
         break;
 
-    case PS_STREAM_ID_PACK_HEADER|0x100:
+    case PS_STREAM_ID_PACK_HEADER:
         if( !ps_pkt_parse_pack( p_pkt, &p_sys->i_scr, &i_mux_rate ) )
         {
             p_sys->i_last_scr = p_sys->i_scr;
@@ -378,7 +383,7 @@ static int Demux( demux_t *p_demux )
         block_Release( p_pkt );
         break;
 
-    case PS_STREAM_ID_SYSTEM_HEADER|0x100:
+    case PS_STREAM_ID_SYSTEM_HEADER:
         if( !ps_pkt_parse_system( p_pkt, &p_sys->psm, p_sys->tk ) )
         {
             int i;
@@ -395,7 +400,7 @@ static int Demux( demux_t *p_demux )
         block_Release( p_pkt );
         break;
 
-    case PS_STREAM_ID_MAP|0x100:
+    case PS_STREAM_ID_MAP:
         if( p_sys->psm.i_version == 0xFFFF )
             msg_Dbg( p_demux, "contains a PSM");
 
@@ -404,8 +409,16 @@ static int Demux( demux_t *p_demux )
         break;
 
     default:
-        if( (i_id = ps_pkt_id( p_pkt )) >= 0xc0 )
+        /* Reject non video/audio nor PES */
+        if( i_stream_id < 0xC0 || i_stream_id > 0xEF )
         {
+            block_Release( p_pkt );
+            break;
+        }
+        //ft
+    case PS_STREAM_ID_PRIVATE_STREAM1:
+        {
+            int i_id = ps_pkt_id( p_pkt );
             /* Small heuristic to improve MLP detection from AOB */
             if( i_id == 0xa001 &&
                 p_sys->i_aob_mlp_count < 500 )
@@ -506,10 +519,6 @@ static int Demux( demux_t *p_demux )
             }
 
             p_sys->i_scr = -1;
-        }
-        else
-        {
-            block_Release( p_pkt );
         }
         break;
     }
@@ -653,7 +662,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *  It doesn't skip more than 512 bytes
  *  -1 -> error, 0 -> not synch, 1 -> ok
  */
-static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa, bool b_pack )
+static int ps_pkt_resynch( stream_t *s, bool b_cdxa, bool b_pack )
 {
     const uint8_t *p_peek;
     int     i_peek;
@@ -666,7 +675,6 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa, bool b_p
     if( p_peek[0] == 0 && p_peek[1] == 0 && p_peek[2] == 1 &&
         p_peek[3] >= PS_STREAM_ID_END_STREAM )
     {
-        *pi_code = 0x100 | p_peek[3];
         return 1;
     }
 
@@ -707,7 +715,6 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa, bool b_p
             ( b_pack ) ? ( p_peek[3] == PS_STREAM_ID_PACK_HEADER )
                        : ( p_peek[3] >= PS_STREAM_ID_END_STREAM ) )
         {
-            *pi_code = 0x100 | p_peek[3];
             return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 1 : -1;
         }
 
@@ -718,7 +725,7 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code, bool b_cdxa, bool b_p
     return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 0 : -1;
 }
 
-static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
+static block_t *ps_pkt_read( stream_t *s )
 {
     const uint8_t *p_peek;
     int i_peek = vlc_stream_Peek( s, &p_peek, 14 );
@@ -754,6 +761,5 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
         return vlc_stream_Block( s, i_size );
     }
 
-    VLC_UNUSED(i_code);
     return NULL;
 }
