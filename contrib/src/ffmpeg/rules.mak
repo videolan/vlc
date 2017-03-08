@@ -38,7 +38,8 @@ ifdef USE_FFMPEG
 FFMPEGCONF += \
 	--disable-swresample \
 	--disable-iconv \
-	--disable-avisynth
+	--disable-avisynth \
+	--disable-nvenc
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += \
 	--disable-videotoolbox
