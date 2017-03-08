@@ -958,9 +958,17 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
                 p_sys->fmt.i_bytes_per_frame = 16;
                 break;
 #endif
+            case VLC_CODEC_DTS:
+                if( b_dtshd && p_sys->fmt.i_rate >= 48000 )
+                {
+                    p_sys->fmt.i_rate = 192000;
+                    p_sys->fmt.i_bytes_per_frame = 16;
+                }
+                else
+                    p_sys->fmt.i_bytes_per_frame = 4;
+                break;
             case VLC_CODEC_EAC3:
                 p_sys->fmt.i_rate = 192000;
-            case VLC_CODEC_DTS:
             case VLC_CODEC_A52:
                 p_sys->fmt.i_bytes_per_frame = 4;
                 break;
