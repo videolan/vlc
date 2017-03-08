@@ -47,6 +47,7 @@
     "be usable. Disable this option to calculate from the bitrate instead." )
 
 #define PS_PACKET_PROBE 3
+#define CDXA_HEADER_SIZE 44
 
 /*****************************************************************************
  * Module descriptor
@@ -90,6 +91,7 @@ struct demux_sys_t
     int64_t     i_length;
     int         i_time_track;
     int64_t     i_current_pts;
+    uint64_t    i_start_byte;
 
     int         i_aob_mlp_count;
 
@@ -97,13 +99,18 @@ struct demux_sys_t
     bool  b_have_pack;
     bool  b_bad_scr;
     bool  b_seekable;
-    bool  b_cdxa;
+    enum
+    {
+        MPEG_PS = 0,
+        CDXA_PS,
+        PSMF_PS,
+    } format;
 };
 
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static int      ps_pkt_resynch( stream_t *, bool, bool );
+static int      ps_pkt_resynch( stream_t *, int, bool );
 static block_t *ps_pkt_read   ( stream_t * );
 
 /*****************************************************************************
@@ -117,7 +124,11 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     const uint8_t *p_peek;
     ssize_t i_peek = 0;
     ssize_t i_offset = 0;
-    bool b_cdxa = false;
+    ssize_t i_skip = 0;
+    unsigned i_max_packets = PS_PACKET_PROBE;
+    int format = MPEG_PS;
+    int i_mux_rate = 0;
+    int i_length = -1;
 
     i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
     if( i_peek < 16 )
@@ -126,17 +137,35 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         return VLC_EGENERIC;
     }
 
-    if( !memcmp( p_peek, "RIFF", 4 ) && !memcmp( &p_peek[8], "CDXA", 4 ) )
+    if( !memcmp( p_peek, "PSMF", 4 ) &&
+        (GetDWBE( &p_peek[4] ) & 0x30303030) == 0x30303030 )
     {
-        b_cdxa = true;
+        i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 100 );
+        if( i_peek < 100 )
+            return VLC_EGENERIC;
+        i_skip = i_offset = GetWBE( &p_peek[10] );
+        format = PSMF_PS;
+        msg_Info( p_demux, "Detected PSMF-PS header");
+        i_mux_rate = GetDWBE( &p_peek[96] );
+        if( GetDWBE( &p_peek[86] ) > 0 )
+            i_length = CLOCK_FREQ * GetDWBE( &p_peek[92] ) / GetDWBE( &p_peek[86] );
+    }
+    else if( !memcmp( p_peek, "RIFF", 4 ) && !memcmp( &p_peek[8], "CDXA", 4 ) )
+    {
+        format = CDXA_PS;
+        i_max_packets = 0; /* We can't probe here */
+        i_skip = CDXA_HEADER_SIZE;
         msg_Info( p_demux, "Detected CDXA-PS" );
+        /* FIXME: have a proper way to decap CD sectors or make an access stream filter */
     }
     else if( b_force )
     {
         msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
                   "continuing anyway" );
+        i_max_packets = 0;
     }
-    else for( unsigned i=0; i<PS_PACKET_PROBE; i++ )
+
+    for( unsigned i=0; i<i_max_packets; i++ )
     {
         if( i_peek < i_offset + 16 )
         {
@@ -159,6 +188,10 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         i_offset += i_pessize;
     }
 
+    if( i_skip > 0 && !p_demux->b_preparsing &&
+        vlc_stream_Read( p_demux->s, NULL, i_skip ) != i_skip )
+        return VLC_EGENERIC;
+
     /* Fill p_demux field */
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
@@ -167,19 +200,20 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_demux->pf_control = Control;
 
     /* Init p_sys */
-    p_sys->i_mux_rate = 0;
+    p_sys->i_mux_rate = i_mux_rate;
     p_sys->i_scr      = -1;
     p_sys->i_last_scr = -1;
-    p_sys->i_length   = -1;
+    p_sys->i_length   = i_length;
     p_sys->i_current_pts = (mtime_t) 0;
     p_sys->i_time_track = -1;
     p_sys->i_aob_mlp_count = 0;
+    p_sys->i_start_byte = i_skip;
 
     p_sys->b_lost_sync = false;
     p_sys->b_have_pack = false;
     p_sys->b_bad_scr   = false;
     p_sys->b_seekable  = false;
-    p_sys->b_cdxa      = b_cdxa;
+    p_sys->format      = format;
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
@@ -231,7 +265,7 @@ static int Probe( demux_t *p_demux, bool b_end )
     int i_ret, i_id;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, p_sys->b_cdxa, p_sys->b_have_pack );
+    i_ret = ps_pkt_resynch( p_demux->s, p_sys->format, p_sys->b_have_pack );
     if( i_ret < 0 )
     {
         return VLC_DEMUXER_EOF;
@@ -351,7 +385,7 @@ static int Demux( demux_t *p_demux )
     int i_ret, i_mux_rate;
     block_t *p_pkt;
 
-    i_ret = ps_pkt_resynch( p_demux->s, p_sys->b_cdxa, p_sys->b_have_pack );
+    i_ret = ps_pkt_resynch( p_demux->s, p_sys->format, p_sys->b_have_pack );
     if( i_ret < 0 )
     {
         return VLC_DEMUXER_EOF;
@@ -464,6 +498,23 @@ static int Demux( demux_t *p_demux )
             {
                 if( !ps_track_fill( tk, &p_sys->psm, i_id, p_pkt ) )
                 {
+                    /* No PSM and no probing yet */
+                    if( p_sys->format == PSMF_PS )
+                    {
+                        if( tk->fmt.i_cat == VIDEO_ES )
+                            tk->fmt.i_codec = VLC_CODEC_H264;
+#if 0
+                        if( i_stream_id == PS_STREAM_ID_PRIVATE_STREAM1 )
+                        {
+                            tk->fmt.i_codec = VLC_CODEC_ATRAC3P;
+                            tk->fmt.i_cat = AUDIO_ES;
+                            tk->fmt.audio.i_blockalign = 376;
+                            tk->fmt.audio.i_channels = 2;
+                            tk->fmt.audio.i_rate = 44100;
+                        }
+#endif
+                    }
+
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
                     b_new = true;
                 }
@@ -535,7 +586,13 @@ static int Demux( demux_t *p_demux )
                     p_pkt->i_flags = tk->i_next_block_flags;
                     tk->i_next_block_flags = 0;
                 }
-
+#if 0
+                if( tk->fmt.i_codec == VLC_CODEC_ATRAC3P )
+                {
+                    p_pkt->p_buffer += 14;
+                    p_pkt->i_buffer -= 14;
+                }
+#endif
                 es_out_Send( p_demux->out, tk->es, p_pkt );
             }
             else
@@ -570,10 +627,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_POSITION:
             pf = (double*) va_arg( args, double* );
-            i64 = stream_Size( p_demux->s );
+            i64 = stream_Size( p_demux->s ) - p_sys->i_start_byte;
             if( i64 > 0 )
             {
-                double current = vlc_stream_Tell( p_demux->s );
+                double current = vlc_stream_Tell( p_demux->s ) - p_sys->i_start_byte;
                 *pf = current / (double)i64;
             }
             else
@@ -584,11 +641,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = (double) va_arg( args, double );
-            i64 = stream_Size( p_demux->s );
+            i64 = stream_Size( p_demux->s ) - p_sys->i_start_byte;
             p_sys->i_current_pts = 0;
             p_sys->i_last_scr = -1;
 
-            i_ret = vlc_stream_Seek( p_demux->s, (int64_t)(i64 * f) );
+            i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_start_byte + (int64_t)(i64 * f) );
             if( i_ret == VLC_SUCCESS )
             {
                 NotifyDiscontinuity( p_sys->tk, p_demux->out );
@@ -605,7 +662,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             if( p_sys->i_mux_rate > 0 )
             {
-                *pi64 = (int64_t)1000000 * ( vlc_stream_Tell( p_demux->s ) / 50 ) /
+                *pi64 = CLOCK_FREQ * ( vlc_stream_Tell( p_demux->s ) - p_sys->i_start_byte / 50 ) /
                     p_sys->i_mux_rate;
                 return VLC_SUCCESS;
             }
@@ -621,7 +678,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( p_sys->i_mux_rate > 0 )
             {
-                *pi64 = (int64_t)1000000 * ( stream_Size( p_demux->s ) / 50 ) /
+                *pi64 = CLOCK_FREQ * ( stream_Size( p_demux->s ) - p_sys->i_start_byte / 50 ) /
                     p_sys->i_mux_rate;
                 return VLC_SUCCESS;
             }
@@ -633,7 +690,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->i_time_track >= 0 && p_sys->i_current_pts > 0 )
             {
                 int64_t i_now = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
-                int64_t i_pos = vlc_stream_Tell( p_demux->s );
+                int64_t i_pos = vlc_stream_Tell( p_demux->s ) - p_sys->i_start_byte;
 
                 if( !i_now )
                     return i64 ? VLC_EGENERIC : VLC_SUCCESS;
@@ -642,7 +699,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_last_scr = -1;
                 i_pos *= (float)i64 / (float)i_now;
 
-                i_ret = vlc_stream_Seek( p_demux->s, i_pos );
+                i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_start_byte + i_pos );
                 if( i_ret == VLC_SUCCESS )
                 {
                     NotifyDiscontinuity( p_sys->tk, p_demux->out );
@@ -687,7 +744,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *  It doesn't skip more than 512 bytes
  *  -1 -> error, 0 -> not synch, 1 -> ok
  */
-static int ps_pkt_resynch( stream_t *s, bool b_cdxa, bool b_pack )
+static int ps_pkt_resynch( stream_t *s, int format, bool b_pack )
 {
     const uint8_t *p_peek;
     int     i_peek;
@@ -717,7 +774,7 @@ static int ps_pkt_resynch( stream_t *s, bool b_cdxa, bool b_pack )
         }
         /* Handle mid stream 24 bytes padding+CRC creating emulated sync codes with incorrect
            PES sizes and frelling up to UINT16_MAX bytes followed by 24 bytes CDXA Header */
-        if( b_cdxa && i_skip == 0 && i_peek >= 48 )
+        if( format == CDXA_PS && i_skip == 0 && i_peek >= 48 )
         {
             size_t i = 0;
             while( i<24 && p_peek[i] == 0 )
