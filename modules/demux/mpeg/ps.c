@@ -46,6 +46,8 @@
     "to calculate position and duration. However sometimes this might not " \
     "be usable. Disable this option to calculate from the bitrate instead." )
 
+#define PS_PACKET_PROBE 3
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -113,28 +115,48 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     demux_sys_t *p_sys;
 
     const uint8_t *p_peek;
+    ssize_t i_peek = 0;
+    ssize_t i_offset = 0;
     bool b_cdxa = false;
 
-    if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
+    i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
+    if( i_peek < 16 )
     {
         msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
 
-    if( memcmp( p_peek, "\x00\x00\x01", 3 ) || ( p_peek[3] < 0xb9 ) )
+    if( !memcmp( p_peek, "RIFF", 4 ) && !memcmp( &p_peek[8], "CDXA", 4 ) )
     {
-        if( memcmp( p_peek, "RIFF", 4 ) || memcmp( &p_peek[8], "CDXA", 4 ) )
+        b_cdxa = true;
+        msg_Info( p_demux, "Detected CDXA-PS" );
+    }
+    else if( b_force )
+    {
+        msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
+                  "continuing anyway" );
+    }
+    else for( unsigned i=0; i<PS_PACKET_PROBE; i++ )
+    {
+        if( i_peek < i_offset + 16 )
         {
-            if( !b_force )
+            i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_offset + 16 );
+            if( i_peek < i_offset + 16 )
                 return VLC_EGENERIC;
-            msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
-                      "continuing anyway" );
         }
-        else
-        {
-            b_cdxa = true;
-            msg_Info( p_demux, "Detected CDXA-PS" );
-        }
+
+        const uint8_t startcode[3] = { 0x00, 0x00, 0x01 };
+        const uint8_t *p_header = &p_peek[i_offset];
+        if( memcmp( p_header, startcode, 3 ) ||
+           ( (p_header[3] & 0xB0) != 0xB0 &&
+            !(p_header[3] >= 0xC0 && p_header[3] <= 0xEF) &&
+              p_header[3] != 0xFF ) )
+            return VLC_EGENERIC;
+
+        ssize_t i_pessize = ps_pkt_size( p_header, 16 );
+        if( i_pessize < 5 )
+            return VLC_EGENERIC;
+        i_offset += i_pessize;
     }
 
     /* Fill p_demux field */
