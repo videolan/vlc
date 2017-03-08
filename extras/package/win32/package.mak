@@ -31,7 +31,6 @@ package-win-common: package-win-install
 
 # Executables, major libs+manifests
 	find $(prefix) -maxdepth 4 \( -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" \) -exec cp {} "$(win32_destdir)/" \;
-	cd $(top_srcdir)/extras/package/win32 && cp vlc$(EXEEXT).manifest libvlc$(LIBEXT).manifest "$(win32_destdir)/"
 
 # Text files, clean them from mail addresses
 	for file in AUTHORS THANKS ; \
