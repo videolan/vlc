@@ -67,8 +67,8 @@ static const struct {
     const char *psz_name;
     enum au_dev au_dev;
 } au_devs[] = {
-    { "PCM", "Up to 9 channels PCM output", AU_DEV_PCM },
-    { "ENCODED", "Encoded output if available (via HDMI/SPDIF) or PCM output",
+    { "pcm", "Up to 9 channels PCM output", AU_DEV_PCM },
+    { "encoded", "Encoded output if available (via HDMI/SPDIF) or PCM output",
       AU_DEV_ENCODED },
 };
 
