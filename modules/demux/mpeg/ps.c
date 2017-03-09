@@ -225,7 +225,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static int Demux2( demux_t *p_demux, bool b_end )
+static int Probe( demux_t *p_demux, bool b_end )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_ret, i_id;
@@ -292,7 +292,7 @@ static bool FindLength( demux_t *p_demux )
         /* Check beginning */
         int i = 0;
         i_current_pos = vlc_stream_Tell( p_demux->s );
-        while( i < 40 && Demux2( p_demux, false ) > 0 ) i++;
+        while( i < 40 && Probe( p_demux, false ) > 0 ) i++;
 
         /* Check end */
         i_size = stream_Size( p_demux->s );
@@ -300,7 +300,7 @@ static bool FindLength( demux_t *p_demux )
         if( vlc_stream_Seek( p_demux->s, i_size - i_end ) == VLC_SUCCESS )
         {
             i = 0;
-            while( i < 400 && Demux2( p_demux, true ) > 0 ) i++;
+            while( i < 400 && Probe( p_demux, true ) > 0 ) i++;
             if( i_current_pos >= 0 &&
                 vlc_stream_Seek( p_demux->s, i_current_pos ) != VLC_SUCCESS )
                     return false;
