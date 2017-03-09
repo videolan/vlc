@@ -350,7 +350,7 @@ static bool FindLength( demux_t *p_demux )
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
-        if( tk->i_last_pts > 0 &&
+        if( tk->i_first_pts >= 0 &&
             tk->i_last_pts > tk->i_first_pts )
         {
             int64_t i_length = (int64_t)tk->i_last_pts - tk->i_first_pts;
