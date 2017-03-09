@@ -252,7 +252,9 @@ static int Demux2( demux_t *p_demux, bool b_end )
     {
         return 0;
     }
-    if( (i_id = ps_pkt_id( p_pkt )) >= 0xc0 )
+
+    i_id = ps_pkt_id( p_pkt );
+    if( i_id >= 0xc0 )
     {
         ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
         if( !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) &&
@@ -267,10 +269,11 @@ static int Demux2( demux_t *p_demux, bool b_end )
                 tk->i_first_pts = p_pkt->i_pts;
             }
         }
-
-        if( i_id == PS_STREAM_ID_PACK_HEADER )
-            p_sys->b_have_pack = true;
     }
+
+    if( i_id == PS_STREAM_ID_PACK_HEADER )
+        p_sys->b_have_pack = true;
+
     block_Release( p_pkt );
     return 1;
 }
