@@ -234,7 +234,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
     i_ret = ps_pkt_resynch( p_demux->s, p_sys->b_cdxa, p_sys->b_have_pack );
     if( i_ret < 0 )
     {
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     else if( i_ret == 0 )
     {
@@ -242,7 +242,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
             msg_Warn( p_demux, "garbage at input, trying to resync..." );
 
         p_sys->b_lost_sync = true;
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     if( p_sys->b_lost_sync ) msg_Warn( p_demux, "found sync code" );
@@ -250,7 +250,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
 
     if( ( p_pkt = ps_pkt_read( p_demux->s ) ) == NULL )
     {
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     i_id = ps_pkt_id( p_pkt );
@@ -275,7 +275,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
         p_sys->b_have_pack = true;
 
     block_Release( p_pkt );
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 static bool FindLength( demux_t *p_demux )
