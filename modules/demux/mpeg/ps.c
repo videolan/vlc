@@ -92,6 +92,7 @@ struct demux_sys_t
     int         i_time_track;
     int64_t     i_current_pts;
     uint64_t    i_start_byte;
+    uint64_t    i_lastpack_byte;
 
     int         i_aob_mlp_count;
 
@@ -208,6 +209,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->i_time_track = -1;
     p_sys->i_aob_mlp_count = 0;
     p_sys->i_start_byte = i_skip;
+    p_sys->i_lastpack_byte = i_skip;
 
     p_sys->b_lost_sync = false;
     p_sys->b_have_pack = false;
@@ -434,6 +436,7 @@ static int Demux( demux_t *p_demux )
         if( !ps_pkt_parse_pack( p_pkt, &p_sys->i_scr, &i_mux_rate ) )
         {
             p_sys->i_last_scr = p_sys->i_scr;
+            p_sys->i_lastpack_byte = vlc_stream_Tell( p_demux->s );
             if( !p_sys->b_have_pack ) p_sys->b_have_pack = true;
             /* done later on to work around bad vcd/svcd streams */
             /* es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_scr ); */
@@ -660,10 +663,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *pi64 = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
                 return VLC_SUCCESS;
             }
-            if( p_sys->i_mux_rate > 0 )
+            if( p_sys->b_have_pack && p_sys->i_mux_rate > 0 && p_sys->i_last_scr > -1 )
             {
-                *pi64 = CLOCK_FREQ * ( vlc_stream_Tell( p_demux->s ) - p_sys->i_start_byte / 50 ) /
-                    p_sys->i_mux_rate;
+                /* H.222 2.5.2.2 */
+                uint64_t i_offset = vlc_stream_Tell( p_demux->s ) - p_sys->i_lastpack_byte;
+                *pi64 = p_sys->i_last_scr + CLOCK_FREQ * i_offset / (p_sys->i_mux_rate * 50);
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
@@ -687,24 +691,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
-            if( p_sys->i_time_track >= 0 && p_sys->i_current_pts > 0 )
+            if( p_sys->i_time_track >= 0 && p_sys->i_current_pts > 0 && p_sys->i_length )
             {
-                int64_t i_now = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
-                int64_t i_pos = vlc_stream_Tell( p_demux->s ) - p_sys->i_start_byte;
-
-                if( !i_now )
-                    return i64 ? VLC_EGENERIC : VLC_SUCCESS;
-
-                p_sys->i_current_pts = 0;
-                p_sys->i_last_scr = -1;
-                i_pos *= (float)i64 / (float)i_now;
-
-                i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_start_byte + i_pos );
-                if( i_ret == VLC_SUCCESS )
-                {
-                    NotifyDiscontinuity( p_sys->tk, p_demux->out );
-                    return i_ret;
-                }
+                i64 -= p_sys->tk[p_sys->i_time_track].i_first_pts;
+                return demux_Control( p_demux, DEMUX_SET_POSITION, (double) i64 / p_sys->i_length );
             }
             break;
 
