@@ -607,7 +607,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     api->BindBuffer    = GET_PROC_ADDR(glBindBuffer);
     api->BufferData    = GET_PROC_ADDR(glBufferData);
     api->DeleteBuffers = GET_PROC_ADDR(glDeleteBuffers);
-#ifdef VLCGL_HAS_PBO
+#ifdef VLCGL_HAS_MAP_PERSISTENT
     api->BufferStorage          = GET_PROC_ADDR(glBufferStorage);
     api->MapBufferRange         = GET_PROC_ADDR(glMapBufferRange);
     api->FlushMappedBufferRange = GET_PROC_ADDR(glFlushMappedBufferRange);

@@ -32,7 +32,7 @@
 #   define GLSL_VERSION "120"
 #   define VLCGL_PICTURE_MAX 128
 #   ifdef GL_VERSION_4_4
-#       define VLCGL_HAS_PBO
+#       define VLCGL_HAS_MAP_PERSISTENT
 #   endif
 #   define PRECISION ""
 #   if defined(__APPLE__)
@@ -66,7 +66,7 @@
 #   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
 #   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
-#   ifdef VLCGL_HAS_PBO
+#   ifdef VLCGL_HAS_MAP_PERSISTENT
 #    define PFNGLBUFFERSTORAGEPROC           typeof(glBufferStorage)*
 #    define PFNGLMAPBUFFERRANGEPROC          typeof(glMapBufferRange)*
 #    define PFNGLFLUSHMAPPEDBUFFERRANGEPROC  typeof(glFlushMappedBufferRange)*
@@ -119,7 +119,7 @@ typedef struct {
     PFNGLGENBUFFERSPROC    GenBuffers;
     PFNGLBINDBUFFERPROC    BindBuffer;
     PFNGLBUFFERDATAPROC    BufferData;
-#ifdef VLCGL_HAS_PBO
+#ifdef VLCGL_HAS_MAP_PERSISTENT
     PFNGLBUFFERSTORAGEPROC          BufferStorage;
     PFNGLMAPBUFFERRANGEPROC         MapBufferRange;
     PFNGLFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange;

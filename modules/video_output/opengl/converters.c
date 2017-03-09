@@ -47,7 +47,7 @@
 #define NEED_GL_EXT_unpack_subimage
 #endif
 
-#ifdef VLCGL_HAS_PBO
+#ifdef VLCGL_HAS_MAP_PERSISTENT
 struct picture_sys_t
 {
     const opengl_tex_converter_t *tc;
@@ -63,11 +63,11 @@ struct priv
     bool   has_unpack_subimage;
     void * texture_temp_buf;
     size_t texture_temp_buf_size;
-#ifdef VLCGL_HAS_PBO
+#ifdef VLCGL_HAS_MAP_PERSISTENT
     struct {
         picture_t *pics[VLCGL_PICTURE_MAX];
         unsigned long long list;
-    } ongpu;
+    } persistent;
 #endif
 };
 
@@ -491,9 +491,9 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
     return fragment_shader;
 }
 
-#ifdef VLCGL_HAS_PBO
+#ifdef VLCGL_HAS_MAP_PERSISTENT
 static int
-pbo_map(const opengl_tex_converter_t *tc, picture_t *pic)
+persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
 
@@ -537,17 +537,17 @@ static int fnsll(unsigned long long x, unsigned i)
 }
 
 static void
-pbo_release_gpupics(const opengl_tex_converter_t *tc, bool force)
+persistent_release_gpupics(const opengl_tex_converter_t *tc, bool force)
 {
     struct priv *priv = tc->priv;
 
     /* Release all pictures that are not used by the GPU anymore */
-    for (unsigned i = ffsll(priv->ongpu.list); i;
-         i = fnsll(priv->ongpu.list, i))
+    for (unsigned i = ffsll(priv->persistent.list); i;
+         i = fnsll(priv->persistent.list, i))
     {
-        assert(priv->ongpu.pics[i - 1] != NULL);
+        assert(priv->persistent.pics[i - 1] != NULL);
 
-        picture_t *pic = priv->ongpu.pics[i - 1];
+        picture_t *pic = priv->persistent.pics[i - 1];
         picture_sys_t *picsys = pic->p_sys;
 
         assert(picsys->fence != NULL);
@@ -559,15 +559,15 @@ pbo_release_gpupics(const opengl_tex_converter_t *tc, bool force)
             tc->api->DeleteSync(picsys->fence);
             picsys->fence = NULL;
 
-            priv->ongpu.list &= ~(1ULL << (i - 1));
-            priv->ongpu.pics[i - 1] = NULL;
+            priv->persistent.list &= ~(1ULL << (i - 1));
+            priv->persistent.pics[i - 1] = NULL;
             picture_Release(pic);
         }
     }
 }
 
 static int
-pbo_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
+persistent_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
                   const GLsizei *tex_width, const GLsizei *tex_height,
                   picture_t *pic)
 {
@@ -608,16 +608,16 @@ pbo_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
         hold = false;
     }
 
-    pbo_release_gpupics(tc, false);
+    persistent_release_gpupics(tc, false);
 
     if (hold)
     {
         /* Hold the picture while it's used by the GPU */
         unsigned index = pic->p_sys->index;
 
-        priv->ongpu.list |= 1ULL << index;
-        assert(priv->ongpu.pics[index] == NULL);
-        priv->ongpu.pics[index] = pic;
+        priv->persistent.list |= 1ULL << index;
+        assert(priv->persistent.pics[index] == NULL);
+        priv->persistent.pics[index] = pic;
         picture_Hold(pic);
     }
 
@@ -628,7 +628,7 @@ pbo_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
 }
 
 static void
-picture_destroy_cb(picture_t *pic)
+picture_persistent_destroy_cb(picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
     const opengl_tex_converter_t *tc = picsys->tc;
@@ -647,14 +647,14 @@ picture_destroy_cb(picture_t *pic)
 }
 
 static picture_pool_t *
-tc_common_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                   unsigned requested_count)
+tc_persistent_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
+                       unsigned requested_count)
 {
     struct priv *priv = tc->priv;
     picture_t *pictures[VLCGL_PICTURE_MAX];
     unsigned count;
 
-    priv->ongpu.list = 0;
+    priv->persistent.list = 0;
 
     for (count = 0; count < requested_count; count++)
     {
@@ -665,7 +665,7 @@ tc_common_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
         picsys->index = count;
         picture_resource_t rsc = {
             .p_sys = picsys,
-            .pf_destroy = picture_destroy_cb,
+            .pf_destroy = picture_persistent_destroy_cb,
         };
 
         picture_t *pic = pictures[count] = picture_NewFromResource(fmt, &rsc);
@@ -694,7 +694,7 @@ tc_common_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
             assert(picsys->bytes[i] == pictures[0]->p_sys->bytes[i]);
         }
 
-        if (pbo_map(tc, pic) != VLC_SUCCESS)
+        if (persistent_map(tc, pic) != VLC_SUCCESS)
         {
             picture_Release(pic);
             break;
@@ -720,7 +720,7 @@ error:
 
     return NULL;
 }
-#endif /* VLCGL_HAS_PBO */
+#endif /* VLCGL_HAS_MAP_PERSISTENT */
 
 static int
 tc_common_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
@@ -801,9 +801,9 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
                  const GLsizei *tex_width, const GLsizei *tex_height,
                  picture_t *pic, const size_t *plane_offset)
 {
-#ifdef VLCGL_HAS_PBO
+#ifdef VLCGL_HAS_MAP_PERSISTENT
     if (pic->p_sys != NULL)
-        return pbo_common_update(tc, textures, tex_width, tex_height, pic);
+        return persistent_common_update(tc, textures, tex_width, tex_height, pic);
 #endif
 
     int ret = VLC_SUCCESS;
@@ -829,8 +829,8 @@ tc_common_release(const opengl_tex_converter_t *tc)
     struct priv *priv = tc->priv;
     free(priv->texture_temp_buf);
 
-#ifdef VLCGL_HAS_PBO
-    pbo_release_gpupics(tc, true);
+#ifdef VLCGL_HAS_MAP_PERSISTENT
+    persistent_release_gpupics(tc, true);
 #endif
 
     free(tc->priv);
@@ -847,17 +847,17 @@ common_init(opengl_tex_converter_t *tc)
     tc->pf_release      = tc_common_release;
     tc->pf_allocate_textures = tc_common_allocate_textures;
 
-#ifdef VLCGL_HAS_PBO
-    const bool supports_pbo = tc->api->BufferStorage
+#ifdef VLCGL_HAS_MAP_PERSISTENT
+    const bool supports_map_persistent = tc->api->BufferStorage
         && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
         && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
         && tc->api->ClientWaitSync
         && HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object")
         && HasExtension(tc->glexts, "GL_ARB_buffer_storage");
-    if (supports_pbo)
-        tc->pf_get_pool = tc_common_get_pool;
-    msg_Dbg(tc->gl, "PBO support (direct rendering): %s",
-            supports_pbo ? "On" : "Off");
+    if (supports_map_persistent)
+        tc->pf_get_pool = tc_persistent_get_pool;
+    msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering): %s",
+            supports_map_persistent ? "On" : "Off");
 #endif
 
 #ifdef NEED_GL_EXT_unpack_subimage
