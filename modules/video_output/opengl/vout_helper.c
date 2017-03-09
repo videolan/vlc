@@ -565,76 +565,79 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #if !defined(USE_OPENGL_ES2)
     const unsigned char *ogl_version = glGetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
-#else
-    bool supports_shaders = true;
+    if (!supports_shaders)
+    {
+        msg_Err(gl, "shaders not supported, bailing out\n");
+        free(vgl);
+        return NULL;
+    }
 #endif
 
     opengl_shaders_api_t *api = &vgl->api;
 
 #if defined(USE_OPENGL_ES2)
-#define GET_PROC_ADDR(name) name
+#define GET_PROC_ADDR(name, critical) api->name = gl##name
 #else
-#define GET_PROC_ADDR(name) vlc_gl_GetProcAddress(gl, #name)
+#define GET_PROC_ADDR(name, critical) do { \
+    api->name = vlc_gl_GetProcAddress(gl, "gl"#name); \
+    if (api->name == NULL && critical) { \
+        msg_Err(gl, "gl"#name" symbol not found, bailing out\n"); \
+        free(vgl); \
+        return NULL; \
+    } \
+} while(0)
 #endif
-    api->CreateShader       = GET_PROC_ADDR(glCreateShader);
-    api->ShaderSource       = GET_PROC_ADDR(glShaderSource);
-    api->CompileShader      = GET_PROC_ADDR(glCompileShader);
-    api->AttachShader       = GET_PROC_ADDR(glAttachShader);
+    GET_PROC_ADDR(CreateShader, true);
+    GET_PROC_ADDR(ShaderSource, true);
+    GET_PROC_ADDR(CompileShader, true);
+    GET_PROC_ADDR(AttachShader, true);
 
-    api->GetProgramiv       = GET_PROC_ADDR(glGetProgramiv);
-    api->GetShaderiv        = GET_PROC_ADDR(glGetShaderiv);
-    api->GetProgramInfoLog  = GET_PROC_ADDR(glGetProgramInfoLog);
-    api->GetShaderInfoLog   = GET_PROC_ADDR(glGetShaderInfoLog);
+    GET_PROC_ADDR(GetProgramiv, true);
+    GET_PROC_ADDR(GetShaderiv, true);
+    GET_PROC_ADDR(GetProgramInfoLog, true);
+    GET_PROC_ADDR(GetShaderInfoLog, true);
 
-    api->DeleteShader       = GET_PROC_ADDR(glDeleteShader);
+    GET_PROC_ADDR(DeleteShader, true);
 
-    api->GetUniformLocation      = GET_PROC_ADDR(glGetUniformLocation);
-    api->GetAttribLocation       = GET_PROC_ADDR(glGetAttribLocation);
-    api->VertexAttribPointer     = GET_PROC_ADDR(glVertexAttribPointer);
-    api->EnableVertexAttribArray = GET_PROC_ADDR(glEnableVertexAttribArray);
-    api->UniformMatrix4fv        = GET_PROC_ADDR(glUniformMatrix4fv);
-    api->Uniform4fv              = GET_PROC_ADDR(glUniform4fv);
-    api->Uniform4f               = GET_PROC_ADDR(glUniform4f);
-    api->Uniform2f               = GET_PROC_ADDR(glUniform2f);
-    api->Uniform1i               = GET_PROC_ADDR(glUniform1i);
+    GET_PROC_ADDR(GetUniformLocation, true);
+    GET_PROC_ADDR(GetAttribLocation, true);
+    GET_PROC_ADDR(VertexAttribPointer, true);
+    GET_PROC_ADDR(EnableVertexAttribArray, true);
+    GET_PROC_ADDR(UniformMatrix4fv, true);
+    GET_PROC_ADDR(Uniform4fv, true);
+    GET_PROC_ADDR(Uniform4f, true);
+    GET_PROC_ADDR(Uniform2f, true);
+    GET_PROC_ADDR(Uniform1i, true);
 
-    api->CreateProgram = GET_PROC_ADDR(glCreateProgram);
-    api->LinkProgram   = GET_PROC_ADDR(glLinkProgram);
-    api->UseProgram    = GET_PROC_ADDR(glUseProgram);
-    api->DeleteProgram = GET_PROC_ADDR(glDeleteProgram);
+    GET_PROC_ADDR(CreateProgram, true);
+    GET_PROC_ADDR(LinkProgram, true);
+    GET_PROC_ADDR(UseProgram, true);
+    GET_PROC_ADDR(DeleteProgram, true);
 
-    api->GenBuffers    = GET_PROC_ADDR(glGenBuffers);
-    api->BindBuffer    = GET_PROC_ADDR(glBindBuffer);
-    api->BufferData    = GET_PROC_ADDR(glBufferData);
-    api->DeleteBuffers = GET_PROC_ADDR(glDeleteBuffers);
+    GET_PROC_ADDR(GenBuffers, true);
+    GET_PROC_ADDR(BindBuffer, true);
+    GET_PROC_ADDR(BufferData, true);
+    GET_PROC_ADDR(DeleteBuffers, true);
+
 #ifdef VLCGL_HAS_MAP_PERSISTENT
-    api->BufferStorage          = GET_PROC_ADDR(glBufferStorage);
-    api->MapBufferRange         = GET_PROC_ADDR(glMapBufferRange);
-    api->FlushMappedBufferRange = GET_PROC_ADDR(glFlushMappedBufferRange);
-    api->UnmapBuffer            = GET_PROC_ADDR(glUnmapBuffer);
-    api->FenceSync              = GET_PROC_ADDR(glFenceSync);
-    api->DeleteSync             = GET_PROC_ADDR(glDeleteSync);
-    api->ClientWaitSync         = GET_PROC_ADDR(glClientWaitSync);
+    GET_PROC_ADDR(BufferStorage, false);
+    GET_PROC_ADDR(MapBufferRange, false);
+    GET_PROC_ADDR(FlushMappedBufferRange, false);
+    GET_PROC_ADDR(UnmapBuffer, false);
+    GET_PROC_ADDR(FenceSync, false);
+    GET_PROC_ADDR(DeleteSync, false);
+    GET_PROC_ADDR(ClientWaitSync, false);
 #endif
-#undef GET_PROC_ADDR
-
-    if (!vgl->api.CreateShader || !vgl->api.ShaderSource || !vgl->api.CreateProgram)
-        supports_shaders = false;
-    if (!supports_shaders)
-    {
-        msg_Err(gl, "shaders not supported");
-        free(vgl);
-        return NULL;
-    }
 
 #if defined(_WIN32)
-    api->ActiveTexture = vlc_gl_GetProcAddress(gl, "glActiveTexture");
-    api->ClientActiveTexture = vlc_gl_GetProcAddress(gl, "glClientActiveTexture");
+    GET_PROC_ADDR(ActiveTexture, true);
+    GET_PROC_ADDR(ClientActiveTexture, true);
 #   undef glActiveTexture
 #   undef glClientActiveTexture
 #   define glActiveTexture vgl->api.ActiveTexture
 #   define glClientActiveTexture vgl->api.ClientActiveTexture
 #endif
+#undef GET_PROC_ADDR
 
 #if defined(USE_OPENGL_ES2)
     /* OpenGL ES 2 includes support for non-power of 2 textures by specification
