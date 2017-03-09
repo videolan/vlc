@@ -48,6 +48,8 @@
 
 #define PS_PACKET_PROBE 3
 #define CDXA_HEADER_SIZE 44
+#define CDXA_SECTOR_SIZE 2352
+#define CDXA_SECTOR_HEADER_SIZE 24
 
 /*****************************************************************************
  * Module descriptor
@@ -648,7 +650,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_current_pts = 0;
             p_sys->i_last_scr = -1;
 
-            i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_start_byte + (int64_t)(i64 * f) );
+            if( p_sys->format == CDXA_PS )
+            {
+                i64 = (int64_t)(i64  * f); /* Align to sector payload */
+                i64 = p_sys->i_start_byte + i64 - (i64 % CDXA_SECTOR_SIZE) + CDXA_SECTOR_HEADER_SIZE;
+            }
+            else
+            {
+                i64 = p_sys->i_start_byte + (int64_t)(i64 * f);
+            }
+
+            i_ret = vlc_stream_Seek( p_demux->s, i64 );
             if( i_ret == VLC_SUCCESS )
             {
                 NotifyDiscontinuity( p_sys->tk, p_demux->out );
