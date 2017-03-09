@@ -778,20 +778,14 @@ static int ps_pkt_resynch( stream_t *s, int format, bool b_pack )
            PES sizes and frelling up to UINT16_MAX bytes followed by 24 bytes CDXA Header */
         if( format == CDXA_PS && i_skip == 0 && i_peek >= 48 )
         {
-            size_t i = 0;
-            while( i<24 && p_peek[i] == 0 )
-                i++;
-            if( i == 20 )
+            const uint8_t cdxasynccode[12] = { 0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
+                                               0xff, 0xff, 0xff, 0xff, 0xff, 0x00 };
+            if( !memcmp( &p_peek[24], cdxasynccode, 12 ) )
             {
-                const uint8_t cdxasynccode[12] = { 0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
-                                                   0xff, 0xff, 0xff, 0xff, 0xff, 0x00 };
-                if( !memcmp( &p_peek[24], cdxasynccode, 12 ) )
-                {
-                    i_peek -= 48;
-                    p_peek += 48;
-                    i_skip += 48;
-                    continue;
-                }
+                i_peek -= 48;
+                p_peek += 48;
+                i_skip += 48;
+                continue;
             }
         }
 
