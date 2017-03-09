@@ -837,40 +837,6 @@ tc_common_release(const opengl_tex_converter_t *tc)
 }
 
 static int
-common_init(opengl_tex_converter_t *tc)
-{
-    struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
-    if (unlikely(priv == NULL))
-        return VLC_ENOMEM;
-
-    tc->pf_update       = tc_common_update;
-    tc->pf_release      = tc_common_release;
-    tc->pf_allocate_textures = tc_common_allocate_textures;
-
-#ifdef VLCGL_HAS_MAP_PERSISTENT
-    const bool supports_map_persistent = tc->api->BufferStorage
-        && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
-        && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
-        && tc->api->ClientWaitSync
-        && HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object")
-        && HasExtension(tc->glexts, "GL_ARB_buffer_storage");
-    if (supports_map_persistent)
-        tc->pf_get_pool = tc_persistent_get_pool;
-    msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering): %s",
-            supports_map_persistent ? "On" : "Off");
-#endif
-
-#ifdef NEED_GL_EXT_unpack_subimage
-    priv->has_unpack_subimage = HasExtension(tc->glexts,
-                                             "GL_EXT_unpack_subimage");
-#else
-    priv->has_unpack_subimage = true;
-#endif
-
-    return VLC_SUCCESS;
-}
-
-static int
 tc_xyz12_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 {
     tc->uloc.Texture[0] = tc->api->GetUniformLocation(program, "Texture0");
@@ -887,7 +853,7 @@ tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
 }
 
 static GLuint
-tc_xyz12_init(const video_format_t *fmt, opengl_tex_converter_t *tc)
+xyz12_shader_init(opengl_tex_converter_t *tc)
 {
     tc->chroma  = VLC_CODEC_XYZ12;
     tc->tex_count = 1;
@@ -898,9 +864,6 @@ tc_xyz12_init(const video_format_t *fmt, opengl_tex_converter_t *tc)
 
     tc->pf_fetch_locations = tc_xyz12_fetch_locations;
     tc->pf_prepare_shader = tc_xyz12_prepare_shader;
-
-    if (common_init(tc) != VLC_SUCCESS)
-        return 0;
 
     /* Shader for XYZ to RGB correction
      * 3 steps :
@@ -936,10 +899,7 @@ tc_xyz12_init(const video_format_t *fmt, opengl_tex_converter_t *tc)
 
     GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
     if (fragment_shader == 0)
-    {
-        tc_common_release(tc);
         return 0;
-    }
     tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
     tc->api->CompileShader(fragment_shader);
     return fragment_shader;
@@ -954,43 +914,71 @@ opengl_tex_converter_generic_init(const video_format_t *fmt,
     if (!desc || desc->plane_count == 0)
         return 0;
 
+    GLuint fragment_shader = 0;
     if (fmt->i_chroma == VLC_CODEC_XYZ12)
-        return tc_xyz12_init(fmt, tc);
-
-    video_color_space_t space;
-    const vlc_fourcc_t *(*get_fallback)(vlc_fourcc_t i_fourcc);
-    if (vlc_fourcc_IsYUV(fmt->i_chroma))
-    {
-        GLint max_texture_units = 0;
-        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
-        if (max_texture_units < 3)
-            return 0;
-
-        get_fallback = vlc_fourcc_GetYUVFallback;
-        space = fmt->space;
-    }
+        fragment_shader = xyz12_shader_init(tc);
     else
     {
-        get_fallback = vlc_fourcc_GetRGBFallback;
-        space = COLOR_SPACE_UNDEF;
-    }
+        video_color_space_t space;
+        const vlc_fourcc_t *(*get_fallback)(vlc_fourcc_t i_fourcc);
 
-    const vlc_fourcc_t *list = get_fallback(fmt->i_chroma);
-    GLuint fragment_shader = 0;
-    while (*list && fragment_shader == 0)
-    {
-        fragment_shader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list,
-                                                      space);
-        list++;
+        if (vlc_fourcc_IsYUV(fmt->i_chroma))
+        {
+            GLint max_texture_units = 0;
+            glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+            if (max_texture_units < 3)
+                return 0;
+
+            get_fallback = vlc_fourcc_GetYUVFallback;
+            space = fmt->space;
+        }
+        else
+        {
+            get_fallback = vlc_fourcc_GetRGBFallback;
+            space = COLOR_SPACE_UNDEF;
+        }
+
+        const vlc_fourcc_t *list = get_fallback(fmt->i_chroma);
+        while (*list && fragment_shader == 0)
+        {
+            fragment_shader =
+                opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list, space);
+            list++;
+        }
     }
     if (fragment_shader == 0)
         return 0;
 
-    if (common_init(tc) != VLC_SUCCESS)
-    {
-        tc->api->DeleteShader(fragment_shader);
-        return 0;
-    }
+    struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
+    if (unlikely(priv == NULL))
+        goto error;
+
+    tc->pf_update            = tc_common_update;
+    tc->pf_release           = tc_common_release;
+    tc->pf_allocate_textures = tc_common_allocate_textures;
+
+#ifdef VLCGL_HAS_MAP_PERSISTENT
+    const bool supports_map_persistent = tc->api->BufferStorage
+        && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
+        && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
+        && tc->api->ClientWaitSync
+        && HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object")
+        && HasExtension(tc->glexts, "GL_ARB_buffer_storage");
+    if (supports_map_persistent)
+        tc->pf_get_pool = tc_persistent_get_pool;
+    msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering): %s",
+            supports_map_persistent ? "On" : "Off");
+#endif
+
+#ifdef NEED_GL_EXT_unpack_subimage
+    priv->has_unpack_subimage = HasExtension(tc->glexts,
+                                             "GL_EXT_unpack_subimage");
+#else
+    priv->has_unpack_subimage = true;
+#endif
 
     return fragment_shader;
+error:
+    tc->api->DeleteShader(fragment_shader);
+    return 0;
 }
