@@ -321,12 +321,16 @@ GLuint
 opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space);
 
-extern GLuint
+GLuint
+opengl_tex_converter_subpictures_init(const video_format_t *,
+                                      opengl_tex_converter_t *);
+
+GLuint
 opengl_tex_converter_generic_init(const video_format_t *,
                                   opengl_tex_converter_t *);
 
 #ifdef __ANDROID__
-extern GLuint
+GLuint
 opengl_tex_converter_anop_init(const video_format_t *,
                                opengl_tex_converter_t *);
 #endif

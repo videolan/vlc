@@ -672,8 +672,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    GLuint fshader = opengl_tex_converter_generic_init(&vgl->fmt,
-                                                       &vgl->sub_prgm->tc);
+    GLuint fshader = opengl_tex_converter_subpictures_init(&vgl->fmt,
+                                                           &vgl->sub_prgm->tc);
     int ret = opengl_link_program(vgl->sub_prgm, fshader);
     if (ret != VLC_SUCCESS)
     {

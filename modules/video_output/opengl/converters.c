@@ -567,10 +567,11 @@ persistent_release_gpupics(const opengl_tex_converter_t *tc, bool force)
 }
 
 static int
-persistent_common_update(const opengl_tex_converter_t *tc, const GLuint *textures,
-                  const GLsizei *tex_width, const GLsizei *tex_height,
-                  picture_t *pic)
+tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
+                     const GLsizei *tex_width, const GLsizei *tex_height,
+                     picture_t *pic, const size_t *plane_offset)
 {
+    (void) plane_offset; assert(plane_offset == NULL);
     struct priv *priv = tc->priv;
     picture_sys_t *picsys = pic->p_sys;
 
@@ -801,11 +802,7 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
                  const GLsizei *tex_width, const GLsizei *tex_height,
                  picture_t *pic, const size_t *plane_offset)
 {
-#ifdef VLCGL_HAS_MAP_PERSISTENT
-    if (pic->p_sys != NULL)
-        return persistent_common_update(tc, textures, tex_width, tex_height, pic);
-#endif
-
+    assert(pic->p_sys == NULL);
     int ret = VLC_SUCCESS;
     for (unsigned i = 0; i < tc->tex_count && ret == VLC_SUCCESS; i++)
     {
@@ -905,9 +902,9 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
     return fragment_shader;
 }
 
-GLuint
-opengl_tex_converter_generic_init(const video_format_t *fmt,
-                                  opengl_tex_converter_t *tc)
+static GLuint
+generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
+             bool allow_dr)
 {
     const vlc_chroma_description_t *desc =
         vlc_fourcc_GetChromaDescription(fmt->i_chroma);
@@ -957,18 +954,23 @@ opengl_tex_converter_generic_init(const video_format_t *fmt,
     tc->pf_release           = tc_common_release;
     tc->pf_allocate_textures = tc_common_allocate_textures;
 
+    if (allow_dr)
+    {
 #ifdef VLCGL_HAS_MAP_PERSISTENT
-    const bool supports_map_persistent = tc->api->BufferStorage
-        && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
-        && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
-        && tc->api->ClientWaitSync
-        && HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object")
-        && HasExtension(tc->glexts, "GL_ARB_buffer_storage");
-    if (supports_map_persistent)
-        tc->pf_get_pool = tc_persistent_get_pool;
-    msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering): %s",
-            supports_map_persistent ? "On" : "Off");
+        const bool supports_map_persistent = tc->api->BufferStorage
+            && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
+            && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
+            && tc->api->ClientWaitSync
+            && HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object")
+            && HasExtension(tc->glexts, "GL_ARB_buffer_storage");
+        if (supports_map_persistent)
+        {
+            tc->pf_get_pool = tc_persistent_get_pool;
+            tc->pf_update   = tc_persistent_update;
+            msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering) enabled");
+        }
 #endif
+    }
 
 #ifdef NEED_GL_EXT_unpack_subimage
     priv->has_unpack_subimage = HasExtension(tc->glexts,
@@ -981,4 +983,18 @@ opengl_tex_converter_generic_init(const video_format_t *fmt,
 error:
     tc->api->DeleteShader(fragment_shader);
     return 0;
+}
+
+GLuint
+opengl_tex_converter_subpictures_init(const video_format_t *fmt,
+                                      opengl_tex_converter_t *tc)
+{
+    return generic_init(fmt, tc, false);
+}
+
+GLuint
+opengl_tex_converter_generic_init(const video_format_t *fmt,
+                                  opengl_tex_converter_t *tc)
+{
+    return generic_init(fmt, tc, true);
 }
