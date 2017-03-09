@@ -348,7 +348,6 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_input_cachelevel_customLabel setStringValue: _NS("Use the complete preferences to configure custom caching values for each access module.")];
     [_input_muxBox setTitle: _NS("Codecs / Muxers")];
     [_input_netBox setTitle: _NS("Network")];
-    [_input_avcodec_hwLabel setStringValue: _NS("Hardware Acceleration")];
     [_input_postprocLabel setStringValue: _NS("Post-Processing Quality")];
     [_input_skipLoopLabel setStringValue: _NS("Skip the loop filter for H.264 decoding")];
     [_input_urlhandlerButton setTitle: _NS("Edit default application settings for network protocols")];
@@ -706,7 +705,6 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     [self setupField:_input_recordTextField forOption:"input-record-path"];
     [_input_postprocTextField setIntValue: config_GetInt(p_intf, "postproc-q")];
     [_input_postprocTextField setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
-    [self setupButton:_input_avcodec_hwPopup forModuleList: "avcodec-hw"];
     [self setupButton:_input_skipFramesCheckbox forBoolValue: "skip-frames"];
     [self setupButton:_input_aviPopup forIntList: "avi-index"];
     [self setupButton:_input_skipLoopPopup forIntList: "avcodec-skiploopfilter"];
@@ -1028,7 +1026,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         SaveIntList(_input_aviPopup, "avi-index");
 
-        SaveModuleList(_input_avcodec_hwPopup, "avcodec-hw");
         SaveIntList(_input_skipLoopPopup, "avcodec-skiploopfilter");
 
         #define CaC(name, factor) config_PutInt(p_intf, name, [[_input_cachelevelPopup selectedItem] tag] * factor)

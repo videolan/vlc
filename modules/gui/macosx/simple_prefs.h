@@ -75,8 +75,6 @@
 @property (readwrite, weak) IBOutlet NSBox *input_cachingBox;
 @property (readwrite, weak) IBOutlet NSBox *input_muxBox;
 @property (readwrite, weak) IBOutlet NSBox *input_netBox;
-@property (readwrite, weak) IBOutlet NSTextField *input_avcodec_hwLabel;
-@property (readwrite, weak) IBOutlet NSPopUpButton *input_avcodec_hwPopup;
 @property (readwrite, weak) IBOutlet NSTextField *input_postprocTextField;
 @property (readwrite, weak) IBOutlet NSTextField *input_postprocLabel;
 @property (readwrite, weak) IBOutlet NSTextField *input_skipLoopLabel;

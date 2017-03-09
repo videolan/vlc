@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1211" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1217" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -44,8 +44,6 @@
                 <outlet property="hotkeys_clearButton" destination="2674" id="0JA-op-ATZ"/>
                 <outlet property="hotkeys_listbox" destination="2670" id="i2J-F5-aT6"/>
                 <outlet property="inputView" destination="2562" id="FPv-Zx-DLZ"/>
-                <outlet property="input_avcodec_hwLabel" destination="3861" id="Esr-1x-9Ak"/>
-                <outlet property="input_avcodec_hwPopup" destination="3862" id="IPF-xF-e5F"/>
                 <outlet property="input_aviLabel" destination="2593" id="Tm7-Yh-wKr"/>
                 <outlet property="input_aviPopup" destination="2594" id="2No-D7-Fgf"/>
                 <outlet property="input_cachelevelLabel" destination="2574" id="mJl-GV-Ui9"/>
@@ -1255,11 +1253,11 @@ Gw
             <point key="canvasLocation" x="-392" y="89.5"/>
         </customView>
         <customView id="2562" userLabel="Input &amp; Codecs">
-            <rect key="frame" x="0.0" y="0.0" width="572" height="446"/>
+            <rect key="frame" x="0.0" y="0.0" width="572" height="422"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <box title="Caching" translatesAutoresizingMaskIntoConstraints="NO" id="2572">
-                    <rect key="frame" x="17" y="207" width="538" height="88"/>
+                    <rect key="frame" x="17" y="183" width="538" height="88"/>
                     <view key="contentView" id="deK-kX-Lvr">
                         <rect key="frame" x="2" y="2" width="534" height="71"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1302,10 +1300,10 @@ Gw
                             </textField>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="2574" firstAttribute="top" secondItem="deK-kX-Lvr" secondAttribute="top" constant="12" id="4so-vT-r4H"/>
                             <constraint firstItem="3162" firstAttribute="centerX" secondItem="deK-kX-Lvr" secondAttribute="centerX" id="Huj-Q0-fSB"/>
                             <constraint firstAttribute="trailing" secondItem="2580" secondAttribute="trailing" constant="17" id="N4J-65-EWZ"/>
                             <constraint firstItem="2574" firstAttribute="leading" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="16" id="YS7-i8-eoQ"/>
-                            <constraint firstItem="2580" firstAttribute="top" secondItem="deK-kX-Lvr" secondAttribute="top" constant="10" id="dQY-a6-Yaw"/>
                             <constraint firstItem="3162" firstAttribute="top" secondItem="2580" secondAttribute="bottom" constant="5" id="ltx-8x-IZC"/>
                             <constraint firstItem="2574" firstAttribute="centerY" secondItem="2580" secondAttribute="centerY" id="yq3-Ir-bxc"/>
                         </constraints>
@@ -1315,13 +1313,47 @@ Gw
                     </constraints>
                 </box>
                 <box title="Codecs / Muxers" translatesAutoresizingMaskIntoConstraints="NO" id="2585">
-                    <rect key="frame" x="17" y="16" width="538" height="184"/>
+                    <rect key="frame" x="17" y="16" width="538" height="160"/>
                     <view key="contentView" id="30i-kg-rYI">
-                        <rect key="frame" x="2" y="2" width="534" height="167"/>
+                        <rect key="frame" x="2" y="2" width="534" height="143"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2592">
+                                <rect key="frame" x="14" y="114" width="150" height="17"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Post-Processing Quality" id="3518">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2593">
+                                <rect key="frame" x="14" y="81" width="98" height="17"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Repair AVI Files" id="3519">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3434">
+                                <rect key="frame" x="14" y="48" width="240" height="17"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Skip the Loop filter for H.264 decoding" id="3522">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="lem-yf-jZB">
+                                <rect key="frame" x="14" y="16" width="94" height="18"/>
+                                <buttonCell key="cell" type="check" title="Skip frames" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="lfl-mG-es8">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="inputSettingChanged:" target="-2" id="tI4-5J-NJ2"/>
+                                </connections>
+                            </button>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2587">
-                                <rect key="frame" x="320" y="103" width="58" height="22"/>
+                                <rect key="frame" x="317" y="112" width="58" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="58" id="LL4-lM-q8l"/>
                                 </constraints>
@@ -1343,30 +1375,14 @@ Gw
                                 </connections>
                             </textField>
                             <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2589">
-                                <rect key="frame" x="383" y="100" width="19" height="27"/>
+                                <rect key="frame" x="380" y="109" width="19" height="27"/>
                                 <stepperCell key="cell" continuous="YES" alignment="left" maxValue="8" valueWraps="YES" id="3517"/>
                                 <connections>
                                     <action selector="inputSettingChanged:" target="-2" id="ED3-8S-LYW"/>
                                 </connections>
                             </stepper>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2592">
-                                <rect key="frame" x="15" y="106" width="150" height="17"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Post-Processing Quality" id="3518">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2593">
-                                <rect key="frame" x="15" y="73" width="98" height="17"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Repair AVI Files" id="3519">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2594">
-                                <rect key="frame" x="318" y="68" width="202" height="26"/>
+                                <rect key="frame" x="315" y="76" width="202" height="26"/>
                                 <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2598" id="3520">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -1382,51 +1398,8 @@ Gw
                                     <action selector="inputSettingChanged:" target="-2" id="AYa-x1-EVT"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3434">
-                                <rect key="frame" x="15" y="41" width="240" height="17"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Skip the Loop filter for H.264 decoding" id="3522">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3861">
-                                <rect key="frame" x="15" y="138" width="142" height="17"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Hardware Acceleration" id="3868">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3862">
-                                <rect key="frame" x="318" y="133" width="202" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3865" id="3863">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" title="OtherViews" id="3864">
-                                        <items>
-                                            <menuItem title="Item1" state="on" id="3865"/>
-                                            <menuItem title="Item2" id="3866"/>
-                                            <menuItem title="Item3" id="3867"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                                <connections>
-                                    <action selector="inputSettingChanged:" target="-2" id="NbU-v1-MAD"/>
-                                </connections>
-                            </popUpButton>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="lem-yf-jZB">
-                                <rect key="frame" x="15" y="11" width="94" height="18"/>
-                                <buttonCell key="cell" type="check" title="Skip frames" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="lfl-mG-es8">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="inputSettingChanged:" target="-2" id="tI4-5J-NJ2"/>
-                                </connections>
-                            </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3435">
-                                <rect key="frame" x="318" y="36" width="202" height="26"/>
+                                <rect key="frame" x="315" y="43" width="202" height="26"/>
                                 <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3439" id="3523">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -1444,35 +1417,31 @@ Gw
                             </popUpButton>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="2587" firstAttribute="leading" secondItem="3862" secondAttribute="leading" id="094-iz-sYG"/>
                             <constraint firstItem="2589" firstAttribute="centerY" secondItem="2587" secondAttribute="centerY" id="4D0-CS-wLd"/>
-                            <constraint firstItem="3861" firstAttribute="leading" secondItem="2592" secondAttribute="leading" id="5GX-4b-scD"/>
-                            <constraint firstItem="3861" firstAttribute="leading" secondItem="30i-kg-rYI" secondAttribute="leading" constant="17" id="99Y-U6-36R"/>
+                            <constraint firstItem="2594" firstAttribute="leading" secondItem="2587" secondAttribute="leading" id="6YF-zX-qnU"/>
                             <constraint firstItem="3434" firstAttribute="leading" secondItem="2593" secondAttribute="leading" id="DbT-Jq-Nxe"/>
                             <constraint firstItem="2592" firstAttribute="centerY" secondItem="2587" secondAttribute="centerY" id="Fkm-jR-oMF"/>
-                            <constraint firstItem="3435" firstAttribute="leading" secondItem="3862" secondAttribute="leading" id="GX2-c6-heC"/>
-                            <constraint firstItem="3435" firstAttribute="top" secondItem="2594" secondAttribute="bottom" constant="11" id="Htu-Kk-JgX"/>
+                            <constraint firstAttribute="trailing" secondItem="2589" secondAttribute="trailing" constant="138" id="HmN-hM-nt0"/>
                             <constraint firstItem="lem-yf-jZB" firstAttribute="leading" secondItem="3434" secondAttribute="leading" id="IpM-8a-E67"/>
-                            <constraint firstAttribute="bottom" secondItem="lem-yf-jZB" secondAttribute="bottom" constant="13" id="L97-wg-aIs"/>
-                            <constraint firstItem="3862" firstAttribute="width" secondItem="2594" secondAttribute="width" id="LsZ-hH-QAf"/>
-                            <constraint firstItem="2594" firstAttribute="top" secondItem="2587" secondAttribute="bottom" constant="11" id="MH8-Rs-NCX"/>
-                            <constraint firstItem="3861" firstAttribute="centerY" secondItem="3862" secondAttribute="centerY" id="N4D-Z7-5bm"/>
+                            <constraint firstItem="2593" firstAttribute="top" secondItem="2592" secondAttribute="bottom" constant="16" id="JOz-5x-WGX"/>
+                            <constraint firstItem="lem-yf-jZB" firstAttribute="top" secondItem="3434" secondAttribute="bottom" constant="16" id="RYW-Uf-buV"/>
+                            <constraint firstItem="3434" firstAttribute="top" secondItem="2593" secondAttribute="bottom" constant="16" id="Tam-yC-51c"/>
+                            <constraint firstItem="3435" firstAttribute="width" secondItem="2594" secondAttribute="width" id="V0T-ah-xQd"/>
                             <constraint firstItem="3434" firstAttribute="centerY" secondItem="3435" secondAttribute="centerY" id="WV5-Nx-zJo"/>
-                            <constraint firstItem="3862" firstAttribute="leading" secondItem="2594" secondAttribute="leading" id="iCW-jJ-yfn"/>
+                            <constraint firstItem="2592" firstAttribute="leading" secondItem="30i-kg-rYI" secondAttribute="leading" constant="16" id="dQB-hm-G2h"/>
+                            <constraint firstItem="3435" firstAttribute="leading" secondItem="2594" secondAttribute="leading" id="h44-ac-8ao"/>
+                            <constraint firstItem="2592" firstAttribute="top" secondItem="30i-kg-rYI" secondAttribute="top" constant="12" id="hWU-Qa-oAW"/>
                             <constraint firstItem="2593" firstAttribute="centerY" secondItem="2594" secondAttribute="centerY" id="jae-OS-C7i"/>
-                            <constraint firstItem="2587" firstAttribute="top" secondItem="3862" secondAttribute="bottom" constant="11" id="kFY-Sd-FzR"/>
                             <constraint firstItem="2589" firstAttribute="leading" secondItem="2587" secondAttribute="trailing" constant="8" id="pEK-ey-Plq"/>
                             <constraint firstItem="2593" firstAttribute="leading" secondItem="2592" secondAttribute="leading" id="raR-vS-fzh"/>
-                            <constraint firstItem="3435" firstAttribute="width" secondItem="3862" secondAttribute="width" id="t3c-pj-hmk"/>
                         </constraints>
                     </view>
                     <constraints>
-                        <constraint firstAttribute="height" constant="180" id="8KJ-6M-0pY"/>
-                        <constraint firstItem="3862" firstAttribute="top" secondItem="2585" secondAttribute="top" constant="25" id="HbP-Ji-or1"/>
+                        <constraint firstAttribute="height" constant="156" id="8KJ-6M-0pY"/>
                     </constraints>
                 </box>
                 <box title="Network" translatesAutoresizingMaskIntoConstraints="NO" id="2563">
-                    <rect key="frame" x="17" y="300" width="538" height="60"/>
+                    <rect key="frame" x="17" y="276" width="538" height="60"/>
                     <view key="contentView" id="1lv-cw-XiH">
                         <rect key="frame" x="2" y="2" width="534" height="43"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1497,7 +1466,7 @@ Gw
                     </constraints>
                 </box>
                 <box autoresizesSubviews="NO" borderType="line" title="Record directory or filename" translatesAutoresizingMaskIntoConstraints="NO" id="3623">
-                    <rect key="frame" x="17" y="364" width="538" height="62"/>
+                    <rect key="frame" x="17" y="340" width="538" height="62"/>
                     <view key="contentView" id="7b2-vV-8CM">
                         <rect key="frame" x="1" y="1" width="536" height="46"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1539,21 +1508,20 @@ Gw
             </subviews>
             <constraints>
                 <constraint firstItem="3623" firstAttribute="top" secondItem="2562" secondAttribute="top" constant="20" id="1ix-eF-TTK"/>
-                <constraint firstItem="2580" firstAttribute="leading" secondItem="3862" secondAttribute="leading" id="CE3-H2-7RO"/>
                 <constraint firstItem="2585" firstAttribute="top" secondItem="2572" secondAttribute="bottom" constant="11" id="FDR-q2-Lo9"/>
                 <constraint firstItem="2572" firstAttribute="top" secondItem="2563" secondAttribute="bottom" constant="9" id="GEn-WD-38d"/>
                 <constraint firstItem="2563" firstAttribute="top" secondItem="3623" secondAttribute="bottom" constant="8" id="HYu-M9-6fQ"/>
                 <constraint firstItem="2585" firstAttribute="leading" secondItem="2572" secondAttribute="leading" id="Iy8-4C-OoE"/>
+                <constraint firstItem="2594" firstAttribute="width" secondItem="2580" secondAttribute="width" id="JeM-EA-DuV"/>
                 <constraint firstItem="3623" firstAttribute="width" secondItem="2585" secondAttribute="width" id="P5p-eN-ARm"/>
                 <constraint firstItem="2572" firstAttribute="leading" secondItem="2563" secondAttribute="leading" id="bpU-pH-0tc"/>
                 <constraint firstItem="3623" firstAttribute="width" secondItem="2563" secondAttribute="width" id="c9G-uN-T6d"/>
                 <constraint firstItem="3623" firstAttribute="leading" secondItem="2562" secondAttribute="leading" constant="20" id="iUT-Of-JWh"/>
                 <constraint firstItem="3623" firstAttribute="width" secondItem="2572" secondAttribute="width" id="nQq-Lo-e5Y"/>
                 <constraint firstAttribute="trailing" secondItem="3623" secondAttribute="trailing" constant="20" id="noM-v5-qkA"/>
-                <constraint firstItem="2580" firstAttribute="width" secondItem="3862" secondAttribute="width" id="oDT-ER-wlv"/>
                 <constraint firstItem="2563" firstAttribute="leading" secondItem="3623" secondAttribute="leading" id="zVq-6c-r8n"/>
             </constraints>
-            <point key="canvasLocation" x="883" y="170"/>
+            <point key="canvasLocation" x="883" y="158"/>
         </customView>
         <customView id="2523" userLabel="Subtitles &amp; OSD Settings">
             <rect key="frame" x="0.0" y="0.0" width="570" height="401"/>
