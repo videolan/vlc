@@ -137,8 +137,9 @@ struct decoder_sys_t
     mtime_t i_frame_pts;
     mtime_t i_frame_dts;
     mtime_t i_prev_pts;
-    mtime_t i_prev_dts;
     uint8_t i_dpb_output_delay;
+
+    date_t dts;
 
     /* */
     cc_storage_t *p_ccs;
@@ -238,14 +239,22 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_even_frame = false;
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
-    p_sys->i_prev_dts = VLC_TS_INVALID;
     p_sys->i_prev_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
+
+    date_Init( &p_sys->dts, 1, 1 );
+    date_Set( &p_sys->dts, VLC_TS_INVALID );
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_H264;
     p_dec->fmt_out.b_packetized = true;
+
+    if( p_dec->fmt_in.video.i_frame_rate_base > 0 )
+    {
+        date_Change( &p_sys->dts, p_dec->fmt_in.video.i_frame_rate * 2,
+                                  p_dec->fmt_in.video.i_frame_rate_base );
+    }
 
     if( b_avc )
     {
@@ -408,7 +417,7 @@ static void PacketizeReset( void *p_private, bool b_broken )
     }
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_frame_dts = VLC_TS_INVALID;
-    p_sys->i_prev_dts = VLC_TS_INVALID;
+    date_Set( &p_sys->dts, VLC_TS_INVALID );
     p_sys->i_prev_pts = VLC_TS_INVALID;
     p_sys->b_even_frame = false;
 }
@@ -540,6 +549,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
         *pb_ts_used = true;
+        if( i_frag_dts > VLC_TS_INVALID )
+            date_Set( &p_sys->dts, i_frag_dts );
     }
     return p_pic;
 }
@@ -639,7 +650,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
                 p_pic->i_flags |= (p_sys->i_pic_struct == 1) ? BLOCK_FLAG_TOP_FIELD_FIRST
                                                              : BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             }
-            else if( p_pic->i_pts <= VLC_TS_INVALID && p_sys->i_prev_pts > VLC_TS_INVALID && p_pic->i_length )
+            else if( p_pic->i_pts <= VLC_TS_INVALID &&
+                     date_Get( &p_sys->dts ) > VLC_TS_INVALID && p_pic->i_length )
             {
                 /* interpolate from even frame */
                 i_field_pts_diff = p_pic->i_length;
@@ -674,7 +686,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     /* Fixup missing timestamps after split (multiple AU/block)*/
     if( p_pic->i_dts <= VLC_TS_INVALID )
-        p_pic->i_dts = p_sys->i_prev_dts;
+        p_pic->i_dts = date_Get( &p_sys->dts );
 
     /* PTS Fixup, interlaced fields (multiple AU/block) */
     if( p_pic->i_pts <= VLC_TS_INVALID && p_sys->i_time_scale )
@@ -686,8 +698,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_pic->i_pts += i_field_pts_diff;
     }
 
+    date_Increment( &p_sys->dts, i_num_clock_ts );
+
     /* save for next pic fixups */
-    p_sys->i_prev_dts = p_pic->i_dts;
     p_sys->i_prev_pts = p_pic->i_pts;
 
     p_pic->i_flags |= p_sys->slice.i_frame_type;
@@ -765,6 +778,8 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         {
             p_dec->fmt_out.video.i_frame_rate_base = p_sps->vui.i_num_units_in_tick;
             p_dec->fmt_out.video.i_frame_rate = p_sps->vui.i_time_scale >> 1 /* num_clock_ts == 2 */;
+            if( p_sps->vui.i_num_units_in_tick > 0 )
+                date_Change( &p_sys->dts, p_sps->vui.i_time_scale, p_sps->vui.i_num_units_in_tick );
         }
         if( p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF )
         {
