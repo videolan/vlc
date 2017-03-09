@@ -28,9 +28,13 @@
 #   define PRECISION "precision highp float;"
 #   define VLCGL_PICTURE_MAX 128
 #   define glClientActiveTexture(x)
+#   define VLCGL_HAS_PBO /* PBO present as an OpenGlES 2 extension */
 #else
 #   define GLSL_VERSION "120"
 #   define VLCGL_PICTURE_MAX 128
+#   ifdef GL_VERSION_2_0
+#       define VLCGL_HAS_PBO
+#   endif
 #   ifdef GL_VERSION_4_4
 #       define VLCGL_HAS_MAP_PERSISTENT
 #   endif
@@ -66,6 +70,9 @@
 #   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
 #   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
+#   ifdef VLCGL_HAS_PBO
+#    define PFNGLBUFFERSUBDATAPROC           typeof(glBufferSubData)*
+#   endif
 #   ifdef VLCGL_HAS_MAP_PERSISTENT
 #    define PFNGLBUFFERSTORAGEPROC           typeof(glBufferStorage)*
 #    define PFNGLMAPBUFFERRANGEPROC          typeof(glMapBufferRange)*
@@ -119,6 +126,9 @@ typedef struct {
     PFNGLGENBUFFERSPROC    GenBuffers;
     PFNGLBINDBUFFERPROC    BindBuffer;
     PFNGLBUFFERDATAPROC    BufferData;
+#ifdef VLCGL_HAS_PBO
+    PFNGLBUFFERSUBDATAPROC          BufferSubData;
+#endif
 #ifdef VLCGL_HAS_MAP_PERSISTENT
     PFNGLBUFFERSTORAGEPROC          BufferStorage;
     PFNGLMAPBUFFERRANGEPROC         MapBufferRange;

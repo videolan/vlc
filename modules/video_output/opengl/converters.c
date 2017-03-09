@@ -47,14 +47,17 @@
 #define NEED_GL_EXT_unpack_subimage
 #endif
 
-#ifdef VLCGL_HAS_MAP_PERSISTENT
+#ifdef VLCGL_HAS_PBO
+#define PBO_DISPLAY_COUNT 2 /* Double buffering */
 struct picture_sys_t
 {
     const opengl_tex_converter_t *tc;
     GLuint      buffers[PICTURE_PLANE_MAX];
     size_t      bytes[PICTURE_PLANE_MAX];
+#ifdef VLCGL_HAS_MAP_PERSISTENT
     GLsync      fence;
     unsigned    index;
+#endif
 };
 #endif
 
@@ -63,11 +66,17 @@ struct priv
     bool   has_unpack_subimage;
     void * texture_temp_buf;
     size_t texture_temp_buf_size;
+#ifdef VLCGL_HAS_PBO
+    struct {
+        picture_t *display_pics[PBO_DISPLAY_COUNT];
+        size_t display_idx;
+    } pbo;
 #ifdef VLCGL_HAS_MAP_PERSISTENT
     struct {
         picture_t *pics[VLCGL_PICTURE_MAX];
         unsigned long long list;
     } persistent;
+#endif
 #endif
 };
 
@@ -491,7 +500,14 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
     return fragment_shader;
 }
 
-#ifdef VLCGL_HAS_MAP_PERSISTENT
+#ifdef VLCGL_HAS_PBO
+# ifndef GL_PIXEL_UNPACK_BUFFER
+#  define GL_PIXEL_UNPACK_BUFFER 0x88EC
+# endif
+# ifndef GL_DYNAMIC_DRAW
+#  define GL_DYNAMIC_DRAW 0x88E8
+# endif
+
 static picture_t *
 pbo_picture_create(const opengl_tex_converter_t *tc, const video_format_t *fmt,
                    void (*pf_destroy)(picture_t *))
@@ -532,6 +548,113 @@ pbo_picture_create(const opengl_tex_converter_t *tc, const video_format_t *fmt,
     return pic;
 }
 
+static int
+pbo_data_alloc(const opengl_tex_converter_t *tc, picture_t *pic)
+{
+    picture_sys_t *picsys = pic->p_sys;
+
+    glGetError();
+    tc->api->GenBuffers(pic->i_planes, picsys->buffers);
+
+    for (int i = 0; i < pic->i_planes; ++i)
+    {
+        tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
+        tc->api->BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
+                            GL_DYNAMIC_DRAW);
+
+        if (glGetError() != GL_NO_ERROR)
+        {
+            msg_Err(tc->gl, "could not alloc PBO buffers");
+            tc->api->DeleteBuffers(i, picsys->buffers);
+            return VLC_EGENERIC;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static void
+picture_pbo_destroy_cb(picture_t *pic)
+{
+    picture_sys_t *picsys = pic->p_sys;
+    const opengl_tex_converter_t *tc = picsys->tc;
+
+    if (picsys->buffers[0] != 0)
+        tc->api->DeleteBuffers(pic->i_planes, picsys->buffers);
+    free(picsys);
+    free(pic);
+}
+
+static int
+pbo_pics_alloc(const opengl_tex_converter_t *tc, const video_format_t *fmt)
+{
+    struct priv *priv = tc->priv;
+    for (size_t i = 0; i < PBO_DISPLAY_COUNT; ++i)
+    {
+        picture_t *pic = priv->pbo.display_pics[i] =
+            pbo_picture_create(tc, fmt, picture_pbo_destroy_cb);
+        if (pic == NULL)
+            goto error;
+
+        if (pbo_data_alloc(tc, pic) != VLC_SUCCESS)
+            goto error;
+    }
+
+    /* turn off pbo */
+    tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+
+    return VLC_SUCCESS;
+error:
+    for (size_t i = 0; i < PBO_DISPLAY_COUNT && priv->pbo.display_pics[i]; ++i)
+        picture_Release(priv->pbo.display_pics[i]);
+    return VLC_EGENERIC;
+}
+
+static int
+tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
+              const GLsizei *tex_width, const GLsizei *tex_height,
+              picture_t *pic, const size_t *plane_offset)
+{
+    (void) plane_offset; assert(plane_offset == NULL);
+    struct priv *priv = tc->priv;
+
+    picture_t *display_pic = priv->pbo.display_pics[priv->pbo.display_idx];
+    priv->pbo.display_idx = (priv->pbo.display_idx + 1) % PBO_DISPLAY_COUNT;
+
+    for (int i = 0; i < pic->i_planes; i++)
+    {
+        GLsizeiptr size = pic->p[i].i_visible_lines * pic->p[i].i_visible_pitch;
+        const GLvoid *data = pic->p[i].p_pixels;
+        tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
+                            display_pic->p_sys->buffers[i]);
+        tc->api->BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
+
+        glActiveTexture(GL_TEXTURE0 + i);
+        glClientActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(tc->tex_target, textures[i]);
+
+        glPixelStorei(GL_UNPACK_ROW_LENGTH,
+                      pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
+
+        glTexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
+                        tc->texs[i].format, tc->texs[i].type, NULL);
+    }
+
+    /* turn off pbo */
+    tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+
+    return VLC_SUCCESS;
+}
+
+static void
+tc_pbo_release(const opengl_tex_converter_t *tc)
+{
+    struct priv *priv = tc->priv;
+    for (size_t i = 0; i < PBO_DISPLAY_COUNT && priv->pbo.display_pics[i]; ++i)
+        picture_Release(priv->pbo.display_pics[i]);
+    free(tc->priv);
+}
+
+#ifdef VLCGL_HAS_MAP_PERSISTENT
 static int
 persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 {
@@ -743,6 +866,7 @@ error:
     return NULL;
 }
 #endif /* VLCGL_HAS_MAP_PERSISTENT */
+#endif /* VLCGL_HAS_PBO */
 
 static int
 tc_common_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
@@ -972,14 +1096,17 @@ generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
 
     if (allow_dr)
     {
-#ifdef VLCGL_HAS_MAP_PERSISTENT
+        bool supports_map_persistent = false;
+
         const bool has_pbo =
             HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object") ||
             HasExtension(tc->glexts, "GL_EXT_pixel_buffer_object");
+
+#ifdef VLCGL_HAS_MAP_PERSISTENT
         const bool has_bs =
             HasExtension(tc->glexts, "GL_ARB_buffer_storage") ||
             HasExtension(tc->glexts, "GL_EXT_buffer_storage");
-        const bool supports_map_persistent = has_pbo && has_bs && tc->api->BufferStorage
+        supports_map_persistent = has_pbo && has_bs && tc->api->BufferStorage
             && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
             && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
             && tc->api->ClientWaitSync;
@@ -989,6 +1116,19 @@ generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
             tc->pf_update   = tc_persistent_update;
             tc->pf_release  = tc_persistent_release;
             msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering) enabled");
+        }
+#endif
+#ifdef VLCGL_HAS_PBO
+        if (!supports_map_persistent)
+        {
+            const bool supports_pbo = has_pbo && tc->api->BufferData
+                && tc->api->BufferSubData;
+            if (supports_pbo && pbo_pics_alloc(tc, fmt) == VLC_SUCCESS)
+            {
+                tc->pf_update  = tc_pbo_update;
+                tc->pf_release = tc_pbo_release;
+                msg_Err(tc->gl, "PBO support enabled");
+            }
         }
 #endif
     }

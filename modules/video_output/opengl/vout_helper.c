@@ -619,6 +619,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(BufferData, true);
     GET_PROC_ADDR(DeleteBuffers, true);
 
+#ifdef VLCGL_HAS_PBO
+    GET_PROC_ADDR(BufferSubData, false);
+#endif
 #ifdef VLCGL_HAS_MAP_PERSISTENT
     GET_PROC_ADDR(BufferStorage, false);
     GET_PROC_ADDR(MapBufferRange, false);
