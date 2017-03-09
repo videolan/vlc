@@ -108,7 +108,7 @@ function js_descramble( sig, js_url )
 
     -- Look for the descrambler function's name
     -- c&&a.set("signature",br(c));
-    local descrambler = js_extract( js, "%.set%(\"signature\",(.-)%(" )
+    local descrambler = js_extract( js, "%.set%(\"signature\",([^)]-)%(" )
     if not descrambler then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling function name" )
         return sig
