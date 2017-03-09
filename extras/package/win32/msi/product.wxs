@@ -84,7 +84,6 @@
 
                         <Component Id='CompVLC' Guid='$(var.CompVLCexe)' Win64="$(var.Win64)">
                             <File Id='vlc.exe' Name='vlc.exe' KeyPath='yes' Vital='yes' DiskId='1' />
-                            <File Id='vlc.exe.manifest' Name='vlc.exe.manifest' DiskId='1' />
 
                             <Shortcut Id="DesktopShortcut"
                                 Directory="DesktopFolder"
@@ -124,17 +123,14 @@
 
                         <Component Id='CompLibvlc' Guid='50d7e1e1-4512-4020-9f7b-5dc8484574f3' Win64="$(var.Win64)">
                             <File Id='libvlc.dll' Name='libvlc.dll' KeyPath='yes' Vital='yes' DiskId='1' />
-                            <File Id='libvlc.dll.manifest' Name='libvlc.dll.manifest' DiskId='1' />
                         </Component>
 
                         <Component Id='CompNpvlc' Guid='e7d6b54c-c4ea-4280-90f5-c6ae80073d25' Win64="$(var.Win64)">
                             <File Id='npvlc.dll' Name='npvlc.dll' KeyPath='yes' DiskId='1' />
-                            <File Id='npvlc.dll.manifest' Name='npvlc.dll.manifest' DiskId='1' />
                         </Component>
 
                         <Component Id='CompAxvlc' Guid='cabe28b1-5586-4ac3-815b-4f3a834c0d54' Win64="$(var.Win64)">
                             <File Id='axvlc.dll' Name='axvlc.dll' KeyPath='yes' DiskId='1' />
-                            <File Id='axvlc.dll.manifest' Name='axvlc.dll.manifest' DiskId='1' />
                         </Component>
 
                         <Component Id='CompCacheGen' Guid='e1b4a499-e223-4c18-9de0-258f12b8dcfa' Win64="$(var.Win64)">
