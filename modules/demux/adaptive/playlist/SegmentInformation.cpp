@@ -231,7 +231,7 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         uint64_t number;
         if( !segmentList->getSegmentNumberByScaledTime( bufferingstart, &number ) )
             return list.front()->getSequenceNumber();
-        if( number + OFFSET_FROM_END > list.front()->getSequenceNumber() )
+        if( number > list.front()->getSequenceNumber() + OFFSET_FROM_END )
             number -= OFFSET_FROM_END;
         else
             number = list.front()->getSequenceNumber();
