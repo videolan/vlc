@@ -32,6 +32,7 @@
 #define PS_STREAM_ID_MAP              0xBC
 #define PS_STREAM_ID_PRIVATE_STREAM1  0xBD
 #define PS_STREAM_ID_PADDING          0xBE
+#define PS_STREAM_ID_EXTENDED         0xFD
 #define PS_STREAM_ID_DIRECTORY        0xFF
 
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */

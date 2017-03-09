@@ -182,7 +182,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         if( memcmp( p_header, startcode, 3 ) ||
            ( (p_header[3] & 0xB0) != 0xB0 &&
             !(p_header[3] >= 0xC0 && p_header[3] <= 0xEF) &&
-              p_header[3] != 0xFF ) )
+              p_header[3] != PS_STREAM_ID_EXTENDED &&
+              p_header[3] != PS_STREAM_ID_DIRECTORY ) )
             return VLC_EGENERIC;
 
         ssize_t i_pessize = ps_pkt_size( p_header, 16 );
@@ -481,6 +482,7 @@ static int Demux( demux_t *p_demux )
         }
         //ft
     case PS_STREAM_ID_PRIVATE_STREAM1:
+    case PS_STREAM_ID_EXTENDED:
         {
             int i_id = ps_pkt_id( p_pkt );
             /* Small heuristic to improve MLP detection from AOB */
