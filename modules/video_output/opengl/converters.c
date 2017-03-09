@@ -492,6 +492,46 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 }
 
 #ifdef VLCGL_HAS_MAP_PERSISTENT
+static picture_t *
+pbo_picture_create(const opengl_tex_converter_t *tc, const video_format_t *fmt,
+                   void (*pf_destroy)(picture_t *))
+{
+    picture_sys_t *picsys = calloc(1, sizeof(*picsys));
+    if (unlikely(picsys == NULL))
+        return NULL;
+    picsys->tc = tc;
+    picture_resource_t rsc = {
+        .p_sys = picsys,
+        .pf_destroy = pf_destroy,
+    };
+
+    picture_t *pic = picture_NewFromResource(fmt, &rsc);
+    if (pic == NULL)
+    {
+        free(picsys);
+        return NULL;
+    }
+    if (picture_Setup(pic, fmt))
+    {
+        picture_Release(pic);
+        return NULL;
+    }
+
+    assert(pic->i_planes > 0
+        && (unsigned) pic->i_planes == tc->tex_count);
+
+    for (int i = 0; i < pic->i_planes; ++i)
+    {
+        const plane_t *p = &pic->p[i];
+
+        if( p->i_pitch < 0 || p->i_lines <= 0 ||
+            (size_t)p->i_pitch > SIZE_MAX/p->i_lines )
+            return NULL;
+        picsys->bytes[i] = (p->i_pitch * p->i_lines) + 15 / 16 * 16;
+    }
+    return pic;
+}
+
 static int
 persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 {
@@ -659,41 +699,15 @@ tc_persistent_get_pool(const opengl_tex_converter_t *tc, const video_format_t *f
 
     for (count = 0; count < requested_count; count++)
     {
-        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
-        if (unlikely(picsys == NULL))
-            break;
-        picsys->tc = tc;
-        picsys->index = count;
-        picture_resource_t rsc = {
-            .p_sys = picsys,
-            .pf_destroy = picture_persistent_destroy_cb,
-        };
-
-        picture_t *pic = pictures[count] = picture_NewFromResource(fmt, &rsc);
+        picture_t *pic = pictures[count] =
+            pbo_picture_create(tc, fmt, picture_persistent_destroy_cb);
         if (pic == NULL)
-        {
-            free(picsys);
             break;
-        }
-        if (picture_Setup(pic, fmt))
-        {
-            picture_Release(pic);
-            break;
-        }
-
-        assert(pic->i_planes > 0
-            && (unsigned) pic->i_planes == tc->tex_count);
-
+#ifndef NDEBUG
         for (int i = 0; i < pic->i_planes; ++i)
-        {
-            const plane_t *p = &pic->p[i];
-
-            if( p->i_pitch < 0 || p->i_lines <= 0 ||
-                (size_t)p->i_pitch > SIZE_MAX/p->i_lines )
-                goto error;
-            picsys->bytes[i] = (p->i_pitch * p->i_lines) + 15 / 16 * 16;
-            assert(picsys->bytes[i] == pictures[0]->p_sys->bytes[i]);
-        }
+            assert(pic->p_sys->bytes[i] == pictures[0]->p_sys->bytes[i]);
+#endif
+        pic->p_sys->index = count;
 
         if (persistent_map(tc, pic) != VLC_SUCCESS)
         {
