@@ -109,13 +109,16 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
             if( ( i_id&0xf0 ) == 0xc0 && p_pkt && p_pkt->i_buffer > 8 )
             {
                 unsigned i_start = 9 + p_pkt->p_buffer[8];
-                /* AC-3 marking, see vlc_a52_header_Parse */
-                if( p_pkt->p_buffer[i_start + 4] == 0x0b ||
-                    p_pkt->p_buffer[i_start + 5] == 0x77 )
+                if( i_start + 9 < p_pkt->i_buffer )
                 {
-                    int bsid = p_pkt->p_buffer[i_start + 9] >> 3;
-                    if( bsid > 10 )
-                        b_eac3 = true;
+                    /* AC-3 marking, see vlc_a52_header_Parse */
+                    if( p_pkt->p_buffer[i_start + 4] == 0x0b ||
+                        p_pkt->p_buffer[i_start + 5] == 0x77 )
+                    {
+                        int bsid = p_pkt->p_buffer[i_start + 9] >> 3;
+                        if( bsid > 10 )
+                            b_eac3 = true;
+                    }
                 }
             }
 
