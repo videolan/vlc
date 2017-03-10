@@ -101,26 +101,30 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     SetErrorMode(SEM_FAILCRITICALERRORS);
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
-    /* SetProcessDEPPolicy */
+    /* SetProcessDEPPolicy, SetDllDirectory, & Co. */
     HINSTANCE h_Kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
     if (h_Kernel32 != NULL)
     {
-        BOOL (WINAPI * mySetProcessDEPPolicy)( DWORD dwFlags);
-        BOOL (WINAPI * mySetDllDirectoryA)(const char* lpPathName);
+        /* Enable DEP */
 # define PROCESS_DEP_ENABLE 1
-
+        BOOL (WINAPI * mySetProcessDEPPolicy)( DWORD dwFlags);
         mySetProcessDEPPolicy = (BOOL (WINAPI *)(DWORD))
                             GetProcAddress(h_Kernel32, "SetProcessDEPPolicy");
         if(mySetProcessDEPPolicy)
             mySetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
         /* Do NOT load any library from cwd. */
+        BOOL (WINAPI * mySetDllDirectoryA)(const char* lpPathName);
         mySetDllDirectoryA = (BOOL (WINAPI *)(const char*))
                             GetProcAddress(h_Kernel32, "SetDllDirectoryA");
         if(mySetDllDirectoryA)
             mySetDllDirectoryA("");
     }
 
+    /***
+     * The LoadLibrary* calls from the modules and the 3rd party code
+     * will search in SYSTEM32 only
+     * */
     SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
 
     /* Args */
