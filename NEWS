@@ -75,7 +75,7 @@ Decoder:
  * New BPG decoder based on libbpg
  * Fixed uncompressed DVD-Audio (AOB) LPCM decoding
  * Rewrite WPL playlists and add ZPL playlists support (Zune)
- * Support TDSC, Canopus HQX, Cineform, SpeedHQ, Pixlet and QDMC codecs
+ * Support TDSC, Canopus HQX, Cineform, SpeedHQ, Pixlet, QDMC and FMVC codecs
  * TTML subtitles support, including EBU-TT-D variant
  * Support 9-bit and 10-bit GBR planar formats
  * New hardware accelerated decoder for OS X and and iOS based on Video Toolbox

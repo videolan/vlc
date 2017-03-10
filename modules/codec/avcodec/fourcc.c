@@ -287,6 +287,10 @@ static const struct
     { VLC_CODEC_SPEEDHQ, AV_CODEC_ID_SPEEDHQ, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_CHECK( 57, 999, 999, 79, 100 )
+    { VLC_CODEC_FMVC, AV_CODEC_ID_FMVC, VIDEO_ES },
+#endif
+
     /*
      *  Audio Codecs
      */

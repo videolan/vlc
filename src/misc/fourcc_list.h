@@ -587,6 +587,10 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_VMNC, "VMware Video"),
         A("VMnc"),
+
+    B(VLC_CODEC_FMVC, "FM Screen Capture Codec"),
+        A("FMVC"),
+
     B(VLC_CODEC_FRAPS, "FRAPS: Realtime Video Capture"),
         A("FPS1"),
         A("fps1"),

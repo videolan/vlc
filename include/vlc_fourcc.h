@@ -84,6 +84,7 @@
 #define VLC_CODEC_CSCD            VLC_FOURCC('C','S','C','D')
 #define VLC_CODEC_ZMBV            VLC_FOURCC('Z','M','B','V')
 #define VLC_CODEC_VMNC            VLC_FOURCC('V','M','n','c')
+#define VLC_CODEC_FMVC            VLC_FOURCC('F','M','V','C')
 #define VLC_CODEC_FRAPS           VLC_FOURCC('F','P','S','1')
 #define VLC_CODEC_TRUEMOTION1     VLC_FOURCC('D','U','C','K')
 #define VLC_CODEC_TRUEMOTION2     VLC_FOURCC('T','M','2','0')
