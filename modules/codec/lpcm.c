@@ -847,9 +847,9 @@ static int AobHeader( unsigned *pi_rate,
      *         + 3 bytes (1 for continuity counter + 2 for header_size ) */
     *pi_padding = 3 + i_header_size - LPCM_AOB_HEADER_LEN;
 
-    const int i_index_size_g1 = (p_header[6] >> 4) & 0x0f;
+    const int i_index_size_g1 = (p_header[6] >> 4);
     const int i_index_size_g2 = (p_header[6]     ) & 0x0f;
-    const int i_index_rate_g1 = (p_header[7] >> 4) & 0x0f;
+    const int i_index_rate_g1 = (p_header[7] >> 4);
     const int i_index_rate_g2 = (p_header[7]     ) & 0x0f;
     const int i_assignment     = p_header[9];
 
