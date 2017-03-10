@@ -247,11 +247,34 @@ static void check_crashdump(void)
 
     if(answer == IDYES)
     {
-        HINTERNET Hint = InternetOpen(L"VLC Crash Reporter",
+        HMODULE hWininet = LoadLibrary(TEXT("wininet.dll"));
+        if (hWininet == NULL)
+        {
+            fprintf(stderr, "There was an error loading the network"
+                    " 0x%08lx\n", (unsigned long)GetLastError());
+            goto done;
+        }
+
+        HINTERNET (WINAPI *InternetOpenW_)(LPCWSTR ,DWORD dwAccessType,LPCWSTR lpszProxy,LPCWSTR lpszProxyBypass,DWORD dwFlags);
+        HINTERNET (WINAPI *InternetConnectW_)(HINTERNET hInternet,LPCWSTR lpszServerName,INTERNET_PORT nServerPort,LPCWSTR lpszUserName,LPCWSTR lpszPassword,DWORD dwService,DWORD dwFlags,DWORD_PTR dwContext);
+        BOOL (WINAPI *InternetCloseHandle_)(HINTERNET hInternet);
+        BOOL (WINAPI *FtpPutFileW_)(HINTERNET hConnect,LPCWSTR lpszLocalFile,LPCWSTR lpszNewRemoteFile,DWORD dwFlags,DWORD_PTR dwContext);
+        InternetOpenW_       = (void*)GetProcAddress(hWininet, "InternetOpenW");
+        InternetConnectW_    = (void*)GetProcAddress(hWininet, "InternetConnectW");
+        InternetCloseHandle_ = (void*)GetProcAddress(hWininet, "InternetCloseHandle");
+        FtpPutFileW_         = (void*)GetProcAddress(hWininet, "FtpPutFileW");
+        if (!InternetOpenW_ || !InternetConnectW_ || !InternetCloseHandle_ || !FtpPutFileW_)
+        {
+            fprintf(stderr, "There was an error loading the network API entries"
+                    " 0x%08lx\n", (unsigned long)GetLastError());
+            goto done;
+        }
+
+        HINTERNET Hint = InternetOpenW_(L"VLC Crash Reporter",
                 INTERNET_OPEN_TYPE_PRECONFIG, NULL,NULL,0);
         if(Hint)
         {
-            HINTERNET ftp = InternetConnect(Hint, L"crash.videolan.org",
+            HINTERNET ftp = InternetConnectW_(Hint, L"crash.videolan.org",
                         INTERNET_DEFAULT_FTP_PORT, NULL, NULL,
                         INTERNET_SERVICE_FTP, INTERNET_FLAG_PASSIVE, 0);
             if(ftp)
@@ -264,26 +287,29 @@ static void check_crashdump(void)
                         now.wYear, now.wMonth, now.wDay, now.wHour,
                         now.wMinute, now.wSecond );
 
-                if( FtpPutFile( ftp, mv_crashdump_path, remote_file,
+                if( FtpPutFileW_( ftp, mv_crashdump_path, remote_file,
                             FTP_TRANSFER_TYPE_BINARY, 0) )
                     fprintf(stderr, "Report sent correctly to FTP.\n");
                 else
                     fprintf(stderr,"Couldn't send report to FTP server\n");
 
-                InternetCloseHandle(ftp);
+                InternetCloseHandle_(ftp);
             }
             else
             {
                 fprintf(stderr, "Can't connect to FTP server 0x%08lx\n",
                         (unsigned long)GetLastError());
             }
-            InternetCloseHandle(Hint);
+            InternetCloseHandle_(Hint);
         }
         else
         {
               fprintf(stderr, "There was an error while connecting to the "
                       "Internet  0x%08lx\n", (unsigned long)GetLastError());
         }
+done:
+        if (hWininet != NULL)
+            FreeLibrary(hWininet);
         MessageBox( NULL, L"Thanks a lot for helping improving VLC!",
                     L"VLC crash report" , MB_OK);
     }
