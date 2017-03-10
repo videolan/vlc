@@ -248,6 +248,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
 
     /* PES packets usually contain truncated frames */
     tk->fmt.b_packetized = false;
+    tk->fmt.i_priority = ~i_id & 0x0F;
 
     if( ps_id_to_lang( p_psm, i_id ) )
     {
