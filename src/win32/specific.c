@@ -69,8 +69,7 @@ void system_Init(void)
     if (GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
                                        "SetDefaultDllDirectories") != NULL)
 # endif /* FIXME: not reentrant */
-        LoadLibraryFlags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
-                           LOAD_LIBRARY_SEARCH_SYSTEM32;
+        LoadLibraryFlags = LOAD_LIBRARY_SEARCH_SYSTEM32;
 #endif
 }
 
