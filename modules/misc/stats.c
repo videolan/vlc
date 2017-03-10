@@ -28,7 +28,7 @@
 /* Example usage:
  *  $ vlc movie.avi --sout="#transcode{aenc=dummy,venc=stats}:\
  *                          std{access=http,mux=dummy,dst=0.0.0.0:8081}"
- *  $ vlc -vvv http://127.0.0.1:8081 --demux=stats --vout=stats --codec=stats
+ *  $ vlc -vv http://127.0.0.1:8081 --demux=stats --vout=stats --codec=stats
  */
 
 #define kBufferSize 0x500
