@@ -424,7 +424,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 
             if( !tk[i_tk].b_seen )
             {
-                if( !ps_track_fill( &tk[i_tk], p_psm, i_id, p_pkt ) )
+                if( !ps_track_fill( &tk[i_tk], p_psm, i_id, NULL ) )
                 {
                     tk[i_tk].b_seen = true;
                 }
