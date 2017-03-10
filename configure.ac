@@ -4119,6 +4119,14 @@ AS_IF([test "${with_kde_solid}" != "no"], [
 AC_SUBST(soliddatadir)
 AM_CONDITIONAL(KDE_SOLID, [test "x${soliddatadir}" != "x"])
 
+dnl
+dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY 
+dnl It should only be available when building for win10, but some SDKs define it unconditionnaly
+dnl
+if test "${SYS}" = "mingw32"; then
+    AC_CHECK_TYPES([PROCESS_MITIGATION_IMAGE_LOAD_POLICY],,,[#include <windows.h>])
+fi
+
 EXTEND_HELP_STRING([Components:])
 
 dnl

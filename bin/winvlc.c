@@ -78,7 +78,38 @@ static BOOL SetDefaultDllDirectories_(DWORD flags)
     return SetDefaultDllDirectoriesReal(flags);
 }
 # define SetDefaultDllDirectories SetDefaultDllDirectories_
+
 #endif
+
+static void PrioritizeSystem32(void)
+{
+#ifndef HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY
+    typedef struct _PROCESS_MITIGATION_IMAGE_LOAD_POLICY {
+      union {
+        DWORD  Flags;
+        struct {
+          DWORD NoRemoteImages  :1;
+          DWORD NoLowMandatoryLabelImages  :1;
+          DWORD PreferSystem32Images  :1;
+          DWORD ReservedFlags  :29;
+        };
+      };
+    } PROCESS_MITIGATION_IMAGE_LOAD_POLICY;
+#endif
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+    BOOL WINAPI (*SetProcessMitigationPolicy)(PROCESS_MITIGATION_POLICY, PVOID, SIZE_T);
+    HINSTANCE h_Kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+    if ( !h_Kernel32 )
+        return;
+    SetProcessMitigationPolicy = (BOOL (WINAPI *)(PROCESS_MITIGATION_POLICY, PVOID, SIZE_T))
+                                   GetProcAddress(h_Kernel32, "SetProcessMitigationPolicy");
+    if (SetProcessMitigationPolicy == NULL)
+        return;
+#endif
+    PROCESS_MITIGATION_IMAGE_LOAD_POLICY m = { .Flags = 0 };
+    m.PreferSystem32Images = 1;
+    SetProcessMitigationPolicy( 10 /* ProcessImageLoadPolicy */, &m, sizeof( m ) );
+}
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPSTR lpCmdLine,
@@ -126,6 +157,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
      * will search in SYSTEM32 only
      * */
     SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
+    /***
+     * Load DLLs from system32 before any other folder (when possible)
+     */
+    PrioritizeSystem32();
 
     /* Args */
     wchar_t **wargv = CommandLineToArgvW (GetCommandLine (), &argc);
