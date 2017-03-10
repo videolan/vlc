@@ -389,7 +389,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)
             lpExceptionInfo->ExceptionRecord;
         /* No nested exceptions for now */
-        fwprintf( fd, L"\n\n[exceptions]\n%08x at %px", 
+        fwprintf( fd, L"\n\n[exceptions]\n%08x at %px",
                 pException->ExceptionCode, pException->ExceptionAddress );
 
         for( unsigned int i = 0; i < pException->NumberParameters; i++ )
