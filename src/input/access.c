@@ -345,7 +345,7 @@ static int compar_filename(const void *a, const void *b)
         return i_ret;
 
     size_t i;
-    char c;
+    char ca, cb;
 
     /* Attempt to guess if the sorting algorithm should be alphabetic
      * (i.e. collation) or numeric:
@@ -358,11 +358,11 @@ static int compar_filename(const void *a, const void *b)
      * - Otherwise, the comparands are numerical values, and might not be
      *   aligned (i.e. not same order of magnitude). If so, collation would
      *   fail. So numerical comparison is performed. */
-    for (i = 0; (c = ia->psz_name[i]) == ib->psz_name[i]; i++)
-        if (c == '\0')
+    for (i = 0; (ca = ia->psz_name[i]) == (cb = ib->psz_name[i]); i++)
+        if (ca == '\0')
             return 0; /* strings are exactly identical */
 
-    if ((unsigned)(c - '0') > 9)
+    if ((unsigned)(ca - '0') > 9 || (unsigned)(cb - '0') > 9)
         return strcoll(ia->psz_name, ib->psz_name);
 
     unsigned long long ua = strtoull(ia->psz_name + i, NULL, 10);
