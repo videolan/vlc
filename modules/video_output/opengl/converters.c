@@ -669,6 +669,13 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
 }
 
 static void
+tc_persistent_release(const opengl_tex_converter_t *tc)
+{
+    persistent_release_gpupics(tc, true);
+    free(tc->priv);
+}
+
+static void
 picture_persistent_destroy_cb(picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
@@ -839,11 +846,6 @@ tc_common_release(const opengl_tex_converter_t *tc)
 {
     struct priv *priv = tc->priv;
     free(priv->texture_temp_buf);
-
-#ifdef VLCGL_HAS_MAP_PERSISTENT
-    persistent_release_gpupics(tc, true);
-#endif
-
     free(tc->priv);
 }
 
@@ -981,6 +983,7 @@ generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
         {
             tc->pf_get_pool = tc_persistent_get_pool;
             tc->pf_update   = tc_persistent_update;
+            tc->pf_release  = tc_persistent_release;
             msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering) enabled");
         }
 #endif
