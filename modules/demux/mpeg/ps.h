@@ -410,25 +410,32 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 
     /* System header is not useable if it references private streams (0xBD)
      * or 'all audio streams' (0xB8) or 'all video streams' (0xB9) */
-    while( p < &p_pkt->p_buffer[p_pkt->i_buffer] )
+    while( p < &p_pkt->p_buffer[p_pkt->i_buffer] && (p[0] & 0x80) )
     {
         int i_id = p[0];
-
-        /* fprintf( stderr, "   SYSTEM_START_CODEEE: id=0x%x\n", p[0] ); */
-        if( p[0] >= 0xBC || p[0] == 0xB8 || p[0] == 0xB9 ) p += 2;
-        p++;
-
-        if( i_id >= 0xc0 )
+        switch( i_id )
         {
-            int i_tk = PS_ID_TO_TK( i_id );
+            case 0xB7:
+                if( &p_pkt->p_buffer[p_pkt->i_buffer] - p < 6 )
+                    return VLC_EGENERIC;
+                i_id = (PS_STREAM_ID_EXTENDED << 8) | (p[2] & 0x7F);
+                p += 6;
+                break;
+            default:
+                if( &p_pkt->p_buffer[p_pkt->i_buffer] - p < 3 )
+                    return VLC_EGENERIC;
+                p += 3;
+                break;
+        }
 
-            if( !tk[i_tk].b_seen )
-            {
-                if( !ps_track_fill( &tk[i_tk], p_psm, i_id, NULL ) )
-                {
-                    tk[i_tk].b_seen = true;
-                }
-            }
+        if( i_id < 0xc0 )
+            continue;
+
+        int i_tk = PS_ID_TO_TK( i_id );
+        if( !tk[i_tk].b_seen &&
+            !ps_track_fill( &tk[i_tk], p_psm, i_id, NULL ) )
+        {
+                tk[i_tk].b_seen = true;
         }
     }
     return VLC_SUCCESS;
