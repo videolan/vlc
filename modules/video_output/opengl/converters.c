@@ -973,12 +973,16 @@ generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
     if (allow_dr)
     {
 #ifdef VLCGL_HAS_MAP_PERSISTENT
-        const bool supports_map_persistent = tc->api->BufferStorage
+        const bool has_pbo =
+            HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object") ||
+            HasExtension(tc->glexts, "GL_EXT_pixel_buffer_object");
+        const bool has_bs =
+            HasExtension(tc->glexts, "GL_ARB_buffer_storage") ||
+            HasExtension(tc->glexts, "GL_EXT_buffer_storage");
+        const bool supports_map_persistent = has_pbo && has_bs && tc->api->BufferStorage
             && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
             && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
-            && tc->api->ClientWaitSync
-            && HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object")
-            && HasExtension(tc->glexts, "GL_ARB_buffer_storage");
+            && tc->api->ClientWaitSync;
         if (supports_map_persistent)
         {
             tc->pf_get_pool = tc_persistent_get_pool;
