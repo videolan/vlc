@@ -149,6 +149,8 @@ LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
  * SEM_FAILCRITICALERRORS flag <b>must</b> be set with the SetErrorMode()
  * function before using LibVLC. On later versions, it is optional and
  * unnecessary.
+ * On Microsoft Windows Vista/7/8/8.1/10, we also strongly recommand to set
+ * SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32) for security reasons
  *
  * \version
  * Arguments are meant to be passed from the command line to LibVLC, just like
