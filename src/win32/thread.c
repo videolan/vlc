@@ -38,6 +38,9 @@
 #include <limits.h>
 #include <errno.h>
 #include <time.h>
+#if !VLC_WINSTORE_APP
+#include <mmsystem.h>
+#endif
 
 /*** Static mutex and condition variable ***/
 static CRITICAL_SECTION super_mutex;
@@ -709,6 +712,13 @@ static union
     {
         LARGE_INTEGER freq;
     } perf;
+#if !VLC_WINSTORE_APP
+    struct
+    {
+        MMRESULT (WINAPI *timeGetDevCaps)(LPTIMECAPS ptc,UINT cbtc);
+        DWORD (WINAPI *timeGetTime)(void);
+    } multimedia;
+#endif
 } clk;
 
 static mtime_t mdate_interrupt (void)
@@ -742,10 +752,9 @@ static mtime_t mdate_tick (void)
     return ts * (CLOCK_FREQ / 1000);
 }
 #if !VLC_WINSTORE_APP
-#include <mmsystem.h>
 static mtime_t mdate_multimedia (void)
 {
-     DWORD ts = timeGetTime ();
+    DWORD ts = clk.multimedia.timeGetTime ();
 
     /* milliseconds */
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
@@ -884,9 +893,18 @@ static void SelectClockSource (vlc_object_t *obj)
     {
         TIMECAPS caps;
 
+        HMODULE hWinmm = GetModuleHandle(TEXT("winmm.dll"));
+        if (!hWinmm)
+            goto perf;
+
+        clk.multimedia.timeGetDevCaps = (void*)GetProcAddress(hWinmm, "timeGetDevCaps");
+        clk.multimedia.timeGetTime = (void*)GetProcAddress(hWinmm, "timeGetTime");
+        if (!clk.multimedia.timeGetDevCaps || !clk.multimedia.timeGetTime)
+            goto perf;
+
         msg_Dbg (obj, "using multimedia timers as clock source");
-        if (timeGetDevCaps (&caps, sizeof (caps)) != MMSYSERR_NOERROR)
-            abort ();
+        if (clk.multimedia.timeGetDevCaps (&caps, sizeof (caps)) != MMSYSERR_NOERROR)
+            goto perf;
         msg_Dbg (obj, " min period: %u ms, max period: %u ms",
                  caps.wPeriodMin, caps.wPeriodMax);
         mdate_selected = mdate_multimedia;
@@ -895,6 +913,7 @@ static void SelectClockSource (vlc_object_t *obj)
     else
     if (!strcmp (name, "perf"))
     {
+    perf:
         msg_Dbg (obj, "using performance counters as clock source");
         if (!QueryPerformanceFrequency (&clk.perf.freq))
             abort ();

@@ -315,9 +315,7 @@ AS_IF([test "${SYS}" = "mingw32"],[
     LIBCOM=""
      VLC_ADD_LIBS([libvlccore], [-lruntimeobject])
      AC_LIBOBJ([gai_strerror])
-    ],[
-     VLC_ADD_LIBS([libvlccore],[-lwinmm])
-    ])
+    ],[])
   AC_SUBST(LIBCOM)
   ])
 AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
