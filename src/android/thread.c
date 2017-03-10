@@ -42,8 +42,6 @@
 #include <pthread.h>
 #include <sched.h>
 
-#include <android/log.h>
-
 #if !defined(HAVE_PTHREAD_CONDATTR_SETCLOCK) && !defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP)
 #error no pthread monotonic clock support
 #endif
@@ -52,8 +50,8 @@
 
 #ifndef NDEBUG
 static void
-vlc_thread_fatal (const char *action, int error,
-                  const char *function, const char *file, unsigned line)
+vlc_thread_fatal_print (const char *action, int error,
+                        const char *function, const char *file, unsigned line)
 {
     char buf[1000];
     const char *msg;
@@ -71,17 +69,18 @@ vlc_thread_fatal (const char *action, int error,
             break;
     }
 
-    __android_log_print(ANDROID_LOG_ERROR, "vlc",
-        "LibVLC fatal error %s (%d) in thread %lu "
-        "at %s:%u in %s\n Error message: %s\n",
-        action, error, vlc_thread_id (), file, line, function, msg);
-
-    abort ();
+    fprintf(stderr, "LibVLC fatal error %s (%d) in thread %lu "
+            "at %s:%u in %s\n Error message: %s\n",
+            action, error, vlc_thread_id (), file, line, function, msg);
+    fflush (stderr);
 }
 
-# define VLC_THREAD_ASSERT( action ) \
-    if (unlikely(val)) \
-        vlc_thread_fatal (action, val, __func__, __FILE__, __LINE__)
+# define VLC_THREAD_ASSERT( action ) do { \
+    if (unlikely(val)) { \
+        vlc_thread_fatal_print (action, val, __func__, __FILE__, __LINE__); \
+        assert (!action); \
+    } \
+} while(0)
 #else
 # define VLC_THREAD_ASSERT( action ) ((void)val)
 #endif
