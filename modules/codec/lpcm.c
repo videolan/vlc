@@ -458,11 +458,12 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
         /* */
         block_t *p_aout_buffer;
-        if( decoder_UpdateAudioFormat( p_dec ) )
+        if( decoder_UpdateAudioFormat( p_dec ) != VLC_SUCCESS ||
+           !(p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_frame_length )) )
+        {
+            block_Release( p_block );
             return NULL;
-        p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_frame_length );
-        if( !p_aout_buffer )
-            return NULL;
+        }
 
         p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
         p_aout_buffer->i_length =
