@@ -49,14 +49,6 @@
 #endif
 
 /* debug */
-#define vlc_assert(x) do { \
-    if (unlikely(!(x))) { \
-    __android_log_print(ANDROID_LOG_ERROR, "vlc", "assert failed %s:%d: %s", \
-        __FILE__, __LINE__, #x \
-        ); \
-        abort(); \
-    } \
-} while(0)
 
 #ifndef NDEBUG
 static void
@@ -129,7 +121,7 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
 #ifndef NDEBUG
 void vlc_assert_locked (vlc_mutex_t *p_mutex)
 {
-    vlc_assert (pthread_mutex_lock (p_mutex) == EDEADLK);
+    assert (pthread_mutex_lock (p_mutex) == EDEADLK);
 }
 #endif
 
