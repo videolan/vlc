@@ -135,22 +135,33 @@ LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
  * - on Microsoft Windows, SetErrorMode().
  * - sigprocmask() shall never be invoked; pthread_sigmask() can be used.
  *
- * On POSIX systems, the SIGCHLD signal must <b>not</b> be ignored, i.e. the
+ * On POSIX systems, the SIGCHLD signal <b>must not</b> be ignored, i.e. the
  * signal handler must set to SIG_DFL or a function pointer, not SIG_IGN.
  * Also while LibVLC is active, the wait() function shall not be called, and
  * any call to waitpid() shall use a strictly positive value for the first
  * parameter (i.e. the PID). Failure to follow those rules may lead to a
  * deadlock or a busy loop.
- *
  * Also on POSIX systems, it is recommended that the SIGPIPE signal be blocked,
- * even if it is not, in principles, necessary.
+ * even if it is not, in principles, necessary, e.g.:
+ * @code
+   sigset_t set;
+
+   signal(SIGCHLD, SIG_DFL);
+   sigemptyset(&set);
+   sigaddset(&set, SIGPIPE);
+   pthread_sigmask(SIG_BLOCK, &set, NULL);
+ * @endcode
  *
  * On Microsoft Windows Vista/2008, the process error mode
- * SEM_FAILCRITICALERRORS flag <b>must</b> be set with the SetErrorMode()
- * function before using LibVLC. On later versions, it is optional and
- * unnecessary.
- * On Microsoft Windows Vista/7/8/8.1/10, we also strongly recommand to set
- * SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32) for security reasons
+ * SEM_FAILCRITICALERRORS flag <b>must</b> be set before using LibVLC.
+ * On later versions, that is optional and unnecessary.
+ * Also on Microsoft Windows (Vista and any later version), setting the default
+ * DLL directories to SYSTEM32 exclusively is strongly recommended for
+ * security reasons:
+ * @code
+   SetErrorMode(SEM_FAILCRITICALERRORS);
+   SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
+ * @endcode
  *
  * \version
  * Arguments are meant to be passed from the command line to LibVLC, just like
