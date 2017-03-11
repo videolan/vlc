@@ -319,7 +319,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
                 if( p_face->family_name )
                     psz_lc = ToLower( p_face->family_name );
                 else
-                    if( asprintf( &psz_lc, FB_NAME"-%02d",
+                    if( asprintf( &psz_lc, FB_NAME"-%04d",
                                   p_sys->i_fallback_counter++ ) < 0 )
                         psz_lc = NULL;
 
@@ -1321,7 +1321,8 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_get_fallbacks = Android_GetFallbacks;
     p_sys->pf_select = Generic_Select;
 
-    Android_Prepare( p_filter );
+    if( Android_Prepare( p_filter ) == VLC_ENOMEM )
+        goto error;
 #else
     p_sys->pf_select = Dummy_Select;
 #endif

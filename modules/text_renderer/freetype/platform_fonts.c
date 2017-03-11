@@ -249,7 +249,7 @@ vlc_family_t *NewFamily( filter_t *p_filter, const char *psz_family,
     if( psz_family && *psz_family )
         psz_name = ToLower( psz_family );
     else
-        if( asprintf( &psz_name, FB_NAME"-%02d",
+        if( asprintf( &psz_name, FB_NAME"-%04d",
                       p_sys->i_fallback_counter++ ) < 0 )
             psz_name = NULL;
 
