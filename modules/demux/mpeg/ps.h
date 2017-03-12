@@ -94,6 +94,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
 {
     tk->i_skip = 0;
     tk->i_id = i_id;
+
     if( ( i_id&0xff00 ) == 0xbd00 ) /* 0xBD00 -> 0xBDFF, Private Stream 1 */
     {
         if( ( i_id&0xf8 ) == 0x88 || /* 0x88 -> 0x8f - Can be DTS-HD primary audio in evob */
@@ -420,7 +421,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
             case 0xB7:
                 if( &p_pkt->p_buffer[p_pkt->i_buffer] - p < 6 )
                     return VLC_EGENERIC;
-                i_id = (PS_STREAM_ID_EXTENDED << 8) | (p[2] & 0x7F);
+                i_id = ((int)PS_STREAM_ID_EXTENDED << 8) | (p[2] & 0x7F);
                 p += 6;
                 break;
             default:
@@ -481,17 +482,19 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     return VLC_SUCCESS;
 }
 
+typedef struct
+{
+    /* Language is iso639-2T */
+    uint8_t lang[3];
+} ps_descriptors_t;
+
 /* Program stream map handling */
 typedef struct ps_es_t
 {
     int i_type;
     int i_id;
 
-    int i_descriptor;
-    uint8_t *p_descriptor;
-
-    /* Language is iso639-2T */
-    uint8_t lang[3];
+    ps_descriptors_t desc;
 
 } ps_es_t;
 
@@ -499,26 +502,29 @@ struct ps_psm_t
 {
     int i_version;
 
-    int     i_es;
-    ps_es_t **es;
+    size_t  i_es;
+    ps_es_t *es;
+
+    ps_descriptors_t uniqueextdesc;
 };
 
 static inline int ps_id_to_type( const ps_psm_t *p_psm, int i_id )
 {
-    int i;
+    size_t i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
     {
-        if( p_psm->es[i]->i_id == i_id ) return p_psm->es[i]->i_type;
+        if( p_psm->es[i].i_id == i_id ) return p_psm->es[i].i_type;
     }
     return 0;
 }
 
 static inline const uint8_t *ps_id_to_lang( const ps_psm_t *p_psm, int i_id )
 {
-    int i;
+    size_t i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
     {
-        if( p_psm->es[i]->i_id == i_id ) return p_psm->es[i]->lang;
+        if( p_psm->es[i].i_id == i_id )
+            return p_psm->es[i].desc.lang;
     }
     return 0;
 }
@@ -528,42 +534,64 @@ static inline void ps_psm_init( ps_psm_t *p_psm )
     p_psm->i_version = 0xFFFF;
     p_psm->i_es = 0;
     p_psm->es = 0;
+    memset( &p_psm->uniqueextdesc, 0, 3 );
 }
 
 static inline void ps_psm_destroy( ps_psm_t *p_psm )
 {
-    while( p_psm->i_es-- )
-    {
-        free( p_psm->es[p_psm->i_es]->p_descriptor );
-        free( p_psm->es[p_psm->i_es] );
-    }
     free( p_psm->es );
-
-    p_psm->es = 0;
+    p_psm->es = NULL;
     p_psm->i_es = 0;
+}
+
+static inline void ps_parse_descriptors( const uint8_t *p_data, size_t i_data,
+                                        ps_descriptors_t *p_desc )
+{
+    while( i_data > 3 && i_data > 2u + p_data[1] )
+    {
+        switch( p_data[0] )
+        {
+            case 0x0A: /* ISO_639_language_descriptor */
+                if( i_data >= 6 )
+                    memcpy( p_desc->lang, &p_data[2], 3 );
+                break;
+
+            default:
+                break;
+        }
+        p_data += 2 + p_data[1];
+        i_data -= 2 + p_data[1];
+    }
 }
 
 static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
                                ps_track_t tk[PS_TK_COUNT], es_out_t *out )
 {
-    int i_buffer = p_pkt->i_buffer;
+    size_t i_buffer = p_pkt->i_buffer;
     uint8_t *p_buffer = p_pkt->p_buffer;
-    int i_length, i_version, i_info_length, i_es_base;
+    size_t i_length, i_info_length, i_es_base;
+    int i_version;
+    bool b_single_extension;
 
-    if( !p_psm || p_buffer[3] != 0xbc ) return VLC_EGENERIC;
+    if( !p_psm || p_buffer[3] != PS_STREAM_ID_MAP )
+        return VLC_EGENERIC;
 
-    i_length = (uint16_t)(p_buffer[4] << 8) + p_buffer[5] + 6;
+    i_length = GetWBE(&p_buffer[4]) + 6;
     if( i_length > i_buffer ) return VLC_EGENERIC;
 
-    //i_current_next_indicator = (p_buffer[6] & 0x01);
+    if((p_buffer[6] & 0x80) == 0) /* current_next_indicator */
+        return VLC_EGENERIC;
+
+    b_single_extension = p_buffer[6] & 0x40;
     i_version = (p_buffer[6] & 0xf8);
 
     if( p_psm->i_version == i_version ) return VLC_EGENERIC;
 
     ps_psm_destroy( p_psm );
 
-    i_info_length = (uint16_t)(p_buffer[8] << 8) + p_buffer[9];
-    if( i_info_length + 10 > i_length ) return VLC_EGENERIC;
+    i_info_length = GetWBE(&p_buffer[8]);
+    if( i_info_length + 10 > i_length )
+        return VLC_EGENERIC;
 
     /* Elementary stream map */
     /* int i_esm_length = (uint16_t)(p_buffer[ 10 + i_info_length ] << 8) +
@@ -572,64 +600,41 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
 
     while( i_es_base + 4 < i_length )
     {
-        ps_es_t **tmp_es;
-        ps_es_t es;
-        es.lang[0] = es.lang[1] = es.lang[2] = 0;
+        ps_es_t *tmp_es = realloc( p_psm->es, sizeof(ps_es_t) * (p_psm->i_es+1) );
+        if( tmp_es == NULL )
+            break;
+        p_psm->es = tmp_es;
 
-        es.i_type = p_buffer[ i_es_base  ];
-        es.i_id = p_buffer[ i_es_base + 1 ];
-        i_info_length = (uint16_t)(p_buffer[ i_es_base + 2 ] << 8) +
-            p_buffer[ i_es_base + 3 ];
+        ps_es_t *p_es = &p_psm->es[ p_psm->i_es++ ];
+        p_es->i_type = p_buffer[ i_es_base  ];
+        p_es->i_id = p_buffer[ i_es_base + 1 ];
 
-        if( i_es_base + 4 + i_info_length > i_length ) break;
+        i_info_length = GetWBE(&p_buffer[ i_es_base + 2 ]);
+
+        if( i_es_base + 4 + i_info_length > i_length )
+            break;
 
         /* TODO Add support for VC-1 stream:
          *      stream_type=0xea, stream_id=0xfd AND registration
          *      descriptor 0x5 with format_identifier == 0x56432D31 (VC-1)
          *      (I need a sample that use PSM with VC-1) */
 
-        es.p_descriptor = 0;
-        es.i_descriptor = i_info_length;
-        if( i_info_length > 0 )
+        if( p_es->i_id == PS_STREAM_ID_EXTENDED && b_single_extension == 0 )
         {
-            int i = 0;
-
-            es.p_descriptor = malloc( i_info_length );
-            if( es.p_descriptor )
-            {
-                memcpy( es.p_descriptor, p_buffer + i_es_base + 4, i_info_length);
-
-                while( i <= es.i_descriptor - 2 )
-                {
-                    /* Look for the ISO639 language descriptor */
-                    if( es.p_descriptor[i] != 0x0a )
-                    {
-                        i += es.p_descriptor[i+1] + 2;
-                        continue;
-                    }
-
-                    if( i <= es.i_descriptor - 6 )
-                    {
-                        es.lang[0] = es.p_descriptor[i+2];
-                        es.lang[1] = es.p_descriptor[i+3];
-                        es.lang[2] = es.p_descriptor[i+4];
-                    }
-                    break;
-                }
-            }
+            if( i_info_length < 3 )
+                break;
+            p_es->i_id = (p_es->i_id << 8) | (p_buffer[i_es_base + 6] & 0x7F);
+            ps_parse_descriptors( &p_buffer[i_es_base + 4 + 3],
+                                  i_info_length - 3,
+                                  &p_psm->uniqueextdesc );
+        }
+        else
+        {
+            ps_parse_descriptors( &p_buffer[i_es_base + 4],
+                                  i_info_length, &p_es->desc );
         }
 
-        tmp_es = realloc( p_psm->es, sizeof(ps_es_t *) * (p_psm->i_es+1) );
-        if( tmp_es )
-        {
-            p_psm->es = tmp_es;
-            p_psm->es[p_psm->i_es] = malloc( sizeof(ps_es_t) );
-            if( p_psm->es[p_psm->i_es] )
-            {
-                *p_psm->es[p_psm->i_es++] = es;
-                i_es_base += 4 + i_info_length;
-            }
-        }
+        i_es_base += 4 + i_info_length;
     }
 
     /* TODO: CRC */
