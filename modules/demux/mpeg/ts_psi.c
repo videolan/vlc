@@ -1321,17 +1321,23 @@ static void PIDFillFormat( demux_t *p_demux, ts_pes_t *p_pes,
     case 0x04:  /* MPEG-2 audio */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MPGA );
         break;
-    case 0x11:  /* MPEG4 (audio) LATM */
     case 0x0f:  /* ISO/IEC 13818-7 Audio with ADTS transport syntax */
-    case 0x1c:  /* ISO/IEC 14496-3 Audio, without using any additional
-                   transport syntax, such as DST, ALS and SLS */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
+        fmt->i_original_fourcc = VLC_FOURCC('A','D','T','S');
         break;
     case 0x10:  /* MPEG4 (video) */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MP4V );
         break;
+    case 0x11:  /* MPEG4 (audio) LATM */
+        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
+        fmt->i_original_fourcc = VLC_FOURCC('L','A','T','M');
+        break;
     case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_H264 );
+        break;
+    case 0x1C:  /* ISO/IEC 14496-3 Audio, without using any additional
+                   transport syntax, such as DST, ALS and SLS */
+        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
         break;
     case 0x24:  /* HEVC */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_HEVC );
