@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_tls.h: Transport Layer Security API
+ * vlc_tls.h:
  *****************************************************************************
  * Copyright (C) 2004-2016 Rémi Denis-Courmont
  * Copyright (C) 2005-2006 VLC authors and VideoLAN
@@ -29,7 +29,8 @@
  *
  * Originally intended for the TLS protocol (Transport Layer Security),
  * the Transport Layer Sockets now provides a generic abstraction
- * for full-duplex I/O byte streams.
+ * for connection-oriented full-duplex I/O byte streams, such as TCP/IP sockets
+ * and TLS protocol sessions.
  *
  * @{
  * \file

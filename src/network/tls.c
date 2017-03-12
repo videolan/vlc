@@ -21,7 +21,9 @@
 
 /**
  * @file
- * libvlc interface to the Transport Layer Security (TLS) plugins.
+ * Transport Layer Socket abstraction.
+ *
+ * This file implements the Transport Layer Socket (vlc_tls) abstraction.
  */
 
 #ifdef HAVE_CONFIG_H
