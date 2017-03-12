@@ -91,25 +91,6 @@ static char *vlc_http_proxy_find(const char *hostname, unsigned port,
     return proxy;
 }
 
-static vlc_tls_t *vlc_https_connect_i11e(vlc_tls_creds_t *creds,
-                                         const char *host, unsigned port,
-                                         bool *restrict http_two)
-{
-    vlc_tls_t *tls;
-
-    char *proxy = vlc_http_proxy_find(host, port, true);
-    if (proxy != NULL)
-    {
-        tls = vlc_https_connect_proxy(creds->obj.parent, creds, host, port,
-                                      http_two, proxy);
-        free(proxy);
-    }
-    else
-        tls = vlc_https_connect(creds, host, port, http_two);
-
-    return tls;
-}
-
 
 struct vlc_http_mgr
 {
@@ -165,6 +146,9 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
                                               const char *host, unsigned port,
                                               const struct vlc_http_msg *req)
 {
+    vlc_tls_t *tls;
+    bool http2;
+
     if (mgr->creds == NULL && mgr->conn != NULL)
         return NULL; /* switch from HTTP to HTTPS not implemented */
 
@@ -180,8 +164,16 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
     if (resp != NULL)
         return resp; /* existing connection reused */
 
-    bool http2 = true;
-    vlc_tls_t *tls = vlc_https_connect_i11e(mgr->creds, host, port, &http2);
+    char *proxy = vlc_http_proxy_find(host, port, true);
+    if (proxy != NULL)
+    {
+        tls = vlc_https_connect_proxy(mgr->creds, mgr->creds,
+                                      host, port, &http2, proxy);
+        free(proxy);
+    }
+    else
+        tls = vlc_https_connect(mgr->creds, host, port, &http2);
+
     if (tls == NULL)
         return NULL;
 
