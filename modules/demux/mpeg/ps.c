@@ -524,12 +524,12 @@ static int Demux( demux_t *p_demux )
 
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
                     b_new = true;
+                    tk->b_seen = true;
                 }
                 else
                 {
                     msg_Dbg( p_demux, "es id=0x%x format unknown", i_id );
                 }
-                tk->b_seen = true;
             }
 
             /* The popular VCD/SVCD subtitling WinSubMux does not

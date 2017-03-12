@@ -89,6 +89,39 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
     }
 }
 
+static inline bool ps_is_H264( const uint8_t *p_data, size_t i_data )
+{
+    const uint8_t startcode[3] = { 0, 0, 1 };
+    int i_flags = 0;
+
+    if( i_data < 9 ||
+       (!memcmp( p_data, startcode, 3 ) &&
+        !memcmp( &p_data[1], startcode, 3 )) )
+        return false;
+
+    /* Shitty H264 probing. We need a centralized way do to this */
+    while( i_data > 5 )
+    {
+        if( !memcmp( p_data, startcode, 3 ) )
+        {
+            if(p_data[3] == 0x67)
+                i_flags ^= 0x01;
+            else if(p_data[3] == 0x68)
+                i_flags ^= 0x02;
+            else if( p_data[3] & 0x80 )
+                return false;
+            else if( (p_data[3] & 0x1F) > 23 || (p_data[3] & 0x1F) < 1 )
+                return false;
+            else if( (p_data[3] & 0x1F) < 6 )
+                return (i_flags == 0x03);
+        }
+        p_data++;
+        i_data--;
+    }
+
+    return false;
+}
+
 /* From id fill i_skip and es_format_t */
 static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, block_t *p_pkt )
 {
@@ -222,7 +255,15 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
             {
                 es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
             }
-            else if( tk->fmt.i_cat == UNKNOWN_ES )
+            else if( p_pkt && i_type == 0x00 && /* Not from PSM */
+                     p_pkt->i_buffer > 9 + 5 &&
+                     p_pkt->i_buffer > 9U + 5 + p_pkt->p_buffer[8] &&
+                     ps_is_H264( &p_pkt->p_buffer[ 9 + p_pkt->p_buffer[8] ],
+                                  p_pkt->i_buffer - 9 - p_pkt->p_buffer[8] ) )
+            {
+                es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
+            }
+            else if( tk->fmt.i_cat == UNKNOWN_ES && p_pkt != NULL /* Not system */ )
             {
                 es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
             }
@@ -266,7 +307,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
         }
     }
 
-    return VLC_SUCCESS;
+    return (p_pkt) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 /* return the id of a PES (should be valid) */
