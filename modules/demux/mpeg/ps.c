@@ -538,8 +538,7 @@ static int Demux( demux_t *p_demux )
                 ( tk->fmt.i_codec == VLC_CODEC_OGT ||
                   tk->fmt.i_codec == VLC_CODEC_CVD ) )
             {
-                p_sys->i_scr = -1;
-                p_sys->i_last_scr = -1;
+                p_sys->b_bad_scr = true;
             }
 
             if( p_sys->i_scr >= 0 && !p_sys->b_bad_scr )
