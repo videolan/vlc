@@ -7,9 +7,9 @@
 	Authors: Gautier <midas002 at gmail dot com>
 
 	Currently enabled for: 
-		deredactie.be	X
+		deredactie.be		X
 		vrtnu.be		-
-		een.be		-
+		een.be			-
 		canvas.be		-
 		sporza.be		X
 --]]
@@ -29,10 +29,12 @@ function parse()
 
         if not line then break end
 
-	-- Find video URL "data-video-src"
-		if string.match( line, "data%-video%-src") then
-			path  = string.match( line, "data%-video%-src=\"(.-)\"" )
- 	  		vlc.msg.info("Video URL found:", path)
+	-- Find video URL "data-video-src"; only grab the first video link if there is more than one
+		if not path then
+			if string.match( line, "data%-video%-src") then
+				path  = string.match( line, "data%-video%-src=\"(.-)\"" )
+ 	  			vlc.msg.info("Video URL found:", path)
+			end
 		end
 
 	-- Find title
@@ -45,10 +47,10 @@ function parse()
 	-- Find description
 		if string.match( line, "<meta property=\"og:description\"" ) then
 			_,_,description = string.find( line, "content=\"(.-)\"" )
-	            if (description ~= nil) then
-      	          description = vlc.strings.resolve_xml_special_chars( description )
+		    if (description ~= nil) then
+			description = vlc.strings.resolve_xml_special_chars( description )
  	  		vlc.msg.info("Description found:", description)
-            	end
+            	    end
 		end
 
 	-- Find image/art
