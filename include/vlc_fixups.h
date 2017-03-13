@@ -452,6 +452,49 @@ long nrand48 (unsigned short subi[3]);
 #ifdef __OS2__
 # undef HAVE_FORK   /* Implementation of fork() is imperfect on OS/2 */
 
+/* GAI error codes */
+# ifndef EAI_BADFLAGS
+#  define EAI_BADFLAGS -1
+# endif
+# ifndef EAI_NONAME
+#  define EAI_NONAME -2
+# endif
+# ifndef EAI_AGAIN
+#  define EAI_AGAIN -3
+# endif
+# ifndef EAI_FAIL
+#  define EAI_FAIL -4
+# endif
+# ifndef EAI_NODATA
+#  define EAI_NODATA -5
+# endif
+# ifndef EAI_FAMILY
+#  define EAI_FAMILY -6
+# endif
+# ifndef EAI_SOCKTYPE
+#  define EAI_SOCKTYPE -7
+# endif
+# ifndef EAI_SERVICE
+#  define EAI_SERVICE -8
+# endif
+# ifndef EAI_ADDRFAMILY
+#  define EAI_ADDRFAMILY -9
+# endif
+# ifndef EAI_MEMORY
+#  define EAI_MEMORY -10
+# endif
+# ifndef EAI_OVERFLOW
+#  define EAI_OVERFLOW -11
+# endif
+# ifndef EAI_SYSTEM
+#  define EAI_SYSTEM -12
+# endif
+
+# ifndef NI_MAXHOST
+#  define NI_MAXHOST 1025
+#  define NI_MAXSERV 32
+# endif
+
 struct addrinfo
 {
     int ai_flags;
