@@ -262,7 +262,7 @@ static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *ps
 
     free( psz_chain );
 
-    return list.join( ':' );
+    return list.join( ":" );
 }
 
 static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
