@@ -769,6 +769,7 @@ void MainInterface::releaseVideoSlot( void )
     stackCentralOldWidget = bgWidget;
 }
 
+// The provided size is in physical pixels, coming from the core.
 void MainInterface::setVideoSize( unsigned int w, unsigned int h )
 {
     if (!isFullScreen() && !isMaximized() )
@@ -782,7 +783,12 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
         if (b_autoresize)
         {
             QRect screen = QApplication::desktop()->availableGeometry();
-            if( h > screen.height() )
+#if HAS_QT56
+            float factor = videoWidget->devicePixelRatioF();
+#else
+            float factor = 1.0f;
+#endif
+            if( (float)h / factor > screen.height() )
             {
                 w = screen.width();
                 h = screen.height();
@@ -800,6 +806,13 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
                 h -= style()->pixelMetric(QStyle::PM_TitleBarHeight);
                 h -= style()->pixelMetric(QStyle::PM_LayoutBottomMargin);
                 h -= 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+            }
+            else
+            {
+                // Convert the size in logical pixels
+                w = qRound( (float)w / factor );
+                h = qRound( (float)h / factor );
+                msg_Dbg( p_intf, "Logical video size: %ux%u", w, h );
             }
             videoWidget->setSize( w, h );
         }
