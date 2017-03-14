@@ -346,22 +346,14 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     }
     else if( p_sps->i_pic_order_cnt_type == 1 )
     {
-        int i_cycle;
-        /* skip b_delta_pic_order_always_zero */
         p_sps->i_delta_pic_order_always_zero_flag = bs_read( p_bs, 1 );
-        /* skip i_offset_for_non_ref_pic */
-        bs_read_se( p_bs );
-        /* skip i_offset_for_top_to_bottom_field */
-        bs_read_se( p_bs );
-        /* read i_num_ref_frames_in_poc_cycle */
-        i_cycle = bs_read_ue( p_bs );
-        if( i_cycle > 256 ) i_cycle = 256;
-        while( i_cycle > 0 )
-        {
-            /* skip i_offset_for_ref_frame */
-            bs_read_se(p_bs );
-            i_cycle--;
-        }
+        p_sps->offset_for_non_ref_pic = bs_read_se( p_bs );
+        p_sps->offset_for_top_to_bottom_field = bs_read_se( p_bs );
+        p_sps->i_num_ref_frames_in_pic_order_cnt_cycle = bs_read_ue( p_bs );
+        if( p_sps->i_num_ref_frames_in_pic_order_cnt_cycle > 255 )
+            return false;
+        for( int i=0; i<p_sps->i_num_ref_frames_in_pic_order_cnt_cycle; i++ )
+            p_sps->offset_for_ref_frame[i] = bs_read_se( p_bs );
     }
     /* i_num_ref_frames */
     bs_read_ue( p_bs );
@@ -548,6 +540,55 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
 
     bs_skip( p_bs, 1 ); // entropy coding mode flag
     p_pps->i_pic_order_present_flag = bs_read( p_bs, 1 );
+    unsigned num_slice_groups_minus1 = bs_read_ue( p_bs );
+    if( num_slice_groups_minus1 > 0 )
+    {
+        unsigned slice_group_map_type = bs_read_ue( p_bs );
+        if( slice_group_map_type == 0 )
+        {
+            for( unsigned i=0; i <= num_slice_groups_minus1; i++ )
+                bs_read_ue( p_bs ); /* run_length_minus1[group] */
+        }
+        else if( slice_group_map_type == 2 )
+        {
+            for( unsigned i=0; i <= num_slice_groups_minus1; i++ )
+            {
+                bs_read_ue( p_bs ); /* top_left[group] */
+                bs_read_ue( p_bs ); /* bottom_right[group] */
+            }
+        }
+        else if( slice_group_map_type > 2 && slice_group_map_type < 6 )
+        {
+            bs_read1( p_bs );   /* slice_group_change_direction_flag */
+            bs_read_ue( p_bs ); /* slice_group_change_rate_minus1 */
+        }
+        else if( slice_group_map_type == 6 )
+        {
+            unsigned pic_size_in_maps_units_minus1 = bs_read_ue( p_bs );
+            unsigned sliceGroupSize = 1;
+            while(num_slice_groups_minus1 > 0)
+            {
+                sliceGroupSize++;
+                num_slice_groups_minus1 >>= 1;
+            }
+            for( unsigned i=0; i <= pic_size_in_maps_units_minus1; i++ )
+            {
+                bs_read( p_bs, sliceGroupSize );
+            }
+        }
+    }
+
+    bs_read_ue( p_bs ); /* num_ref_idx_l0_default_active_minus1 */
+    bs_read_ue( p_bs ); /* num_ref_idx_l1_default_active_minus1 */
+    p_pps->weighted_pred_flag = bs_read( p_bs, 1 );
+    p_pps->weighted_bipred_idc = bs_read( p_bs, 2 );
+    bs_read_se( p_bs ); /* pic_init_qp_minus26 */
+    bs_read_se( p_bs ); /* pic_init_qs_minus26 */
+    bs_read_se( p_bs ); /* chroma_qp_index_offset */
+    bs_read( p_bs, 1 ); /* deblocking_filter_control_present_flag */
+    bs_read( p_bs, 1 ); /* constrained_intra_pred_flag */
+    p_pps->i_redundant_pic_present_flag = bs_read( p_bs, 1 );
+
     /* TODO */
 
     return true;

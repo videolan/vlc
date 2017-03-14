@@ -106,6 +106,10 @@ struct h264_sequence_parameter_set_t
     int i_log2_max_frame_num;
     int i_pic_order_cnt_type;
     int i_delta_pic_order_always_zero_flag;
+    int32_t offset_for_non_ref_pic;
+    int32_t offset_for_top_to_bottom_field;
+    int i_num_ref_frames_in_pic_order_cnt_cycle;
+    int32_t offset_for_ref_frame[255];
     int i_log2_max_pic_order_cnt_lsb;
 
     struct {
@@ -136,7 +140,10 @@ struct h264_picture_parameter_set_t
 {
     uint8_t i_id;
     uint8_t i_sps_id;
-    int i_pic_order_present_flag;
+    uint8_t i_pic_order_present_flag;
+    uint8_t i_redundant_pic_present_flag;
+    uint8_t weighted_pred_flag;
+    uint8_t weighted_bipred_idc;
 };
 
 /*
