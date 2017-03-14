@@ -490,6 +490,25 @@ int libvlc_video_get_teletext( libvlc_media_player_t *p_mi )
     return var_GetInteger (p_mi, "vbi-page");
 }
 
+static void teletext_enable( input_thread_t *p_input_thread, bool b_enable )
+{
+    if( b_enable )
+    {
+        vlc_value_t list;
+        if( !var_Change( p_input_thread, "teletext-es", VLC_VAR_GETCHOICES,
+                         &list, NULL ) )
+        {
+            if( list.p_list->i_count > 0 )
+                var_SetInteger( p_input_thread, "spu-es",
+                                list.p_list->p_values[0].i_int );
+
+            var_FreeList( &list, NULL );
+        }
+    }
+    else
+        var_SetInteger( p_input_thread, "spu-es", -1 );
+}
+
 void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
 {
     input_thread_t *p_input_thread;
@@ -533,21 +552,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi )
         return;
     }
     const bool b_selected = var_GetInteger( p_input_thread, "teletext-es" ) >= 0;
-    if( b_selected )
-    {
-        var_SetInteger( p_input_thread, "spu-es", -1 );
-    }
-    else
-    {
-        vlc_value_t list;
-        if( !var_Change( p_input_thread, "teletext-es", VLC_VAR_GETCHOICES, &list, NULL ) )
-        {
-            if( list.p_list->i_count > 0 )
-                var_SetInteger( p_input_thread, "spu-es", list.p_list->p_values[0].i_int );
-
-            var_FreeList( &list, NULL );
-        }
-    }
+    teletext_enable( p_input_thread, !b_selected );
     vlc_object_release( p_input_thread );
 }
 
