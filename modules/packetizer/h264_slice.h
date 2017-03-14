@@ -41,6 +41,7 @@ typedef struct
     int i_delta_pic_order_cnt0;
     int i_delta_pic_order_cnt1;
 
+    bool has_mmco5;
 } h264_slice_t;
 
 static inline void h264_slice_init( h264_slice_t *p_slice )
@@ -58,6 +59,7 @@ static inline void h264_slice_init( h264_slice_t *p_slice )
     p_slice->i_delta_pic_order_cnt_bottom = -1;
     p_slice->i_delta_pic_order_cnt0 = 0;
     p_slice->i_delta_pic_order_cnt1 = 0;
+    p_slice->has_mmco5 = false;
 }
 
 bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
@@ -66,4 +68,31 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
                                              const h264_picture_parameter_set_t ** ),
                         void *, h264_slice_t *p_slice );
 
+typedef struct
+{
+    struct
+    {
+        int lsb;
+        int msb;
+    } prevPicOrderCnt;
+    unsigned prevFrameNum;
+    unsigned prevFrameNumOffset;
+    int  prevRefPictureTFOC;
+    bool prevRefPictureIsBottomField;
+    bool prevRefPictureHasMMCO5;
+} poc_context_t;
+
+static inline void h264_poc_context_init( poc_context_t *p_ctx )
+{
+    p_ctx->prevPicOrderCnt.lsb = 0;
+    p_ctx->prevPicOrderCnt.msb = 0;
+    p_ctx->prevFrameNum = 0;
+    p_ctx->prevFrameNumOffset = 0;
+    p_ctx->prevRefPictureIsBottomField = false;
+    p_ctx->prevRefPictureHasMMCO5 = false;
+}
+
+void h264_compute_poc( const h264_sequence_parameter_set_t *p_sps,
+                       const h264_slice_t *p_slice, poc_context_t *p_ctx,
+                       int *p_PictureOrderCount, int *p_tFOC, int *p_bFOC );
 #endif
