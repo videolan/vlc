@@ -659,7 +659,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi,
 /* ************** */
 
 static void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
-                               bool b_add, bool b_setconfig )
+                               bool b_add )
 {
     char *psz_parser;
     char *psz_string;
@@ -736,11 +736,6 @@ static void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
          }
     }
 
-    if( b_setconfig )
-    {
-        config_PutPsz( p_vout, psz_filter_type, psz_string );
-    }
-
     var_SetString( p_vout, psz_filter_type, psz_string );
 
     free( psz_string );
@@ -785,7 +780,7 @@ set_int( libvlc_media_player_t *p_mi, const char *restrict name,
             vout_thread_t *vout = GetVout( p_mi, 0 );
             if (vout != NULL)
             {   /* Fill sub-source */
-                vout_EnableFilter( vout, opt->name, value, false );
+                vout_EnableFilter( vout, opt->name, value );
                 var_TriggerCallback( vout, "sub-source" );
                 vlc_object_release( vout );
             }
