@@ -170,8 +170,6 @@ VLC_API void vout_PutSubpicture( vout_thread_t *, subpicture_t * );
 VLC_API int vout_RegisterSubpictureChannel( vout_thread_t * );
 VLC_API void vout_FlushSubpictureChannel( vout_thread_t *, int );
 
-VLC_API void vout_EnableFilter( vout_thread_t *, const char *,bool , bool  );
-
 /**@}*/
 
 #endif /* _VLC_VIDEO_H */
