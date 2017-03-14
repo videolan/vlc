@@ -733,7 +733,10 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
     size_t i_buffer = p_frag->i_buffer;
 
     if( !hxxx_strip_AnnexB_startcode( &p_buffer, &i_buffer ) )
+    {
+        block_Release( p_frag );
         return;
+    }
 
     h264_sequence_parameter_set_t *p_sps = h264_decode_sps( p_buffer, i_buffer, true );
     if( !p_sps )
@@ -811,7 +814,10 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
     size_t i_buffer = p_frag->i_buffer;
 
     if( !hxxx_strip_AnnexB_startcode( &p_buffer, &i_buffer ) )
+    {
+        block_Release( p_frag );
         return;
+    }
 
     h264_picture_parameter_set_t *p_pps = h264_decode_pps( p_buffer, i_buffer, true );
     if( !p_pps )
