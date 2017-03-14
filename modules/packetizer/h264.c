@@ -617,6 +617,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
         p_pic = block_ChainGather( p_sys->p_frame );
     }
 
+    if( !p_pic )
+        return NULL;
+
     unsigned i_num_clock_ts = 2;
     if( p_sys->b_frame_mbs_only == 0 )
     {
