@@ -672,7 +672,7 @@ persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 
         pic->p[i].p_pixels =
             tc->api->MapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, picsys->bytes[i],
-                                    access);
+                                    access | GL_MAP_FLUSH_EXPLICIT_BIT);
 
         if (pic->p[i].p_pixels == NULL)
         {
