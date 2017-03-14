@@ -71,7 +71,7 @@ typedef struct stream_extractor_t {
 } stream_extractor_t;
 
 typedef struct stream_directory_t {
-    VLC_COMMON_MEMBERS;
+    VLC_COMMON_MEMBERS
 
     /**
      * \name Callbacks for stream directories
