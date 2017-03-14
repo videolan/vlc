@@ -35,6 +35,9 @@
 
 #include <mmsystem.h>
 #include <winsock.h>
+#if VLC_WINSTORE_APP && !defined(__MINGW32__)
+typedef UINT MMRESULT;
+#endif
 
 DWORD LoadLibraryFlags = 0;
 
