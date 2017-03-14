@@ -515,7 +515,13 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
     vlc_object_t *p_zvbi = NULL;
     int telx;
 
-    var_SetInteger (p_mi, "vbi-page", i_page);
+    if( i_page >= 0 && i_page < 1000 )
+        var_SetInteger( p_mi, "vbi-page", i_page );
+    else if( i_page != -1 )
+    {
+        libvlc_printerr("Invalid page number");
+        return;
+    }
 
     p_input_thread = libvlc_get_input_thread( p_mi );
     if( !p_input_thread ) return;
@@ -526,14 +532,26 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
         return;
     }
 
-    telx = var_GetInteger( p_input_thread, "teletext-es" );
-    if( telx >= 0 )
+    if( i_page == -1 )
     {
-        if( input_GetEsObjects( p_input_thread, telx, &p_zvbi, NULL, NULL )
-            == VLC_SUCCESS )
+        teletext_enable( p_input_thread, false );
+    }
+    else
+    {
+        telx = var_GetInteger( p_input_thread, "teletext-es" );
+        if( telx >= 0 )
         {
-            var_SetInteger( p_zvbi, "vbi-page", i_page );
-            vlc_object_release( p_zvbi );
+            if( input_GetEsObjects( p_input_thread, telx, &p_zvbi, NULL, NULL )
+                == VLC_SUCCESS )
+            {
+                var_SetInteger( p_zvbi, "vbi-page", i_page );
+                vlc_object_release( p_zvbi );
+            }
+        }
+        else
+        {
+            /* the "vbi-page" will be selected on es creation */
+            teletext_enable( p_input_thread, true );
         }
     }
     vlc_object_release( p_input_thread );

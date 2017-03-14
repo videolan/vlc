@@ -1351,7 +1351,9 @@ LIBVLC_API int libvlc_video_get_teletext( libvlc_media_player_t *p_mi );
  * Set new teletext page to retrieve.
  *
  * \param p_mi the media player
- * \param i_page teletex page number requested
+ * \param i_page teletex page number requested. This value can be -1 to disable
+ * teletext or a number in the range [0;1000[ to show the requested page. 100
+ * is the default teletext page.
  */
 LIBVLC_API void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page );
 
