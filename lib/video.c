@@ -778,9 +778,11 @@ set_int( libvlc_media_player_t *p_mi, const char *restrict name,
         case 0: /* the enabler */
         {
             vout_thread_t *vout = GetVout( p_mi, 0 );
+            vlc_object_t *p_parent = vout ? VLC_OBJECT( vout ) :
+                                            VLC_OBJECT( p_mi );
+            vout_EnableFilter( p_parent, opt->name, value );
             if (vout != NULL)
             {   /* Fill sub-source */
-                vout_EnableFilter( VLC_OBJECT( vout ), opt->name, value );
                 var_TriggerCallback( vout, "sub-source" );
                 vlc_object_release( vout );
             }

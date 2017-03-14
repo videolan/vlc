@@ -650,6 +650,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "vbi-page", VLC_VAR_INTEGER);
     var_SetInteger (mp, "vbi-page", 100);
 
+    var_Create (mp, "video-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create (mp, "sub-source", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create (mp, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+
     var_Create (mp, "marq-marquee", VLC_VAR_STRING);
     var_Create (mp, "marq-color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "marq-opacity", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
