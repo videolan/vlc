@@ -2156,7 +2156,8 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR, p_pmt->i_number, FROM_SCALE(i_pcr) );
         /* growing files/named fifo handling */
-        if( vlc_stream_Tell( p_sys->stream ) > p_pmt->i_last_dts_byte )
+        if( p_sys->b_access_control == false &&
+            vlc_stream_Tell( p_sys->stream ) > p_pmt->i_last_dts_byte )
         {
             p_pmt->i_last_dts = i_pcr;
             p_pmt->i_last_dts_byte = vlc_stream_Tell( p_sys->stream );
