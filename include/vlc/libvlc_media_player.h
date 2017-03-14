@@ -1358,13 +1358,6 @@ LIBVLC_API int libvlc_video_get_teletext( libvlc_media_player_t *p_mi );
 LIBVLC_API void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page );
 
 /**
- * Toggle teletext transparent status on video output.
- *
- * \param p_mi the media player
- */
-LIBVLC_API void libvlc_toggle_teletext( libvlc_media_player_t *p_mi );
-
-/**
  * Get number of available video tracks.
  *
  * \param p_mi media player

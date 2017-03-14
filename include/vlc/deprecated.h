@@ -128,6 +128,15 @@ LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
 LIBVLC_DEPRECATED LIBVLC_API int
 libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi, const char *psz_subtitle );
 
+/**
+ * Toggle teletext transparent status on video output.
+ * \deprecated use libvlc_video_set_teletext() instead.
+ *
+ * \param p_mi the media player
+ */
+LIBVLC_DEPRECATED LIBVLC_API void
+libvlc_toggle_teletext( libvlc_media_player_t *p_mi );
+
 /** @}*/
 
 /**
