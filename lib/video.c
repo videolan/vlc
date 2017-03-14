@@ -658,7 +658,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi,
 /* module helpers */
 /* ************** */
 
-static void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
+static void vout_EnableFilter( vlc_object_t *p_parent, const char *psz_name,
                                bool b_add )
 {
     char *psz_parser;
@@ -668,7 +668,7 @@ static void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
     module_t *p_obj = module_find( psz_name );
     if( !p_obj )
     {
-        msg_Err( p_vout, "Unable to find filter module \"%s\".", psz_name );
+        msg_Err( p_parent, "Unable to find filter module \"%s\".", psz_name );
         return;
     }
 
@@ -686,11 +686,11 @@ static void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
     }
     else
     {
-        msg_Err( p_vout, "Unknown video filter type." );
+        msg_Err( p_parent, "Unknown video filter type." );
         return;
     }
 
-    psz_string = var_GetString( p_vout, psz_filter_type );
+    psz_string = var_GetString( p_parent, psz_filter_type );
 
     /* Todo : Use some generic chain manipulation functions */
     if( !psz_string ) psz_string = strdup("");
@@ -736,7 +736,7 @@ static void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
          }
     }
 
-    var_SetString( p_vout, psz_filter_type, psz_string );
+    var_SetString( p_parent, psz_filter_type, psz_string );
 
     free( psz_string );
 }
@@ -780,7 +780,7 @@ set_int( libvlc_media_player_t *p_mi, const char *restrict name,
             vout_thread_t *vout = GetVout( p_mi, 0 );
             if (vout != NULL)
             {   /* Fill sub-source */
-                vout_EnableFilter( vout, opt->name, value );
+                vout_EnableFilter( VLC_OBJECT( vout ), opt->name, value );
                 var_TriggerCallback( vout, "sub-source" );
                 vlc_object_release( vout );
             }
