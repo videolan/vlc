@@ -1649,6 +1649,14 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                     return rgb / 6.0";
             src_transfer = TRANSFER_FUNC_LINEAR;
             break;
+        case TRANSFER_FUNC_BT709:
+            psz_src_transform = "return pow(rgb, 1.0 / 0.45)";
+            src_transfer = TRANSFER_FUNC_LINEAR;
+            break;
+        case TRANSFER_FUNC_SRGB:
+            psz_src_transform = "return pow(rgb, 2.2)";
+            src_transfer = TRANSFER_FUNC_LINEAR;
+            break;
         default:
             src_transfer = transfer;
             break;
