@@ -676,7 +676,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 static block_t *OutputPicture( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_pic;
+    block_t *p_pic = NULL;
+    block_t **pp_pic_last = &p_pic;
 
     if ( !p_sys->b_header && p_sys->i_recovery_frames != -1 )
     {
@@ -686,6 +687,12 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_sys->b_header = true;
         }
         --p_sys->i_recovery_frames;
+    }
+
+    if( unlikely(!p_sys->p_frame) )
+    {
+        assert( p_sys->p_frame );
+        return NULL;
     }
 
     if( !p_sys->b_header && p_sys->i_recovery_frames == -1 &&
@@ -698,48 +705,50 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_pps || !p_sps )
         return NULL;
 
+    /* Gather PPS/SPS if required */
+    block_t *p_xpsnal = NULL;
+    block_t **pp_xpsnal_tail = &p_xpsnal;
     const bool b_sps_pps_i = p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I &&
                              p_sys->p_active_pps &&
                              p_sys->p_active_sps;
     if( b_sps_pps_i || p_sys->b_new_sps || p_sys->b_new_pps )
     {
-        block_t *p_head = NULL;
-        if( p_sys->p_frame->i_flags & BLOCK_FLAG_PRIVATE_AUD )
-        {
-            p_head = p_sys->p_frame;
-            p_sys->p_frame = p_sys->p_frame->p_next;
-            if( p_sys->p_frame == NULL )
-                p_sys->pp_frame_last = &p_sys->p_frame;
-            p_head->p_next = NULL;
-        }
-
-        block_t *p_list = NULL;
-        block_t **pp_list_tail = &p_list;
         for( int i = 0; i <= H264_SPS_ID_MAX && (b_sps_pps_i || p_sys->b_new_sps); i++ )
         {
             if( p_sys->sps[i].p_block )
-                block_ChainLastAppend( &pp_list_tail, block_Duplicate( p_sys->sps[i].p_block ) );
+                block_ChainLastAppend( &pp_xpsnal_tail, block_Duplicate( p_sys->sps[i].p_block ) );
         }
         for( int i = 0; i < H264_PPS_ID_MAX && (b_sps_pps_i || p_sys->b_new_pps); i++ )
         {
             if( p_sys->pps[i].p_block )
-                block_ChainLastAppend( &pp_list_tail, block_Duplicate( p_sys->pps[i].p_block ) );
+                block_ChainLastAppend( &pp_xpsnal_tail, block_Duplicate( p_sys->pps[i].p_block ) );
         }
-        if( b_sps_pps_i && p_list )
+        if( b_sps_pps_i && p_xpsnal )
             p_sys->b_header = true;
-
-        if( p_list )
-            block_ChainAppend( &p_head, p_list );
-
-        if( p_sys->p_frame )
-            block_ChainAppend( &p_head, p_sys->p_frame );
-
-        p_pic = block_ChainGather( p_head );
     }
-    else
+
+    /* Now rebuild NAL Sequence, inserting PPS/SPS if any */
+    if( p_sys->p_frame->i_flags & BLOCK_FLAG_PRIVATE_AUD )
     {
-        p_pic = block_ChainGather( p_sys->p_frame );
+        block_t *p_au = p_sys->p_frame;
+        p_sys->p_frame = p_au->p_next;
+        p_au->p_next = NULL;
+        p_au->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
+        block_ChainLastAppend( &pp_pic_last, p_au );
     }
+
+    if( p_xpsnal )
+        block_ChainLastAppend( &pp_pic_last, p_xpsnal );
+
+    assert( p_sys->p_frame );
+    if( p_sys->p_frame )
+        block_ChainLastAppend( &pp_pic_last, p_sys->p_frame );
+
+    /* Reset chains, now empty */
+    p_sys->p_frame = NULL;
+    p_sys->pp_frame_last = &p_sys->p_frame;
+
+    p_pic = block_ChainGather( p_pic );
 
     if( !p_pic )
         return NULL;
