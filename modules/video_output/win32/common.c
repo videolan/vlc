@@ -296,7 +296,7 @@ void UpdateRects(vout_display_t *vd,
 #endif
 
 #ifndef NDEBUG
-    msg_Dbg(vd, "DirectXUpdateRects souce"
+    msg_Dbg(vd, "DirectXUpdateRects source"
         " offset: %i,%i visible: %ix%i",
         source->i_x_offset, source->i_y_offset,
         source->i_visible_width, source->i_visible_height);
