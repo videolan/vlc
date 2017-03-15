@@ -45,8 +45,8 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
                              unsigned *pi_lost );
 
 /**
- * This function will ensure that all ready/displayed pciture have at most
- * the provided dat
+ * This function will ensure that all ready/displayed pictures have at most
+ * the provided date.
  */
 void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
 
