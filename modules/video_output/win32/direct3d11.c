@@ -1681,11 +1681,11 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
                 {
                     /* Linear to ST2084 */
-                    psz_src_transform =
+                    psz_display_transform =
                            ST2084_PQ_CONSTANTS
-                           "rgb = pow(rgb, m1);\
+                           "rgb = pow(rgb, ST2084_m1);\
                             rgb = (ST2084_c1 + ST2084_c2 * rgb) / (1 + ST2084_c3 * rgb);\
-                            rgb = pow(rgb, ST2084_m3);\
+                            rgb = pow(rgb, ST2084_m2);\
                             return rgb";
                 }
                 else
