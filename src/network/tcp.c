@@ -368,18 +368,25 @@ static int SocksNegotiate( vlc_object_t *p_obj,
             return VLC_EGENERIC;
         }
 
-        int i_len1 = __MIN( strlen(psz_socks_user), 255 );
-        int i_len2 = __MIN( strlen(psz_socks_passwd), 255 );
+        int const i_user = strlen( psz_socks_user );
+        int const i_pasw = strlen( psz_socks_passwd );
+
+        if( i_user > 255 || i_pasw > 255 )
+        {
+            msg_Err( p_obj, "socks: rejecting username and/or password due to "
+                            "violation of RFC1929 (longer than 255 bytes)" );
+            return VLC_EGENERIC;
+        }
+
         msg_Dbg( p_obj, "socks: username/password authentication" );
 
-        /* XXX: we don't support user/pwd > 255 (truncated)*/
         buffer[0] = i_socks_version;        /* Version */
-        buffer[1] = i_len1;                 /* User length */
-        memcpy( &buffer[2], psz_socks_user, i_len1 );
-        buffer[2+i_len1] = i_len2;          /* Password length */
-        memcpy( &buffer[2+i_len1+1], psz_socks_passwd, i_len2 );
+        buffer[1] = i_user;                 /* User length */
+        memcpy( &buffer[2], psz_socks_user, i_user );
+        buffer[2+i_user] = i_pasw;          /* Password length */
+        memcpy( &buffer[2+i_user+1], psz_socks_passwd, i_pasw );
 
-        i_len = 3 + i_len1 + i_len2;
+        i_len = 3 + i_user + i_pasw;
 
         if( net_Write( p_obj, fd, buffer, i_len ) != i_len )
             return VLC_EGENERIC;
