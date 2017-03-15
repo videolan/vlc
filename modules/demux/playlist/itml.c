@@ -344,9 +344,8 @@ static bool parse_track_dict( demux_t *p_demux, input_item_node_t *p_input_node,
 
 static track_elem_t *new_track()
 {
-    track_elem_t *p_track;
-    p_track = malloc( sizeof( track_elem_t ) );
-    if( p_track )
+    track_elem_t *p_track = malloc( sizeof *p_track );
+    if( likely( p_track ) )
     {
         p_track->name = NULL;
         p_track->artist = NULL;
