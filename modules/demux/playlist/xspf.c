@@ -741,7 +741,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 }
 
                 /* special tag <vlc:id> */
-                if (!strcmp(p_handler->name, "vlc:id"))
+                if (!strcmp(p_handler->name, "vlc:id") && psz_value )
                 {
                     p_demux->p_sys->i_track_id = atoi(psz_value);
                 }
