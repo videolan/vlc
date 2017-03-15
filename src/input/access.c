@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#ifdef HAVE_STRCOLL
+#ifndef HAVE_STRCOLL
 # define strcoll strcasecmp
 #endif
 
