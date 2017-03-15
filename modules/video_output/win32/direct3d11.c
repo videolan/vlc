@@ -40,7 +40,7 @@
 #define COBJMACROS
 #include <initguid.h>
 #include <d3d11.h>
-#include <dxgi1_2.h>
+#include <dxgi1_4.h>
 #include <d3dcompiler.h>
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
@@ -105,6 +105,21 @@ typedef struct
     unsigned int              i_width;
     unsigned int              i_height;
 } d3d_quad_t;
+
+typedef enum video_color_axis {
+    COLOR_AXIS_RGB,
+    COLOR_AXIS_YCBCR,
+} video_color_axis;
+
+typedef struct {
+    DXGI_COLOR_SPACE_TYPE   dxgi;
+    const char              *name;
+    video_color_axis        axis;
+    video_color_primaries_t primaries;
+    video_transfer_func_t   transfer;
+    video_color_space_t     color;
+    bool                    b_full_range;
+} dxgi_color_space;
 
 struct vout_display_sys_t
 {
@@ -1325,6 +1340,68 @@ static HINSTANCE Direct3D11LoadShaderLibrary(void)
 }
 #endif
 
+#define COLOR_RANGE_FULL   1 /* 0-255 */
+#define COLOR_RANGE_STUDIO 0 /* 16-235 */
+
+#define TRANSFER_FUNC_10    TRANSFER_FUNC_LINEAR
+#define TRANSFER_FUNC_22    TRANSFER_FUNC_SRGB
+#define TRANSFER_FUNC_2084  TRANSFER_FUNC_SMPTE_ST2084
+
+#define COLOR_PRIMARIES_BT601  COLOR_PRIMARIES_BT601_525
+
+static const dxgi_color_space color_spaces[] = {
+#define DXGIMAP(AXIS, RANGE, GAMMA, SITTING, PRIMARIES) \
+    { DXGI_COLOR_SPACE_##AXIS##_##RANGE##_G##GAMMA##_##SITTING##_P##PRIMARIES, \
+      #AXIS " Rec." #PRIMARIES " gamma:" #GAMMA " range:" #RANGE, \
+      COLOR_AXIS_##AXIS, COLOR_PRIMARIES_BT##PRIMARIES, TRANSFER_FUNC_##GAMMA, \
+      COLOR_SPACE_BT##PRIMARIES, COLOR_RANGE_##RANGE},
+
+    DXGIMAP(RGB,   FULL,     22,    NONE,   709)
+    DXGIMAP(YCBCR, STUDIO,   22,    LEFT,   601)
+    DXGIMAP(YCBCR, FULL,     22,    LEFT,   601)
+    DXGIMAP(RGB,   FULL,     10,    NONE,   709)
+    DXGIMAP(RGB,   STUDIO,   22,    NONE,   709)
+    DXGIMAP(YCBCR, STUDIO,   22,    LEFT,   709)
+    DXGIMAP(YCBCR, FULL,     22,    LEFT,   709)
+    DXGIMAP(RGB,   STUDIO,   22,    NONE,  2020)
+    DXGIMAP(YCBCR, STUDIO,   22,    LEFT,  2020)
+    DXGIMAP(YCBCR, FULL,     22,    LEFT,  2020)
+    DXGIMAP(YCBCR, STUDIO,   22, TOPLEFT,  2020)
+    DXGIMAP(RGB,   FULL,     22,    NONE,  2020)
+    DXGIMAP(RGB,   FULL,   2084,    NONE,  2020)
+    DXGIMAP(YCBCR, STUDIO, 2084,    LEFT,  2020)
+    DXGIMAP(RGB,   STUDIO, 2084,    NONE,  2020)
+    DXGIMAP(YCBCR, STUDIO, 2084, TOPLEFT,  2020)
+    /*DXGIMAP(YCBCR, FULL,     22,    NONE,  2020, 601)*/
+    {DXGI_COLOR_SPACE_RESERVED, NULL, 0, 0, 0, 0, 0},
+#undef DXGIMAP
+};
+
+static void D3D11SetColorSpace(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+    UINT support;
+    IDXGISwapChain3 *dxgiswapChain3 = NULL;
+
+    hr = ID3D11Device_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
+    if (FAILED(hr)) {
+        msg_Warn(vd, "could not get a IDXGISwapChain3");
+        goto done;
+    }
+
+    for (int i=0; color_spaces[i].name; ++i)
+    {
+        hr = IDXGISwapChain3_CheckColorSpaceSupport(dxgiswapChain3, color_spaces[i].dxgi, &support);
+        if (SUCCEEDED(hr) && support) {
+            msg_Dbg(vd, "supports colorspace %s", color_spaces[i].name);
+        }
+    }
+
+done:
+    if (dxgiswapChain3)
+        IDXGISwapChain3_Release(dxgiswapChain3);
+}
 
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 {
@@ -1429,6 +1506,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 #endif
+
+    D3D11SetColorSpace(vd);
+
     /* TODO adjust the swapchain transfer function based on the source */
     sys->display_transfer = TRANSFER_FUNC_SRGB;
 
