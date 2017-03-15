@@ -534,8 +534,6 @@ modules/gui/macosx/VLCAudioEffectsWindowController.h
 modules/gui/macosx/VLCAudioEffectsWindowController.m
 modules/gui/macosx/VLCBookmarksWindowController.h
 modules/gui/macosx/VLCBookmarksWindowController.m
-modules/gui/macosx/BWQuincyUI.h
-modules/gui/macosx/BWQuincyUI.m
 modules/gui/macosx/VLCControlsBarCommon.h
 modules/gui/macosx/VLCControlsBarCommon.m
 modules/gui/macosx/VLCConvertAndSaveWindowController.h
@@ -582,8 +580,8 @@ modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
 modules/gui/macosx/VLCResumeDialogController.h
 modules/gui/macosx/VLCResumeDialogController.m
-modules/gui/macosx/simple_prefs.h
-modules/gui/macosx/simple_prefs.m
+modules/gui/macosx/VLCSimplePrefsController.h
+modules/gui/macosx/VLCSimplePrefsController.m
 modules/gui/macosx/VLCStringUtility.h
 modules/gui/macosx/VLCStringUtility.m
 modules/gui/macosx/VLCTrackSynchronizationWindowController.h
