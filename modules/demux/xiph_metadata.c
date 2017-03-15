@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
+#include <vlc_arrays.h>
 #include <vlc_input.h>
 #include "xiph_metadata.h"
 
@@ -135,7 +136,7 @@ input_attachment_t* ParseFlacPicture( const uint8_t *p_data, size_t size,
     p_attachment = vlc_input_attachment_New( name, mime, description, p_data,
                                              size /* XXX: len instead? */ );
 
-    if( type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
+    if( type < ARRAY_SIZE(pi_cover_score) &&
         *i_cover_score < pi_cover_score[type] )
     {
         *i_cover_idx = i_attachments;
