@@ -25,7 +25,7 @@
 #import "VLCMain.h"
 #import <vlc_common.h>
 
-@interface VLCSimplePrefs : NSWindowController
+@interface VLCSimplePrefsController : NSWindowController
 
 // Audio pane
 @property (readwrite, weak) IBOutlet NSPopUpButton *audio_dolbyPopup;
@@ -238,13 +238,5 @@
 /* hotkeys */
 - (IBAction)hotkeySettingChanged:(id)sender;
 - (BOOL)changeHotkeyTo: (NSString *)theKey;
-
-@end
-
-@interface VLCHotkeyChangeWindow : NSWindow
-
-@end
-
-@interface VLCSimplePrefsWindow : NSWindow
 
 @end

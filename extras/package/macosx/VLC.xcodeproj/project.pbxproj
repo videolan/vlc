@@ -162,6 +162,8 @@
 		1C31142A1E508D1B00D4DD76 /* VLCStatusBarIconMainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */; };
 		6B3BE42C1E6217CB008D098A /* VLCHUDImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */; };
 		6B3BE4321E621F24008D098A /* VLCHUDToggleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */; };
+		6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */; };
+		6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -196,6 +198,10 @@
 		6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDImageButton.m; sourceTree = "<group>"; };
 		6B3BE4301E621F24008D098A /* VLCHUDToggleButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDToggleButton.h; sourceTree = "<group>"; };
 		6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDToggleButton.m; sourceTree = "<group>"; };
+		6B4D508E1E79781F004479B5 /* VLCHotkeyChangeWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHotkeyChangeWindow.h; sourceTree = "<group>"; };
+		6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHotkeyChangeWindow.m; sourceTree = "<group>"; };
+		6B4D50911E7979CB004479B5 /* VLCSimplePrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCSimplePrefsWindow.h; sourceTree = "<group>"; };
+		6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSimplePrefsWindow.m; sourceTree = "<group>"; };
 		6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSlider.h; sourceTree = "<group>"; };
 		6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCDefaultValueSlider.m; sourceTree = "<group>"; };
 		6B6A499C1DFD9B23009128AC /* VLCDefaultValueSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSliderCell.h; sourceTree = "<group>"; };
@@ -999,6 +1005,10 @@
 				1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */,
 				CCB24D5E0D54BBAE004D780C /* VLCSimplePrefsController.h */,
 				CCB24D5D0D54BBAE004D780C /* VLCSimplePrefsController.m */,
+				6B4D50911E7979CB004479B5 /* VLCSimplePrefsWindow.h */,
+				6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */,
+				6B4D508E1E79781F004479B5 /* VLCHotkeyChangeWindow.h */,
+				6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */,
 				CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */,
 				CC269A4715E7947F00F2FDC9 /* VLCStringUtility.m */,
 				CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */,
@@ -1896,6 +1906,7 @@
 				1C31140F1E508D1B00D4DD76 /* AddonManager.xib in Sources */,
 				1C3114101E508D1B00D4DD76 /* AudioEffects.xib in Sources */,
 				1C3114111E508D1B00D4DD76 /* Bookmarks.xib in Sources */,
+				6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */,
 				1C3114131E508D1B00D4DD76 /* ConvertAndSave.xib in Sources */,
 				1C3114141E508D1B00D4DD76 /* CoreDialogs.xib in Sources */,
 				1C3114151E508D1B00D4DD76 /* DetachedVideoWindow.xib in Sources */,
@@ -1944,6 +1955,7 @@
 				1C3113F61E508C7600D4DD76 /* VLCHUDButtonCell.h in Sources */,
 				1C3113F71E508C7600D4DD76 /* VLCHUDButtonCell.m in Sources */,
 				1C3113F81E508C7600D4DD76 /* VLCHUDCheckboxCell.h in Sources */,
+				6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */,
 				1C3113F91E508C7600D4DD76 /* VLCHUDCheckboxCell.m in Sources */,
 				1C3113FA1E508C7600D4DD76 /* VLCHUDRadiobuttonCell.h in Sources */,
 				1C3113FB1E508C7600D4DD76 /* VLCHUDRadiobuttonCell.m in Sources */,

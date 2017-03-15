@@ -63,7 +63,7 @@ static NSString * VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySu
 @class VLCPlaylist;
 @class VLCInputManager;
 @class VLCResumeDialogController;
-@class VLCSimplePrefs;
+@class VLCSimplePrefsController;
 @class VLCPrefs;
 @class VLCCoreDialogProvider;
 @class VLCBookmarksWindowController;
@@ -90,7 +90,7 @@ static NSString * VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySu
 - (VLCMainWindow *)mainWindow;
 - (VLCBookmarksWindowController *)bookmarks;
 - (VLCOpenWindowController *)open;
-- (VLCSimplePrefs *)simplePreferences;
+- (VLCSimplePrefsController *)simplePreferences;
 - (VLCPrefs *)preferences;
 - (VLCPlaylist *)playlist;
 - (VLCCoreDialogProvider *)coreDialogProvider;

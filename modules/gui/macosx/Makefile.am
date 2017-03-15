@@ -59,6 +59,8 @@ libmacosx_plugin_la_SOURCES = \
 	VLCPopupPanelController.h VLCPopupPanelController.m \
 	VLCTextfieldPanelController.h VLCTextfieldPanelController.m \
 	VLCSimplePrefsController.h VLCSimplePrefsController.m \
+	VLCSimplePrefsWindow.h VLCSimplePrefsWindow.m \
+	VLCHotkeyChangeWindow.h VLCHotkeyChangeWindow.m \
 	SPInvocationGrabbing.h SPInvocationGrabbing.m \
 	SPMediaKeyTap.h SPMediaKeyTap.m \
 	Spotify.h \

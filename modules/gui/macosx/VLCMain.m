@@ -166,7 +166,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     NSWindowController *_mainWindowController;
     VLCMainMenu *_mainmenu;
     VLCPrefs *_prefs;
-    VLCSimplePrefs *_sprefs;
+    VLCSimplePrefsController *_sprefs;
     VLCOpenWindowController *_open;
     VLCCoreDialogProvider *_coredialogs;
     VLCBookmarksWindowController *_bookmarks;
@@ -560,10 +560,10 @@ static VLCMain *sharedInstance = nil;
     return _convertAndSaveWindow;
 }
 
-- (VLCSimplePrefs *)simplePreferences
+- (VLCSimplePrefsController *)simplePreferences
 {
     if (!_sprefs)
-        _sprefs = [[VLCSimplePrefs alloc] init];
+        _sprefs = [[VLCSimplePrefsController alloc] init];
 
     return _sprefs;
 }
