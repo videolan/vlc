@@ -251,10 +251,8 @@ static input_item_t *ParseLine(char *line)
             if (*end)
                 return NULL;
 
-            str = strsep(&line, ":");
-            const char *fec = ParseFEC(str);
-            str = strsep(&line, ":");
-            const char *mod = ParseModulation(str);
+            const char *fec = ParseFEC(strsep(&line, ":"));
+            const char *mod = ParseModulation(strsep(&line,":"));
             if (fec == NULL || mod == NULL)
                 return NULL;
 
@@ -267,12 +265,10 @@ static input_item_t *ParseLine(char *line)
         {   /* DVB-T */
             unsigned bandwidth = atoi(str + 10);
 
-            str = strsep(&line, ":");
-            const char *hp = ParseFEC(str);
-            str = strsep(&line, ":");
-            const char *lp = ParseFEC(str);
-            str = strsep(&line, ":");
-            const char *mod = ParseModulation(str);
+            const char *hp = ParseFEC(strsep(&line, ":"));
+            const char *lp = ParseFEC(strsep(&line, ":"));
+            const char *mod = ParseModulation(strsep(&line, ":"));
+
             if (hp == NULL || lp == NULL || mod == NULL)
                 return NULL;
 
@@ -283,8 +279,7 @@ static input_item_t *ParseLine(char *line)
             if (xmit == 0)
                 xmit = -1; /* AUTO */
 
-            str = strsep(&line, ":");
-            const char *guard = ParseGuard(str);
+            const char *guard = ParseGuard(strsep(&line,":"));
             if (guard == NULL)
                 return NULL;
 
