@@ -1346,7 +1346,7 @@ void AddonItemDelegate::editButtonClicked()
     QWidget *editor = qobject_cast<QWidget *>(sender()->parent());
     if ( !editor ) return;
     int value = editor->property("Addon::state").toInt();
-    if ( ( value == ADDON_INSTALLED ) )
+    if ( value == ADDON_INSTALLED )
         /* uninstall */
         editor->setProperty("Addon::state", ADDON_UNINSTALLING );
     else
