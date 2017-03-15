@@ -36,53 +36,134 @@ struct demux_sys_t
     char* psz_prefix;
 };
 
+static int consume_tag( xml_reader_t* p_reader, char const* psz_tag )
+{
+    int i_type, i_depth = 0;
+    char const *psz_name;
+
+    if( xml_ReaderIsEmptyElement( p_reader ) == 1 )
+        return VLC_SUCCESS;
+
+    while( ( i_type = xml_ReaderNextNode( p_reader, &psz_name ) ) > 0 )
+    {
+        if( i_type == XML_READER_ENDELEM && !strcasecmp( psz_name, psz_tag ) )
+        {
+            if( --i_depth < 0 )
+                return VLC_SUCCESS;
+        }
+        else if( i_type == XML_READER_STARTELEM && !strcasecmp( psz_name, psz_tag ) )
+            ++i_depth;
+    }
+
+    return VLC_EGENERIC;
+}
+
+static int consume_volatile_tag( demux_t* p_demux, char const* psz_tag )
+{
+    char* psz_copy = strdup( psz_tag );
+    int ret = VLC_ENOMEM;
+
+    if( likely( psz_copy ) )
+        ret = consume_tag( p_demux->p_sys->p_reader, psz_copy );
+
+    free( psz_copy );
+    return ret;
+}
+
+static void parse_meta( demux_t* p_demux, input_item_t* p_input )
+{
+    xml_reader_t* p_reader = p_demux->p_sys->p_reader;
+    bool const b_empty = xml_ReaderIsEmptyElement( p_reader ) == 1;
+
+    char *psz_meta_name = NULL, *psz_meta_content = NULL;
+    char const *psz_attr, *psz_value;
+    while( ( psz_attr = xml_ReaderNextAttr( p_reader, &psz_value ) ) )
+    {
+        if( psz_value == NULL )
+            continue;
+
+        if( !strcasecmp( psz_attr, "name" ) && !psz_meta_name )
+            psz_meta_name = strdup( psz_value );
+        else
+            if( !strcasecmp( psz_attr, "content" ) && !psz_meta_content )
+                psz_meta_content = strdup( psz_value );
+
+        if( psz_meta_name && psz_meta_content )
+            break;
+    }
+
+    if( b_empty == false )
+        consume_tag( p_reader, "meta" );
+
+    if( !psz_meta_name || !psz_meta_content )
+        goto done;
+
+    if( !strcasecmp( psz_meta_name, "TotalDuration" ) )
+        input_item_SetDuration( p_input, atoll( psz_meta_content ) );
+    else
+        if( !strcasecmp( psz_meta_name, "Author" ) )
+            input_item_SetPublisher( p_input, psz_meta_content );
+    else
+        if( !strcasecmp( psz_meta_name, "Rating" ) )
+            input_item_SetRating( p_input, psz_meta_content );
+    else
+        if( !strcasecmp( psz_meta_name, "Genre" ) )
+            input_item_SetGenre( p_input, psz_meta_content );
+    else
+        msg_Warn( p_demux, "ignoring unknown meta-attribute %s", psz_meta_name );
+
+done:
+    free( psz_meta_name );
+    free( psz_meta_content );
+}
+
+static int parse_title_element( demux_t* p_demux, input_item_t* p_input )
+{
+    xml_reader_t* p_reader = p_demux->p_sys->p_reader;
+    char const* psz_title;
+
+    if( xml_ReaderIsEmptyElement( p_reader ) )
+        return VLC_SUCCESS;
+
+    if( xml_ReaderNextNode( p_reader, &psz_title ) != XML_READER_TEXT )
+        return VLC_EGENERIC;
+
+    input_item_SetTitle( p_input, psz_title );
+
+    consume_tag( p_reader, "title" );
+    return VLC_SUCCESS;
+}
+
 static void read_head( demux_t* p_demux, input_item_t* p_input )
 {
-    demux_sys_t* p_sys = p_demux->p_sys;
-    const char* psz_name;
+    xml_reader_t* p_reader = p_demux->p_sys->p_reader;
+    char const* psz_name;
     int i_type;
 
-    do
+    while( ( i_type = xml_ReaderNextNode( p_reader, &psz_name ) ) > 0 )
     {
-        i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
-        if ( !strcasecmp( psz_name, "meta" ) )
+        if( i_type == XML_READER_ENDELEM && !strcasecmp( psz_name, "head" ) )
+            break;
+
+        if( i_type == XML_READER_STARTELEM )
         {
-            char* psz_attribute_name = NULL;
-            char* psz_attribute_value = NULL;
-            while (!psz_attribute_name || !psz_attribute_value)
+            if( !strcasecmp( psz_name, "meta" ) )
             {
-                const char* psz_attr = NULL;
-                const char* psz_val = NULL;
-                psz_attr = xml_ReaderNextAttr( p_sys->p_reader, &psz_val );
-                if ( !psz_attr || !psz_val )
+                parse_meta( p_demux, p_input );
+                continue;
+            }
+
+            if( !strcasecmp( psz_name, "title" ) )
+            {
+                if( parse_title_element( p_demux, p_input ) )
                     break;
-                if ( !strcasecmp( psz_attr, "name" ) && !psz_attribute_name )
-                    psz_attribute_name = strdup( psz_val );
-                else if ( !strcasecmp( psz_attr, "content" ) && !psz_attribute_value )
-                    psz_attribute_value = strdup( psz_val );
+                continue;
             }
-            if ( psz_attribute_name && psz_attribute_value )
-            {
-                if ( !strcasecmp( psz_attribute_name, "TotalDuration" ) )
-                    input_item_SetDuration( p_input, atoll( psz_attribute_value ) );
-                else if ( !strcasecmp( psz_attribute_name, "Author" ) )
-                    input_item_SetPublisher( p_input, psz_attribute_value );
-                else if ( !strcasecmp( psz_attribute_name, "Rating" ) )
-                    input_item_SetRating( p_input, psz_attribute_value );
-                else if ( !strcasecmp( psz_attribute_name, "Genre" ) )
-                    input_item_SetGenre( p_input, psz_attribute_value );
-            }
-            free( psz_attribute_name );
-            free( psz_attribute_value );
+
+            msg_Warn( p_demux, "skipping unknown tag <%s> in <head>", psz_name );
+            consume_volatile_tag( p_demux, psz_name );
         }
-        else if ( !strcasecmp( psz_name, "title" ) )
-        {
-            const char* psz_title;
-            int i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_title );
-            if ( i_type == XML_READER_TEXT && psz_title != NULL )
-                input_item_SetTitle( p_input, psz_title );
-        }
-    } while ( i_type != XML_READER_ENDELEM || strcasecmp( psz_name, "head" ) );
+    }
 }
 
 static void read_body( demux_t* p_demux, input_item_node_t* p_node )
@@ -98,33 +179,50 @@ static void read_body( demux_t* p_demux, input_item_node_t* p_node )
         return;
     }
 
-    do
+    if( xml_ReaderIsEmptyElement( p_sys->p_reader ) == 1 )
+        return;
+
+    while ( ( i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name ) ) > 0 )
     {
-        i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
-        if ( !strcasecmp( psz_name, "media" ) )
+        if ( i_type == XML_READER_ENDELEM && !strcasecmp( psz_name, "seq" ) )
+            break;
+
+        if( i_type == XML_READER_STARTELEM )
         {
-            const char* psz_attr = NULL;
-            const char* psz_val = NULL;
-            while ((psz_attr = xml_ReaderNextAttr( p_sys->p_reader, &psz_val )))
+            if( !strcasecmp( psz_name, "media" ) )
             {
-                if ( !psz_val )
-                    continue;
-                if (!strcasecmp( psz_attr, "src" ) )
+                const bool b_empty = xml_ReaderIsEmptyElement( p_sys->p_reader );
+
+                const char *psz_attr = NULL, *psz_val = NULL;
+                while ((psz_attr = xml_ReaderNextAttr( p_sys->p_reader, &psz_val )))
                 {
-                    char* mrl = ProcessMRL( psz_val, p_sys->psz_prefix );
-                    if ( unlikely( !mrl ) )
-                        return;
-                    input_item_t* p_item = input_item_New( mrl, NULL );
-                    if ( likely( p_item ) )
+                    if ( !psz_val || *psz_val == '\0' )
+                        continue;
+                    if (!strcasecmp( psz_attr, "src" ) )
                     {
-                        input_item_node_AppendItem( p_node, p_item );
-                        input_item_Release( p_item );
+                        char* mrl = ProcessMRL( psz_val, p_sys->psz_prefix );
+                        if ( unlikely( !mrl ) )
+                            return;
+                        input_item_t* p_item = input_item_New( mrl, NULL );
+                        if ( likely( p_item ) )
+                        {
+                            input_item_node_AppendItem( p_node, p_item );
+                            input_item_Release( p_item );
+                        }
+                        free( mrl );
                     }
-                    free( mrl );
                 }
+
+                if( b_empty == false )
+                    consume_tag( p_sys->p_reader, "media" );
+
+                continue;
             }
+
+            msg_Warn( p_demux, "skipping unknown tag <%s> in <seq>", psz_name );
+            consume_volatile_tag( p_demux, psz_name );
         }
-    } while ( i_type != XML_READER_ENDELEM || strcasecmp( psz_name, "seq" ) );
+    }
 
     i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
     if ( i_type != XML_READER_ENDELEM || strcasecmp( psz_name, "body" ) )
@@ -137,20 +235,45 @@ static int Demux( demux_t* p_demux )
     int i_type;
 
     demux_sys_t* p_sys = p_demux->p_sys;
-    input_item_t* p_input = GetCurrentItem( p_demux );
-    input_item_node_t* p_node = input_item_node_Create( p_input );
     p_sys->psz_prefix = FindPrefix( p_demux );
     if( unlikely(p_sys->psz_prefix == NULL) )
         return VLC_DEMUXER_EOF;
 
-    do
+    if( xml_ReaderNextNode( p_sys->p_reader, &psz_name ) != XML_READER_STARTELEM ||
+        strcasecmp( psz_name, "smil" ) || xml_ReaderIsEmptyElement( p_sys->p_reader ) == 1 )
     {
-        i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
-        if ( i_type == XML_READER_STARTELEM && !strcasecmp( psz_name, "head" ) )
-            read_head( p_demux, p_input );
-        else if ( i_type == XML_READER_STARTELEM && !strcasecmp( psz_name, "body" ) )
-            read_body( p_demux, p_node );
-    } while (i_type != XML_READER_ENDELEM || strcasecmp( psz_name, "smil" ) );
+        return VLC_DEMUXER_EOF;
+    }
+
+    input_item_t* p_input = GetCurrentItem( p_demux );
+    input_item_node_t* p_node = input_item_node_Create( p_input );
+
+    if( unlikely( !p_node ) )
+        return VLC_DEMUXER_EOF;
+
+    while( ( i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name ) ) > 0 )
+    {
+        if( i_type == XML_READER_ENDELEM && !strcasecmp( psz_name, "smil" ) )
+            break;
+
+        if( i_type == XML_READER_STARTELEM )
+        {
+            if( !strcasecmp( psz_name, "head" ) )
+            {
+                read_head( p_demux, p_input );
+                continue;
+            }
+
+            if( !strcasecmp( psz_name, "body" ) )
+            {
+                read_body( p_demux, p_node );
+                continue;
+            }
+
+            msg_Warn( p_demux, "skipping unknown tag <%s> in <smil>", psz_name );
+            consume_volatile_tag( p_demux, psz_name );
+        }
+    }
 
     input_item_node_PostAndDelete( p_node );
     input_item_Release( p_input );
