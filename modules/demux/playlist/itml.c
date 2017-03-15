@@ -179,11 +179,6 @@ static bool parse_dict( demux_t *p_demux, input_item_node_t *p_input_node,
         {
         /*  element start tag  */
         case XML_READER_STARTELEM:
-            if( !*node )
-            {
-                msg_Err( p_demux, "invalid XML stream" );
-                goto end;
-            }
             /* choose handler */
             for( p_handler = p_handlers;
                      p_handler->name && strcmp( node, p_handler->name );
