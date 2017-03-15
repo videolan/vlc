@@ -322,7 +322,7 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
     free(sys);
 }
 
-vlc_fourcc_t d3d9va_fourcc(enum PixelFormat swfmt)
+static vlc_fourcc_t d3d9va_fourcc(enum PixelFormat swfmt)
 {
     switch (swfmt)
     {
