@@ -649,6 +649,7 @@ static char *DxDescribe(directx_sys_t *dx_sys)
        return NULL;
     }
 
+    char *description = NULL;
     DXGI_ADAPTER_DESC adapterDesc;
     if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
         const char *vendor = "Unknown";
@@ -659,17 +660,19 @@ static char *DxDescribe(directx_sys_t *dx_sys)
             }
         }
 
-        char *description;
-        if (asprintf(&description, "D3D11VA (%s, vendor %u(%s), device %u, revision %u)",
-                     FromWide(adapterDesc.Description),
-                     adapterDesc.VendorId, vendor, adapterDesc.DeviceId, adapterDesc.Revision) < 0)
-            return NULL;
-        IDXGIAdapter_Release(p_adapter);
-        return description;
+        char *utfdesc = FromWide(adapterDesc.Description);
+        if (likely(utfdesc!=NULL))
+        {
+            if (asprintf(&description, "D3D11VA (%s, vendor %u(%s), device %u, revision %u)",
+                         utfdesc,
+                         adapterDesc.VendorId, vendor, adapterDesc.DeviceId, adapterDesc.Revision) < 0)
+                description = NULL;
+            free(utfdesc);
+        }
     }
 
     IDXGIAdapter_Release(p_adapter);
-    return NULL;
+    return description;
 }
 
 /**
