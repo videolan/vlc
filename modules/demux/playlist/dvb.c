@@ -119,7 +119,7 @@ static const char *ParseFEC(const char *str)
          { "AUTO", "" },   { "NONE", "0" }
      };
 
-     if (strncmp(str, "FEC_", 4))
+     if (str == NULL || strncmp(str, "FEC_", 4))
          return NULL;
      str += 4;
 
@@ -143,6 +143,9 @@ static const char *ParseModulation(const char *str)
          { "VSB_16", "16VSB" }, { "VSB_8", "8VSB" }
      };
 
+     if( str == NULL )
+         return NULL;
+
      const struct mod *m = bsearch(str, tab, sizeof (tab) / sizeof(tab[0]),
                                    sizeof (tab[0]), cmp);
      return (m != NULL) ? m->vlc : NULL;
@@ -160,7 +163,7 @@ static const char *ParseGuard(const char *str)
          { "1_8", "1/8" }, { "AUTO", "" },
      };
 
-     if (strncmp(str, "GUARD_INTERVAL_", 15))
+     if (str == NULL || strncmp(str, "GUARD_INTERVAL_", 15))
          return NULL;
      str += 15;
 
