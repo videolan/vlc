@@ -114,7 +114,7 @@ static int Demux( demux_t *p_demux )
             {
                 free( psz_elname );
                 psz_elname = strdup( node );
-                if( unlikely(!node) )
+                if( unlikely(!psz_elname) )
                     goto error;
 
                 if( !strcmp( node, "item" ) )
