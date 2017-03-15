@@ -198,6 +198,58 @@ static void StorePPS( decoder_sys_t *p_sys, uint8_t i_id,
     p_sys->pps[i_id].p_pps = p_pps;
 }
 
+static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t *p_sps,
+                                            const h264_picture_parameter_set_t *p_pps )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->p_active_pps = p_pps;
+    p_sys->p_active_sps = p_sps;
+
+    if( p_sps )
+    {
+        p_dec->fmt_out.i_profile = p_sps->i_profile;
+        p_dec->fmt_out.i_level = p_sps->i_level;
+
+        (void) h264_get_picture_size( p_sps, &p_dec->fmt_out.video.i_width,
+                                      &p_dec->fmt_out.video.i_height,
+                                      &p_dec->fmt_out.video.i_visible_width,
+                                      &p_dec->fmt_out.video.i_visible_height );
+
+        if( p_sps->vui.i_sar_num != 0 && p_sps->vui.i_sar_den != 0 )
+        {
+            p_dec->fmt_out.video.i_sar_num = p_sps->vui.i_sar_num;
+            p_dec->fmt_out.video.i_sar_den = p_sps->vui.i_sar_den;
+        }
+
+        if( p_sps->vui.b_valid )
+        {
+            p_sys->b_pic_struct_present_flag = p_sps->vui.b_pic_struct_present_flag;
+            p_sys->b_cpb_dpb_delays_present_flag = p_sps->vui.b_hrd_parameters_present_flag;
+            p_sys->i_cpb_removal_delay_length_minus1 = p_sps->vui.i_cpb_removal_delay_length_minus1;
+            p_sys->i_dpb_output_delay_length_minus1 = p_sps->vui.i_dpb_output_delay_length_minus1;
+
+            if( p_sps->vui.b_fixed_frame_rate && !p_dec->fmt_out.video.i_frame_rate_base )
+            {
+                p_dec->fmt_out.video.i_frame_rate_base = p_sps->vui.i_num_units_in_tick;
+                p_dec->fmt_out.video.i_frame_rate = p_sps->vui.i_time_scale >> 1 /* num_clock_ts == 2 */;
+                if( p_sps->vui.i_num_units_in_tick > 0 )
+                    date_Change( &p_sys->dts, p_sps->vui.i_time_scale, p_sps->vui.i_num_units_in_tick );
+            }
+            if( p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF )
+            {
+                p_dec->fmt_out.video.primaries =
+                        hxxx_colour_primaries_to_vlc( p_sps->vui.colour.i_colour_primaries );
+                p_dec->fmt_out.video.transfer =
+                        hxxx_transfer_characteristics_to_vlc( p_sps->vui.colour.i_transfer_characteristics );
+                p_dec->fmt_out.video.space =
+                        hxxx_matrix_coeffs_to_vlc( p_sps->vui.colour.i_matrix_coefficients );
+                p_dec->fmt_out.video.b_color_range_full = p_sps->vui.colour.b_full_range;
+            }
+        }
+    }
+}
+
 /*****************************************************************************
  * Open: probe the packetizer and return score
  * When opening after demux, the packetizer is only loaded AFTER the decoder
@@ -781,45 +833,6 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         return;
     }
 
-    p_dec->fmt_out.i_profile = p_sps->i_profile;
-    p_dec->fmt_out.i_level = p_sps->i_level;
-
-    (void) h264_get_picture_size( p_sps, &p_dec->fmt_out.video.i_width,
-                                         &p_dec->fmt_out.video.i_height,
-                                         &p_dec->fmt_out.video.i_visible_width,
-                                         &p_dec->fmt_out.video.i_visible_height );
-
-    if( p_sps->vui.i_sar_num != 0 && p_sps->vui.i_sar_den != 0 )
-    {
-        p_dec->fmt_out.video.i_sar_num = p_sps->vui.i_sar_num;
-        p_dec->fmt_out.video.i_sar_den = p_sps->vui.i_sar_den;
-    }
-
-    if( p_sps->vui.b_valid )
-    {
-        p_sys->b_pic_struct_present_flag = p_sps->vui.b_pic_struct_present_flag;
-        p_sys->b_cpb_dpb_delays_present_flag = p_sps->vui.b_hrd_parameters_present_flag;
-        p_sys->i_cpb_removal_delay_length_minus1 = p_sps->vui.i_cpb_removal_delay_length_minus1;
-        p_sys->i_dpb_output_delay_length_minus1 = p_sps->vui.i_dpb_output_delay_length_minus1;
-
-        if( p_sps->vui.b_fixed_frame_rate && !p_dec->fmt_out.video.i_frame_rate_base )
-        {
-            p_dec->fmt_out.video.i_frame_rate_base = p_sps->vui.i_num_units_in_tick;
-            p_dec->fmt_out.video.i_frame_rate = p_sps->vui.i_time_scale >> 1 /* num_clock_ts == 2 */;
-            if( p_sps->vui.i_num_units_in_tick > 0 )
-                date_Change( &p_sys->dts, p_sps->vui.i_time_scale, p_sps->vui.i_num_units_in_tick );
-        }
-        if( p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF )
-        {
-            p_dec->fmt_out.video.primaries =
-                hxxx_colour_primaries_to_vlc( p_sps->vui.colour.i_colour_primaries );
-            p_dec->fmt_out.video.transfer =
-                hxxx_transfer_characteristics_to_vlc( p_sps->vui.colour.i_transfer_characteristics );
-            p_dec->fmt_out.video.space =
-                hxxx_matrix_coeffs_to_vlc( p_sps->vui.colour.i_matrix_coefficients );
-            p_dec->fmt_out.video.b_color_range_full = p_sps->vui.colour.b_full_range;
-        }
-    }
     /* We have a new SPS */
     if( !p_sys->sps[p_sps->i_id].p_sps )
         msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", p_sps->i_id );
@@ -918,6 +931,8 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
             p_sys->p_active_sps = p_sys->sps[p_pps->i_sps_id].p_sps;
     if( p_sps == NULL )
         return false;
+
+    ActivateSets( p_dec, p_sps, p_pps );
 
     slice.i_frame_num = bs_read( &s, p_sps->i_log2_max_frame_num + 4 );
     slice.i_field_pic_flag = 0;
