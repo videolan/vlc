@@ -131,6 +131,7 @@ struct decoder_sys_t
 
     /* */
     bool b_even_frame;
+    bool b_discontinuity;
 
     mtime_t i_frame_pts;
     mtime_t i_frame_dts;
@@ -349,6 +350,7 @@ static int Open( vlc_object_t *p_this )
     SliceInit( &p_sys->slice );
 
     p_sys->b_even_frame = false;
+    p_sys->b_discontinuity = false;
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_prev_pts = VLC_TS_INVALID;
@@ -512,7 +514,7 @@ static void PacketizeReset( void *p_private, bool b_broken )
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( b_broken )
+    if( b_broken || !p_sys->b_slice )
     {
         block_ChainRelease( p_sys->p_frame );
         block_ChainRelease( p_sys->p_sei );
@@ -524,17 +526,18 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->b_new_pps = false;
         p_sys->p_active_pps = NULL;
         p_sys->p_active_sps = NULL;
+        p_sys->i_frame_pts = VLC_TS_INVALID;
+        p_sys->i_frame_dts = VLC_TS_INVALID;
+        p_sys->i_prev_pts = VLC_TS_INVALID;
+        p_sys->b_even_frame = false;
         p_sys->slice.i_frame_type = 0;
         p_sys->b_slice = false;
         /* From SEI */
         p_sys->i_dpb_output_delay = 0;
         p_sys->i_pic_struct = 0;
     }
-    p_sys->i_frame_pts = VLC_TS_INVALID;
-    p_sys->i_frame_dts = VLC_TS_INVALID;
+    p_sys->b_discontinuity = true;
     date_Set( &p_sys->dts, VLC_TS_INVALID );
-    p_sys->i_prev_pts = VLC_TS_INVALID;
-    p_sys->b_even_frame = false;
 }
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
 {
@@ -854,10 +857,20 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_pic->i_pts += i_field_pts_diff;
     }
 
-    date_Increment( &p_sys->dts, i_num_clock_ts );
-
-    /* save for next pic fixups */
-    p_sys->i_prev_pts = p_pic->i_pts;
+    if( !p_sys->b_discontinuity )
+    {
+        /* save for next pic fixups */
+        date_Increment( &p_sys->dts, i_num_clock_ts );
+        p_sys->i_prev_pts = p_pic->i_pts;
+    }
+    else
+    {
+        p_sys->b_discontinuity = false;
+        p_sys->i_prev_pts = VLC_TS_INVALID;
+        date_Set( &p_sys->dts, VLC_TS_INVALID );
+        if( p_pic )
+            p_pic->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
 
     p_pic->i_flags |= p_sys->slice.i_frame_type;
     p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
