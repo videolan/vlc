@@ -103,29 +103,10 @@ const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_fa
     if( !p_family )
         return NULL;
 
-    bool b_bold, b_italic;
-
-    for( int i = 0; i < 4; ++i )
+    for( int i = 0; i < 4; ++i ) /* Iterate through FC_{SLANT,WEIGHT} combos */
     {
-        switch( i )
-        {
-        case 0:
-            b_bold = false;
-            b_italic = false;
-            break;
-        case 1:
-            b_bold = true;
-            b_italic = false;
-            break;
-        case 2:
-            b_bold = false;
-            b_italic = true;
-            break;
-        case 3:
-            b_bold = true;
-            b_italic = true;
-            break;
-        }
+        bool const b_bold = i & 1;
+        bool const b_italic = i & 2;
 
         int i_index = 0;
         FcResult result = FcResultMatch;
