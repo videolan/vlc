@@ -366,7 +366,6 @@ static track_elem_t *new_track()
 
 static void free_track( track_elem_t *p_track )
 {
-    fprintf( stderr, "free track\n" );
     if ( !p_track )
         return;
 
