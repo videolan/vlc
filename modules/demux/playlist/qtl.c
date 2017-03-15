@@ -70,6 +70,8 @@ typedef enum { LOOP_TRUE,
                LOOP_PALINDROME } qtl_loop_t;
 const char* ppsz_loop[] = { "true", "false", "palindrome" };
 
+#define ROOT_NODE_MAX_DEPTH 2
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -96,7 +98,6 @@ int Import_QTL( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     xml_reader_t *p_xml_reader;
-    const char *node;
     input_item_t *p_input;
     int i_ret = -1;
 
@@ -122,20 +123,21 @@ static int Demux( demux_t *p_demux )
     if( !p_xml_reader )
         goto error;
 
-    /* check root node */
-    if( xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM
-     || strcmp( node, "embed" ) )
+    for( int i = 0;; ++i ) /* locate root node */
     {
-        msg_Err( p_demux, "invalid root node <%s>", node );
-
-        /* second line has <?quicktime tag ... so we try to skip it */
-        msg_Dbg( p_demux, "trying to read one more node" );
-        if( xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM
-         || strcmp( node, "embed" ) )
+        const char *node;
+        if( i == ROOT_NODE_MAX_DEPTH ||
+            xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM )
         {
-            msg_Err( p_demux, "invalid root node <%s>", node );
+            msg_Err( p_demux, "unable to locate root-node" );
             goto error;
         }
+
+        if( strcmp( node, "embed" ) == 0 )
+            break; /* found it */
+
+        msg_Dbg( p_demux, "invalid root node <%s>, trying next (%d / %d)",
+                           node, i + 1, ROOT_NODE_MAX_DEPTH );
     }
 
     const char *attrname, *value;
