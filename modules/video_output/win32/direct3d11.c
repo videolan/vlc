@@ -125,8 +125,9 @@ struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
 
-    video_transfer_func_t    display_transfer; /* TODO may go in vout_display_info_t */
-    bool                     display_is_limited_range;
+    struct { /* TODO may go in vout_display_info_t without DXGI */
+        const dxgi_color_space   *colorspace;
+    } display;
 
 #if !VLC_WINSTORE_APP
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
@@ -1381,8 +1382,11 @@ static void D3D11SetColorSpace(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
+    int best = -1;
+    int score, best_score = 0;
     UINT support;
     IDXGISwapChain3 *dxgiswapChain3 = NULL;
+    sys->display.colorspace = &color_spaces[0];
 
     hr = ID3D11Device_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
     if (FAILED(hr)) {
@@ -1390,14 +1394,55 @@ static void D3D11SetColorSpace(vout_display_t *vd)
         goto done;
     }
 
+    bool src_full_range = vd->source.b_color_range_full ||
+                          /* the YUV->RGB conversion already output full range */
+                          is_d3d11_opaque(vd->source.i_chroma) ||
+                          vlc_fourcc_IsYUV(vd->source.i_chroma);
+#if VLC_WINSTORE_APP
+    if (!src_full_range && isXboxHardware(sys->d3ddevice)) {
+        /* even in full range the Xbox outputs with less range so use the max we can*/
+        src_full_range = true;
+    }
+#endif
+
+    /* pick the best output based on color support and transfer */
+    /* TODO support YUV output later */
     for (int i=0; color_spaces[i].name; ++i)
     {
         hr = IDXGISwapChain3_CheckColorSpaceSupport(dxgiswapChain3, color_spaces[i].dxgi, &support);
         if (SUCCEEDED(hr) && support) {
             msg_Dbg(vd, "supports colorspace %s", color_spaces[i].name);
+            score = 0;
+            if (color_spaces[i].primaries == vd->source.primaries)
+                score++;
+            if (color_spaces[i].color == vd->source.space)
+                score += 2; /* we don't want to translate color spaces */
+            if (color_spaces[i].transfer == vd->source.transfer ||
+                /* favor 2084 output for HLG source */
+                (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && vd->source.transfer == TRANSFER_FUNC_HLG))
+                score++;
+            if (color_spaces[i].b_full_range == src_full_range)
+                score++;
+            if (score > best_score || (score && best == -1)) {
+                best = i;
+                best_score = score;
+            }
         }
     }
 
+    if (best == -1)
+    {
+        best = 0;
+        msg_Warn(vd, "no matching colorspace found force %s", color_spaces[best].name);
+    }
+    hr = IDXGISwapChain3_SetColorSpace1(dxgiswapChain3, color_spaces[best].dxgi);
+    if (SUCCEEDED(hr))
+    {
+        sys->display.colorspace = &color_spaces[best];
+        msg_Dbg(vd, "using colorspace %s", sys->display.colorspace->name);
+    }
+    else
+        msg_Err(vd, "Failed to set colorspace %s. (hr=0x%lX)", sys->display.colorspace->name, hr);
 done:
     if (dxgiswapChain3)
         IDXGISwapChain3_Release(dxgiswapChain3);
@@ -1508,15 +1553,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 #endif
 
     D3D11SetColorSpace(vd);
-
-    /* TODO adjust the swapchain transfer function based on the source */
-    sys->display_transfer = TRANSFER_FUNC_SRGB;
-
-#if VLC_WINSTORE_APP
-    if (isXboxHardware(sys->d3ddevice)) {
-        sys->display_is_limited_range = 1;
-    }
-#endif
 
     // look for the requested pixel format first
     sys->picQuadConfig = GetOutputFormat(vd, fmt->i_chroma, 0, true, false);
@@ -1708,43 +1744,45 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     }
 
     video_transfer_func_t src_transfer;
-    switch (transfer)
+    if (transfer != sys->display.colorspace->transfer)
     {
-        case TRANSFER_FUNC_SMPTE_ST2084:
-            /* ST2084 to Linear */
-            psz_src_transform =
-                   ST2084_PQ_CONSTANTS
-                   "rgb = pow(rgb, 1.0/ST2084_m2);\
-                    rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\
-                    rgb = pow(rgb, 1.0/ST2084_m1);\
-                    return rgb";
-            src_transfer = TRANSFER_FUNC_LINEAR;
-            break;
-        case TRANSFER_FUNC_HLG:
-            /* HLG to Linear */
-            psz_src_transform =
-                   "rgb.r = inverse_HLG(rgb.r);\
-                    rgb.g = inverse_HLG(rgb.g);\
-                    rgb.b = inverse_HLG(rgb.b);\
-                    return rgb / 12.0";
-            src_transfer = TRANSFER_FUNC_LINEAR;
-            break;
-        case TRANSFER_FUNC_BT709:
-            psz_src_transform = "return pow(rgb, 1.0 / 0.45)";
-            src_transfer = TRANSFER_FUNC_LINEAR;
-            break;
-        case TRANSFER_FUNC_SRGB:
-            psz_src_transform = "return pow(rgb, 2.2)";
-            src_transfer = TRANSFER_FUNC_LINEAR;
-            break;
-        default:
-            src_transfer = transfer;
-            break;
-    }
+        /* we need to go in linear mode */
+        switch (transfer)
+        {
+            case TRANSFER_FUNC_SMPTE_ST2084:
+                /* ST2084 to Linear */
+                psz_src_transform =
+                       ST2084_PQ_CONSTANTS
+                       "rgb = pow(rgb, 1.0/ST2084_m2);\
+                        rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\
+                        rgb = pow(rgb, 1.0/ST2084_m1);\
+                        return rgb";
+                src_transfer = TRANSFER_FUNC_LINEAR;
+                break;
+            case TRANSFER_FUNC_HLG:
+                /* HLG to Linear */
+                psz_src_transform =
+                       "rgb.r = inverse_HLG(rgb.r);\
+                        rgb.g = inverse_HLG(rgb.g);\
+                        rgb.b = inverse_HLG(rgb.b);\
+                        return rgb / 12.0";
+                src_transfer = TRANSFER_FUNC_LINEAR;
+                break;
+            case TRANSFER_FUNC_BT709:
+                psz_src_transform = "return pow(rgb, 1.0 / 0.45)";
+                src_transfer = TRANSFER_FUNC_LINEAR;
+                break;
+            case TRANSFER_FUNC_SRGB:
+                psz_src_transform = "return pow(rgb, 2.2)";
+                src_transfer = TRANSFER_FUNC_LINEAR;
+                break;
+            default:
+                msg_Dbg(vd, "unhandled source transfer %d", transfer);
+                src_transfer = transfer;
+                break;
+        }
 
-    if (src_transfer != sys->display_transfer)
-    {
-        switch (sys->display_transfer)
+        switch (sys->display.colorspace->transfer)
         {
             case TRANSFER_FUNC_SRGB:
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
@@ -1780,7 +1818,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                     msg_Warn(vd, "don't know how to transfer from %d to SMPTE ST 2084", src_transfer);
                 break;
             default:
-                msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, sys->display_transfer);
+                msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, sys->display.colorspace->transfer);
                 break;
         }
     }
@@ -2376,7 +2414,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         colorspace.WhitePoint[2*4 + 3] = -itu_achromacy;
     }
 
-    if (sys->display_is_limited_range) {
+    if (!sys->display.colorspace->b_full_range) {
         /* get to the limited/studio range */
         colorspace.WhitePoint[0*4 + 3] += itu_black_level;
         if (RGB_shader)
