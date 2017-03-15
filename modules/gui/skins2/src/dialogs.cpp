@@ -164,7 +164,6 @@ bool Dialogs::init()
     m_pModule = module_need( m_pProvider, "dialogs provider", NULL, false );
     if( m_pModule == NULL )
     {
-        msg_Err( getIntf(), "no suitable dialogs provider found (hint: compile the qt plugin, and make sure it is loaded properly)" );
         vlc_object_release( m_pProvider );
         m_pProvider = NULL;
         return false;
