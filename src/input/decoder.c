@@ -1754,7 +1754,10 @@ static void DeleteDecoder( decoder_t * p_dec )
     }
     if( p_owner->p_vout )
     {
-        /* */
+        /* Reset the cancel state that was set before joining the decoder
+         * thread */
+        vout_Cancel( p_owner->p_vout, false );
+
         input_resource_RequestVout( p_owner->p_resource, p_owner->p_vout, NULL,
                                     0, true );
         if( p_owner->p_input != NULL )
