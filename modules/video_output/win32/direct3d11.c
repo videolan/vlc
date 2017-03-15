@@ -1672,7 +1672,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                     /* Linear to sRGB */
                     psz_display_transform = "return pow(rgb, 1.0 / 2.2)";
 
-                    if (transfer == TRANSFER_FUNC_SMPTE_ST2084)
+                    if (transfer == TRANSFER_FUNC_SMPTE_ST2084 || transfer == TRANSFER_FUNC_HLG)
                     {
                         /* HDR tone mapping */
                         psz_tone_mapping =
