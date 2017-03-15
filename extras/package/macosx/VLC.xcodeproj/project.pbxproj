@@ -120,10 +120,6 @@
 		1C3113FB1E508C7600D4DD76 /* VLCHUDRadiobuttonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE11CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m */; };
 		1C3113FC1E508C7600D4DD76 /* VLCHUDSliderCell.h in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE21CF5D88C00112E54 /* VLCHUDSliderCell.h */; };
 		1C3113FD1E508C7600D4DD76 /* VLCHUDSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */; };
-		1C3113FE1E508C8800D4DD76 /* BWQuincyManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652618805297005776C4 /* BWQuincyManager.h */; };
-		1C3113FF1E508C8800D4DD76 /* BWQuincyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652718805297005776C4 /* BWQuincyManager.m */; };
-		1C3114001E508C8800D4DD76 /* BWQuincyUI.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652818805297005776C4 /* BWQuincyUI.h */; };
-		1C3114011E508C8800D4DD76 /* BWQuincyUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652918805297005776C4 /* BWQuincyUI.m */; };
 		1C3114021E508C8800D4DD76 /* AppleRemote.h in Sources */ = {isa = PBXBuildFile; fileRef = CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */; };
 		1C3114031E508C8800D4DD76 /* AppleRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */; };
 		1C3114041E508C8800D4DD76 /* SideBarItem.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCDDEEF13E870BB00A35661 /* SideBarItem.h */; };
@@ -140,7 +136,6 @@
 		1C31140F1E508D1B00D4DD76 /* AddonManager.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8223FF1E4D2A9000833BE1 /* AddonManager.xib */; };
 		1C3114101E508D1B00D4DD76 /* AudioEffects.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224001E4D2A9000833BE1 /* AudioEffects.xib */; };
 		1C3114111E508D1B00D4DD76 /* Bookmarks.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224011E4D2A9000833BE1 /* Bookmarks.xib */; };
-		1C3114121E508D1B00D4DD76 /* BWQuincyMain.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224021E4D2A9000833BE1 /* BWQuincyMain.xib */; };
 		1C3114131E508D1B00D4DD76 /* ConvertAndSave.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224031E4D2A9000833BE1 /* ConvertAndSave.xib */; };
 		1C3114141E508D1B00D4DD76 /* CoreDialogs.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */; };
 		1C3114151E508D1B00D4DD76 /* DetachedVideoWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */; };
@@ -209,7 +204,6 @@
 		6B8223FF1E4D2A9000833BE1 /* AddonManager.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddonManager.xib; sourceTree = "<group>"; };
 		6B8224001E4D2A9000833BE1 /* AudioEffects.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AudioEffects.xib; sourceTree = "<group>"; };
 		6B8224011E4D2A9000833BE1 /* Bookmarks.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Bookmarks.xib; sourceTree = "<group>"; };
-		6B8224021E4D2A9000833BE1 /* BWQuincyMain.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BWQuincyMain.xib; sourceTree = "<group>"; };
 		6B8224031E4D2A9000833BE1 /* ConvertAndSave.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConvertAndSave.xib; sourceTree = "<group>"; };
 		6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoreDialogs.xib; sourceTree = "<group>"; };
 		6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetachedVideoWindow.xib; sourceTree = "<group>"; };
@@ -766,10 +760,6 @@
 		6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCFSPanelController.h; sourceTree = "<group>"; };
 		6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCFSPanelController.m; sourceTree = "<group>"; };
 		6BF557CF1E4E0E2500C03C9D /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = "Button-Icons/VLCPauseTemplate.pdf"; sourceTree = "<group>"; };
-		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWQuincyManager.h; sourceTree = "<group>"; };
-		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWQuincyManager.m; sourceTree = "<group>"; };
-		7D3F652818805297005776C4 /* BWQuincyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWQuincyUI.h; sourceTree = "<group>"; };
-		7D3F652918805297005776C4 /* BWQuincyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWQuincyUI.m; sourceTree = "<group>"; };
 		7D5678EB1D5BA1DC002698F3 /* VLCApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCApplication.h; sourceTree = "<group>"; };
 		7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCApplication.m; sourceTree = "<group>"; };
 		7D5678EE1D5BA397002698F3 /* VLCMainWindowControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCMainWindowControlsBar.h; sourceTree = "<group>"; };
@@ -1679,17 +1669,6 @@
 			name = Renderers;
 			sourceTree = "<group>";
 		};
-		7D3F652A1880529C005776C4 /* QuincyKit */ = {
-			isa = PBXGroup;
-			children = (
-				7D3F652618805297005776C4 /* BWQuincyManager.h */,
-				7D3F652718805297005776C4 /* BWQuincyManager.m */,
-				7D3F652818805297005776C4 /* BWQuincyUI.h */,
-				7D3F652918805297005776C4 /* BWQuincyUI.m */,
-			);
-			name = QuincyKit;
-			sourceTree = "<group>";
-		};
 		8E445F86047289E50059A3A7 /* File Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -1748,7 +1727,6 @@
 		CC0CD0E513DE0FC600B0D90D /* Imported Code */ = {
 			isa = PBXGroup;
 			children = (
-				7D3F652A1880529C005776C4 /* QuincyKit */,
 				6B8223FD1E4D29F100833BE1 /* Apple Remote */,
 				CC0CD0E413DE0EB500B0D90D /* PXSourceList */,
 				CC78DA4A13DE0E0100E9603C /* SPMediaKeyTap */,
@@ -1828,7 +1806,6 @@
 				6B8223FF1E4D2A9000833BE1 /* AddonManager.xib */,
 				6B8224001E4D2A9000833BE1 /* AudioEffects.xib */,
 				6B8224011E4D2A9000833BE1 /* Bookmarks.xib */,
-				6B8224021E4D2A9000833BE1 /* BWQuincyMain.xib */,
 				6B8224031E4D2A9000833BE1 /* ConvertAndSave.xib */,
 				6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */,
 				6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */,
@@ -1919,7 +1896,6 @@
 				1C31140F1E508D1B00D4DD76 /* AddonManager.xib in Sources */,
 				1C3114101E508D1B00D4DD76 /* AudioEffects.xib in Sources */,
 				1C3114111E508D1B00D4DD76 /* Bookmarks.xib in Sources */,
-				1C3114121E508D1B00D4DD76 /* BWQuincyMain.xib in Sources */,
 				1C3114131E508D1B00D4DD76 /* ConvertAndSave.xib in Sources */,
 				1C3114141E508D1B00D4DD76 /* CoreDialogs.xib in Sources */,
 				1C3114151E508D1B00D4DD76 /* DetachedVideoWindow.xib in Sources */,
@@ -1944,10 +1920,6 @@
 				1C3114281E508D1B00D4DD76 /* VLCFullScreenPanel.xib in Sources */,
 				1C3114291E508D1B00D4DD76 /* VLCRendererDialog.xib in Sources */,
 				1C31142A1E508D1B00D4DD76 /* VLCStatusBarIconMainMenu.xib in Sources */,
-				1C3113FE1E508C8800D4DD76 /* BWQuincyManager.h in Sources */,
-				1C3113FF1E508C8800D4DD76 /* BWQuincyManager.m in Sources */,
-				1C3114001E508C8800D4DD76 /* BWQuincyUI.h in Sources */,
-				1C3114011E508C8800D4DD76 /* BWQuincyUI.m in Sources */,
 				1C3114021E508C8800D4DD76 /* AppleRemote.h in Sources */,
 				1C3114031E508C8800D4DD76 /* AppleRemote.m in Sources */,
 				1C3114041E508C8800D4DD76 /* SideBarItem.h in Sources */,

@@ -26,8 +26,6 @@ libmacosx_plugin_la_SOURCES = \
 	VLCAddonsWindowController.h VLCAddonsWindowController.m \
 	applescript.h applescript.m \
 	AppleRemote.h AppleRemote.m \
-	BWQuincyManager.h BWQuincyManager.m \
-	BWQuincyUI.h BWQuincyUI.m \
 	CompatibilityFixes.h \
 	VLCControlsBarCommon.m VLCControlsBarCommon.h \
 	VLCDocumentController.m VLCDocumentController.h \
@@ -101,7 +99,6 @@ nobase_libmacosx_plugin_la_DATA = \
 	UI/AddonManager.nib \
 	UI/AudioEffects.nib \
 	UI/Bookmarks.nib \
-	UI/BWQuincyMain.nib \
 	UI/ConvertAndSave.nib \
 	UI/CoreDialogs.nib \
 	UI/DetachedVideoWindow.nib \
@@ -132,7 +129,6 @@ libmacosx_plugin_la_SOURCES += \
 	UI/AddonManager.xib \
 	UI/AudioEffects.xib \
 	UI/Bookmarks.xib \
-	UI/BWQuincyMain.xib \
 	UI/ConvertAndSave.xib \
 	UI/CoreDialogs.xib \
 	UI/DetachedVideoWindow.xib \

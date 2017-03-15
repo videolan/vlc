@@ -57,7 +57,6 @@
 #import "VLCCoreInteraction.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCExtensionsManager.h"
-#import "BWQuincyManager.h"
 #import "VLCResumeDialogController.h"
 #import "VLCDebugMessageWindowController.h"
 #import "VLCConvertAndSaveWindowController.h"
@@ -153,11 +152,10 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 #pragma mark -
 #pragma mark Private
 
-@interface VLCMain () <BWQuincyManagerDelegate
+@interface VLCMain ()
 #ifdef HAVE_SPARKLE
-    , SUUpdaterDelegate
+    <SUUpdaterDelegate>
 #endif
->
 {
     intf_thread_t *p_intf;
     BOOL launched;
@@ -289,17 +287,6 @@ static VLCMain *sharedInstance = nil;
 
     if (!p_intf)
         return;
-
-    NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] valueForKey: @"CFBundleVersion"];
-    NSRange endRande = [appVersion rangeOfString:@"-"];
-    if (endRande.location != NSNotFound)
-        appVersion = [appVersion substringToIndex:endRande.location];
-
-    BWQuincyManager *quincyManager = [BWQuincyManager sharedQuincyManager];
-    [quincyManager setApplicationVersion:appVersion];
-    [quincyManager setSubmissionURL:@"http://crash.videolan.org/crash_v200.php"];
-    [quincyManager setDelegate:self];
-    [quincyManager setCompanyName:@"VideoLAN"];
 
     [_coreinteraction updateCurrentlyUsedHotkeys];
 
