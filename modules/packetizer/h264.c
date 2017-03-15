@@ -122,14 +122,9 @@ struct decoder_sys_t
     /* avcC data */
     uint8_t i_avcC_length_size;
 
-    /* From SEI */
+    /* From SEI for current frame */
     uint8_t i_pic_struct;
-
-    /* VUI cached for parsing SEI */
-    bool b_cpb_dpb_delays_present_flag;
-    bool b_pic_struct_present_flag;
-    uint8_t i_cpb_removal_delay_length_minus1;
-    uint8_t i_dpb_output_delay_length_minus1;
+    uint8_t i_dpb_output_delay;
 
     /* Useful values of the Slice Header */
     slice_t slice;
@@ -140,7 +135,6 @@ struct decoder_sys_t
     mtime_t i_frame_pts;
     mtime_t i_frame_dts;
     mtime_t i_prev_pts;
-    uint8_t i_dpb_output_delay;
 
     date_t dts;
 
@@ -227,11 +221,6 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
 
         if( p_sps->vui.b_valid )
         {
-            p_sys->b_pic_struct_present_flag = p_sps->vui.b_pic_struct_present_flag;
-            p_sys->b_cpb_dpb_delays_present_flag = p_sps->vui.b_hrd_parameters_present_flag;
-            p_sys->i_cpb_removal_delay_length_minus1 = p_sps->vui.i_cpb_removal_delay_length_minus1;
-            p_sys->i_dpb_output_delay_length_minus1 = p_sps->vui.i_dpb_output_delay_length_minus1;
-
             if( p_sps->vui.b_fixed_frame_rate && !p_dec->fmt_out.video.i_frame_rate_base )
             {
                 p_dec->fmt_out.video.i_frame_rate_base = p_sps->vui.i_num_units_in_tick;
@@ -537,6 +526,9 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->p_active_sps = NULL;
         p_sys->slice.i_frame_type = 0;
         p_sys->b_slice = false;
+        /* From SEI */
+        p_sys->i_dpb_output_delay = 0;
+        p_sys->i_pic_struct = 0;
     }
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_frame_dts = VLC_TS_INVALID;
@@ -589,6 +581,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         p_sys->p_sei = NULL;
         p_sys->pp_sei_last = &p_sys->p_sei;
         p_sys->b_slice = false;
+        /* From SEI */
+        p_sys->i_dpb_output_delay = 0;
+        p_sys->i_pic_struct = 0;
         cc_storage_reset( p_sys->p_ccs );
     }
 
@@ -603,8 +598,18 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
                 newslice.i_idr_pic_id = p_sys->slice.i_idr_pic_id;
 
             b_new_picture = IsFirstVCLNALUnit( &p_sys->slice, &newslice );
-            if( b_new_picture && p_sys->b_slice )
-                p_pic = OutputPicture( p_dec );
+            if( b_new_picture )
+            {
+                /* Parse SEI for that frame now we should have matched SPS/PPS */
+                for( block_t *p_sei = p_sys->p_sei; p_sei; p_sei = p_sei->p_next )
+                {
+                    HxxxParse_AnnexB_SEI( p_sei->p_buffer, p_sei->i_buffer,
+                                          1 /* nal header */, ParseSeiCallback, p_dec );
+                }
+
+                if( p_sys->b_slice )
+                    p_pic = OutputPicture( p_dec );
+            }
 
             /* */
             p_sys->slice = newslice;
@@ -642,9 +647,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     {
         if( p_sys->b_slice )
             p_pic = OutputPicture( p_dec );
-        /* Parse SEI for CC support */
-        HxxxParse_AnnexB_SEI( p_frag->p_buffer, p_frag->i_buffer,
-                              1 /* nal header */, ParseSeiCallback, p_dec );
+
         block_ChainLastAppend( &p_sys->pp_sei_last, p_frag );
         p_frag = NULL;
     }
@@ -865,6 +868,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
+    p_sys->i_pic_struct = 0;
     p_sys->slice.i_frame_type = 0;
     p_sys->p_sei = NULL;
     p_sys->pp_sei_last = &p_sys->p_sei;
@@ -1041,16 +1045,26 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
         /* Look for pic timing */
         case HXXX_SEI_PIC_TIMING:
         {
-            if( p_sys->b_cpb_dpb_delays_present_flag )
+            const h264_sequence_parameter_set_t *p_sps = p_sys->p_active_sps;
+            if( unlikely( p_sps == NULL ) )
             {
-                bs_read( p_sei_data->p_bs, p_sys->i_cpb_removal_delay_length_minus1 + 1 );
-                p_sys->i_dpb_output_delay =
-                        bs_read( p_sei_data->p_bs, p_sys->i_dpb_output_delay_length_minus1 + 1 );
+                assert( p_sps );
+                break;
             }
 
-            if( p_sys->b_pic_struct_present_flag )
-                p_sys->i_pic_struct = bs_read( p_sei_data->p_bs, 4 );
-            /* + unparsed remains */
+            if( p_sps->vui.b_valid )
+            {
+                if( p_sps->vui.b_pic_struct_present_flag )
+                {
+                    bs_read( p_sei_data->p_bs, p_sps->vui.i_cpb_removal_delay_length_minus1 + 1 );
+                    p_sys->i_dpb_output_delay =
+                            bs_read( p_sei_data->p_bs, p_sps->vui.i_dpb_output_delay_length_minus1 + 1 );
+                }
+
+                if( p_sps->vui.b_pic_struct_present_flag )
+                    p_sys->i_pic_struct = bs_read( p_sei_data->p_bs, 4 );
+                /* + unparsed remains */
+            }
         } break;
 
             /* Look for user_data_registered_itu_t_t35 */
