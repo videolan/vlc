@@ -161,8 +161,8 @@ static block_t *ParseNALBlock( decoder_t *, bool *pb_ts_used, block_t * );
 static block_t *OutputPicture( decoder_t *p_dec );
 static void PutSPS( decoder_t *p_dec, block_t *p_frag );
 static void PutPPS( decoder_t *p_dec, block_t *p_frag );
-static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
-                        int i_nal_ref_idc, int i_nal_type, const block_t *p_frag );
+static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_type,
+                              const block_t *p_frag, bool *pb_new_picture, slice_t *p_slice );
 static bool ParseSeiCallback( const hxxx_sei_data_t *, void * );
 
 
@@ -250,6 +250,22 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
     }
 }
 
+static void SliceInit( slice_t *p_slice )
+{
+    p_slice->i_nal_type = -1;
+    p_slice->i_nal_ref_idc = -1;
+    p_slice->i_idr_pic_id = -1;
+    p_slice->i_frame_num = -1;
+    p_slice->i_frame_type = 0;
+    p_slice->i_pic_parameter_set_id = -1;
+    p_slice->i_field_pic_flag = 0;
+    p_slice->i_bottom_field_flag = -1;
+    p_slice->i_pic_order_cnt_lsb = -1;
+    p_slice->i_delta_pic_order_cnt_bottom = -1;
+    p_slice->i_delta_pic_order_cnt0 = 0;
+    p_slice->i_delta_pic_order_cnt1 = 0;
+}
+
 /*****************************************************************************
  * Open: probe the packetizer and return score
  * When opening after demux, the packetizer is only loaded AFTER the decoder
@@ -307,16 +323,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_active_pps = NULL;
     p_sys->i_recovery_frames = -1;
 
-    p_sys->slice.i_nal_type = -1;
-    p_sys->slice.i_nal_ref_idc = -1;
-    p_sys->slice.i_idr_pic_id = -1;
-    p_sys->slice.i_frame_num = -1;
-    p_sys->slice.i_frame_type = 0;
-    p_sys->slice.i_pic_parameter_set_id = -1;
-    p_sys->slice.i_field_pic_flag = 0;
-    p_sys->slice.i_bottom_field_flag = -1;
-    p_sys->slice.i_pic_order_cnt_lsb = -1;
-    p_sys->slice.i_delta_pic_order_cnt_bottom = -1;
+    SliceInit( &p_sys->slice );
 
     p_sys->b_even_frame = false;
     p_sys->i_frame_dts = VLC_TS_INVALID;
@@ -550,7 +557,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     {
         slice_t slice;
 
-        if(ParseSlice( p_dec, &b_new_picture, &slice, i_nal_ref_idc, i_nal_type, p_frag ))
+        if( ParseSliceHeader( p_dec, i_nal_ref_idc, i_nal_type, p_frag, &b_new_picture, &slice ) )
         {
             /* */
             if( b_new_picture && p_sys->b_slice )
@@ -867,12 +874,13 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
     StorePPS( p_sys, p_pps->i_id, p_frag, p_pps );
 }
 
-static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
-                        int i_nal_ref_idc, int i_nal_type, const block_t *p_frag )
+static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_type,
+                              const block_t *p_frag, bool *pb_new_picture, slice_t *p_slice )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_slice_type;
     slice_t slice;
+    SliceInit( &slice );
     bs_t s;
     unsigned i_bitflow = 0;
 
@@ -935,8 +943,6 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     ActivateSets( p_dec, p_sps, p_pps );
 
     slice.i_frame_num = bs_read( &s, p_sps->i_log2_max_frame_num + 4 );
-    slice.i_field_pic_flag = 0;
-    slice.i_bottom_field_flag = -1;
 
     if( !p_sps->frame_mbs_only_flag )
     {
@@ -950,10 +956,6 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     if( slice.i_nal_type == H264_NAL_SLICE_IDR )
         slice.i_idr_pic_id = bs_read_ue( &s );
 
-    slice.i_pic_order_cnt_lsb = -1;
-    slice.i_delta_pic_order_cnt_bottom = -1;
-    slice.i_delta_pic_order_cnt0 = 0;
-    slice.i_delta_pic_order_cnt1 = 0;
     if( p_sps->i_pic_order_cnt_type == 0 )
     {
         slice.i_pic_order_cnt_lsb = bs_read( &s, p_sps->i_log2_max_pic_order_cnt_lsb + 4 );
