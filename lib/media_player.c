@@ -1807,6 +1807,8 @@ libvlc_track_description_t *
             {
                 libvlc_track_description_list_release( p_track_description );
                 libvlc_printerr( "Not enough memory" );
+
+                p_track_description = NULL;
                 goto end;
             }
         }
