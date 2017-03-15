@@ -82,8 +82,8 @@
 		1C3113D51E508C6900D4DD76 /* VLCTextfieldPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6D160078340022423C /* VLCTextfieldPanelController.m */; };
 		1C3113D61E508C6900D4DD76 /* VLCPopupPanelController.h in Sources */ = {isa = PBXBuildFile; fileRef = 1C7CB91A1D787E7600388902 /* VLCPopupPanelController.h */; };
 		1C3113D71E508C6900D4DD76 /* VLCPopupPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */; };
-		1C3113D81E508C6900D4DD76 /* simple_prefs.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5E0D54BBAE004D780C /* simple_prefs.h */; };
-		1C3113D91E508C6900D4DD76 /* simple_prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5D0D54BBAE004D780C /* simple_prefs.m */; };
+		1C3113D81E508C6900D4DD76 /* VLCSimplePrefsController.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5E0D54BBAE004D780C /* VLCSimplePrefsController.h */; };
+		1C3113D91E508C6900D4DD76 /* VLCSimplePrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5D0D54BBAE004D780C /* VLCSimplePrefsController.m */; };
 		1C3113DA1E508C6900D4DD76 /* VLCStringUtility.h in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */; };
 		1C3113DB1E508C6900D4DD76 /* VLCStringUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4715E7947F00F2FDC9 /* VLCStringUtility.m */; };
 		1C3113DC1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */; };
@@ -846,8 +846,8 @@
 		CC79F66614014FC30015D89E /* opengl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../../modules/video_output/opengl.h; sourceTree = "<group>"; };
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CompatibilityFixes.h; sourceTree = "<group>"; };
-		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = simple_prefs.m; sourceTree = "<group>"; };
-		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simple_prefs.h; sourceTree = "<group>"; };
+		CCB24D5D0D54BBAE004D780C /* VLCSimplePrefsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = VLCSimplePrefsController.m; sourceTree = "<group>"; };
+		CCB24D5E0D54BBAE004D780C /* VLCSimplePrefsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCSimplePrefsController.h; sourceTree = "<group>"; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		CCCCDCA01413E1C000FE3DE1 /* VLCVoutView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCVoutView.h; sourceTree = "<group>"; };
 		CCCCDCA11413E1C000FE3DE1 /* VLCVoutView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCVoutView.m; sourceTree = "<group>"; };
@@ -997,8 +997,8 @@
 				CC461F6D160078340022423C /* VLCTextfieldPanelController.m */,
 				1C7CB91A1D787E7600388902 /* VLCPopupPanelController.h */,
 				1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */,
-				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
-				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
+				CCB24D5E0D54BBAE004D780C /* VLCSimplePrefsController.h */,
+				CCB24D5D0D54BBAE004D780C /* VLCSimplePrefsController.m */,
 				CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */,
 				CC269A4715E7947F00F2FDC9 /* VLCStringUtility.m */,
 				CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */,
@@ -2024,8 +2024,8 @@
 				1C3113D51E508C6900D4DD76 /* VLCTextfieldPanelController.m in Sources */,
 				1C3113D61E508C6900D4DD76 /* VLCPopupPanelController.h in Sources */,
 				1C3113D71E508C6900D4DD76 /* VLCPopupPanelController.m in Sources */,
-				1C3113D81E508C6900D4DD76 /* simple_prefs.h in Sources */,
-				1C3113D91E508C6900D4DD76 /* simple_prefs.m in Sources */,
+				1C3113D81E508C6900D4DD76 /* VLCSimplePrefsController.h in Sources */,
+				1C3113D91E508C6900D4DD76 /* VLCSimplePrefsController.m in Sources */,
 				1C3113DA1E508C6900D4DD76 /* VLCStringUtility.h in Sources */,
 				1C3113DB1E508C6900D4DD76 /* VLCStringUtility.m in Sources */,
 				1C3113DC1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.h in Sources */,

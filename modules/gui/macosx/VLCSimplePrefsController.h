@@ -1,5 +1,5 @@
 /*****************************************************************************
-* simple_prefs.h: Simple Preferences for Mac OS X
+* VLCSimplePrefsController.h: Simple Preferences for Mac OS X
 *****************************************************************************
 * Copyright (C) 2008-2014 VLC authors and VideoLAN
 * $Id$

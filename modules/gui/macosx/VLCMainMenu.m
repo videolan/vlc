@@ -35,7 +35,7 @@
 #import "VLCHelpWindowController.h"
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCBookmarksWindowController.h"
-#import "simple_prefs.h"
+#import "VLCSimplePrefsController.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCVoutView.h"

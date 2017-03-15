@@ -1,5 +1,5 @@
 /*****************************************************************************
-* simple_prefs.m: Simple Preferences for Mac OS X
+* VLCSimplePrefsController.m: Simple Preferences for Mac OS X
 *****************************************************************************
 * Copyright (C) 2008-2014 VLC authors and VideoLAN
 * $Id$
@@ -25,7 +25,7 @@
 #endif
 
 #import "CompatibilityFixes.h"
-#import "simple_prefs.h"
+#import "VLCSimplePrefsController.h"
 #import "prefs.h"
 #import <vlc_keys.h>
 #import <vlc_interface.h>

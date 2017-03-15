@@ -53,7 +53,7 @@
 #import "VLCOpenWindowController.h"
 #import "VLCBookmarksWindowController.h"
 #import "VLCCoreDialogProvider.h"
-#import "simple_prefs.h"
+#import "VLCSimplePrefsController.h"
 #import "VLCCoreInteraction.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCExtensionsManager.h"

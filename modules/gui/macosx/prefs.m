@@ -56,7 +56,7 @@
 #import "CompatibilityFixes.h"
 #import "VLCMain.h"
 #import "prefs.h"
-#import "simple_prefs.h"
+#import "VLCSimplePrefsController.h"
 #import "prefs_widgets.h"
 #import "VLCCoreInteraction.h"
 #import <vlc_keys.h>
