@@ -645,11 +645,6 @@ static int satip_open(vlc_object_t *obj)
     for (unsigned i = 0; i < strlen(psz_lower_url); i++)
         psz_lower_url[i] = tolower(psz_lower_url[i]);
 
-    const char* psz_lower_location = strstr( psz_lower_url, "://" );
-    if ( psz_lower_location == NULL )
-        goto error;
-    psz_lower_location += 3;
-
     vlc_UrlParse(&url, psz_lower_url);
     if (url.i_port <= 0)
         url.i_port = RTSP_DEFAULT_PORT;
