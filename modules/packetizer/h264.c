@@ -96,6 +96,8 @@ struct decoder_sys_t
     bool    b_slice;
     block_t *p_frame;
     block_t **pp_frame_last;
+    block_t *p_sei;
+    block_t **pp_sei_last;
     /* a new sps/pps can be transmitted outside of iframes */
     bool    b_new_sps;
     bool    b_new_pps;
@@ -335,6 +337,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_slice = false;
     p_sys->p_frame = NULL;
     p_sys->pp_frame_last = &p_sys->p_frame;
+    p_sys->p_sei = NULL;
+    p_sys->pp_sei_last = &p_sys->p_sei;
     p_sys->b_new_sps = false;
     p_sys->b_new_pps = false;
 
@@ -457,8 +461,8 @@ static void Close( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i;
 
-    if( p_sys->p_frame )
-        block_ChainRelease( p_sys->p_frame );
+    block_ChainRelease( p_sys->p_frame );
+    block_ChainRelease( p_sys->p_sei );
     for( i = 0; i <= H264_SPS_ID_MAX; i++ )
         StoreSPS( p_sys, i, NULL, NULL );
     for( i = 0; i <= H264_PPS_ID_MAX; i++ )
@@ -521,10 +525,12 @@ static void PacketizeReset( void *p_private, bool b_broken )
 
     if( b_broken )
     {
-        if( p_sys->p_frame )
-            block_ChainRelease( p_sys->p_frame );
+        block_ChainRelease( p_sys->p_frame );
+        block_ChainRelease( p_sys->p_sei );
         p_sys->p_frame = NULL;
         p_sys->pp_frame_last = &p_sys->p_frame;
+        p_sys->p_sei = NULL;
+        p_sys->pp_sei_last = &p_sys->p_sei;
         p_sys->b_new_sps = false;
         p_sys->b_new_pps = false;
         p_sys->p_active_pps = NULL;
@@ -573,12 +579,15 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     if( p_sys->b_slice && (!p_sys->p_active_pps || !p_sys->p_active_sps) )
     {
         block_ChainRelease( p_sys->p_frame );
+        block_ChainRelease( p_sys->p_sei );
         msg_Warn( p_dec, "waiting for SPS/PPS" );
 
         /* Reset context */
         p_sys->slice.i_frame_type = 0;
         p_sys->p_frame = NULL;
         p_sys->pp_frame_last = &p_sys->p_frame;
+        p_sys->p_sei = NULL;
+        p_sys->pp_sei_last = &p_sys->p_sei;
         p_sys->b_slice = false;
         cc_storage_reset( p_sys->p_ccs );
     }
@@ -629,20 +638,23 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         /* Do not append the PPS because we will insert it on keyframes */
         p_frag = NULL;
     }
+    else if( i_nal_type == H264_NAL_SEI )
+    {
+        if( p_sys->b_slice )
+            p_pic = OutputPicture( p_dec );
+        /* Parse SEI for CC support */
+        HxxxParse_AnnexB_SEI( p_frag->p_buffer, p_frag->i_buffer,
+                              1 /* nal header */, ParseSeiCallback, p_dec );
+        block_ChainLastAppend( &p_sys->pp_sei_last, p_frag );
+        p_frag = NULL;
+    }
     else if( i_nal_type == H264_NAL_AU_DELIMITER ||
-             i_nal_type == H264_NAL_SEI ||
              ( i_nal_type >= H264_NAL_PREFIX && i_nal_type <= H264_NAL_RESERVED_18 ) )
     {
         if( p_sys->b_slice )
             p_pic = OutputPicture( p_dec );
 
-        /* Parse SEI for CC support */
-        if( i_nal_type == H264_NAL_SEI )
-        {
-            HxxxParse_AnnexB_SEI( p_frag->p_buffer, p_frag->i_buffer,
-                                  1 /* nal header */, ParseSeiCallback, p_dec );
-        }
-        else if( i_nal_type == H264_NAL_AU_DELIMITER )
+        if( i_nal_type == H264_NAL_AU_DELIMITER )
         {
             if( p_sys->p_frame && (p_sys->p_frame->i_flags & BLOCK_FLAG_PRIVATE_AUD) )
             {
@@ -740,6 +752,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( p_xpsnal )
         block_ChainLastAppend( &pp_pic_last, p_xpsnal );
 
+    if( p_sys->p_sei )
+        block_ChainLastAppend( &pp_pic_last, p_sys->p_sei );
+
     assert( p_sys->p_frame );
     if( p_sys->p_frame )
         block_ChainLastAppend( &pp_pic_last, p_sys->p_frame );
@@ -747,6 +762,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     /* Reset chains, now empty */
     p_sys->p_frame = NULL;
     p_sys->pp_frame_last = &p_sys->p_frame;
+    p_sys->p_sei = NULL;
+    p_sys->pp_sei_last = &p_sys->p_sei;
 
     p_pic = block_ChainGather( p_pic );
 
@@ -849,8 +866,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
     p_sys->slice.i_frame_type = 0;
-    p_sys->p_frame = NULL;
-    p_sys->pp_frame_last = &p_sys->p_frame;
+    p_sys->p_sei = NULL;
+    p_sys->pp_sei_last = &p_sys->p_sei;
     p_sys->b_new_sps = false;
     p_sys->b_new_pps = false;
     p_sys->b_slice = false;
