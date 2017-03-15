@@ -167,11 +167,6 @@ static int Decode( decoder_t *p_dec, block_t *p_in_buf )
         p_sys->b_dontwarn = 1;
     }
 
-    if( 0)//!p_sys->b_dynrng )
-    {
-        dca_dynrng( p_sys->p_libdca, NULL, NULL );
-    }
-
     for( int i = 0; i < dca_blocks_num(p_sys->p_libdca); i++ )
     {
         sample_t * p_samples;
