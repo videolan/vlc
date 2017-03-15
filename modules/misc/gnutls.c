@@ -348,10 +348,11 @@ static int gnutls_ContinueHandshake(vlc_tls_creds_t *crd,
     msg_Err(crd, "TLS handshake error: %s", gnutls_strerror (val));
     return -1;
 
-    unsigned flags;
 done:
 #if (GNUTLS_VERSION_NUMBER >= 0x030500)
-    flags = gnutls_session_get_flags(session);
+    /* intentionally left blank */;
+
+    unsigned flags = gnutls_session_get_flags(session);
 
     if (flags & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)
         msg_Dbg(crd, " - safe renegotiation (RFC5746) enabled");
