@@ -79,6 +79,7 @@ typedef struct
 
     int i_idr_pic_id;
 
+    int i_pic_order_cnt_type;
     int i_pic_order_cnt_lsb;
     int i_delta_pic_order_cnt_bottom;
 
@@ -162,7 +163,7 @@ static block_t *OutputPicture( decoder_t *p_dec );
 static void PutSPS( decoder_t *p_dec, block_t *p_frag );
 static void PutPPS( decoder_t *p_dec, block_t *p_frag );
 static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_type,
-                              const block_t *p_frag, bool *pb_new_picture, slice_t *p_slice );
+                              const block_t *p_frag, slice_t *p_slice );
 static bool ParseSeiCallback( const hxxx_sei_data_t *, void * );
 
 
@@ -260,10 +261,39 @@ static void SliceInit( slice_t *p_slice )
     p_slice->i_pic_parameter_set_id = -1;
     p_slice->i_field_pic_flag = 0;
     p_slice->i_bottom_field_flag = -1;
+    p_slice->i_pic_order_cnt_type = -1;
     p_slice->i_pic_order_cnt_lsb = -1;
     p_slice->i_delta_pic_order_cnt_bottom = -1;
     p_slice->i_delta_pic_order_cnt0 = 0;
     p_slice->i_delta_pic_order_cnt1 = 0;
+}
+
+static bool IsFirstVCLNALUnit( const slice_t *p_prev, const slice_t *p_cur )
+{
+    /* Detection of the first VCL NAL unit of a primary coded picture
+     * (cf. 7.4.1.2.4) */
+    if( p_cur->i_frame_num != p_prev->i_frame_num ||
+        p_cur->i_pic_parameter_set_id != p_prev->i_pic_parameter_set_id ||
+        p_cur->i_field_pic_flag != p_prev->i_field_pic_flag ||
+       !p_cur->i_nal_ref_idc != !p_prev->i_nal_ref_idc )
+        return true;
+    if( (p_cur->i_bottom_field_flag != -1) &&
+        (p_prev->i_bottom_field_flag != -1) &&
+        (p_cur->i_bottom_field_flag != p_prev->i_bottom_field_flag) )
+        return true;
+    if( p_cur->i_pic_order_cnt_type == 0 &&
+       ( p_cur->i_pic_order_cnt_lsb != p_prev->i_pic_order_cnt_lsb ||
+         p_cur->i_delta_pic_order_cnt_bottom != p_prev->i_delta_pic_order_cnt_bottom ) )
+        return true;
+    else if( p_cur->i_pic_order_cnt_type == 1 &&
+           ( p_cur->i_delta_pic_order_cnt0 != p_prev->i_delta_pic_order_cnt0 ||
+             p_cur->i_delta_pic_order_cnt1 != p_prev->i_delta_pic_order_cnt1 ) )
+        return true;
+    if( ( p_cur->i_nal_type == H264_NAL_SLICE_IDR || p_prev->i_nal_type == H264_NAL_SLICE_IDR ) &&
+        ( p_cur->i_nal_type != p_prev->i_nal_type || p_cur->i_idr_pic_id != p_prev->i_idr_pic_id ) )
+        return true;
+
+    return false;
 }
 
 /*****************************************************************************
@@ -555,24 +585,27 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 
     if( i_nal_type >= H264_NAL_SLICE && i_nal_type <= H264_NAL_SLICE_IDR )
     {
-        slice_t slice;
+        slice_t newslice;
 
-        if( ParseSliceHeader( p_dec, i_nal_ref_idc, i_nal_type, p_frag, &b_new_picture, &slice ) )
+        if( ParseSliceHeader( p_dec, i_nal_ref_idc, i_nal_type, p_frag, &newslice ) )
         {
-            /* */
+            /* Only IDR carries the id, to be propagated */
+            if( newslice.i_idr_pic_id == -1 )
+                newslice.i_idr_pic_id = p_sys->slice.i_idr_pic_id;
+
+            b_new_picture = IsFirstVCLNALUnit( &p_sys->slice, &newslice );
             if( b_new_picture && p_sys->b_slice )
                 p_pic = OutputPicture( p_dec );
 
             /* */
-            p_sys->slice = slice;
-            p_sys->b_slice = true;
+            p_sys->slice = newslice;
         }
         else
         {
-            p_sys->b_slice = true;
             p_sys->p_active_pps = NULL;
             /* Fragment will be discarded later on */
         }
+        p_sys->b_slice = true;
     }
     else if( i_nal_type == H264_NAL_SPS )
     {
@@ -875,12 +908,11 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
 }
 
 static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_type,
-                              const block_t *p_frag, bool *pb_new_picture, slice_t *p_slice )
+                              const block_t *p_frag, slice_t *p_slice )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_slice_type;
-    slice_t slice;
-    SliceInit( &slice );
+    SliceInit( p_slice );
     bs_t s;
     unsigned i_bitflow = 0;
 
@@ -902,36 +934,36 @@ static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_typ
     switch( (i_slice_type = bs_read_ue( &s )) )
     {
     case 0: case 5:
-        slice.i_frame_type = BLOCK_FLAG_TYPE_P;
+        p_slice->i_frame_type = BLOCK_FLAG_TYPE_P;
         break;
     case 1: case 6:
-        slice.i_frame_type = BLOCK_FLAG_TYPE_B;
+        p_slice->i_frame_type = BLOCK_FLAG_TYPE_B;
         break;
     case 2: case 7:
-        slice.i_frame_type = BLOCK_FLAG_TYPE_I;
+        p_slice->i_frame_type = BLOCK_FLAG_TYPE_I;
         break;
     case 3: case 8: /* SP */
-        slice.i_frame_type = BLOCK_FLAG_TYPE_P;
+        p_slice->i_frame_type = BLOCK_FLAG_TYPE_P;
         break;
     case 4: case 9:
-        slice.i_frame_type = BLOCK_FLAG_TYPE_I;
+        p_slice->i_frame_type = BLOCK_FLAG_TYPE_I;
         break;
     default:
-        slice.i_frame_type = 0;
+        p_slice->i_frame_type = 0;
         break;
     }
 
     /* */
-    slice.i_nal_type = i_nal_type;
-    slice.i_nal_ref_idc = i_nal_ref_idc;
+    p_slice->i_nal_type = i_nal_type;
+    p_slice->i_nal_ref_idc = i_nal_ref_idc;
 
-    slice.i_pic_parameter_set_id = bs_read_ue( &s );
-    if( slice.i_pic_parameter_set_id > H264_PPS_ID_MAX )
+    p_slice->i_pic_parameter_set_id = bs_read_ue( &s );
+    if( p_slice->i_pic_parameter_set_id > H264_PPS_ID_MAX )
         return false;
 
     /* Bind matched/referred PPS and SPS */
     const h264_picture_parameter_set_t *p_pps =
-            p_sys->p_active_pps = p_sys->pps[slice.i_pic_parameter_set_id].p_pps;
+            p_sys->p_active_pps = p_sys->pps[p_slice->i_pic_parameter_set_id].p_pps;
     if( p_pps == NULL )
         return false;
 
@@ -942,61 +974,33 @@ static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_typ
 
     ActivateSets( p_dec, p_sps, p_pps );
 
-    slice.i_frame_num = bs_read( &s, p_sps->i_log2_max_frame_num + 4 );
+    p_slice->i_frame_num = bs_read( &s, p_sps->i_log2_max_frame_num + 4 );
 
     if( !p_sps->frame_mbs_only_flag )
     {
         /* field_pic_flag */
-        slice.i_field_pic_flag = bs_read( &s, 1 );
-        if( slice.i_field_pic_flag )
-            slice.i_bottom_field_flag = bs_read( &s, 1 );
+        p_slice->i_field_pic_flag = bs_read( &s, 1 );
+        if( p_slice->i_field_pic_flag )
+            p_slice->i_bottom_field_flag = bs_read( &s, 1 );
     }
 
-    slice.i_idr_pic_id = p_sys->slice.i_idr_pic_id;
-    if( slice.i_nal_type == H264_NAL_SLICE_IDR )
-        slice.i_idr_pic_id = bs_read_ue( &s );
+    if( p_slice->i_nal_type == H264_NAL_SLICE_IDR )
+        p_slice->i_idr_pic_id = bs_read_ue( &s );
 
+    p_slice->i_pic_order_cnt_type = p_sps->i_pic_order_cnt_type;
     if( p_sps->i_pic_order_cnt_type == 0 )
     {
-        slice.i_pic_order_cnt_lsb = bs_read( &s, p_sps->i_log2_max_pic_order_cnt_lsb + 4 );
-        if( p_pps->i_pic_order_present_flag && !slice.i_field_pic_flag )
-            slice.i_delta_pic_order_cnt_bottom = bs_read_se( &s );
+        p_slice->i_pic_order_cnt_lsb = bs_read( &s, p_sps->i_log2_max_pic_order_cnt_lsb + 4 );
+        if( p_pps->i_pic_order_present_flag && !p_slice->i_field_pic_flag )
+            p_slice->i_delta_pic_order_cnt_bottom = bs_read_se( &s );
     }
     else if( (p_sps->i_pic_order_cnt_type == 1) &&
              (!p_sps->i_delta_pic_order_always_zero_flag) )
     {
-        slice.i_delta_pic_order_cnt0 = bs_read_se( &s );
-        if( p_pps->i_pic_order_present_flag && !slice.i_field_pic_flag )
-            slice.i_delta_pic_order_cnt1 = bs_read_se( &s );
+        p_slice->i_delta_pic_order_cnt0 = bs_read_se( &s );
+        if( p_pps->i_pic_order_present_flag && !p_slice->i_field_pic_flag )
+            p_slice->i_delta_pic_order_cnt1 = bs_read_se( &s );
     }
-
-    /* Detection of the first VCL NAL unit of a primary coded picture
-     * (cf. 7.4.1.2.4) */
-    bool b_pic = false;
-    if( slice.i_frame_num != p_sys->slice.i_frame_num ||
-        slice.i_pic_parameter_set_id != p_sys->slice.i_pic_parameter_set_id ||
-        slice.i_field_pic_flag != p_sys->slice.i_field_pic_flag ||
-        !slice.i_nal_ref_idc != !p_sys->slice.i_nal_ref_idc )
-        b_pic = true;
-    if( (slice.i_bottom_field_flag != -1) &&
-        (p_sys->slice.i_bottom_field_flag != -1) &&
-        (slice.i_bottom_field_flag != p_sys->slice.i_bottom_field_flag) )
-        b_pic = true;
-    if( p_sps->i_pic_order_cnt_type == 0 &&
-        ( slice.i_pic_order_cnt_lsb != p_sys->slice.i_pic_order_cnt_lsb ||
-          slice.i_delta_pic_order_cnt_bottom != p_sys->slice.i_delta_pic_order_cnt_bottom ) )
-        b_pic = true;
-    else if( p_sps->i_pic_order_cnt_type == 1 &&
-             ( slice.i_delta_pic_order_cnt0 != p_sys->slice.i_delta_pic_order_cnt0 ||
-               slice.i_delta_pic_order_cnt1 != p_sys->slice.i_delta_pic_order_cnt1 ) )
-        b_pic = true;
-    if( ( slice.i_nal_type == H264_NAL_SLICE_IDR || p_sys->slice.i_nal_type == H264_NAL_SLICE_IDR ) &&
-        ( slice.i_nal_type != p_sys->slice.i_nal_type || slice.i_idr_pic_id != p_sys->slice.i_idr_pic_id ) )
-            b_pic = true;
-
-    /* */
-    *pb_new_picture = b_pic;
-    *p_slice = slice;
 
     return true;
 }
