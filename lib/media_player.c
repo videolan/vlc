@@ -1788,8 +1788,7 @@ libvlc_track_description_t *
     if( val_list.p_list->i_count <= 0 )
         goto end;
 
-    p_track_description = ( libvlc_track_description_t * )
-        malloc( sizeof( libvlc_track_description_t ) );
+    p_track_description = malloc( sizeof *p_track_description );
     if ( !p_track_description )
     {
         libvlc_printerr( "Not enough memory" );
@@ -1801,8 +1800,7 @@ libvlc_track_description_t *
     {
         if( !p_actual )
         {
-            p_actual = ( libvlc_track_description_t * )
-                malloc( sizeof( libvlc_track_description_t ) );
+            p_actual = malloc( sizeof *p_actual );
             if ( !p_actual )
             {
                 libvlc_track_description_list_release( p_track_description );
