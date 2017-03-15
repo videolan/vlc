@@ -112,7 +112,7 @@ Node* DOMParser::processNode(bool b_strict)
                     addAttributesToNode(node);
                 }
 
-                if(empty)
+                if(empty && lifo.size() > 1)
                     lifo.pop();
                 break;
             }
