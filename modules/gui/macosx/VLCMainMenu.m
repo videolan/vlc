@@ -48,6 +48,7 @@
 #import "VLCAddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"
 #import "VLCRendererDialog.h"
+#import "NSScreen+VLCAdditions.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>

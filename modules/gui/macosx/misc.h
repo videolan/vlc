@@ -25,26 +25,6 @@
 #import <Cocoa/Cocoa.h>
 
 /*****************************************************************************
- * NSScreen (VLCAdditions)
- *
- *  Missing extension to NSScreen
- *****************************************************************************/
-
-@interface NSScreen (VLCAdditions)
-
-+ (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID;
-- (BOOL)hasMenuBar;
-- (BOOL)hasDock;
-- (BOOL)isScreen: (NSScreen*)screen;
-- (CGDirectDisplayID)displayID;
-- (void)blackoutOtherScreens;
-+ (void)unblackoutScreens;
-
-- (void)setFullscreenPresentationOptions;
-- (void)setNonFullscreenPresentationOptions;
-@end
-
-/*****************************************************************************
  * VLCDragDropView
  *
  * Disables default drag / drop behaviour of an NSImageView.

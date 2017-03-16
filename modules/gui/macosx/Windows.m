@@ -28,6 +28,7 @@
 #import "VLCControlsBarCommon.h"
 #import "VLCVoutView.h"
 #import "CompatibilityFixes.h"
+#import "NSScreen+VLCAdditions.h"
 
 /*****************************************************************************
  * VLCWindow

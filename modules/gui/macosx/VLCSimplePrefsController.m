@@ -38,6 +38,7 @@
 #import "VLCMain+OldPrefs.h"
 #import "AppleRemote.h"
 #import "VLCCoreInteraction.h"
+#import "NSScreen+VLCAdditions.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                        //for o_intf_last_updateLabel

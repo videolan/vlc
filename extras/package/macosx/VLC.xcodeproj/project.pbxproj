@@ -165,6 +165,7 @@
 		6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */; };
 		6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */; };
 		6B4D50961E7A7D16004479B5 /* NSSound+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50951E7A7D16004479B5 /* NSSound+VLCAdditions.m */; };
+		6B4D50A71E7AB52C004479B5 /* NSScreen+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -205,6 +206,8 @@
 		6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSimplePrefsWindow.m; sourceTree = "<group>"; };
 		6B4D50941E7A7D16004479B5 /* NSSound+VLCAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSSound+VLCAdditions.h"; sourceTree = "<group>"; };
 		6B4D50951E7A7D16004479B5 /* NSSound+VLCAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSSound+VLCAdditions.m"; sourceTree = "<group>"; };
+		6B4D50A51E7AB52C004479B5 /* NSScreen+VLCAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSScreen+VLCAdditions.h"; sourceTree = "<group>"; };
+		6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSScreen+VLCAdditions.m"; sourceTree = "<group>"; };
 		6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSlider.h; sourceTree = "<group>"; };
 		6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCDefaultValueSlider.m; sourceTree = "<group>"; };
 		6B6A499C1DFD9B23009128AC /* VLCDefaultValueSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDefaultValueSliderCell.h; sourceTree = "<group>"; };
@@ -988,6 +991,8 @@
 				CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */,
 				8ED6C27F03E2EB1C0059A3A7 /* misc.h */,
 				8ED6C28003E2EB1C0059A3A7 /* misc.m */,
+				6B4D50A51E7AB52C004479B5 /* NSScreen+VLCAdditions.h */,
+				6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */,
 				6B4D50941E7A7D16004479B5 /* NSSound+VLCAdditions.h */,
 				6B4D50951E7A7D16004479B5 /* NSSound+VLCAdditions.m */,
 				8ED6C28103E2EB1C0059A3A7 /* VLCOpenWindowController.h */,
@@ -2047,6 +2052,7 @@
 				1C3113DA1E508C6900D4DD76 /* VLCStringUtility.h in Sources */,
 				1C3113DB1E508C6900D4DD76 /* VLCStringUtility.m in Sources */,
 				1C3113DC1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.h in Sources */,
+				6B4D50A71E7AB52C004479B5 /* NSScreen+VLCAdditions.m in Sources */,
 				1C3113DD1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.m in Sources */,
 				1C3113DE1E508C6900D4DD76 /* VLCVideoEffectsWindowController.h in Sources */,
 				1C3113DF1E508C6900D4DD76 /* VLCVideoEffectsWindowController.m in Sources */,

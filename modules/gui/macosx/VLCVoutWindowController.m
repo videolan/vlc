@@ -37,6 +37,7 @@
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCResumeDialogController.h"
 #import "VLCPlaylist.h"
+#import "NSScreen+VLCAdditions.h"
 
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
