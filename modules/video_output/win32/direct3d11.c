@@ -1646,7 +1646,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                    "rgb.r = inverse_HLG(rgb.r);\
                     rgb.g = inverse_HLG(rgb.g);\
                     rgb.b = inverse_HLG(rgb.b);\
-                    return rgb / 6.0";
+                    return rgb / 12.0";
             src_transfer = TRANSFER_FUNC_LINEAR;
             break;
         case TRANSFER_FUNC_BT709:
