@@ -44,6 +44,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCMainMenu.h VLCMainMenu.m \
 	VLCMainWindowTitleView.h VLCMainWindowTitleView.m \
 	misc.h misc.m \
+	NSSound+VLCAdditions.h NSSound+VLCAdditions.m \
 	VLCOpenWindowController.h VLCOpenWindowController.m \
 	VLCOutput.h VLCOutput.m \
 	VLCPlaylistView.h VLCPlaylistView.m \

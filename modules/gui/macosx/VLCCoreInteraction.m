@@ -41,6 +41,8 @@
 #import "AppleRemote.h"
 #import "VLCInputManager.h"
 
+#import "NSSound+VLCAdditions.h"
+
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
