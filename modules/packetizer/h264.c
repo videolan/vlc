@@ -848,7 +848,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
         p_pic->i_dts = date_Get( &p_sys->dts );
 
     /* PTS Fixup, interlaced fields (multiple AU/block) */
-    if( p_pic->i_pts <= VLC_TS_INVALID && p_sps->vui.i_time_scale )
+    if( p_pic->i_pts <= VLC_TS_INVALID && p_sps->vui.i_time_scale &&
+        p_sps->vui.b_valid && p_sps->vui.b_hrd_parameters_present_flag )
     {
         mtime_t i_pts_delay = CLOCK_FREQ * p_sys->i_dpb_output_delay *
                               p_sps->vui.i_num_units_in_tick / p_sps->vui.i_time_scale;
