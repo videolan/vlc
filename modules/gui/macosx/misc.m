@@ -49,6 +49,7 @@ static NSMapTable *VLCAdditions_userInfo = NULL;
     VLCAdditions_userInfo = NSCreateMapTable(NSNonRetainedObjectMapKeyCallBacks, NSObjectMapValueCallBacks, 16);
 }
 
+#warning FIXME: Dealloc is replaced, this seems like a very bad idea.
 - (void)dealloc
 {
     NSMapRemove(VLCAdditions_userInfo, (__bridge const void * __nullable)(self));
