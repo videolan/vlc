@@ -1067,7 +1067,7 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
 
             if( p_sps->vui.b_valid )
             {
-                if( p_sps->vui.b_pic_struct_present_flag )
+                if( p_sps->vui.b_hrd_parameters_present_flag )
                 {
                     bs_read( p_sei_data->p_bs, p_sps->vui.i_cpb_removal_delay_length_minus1 + 1 );
                     p_sys->i_dpb_output_delay =

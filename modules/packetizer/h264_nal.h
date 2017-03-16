@@ -122,7 +122,7 @@ struct h264_sequence_parameter_set_t
         uint32_t i_time_scale;
         bool b_fixed_frame_rate;
         bool b_pic_struct_present_flag;
-        bool b_hrd_parameters_present_flag;
+        bool b_hrd_parameters_present_flag; /* CpbDpbDelaysPresentFlag */
         uint8_t i_cpb_removal_delay_length_minus1;
         uint8_t i_dpb_output_delay_length_minus1;
 
