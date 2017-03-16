@@ -178,15 +178,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     {
         video_format_t fmt_in;
         video_format_t fmt_out;
-        picture_t crop;
+        plane_t orig_planes[PICTURE_PLANE_MAX];
+        memcpy(orig_planes, p_pic->p, sizeof orig_planes);
 
-        crop = *p_pic;
         for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
             const int o_yp = o_y * p_outpic->p[i_plane].i_lines / p_outpic->p[Y_PLANE].i_lines;
             const int o_xp = o_x * p_outpic->p[i_plane].i_pitch / p_outpic->p[Y_PLANE].i_pitch;
 
-            crop.p[i_plane].p_pixels += o_yp * p_pic->p[i_plane].i_pitch + o_xp;
+            p_pic->p[i_plane].p_pixels += o_yp * p_pic->p[i_plane].i_pitch + o_xp;
         }
 
         /* */
@@ -196,8 +196,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         /* */
         fmt_out = p_filter->fmt_out.video;
-
-        p_converted = image_Convert( p_sys->p_image, &crop, &fmt_in, &fmt_out );
+        p_converted = image_Convert( p_sys->p_image, p_pic, &fmt_in, &fmt_out );
+        memcpy(p_pic->p, orig_planes, sizeof orig_planes);
 
         picture_CopyPixels( p_outpic, p_converted );
 
