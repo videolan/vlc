@@ -65,6 +65,16 @@ typedef struct
     float      pf_gain[AUDIO_REPLAY_GAIN_MAX];
 } audio_replay_gain_t;
 
+
+/**
+ * Audio channel type
+ */
+typedef enum audio_channel_type_t
+{
+    AUDIO_CHANNEL_TYPE_BITMAP,
+    AUDIO_CHANNEL_TYPE_AMBISONICS,
+} audio_channel_type_t;
+
 /**
  * audio format description
  */
@@ -81,6 +91,9 @@ struct audio_format_t
      * (demux/codec/packetizer) or overridden by the user, used by audio
      * filters. */
     uint16_t     i_chan_mode;
+
+    /* Channel type */
+    audio_channel_type_t channel_type;
 
     /* Optional - for A/52, SPDIF and DTS types : */
     /* Bytes used by one compressed frame, depends on bitrate. */
