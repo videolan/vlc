@@ -51,4 +51,6 @@ typedef NS_OPTIONS(NSUInteger, NSStatusItemBehavior) {
 
 @end
 
+typedef NSUInteger NSWindowStyleMask;
+
 #endif

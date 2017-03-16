@@ -46,7 +46,7 @@
 
 @implementation VLCWindow
 
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
     self = [super initWithContentRect:contentRect styleMask:styleMask backing:backingType defer:flag];
@@ -229,7 +229,7 @@
 #pragma mark -
 #pragma mark Init
 
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
     _darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
