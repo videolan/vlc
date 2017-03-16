@@ -41,12 +41,6 @@
     BOOL b_isset_canBecomeKeyWindow;
     BOOL b_canBecomeMainWindow;
     BOOL b_isset_canBecomeMainWindow;
-    NSViewAnimation *o_current_animation;
-
-    /*
-     * YES when all animations are over
-     * for fullscreen window: always YES
-     */
 }
 @end
 
@@ -91,136 +85,65 @@
     return [super canBecomeMainWindow];
 }
 
-- (void)closeAndAnimate: (BOOL)animate
+- (void)closeAndAnimate:(BOOL)animate
 {
-    NSInvocation *invoc;
-
+    // No animation, just close
     if (!animate) {
         [super close];
         return;
     }
 
-    // TODO this callback stuff does not work and is not needed
-    invoc = [[NSInvocation alloc] init];
-    [invoc setSelector:@selector(close)];
-    [invoc setTarget: self];
+    // Animate window alpha value
+    [self setAlphaValue:1.0];
+    __unsafe_unretained typeof(self) this = self;
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
+        [[NSAnimationContext currentContext] setDuration:0.9];
+        [[this animator] setAlphaValue:0.0];
+    } completionHandler:^{
+        [this close];
+    }];
+}
 
-    if (![self isVisible] || [self alphaValue] == 0.0) {
-        [super close];
+- (void)orderOut:(id)sender animate:(BOOL)animate
+{
+    if (!animate) {
+        [super orderOut:sender];
         return;
     }
 
-    [self orderOut: self animate: YES callback: invoc];
-}
-
-- (void)orderOut: (id)sender animate: (BOOL)animate
-{
-    NSInvocation *invoc = [[NSInvocation alloc] init];
-    [invoc setSelector:@selector(orderOut:)];
-    [invoc setTarget: self];
-    [invoc setArgument:(__bridge void * __nonnull)sender atIndex:2];
-    [self orderOut: sender animate: animate callback: invoc];
-}
-
-- (void)orderOut: (id)sender animate: (BOOL)animate callback:(NSInvocation *)callback
-{
-    NSViewAnimation *anim;
-    NSViewAnimation *current_anim;
-    NSMutableDictionary *dict;
-
-    if (!animate) {
-        [self orderOut: sender];
+    if ([self alphaValue] == 0.0) {
+        [super orderOut:self];
         return;
     }
-
-    dict = [[NSMutableDictionary alloc] initWithCapacity:2];
-
-    [dict setObject:self forKey:NSViewAnimationTargetKey];
-
-    [dict setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
-    anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
-
-    [anim setAnimationBlockingMode:NSAnimationNonblocking];
-    [anim setDuration:0.9];
-    [anim setFrameRate:30];
-    [anim setUserInfo:(__bridge void *)callback];
-    [anim setDelegate:self];
-
-    @synchronized(self) {
-        current_anim = self->o_current_animation;
-
-        if (!([[[current_anim viewAnimations] firstObject] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating])) {
-            if (current_anim) {
-                [current_anim stopAnimation];
-                [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
-            } else
-                [anim setCurrentProgress:1.0 - [self alphaValue]];
-            self->o_current_animation = anim;
-            [anim startAnimation];
-        }
-    }
+    __unsafe_unretained typeof(self) this = self;
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
+        [[NSAnimationContext currentContext] setDuration:0.5];
+        [[this animator] setAlphaValue:0.0];
+    } completionHandler:^{
+        [this orderOut:self];
+    }];
 }
 
-- (void)orderFront: (id)sender animate: (BOOL)animate
+- (void)orderFront:(id)sender animate:(BOOL)animate
 {
-    NSViewAnimation *anim;
-    NSViewAnimation *current_anim;
-    NSMutableDictionary *dict;
-
     if (!animate) {
-        [super orderFront: sender];
-        [self setAlphaValue: 1.0];
+        [super orderFront:sender];
+        [self setAlphaValue:1.0];
         return;
     }
 
     if (![self isVisible]) {
-        [self setAlphaValue: 0.0];
-        [super orderFront: sender];
-    }
-    else if ([self alphaValue] == 1.0) {
-        [super orderFront: self];
+        [self setAlphaValue:0.0];
+        [super orderFront:sender];
+    } else if ([self alphaValue] == 1.0) {
+        [super orderFront:self];
         return;
     }
 
-    dict = [[NSMutableDictionary alloc] initWithCapacity:2];
-
-    [dict setObject:self forKey:NSViewAnimationTargetKey];
-
-    [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
-    anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
-
-    [anim setAnimationBlockingMode:NSAnimationNonblocking];
-    [anim setDuration:0.5];
-    [anim setFrameRate:30];
-    [anim setDelegate:self];
-
-    @synchronized(self) {
-        current_anim = self->o_current_animation;
-
-        if (!([[[current_anim viewAnimations] firstObject] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating])) {
-            if (current_anim) {
-                [current_anim stopAnimation];
-                [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
-            }
-            else
-                [anim setCurrentProgress:[self alphaValue]];
-            self->o_current_animation = anim;
-            [self orderFront: sender];
-            [anim startAnimation];
-        }
-    }
-}
-
-- (void)animationDidEnd:(NSAnimation*)anim
-{
-    if ([self alphaValue] <= 0.0) {
-        NSInvocation * invoc;
-        [super orderOut: nil];
-        [self setAlphaValue: 1.0];
-        if ((invoc = [anim userInfo])) {
-            [invoc invoke];
-        }
-    }
+    [NSAnimationContext beginGrouping];
+    [[NSAnimationContext currentContext] setDuration:0.5];
+    [[self animator] setAlphaValue:1.0];
+    [NSAnimationContext endGrouping];
 }
 
 - (VLCVoutView *)videoView

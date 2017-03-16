@@ -40,17 +40,9 @@
 @property (nonatomic, readwrite) BOOL hasActiveVideo;
 @property (nonatomic, readwrite) BOOL fullscreen;
 
-/* animate mode is only supported in >=10.4 */
-- (void)orderFront: (id)sender animate: (BOOL)animate;
-
-/* animate mode is only supported in >=10.4 */
-- (void)orderOut: (id)sender animate: (BOOL)animate;
-
-/* animate mode is only supported in >=10.4 */
-- (void)orderOut: (id)sender animate: (BOOL)animate callback:(NSInvocation *)callback;
-
-/* animate mode is only supported in >=10.4 */
-- (void)closeAndAnimate: (BOOL)animate;
+- (void)closeAndAnimate:(BOOL)animate;
+- (void)orderFront:(id)sender animate:(BOOL)animate;
+- (void)orderOut:(id)sender animate:(BOOL)animate;
 
 - (VLCVoutView *)videoView;
 

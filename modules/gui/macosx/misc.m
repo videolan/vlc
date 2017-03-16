@@ -34,39 +34,6 @@
 NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 /*****************************************************************************
- * NSAnimation (VLCAdditions)
- *
- *  Missing extension to NSAnimation
- *****************************************************************************/
-
-@implementation NSAnimation (VLCAdditions)
-/* fake class attributes  */
-static NSMapTable *VLCAdditions_userInfo = NULL;
-
-+ (void)load
-{
-    /* init our fake object attribute */
-    VLCAdditions_userInfo = NSCreateMapTable(NSNonRetainedObjectMapKeyCallBacks, NSObjectMapValueCallBacks, 16);
-}
-
-#warning FIXME: Dealloc is replaced, this seems like a very bad idea.
-- (void)dealloc
-{
-    NSMapRemove(VLCAdditions_userInfo, (__bridge const void * __nullable)(self));
-}
-
-- (void)setUserInfo: (void *)userInfo
-{
-    NSMapInsert(VLCAdditions_userInfo, (__bridge const void * __nullable)(self), (void*)userInfo);
-}
-
-- (void *)userInfo
-{
-    return NSMapGet(VLCAdditions_userInfo, (__bridge const void * __nullable)(self));
-}
-@end
-
-/*****************************************************************************
  * NSScreen (VLCAdditions)
  *
  *  Missing extension to NSScreen

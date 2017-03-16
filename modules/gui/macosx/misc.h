@@ -25,15 +25,6 @@
 #import <Cocoa/Cocoa.h>
 
 /*****************************************************************************
- * NSAnimation (VLCAddition)
- *****************************************************************************/
-
-@interface NSAnimation (VLCAdditions)
-@property (readwrite) void * userInfo;
-
-@end
-
-/*****************************************************************************
  * NSScreen (VLCAdditions)
  *
  *  Missing extension to NSScreen
