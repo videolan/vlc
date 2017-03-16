@@ -66,6 +66,7 @@
 /* Check if i_rate == i_rate and i_channels == i_channels */
 #define AOUT_FMTS_SIMILAR( p_first, p_second ) (                            \
     ((p_first)->i_rate == (p_second)->i_rate)                               \
+      && ((p_first)->channel_type == (p_second)->channel_type)            \
       && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
       && ((p_first)->i_chan_mode == (p_second)->i_chan_mode) )
 
