@@ -1985,8 +1985,13 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
 
     assert( !p_owner->b_waiting );
 
-    if( block_FifoCount( p_dec->p_owner->p_fifo ) > 0 )
+    vlc_fifo_Lock( p_owner->p_fifo );
+    if( !vlc_fifo_IsEmpty( p_dec->p_owner->p_fifo ) || p_owner->b_draining )
+    {
+        vlc_fifo_Unlock( p_owner->p_fifo );
         return false;
+    }
+    vlc_fifo_Unlock( p_owner->p_fifo );
 
     bool b_empty;
 
