@@ -345,8 +345,8 @@ static const char* globPixelShaderDefault = "\
     float3 rgb = (float3)rgba;\
     rgb = sourceToLinear(rgb);\
     rgb = toneMapping(rgb);\
-    rgb = linearToDisplay(saturate(rgb));\
-    return float4(rgb, saturate(opacity));\
+    rgb = linearToDisplay(rgb);\
+    return saturate(float4(rgb, opacity));\
   }\
 ";
 
