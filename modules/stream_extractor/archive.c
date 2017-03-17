@@ -632,6 +632,7 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 
 static void CommonClose( private_sys_t* p_sys )
 {
+    p_sys->b_dead = true;
     archive_clean( p_sys );
 
     for( size_t i = 0; i < p_sys->i_callback_data; ++i )
