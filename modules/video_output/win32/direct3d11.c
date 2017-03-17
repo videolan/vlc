@@ -127,6 +127,7 @@ struct vout_display_sys_t
 
     struct { /* TODO may go in vout_display_info_t without DXGI */
         const dxgi_color_space   *colorspace;
+        unsigned                 luminance_peak;
     } display;
 
 #if !VLC_WINSTORE_APP
@@ -351,6 +352,10 @@ static const char* globPixelShaderDefault = "\
       %s;\
   }\
   \
+  inline float3 adjustPeakLuminance(float3 rgb) {\
+      %s;\
+  }\
+  \
   inline float3 adjustRange(float3 rgb) {\
       %s;\
   }\
@@ -365,6 +370,7 @@ static const char* globPixelShaderDefault = "\
     float3 rgb = (float3)rgba;\
     rgb = sourceToLinear(rgb);\
     rgb = toneMapping(rgb);\
+    rgb = adjustPeakLuminance(rgb);\
     rgb = linearToDisplay(rgb);\
     rgb = adjustRange(rgb);\
     return float4(rgb, saturate(opacity));\
@@ -376,6 +382,9 @@ const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\
 const float ST2084_c1 = 3424.0 / 4096.0;\
 const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;\
 const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;"
+
+#define DEFAULT_BRIGHTNESS 80
+
 
 static int Direct3D11MapPoolTexture(picture_t *picture)
 {
@@ -1449,6 +1458,21 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     else
         msg_Err(vd, "Failed to set colorspace %s. (hr=0x%lX)", sys->display.colorspace->name, hr);
 done:
+    /* guestimate the display peak luminance */
+    switch (sys->display.colorspace->transfer)
+    {
+    case TRANSFER_FUNC_LINEAR:
+    case TRANSFER_FUNC_SRGB:
+        sys->display.luminance_peak = DEFAULT_BRIGHTNESS;
+        break;
+    case TRANSFER_FUNC_SMPTE_ST2084:
+        sys->display.luminance_peak = 10000;
+        break;
+    /* there is no other output transfer on Windows */
+    default:
+        vlc_assert_unreachable();
+    }
+
     if (dxgiswapChain3)
         IDXGISwapChain3_Release(dxgiswapChain3);
 }
@@ -1722,7 +1746,9 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     const char *psz_src_transform     = DEFAULT_NOOP;
     const char *psz_display_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
+    const char *psz_peak_luminance    = DEFAULT_NOOP;
     const char *psz_adjust_range      = DEFAULT_NOOP;
+    char *psz_luminance = NULL;
     char *psz_range = NULL;
 
     switch (format->formatTexture)
@@ -1752,6 +1778,26 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     }
 
     video_transfer_func_t src_transfer;
+    unsigned src_luminance_peak;
+    switch (transfer)
+    {
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            /* TODO ajust this value using HDR metadata ? */
+            src_luminance_peak = 7500;
+            break;
+        case TRANSFER_FUNC_HLG:
+            src_luminance_peak = 1000;
+            break;
+        case TRANSFER_FUNC_BT709:
+        case TRANSFER_FUNC_SRGB:
+            src_luminance_peak = DEFAULT_BRIGHTNESS;
+            break;
+        default:
+            msg_Dbg(vd, "unhandled source transfer %d", transfer);
+            src_luminance_peak = DEFAULT_BRIGHTNESS;
+            break;
+    }
+
     if (transfer != sys->display.colorspace->transfer)
     {
         /* we need to go in linear mode */
@@ -1773,7 +1819,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                        "rgb.r = inverse_HLG(rgb.r);\
                         rgb.g = inverse_HLG(rgb.g);\
                         rgb.b = inverse_HLG(rgb.b);\
-                        return rgb / 12.0";
+                        return rgb / 20.0";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT709:
@@ -1803,7 +1849,7 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
                         /* HDR tone mapping */
                         psz_tone_mapping =
                             "static const float3 HABLE_DIV = hable(11.2);\
-                            rgb = hable(32.0 * rgb) / HABLE_DIV;\
+                            rgb = hable(rgb) / HABLE_DIV;\
                             return rgb";
                     }
                 }
@@ -1828,6 +1874,16 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
             default:
                 msg_Warn(vd, "don't know how to transfer from %d to %d", src_transfer, sys->display.colorspace->transfer);
                 break;
+        }
+    }
+
+    if (src_luminance_peak != sys->display.luminance_peak)
+    {
+        psz_luminance = malloc(64);
+        if (likely(psz_luminance))
+        {
+            sprintf(psz_luminance, "return rgb * %f", (float)src_luminance_peak / (float)sys->display.luminance_peak);
+            psz_peak_luminance = psz_luminance;
         }
     }
 
@@ -1909,23 +1965,26 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
 
     char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
                           strlen(psz_src_transform) + strlen(psz_display_transform) +
-                          strlen(psz_tone_mapping) + strlen(psz_adjust_range));
+                          strlen(psz_tone_mapping) + strlen(psz_peak_luminance) + strlen(psz_adjust_range));
     if (!shader)
     {
         msg_Err(vd, "no room for the Pixel Shader");
+        free(psz_luminance);
         free(psz_range);
         return E_OUTOFMEMORY;
     }
     sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
+            psz_display_transform, psz_tone_mapping, psz_peak_luminance, psz_adjust_range, psz_sampler);
 #ifndef NDEBUG
     if (!IsRGBShader(format)) {
         msg_Dbg(vd,"psz_src_transform %s", psz_src_transform);
         msg_Dbg(vd,"psz_tone_mapping %s", psz_tone_mapping);
+        msg_Dbg(vd,"psz_peak_luminance %s", psz_peak_luminance);
         msg_Dbg(vd,"psz_display_transform %s", psz_display_transform);
         msg_Dbg(vd,"psz_adjust_range %s", psz_adjust_range);
     }
 #endif
+    free(psz_luminance);
     free(psz_range);
 
     ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
