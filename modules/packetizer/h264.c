@@ -113,9 +113,16 @@ struct decoder_sys_t
     bool b_even_frame;
     bool b_discontinuity;
 
+    /* POC */
+    poc_context_t pocctx;
+    struct
+    {
+        mtime_t pts;
+        int num;
+    } prevdatedpoc;
+
     mtime_t i_frame_pts;
     mtime_t i_frame_dts;
-    mtime_t i_prev_pts;
 
     date_t dts;
 
@@ -315,8 +322,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_discontinuity = false;
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
-    p_sys->i_prev_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
+
+    /* POC */
+    h264_poc_context_init( &p_sys->pocctx );
+    p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
 
     date_Init( &p_sys->dts, 1, 1 );
     date_Set( &p_sys->dts, VLC_TS_INVALID );
@@ -490,10 +500,12 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->p_active_sps = NULL;
         p_sys->i_frame_pts = VLC_TS_INVALID;
         p_sys->i_frame_dts = VLC_TS_INVALID;
-        p_sys->i_prev_pts = VLC_TS_INVALID;
         p_sys->b_even_frame = false;
         p_sys->slice.i_frame_type = 0;
         p_sys->b_slice = false;
+        /* POC */
+        h264_poc_context_init( &p_sys->pocctx );
+        p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
         /* From SEI */
         p_sys->i_dpb_output_delay = 0;
         p_sys->i_pic_struct = 0;
@@ -757,7 +769,6 @@ static block_t *OutputPicture( decoder_t *p_dec )
                           p_sps->vui.i_num_units_in_tick / p_sps->vui.i_time_scale;
     }
 
-    mtime_t i_field_pts_diff = -1;
     if( p_sps->frame_mbs_only_flag == 0 && p_sps->vui.b_pic_struct_present_flag )
     {
         switch( p_sys->i_pic_struct )
@@ -770,13 +781,6 @@ static block_t *OutputPicture( decoder_t *p_dec )
                 p_pic->i_flags |= (p_sys->i_pic_struct == 1) ? BLOCK_FLAG_TOP_FIELD_FIRST
                                                              : BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             }
-            else if( p_pic->i_pts <= VLC_TS_INVALID &&
-                     date_Get( &p_sys->dts ) > VLC_TS_INVALID && p_pic->i_length )
-            {
-                /* interpolate from even frame */
-                i_field_pts_diff = p_pic->i_length;
-            }
-
             p_sys->b_even_frame = !p_sys->b_even_frame;
             break;
         /* Each of the following slices contains multiple fields */
@@ -809,26 +813,64 @@ static block_t *OutputPicture( decoder_t *p_dec )
         p_pic->i_dts = date_Get( &p_sys->dts );
 
     /* PTS Fixup, interlaced fields (multiple AU/block) */
-    if( p_pic->i_pts <= VLC_TS_INVALID && p_sps->vui.i_time_scale &&
-        p_sps->vui.b_valid && p_sps->vui.b_hrd_parameters_present_flag )
+    int tFOC = 0, bFOC = 0, PictureOrderCount = 0;
+    h264_compute_poc( p_sps, &p_sys->slice, &p_sys->pocctx, &PictureOrderCount, &tFOC, &bFOC );
+
+    if( p_sys->slice.i_frame_type & BLOCK_FLAG_TYPE_I )
+        p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
+
+    if( p_pic->i_pts == VLC_TS_INVALID )
     {
-        mtime_t i_pts_delay = CLOCK_FREQ * p_sys->i_dpb_output_delay *
-                              p_sps->vui.i_num_units_in_tick / p_sps->vui.i_time_scale;
-        p_pic->i_pts = p_pic->i_dts + i_pts_delay;
-        if( i_field_pts_diff >= 0 )
-            p_pic->i_pts += i_field_pts_diff;
+        if( p_sys->prevdatedpoc.pts > VLC_TS_INVALID )
+        {
+            date_t pts = p_sys->dts;
+            date_Set( &pts, p_sys->prevdatedpoc.pts );
+
+            int diff = tFOC - p_sys->prevdatedpoc.num;
+            if( diff > 0 )
+                date_Increment( &pts, diff );
+            else
+                date_Decrement( &pts, -diff );
+
+            p_pic->i_pts = date_Get( &pts );
+        }
+        /* In case there's no PTS at all */
+        else if( p_sys->slice.i_nal_ref_idc == 0 &&
+                 p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_B )
+        {
+            p_pic->i_pts = p_pic->i_dts;
+        }
+        else if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I )
+        {
+            /* Hell no PTS on IDR. We're totally blind */
+            date_t pts = p_sys->dts;
+            date_Increment( &pts, 2 );
+            p_pic->i_pts = date_Get( &pts );
+        }
     }
+
+    if( p_pic->i_pts > VLC_TS_INVALID )
+    {
+        p_sys->prevdatedpoc.pts = p_pic->i_pts;
+        p_sys->prevdatedpoc.num = PictureOrderCount;
+    }
+
+#if 0
+    msg_Err(p_dec, "F/BOC %d/%d POC %d %s ref%d fn %d fp %d %d pts %ld",
+                    tFOC, bFOC, PictureOrderCount,
+                    (p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I) ? "I" : (p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_P ? "P": "B"),
+                    p_sys->slice.i_nal_ref_idc, p_sys->slice.i_frame_num, p_sys->slice.i_field_pic_flag,
+                    p_pic->i_pts - p_pic->i_dts, p_pic->i_pts % (100*CLOCK_FREQ));
+#endif
 
     if( !p_sys->b_discontinuity )
     {
         /* save for next pic fixups */
         date_Increment( &p_sys->dts, i_num_clock_ts );
-        p_sys->i_prev_pts = p_pic->i_pts;
     }
     else
     {
         p_sys->b_discontinuity = false;
-        p_sys->i_prev_pts = VLC_TS_INVALID;
         date_Set( &p_sys->dts, VLC_TS_INVALID );
         if( p_pic )
             p_pic->i_flags |= BLOCK_FLAG_DISCONTINUITY;
