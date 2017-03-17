@@ -52,7 +52,10 @@ static int consume_tag( xml_reader_t* p_reader, char const* psz_tag )
                 return VLC_SUCCESS;
         }
         else if( i_type == XML_READER_STARTELEM && !strcasecmp( psz_name, psz_tag ) )
-            ++i_depth;
+        {
+            if( xml_ReaderIsEmptyElement( p_reader ) != 1 )
+                ++i_depth;
+        }
     }
 
     return VLC_EGENERIC;
