@@ -99,9 +99,8 @@ static int libarchive_exit_cb( libarchive_t* p_arc, void* p_obj )
     libarchive_callback_t* p_cb = (libarchive_callback_t*)p_obj;
 
     if( p_cb->p_sys->source == p_cb->p_source )
-    { /* DO NOT CLOSE OUR MOTHER STREAM */
-
-        if( vlc_stream_Seek( p_cb->p_source, 0 ) )
+    {  /* DO NOT CLOSE OUR MOTHER STREAM */
+        if( !p_cb->p_sys->b_dead && vlc_stream_Seek( p_cb->p_source, 0 ) )
             return ARCHIVE_FATAL;
     }
     else if( p_cb->p_source )
