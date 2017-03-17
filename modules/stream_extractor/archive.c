@@ -484,6 +484,9 @@ static int Control( stream_extractor_t* p_extractor, int i_query, va_list args )
             break;
 
         case STREAM_GET_SIZE:
+            if( p_sys->p_entry == NULL )
+                return VLC_EGENERIC;
+
             *va_arg( args, uint64_t* ) = archive_entry_size( p_sys->p_entry );
             break;
 
@@ -543,7 +546,7 @@ static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_siz
     libarchive_t* p_arc = p_sys->p_archive;
     ssize_t       i_ret;
 
-    if( p_sys->b_dead )
+    if( p_sys->b_dead || p_sys->p_entry == NULL )
         return 0;
 
     i_ret = archive_read_data( p_arc,
