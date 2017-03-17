@@ -240,23 +240,11 @@ bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tem
         for( int i = 0; i < node->i_children; ++i )
         {
             auto child = node->pp_children[i]->p_item;
-            auto child_stream = make_stream_ptr( vlc_stream_NewURL( getIntf(), uri.get() ) );
+            auto child_stream = make_stream_ptr( vlc_stream_NewMRL( getIntf(), child->psz_uri ) );
             if( !child_stream )
             {
                 msg_Err( getIntf(), "unable to open %s for reading", child->psz_name );
             }
-
-            stream_t* stream = child_stream.get();
-            if( vlc_stream_extractor_Attach( &stream, child->psz_name, NULL ) )
-            {
-                msg_Err( getIntf(), "unable to locate %s within %s",
-                         child->psz_name, fileName.c_str() );
-
-                return false;
-            }
-
-            child_stream.release();
-            child_stream.reset( stream );
 
             auto out_path = tempPath + "/" + child->psz_name;
 
