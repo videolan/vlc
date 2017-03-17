@@ -322,8 +322,11 @@ static int archive_clean( private_sys_t* p_sys )
 {
     libarchive_t* p_arc = p_sys->p_archive;
 
-    archive_entry_free( p_sys->p_entry );
-    archive_read_free( p_arc );
+    if( p_sys->p_entry )
+        archive_entry_free( p_sys->p_entry );
+
+    if( p_arc )
+        archive_read_free( p_arc );
 
     p_sys->p_entry   = NULL;
     p_sys->p_archive = NULL;
