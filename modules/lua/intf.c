@@ -59,13 +59,6 @@ struct intf_sys_t
 /*****************************************************************************
  *
  *****************************************************************************/
-static inline void luaL_register_submodule( lua_State *L, const char *psz_name,
-                                            const luaL_Reg *l )
-{
-    lua_newtable( L );
-    luaL_register( L, NULL, l );
-    lua_setfield( L, -2, psz_name );
-}
 
 static char *MakeConfig( intf_thread_t *p_intf, const char *name )
 {
