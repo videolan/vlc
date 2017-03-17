@@ -37,9 +37,11 @@
 #include <vlc_access.h>
 #include <vlc_charset.h>
 #include <vlc_interrupt.h>
+#include <vlc_stream_extractor.h>
 
 #include <libvlc.h>
 #include "stream.h"
+#include "mrl_helpers.h"
 
 typedef struct stream_priv_t
 {
@@ -131,6 +133,32 @@ stream_t *(vlc_stream_NewURL)(vlc_object_t *p_parent, const char *psz_url)
     if( s == NULL )
         msg_Err( p_parent, "no suitable access module for `%s'", psz_url );
     return s;
+}
+
+stream_t *(vlc_stream_NewMRL)(vlc_object_t* parent, const char* mrl )
+{
+    stream_t* stream = vlc_stream_NewURL( parent, mrl );
+
+    if( stream == NULL )
+        return NULL;
+
+    char const* anchor = strchr( mrl, '#' );
+
+    if( anchor == NULL )
+        return stream;
+
+    char const* extra;
+    if( stream_extractor_AttachParsed( &stream, anchor + 1, &extra ) )
+    {
+        msg_Err( parent, "unable to open %s", mrl );
+        vlc_stream_Delete( stream );
+        return NULL;
+    }
+
+    if( extra && *extra )
+        msg_Warn( parent, "ignoring extra fragment data: %s", extra );
+
+    return stream;
 }
 
 /**

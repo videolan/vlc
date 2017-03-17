@@ -90,6 +90,29 @@ typedef struct stream_directory_t {
 } stream_directory_t;
 
 /**
+ * Create a stream for the data referred to by a \ref mrl
+ *
+ * This function will create a \ref stream that reads from the specified \ref
+ * mrl, potentially making use of \ref stream_extractor%s to access named
+ * entities within the data read from the original source.
+ *
+ *  - See the \ref mrl specification for further information.
+ *  - The returned resource shall be deleted through \ref vlc_stream_Delete.
+ *
+ * \warning This function is only be used when \ref mrl functionality is
+ *          explicitly needed, \ref vlc_stream_NewURL shall be used where
+ *          applicable (and functionality associated with \ref MRL is not
+ *          wanted nor needed).
+ *
+ * \param obj the owner of the requested stream
+ * \param mrl the mrl for which the stream_t should be created
+ * \return `NULL` on error, a pointer to \ref stream_t on success.
+ **/
+VLC_API stream_t * vlc_stream_NewMRL(vlc_object_t *obj, const char *mrl)
+VLC_USED;
+#define vlc_stream_NewMRL(a, b) vlc_stream_NewMRL(VLC_OBJECT(a), b)
+
+/**
  * Create a relative MRL for the associated entity
  *
  * This function shall be used by stream_directory_t's in order to
