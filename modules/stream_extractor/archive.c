@@ -118,7 +118,8 @@ static int libarchive_jump_cb( libarchive_t* p_arc, void* p_obj_current,
     libarchive_callback_t* p_current = (libarchive_callback_t*)p_obj_current;
     libarchive_callback_t* p_next    = (libarchive_callback_t*)p_obj_next;
 
-    libarchive_exit_cb( p_arc, p_current );
+    if( libarchive_exit_cb( p_arc, p_current ) )
+        return ARCHIVE_FATAL;
 
     if( p_next->p_source == NULL )
         p_next->p_source = vlc_stream_NewURL( p_next->p_sys->p_obj,
