@@ -694,6 +694,9 @@ static int ExtractorOpen( vlc_object_t* p_obj )
     stream_extractor_t* p_extractor = (void*)p_obj;
     private_sys_t* p_sys = CommonOpen( p_obj, p_extractor->source );
 
+    if( p_sys == NULL )
+        return VLC_EGENERIC;
+
     if( archive_seek_subentry( p_sys, p_extractor->identifier ) )
     {
         CommonClose( p_sys );
