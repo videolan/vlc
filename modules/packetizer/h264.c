@@ -159,8 +159,7 @@ static block_t *ParseNALBlock( decoder_t *, bool *pb_ts_used, block_t * );
 static block_t *OutputPicture( decoder_t *p_dec );
 static void PutSPS( decoder_t *p_dec, block_t *p_frag );
 static void PutPPS( decoder_t *p_dec, block_t *p_frag );
-static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_type,
-                              const block_t *p_frag, slice_t *p_slice );
+static bool ParseSliceHeader( decoder_t *p_dec, const block_t *p_frag, slice_t *p_slice );
 static bool ParseSeiCallback( const hxxx_sei_data_t *, void * );
 
 
@@ -566,7 +565,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     block_t *p_pic = NULL;
     bool b_new_picture = false;
 
-    const int i_nal_ref_idc = (p_frag->p_buffer[4] >> 5)&0x03;
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
     const mtime_t i_frag_dts = p_frag->i_dts;
     const mtime_t i_frag_pts = p_frag->i_pts;
@@ -594,7 +592,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     {
         slice_t newslice;
 
-        if( ParseSliceHeader( p_dec, i_nal_ref_idc, i_nal_type, p_frag, &newslice ) )
+        if( ParseSliceHeader( p_dec, p_frag, &newslice ) )
         {
             /* Only IDR carries the id, to be propagated */
             if( newslice.i_idr_pic_id == -1 )
@@ -951,8 +949,7 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
     StorePPS( p_sys, p_pps->i_id, p_frag, p_pps );
 }
 
-static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_type,
-                              const block_t *p_frag, slice_t *p_slice )
+static bool ParseSliceHeader( decoder_t *p_dec, const block_t *p_frag, slice_t *p_slice )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_slice_type;
@@ -969,7 +966,10 @@ static bool ParseSliceHeader( decoder_t *p_dec, int i_nal_ref_idc, int i_nal_typ
     bs_init( &s, p_stripped, i_stripped );
     s.p_fwpriv = &i_bitflow;
     s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
-    bs_skip( &s, 8 ); /* nal unit header */
+    /* nal unit header */
+    bs_skip( &s, 1 );
+    const uint8_t i_nal_ref_idc = bs_read( &s, 2 );
+    const uint8_t i_nal_type = bs_read( &s, 5 );
 
     /* first_mb_in_slice */
     /* int i_first_mb = */ bs_read_ue( &s );
