@@ -37,13 +37,13 @@
 #include <sys/stat.h>
 
 #include "input_internal.h"
-#include "mrl_helpers.h"
 #include "event.h"
 #include "es_out.h"
 #include "es_out_timeshift.h"
 #include "demux.h"
 #include "item.h"
 #include "resource.h"
+#include "stream.h"
 
 #include <vlc_sout.h>
 #include <vlc_dialog.h>
@@ -2262,53 +2262,21 @@ static int
 InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
                          char const *anchor )
 {
-    vlc_array_t identifiers;
     char const* extra;
-
-    if( mrl_FragmentSplit( &identifiers, &extra, anchor ) )
+    if( stream_extractor_AttachParsed( stream, anchor, &extra ) )
     {
-        msg_Err( source, "unable to parse MRL-fragment: %s", anchor );
-        goto error;
+        msg_Err( source, "unable to attach stream-extractors for" );
+        return VLC_EGENERIC;
     }
+
+    if( vlc_stream_directory_Attach( stream, NULL ) )
+        msg_Dbg( source, "attach of directory extractor failed" );
 
     MRLSections( extra ? extra : "",
         &source->i_title_start, &source->i_title_end,
         &source->i_seekpoint_start, &source->i_seekpoint_end );
 
-    while( vlc_array_count( &identifiers ) )
-    {
-        char* id = vlc_array_item_at_index( &identifiers, 0 );
-
-        if( vlc_stream_extractor_Attach( stream, id, NULL ) )
-        {
-            msg_Err( source, "unable to locate entity '%s' within stream", id );
-            break;
-        }
-        else
-            msg_Dbg( source, "successfully located entity '%s' within stream", id );
-
-        vlc_array_remove( &identifiers, 0 );
-        free( id );
-    }
-
-    size_t remaining = vlc_array_count( &identifiers );
-
-    for( size_t i = 0; i < remaining; ++i )
-        free( vlc_array_item_at_index( &identifiers, i ) );
-
-    vlc_array_clear( &identifiers );
-
-    if( remaining == 0 )
-    {
-        if( vlc_stream_directory_Attach( stream, NULL ) )
-            msg_Dbg( source, "attach of directory extractor failed" );
-
-        return VLC_SUCCESS;
-    }
-
-error:
-    return VLC_EGENERIC;
-
+    return VLC_SUCCESS;
 }
 
 static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source,
