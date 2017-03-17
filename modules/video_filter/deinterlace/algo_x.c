@@ -207,14 +207,6 @@ static inline void XDeint8x8MergeMMXEXT( uint8_t *dst,  int i_dst,
 
 #endif
 
-/* For debug */
-static inline void XDeint8x8Set( uint8_t *dst, int i_dst, uint8_t v )
-{
-    int y;
-    for( y = 0; y < 8; y++ )
-        memset( &dst[y*i_dst], v, 8 );
-}
-
 /* XDeint8x8FieldE: Stupid deinterlacing (1,0,1) for block that miss a
  * neighbour
  * (Use 8x9 pixels)
