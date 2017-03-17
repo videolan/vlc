@@ -95,7 +95,10 @@ static void PreparserCloseInput( void* preparser_, void* input_ )
     input_Close( input );
 
     if( preparser->fetcher )
-        playlist_fetcher_Push( preparser->fetcher, item, 0 );
+    {
+        if( !playlist_fetcher_Push( preparser->fetcher, item, 0, status ) )
+            return;
+    }
 
     input_item_SetPreparsed( item, true );
     input_item_SignalPreparseEnded( item, status );
@@ -169,7 +172,7 @@ void playlist_preparser_fetcher_Push( playlist_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t options )
 {
     if( preparser->fetcher )
-        playlist_fetcher_Push( preparser->fetcher, item, options );
+        playlist_fetcher_Push( preparser->fetcher, item, options, -1 );
 }
 
 void playlist_preparser_Cancel( playlist_preparser_t *preparser, void *id )

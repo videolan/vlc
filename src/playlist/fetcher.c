@@ -53,6 +53,7 @@ struct playlist_fetcher_t {
 struct fetcher_request {
     input_item_t* item;
     atomic_uint refs;
+    int preparse_status;
     int options;
 };
 
@@ -206,11 +207,20 @@ static int SearchByScope( playlist_fetcher_t* fetcher,
         ! SearchArt( fetcher, item, scope ) )
     {
         AddAlbumCache( fetcher, req->item, false );
-        background_worker_Push( fetcher->downloader, req, NULL, 0 );
-        return VLC_SUCCESS;
+        if( !background_worker_Push( fetcher->downloader, req, NULL, 0 ) )
+            return VLC_SUCCESS;
     }
 
     return VLC_EGENERIC;
+}
+
+static void SetPreparsed( struct fetcher_request* req )
+{
+    if( req->preparse_status != -1 )
+    {
+        input_item_SetPreparsed( req->item, true );
+        input_item_SignalPreparseEnded( req->item, req->preparse_status );
+    }
 }
 
 static void Downloader( playlist_fetcher_t* fetcher,
@@ -271,6 +281,7 @@ out:
     }
 
     free( psz_arturl );
+    SetPreparsed( req );
     return;
 
 error:
@@ -286,15 +297,23 @@ static void SearchLocal( playlist_fetcher_t* fetcher, struct fetcher_request* re
     if( var_InheritBool( fetcher->owner, "metadata-network-access" ) ||
         req->options & META_REQUEST_OPTION_SCOPE_NETWORK )
     {
-        background_worker_Push( fetcher->network, req, NULL, 0 );
+        if( background_worker_Push( fetcher->network, req, NULL, 0 ) )
+            SetPreparsed( req );
     }
-    else input_item_SetArtNotFound( req->item, true );
+    else
+    {
+        input_item_SetArtNotFound( req->item, true );
+        SetPreparsed( req );
+    }
 }
 
 static void SearchNetwork( playlist_fetcher_t* fetcher, struct fetcher_request* req )
 {
     if( SearchByScope( fetcher, req, FETCHER_SCOPE_NETWORK ) )
+    {
         input_item_SetArtNotFound( req->item, true );
+        SetPreparsed( req );
+    }
 }
 
 static void RequestRelease( void* req_ )
@@ -428,22 +447,26 @@ playlist_fetcher_t* playlist_fetcher_New( vlc_object_t* owner )
     return fetcher;
 }
 
-void playlist_fetcher_Push( playlist_fetcher_t* fetcher, input_item_t* item,
-    input_item_meta_request_option_t options )
+int playlist_fetcher_Push( playlist_fetcher_t* fetcher, input_item_t* item,
+    input_item_meta_request_option_t options, int preparse_status )
 {
     struct fetcher_request* req = malloc( sizeof *req );
 
     if( unlikely( !req ) )
-        return;
+        return VLC_ENOMEM;
 
     req->item = item;
     req->options = options;
+    req->preparse_status = preparse_status;
 
     atomic_init( &req->refs, 1 );
     input_item_Hold( item );
 
-    background_worker_Push( fetcher->local, req, NULL, 0 );
+    if( background_worker_Push( fetcher->local, req, NULL, 0 ) )
+        SetPreparsed( req );
+
     RequestRelease( req );
+    return VLC_SUCCESS;
 }
 
 void playlist_fetcher_Delete( playlist_fetcher_t* fetcher )
