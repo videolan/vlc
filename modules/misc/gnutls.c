@@ -471,13 +471,13 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
             return 0;
         case GNUTLS_E_NO_CERTIFICATE_FOUND:
             msg_Dbg(creds, "no known certificates for %s", host);
-            msg = N_("However the security certificate presented by the "
+            msg = N_("However, the security certificate presented by the "
                 "server is unknown and could not be authenticated by any "
                 "trusted Certificate Authority.");
             break;
         case GNUTLS_E_CERTIFICATE_KEY_MISMATCH:
             msg_Dbg(creds, "certificate keys mismatch for %s", host);
-            msg = N_("However the security certificate presented by the "
+            msg = N_("However, the security certificate presented by the "
                 "server changed since the previous visit and was not "
                 "authenticated by any trusted Certificate Authority. ");
             break;
