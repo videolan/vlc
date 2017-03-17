@@ -670,7 +670,7 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
     const int i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_probe );
     if( i_peek < i_skip + i_check_size )
     {
-        msg_Err( p_demux, "cannot peek" );
+        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
     for( ;; )
