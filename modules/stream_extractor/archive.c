@@ -604,11 +604,12 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
             if( archive_clean( p_sys ) )
                 return VLC_EGENERIC;
 
-            if( archive_init( p_sys, p_extractor->source ) )
+            if( archive_init( p_sys, p_extractor->source ) ||
+                archive_seek_subentry( p_sys, p_extractor->identifier ) )
+            {
+                msg_Err( p_extractor, "unable to recreate libarchive handle" );
                 return VLC_EGENERIC;
-
-            if( archive_seek_subentry( p_sys, p_extractor->identifier ) )
-                return VLC_EGENERIC;
+            }
 
             i_skip = i_req;
             i_offset = 0;
