@@ -53,6 +53,35 @@ stream_t *stream_FilterAutoNew( stream_t *source ) VLC_USED;
  */
 stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain );
 
+/**
+ * Attach \ref stream_extractor%s according to specified data
+ *
+ * This function will parse the passed data, and try to attach a \ref
+ * stream_extractor for each specified entity as per the fragment specification
+ * associated with a \ref mrl,
+ *
+ * \warning The data in `*stream` can be modified even if this function only
+ *          locates some of the entities specified in `psz_data`. It is up to
+ *          the caller to free the resource referred to by `*stream`, no matter
+ *          what this function returns.
+ *
+ * \warning Please see \ref vlc_stream_extractor_Attach for a function that
+ *          will not modify the passed stream upon failure. \ref
+ *          stream_extractor_AttachParsed shall only be used when the caller
+ *          only cares about the stream on successful attachment of **all**
+ *          stream-extractors referred to by `psz_data`, something which is not
+ *          guaranteed.
+ *
+ * \param[out] source a pointer-to-pointer to stream where the attached
+ *             stream-extractor will be applied. `*stream` will refer
+ *             to the last successful attachment.
+ * \param[out] out_extra `*out_extra` will point to any additional data
+ *             in `psz_data` that does not specify an entity (if any).
+ * \return VLC_SUCCESS on success, an error-code on failure
+ **/
+int stream_extractor_AttachParsed( stream_t** stream, const char* psz_data,
+                                   char const** out_extra );
+
 char *get_path(const char *location);
 
 #endif
