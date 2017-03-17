@@ -406,7 +406,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
         /* For others, we don't have the delorean, so always lie */
         case ES_OUT_GET_ES_STATE:
         {
-            static_cast<void*>(va_arg( args, es_out_id_t * ));
+            static_cast<void>(va_arg( args, es_out_id_t * ));
             bool *pb = static_cast<bool *>(va_arg( args, bool * ));
             *pb = true;
             // ft
