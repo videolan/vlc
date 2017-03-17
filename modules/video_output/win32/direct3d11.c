@@ -351,6 +351,10 @@ static const char* globPixelShaderDefault = "\
       %s;\
   }\
   \
+  inline float3 adjustRange(float3 rgb) {\
+      %s;\
+  }\
+  \
   float4 main( PS_INPUT In ) : SV_TARGET\
   {\
     float4 sample;\
@@ -362,7 +366,8 @@ static const char* globPixelShaderDefault = "\
     rgb = sourceToLinear(rgb);\
     rgb = toneMapping(rgb);\
     rgb = linearToDisplay(rgb);\
-    return saturate(float4(rgb, opacity));\
+    rgb = adjustRange(rgb);\
+    return float4(rgb, saturate(opacity));\
   }\
 ";
 
@@ -1707,7 +1712,8 @@ static bool IsRGBShader(const d3d_format_t *cfg)
 }
 
 static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format,
-                                  video_transfer_func_t transfer, ID3D11PixelShader **output)
+                                  video_transfer_func_t transfer, bool src_full_range,
+                                  ID3D11PixelShader **output)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -1716,6 +1722,8 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     const char *psz_src_transform     = DEFAULT_NOOP;
     const char *psz_display_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
+    const char *psz_adjust_range      = DEFAULT_NOOP;
+    char *psz_range = NULL;
 
     switch (format->formatTexture)
     {
@@ -1823,23 +1831,102 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
         }
     }
 
+    int range_adjust = sys->display.colorspace->b_full_range;
+#if VLC_WINSTORE_APP
+    if (isXboxHardware(sys->d3ddevice)) {
+        /* the Xbox lies, when it says it outputs full range it's less than full range */
+        range_adjust--;
+    }
+#endif
+    if (!IsRGBShader(format))
+        range_adjust--; /* the YUV->RGB conversion already output full range */
+    if (src_full_range)
+        range_adjust--;
+
+    if (range_adjust != 0)
+    {
+        psz_range = malloc(256);
+        if (likely(psz_range))
+        {
+            FLOAT itu_black_level;
+            FLOAT itu_range_factor;
+            FLOAT itu_white_level;
+            switch (format->bitsPerChannel)
+            {
+            case 8:
+                /* Rec. ITU-R BT.709-6 §4.6 */
+                itu_black_level  =              16.f / 255.f;
+                itu_white_level  =             235.f / 255.f;
+                itu_range_factor = (float)(235 - 16) / 255.f;
+                break;
+            case 10:
+                /* Rec. ITU-R BT.709-6 §4.6 */
+                itu_black_level  =              64.f / 1023.f;
+                itu_white_level  =             940.f / 1023.f;
+                itu_range_factor = (float)(940 - 64) / 1023.f;
+                break;
+            case 12:
+                /* Rec. ITU-R BT.2020-2 Table 5 */
+                itu_black_level  =               256.f / 4095.f;
+                itu_white_level  =              3760.f / 4095.f;
+                itu_range_factor = (float)(3760 - 256) / 4095.f;
+                break;
+            default:
+                /* unknown bitdepth, use approximation for infinite bit depth */
+                itu_black_level  =              16.f / 256.f;
+                itu_white_level  =             235.f / 256.f;
+                itu_range_factor = (float)(235 - 16) / 256.f;
+                break;
+            }
+
+            FLOAT black_level = 0;
+            FLOAT range_factor = 1.0f;
+            if (range_adjust > 0)
+            {
+                /* expand the range from studio to full range */
+                while (range_adjust--)
+                {
+                    black_level -= itu_black_level;
+                    range_factor /= itu_range_factor;
+                }
+                sprintf(psz_range, "return max(0,min(1,(rgb + %f) * %f))",
+                        black_level, range_factor);
+            }
+            else
+            {
+                /* shrink the range to studio range */
+                while (range_adjust++)
+                {
+                    black_level += itu_black_level;
+                    range_factor *= itu_range_factor;
+                }
+                sprintf(psz_range, "return clamp(rgb + %f * %f,%f,%f)",
+                        black_level, range_factor, itu_black_level, itu_white_level);
+            }
+            psz_adjust_range = psz_range;
+        }
+    }
+
     char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
                           strlen(psz_src_transform) + strlen(psz_display_transform) +
-                          strlen(psz_tone_mapping));
+                          strlen(psz_tone_mapping) + strlen(psz_adjust_range));
     if (!shader)
     {
         msg_Err(vd, "no room for the Pixel Shader");
+        free(psz_range);
         return E_OUTOFMEMORY;
     }
     sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_tone_mapping, psz_sampler);
+            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_sampler);
 #ifndef NDEBUG
     if (!IsRGBShader(format)) {
         msg_Dbg(vd,"psz_src_transform %s", psz_src_transform);
         msg_Dbg(vd,"psz_tone_mapping %s", psz_tone_mapping);
         msg_Dbg(vd,"psz_display_transform %s", psz_display_transform);
+        msg_Dbg(vd,"psz_adjust_range %s", psz_adjust_range);
     }
 #endif
+    free(psz_range);
 
     ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
     free(shader);
@@ -1992,7 +2079,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     sys->legacy_shader = !CanUseTextureArray(vd);
     vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma);
 
-    hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, &sys->picQuadPixelShader);
+    hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
     if (FAILED(hr))
     {
 #ifdef HAVE_ID3D11VIDEODECODER
@@ -2000,7 +2087,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         {
             sys->legacy_shader = true;
             msg_Dbg(vd, "fallback to legacy shader mode");
-            hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, &sys->picQuadPixelShader);
+            hr = CompilePixelShader(vd, sys->picQuadConfig, fmt->transfer, fmt->b_color_range_full, &sys->picQuadPixelShader);
         }
 #endif
         if (FAILED(hr))
@@ -2012,7 +2099,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     if (sys->d3dregion_format != NULL)
     {
-        hr = CompilePixelShader(vd, sys->d3dregion_format, TRANSFER_FUNC_SRGB, &sys->pSPUPixelShader);
+        hr = CompilePixelShader(vd, sys->d3dregion_format, TRANSFER_FUNC_SRGB, true, &sys->pSPUPixelShader);
         if (FAILED(hr))
         {
             ID3D11PixelShader_Release(sys->picQuadPixelShader);
@@ -2317,8 +2404,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     }
 
     FLOAT itu_black_level = 0.f;
-    FLOAT itu_achromacy = 0.f;
-    FLOAT itu_range_factor = 1.0f;
+    FLOAT itu_achromacy   = 0.f;
     if (!RGB_shader)
     {
         switch (cfg->bitsPerChannel)
@@ -2327,25 +2413,21 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
             /* Rec. ITU-R BT.709-6 §4.6 */
             itu_black_level  =              16.f / 255.f;
             itu_achromacy    =             128.f / 255.f;
-            itu_range_factor = (float)(235 - 16) / 255.f;
             break;
         case 10:
             /* Rec. ITU-R BT.709-6 §4.6 */
             itu_black_level  =              64.f / 1023.f;
             itu_achromacy    =             512.f / 1023.f;
-            itu_range_factor = (float)(940 - 64) / 1023.f;
             break;
         case 12:
             /* Rec. ITU-R BT.2020-2 Table 5 */
             itu_black_level  =               256.f / 4095.f;
             itu_achromacy    =              2048.f / 4095.f;
-            itu_range_factor = (float)(3760 - 256) / 4095.f;
             break;
         default:
             /* unknown bitdepth, use approximation for infinite bit depth */
             itu_black_level  =              16.f / 256.f;
             itu_achromacy    =             128.f / 256.f;
-            itu_range_factor = (float)(235 - 16) / 256.f;
             break;
         }
     }
@@ -2381,60 +2463,38 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     };
 
     PS_COLOR_TRANSFORM colorspace;
+
+    memcpy(colorspace.WhitePoint, IDENTITY_4X4, sizeof(colorspace.WhitePoint));
+
     const FLOAT *ppColorspace;
     if (RGB_shader)
         ppColorspace = IDENTITY_4X4;
-    else
-    switch (fmt->space){
-        case COLOR_SPACE_BT709:
-            ppColorspace = COLORSPACE_BT709_TO_FULL;
-            break;
-        case COLOR_SPACE_BT2020:
-            ppColorspace = COLORSPACE_BT2020_TO_FULL;
-            break;
-        case COLOR_SPACE_BT601:
-            ppColorspace = COLORSPACE_BT601_TO_FULL;
-            break;
-        default:
-        case COLOR_SPACE_UNDEF:
-            if( fmt->i_height > 576 )
+    else {
+        switch (fmt->space){
+            case COLOR_SPACE_BT709:
                 ppColorspace = COLORSPACE_BT709_TO_FULL;
-            else
+                break;
+            case COLOR_SPACE_BT2020:
+                ppColorspace = COLORSPACE_BT2020_TO_FULL;
+                break;
+            case COLOR_SPACE_BT601:
                 ppColorspace = COLORSPACE_BT601_TO_FULL;
-            break;
-    }
-
-    memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
-    memcpy(colorspace.WhitePoint, IDENTITY_4X4, sizeof(colorspace.WhitePoint));
-
-    if (!RGB_shader)
-    {
+                break;
+            default:
+            case COLOR_SPACE_UNDEF:
+                if( fmt->i_height > 576 )
+                    ppColorspace = COLORSPACE_BT709_TO_FULL;
+                else
+                    ppColorspace = COLORSPACE_BT601_TO_FULL;
+                break;
+        }
+        /* all matrices work in studio range and output in full range */
         colorspace.WhitePoint[0*4 + 3] = -itu_black_level;
         colorspace.WhitePoint[1*4 + 3] = -itu_achromacy;
         colorspace.WhitePoint[2*4 + 3] = -itu_achromacy;
     }
 
-    if (!sys->display.colorspace->b_full_range) {
-        /* get to the limited/studio range */
-        colorspace.WhitePoint[0*4 + 3] += itu_black_level;
-        if (RGB_shader)
-        {
-            colorspace.WhitePoint[1*4 + 3] += itu_black_level;
-            colorspace.WhitePoint[2*4 + 3] += itu_black_level;
-        }
-
-        if (RGB_shader) {
-            /* expand each color's range */
-            colorspace.Colorspace[0 * 5] *= itu_range_factor;
-            colorspace.Colorspace[1 * 5] *= itu_range_factor;
-            colorspace.Colorspace[2 * 5] *= itu_range_factor;
-        } else {
-            /* expand the luminance range */
-            colorspace.Colorspace[0 * 4] *= itu_range_factor;
-            colorspace.Colorspace[1 * 4] *= itu_range_factor;
-            colorspace.Colorspace[2 * 4] *= itu_range_factor;
-        }
-    }
+    memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
 
     constantInit.pSysMem = &colorspace;
 
