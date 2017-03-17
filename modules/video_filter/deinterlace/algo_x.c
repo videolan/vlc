@@ -448,23 +448,6 @@ static inline void XDeintNxN( uint8_t *dst, int i_dst, uint8_t *src, int i_src,
         XDeintNxNFrame( dst, i_dst, src, i_src, i_width, i_height );
 }
 
-static inline int median( int a, int b, int c )
-{
-    int min = a, max =a;
-    if( b < min )
-        min = b;
-    else
-        max = b;
-
-    if( c < min )
-        min = c;
-    else if( c > max )
-        max = c;
-
-    return a + b + c - min - max;
-}
-
-
 /* XDeintBand8x8:
  */
 static inline void XDeintBand8x8C( uint8_t *dst, int i_dst,
