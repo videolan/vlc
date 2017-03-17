@@ -44,6 +44,7 @@ endif
 	$(APPLY) $(SRC)/upnp/fix_infinite_loop.patch
 	$(APPLY) $(SRC)/upnp/dont_use_down_intf.patch
 	$(APPLY) $(SRC)/upnp/upnp-no-debugfile.patch
+	$(APPLY) $(SRC)/upnp/use-unicode.patch
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux/
 	$(MOVE)
 
