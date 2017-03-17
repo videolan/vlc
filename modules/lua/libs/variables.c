@@ -307,12 +307,6 @@ end:
     return 1;
 }
 
-static inline const void *luaL_checklightuserdata( lua_State *L, int narg )
-{
-    luaL_checktype( L, narg, LUA_TLIGHTUSERDATA ); /* can raise an error */
-    return lua_topointer( L, narg );
-}
-
 static int vlclua_trigger_callback( lua_State *L )
 {
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
