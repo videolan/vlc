@@ -308,11 +308,6 @@ static bool Mapping( intf_thread_t *p_intf )
         if( i_vlc_key == KEY_UNSET )
             continue;
 
-        xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode(
-                p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
-        if( !p_keys )
-            continue;
-
         const unsigned i_modifier = GetX11Modifier( p_sys->p_connection,
                 p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
 
@@ -324,6 +319,12 @@ static bool Mapping( intf_thread_t *p_intf )
                     p_sys->p_symbols, p_x11_modifier_ignored[i] );
             if( i != 0 && i_ignored == 0)
                 continue;
+
+            xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode(
+                p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
+
+            if( !p_keys )
+                break;
 
             hotkey_mapping_t *p_map = realloc( p_sys->p_map,
                               sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
