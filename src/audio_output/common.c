@@ -381,7 +381,7 @@ do { \
     switch( fourcc )
     {
         case VLC_CODEC_U8:   INTERLEAVE_TYPE(uint8_t);  break;
-        case VLC_CODEC_S16N: INTERLEAVE_TYPE(uint16_t); break;
+        case VLC_CODEC_S16N: INTERLEAVE_TYPE(int16_t);  break;
         case VLC_CODEC_FL32: INTERLEAVE_TYPE(float);    break;
         case VLC_CODEC_S32N: INTERLEAVE_TYPE(int32_t);  break;
         case VLC_CODEC_FL64: INTERLEAVE_TYPE(double);   break;
@@ -417,7 +417,7 @@ do { \
     switch( fourcc )
     {
         case VLC_CODEC_U8:   DEINTERLEAVE_TYPE(uint8_t);  break;
-        case VLC_CODEC_S16N: DEINTERLEAVE_TYPE(uint16_t); break;
+        case VLC_CODEC_S16N: DEINTERLEAVE_TYPE(int16_t);  break;
         case VLC_CODEC_FL32: DEINTERLEAVE_TYPE(float);    break;
         case VLC_CODEC_S32N: DEINTERLEAVE_TYPE(int32_t);  break;
         case VLC_CODEC_FL64: DEINTERLEAVE_TYPE(double);   break;
