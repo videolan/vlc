@@ -9,10 +9,6 @@
 		<dict>
 			<key>CFBundleTypeName</key>
 			<string>Folder</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>fold</string>
-			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
@@ -23,10 +19,6 @@
 		<dict>
 			<key>CFBundleTypeName</key>
 			<string>Volume</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>disk</string>
-			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
@@ -35,11 +27,6 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>f4v</string>
-				<string>flv</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>flv.icns</string>
 			<key>CFBundleTypeName</key>
@@ -118,29 +105,28 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>pls</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>playlist.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Shoutcast playlist</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.pls-playlist</string>
+			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>m3u</string>
-				<string>m3u8</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>playlist.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Playlist file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.m3u-playlist</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -160,16 +146,16 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>asx</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>playlist.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>ASX file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.microsoft.advanced-stream-redirector</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -200,16 +186,8 @@
 			<string>Binary</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>flac</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>audio/flac</string>
-			</array>
 			<key>CFBundleTypeName</key>
 			<string>FLAC Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -264,12 +242,6 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>ram</string>
-				<string>rm</string>
-				<string>rmvb</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>rm.icns</string>
 			<key>CFBundleTypeName</key>
@@ -278,9 +250,9 @@
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
+				<string>com.real.realmedia-vbr</string>
 				<string>com.real.realaudio</string>
 				<string>com.real.realmedia</string>
-				<string>com.real.ram</string>
 			</array>
 		</dict>
 		<dict>
@@ -299,6 +271,7 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>mod</string>
+				<string>xm</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
@@ -336,11 +309,6 @@
 			<string>Binary</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>aiff</string>
-				<string>aif</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>aiff.icns</string>
 			<key>CFBundleTypeName</key>
@@ -350,19 +318,20 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>public.aiff-audio</string>
+				<string>public.aifc-audio</string>
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>amr</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Adaptive Multi-Rate Codec File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.3gpp.adaptive-multi-rate-audio</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -417,10 +386,6 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>wav</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>wav.icns</string>
 			<key>CFBundleTypeName</key>
@@ -481,17 +446,16 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>iso</string>
-				<string>bin</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>ISO file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.iso-image</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -506,29 +470,28 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>a52</string>
-				<string>ac3</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Digital Audio</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.ac3-audio</string>
+			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>aac</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>AAC file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.aac-audio</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -748,10 +711,6 @@
 			<string>Binary</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>avi</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>avi.icns</string>
 			<key>CFBundleTypeName</key>
@@ -800,18 +759,8 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mov</string>
-				<string>moov</string>
-				<string>qt</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mov.icns</string>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>video/quicktime</string>
-			</array>
 			<key>CFBundleTypeName</key>
 			<string>Apple QuickTime container</string>
 			<key>CFBundleTypeRole</key>
@@ -834,10 +783,6 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>dv</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>movie.icns</string>
 			<key>CFBundleTypeName</key>
@@ -850,10 +795,6 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>asf</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>movie.icns</string>
 			<key>CFBundleTypeName</key>
@@ -866,10 +807,6 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>wma</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>wma.icns</string>
 			<key>CFBundleTypeName</key>
@@ -882,11 +819,6 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>wmv</string>
-				<string>wm</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>wmv.icns</string>
 			<key>CFBundleTypeName</key>
@@ -895,6 +827,7 @@
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
+				<string>com.microsoft.windows-media-wm</string>
 				<string>com.microsoft.windows-media-wmv</string>
 			</array>
 		</dict>
@@ -911,19 +844,16 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mpg</string>
-				<string>mpeg</string>
-				<string>mpeg1</string>
-				<string>mpeg2</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>multiplexed MPEG-1/2</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.mpeg</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -962,22 +892,18 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mp2</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG Audio Layer 2</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.mp2</string>
+			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mp3</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mp3.icns</string>
 			<key>CFBundleTypeName</key>
@@ -1023,17 +949,16 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>m2v</string>
-				<string>mpv</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-2 Video File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.mpeg-2-video</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -1048,12 +973,6 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mp4</string>
-				<string>mpeg4</string>
-				<string>m4v</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>m4v.icns</string>
 			<key>CFBundleTypeName</key>
@@ -1062,14 +981,12 @@
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
+				<string>public.mpeg-4-audio</string>
+				<string>com.apple.m4v-video</string>
 				<string>public.mpeg-4</string>
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>m4a</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>m4a.icns</string>
 			<key>CFBundleTypeName</key>
@@ -1078,17 +995,22 @@
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>public.mpeg-4-audio</string>
+				<string>com.apple.m4a-audio</string>
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
+			<key>CFBundleTypeIconFile</key>
+			<string>movie.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>3GPP File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
 			<array>
-				<string>smf</string>
-				<string>mid</string>
-				<string>midi</string>
-				<string>kar</string>
+				<string>public.3gpp</string>
 			</array>
+		</dict>
+		<dict>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
