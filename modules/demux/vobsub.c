@@ -246,12 +246,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = (int64_t) p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
                 bool b_selected;
@@ -268,7 +268,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
-            i64 = (int64_t)va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
                 p_sys->track[i].i_current_subtitle = 0;
@@ -284,7 +284,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
                 bool b_selected;
@@ -309,7 +309,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
             i64 = (int64_t) f * p_sys->i_length;
 
             for( i = 0; i < p_sys->i_tracks; i++ )
@@ -326,7 +326,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
-            p_sys->i_next_demux_date = (int64_t)va_arg( args, int64_t );
+            p_sys->i_next_demux_date = va_arg( args, int64_t );
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
