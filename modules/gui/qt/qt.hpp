@@ -68,22 +68,14 @@ enum{
     NOTIFICATION_ALWAYS = 2,
 };
 
-class QVLCApp;
-class MainInterface;
-class QSettings;
-class PLModel;
-
 struct intf_sys_t
 {
     vlc_thread_t thread;
 
-    QVLCApp *p_app;          /* Main Qt Application */
-
-    MainInterface *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
-
-    QSettings *mainSettings; /* Qt State settings not messing main VLC ones */
-
-    PLModel *pl_model;
+    class QVLCApp *p_app;          /* Main Qt Application */
+    class MainInterface *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
+    class QSettings *mainSettings; /* Qt State settings not messing main VLC ones */
+    class PLModel *pl_model;
 
     QString filepath;        /* Last path used in dialogs */
 
