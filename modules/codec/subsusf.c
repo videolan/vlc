@@ -411,13 +411,11 @@ static void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
 
 static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
                                               char *psz_subtitle,
-                                              int i_len,
                                               int i_sys_align )
 {
     decoder_sys_t        *p_sys = p_dec->p_sys;
     subpicture_region_t  *p_text_region;
     video_format_t        fmt;
-    VLC_UNUSED( i_len );
 
     /* Create a new subpicture region */
     video_format_Init( &fmt, VLC_CODEC_TEXT );
@@ -852,7 +850,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
 
                     p_text_region = CreateTextRegion( p_dec,
                                                       psz_subtitle,
-                                                      psz_end - psz_subtitle,
                                                       p_sys->i_align );
 
                     if( !p_region_first )
@@ -931,7 +928,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
 
                 p_text_region = CreateTextRegion( p_dec,
                                                   psz_subtitle,
-                                                  psz_end - psz_subtitle,
                                                   p_sys->i_align );
 
                 if( p_text_region )
