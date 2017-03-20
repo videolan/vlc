@@ -321,12 +321,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_HAS_UNSUPPORTED_META:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool* );
             *pb_bool = true;
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
 #ifndef HAVE_MPC_MPCDEC_H
             *pi64 = CLOCK_FREQ * p_sys->info.pcm_samples /
                         p_sys->info.sample_freq;
@@ -338,7 +338,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
 #ifndef HAVE_MPC_MPCDEC_H
             if( p_sys->info.pcm_samples > 0 )
                 *pf = (double) p_sys->i_position /
@@ -353,13 +353,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = CLOCK_FREQ * p_sys->i_position /
                         p_sys->info.sample_freq;
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
 #ifndef HAVE_MPC_MPCDEC_H
             i64 = (int64_t)(f * p_sys->info.pcm_samples);
             if( mpc_decoder_seek_sample( &p_sys->decoder, i64 ) )
@@ -375,7 +375,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
-            i64 = (int64_t)va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
 #ifndef HAVE_MPC_MPCDEC_H
             if( mpc_decoder_seek_sample( &p_sys->decoder, i64 ) )
 #else
