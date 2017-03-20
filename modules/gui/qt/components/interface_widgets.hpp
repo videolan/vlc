@@ -114,7 +114,7 @@ protected:
     static const int MARGIN = 5;
     QString defaultArt;
 public slots:
-    void toggle(){ TOGGLEV( this ); }
+    void toggle(){ isVisible() ? hide() : show(); }
     void updateArt( const QString& );
 };
 

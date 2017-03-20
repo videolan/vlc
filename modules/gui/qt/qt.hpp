@@ -153,9 +153,6 @@ struct vlc_playlist_locker {
 
 #define VISIBLE(i) (i && i->isVisible())
 
-#define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
-            else  x->show(); }
-
 /* for widgets which must not follow the RTL auto layout changes */
 #define RTL_UNAFFECTED_WIDGET setLayoutDirection( Qt::LeftToRight );
 
