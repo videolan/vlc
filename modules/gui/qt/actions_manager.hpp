@@ -73,7 +73,7 @@ private:
     ActionsManager( intf_thread_t  *_p_i );
     virtual ~ActionsManager();
 
-    intf_thread_t       *p_intf;
+    intf_thread_t* const p_intf;
     vlc_renderer_discovery_t *p_rd;
 
     bool  b_rd_started;

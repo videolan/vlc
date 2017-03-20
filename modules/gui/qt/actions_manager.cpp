@@ -39,11 +39,10 @@
 #include "menus.hpp"
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
-{
-    p_intf = _p_i;
-    p_rd   = NULL;
-    b_rd_started = false;
-}
+    : p_intf( _p_i )
+    , p_rd( NULL )
+    , b_rd_started( false )
+{ }
 
 ActionsManager::~ActionsManager()
 {
