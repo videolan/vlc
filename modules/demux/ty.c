@@ -466,8 +466,9 @@ static int Demux( demux_t *p_demux )
             DemuxRecAudio( p_demux, p_rec, p_block_in );
             break;
 
-        case 0x01: /* closed caption */
-        case 0x02: /* XDS */
+        case 0x01:
+        case 0x02:
+            /* closed captions/XDS */
             DemuxRecCc( p_demux, p_rec, p_block_in );
             break;
 
