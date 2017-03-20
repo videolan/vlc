@@ -23,7 +23,6 @@
 
 #include <vlc_common.h>
 #include <vlc_bits.h>
-#include <vlc_block.h>
 
 #include "h264_nal.h"
 #include "h264_slice.h"
@@ -52,27 +51,8 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
     /* int i_first_mb = */ bs_read_ue( &s );
 
     /* slice_type */
-    switch( (i_slice_type = bs_read_ue( &s )) )
-    {
-    case 0: case 5:
-        p_slice->i_frame_type = BLOCK_FLAG_TYPE_P;
-        break;
-    case 1: case 6:
-        p_slice->i_frame_type = BLOCK_FLAG_TYPE_B;
-        break;
-    case 2: case 7:
-        p_slice->i_frame_type = BLOCK_FLAG_TYPE_I;
-        break;
-    case 3: case 8: /* SP */
-        p_slice->i_frame_type = BLOCK_FLAG_TYPE_P;
-        break;
-    case 4: case 9:
-        p_slice->i_frame_type = BLOCK_FLAG_TYPE_I;
-        break;
-    default:
-        p_slice->i_frame_type = 0;
-        break;
-    }
+    i_slice_type = bs_read_ue( &s );
+    p_slice->type = i_slice_type % 5;
 
     /* */
     p_slice->i_nal_type = i_nal_type;

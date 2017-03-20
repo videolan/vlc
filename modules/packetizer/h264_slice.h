@@ -20,12 +20,22 @@
 #ifndef VLC_H264_SLICE_H
 #define VLC_H264_SLICE_H
 
+enum h264_slice_type_e
+{
+    H264_SLICE_TYPE_P = 0,
+    H264_SLICE_TYPE_B,
+    H264_SLICE_TYPE_I,
+    H264_SLICE_TYPE_SP,
+    H264_SLICE_TYPE_SI,
+    H264_SLICE_TYPE_UNKNOWN,
+};
+
 typedef struct
 {
     int i_nal_type;
     int i_nal_ref_idc;
 
-    int i_frame_type;
+    enum h264_slice_type_e type;
     int i_pic_parameter_set_id;
     int i_frame_num;
 
@@ -50,7 +60,7 @@ static inline void h264_slice_init( h264_slice_t *p_slice )
     p_slice->i_nal_ref_idc = -1;
     p_slice->i_idr_pic_id = -1;
     p_slice->i_frame_num = -1;
-    p_slice->i_frame_type = 0;
+    p_slice->type = H264_SLICE_TYPE_UNKNOWN;
     p_slice->i_pic_parameter_set_id = -1;
     p_slice->i_field_pic_flag = 0;
     p_slice->i_bottom_field_flag = -1;

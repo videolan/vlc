@@ -501,7 +501,7 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->i_frame_pts = VLC_TS_INVALID;
         p_sys->i_frame_dts = VLC_TS_INVALID;
         p_sys->b_even_frame = false;
-        p_sys->slice.i_frame_type = 0;
+        p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
         p_sys->b_slice = false;
         /* POC */
         h264_poc_context_init( &p_sys->pocctx );
@@ -551,7 +551,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         msg_Warn( p_dec, "waiting for SPS/PPS" );
 
         /* Reset context */
-        p_sys->slice.i_frame_type = 0;
+        p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
         p_sys->p_frame = NULL;
         p_sys->pp_frame_last = &p_sys->p_frame;
         p_sys->p_sei = NULL;
@@ -687,7 +687,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     }
 
     if( !p_sys->b_header && p_sys->i_recovery_frames == -1 &&
-         p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I)
+         p_sys->slice.type != H264_SLICE_TYPE_I)
         return NULL;
 
     /* Bind matched/referred PPS and SPS */
@@ -699,7 +699,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     /* Gather PPS/SPS if required */
     block_t *p_xpsnal = NULL;
     block_t **pp_xpsnal_tail = &p_xpsnal;
-    const bool b_sps_pps_i = p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I &&
+    const bool b_sps_pps_i = p_sys->slice.type != H264_SLICE_TYPE_I &&
                              p_sys->p_active_pps &&
                              p_sys->p_active_sps;
     if( b_sps_pps_i || p_sys->b_new_sps || p_sys->b_new_pps )
@@ -816,7 +816,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     int tFOC = 0, bFOC = 0, PictureOrderCount = 0;
     h264_compute_poc( p_sps, &p_sys->slice, &p_sys->pocctx, &PictureOrderCount, &tFOC, &bFOC );
 
-    if( p_sys->slice.i_frame_type & BLOCK_FLAG_TYPE_I )
+    if( p_sys->slice.type == H264_SLICE_TYPE_I )
         p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
 
     if( p_pic->i_pts == VLC_TS_INVALID )
@@ -836,11 +836,11 @@ static block_t *OutputPicture( decoder_t *p_dec )
         }
         /* In case there's no PTS at all */
         else if( p_sys->slice.i_nal_ref_idc == 0 &&
-                 p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_B )
+                 p_sys->slice.type == H264_SLICE_TYPE_B )
         {
             p_pic->i_pts = p_pic->i_dts;
         }
-        else if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I )
+        else if( p_sys->slice.type == H264_SLICE_TYPE_I )
         {
             /* Hell no PTS on IDR. We're totally blind */
             date_t pts = p_sys->dts;
@@ -876,7 +876,20 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_pic->i_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
 
-    p_pic->i_flags |= p_sys->slice.i_frame_type;
+    switch( p_sys->slice.type )
+    {
+        case H264_SLICE_TYPE_P:
+            p_pic->i_flags |= BLOCK_FLAG_TYPE_P;
+            break;
+        case H264_SLICE_TYPE_B:
+            p_pic->i_flags |= BLOCK_FLAG_TYPE_B;
+            break;
+        case H264_SLICE_TYPE_I:
+            p_pic->i_flags |= BLOCK_FLAG_TYPE_I;
+        default:
+            break;
+    }
+
     p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
     if( !p_sys->b_header )
         p_pic->i_flags |= BLOCK_FLAG_PREROLL;
@@ -886,7 +899,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
     p_sys->i_pic_struct = 0;
-    p_sys->slice.i_frame_type = 0;
+    p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
     p_sys->p_sei = NULL;
     p_sys->pp_sei_last = &p_sys->p_sei;
     p_sys->b_new_sps = false;
