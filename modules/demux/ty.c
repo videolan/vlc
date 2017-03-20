@@ -456,38 +456,28 @@ static int Demux( demux_t *p_demux )
                 p_rec->rec_type, p_rec->ex1, p_rec->ex2);
     }*/
 
-    if( p_rec->rec_type == 0xe0 )
+    switch( p_rec->rec_type )
     {
-        /* Video */
-        DemuxRecVideo( p_demux, p_rec, p_block_in );
-    }
-    else if ( p_rec->rec_type == 0xc0 )
-    {
-        /* Audio */
-        DemuxRecAudio( p_demux, p_rec, p_block_in );
-    }
-    else if( p_rec->rec_type == 0x01 || p_rec->rec_type == 0x02 )
-    {
-        /* Closed Captions/XDS */
-        DemuxRecCc( p_demux, p_rec, p_block_in );
-    }
-    else if ( p_rec->rec_type == 0x03 )
-    {
-        /* Tivo data services (e.g. "thumbs-up to record!")  useless for us */
-        if( p_block_in )
-            block_Release(p_block_in);
-    }
-    else if ( p_rec->rec_type == 0x05 )
-    {
-        /* Unknown, but seen regularly */
-        if( p_block_in )
-            block_Release(p_block_in);
-    }
-    else
-    {
-        msg_Dbg(p_demux, "Invalid record type 0x%02x", p_rec->rec_type );
-        if( p_block_in )
-            block_Release(p_block_in);
+        case 0xe0: /* video */
+            DemuxRecVideo( p_demux, p_rec, p_block_in );
+            break;
+
+        case 0xc0: /* audio */
+            DemuxRecAudio( p_demux, p_rec, p_block_in );
+            break;
+
+        case 0x01: /* closed caption */
+        case 0x02: /* XDS */
+            DemuxRecCc( p_demux, p_rec, p_block_in );
+            break;
+
+        default:
+            msg_Dbg(p_demux, "Invalid record type 0x%02x", p_rec->rec_type );
+
+        case 0x03: /* tivo data services */
+        case 0x05: /* unknown, but seen regularly */
+            if( p_block_in )
+                block_Release( p_block_in );
     }
 
     /* */
