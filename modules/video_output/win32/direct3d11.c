@@ -1707,6 +1707,13 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
     }
     sprintf(shader, globPixelShaderDefault, sys->legacy_shader ? "" : "Array", psz_src_transform,
             psz_display_transform, psz_tone_mapping, psz_sampler);
+#ifndef NDEBUG
+    if (!IsRGBShader(format)) {
+        msg_Dbg(vd,"psz_src_transform %s", psz_src_transform);
+        msg_Dbg(vd,"psz_tone_mapping %s", psz_tone_mapping);
+        msg_Dbg(vd,"psz_display_transform %s", psz_display_transform);
+    }
+#endif
 
     ID3DBlob *pPSBlob = CompileShader(vd, shader, true);
     free(shader);
