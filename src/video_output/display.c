@@ -1454,7 +1454,6 @@ static void SplitterPrepare(vout_display_t *vd,
     if (video_splitter_Filter(sys->splitter, sys->picture, picture)) {
         for (int i = 0; i < sys->count; i++)
             sys->picture[i] = NULL;
-        picture_Release(picture);
         return;
     }
 
