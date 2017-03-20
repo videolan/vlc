@@ -2212,7 +2212,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         }
     }
 
-    static const FLOAT COLORSPACE_RGB_FULL[4 * 4] = {
+    static const FLOAT IDENTITY_4X4[4 * 4] = {
         1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
         0.f, 0.f, 1.f, 0.f,
@@ -2245,7 +2245,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     PS_COLOR_TRANSFORM colorspace;
     const FLOAT *ppColorspace;
     if (RGB_shader)
-        ppColorspace = COLORSPACE_RGB_FULL;
+        ppColorspace = IDENTITY_4X4;
     else
     switch (fmt->space){
         case COLOR_SPACE_BT709:
@@ -2267,7 +2267,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     }
 
     memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
-    memcpy(colorspace.WhitePoint, COLORSPACE_RGB_FULL, sizeof(colorspace.WhitePoint));
+    memcpy(colorspace.WhitePoint, IDENTITY_4X4, sizeof(colorspace.WhitePoint));
 
     if (!RGB_shader)
     {
