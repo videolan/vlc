@@ -318,6 +318,8 @@ codec_LTLIBRARIES += $(LTLIBoggspots)
 libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h \
 	codec/videotoolbox.m codec/hxxx_helper.c codec/hxxx_helper.h \
 	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
+	packetizer/hxxx_sei.h packetizer/hxxx_sei.c \
+	packetizer/h264_slice.c packetizer/h264_slice.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
 if HAVE_OSX
