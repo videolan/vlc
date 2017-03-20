@@ -1039,7 +1039,11 @@ void ExtensionItemDelegate::paint( QPainter *painter,
                                    const QStyleOptionViewItem &option,
                                    const QModelIndex &index ) const
 {
+#if HAS_QT5
+    QStyleOptionViewItem opt = option;
+#else
     QStyleOptionViewItemV4 opt = option;
+#endif
     initStyleOption( &opt, index );
 
     // Draw background
@@ -1122,7 +1126,11 @@ void AddonItemDelegate::paint( QPainter *painter,
                                const QStyleOptionViewItem &option,
                                const QModelIndex &index ) const
 {
+#if HAS_QT5
+    QStyleOptionViewItem newopt = option;
+#else
     QStyleOptionViewItemV4 newopt = option;
+#endif
     int i_state = index.data( AddonsListModel::StateRole ).toInt();
     int i_type = index.data( AddonsListModel::TypeRole ).toInt();
 
