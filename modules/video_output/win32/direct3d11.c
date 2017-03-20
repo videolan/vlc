@@ -1588,10 +1588,11 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
 {
     vout_display_sys_t *sys = vd->sys;
 
+    static const char *DEFAULT_NOOP = "return rgb";
     const char *psz_sampler;
-    const char *psz_src_transform     = "return rgb";
-    const char *psz_display_transform = "return rgb";
-    const char *psz_tone_mapping      = "return rgb";
+    const char *psz_src_transform     = DEFAULT_NOOP;
+    const char *psz_display_transform = DEFAULT_NOOP;
+    const char *psz_tone_mapping      = DEFAULT_NOOP;
 
     switch (format->formatTexture)
     {
