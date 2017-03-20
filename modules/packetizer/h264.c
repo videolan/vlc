@@ -110,7 +110,6 @@ struct decoder_sys_t
     h264_slice_t slice;
 
     /* */
-    bool b_even_frame;
     bool b_discontinuity;
 
     /* POC */
@@ -318,7 +317,6 @@ static int Open( vlc_object_t *p_this )
 
     h264_slice_init( &p_sys->slice );
 
-    p_sys->b_even_frame = false;
     p_sys->b_discontinuity = false;
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
@@ -500,7 +498,6 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->p_active_sps = NULL;
         p_sys->i_frame_pts = VLC_TS_INVALID;
         p_sys->i_frame_dts = VLC_TS_INVALID;
-        p_sys->b_even_frame = false;
         p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
         p_sys->b_slice = false;
         /* POC */
@@ -776,21 +773,15 @@ static block_t *OutputPicture( decoder_t *p_dec )
         /* Top and Bottom field slices */
         case 1:
         case 2:
-            if( !p_sys->b_even_frame )
-            {
-                p_pic->i_flags |= (p_sys->i_pic_struct == 1) ? BLOCK_FLAG_TOP_FIELD_FIRST
-                                                             : BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            }
-            p_sys->b_even_frame = !p_sys->b_even_frame;
+            p_pic->i_flags |= (!p_sys->slice.i_bottom_field_flag) ? BLOCK_FLAG_TOP_FIELD_FIRST
+                                                                  : BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             break;
         /* Each of the following slices contains multiple fields */
         case 3:
             p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
-            p_sys->b_even_frame = false;
             break;
         case 4:
             p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            p_sys->b_even_frame = false;
             break;
         case 5:
             p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
@@ -799,7 +790,6 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             break;
         default:
-            p_sys->b_even_frame = false;
             break;
         }
     }
