@@ -513,7 +513,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         /* arg is 0.0 - 1.0 percent of overall file position */
         if( ( i64 = p_sys->i_stream_size ) > 0 )
         {
-            pf = (double*) va_arg( args, double* );
+            pf = va_arg( args, double* );
             *pf = ((double)1.0) * vlc_stream_Tell( p_demux->s ) / (double) i64;
             return VLC_SUCCESS;
         }
@@ -528,7 +528,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         return VLC_EGENERIC;
     case DEMUX_GET_TIME:
         /* return TiVo timestamp */
-        p_i64 = (int64_t *) va_arg(args, int64_t *);
+        p_i64 = va_arg(args, int64_t *);
         //*p_i64 = p_sys->lastAudioPTS - p_sys->firstAudioPTS;
         //*p_i64 = (p_sys->l_last_ty_pts / 1000) + (p_sys->lastAudioPTS -
         //    p_sys->l_last_ty_pts_sync);
@@ -536,11 +536,11 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         return VLC_SUCCESS;
     case DEMUX_GET_LENGTH:    /* length of program in microseconds, 0 if unk */
         /* size / bitrate */
-        p_i64 = (int64_t *) va_arg(args, int64_t *);
+        p_i64 = va_arg(args, int64_t *);
         *p_i64 = 0;
         return VLC_SUCCESS;
     case DEMUX_SET_TIME:      /* arg is time in microsecs */
-        i64 = (int64_t) va_arg( args, int64_t );
+        i64 = va_arg( args, int64_t );
         return ty_stream_seek_time(p_demux, i64 * 1000);
     case DEMUX_GET_FPS:
     default:
