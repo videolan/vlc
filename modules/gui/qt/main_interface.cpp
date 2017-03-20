@@ -1161,27 +1161,6 @@ void MainInterface::setPlaylistVisibility( bool b_visible )
     playlistVisible = b_visible;
 }
 
-#if 0
-void MainInterface::visual()
-{
-    if( !VISIBLE( visualSelector) )
-    {
-        visualSelector->show();
-        if( !THEMIM->getIM()->hasVideo() )
-        {
-            /* Show the background widget */
-        }
-        visualSelectorEnabled = true;
-    }
-    else
-    {
-        /* Stop any currently running visualization */
-        visualSelector->hide();
-        visualSelectorEnabled = false;
-    }
-}
-#endif
-
 /************************************************************************
  * Other stuff
  ************************************************************************/

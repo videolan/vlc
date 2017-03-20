@@ -221,9 +221,6 @@ protected slots:
     void recreateToolbars();
     void setName( const QString& );
     void setVLCWindowsTitle( const QString& title = "" );
-#if 0
-    void visual();
-#endif
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayTooltipName( const QString& );
     void updateSystrayTooltipStatus( int );
