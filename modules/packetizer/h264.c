@@ -256,6 +256,16 @@ static bool IsFirstVCLNALUnit( const h264_slice_t *p_prev, const h264_slice_t *p
     return false;
 }
 
+static void DropStoredNAL( decoder_sys_t *p_sys )
+{
+    block_ChainRelease( p_sys->p_frame );
+    block_ChainRelease( p_sys->p_sei );
+    p_sys->p_frame = NULL;
+    p_sys->pp_frame_last = &p_sys->p_frame;
+    p_sys->p_sei = NULL;
+    p_sys->pp_sei_last = &p_sys->p_sei;
+}
+
 /*****************************************************************************
  * Open: probe the packetizer and return score
  * When opening after demux, the packetizer is only loaded AFTER the decoder
@@ -422,8 +432,7 @@ static void Close( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i;
 
-    block_ChainRelease( p_sys->p_frame );
-    block_ChainRelease( p_sys->p_sei );
+    DropStoredNAL( p_sys );
     for( i = 0; i <= H264_SPS_ID_MAX; i++ )
         StoreSPS( p_sys, i, NULL, NULL );
     for( i = 0; i <= H264_PPS_ID_MAX; i++ )
@@ -486,12 +495,7 @@ static void PacketizeReset( void *p_private, bool b_broken )
 
     if( b_broken || !p_sys->b_slice )
     {
-        block_ChainRelease( p_sys->p_frame );
-        block_ChainRelease( p_sys->p_sei );
-        p_sys->p_frame = NULL;
-        p_sys->pp_frame_last = &p_sys->p_frame;
-        p_sys->p_sei = NULL;
-        p_sys->pp_sei_last = &p_sys->p_sei;
+        DropStoredNAL( p_sys );
         p_sys->b_new_sps = false;
         p_sys->b_new_pps = false;
         p_sys->p_active_pps = NULL;
@@ -543,17 +547,12 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 
     if( p_sys->b_slice && (!p_sys->p_active_pps || !p_sys->p_active_sps) )
     {
-        block_ChainRelease( p_sys->p_frame );
-        block_ChainRelease( p_sys->p_sei );
         msg_Warn( p_dec, "waiting for SPS/PPS" );
 
         /* Reset context */
         p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
-        p_sys->p_frame = NULL;
-        p_sys->pp_frame_last = &p_sys->p_frame;
-        p_sys->p_sei = NULL;
-        p_sys->pp_sei_last = &p_sys->p_sei;
         p_sys->b_slice = false;
+        DropStoredNAL( p_sys );
         /* From SEI */
         p_sys->i_dpb_output_delay = 0;
         p_sys->i_pic_struct = 0;
@@ -683,15 +682,20 @@ static block_t *OutputPicture( decoder_t *p_dec )
         return NULL;
     }
 
-    if( !p_sys->b_header && p_sys->i_recovery_frames == -1 &&
-         p_sys->slice.type != H264_SLICE_TYPE_I)
-        return NULL;
-
     /* Bind matched/referred PPS and SPS */
     const h264_picture_parameter_set_t *p_pps = p_sys->p_active_pps;
     const h264_sequence_parameter_set_t *p_sps = p_sys->p_active_sps;
     if( !p_pps || !p_sps )
+    {
+        DropStoredNAL( p_sys );
         return NULL;
+    }
+
+    if( p_sys->i_recovery_frames > -1 && p_sys->slice.type != H264_SLICE_TYPE_I )
+    {
+        DropStoredNAL( p_sys );
+        return NULL;
+    }
 
     /* Gather PPS/SPS if required */
     block_t *p_xpsnal = NULL;
