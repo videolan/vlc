@@ -151,8 +151,6 @@ struct vlc_playlist_locker {
     BUTTON_SET_IMG( button, text, image, tooltip );                \
     BUTTONACT( button, thisslot );
 
-#define VISIBLE(i) (i && i->isVisible())
-
 /* for widgets which must not follow the RTL auto layout changes */
 #define RTL_UNAFFECTED_WIDGET setLayoutDirection( Qt::LeftToRight );
 
