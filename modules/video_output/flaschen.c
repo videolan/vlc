@@ -33,6 +33,9 @@
 #endif
 
 #include <errno.h>
+#ifdef HAVE_SYS_UIO_H
+# include <sys/uio.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_fs.h>

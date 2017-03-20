@@ -35,6 +35,9 @@
 #ifdef HAVE_POLL
 # include <poll.h>
 #endif
+#ifdef HAVE_SYS_UIO_H
+# include <sys/uio.h>
+#endif
 
 #include "rtp.h"
 #ifdef HAVE_SRTP

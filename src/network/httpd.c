@@ -45,6 +45,9 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#ifdef HAVE_SYS_UIO_H
+# include <sys/uio.h>
+#endif
 
 #ifdef HAVE_POLL
 # include <poll.h>

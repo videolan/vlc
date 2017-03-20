@@ -29,6 +29,9 @@
 #include <errno.h>
 #include <assert.h>
 #include <unistd.h>
+#ifdef HAVE_SYS_UIO_H
+# include <sys/uio.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
