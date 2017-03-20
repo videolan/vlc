@@ -322,7 +322,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
         msg_Dbg( p_dec, "subtitle packet complete, size=%zu", p_spu->i_buffer );
 
         p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
-        p_sys->p_spu = 0;
+        p_sys->p_spu = NULL;
         return p_spu;
     }
 
