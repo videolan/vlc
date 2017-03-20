@@ -1112,10 +1112,9 @@ void ExtensionItemDelegate::initStyleOption( QStyleOptionViewItem *option,
 
 AddonItemDelegate::AddonItemDelegate( QObject *parent )
     : ExtensionItemDelegate( parent )
-{
-    animator = NULL;
-    progressbar = NULL;
-}
+    , animator( NULL )
+    , progressbar( NULL )
+{ }
 
 AddonItemDelegate::~AddonItemDelegate()
 {
