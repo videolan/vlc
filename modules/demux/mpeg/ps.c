@@ -90,6 +90,7 @@ struct demux_sys_t
     int64_t     i_pack_scr; /* current read pack scr value, temp */
     int64_t     i_first_scr; /* media offset */
     int64_t     i_scr; /* committed, current position */
+    int64_t     i_scr_track_id;
     int         i_mux_rate;
     int64_t     i_length;
     int         i_time_track_index;
@@ -209,6 +210,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->i_pack_scr      = -1;
     p_sys->i_first_scr = -1;
     p_sys->i_scr = -1;
+    p_sys->i_scr_track_id = 0;
     p_sys->i_length   = i_length;
     p_sys->i_current_pts = (mtime_t) 0;
     p_sys->i_time_track_index = -1;
@@ -545,11 +547,12 @@ static int Demux( demux_t *p_demux )
 
             /* The popular VCD/SVCD subtitling WinSubMux does not
              * renumber the SCRs when merging subtitles into the PES */
-            if( tk->b_seen &&
+            if( tk->b_seen && !p_sys->b_bad_scr &&
                 ( tk->fmt.i_codec == VLC_CODEC_OGT ||
                   tk->fmt.i_codec == VLC_CODEC_CVD ) )
             {
                 p_sys->b_bad_scr = true;
+                p_sys->i_first_scr = -1;
             }
 
             if( p_sys->i_pack_scr >= 0 && !p_sys->b_bad_scr )
@@ -560,6 +563,7 @@ static int Demux( demux_t *p_demux )
                     msg_Warn( p_demux, "Incorrect SCR timing offset by of %ld ms, disabling",
                                        tk->i_first_pts - p_sys->i_pack_scr / 1000 );
                     p_sys->b_bad_scr = true; /* Disable Offset SCR */
+                    p_sys->i_first_scr = -1;
                 }
                 else
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pack_scr );
@@ -568,23 +572,35 @@ static int Demux( demux_t *p_demux )
             if( tk->b_seen && tk->es &&
                 !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
             {
-                if( (tk->fmt.i_cat == AUDIO_ES || tk->fmt.i_cat == VIDEO_ES) &&
-                    !p_sys->b_bad_scr && p_sys->i_pack_scr > 0 && p_pkt->i_pts > 0 &&
-                    p_sys->i_pack_scr > p_pkt->i_pts + CLOCK_FREQ / 4 )
+                if( tk->fmt.i_cat == AUDIO_ES || tk->fmt.i_cat == VIDEO_ES )
                 {
-                    msg_Warn( p_demux, "Incorrect SCR timing in advance of %ld ms, disabling",
-                                       p_sys->i_pack_scr - p_pkt->i_pts / 1000 );
-                    p_sys->b_bad_scr = true;
+                    if( !p_sys->b_bad_scr && p_sys->i_pack_scr > 0 && p_pkt->i_pts > 0 &&
+                        p_sys->i_pack_scr > p_pkt->i_pts + CLOCK_FREQ / 4 )
+                    {
+                        msg_Warn( p_demux, "Incorrect SCR timing in advance of %ld ms, disabling",
+                                           p_sys->i_pack_scr - p_pkt->i_pts / 1000 );
+                        p_sys->b_bad_scr = true;
+                        p_sys->i_first_scr = -1;
+                    }
+
+                    if( (p_sys->b_bad_scr || !p_sys->b_have_pack) && !p_sys->i_scr_track_id )
+                    {
+                        p_sys->i_scr_track_id = tk->i_id;
+                    }
                 }
 
                 if( ((!b_new && !p_sys->b_have_pack) || p_sys->b_bad_scr) &&
-                    (tk->fmt.i_cat == AUDIO_ES) &&
-                    (p_pkt->i_pts > VLC_TS_INVALID) )
+                    p_sys->i_scr_track_id == tk->i_id &&
+                    p_pkt->i_pts > VLC_TS_INVALID )
                 {
                     /* A hack to sync the A/V on PES files. */
                     msg_Dbg( p_demux, "force SCR: %"PRId64, p_pkt->i_pts );
+                    p_sys->i_scr = p_pkt->i_pts;
+                    if( p_sys->i_first_scr == -1 )
+                        p_sys->i_first_scr = p_sys->i_scr;
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_pkt->i_pts );
                 }
+
                 if( tk->fmt.i_codec == VLC_CODEC_TELETEXT &&
                     p_pkt->i_pts <= VLC_TS_INVALID && p_sys->i_scr >= 0 )
                 {
