@@ -91,7 +91,7 @@ struct demux_sys_t
     int64_t     i_last_scr;
     int         i_mux_rate;
     int64_t     i_length;
-    int         i_time_track;
+    int         i_time_track_index;
     int64_t     i_current_pts;
     uint64_t    i_start_byte;
     uint64_t    i_lastpack_byte;
@@ -209,7 +209,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->i_last_scr = -1;
     p_sys->i_length   = i_length;
     p_sys->i_current_pts = (mtime_t) 0;
-    p_sys->i_time_track = -1;
+    p_sys->i_time_track_index = -1;
     p_sys->i_aob_mlp_count = 0;
     p_sys->i_start_byte = i_skip;
     p_sys->i_lastpack_byte = i_skip;
@@ -358,7 +358,7 @@ static bool FindLength( demux_t *p_demux )
             if( i_length > p_sys->i_length )
             {
                 p_sys->i_length = i_length;
-                p_sys->i_time_track = i;
+                p_sys->i_time_track_index = i;
                 msg_Dbg( p_demux, "we found a length of: %"PRId64 "s", p_sys->i_length / CLOCK_FREQ );
             }
         }
@@ -671,9 +671,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_time_track >= 0 && p_sys->i_current_pts > 0 )
+            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts > 0 )
             {
-                *pi64 = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
+                *pi64 = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track_index].i_first_pts;
                 return VLC_SUCCESS;
             }
             if( p_sys->b_have_pack && p_sys->i_mux_rate > 0 && p_sys->i_last_scr > -1 )
@@ -704,9 +704,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
-            if( p_sys->i_time_track >= 0 && p_sys->i_current_pts > 0 && p_sys->i_length )
+            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts > 0 && p_sys->i_length )
             {
-                i64 -= p_sys->tk[p_sys->i_time_track].i_first_pts;
+                i64 -= p_sys->tk[p_sys->i_time_track_index].i_first_pts;
                 return demux_Control( p_demux, DEMUX_SET_POSITION, (double) i64 / p_sys->i_length );
             }
             break;
