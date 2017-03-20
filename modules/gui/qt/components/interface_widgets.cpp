@@ -568,60 +568,6 @@ void EasterEggBackgroundWidget::paintEvent( QPaintEvent *e )
     BackgroundWidget::paintEvent( e );
 }
 
-#if 0
-#include <QPushButton>
-#include <QHBoxLayout>
-
-/**********************************************************************
- * Visualization selector panel
- **********************************************************************/
-VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
-                                QFrame( NULL ), p_intf( _p_i )
-{
-    QHBoxLayout *layout = new QHBoxLayout( this );
-    layout->setMargin( 0 );
-    QPushButton *prevButton = new QPushButton( "Prev" );
-    QPushButton *nextButton = new QPushButton( "Next" );
-    layout->addWidget( prevButton );
-    layout->addWidget( nextButton );
-
-    layout->addStretch( 10 );
-    layout->addWidget( new QLabel( qtr( "Current visualization" ) ) );
-
-    current = new QLabel( qtr( "None" ) );
-    layout->addWidget( current );
-
-    BUTTONACT( prevButton, prev() );
-    BUTTONACT( nextButton, next() );
-
-    setLayout( layout );
-    setMaximumHeight( 35 );
-}
-
-VisualSelector::~VisualSelector()
-{}
-
-void VisualSelector::prev()
-{
-    char *psz_new = aout_VisualPrev( p_intf );
-    if( psz_new )
-    {
-        current->setText( qfu( psz_new ) );
-        free( psz_new );
-    }
-}
-
-void VisualSelector::next()
-{
-    char *psz_new = aout_VisualNext( p_intf );
-    if( psz_new )
-    {
-        current->setText( qfu( psz_new ) );
-        free( psz_new );
-    }
-}
-#endif
-
 SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
            : QLabel( parent ), p_intf( _p_intf )
 {

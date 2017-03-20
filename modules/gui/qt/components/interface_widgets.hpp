@@ -153,22 +153,6 @@ private:
     static const int MAX_FLAKES = 1000;
 };
 
-#if 0
-class VisualSelector : public QFrame
-{
-    Q_OBJECT
-public:
-    VisualSelector( intf_thread_t *);
-    virtual ~VisualSelector();
-private:
-    intf_thread_t *p_intf;
-    QLabel *current;
-private slots:
-    void prev();
-    void next();
-};
-#endif
-
 class ClickableQLabel : public QLabel
 {
     Q_OBJECT
