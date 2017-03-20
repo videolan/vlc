@@ -1399,7 +1399,6 @@ static char* getPreferedAdapter()
     p_adapter = addresses;
     while (p_adapter != NULL)
     {
-        printf("Adapter %S\n", p_adapter->FriendlyName);
         if (isAdapterSuitable( p_adapter, true ))
         {
             /* make sure it supports 239.255.255.250 */
