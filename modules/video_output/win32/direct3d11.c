@@ -1583,6 +1583,13 @@ static ID3DBlob* CompileShader(vout_display_t *vd, const char *psz_shader, bool 
     return pShaderBlob;
 }
 
+static bool IsRGBShader(const d3d_format_t *cfg)
+{
+    return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
+           cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
+           cfg->formatTexture != DXGI_FORMAT_YUY2;
+}
+
 static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format,
                                   video_transfer_func_t transfer, ID3D11PixelShader **output)
 {
@@ -2156,9 +2163,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
-    const bool RGB_shader = cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
-        cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
-        fmt->i_chroma != VLC_CODEC_YUYV;
+    const bool RGB_shader = IsRGBShader(cfg);
 
     /* pixel shader constant buffer */
     PS_CONSTANT_BUFFER defaultConstants = {
