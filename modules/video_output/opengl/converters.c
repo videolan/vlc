@@ -826,6 +826,7 @@ tc_persistent_get_pool(const opengl_tex_converter_t *tc, const video_format_t *f
     unsigned count;
 
     priv->persistent.list = 0;
+    requested_count++;
 
     for (count = 0; count < requested_count; count++)
     {
