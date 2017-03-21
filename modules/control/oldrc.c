@@ -1854,8 +1854,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
         {
             if( read( 0/*STDIN_FILENO*/, p_buffer + *pi_size, 1 ) <= 0 )
             {   /* Standard input closed: exit */
-                vlc_value_t empty;
-                Quit( VLC_OBJECT(p_intf), NULL, empty, empty, NULL );
+                libvlc_Quit( p_intf->obj.libvlc );
                 p_buffer[*pi_size] = 0;
                 return true;
             }
