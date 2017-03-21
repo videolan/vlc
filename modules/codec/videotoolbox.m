@@ -29,8 +29,7 @@
 #import <vlc_common.h>
 #import <vlc_plugin.h>
 #import <vlc_codec.h>
-#import "../packetizer/h264_nal.h"
-#import "../packetizer/hxxx_nal.h"
+#import "hxxx_helper.h"
 #import "../video_chroma/copy.h"
 #import <vlc_bits.h>
 #import <vlc_boxes.h>
@@ -82,12 +81,13 @@ vlc_module_end()
 #pragma mark - local prototypes
 
 static int ESDSCreate(decoder_t *, uint8_t *, uint32_t);
-static int avcCFromAnnexBCreate(decoder_t *, block_t *);
+static int avcCFromAnnexBCreate(decoder_t *);
 static int ExtradataInfoCreate(decoder_t *, CFStringRef, void *, size_t);
 static int DecodeBlock(decoder_t *, block_t *);
 static void PicReorder_pushSorted(decoder_t *, picture_t *);
 static picture_t *PicReorder_pop(decoder_t *, bool);
 static void PicReorder_flush(decoder_t *);
+static void PicReorder_setup(decoder_t *);
 static void Flush(decoder_t *);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
@@ -106,11 +106,10 @@ struct picture_sys_t {
 struct decoder_sys_t
 {
     CMVideoCodecType            codec;
-    uint8_t                     i_nal_length_size;
+    struct                      hxxx_helper hh;
 
     bool                        b_vt_feed;
     bool                        b_vt_flush;
-    bool                        b_is_avcc;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
     CFMutableDictionaryRef      decoderConfiguration;
@@ -498,24 +497,24 @@ static int SetupDecoderExtradata(decoder_t *p_dec)
 
     if (p_sys->codec == kCMVideoCodecType_H264)
     {
+        hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
+                         p_dec->fmt_in.i_codec, true);
+        int i_ret = hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
+                                          p_dec->fmt_in.i_extra);
+        if (i_ret != VLC_SUCCESS)
+            return i_ret;
+
         if (p_dec->fmt_in.p_extra)
         {
-            if (!h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
-                return VLC_EGENERIC;
             int i_ret = ExtradataInfoCreate(p_dec, CFSTR("avcC"),
                                             p_dec->fmt_in.p_extra,
                                             p_dec->fmt_in.i_extra);
             if (i_ret != VLC_SUCCESS)
                 return i_ret;
-            p_sys->b_is_avcc = true;
-            p_sys->i_pic_reorder_max = 5;
-        }
-        else
-        {
-            /* AnnexB case, we'll get extradata from first input blocks */
-            p_sys->b_is_avcc = false;
-        }
 
+            PicReorder_setup(p_dec);
+        }
+        /* else: AnnexB case, we'll get extradata from first input blocks */
     }
     else if (p_sys->codec == kCMVideoCodecType_MPEG4Video)
     {
@@ -569,7 +568,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->session = nil;
     p_sys->b_vt_feed = false;
     p_sys->b_vt_flush = false;
-    p_sys->b_is_avcc = false;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = nil;
     p_sys->decoderConfiguration = nil;
@@ -737,63 +735,38 @@ static int ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
     return i_ret;
 }
 
-static int avcCFromAnnexBCreate(decoder_t *p_dec, block_t *p_block)
+static int avcCFromAnnexBCreate(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* get the SPS and PPS units from the NAL unit which is either
-     * part of the demuxer's avvC atom or the mid stream data block */
-    const uint8_t *p_sps_nal = NULL, *p_pps_nal = NULL;
-    size_t i_sps_nalsize = 0, i_pps_nalsize = 0;
-    if (!h264_AnnexB_get_spspps(p_block->p_buffer, p_block->i_buffer,
-                                &p_sps_nal, &i_sps_nalsize,
-                                &p_pps_nal, &i_pps_nalsize,
-                                NULL, NULL) || i_sps_nalsize == 0)
-    {
-        msg_Warn(p_dec, "sps pps detection failed");
+    if (p_sys->hh.h264.i_sps_count == 0 || p_sys->hh.h264.i_pps_count == 0)
         return VLC_EGENERIC;
-    }
-    assert(p_sps_nal);
 
-    /* Decode Sequence Parameter Set */
-    h264_sequence_parameter_set_t *p_sps_data;
-    if (!(p_sps_data = h264_decode_sps(p_sps_nal, i_sps_nalsize, true)))
-    {
-        msg_Warn(p_dec, "sps pps parsing failed");
-        return VLC_EGENERIC;
-    }
-
-    /* this data is more trust-worthy than what we receive
-     * from the demuxer, so we will use it to over-write
-     * the current values */
-    unsigned h264_width, h264_height, i_video_width, i_video_height;
-    h264_get_picture_size(p_sps_data, &h264_width, &h264_height,
-                          &i_video_width, &i_video_height);
+    unsigned i_h264_width, i_h264_height, i_video_width, i_video_height;
+    int i_sar_num, i_sar_den, i_ret;
+    i_ret = h264_helper_get_current_picture_size(&p_sys->hh,
+                                                 &i_h264_width, &i_h264_height,
+                                                 &i_video_width, &i_video_height);
+    if (i_ret != VLC_SUCCESS)
+        return i_ret;
+    i_ret = h264_helper_get_current_sar(&p_sys->hh, &i_sar_num, &i_sar_den);
+    if (i_ret != VLC_SUCCESS)
+        return i_ret;
+    PicReorder_setup(p_dec);
 
     p_dec->fmt_out.video.i_visible_width =
     p_dec->fmt_out.video.i_width = i_video_width;
     p_dec->fmt_out.video.i_visible_height =
     p_dec->fmt_out.video.i_height = i_video_height;
-    p_dec->fmt_out.video.i_sar_num = p_sps_data->vui.i_sar_num;
-    p_dec->fmt_out.video.i_sar_den = p_sps_data->vui.i_sar_den;
+    p_dec->fmt_out.video.i_sar_num = i_sar_num;
+    p_dec->fmt_out.video.i_sar_den = i_sar_den;
 
-    uint8_t i_depth;
-    unsigned i_delay;
-    if (h264_get_dpb_values(p_sps_data, &i_depth, &i_delay) == false)
-        i_depth = 4;
-    p_sys->i_pic_reorder_max = i_depth + 1;
-
-    h264_release_sps(p_sps_data);
-
-    p_sys->i_nal_length_size = 4; /* default to 4 bytes */
-    block_t *p_avcC = h264_NAL_to_avcC(p_sys->i_nal_length_size,
-                                       &p_sps_nal, &i_sps_nalsize, 1,
-                                       &p_pps_nal, &i_pps_nalsize, 1);
+    block_t *p_avcC = h264_helper_get_avcc_config(&p_sys->hh);
     if (!p_avcC)
         return VLC_EGENERIC;
 
-    int i_ret = ExtradataInfoCreate(p_dec, CFSTR("avcC"), p_avcC->p_buffer,
-                                    p_avcC->i_buffer);
+    i_ret = ExtradataInfoCreate(p_dec, CFSTR("avcC"), p_avcC->p_buffer,
+                                p_avcC->i_buffer);
     block_Release(p_avcC);
     return i_ret;
 }
@@ -823,17 +796,6 @@ static int ExtradataInfoCreate(decoder_t *p_dec, CFStringRef name, void *p_data,
     CFDictionarySetValue(p_sys->extradataInfo, name, extradata);
     CFRelease(extradata);
     return VLC_SUCCESS;
-}
-
-static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    assert(p_block);
-
-    if (p_sys->b_is_avcc) /* FIXME: no change checks done for AVC ? */
-        return p_block;
-
-    return hxxx_AnnexB_to_xVC(p_block, p_sys->i_nal_length_size);
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
@@ -973,6 +935,17 @@ static void PicReorder_flush(decoder_t *p_dec)
     p_sys->p_pic_reorder = NULL;
 }
 
+static void PicReorder_setup(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    uint8_t i_depth;
+    unsigned i_delay;
+    if (h264_helper_get_current_dpb_values(&p_sys->hh, &i_depth, &i_delay)
+     != VLC_SUCCESS)
+        i_depth = 4;
+    p_sys->i_pic_reorder_max = i_depth + 1;
+}
+
 static void Flush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1025,13 +998,26 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         goto skip;
     }
 
-    if (!p_sys->session)
+    bool b_config_changed = false;
+    if (p_sys->codec == kCMVideoCodecType_H264 && p_sys->hh.pf_process_block)
+    {
+        p_block = p_sys->hh.pf_process_block(&p_sys->hh, p_block, &b_config_changed);
+        if (!p_block)
+            return VLCDEC_SUCCESS;
+    }
+
+    if (b_config_changed)
     {
         /* decoding didn't start yet, which is ok for H264, let's see
          * if we can use this block to get going */
-        assert(p_sys->codec == kCMVideoCodecType_H264 && !p_sys->b_is_avcc);
-        int i_ret = avcCFromAnnexBCreate(p_dec, p_block);
+        assert(p_sys->codec == kCMVideoCodecType_H264 && !p_sys->hh.b_is_xvcC);
+        if (p_sys->session)
+        {
+            msg_Dbg(p_dec, "SPS/PPS changed: restarting H264 decoder");
+            StopVideoToolbox(p_dec, true);
+        }
 
+        int i_ret = avcCFromAnnexBCreate(p_dec);
         if (i_ret == VLC_SUCCESS)
         {
             if ((p_block->i_flags & BLOCK_FLAG_TOP_FIELD_FIRST
@@ -1053,12 +1039,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
          * the right order. Abort and use an other decoder. */
         msg_Warn(p_dec, "unable to reorder output frames, abort");
         goto reload;
-    }
-
-    if (p_sys->codec == kCMVideoCodecType_H264) {
-        p_block = H264ProcessBlock(p_dec, p_block);
-        if (!p_block)
-            return VLCDEC_SUCCESS;
     }
 
     CMSampleBufferRef sampleBuffer =

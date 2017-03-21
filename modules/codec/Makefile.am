@@ -315,9 +315,11 @@ liboggspots_plugin_la_LIBADD = $(OGGSPOTS_LIBS)
 EXTRA_LTLIBRARIES += liboggspots_plugin.la
 codec_LTLIBRARIES += $(LTLIBoggspots)
 
-libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h codec/videotoolbox.m \
-                                    packetizer/h264_nal.c packetizer/h264_nal.h \
-                                    packetizer/hxxx_nal.c packetizer/hxxx_nal.h
+libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h \
+	codec/videotoolbox.m codec/hxxx_helper.c codec/hxxx_helper.h \
+	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
+	packetizer/h264_nal.c packetizer/h264_nal.h \
+	packetizer/hevc_nal.c packetizer/hevc_nal.h
 if HAVE_OSX
 libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_CFLAGS) -mmacosx-version-min=10.8
 endif
@@ -457,7 +459,9 @@ libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacode
 	video_chroma/copy.c \
 	video_output/android/utils.c video_output/android/utils.h \
 	video_output/android/display.h \
-	packetizer/hxxx_nal.h packetizer/h264_nal.c packetizer/h264_nal.h \
+	codec/hxxx_helper.c codec/hxxx_helper.h \
+	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
+	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
 
 codec_LTLIBRARIES += $(LTLIBomxil) $(LTLIBomxil_vout)
