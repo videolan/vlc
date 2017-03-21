@@ -205,6 +205,8 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     assert( p_sys->p_input == NULL );
     PL_UNLOCK;
 
+    libvlc_MetadataCancel( p_playlist->obj.libvlc, p_item );
+
     input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL,
                                                    p_sys->p_input_resource );
     if( likely(p_input_thread != NULL) )

@@ -776,7 +776,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
     if( sys->b_preparse && !input_item_IsPreparsed( p_item->p_input )
      && (EMPTY_STR(psz_artist) || EMPTY_STR(psz_album)) )
         libvlc_MetadataRequest( p_playlist->obj.libvlc, p_item->p_input, 0, -1,
-                                NULL );
+                                p_item );
     free( psz_artist );
     free( psz_album );
 }
