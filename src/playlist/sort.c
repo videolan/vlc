@@ -90,9 +90,6 @@ static inline int meta_sort( const playlist_item_t *first,
         i_ret = 1;
     else if( psz_first && !psz_second )
         i_ret = -1;
-    /* No meta, sort by name */
-    else if( !psz_first && !psz_second )
-        i_ret = meta_strcasecmp_title( first, second );
     else
     {
         if( b_integer )
@@ -216,12 +213,27 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
 #define SORTFN( SORT, first, second ) static inline int proto_##SORT \
 	( const playlist_item_t *first, const playlist_item_t *second )
 
+SORTFN( SORT_TRACK_NUMBER, first, second )
+{
+    return meta_sort( first, second, vlc_meta_TrackNumber, true );
+}
+
+SORTFN( SORT_DISC_NUMBER, first, second )
+{
+    int i_ret = meta_sort( first, second, vlc_meta_DiscNumber, true );
+    /* Items came from the same disc: compare the track numbers */
+    if( i_ret == 0 )
+        i_ret = proto_SORT_TRACK_NUMBER( first, second );
+
+    return i_ret;
+}
+
 SORTFN( SORT_ALBUM, first, second )
 {
     int i_ret = meta_sort( first, second, vlc_meta_Album, false );
-    /* Items came from the same album: compare the track numbers */
+    /* Items came from the same album: compare the disc numbers */
     if( i_ret == 0 )
-        i_ret = meta_sort( first, second, vlc_meta_TrackNumber, true );
+        i_ret = proto_SORT_DISC_NUMBER( first, second );
 
     return i_ret;
 }
@@ -313,16 +325,6 @@ SORTFN( SORT_TITLE_NUMERIC, first, second )
     return i_ret;
 }
 
-SORTFN( SORT_TRACK_NUMBER, first, second )
-{
-    return meta_sort( first, second, vlc_meta_TrackNumber, true );
-}
-
-SORTFN( SORT_DISC_NUMBER, first, second )
-{
-  return meta_sort( first, second, vlc_meta_DiscNumber, true );
-}
-
 SORTFN( SORT_URI, first, second )
 {
     int i_ret;
@@ -371,4 +373,3 @@ static const sortfn_t sorting_fns[NUM_SORT_FNS][2] =
 #define DEF( a ) { cmp_a_##a, cmp_d_##a },
 { VLC_DEFINE_SORT_FUNCTIONS };
 #undef  DEF
-
