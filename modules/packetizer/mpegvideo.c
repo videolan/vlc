@@ -649,7 +649,10 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_dec->fmt_out.video.i_width = (p_dec->fmt_out.video.i_visible_width + 0x0F) & ~0x0F;
         p_dec->fmt_out.video.i_visible_height =
             ( (p_frag->p_buffer[5]&0x0f) << 8 )|p_frag->p_buffer[6];
-        p_dec->fmt_out.video.i_height = (p_dec->fmt_out.video.i_visible_height + 0x0F) & ~0x0F;
+        if( p_sys->b_seq_progressive )
+            p_dec->fmt_out.video.i_height = (p_dec->fmt_out.video.i_visible_height + 0x0F) & ~0x0F;
+        else
+            p_dec->fmt_out.video.i_height = (p_dec->fmt_out.video.i_visible_height + 0x1F) & ~0x1F;
         p_sys->i_aspect_ratio_info = p_frag->p_buffer[7] >> 4;
 
         /* TODO: MPEG1 aspect ratio */
