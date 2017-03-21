@@ -644,10 +644,12 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_seq_old = 0;
         p_sys->p_ext = NULL;
 
-        p_dec->fmt_out.video.i_width =
+        p_dec->fmt_out.video.i_visible_width =
             ( p_frag->p_buffer[4] << 4)|(p_frag->p_buffer[5] >> 4 );
-        p_dec->fmt_out.video.i_height =
+        p_dec->fmt_out.video.i_width = (p_dec->fmt_out.video.i_visible_width + 0x0F) & ~0x0F;
+        p_dec->fmt_out.video.i_visible_height =
             ( (p_frag->p_buffer[5]&0x0f) << 8 )|p_frag->p_buffer[6];
+        p_dec->fmt_out.video.i_height = (p_dec->fmt_out.video.i_visible_height + 0x0F) & ~0x0F;
         p_sys->i_aspect_ratio_info = p_frag->p_buffer[7] >> 4;
 
         /* TODO: MPEG1 aspect ratio */
@@ -671,7 +673,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         if ( !p_sys->b_inited )
         {
-            msg_Dbg( p_dec, "size %dx%d fps=%.3f",
+            msg_Dbg( p_dec, "size %dx%d/%dx%d fps=%.3f",
+                 p_dec->fmt_out.video.i_visible_width, p_dec->fmt_out.video.i_visible_height,
                  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height,
                  p_sys->i_frame_rate / (float)p_sys->i_frame_rate_base );
             p_sys->b_inited = 1;
