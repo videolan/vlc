@@ -318,7 +318,7 @@ static int Probe( demux_t *p_demux, bool b_end )
         int64_t i_scr; int dummy;
         if( !b_end && !ps_pkt_parse_pack( p_pkt, &i_scr, &dummy ) )
         {
-            if( p_sys->i_first_scr )
+            if( p_sys->i_first_scr == -1 )
                 p_sys->i_first_scr = i_scr;
         }
         p_sys->b_have_pack = true;
