@@ -183,7 +183,7 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
 
 QSize VideoWidget::physicalSize() const
 {
-#if defined(HAVE_X11_XLIB_H) && HAS_QT5
+#ifdef QT5_HAS_X11
     if ( QX11Info::isPlatformX11() )
     {
         Display *p_x_display = QX11Info::display();
