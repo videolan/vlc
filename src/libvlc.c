@@ -507,6 +507,9 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
 
+    if (priv->parser != NULL)
+        playlist_preparser_Deactivate(priv->parser);
+
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
     intf_DestroyAll( p_libvlc );

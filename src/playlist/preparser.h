@@ -75,5 +75,13 @@ void playlist_preparser_Cancel( playlist_preparser_t *, void *id );
  */
 void playlist_preparser_Delete( playlist_preparser_t * );
 
+/**
+ * This function deactivates the preparser
+ *
+ * All pending requests will be removed, and it will block until the currently
+ * running entity has finished (if any).
+ */
+void playlist_preparser_Deactivate( playlist_preparser_t * );
+
 #endif
 

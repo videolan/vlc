@@ -36,6 +36,7 @@ struct playlist_preparser_t
     vlc_object_t* owner;
     playlist_fetcher_t* fetcher;
     struct background_worker* worker;
+    atomic_bool deactivated;
 };
 
 static int InputEvent( vlc_object_t* obj, const char* varname,
@@ -127,6 +128,7 @@ playlist_preparser_t* playlist_preparser_New( vlc_object_t *parent )
 
     preparser->owner = parent;
     preparser->fetcher = playlist_fetcher_New( parent );
+    atomic_init( &preparser->deactivated, false );
 
     if( unlikely( !preparser->fetcher ) )
         msg_Warn( parent, "unable to create art fetcher" );
@@ -138,6 +140,9 @@ void playlist_preparser_Push( playlist_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t i_options,
     int timeout, void *id )
 {
+    if( atomic_load( &preparser->deactivated ) )
+        return;
+
     vlc_mutex_lock( &item->lock );
     int i_type = item->i_type;
     int b_net = item->b_net;
@@ -170,6 +175,12 @@ void playlist_preparser_fetcher_Push( playlist_preparser_t *preparser,
 void playlist_preparser_Cancel( playlist_preparser_t *preparser, void *id )
 {
     background_worker_Cancel( preparser->worker, id );
+}
+
+void playlist_preparser_Deactivate( playlist_preparser_t* preparser )
+{
+    atomic_store( &preparser->deactivated, true );
+    background_worker_Cancel( preparser->worker, NULL );
 }
 
 void playlist_preparser_Delete( playlist_preparser_t *preparser )
