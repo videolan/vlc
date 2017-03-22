@@ -78,7 +78,7 @@ void Close_Dir ( vlc_object_t * );
 
 extern input_item_t * GetCurrentItem(demux_t *p_demux);
 
-bool CheckContentType( stream_t * p_stream, const char * psz_ctype );
+bool CheckMimeType( stream_t * p_stream, const char * psz_ctype );
 
 #define CHECK_FILE() \
 do { \

@@ -79,14 +79,17 @@ int Import_M3U( vlc_object_t *p_this )
 
     if( demux_IsPathExtension( p_demux, ".m3u8" )
      || demux_IsForced( p_demux, "m3u8" )
-     || CheckContentType( p_demux->s, "application/vnd.apple.mpegurl" ) )
+     || CheckMimeType( p_demux->s, "application/vnd.apple.mpegurl" ) )
+    {
+        fprintf( stderr, "so apparently this is a m3u8\n" );
         pf_dup = CheckUnicode; /* UTF-8 file type */
+    }
     else
     if( demux_IsPathExtension( p_demux, ".m3u" )
      || demux_IsPathExtension( p_demux, ".vlc" )
      || demux_IsForced( p_demux, "m3u" )
      || ContainsURL( p_demux )
-     || CheckContentType( p_demux->s, "audio/x-mpegurl") )
+     || CheckMimeType( p_demux->s, "audio/x-mpegurl") )
         ; /* Guess encoding */
     else
     {

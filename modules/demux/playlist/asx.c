@@ -150,8 +150,8 @@ int Import_ASX( vlc_object_t *p_this )
         demux_IsPathExtension( p_demux, ".wax" ) ||
         demux_IsPathExtension( p_demux, ".wvx" ) ||
         (
-          ( CheckContentType( p_demux->s, "video/x-ms-asf" ) ||
-            CheckContentType( p_demux->s, "audio/x-ms-wax" ) ) && PeekASX( p_demux )
+          ( CheckMimeType( p_demux->s, "video/x-ms-asf" ) ||
+            CheckMimeType( p_demux->s, "audio/x-ms-wax" ) ) && PeekASX( p_demux )
         ) ||
         demux_IsForced( p_demux, "asx-open" ) )
     {
