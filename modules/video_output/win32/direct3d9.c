@@ -334,6 +334,13 @@ static void DestroyPicture(picture_t *picture)
     free(picture);
 }
 
+static D3DCOLOR GetFormatBlack(D3DFORMAT format)
+{
+    if (vlc_fourcc_IsYUV(format))
+        return D3DCOLOR_XYUV(0,0x80,0x80);
+    return D3DCOLOR_ARGB(0xFF, 0, 0, 0);
+}
+
 /* */
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
@@ -366,6 +373,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
            free(picsys);
            goto error;
         }
+
+        IDirect3DDevice9_ColorFill(vd->sys->d3ddev, picsys->surface, NULL, GetFormatBlack(format));
 
         picture_resource_t resource = {
             .p_sys = picsys,
@@ -1160,7 +1169,7 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
 #endif
 
     /* fill surface with black color */
-    IDirect3DDevice9_ColorFill(d3ddev, surface, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0));
+    IDirect3DDevice9_ColorFill(d3ddev, surface, NULL, GetFormatBlack(d3dfmt->format));
 
     /* Create the associated picture */
     picture_sys_t *picsys = malloc(sizeof(*picsys));

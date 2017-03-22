@@ -689,6 +689,13 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     return err;
 }
 
+static D3DCOLOR GetFormatBlack(D3DFORMAT format)
+{
+    if (vlc_fourcc_IsYUV(format))
+        return D3DCOLOR_XYUV(0,0x80,0x80);
+    return D3DCOLOR_ARGB(0xFF, 0, 0, 0);
+}
+
 /**
  * It creates a DXVA2 decoder using the given video format
  */
@@ -827,6 +834,11 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
         return VLC_EGENERIC;
     }
     sys->decoder = (IUnknown*) decoder;
+
+    for (int i = 0; i < sys->surface_count; i++)
+        IDirect3DDevice9_ColorFill((IDirect3DDevice9*) sys->d3ddev,
+                                   (IDirect3DSurface9*) sys->hw_surface[i],
+                                   NULL, GetFormatBlack(p_sys->render));
 
     msg_Dbg(va, "IDirectXVideoDecoderService_CreateVideoDecoder succeed");
     return VLC_SUCCESS;
