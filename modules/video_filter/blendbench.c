@@ -177,8 +177,8 @@ static int Create( vlc_object_t *p_this )
                                                   CFG_PREFIX "alpha" );
 
     psz_temp = var_CreateGetStringCommand( p_filter, CFG_PREFIX "base-chroma" );
-    p_sys->i_base_chroma = VLC_FOURCC( psz_temp[0], psz_temp[1],
-                                       psz_temp[2], psz_temp[3] );
+    p_sys->i_base_chroma = !psz_temp || strlen( psz_temp ) != 4 ? 0 :
+        VLC_FOURCC( psz_temp[0], psz_temp[1], psz_temp[2], psz_temp[3] );
     psz_cmd = var_CreateGetStringCommand( p_filter, CFG_PREFIX "base-image" );
     i_ret = blendbench_LoadImage( p_this, &p_sys->p_base_image,
                                   p_sys->i_base_chroma, psz_cmd, "Base" );
@@ -192,8 +192,8 @@ static int Create( vlc_object_t *p_this )
 
     psz_temp = var_CreateGetStringCommand( p_filter,
                                            CFG_PREFIX "blend-chroma" );
-    p_sys->i_blend_chroma = VLC_FOURCC( psz_temp[0], psz_temp[1],
-                                        psz_temp[2], psz_temp[3] );
+    p_sys->i_blend_chroma = !psz_temp || strlen( psz_temp ) != 4
+        ? 0 : VLC_FOURCC( psz_temp[0], psz_temp[1], psz_temp[2], psz_temp[3] );
     psz_cmd = var_CreateGetStringCommand( p_filter, CFG_PREFIX "blend-image" );
     i_ret = blendbench_LoadImage( p_this, &p_sys->p_blend_image, p_sys->i_blend_chroma,
                                   psz_cmd, "Blend" );
