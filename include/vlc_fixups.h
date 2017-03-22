@@ -281,6 +281,10 @@ int unsetenv (const char *);
 int posix_memalign (void **, size_t, size_t);
 #endif
 
+#if defined(__native_client__) && defined(__cplusplus)
+# define HAVE_USELOCALE
+#endif
+
 /* locale.h */
 #ifndef HAVE_USELOCALE
 #define LC_ALL_MASK      0
