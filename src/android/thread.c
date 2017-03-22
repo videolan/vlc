@@ -42,10 +42,6 @@
 #include <pthread.h>
 #include <sched.h>
 
-#if !defined(HAVE_PTHREAD_CONDATTR_SETCLOCK) && !defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP)
-#error no pthread monotonic clock support
-#endif
-
 /* debug */
 
 #ifndef NDEBUG
