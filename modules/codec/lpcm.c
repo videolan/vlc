@@ -447,11 +447,13 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         /* */
         if( i_bits == 16 )
         {
+            p_dec->fmt_out.audio.i_format =
             p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
             p_dec->fmt_out.audio.i_bitspersample = 16;
         }
         else
         {
+            p_dec->fmt_out.audio.i_format =
             p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
             p_dec->fmt_out.audio.i_bitspersample = 32;
         }
