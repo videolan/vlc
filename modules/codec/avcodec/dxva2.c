@@ -377,7 +377,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     dx_sys->d3ddev = NULL;
     if (p_sys!=NULL)
+    {
+        D3DSURFACE_DESC src;
+        if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
+            sys->render = src.Format;
         IDirect3DSurface9_GetDevice(p_sys->surface, (IDirect3DDevice9**) &dx_sys->d3ddev );
+    }
 
     sys->i_chroma = d3d9va_fourcc(ctx->sw_pix_fmt);
 
@@ -668,22 +673,27 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     }
 
     /* */
-    for (unsigned j = 0; d3d_formats[j].name; j++) {
-        const d3d_format_t *format = &d3d_formats[j];
+    for (unsigned pass = 0; pass < 2 && err != VLC_SUCCESS; ++pass)
+    {
+        for (unsigned j = 0; d3d_formats[j].name; j++) {
+            const d3d_format_t *format = &d3d_formats[j];
 
-        /* */
-        bool is_supported = false;
-        for (unsigned k = 0; !is_supported && k < output_count; k++) {
-            is_supported = format->format == output_list[k];
+            /* */
+            bool is_supported = false;
+            for (unsigned k = 0; !is_supported && k < output_count; k++) {
+                is_supported = format->format == output_list[k];
+            }
+            if (!is_supported)
+                continue;
+            if (pass == 0 && format->format != va->sys->render)
+                continue;
+
+            /* We have our solution */
+            msg_Dbg(va, "Using decoder output '%s'", format->name);
+            va->sys->render = format->format;
+            err = VLC_SUCCESS;
+            break;
         }
-        if (!is_supported)
-            continue;
-
-        /* We have our solution */
-        msg_Dbg(va, "Using decoder output '%s'", format->name);
-        va->sys->render = format->format;
-        err = VLC_SUCCESS;
-        break;
     }
     CoTaskMemFree(output_list);
     return err;
