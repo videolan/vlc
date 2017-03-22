@@ -246,7 +246,7 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
     msg_Dbg(p_aout, "Output on %s, channel count: %u",
             *pport_type == PORT_TYPE_HDMI ? "HDMI" :
             *pport_type == PORT_TYPE_USB ? "USB" : "Default",
-            layout ? layout->mNumberChannelDescriptions : 2);
+            layout ? (unsigned) layout->mNumberChannelDescriptions : 2);
 
     *playout = layout;
     return VLC_SUCCESS;
