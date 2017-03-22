@@ -4071,7 +4071,7 @@ AC_ARG_ENABLE(osx_notifications,
   [  --enable-osx-notifications          osx notification plugin (default disabled)],,
   [enable_osx_notifications=no])
 AS_IF([test "${enable_osx_notifications}" != "no"], [
-  if test ! -d ${CONTRIB_DIR}/Growl.framework -a ! -d ${CONTRIB_DIR}/Frameworks/Growl.framework
+  if test -d ${CONTRIB_DIR}/Growl.framework -o -d ${CONTRIB_DIR}/Frameworks/Growl.framework
   then
       VLC_ADD_PLUGIN([osx_notifications])
       VLC_ADD_LIBS([osx_notifications], [-Wl,-framework,Growl,-framework,Foundation])
