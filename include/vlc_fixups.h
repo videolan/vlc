@@ -259,6 +259,10 @@ pid_t getpid (void) VLC_NOTHROW;
 int fsync (int fd);
 #endif
 
+#ifndef HAVE_PATHCONF
+long pathconf (const char *path, int name);
+#endif
+
 /* dirent.h */
 #ifndef HAVE_DIRFD
 int (dirfd) (DIR *);
