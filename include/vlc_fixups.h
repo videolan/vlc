@@ -406,6 +406,10 @@ struct msghdr
 };
 #endif
 
+#ifdef _NEWLIB_VERSION
+#define IOV_MAX 255
+#endif
+
 #ifndef HAVE_RECVMSG
 struct msghdr;
 ssize_t recvmsg(int, struct msghdr *, int);
