@@ -328,6 +328,22 @@ static inline char *stream_ContentType( stream_t *s )
 }
 
 /**
+ * Get the mime-type of a stream
+ *
+ * \warning the returned resource is to be freed by the caller
+ * \return the mime-type, or `NULL` if unknown
+ **/
+static inline char *stream_MimeType( stream_t *s )
+{
+    char* mime_type = stream_ContentType( s );
+
+    if( mime_type ) /* strip parameters */
+        mime_type[strcspn( mime_type, " ;" )] = '\0';
+
+    return mime_type;
+}
+
+/**
  * Create a stream from a memory buffer.
  *
  * \param obj parent VLC object
