@@ -339,6 +339,11 @@ int inet_pton(int, const char *, void *);
 const char *inet_ntop(int, const void *, char *, socklen_t);
 #endif
 
+/* NaCl has a broken netinet/tcp.h, so TCP_NODELAY is not set */
+#if defined(__native_client__) && !defined( HAVE_NETINET_TCP_H )
+#  define TCP_NODELAY 1
+#endif
+
 #ifndef HAVE_STRUCT_POLLFD
 enum
 {
