@@ -1,7 +1,11 @@
 /*****************************************************************************
  * recvmsg.c: POSIX recvmsg() replacement
  *****************************************************************************
+ * Copyright © 2017 VLC authors and VideoLAN
  * Copyright © 2016 Rémi Denis-Courmont
+ *
+ * Authors: Rémi Denis-Courmont
+ *          Dennis Hamester <dhamester@jusst.de>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -78,4 +82,82 @@ ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
     }
     return -1;
 }
+
+#elif __native_client__
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/uio.h>
+
+ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
+{
+    if (msg->msg_controllen != 0)
+    {
+        errno = ENOSYS;
+        return -1;
+    }
+
+    if ((msg->msg_iovlen <= 0) || (msg->msg_iovlen > IOV_MAX))
+    {
+        errno = EMSGSIZE;
+        return -1;
+    }
+
+    size_t full_size = 0;
+    for (int i = 0; i < msg->msg_iovlen; ++i)
+        full_size += msg->msg_iov[i].iov_len;
+
+    if (full_size > SSIZE_MAX) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    /**
+     * We always allocate here, because whether recv/recvfrom allow NULL message
+     * or not is unspecified.
+     */
+    char *data = malloc(full_size ? full_size : 1);
+    if (!data) {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    ssize_t res;
+    if (msg->msg_name)
+        res = recvfrom(fd, data, full_size, flags, msg->msg_name, &msg->msg_namelen);
+    else
+        res = recv(fd, data, full_size, flags);
+
+    if (res > 0) {
+        size_t left;
+        if ((size_t)res <= full_size) {
+            left = res;
+            msg->msg_flags = 0;
+        }
+        else {
+            left = full_size;
+            msg->msg_flags = MSG_TRUNC;
+        }
+
+        const char *src = data;
+        for (int i = 0; (i < msg->msg_iovlen) && (left > 0); ++i)
+        {
+            size_t to_copy = msg->msg_iov[i].iov_len;
+            if (to_copy > left)
+                to_copy = left;
+
+            memcpy(msg->msg_iov[i].iov_base, src, to_copy);
+            src += to_copy;
+            left -= to_copy;
+        }
+    }
+
+    free(data);
+    return res;
+}
+
+#else
+#error recvmsg not implemented on your platform!
 #endif

@@ -301,6 +301,8 @@ case "${host_os}" in
     SYS=nacl
     AC_DEFINE([_XOPEN_SOURCE], [700], [POSIX and XPG 7th edition])
     AC_LIBOBJ([sigwait])
+    AC_LIBOBJ([recvmsg])
+    AC_LIBOBJ([sendmsg])
     ;;
   *)
     SYS="${host_os}"

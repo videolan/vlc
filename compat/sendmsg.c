@@ -1,7 +1,11 @@
 /*****************************************************************************
  * sendmsg.c: POSIX sendmsg() replacement
  *****************************************************************************
+ * Copyright © 2017 VLC authors and VideoLAN
  * Copyright © 2016 Rémi Denis-Courmont
+ *
+ * Authors: Rémi Denis-Courmont
+ *          Dennis Hamester <dhamester@jusst.de>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -68,4 +72,64 @@ ssize_t sendmsg(int fd, const struct msghdr *msg, int flags)
     }
     return -1;
 }
+
+#elif __native_client__
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/uio.h>
+
+ssize_t sendmsg(int fd, const struct msghdr *msg, int flags)
+{
+    if (msg->msg_controllen != 0)
+    {
+        errno = ENOSYS;
+        return -1;
+    }
+
+    if ((msg->msg_iovlen <= 0) || (msg->msg_iovlen > IOV_MAX))
+    {
+        errno = EMSGSIZE;
+        return -1;
+    }
+
+    size_t full_size = 0;
+    for (int i = 0; i < msg->msg_iovlen; ++i)
+        full_size += msg->msg_iov[i].iov_len;
+
+    if (full_size > SSIZE_MAX) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    /**
+     * We always allocate here, because whether send/sento allow NULL message or
+     * not is unspecified.
+     */
+    char *data = malloc(full_size ? full_size : 1);
+    if (!data) {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    size_t tmp = 0;
+    for (int i = 0; i < msg->msg_iovlen; ++i) {
+        memcpy(data + tmp, msg->msg_iov[i].iov_base, msg->msg_iov[i].iov_len);
+        tmp += msg->msg_iov[i].iov_len;
+    }
+
+    ssize_t res;
+    if (msg->msg_name)
+        res = sendto(fd, data, full_size, flags, msg->msg_name, msg->msg_namelen);
+    else
+        res = send(fd, data, full_size, flags);
+
+    free(data);
+    return res;
+}
+
+#else
+#error sendmsg not implemented on your platform!
 #endif
