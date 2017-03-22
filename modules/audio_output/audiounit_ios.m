@@ -69,7 +69,7 @@ static const struct {
 } au_devs[] = {
     { "pcm", "Up to 9 channels PCM output", AU_DEV_PCM },
     { "encoded", "Encoded output if available (via HDMI/SPDIF) or PCM output",
-      AU_DEV_ENCODED },
+      AU_DEV_ENCODED }, /* This can also be forced with the --spdif option */
 };
 
 /*****************************************************************************
@@ -514,7 +514,7 @@ Open(vlc_object_t *obj)
 
     sys->b_muted = false;
     sys->b_preferred_channels_set = false;
-    sys->au_dev = AU_DEV_PCM;
+    sys->au_dev = var_InheritBool(aout, "spdif") ? AU_DEV_ENCODED : AU_DEV_PCM;
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
