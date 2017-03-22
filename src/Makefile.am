@@ -382,6 +382,16 @@ libvlccore_la_SOURCES += \
 	os2/rand.c \
 	os2/thread.c
 else
+if HAVE_NACL
+libvlccore_la_SOURCES += \
+	android/error.c \
+	posix/dirs.c \
+	posix/filesystem.c \
+	posix/netconf.c \
+	posix/rand.c \
+	posix/specific.c \
+	posix/timer.c
+else
 libvlccore_la_SOURCES += \
 	posix/filesystem.c \
 	posix/plugin.c \
@@ -420,6 +430,7 @@ libvlccore_la_LIBADD += -lanl
 else
 libvlccore_la_SOURCES += \
 	posix/getaddrinfo.c
+endif
 endif
 endif
 endif

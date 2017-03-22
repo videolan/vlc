@@ -297,6 +297,10 @@ case "${host_os}" in
     AC_LIBOBJ([freeaddrinfo])
     AC_LIBOBJ([gai_strerror])
     ;;
+  *nacl*)
+    SYS=nacl
+    AC_DEFINE([_XOPEN_SOURCE], [700], [POSIX and XPG 7th edition])
+    ;;
   *)
     SYS="${host_os}"
     ;;
@@ -327,6 +331,8 @@ AM_CONDITIONAL(HAVE_DARWIN,  test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_IOS,     test "${HAVE_IOS}" = "1")
 AM_CONDITIONAL(HAVE_OSX,     test "${HAVE_OSX}" = "1")
 AM_CONDITIONAL(HAVE_TVOS,    test "${HAVE_TVOS}" = "1")
+
+AM_CONDITIONAL(HAVE_NACL,    test "${SYS}" = "nacl")
 
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1") dnl Only used for the packaging
