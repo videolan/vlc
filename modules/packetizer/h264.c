@@ -764,12 +764,6 @@ static block_t *OutputPicture( decoder_t *p_dec )
         }
     }
 
-    if( p_sps->vui.i_time_scale && p_pic->i_length == 0 )
-    {
-        p_pic->i_length = CLOCK_FREQ * i_num_clock_ts *
-                          p_sps->vui.i_num_units_in_tick / p_sps->vui.i_time_scale;
-    }
-
     if( p_sps->frame_mbs_only_flag == 0 && p_sps->vui.b_pic_struct_present_flag )
     {
         switch( p_sys->i_pic_struct )
@@ -847,6 +841,21 @@ static block_t *OutputPicture( decoder_t *p_dec )
     {
         p_sys->prevdatedpoc.pts = p_pic->i_pts;
         p_sys->prevdatedpoc.num = PictureOrderCount;
+    }
+
+    if( p_pic->i_length == 0 )
+    {
+        if( p_sps->vui.i_time_scale )
+        {
+            p_pic->i_length = CLOCK_FREQ * i_num_clock_ts *
+                              p_sps->vui.i_num_units_in_tick / p_sps->vui.i_time_scale;
+        }
+        else
+        {
+            date_t next = p_sys->dts;
+            date_Increment( &next, i_num_clock_ts );
+            p_pic->i_length = date_Get( &next ) - date_Get( &p_sys->dts );
+        }
     }
 
 #if 0
