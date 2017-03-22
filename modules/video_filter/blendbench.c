@@ -195,10 +195,19 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_blend_chroma = VLC_FOURCC( psz_temp[0], psz_temp[1],
                                         psz_temp[2], psz_temp[3] );
     psz_cmd = var_CreateGetStringCommand( p_filter, CFG_PREFIX "blend-image" );
-    blendbench_LoadImage( p_this, &p_sys->p_blend_image, p_sys->i_blend_chroma,
-                          psz_cmd, "Blend" );
+    i_ret = blendbench_LoadImage( p_this, &p_sys->p_blend_image, p_sys->i_blend_chroma,
+                                  psz_cmd, "Blend" );
+
     free( psz_temp );
     free( psz_cmd );
+
+    if( i_ret != VLC_SUCCESS )
+    {
+        picture_Release( p_sys->p_base_image );
+        free( p_sys );
+
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
