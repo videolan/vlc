@@ -58,7 +58,7 @@ static demux_mapping* demux_lookup( char const* key,
     return bsearch( key, data, size, sizeof( *data ), demux_mapping_cmp );
 }
 
-static const char *demux_NameFromContentType(const char *mime)
+static const char *demux_NameFromMimeType(const char *mime)
 {
     static demux_mapping types[] =
     {   /* Must be sorted in ascending ASCII order */
@@ -196,11 +196,11 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     demux_t *p_demux = &priv->demux;
 
     if( s != NULL && (!strcasecmp( psz_demux, "any" ) || !psz_demux[0]) )
-    {   /* Look up demux by Content-Type for hard to detect formats */
-        char *type = stream_ContentType( s );
+    {   /* Look up demux by mime-type for hard to detect formats */
+        char *type = stream_MimeType( s );
         if( type != NULL )
         {
-            psz_demux = demux_NameFromContentType( type );
+            psz_demux = demux_NameFromMimeType( type );
             free( type );
         }
     }

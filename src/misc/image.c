@@ -293,7 +293,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
 
     if( !p_fmt_in->i_chroma )
     {
-        char *psz_mime = stream_ContentType( p_stream );
+        char *psz_mime = stream_MimeType( p_stream );
         if( psz_mime != NULL )
         {
             p_fmt_in->i_chroma = image_Mime2Fourcc( psz_mime );
