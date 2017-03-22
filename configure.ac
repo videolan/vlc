@@ -300,6 +300,7 @@ case "${host_os}" in
   *nacl*)
     SYS=nacl
     AC_DEFINE([_XOPEN_SOURCE], [700], [POSIX and XPG 7th edition])
+    AC_LIBOBJ([sigwait])
     ;;
   *)
     SYS="${host_os}"

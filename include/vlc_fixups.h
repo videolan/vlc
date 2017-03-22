@@ -107,6 +107,15 @@ extern "C" {
 # define VLC_NOTHROW
 #endif
 
+/* signal.h */
+#if !defined(HAVE_SIGWAIT) && defined(__native_client__)
+/* NaCl does not define sigwait in signal.h. We need to include it here to
+ * define sigwait, because sigset_t is allowed to be either an integral or a
+ * struct. */
+#include <signal.h>
+int sigwait(const sigset_t *set, int *sig);
+#endif
+
 /* stddef.h */
 #if !defined (__cplusplus) && !defined (HAVE_MAX_ALIGN_T)
 typedef struct {
