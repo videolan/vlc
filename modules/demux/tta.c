@@ -33,6 +33,7 @@
 #include <vlc_demux.h>
 #include <vlc_codec.h>
 #include <math.h>
+#include <limits.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -134,7 +135,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_totalframes = p_sys->i_datalength / p_sys->i_framelength +
                           ((p_sys->i_datalength % p_sys->i_framelength) != 0);
     p_sys->i_currentframe = 0;
-    if( p_sys->i_totalframes > (1 << 29))
+    if( (INT_MAX - 22 - 4) / sizeof(uint32_t) < p_sys->i_totalframes )
         goto error;
 
     i_seektable_size = sizeof(uint32_t)*p_sys->i_totalframes;
