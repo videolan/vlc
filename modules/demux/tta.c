@@ -164,7 +164,8 @@ static int Open( vlc_object_t * p_this )
         p_fullheader += 4;
     }
 
-    vlc_stream_Read( p_demux->s, p_fullheader, 4 ); /* CRC */
+    if( 4 != vlc_stream_Read( p_demux->s, p_fullheader, 4 ) ) /* CRC */
+        goto error;
     p_fullheader += 4;
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
