@@ -99,7 +99,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Open, Close )
 
-    add_integer( "vbi-page", 100,
+    add_integer_with_range( "vbi-page", 100, 0, 'z' << 16,
                  PAGE_TEXT, PAGE_LONGTEXT, false )
     add_bool( "vbi-opaque", false,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
@@ -208,6 +208,13 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec != VLC_CODEC_TELETEXT )
         return VLC_EGENERIC;
 
+    int i_page = var_CreateGetInteger( p_dec, "vbi-page" );
+    if( i_page > 999 )
+    {
+        msg_Warn( p_dec, "invalid vbi-page requested");
+        i_page = 0;
+    }
+
     p_sys = p_dec->p_sys = calloc( 1, sizeof(decoder_sys_t) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
@@ -245,7 +252,7 @@ static int Open( vlc_object_t *p_this )
                                 0 , EventHandler, p_dec );
 
     /* Create the var on vlc_global. */
-    p_sys->i_wanted_page = var_CreateGetInteger( p_dec, "vbi-page" );
+    p_sys->i_wanted_page = i_page;
     var_AddCallback( p_dec, "vbi-page", RequestPage, p_sys );
 
     /* Check if the Teletext track has a known "initial page". */
@@ -363,6 +370,12 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     /* */
     vlc_mutex_lock( &p_sys->lock );
+    if( p_sys->i_wanted_page == 0 )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
+    }
     const int i_align = p_sys->i_align;
     const unsigned int i_wanted_page = p_sys->i_wanted_page;
     const unsigned int i_wanted_subpage = p_sys->i_wanted_subpage;
@@ -710,7 +723,7 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
             p_sys->i_wanted_subpage = p_sys->nav_link[want_navlink].subno;
         }
     }
-    else if( newval.i_int > 0 && newval.i_int < 999 )
+    else if( newval.i_int >= 0 && newval.i_int < 999 )
     {
         p_sys->i_wanted_page = newval.i_int;
         p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
