@@ -230,6 +230,8 @@ char *FindPrefix(demux_t *p_demux)
  */
 char *ProcessMRL(const char *str, const char *base)
 {
+    char const* orig = str;
+
     if (str == NULL)
         return NULL;
 
@@ -267,6 +269,25 @@ char *ProcessMRL(const char *str, const char *base)
 
     char *abs = vlc_uri_resolve(base, str);
     free(rel);
+
+    if (abs == NULL)
+    {
+        /** If the input is not a valid URL, see if there is a scheme:// where
+         * the scheme itself consists solely of valid scheme-characters
+         * (including the VLC's scheme-extension). If it does, fall back to
+         * allowing the URI in order to not break back-compatibility.
+         */
+        char const* scheme_end = strstr( orig, "://" );
+        char const* valid_chars = "abcdefghijklmnopqrstuvwxyz"
+                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                  "0123456789" "+-./";
+        if (scheme_end &&
+            strspn (orig, valid_chars) == (size_t)(scheme_end - orig))
+        {
+            abs = strdup (orig);
+        }
+    }
+
     return abs;
 }
 
