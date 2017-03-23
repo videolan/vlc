@@ -689,8 +689,9 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             goto bailout;
 
     /* Set default CSD if ParseVideoExtra failed to configure one */
-    if (!p_sys->i_csd_count && p_dec->fmt_in.i_extra)
-        CSDDup(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+    if (!p_sys->i_csd_count && p_dec->fmt_in.i_extra
+     && CSDDup(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra) != VLC_SUCCESS)
+        goto bailout;
 
     i_ret = StartMediaCodec(p_dec);
     switch (i_ret)
