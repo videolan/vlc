@@ -149,6 +149,18 @@ typedef enum libvlc_position_t {
 } libvlc_position_t;
 
 /**
+ * Enumeration of teletext keys than can be passed via
+ * libvlc_video_set_teletext()
+ */
+typedef enum libvlc_teletext_key_t {
+    libvlc_teletext_key_red = 'r' << 16,
+    libvlc_teletext_key_green = 'g' << 16,
+    libvlc_teletext_key_yellow = 'y' << 16,
+    libvlc_teletext_key_blue = 'b' << 16,
+    libvlc_teletext_key_index = 'i' << 16,
+} libvlc_teletext_key_t;
+
+/**
  * Opaque equalizer handle.
  *
  * Equalizer settings can be applied to a media player.
@@ -1350,10 +1362,12 @@ LIBVLC_API int libvlc_video_get_teletext( libvlc_media_player_t *p_mi );
 /**
  * Set new teletext page to retrieve.
  *
+ * This function can also be used to send a teletext key.
+ *
  * \param p_mi the media player
  * \param i_page teletex page number requested. This value can be -1 to disable
- * teletext or a number in the range [0;1000[ to show the requested page. 100
- * is the default teletext page.
+ * teletext, a number in the range [0;1000[ to show the requested page, or a
+ * \ref libvlc_teletext_key_t. 100 is the default teletext page.
  */
 LIBVLC_API void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page );
 

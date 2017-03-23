@@ -514,13 +514,30 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
     input_thread_t *p_input_thread;
     vlc_object_t *p_zvbi = NULL;
     int telx;
+    bool b_key = false;
 
     if( i_page >= 0 && i_page < 1000 )
         var_SetInteger( p_mi, "vbi-page", i_page );
-    else if( i_page != -1 )
+    else if( i_page < -1 )
     {
         libvlc_printerr("Invalid page number");
         return;
+    }
+    else
+    {
+        switch (i_page)
+        {
+            case libvlc_teletext_key_red:
+            case libvlc_teletext_key_green:
+            case libvlc_teletext_key_yellow:
+            case libvlc_teletext_key_blue:
+            case libvlc_teletext_key_index:
+                b_key = true;
+                break;
+            default:
+                libvlc_printerr("Invalid key action");
+                return;
+        }
     }
 
     p_input_thread = libvlc_get_input_thread( p_mi );
@@ -548,11 +565,13 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
                 vlc_object_release( p_zvbi );
             }
         }
-        else
+        else if (!b_key)
         {
             /* the "vbi-page" will be selected on es creation */
             teletext_enable( p_input_thread, true );
         }
+        else
+            libvlc_printerr("Key action sent while the teletext is disabled");
     }
     vlc_object_release( p_input_thread );
 }
