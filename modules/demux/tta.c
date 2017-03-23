@@ -143,7 +143,10 @@ static int Open( vlc_object_t * p_this )
     fmt.i_extra = 22 + i_seektable_size + 4;
     fmt.p_extra = p_fullheader = malloc( fmt.i_extra );
     if( !p_fullheader )
+    {
+        fmt.i_extra = 0;
         goto error;
+    }
 
     memcpy( p_fullheader, p_header, 22 );
     p_fullheader += 22;
