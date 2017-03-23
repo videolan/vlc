@@ -164,8 +164,8 @@ static int Open( vlc_object_t * p_this )
     p_fullheader += 4;
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
-    es_format_Clean( &fmt );
     p_sys->i_start = p_fullheader - (uint8_t *)fmt.p_extra;
+    es_format_Clean( &fmt );
 
     return VLC_SUCCESS;
 error:
