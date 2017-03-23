@@ -671,20 +671,6 @@ block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
     return bo.b;
 }
 
-block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
-                                  const uint8_t *p_sps_buf,
-                                  size_t i_sps_size,
-                                  const uint8_t *p_pps_buf,
-                                  size_t i_pps_size )
-{
-    if( !hxxx_strip_AnnexB_startcode( &p_sps_buf, &i_sps_size ) ||
-        !hxxx_strip_AnnexB_startcode( &p_pps_buf, &i_pps_size ) )
-        return NULL;
-    return h264_NAL_to_avcC( i_nal_length_size,
-                             p_sps_buf, i_sps_size,
-                             p_pps_buf, i_pps_size );
-}
-
 static const h264_level_limits_t * h264_get_level_limits( const h264_sequence_parameter_set_t *p_sps )
 {
     uint16_t i_level_number = p_sps->i_level;
