@@ -103,6 +103,7 @@ struct h264_sequence_parameter_set_t
         uint32_t bottom_offset;
     } frame_crop;
     uint8_t frame_mbs_only_flag;
+    uint8_t mb_adaptive_frame_field_flag;
     int i_log2_max_frame_num;
     int i_pic_order_cnt_type;
     int i_delta_pic_order_always_zero_flag;

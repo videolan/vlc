@@ -367,7 +367,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     /* b_frame_mbs_only */
     p_sps->frame_mbs_only_flag = bs_read( p_bs, 1 );
     if( !p_sps->frame_mbs_only_flag )
-        bs_skip( p_bs, 1 );
+        p_sps->mb_adaptive_frame_field_flag = bs_read( p_bs, 1 );
 
     /* b_direct8x8_inference */
     bs_skip( p_bs, 1 );
