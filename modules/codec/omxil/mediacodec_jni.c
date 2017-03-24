@@ -38,7 +38,7 @@
 #include "mediacodec.h"
 
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile);
+                         size_t h264_profile, bool *p_adaptive);
 
 #define THREAD_NAME "mediacodec_jni"
 
@@ -58,6 +58,7 @@ struct jfields
     jclass buffer_info_class, byte_buffer_class;
     jmethodID tostring;
     jmethodID get_codec_count, get_codec_info_at, is_encoder, get_capabilities_for_type;
+    jmethodID is_feature_supported;
     jfieldID profile_levels_field, profile_field, level_field;
     jmethodID get_supported_types, get_name;
     jmethodID create_by_codec_name, configure, start, stop, flush, release;
@@ -113,7 +114,7 @@ static const struct member members[] = {
     { "getSupportedTypes", "()[Ljava/lang/String;", "android/media/MediaCodecInfo", OFF(get_supported_types), METHOD, true },
     { "getName", "()Ljava/lang/String;", "android/media/MediaCodecInfo", OFF(get_name), METHOD, true },
     { "getCapabilitiesForType", "(Ljava/lang/String;)Landroid/media/MediaCodecInfo$CodecCapabilities;", "android/media/MediaCodecInfo", OFF(get_capabilities_for_type), METHOD, true },
-
+    { "isFeatureSupported", "(Ljava/lang/String;)Z", "android/media/MediaCodecInfo$CodecCapabilities", OFF(is_feature_supported), METHOD, false },
     { "profileLevels", "[Landroid/media/MediaCodecInfo$CodecProfileLevel;", "android/media/MediaCodecInfo$CodecCapabilities", OFF(profile_levels_field), FIELD, true },
     { "profile", "I", "android/media/MediaCodecInfo$CodecProfileLevel", OFF(profile_field), FIELD, true },
     { "level", "I", "android/media/MediaCodecInfo$CodecProfileLevel", OFF(level_field), FIELD, true },
@@ -309,7 +310,7 @@ struct mc_api_sys
  * MediaCodec_GetName
  *****************************************************************************/
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile)
+                         size_t h264_profile, bool *p_adaptive)
 {
     JNIEnv *env;
     int num_codecs;
@@ -341,6 +342,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
         int profile_levels_len = 0, num_types = 0;
         const char *name_ptr = NULL;
         bool found = false;
+        bool b_adaptive = false;
 
         info = (*env)->CallStaticObjectMethod(env, jfields.media_codec_list_class,
                                               jfields.get_codec_info_at, i);
@@ -368,6 +370,16 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
             profile_levels = (*env)->GetObjectField(env, codec_capabilities, jfields.profile_levels_field);
             if (profile_levels)
                 profile_levels_len = (*env)->GetArrayLength(env, profile_levels);
+            if (jfields.is_feature_supported)
+            {
+                jstring jfeature = JNI_NEW_STRING("adaptive-playback");
+                b_adaptive =
+                    (*env)->CallBooleanMethod(env, codec_capabilities,
+                                              jfields.is_feature_supported,
+                                              jfeature);
+                CHECK_EXCEPTION();
+                (*env)->DeleteLocalRef(env, jfeature);
+            }
         }
         msg_Dbg(p_obj, "Number of profile levels: %d", profile_levels_len);
 
@@ -418,6 +430,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                 memcpy(psz_name, name_ptr, name_len);
                 psz_name[name_len] = '\0';
             }
+            *p_adaptive = b_adaptive;
         }
 loopclean:
         if (name)
@@ -543,10 +556,15 @@ static int Start(mc_api *api, union mc_api_args *p_args)
         if (p_args->video.i_angle != 0)
             SET_INTEGER(jformat, "rotation-degrees", p_args->video.i_angle);
 
-        /* feature-tunneled-playback available since API 21 */
-        if (b_direct_rendering && jfields.get_input_buffer)
-            SET_INTEGER(jformat, "feature-tunneled-playback",
-                        p_args->video.b_tunneled_playback);
+        if (b_direct_rendering)
+        {
+            /* feature-tunneled-playback available since API 21 */
+            if (jfields.get_input_buffer && p_args->video.b_tunneled_playback)
+                SET_INTEGER(jformat, "feature-tunneled-playback", 1);
+
+            if (p_args->video.b_adaptive_playback)
+                SET_INTEGER(jformat, "feature-adaptive-playback", 1);
+        }
     }
     else
     {
@@ -946,8 +964,9 @@ static void Clean(mc_api *api)
 static int Configure(mc_api *api, size_t i_h264_profile)
 {
     free(api->psz_name);
+    bool b_adaptive;
     api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
-                                       i_h264_profile);
+                                       i_h264_profile, &b_adaptive);
     if (!api->psz_name)
         return MC_API_ERROR;
     api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
@@ -956,6 +975,8 @@ static int Configure(mc_api *api, size_t i_h264_profile)
     /* Allow interlaced picture after API 21 */
     if (jfields.get_input_buffer && jfields.get_output_buffer)
         api->i_quirks |= MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED;
+    if (b_adaptive)
+        api->i_quirks |= MC_API_VIDEO_QUIRKS_ADAPTIVE;
     return 0;
 }
 

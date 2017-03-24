@@ -45,6 +45,9 @@ int MediaCodecNdk_Init(mc_api*);
 #define MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED 0x4
 #define MC_API_AUDIO_QUIRKS_NEED_CHANNELS 0x8
 
+/* MediaCodec only QUIRKS */
+#define MC_API_VIDEO_QUIRKS_ADAPTIVE 0x1000
+
 struct mc_api_out
 {
     enum {
@@ -94,6 +97,7 @@ union mc_api_args
         int i_height;
         int i_angle;
         bool b_tunneled_playback;
+        bool b_adaptive_playback;
     } video;
     struct
     {

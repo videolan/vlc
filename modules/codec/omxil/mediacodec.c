@@ -103,6 +103,7 @@ struct decoder_sys_t
     /* If true, the first input block was successfully dequeued */
     bool            b_input_dequeued;
     bool            b_aborted;
+    bool            b_adaptive;
     int             i_decode_flags;
 
     union
@@ -283,6 +284,12 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
+    if (!hh->b_is_xvcC && p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
+    {
+        p_sys->b_adaptive = true;
+        return VLC_SUCCESS;
+    }
+
     assert(hh->pf_process_block != NULL);
     p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
@@ -297,8 +304,19 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     struct hxxx_helper *hh = &p_sys->video.hh;
 
     int i_ret = hxxx_helper_set_extra(hh, p_extra, i_extra);
-    if (i_ret != VLC_SUCCESS || hh->pf_process_block == NULL)
+    if (i_ret != VLC_SUCCESS)
         return i_ret;
+
+    if (!hh->b_is_xvcC)
+    {
+        if (p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
+        {
+            p_sys->b_adaptive = true;
+            return VLC_SUCCESS;
+        }
+        else /* TODO */
+            return VLC_EGENERIC;
+    }
 
     assert(hh->pf_process_block != NULL);
     p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
@@ -445,7 +463,8 @@ static int StartMediaCodec(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     union mc_api_args args;
 
-    if (((p_sys->api.i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->i_csd_count))
+    if ((p_sys->api.i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->i_csd_count
+     && !p_sys->b_adaptive)
     {
         msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
                  (const char *)&p_dec->fmt_in.i_codec);
@@ -454,7 +473,8 @@ static int StartMediaCodec(decoder_t *p_dec)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        if (!p_dec->fmt_out.video.i_width  || !p_dec->fmt_out.video.i_height)
+        if (!p_sys->b_adaptive
+         && (!p_dec->fmt_out.video.i_width || !p_dec->fmt_out.video.i_height))
         {
             msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
                      (const char *)&p_dec->fmt_in.i_codec);
@@ -468,6 +488,9 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.video.p_jsurface = p_sys->video.p_jsurface;
         args.video.b_tunneled_playback = args.video.p_surface ?
                 var_InheritBool(p_dec, CFG_PREFIX "tunneled-playback") : false;
+        if (p_sys->b_adaptive)
+            msg_Dbg(p_dec, "mediacodec configured for adaptative playback");
+        args.video.b_adaptive_playback = p_sys->b_adaptive;
     }
     else
     {
@@ -1368,6 +1391,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
                     if (!i_ts && p_block->i_dts)
                         i_ts = p_block->i_dts;
                 }
+                else fprintf(stderr, "send CSD\n");
                 p_buf = p_block->p_buffer;
                 i_size = p_block->i_buffer;
             }

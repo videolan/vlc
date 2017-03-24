@@ -39,7 +39,7 @@
 #include "mediacodec.h"
 
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile);
+                         size_t h264_profile, bool *p_adaptive);
 
 #define THREAD_NAME "mediacodec_ndk"
 
@@ -342,8 +342,10 @@ static int Start(mc_api *api, union mc_api_args *p_args)
             p_anw = p_args->video.p_surface;
             if (p_args->video.b_tunneled_playback)
                 syms.AMediaFormat.setInt32(p_sys->p_format,
-                                           "feature-tunneled-playback",
-                                           p_args->video.b_tunneled_playback);
+                                           "feature-tunneled-playback", 1);
+            if (p_args->video.b_adaptive_playback)
+                syms.AMediaFormat.setInt32(p_sys->p_format,
+                                           "feature-adaptive-playback", 1);
         }
     }
     else
@@ -584,14 +586,17 @@ static void Clean(mc_api *api)
 static int Configure(mc_api * api, size_t i_h264_profile)
 {
     free(api->psz_name);
+    bool b_adaptive;
     api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
-                                       i_h264_profile);
+                                       i_h264_profile, &b_adaptive);
     if (!api->psz_name)
         return MC_API_ERROR;
     api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
                                        strlen(api->psz_name));
     /* Allow interlaced picture after API 21 */
     api->i_quirks |= MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED;
+    if (b_adaptive)
+        api->i_quirks |= MC_API_VIDEO_QUIRKS_ADAPTIVE;
     return 0;
 }
 
