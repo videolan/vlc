@@ -144,7 +144,7 @@ VLC_API void block_Init( block_t *, void *, size_t );
  */
 VLC_API block_t *block_Alloc(size_t size) VLC_USED VLC_MALLOC;
 
-block_t *block_TryRealloc(block_t *, ssize_t pre, size_t body) VLC_USED;
+VLC_API block_t *block_TryRealloc(block_t *, ssize_t pre, size_t body) VLC_USED;
 
 /**
  * Reallocates a block.
