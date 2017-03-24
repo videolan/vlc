@@ -452,8 +452,8 @@ static int StartVideoToolbox(decoder_t *p_dec, const block_t *p_block)
         if(!p_sys->b_is_avcc)
         {
             block_t *p_avcC = h264_NAL_to_avcC( p_sys->i_nal_length_size,
-                                                p_sps_nal, i_sps_nalsize,
-                                                p_pps_nal, i_pps_nalsize);
+                                                &p_sps_nal, &i_sps_nalsize, 1,
+                                                &p_pps_nal, &i_pps_nalsize, 1);
             if (!p_avcC) {
                 msg_Warn(p_dec, "buffer creation failed");
                 return VLC_EGENERIC;
