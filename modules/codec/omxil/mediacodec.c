@@ -284,6 +284,7 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         return i_ret;
 
     assert(hh->pf_process_block != NULL);
+    p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
     if (hh->h264.i_sps_count > 0 || hh->h264.i_pps_count > 0)
         return H264SetCSD(p_dec, NULL);
@@ -300,6 +301,7 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         return i_ret;
 
     assert(hh->pf_process_block != NULL);
+    p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
     if (hh->hevc.i_annexb_config_nal > 0)
         return HEVCSetCSD(p_dec, NULL);
@@ -326,6 +328,7 @@ static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     if (offset >= i_extra - 4)
         return VLC_EGENERIC;
 
+    p_dec->p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
     return CSDDup(p_dec, p_extra + offset, i_extra - offset);
 }
 
@@ -359,6 +362,7 @@ static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     SetDWLE(&(p_data[12]), p_dec->fmt_in.video.i_height);
     SetDWLE(&(p_data[16]), p_dec->fmt_in.video.i_width);
 
+    p_dec->p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
     return CSDDup(p_dec, p_data, sizeof(p_data));
 }
 
@@ -633,17 +637,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
-            p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
             hxxx_helper_init(&p_sys->video.hh, VLC_OBJECT(p_dec),
                              p_dec->fmt_in.i_codec, false);
             break;
-        case VLC_CODEC_VC1:
-            p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
-            break;
-        default:
-            p_sys->pf_on_new_block = Video_OnNewBlock;
-            break;
         }
+        p_sys->pf_on_new_block = Video_OnNewBlock;
         p_sys->pf_on_flush = Video_OnFlush;
         p_sys->pf_process_output = Video_ProcessOutput;
 
