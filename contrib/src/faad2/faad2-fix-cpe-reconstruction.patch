@@ -1,0 +1,37 @@
+hDecoder->element_alloced denotes whether or not we have allocated memory for
+usage in terms of the specified channel element. Given that it previously only
+had two states (1 meaning allocated, and 0 meaning not allocated), it would not
+allocate enough memory for parsing a CPE it if is preceeded by a SCE (and
+therefor crash).
+
+These changes fixes the issue by making sure that we allocate additional memory
+if so is necessary, and the set of values for hDecoder->element_alloced[n] is
+now:
+
+ 0 = nothing allocated
+ 1 = allocated enough for SCE
+ 2 = allocated enough for CPE
+
+All branches that depend on hDecoder->element_alloced[n] prior to this patch
+only checks if the value is, or is not, zero. The added state, 2, is therefor
+correctly handled automatically.
+
+--- faad2/libfaad/specrec.c	2017-03-12 20:16:58.305887783 +0100
++++ faad2/libfaad/specrec.c	2017-03-25 03:48:19.875321643 +0100
+@@ -1110,13 +1110,13 @@
+ #ifdef PROFILE
+     int64_t count = faad_get_ts();
+ #endif
+-    if (hDecoder->element_alloced[hDecoder->fr_ch_ele] == 0)
++    if (hDecoder->element_alloced[hDecoder->fr_ch_ele] != 2)
+     {
+         retval = allocate_channel_pair(hDecoder, cpe->channel, (uint8_t)cpe->paired_channel);
+         if (retval > 0)
+             return retval;
+ 
+-        hDecoder->element_alloced[hDecoder->fr_ch_ele] = 1;
++        hDecoder->element_alloced[hDecoder->fr_ch_ele] = 2;
+     }
+ 
+     /* dequantisation and scaling */
+
