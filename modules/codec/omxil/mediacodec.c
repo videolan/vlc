@@ -103,6 +103,7 @@ struct decoder_sys_t
     /* If true, the first input block was successfully dequeued */
     bool            b_input_dequeued;
     bool            b_aborted;
+    bool            b_drained;
     bool            b_adaptive;
     int             i_decode_flags;
 
@@ -1211,9 +1212,9 @@ static void *OutThread(void *data)
 
                 if (out.b_eos)
                 {
-                    msg_Warn(p_dec, "EOS received, abort OutThread");
-                    vlc_restorecancel(canc);
-                    break;
+                    msg_Warn(p_dec, "EOS received");
+                    p_sys->b_drained = true;
+                    vlc_cond_signal(&p_sys->dec_cond);
                 }
             } else if (i_ret != 0)
             {
@@ -1358,11 +1359,15 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
          * frames. Use a timeout here since we can't know if all decoders will
          * behave correctly. */
         mtime_t deadline = mdate() + INT64_C(1000000);
-        while (!p_sys->b_aborted
+        while (!p_sys->b_aborted && !p_sys->b_drained
             && vlc_cond_timedwait(&p_sys->dec_cond, &p_sys->lock, deadline) == 0);
 
-        if (!p_sys->b_aborted)
+        if (!p_sys->b_drained)
+        {
             msg_Err(p_dec, "OutThread timed out");
+            p_sys->b_aborted = true;
+        }
+        p_sys->b_drained = false;
     }
 
     return VLC_SUCCESS;
