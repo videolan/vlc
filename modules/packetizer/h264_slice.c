@@ -371,6 +371,7 @@ uint8_t h264_get_num_ts( const h264_sequence_parameter_set_t *p_sps,
                          int tFOC, int bFOC )
 {
     i_pic_struct = h264_infer_pic_struct( p_sps, p_slice, i_pic_struct, tFOC, bFOC );
-    const uint8_t rgi_numclock[9] = { 1, 1, 1, 2, 2, 3, 3, 2, 3 };
+    /* !WARN modified with nuit field based multiplier for values 0, 7 and 8 */
+    const uint8_t rgi_numclock[9] = { 2, 1, 1, 2, 2, 3, 3, 4, 6 };
     return rgi_numclock[ i_pic_struct ];
 }
