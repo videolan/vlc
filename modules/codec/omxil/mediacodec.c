@@ -1249,12 +1249,133 @@ static block_t *GetNextBlock(decoder_sys_t *p_sys, block_t *p_block)
         return p_block;
 }
 
+static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
+                            bool b_drain)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = NULL;
+    bool b_dequeue_timeout = false;
+
+    assert(p_sys->api.b_started);
+
+    /* Queue CSD blocks and input blocks */
+    while (b_drain || (p_block = GetNextBlock(p_sys, p_in_block)))
+    {
+        int i_index;
+
+        vlc_mutex_unlock(&p_sys->lock);
+        /* Wait for an input buffer. This function returns when a new input
+         * buffer is available or after 1sec of timeout. */
+        i_index = p_sys->api.dequeue_in(&p_sys->api,
+                                        p_sys->api.b_direct_rendering ?
+                                        INT64_C(1000000) : -1);
+        vlc_mutex_lock(&p_sys->lock);
+
+        if (p_sys->b_aborted)
+            return VLC_EGENERIC;
+
+        bool b_config = false;
+        mtime_t i_ts = 0;
+        p_sys->b_input_dequeued = true;
+        const void *p_buf = NULL;
+        size_t i_size = 0;
+
+        if (i_index >= 0)
+        {
+            assert(b_drain || p_block != NULL);
+            if (p_block != NULL)
+            {
+                b_config = (p_block->i_flags & BLOCK_FLAG_CSD);
+                if (!b_config)
+                {
+                    i_ts = p_block->i_pts;
+                    if (!i_ts && p_block->i_dts)
+                        i_ts = p_block->i_dts;
+                }
+                p_buf = p_block->p_buffer;
+                i_size = p_block->i_buffer;
+            }
+
+            if (p_sys->api.queue_in(&p_sys->api, i_index, p_buf, i_size,
+                                    i_ts, b_config) == 0)
+            {
+                if (!b_config && p_block != NULL)
+                {
+                    if (p_block->i_flags & BLOCK_FLAG_PREROLL)
+                        p_sys->i_preroll_end = i_ts;
+
+                    /* One input buffer is queued, signal OutThread that will
+                     * fetch output buffers */
+                    p_sys->b_output_ready = true;
+                    vlc_cond_broadcast(&p_sys->cond);
+
+                    assert(p_block == p_in_block),
+                    p_in_block = NULL;
+                }
+                b_dequeue_timeout = false;
+                if (b_drain)
+                    break;
+            } else
+            {
+                msg_Err(p_dec, "queue_in failed");
+                goto error;
+            }
+        }
+        else if (i_index == MC_API_INFO_TRYAGAIN)
+        {
+            /* HACK: When direct rendering is enabled, there is a possible
+             * deadlock between the Decoder and the Vout. It happens when the
+             * Vout is paused and when the Decoder is flushing. In that case,
+             * the Vout won't release any output buffers, therefore MediaCodec
+             * won't dequeue any input buffers. To work around this issue,
+             * release all output buffers if DecodeBlock is waiting more than
+             * 1sec for a new input buffer. */
+            if (!b_dequeue_timeout)
+            {
+                msg_Warn(p_dec, "Decoder stuck: invalidate all buffers");
+                InvalidateAllPictures(p_dec);
+                b_dequeue_timeout = true;
+                continue;
+            }
+            else
+            {
+                msg_Err(p_dec, "dequeue_in timeout: no input available for 2secs");
+                goto error;
+            }
+        }
+        else
+        {
+            msg_Err(p_dec, "dequeue_in failed");
+            goto error;
+        }
+    }
+
+    if (b_drain)
+    {
+        msg_Warn(p_dec, "EOS sent, waiting for OutThread");
+
+        /* Wait for the OutThread to stop (and process all remaining output
+         * frames. Use a timeout here since we can't know if all decoders will
+         * behave correctly. */
+        mtime_t deadline = mdate() + INT64_C(1000000);
+        while (!p_sys->b_aborted
+            && vlc_cond_timedwait(&p_sys->dec_cond, &p_sys->lock, deadline) == 0);
+
+        if (!p_sys->b_aborted)
+            msg_Err(p_dec, "OutThread timed out");
+    }
+
+    return VLC_SUCCESS;
+
+error:
+    AbortDecoderLocked(p_dec);
+    return VLC_EGENERIC;
+}
+
 static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_ret;
-    bool b_dequeue_timeout = false;
-    bool b_draining;
 
     vlc_mutex_lock(&p_sys->lock);
 
@@ -1266,53 +1387,46 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
             goto reload;
     }
 
-    if (p_in_block != NULL)
-    {
-        b_draining = false;
-        if (p_in_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
-        {
-            DecodeFlushLocked(p_dec);
-            if (p_sys->b_aborted)
-                goto end;
-            if (p_in_block->i_flags & BLOCK_FLAG_CORRUPTED)
-                goto end;
-        }
-
-        if (p_in_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
-         && !(p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED))
-        {
-            /* Before Android 21 and depending on the vendor, MediaCodec can
-             * crash or be in an inconsistent state when decoding interlaced
-             * videos. See OMXCodec_GetQuirks() for a white list of decoders
-             * that supported interlaced videos before Android 21. */
-            msg_Warn(p_dec, "codec doesn't support interlaced videos");
-            goto reload;
-        }
-
-        /* Parse input block */
-        if ((i_ret = p_sys->pf_on_new_block(p_dec, &p_in_block)) != 1)
-        {
-            if (i_ret != 0)
-            {
-                AbortDecoderLocked(p_dec);
-                msg_Err(p_dec, "pf_on_new_block failed");
-            }
-            goto end;
-        }
-    }
-    else
+    if (p_in_block == NULL)
     {
         /* No input block, decoder is draining */
         msg_Err(p_dec, "Decoder is draining");
-        b_draining = true;
 
-        if (!p_sys->b_output_ready)
-        {
-            /* Output no ready, no need to drain */
-            goto end;
-        }
+        if (p_sys->b_output_ready)
+            QueueBlockLocked(p_dec, NULL, true);
+        goto end;
     }
 
+    if (p_in_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
+    {
+        DecodeFlushLocked(p_dec);
+        if (p_sys->b_aborted)
+            goto end;
+        if (p_in_block->i_flags & BLOCK_FLAG_CORRUPTED)
+            goto end;
+    }
+
+    if (p_in_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
+     && !(p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED))
+    {
+        /* Before Android 21 and depending on the vendor, MediaCodec can
+         * crash or be in an inconsistent state when decoding interlaced
+         * videos. See OMXCodec_GetQuirks() for a white list of decoders
+         * that supported interlaced videos before Android 21. */
+        msg_Warn(p_dec, "codec doesn't support interlaced videos");
+        goto reload;
+    }
+
+    /* Parse input block */
+    if ((i_ret = p_sys->pf_on_new_block(p_dec, &p_in_block)) != 1)
+    {
+        if (i_ret != 0)
+        {
+            AbortDecoderLocked(p_dec);
+            msg_Err(p_dec, "pf_on_new_block failed");
+        }
+        goto end;
+    }
     if (p_sys->i_decode_flags & (DECODE_FLASH_FLUSH|DECODE_FLAG_RESTART))
     {
         msg_Warn(p_dec, "Flushing from DecodeBlock");
@@ -1353,124 +1467,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
     }
 
     /* Abort if MediaCodec is not yet started */
-    if (!p_sys->api.b_started)
-        goto end;
-
-    /* Queue CSD blocks and input blocks */
-    block_t *p_block = NULL;
-    while (b_draining || (p_block = GetNextBlock(p_sys, p_in_block)))
-    {
-        int i_index;
-
-        vlc_mutex_unlock(&p_sys->lock);
-        /* Wait for an input buffer. This function returns when a new input
-         * buffer is available or after 1sec of timeout. */
-        i_index = p_sys->api.dequeue_in(&p_sys->api,
-                                        p_sys->api.b_direct_rendering ?
-                                        INT64_C(1000000) : -1);
-        vlc_mutex_lock(&p_sys->lock);
-
-        if (p_sys->b_aborted)
-            goto end;
-
-        bool b_config = false;
-        mtime_t i_ts = 0;
-        p_sys->b_input_dequeued = true;
-        const void *p_buf = NULL;
-        size_t i_size = 0;
-
-        if (i_index >= 0)
-        {
-            assert(b_draining || p_block != NULL);
-            if (p_block != NULL)
-            {
-                b_config = (p_block->i_flags & BLOCK_FLAG_CSD);
-                if (!b_config)
-                {
-                    i_ts = p_block->i_pts;
-                    if (!i_ts && p_block->i_dts)
-                        i_ts = p_block->i_dts;
-                }
-                else fprintf(stderr, "send CSD\n");
-                p_buf = p_block->p_buffer;
-                i_size = p_block->i_buffer;
-            }
-
-            if (p_sys->api.queue_in(&p_sys->api, i_index, p_buf, i_size,
-                                    i_ts, b_config) == 0)
-            {
-                if (!b_config && p_block != NULL)
-                {
-                    if (p_block->i_flags & BLOCK_FLAG_PREROLL)
-                        p_sys->i_preroll_end = i_ts;
-
-                    /* One input buffer is queued, signal OutThread that will
-                     * fetch output buffers */
-                    p_sys->b_output_ready = true;
-                    vlc_cond_broadcast(&p_sys->cond);
-
-                    assert(p_block == p_in_block),
-                    block_Release(p_in_block);
-                    p_in_block = NULL;
-                }
-                b_dequeue_timeout = false;
-                if (b_draining)
-                    break;
-            } else
-            {
-                msg_Err(p_dec, "queue_in failed");
-                AbortDecoderLocked(p_dec);
-                goto end;
-            }
-        }
-        else if (i_index == MC_API_INFO_TRYAGAIN)
-        {
-            /* HACK: When direct rendering is enabled, there is a possible
-             * deadlock between the Decoder and the Vout. It happens when the
-             * Vout is paused and when the Decoder is flushing. In that case,
-             * the Vout won't release any output buffers, therefore MediaCodec
-             * won't dequeue any input buffers. To work around this issue,
-             * release all output buffers if DecodeBlock is waiting more than
-             * 1sec for a new input buffer. */
-            if (!b_dequeue_timeout)
-            {
-                msg_Warn(p_dec, "Decoder stuck: invalidate all buffers");
-                InvalidateAllPictures(p_dec);
-                b_dequeue_timeout = true;
-                continue;
-            }
-            else
-            {
-                msg_Err(p_dec, "dequeue_in timeout: no input available for 2secs");
-                AbortDecoderLocked(p_dec);
-                goto end;
-            }
-        }
-        else
-        {
-            msg_Err(p_dec, "dequeue_in failed");
-            AbortDecoderLocked(p_dec);
-            goto end;
-        }
-    }
-
-    if (b_draining)
-    {
-        msg_Warn(p_dec, "EOS sent, waiting for OutThread");
-
-        /* Wait for the OutThread to stop (and process all remaining output
-         * frames. Use a timeout here since we can't know if all decoders will
-         * behave correctly. */
-        mtime_t deadline = mdate() + INT64_C(1000000);
-        while (!p_sys->b_aborted
-            && vlc_cond_timedwait(&p_sys->dec_cond, &p_sys->lock, deadline) == 0);
-
-        if (!p_sys->b_aborted)
-            msg_Err(p_dec, "OutThread timed out");
-
-        vlc_mutex_unlock(&p_sys->lock);
-        return VLCDEC_SUCCESS;
-    }
+    if (p_sys->api.b_started)
+        QueueBlockLocked(p_dec, p_in_block, false);
 
 end:
     if (p_in_block)
