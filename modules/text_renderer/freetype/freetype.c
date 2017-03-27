@@ -1266,7 +1266,9 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_select = Generic_Select;
     p_sys->pf_get_family = FontConfig_GetFamily;
     p_sys->pf_get_fallbacks = FontConfig_GetFallbacks;
-    FontConfig_Prepare( p_filter );
+    if( FontConfig_Prepare( p_filter ) )
+        goto error;
+
 #elif defined( __APPLE__ )
     p_sys->pf_select = Generic_Select;
     p_sys->pf_get_family = CoreText_GetFamily;
@@ -1308,6 +1310,9 @@ static int Create( vlc_object_t *p_this )
     if( !p_sys->p_face )
     {
         msg_Err( p_filter, "Error loading default face" );
+#ifdef HAVE_FONTCONFIG
+        FontConfig_Unprepare();
+#endif
         goto error;
     }
 
@@ -1365,7 +1370,11 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-#if defined( _WIN32 )
+#ifdef HAVE_FONTCONFIG
+    if( p_sys->p_face != NULL )
+        FontConfig_Unprepare();
+
+#elif defined( _WIN32 )
     if( p_sys->pf_get_family == DWrite_GetFamily )
         ReleaseDWrite( p_filter );
 #endif

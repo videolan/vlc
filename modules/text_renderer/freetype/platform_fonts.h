@@ -145,6 +145,7 @@ vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_famil
                                        uni_char_t codepoint );
 const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family );
 int FontConfig_Prepare( filter_t *p_filter );
+void FontConfig_Unprepare( void );
 #endif /* FONTCONFIG */
 
 #if defined( _WIN32 )

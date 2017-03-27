@@ -34,6 +34,9 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+#include <stdint.h>
+
 #include <vlc_common.h>
 #include <vlc_filter.h>                     /* filter_sys_t */
 #include <vlc_dialog.h>                     /* FcCache dialog */
@@ -42,24 +45,35 @@
 
 #include "../platform_fonts.h"
 
+static FcConfig *config;
+static uintptr_t refs;
+static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+
 int FontConfig_Prepare( filter_t *p_filter )
 {
-    /* */
+    mtime_t ts;
+
+    vlc_mutex_lock( &lock );
+    if( refs++ > 0 )
+    {
+        vlc_mutex_unlock( &lock );
+        return VLC_SUCCESS;
+    }
+
     msg_Dbg( p_filter, "Building font databases.");
-    mtime_t t1, t2;
-    t1 = mdate();
+    ts = mdate();
 
-#ifdef __OS2__
-    FcInit();
-#endif
+#ifndef _WIN32
+    config = FcInitLoadConfigAndFonts();
+    if( unlikely(config == NULL) )
+        refs = 0;
 
-#if defined( _WIN32 )
-    int i_ret;
+#else
     unsigned int i_dialog_id = 0;
     dialog_progress_bar_t *p_dialog = NULL;
-    FcConfig *fcConfig = FcInitLoadConfig();
+    config = FcInitLoadConfig();
 
-    i_ret =
+    int i_ret =
         vlc_dialog_display_progress( p_filter, true, 0.0, NULL,
                                      _("Building font cache"),
                                      _("Please wait while your font cache is rebuilt.\n"
@@ -67,15 +81,29 @@ int FontConfig_Prepare( filter_t *p_filter )
 
     i_dialog_id = i_ret > 0 ? i_ret : 0;
 
-    if( FcConfigBuildFonts( fcConfig ) == FcFalse )
+    if( FcConfigBuildFonts( config ) == FcFalse )
         return VLC_ENOMEM;
 
     if( i_dialog_id != 0 )
         vlc_dialog_cancel( p_filter, i_dialog_id );
+
 #endif
-    t2 = mdate();
-    msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
-    return VLC_SUCCESS;
+
+    vlc_mutex_unlock( &lock );
+    ts -= mdate();
+    msg_Dbg( p_filter, "Took %ld microseconds", (long)ts );
+
+    return (config != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+void FontConfig_Unprepare(void)
+{
+    vlc_mutex_lock( &lock );
+    assert( refs > 0 );
+    if( --refs == 0 )
+        FcConfigDestroy( config );
+
+    vlc_mutex_unlock( &lock );
 }
 
 const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family )
@@ -114,7 +142,6 @@ const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_fa
         FcChar8* val_s;
         FcBool val_b;
         char *psz_fontfile = NULL;
-        FcConfig* config = NULL;
 
         /* Create a pattern and fill it */
         pat = FcPatternCreate();
@@ -201,11 +228,11 @@ vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_famil
     family.type = FcTypeString;
     family.u.s = ( const FcChar8* ) psz_family;
     FcPatternAdd( p_pattern, FC_FAMILY, family, FcFalse );
-    if( FcConfigSubstitute( NULL, p_pattern, FcMatchPattern ) == FcTrue )
+    if( FcConfigSubstitute( config, p_pattern, FcMatchPattern ) == FcTrue )
     {
         FcDefaultSubstitute( p_pattern );
         FcResult result;
-        FcFontSet* p_font_set = FcFontSort( NULL, p_pattern, FcTrue, NULL, &result );
+        FcFontSet* p_font_set = FcFontSort( config, p_pattern, FcTrue, NULL, &result );
         if( p_font_set )
         {
             for( int i = 0; i < p_font_set->nfont; ++i )
