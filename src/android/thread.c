@@ -417,5 +417,5 @@ mtime_t mdate (void)
 
 unsigned vlc_GetCPUCount(void)
 {
-    return sysconf(_SC_NPROCESSORS_CONF);
+    return sysconf(_SC_NPROCESSORS_ONLN);
 }
