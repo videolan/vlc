@@ -964,6 +964,26 @@ static void Flush(decoder_t *p_dec)
     p_sys->b_vt_flush = p_sys->b_vt_feed;
 }
 
+static void Drain(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* draining: return last pictures of the reordered queue */
+    if (p_sys->session)
+        VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
+    for (;;)
+    {
+        vlc_mutex_lock(&p_sys->lock);
+        picture_t *p_pic = PicReorder_pop(p_dec, true);
+        vlc_mutex_unlock(&p_sys->lock);
+
+        if (p_pic)
+            decoder_QueueVideo(p_dec, p_pic);
+        else
+            break;
+    }
+}
+
 static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -975,20 +995,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     if (!p_block)
     {
-        /* draining: return last pictures of the reordered queue */
-        if (p_sys->session)
-            VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
-        for (;;)
-        {
-            vlc_mutex_lock(&p_sys->lock);
-            picture_t *p_pic = PicReorder_pop(p_dec, true);
-            vlc_mutex_unlock(&p_sys->lock);
-
-            if (p_pic)
-                decoder_QueueVideo(p_dec, p_pic);
-            else
-                break;
-        }
+        Drain(p_dec);
         return VLCDEC_SUCCESS;
     }
 
@@ -1002,7 +1009,10 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
     {
         if (p_sys->b_vt_feed)
+        {
+            Drain(p_dec);
             RestartVideoToolbox(p_dec, false);
+        }
         goto skip;
     }
 
@@ -1021,6 +1031,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         assert(p_sys->codec == kCMVideoCodecType_H264 && !p_sys->hh.b_is_xvcC);
         if (p_sys->session)
         {
+            msg_Dbg(p_dec, "SPS/PPS changed: draining H264 decoder");
+            Drain(p_dec);
             msg_Dbg(p_dec, "SPS/PPS changed: restarting H264 decoder");
             StopVideoToolbox(p_dec, true);
         }
