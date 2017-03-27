@@ -3169,14 +3169,14 @@ if test "${enable_freetype}" != "no"; then
       VLC_ADD_CPPFLAGS([skins2],[${FREETYPE_CFLAGS}])
       VLC_ADD_LIBS([skins2],[${FREETYPE_LIBS}])
 
-      dnl fontconfig support
-      if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" ; then
-          if test "${enable_fontconfig}" != "no"; then
-            AC_CHECK_HEADERS(fontconfig/fontconfig.h, [
-              have_fontconfig="yes"
-            ],[AC_MSG_WARN([library fontconfig not found. Styles will be disabled in freetype])])
-          fi
-      fi
+    dnl fontconfig support
+    AS_IF([test "${enable_fontconfig}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "darwin"], [
+      PKG_CHECK_MODULES(FONTCONFIG, [fontconfig], [
+        have_fontconfig="yes"
+      ], [
+        AC_MSG_WARN([${FONTCONFIG_PKG_ERRORS}. Styles will be disabled in FreeType.])
+      ])
+    ])
 
       dnl fribidi support
       if test "${enable_fribidi}" != "no"; then
