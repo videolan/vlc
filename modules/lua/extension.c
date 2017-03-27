@@ -151,23 +151,18 @@ void Close_Extension( vlc_object_t *p_this )
         if( !p_ext ) break;
         msg_Dbg( p_mgr, "Deactivating '%s'", p_ext->psz_title );
         Deactivate( p_mgr, p_ext );
-        vlc_join( p_ext->p_sys->thread, NULL );
     }
     FOREACH_END()
 
     msg_Dbg( p_mgr, "All extensions are now deactivated" );
     ARRAY_RESET( p_mgr->p_sys->activated_extensions );
 
-    vlc_mutex_destroy( &p_mgr->lock );
-    vlc_mutex_destroy( &p_mgr->p_sys->lock );
-    free( p_mgr->p_sys );
-    p_mgr->p_sys = NULL;
-
     /* Free extensions' memory */
     FOREACH_ARRAY( p_ext, p_mgr->extensions )
     {
         if( !p_ext )
             break;
+        vlc_join( p_ext->p_sys->thread, NULL );
         if( p_ext->p_sys->L )
             lua_close( p_ext->p_sys->L );
         free( p_ext->psz_name );
@@ -188,6 +183,11 @@ void Close_Extension( vlc_object_t *p_this )
         free( p_ext );
     }
     FOREACH_END()
+
+    vlc_mutex_destroy( &p_mgr->lock );
+    vlc_mutex_destroy( &p_mgr->p_sys->lock );
+    free( p_mgr->p_sys );
+    p_mgr->p_sys = NULL;
 
     ARRAY_RESET( p_mgr->extensions );
 }
