@@ -436,7 +436,7 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
     }
 }
 
-static void RestartVideoToolbox(decoder_t *p_dec, bool b_reset_format)
+static int RestartVideoToolbox(decoder_t *p_dec, bool b_reset_format)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -445,9 +445,7 @@ static void RestartVideoToolbox(decoder_t *p_dec, bool b_reset_format)
     if (p_sys->session != nil)
         StopVideoToolbox(p_dec, b_reset_format);
 
-    if (StartVideoToolbox(p_dec) != VLC_SUCCESS) {
-        msg_Warn(p_dec, "Decoder session restart failed");
-    }
+    return StartVideoToolbox(p_dec);
 }
 
 #pragma mark - module open and close
@@ -1064,7 +1062,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     OSStatus status =
         VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
                                           decoderFlags, NULL, &flagOut);
-    CFRelease(sampleBuffer);
     if (HandleVTStatus(p_dec, status) == VLC_SUCCESS)
         p_sys->b_vt_feed = true;
     else
@@ -1081,7 +1078,14 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
                 break;
             case -8969 /* codecBadDataErr */:
             case kVTVideoDecoderBadDataErr:
-                StopVideoToolbox(p_dec, true);
+                if (RestartVideoToolbox(p_dec, true) == VLC_SUCCESS)
+                {
+                    status = VTDecompressionSessionDecodeFrame(p_sys->session,
+                                    sampleBuffer, decoderFlags, NULL, &flagOut);
+
+                    if (status != 0)
+                        StopVideoToolbox(p_dec, true);
+                }
                 break;
             case -8960 /* codecErr */:
             case kVTVideoDecoderMalfunctionErr:
@@ -1090,6 +1094,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
                 break;
         }
     }
+    CFRelease(sampleBuffer);
 
 skip:
     block_Release(p_block);
