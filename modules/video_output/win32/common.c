@@ -544,20 +544,25 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
         taskbl->lpVtbl->HrInit(taskbl);
 
         HWND hroot = GetAncestor(sys->hwnd,GA_ROOT);
-        RECT relative;
+        RECT video;
         if (show) {
-            RECT video, parent;
-            GetWindowRect(sys->hvideownd, &video);
-            GetWindowRect(hroot, &parent);
-            relative.left   = video.left   - parent.left - 8;
-            relative.top    = video.top    - parent.top - 10;
-
-            relative.right  = video.right  - video.left + relative.left;
-            relative.bottom = video.bottom - video.top  + relative.top - 25;
+            GetWindowRect(sys->hparent, &video);
+            POINT client = {video.left, video.top};
+            if (ScreenToClient(hroot, &client))
+            {
+                unsigned int width = video.right - video.left;
+                unsigned int height = video.bottom - video.top;
+                video.left = client.x;
+                video.top = client.y;
+                video.right = video.left + width;
+                video.bottom = video.top + height;
+            }
         }
-        if (S_OK != taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
-                                                 show ? &relative : NULL))
-            msg_Err(vd, "SetThumbNailClip failed");
+        HRESULT hr;
+        hr = taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
+                                                 show ? &video : NULL);
+        if ( hr != S_OK )
+            msg_Err(vd, "SetThumbNailClip failed: %u", hr);
 
         taskbl->lpVtbl->Release(taskbl);
     }
