@@ -35,6 +35,7 @@
 #import <vlc_boxes.h>
 
 #import <VideoToolbox/VideoToolbox.h>
+#import <VideoToolbox/VTErrors.h>
 
 #import <Foundation/Foundation.h>
 #import <TargetConditionals.h>
@@ -83,6 +84,7 @@ vlc_module_end()
 static int ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static int avcCFromAnnexBCreate(decoder_t *);
 static int ExtradataInfoCreate(decoder_t *, CFStringRef, void *, size_t);
+static int HandleVTStatus(decoder_t *, OSStatus);
 static int DecodeBlock(decoder_t *, block_t *);
 static void PicReorder_pushSorted(decoder_t *, picture_t *);
 static picture_t *PicReorder_pop(decoder_t *, bool);
@@ -395,48 +397,8 @@ static int StartVideoToolbox(decoder_t *p_dec)
                                           p_sys->destinationPixelBufferAttributes,
                                           &decoderCallbackRecord, &p_sys->session);
 
-    /* check if the session is valid */
-    switch (status)
-    {
-        case 0:
-            break;
-        case -12470:
-            msg_Err(p_dec, "VT is not supported on this hardware");
-            return VLC_EGENERIC;
-        case -12471:
-            msg_Err(p_dec, "Video format is not supported by VT");
-            return VLC_EGENERIC;
-        case -12903:
-            msg_Err(p_dec, "created session is invalid, could not select and "
-                    "open decoder instance");
-            return VLC_EGENERIC;
-        case -12906:
-            msg_Err(p_dec, "could not find decoder");
-            return VLC_EGENERIC;
-        case -12910:
-            msg_Err(p_dec, "unsupported data");
-            return VLC_EGENERIC;
-        case -12913:
-            msg_Err(p_dec, "VT is not available to sandboxed apps on this OS "
-                    "release or maximum number of decoders reached");
-            return VLC_EGENERIC;
-        case -12917:
-            msg_Err(p_dec, "Insufficient source color data");
-            return VLC_EGENERIC;
-        case -12918:
-            msg_Err(p_dec, "Could not create color correction data");
-            return VLC_EGENERIC;
-        case -12210:
-            msg_Err(p_dec, "Insufficient authorization to create decoder");
-            return VLC_EGENERIC;
-        case -8973:
-            msg_Err(p_dec, "Could not select and open decoder instance");
-            return VLC_EGENERIC;
-        default:
-            msg_Err(p_dec, "Decompression session creation failed (%i)",
-                    (int)status);
-            return VLC_EGENERIC;
-    }
+    if (HandleVTStatus(p_dec, status) != VLC_SUCCESS)
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
@@ -878,6 +840,54 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
     CVPixelBufferUnlockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
 }
 
+static int HandleVTStatus(decoder_t *p_dec, OSStatus status)
+{
+#define VTERRCASE(x) \
+    case x: msg_Err(p_dec, "vt session error: '" #x "'"); break;
+
+    switch (status)
+    {
+        case 0:
+            return VLC_SUCCESS;
+
+        VTERRCASE(kVTPropertyNotSupportedErr)
+        VTERRCASE(kVTPropertyReadOnlyErr)
+        VTERRCASE(kVTParameterErr)
+        VTERRCASE(kVTInvalidSessionErr)
+        VTERRCASE(kVTAllocationFailedErr)
+        VTERRCASE(kVTPixelTransferNotSupportedErr)
+        VTERRCASE(kVTCouldNotFindVideoDecoderErr)
+        VTERRCASE(kVTCouldNotCreateInstanceErr)
+        VTERRCASE(kVTCouldNotFindVideoEncoderErr)
+        VTERRCASE(kVTVideoDecoderBadDataErr)
+        VTERRCASE(kVTVideoDecoderUnsupportedDataFormatErr)
+        VTERRCASE(kVTVideoDecoderMalfunctionErr)
+        VTERRCASE(kVTVideoEncoderMalfunctionErr)
+        VTERRCASE(kVTVideoDecoderNotAvailableNowErr)
+        VTERRCASE(kVTImageRotationNotSupportedErr)
+        VTERRCASE(kVTVideoEncoderNotAvailableNowErr)
+        VTERRCASE(kVTFormatDescriptionChangeNotSupportedErr)
+        VTERRCASE(kVTInsufficientSourceColorDataErr)
+        VTERRCASE(kVTCouldNotCreateColorCorrectionDataErr)
+        VTERRCASE(kVTColorSyncTransformConvertFailedErr)
+        VTERRCASE(kVTVideoDecoderAuthorizationErr)
+        VTERRCASE(kVTVideoEncoderAuthorizationErr)
+        VTERRCASE(kVTColorCorrectionPixelTransferFailedErr)
+        VTERRCASE(kVTMultiPassStorageIdentifierMismatchErr)
+        VTERRCASE(kVTMultiPassStorageInvalidErr)
+        VTERRCASE(kVTFrameSiloInvalidTimeStampErr)
+        VTERRCASE(kVTFrameSiloInvalidTimeRangeErr)
+        VTERRCASE(kVTCouldNotFindTemporalFilterErr)
+        VTERRCASE(kVTPixelTransferNotPermittedErr)
+        VTERRCASE(kVTColorCorrectionImageRotationFailedErr)
+
+        default:
+            msg_Err(p_dec, "unknown vt session error (%i)", (int)status);
+    }
+#undef VTERRCASE
+    return VLC_EGENERIC;
+}
+
 #pragma mark - actual decoding
 
 static void PicReorder_pushSorted(decoder_t *p_dec, picture_t *p_pic)
@@ -1055,31 +1065,30 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
                                           decoderFlags, NULL, &flagOut);
     CFRelease(sampleBuffer);
-    if (status == noErr)
+    if (HandleVTStatus(p_dec, status) == VLC_SUCCESS)
         p_sys->b_vt_feed = true;
-    else {
-        if (status == kCVReturnInvalidSize)
-            msg_Err(p_dec, "decoder failure: invalid block size");
-        else if (status == -666)
-            msg_Err(p_dec, "decoder failure: invalid SPS/PPS");
-        else if (status == -6661) {
-            msg_Err(p_dec, "decoder failure: invalid argument");
-            /* The decoder module will be reloaded next time since we already
-             * modified the input block */
-            vlc_mutex_lock(&p_sys->lock);
-            p_dec->p_sys->b_abort = true;
-            vlc_mutex_unlock(&p_sys->lock);
-        } else if (status == -8969 || status == -12909) {
-            msg_Err(p_dec, "decoder failure: bad data (%i)", (int)status);
-            StopVideoToolbox(p_dec, true);
-        } else if (status == -8960 || status == -12911) {
-            msg_Err(p_dec, "decoder failure: internal malfunction (%i)", (int)status);
-            RestartVideoToolbox(p_dec, true);
-        } else if (status == -12903) {
-            msg_Warn(p_dec, "decoder failure: session invalid");
-            RestartVideoToolbox(p_dec, true);
-        } else
-            msg_Dbg(p_dec, "decoding frame failed (%i)", (int)status);
+    else
+    {
+        switch (status)
+        {
+            case kCVReturnInvalidArgument:
+                msg_Err(p_dec, "decoder failure: invalid argument");
+                /* The decoder module will be reloaded next time since we already
+                 * modified the input block */
+                vlc_mutex_lock(&p_sys->lock);
+                p_dec->p_sys->b_abort = true;
+                vlc_mutex_unlock(&p_sys->lock);
+                break;
+            case -8969 /* codecBadDataErr */:
+            case kVTVideoDecoderBadDataErr:
+                StopVideoToolbox(p_dec, true);
+                break;
+            case -8960 /* codecErr */:
+            case kVTVideoDecoderMalfunctionErr:
+            case kVTInvalidSessionErr:
+                RestartVideoToolbox(p_dec, true);
+                break;
+        }
     }
 
 skip:
