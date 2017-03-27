@@ -345,3 +345,32 @@ void h264_compute_poc( const h264_sequence_parameter_set_t *p_sps,
     else
         *p_PictureOrderCount = *p_tFOC;
 }
+
+static uint8_t h264_infer_pic_struct( const h264_sequence_parameter_set_t *p_sps,
+                                      const h264_slice_t *p_slice,
+                                      uint8_t i_pic_struct, int tFOC, int bFOC )
+{
+    /* See D-1 and note 6 */
+    if( !p_sps->vui.b_pic_struct_present_flag || i_pic_struct >= 9 )
+    {
+        if( p_slice->i_field_pic_flag )
+            i_pic_struct = 1 + p_slice->i_bottom_field_flag;
+        else if( tFOC == bFOC )
+            i_pic_struct = 0;
+        else if( tFOC < bFOC )
+            i_pic_struct = 3;
+        else
+            i_pic_struct = 4;
+    }
+
+    return i_pic_struct;
+}
+
+uint8_t h264_get_num_ts( const h264_sequence_parameter_set_t *p_sps,
+                         const h264_slice_t *p_slice, uint8_t i_pic_struct,
+                         int tFOC, int bFOC )
+{
+    i_pic_struct = h264_infer_pic_struct( p_sps, p_slice, i_pic_struct, tFOC, bFOC );
+    const uint8_t rgi_numclock[9] = { 1, 1, 1, 2, 2, 3, 3, 2, 3 };
+    return rgi_numclock[ i_pic_struct ];
+}

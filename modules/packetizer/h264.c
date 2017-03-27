@@ -509,7 +509,7 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
         /* From SEI */
         p_sys->i_dpb_output_delay = 0;
-        p_sys->i_pic_struct = 0;
+        p_sys->i_pic_struct = UINT8_MAX;
     }
     p_sys->b_discontinuity = true;
     date_Set( &p_sys->dts, VLC_TS_INVALID );
@@ -555,7 +555,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         DropStoredNAL( p_sys );
         /* From SEI */
         p_sys->i_dpb_output_delay = 0;
-        p_sys->i_pic_struct = 0;
+        p_sys->i_pic_struct = UINT8_MAX;
         cc_storage_reset( p_sys->p_ccs );
     }
 
@@ -750,19 +750,11 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_pic )
         return NULL;
 
-    unsigned i_num_clock_ts = 2;
-    if( p_sps->frame_mbs_only_flag == 0 )
-    {
-        if( p_sps->vui.b_pic_struct_present_flag && p_sys->i_pic_struct < 9 )
-        {
-            const uint8_t rgi_numclock[9] = { 1, 1, 1, 2, 2, 3, 3, 2, 3 };
-            i_num_clock_ts = rgi_numclock[ p_sys->i_pic_struct ];
-        }
-        else if( p_sys->slice.i_field_pic_flag ) /* See D-1 and E-6 */
-        {
-            i_num_clock_ts = 1;
-        }
-    }
+    /* for PTS Fixup, interlaced fields (multiple AU/block) */
+    int tFOC = 0, bFOC = 0, PictureOrderCount = 0;
+    h264_compute_poc( p_sps, &p_sys->slice, &p_sys->pocctx, &PictureOrderCount, &tFOC, &bFOC );
+
+    unsigned i_num_clock_ts = h264_get_num_ts( p_sps, &p_sys->slice, p_sys->i_pic_struct, tFOC, bFOC );
 
     if( p_sps->frame_mbs_only_flag == 0 && p_sps->vui.b_pic_struct_present_flag )
     {
@@ -799,10 +791,6 @@ static block_t *OutputPicture( decoder_t *p_dec )
     /* Fixup missing timestamps after split (multiple AU/block)*/
     if( p_pic->i_dts <= VLC_TS_INVALID )
         p_pic->i_dts = date_Get( &p_sys->dts );
-
-    /* PTS Fixup, interlaced fields (multiple AU/block) */
-    int tFOC = 0, bFOC = 0, PictureOrderCount = 0;
-    h264_compute_poc( p_sps, &p_sys->slice, &p_sys->pocctx, &PictureOrderCount, &tFOC, &bFOC );
 
     if( p_sys->slice.type == H264_SLICE_TYPE_I )
         p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
@@ -901,7 +889,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
-    p_sys->i_pic_struct = 0;
+    p_sys->i_pic_struct = UINT8_MAX;
     p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
     p_sys->p_sei = NULL;
     p_sys->pp_sei_last = &p_sys->p_sei;
