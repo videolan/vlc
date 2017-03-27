@@ -36,7 +36,9 @@
 #include <vlc_demux.h>
 #include <vlc_xml.h>
 #include <vlc_strings.h>
+#include <vlc_charset.h>
 
+#include <assert.h>
 #include <ctype.h>
 
 #include "playlist.h"
@@ -311,6 +313,44 @@ end:
     free( psz_description );
 }
 
+static stream_t* UTF8Stream( demux_t *p_demux )
+{
+    uint64_t streamSize;
+
+     if (vlc_stream_GetSize( p_demux->s, &streamSize ) != VLC_SUCCESS)
+         return NULL;
+     // Don't attempt to convert/store huge streams
+     if( streamSize > 1024 * 1024 )
+         return NULL;
+     char* psz_source = malloc( streamSize + 1 * sizeof( *psz_source ) );
+     if ( unlikely( psz_source == NULL ) )
+         return NULL;
+     size_t i_read = 0;
+     do
+     {
+         ssize_t i_ret = vlc_stream_Read( p_demux->s, psz_source + i_read,
+                                          streamSize > 1024 ? 1024 : streamSize );
+         if ( i_ret <= 0 )
+             break;
+         assert( (size_t)i_ret <= streamSize );
+         streamSize -= i_ret;
+         i_read += i_ret;
+     } while ( streamSize > 0 );
+     psz_source[i_read] = 0;
+     if ( IsUTF8( psz_source ) )
+         return vlc_stream_MemoryNew( p_demux, (uint8_t*)psz_source, i_read, false );
+
+     char *psz_utf8 = FromLatin1( psz_source );
+     if( psz_utf8 == NULL )
+     {
+         free( psz_source );
+         return NULL;
+     }
+     stream_t * p_stream = vlc_stream_MemoryNew( p_demux, (uint8_t*)psz_utf8, strlen(psz_utf8), false );
+     free( psz_source );
+     return p_stream;
+}
+
 static int Demux( demux_t *p_demux )
 {
     const char *psz_node = NULL;
@@ -325,12 +365,13 @@ static int Demux( demux_t *p_demux )
     xml_reader_t *p_xml_reader = NULL;
     input_item_t *p_current_input = GetCurrentItem( p_demux );
     input_item_node_t *p_subitems = NULL;
+    stream_t* p_stream = UTF8Stream( p_demux );
 
     bool b_first_node = false;
     int i_type;
     int i_n_entry = 0;
 
-    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_stream ? p_stream : p_demux->s );
     if( !p_xml_reader )
     {
         msg_Err( p_demux, "Cannot parse ASX input file as XML");
@@ -453,7 +494,8 @@ error:
         xml_ReaderDelete( p_xml_reader );
     if( p_subitems )
         input_item_node_Delete( p_subitems );
-
+    if( p_stream )
+        vlc_stream_Delete( p_stream );
     vlc_gc_decref( p_current_input );
 
     return 0;
