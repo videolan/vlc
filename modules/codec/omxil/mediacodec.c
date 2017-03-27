@@ -50,7 +50,7 @@
 #define BLOCK_FLAG_CSD (0x01 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 #define DECODE_FLAG_RESTART (0x01)
-#define DECODE_FLASH_FLUSH (0x02)
+#define DECODE_FLAG_DRAIN (0x02)
 /**
  * Callback called when a new block is processed from DecodeBlock.
  * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
@@ -1404,6 +1404,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
 
     if (p_in_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
     {
+        if (p_sys->b_output_ready)
+            QueueBlockLocked(p_dec, NULL, true);
         DecodeFlushLocked(p_dec);
         if (p_sys->b_aborted)
             goto end;
@@ -1432,13 +1434,15 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
         }
         goto end;
     }
-    if (p_sys->i_decode_flags & (DECODE_FLASH_FLUSH|DECODE_FLAG_RESTART))
+    if (p_sys->i_decode_flags & (DECODE_FLAG_DRAIN|DECODE_FLAG_RESTART))
     {
-        msg_Warn(p_dec, "Flushing from DecodeBlock");
+        msg_Warn(p_dec, "Draining from DecodeBlock");
         const bool b_restart = p_sys->i_decode_flags & DECODE_FLAG_RESTART;
         p_sys->i_decode_flags = 0;
 
-        /* Flush before restart to unblock OutThread */
+        /* Drain and flush before restart to unblock OutThread */
+        if (p_sys->b_output_ready)
+            QueueBlockLocked(p_dec, NULL, true);
         DecodeFlushLocked(p_dec);
         if (p_sys->b_aborted)
             goto end;
@@ -1539,8 +1543,8 @@ static int VideoHXXX_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
             p_sys->i_decode_flags |= DECODE_FLAG_RESTART;
         } else
         {
-            msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
-            p_sys->i_decode_flags |= DECODE_FLASH_FLUSH;
+            msg_Err(p_dec, "SPS/PPS changed during playback. Drain it");
+            p_sys->i_decode_flags |= DECODE_FLAG_DRAIN;
         }
     }
 
