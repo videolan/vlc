@@ -1352,7 +1352,10 @@ LIBVLC_API
 void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi, const char *psz_geometry );
 
 /**
- * Get current teletext page requested.
+ * Get current teletext page requested or 0 if it's disabled.
+ *
+ * Teletext is disabled by default, call libvlc_video_set_teletext() to enable
+ * it.
  *
  * \param p_mi the media player
  * \return the current teletext page requested.
@@ -1365,8 +1368,8 @@ LIBVLC_API int libvlc_video_get_teletext( libvlc_media_player_t *p_mi );
  * This function can also be used to send a teletext key.
  *
  * \param p_mi the media player
- * \param i_page teletex page number requested. This value can be -1 to disable
- * teletext, a number in the range [0;1000[ to show the requested page, or a
+ * \param i_page teletex page number requested. This value can be 0 to disable
+ * teletext, a number in the range ]0;1000[ to show the requested page, or a
  * \ref libvlc_teletext_key_t. 100 is the default teletext page.
  */
 LIBVLC_API void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page );

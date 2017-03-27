@@ -518,12 +518,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
 
     if( i_page >= 0 && i_page < 1000 )
         var_SetInteger( p_mi, "vbi-page", i_page );
-    else if( i_page < -1 )
-    {
-        libvlc_printerr("Invalid page number");
-        return;
-    }
-    else
+    else if( i_page >= 1000 )
     {
         switch (i_page)
         {
@@ -539,6 +534,11 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
                 return;
         }
     }
+    else
+    {
+        libvlc_printerr("Invalid page number");
+        return;
+    }
 
     p_input_thread = libvlc_get_input_thread( p_mi );
     if( !p_input_thread ) return;
@@ -549,7 +549,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
         return;
     }
 
-    if( i_page == -1 )
+    if( i_page == 0 )
     {
         teletext_enable( p_input_thread, false );
     }
