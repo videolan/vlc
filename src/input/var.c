@@ -184,18 +184,22 @@ void input_ControlVarInit ( input_thread_t *p_input )
                     1000 * var_GetInteger( p_input, "audio-desync" ) );
     var_Create( p_input, "spu-delay", VLC_VAR_INTEGER );
 
+    val.i_int = -1;
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER );
+    var_Change( p_input, "video-es", VLC_VAR_SETVALUE, &val, NULL );
     text.psz_string = _("Video Track");
     var_Change( p_input, "video-es", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Audio ES */
     var_Create( p_input, "audio-es", VLC_VAR_INTEGER );
+    var_Change( p_input, "audio-es", VLC_VAR_SETVALUE, &val, NULL );
     text.psz_string = _("Audio Track");
     var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Spu ES */
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER );
+    var_Change( p_input, "spu-es", VLC_VAR_SETVALUE, &val, NULL );
     text.psz_string = _("Subtitle Track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
