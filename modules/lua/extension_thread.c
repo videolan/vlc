@@ -332,7 +332,8 @@ static void* Run( void *data )
         }
         p_ext->p_sys->command = cmd->next;
         cmd->next = NULL; /* unlink command (for FreeCommands()) */
-
+        // Create watch timer
+        vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
         vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
         /* Run command */
@@ -423,6 +424,13 @@ static void* Run( void *data )
         FreeCommands( cmd );
 
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
+        // Reset watch timer and timestamp
+        if( p_ext->p_sys->p_progress_id != NULL )
+        {
+            vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
+            p_ext->p_sys->p_progress_id = NULL;
+        }
+        vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
     }
 
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );

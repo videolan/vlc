@@ -63,8 +63,6 @@ static const char caps[][20] = {
     "playing-listener",
 };
 
-#define WATCH_TIMER_PERIOD    (10 * CLOCK_FREQ) ///< 10s period for the timer
-
 static int ScanExtensions( extensions_manager_t *p_this );
 static int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
                             const struct luabatch_context_t * );
@@ -948,11 +946,6 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
         i_args ++;
     }
 
-    // Create watch timer
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
-    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-
     // Start actual call to Lua
     if( lua_pcall( L, i_args, 1, 0 ) )
     {
@@ -961,16 +954,6 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
                   lua_tostring( L, lua_gettop( L ) ) );
         i_ret = VLC_EGENERIC;
     }
-
-    // Reset watch timer and timestamp
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    if( p_ext->p_sys->p_progress_id != NULL )
-    {
-        vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
-        p_ext->p_sys->p_progress_id = NULL;
-    }
-    vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
-    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
     i_ret |= lua_DialogFlush( L );
 
@@ -1006,11 +989,6 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
     /* Pass id as unique argument to the function */
     lua_pushinteger( L, id );
 
-    // Create watch timer
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
-    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-
     if( lua_pcall( L, 1, 1, 0 ) != 0 )
     {
         msg_Warn( p_mgr, "Error while running script %s, "
@@ -1018,16 +996,6 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
                   lua_tostring( L, lua_gettop( L ) ) );
         i_ret = VLC_EGENERIC;
     }
-
-    // Reset watch timer and timestamp
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    if( p_ext->p_sys->p_progress_id != NULL )
-    {
-        vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
-        p_ext->p_sys->p_progress_id = NULL;
-    }
-    vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
-    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
     i_ret |= lua_DialogFlush( L );
     if( i_ret < VLC_SUCCESS )
