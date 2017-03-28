@@ -228,8 +228,6 @@ void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
 int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                    va_list args )
 {
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
-
     /* Create command */
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
     cmd->i_command = i_command;
@@ -244,7 +242,6 @@ int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                 if( !pi )
                 {
                     free( cmd );
-                    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
                     return VLC_ENOMEM;
                 }
                 *pi = va_arg( args, int );
@@ -257,7 +254,6 @@ int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                 if( !pi )
                 {
                     free( cmd );
-                    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
                     return VLC_ENOMEM;
                 }
                 *pi = va_arg( args, int );
@@ -274,6 +270,8 @@ int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                      "Unknown command send to extension: %d", i_command );
             break;
     }
+
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
 
     /* Push command to the end of the queue */
     struct command_t *last = p_ext->p_sys->command;
