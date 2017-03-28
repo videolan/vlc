@@ -1266,10 +1266,10 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
 
         vlc_mutex_unlock(&p_sys->lock);
         /* Wait for an input buffer. This function returns when a new input
-         * buffer is available or after 1sec of timeout. */
+         * buffer is available or after 2secs of timeout. */
         i_index = p_sys->api.dequeue_in(&p_sys->api,
                                         p_sys->api.b_direct_rendering ?
-                                        INT64_C(1000000) : -1);
+                                        INT64_C(2000000) : -1);
         vlc_mutex_lock(&p_sys->lock);
 
         if (p_sys->b_aborted)
@@ -1330,7 +1330,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
              * the Vout won't release any output buffers, therefore MediaCodec
              * won't dequeue any input buffers. To work around this issue,
              * release all output buffers if DecodeBlock is waiting more than
-             * 1sec for a new input buffer. */
+             * 2secs for a new input buffer. */
             if (!b_dequeue_timeout)
             {
                 msg_Warn(p_dec, "Decoder stuck: invalidate all buffers");
