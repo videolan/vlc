@@ -613,8 +613,10 @@ static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
     vout_display_sys_t *sys = vd->sys;
     int i;
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc = { 0 };
+    D3D11_TEXTURE2D_DESC texDesc;
+    ID3D11Texture2D_GetDesc(picsys->texture[0], &texDesc);
 
-    if (sys->legacy_shader)
+    if (texDesc.ArraySize == 1)
     {
         resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         resviewDesc.Texture2D.MipLevels = 1;
