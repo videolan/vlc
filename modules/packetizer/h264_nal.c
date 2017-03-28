@@ -101,11 +101,11 @@ static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
 {
     size_t i_total = 0;
 
-    p_buf += 5;
-    i_buf -= 5;
-
     if( i_buf < H264_MIN_AVCC_SIZE )
         return 0;
+
+    p_buf += 5;
+    i_buf -= 5;
 
     for ( unsigned int j = 0; j < 2; j++ )
     {
@@ -115,6 +115,9 @@ static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
 
         for ( unsigned int i = 0; i < i_loop_end; i++ )
         {
+            if( i_buf < 2 )
+                return 0;
+
             uint16_t i_nal_size = (p_buf[0] << 8) | p_buf[1];
             if(i_nal_size > i_buf - 2)
                 return 0;
@@ -122,6 +125,9 @@ static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
             p_buf += i_nal_size + 2;
             i_buf -= i_nal_size + 2;
         }
+
+        if( j == 0 && i_buf < 1 )
+            return 0;
     }
     return i_total;
 }
