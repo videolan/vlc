@@ -593,6 +593,9 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     StopVideoToolbox(p_dec, true);
 
+    if (p_sys->codec == kCMVideoCodecType_H264)
+        hxxx_helper_clean(&p_sys->hh);
+
     vlc_mutex_destroy(&p_sys->lock);
     free(p_sys);
 }
