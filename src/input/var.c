@@ -767,6 +767,8 @@ static int EsVideoCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( newval.i_int < 0 )
         newval.i_int = -VIDEO_ES; /* disable video es */
+    else
+        var_SetBool( p_input, "video", true );
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
 
@@ -781,6 +783,8 @@ static int EsAudioCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( newval.i_int < 0 )
         newval.i_int = -AUDIO_ES; /* disable audio es */
+    else
+        var_SetBool( p_input, "audio", true );
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
 
@@ -795,6 +799,8 @@ static int EsSpuCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( newval.i_int < 0 )
         newval.i_int = -SPU_ES; /* disable spu es */
+    else
+        var_SetBool( p_input, "spu", true );
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
 
