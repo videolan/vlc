@@ -230,6 +230,8 @@ int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
 {
     /* Create command */
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
+    if( unlikely( cmd == NULL ) )
+        return VLC_ENOMEM;
     cmd->i_command = i_command;
     switch( i_command )
     {
