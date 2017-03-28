@@ -549,7 +549,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
     for (unsigned i = 0; i < p_list.count; i++) {
         const GUID *g = &p_list.list[i];
         char *psz_decoder_name = directx_va_GetDecoderName(g);
-        msg_Dbg(va, "- '%s' is supported by hardware", psz_decoder_name);
+        msg_Dbg(va, "- '%s' is supported", psz_decoder_name);
         free(psz_decoder_name);
     }
 
