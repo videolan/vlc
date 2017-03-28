@@ -139,6 +139,7 @@ struct decoder_sys_t
     frame_info_t               *p_pic_reorder;
     uint8_t                     i_pic_reorder;
     uint8_t                     i_pic_reorder_max;
+    bool                        b_invalid_pic_reorder_max;
     bool                        b_poc_based_reorder;
     bool                        b_enable_temporal_processing;
 
@@ -220,12 +221,15 @@ static bool ParseH264NAL(decoder_sys_t *p_sys,
             GetSPSPPS(slice.i_pic_parameter_set_id, p_sys, &p_sps, &p_pps);
             if(p_sps)
             {
-                unsigned dummy;
-                uint8_t i_reorder;
-                h264_get_dpb_values(p_sps, &i_reorder, &dummy);
-                vlc_mutex_lock(&p_sys->lock);
-                p_sys->i_pic_reorder_max = i_reorder;
-                vlc_mutex_unlock(&p_sys->lock);
+                if(!p_sys->b_invalid_pic_reorder_max && i_nal_type == H264_NAL_SLICE_IDR)
+                {
+                    unsigned dummy;
+                    uint8_t i_reorder;
+                    h264_get_dpb_values(p_sps, &i_reorder, &dummy);
+                    vlc_mutex_lock(&p_sys->lock);
+                    p_sys->i_pic_reorder_max = i_reorder;
+                    vlc_mutex_unlock(&p_sys->lock);
+                }
 
                 int bFOC;
                 h264_compute_poc(p_sps, &slice, &p_sys->pocctx,
@@ -394,6 +398,28 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
     assert(p_info->p_picture);
     while(p_info->b_flush || p_sys->i_pic_reorder == (p_sys->i_pic_reorder_max * 2))
     {
+        /* First check if DPB sizing was correct before removing one frame */
+        if (p_sys->p_pic_reorder && !p_info->b_flush &&
+            p_sys->i_pic_reorder_max < H264_MAX_DPB)
+        {
+            if(p_sys->b_poc_based_reorder && p_sys->p_pic_reorder->i_foc > p_info->i_foc)
+            {
+                p_sys->b_invalid_pic_reorder_max = true;
+                p_sys->i_pic_reorder_max++;
+                msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
+                break;
+            }
+            else if (!p_sys->b_poc_based_reorder &&
+                     p_info->p_picture->date > VLC_TS_INVALID &&
+                     p_sys->p_pic_reorder->p_picture->date > p_info->p_picture->date)
+            {
+                p_sys->b_invalid_pic_reorder_max = true;
+                p_sys->i_pic_reorder_max++;
+                msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
+                break;
+            }
+        }
+
         picture_t *p_fields = RemoveOneFrameFromDPB(p_sys);
         if (p_fields == NULL)
             break;
@@ -815,6 +841,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->p_pic_reorder = NULL;
     p_sys->i_pic_reorder = 0;
     p_sys->i_pic_reorder_max = 4;
+    p_sys->b_invalid_pic_reorder_max = false;
     p_sys->b_poc_based_reorder = false;
     p_sys->b_format_propagated = false;
     p_sys->b_abort = false;
