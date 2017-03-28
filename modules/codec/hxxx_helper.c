@@ -250,6 +250,39 @@ fprintf(stderr, "new PPS parsed: %u\n", p_pps->i_id);
 }
 
 static int
+helper_process_avcC_h264(struct hxxx_helper *hh, const uint8_t *p_buf,
+                         size_t i_buf)
+{
+    if (i_buf < H264_MIN_AVCC_SIZE)
+        return VLC_EGENERIC;
+
+    p_buf += 5; i_buf -= 5;
+
+    for (unsigned int j = 0; j < 2 && i_buf > 0; j++)
+    {
+        /* First time is SPS, Second is PPS */
+        const unsigned int i_num_nal = p_buf[0] & (j == 0 ? 0x1f : 0xff);
+        p_buf++; i_buf--;
+
+        for (unsigned int i = 0; i < i_num_nal && i_buf >= 2; i++)
+        {
+            uint16_t i_nal_size = (p_buf[0] << 8) | p_buf[1];
+            if (i_nal_size > i_buf - 2)
+                return VLC_EGENERIC;
+            bool b_unused;
+            int i_ret = h264_helper_parse_nal(hh, p_buf, i_nal_size + 2, 2,
+                                              &b_unused);
+            if (i_ret != VLC_SUCCESS)
+                return i_ret;
+            p_buf += i_nal_size + 2;
+            i_buf -= i_nal_size + 2;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int
 h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                       size_t i_extra)
 {
@@ -261,26 +294,10 @@ h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
     }
     else if (h264_isavcC(p_extra, i_extra))
     {
-        bool b_unused;
-
         hh->i_nal_length_size = (((uint8_t*)p_extra)[4] & 0x03) + 1;
         if (!helper_nal_length_valid(hh))
             return VLC_EGENERIC;
         hh->b_is_xvcC = true;
-
-        if (hh->b_need_xvcC)
-            return h264_helper_parse_nal(hh, p_extra, i_extra,
-                                         hh->i_nal_length_size, &b_unused);
-
-        size_t i_buf;
-        uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_buf,
-                                                 NULL);
-        if (!p_buf)
-        {
-            msg_Dbg(hh->p_obj, "h264_avcC_to_AnnexB_NAL failed");
-            return VLC_EGENERIC;
-        }
-        fprintf(stderr, "got annex b extra: %d (nal: %d)\n", i_buf, hh->i_nal_length_size);
 
         /* XXX h264_AVC_to_AnnexB() works only with a i_nal_length_size of 4.
          * If nal_length_size is smaller than 4, fallback to SW decoding. I
@@ -288,17 +305,13 @@ h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
          * a smaller nal_length_size. Indeed, this case will happen only with
          * very small resolutions, where hardware decoders are not that useful.
          * -Thomas */
-        if (hh->i_nal_length_size != 4)
+        if (!hh->b_need_xvcC && hh->i_nal_length_size != 4)
         {
             msg_Dbg(hh->p_obj, "nal_length_size is too small");
-            free(p_buf);
             return VLC_EGENERIC;
         }
 
-        int i_ret = h264_helper_parse_nal(hh, p_buf, i_buf,
-                                          hh->i_nal_length_size, &b_unused);
-        free(p_buf);
-        return i_ret;
+        return helper_process_avcC_h264(hh, p_extra, i_extra);
     }
     else /* Can't handle extra that is not avcC */
         return VLC_EGENERIC;
