@@ -57,8 +57,12 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
-static int ESCallback      ( vlc_object_t *p_this, char const *psz_cmd,
+static int EsVideoCallback ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
+static int EsAudioCallback ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void * );
+static int EsSpuCallback ( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval, void * );
 static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 
@@ -99,9 +103,9 @@ static const vlc_input_callback_t p_input_callbacks[] =
     CALLBACK( "chapter", SeekpointCallback ),
     CALLBACK( "audio-delay", EsDelayCallback ),
     CALLBACK( "spu-delay", EsDelayCallback ),
-    CALLBACK( "video-es", ESCallback ),
-    CALLBACK( "audio-es", ESCallback ),
-    CALLBACK( "spu-es", ESCallback ),
+    CALLBACK( "video-es", EsVideoCallback ),
+    CALLBACK( "audio-es", EsAudioCallback ),
+    CALLBACK( "spu-es", EsSpuCallback ),
     CALLBACK( "record", RecordCallback ),
     CALLBACK( "frame-next", FrameNextCallback ),
 
@@ -755,31 +759,44 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int EsVideoCallback( vlc_object_t *p_this, char const *psz_cmd,
+                            vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    VLC_UNUSED( psz_cmd); VLC_UNUSED( oldval ); VLC_UNUSED( p_data );
 
     if( newval.i_int < 0 )
-    {
-        vlc_value_t v;
-        /* Hack */
-        if( !strcmp( psz_cmd, "audio-es" ) )
-            v.i_int = -AUDIO_ES;
-        else if( !strcmp( psz_cmd, "video-es" ) )
-            v.i_int = -VIDEO_ES;
-        else if( !strcmp( psz_cmd, "spu-es" ) )
-            v.i_int = -SPU_ES;
-        else
-            v.i_int = 0;
-        if( v.i_int != 0 )
-            input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &v );
-    }
-    else
-    {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
-    }
+        newval.i_int = -VIDEO_ES; /* disable video es */
+
+    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
+
+    return VLC_SUCCESS;
+}
+
+static int EsAudioCallback( vlc_object_t *p_this, char const *psz_cmd,
+                            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t*)p_this;
+    VLC_UNUSED( psz_cmd); VLC_UNUSED( oldval ); VLC_UNUSED( p_data );
+
+    if( newval.i_int < 0 )
+        newval.i_int = -AUDIO_ES; /* disable audio es */
+
+    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
+
+    return VLC_SUCCESS;
+}
+
+static int EsSpuCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t*)p_this;
+    VLC_UNUSED( psz_cmd); VLC_UNUSED( oldval ); VLC_UNUSED( p_data );
+
+    if( newval.i_int < 0 )
+        newval.i_int = -SPU_ES; /* disable spu es */
+
+    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
 
     return VLC_SUCCESS;
 }
