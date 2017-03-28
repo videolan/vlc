@@ -142,17 +142,16 @@ helper_nal_length_valid(struct hxxx_helper *hh)
 
 static int
 h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf,
-                      bool b_is_xvcC, bool *p_config_changed)
+                      uint8_t i_nal_length_size, bool *p_config_changed)
 {
     const uint8_t *p_nal;
     size_t i_nal;
     hxxx_iterator_ctx_t it;
-    hxxx_iterator_init(&it, p_buf, i_buf, hh->i_nal_length_size);
-    bool (*pf_iterator)(hxxx_iterator_ctx_t *, const uint8_t **, size_t *) =
-        b_is_xvcC ? hxxx_iterate_next : hxxx_annexb_iterate_next;
+    hxxx_iterator_init(&it, p_buf, i_buf, i_nal_length_size);
     *p_config_changed = false;
 
-    while (pf_iterator(&it, &p_nal, &i_nal))
+    while ((i_nal_length_size) ? hxxx_iterate_next(&it, &p_nal, &i_nal)
+                               : hxxx_annexb_iterate_next(&it, &p_nal, &i_nal))
     {
         if (i_nal < 2)
             continue;
@@ -270,7 +269,8 @@ h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
         hh->b_is_xvcC = true;
 
         if (hh->b_need_xvcC)
-            return h264_helper_parse_nal(hh, p_extra, i_extra, true, &b_unused);
+            return h264_helper_parse_nal(hh, p_extra, i_extra,
+                                         hh->i_nal_length_size, &b_unused);
 
         size_t i_buf;
         uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_buf,
@@ -295,7 +295,8 @@ h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
             return VLC_EGENERIC;
         }
 
-        int i_ret = h264_helper_parse_nal(hh, p_buf, i_buf, false, &b_unused);
+        int i_ret = h264_helper_parse_nal(hh, p_buf, i_buf,
+                                          hh->i_nal_length_size, &b_unused);
         free(p_buf);
         return i_ret;
     }
@@ -356,7 +357,7 @@ helper_process_block_h264_annexb(struct hxxx_helper *hh, block_t *p_block,
                                  bool *p_config_changed)
 {
     int i_ret = h264_helper_parse_nal(hh, p_block->p_buffer, p_block->i_buffer,
-                                      false, p_config_changed);
+                                      0, p_config_changed);
     if (i_ret != VLC_SUCCESS)
     {
         block_Release(p_block);
