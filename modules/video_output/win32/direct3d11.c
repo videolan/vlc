@@ -643,11 +643,10 @@ static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
 
     if (i != D3D11_MAX_SHADER_VIEW)
     {
-        while (i >= 0)
+        while (--i >= 0)
         {
             ID3D11ShaderResourceView_Release(picsys->resourceView[i]);
             picsys->resourceView[i] = NULL;
-            i--;
         }
         return VLC_EGENERIC;
     }
@@ -2787,7 +2786,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         picture_t *quad_picture = (*region)[i];
         if (quad_picture == NULL) {
-            ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW];
+            ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
             d3d_quad_t *d3dquad = calloc(1, sizeof(*d3dquad));
             if (unlikely(d3dquad==NULL)) {
                 continue;
