@@ -217,7 +217,10 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
             p_sys->i_input_size = p_sys->i_next_offset
-                                = p_sys->dts.i_frame_size;
+                                /* Even frame size is likely incorrect FSIZE.
+                                 * Sync minus one byte, we can always sync 1 byte further */
+                                = (p_sys->dts.i_frame_size % 2) ? p_sys->dts.i_frame_size - 1
+                                                                : p_sys->dts.i_frame_size;
             p_sys->i_state = STATE_NEXT_SYNC;
 
         case STATE_NEXT_SYNC:
