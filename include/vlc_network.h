@@ -55,11 +55,6 @@
 #   include <netdb.h>
 #   define net_errno errno
 #   define net_Close(fd) ((void)vlc_close(fd))
-#   ifdef __OS2__
-#       define SHUT_RD    0
-#       define SHUT_WR    1
-#       define SHUT_RDWR  2
-#   endif
 #endif
 
 #ifndef MSG_NOSIGNAL
@@ -206,56 +201,11 @@ VLC_API int vlc_close(int);
 # endif
 #endif
 
-#ifdef __OS2__
-# ifndef NI_NUMERICHOST
-#  define NI_NUMERICHOST 0x01
-#  define NI_NUMERICSERV 0x02
-#  define NI_NOFQDN      0x04
-#  define NI_NAMEREQD    0x08
-#  define NI_DGRAM       0x10
-# endif
-
-# define AI_PASSIVE     1
-# define AI_CANONNAME   2
-# define AI_NUMERICHOST 4
-
-VLC_API const char *gai_strerror( int errnum );
-
-VLC_API int  getaddrinfo ( const char *, const char *,
-                           const struct addrinfo *, struct addrinfo ** );
-VLC_API void freeaddrinfo( struct addrinfo * );
-VLC_API int  getnameinfo ( const struct sockaddr *, socklen_t,
-                           char *, int, char *, int, int );
-#endif
-
 VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, int );
 VLC_API int vlc_getaddrinfo (const char *, unsigned,
                              const struct addrinfo *, struct addrinfo **);
 VLC_API int vlc_getaddrinfo_i11e(const char *, unsigned,
                                  const struct addrinfo *, struct addrinfo **);
-
-#ifdef __OS2__
-/* OS/2 does not support IPv6, yet. But declare these only for compilation */
-struct in6_addr
-{
-    uint8_t s6_addr[16];
-};
-
-struct sockaddr_in6
-{
-    uint8_t         sin6_len;
-    uint8_t         sin6_family;
-    uint16_t        sin6_port;
-    uint32_t        sin6_flowinfo;
-    struct in6_addr sin6_addr;
-    uint32_t        sin6_scope_id;
-};
-
-# define IN6_IS_ADDR_MULTICAST(a)   (((__const uint8_t *) (a))[0] == 0xff)
-
-static const struct in6_addr in6addr_any =
-    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
-#endif
 
 static inline bool
 net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)

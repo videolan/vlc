@@ -474,6 +474,10 @@ long nrand48 (unsigned short subi[3]);
 #ifdef __OS2__
 # undef HAVE_FORK   /* Implementation of fork() is imperfect on OS/2 */
 
+# define SHUT_RD    0
+# define SHUT_WR    1
+# define SHUT_RDWR  2
+
 /* GAI error codes */
 # ifndef EAI_BADFLAGS
 #  define EAI_BADFLAGS -1
@@ -512,10 +516,22 @@ long nrand48 (unsigned short subi[3]);
 #  define EAI_SYSTEM -12
 # endif
 
+# ifndef NI_NUMERICHOST
+#  define NI_NUMERICHOST 0x01
+#  define NI_NUMERICSERV 0x02
+#  define NI_NOFQDN      0x04
+#  define NI_NAMEREQD    0x08
+#  define NI_DGRAM       0x10
+# endif
+
 # ifndef NI_MAXHOST
 #  define NI_MAXHOST 1025
 #  define NI_MAXSERV 32
 # endif
+
+# define AI_PASSIVE     1
+# define AI_CANONNAME   2
+# define AI_NUMERICHOST 4
 
 struct addrinfo
 {
@@ -529,7 +545,37 @@ struct addrinfo
     struct addrinfo *ai_next;
 };
 
+const char *gai_strerror (int);
+
+int  getaddrinfo  (const char *node, const char *service,
+                   const struct addrinfo *hints, struct addrinfo **res);
 void freeaddrinfo (struct addrinfo *res);
+int  getnameinfo  (const struct sockaddr *sa, socklen_t salen,
+                   char *host, int hostlen, char *serv, int servlen,
+                   int flags);
+
+/* OS/2 does not support IPv6, yet. But declare these only for compilation */
+# include <stdint.h>
+
+struct in6_addr
+{
+    uint8_t s6_addr[16];
+};
+
+struct sockaddr_in6
+{
+    uint8_t         sin6_len;
+    uint8_t         sin6_family;
+    uint16_t        sin6_port;
+    uint32_t        sin6_flowinfo;
+    struct in6_addr sin6_addr;
+    uint32_t        sin6_scope_id;
+};
+
+# define IN6_IS_ADDR_MULTICAST(a)   (((__const uint8_t *) (a))[0] == 0xff)
+
+static const struct in6_addr in6addr_any =
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 # include <errno.h>
 # ifndef EPROTO
