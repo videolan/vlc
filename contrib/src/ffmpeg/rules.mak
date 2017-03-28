@@ -181,10 +181,6 @@ else
 FFMPEGCONF += --disable-dxva2
 endif
 
-ifdef USE_FFMPEG
-FFMPEGCONF += --enable-memalign-hack
-endif
-
 ifdef HAVE_WIN64
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
 else
