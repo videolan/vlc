@@ -269,7 +269,11 @@ static int dts_header_ParseCore( vlc_dts_header_t *p_header,
     bs_init( &s, p_buffer, VLC_DTS_HEADER_SIZE );
     bs_skip( &s, 32 /*SYNC*/ + 1 /*FTYPE*/ + 5 /*SHORT*/ + 1 /*CPF*/ );
     uint8_t i_nblks = bs_read( &s, 7 );
+    if( i_nblks < 5 )
+        return VLC_EGENERIC;
     uint16_t i_fsize = bs_read( &s, 14 );
+    if( i_fsize < 95 )
+        return VLC_EGENERIC;
     uint8_t i_amode = bs_read( &s, 6 );
     uint8_t i_sfreq = bs_read( &s, 4 );
     uint8_t i_rate = bs_read( &s, 5 );
