@@ -213,7 +213,7 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
  */
 
 #define SORTFN( SORT, first, second ) static inline int proto_##SORT \
-	( const playlist_item_t *first, const playlist_item_t *second )
+    ( const playlist_item_t *first, const playlist_item_t *second )
 
 SORTFN( SORT_TRACK_NUMBER, first, second )
 {
@@ -358,14 +358,14 @@ SORTFN( SORT_URI, first, second )
 #endif
 
 #define DEF( s ) \
-	static int cmp_a_##s(const void *l,const void *r) \
-	{ return proto_##s(*(const playlist_item_t *const *)l, \
+    static int cmp_a_##s(const void *l,const void *r) \
+    { return proto_##s(*(const playlist_item_t *const *)l, \
                            *(const playlist_item_t *const *)r); } \
-	static int cmp_d_##s(const void *l,const void *r) \
-	{ return -1*proto_##s(*(const playlist_item_t * const *)l, \
+    static int cmp_d_##s(const void *l,const void *r) \
+    { return -1*proto_##s(*(const playlist_item_t * const *)l, \
                               *(const playlist_item_t * const *)r); }
 
-	VLC_DEFINE_SORT_FUNCTIONS
+    VLC_DEFINE_SORT_FUNCTIONS
 
 #undef  DEF
 
