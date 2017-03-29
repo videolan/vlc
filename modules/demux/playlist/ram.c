@@ -333,7 +333,8 @@ static int Demux( demux_t *p_demux )
                 free( psz_mrl );
                 goto error;
             }
-            input_item_AddOptions( p_input, i_options, ppsz_options, 0 );
+            if( ppsz_options )
+                input_item_AddOptions( p_input, i_options, ppsz_options, 0 );
 
             if( !EMPTY_STR( psz_artist ) ) input_item_SetArtist( p_input, psz_artist );
             if( !EMPTY_STR( psz_author ) ) input_item_SetPublisher( p_input, psz_author );
