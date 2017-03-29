@@ -81,8 +81,6 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
     {
         p_sys->b_exiting = true;
         p_sys->b_thread_running = false;
-        // Note: Automatically deactivating the extension...
-        Deactivate( p_mgr, p_ext );
         return VLC_ENOMEM;
     }
 
