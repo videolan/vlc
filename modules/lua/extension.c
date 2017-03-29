@@ -140,11 +140,23 @@ void Close_Extension( vlc_object_t *p_this )
             break;
 
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
-        bool b_activated = p_ext->p_sys->b_activated;
-        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-
-        if( b_activated == true )
+        if( p_ext->p_sys->b_activated == true )
+        {
+            p_ext->p_sys->b_exiting = true;
+            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+            // DeactivateCommand will signal the wait condition.
             Deactivate( p_mgr, p_ext );
+        }
+        else
+        {
+            if ( p_ext->p_sys->L != NULL )
+                vlclua_fd_interrupt( &p_ext->p_sys->dtable );
+            // however here we need to manually signal the wait cond, since no command is queued.
+            p_ext->p_sys->b_exiting = true;
+            vlc_cond_signal( &p_ext->p_sys->wait );
+            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+        }
+
 
         if( p_ext->p_sys->b_thread_running == true )
             vlc_join( p_ext->p_sys->thread, NULL );
