@@ -166,7 +166,7 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     msg_Dbg( p_mgr, "Killing extension now" );
-    lua_ExtensionDeactivate( p_mgr, p_ext );
+    vlclua_fd_interrupt( &p_ext->p_sys->dtable );
 
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
     p_ext->p_sys->b_activated = false;
