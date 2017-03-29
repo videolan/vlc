@@ -436,6 +436,46 @@ static void ActivateSets(decoder_t *p_dec,
     p_sys->p_active_pps = p_pps;
     p_sys->p_active_sps = p_sps;
     p_sys->p_active_vps = p_vps;
+    if(p_sps)
+    {
+        if(!p_dec->fmt_out.video.i_frame_rate)
+        {
+            (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
+                                        &p_dec->fmt_out.video.i_frame_rate,
+                                        &p_dec->fmt_out.video.i_frame_rate_base );
+        }
+
+        if(p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF)
+        {
+            (void) hevc_get_colorimetry( p_sps,
+                                         &p_dec->fmt_out.video.primaries,
+                                         &p_dec->fmt_out.video.transfer,
+                                         &p_dec->fmt_out.video.space,
+                                         &p_dec->fmt_out.video.b_color_range_full);
+        }
+
+        unsigned sizes[4];
+        if( hevc_get_picture_size( p_sps, &sizes[0], &sizes[1],
+                                          &sizes[2], &sizes[3] ) )
+        {
+            if( p_dec->fmt_out.video.i_width != sizes[0] ||
+                p_dec->fmt_out.video.i_height != sizes[1] )
+            {
+                p_dec->fmt_out.video.i_width = sizes[0];
+                p_dec->fmt_out.video.i_height = sizes[1];
+            }
+        }
+
+        if(p_dec->fmt_out.i_profile == -1)
+        {
+            uint8_t i_profile, i_level;
+            if( hevc_get_sps_profile_tier_level( p_sps, &i_profile, &i_level ) )
+            {
+                p_dec->fmt_out.i_profile = i_profile;
+                p_dec->fmt_out.i_level = i_level;
+            }
+        }
+    }
 }
 
 static void GetXPSSet(uint8_t i_pps_id, void *priv,
@@ -553,52 +593,8 @@ static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
         case HEVC_NAL_PPS:
         {
             uint8_t i_id;
-            if( hevc_get_xps_id(p_nalb->p_buffer, p_nalb->i_buffer, &i_id) &&
-                InsertXPS(p_dec, i_nal_type, i_id, p_nalb) )
-            {
-                const hevc_sequence_parameter_set_t *p_sps;
-                if( i_nal_type == HEVC_NAL_SPS &&
-                   (p_sps = p_dec->p_sys->rgi_p_decsps[i_id]) )
-                {
-                    if(!p_dec->fmt_out.video.i_frame_rate)
-                    {
-                        (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
-                                                    &p_dec->fmt_out.video.i_frame_rate,
-                                                    &p_dec->fmt_out.video.i_frame_rate_base );
-                    }
-
-                    if(p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF)
-                    {
-                        (void) hevc_get_colorimetry( p_sps,
-                                                     &p_dec->fmt_out.video.primaries,
-                                                     &p_dec->fmt_out.video.transfer,
-                                                     &p_dec->fmt_out.video.space,
-                                                     &p_dec->fmt_out.video.b_color_range_full);
-                    }
-
-                    unsigned sizes[4];
-                    if( hevc_get_picture_size( p_sps, &sizes[0], &sizes[1],
-                                                      &sizes[2], &sizes[3] ) )
-                    {
-                        if( p_dec->fmt_out.video.i_width != sizes[0] ||
-                            p_dec->fmt_out.video.i_height != sizes[1] )
-                        {
-                            p_dec->fmt_out.video.i_width = sizes[0];
-                            p_dec->fmt_out.video.i_height = sizes[1];
-                        }
-                    }
-
-                    if(p_dec->fmt_out.i_profile == -1)
-                    {
-                        uint8_t i_profile, i_level;
-                        if( hevc_get_sps_profile_tier_level( p_sps, &i_profile, &i_level ) )
-                        {
-                            p_dec->fmt_out.i_profile = i_profile;
-                            p_dec->fmt_out.i_level = i_level;
-                        }
-                    }
-                }
-            }
+            if(hevc_get_xps_id(p_nalb->p_buffer, p_nalb->i_buffer, &i_id))
+                InsertXPS(p_dec, i_nal_type, i_id, p_nalb);
             break;
         }
 
