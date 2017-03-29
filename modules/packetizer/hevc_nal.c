@@ -1008,6 +1008,11 @@ uint8_t hevc_get_pps_sps_id( const hevc_picture_parameter_set_t *p_pps )
     return p_pps->pps_seq_parameter_set_id;
 }
 
+uint8_t hevc_get_slice_pps_id( const hevc_slice_segment_header_t *p_slice )
+{
+    return p_slice->slice_pic_parameter_set_id;
+}
+
 bool hevc_get_sps_profile_tier_level( const hevc_sequence_parameter_set_t *p_sps,
                                       uint8_t *pi_profile, uint8_t *pi_level)
 {
@@ -1093,10 +1098,14 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
 
 static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
                                                   uint8_t i_nal_type,
-                                                  hevc_sequence_parameter_set_t **pp_sps,
-                                                  hevc_picture_parameter_set_t **pp_pps,
+                                                  pf_get_matchedxps get_matchedxps,
+                                                  void *priv,
                                                   hevc_slice_segment_header_t *p_sl )
 {
+    hevc_sequence_parameter_set_t *p_sps;
+    hevc_picture_parameter_set_t *p_pps;
+    hevc_video_parameter_set_t *p_vps;
+
     if( bs_remain( p_bs ) < 3 )
         return false;
 
@@ -1107,8 +1116,8 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
     if( p_sl->slice_pic_parameter_set_id > HEVC_PPS_ID_MAX || bs_remain( p_bs ) < 1 )
         return false;
 
-    const hevc_picture_parameter_set_t *p_pps = pp_pps[p_sl->slice_pic_parameter_set_id];
-    if(!p_pps)
+    get_matchedxps( p_sl->slice_pic_parameter_set_id, priv, &p_pps, &p_sps, &p_vps );
+    if(!p_sps || !p_pps)
         return false;
 
     if( !p_sl->first_slice_segment_in_pic_flag )
@@ -1116,7 +1125,6 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
         if( p_pps->dependent_slice_segments_enabled_flag )
             p_sl->dependent_slice_segment_flag = bs_read1( p_bs );
 
-        const hevc_sequence_parameter_set_t *p_sps = pp_sps[p_pps->pps_seq_parameter_set_id];
         if( !p_sps )
             return false;
 
@@ -1165,12 +1173,8 @@ void hevc_rbsp_release_slice_header( hevc_slice_segment_header_t *p_sh )
 }
 
 hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, size_t i_buf, bool b_escaped,
-                                                        hevc_sequence_parameter_set_t **pp_sps,
-                                                        hevc_picture_parameter_set_t **pp_pps )
+                                                        pf_get_matchedxps get_matchedxps, void *priv )
 {
-    if(!pp_sps || !pp_pps)
-        return NULL;
-
     hevc_slice_segment_header_t *p_sh = calloc(1, sizeof(hevc_slice_segment_header_t));
     if(likely(p_sh))
     {
@@ -1188,7 +1192,7 @@ hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, si
         uint8_t i_nuh_layer_id = bs_read( &bs, 6 );
         bs_skip( &bs, 3 ); /* !nal_unit_header */
         if( i_nuh_layer_id > 62 ||
-           !hevc_parse_slice_segment_header_rbsp( &bs, i_nal_type, pp_sps, pp_pps, p_sh ) )
+           !hevc_parse_slice_segment_header_rbsp( &bs, i_nal_type, get_matchedxps, priv, p_sh ) )
         {
             hevc_rbsp_release_slice_header( p_sh );
             p_sh = NULL;

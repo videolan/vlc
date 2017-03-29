@@ -402,6 +402,19 @@ static bool XPSReady(decoder_sys_t *p_sys)
     return false;
 }
 
+static void GetXPSSet(uint8_t i_pps_id, void *priv,
+                      hevc_picture_parameter_set_t **pp_pps,
+                      hevc_sequence_parameter_set_t **pp_sps,
+                      hevc_video_parameter_set_t **pp_vps)
+{
+    decoder_sys_t *p_sys = priv;
+    *pp_sps = NULL;
+    *pp_vps = NULL;
+    if((*pp_pps = p_sys->rgi_p_decpps[i_pps_id]))
+        if((*pp_sps = p_sys->rgi_p_decsps[hevc_get_pps_sps_id(*pp_pps)]))
+            *pp_vps = p_sys->rgi_p_decvps[hevc_get_sps_vps_id(*pp_sps)];
+}
+
 static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -440,7 +453,7 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
             default:
             {
                 hevc_slice_segment_header_t *p_sli = hevc_decode_slice_header( p_buffer, i_buffer, true,
-                                                                               p_sys->rgi_p_decsps, p_sys->rgi_p_decpps );
+                                                                               GetXPSSet, p_sys );
                 if( p_sli )
                 {
                     enum hevc_slice_type_e type;
