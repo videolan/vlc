@@ -86,6 +86,8 @@ static inline int meta_sort( const playlist_item_t *first,
     else if( first->i_children >= 0 && second->i_children >= 0 )
         i_ret = meta_strcasecmp_title( first, second );
     /* Both are items */
+    else if( !psz_first && !psz_second )
+        i_ret = 0;
     else if( !psz_first && psz_second )
         i_ret = 1;
     else if( psz_first && !psz_second )
