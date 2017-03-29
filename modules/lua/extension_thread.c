@@ -38,7 +38,6 @@ struct thread_sys_t
 /** Thread Run */
 static void* Run( void *data );
 static void FreeCommands( struct command_t *command );
-static int RemoveActivated( extensions_manager_t *p_mgr, extension_t *p_ext );
 
 /**
  * Activate an extension
@@ -55,16 +54,8 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
 
     msg_Dbg( p_mgr, "Activating extension '%s'", p_ext->psz_title );
 
-    if( IsActivated( p_mgr, p_ext ) )
-    {
-        msg_Warn( p_mgr, "Extension is already activated!" );
-        return VLC_EGENERIC;
-    }
-
-    /* Add this script to the activated extensions list */
-    vlc_mutex_lock( &p_mgr->p_sys->lock );
-    ARRAY_APPEND( p_mgr->p_sys->activated_extensions, p_ext );
-    vlc_mutex_unlock( &p_mgr->p_sys->lock );
+    if (p_sys->b_thread_running == true)
+        return VLC_SUCCESS;
 
     /* Prepare first command */
     p_sys->command = calloc( 1, sizeof( struct command_t ) );
@@ -85,32 +76,6 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
     }
 
     return VLC_SUCCESS;
-}
-
-/** Look for an extension in the activated extensions list
- * @todo FIXME Should be entered with the lock held
- **/
-bool IsActivated( extensions_manager_t *p_mgr, extension_t *p_ext )
-{
-    assert( p_ext != NULL );
-    vlc_mutex_lock( &p_mgr->p_sys->lock );
-
-    extension_t *p_iter;
-    FOREACH_ARRAY( p_iter, p_mgr->p_sys->activated_extensions )
-    {
-        if( !p_iter )
-            break;
-        assert( p_iter->psz_name != NULL );
-        if( !strcmp( p_iter->psz_name, p_ext->psz_name ) )
-        {
-            vlc_mutex_unlock( &p_mgr->p_sys->lock );
-            return true;
-        }
-    }
-    FOREACH_END()
-
-    vlc_mutex_unlock( &p_mgr->p_sys->lock );
-    return false;
 }
 
 /** Recursively drop and free commands starting from "command" */
@@ -176,52 +141,16 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
     return VLC_SUCCESS;
 }
 
-/** Remove an extension from the activated list */
-static int RemoveActivated( extensions_manager_t *p_mgr, extension_t *p_ext )
-{
-    if( p_mgr->p_sys->b_killed )
-        return VLC_SUCCESS;
-    vlc_mutex_lock( &p_mgr->p_sys->lock );
-
-    int i_idx = -1;
-    extension_t *p_iter;
-    FOREACH_ARRAY( p_iter, p_mgr->p_sys->activated_extensions )
-    {
-        i_idx++;
-        if( !p_iter )
-        {
-            i_idx = -1;
-            break;
-        }
-        assert( p_iter->psz_name != NULL );
-        if( !strcmp( p_iter->psz_name, p_ext->psz_name ) )
-            break;
-    }
-    FOREACH_END()
-
-    if( i_idx >= 0 )
-    {
-        ARRAY_REMOVE( p_mgr->p_sys->activated_extensions, i_idx );
-    }
-    else
-    {
-        msg_Dbg( p_mgr, "Can't find extension '%s' in the activated list",
-                 p_ext->psz_title );
-    }
-
-    vlc_mutex_unlock( &p_mgr->p_sys->lock );
-    return (i_idx >= 0) ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     msg_Dbg( p_mgr, "Killing extension now" );
     lua_ExtensionDeactivate( p_mgr, p_ext );
+
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    p_ext->p_sys->b_activated = false;
     p_ext->p_sys->b_exiting = true;
     vlc_cond_signal( &p_ext->p_sys->wait );
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-    RemoveActivated( p_mgr, p_ext );
 }
 
 /** Push a UI command */
@@ -347,7 +276,11 @@ static void* Run( void *data )
                     {
                         msg_Err( p_mgr, "Could not activate extension!" );
                         Deactivate( p_mgr, p_ext );
+                        break;
                     }
+                    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+                    p_ext->p_sys->b_activated = true;
+                    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
                     break;
                 }
 
@@ -359,8 +292,10 @@ static void* Run( void *data )
                         msg_Warn( p_mgr, "Extension '%s' did not deactivate properly",
                                   p_ext->psz_title );
                     }
+                    vlc_mutex_lock( &p_ext->p_sys->command_lock );
                     p_ext->p_sys->b_exiting = true;
-                    RemoveActivated( p_mgr, p_ext );
+                    p_ext->p_sys->b_activated = false;
+                    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
                     break;
                 }
 

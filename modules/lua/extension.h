@@ -51,18 +51,6 @@ typedef enum
     LUA_TEXT
 } lua_datatype_e;
 
-struct extensions_manager_sys_t
-{
-    /* List of activated extensions */
-    DECL_ARRAY( extension_t* ) activated_extensions;
-
-    /* Lock for this list */
-    vlc_mutex_t lock;
-
-    /* Flag indicating that the module is about to be unloaded */
-    bool b_killed;
-};
-
 struct extension_sys_t
 {
     /* Extension general */
@@ -99,11 +87,11 @@ struct extension_sys_t
     bool b_exiting;
 
     bool b_thread_running; //< Only accessed out of the extension thread.
+    bool b_activated; ///< Protected by the command lock
 };
 
 /* Extensions: manager functions */
 int Activate( extensions_manager_t *p_mgr, extension_t * );
-bool IsActivated( extensions_manager_t *p_mgr, extension_t * );
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext );
 int PushCommand__( extension_t *ext, bool unique, command_type_e cmd, va_list options );

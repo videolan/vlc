@@ -102,15 +102,8 @@ int Open_Extension( vlc_object_t *p_this )
 
     p_mgr->pf_control = Control;
 
-    extensions_manager_sys_t *p_sys = ( extensions_manager_sys_t* )
-                    calloc( 1, sizeof( extensions_manager_sys_t ) );
-    if( !p_sys ) return VLC_ENOMEM;
-
-    p_mgr->p_sys = p_sys;
-    ARRAY_INIT( p_sys->activated_extensions );
-    ARRAY_INIT( p_mgr->extensions );
+    p_mgr->p_sys = NULL;
     vlc_mutex_init( &p_mgr->lock );
-    vlc_mutex_init( &p_mgr->p_sys->lock );
 
     /* Scan available Lua Extensions */
     if( ScanExtensions( p_mgr ) != VLC_SUCCESS )
@@ -133,33 +126,26 @@ int Open_Extension( vlc_object_t *p_this )
 void Close_Extension( vlc_object_t *p_this )
 {
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
-    msg_Dbg( p_mgr, "Deactivating all loaded extensions" );
-
-    vlc_mutex_lock( &p_mgr->lock );
-    p_mgr->p_sys->b_killed = true;
-    vlc_mutex_unlock( &p_mgr->lock );
 
     var_DelCallback( p_this, "dialog-event",
                      vlclua_extension_dialog_callback, NULL );
     var_Destroy( p_mgr, "dialog-event" );
 
     extension_t *p_ext = NULL;
-    FOREACH_ARRAY( p_ext, p_mgr->p_sys->activated_extensions )
-    {
-        if( !p_ext ) break;
-        msg_Dbg( p_mgr, "Deactivating '%s'", p_ext->psz_title );
-        Deactivate( p_mgr, p_ext );
-    }
-    FOREACH_END()
-
-    msg_Dbg( p_mgr, "All extensions are now deactivated" );
-    ARRAY_RESET( p_mgr->p_sys->activated_extensions );
 
     /* Free extensions' memory */
     FOREACH_ARRAY( p_ext, p_mgr->extensions )
     {
         if( !p_ext )
             break;
+
+        vlc_mutex_lock( &p_ext->p_sys->command_lock );
+        bool b_activated = p_ext->p_sys->b_activated;
+        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+
+        if( b_activated == true )
+            Deactivate( p_mgr, p_ext );
+
         if( p_ext->p_sys->b_thread_running == true )
             vlc_join( p_ext->p_sys->thread, NULL );
 
@@ -190,9 +176,6 @@ void Close_Extension( vlc_object_t *p_this )
     FOREACH_END()
 
     vlc_mutex_destroy( &p_mgr->lock );
-    vlc_mutex_destroy( &p_mgr->p_sys->lock );
-    free( p_mgr->p_sys );
-    p_mgr->p_sys = NULL;
 
     ARRAY_RESET( p_mgr->extensions );
 }
@@ -532,7 +515,9 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
         case EXTENSION_IS_ACTIVATED:
             p_ext = ( extension_t* ) va_arg( args, extension_t* );
             pb = ( bool* ) va_arg( args, bool* );
-            *pb = IsActivated( p_mgr, p_ext );
+            vlc_mutex_lock( &p_ext->p_sys->command_lock );
+            *pb = p_ext->p_sys->b_activated;
+            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             break;
 
         case EXTENSION_HAS_MENU:
@@ -651,8 +636,7 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     assert( p_mgr != NULL && p_ext != NULL );
 
-    // b_exiting will be set to true once the entire tear down has been completed
-    if( p_ext->p_sys->b_exiting == true )
+    if( p_ext->p_sys->b_activated == false )
         return VLC_SUCCESS;
 
     vlclua_fd_interrupt( &p_ext->p_sys->dtable );
@@ -703,11 +687,14 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
     assert( *pppsz_titles == NULL );
     assert( *ppi_ids == NULL );
 
-    if( !IsActivated( p_mgr, p_ext ) )
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    if( p_ext->p_sys->b_activated == false )
     {
+        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
         msg_Dbg( p_mgr, "Can't get menu before activating the extension!" );
         return VLC_EGENERIC;
     }
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
     if( !LockExtension( p_ext ) )
     {
