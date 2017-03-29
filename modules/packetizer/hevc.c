@@ -86,6 +86,9 @@ struct decoder_sys_t
     hevc_video_parameter_set_t    *rgi_p_decvps[HEVC_VPS_ID_MAX + 1];
     hevc_sequence_parameter_set_t *rgi_p_decsps[HEVC_SPS_ID_MAX + 1];
     hevc_picture_parameter_set_t  *rgi_p_decpps[HEVC_PPS_ID_MAX + 1];
+    const hevc_video_parameter_set_t    *p_active_vps;
+    const hevc_sequence_parameter_set_t *p_active_sps;
+    const hevc_picture_parameter_set_t  *p_active_pps;
     bool b_init_sequence_complete;
 
     /* */
@@ -307,6 +310,7 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                       const block_t *p_nalb)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    bool b_active = false;
 
     switch(i_nal_type)
     {
@@ -330,16 +334,31 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
     if(i_nal_type == HEVC_NAL_SPS && p_sys->rgi_p_decsps[i_id])
     {
         hevc_rbsp_release_sps(p_sys->rgi_p_decsps[i_id]);
+        if(p_sys->p_active_sps == p_sys->rgi_p_decsps[i_id])
+        {
+           p_sys->p_active_sps = NULL;
+           b_active = true;
+        }
         p_sys->rgi_p_decsps[i_id] = NULL;
     }
     else if(i_nal_type == HEVC_NAL_PPS && p_sys->rgi_p_decpps[i_id])
     {
         hevc_rbsp_release_pps(p_sys->rgi_p_decpps[i_id]);
+        if(p_sys->p_active_pps == p_sys->rgi_p_decpps[i_id])
+        {
+            p_sys->p_active_pps = NULL;
+            b_active = true;
+        }
         p_sys->rgi_p_decpps[i_id] = NULL;
     }
     else if(i_nal_type == HEVC_NAL_VPS && p_sys->rgi_p_decvps[i_id])
     {
         hevc_rbsp_release_vps(p_sys->rgi_p_decvps[i_id]);
+        if(p_sys->p_active_vps == p_sys->rgi_p_decvps[i_id])
+        {
+           p_sys->p_active_vps = NULL;
+           b_active = true;
+        }
         p_sys->rgi_p_decvps[i_id] = NULL;
     }
 
@@ -356,6 +375,8 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 msg_Err(p_dec, "Failed decoding SPS id %d", i_id);
                 return false;
             }
+            if(b_active)
+                p_sys->p_active_sps = p_sys->rgi_p_decsps[i_id];
         }
         else if(i_nal_type == HEVC_NAL_PPS)
         {
@@ -365,6 +386,8 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 msg_Err(p_dec, "Failed decoding PPS id %d", i_id);
                 return false;
             }
+            if(b_active)
+                p_sys->p_active_pps = p_sys->rgi_p_decpps[i_id];
         }
         else if(i_nal_type == HEVC_NAL_VPS)
         {
@@ -374,6 +397,8 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 msg_Err(p_dec, "Failed decoding VPS id %d", i_id);
                 return false;
             }
+            if(b_active)
+                p_sys->p_active_vps = p_sys->rgi_p_decvps[i_id];
         }
         return true;
 
@@ -400,6 +425,17 @@ static bool XPSReady(decoder_sys_t *p_sys)
         }
     }
     return false;
+}
+
+static void ActivateSets(decoder_t *p_dec,
+                         const hevc_picture_parameter_set_t *p_pps,
+                         const hevc_sequence_parameter_set_t *p_sps,
+                         const hevc_video_parameter_set_t *p_vps)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    p_sys->p_active_pps = p_pps;
+    p_sys->p_active_sps = p_sps;
+    p_sys->p_active_vps = p_vps;
 }
 
 static void GetXPSSet(uint8_t i_pps_id, void *priv,
@@ -439,6 +475,17 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
             p_outputchain = OutputQueues(p_sys, p_sys->b_init_sequence_complete);
         }
 
+        hevc_slice_segment_header_t *p_sli = hevc_decode_slice_header(p_buffer, i_buffer, true,
+                                                                      GetXPSSet, p_sys);
+        if(p_sli && i_layer == 0)
+        {
+            hevc_sequence_parameter_set_t *p_sps;
+            hevc_picture_parameter_set_t *p_pps;
+            hevc_video_parameter_set_t *p_vps;
+            GetXPSSet(hevc_get_slice_pps_id(p_sli), p_sys, &p_pps, &p_sps, &p_vps);
+            ActivateSets(p_dec, p_pps, p_sps, p_vps);
+        }
+
         switch(i_nal_type)
         {
             case HEVC_NAL_BLA_W_LP:
@@ -452,24 +499,24 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
 
             default:
             {
-                hevc_slice_segment_header_t *p_sli = hevc_decode_slice_header( p_buffer, i_buffer, true,
-                                                                               GetXPSSet, p_sys );
-                if( p_sli )
+                if(p_sli)
                 {
                     enum hevc_slice_type_e type;
-                    if( hevc_get_slice_type( p_sli, &type ) )
+                    if(hevc_get_slice_type( p_sli, &type ))
                     {
                         if( type == HEVC_SLICE_TYPE_P )
                             p_frag->i_flags |= BLOCK_FLAG_TYPE_P;
                         else
                             p_frag->i_flags |= BLOCK_FLAG_TYPE_B;
                     }
-                    hevc_rbsp_release_slice_header( p_sli );
                 }
                 else p_frag->i_flags |= BLOCK_FLAG_TYPE_B;
             }
             break;
         }
+
+        if(p_sli)
+            hevc_rbsp_release_slice_header(p_sli);
     }
 
     if(!p_sys->b_init_sequence_complete && i_layer == 0 &&
