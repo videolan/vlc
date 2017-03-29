@@ -160,9 +160,16 @@ void Close_Extension( vlc_object_t *p_this )
     {
         if( !p_ext )
             break;
-        vlc_join( p_ext->p_sys->thread, NULL );
+        if( p_ext->p_sys->b_thread_running == true )
+            vlc_join( p_ext->p_sys->thread, NULL );
+
+        /* Clear Lua State */
         if( p_ext->p_sys->L )
+        {
             lua_close( p_ext->p_sys->L );
+            vlclua_fd_cleanup( &p_ext->p_sys->dtable );
+        }
+
         free( p_ext->psz_name );
         free( p_ext->psz_title );
         free( p_ext->psz_author );
@@ -644,7 +651,8 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     assert( p_mgr != NULL && p_ext != NULL );
 
-    if( !p_ext->p_sys->L )
+    // b_exiting will be set to true once the entire tear down has been completed
+    if( p_ext->p_sys->b_exiting == true )
         return VLC_SUCCESS;
 
     vlclua_fd_interrupt( &p_ext->p_sys->dtable );
@@ -662,14 +670,7 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         p_ext->p_sys->p_input = NULL;
     }
 
-    int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
-
-    /* Clear Lua State */
-    vlclua_fd_cleanup( &p_ext->p_sys->dtable );
-    lua_close( p_ext->p_sys->L );
-    p_ext->p_sys->L = NULL;
-
-    return i_ret;
+    return lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
 }
 
 int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,

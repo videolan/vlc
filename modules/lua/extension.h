@@ -97,6 +97,8 @@ struct extension_sys_t
     vlc_timer_t timer; ///< This timer makes sure Lua never gets stuck >5s
 
     bool b_exiting;
+
+    bool b_thread_running; //< Only accessed out of the extension thread.
 };
 
 /* Extensions: manager functions */

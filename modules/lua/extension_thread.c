@@ -74,11 +74,13 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
 
     /* Start thread */
     p_sys->b_exiting = false;
+    p_sys->b_thread_running = true;
 
     if( vlc_clone( &p_sys->thread, Run, p_ext, VLC_THREAD_PRIORITY_LOW )
         != VLC_SUCCESS )
     {
         p_sys->b_exiting = true;
+        p_sys->b_thread_running = false;
         // Note: Automatically deactivating the extension...
         Deactivate( p_mgr, p_ext );
         return VLC_ENOMEM;
