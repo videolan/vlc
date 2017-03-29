@@ -115,6 +115,27 @@ static void FreeCommands( struct command_t *command )
     FreeCommands( next );
 }
 
+static bool QueueDeactivateCommand( extension_t *p_ext )
+{
+    struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
+    if( unlikely( cmd == NULL ) )
+        return false;
+    /* Free the list of commands */
+    if( p_ext->p_sys->command )
+        FreeCommands( p_ext->p_sys->command->next );
+
+    /* Push command */
+
+    cmd->i_command = CMD_DEACTIVATE;
+    if( p_ext->p_sys->command )
+        p_ext->p_sys->command->next = cmd;
+    else
+        p_ext->p_sys->command = cmd;
+
+    vlc_cond_signal( &p_ext->p_sys->wait );
+    return true;
+}
+
 /** Deactivate this extension: pushes immediate command and drops queued */
 int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
@@ -136,22 +157,10 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         return VLC_SUCCESS;
     }
 
-    /* Free the list of commands */
-    if( p_ext->p_sys->command )
-        FreeCommands( p_ext->p_sys->command->next );
-
-    /* Push command */
-    struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
-    cmd->i_command = CMD_DEACTIVATE;
-    if( p_ext->p_sys->command )
-        p_ext->p_sys->command->next = cmd;
-    else
-        p_ext->p_sys->command = cmd;
-
-    vlc_cond_signal( &p_ext->p_sys->wait );
+    bool b_success = QueueDeactivateCommand( p_ext );
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
-    return VLC_SUCCESS;
+    return b_success ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
