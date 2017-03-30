@@ -924,6 +924,7 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
     {
         msg_Warn( p_mgr, "Error while running script %s, "
                   "function %s() not found", p_ext->psz_name, psz_function );
+        lua_pop( L, 1 );
         goto exit;
     }
 
@@ -942,6 +943,8 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
         {
             msg_Warn( p_mgr, "Undefined argument type %d to lua function %s"
                    "from script %s", type, psz_function, p_ext->psz_name );
+            if( i_args > 0 )
+                lua_pop( L, i_args );
             goto exit;
         }
         i_args ++;
