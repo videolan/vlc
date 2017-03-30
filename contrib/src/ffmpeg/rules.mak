@@ -5,7 +5,7 @@
 #USE_FFMPEG ?= 1
 
 ifdef USE_FFMPEG
-FFMPEG_HASH=66963d4b8d302611553e7928063c1cb2ff0efdff
+FFMPEG_HASH=46998d037f8bfebee7bb6578df24a5a3b8f41299
 FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 else
