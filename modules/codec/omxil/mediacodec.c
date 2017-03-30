@@ -385,7 +385,7 @@ static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     return CSDDup(p_dec, p_data, sizeof(p_data));
 }
 
-static int ParseVideoExtra(decoder_t *p_dec)
+static int ParseExtra(decoder_t *p_dec)
 {
     uint8_t *p_extra = p_dec->fmt_in.p_extra;
     int i_extra = p_dec->fmt_in.i_extra;
@@ -401,7 +401,11 @@ static int ParseVideoExtra(decoder_t *p_dec)
     case VLC_CODEC_VC1:
         return ParseVideoExtraVc1(p_dec, p_extra, i_extra);
     default:
-        return VLC_SUCCESS;
+        /* Set default CSD */
+        if (p_dec->fmt_in.i_extra)
+            return CSDDup(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+        else
+            return VLC_SUCCESS;
     }
 }
 
@@ -704,14 +708,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         }
     }
 
-    /* Try first to configure specific Video CSD */
-    if (p_dec->fmt_in.i_cat == VIDEO_ES)
-        if (ParseVideoExtra(p_dec) != VLC_SUCCESS)
-            goto bailout;
-
-    /* Set default CSD if ParseVideoExtra failed to configure one */
-    if (!p_sys->i_csd_count && p_dec->fmt_in.i_extra
-     && CSDDup(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra) != VLC_SUCCESS)
+    /* Try first to configure CSD */
+    if (ParseExtra(p_dec) != VLC_SUCCESS)
         goto bailout;
 
     i_ret = StartMediaCodec(p_dec);
