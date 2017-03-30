@@ -207,12 +207,18 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
 
         if( p_sps->vui.b_valid )
         {
-            if( p_sps->vui.b_fixed_frame_rate && !p_dec->fmt_out.video.i_frame_rate_base )
+            if( !p_dec->fmt_in.video.i_frame_rate_base &&
+                 p_sps->vui.b_fixed_frame_rate && p_sps->vui.i_num_units_in_tick > 0 )
             {
-                p_dec->fmt_out.video.i_frame_rate_base = p_sps->vui.i_num_units_in_tick;
-                p_dec->fmt_out.video.i_frame_rate = p_sps->vui.i_time_scale >> 1 /* num_clock_ts == 2 */;
-                if( p_sps->vui.i_num_units_in_tick > 0 )
+                const unsigned i_rate_base = p_sps->vui.i_num_units_in_tick;
+                const unsigned i_rate = p_sps->vui.i_time_scale >> 1; /* num_clock_ts == 2 */
+                if( i_rate_base != p_dec->fmt_out.video.i_frame_rate_base &&
+                    i_rate != p_dec->fmt_out.video.i_frame_rate )
+                {
+                    p_dec->fmt_out.video.i_frame_rate_base = i_rate_base;
+                    p_dec->fmt_out.video.i_frame_rate = i_rate;
                     date_Change( &p_sys->dts, p_sps->vui.i_time_scale, p_sps->vui.i_num_units_in_tick );
+                }
             }
             if( p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF )
             {
