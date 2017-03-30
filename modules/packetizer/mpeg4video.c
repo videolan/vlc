@@ -110,6 +110,7 @@ static int vlc_log2( unsigned int );
 
 #define VIDEO_OBJECT_START_CODE                 0x100
 #define VIDEO_OBJECT_LAYER_START_CODE           0x120
+#define RESERVED_START_CODE                     0x130
 #define VISUAL_OBJECT_SEQUENCE_START_CODE       0x1b0
 #define VISUAL_OBJECT_SEQUENCE_END_CODE         0x1b1
 #define USER_DATA_START_CODE                    0x1b2
@@ -284,7 +285,10 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
-    if( p_frag->p_buffer[3] == 0xB0 || p_frag->p_buffer[3] == 0xB1 || p_frag->p_buffer[3] == 0xB2 )
+    const uint32_t i_startcode = GetDWBE( p_frag->p_buffer );
+    if( i_startcode == VISUAL_OBJECT_SEQUENCE_START_CODE ||
+        i_startcode == VISUAL_OBJECT_SEQUENCE_END_CODE ||
+        i_startcode == USER_DATA_START_CODE )
     {   /* VOS and USERDATA */
 #if 0
         /* Remove VOS start/end code from the original stream */
@@ -296,7 +300,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 #endif
         return NULL;
     }
-    if( p_frag->p_buffer[3] >= 0x20 && p_frag->p_buffer[3] <= 0x2f )
+    else if( i_startcode >= VIDEO_OBJECT_LAYER_START_CODE &&
+             i_startcode < RESERVED_START_CODE )
     {
         /* Copy the complete VOL */
         if( (size_t)p_dec->fmt_out.i_extra != p_frag->i_buffer )
@@ -332,12 +337,12 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         block_ChainLastAppend( &p_sys->pp_last, p_frag );
     }
 
-    if(p_frag->p_buffer[3] == 0xb5)
+    if( i_startcode == VISUAL_OBJECT_START_CODE )
     {
         ParseVO( p_dec, p_frag );
     }
     else
-    if( p_frag->p_buffer[3] == 0xb6 &&
+    if( i_startcode == VOP_START_CODE &&
         ParseVOP( p_dec, p_frag ) == VLC_SUCCESS )
     {
         /* We are dealing with a VOP */
