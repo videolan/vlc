@@ -39,6 +39,9 @@
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 #include <libavutil/pixdesc.h>
+#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
+#include <libavutil/mastering_display_metadata.h>
+#endif
 
 #include "avcodec.h"
 #include "va.h"
@@ -303,6 +306,9 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     dec->fmt_out.video.orientation = dec->fmt_in.video.orientation;
     dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
     dec->fmt_out.video.pose = dec->fmt_in.video.pose;
+    if ( dec->fmt_in.video.mastering.max_luminance )
+        dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
+    dec->fmt_out.video.ligthing = dec->fmt_in.video.ligthing;
     return decoder_UpdateVideoFormat(dec);
 }
 
@@ -1012,6 +1018,38 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
 
+#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
+        const AVFrameSideData *metadata =
+                av_frame_get_side_data( frame,
+                                        AV_FRAME_DATA_MASTERING_DISPLAY_METADATA );
+        if ( metadata )
+        {
+            const AVMasteringDisplayMetadata *hdr_meta =
+                    (const AVMasteringDisplayMetadata *) metadata->data;
+            if ( hdr_meta->has_luminance )
+            {
+                p_pic->format.mastering.max_luminance = hdr_meta->max_luminance.num;
+                p_pic->format.mastering.min_luminance = hdr_meta->min_luminance.num;
+            }
+            if ( hdr_meta->has_primaries )
+            {
+#define ST2086_RED   2
+#define ST2086_GREEN 0
+#define ST2086_BLUE  1
+#define LAV_RED    0
+#define LAV_GREEN  1
+#define LAV_BLUE   2
+                p_pic->format.mastering.primaries[ST2086_RED*2   + 0] = hdr_meta->display_primaries[LAV_RED][0].num;
+                p_pic->format.mastering.primaries[ST2086_RED*2   + 1] = hdr_meta->display_primaries[LAV_RED][1].num;
+                p_pic->format.mastering.primaries[ST2086_GREEN*2 + 0] = hdr_meta->display_primaries[LAV_GREEN][0].num;
+                p_pic->format.mastering.primaries[ST2086_GREEN*2 + 1] = hdr_meta->display_primaries[LAV_GREEN][1].num;
+                p_pic->format.mastering.primaries[ST2086_BLUE*2  + 0] = hdr_meta->display_primaries[LAV_BLUE][0].num;
+                p_pic->format.mastering.primaries[ST2086_BLUE*2  + 1] = hdr_meta->display_primaries[LAV_BLUE][1].num;
+                p_pic->format.mastering.white_point[0] = hdr_meta->white_point[0].num;
+                p_pic->format.mastering.white_point[1] = hdr_meta->white_point[1].num;
+            }
+        }
+#endif
         av_frame_free(&frame);
 
         /* Send decoded frame to vout */
