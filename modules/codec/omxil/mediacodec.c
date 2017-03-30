@@ -387,6 +387,7 @@ static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 
 static int ParseExtra(decoder_t *p_dec)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p_extra = p_dec->fmt_in.p_extra;
     int i_extra = p_dec->fmt_in.i_extra;
 
@@ -400,6 +401,10 @@ static int ParseExtra(decoder_t *p_dec)
         return ParseVideoExtraWmv3(p_dec, p_extra, i_extra);
     case VLC_CODEC_VC1:
         return ParseVideoExtraVc1(p_dec, p_extra, i_extra);
+    case VLC_CODEC_MP4V:
+        if (!i_extra && p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
+            p_sys->b_adaptive = true;
+        /* fall through */
     default:
         /* Set default CSD */
         if (p_dec->fmt_in.i_extra)
