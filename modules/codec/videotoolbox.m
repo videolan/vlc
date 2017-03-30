@@ -1195,8 +1195,10 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status)
         VTERRCASE(kVTFrameSiloInvalidTimeRangeErr)
         VTERRCASE(kVTCouldNotFindTemporalFilterErr)
         VTERRCASE(kVTPixelTransferNotPermittedErr)
-        VTERRCASE(kVTColorCorrectionImageRotationFailedErr)
-
+        case -12219:
+            msg_Err(p_dec, "vt session error: "
+                    "'kVTColorCorrectionImageRotationFailedErr'");
+            break;
         default:
             msg_Err(p_dec, "unknown vt session error (%i)", (int)status);
     }
