@@ -220,7 +220,7 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
                     date_Change( &p_sys->dts, p_sps->vui.i_time_scale, p_sps->vui.i_num_units_in_tick );
                 }
             }
-            if( p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF )
+            if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
             {
                 p_dec->fmt_out.video.primaries =
                         hxxx_colour_primaries_to_vlc( p_sps->vui.colour.i_colour_primaries );
