@@ -428,6 +428,7 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                     return VLC_EGENERIC; /* TODO */
                 else
                     hh->pf_process_block = NULL;
+                break;
             default:
                 vlc_assert_unreachable();
         }
