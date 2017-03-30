@@ -58,11 +58,13 @@ struct decoder_sys_t
 
     /* for frame skipping algo */
     bool b_hurry_up;
+    bool b_from_preroll;
     enum AVDiscard i_skip_frame;
 
     /* how many decoded frames are late */
     int     i_late_frames;
     mtime_t i_late_frames_start;
+    mtime_t i_last_late_delay;
 
     /* for direct rendering */
     bool        b_direct_rendering;
@@ -534,6 +536,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_first_frame = true;
     p_sys->i_late_frames = 0;
+    p_sys->b_from_preroll = false;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -626,6 +629,8 @@ static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_
          * TODO avoid decoding of non reference frame
          * (ie all B except for H264 where it depends only on nal_ref_idc) */
         p_sys->i_late_frames = 0;
+        p_sys->b_from_preroll = true;
+        p_sys->i_last_late_delay = INT64_MAX;
     }
 
     if( p_sys->i_late_frames <= 0 )
@@ -705,9 +710,21 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t
 
    if( i_display_date > VLC_TS_INVALID && i_display_date <= current_time )
    {
+       /* Out of preroll, consider only late frames on rising delay */
+       if( p_sys->b_from_preroll )
+       {
+           if( p_sys->i_last_late_delay > current_time - i_display_date )
+           {
+               p_sys->i_last_late_delay = current_time - i_display_date;
+               return;
+           }
+           p_sys->b_from_preroll = false;
+       }
+
        p_sys->i_late_frames++;
        if( p_sys->i_late_frames == 1 )
            p_sys->i_late_frames_start = current_time;
+
    }
    else
    {
