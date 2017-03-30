@@ -438,14 +438,14 @@ static void ActivateSets(decoder_t *p_dec,
     p_sys->p_active_vps = p_vps;
     if(p_sps)
     {
-        if(!p_dec->fmt_out.video.i_frame_rate)
+        if(!p_dec->fmt_in.video.i_frame_rate)
         {
             (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
                                         &p_dec->fmt_out.video.i_frame_rate,
                                         &p_dec->fmt_out.video.i_frame_rate_base );
         }
 
-        if(p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF)
+        if(p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF)
         {
             (void) hevc_get_colorimetry( p_sps,
                                          &p_dec->fmt_out.video.primaries,
@@ -466,7 +466,7 @@ static void ActivateSets(decoder_t *p_dec,
             }
         }
 
-        if(p_dec->fmt_out.i_profile == -1)
+        if(p_dec->fmt_in.i_profile == -1)
         {
             uint8_t i_profile, i_level;
             if( hevc_get_sps_profile_tier_level( p_sps, &i_profile, &i_level ) )
