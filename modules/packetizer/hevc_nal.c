@@ -317,6 +317,8 @@ struct hevc_slice_segment_header_t
     // slice_segment_address; read but discarded
     nal_ue_t slice_type;
     nal_u1_t pic_output_flag;
+
+    uint32_t pic_order_cnt_lsb;
     /* incomplete */
 
 };
@@ -1162,6 +1164,14 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
         if( p_pps->output_flag_present_flag )
             p_sl->pic_output_flag = bs_read1( p_bs );
     }
+
+    if( p_sps->separate_colour_plane_flag )
+        bs_skip( p_bs, 2 ); /* colour_plane_id */
+
+    if( p_sl->nal_type != HEVC_NAL_IDR_W_RADL && p_sl->nal_type != HEVC_NAL_IDR_N_LP )
+        p_sl->pic_order_cnt_lsb = bs_read( p_bs, p_sps->log2_max_pic_order_cnt_lsb_minus4 + 4 );
+    else
+        p_sl->pic_order_cnt_lsb = 0;
 
     if( bs_remain( p_bs ) < 1 )
         return false;
