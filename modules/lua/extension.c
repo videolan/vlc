@@ -140,12 +140,11 @@ void Close_Extension( vlc_object_t *p_this )
             break;
 
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
-        if( p_ext->p_sys->b_activated == true )
+        if( p_ext->p_sys->b_activated == true && p_ext->p_sys->p_progress_id == NULL )
         {
             p_ext->p_sys->b_exiting = true;
-            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-            // DeactivateCommand will signal the wait condition.
-            Deactivate( p_mgr, p_ext );
+            // QueueDeactivateCommand will signal the wait condition.
+            QueueDeactivateCommand( p_ext );
         }
         else
         {
@@ -154,9 +153,8 @@ void Close_Extension( vlc_object_t *p_this )
             // however here we need to manually signal the wait cond, since no command is queued.
             p_ext->p_sys->b_exiting = true;
             vlc_cond_signal( &p_ext->p_sys->wait );
-            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
         }
-
+        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
         if( p_ext->p_sys->b_thread_running == true )
             vlc_join( p_ext->p_sys->thread, NULL );
@@ -1061,8 +1059,10 @@ extension_t *vlclua_extension_get( lua_State *L )
 int vlclua_extension_deactivate( lua_State *L )
 {
     extension_t *p_ext = vlclua_extension_get( L );
-    int i_ret = Deactivate( p_ext->p_sys->p_mgr, p_ext );
-    return ( i_ret == VLC_SUCCESS ) ? 1 : 0;
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    bool b_ret = QueueDeactivateCommand( p_ext );
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+    return ( b_ret == true ) ? 1 : 0;
 }
 
 /** Keep an extension alive. This resets the watch timer to 0

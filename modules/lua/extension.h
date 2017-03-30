@@ -93,6 +93,7 @@ struct extension_sys_t
 /* Extensions: manager functions */
 int Activate( extensions_manager_t *p_mgr, extension_t * );
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
+bool QueueDeactivateCommand( extension_t *p_ext );
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext );
 int PushCommand__( extension_t *ext, bool unique, command_type_e cmd, va_list options );
 static inline int PushCommand( extension_t *ext, int cmd, ... )

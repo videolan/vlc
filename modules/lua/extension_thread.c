@@ -115,7 +115,7 @@ static void FreeCommands( struct command_t *command )
     FreeCommands( next );
 }
 
-static bool QueueDeactivateCommand( extension_t *p_ext )
+bool QueueDeactivateCommand( extension_t *p_ext )
 {
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
     if( unlikely( cmd == NULL ) )
@@ -297,7 +297,9 @@ static void* Run( void *data )
                     if( lua_ExecuteFunction( p_mgr, p_ext, "activate", LUA_END ) < 0 )
                     {
                         msg_Err( p_mgr, "Could not activate extension!" );
-                        Deactivate( p_mgr, p_ext );
+                        vlc_mutex_lock( &p_ext->p_sys->command_lock );
+                        QueueDeactivateCommand( p_ext );
+                        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
                         break;
                     }
                     vlc_mutex_lock( &p_ext->p_sys->command_lock );
