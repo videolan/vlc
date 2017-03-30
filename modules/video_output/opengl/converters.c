@@ -668,7 +668,7 @@ persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
     {
         tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
         tc->api->BufferStorage(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
-                               access);
+                               access | GL_CLIENT_STORAGE_BIT);
 
         pic->p[i].p_pixels =
             tc->api->MapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, picsys->bytes[i],
