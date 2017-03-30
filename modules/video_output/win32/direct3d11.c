@@ -683,15 +683,6 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
     texDesc.ArraySize = pool_size;
     texDesc.Height = fmt->i_height;
     texDesc.Width = fmt->i_width;
-    /* add an extra line if needed, it will be cropped on display */
-    if (cfg->formatTexture == DXGI_FORMAT_NV12 || cfg->formatTexture == DXGI_FORMAT_P010)
-    {
-        texDesc.Width  = (texDesc.Width + 1) & ~1;
-        texDesc.Height = (texDesc.Height + 1) & ~1;
-    }
-    /* this is the actual decoding size that will be used */
-    fmt->i_height = texDesc.Height;
-    fmt->i_width = texDesc.Width;
 
     hr = ID3D11Device_CreateTexture2D( sys->d3ddevice, &texDesc, NULL, &slicedTexture );
     if (FAILED(hr)) {
@@ -756,7 +747,15 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (vd->info.is_slow)
         pool_size = 1;
 
-    if (AllocateTextures(vd, sys->picQuadConfig, &vd->fmt, pool_size, textures))
+    video_format_t surface_fmt = vd->fmt;
+    if (is_d3d11_opaque(surface_fmt.i_chroma))
+    {
+        /* worst case scenario we need 128 alignment for HEVC */
+        surface_fmt.i_width  = (surface_fmt.i_width  + 0x7F) & ~0x7F;
+        surface_fmt.i_height = (surface_fmt.i_height + 0x7F) & ~0x7F;
+    }
+
+    if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, pool_size, textures))
         goto error;
 
     if (vd->info.is_slow) {
@@ -765,7 +764,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             .pf_destroy = DestroyDisplayPoolPicture,
         };
 
-        picture = picture_NewFromResource(&vd->fmt, &resource);
+        picture = picture_NewFromResource(&surface_fmt, &resource);
         if (likely(picture != NULL)) {
             pool_cfg.picture       = &picture;
             pool_cfg.lock          = Direct3D11MapPoolTexture;
@@ -802,7 +801,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             .pf_destroy = DestroyDisplayPoolPicture,
         };
 
-        picture = picture_NewFromResource(&vd->fmt, &resource);
+        picture = picture_NewFromResource(&surface_fmt, &resource);
         if (unlikely(picture == NULL)) {
             free(picsys);
             msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
@@ -815,11 +814,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
 #ifdef HAVE_ID3D11VIDEODECODER
-    if (!is_d3d11_opaque(vd->fmt.i_chroma) || sys->legacy_shader)
+    if (!is_d3d11_opaque(surface_fmt.i_chroma) || sys->legacy_shader)
     {
         /* we need a staging texture */
         video_format_t staging_fmt;
-        video_format_Copy(&staging_fmt, &vd->fmt);
+        video_format_Copy(&staging_fmt, &surface_fmt);
         staging_fmt.i_width = staging_fmt.i_visible_width;
         staging_fmt.i_height = staging_fmt.i_visible_height;
         if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures))
@@ -838,10 +837,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     } else
 #endif
     {
-        sys->picQuad.i_x_offset = vd->fmt.i_x_offset;
-        sys->picQuad.i_y_offset = vd->fmt.i_y_offset;
-        sys->picQuad.i_width    = vd->fmt.i_width;
-        sys->picQuad.i_height   = vd->fmt.i_height;
+        sys->picQuad.i_x_offset = surface_fmt.i_x_offset;
+        sys->picQuad.i_y_offset = surface_fmt.i_y_offset;
+        sys->picQuad.i_width    = surface_fmt.i_width;
+        sys->picQuad.i_height   = surface_fmt.i_height;
 
         for (picture_count = 0; picture_count < pool_size; picture_count++) {
             if (AllocateShaderView(vd, sys->picQuadConfig, picture_count, pictures[picture_count]->p_sys))
@@ -849,8 +848,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         }
     }
 
-    if (SetupQuad( vd, &vd->fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
-                   vd->fmt.projection_mode) != VLC_SUCCESS) {
+    if (SetupQuad( vd, &surface_fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
+                   surface_fmt.projection_mode) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
     }
@@ -877,7 +876,7 @@ error:
         sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
     } else {
         msg_Dbg(vd, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d) context 0x%p",
-                picture_count, vd->fmt.i_width, vd->fmt.i_height, sys->d3dcontext);
+                picture_count, surface_fmt.i_width, surface_fmt.i_height, sys->d3dcontext);
     }
     return sys->sys.pool;
 }
