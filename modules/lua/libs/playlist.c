@@ -400,7 +400,9 @@ static const luaL_Reg vlclua_playlist_reg[] = {
     { "repeat_", vlclua_playlist_repeat }, // ... provide repeat_ too.
     { "loop", vlclua_playlist_loop },
     { "random", vlclua_playlist_random },
+#if LUA_VERSION_NUM < 502
     { "goto", vlclua_playlist_gotoitem },
+#endif
     { "gotoitem", vlclua_playlist_gotoitem },
     { "add", vlclua_playlist_add },
     { "enqueue", vlclua_playlist_enqueue },
