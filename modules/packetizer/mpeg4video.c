@@ -41,6 +41,7 @@
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
+#include "hxxx_nal.h" /* colour values/mappings */
 
 /*****************************************************************************
  * Module descriptor
@@ -100,6 +101,7 @@ static int PacketizeValidate( void *p_private, block_t * );
 
 static block_t *ParseMPEGBlock( decoder_t *, block_t * );
 static int ParseVOL( decoder_t *, es_format_t *, uint8_t *, int );
+static int ParseVO( decoder_t *, block_t * );
 static int ParseVOP( decoder_t *, block_t * );
 static int vlc_log2( unsigned int );
 
@@ -330,6 +332,11 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         block_ChainLastAppend( &p_sys->pp_last, p_frag );
     }
 
+    if(p_frag->p_buffer[3] == 0xb5)
+    {
+        ParseVO( p_dec, p_frag );
+    }
+    else
     if( p_frag->p_buffer[3] == 0xb6 &&
         ParseVOP( p_dec, p_frag ) == VLC_SUCCESS )
     {
@@ -432,6 +439,45 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
         bs_skip( &s, 1 );
         fmt->video.i_height= bs_read( &s, 13 );
         bs_skip( &s, 1 );
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int ParseVO( decoder_t *p_dec, block_t *p_vo )
+{
+    bs_t s;
+    bs_init( &s, &p_vo->p_buffer[4], p_vo->i_buffer - 4 );
+    if( bs_read1( &s ) )
+        bs_skip( &s, 7 );
+
+    const uint8_t visual_object_type = bs_read( &s, 4 );
+    if( visual_object_type == 1 /* video ID */ ||
+        visual_object_type == 2 /* still texture ID */ )
+    {
+        uint8_t colour_primaries = 1;
+        uint8_t colour_xfer = 1;
+        uint8_t colour_matrix_coeff = 1;
+        uint8_t full_range = 0;
+        if( bs_read1( &s ) ) /* video_signal_type */
+        {
+            bs_read( &s, 3 );
+            full_range = bs_read( &s, 1 );
+            if( bs_read( &s, 1 ) ) /* colour description */
+            {
+                colour_primaries = bs_read( &s, 8 );
+                colour_xfer = bs_read( &s, 8 );
+                colour_matrix_coeff = bs_read( &s, 8 );
+            }
+        }
+
+        if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
+        {
+            p_dec->fmt_out.video.primaries = hxxx_colour_primaries_to_vlc( colour_primaries );
+            p_dec->fmt_out.video.transfer = hxxx_transfer_characteristics_to_vlc( colour_xfer );
+            p_dec->fmt_out.video.space = hxxx_matrix_coeffs_to_vlc( colour_matrix_coeff );
+            p_dec->fmt_out.video.b_color_range_full = full_range;
+        }
     }
 
     return VLC_SUCCESS;
