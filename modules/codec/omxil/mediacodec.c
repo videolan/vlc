@@ -405,46 +405,44 @@ static int ParseVideoExtra(decoder_t *p_dec)
     }
 }
 
-static int UpdateOpaqueVout(decoder_t *p_dec)
+static int UpdateVout(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    picture_t *p_dummy_hwpic;
 
-    if (p_sys->api.b_support_rotation)
+    /* If MediaCodec can handle the rotation, reset the orientation to
+     * Normal in order to ask the vout not to rotate. */
+    if (p_sys->video.i_angle != 0)
     {
-        switch (p_dec->fmt_in.video.orientation)
-        {
-            case ORIENT_ROTATED_90:
-                p_sys->video.i_angle = 90;
-                break;
-            case ORIENT_ROTATED_180:
-                p_sys->video.i_angle = 180;
-                break;
-            case ORIENT_ROTATED_270:
-                p_sys->video.i_angle = 270;
-                break;
-            default:
-                p_sys->video.i_angle = 0;
-                break;
-        }
-
-        /* If MediaCodec can handle the rotation, reset the orientation to
-         * Normal in order to ask the vout not to rotate. */
-        if (p_sys->video.i_angle != 0)
-            video_format_ApplyRotation(&p_dec->fmt_out.video,
-                                       &p_dec->fmt_in.video);
+        assert(p_dec->fmt_out.i_codec == VLC_CODEC_ANDROID_OPAQUE);
+        p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
+        video_format_ApplyRotation(&p_dec->fmt_out.video,
+                                   &p_dec->fmt_out.video);
     }
-    else
-        p_sys->video.i_angle = 0;
 
-    /* Direct rendering: Request a valid OPAQUE Vout in order to get
-     * the surface attached to it */
-    if (decoder_UpdateVideoFormat(p_dec) != 0
-     || (p_dummy_hwpic = decoder_NewPicture(p_dec)) == NULL)
+    bool b_invalid_size = !p_dec->fmt_out.video.i_width
+                      && !p_dec->fmt_out.video.i_height;
+    if (b_invalid_size)
     {
-        p_sys->video.p_surface = p_sys->video.p_jsurface = NULL;
+        if (p_dec->fmt_out.i_codec != VLC_CODEC_ANDROID_OPAQUE)
+            return VLC_EGENERIC;
+        /* The correct video size will come from MediaCodec, setup a dummy
+         * one in order to get the surface */
+        p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_height = 1;
+    }
+
+    if (decoder_UpdateVideoFormat(p_dec) != 0)
         return VLC_EGENERIC;
-    }
+
+    if (b_invalid_size)
+        p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_height = 0;
+
+    if (p_dec->fmt_out.i_codec != VLC_CODEC_ANDROID_OPAQUE)
+        return VLC_SUCCESS;
+
+    /* Direct rendering: get the surface attached to the VOUT */
+    picture_t *p_dummy_hwpic = decoder_NewPicture(p_dec);
+    if (p_dummy_hwpic == NULL)
+        return VLC_EGENERIC;
 
     assert(p_dummy_hwpic->p_sys);
     assert(p_dummy_hwpic->p_sys->hw.p_surface);
@@ -663,7 +661,28 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
              * the surface attached to it */
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
 
-            if (UpdateOpaqueVout(p_dec) != VLC_SUCCESS)
+            if (p_sys->api.b_support_rotation)
+            {
+                switch (p_dec->fmt_out.video.orientation)
+                {
+                    case ORIENT_ROTATED_90:
+                        p_sys->video.i_angle = 90;
+                        break;
+                    case ORIENT_ROTATED_180:
+                        p_sys->video.i_angle = 180;
+                        break;
+                    case ORIENT_ROTATED_270:
+                        p_sys->video.i_angle = 270;
+                        break;
+                    default:
+                        p_sys->video.i_angle = 0;
+                        break;
+                }
+            }
+            else
+                p_sys->video.i_angle = 0;
+
+            if (UpdateVout(p_dec) != VLC_SUCCESS)
             {
                 msg_Err(p_dec, "Opaque Vout request failed");
                 goto bailout;
@@ -966,10 +985,9 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_sys->video.i_stride = p_dec->fmt_out.video.i_width;
         }
 
-        if (!p_sys->api.b_direct_rendering
-         && decoder_UpdateVideoFormat(p_dec) != 0)
+        if (UpdateVout(p_dec) != VLC_SUCCESS)
         {
-            msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
+            msg_Err(p_dec, "UpdateVout failed");
             return -1;
         }
 
@@ -1439,14 +1457,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
         if (b_restart)
         {
             StopMediaCodec(p_dec);
-
-            if (p_sys->api.b_direct_rendering
-             && UpdateOpaqueVout(p_dec) != VLC_SUCCESS)
-            {
-                msg_Err(p_dec, "UpdateOpaqueVout failed");
-                AbortDecoderLocked(p_dec);
-                goto end;
-            }
 
             int i_ret = StartMediaCodec(p_dec);
             switch (i_ret)
