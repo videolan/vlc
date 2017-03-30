@@ -466,21 +466,13 @@ static int StartMediaCodec(decoder_t *p_dec)
 
     if ((p_sys->api.i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->i_csd_count
      && !p_sys->b_adaptive)
-    {
-        msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
-                 (const char *)&p_dec->fmt_in.i_codec);
         return VLC_ENOOBJ;
-    }
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
         if (!p_sys->b_adaptive
          && (!p_dec->fmt_out.video.i_width || !p_dec->fmt_out.video.i_height))
-        {
-            msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
-                     (const char *)&p_dec->fmt_in.i_codec);
             return VLC_ENOOBJ;
-        }
         args.video.i_width = p_dec->fmt_out.video.i_width;
         args.video.i_height = p_dec->fmt_out.video.i_height;
         args.video.i_angle = p_sys->video.i_angle;
@@ -722,10 +714,19 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     case VLC_SUCCESS:
         break;
     case VLC_ENOOBJ:
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_MP4V)
-            msg_Warn(p_dec, "late opening with MPEG4 not handled"); /* TODO */
-        else
+        switch (p_dec->fmt_in.i_codec)
+        {
+        case VLC_CODEC_H264:
+        case VLC_CODEC_HEVC:
+            msg_Warn(p_dec, "late opening for codec %4.4s",
+                     (const char *)&p_dec->fmt_in.i_codec);
             break;
+        default:
+            msg_Warn(p_dec, "late opening with %4.4s not handled",
+                     (const char *) &p_dec->fmt_in.i_codec);
+            goto bailout;
+        }
+        break;
     default:
         msg_Err(p_dec, "StartMediaCodec failed");
         goto bailout;
