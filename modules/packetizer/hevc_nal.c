@@ -1242,3 +1242,68 @@ bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
 
     return true;
 }
+
+/* 8.3.1 Decoding process for POC */
+int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps,
+                                       const hevc_slice_segment_header_t *p_slice,
+                                       hevc_poc_ctx_t *p_ctx )
+{
+    int pocMSB;
+    bool NoRaslOutputFlag;
+    bool IsIRAP = ( p_slice->nal_type >= HEVC_NAL_BLA_W_LP &&
+                    p_slice->nal_type <= HEVC_NAL_IRAP_VCL23 );
+
+    if( IsIRAP )
+    {
+        /* if( IRAP ) NoRaslOutputFlag = first || IDR || BLA || after(EOSNAL) */
+        NoRaslOutputFlag =(p_ctx->first_picture ||
+                           p_slice->nal_type == HEVC_NAL_IDR_N_LP ||
+                           p_slice->nal_type == HEVC_NAL_IDR_W_RADL ||
+                           p_slice->nal_type == HEVC_NAL_BLA_W_LP ||
+                           p_slice->nal_type == HEVC_NAL_BLA_W_RADL ||
+                           p_slice->nal_type == HEVC_NAL_BLA_N_LP);
+    }
+    else
+    {
+        NoRaslOutputFlag = false;
+    }
+
+    if( p_slice->nal_type == HEVC_NAL_IDR_N_LP ||
+        p_slice->nal_type == HEVC_NAL_IDR_W_RADL )
+    {
+        p_ctx->prevPicOrderCnt.msb = 0;
+        p_ctx->prevPicOrderCnt.lsb = 0;
+    }
+
+    /* Not an IRAP with NoRaslOutputFlag == 1 */
+    if( !IsIRAP || !NoRaslOutputFlag )
+    {
+        pocMSB = 0;
+        p_ctx->prevPicOrderCnt.msb = p_ctx->prevTid0PicOrderCnt.msb;
+        p_ctx->prevPicOrderCnt.lsb = p_ctx->prevTid0PicOrderCnt.lsb;
+    }
+    else
+    {
+        const unsigned maxPocLSB = 1U << (p_sps->log2_max_pic_order_cnt_lsb_minus4 + 4);
+        pocMSB = p_ctx->prevPicOrderCnt.msb;
+        int64_t orderDiff = p_slice->pic_order_cnt_lsb - p_ctx->prevPicOrderCnt.lsb;
+        if( orderDiff < 0 && -orderDiff >= maxPocLSB / 2 )
+            pocMSB += maxPocLSB;
+        else if( orderDiff > maxPocLSB / 2 )
+            pocMSB -= maxPocLSB;
+    }
+
+    /* Set prevTid0Pic for next pic */
+    if( p_slice->temporal_id == 0 &&
+       !( ( p_slice->nal_type <= HEVC_NAL_RSV_VCL_N14 && p_slice->nal_type % 2 == 0 /* SLNR */ ) ||
+          ( p_slice->nal_type >= HEVC_NAL_RADL_N && p_slice->nal_type <= HEVC_NAL_RASL_R ) /* RADL or RASL */ ) )
+    {
+        p_ctx->prevTid0PicOrderCnt.msb = pocMSB;
+        p_ctx->prevTid0PicOrderCnt.lsb = p_slice->pic_order_cnt_lsb;
+    }
+
+    p_ctx->prevPicOrderCnt.msb = pocMSB;
+    p_ctx->prevPicOrderCnt.lsb = p_slice->pic_order_cnt_lsb;
+
+    return pocMSB + p_slice->pic_order_cnt_lsb;
+}

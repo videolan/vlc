@@ -198,4 +198,19 @@ bool hevc_get_slice_type( const hevc_slice_segment_header_t *, enum hevc_slice_t
 bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
                             uint8_t *pi_level, uint8_t *pi_nal_length_size);
 
+typedef struct
+{
+    struct
+    {
+        int lsb;
+        int msb;
+    } prevPicOrderCnt, prevTid0PicOrderCnt;
+
+    bool first_picture; /* Must be set on start or on NAL_EOS */
+} hevc_poc_ctx_t;
+
+int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps,
+                                       const hevc_slice_segment_header_t *slice,
+                                       hevc_poc_ctx_t *ctx );
+
 #endif /* HEVC_NAL_H */
