@@ -283,7 +283,8 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
 
-    avcodec_flush_buffers( ctx );
+    if( avcodec_is_open( ctx ) )
+        avcodec_flush_buffers( ctx );
     date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     if( ctx->codec_id == AV_CODEC_ID_MP2 ||
