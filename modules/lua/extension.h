@@ -112,8 +112,6 @@ static inline int PushCommandUnique( extension_t *ext, int cmd, ... )
     va_end( args );
     return i_ret;
 }
-bool LockExtension( extension_t *p_ext );
-void UnlockExtension( extension_t *p_ext );
 
 /* Lua specific functions */
 void vlclua_extension_set( lua_State *L, extension_t * );

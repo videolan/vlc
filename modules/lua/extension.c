@@ -565,8 +565,17 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             p_ext = ( extension_t* ) va_arg( args, extension_t* );
             input_thread_t *p_input = va_arg( args, struct input_thread_t * );
 
-            if( !LockExtension( p_ext ) )
+            if( p_ext == NULL )
                 return VLC_EGENERIC;
+            vlc_mutex_lock( &p_ext->p_sys->command_lock );
+            if ( p_ext->p_sys->b_exiting == true )
+            {
+                vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+                return VLC_EGENERIC;
+            }
+            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+
+            vlc_mutex_lock( &p_ext->p_sys->running_lock );
 
             // Change input
             input_thread_t *old = p_ext->p_sys->p_input;
@@ -607,7 +616,7 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
                                   p_ext );
             }
 
-            UnlockExtension( p_ext );
+            vlc_mutex_unlock( &p_ext->p_sys->running_lock );
             break;
         }
         case EXTENSION_PLAYING_CHANGED:
@@ -700,19 +709,15 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
     assert( *ppi_ids == NULL );
 
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    if( p_ext->p_sys->b_activated == false )
+    if( p_ext->p_sys->b_activated == false || p_ext->p_sys->b_exiting == true )
     {
         vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-        msg_Dbg( p_mgr, "Can't get menu before activating the extension!" );
+        msg_Dbg( p_mgr, "Can't get menu of an unactivated/dying extension!" );
         return VLC_EGENERIC;
     }
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
-    if( !LockExtension( p_ext ) )
-    {
-        /* Dying extension, fail. */
-        return VLC_EGENERIC;
-    }
+    vlc_mutex_lock( &p_ext->p_sys->running_lock );
 
     int i_ret = VLC_EGENERIC;
     lua_State *L = GetLuaState( p_mgr, p_ext );
@@ -783,7 +788,7 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
     i_ret = VLC_SUCCESS;
 
 exit:
-    UnlockExtension( p_ext );
+    vlc_mutex_unlock( &p_ext->p_sys->running_lock );
     if( i_ret != VLC_SUCCESS )
     {
         msg_Dbg( p_mgr, "Something went wrong in %s (%s:%d)",
@@ -1139,34 +1144,6 @@ static void inputItemMetaChanged( const vlc_event_t *p_event,
     assert( p_ext != NULL );
 
     PushCommandUnique( p_ext, CMD_UPDATE_META );
-}
-
-/** Lock this extension. Can fail. */
-bool LockExtension( extension_t *p_ext )
-{
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    if( p_ext->p_sys->b_exiting )
-    {
-        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-        return false;
-    }
-
-    vlc_mutex_lock( &p_ext->p_sys->running_lock );
-    if( p_ext->p_sys->b_exiting )
-    {
-        vlc_mutex_unlock( &p_ext->p_sys->running_lock );
-        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-        return false;
-    }
-
-    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-    return true;
-}
-
-/** Unlock this extension. */
-void UnlockExtension( extension_t *p_ext )
-{
-    vlc_mutex_unlock( &p_ext->p_sys->running_lock );
 }
 
 /** Watch timer callback
