@@ -1502,7 +1502,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
     if (infoFlags & kVTDecodeInfo_FrameDropped)
     {
-        printf("OUT %ld\n", pts.value);
         msg_Dbg(p_dec, "decoder dropped frame");
         free(p_info);
         return;
