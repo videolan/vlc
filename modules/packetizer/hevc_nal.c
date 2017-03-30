@@ -307,6 +307,9 @@ struct hevc_picture_parameter_set_t
 
 struct hevc_slice_segment_header_t
 {
+    nal_u6_t nal_type;
+    nal_u6_t nuh_layer_id;
+    nal_u3_t temporal_id;
     nal_u1_t first_slice_segment_in_pic_flag;
     nal_u1_t no_output_of_prior_pics_flag;
     nal_ue_t slice_pic_parameter_set_id;
@@ -1097,7 +1100,6 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
 }
 
 static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
-                                                  uint8_t i_nal_type,
                                                   pf_get_matchedxps get_matchedxps,
                                                   void *priv,
                                                   hevc_slice_segment_header_t *p_sl )
@@ -1110,7 +1112,7 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
         return false;
 
     p_sl->first_slice_segment_in_pic_flag = bs_read1( p_bs );
-    if( i_nal_type >= HEVC_NAL_BLA_W_LP && i_nal_type <= HEVC_NAL_IRAP_VCL23 )
+    if( p_sl->nal_type >= HEVC_NAL_BLA_W_LP && p_sl->nal_type <= HEVC_NAL_IRAP_VCL23 )
         p_sl->no_output_of_prior_pics_flag = bs_read1( p_bs );
     p_sl->slice_pic_parameter_set_id = bs_read_ue( p_bs );
     if( p_sl->slice_pic_parameter_set_id > HEVC_PPS_ID_MAX || bs_remain( p_bs ) < 1 )
@@ -1178,7 +1180,6 @@ hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, si
     hevc_slice_segment_header_t *p_sh = calloc(1, sizeof(hevc_slice_segment_header_t));
     if(likely(p_sh))
     {
-        uint8_t i_nal_type = hevc_getNALType(p_buf);
         bs_t bs;
         bs_init( &bs, p_buf, i_buf );
         unsigned i_bitflow = 0;
@@ -1188,11 +1189,12 @@ hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, si
             bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
         }
         else (void) i_bitflow;
-        bs_skip( &bs, 7 ); /* nal_unit_header */
-        uint8_t i_nuh_layer_id = bs_read( &bs, 6 );
-        bs_skip( &bs, 3 ); /* !nal_unit_header */
-        if( i_nuh_layer_id > 62 ||
-           !hevc_parse_slice_segment_header_rbsp( &bs, i_nal_type, get_matchedxps, priv, p_sh ) )
+        bs_skip( &bs, 1 );
+        p_sh->nal_type = bs_read( &bs, 6 );
+        p_sh->nuh_layer_id = bs_read( &bs, 6 );
+        p_sh->temporal_id = bs_read( &bs, 3 );
+        if( p_sh->nuh_layer_id > 62 ||
+           !hevc_parse_slice_segment_header_rbsp( &bs, get_matchedxps, priv, p_sh ) )
         {
             hevc_rbsp_release_slice_header( p_sh );
             p_sh = NULL;
