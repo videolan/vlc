@@ -285,6 +285,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
+    if( p_frag->i_buffer < 4 )
+        return p_frag;
+
     const uint32_t i_startcode = GetDWBE( p_frag->p_buffer );
     if( i_startcode == VISUAL_OBJECT_SEQUENCE_START_CODE ||
         i_startcode == VISUAL_OBJECT_SEQUENCE_END_CODE ||
