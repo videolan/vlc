@@ -533,19 +533,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
-        {
-            /* We can handle h264 without a valid video size
-             * TODO handle VC1 with no size */
-            if (p_dec->fmt_in.i_codec != VLC_CODEC_H264)
-            {
-                msg_Dbg(p_dec, "resolution (%dx%d) not supported",
-                        p_dec->fmt_in.video.i_width,
-                        p_dec->fmt_in.video.i_height);
-                return VLC_EGENERIC;
-            }
-        }
-
         switch (p_dec->fmt_in.i_codec) {
         case VLC_CODEC_HEVC: mime = "video/hevc"; break;
         case VLC_CODEC_H264: mime = "video/avc"; break;
