@@ -750,13 +750,32 @@ static bool ParseSEICallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
     decoder_t *p_dec = (decoder_t *) cbdata;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sei_data->i_type == HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35 )
+    switch( p_sei_data->i_type )
     {
-        if( p_sei_data->itu_t35.type == HXXX_ITU_T35_TYPE_CC )
+        case HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35:
         {
-            cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.u.cc.p_data,
-                                                   p_sei_data->itu_t35.u.cc.i_data );
-        }
+            if( p_sei_data->itu_t35.type == HXXX_ITU_T35_TYPE_CC )
+            {
+                cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.u.cc.p_data,
+                                                       p_sei_data->itu_t35.u.cc.i_data );
+            }
+        } break;
+        case HXXX_SEI_MASTERING_DISPLAY_COLOUR_VOLUME:
+        {
+            video_format_t *p_fmt = &p_dec->fmt_out.video;
+            for (size_t i=0; i<ARRAY_SIZE(p_sei_data->colour_volume.primaries); ++i)
+                p_fmt->mastering.primaries[i] = p_sei_data->colour_volume.primaries[i];
+            for (size_t i=0; i<ARRAY_SIZE(p_sei_data->colour_volume.white_point); ++i)
+                p_fmt->mastering.white_point[i] = p_sei_data->colour_volume.white_point[i];
+            p_fmt->mastering.max_luminance = p_sei_data->colour_volume.max_luminance;
+            p_fmt->mastering.min_luminance = p_sei_data->colour_volume.min_luminance;
+        } break;
+        case HXXX_SEI_CONTENT_LIGHT_LEVEL:
+        {
+            video_format_t *p_fmt = &p_dec->fmt_out.video;
+            p_fmt->ligthing.MaxCLL = p_sei_data->content_light_lvl.MaxCLL;
+            p_fmt->ligthing.MaxFALL = p_sei_data->content_light_lvl.MaxFALL;
+        } break;
     }
 
     return true;
