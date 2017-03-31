@@ -194,14 +194,8 @@ struct opengl_tex_converter_t
 
     struct opengl_tex_cfg {
         /* Texture scale factor, cannot be 0 */
-        struct {
-            unsigned num;
-            unsigned den;
-        } w;
-        struct {
-            unsigned num;
-            unsigned den;
-        } h;
+        vlc_rational_t w;
+        vlc_rational_t h;
 
         /* The following is used and filled by the opengl_fragment_shader_init
          * function. */

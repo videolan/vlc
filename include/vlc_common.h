@@ -836,6 +836,10 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #   include <tchar.h>
 #endif /* _WIN32 */
 
+typedef struct {
+    unsigned num, den;
+} vlc_rational_t;
+
 VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t );
 
 /* Aligned memory allocator */

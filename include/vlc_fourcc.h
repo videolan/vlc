@@ -662,14 +662,8 @@ VLC_API bool vlc_fourcc_AreUVPlanesSwapped(vlc_fourcc_t , vlc_fourcc_t );
 typedef struct {
     unsigned plane_count;
     struct {
-        struct {
-            unsigned num;
-            unsigned den;
-        } w;
-        struct {
-            unsigned num;
-            unsigned den;
-        } h;
+        vlc_rational_t w;
+        vlc_rational_t h;
     } p[4];
     unsigned pixel_size;        /* Number of bytes per pixel for a plane */
     unsigned pixel_bits;        /* Number of bits actually used bits per pixel for a plane */

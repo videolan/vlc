@@ -337,10 +337,7 @@ typedef struct {
 
     /* */
     vout_display_cfg_t cfg;
-    struct {
-        unsigned num;
-        unsigned den;
-    } sar_initial;
+    vlc_rational_t sar_initial;
 
     /* */
     unsigned width_saved;
@@ -351,20 +348,14 @@ typedef struct {
     bool is_display_filled;
 
     bool ch_zoom;
-    struct {
-        unsigned num;
-        unsigned den;
-    } zoom;
+    vlc_rational_t zoom;
 #if defined(_WIN32) || defined(__OS2__)
     bool ch_wm_state;
     unsigned wm_state;
     unsigned wm_state_initial;
 #endif
     bool ch_sar;
-    struct {
-        unsigned num;
-        unsigned den;
-    } sar;
+    vlc_rational_t sar;
 
     bool ch_crop;
     struct {
@@ -1229,8 +1220,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_cfg_t *cfg = &osys->cfg;
 
     *cfg = state->cfg;
-    osys->sar_initial.num = state->sar.num;
-    osys->sar_initial.den = state->sar.den;
+    osys->sar_initial = state->sar;
     vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
                                        source, cfg);
 
@@ -1327,8 +1317,7 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
 #if defined(_WIN32) || defined(__OS2__)
         state->wm_state = osys->wm_state;
 #endif
-        state->sar.num  = osys->sar_initial.num;
-        state->sar.den  = osys->sar_initial.den;
+        state->sar = osys->sar_initial;
     }
 
     VoutDisplayDestroyRender(vd);
