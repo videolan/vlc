@@ -212,7 +212,7 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
             {
                 const unsigned i_rate_base = p_sps->vui.i_num_units_in_tick;
                 const unsigned i_rate = p_sps->vui.i_time_scale >> 1; /* num_clock_ts == 2 */
-                if( i_rate_base != p_dec->fmt_out.video.i_frame_rate_base &&
+                if( i_rate_base != p_dec->fmt_out.video.i_frame_rate_base ||
                     i_rate != p_dec->fmt_out.video.i_frame_rate )
                 {
                     p_dec->fmt_out.video.i_frame_rate_base = i_rate_base;
