@@ -42,6 +42,8 @@
 #include "media_player_internal.h"
 #include "renderer_discoverer_internal.h"
 
+#define ES_INIT (-2) /* -1 is reserved for ES deselect */
+
 static int
 input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval,
@@ -63,11 +65,6 @@ static int
 input_es_changed( vlc_object_t * p_this, char const * psz_cmd,
                   int action, vlc_value_t *p_val,
                   void *p_userdata);
-
-static int
-input_es_selected( vlc_object_t * p_this, char const * psz_cmd,
-                   vlc_value_t oldval, vlc_value_t newval,
-                   void * p_userdata );
 
 static int
 corks_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
@@ -411,6 +408,43 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         event.u.media_player_chapter_changed.new_chapter = var_GetInteger( p_input, "chapter" );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
+    else if ( newval.i_int == INPUT_EVENT_ES )
+    {
+        /* Send ESSelected events from this callback ("intf-event") and not
+         * from "audio-es", "video-es", "spu-es" callbacks. Indeed, these
+         * callbacks are not triggered when the input_thread changes an ES
+         * while this callback is. */
+        struct {
+            const char *psz_name;
+            const libvlc_track_type_t type;
+            int new_es;
+        } es_list[] = {
+            { "audio-es", libvlc_track_audio, ES_INIT },
+            { "video-es", libvlc_track_video, ES_INIT },
+            { "spu-es", libvlc_track_text, ES_INIT },
+        };
+        /* Check if an ES selection changed */
+        lock( p_mi );
+        for( size_t i = 0; i < ARRAY_SIZE( es_list ); ++i )
+        {
+            int current_es = var_GetInteger( p_input, es_list[i].psz_name );
+            if( current_es != p_mi->selected_es[i] )
+                es_list[i].new_es = p_mi->selected_es[i] = current_es;
+        }
+        unlock( p_mi );
+
+        /* Send the ESSelected event for each ES that were newly selected */
+        for( size_t i = 0; i < ARRAY_SIZE( es_list ); ++i )
+        {
+            if( es_list[i].new_es != ES_INIT )
+            {
+                event.type = libvlc_MediaPlayerESSelected;
+                event.u.media_player_es_changed.i_type = es_list[i].type;
+                event.u.media_player_es_changed.i_id = es_list[i].new_es;
+                libvlc_event_send( p_mi->p_event_manager, &event );
+            }
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -469,25 +503,6 @@ static int input_es_changed( vlc_object_t *p_this,
         i_id = -1;
     }
     event.u.media_player_es_changed.i_id = i_id;
-
-    libvlc_event_send(mp->p_event_manager, &event);
-
-    return VLC_SUCCESS;
-}
-
-static int
-input_es_selected( vlc_object_t * p_this, char const * psz_cmd,
-                   vlc_value_t oldval, vlc_value_t newval,
-                   void * p_userdata )
-{
-    VLC_UNUSED(p_this);
-    VLC_UNUSED(oldval);
-    libvlc_media_player_t *mp = p_userdata;
-    libvlc_event_t event;
-
-    event.type = libvlc_MediaPlayerESSelected;
-    event.u.media_player_es_changed.i_type = track_type_from_name(psz_cmd);
-    event.u.media_player_es_changed.i_id = newval.i_int;
 
     libvlc_event_send(mp->p_event_manager, &event);
 
@@ -916,9 +931,6 @@ static void add_es_callbacks( input_thread_t *p_input_thread, libvlc_media_playe
     var_AddListCallback( p_input_thread, "video-es", input_es_changed, p_mi );
     var_AddListCallback( p_input_thread, "audio-es", input_es_changed, p_mi );
     var_AddListCallback( p_input_thread, "spu-es", input_es_changed, p_mi );
-    var_AddCallback( p_input_thread, "video-es", input_es_selected, p_mi );
-    var_AddCallback( p_input_thread, "audio-es", input_es_selected, p_mi );
-    var_AddCallback( p_input_thread, "spu-es", input_es_selected, p_mi );
 }
 
 static void del_es_callbacks( input_thread_t *p_input_thread, libvlc_media_player_t *p_mi )
@@ -926,9 +938,6 @@ static void del_es_callbacks( input_thread_t *p_input_thread, libvlc_media_playe
     var_DelListCallback( p_input_thread, "video-es", input_es_changed, p_mi );
     var_DelListCallback( p_input_thread, "audio-es", input_es_changed, p_mi );
     var_DelListCallback( p_input_thread, "spu-es", input_es_changed, p_mi );
-    var_DelCallback( p_input_thread, "video-es", input_es_selected, p_mi );
-    var_DelCallback( p_input_thread, "audio-es", input_es_selected, p_mi );
-    var_DelCallback( p_input_thread, "spu-es", input_es_selected, p_mi );
 }
 
 /**************************************************************************
@@ -957,6 +966,9 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         libvlc_printerr( "No associated media descriptor" );
         return -1;
     }
+
+    for( size_t i = 0; i < ARRAY_SIZE( p_mi->selected_es ); ++i )
+        p_mi->selected_es[i] = ES_INIT;
 
     media_attach_preparsed_event( p_mi->p_md );
 
