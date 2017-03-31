@@ -66,8 +66,8 @@ typedef struct {
     unsigned wm_state;
 #endif
     struct {
-        int num;
-        int den;
+        unsigned num;
+        unsigned den;
     } sar;
 } vout_display_state_t;
 
