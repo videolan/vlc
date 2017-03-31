@@ -40,7 +40,7 @@
 #define COBJMACROS
 #include <initguid.h>
 #include <d3d11.h>
-#include <dxgi1_4.h>
+#include <dxgi1_5.h>
 #include <d3dcompiler.h>
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
@@ -144,6 +144,7 @@ struct vout_display_sys_t
                                                   for hw decoding */
 #endif
     IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.1 swap chain */
+    IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
     d3d_quad_t               picQuad;
@@ -1303,6 +1304,25 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
 #endif
 
+    if (sys->dxgiswapChain4 && picture->format.mastering.max_luminance)
+    {
+        DXGI_HDR_METADATA_HDR10 hdr10 = {0};
+        hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
+        hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
+        hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
+        hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
+        hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
+        hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
+        hdr10.WhitePoint[0] = picture->format.mastering.white_point[0];
+        hdr10.WhitePoint[1] = picture->format.mastering.white_point[1];
+        hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
+        hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
+        hdr10.MaxContentLightLevel = picture->format.ligthing.MaxCLL;
+        hdr10.MaxFrameAverageLightLevel = picture->format.ligthing.MaxFALL;
+        IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
+    }
+
+
     DXGI_PRESENT_PARAMETERS presentParams;
     memset(&presentParams, 0, sizeof(presentParams));
     HRESULT hr = IDXGISwapChain1_Present1(sys->dxgiswapChain, 0, 0, &presentParams);
@@ -1581,6 +1601,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 #endif
 
+    ID3D11Device_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
+
     D3D11SetColorSpace(vd);
 
     // look for the requested pixel format first
@@ -1677,6 +1699,11 @@ static void Direct3D11Close(vout_display_t *vd)
     {
         ID3D11Device_Release(sys->d3ddevice);
         sys->d3ddevice = NULL;
+    }
+    if (sys->dxgiswapChain4)
+    {
+        IDXGISwapChain_Release(sys->dxgiswapChain4);
+        sys->dxgiswapChain4 = NULL;
     }
     if (sys->dxgiswapChain)
     {
