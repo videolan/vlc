@@ -613,7 +613,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                 {
                     ESNew( p_demux, i_id, 0 );
                 }
-                if( tk->b_configured && tk->es &&
+                if( tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
                 {
                     es_out_Send( p_demux->out, tk->es, p_pkt );

@@ -383,7 +383,7 @@ static void NotifyDiscontinuity( ps_track_t *p_tk, es_out_t *out )
     for( size_t i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_tk[i];
-        if( tk->b_configured && tk->es &&
+        if( tk->es &&
                 es_out_Control( out, ES_OUT_GET_ES_STATE, tk->es, &b_selected ) == VLC_SUCCESS
                 && b_selected )
         {
