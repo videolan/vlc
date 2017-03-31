@@ -345,6 +345,18 @@ struct video_format_t
         float f_roll_degrees;     /**< view point roll in degrees ]-180;180] */
         float f_fov_degrees;          /**< view point fov in degrees ]0;180[ */
     } pose;
+    struct {
+        /* similar to SMPTE ST 2086 mastering display color volume */
+        uint16_t primaries[3*2]; /* G,B,R / x,y */
+        uint16_t white_point[2]; /* x,y */
+        uint32_t max_luminance;
+        uint32_t min_luminance;
+    } mastering;
+    struct {
+        /* similar to CTA-861.3 content light level */
+        uint16_t MaxCLL;  /* max content light level */
+        uint16_t MaxFALL; /* max frame average light level */
+    } ligthing;
     uint32_t i_cubemap_padding; /**< padding in pixels of the cube map faces */
 };
 
