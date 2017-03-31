@@ -145,6 +145,30 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                 b_continue = pf_callback( &sei_data, cbdata );
             } break;
 
+            case HXXX_SEI_MASTERING_DISPLAY_COLOUR_VOLUME:
+            {
+                if ( bs_remain( &s ) < (16*6+16*2+32+32) )
+                    /* not enough data */
+                    break;
+                for ( size_t i = 0; i < 6 ; ++i)
+                    sei_data.colour_volume.primaries[i] = bs_read( &s, 16 );
+                for ( size_t i = 0; i < 2 ; ++i)
+                    sei_data.colour_volume.white_point[i] = bs_read( &s, 16 );
+                sei_data.colour_volume.max_luminance = bs_read( &s, 32 );
+                sei_data.colour_volume.min_luminance = bs_read( &s, 32 );
+                b_continue = pf_callback( &sei_data, cbdata );
+            } break;
+
+            case HXXX_SEI_CONTENT_LIGHT_LEVEL:
+            {
+                if ( bs_remain( &s ) < (16+16) )
+                    /* not enough data */
+                    break;
+                sei_data.content_light_lvl.MaxCLL = bs_read( &s, 16 );
+                sei_data.content_light_lvl.MaxFALL = bs_read( &s, 16 );
+                b_continue = pf_callback( &sei_data, cbdata );
+            } break;
+
             default:
                 /* Will skip */
                 break;
