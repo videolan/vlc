@@ -125,7 +125,8 @@ static inline bool ps_is_H264( const uint8_t *p_data, size_t i_data )
 }
 
 /* From id fill i_skip and es_format_t */
-static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, block_t *p_pkt )
+static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
+                                 int i_id, block_t *p_pkt, bool b_mpeg2only )
 {
     tk->i_skip = 0;
     tk->i_id = i_id;
@@ -142,8 +143,11 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
                  ( i_id&0xf0 ) == 0xc0 )  /* 0xc0 -> 0xcf AC-3, Can also be DD+/E-AC3 in evob */
         {
             bool b_eac3 = false;
-            if( ( i_id&0xf0 ) == 0xc0 && p_pkt && p_pkt->i_buffer > 8 )
+            if( ( i_id&0xf0 ) == 0xc0 )
             {
+                if( p_pkt == NULL || p_pkt->i_buffer < 9 )
+                    return VLC_EGENERIC;
+
                 unsigned i_start = 9 + p_pkt->p_buffer[8];
                 if( i_start + 9 < p_pkt->i_buffer )
                 {
@@ -265,7 +269,8 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
             {
                 es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
             }
-            else if( tk->fmt.i_cat == UNKNOWN_ES && p_pkt != NULL /* Not system */ )
+            else if( tk->fmt.i_cat == UNKNOWN_ES &&
+                     ( p_pkt != NULL /* Not system */ || b_mpeg2only ) )
             {
                 es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
             }
@@ -309,7 +314,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
         }
     }
 
-    return (p_pkt) ? VLC_SUCCESS : VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 /* return the id of a PES (should be valid) */
@@ -479,7 +484,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 
         int i_tk = PS_ID_TO_TK( i_id );
         if( !tk[i_tk].b_configured &&
-            !ps_track_fill( &tk[i_tk], p_psm, i_id, NULL ) )
+            !ps_track_fill( &tk[i_tk], p_psm, i_id, NULL, false ) )
         {
                 tk[i_tk].b_configured = true;
         }
@@ -691,7 +696,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
 
         if( !tk[i].b_configured || !tk[i].es ) continue;
 
-        if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id, p_pkt ) != VLC_SUCCESS )
+        if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id, p_pkt, false ) != VLC_SUCCESS )
             continue;
 
         if( tk_tmp.fmt.i_codec == tk[i].fmt.i_codec )

@@ -517,7 +517,7 @@ static int Demux( demux_t *p_demux )
 
             if( !tk->b_configured )
             {
-                if( !ps_track_fill( tk, &p_sys->psm, i_id, p_pkt ) )
+                if( !ps_track_fill( tk, &p_sys->psm, i_id, p_pkt, false ) )
                 {
                     /* No PSM and no probing yet */
                     if( p_sys->format == PSMF_PS )
