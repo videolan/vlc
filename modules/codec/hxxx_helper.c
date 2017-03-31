@@ -75,8 +75,7 @@ hxxx_helper_clean(struct hxxx_helper *hh)
             }
             break;
         case VLC_CODEC_HEVC:
-            if (hh->hevc.p_annexb_config_nal)
-                block_Release(hh->hevc.p_annexb_config_nal);
+            free(hh->hevc.p_annexb_config_nal);
             break;
         default:
             vlc_assert_unreachable();
