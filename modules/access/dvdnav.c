@@ -1305,18 +1305,21 @@ static void ESSubtitleUpdate( demux_t *p_demux )
         ESNew( p_demux, 0xbd20 + i_spu );
 
         /* be sure to unselect it (reset) */
-        es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
-                        (bool)false );
+        if( tk->es )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
+                            (bool)false );
 
-        /* now select it */
-        es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
+            /* now select it */
+            es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
+        }
     }
     else
     {
         for( i_spu = 0; i_spu <= 0x1F; i_spu++ )
         {
             ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(0xbd20 + i_spu)];
-            if( tk->b_configured )
+            if( tk->es )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
                                 (bool)false );
@@ -1514,7 +1517,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     }
 
     tk->es = es_out_Add( p_demux->out, &tk->fmt );
-    if( b_select )
+    if( b_select && tk->es )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
     }
