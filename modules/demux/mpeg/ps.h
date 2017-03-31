@@ -61,7 +61,8 @@ static inline const uint8_t *ps_id_to_lang( const ps_psm_t *, int );
 
 typedef struct
 {
-    bool  b_seen;
+    bool        b_configured;
+    bool        b_seen;
     int         i_skip;
     int         i_id;
     int         i_next_block_flags;
@@ -78,6 +79,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
     int i;
     for( i = 0; i < PS_TK_COUNT; i++ )
     {
+        tk[i].b_configured = false;
         tk[i].b_seen = false;
         tk[i].i_skip = 0;
         tk[i].i_id   = 0;
@@ -476,10 +478,10 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
             continue;
 
         int i_tk = PS_ID_TO_TK( i_id );
-        if( !tk[i_tk].b_seen &&
+        if( !tk[i_tk].b_configured &&
             !ps_track_fill( &tk[i_tk], p_psm, i_id, NULL ) )
         {
-                tk[i_tk].b_seen = true;
+                tk[i_tk].b_configured = true;
         }
     }
     return VLC_SUCCESS;
@@ -687,7 +689,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
     {
         ps_track_t tk_tmp;
 
-        if( !tk[i].b_seen || !tk[i].es ) continue;
+        if( !tk[i].b_configured || !tk[i].es ) continue;
 
         if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id, p_pkt ) != VLC_SUCCESS )
             continue;
@@ -701,7 +703,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
         es_out_Del( out, tk[i].es );
         es_format_Clean( &tk[i].fmt );
 
-        tk_tmp.b_seen = true;
+        tk_tmp.b_configured = true;
         tk[i] = tk_tmp;
         tk[i].es = es_out_Add( out, &tk[i].fmt );
     }

@@ -534,7 +534,7 @@ static void Close( vlc_object_t *p_this )
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
-        if( tk->b_seen )
+        if( tk->b_configured )
         {
             es_format_Clean( &tk->fmt );
             if( tk->es ) es_out_Del( p_demux->out, tk->es );
@@ -942,12 +942,12 @@ static int Demux( demux_t *p_demux )
         for( int i = 0; i < PS_TK_COUNT; i++ )
         {
             ps_track_t *tk = &p_sys->tk[i];
-            if( tk->b_seen )
+            if( tk->b_configured )
             {
                 es_format_Clean( &tk->fmt );
                 if( tk->es ) es_out_Del( p_demux->out, tk->es );
             }
-            tk->b_seen = false;
+            tk->b_configured = false;
         }
 
         uint32_t i_width, i_height;
@@ -1316,7 +1316,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
         for( i_spu = 0; i_spu <= 0x1F; i_spu++ )
         {
             ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(0xbd20 + i_spu)];
-            if( tk->b_seen )
+            if( tk->b_configured )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
                                 (bool)false );
@@ -1382,11 +1382,11 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
             {
                 ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
 
-                if( !tk->b_seen )
+                if( !tk->b_configured )
                 {
                     ESNew( p_demux, i_id );
                 }
-                if( tk->b_seen && tk->es &&
+                if( tk->b_configured && tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
                 {
                     es_out_Send( p_demux->out, tk->es, p_pkt );
@@ -1436,7 +1436,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     ps_track_t  *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
     bool  b_select = false;
 
-    if( tk->b_seen ) return;
+    if( tk->b_configured ) return;
 
     if( ps_track_fill( tk, 0, i_id, NULL ) )
     {
@@ -1518,7 +1518,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
     }
-    tk->b_seen = true;
+    tk->b_configured = true;
 
     if( tk->fmt.i_cat == VIDEO_ES ) ButtonUpdate( p_demux, false );
 }

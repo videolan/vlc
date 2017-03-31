@@ -256,7 +256,7 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
-        if( tk->b_seen )
+        if( tk->b_configured )
         {
             es_format_Clean( &tk->fmt );
             if( tk->es ) es_out_Del( p_demux->out, tk->es );
@@ -383,7 +383,7 @@ static void NotifyDiscontinuity( ps_track_t *p_tk, es_out_t *out )
     for( size_t i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_tk[i];
-        if( tk->b_seen && tk->es &&
+        if( tk->b_configured && tk->es &&
                 es_out_Control( out, ES_OUT_GET_ES_STATE, tk->es, &b_selected ) == VLC_SUCCESS
                 && b_selected )
         {
@@ -472,6 +472,7 @@ static int Demux( demux_t *p_demux )
                 if( tk->b_seen && !tk->es && tk->fmt.i_cat != UNKNOWN_ES )
                 {
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
+                    tk->b_configured = true;
                 }
             }
         }
@@ -514,7 +515,7 @@ static int Demux( demux_t *p_demux )
             bool b_new = false;
             ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
 
-            if( !tk->b_seen )
+            if( !tk->b_configured )
             {
                 if( !ps_track_fill( tk, &p_sys->psm, i_id, p_pkt ) )
                 {
@@ -537,7 +538,7 @@ static int Demux( demux_t *p_demux )
 
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
                     b_new = true;
-                    tk->b_seen = true;
+                    tk->b_configured = true;
                 }
                 else
                 {
@@ -569,7 +570,7 @@ static int Demux( demux_t *p_demux )
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pack_scr );
             }
 
-            if( tk->b_seen && tk->es &&
+            if( tk->b_configured && tk->es &&
                 !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
             {
                 if( tk->fmt.i_cat == AUDIO_ES || tk->fmt.i_cat == VIDEO_ES )

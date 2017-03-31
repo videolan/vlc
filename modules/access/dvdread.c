@@ -257,7 +257,7 @@ static void Close( vlc_object_t *p_this )
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
-        if( tk->b_seen )
+        if( tk->b_configured )
         {
             es_format_Clean( &tk->fmt );
             if( tk->es ) es_out_Del( p_demux->out, tk->es );
@@ -609,11 +609,11 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
             {
                 ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
 
-                if( !tk->b_seen )
+                if( !tk->b_configured )
                 {
                     ESNew( p_demux, i_id, 0 );
                 }
-                if( tk->b_seen && tk->es &&
+                if( tk->b_configured && tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
                 {
                     es_out_Send( p_demux->out, tk->es, p_pkt );
@@ -647,7 +647,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
     ps_track_t  *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
     char psz_language[3];
 
-    if( tk->b_seen ) return;
+    if( tk->b_configured ) return;
 
     if( ps_track_fill( tk, 0, i_id, NULL ) )
     {
@@ -704,7 +704,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
     }
 
     tk->es = es_out_Add( p_demux->out, &tk->fmt );
-    tk->b_seen = true;
+    tk->b_configured = true;
 }
 
 /*****************************************************************************
@@ -841,12 +841,12 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         for( int i = 0; i < PS_TK_COUNT; i++ )
         {
             ps_track_t *tk = &p_sys->tk[i];
-            if( tk->b_seen )
+            if( tk->b_configured )
             {
                 es_format_Clean( &tk->fmt );
                 if( tk->es ) es_out_Del( p_demux->out, tk->es );
             }
-            tk->b_seen = false;
+            tk->b_configured = false;
         }
 
         if( p_demux->info.i_title != i_title )
