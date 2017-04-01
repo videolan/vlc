@@ -314,7 +314,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
         }
     }
 
-    return VLC_SUCCESS;
+    return (tk->fmt.i_cat != UNKNOWN_ES || p_pkt) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 /* return the id of a PES (should be valid) */
