@@ -177,7 +177,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Monkey's Audio Lossless Audio Compression</string>
+			<string>Monkey&apos;s Audio Lossless Audio Compression</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSTypeIsPackage</key>
@@ -1598,7 +1598,7 @@
 				<string>public.audio</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Monkey's Audio Lossless Audio</string>
+			<string>Monkey&apos;s Audio Lossless Audio</string>
 			<key>UTTypeIdentifier</key>
 			<string>org.videolan.ape</string>
 			<key>UTTypeTagSpecification</key>
@@ -1920,41 +1920,6 @@
 				<string>public.audio</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Digital Audio</string>
-			<key>UTTypeIdentifier</key>
-			<string>org.videolan.ac3</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>ac3</string>
-					<string>a52</string>
-				</array>
-			</dict>
-		</dict>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.audio</string>
-			</array>
-			<key>UTTypeDescription</key>
-			<string>AAC file</string>
-			<key>UTTypeIdentifier</key>
-			<string>org.videolan.aac</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>aac</string>
-				</array>
-			</dict>
-		</dict>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.audio</string>
-			</array>
-			<key>UTTypeDescription</key>
 			<string>OPUS file</string>
 			<key>UTTypeIdentifier</key>
 			<string>org.xiph.opus</string>
@@ -2175,35 +2140,6 @@
 					<string>m2ts</string>
 					<string>mts</string>
 					<string>mt2s</string>
-				</array>
-			</dict>
-		</dict>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.audio</string>
-			</array>
-			<key>UTTypeDescription</key>
-			<string>MIDI audio</string>
-			<key>UTTypeIdentifier</key>
-			<string>public.midi-audio</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>com.apple.ostype</key>
-				<array>
-					<string>Midi</string>
-				</array>
-				<key>public.filename-extension</key>
-				<array>
-					<string>kar</string>
-					<string>smf</string>
-					<string>mid</string>
-					<string>midi</string>
-				</array>
-				<key>public.mime-type</key>
-				<array>
-					<string>audio/midi</string>
-					<string>audio/x-midi</string>
 				</array>
 			</dict>
 		</dict>
