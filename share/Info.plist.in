@@ -129,17 +129,12 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
+			<key>LSItemContentTypes</key>
 			<array>
-				<string>vlc</string>
+				<string>org.videolan.vlc</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>playlist.icns</string>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>application/x-videolan-vlc</string>
-				<string>application/videolan-vlc</string>
-			</array>
 			<key>CFBundleTypeName</key>
 			<string>VLC file</string>
 			<key>CFBundleTypeRole</key>
@@ -1524,6 +1519,32 @@
 	<string>http://update.videolan.org/vlc/sparkle/vlc-intel64.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>VLC playlist file</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.text</string>
+				<string>public.playlist</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>org.videolan.vlc</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/x-videolan-vlc</string>
+					<string>application/videolan-vlc</string>
+				</array>
+				<key>public.filename-extension</key>
+				<array>
+					<string>vlc</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
