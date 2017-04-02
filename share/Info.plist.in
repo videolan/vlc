@@ -1035,10 +1035,6 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mka</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
@@ -1051,10 +1047,6 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mkv</string>
-			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mkv.icns</string>
 			<key>CFBundleTypeName</key>
