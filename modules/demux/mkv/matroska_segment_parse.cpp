@@ -491,8 +491,12 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             mkv_track_t *tk = vars.tk;
 
             tk->f_fps = 0.0;
-            tk->fmt.video.i_frame_rate_base = static_cast<unsigned>( tk->i_default_duration );
-            tk->fmt.video.i_frame_rate = 1000000;
+
+            if( tk->i_default_duration > 1000 ) /* Broken ffmpeg mux info when non set fps */
+            {
+                tk->fmt.video.i_frame_rate_base = static_cast<unsigned>( tk->i_default_duration );
+                tk->fmt.video.i_frame_rate = 1000000;
+            }
 
             vars.level += 1;
             dispatcher.iterate (tkv.begin (), tkv.end (), Payload( vars ) );
