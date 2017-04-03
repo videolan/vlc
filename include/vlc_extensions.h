@@ -277,7 +277,7 @@ struct extension_widget_t
     /* Drop-down & List widgets */
     struct extension_widget_value_t {
         int i_id;          ///< Identifier for the extension module
-                           // (weird behavior may occur if not unique)
+                           ///< (weird behavior may occur if not unique)
         char *psz_text;    ///< String value
         bool b_selected;   ///< True if this item is selected
         struct extension_widget_value_t *p_next; ///< Next value or NULL
@@ -297,7 +297,7 @@ struct extension_widget_t
 
     /* Spinning icon */
     int i_spin_loops;             ///< Number of loops to play (-1 = infinite,
-                                  // 0 = stop animation)
+                                  ///< 0 = stop animation)
 
     /* Orders */
     bool b_kill;                  ///< Destroy this widget
@@ -306,8 +306,8 @@ struct extension_widget_t
     /* Misc */
     void *p_sys;                  ///< Reserved for the extension manager
     void *p_sys_intf;             ///< Reserved for the UI, but:
-                                  // NULL means the UI has destroyed the widget
-                                  // or has not created it yet
+                                  ///< NULL means the UI has destroyed the widget
+                                  ///< or has not created it yet
     extension_dialog_t *p_dialog; ///< Parent dialog
 };
 
