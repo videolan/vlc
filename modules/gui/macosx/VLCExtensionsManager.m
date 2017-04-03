@@ -199,7 +199,6 @@
 
 - (void)triggerMenu:(id)sender
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     intf_thread_t *p_intf = getIntf();
     uint32_t identifier = [(NSMenuItem *)sender tag];
 
