@@ -194,10 +194,11 @@ static bool ParseH264SEI(const hxxx_sei_data_t *p_sei_data, void *priv)
     return true;
 }
 
-static bool ParseH264NAL(decoder_sys_t *p_sys,
+static bool ParseH264NAL(decoder_t *p_dec,
                          const uint8_t *p_buffer, size_t i_buffer,
                          uint8_t i_nal_length_size, frame_info_t *p_info)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     hxxx_iterator_ctx_t itctx;
     hxxx_iterator_init(&itctx, p_buffer, i_buffer, i_nal_length_size);
 
@@ -249,6 +250,14 @@ static bool ParseH264NAL(decoder_sys_t *p_sys,
 
                 p_info->i_num_ts = h264_get_num_ts(p_sps, &slice, sei.i_pic_struct,
                                                    p_info->i_foc, bFOC);
+
+                /* Set frame rate for timings in case of missing rate */
+                if( !p_dec->fmt_in.video.i_frame_rate_base &&
+                    p_sps->vui.i_time_scale && p_sps->vui.i_num_units_in_tick )
+                {
+                    date_Change( &p_sys->pts, p_sps->vui.i_time_scale,
+                                              p_sps->vui.i_num_units_in_tick );
+                }
             }
 
             return true; /* No need to parse further NAL */
@@ -361,8 +370,9 @@ static void FlushDPB(decoder_t *p_dec)
     }
 }
 
-static frame_info_t * CreateReorderInfo(decoder_sys_t *p_sys, const block_t *p_block)
+static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     frame_info_t *p_info = calloc(1, sizeof(*p_info));
     if (!p_info)
         return NULL;
@@ -370,7 +380,7 @@ static frame_info_t * CreateReorderInfo(decoder_sys_t *p_sys, const block_t *p_b
     if (p_sys->b_poc_based_reorder)
     {
         if(p_sys->codec != kCMVideoCodecType_H264 ||
-           !ParseH264NAL(p_sys, p_block->p_buffer, p_block->i_buffer, 4, p_info))
+           !ParseH264NAL(p_dec, p_block->p_buffer, p_block->i_buffer, 4, p_info))
         {
             assert(p_sys->codec == kCMVideoCodecType_H264);
             free(p_info);
@@ -615,8 +625,12 @@ static int StartVideoToolbox(decoder_t *p_dec)
     const unsigned i_sar_num = p_dec->fmt_out.video.i_sar_num;
     const unsigned i_sar_den = p_dec->fmt_out.video.i_sar_den;
 
-
-    date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2, p_dec->fmt_in.video.i_frame_rate_base );
+    if( p_dec->fmt_in.video.i_frame_rate_base )
+    {
+        date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
+                                p_dec->fmt_in.video.i_frame_rate_base );
+    }
+    else date_Init( &p_sys->pts, 30000, 1001 );
 
     VTDictionarySetInt32(pixelaspectratio,
                          kCVImageBufferPixelAspectRatioHorizontalSpacingKey,
@@ -1301,7 +1315,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
 
 
-    p_info = CreateReorderInfo(p_sys, p_block);
+    p_info = CreateReorderInfo(p_dec, p_block);
     if(unlikely(!p_info))
         goto skip;
 
