@@ -415,6 +415,10 @@ static int Demux( demux_t *p_demux)
     {
         b_eof = true;
     }
+    else
+    {
+        p_block_in->i_dts = date_Get( &p_sys->dts );
+    }
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer,
                                                              p_block_in ? &p_block_in : NULL )) )
