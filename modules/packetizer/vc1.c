@@ -516,7 +516,7 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 
                 if( bs_read( &s, 1 ) )  /* Pixel aspect ratio (PAR/SAR) */
                 {
-                    static const int p_ar[16][2] = {
+                    static const unsigned p_ar[16][2] = {
                         { 0, 0}, { 1, 1}, {12,11}, {10,11}, {16,11}, {40,33},
                         {24,11}, {20,11}, {32,11}, {80,33}, {18,11}, {15,11},
                         {64,33}, {160,99},{ 0, 0}, { 0, 0}
@@ -541,8 +541,8 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
             }
             if( bs_read( &s, 1 ) )  /* Frame rate */
             {
-                int i_fps_num = 0;
-                int i_fps_den = 0;
+                unsigned i_fps_num = 0;
+                unsigned i_fps_den = 0;
                 if( bs_read( &s, 1 ) )
                 {
                     i_fps_num = bs_read( &s, 16 )+1;
