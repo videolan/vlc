@@ -352,7 +352,7 @@ static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
                 return 0;
 
             const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
-            if(i_buf < i_nalu_length + 2)
+            if(i_buf < (size_t)i_nalu_length + 2)
                 return 0;
 
             i_total += i_nalu_length + i_nal_length_size;
@@ -746,7 +746,7 @@ static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned stRpsIdx,
     {
         nal_ue_t num_negative_pics = bs_read_ue( p_bs );
         nal_ue_t num_positive_pics = bs_read_ue( p_bs );
-        if( bs_remain( p_bs ) < ((uint64_t)num_negative_pics + num_positive_pics) * 2 )
+        if( bs_remain( p_bs ) < ((int64_t)num_negative_pics + num_positive_pics) * 2 )
             return false;
         for(unsigned int i=0; i<num_negative_pics; i++)
         {
@@ -946,7 +946,7 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
         p_pps->uniform_spacing_flag = bs_read1( p_bs );
         if( !p_pps->uniform_spacing_flag )
         {
-            if( bs_remain( p_bs ) < (uint64_t) p_pps->num_tile_columns_minus1 +
+            if( bs_remain( p_bs ) < (int64_t) p_pps->num_tile_columns_minus1 +
                                                p_pps->num_tile_rows_minus1 + 1 )
                 return false;
             for( unsigned i=0; i< p_pps->num_tile_columns_minus1; i++ )
