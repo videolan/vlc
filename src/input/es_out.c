@@ -3019,7 +3019,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
             info_category_AddInfo( p_cat, _("Channels"), "%s",
                                    _( aout_FormatPrintChannels( &fmt->audio ) ) );
 
-        if( fmt->audio.i_rate > 0 )
+        if( fmt->audio.i_rate != 0 )
         {
             info_category_AddInfo( p_cat, _("Sample rate"), _("%u Hz"),
                                    fmt->audio.i_rate );
@@ -3028,13 +3028,13 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         }
 
         unsigned int i_bitspersample = fmt->audio.i_bitspersample;
-        if( i_bitspersample <= 0 )
+        if( i_bitspersample == 0 )
             i_bitspersample = aout_BitsPerSample( p_fmt_es->i_codec );
-        if( i_bitspersample > 0 )
+        if( i_bitspersample != 0 )
             info_category_AddInfo( p_cat, _("Bits per sample"), "%u",
                                    i_bitspersample );
 
-        if( fmt->i_bitrate > 0 )
+        if( fmt->i_bitrate != 0 )
         {
             info_category_AddInfo( p_cat, _("Bitrate"), _("%u kb/s"),
                                    fmt->i_bitrate / 1000 );

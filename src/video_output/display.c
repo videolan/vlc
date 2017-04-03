@@ -159,14 +159,14 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
                                         const vout_display_cfg_t *cfg)
 {
-    if (cfg->display.width > 0 && cfg->display.height > 0) {
+    if (cfg->display.width != 0 && cfg->display.height != 0) {
         *width  = cfg->display.width;
         *height = cfg->display.height;
-    } else if (cfg->display.width > 0) {
+    } else if (cfg->display.width != 0) {
         *width  = cfg->display.width;
         *height = (int64_t)source->i_visible_height * source->i_sar_den * cfg->display.width * cfg->display.sar.num /
             source->i_visible_width / source->i_sar_num / cfg->display.sar.den;
-    } else if (cfg->display.height > 0) {
+    } else if (cfg->display.height != 0) {
         *width  = (int64_t)source->i_visible_width * source->i_sar_num * cfg->display.height * cfg->display.sar.den /
             source->i_visible_height / source->i_sar_den / cfg->display.sar.num;
         *height = cfg->display.height;
@@ -197,7 +197,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
 {
     /* */
     memset(place, 0, sizeof(*place));
-    if (cfg->display.width <= 0 || cfg->display.height <= 0)
+    if (cfg->display.width == 0 || cfg->display.height == 0)
         return;
 
     /* */
@@ -981,7 +981,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->ch_sar  = false;
 
             /* If a crop ratio is requested, recompute the parameters */
-            if (osys->crop.num > 0 && osys->crop.den > 0)
+            if (osys->crop.num != 0 && osys->crop.den != 0)
                 osys->ch_crop = true;
         }
         /* */
@@ -990,7 +990,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
             unsigned crop_num = osys->crop.num;
             unsigned crop_den = osys->crop.den;
-            if (crop_num > 0 && crop_den > 0) {
+            if (crop_num != 0 && crop_den != 0) {
                 video_format_t fmt = osys->source;
                 fmt.i_sar_num = source.i_sar_num;
                 fmt.i_sar_den = source.i_sar_den;
@@ -1148,7 +1148,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (num > 0 && den > 0) {
+    if (num != 0 && den != 0) {
         vlc_ureduce(&num, &den, num, den, 0);
     } else {
         num = 1;
@@ -1191,7 +1191,7 @@ void vout_SetDisplayCrop(vout_display_t *vd,
 
     if (osys->crop.left  != (int)left  || osys->crop.top != (int)top ||
         osys->crop.right != right || osys->crop.bottom != bottom ||
-        (crop_num > 0 && crop_den > 0 &&
+        (crop_num != 0 && crop_den != 0 &&
          (crop_num != osys->crop.num || crop_den != osys->crop.den))) {
 
         osys->crop.left   = left;
