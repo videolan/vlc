@@ -91,6 +91,10 @@ struct decoder_sys_t
     const hevc_picture_parameter_set_t  *p_active_pps;
     bool b_init_sequence_complete;
 
+    date_t dts;
+    mtime_t pts;
+    bool b_need_ts;
+
     /* */
     cc_storage_t *p_ccs;
 };
@@ -123,11 +127,8 @@ static block_t * OutputQueues(decoder_sys_t *p_sys, bool b_valid)
     {
         i_flags |= p_sys->frame.p_chain->i_flags;
         block_ChainLastAppend(&pp_output_last, p_sys->frame.p_chain);
-        if(p_output->i_dts == 0)
-        {
-            p_output->i_dts = p_sys->frame.p_chain->i_dts;
-            p_output->i_pts = p_sys->frame.p_chain->i_pts;
-        }
+        p_output->i_dts = date_Get(&p_sys->dts);
+        p_output->i_pts = p_sys->pts;
         INITQ(frame);
     }
 
@@ -183,6 +184,16 @@ static int Open(vlc_object_t *p_this)
     /* Copy properties */
     es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);
     p_dec->fmt_out.b_packetized = true;
+
+    /* Init timings */
+    if( p_dec->fmt_in.video.i_frame_rate_base > 0 )
+        date_Init( &p_sys->dts, p_dec->fmt_in.video.i_frame_rate * 2,
+                                p_dec->fmt_in.video.i_frame_rate_base );
+    else
+        date_Init( &p_sys->dts, 1, 1 );
+    date_Set( &p_sys->dts, VLC_TS_INVALID );
+    p_sys->pts = VLC_TS_INVALID;
+    p_sys->b_need_ts = true;
 
     /* Set callbacks */
     const uint8_t *p_extra = p_dec->fmt_in.p_extra;
@@ -304,6 +315,8 @@ static void PacketizeReset(void *p_private, bool b_broken)
         block_ChainRelease(p_out);
 
     p_sys->b_init_sequence_complete = false;
+    p_sys->b_need_ts = true;
+    date_Set(&p_sys->dts, VLC_TS_INVALID);
 }
 
 static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
@@ -685,12 +698,24 @@ static block_t *GatherAndValidateChain(block_t *p_outputchain)
 static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    *pb_ts_used = false;
+
+    if(p_sys->b_need_ts)
+    {
+        if(p_frag->i_dts > VLC_TS_INVALID)
+        {
+            date_Set(&p_sys->dts, p_frag->i_dts);
+            *pb_ts_used = true;
+        }
+        p_sys->pts = p_frag->i_pts;
+        if(date_Get( &p_sys->dts ) != VLC_TS_INVALID)
+            p_sys->b_need_ts = false;
+    }
 
     if(unlikely(p_frag->i_buffer < 5))
     {
         msg_Warn(p_dec,"NAL too small");
         block_Release(p_frag);
-        *pb_ts_used = false;
         return NULL;
     }
 
@@ -698,7 +723,6 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     {
         msg_Warn(p_dec,"Forbidden zero bit not null, corrupted NAL");
         block_Release(p_frag);
-        *pb_ts_used = false;
         return GatherAndValidateChain(OutputQueues(p_sys, false)); /* will drop */
     }
 
@@ -718,7 +742,9 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     }
 
     p_output = GatherAndValidateChain(p_output);
-    *pb_ts_used = (p_output != NULL);
+    if(p_output)
+        p_sys->b_need_ts = true;
+
     return p_output;
 }
 
