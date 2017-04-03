@@ -122,12 +122,12 @@ static block_t * OutputQueues(decoder_sys_t *p_sys, bool b_valid)
     if(p_sys->frame.p_chain)
     {
         i_flags |= p_sys->frame.p_chain->i_flags;
-        if(p_output && p_output->i_dts == 0)
+        block_ChainLastAppend(&pp_output_last, p_sys->frame.p_chain);
+        if(p_output->i_dts == 0)
         {
             p_output->i_dts = p_sys->frame.p_chain->i_dts;
             p_output->i_pts = p_sys->frame.p_chain->i_pts;
         }
-        block_ChainLastAppend(&pp_output_last, p_sys->frame.p_chain);
         INITQ(frame);
     }
 
