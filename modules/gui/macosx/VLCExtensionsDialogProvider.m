@@ -375,12 +375,20 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
             continue; /* Some widgets may be NULL@this point */
 
         BOOL shouldDestroy = widget->b_kill;
+
+        /* Ownership should not be transfered back to ARC here, as
+         * we might just want to update something.
+         */
         NSView *control = (__bridge NSView *)widget->p_sys_intf;
         BOOL update = widget->b_update;
 
         if (!control && !shouldDestroy) {
             control = createControlFromWidget(widget, self);
             updateControlFromWidget(control, widget, self);
+            /* Ownership needs to be given-up, if ARC would remain with the
+             * ownership, the object could be freed while it is still referenced
+             * and the invalid reference would be used later.
+             */
             widget->p_sys_intf = (__bridge_retained void *)control;
             update = YES; // Force update and repositionning
             [control setHidden:widget->b_hide];
@@ -408,6 +416,9 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
         if (shouldDestroy) {
             VLCDialogGridView *gridView = (VLCDialogGridView *)[dialogWindow contentView];
             [gridView removeSubview:control];
+            /* Explicitily release here, as we do not have transfered ownership to ARC,
+             * given that not in all cases we want to destroy the widget.
+             */
             CFRelease(widget->p_sys_intf);
             widget->p_sys_intf = NULL;
         }
