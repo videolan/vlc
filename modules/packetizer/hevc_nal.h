@@ -20,8 +20,8 @@
 #ifndef HEVC_NAL_H
 # define HEVC_NAL_H
 
-# include <vlc_common.h>
 # include <vlc_es.h>
+# include <vlc_bits.h>
 
 #define HEVC_VPS_ID_MAX 15
 #define HEVC_SPS_ID_MAX 15
@@ -212,5 +212,14 @@ typedef struct
 int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps,
                                        const hevc_slice_segment_header_t *slice,
                                        hevc_poc_ctx_t *ctx );
+
+typedef struct hevc_sei_pic_timing_t hevc_sei_pic_timing_t;
+
+hevc_sei_pic_timing_t * hevc_decode_sei_pic_timing( bs_t *,
+                                                    const hevc_sequence_parameter_set_t * );
+void hevc_release_sei_pic_timing( hevc_sei_pic_timing_t * );
+
+uint8_t hevc_get_num_clock_ts( const hevc_sequence_parameter_set_t *,
+                               const hevc_sei_pic_timing_t * /* can be NULL */ );
 
 #endif /* HEVC_NAL_H */
