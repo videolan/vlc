@@ -278,8 +278,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             mpeg2_custom_fbuf( p_sys->p_mpeg2dec, 1 );
 
             /* Set the first 2 reference frames */
-            p_sys->i_sar_num = 0;
-            p_sys->i_sar_den = 0;
             GetAR( p_dec );
             for( int i = 0; i < 2; i++ )
             {
@@ -722,22 +720,19 @@ static void GetAR( decoder_t *p_dec )
         p_sys->i_sar_num = p_dec->fmt_in.video.i_sar_num;
         p_sys->i_sar_den = p_dec->fmt_in.video.i_sar_den;
     }
+    /* Use the value provided in the MPEG sequence header */
+    else if( p_sys->p_info->sequence->pixel_height > 0 )
+    {
+        p_sys->i_sar_num = p_sys->p_info->sequence->pixel_width;
+        p_sys->i_sar_den = p_sys->p_info->sequence->pixel_height;
+    }
     else
     {
-        /* Use the value provided in the MPEG sequence header */
-        if( p_sys->p_info->sequence->pixel_height > 0 )
-        {
-            p_sys->i_sar_num = p_sys->p_info->sequence->pixel_width;
-            p_sys->i_sar_den = p_sys->p_info->sequence->pixel_height;
-        }
-        else
-        {
-            /* Invalid aspect, assume 4:3.
-             * This shouldn't happen and if it does it is a bug
-             * in libmpeg2 (likely triggered by an invalid stream) */
-            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 4;
-            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 3;
-        }
+        /* Invalid aspect, assume 4:3.
+         * This shouldn't happen and if it does it is a bug
+         * in libmpeg2 (likely triggered by an invalid stream) */
+        p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 4;
+        p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 3;
     }
 
     if( p_sys->i_sar_num == i_old_sar_num &&
