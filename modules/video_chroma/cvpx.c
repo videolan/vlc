@@ -1,8 +1,7 @@
 /*****************************************************************************
- * cvpx_i420.c: core video buffer to picture converter
+ * cvpx.c: core video buffer to picture converter
  *****************************************************************************
- * Copyright (C) 2015 Videolabs SAS
- * $Id$
+ * Copyright (C) 2015-2017 VLC authors, VideoLAN and VideoLabs
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
  *

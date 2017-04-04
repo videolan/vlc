@@ -1047,7 +1047,7 @@ modules/text_renderer/sapi.cpp
 modules/text_renderer/svg.c
 modules/text_renderer/tdummy.c
 modules/video_chroma/chain.c
-modules/video_chroma/cvpx_i420.c
+modules/video_chroma/cvpx.c
 modules/video_chroma/d3d11_surface.c
 modules/video_chroma/dxa9.c
 modules/video_chroma/grey_yuv.c

@@ -85,7 +85,7 @@ $Id$
  * croppadd: Crop/Padd image filter
  * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
- * cvpx_i420: filter to copy from OS X accelerated surfaces to CPU in YUV
+ * cvpx: filter to copy from OS X accelerated surfaces to CPU
  * d3d11_surface: Convert D3D11 GPU textures to YUV planes
  * d3d11va: Direct3D11 hardware-accelerated decoding
  * daala: a daala video decoder/packetizer using libdaala
