@@ -13,7 +13,8 @@ if HAVE_ANDROID
 OPENGL_COMMONSOURCES += video_output/opengl/converter_android.c
 endif
 if HAVE_OSX
-OPENGL_COMMONSOURCES += video_output/opengl/converter_cvpx.c
+OPENGL_COMMONSOURCES += video_output/opengl/converter_cvpx.c \
+	codec/vt_utils.c codec/vt_utils.h
 OPENGL_COMMONCFLAGS += -DVLCGL_CONV_CVPX
 OPENGL_COMMONLDFLAGS += -Wl,-framework,IOSurface -Wl,-framework,CoreVideo
 endif

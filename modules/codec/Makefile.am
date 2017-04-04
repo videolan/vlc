@@ -317,6 +317,7 @@ EXTRA_LTLIBRARIES += liboggspots_plugin.la
 codec_LTLIBRARIES += $(LTLIBoggspots)
 
 libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h \
+	codec/vt_utils.c codec/vt_utils.h \
 	codec/videotoolbox.m codec/hxxx_helper.c codec/hxxx_helper.h \
 	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
 	packetizer/hxxx_sei.h packetizer/hxxx_sei.c \
