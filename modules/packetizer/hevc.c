@@ -89,6 +89,7 @@ struct decoder_sys_t
     const hevc_video_parameter_set_t    *p_active_vps;
     const hevc_sequence_parameter_set_t *p_active_sps;
     const hevc_picture_parameter_set_t  *p_active_pps;
+    hevc_sei_pic_timing_t *p_timing;
     bool b_init_sequence_complete;
 
     date_t dts;
@@ -190,7 +191,7 @@ static int Open(vlc_object_t *p_this)
         date_Init( &p_sys->dts, p_dec->fmt_in.video.i_frame_rate * 2,
                                 p_dec->fmt_in.video.i_frame_rate_base );
     else
-        date_Init( &p_sys->dts, 1, 1 );
+        date_Init( &p_sys->dts, 2 * 30000, 1001 );
     date_Set( &p_sys->dts, VLC_TS_INVALID );
     p_sys->pts = VLC_TS_INVALID;
     p_sys->b_need_ts = true;
@@ -261,6 +262,8 @@ static void Close(vlc_object_t *p_this)
         if(p_sys->rgi_p_decvps[i])
             hevc_rbsp_release_vps(p_sys->rgi_p_decvps[i]);
     }
+
+    hevc_release_sei_pic_timing( p_sys->p_timing );
 
     cc_storage_delete( p_sys->p_ccs );
 
@@ -453,9 +456,14 @@ static void ActivateSets(decoder_t *p_dec,
     {
         if(!p_dec->fmt_in.video.i_frame_rate)
         {
-            (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
-                                        &p_dec->fmt_out.video.i_frame_rate,
-                                        &p_dec->fmt_out.video.i_frame_rate_base );
+            unsigned num, den;
+            if(hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps, &num, &den ))
+            {
+                p_dec->fmt_out.video.i_frame_rate = num;
+                p_dec->fmt_out.video.i_frame_rate_base = den;
+                if(p_sys->dts.i_divider_den != den && p_sys->dts.i_divider_num != num)
+                    date_Change(&p_sys->dts, 2 * num, den);
+            }
         }
 
         if(p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF)
@@ -708,6 +716,23 @@ static block_t *GatherAndValidateChain(block_t *p_outputchain)
     return p_output;
 }
 
+static void SetOutputBlockProperties(decoder_t *p_dec, block_t *p_output)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    /* Set frame duration */
+    if(p_sys->p_active_sps)
+    {
+        uint8_t i_num_clock_ts = hevc_get_num_clock_ts(p_sys->p_active_sps,
+                                                       p_sys->p_timing);
+        const mtime_t i_start = date_Get(&p_sys->dts);
+        date_Increment(&p_sys->dts, i_num_clock_ts);
+        p_output->i_length = date_Get(&p_sys->dts) - i_start;
+        p_sys->pts = VLC_TS_INVALID;
+    }
+    hevc_release_sei_pic_timing(p_sys->p_timing);
+    p_sys->p_timing = NULL;
+}
+
 /*****************************************************************************
  * ParseNALBlock: parses annexB type NALs
  * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode
@@ -760,7 +785,10 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
 
     p_output = GatherAndValidateChain(p_output);
     if(p_output)
+    {
         p_sys->b_need_ts = true;
+        SetOutputBlockProperties( p_dec, p_output );
+    }
 
     return p_output;
 }
@@ -795,6 +823,15 @@ static bool ParseSEICallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
 
     switch( p_sei_data->i_type )
     {
+        case HXXX_SEI_PIC_TIMING:
+        {
+            if( p_sys->p_active_sps )
+            {
+                hevc_release_sei_pic_timing( p_sys->p_timing );
+                p_sys->p_timing = hevc_decode_sei_pic_timing( p_sei_data->p_bs,
+                                                              p_sys->p_active_sps );
+            }
+        } break;
         case HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35:
         {
             if( p_sei_data->itu_t35.type == HXXX_ITU_T35_TYPE_CC )
