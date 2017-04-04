@@ -218,6 +218,7 @@ class mkv_track_t
         PrivateTrackData *p_sys;
 
         bool            b_inited;
+        bool            b_discontinuity;
         /* data to be send first */
         int             i_data_init;
         uint8_t         *p_data_init;

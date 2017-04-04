@@ -241,6 +241,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     track.p_sys                  = NULL;
 
     track.b_inited               = false;
+    track.b_discontinuity        = false;
 
     track.i_data_init            = 0;
     track.p_data_init            = NULL;

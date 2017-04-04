@@ -269,6 +269,12 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
             (double) p_segment->i_timescale / ( 1000.0 * i_number_frames );
     }
 
+    if( p_tk->b_discontinuity )
+    {
+        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+        p_tk->b_discontinuity = false;
+    }
+
     es_out_Send( p_demux->out, p_tk->p_es, p_block);
 }
 
