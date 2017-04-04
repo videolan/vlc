@@ -504,6 +504,24 @@ static void GetXPSSet(uint8_t i_pps_id, void *priv,
             *pp_vps = p_sys->rgi_p_decvps[hevc_get_sps_vps_id(*pp_sps)];
 }
 
+static void ParseStoredSEI( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    for( block_t *p_nal = p_sys->pre.p_chain;
+                  p_nal; p_nal = p_nal->p_next )
+    {
+        if( p_nal->i_buffer < 5 )
+            continue;
+
+        if( hevc_getNALType(&p_nal->p_buffer[4]) == HEVC_NAL_PREF_SEI )
+        {
+            HxxxParse_AnnexB_SEI( p_nal->p_buffer, p_nal->i_buffer,
+                                  2 /* nal header */, ParseSEICallback, p_dec );
+        }
+    }
+}
+
 static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -538,6 +556,8 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
             GetXPSSet(hevc_get_slice_pps_id(p_sli), p_sys, &p_pps, &p_sps, &p_vps);
             ActivateSets(p_dec, p_pps, p_sps, p_vps);
         }
+
+        ParseStoredSEI( p_dec );
 
         switch(i_nal_type)
         {
@@ -612,10 +632,7 @@ static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
         }
 
         case HEVC_NAL_PREF_SEI:
-            HxxxParse_AnnexB_SEI( p_nalb->p_buffer, p_nalb->i_buffer,
-                                  2 /* nal header */, ParseSEICallback, p_dec );
-            break;
-
+            /* stored an parsed later when we get sps & frame */
         default:
             break;
     }
