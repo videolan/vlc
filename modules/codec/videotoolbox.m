@@ -662,16 +662,12 @@ static int StartVideoToolbox(decoder_t *p_dec)
                              kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
                              kCFBooleanTrue);
 
-    if (p_sys->b_enable_temporal_processing)
-    {
-        msg_Dbg(p_dec, "Interlaced content detected, inserting temporal deinterlacer");
-        CFDictionarySetValue(p_sys->decoderConfiguration,
-                             kVTDecompressionPropertyKey_FieldMode,
-                             kVTDecompressionProperty_FieldMode_DeinterlaceFields);
-        CFDictionarySetValue(p_sys->decoderConfiguration,
-                             kVTDecompressionPropertyKey_DeinterlaceMode,
-                             kVTDecompressionProperty_DeinterlaceMode_Temporal);
-    }
+    CFDictionarySetValue(p_sys->decoderConfiguration,
+                         kVTDecompressionPropertyKey_FieldMode,
+                         kVTDecompressionProperty_FieldMode_DeinterlaceFields);
+    CFDictionarySetValue(p_sys->decoderConfiguration,
+                         kVTDecompressionPropertyKey_DeinterlaceMode,
+                         kVTDecompressionProperty_DeinterlaceMode_Temporal);
 
     /* create video format description */
     status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
@@ -865,7 +861,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->b_poc_based_reorder = false;
     p_sys->b_format_propagated = false;
     p_sys->b_abort = false;
-    p_sys->b_enable_temporal_processing = false;
+    p_sys->b_enable_temporal_processing =
+        var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing");
     h264_poc_context_init( &p_sys->pocctx );
     vlc_mutex_init(&p_sys->lock);
 
@@ -1316,10 +1313,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         int i_ret = avcCFromAnnexBCreate(p_dec);
         if (i_ret == VLC_SUCCESS)
         {
-            if ((p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK)
-             && var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing"))
-                p_sys->b_enable_temporal_processing = true;
-
             msg_Dbg(p_dec, "Got SPS/PPS: late opening of H264 decoder");
             StartVideoToolbox(p_dec);
         }
@@ -1341,7 +1334,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     VTDecodeInfoFlags flagOut;
     VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
-    if (unlikely(p_sys->b_enable_temporal_processing))
+    if (p_sys->b_enable_temporal_processing
+     && (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK))
         decoderFlags |= kVTDecodeFrame_EnableTemporalProcessing;
 
     OSStatus status =
