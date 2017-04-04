@@ -147,7 +147,7 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
                                               const struct vlc_http_msg *req)
 {
     vlc_tls_t *tls;
-    bool http2;
+    bool http2 = true;
 
     if (mgr->creds == NULL && mgr->conn != NULL)
         return NULL; /* switch from HTTP to HTTPS not implemented */
