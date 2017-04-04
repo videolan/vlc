@@ -191,7 +191,7 @@ int background_worker_Push( struct background_worker* worker, void* entity,
 
     item->id = id;
     item->entity = entity;
-    item->timeout = timeout > 0 ? timeout : worker->conf.default_timeout;
+    item->timeout = timeout < 0 ? worker->conf.default_timeout : timeout;
 
     vlc_mutex_lock( &worker->tail.lock );
     vlc_array_append( &worker->tail.data, item );

@@ -142,8 +142,9 @@ void background_worker_RequestProbe( struct background_worker* worker );
  * \param worker the background-worker
  * \param entity the entity which is to be queued
  * \param id a value suitable for identifying the entity, or `NULL`
- * \param timeout the timeout of the entity in milliseconds, if `0` the
- *        default-timeout of the background-worker will be used.
+ * \param timeout the timeout of the entity in milliseconds, `0` denotes no
+ *                timeout, a negative value will use the default timeout
+ *                associated with the background-worker.
  * \return VLC_SUCCESS if the entity was successfully queued, an error-code on
  *         failure.
  **/
