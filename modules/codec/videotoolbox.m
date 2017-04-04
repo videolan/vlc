@@ -113,6 +113,7 @@ struct frame_info_t
     bool b_flush;
     bool b_field;
     bool b_progressive;
+    bool b_top_field_first;
     uint8_t i_num_ts;
     unsigned i_length;
     frame_info_t *p_next;
@@ -250,6 +251,9 @@ static bool ParseH264NAL(decoder_t *p_dec,
 
                 p_info->i_num_ts = h264_get_num_ts(p_sps, &slice, sei.i_pic_struct,
                                                    p_info->i_foc, bFOC);
+
+                if(!p_info->b_progressive)
+                    p_info->b_top_field_first = (sei.i_pic_struct % 2 == 1);
 
                 /* Set frame rate for timings in case of missing rate */
                 if( !p_dec->fmt_in.video.i_frame_rate_base &&
@@ -1562,6 +1566,11 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
         p_pic->date = pts.value;
         p_pic->b_progressive = p_info->b_progressive;
+        if(!p_pic->b_progressive)
+        {
+            p_pic->i_nb_fields = p_info->i_num_ts;
+            p_pic->b_top_field_first = p_info->b_top_field_first;
+        }
 
         vlc_mutex_lock(&p_sys->lock);
         OnDecodedFrame( p_dec, p_info );
