@@ -634,7 +634,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
         date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
                                 p_dec->fmt_in.video.i_frame_rate_base );
     }
-    else date_Init( &p_sys->pts, 30000, 1001 );
+    else date_Init( &p_sys->pts, 2 * 30000, 1001 );
 
     VTDictionarySetInt32(pixelaspectratio,
                          kCVImageBufferPixelAspectRatioHorizontalSpacingKey,
