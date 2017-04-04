@@ -796,15 +796,18 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     return true;
 }
 
-void matroska_segment_c::FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
+bool matroska_segment_c::FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
 {
-    Seek( i_mk_date, i_mk_time_offset );
-
-    sys.i_start_pts = sys.i_pts;
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
+    if( Seek( i_mk_date, i_mk_time_offset ) )
+    {
+        sys.i_start_pts = sys.i_pts;
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
+        return true;
+    }
+    return false;
 }
 
-void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset )
+bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset )
 {
     SegmentSeeker::tracks_seekpoint_t seekpoints;
 
@@ -830,7 +833,7 @@ void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
     catch( std::exception const& e )
     {
         msg_Err( &sys.demuxer, "error during seek: \"%s\", aborting!", e.what() );
-        return;
+        return false;
     }
 
     // initialize seek information in order to set up playback //
@@ -869,6 +872,8 @@ void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 
     msg_Dbg( &sys.demuxer, "seek: preroll{ start-pts: %" PRId64 ", start-fpos: %" PRIu64 "} ",
       sys.i_pts, i_seek_position );
+
+    return true;
 }
 
 

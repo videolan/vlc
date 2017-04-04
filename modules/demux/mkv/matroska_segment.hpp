@@ -138,8 +138,8 @@ public:
     bool PreloadClusters( uint64 i_cluster_position );
     void InformationCreate();
 
-    void FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
-    void Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
+    bool FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
+    bool Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
 
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 

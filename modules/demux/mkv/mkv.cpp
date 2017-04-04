@@ -83,7 +83,7 @@ struct demux_sys_t;
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise = true );
+static int  Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise = true );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -355,8 +355,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 f = va_arg( args, double );
                 b = va_arg( args, int ); /* precise? */
-                Seek( p_demux, -1, f, NULL, b );
-                return VLC_SUCCESS;
+                return Seek( p_demux, -1, f, NULL, b );
             }
             return VLC_EGENERIC;
 
@@ -385,15 +384,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_idx = va_arg( args, int );
             if(i_idx <  p_sys->titles.size() && p_sys->titles[i_idx]->i_seekpoint)
             {
+                const int i_edition = p_sys->p_current_vsegment->i_current_edition;
+                const int i_title = p_sys->i_current_title;
                 p_sys->p_current_vsegment->i_current_edition = i_idx;
                 p_sys->i_current_title = i_idx;
-
-                Seek( p_demux, static_cast<int64_t>( p_sys->titles[i_idx]->seekpoint[0]->i_time_offset ), -1, NULL);
-                p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
-                p_demux->info.i_seekpoint = 0;
-                p_demux->info.i_title = i_idx;
-                p_sys->f_duration = (float) p_sys->titles[i_idx]->i_length / 1000.f;
-                return VLC_SUCCESS;
+                if( VLC_SUCCESS ==
+                    Seek( p_demux, static_cast<int64_t>( p_sys->titles[i_idx]->seekpoint[0]->i_time_offset ), -1, NULL) )
+                {
+                    p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
+                    p_demux->info.i_seekpoint = 0;
+                    p_demux->info.i_title = i_idx;
+                    p_sys->f_duration = (float) p_sys->titles[i_idx]->i_length / 1000.f;
+                    return VLC_SUCCESS;
+                }
+                else
+                {
+                    p_sys->p_current_vsegment->i_current_edition = i_edition;
+                    p_sys->i_current_title = i_title;
+                }
             }
             return VLC_EGENERIC;
 
@@ -403,10 +411,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             // TODO change the way it works with the << & >> buttons on the UI (+1/-1 instead of a number)
             if( p_sys->titles.size() && i_skp < p_sys->titles[p_sys->i_current_title]->i_seekpoint)
             {
-                Seek( p_demux, static_cast<int64_t>( p_sys->titles[p_sys->i_current_title]->seekpoint[i_skp]->i_time_offset ), -1, NULL);
-                p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-                p_demux->info.i_seekpoint = i_skp;
-                return VLC_SUCCESS;
+                int i_ret = Seek( p_demux, static_cast<int64_t>( p_sys->titles[p_sys->i_current_title]->seekpoint[i_skp]->i_time_offset ), -1, NULL);
+                if( i_ret == VLC_SUCCESS )
+                {
+                    p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+                    p_demux->info.i_seekpoint = i_skp;
+                }
+                return i_ret;
             }
             return VLC_EGENERIC;
 
@@ -435,15 +446,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i64 = va_arg( args, int64_t );
             b = va_arg( args, int ); /* precise? */
             msg_Dbg(p_demux,"SET_TIME to %" PRId64, i64 );
-            Seek( p_demux, i64, -1, NULL, b );
-            return VLC_SUCCESS;
+            return Seek( p_demux, i64, -1, NULL, b );
         default:
             return VLC_EGENERIC;
     }
 }
 
 /* Seek */
-static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise )
+static int Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
@@ -455,22 +465,22 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
     if( i_mk_date < 0 && f_percent < 0 )
     {
         msg_Warn( p_demux, "cannot seek nowhere!" );
-        return;
+        return VLC_EGENERIC;
     }
     if( f_percent > 1.0 )
     {
         msg_Warn( p_demux, "cannot seek so far!" );
-        return;
+        return VLC_EGENERIC;
     }
     if( p_sys->f_duration < 0 )
     {
         msg_Warn( p_demux, "cannot seek without duration!");
-        return;
+        return VLC_EGENERIC;
     }
     if( !p_segment )
     {
         msg_Warn( p_demux, "cannot seek without valid segment position");
-        return;
+        return VLC_EGENERIC;
     }
 
     /* seek without index or without date */
@@ -478,7 +488,7 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
     {
         i_mk_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
     }
-    p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter, b_precise );
+    return p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter, b_precise ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 /* Needed by matroska_segment::Seek() and Seek */
