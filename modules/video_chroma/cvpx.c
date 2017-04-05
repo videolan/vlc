@@ -37,40 +37,18 @@ struct picture_sys_t {
     CVPixelBufferRef pixelBuffer;
 };
 
-static int  Activate(vlc_object_t * );
-static void CVPX_I420(filter_t *, picture_t *, picture_t *);
-static picture_t *CVPX_I420_Filter( filter_t *, picture_t * );
+static int  Activate(vlc_object_t *);
 
 vlc_module_begin ()
-set_description( N_("Conversions from CoreVideo buffers to I420") )
-set_capability( "video converter", 10 )
-set_callbacks( Activate, NULL )
+    set_description( N_("Conversions from CoreVideo buffers to I420") )
+    set_capability( "video converter", 10 )
+    set_callbacks( Activate, NULL )
 vlc_module_end ()
 
-static int Activate(vlc_object_t *obj)
-{
-    filter_t *p_filter = (filter_t *)obj;
-    if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12)
-        return VLC_EGENERIC;
-
-    if (p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
-        || p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width)
-        return VLC_EGENERIC;
-
-    if (p_filter->fmt_out.video.i_chroma != VLC_CODEC_I420)
-        return VLC_EGENERIC;
-
-    p_filter->pf_video_filter = CVPX_I420_Filter;
-
-    return VLC_SUCCESS;
-}
-
-VIDEO_FILTER_WRAPPER( CVPX_I420 )
-
-static void CVPX_I420(filter_t *p_filter, picture_t *sourcePicture, picture_t *destinationPicture)
+static void CVPX_I420(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     VLC_UNUSED(p_filter);
-    picture_sys_t *picsys = sourcePicture->p_sys;
+    picture_sys_t *picsys = src->p_sys;
 
     if (picsys == NULL)
         return;
@@ -99,9 +77,30 @@ static void CVPX_I420(filter_t *p_filter, picture_t *sourcePicture, picture_t *d
     if (CopyInitCache(&cache, width))
         return;
 
-    CopyFromNv12ToI420(destinationPicture, pp_plane, pi_pitch, height, &cache);
+    CopyFromNv12ToI420(dst, pp_plane, pi_pitch, height, &cache);
 
     CopyCleanCache(&cache);
 
     CVPixelBufferUnlockBaseAddress(picsys->pixelBuffer, kCVPixelBufferLock_ReadOnly);
 }
+
+VIDEO_FILTER_WRAPPER(CVPX_I420)
+
+static int Activate(vlc_object_t *obj)
+{
+    filter_t *p_filter = (filter_t *)obj;
+    if (p_filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12)
+        return VLC_EGENERIC;
+
+    if (p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
+        || p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width)
+        return VLC_EGENERIC;
+
+    if (p_filter->fmt_out.video.i_chroma != VLC_CODEC_I420)
+        return VLC_EGENERIC;
+
+    p_filter->pf_video_filter = CVPX_I420_Filter;
+
+    return VLC_SUCCESS;
+}
+
