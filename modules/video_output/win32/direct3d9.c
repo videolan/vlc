@@ -164,15 +164,13 @@ struct vout_display_sys_t
 struct picture_sys_t
 {
     LPDIRECT3DSURFACE9 surface;
-    picture_t          *fallback;
 };
 
 static const d3d_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t chroma, D3DFORMAT target);
 
 static int  Open(vlc_object_t *);
 
-static picture_pool_t *Direct3D9CreateDirectRenderingPool  (vout_display_t *, unsigned);
-static picture_pool_t *Direct3D9CreateSimplePool(vout_display_t *, unsigned);
+static picture_pool_t *Direct3D9CreatePicturePool  (vout_display_t *, unsigned);
 
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
@@ -305,10 +303,7 @@ static int Open(vlc_object_t *object)
     video_format_Copy(&vd->fmt, &fmt);
     vd->info = info;
 
-    if ( is_d3d9_opaque( vd->fmt.i_chroma ) )
-        vd->pool = Direct3D9CreateDirectRenderingPool;
-    else
-        vd->pool = Direct3D9CreateSimplePool;
+    vd->pool = Direct3D9CreatePicturePool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -354,19 +349,59 @@ static void DestroyPicture(picture_t *picture)
     free(picture);
 }
 
+/**
+ * It locks the surface associated to the picture and get the surface
+ * descriptor which amongst other things has the pointer to the picture
+ * data and its pitch.
+ */
+static int Direct3D9LockSurface(picture_t *picture)
+{
+    /* Lock the surface to get a valid pointer to the picture buffer */
+    D3DLOCKED_RECT d3drect;
+    HRESULT hr = IDirect3DSurface9_LockRect(picture->p_sys->surface, &d3drect, NULL, 0);
+    if (FAILED(hr)) {
+        return VLC_EGENERIC;
+    }
+
+    CommonUpdatePicture(picture, NULL, d3drect.pBits, d3drect.Pitch);
+    return VLC_SUCCESS;
+}
+/**
+ * It unlocks the surface associated to the picture.
+ */
+static void Direct3D9UnlockSurface(picture_t *picture)
+{
+    /* Unlock the Surface */
+    HRESULT hr = IDirect3DSurface9_UnlockRect(picture->p_sys->surface);
+    if (FAILED(hr)) {
+        //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%0lx", hr);
+    }
+}
+
 /* */
-static picture_pool_t *Direct3D9CreateDirectRenderingPool(vout_display_t *vd, unsigned count)
+static picture_pool_t *Direct3D9CreatePicturePool(vout_display_t *vd, unsigned count)
 {
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
-
-    assert( is_d3d9_opaque(vd->fmt.i_chroma) == true );
 
     pictures = calloc(count, sizeof(*pictures));
     if (!pictures)
         goto error;
 
-    D3DFORMAT format = vd->fmt.i_chroma == VLC_CODEC_D3D9_OPAQUE_10B ? MAKEFOURCC('P','0','1','0') : MAKEFOURCC('N','V','1','2');
+    D3DFORMAT format;
+    switch (vd->fmt.i_chroma)
+    {
+    case VLC_CODEC_D3D9_OPAQUE_10B:
+        format = MAKEFOURCC('P','0','1','0');
+        break;
+    case VLC_CODEC_D3D9_OPAQUE:
+        format = MAKEFOURCC('N','V','1','2');
+        break;
+    default:
+        format = vd->sys->d3dtexture_format->format;
+        break;
+    }
+
     for (picture_count = 0; picture_count < count; ++picture_count)
     {
         picture_sys_t *picsys = malloc(sizeof(*picsys));
@@ -404,6 +439,11 @@ static picture_pool_t *Direct3D9CreateDirectRenderingPool(vout_display_t *vd, un
     memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = count;
     pool_cfg.picture       = pictures;
+    if( !is_d3d9_opaque( vd->fmt.i_chroma ) )
+    {
+        pool_cfg.lock = Direct3D9LockSurface;
+        pool_cfg.unlock = Direct3D9UnlockSurface;
+    }
 
     vd->sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
 
@@ -415,9 +455,6 @@ error:
     free(pictures);
     return vd->sys->sys.pool;
 }
-
-static int  Direct3D9LockSurface(picture_t *);
-static void Direct3D9UnlockSurface(picture_t *);
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
@@ -956,8 +993,6 @@ static int Direct3D9Reset(vout_display_t *vd)
 }
 
 /* */
-static void Direct3D9DestroyPool(vout_display_t *vd);
-
 static int  Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt);
 static void Direct3D9DestroyScene(vout_display_t *vd);
 
@@ -1002,7 +1037,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
 static void Direct3D9DestroyResources(vout_display_t *vd)
 {
     Direct3D9DestroyScene(vd);
-    Direct3D9DestroyPool(vd);
+    picture_pool_Release(vd->sys->sys.pool);
     Direct3D9DestroyShaders(vd);
 }
 
@@ -1094,138 +1129,6 @@ static const d3d_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t c
         }
     }
     return NULL;
-}
-
-/**
- * It locks the surface associated to the picture and get the surface
- * descriptor which amongst other things has the pointer to the picture
- * data and its pitch.
- */
-static int Direct3D9LockSurface(picture_t *picture)
-{
-    /* Lock the surface to get a valid pointer to the picture buffer */
-    D3DLOCKED_RECT d3drect;
-    HRESULT hr = IDirect3DSurface9_LockRect(picture->p_sys->surface, &d3drect, NULL, 0);
-    if (FAILED(hr)) {
-        //msg_Dbg(vd, "Failed IDirect3DSurface9_LockRect: 0x%0lx", hr);
-        return CommonUpdatePicture(picture, &picture->p_sys->fallback, NULL, 0);
-    }
-
-    CommonUpdatePicture(picture, NULL, d3drect.pBits, d3drect.Pitch);
-    return VLC_SUCCESS;
-}
-/**
- * It unlocks the surface associated to the picture.
- */
-static void Direct3D9UnlockSurface(picture_t *picture)
-{
-    /* Unlock the Surface */
-    HRESULT hr = IDirect3DSurface9_UnlockRect(picture->p_sys->surface);
-    if (FAILED(hr)) {
-        //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%0lx", hr);
-    }
-}
-
-/**
- * It creates the pool of picture (only 1).
- *
- * Each picture has an associated offscreen surface in video memory
- * depending on hardware capabilities the picture chroma will be as close
- * as possible to the orginal render chroma to reduce CPU conversion overhead
- * and delegate this work to video card GPU
- */
-static picture_pool_t *Direct3D9CreateSimplePool(vout_display_t *vd, unsigned count)
-{
-    VLC_UNUSED(count);
-    vout_display_sys_t *sys = vd->sys;
-    video_format_t *fmt = &vd->fmt;
-    LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
-
-    assert( is_d3d9_opaque(fmt->i_chroma) == false );
-    if (sys->sys.pool)
-        return sys->sys.pool;
-
-    /* We create one picture.
-     * It is useless to create more as we can't be used for direct rendering */
-
-    /* Create a surface */
-    LPDIRECT3DSURFACE9 surface;
-    HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3ddev,
-                                                              fmt->i_width,
-                                                              fmt->i_height,
-                                                              sys->d3dtexture_format->format,
-                                                              D3DPOOL_DEFAULT,
-                                                              &surface,
-                                                              NULL);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Failed to create picture surface. (hr=0x%lx)", hr);
-        return NULL;
-    }
-
-#ifndef NDEBUG
-    msg_Dbg(vd, "Direct3D created offscreen surface: %ix%i",
-                fmt->i_width, fmt->i_height);
-#endif
-
-    /* fill surface with black color */
-    IDirect3DDevice9_ColorFill(d3ddev, surface, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0));
-
-    /* Create the associated picture */
-    picture_sys_t *picsys = malloc(sizeof(*picsys));
-    if (unlikely(picsys == NULL)) {
-        IDirect3DSurface9_Release(surface);
-        return NULL;
-    }
-    picsys->surface = surface;
-    picsys->fallback = NULL;
-
-    picture_resource_t resource = { .p_sys = picsys };
-    for (int i = 0; i < PICTURE_PLANE_MAX; i++)
-        resource.p[i].i_lines = fmt->i_height / (i > 0 ? 2 : 1);
-
-    picture_t *picture = picture_NewFromResource(fmt, &resource);
-    if (!picture) {
-        msg_Err(vd, "Failed to create a picture from resources.");
-        IDirect3DSurface9_Release(surface);
-        free(picsys);
-        return NULL;
-    }
-    sys->picsys = picsys;
-
-    /* Wrap it into a picture pool */
-    picture_pool_configuration_t pool_cfg;
-    memset(&pool_cfg, 0, sizeof(pool_cfg));
-    pool_cfg.picture_count = 1;
-    pool_cfg.picture       = &picture;
-    pool_cfg.lock          = Direct3D9LockSurface;
-    pool_cfg.unlock        = Direct3D9UnlockSurface;
-
-    sys->sys.pool = picture_pool_NewExtended(&pool_cfg);
-    if (!sys->sys.pool) {
-        picture_Release(picture);
-        IDirect3DSurface9_Release(surface);
-    }
-    msg_Err( vd, "Returning valid pool" );
-    return sys->sys.pool;
-}
-
-/**
- * It destroys the pool of picture and its resources.
- */
-static void Direct3D9DestroyPool(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->sys.pool) {
-        picture_sys_t *picsys = sys->picsys;
-        if ( picsys != NULL ) {
-            IDirect3DSurface9_Release(picsys->surface);
-            if (picsys->fallback)
-                picture_Release(picsys->fallback);
-        }
-        picture_pool_Release(sys->sys.pool);
-    }
-    sys->sys.pool = NULL;
 }
 
 /**
