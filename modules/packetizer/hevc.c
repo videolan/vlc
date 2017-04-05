@@ -479,11 +479,12 @@ static void ActivateSets(decoder_t *p_dec,
         if( hevc_get_picture_size( p_sps, &sizes[0], &sizes[1],
                                           &sizes[2], &sizes[3] ) )
         {
-            if( p_dec->fmt_out.video.i_width != sizes[0] ||
-                p_dec->fmt_out.video.i_height != sizes[1] )
+            p_dec->fmt_out.video.i_width = sizes[0];
+            p_dec->fmt_out.video.i_height = sizes[1];
+            if(p_dec->fmt_in.video.i_visible_width == 0)
             {
-                p_dec->fmt_out.video.i_width = sizes[0];
-                p_dec->fmt_out.video.i_height = sizes[1];
+                p_dec->fmt_out.video.i_visible_width = sizes[2];
+                p_dec->fmt_out.video.i_visible_height = sizes[3];
             }
         }
 
