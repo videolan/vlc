@@ -100,6 +100,8 @@ static int Create( vlc_object_t *p_this )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I420:
+        case VLC_CODEC_I420_10L:
+        case VLC_CODEC_I420_10B:
         case VLC_CODEC_J420:
         case VLC_CODEC_YV12:
 
@@ -180,6 +182,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     switch( p_pic->format.i_chroma )
     {
     case VLC_CODEC_I420:
+    case VLC_CODEC_I420_10L:
+    case VLC_CODEC_I420_10B:
     case VLC_CODEC_J420:
     case VLC_CODEC_YV12:
     case VLC_CODEC_I422:
@@ -203,8 +207,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
-#define U 128
-#define V 128
+#define U8 128
+#define V8 128
+
+#define U10 512
+#define V10 512
 
 static void mmult( double *res, double *a, double *b )
 {
@@ -262,6 +269,47 @@ static void make_projection_matrix( filter_t *p_filter, int color, int *matrix )
     msg_Dbg( p_filter, "%6d %6d %6d", matrix[6], matrix[7], matrix[8] );
 }
 
+#define IS_YUV_10BITS(fmt) (fmt == VLC_CODEC_I420_10L || fmt == VLC_CODEC_I420_10B)
+
+#define GET_CUSTOM_PIX() \
+    do \
+    { \
+        val = (*y_in[0] * m[3] + (**u_in - u) * m[4] + (**v_in - v) * m[5]) / 65536 + u; \
+        *(*u_out)++ = VLC_CLIP( val, 0, maxval ); \
+        val = (*y_in[0] * m[6] + (**u_in - u) * m[7] + (**v_in - v) * m[8]) / 65536 + v; \
+        *(*v_out)++ = VLC_CLIP( val, 0, maxval ); \
+        val = (*y_in[0]++ * m[0] + (**u_in - u) * m[1] + (**v_in - v) * m[2]) / 65536; \
+        *y_out[0]++ = VLC_CLIP( val, 0, maxval ); \
+        val = (*y_in[0]++ * m[0] + (**u_in - u) * m[1] + (**v_in - v) * m[2]) / 65536; \
+        *y_out[0]++ = VLC_CLIP( val, 0, maxval ); \
+        val = (*y_in[1]++ * m[0] + (**u_in - u) * m[1] + (**v_in - v) * m[2]) / 65536; \
+        *y_out[1]++ = VLC_CLIP( val, 0, maxval ); \
+        val = (*y_in[1]++ * m[0] + (*(*u_in)++ - u) * m[1] + (*(*v_in)++ - v) * m[2]) / 65536; \
+        *y_out[1]++ = VLC_CLIP( val, 0, maxval ); \
+    } while (0);
+
+static inline void
+get_custom_pix_8b( uint8_t *y_in[2], uint8_t *y_out[2],
+                   uint8_t **u_in, uint8_t **u_out,
+                   uint8_t **v_in, uint8_t **v_out,
+                   uint16_t const u, uint16_t const v,
+                   int const *m, int maxval )
+{
+    uint8_t val;
+    GET_CUSTOM_PIX();
+}
+
+static inline void
+get_custom_pix_10b( uint16_t *y_in[2], uint16_t *y_out[2],
+                    uint16_t **u_in, uint16_t **u_out,
+                    uint16_t **v_in, uint16_t **v_out,
+                    uint16_t const u, uint16_t const v,
+                    int const *m, int maxval )
+{
+    uint16_t val;
+    GET_CUSTOM_PIX();
+}
+
 static void
 get_custom_from_yuv( picture_t *p_inpic, picture_t *p_outpic,
                      int const yp, int const up, int const vp, int const *m )
@@ -285,12 +333,13 @@ get_custom_from_yuv( picture_t *p_inpic, picture_t *p_outpic,
         y_out[1] = y_out[0] + i_out_pitch;
         for (uint8_t *const y_row_end = y_in[0] + i_visible_pitch; y_in[0] < y_row_end; )
         {
-            *u_out++ = vlc_uint8((*y_in[0] * m[3] + (*u_in - U) * m[4] + (*v_in - V) * m[5]) / 65536 + U);
-            *v_out++ = vlc_uint8((*y_in[0] * m[6] + (*u_in - U) * m[7] + (*v_in - V) * m[8]) / 65536 + V);
-            *y_out[0]++ = vlc_uint8((*y_in[0]++ * m[0] + (*u_in - U) * m[1] + (*v_in - V) * m[2]) / 65536);
-            *y_out[0]++ = vlc_uint8((*y_in[0]++ * m[0] + (*u_in - U) * m[1] + (*v_in - V) * m[2]) / 65536);
-            *y_out[1]++ = vlc_uint8((*y_in[1]++ * m[0] + (*u_in - U) * m[1] + (*v_in - V) * m[2]) / 65536);
-            *y_out[1]++ = vlc_uint8((*y_in[1]++ * m[0] + (*u_in++ - U) * m[1] + (*v_in++ - V) * m[2]) / 65536);
+            !IS_YUV_10BITS(p_inpic->format.i_chroma)
+                ? get_custom_pix_8b(y_in, y_out, &u_in, &u_out, &v_in, &v_out, U8,
+                                 V8, m, 255)
+                : get_custom_pix_10b((uint16_t **)y_in, (uint16_t **)y_out,
+                                  (uint16_t **)&u_in, (uint16_t **)&u_out,
+                                  (uint16_t **)&v_in, (uint16_t **)&v_out, U10,
+                                  V10, m, 1023);
         }
         y_in[0] += 2 * i_in_pitch - i_visible_pitch;
         y_out[0] += 2 * i_out_pitch - i_visible_pitch;
@@ -329,18 +378,14 @@ static void get_custom_from_packedyuv422( picture_t *p_inpic,
         const uint8_t *ylend = yin + i_visible_pitch;
         while( yin < ylend )
         {
-            *uout = vlc_uint8( (*yin * m[3] + (*uin-U) * m[4] + (*vin-V) * m[5])
-                      / 65536 + U );
+            *uout = vlc_uint8( (*yin * m[3] + (*uin-U8) * m[4] + (*vin-V8) * m[5]) / 65536 + U8 );
             uout += 4;
-            *vout = vlc_uint8( (*yin * m[6] + (*uin-U) * m[7] + (*vin-V) * m[8])
-                     / 65536 + V );
+            *vout = vlc_uint8( (*yin * m[6] + (*uin-U8) * m[7] + (*vin-V8) * m[8]) / 65536 + V8 );
             vout += 4;
-            *yout = vlc_uint8( (*yin * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
-                       / 65536 );
+            *yout = vlc_uint8( (*yin * m[0] + (*uin-U8) * m[1] + (*vin-V8) * m[2]) / 65536 );
             yin  += 2;
             yout += 2;
-            *yout = vlc_uint8( (*yin * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
-                       / 65536 );
+            *yout = vlc_uint8( (*yin * m[0] + (*uin-U8) * m[1] + (*vin-V8) * m[2]) / 65536 );
             yin  += 2;
             yout += 2;
             uin  += 4;
