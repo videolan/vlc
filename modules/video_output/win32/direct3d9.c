@@ -52,6 +52,8 @@
 #include "common.h"
 #include "builtin_shaders.h"
 
+#include <assert.h>
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -105,6 +107,16 @@ static const vlc_fourcc_t d3d_subpicture_chromas[] = {
     0
 };
 
+typedef struct
+{
+    const char   *name;
+    D3DFORMAT    format;    /* D3D format */
+    vlc_fourcc_t fourcc;    /* VLC fourcc */
+    uint32_t     rmask;
+    uint32_t     gmask;
+    uint32_t     bmask;
+} d3d_format_t;
+
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
@@ -130,9 +142,10 @@ struct vout_display_sys_t
     // scene objects
     LPDIRECT3DTEXTURE9      d3dtex;
     LPDIRECT3DVERTEXBUFFER9 d3dvtc;
-    D3DFORMAT               d3dregion_format;
+    D3DFORMAT               d3dregion_format;    /* Backbuffer output format */
     int                     d3dregion_count;
     struct d3d_region_t     *d3dregion;
+    const d3d_format_t      *d3dtexture_format;  /* Rendering texture(s) format */
 
     picture_sys_t           *picsys;
 
@@ -154,9 +167,13 @@ struct picture_sys_t
     picture_t          *fallback;
 };
 
+static const d3d_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t chroma, D3DFORMAT target);
+
 static int  Open(vlc_object_t *);
 
-static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static picture_pool_t *Direct3D9CreateDirectRenderingPool  (vout_display_t *, unsigned);
+static picture_pool_t *Direct3D9CreateSimplePool(vout_display_t *, unsigned);
+
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static int            Control(vout_display_t *, int, va_list);
@@ -288,7 +305,10 @@ static int Open(vlc_object_t *object)
     video_format_Copy(&vd->fmt, &fmt);
     vd->info = info;
 
-    vd->pool    = Pool;
+    if ( is_d3d9_opaque( vd->fmt.i_chroma ) )
+        vd->pool = Direct3D9CreateDirectRenderingPool;
+    else
+        vd->pool = Direct3D9CreateSimplePool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -335,13 +355,12 @@ static void DestroyPicture(picture_t *picture)
 }
 
 /* */
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
+static picture_pool_t *Direct3D9CreateDirectRenderingPool(vout_display_t *vd, unsigned count)
 {
-    if ( vd->sys->sys.pool != NULL )
-        return vd->sys->sys.pool;
-
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
+
+    assert( is_d3d9_opaque(vd->fmt->i_chroma) == true );
 
     pictures = calloc(count, sizeof(*pictures));
     if (!pictures)
@@ -848,6 +867,23 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
         sys->d3ddev = d3ddev;
     }
 
+    /* */
+    *fmt = vd->source;
+
+    /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
+     * the requested chroma which is usable by the hardware in an offscreen surface, as they
+     * typically support more formats than textures */
+    const d3d_format_t *d3dfmt = Direct3DFindFormat(vd, fmt->i_chroma, sys->d3dpp.BackBufferFormat);
+    if (!d3dfmt) {
+        msg_Err(vd, "surface pixel format is not supported.");
+        return VLC_EGENERIC;
+    }
+    fmt->i_chroma = d3dfmt->fourcc;
+    fmt->i_rmask  = d3dfmt->rmask;
+    fmt->i_gmask  = d3dfmt->gmask;
+    fmt->i_bmask  = d3dfmt->bmask;
+    sys->d3dtexture_format = d3dfmt;
+
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create the D3D9 device! (hr=0x%0lx)", hr);
        return VLC_EGENERIC;
@@ -920,7 +956,6 @@ static int Direct3D9Reset(vout_display_t *vd)
 }
 
 /* */
-static int  Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt);
 static void Direct3D9DestroyPool(vout_display_t *vd);
 
 static int  Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt);
@@ -936,10 +971,6 @@ static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (Direct3D9CreatePool(vd, fmt)) {
-        msg_Err(vd, "Direct3D picture pool initialization failed");
-        return VLC_EGENERIC;
-    }
     if (Direct3D9CreateScene(vd, fmt)) {
         msg_Err(vd, "Direct3D scene initialization failed !");
         return VLC_EGENERIC;
@@ -1005,16 +1036,6 @@ static int Direct3D9CheckConversion(vout_display_t *vd,
     }
     return VLC_SUCCESS;
 }
-
-typedef struct
-{
-    const char   *name;
-    D3DFORMAT    format;    /* D3D format */
-    vlc_fourcc_t fourcc;    /* VLC fourcc */
-    uint32_t     rmask;
-    uint32_t     gmask;
-    uint32_t     bmask;
-} d3d_format_t;
 
 static const d3d_format_t d3d_formats[] = {
     /* YV12 is always used for planar 420, the planes are then swapped in Lock() */
@@ -1113,30 +1134,16 @@ static void Direct3D9UnlockSurface(picture_t *picture)
  * as possible to the orginal render chroma to reduce CPU conversion overhead
  * and delegate this work to video card GPU
  */
-static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
+static picture_pool_t *Direct3D9CreateSimplePool(vout_display_t *vd, unsigned count)
 {
+    VLC_UNUSED(count);
     vout_display_sys_t *sys = vd->sys;
+    video_format_t *fmt = &vd->fmt;
     LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
 
-    /* */
-    *fmt = vd->source;
-
-    /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
-     * the requested chroma which is usable by the hardware in an offscreen surface, as they
-     * typically support more formats than textures */
-    const d3d_format_t *d3dfmt = Direct3DFindFormat(vd, fmt->i_chroma, sys->d3dpp.BackBufferFormat);
-    if (!d3dfmt) {
-        msg_Err(vd, "surface pixel format is not supported.");
-        return VLC_EGENERIC;
-    }
-    fmt->i_chroma = d3dfmt->fourcc;
-    fmt->i_rmask  = d3dfmt->rmask;
-    fmt->i_gmask  = d3dfmt->gmask;
-    fmt->i_bmask  = d3dfmt->bmask;
-
-    if ( is_d3d9_opaque(fmt->i_chroma) )
-        /* a DXA9 pool will be created when needed */
-        return VLC_SUCCESS;
+    assert( is_d3d9_opaque(fmt->i_chroma) == false );
+    if (sys->sys.pool)
+        return sys->sys.pool;
 
     /* We create one picture.
      * It is useless to create more as we can't be used for direct rendering */
@@ -1146,13 +1153,13 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
     HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3ddev,
                                                               fmt->i_width,
                                                               fmt->i_height,
-                                                              d3dfmt->format,
+                                                              sys->d3dtexture_format->format,
                                                               D3DPOOL_DEFAULT,
                                                               &surface,
                                                               NULL);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create picture surface. (hr=0x%lx)", hr);
-        return VLC_EGENERIC;
+        return NULL;
     }
 
 #ifndef NDEBUG
@@ -1167,7 +1174,7 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
     picture_sys_t *picsys = malloc(sizeof(*picsys));
     if (unlikely(picsys == NULL)) {
         IDirect3DSurface9_Release(surface);
-        return VLC_ENOMEM;
+        return NULL;
     }
     picsys->surface = surface;
     picsys->fallback = NULL;
@@ -1181,7 +1188,7 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
         msg_Err(vd, "Failed to create a picture from resources.");
         IDirect3DSurface9_Release(surface);
         free(picsys);
-        return VLC_ENOMEM;
+        return NULL;
     }
     sys->picsys = picsys;
 
@@ -1197,10 +1204,11 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
     if (!sys->sys.pool) {
         picture_Release(picture);
         IDirect3DSurface9_Release(surface);
-        return VLC_ENOMEM;
     }
-    return VLC_SUCCESS;
+    msg_Err( vd, "Returning valid pool" );
+    return sys->sys.pool;
 }
+
 /**
  * It destroys the pool of picture and its resources.
  */
