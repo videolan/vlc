@@ -194,8 +194,8 @@ static int Open( vlc_object_t *p_this )
     date_Init( &p_sys->prev_iframe_dts, 1, 1 );
     date_Set( &p_sys->prev_iframe_dts, VLC_TS_INVALID );
 
-    p_sys->i_frame_rate = 1;
-    p_sys->i_frame_rate_base = 1;
+    p_sys->i_frame_rate = 2 * 30000;
+    p_sys->i_frame_rate_base = 1001;
     p_sys->b_seq_progressive = true;
     p_sys->b_low_delay = true;
     p_sys->i_seq_old = 0;
