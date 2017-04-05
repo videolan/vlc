@@ -48,8 +48,7 @@ static int ExtractCallback( vlc_object_t *, char const *,
                             vlc_value_t, vlc_value_t, void * );
 
 static void make_projection_matrix( filter_t *, int color, int *matrix );
-static void get_custom_from_yuv420( picture_t *, picture_t *, int, int, int, int * );
-static void get_custom_from_yuv422( picture_t *, picture_t *, int, int, int, int * );
+static void get_custom_from_yuv( picture_t *, picture_t *, int, int, int, int const * );
 static void get_custom_from_packedyuv422( picture_t *, picture_t *, int * );
 
 
@@ -183,12 +182,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     case VLC_CODEC_I420:
     case VLC_CODEC_J420:
     case VLC_CODEC_YV12:
-        get_custom_from_yuv420( p_pic, p_outpic, Y_PLANE, U_PLANE, V_PLANE, p_sys->projection_matrix);
-        break;
-
     case VLC_CODEC_I422:
     case VLC_CODEC_J422:
-        get_custom_from_yuv422( p_pic, p_outpic, Y_PLANE, U_PLANE, V_PLANE, p_sys->projection_matrix);
+        get_custom_from_yuv( p_pic, p_outpic, Y_PLANE, U_PLANE, V_PLANE, p_sys->projection_matrix );
         break;
 
         CASE_PACKED_YUV_422
@@ -266,95 +262,42 @@ static void make_projection_matrix( filter_t *p_filter, int color, int *matrix )
     msg_Dbg( p_filter, "%6d %6d %6d", matrix[6], matrix[7], matrix[8] );
 }
 
-static void get_custom_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
-                                    int yp, int up, int vp, int *m )
+static void
+get_custom_from_yuv( picture_t *p_inpic, picture_t *p_outpic,
+                     int const yp, int const up, int const vp, int const *m )
 {
-    uint8_t *y1in = p_inpic->p[yp].p_pixels;
-    uint8_t *y2in;
-    uint8_t *uin  = p_inpic->p[up].p_pixels;
-    uint8_t *vin  = p_inpic->p[vp].p_pixels;
+    int const   i_in_pitch  = p_inpic->p[yp].i_pitch;
+    int const   i_out_pitch = p_outpic->p[yp].i_pitch;
+    int const   i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
+    int const   i_visible_lines = p_inpic->p[yp].i_visible_lines;
+    int const   i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
+    uint8_t     *y_in[2] = { p_inpic->p[yp].p_pixels };
+    uint8_t     *u_in = p_inpic->p[up].p_pixels;
+    uint8_t     *v_in = p_inpic->p[vp].p_pixels;
+    uint8_t     *y_out[2] = { p_outpic->p[yp].p_pixels };
+    uint8_t     *u_out = p_outpic->p[up].p_pixels;
+    uint8_t     *v_out = p_outpic->p[vp].p_pixels;
+    uint8_t *const y_end = y_in[0] + i_visible_lines * i_in_pitch;
 
-    uint8_t *y1out = p_outpic->p[yp].p_pixels;
-    uint8_t *y2out;
-    uint8_t *uout  = p_outpic->p[up].p_pixels;
-    uint8_t *vout  = p_outpic->p[vp].p_pixels;
-
-    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
-    const int i_out_pitch = p_outpic->p[yp].i_pitch;
-
-    const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
-    const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-    const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
-
-    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
-    while( y1in < yend )
+    while (y_in[0] < y_end)
     {
-        const uint8_t *y1end = y1in + i_visible_pitch;
-        y2in  = y1in + i_in_pitch;
-        y2out = y1out + i_out_pitch;
-        while( y1in < y1end )
+        y_in[1] = y_in[0] + i_in_pitch;
+        y_out[1] = y_out[0] + i_out_pitch;
+        for (uint8_t *const y_row_end = y_in[0] + i_visible_pitch; y_in[0] < y_row_end; )
         {
-            *uout++ = vlc_uint8( (*y1in * m[3] + (*uin-U) * m[4] + (*vin-V) * m[5])
-                      / 65536 + U );
-            *vout++ = vlc_uint8( (*y1in * m[6] + (*uin-U) * m[7] + (*vin-V) * m[8])
-                      / 65536 + V );
-            *y1out++ = vlc_uint8( (*y1in++ * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
-                       / 65536 );
-            *y1out++ = vlc_uint8( (*y1in++ * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
-                       / 65536 );
-            *y2out++ = vlc_uint8( (*y2in++ * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
-                       / 65536 );
-            *y2out++ = vlc_uint8( (*y2in++ * m[0] + (*uin++ - U) * m[1] + (*vin++ -V) * m[2])
-                       / 65536 );
+            *u_out++ = vlc_uint8((*y_in[0] * m[3] + (*u_in - U) * m[4] + (*v_in - V) * m[5]) / 65536 + U);
+            *v_out++ = vlc_uint8((*y_in[0] * m[6] + (*u_in - U) * m[7] + (*v_in - V) * m[8]) / 65536 + V);
+            *y_out[0]++ = vlc_uint8((*y_in[0]++ * m[0] + (*u_in - U) * m[1] + (*v_in - V) * m[2]) / 65536);
+            *y_out[0]++ = vlc_uint8((*y_in[0]++ * m[0] + (*u_in - U) * m[1] + (*v_in - V) * m[2]) / 65536);
+            *y_out[1]++ = vlc_uint8((*y_in[1]++ * m[0] + (*u_in - U) * m[1] + (*v_in - V) * m[2]) / 65536);
+            *y_out[1]++ = vlc_uint8((*y_in[1]++ * m[0] + (*u_in++ - U) * m[1] + (*v_in++ - V) * m[2]) / 65536);
         }
-        y1in  += 2*i_in_pitch  - i_visible_pitch;
-        y1out += 2*i_out_pitch - i_visible_pitch;
-        uin   += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
-        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
-        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
-        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
-    }
-}
-
-static void get_custom_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
-                                    int yp, int up, int vp, int *m )
-{
-    uint8_t *y1in = p_inpic->p[yp].p_pixels;
-    uint8_t *uin  = p_inpic->p[up].p_pixels;
-    uint8_t *vin  = p_inpic->p[vp].p_pixels;
-
-    uint8_t *y1out = p_outpic->p[yp].p_pixels;
-    uint8_t *uout  = p_outpic->p[up].p_pixels;
-    uint8_t *vout  = p_outpic->p[vp].p_pixels;
-
-    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
-    const int i_out_pitch = p_outpic->p[yp].i_pitch;
-
-    const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
-    const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-    const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
-
-    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
-    while( y1in < yend )
-    {
-        const uint8_t *y1end = y1in + i_visible_pitch;
-        while( y1in < y1end )
-        {
-            *uout++ = vlc_uint8( (*y1in * m[3] + (*uin-U) * m[4] + (*vin-V) * m[5])
-                      / 65536 + U );
-            *vout++ = vlc_uint8( (*y1in * m[6] + (*uin-U) * m[7] + (*vin-V) * m[8])
-                      / 65536 + V );
-            *y1out++ = vlc_uint8( (*y1in++ * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
-                       / 65536 );
-            *y1out++ = vlc_uint8( (*y1in++ * m[0] + (*uin++ -U) * m[1] + (*vin++ -V) * m[2])
-                       / 65536 );
-        }
-        y1in  += i_in_pitch  - i_visible_pitch;
-        y1out += i_out_pitch - i_visible_pitch;
-        uin   += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
-        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
-        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
-        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
+        y_in[0] += 2 * i_in_pitch - i_visible_pitch;
+        y_out[0] += 2 * i_out_pitch - i_visible_pitch;
+        u_in += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
+        u_out += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        v_in += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
+        v_out += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 
