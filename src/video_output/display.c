@@ -346,11 +346,6 @@ typedef struct {
     unsigned width_saved;
     unsigned height_saved;
 
-    struct {
-        unsigned num;
-        unsigned den;
-    } crop_saved;
-
     /* */
     bool ch_display_filled;
     bool is_display_filled;
@@ -1026,8 +1021,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 msg_Err(vd, "Failed to change source crop TODO implement crop at core");
 
                 source = vd->source;
-                crop_num = osys->crop_saved.num;
-                crop_den = osys->crop_saved.den;
+                crop_num = 0;
+                crop_den = 0;
                 /* FIXME implement cropping in the core if not supported by the
                  * vout module (easy)
                  */
@@ -1280,8 +1275,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->crop.top    = 0;
     osys->crop.right  = 0;
     osys->crop.bottom = 0;
-    osys->crop_saved.num = 0;
-    osys->crop_saved.den = 0;
     osys->crop.num = 0;
     osys->crop.den = 0;
 
