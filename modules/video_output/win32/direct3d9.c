@@ -1236,8 +1236,8 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      */
     LPDIRECT3DTEXTURE9 d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        fmt->i_visible_width,
-                                        fmt->i_visible_height,
+                                        fmt->i_width,
+                                        fmt->i_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         sys->d3dpp.BackBufferFormat,
@@ -1251,7 +1251,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
 
 #ifndef NDEBUG
     msg_Dbg(vd, "Direct3D created texture: %ix%i",
-                fmt->i_visible_width, fmt->i_visible_height);
+                fmt->i_width, fmt->i_height);
 #endif
 
     /*
@@ -1579,7 +1579,8 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
     }
 }
 
-static void Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
+static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
+                                  const RECT *src, const RECT *src_clipped,
                                   const RECT *dst,
                                   int alpha,
                                   video_orientation_t orientation)
@@ -1591,6 +1592,7 @@ static void Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
         { dst->right, dst->bottom },
         { dst->left,  dst->bottom },
     };
+    bool has_src = src != NULL && src_clipped != NULL;
 
     /* Compute index remapping necessary to implement the rotation. */
     int vertex_order[4];
@@ -1604,14 +1606,14 @@ static void Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
     vertices[0].tu = .0f;
     vertices[0].tv = .0f;
 
-    vertices[1].tu = 1.f;
+    vertices[1].tu = has_src ? (float)src_clipped->right / (float)src->right : 1.0f;
     vertices[1].tv = .0f;
 
-    vertices[2].tu = 1.f;
-    vertices[2].tv = 1.f;
+    vertices[2].tu = has_src ? (float)src_clipped->right / (float)src->right : 1.0f;
+    vertices[2].tv = has_src ? ((float)src_clipped->bottom) / (float)src->bottom : 1.0f;
 
     vertices[3].tu = .0f;
-    vertices[3].tv = 1.f;
+    vertices[3].tv = has_src ? ((float)src_clipped->bottom) / (float)src->bottom : 1.0f;
 
     for (int i = 0; i < 4; i++) {
         /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
@@ -1650,7 +1652,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &vd->sys->sys.rect_src_clipped, destination, NULL, D3DTEXF_NONE );
+    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &vd->sys->sys.rect_src, destination, NULL, D3DTEXF_NONE);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx",
@@ -1660,7 +1662,8 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->d3dtex;
-    Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_dest_clipped, 255, vd->fmt.orientation);
+    Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_src, &vd->sys->sys.rect_src_clipped,
+                           &vd->sys->sys.rect_dest_clipped, 255, vd->fmt.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1700,8 +1703,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
             d3d_region_t *cache = &sys->d3dregion[j];
             if (cache->texture &&
                 cache->format == sys->d3dregion_format &&
-                cache->width  == r->fmt.i_visible_width &&
-                cache->height == r->fmt.i_visible_height) {
+                cache->width  == r->fmt.i_width &&
+                cache->height == r->fmt.i_height) {
                 *d3dr = *cache;
                 memset(cache, 0, sizeof(*cache));
                 break;
@@ -1709,8 +1712,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         }
         if (!d3dr->texture) {
             d3dr->format = sys->d3dregion_format;
-            d3dr->width  = r->fmt.i_visible_width;
-            d3dr->height = r->fmt.i_visible_height;
+            d3dr->width  = r->fmt.i_width;
+            d3dr->height = r->fmt.i_height;
             hr = IDirect3DDevice9_CreateTexture(sys->d3ddev,
                                                 d3dr->width, d3dr->height,
                                                 1,
@@ -1727,7 +1730,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
             }
 #ifndef NDEBUG
             msg_Dbg(vd, "Created %dx%d texture for OSD",
-                    r->fmt.i_visible_width, r->fmt.i_visible_height);
+                    r->fmt.i_width, r->fmt.i_height);
 #endif
         }
 
@@ -1736,22 +1739,21 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         if (SUCCEEDED(hr)) {
             uint8_t  *dst_data   = lock.pBits;
             int       dst_pitch  = lock.Pitch;
-            const int src_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
-                                   r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
-            uint8_t  *src_data   = &r->p_picture->p->p_pixels[src_offset];
+            uint8_t  *src_data   = r->p_picture->p->p_pixels;
             int       src_pitch  = r->p_picture->p->i_pitch;
+
             if (d3dr->format == D3DFMT_A8B8G8R8) {
-                if (dst_pitch == r->p_picture->p->i_visible_pitch) {
-                    memcpy(dst_data, src_data, r->fmt.i_visible_height * dst_pitch);
+                if (dst_pitch == r->p_picture->p->i_pitch) {
+                    memcpy(dst_data, src_data, r->fmt.i_height * dst_pitch);
                 } else {
-                    int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_visible_pitch);
-                    for (unsigned y = 0; y < r->fmt.i_visible_height; y++) {
+                    int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_pitch);
+                    for (unsigned y = 0; y < r->fmt.i_height; y++) {
                         memcpy(&dst_data[y * dst_pitch], &src_data[y * src_pitch], copy_pitch);
                     }
                 }
             } else {
-                int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_visible_pitch);
-                for (unsigned y = 0; y < r->fmt.i_visible_height; y++) {
+                int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_pitch);
+                for (unsigned y = 0; y < r->fmt.i_height; y++) {
                     for (int x = 0; x < copy_pitch; x += 4) {
                         dst_data[y * dst_pitch + x + 0] = src_data[y * src_pitch + x + 2];
                         dst_data[y * dst_pitch + x + 1] = src_data[y * src_pitch + x + 1];
@@ -1774,10 +1776,10 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         RECT dst;
         dst.left   = video.left + scale_w * r->i_x,
-        dst.right  = dst.left + scale_w * r->fmt.i_visible_width,
+        dst.right  = dst.left + scale_w * r->fmt.i_width,
         dst.top    = video.top  + scale_h * r->i_y,
-        dst.bottom = dst.top  + scale_h * r->fmt.i_visible_height,
-        Direct3D9SetupVertices(d3dr->vertex,
+        dst.bottom = dst.top  + scale_h * r->fmt.i_height,
+        Direct3D9SetupVertices(d3dr->vertex, NULL, NULL,
                               &dst, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
     }
 }
