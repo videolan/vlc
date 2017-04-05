@@ -92,14 +92,6 @@ struct filter_sys_t
     int tab_precalc[512];
 };
 
-/*****************************************************************************
- * clip: avoid negative value and value > 255
- *****************************************************************************/
-inline static int32_t clip( int32_t a )
-{
-    return (a > 255) ? 255 : (a < 0) ? 0 : a;
-}
-
 static void init_precalc_table(filter_sys_t *p_filter, float sigma)
 {
     for(int i = 0; i < 512; ++i)
@@ -119,7 +111,10 @@ static int Create( vlc_object_t *p_this )
 
     const vlc_fourcc_t fourcc = p_filter->fmt_in.video.i_chroma;
     const vlc_chroma_description_t *p_chroma = vlc_fourcc_GetChromaDescription( fourcc );
-    if( !p_chroma || p_chroma->plane_count != 3 || p_chroma->pixel_size != 1 ) {
+    if( !p_chroma || p_chroma->plane_count != 3 ||
+        (p_chroma->pixel_size != 1 &&
+         p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420_10L &&
+         p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420_10B)) {
         msg_Err( p_filter, "Unsupported chroma (%4.4s)", (char*)&fourcc );
         return VLC_EGENERIC;
     }
@@ -167,16 +162,51 @@ static void Destroy( vlc_object_t *p_this )
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
+
+#define IS_YUV_420_10BITS(fmt) (fmt == VLC_CODEC_I420_10L || fmt == VLC_CODEC_I420_10B)
+
+#define SHARPEN_FRAME(maxval)                                           \
+    do                                                                  \
+    {                                                                   \
+        data_t *restrict p_src = (data_t *)p_pic->p[Y_PLANE].p_pixels;  \
+        data_t *restrict p_out = (data_t *)p_outpic->p[Y_PLANE].p_pixels; \
+        const unsigned data_sz = sizeof(data_t);                        \
+        const int i_src_line_len = p_outpic->p[Y_PLANE].i_pitch / data_sz; \
+        const int i_out_line_len = p_pic->p[Y_PLANE].i_pitch / data_sz; \
+                                                                        \
+        memcpy(p_out, p_src, i_visible_pitch);                          \
+                                                                        \
+        for( unsigned i = 1; i < i_visible_lines - 1; i++ )             \
+        {                                                               \
+            p_out[i * i_out_line_len] = p_src[i * i_src_line_len];      \
+                                                                        \
+            for( unsigned j = data_sz; j < i_visible_pitch - 1; j++ )   \
+            {                                                           \
+                pix = (p_src[(i - 1) * i_src_line_len + j - 1] * v[0]) + \
+                    (p_src[(i - 1) * i_src_line_len + j    ] * v[0]) +  \
+                    (p_src[(i - 1) * i_src_line_len + j + 1] * v[0]) +  \
+                    (p_src[(i    ) * i_src_line_len + j - 1] * v[0]) +  \
+                    (p_src[(i    ) * i_src_line_len + j    ] << v[1]) + \
+                    (p_src[(i    ) * i_src_line_len + j + 1] * v[0]) +  \
+                    (p_src[(i + 1) * i_src_line_len + j - 1] * v[0]) +  \
+                    (p_src[(i + 1) * i_src_line_len + j    ] * v[0]) +  \
+                    (p_src[(i + 1) * i_src_line_len + j + 1] * v[0]);   \
+                                                                        \
+                pix = pix >= 0 ? VLC_CLIP(pix, 0, maxval) : -VLC_CLIP(pix * -1, 0, maxval); \
+                p_out[i * i_out_line_len + j] = VLC_CLIP( p_src[i * i_src_line_len + j] + ((pix * sigma) >> 20), 0, maxval); \
+            }                                                           \
+            p_out[i * i_out_line_len + i_visible_pitch / 2 - 1] =       \
+                p_src[i * i_src_line_len + i_visible_pitch / 2 - 1];    \
+        }                                                               \
+        memcpy(&p_out[(i_visible_lines - 1) * i_out_line_len],          \
+               &p_src[(i_visible_lines - 1) * i_src_line_len], i_visible_pitch); \
+    } while (0);
+
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    uint8_t *restrict p_src = NULL;
-    uint8_t *restrict p_out = NULL;
-    int i_src_pitch;
-    int i_out_pitch;
     int pix;
-    const int v1 = -1;
-    const int v2 = 3; /* 2^3 = 8 */
+    const int v[2] = { -1, 3 /* 2^3 = 8 */ };
     const unsigned i_visible_lines = p_pic->p[Y_PLANE].i_visible_lines;
     const unsigned i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
     const int sigma = var_GetFloat( p_filter, FILTER_PREFIX "sigma" ) * (1 << 20);
@@ -188,43 +218,21 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    /* process the Y plane */
-    p_src = p_pic->p[Y_PLANE].p_pixels;
-    p_out = p_outpic->p[Y_PLANE].p_pixels;
-    i_src_pitch = p_pic->p[Y_PLANE].i_pitch;
-    i_out_pitch = p_outpic->p[Y_PLANE].i_pitch;
-
     /* perform convolution only on Y plane. Avoid border line. */
     vlc_mutex_lock( &p_filter->p_sys->lock );
 
-    memcpy(p_out, p_src, i_visible_pitch);
-
-    for( unsigned i = 1; i < i_visible_lines - 1; i++ )
+    if (!IS_YUV_420_10BITS(p_pic->format.i_chroma))
     {
-        p_out[i * i_out_pitch] = p_src[i * i_src_pitch];
+        typedef uint8_t data_t;
 
-        for( unsigned j = 1; j < i_visible_pitch - 1; j++ )
-        {
-            pix = (p_src[(i - 1) * i_src_pitch + j - 1] * v1) +
-                  (p_src[(i - 1) * i_src_pitch + j    ] * v1) +
-                  (p_src[(i - 1) * i_src_pitch + j + 1] * v1) +
-                  (p_src[(i    ) * i_src_pitch + j - 1] * v1) +
-                  (p_src[(i    ) * i_src_pitch + j    ] << v2) +
-                  (p_src[(i    ) * i_src_pitch + j + 1] * v1) +
-                  (p_src[(i + 1) * i_src_pitch + j - 1] * v1) +
-                  (p_src[(i + 1) * i_src_pitch + j    ] * v1) +
-                  (p_src[(i + 1) * i_src_pitch + j + 1] * v1);
-
-           pix = pix >= 0 ? clip(pix) : -clip(pix * -1);
-           p_out[i * i_out_pitch + j] = clip( p_src[i * i_src_pitch + j]
-                                              + ((pix * sigma) >> 20));
-        }
-
-        p_out[i * i_out_pitch + i_visible_pitch - 1] =
-            p_src[i * i_src_pitch + i_visible_pitch - 1];
+        SHARPEN_FRAME(255);
     }
-    memcpy(&p_out[(i_visible_lines - 1) * i_out_pitch],
-           &p_src[(i_visible_lines - 1) * i_src_pitch], i_visible_pitch);
+    else
+    {
+        typedef uint16_t data_t;
+
+        SHARPEN_FRAME(1023);
+    }
 
     vlc_mutex_unlock( &p_filter->p_sys->lock );
 
