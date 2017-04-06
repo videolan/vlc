@@ -1049,6 +1049,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
 
+        bool format_changed = false;
 #if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
         const AVFrameSideData *metadata =
                 av_frame_get_side_data( frame,
@@ -1079,6 +1080,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                 p_pic->format.mastering.white_point[0] = hdr_meta->white_point[0].num;
                 p_pic->format.mastering.white_point[1] = hdr_meta->white_point[1].num;
             }
+
+            if ( memcmp( &p_dec->fmt_out.video.mastering,
+                         &p_pic->format.mastering,
+                         sizeof(p_pic->format.mastering) ) )
+            {
+                p_dec->fmt_out.video.mastering = p_pic->format.mastering;
+                format_changed = true;
+            }
         }
 #endif
 #if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 60, 100 ) )
@@ -1091,9 +1100,19 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                     (const AVContentLightMetadata *) metadata_lt->data;
             p_pic->format.ligthing.MaxCLL = light_meta->MaxCLL;
             p_pic->format.ligthing.MaxFALL = light_meta->MaxFALL;
+            if ( memcmp( &p_dec->fmt_out.video.ligthing,
+                         &p_pic->format.ligthing,
+                         sizeof(p_pic->format.ligthing) ) )
+            {
+                p_dec->fmt_out.video.ligthing  = p_pic->format.ligthing;
+                format_changed = true;
+            }
         }
 #endif
         av_frame_free(&frame);
+
+        if (format_changed)
+            decoder_UpdateVideoFormat( p_dec );
 
         /* Send decoded frame to vout */
         if (i_pts > VLC_TS_INVALID)
