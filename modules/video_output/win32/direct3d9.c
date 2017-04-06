@@ -360,7 +360,7 @@ static picture_pool_t *Direct3D9CreateDirectRenderingPool(vout_display_t *vd, un
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
 
-    assert( is_d3d9_opaque(vd->fmt->i_chroma) == true );
+    assert( is_d3d9_opaque(vd->fmt.i_chroma) == true );
 
     pictures = calloc(count, sizeof(*pictures));
     if (!pictures)
