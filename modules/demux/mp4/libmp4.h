@@ -193,6 +193,8 @@ typedef int64_t stime_t;
 #define ATOM_fl32 VLC_FOURCC( 'f', 'l', '3', '2' )
 #define ATOM_fl64 VLC_FOURCC( 'f', 'l', '6', '4' )
 #define ATOM_Opus VLC_FOURCC( 'O', 'p', 'u', 's' )
+#define ATOM_fLaC VLC_FOURCC( 'f', 'L', 'a', 'C' )
+#define ATOM_dfLa VLC_FOURCC( 'd', 'f', 'L', 'a' )
 
 /* XiphQT */
 #define ATOM_fCtS VLC_FOURCC( 'f', 'C', 't', 'S' )

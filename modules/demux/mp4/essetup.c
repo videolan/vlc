@@ -905,6 +905,24 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             }
             break;
         }
+        case ATOM_fLaC:
+        {
+            const MP4_Box_t *p_dfLa = MP4_BoxGet(  p_sample, "dfLa", 0 );
+            if( p_dfLa && p_dfLa->data.p_binary->i_blob > 4 &&
+                GetDWBE(p_dfLa->data.p_binary->p_blob) == 0 ) /* fullbox header, avoids creating dedicated parser */
+            {
+                size_t i_extra = p_dfLa->data.p_binary->i_blob;
+                uint8_t *p_extra = malloc(i_extra);
+                {
+                    p_track->fmt.i_extra = i_extra;
+                    p_track->fmt.p_extra = p_extra;
+                    memcpy( p_extra, p_dfLa->data.p_binary->p_blob, p_dfLa->data.p_binary->i_blob);
+                    memcpy( p_extra, "fLaC", 4 );
+                    p_track->fmt.i_codec = VLC_CODEC_FLAC;
+                }
+            }
+            break;
+        }
         case( ATOM_eac3 ):
         {
             const MP4_Box_t *p_dec3 = MP4_BoxGet(  p_sample, "dec3", 0 );
