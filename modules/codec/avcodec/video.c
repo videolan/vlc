@@ -1067,6 +1067,18 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             }
         }
 #endif
+#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 60, 100 ) )
+        const AVFrameSideData *metadata_lt =
+                av_frame_get_side_data( frame,
+                                        AV_FRAME_DATA_CONTENT_LIGHT_LEVEL );
+        if ( metadata_lt )
+        {
+            const AVContentLightMetadata *light_meta =
+                    (const AVContentLightMetadata *) metadata_lt->data;
+            p_pic->format.ligthing.MaxCLL = light_meta->MaxCLL;
+            p_pic->format.ligthing.MaxFALL = light_meta->MaxFALL;
+        }
+#endif
         av_frame_free(&frame);
 
         /* Send decoded frame to vout */
