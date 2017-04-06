@@ -637,8 +637,8 @@ typedef struct MP4_Box_data_sample_soun_s
     uint16_t i_samplesize;
     uint16_t i_compressionid;
     uint16_t i_reserved3;
-    uint16_t i_sampleratehi; /* timescale of track */
-    uint16_t i_sampleratelo;
+    uint32_t i_sampleratehi; /* timescale of track */
+    uint32_t i_sampleratelo;
 
     /* for version 1 (i_reserved1[0] == 1) */
     uint32_t i_sample_per_packet;
