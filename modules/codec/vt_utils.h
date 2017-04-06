@@ -41,4 +41,38 @@ int cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx);
  */
 CVPixelBufferRef cvpxpic_get_ref(picture_t *pic);
 
+/*
+ * Create a picture mapped to a cvpx buffer
+ *
+ * @param fmt i_chroma must be VLC_CODEC_UYVY, VLC_CODEC_NV12 or VLC_CODEC_I420
+ * @param cvpx buffer to map
+ * @param readonly true to map read-only, false otherwise
+ * @return a valid picture, call picture_Release() or cvpxpic_unmap() to free
+ * the picture and unmap the cvpx buffer.
+ */
+picture_t *cvpxpic_create_mapped(const video_format_t *fmt,
+                                 CVPixelBufferRef cvpx, bool readonly);
+
+/*
+ * Create a picture attached to an unmapped cvpx buffer
+ *
+ * @param mapped_pic must be a picture created with cvpxpic_create_mapped()
+ * @return a valid picture, the pic chroma will one of VLC_CODEC_CVPX_* chromas
+ */
+picture_t *cvpxpic_unmap(picture_t *mapped_pic);
+
+/*
+ * Create a cvpx pool
+ *
+ * @param fmt i_chroma must be one of VLC_CODEC_CVPX_* chromas
+ * @param count number of pictures to alloc
+ * @return a valid cvpx pool or NULL, release it with CVPixelBufferPoolRelease()
+ */
+CVPixelBufferPoolRef cvpxpool_create(const video_format_t *fmt, unsigned count);
+
+/*
+ * Get a cvpx buffer from a pool
+ */
+CVPixelBufferRef cvpxpool_get_cvpx(CVPixelBufferPoolRef pool);
+
 #endif
