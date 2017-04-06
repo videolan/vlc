@@ -1969,6 +1969,7 @@ static bool Control( input_thread_t *p_input,
                 var_SetAddress( pp_vout[i], "viewpoint", &priv->viewpoint );
                 vlc_object_release( pp_vout[i] );
             }
+            free( pp_vout );
             break;
         }
 
