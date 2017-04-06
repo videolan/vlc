@@ -359,6 +359,16 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                 break;
         }
     }
-    /* FIXME: leaks on missing ENDELEMENT? */
+    /* Free all strings anyway, in case of missing end element */
+    FREENULL( psz_base );
+    FREENULL( psz_name );
+    FREENULL( psz_mt );
+    FREENULL( psz_id );
+    FREENULL( psz_br );
+    FREENULL( psz_genre );
+    FREENULL( psz_ct );
+    FREENULL( psz_lc );
+    FREENULL( psz_rt );
+    FREENULL( psz_load );
     return 0;
 }
