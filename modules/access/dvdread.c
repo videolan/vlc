@@ -169,7 +169,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_demux->psz_file || !*p_demux->psz_file )
     {
         /* Only when selected */
-        if( !p_demux->psz_access || !*p_demux->psz_access )
+        if( !*p_demux->psz_access )
             return VLC_EGENERIC;
 
         psz_file = var_InheritString( p_this, "dvd" );
