@@ -496,6 +496,20 @@ static int vout_update_format( decoder_t *p_dec )
             return -1;
         }
     }
+
+    if ( memcmp( &p_dec->fmt_out.video.mastering,
+                 &p_owner->fmt.video.mastering,
+                 sizeof(p_owner->fmt.video.mastering)) ||
+         p_dec->fmt_out.video.ligthing.MaxCLL !=
+         p_owner->fmt.video.ligthing.MaxCLL ||
+         p_dec->fmt_out.video.ligthing.MaxFALL !=
+         p_owner->fmt.video.ligthing.MaxFALL)
+    {
+        /* the format has changed but we don't need a new vout */
+        vlc_mutex_lock( &p_owner->lock );
+        DecoderUpdateFormatLocked( p_dec );
+        vlc_mutex_unlock( &p_owner->lock );
+    }
     return 0;
 }
 
