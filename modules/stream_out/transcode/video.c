@@ -468,11 +468,11 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
                      p_fmt_out->video.i_sar_den /
                      p_fmt_out->video.i_height;
 
-    msg_Dbg( p_stream, "decoder aspect is %f:1", (double) f_aspect );
+    msg_Dbg( p_stream, "decoder aspect is %f:1", f_aspect );
 
     /* Change f_aspect from source frame to source pixel */
     f_aspect = f_aspect * i_src_visible_height / i_src_visible_width;
-    msg_Dbg( p_stream, "source pixel aspect is %f:1", (double) f_aspect );
+    msg_Dbg( p_stream, "source pixel aspect is %f:1", f_aspect );
 
     /* Calculate scaling factor for specified parameters */
     if( id->p_encoder->fmt_out.video.i_visible_width <= 0 &&
@@ -533,7 +533,7 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
 
      /* Change aspect ratio from source pixel to scaled pixel */
      f_aspect = f_aspect * f_scale_height / f_scale_width;
-     msg_Dbg( p_stream, "scaled pixel aspect is %f:1", (double) f_aspect );
+     msg_Dbg( p_stream, "scaled pixel aspect is %f:1", f_aspect );
 
      /* f_scale_width and f_scale_height are now final */
      /* Calculate width, height from scaling
@@ -544,9 +544,6 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
      int i_dst_visible_height = 2 * lroundf(f_scale_height*i_src_visible_height/2);
      int i_dst_width =  2 * lroundf(f_scale_width*p_fmt_out->video.i_width/2);
      int i_dst_height = 2 * lroundf(f_scale_height*p_fmt_out->video.i_height/2);
-
-     /* Change aspect ratio from scaled pixel to output frame */
-     f_aspect = f_aspect * i_dst_visible_width / i_dst_visible_height;
 
      /* Store calculated values */
      id->p_encoder->fmt_out.video.i_width = i_dst_width;
