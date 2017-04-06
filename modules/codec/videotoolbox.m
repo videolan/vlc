@@ -410,7 +410,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     assert(p_info->p_picture);
-    while(p_info->b_flush || p_sys->i_pic_reorder == (p_sys->i_pic_reorder_max * 2))
+    while(p_info->b_flush || p_sys->i_pic_reorder >= (p_sys->i_pic_reorder_max * 2))
     {
         /* First check if DPB sizing was correct before removing one frame */
         if (p_sys->p_pic_reorder && !p_info->b_flush &&
