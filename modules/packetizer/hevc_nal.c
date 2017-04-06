@@ -1129,9 +1129,6 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
         if( p_pps->dependent_slice_segments_enabled_flag )
             p_sl->dependent_slice_segment_flag = bs_read1( p_bs );
 
-        if( !p_sps )
-            return false;
-
         unsigned w, h;
         if( !hevc_get_picture_CtbsYsize( p_sps, &w, &h ) )
             return false;
