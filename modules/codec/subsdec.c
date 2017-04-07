@@ -512,6 +512,8 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
     // Skip over to the attribute value
     while ( *psz_subtitle && *psz_subtitle != '=' )
         psz_subtitle++;
+    if ( !*psz_subtitle )
+        return psz_attribute_name;
     // Skip the '=' sign
     psz_subtitle++;
 
@@ -539,6 +541,8 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
         psz_subtitle++;
         attr_len++;
     }
+    if ( attr_len == 0 )
+        return psz_attribute_name;
     if ( unlikely( !( *psz_attribute_value = malloc( attr_len + 1 ) ) ) )
     {
         free( psz_attribute_name );
