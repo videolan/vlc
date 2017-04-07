@@ -939,7 +939,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
          *  - We don't support the DEFAULT flag (HEADER)
          */
 
-        else if( psz_subtitle[0] == '{' &&
+        else if( psz_subtitle[0] == '{' && psz_subtitle[1] != 0 &&
                  psz_subtitle[2] == ':' && strchr( &psz_subtitle[2], '}' ) )
         {
             const char *psz_tag_end = strchr( &psz_subtitle[2], '}' );
