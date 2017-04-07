@@ -603,6 +603,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    FLAC__stream_decoder_flush( p_dec->p_sys->p_flac );
     date_Set( &p_sys->end_date, 0 );
 }
 
