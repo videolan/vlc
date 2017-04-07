@@ -284,6 +284,227 @@ Removed modules
  * VDA decoder: use VT
  * Audioqueue: use audiounit
 
+Changes between 2.2.5 and 2.2.5.1:
+--------------------------------
+
+Security hardening for DLL hijacking environments
+
+Translations updates
+
+Misc:
+ * Update for Soundcloud, liveleak and Youtube scripts
+ * Fix potential out-of-band dereference in flac decoder
+ * Fix potential out-of-band reads in mpeg packetizers
+ * Fix infinite loop in subtitles demuxer
+ * Fix incorrect memory free in ogg demuxer
+ * Fix potential out-of-band reads in subtitle decoders and demuxers
+ * Fix green line on Windows with odd sizes
+
+
+Changes between 2.2.4 and 2.2.5:
+--------------------------------
+
+Decoder:
+ * Fix mp3 playback quality regression in libmad
+ * Fix video scaling in VDPAU
+ * Fix playback of palettized codecs
+ * Fix ADPCM heap corruption (FG-VD-16-067)
+ * Fix AES3 16bps decoding
+ * Fix DVD/LPCM heap corruption (FG-VD-16-090)
+ * Fix SCTE-27 colors
+
+Demuxer:
+ * Fix possible ASF integer overflow
+ * Fix MP4, VOC, XA, SMF divide-by-zero errors
+ * Fix MP4 heap buffer overflows
+ * Fix Flac metadata integer overflow
+ * Fix NSVf and AIFF infinite loops
+ * Fix flac null-pointer dereference
+ * Fix vorbis and opus comments integer overflows and leaks
+
+Video output:
+ * Fix green line on Windows with AMD drivers
+ * Fix screenshots size
+
+Access:
+ * Fix crash in screen recording on Windows
+ * Fix FTP scan string injection
+ * Fix HTTP size handling
+
+Mux:
+ * Fix mp4 drift
+
+Lua:
+ * Fix vimeo, youtube, dailymotion, cli, appletrailers, http,
+   soundcloud scripts
+
+Audio filter:
+ * Fix heap write in stereo_widen audio filter
+
+Windows:
+ * The plugins loading will not load external DLLs by default.
+   Plugins will need to LoadLibrary explicitely.
+ * Fix uninstaller path handling
+ * Fix taskbar buttons behavior
+
+MacOS:
+ * Fix scrolling sensitivity on Sierra
+ * Resume points are deleted now if the user clears the list of
+   recent items
+
+
+Changes between 2.2.3 and 2.2.4:
+--------------------------------
+
+Decoder:
+ * Fix crash in G.711 wav files
+ * Fix mp3 crash in libmad
+ * Fix out-of-bound write in adpcm QT IMA codec (CVE-2016-5108)
+
+Qt:
+ * Fix resizing issues
+
+Win32:
+ * Fix overlay creation on Windows XP for DirectDraw video output
+
+Misc:
+ * Build fixes for Hurd
+
+Translations:
+ * Update of Bulgarian, Catalan, German, French, Italian, Marathi, Norwegian
+   Bokmål, Norwegian Nynorsk, Portuguese, Slovak, Spanish (Mexico), Swedish,
+   Simplified Chinese, and Traditional Chinese translations
+
+
+Changes between 2.2.2 and 2.2.3:
+--------------------------------
+
+Demux:
+ * Fix HLS quality selection and a potential stack overflow
+ * Fix potential MKV infinite loop and improve MKV tags support
+ * Fix WMV regression
+
+Decoder:
+ * Fix hardware decoding with libvdpau-va-gl
+ * Fix crashes with libvpx
+ * Use libass without caching dialog
+
+Video Ouptut:
+ * Fix green lines on Direct3D output
+
+Skins2:
+ * Fix maximizing Window in multi-screen context
+
+Qt:
+ * Fix resume where you left off
+ * Fix infinite recursion in the customize dialog
+ * Fix size when switching to/from the minimal interface
+ * Fix size after resume toolbar is displayed
+
+MacOS X:
+ * Fix crashes in media information panel
+ * Correctly respect the disable-screensaver option
+
+Win32:
+ * Allow opening more than 15 elements in Explorer
+
+Translations:
+ * Update of most translations
+
+
+Changes between 2.2.1 and 2.2.2:
+--------------------------------
+
+Access:
+ * Fix SetupFormat for continuous framesize in v4l2
+ * Fix off-by-one buffer overflow in RealRtsp module
+ * Fix screen recording aspect-ratio, framerate and potential crash
+ * Fix Windows directshow input freeze
+ * Fix MMS segmentation fault/abort when server forces a large allocation
+
+Demux:
+ * Fix support for ms-dvr files
+ * Fix time detection in AVI files over HTTP
+ * HLS: fix hang on stop, crashes and small improvements
+ * Fix mp4 NULL dereference reported by by Fortinet's FortiGuard Labs
+ * Fix regression for VC-1 in WMV
+ * Fix MXF crashes on stop
+ * Fix EAC3 detection in some TS files
+
+Decoders:
+ * Fix importing surface from main memory in VDPAU
+ * Fix possible double-free in ADPCM decoder
+ * Support 9-bit and 10-bit GBR planar formats
+ * Support GoToMeeting 2 and GoToMeeting 3 codecs
+ * Fix crash in teletext (zvbi) decoder
+ * Fix Bluray subtitles (PGS) timestamps
+
+Audio output:
+ * Fix audio drop after a flush with pulseaudio
+ * Fix audio initialization on iOS
+ * Fix audio stuttering with AirPlay devices on OS X (2 sec delay needs to
+   be set manually by the user)
+ * Fix pulseaudio latency computation
+ * Fix alsa default device selection
+
+Skins2:
+ * Fix video control that fails to show up
+ * Fix UTF-8 conversion issues
+ * Fix Unicode folders location failing to open the skins
+ * Fix crash over malformed skins bitmaps
+ * Fix fullscreen for Gnome3/Unity Window Managers
+
+OS X:
+ * Support for OS X El Capitan
+ * Fix code signature for releases on El Capitan
+ * Improve resume dialog, starting time, preferences, lua extensions
+ * Fix threads ordering, preferences crashes, URL drag'n drops
+
+Qt:
+ * Fix crash when opening multiple items on Windows
+ * Fix recent items appending when using a playlist
+ * Improve addons manager dialog, playlist
+ * Fix changing the audio-device in the menu
+ * Fix key and mouse event support for Qt >= 5.5 under X11
+ * Fix memory leaks
+
+Video Output:
+ * Fix build if one disables XCB but activate VDPAU on Unix
+ * Fix Direct3D plane allocation size to avoid colour bleeding
+ * Fix some crashes in swscale resizing
+
+Misc:
+ * Fix build with recent FreeRDP versions
+ * Fix interface crashes when input-title-format option is empty
+ * Fix MP4 mux divide-by-zero crash
+ * Improve PNG encoding time
+ * Fix some UPnP initialization lag
+ * Rewrite of the Jamendo Service Discovery
+ * Fix snapshot aspect ratio for anamorphic contents
+ * Fix custom snapshot sizes
+ * Dynamic generation of GnuTLS Diffie-Hellman parameters
+ * Fix "vb" transcoding parameter
+ * Fix superfluous audio channel extraction in the core
+ * Fix miscellaneous crashes, double-frees, integer overflows, infinite loops,
+   read overflow, invalid frees and division by zero issues
+ * Fix support for lua 5.2 and fix XSS in the http interface
+ * Update and improve Soundcloud, Vimeo and Youtube scripts
+ * Update of codecs and libraries to fix 3rd party security issues (like
+   TALOS-CAN-0036, TALOS-CAN-0037, CVE-2015-7981, CVE-2015-8126
+
+Translations:
+ * Add Kashmiri and Maithili languages
+ * Update of most translations
+
+libVLC:
+ * Expose audio mute, cork and volume change events: libvlc_MediaPlayerCorked,
+   libvlc_MediaPlayerUncorked, libvlc_MediaPlayerMuted,
+   libvlc_MediaPlayerUnmuted and libvlc_MediaPlayerAudioVolume
+ * Fix propagation of libvlc_MediaPlayerTitleChanged event
+
+Translations:
+ * Update of most translations
+
 
 Changes between 2.2.0 and 2.2.1:
 --------------------------------
