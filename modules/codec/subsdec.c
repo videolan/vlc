@@ -485,11 +485,11 @@ static bool AppendString( text_segment_t* p_segment, const char* psz_str )
     return true;
 }
 
-static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_value )
+static char* ConsumeAttribute( const char** ppsz_subtitle, char** ppsz_attribute_value )
 {
     const char* psz_subtitle = *ppsz_subtitle;
     char* psz_attribute_name;
-    *psz_attribute_value = NULL;
+    *ppsz_attribute_value = NULL;
 
     while (*psz_subtitle == ' ')
         psz_subtitle++;
@@ -544,13 +544,13 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
     }
     if ( attr_len == 0 )
         return psz_attribute_name;
-    if ( unlikely( !( *psz_attribute_value = malloc( attr_len + 1 ) ) ) )
+    if ( unlikely( !( *ppsz_attribute_value = malloc( attr_len + 1 ) ) ) )
     {
         free( psz_attribute_name );
         return NULL;
     }
-    strncpy( *psz_attribute_value, psz_subtitle - attr_len, attr_len );
-    (*psz_attribute_value)[attr_len] = 0;
+    strncpy( *ppsz_attribute_value, psz_subtitle - attr_len, attr_len );
+    (*ppsz_attribute_value)[attr_len] = 0;
     // Finally, skip over the final delimiter
     if (delimiter != 0 && *psz_subtitle)
         psz_subtitle++;
