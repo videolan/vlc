@@ -215,6 +215,18 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
+static void FlushPacketizer( decoder_t *p_packetizer )
+{
+    if( p_packetizer->pf_flush )
+        p_packetizer->pf_flush( p_packetizer );
+    else
+    {
+        block_t *p_block_out;
+        while( (p_block_out = p_packetizer->pf_packetize( p_packetizer, NULL )) )
+            block_Release( p_block_out );
+    }
+}
+
 /*****************************************************************************
  * Demux: reads and demuxes data packets
  *****************************************************************************
@@ -365,6 +377,14 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
     }
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+
+    FlushPacketizer( p_sys->p_packetizer );
+    if( p_sys->p_current_block )
+    {
+        block_Release( p_sys->p_current_block );
+        p_sys->p_current_block = NULL;
+    }
+
     return VLC_SUCCESS;
 }
 
