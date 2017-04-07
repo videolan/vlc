@@ -489,6 +489,7 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
 {
     const char* psz_subtitle = *ppsz_subtitle;
     char* psz_attribute_name;
+    *psz_attribute_value = NULL;
 
     while (*psz_subtitle == ' ')
         psz_subtitle++;
@@ -778,6 +779,11 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
 
                     while( ( psz_attribute_name = ConsumeAttribute( &psz_subtitle, &psz_attribute_value ) ) )
                     {
+                        if ( !psz_attribute_value )
+                        {
+                            free( psz_attribute_name );
+                            continue;
+                        }
                         if ( !strcasecmp( psz_attribute_name, "face" ) )
                         {
                             p_segment->style->psz_fontname = psz_attribute_value;
