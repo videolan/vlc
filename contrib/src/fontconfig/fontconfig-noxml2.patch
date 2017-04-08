@@ -102,13 +102,12 @@ diff -ruN fontconfig/src/fcxml.c fontconfig.new/src/fcxml.c
  #include "fcaliastail.h"
  #undef __fcxml__
 +#endif
-diff -ruN fontconfig/src/fcinit.c fontconfig.new/src/fcinit.c
---- fontconfig/src/fcinit.c	2014-07-06 00:38:32.773443543 +0200
-+++ fontconfig.new/src/fcinit.c	2014-07-04 22:37:41.036255327 +0200
-@@ -44,11 +44,16 @@
-     config = FcConfigCreate ();
+--- fontconfig-2.12.1/src/fcinit.c.orig	2017-04-08 11:38:02.488354178 +0200
++++ fontconfig-2.12.1/src/fcinit.c	2017-04-08 11:38:52.072351969 +0200
+@@ -45,11 +45,16 @@
      if (!config)
  	goto bail0;
+     FcConfigSetSysRoot (config, sysroot);
 -    if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
 +    char path[MAX_PATH + 8];
 +    GetWindowsDirectory( path, MAX_PATH + 1 );
@@ -123,3 +122,12 @@ diff -ruN fontconfig/src/fcinit.c fontconfig.new/src/fcinit.c
      if (!FcConfigAddCacheDir (config, (FcChar8 *)dir))
  	goto bail1;
      return config;
+@@ -193,7 +202,7 @@
+     FcCacheFini ();
+     FcDefaultFini ();
+     FcObjectFini ();
+-    FcConfigPathFini ();
++//    FcConfigPathFini ();
+ }
+ 
+ /*
