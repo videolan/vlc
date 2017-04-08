@@ -1,6 +1,6 @@
 # gettext
-GETTEXT_VERSION=0.19.8.1
-GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
+GETTEXT_VERSION := 0.19.8.1
+GETTEXT_URL := $(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
 PKGS += gettext
 ifneq ($(filter gnu%,$(subst -, ,$(HOST))),)
