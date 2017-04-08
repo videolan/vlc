@@ -138,7 +138,6 @@ struct aout_sys_t
         LONG          mb;
         bool          mute;
     } volume;
-    HINSTANCE         hdsound_dll; /*< handle of the opened dsound DLL */
 };
 
 static HRESULT Flush( aout_stream_sys_t *sys, bool drain);
@@ -875,16 +874,6 @@ static int InitDirectSound( audio_output_t *p_aout )
 {
     aout_sys_t *sys = p_aout->sys;
     GUID guid, *p_guid = NULL;
-    HRESULT (WINAPI *OurDirectSoundCreate)(LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
-
-    OurDirectSoundCreate = (void *)
-        GetProcAddress( p_aout->sys->hdsound_dll,
-                        "DirectSoundCreate" );
-    if( OurDirectSoundCreate == NULL )
-    {
-        msg_Warn( p_aout, "GetProcAddress FAILED" );
-        goto error;
-    }
 
     char *dev = var_GetNonEmptyString( p_aout, "directx-audio-device" );
     if( dev != NULL )
@@ -900,7 +889,7 @@ static int InitDirectSound( audio_output_t *p_aout )
     }
 
     /* Create the direct sound object */
-    if FAILED( OurDirectSoundCreate( p_guid, &sys->s.p_dsobject, NULL ) )
+    if FAILED( DirectSoundCreate( p_guid, &sys->s.p_dsobject, NULL ) )
     {
         msg_Warn( p_aout, "cannot create a direct sound device" );
         goto error;
@@ -1043,24 +1032,9 @@ static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
 
     (void) psz_name;
 
-    HANDLE hdsound_dll = LoadLibrary(_T("DSOUND.DLL"));
-    if( hdsound_dll == NULL )
-    {
-        msg_Warn( p_this, "cannot open DSOUND.DLL" );
-        goto out;
-    }
+    DirectSoundEnumerate( DeviceEnumCallback, &list );
+    msg_Dbg( p_this, "found %u devices", list.count );
 
-    /* Get DirectSoundEnumerate */
-    HRESULT (WINAPI *OurDirectSoundEnumerate)(LPDSENUMCALLBACKW, LPVOID) =
-            (void *)GetProcAddress( hdsound_dll, "DirectSoundEnumerateW" );
-    if( OurDirectSoundEnumerate != NULL )
-    {
-        OurDirectSoundEnumerate( DeviceEnumCallback, &list );
-        msg_Dbg( p_this, "found %u devices", list.count );
-    }
-    FreeLibrary(hdsound_dll);
-
-out:
     *values = list.ids;
     *descs = list.names;
     return list.count;
@@ -1077,19 +1051,9 @@ static int DeviceSelect (audio_output_t *aout, const char *id)
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
-
-    HINSTANCE hdsound_dll = LoadLibrary(_T("DSOUND.DLL"));
-    if (hdsound_dll == NULL)
-    {
-        msg_Warn(aout, "cannot open DSOUND.DLL");
-        return VLC_EGENERIC;
-    }
-
     aout_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-
-    sys->hdsound_dll = hdsound_dll;
 
     aout->sys = sys;
     aout->start = OutputStart;
@@ -1131,7 +1095,6 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     var_Destroy(aout, "directx-audio-device");
-    FreeLibrary(sys->hdsound_dll); /* free DSOUND.DLL */
     free(sys);
 }
 
