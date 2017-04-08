@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := 1.6.0
+VPX_VERSION := 1.6.1
 VPX_URL := http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-$(VPX_VERSION).tar.bz2
 
 PKGS += vpx
@@ -17,7 +17,6 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
 	$(APPLY) $(SRC)/vpx/libvpx-ios.patch
-	$(APPLY) $(SRC)/vpx/libvpx-arm.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/vpx/libvpx-android.patch
 endif

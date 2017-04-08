@@ -20,8 +20,8 @@ cpu-features.c. Additionally, we don't need to link with pthread.
  PORTS_SRCS-$(ARCH_ARM) += arm_cpudetect.c
 +PORTS_SRCS-$(ARCH_ARM) += cpu-features.c
  PORTS_SRCS-$(ARCH_ARM) += arm.h
---- libvpx/build/make/configure.sh.orig	2016-05-20 12:48:54.468179035 +0200
-+++ libvpx/build/make/configure.sh	2016-05-20 12:49:30.379601840 +0200
+--- libvpx/build/make/configure.sh.orig	2017-04-08 12:19:54.992242234 +0200
++++ libvpx/build/make/configure.sh	2017-04-08 12:22:19.280235805 +0200
 @@ -628,8 +628,8 @@
  }
  
@@ -33,30 +33,30 @@ cpu-features.c. Additionally, we don't need to link with pthread.
    AR=${AR:-${CROSS}ar}
    LD=${LD:-${CROSS}${link_with_cc:-ld}}
    AS=${AS:-${CROSS}as}
-@@ -951,8 +951,8 @@
-           COMPILER_LOCATION=`find "${SDK_PATH}" \
-                              -name "arm-linux-androideabi-gcc*" -print -quit`
-           TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
--          CC=${TOOLCHAIN_PATH}gcc
--          CXX=${TOOLCHAIN_PATH}g++
-+          CC=clang
-+          CXX=clang++
-           AR=${TOOLCHAIN_PATH}ar
-           LD=${TOOLCHAIN_PATH}gcc
-           AS=${TOOLCHAIN_PATH}as
-@@ -983,7 +983,8 @@
-             soft_enable runtime_cpu_detect
-           fi
-           if enabled runtime_cpu_detect; then
--            add_cflags "-I${SDK_PATH}/sources/android/cpufeatures"
-+            cp "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c" vpx_ports
-+            add_cflags "-I${ANDROID_NDK}/sources/android/cpufeatures"
-           fi
-           ;;
- 
-@@ -1363,9 +1364,6 @@
-         ;;
+@@ -916,8 +916,8 @@
+             COMPILER_LOCATION=`find "${SDK_PATH}" \
+               -name "arm-linux-androideabi-gcc*" -print -quit`
+             TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
+-            CC=${TOOLCHAIN_PATH}gcc
+-            CXX=${TOOLCHAIN_PATH}g++
++            CC=clang
++            CXX=clang++
+             AR=${TOOLCHAIN_PATH}ar
+             LD=${TOOLCHAIN_PATH}gcc
+             AS=${TOOLCHAIN_PATH}as
+@@ -948,7 +948,8 @@
+               soft_enable runtime_cpu_detect
+             fi
+             if enabled runtime_cpu_detect; then
+-              add_cflags "-I${SDK_PATH}/sources/android/cpufeatures"
++              cp "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c" vpx_ports
++              add_cflags "-I${ANDROID_NDK}/sources/android/cpufeatures"
+             fi
+           else
+             echo "Assuming standalone build with NDK toolchain."
+@@ -1331,9 +1332,6 @@
        *-android-gcc)
+         # bionic includes basic pthread functionality, obviating -lpthread.
          ;;
 -      *)
 -        check_header pthread.h && add_extralibs -lpthread
