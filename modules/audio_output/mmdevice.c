@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mmdevice.c : Windows Multimedia Device API audio output plugin for VLC
  *****************************************************************************
- * Copyright (C) 2012-2014 Rémi Denis-Courmont
+ * Copyright (C) 2012-2017 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -1096,9 +1096,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         HRESULT hr;
         s->owner.device = sys->dev;
 
-        /* TODO: Do not overload the "aout" configuration item. */
-        sys->module = vlc_module_load(s, "aout stream", "$aout", false,
-                                      aout_stream_Start, s, fmt, &hr);
+        sys->module = vlc_module_load(s, "aout stream", "$mmdevice-backend",
+                                      false, aout_stream_Start, s, fmt, &hr);
         if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelectLocked(aout, NULL))
             break;
     }
@@ -1225,6 +1224,8 @@ vlc_module_begin()
     set_capability("audio output", 150)
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
-    add_shortcut("wasapi", "directsound")
     set_callbacks(Open, Close)
+    add_module("mmdevice-backend", "aout stream", "any",
+               N_("Output back-end"), N_("Audio output back-end interface."),
+               true)
 vlc_module_end()
