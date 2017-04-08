@@ -1,15 +1,18 @@
---- libpng-1.6.10/Makefile.am.orig	2014-05-24 18:11:01.881964331 +0200
-+++ libpng-1.6.10/Makefile.am	2014-05-24 18:12:02.839819773 +0200
-@@ -7,10 +7,10 @@
+--- libpng-1.6.29/Makefile.am.orig	2017-04-08 12:12:49.688261183 +0200
++++ libpng-1.6.29/Makefile.am	2017-04-08 12:13:27.148259514 +0200
+@@ -12,13 +12,13 @@
  ACLOCAL_AMFLAGS = -I scripts
  
  # test programs - run on make check, make distcheck
--check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage
-+check_PROGRAMS= 
+-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage pngcp
++check_PROGRAMS=
+ if HAVE_CLOCK_GETTIME
+ check_PROGRAMS += timepng
+ endif
  
  # Utilities - installed
 -bin_PROGRAMS= pngfix png-fix-itxt
-+bin_PROGRAMS= 
++bin_PROGRAMS=
  
  # This ensures that pnglibconf.h gets built at the start of 'make all' or
  # 'make check', but it does not add dependencies to the individual programs,
