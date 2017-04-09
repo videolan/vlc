@@ -21,5 +21,6 @@ endif
 	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DOPJ_STATIC" ./configure --enable-png=no --enable-tiff=no $(HOSTCONF)
 	cd $< && $(MAKE) -C libopenjpeg -j1 install
+	cd $< && ../../../contrib/src/pkg-static.sh libopenjpeg1.pc
 	cd $< && $(MAKE) install-data
 	touch $@
