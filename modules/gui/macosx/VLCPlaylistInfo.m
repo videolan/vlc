@@ -181,7 +181,7 @@
             vlc_gc_decref(p_item);
         [_saveMetaDataButton setEnabled: NO];
         if (_p_item)
-            vlc_gc_incref(_p_item);
+            input_item_Hold(_p_item);
         p_item = _p_item;
     }
 

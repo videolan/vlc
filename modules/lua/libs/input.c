@@ -413,7 +413,7 @@ static const luaL_Reg vlclua_input_item_reg[] = {
 
 static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
 {
-    vlc_gc_incref( p_item );
+    input_item_Hold( p_item );
     input_item_t **pp = lua_newuserdata( L, sizeof( input_item_t* ) );
     *pp = p_item;
 

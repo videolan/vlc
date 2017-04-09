@@ -1089,7 +1089,7 @@ PlMimeData::~PlMimeData()
 
 void PlMimeData::appendItem( input_item_t *p_item )
 {
-    vlc_gc_incref( p_item );
+    input_item_Hold( p_item );
     _inputItems.append( p_item );
 }
 

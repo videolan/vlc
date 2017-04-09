@@ -67,7 +67,7 @@ static void entry_item_append( services_discovery_t *p_sd,
         return;
     p_entry_item->p_entry = p_entry;
     p_entry_item->p_item = p_item;
-    vlc_gc_incref( p_item );
+    input_item_Hold( p_item );
     vlc_array_append( &p_sys->entry_item_list, p_entry_item );
     services_discovery_AddItem( p_sd, p_item, NULL );
 }

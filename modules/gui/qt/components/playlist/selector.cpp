@@ -438,7 +438,7 @@ PLSelItem * PLSelector::addItem (
 
 PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
 {
-    vlc_gc_incref( p_item->p_input );
+    input_item_Hold( p_item->p_input );
 
     char *psz_name = input_item_GetName( p_item->p_input );
     PLSelItem *item = addItem( PL_ITEM_TYPE,  psz_name, false, false, podcastsParent );

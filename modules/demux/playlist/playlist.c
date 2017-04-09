@@ -203,7 +203,7 @@ int Control(demux_t *demux, int query, va_list args)
 input_item_t * GetCurrentItem(demux_t *p_demux)
 {
     input_item_t *p_current_input = input_GetItem( p_demux->p_input );
-    vlc_gc_incref(p_current_input);
+    input_item_Hold(p_current_input);
     return p_current_input;
 }
 

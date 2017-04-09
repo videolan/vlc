@@ -403,7 +403,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         return NULL;
     }
 
-    vlc_gc_incref( p_md->p_input_item );
+    input_item_Hold( p_md->p_input_item );
 
     install_input_item_observer( p_md );
 

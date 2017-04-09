@@ -761,7 +761,7 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     p_item = THEMIM->currentInputItem();
     if( p_item )
     {
-        vlc_gc_incref( p_item );
+        input_item_Hold( p_item );
         showArtUpdate( p_item );
     }
     else
@@ -780,7 +780,7 @@ void CoverArtLabel::setItem( input_item_t *_p_item )
 {
     if ( p_item ) vlc_gc_decref( p_item );
     p_item = _p_item;
-    if ( p_item ) vlc_gc_incref( p_item );
+    if ( p_item ) input_item_Hold( p_item );
 }
 
 void CoverArtLabel::showArtUpdate( const QString& url )

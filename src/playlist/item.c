@@ -287,7 +287,7 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     assert( p_item == *pp );
 
     p->i_last_playlist_id = p_item->i_id;
-    vlc_gc_incref( p_item->p_input );
+    input_item_Hold( p_item->p_input );
 
     vlc_event_manager_t *p_em = &p_item->p_input->event_manager;
 

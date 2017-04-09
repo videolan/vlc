@@ -51,7 +51,7 @@ static inline fingerprint_request_t *fingerprint_request_New( input_item_t *p_it
     if ( !p_r ) return NULL;
     p_r->results.psz_fingerprint = NULL;
     p_r->i_duration = 0;
-    vlc_gc_incref( p_item );
+    input_item_Hold( p_item );
     p_r->p_item = p_item;
     vlc_array_init( & p_r->results.metas_array ); /* shouldn't be needed */
     return p_r;

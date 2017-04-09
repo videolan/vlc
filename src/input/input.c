@@ -327,7 +327,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     else
         vlc_viewpoint_init( &priv->viewpoint );
 
-    vlc_gc_incref( p_item ); /* Released in Destructor() */
+    input_item_Hold( p_item ); /* Released in Destructor() */
     priv->p_item = p_item;
 
     /* Init Input fields */

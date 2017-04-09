@@ -47,7 +47,7 @@ public:
         CmdGeneric( pIntf ), m_pItem( pItem )
     {
         if( pItem )
-            vlc_gc_incref( pItem );
+            input_item_Hold( pItem );
     }
     virtual ~CmdItemUpdate()
     {

@@ -81,7 +81,7 @@ public:
         : QEvent( (QEvent::Type)(type) )
     {
         if( (p_item = p_input) != NULL )
-            vlc_gc_incref( p_item );
+            input_item_Hold( p_item );
     }
 
     virtual ~IMEvent()

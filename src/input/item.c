@@ -1259,7 +1259,7 @@ input_item_node_t *input_item_node_Create( input_item_t *p_input )
     assert( p_input );
 
     p_node->p_item = p_input;
-    vlc_gc_incref( p_input );
+    input_item_Hold( p_input );
 
     p_node->p_parent = NULL;
     p_node->i_children = 0;
