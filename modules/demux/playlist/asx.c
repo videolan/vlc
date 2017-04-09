@@ -460,7 +460,7 @@ static int Demux( demux_t *p_demux )
                 input_item_CopyOptions( p_input, p_current_input );
                 input_item_node_AppendItem( p_subitems, p_input );
 
-                vlc_gc_decref( p_input );
+                input_item_Release( p_input );
             }
             else
             /* Entry Handler */
@@ -496,7 +496,7 @@ error:
         input_item_node_Delete( p_subitems );
     if( p_stream )
         vlc_stream_Delete( p_stream );
-    vlc_gc_decref( p_current_input );
+    input_item_Release( p_current_input );
 
     return 0;
 }

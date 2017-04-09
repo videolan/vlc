@@ -301,7 +301,7 @@
         msg_Err(getIntf(), "CAS: playlist add input failed :(");
 
     /* we're done with this input */
-    vlc_gc_decref(p_input);
+    input_item_Release(p_input);
 
     [self.window performClose:sender];
 }

@@ -590,7 +590,7 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
                                       vlc_InputItemMetaChanged,
                                       inputItemMetaChanged,
                                       p_ext );
-                    vlc_gc_decref( p_item );
+                    input_item_Release( p_item );
                 }
                 vlc_object_release( old );
             }
@@ -669,7 +669,7 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         {
             // Release item
             input_item_t *p_item = input_GetItem( p_ext->p_sys->p_input );
-            vlc_gc_decref( p_item );
+            input_item_Release( p_item );
         }
         vlc_object_release( p_ext->p_sys->p_input );
         p_ext->p_sys->p_input = NULL;

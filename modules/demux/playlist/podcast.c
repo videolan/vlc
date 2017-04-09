@@ -297,7 +297,7 @@ static int Demux( demux_t *p_demux )
                         FREENULL( psz_item_size );
                     }
                     input_item_node_AppendItem( p_subitems, p_input );
-                    vlc_gc_decref( p_input );
+                    input_item_Release( p_input );
                     b_item = false;
                 }
                 else if( !strcmp( node, "image" ) )
@@ -319,7 +319,7 @@ static int Demux( demux_t *p_demux )
     xml_ReaderDelete( p_xml_reader );
 
     input_item_node_PostAndDelete( p_subitems );
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     return 0; /* Needed for correct operation of go back */
 
 error:
@@ -342,7 +342,7 @@ error:
     if( p_subitems )
         input_item_node_Delete( p_subitems );
 
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     return -1;
 }
 

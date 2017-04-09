@@ -282,7 +282,7 @@ static void CloseDevice( services_discovery_t *p_sd )
             if( pp_items[i_i] != NULL )
             {
                 services_discovery_RemoveItem( p_sd, pp_items[i_i] );
-                vlc_gc_decref( pp_items[i_i] );
+                input_item_Release( pp_items[i_i] );
             }
         }
         free( pp_items );

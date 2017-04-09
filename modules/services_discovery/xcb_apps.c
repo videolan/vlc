@@ -265,7 +265,7 @@ static struct app *AddApp (services_discovery_t *sd, xcb_window_t xid)
     struct app *app = malloc (sizeof (*app));
     if (app == NULL)
     {
-        vlc_gc_decref (item);
+        input_item_Release (item);
         return NULL;
     }
     app->xid = xid;
@@ -280,7 +280,7 @@ static void DelApp (void *data)
     struct app *app = data;
 
     services_discovery_RemoveItem (app->owner, app->item);
-    vlc_gc_decref (app->item);
+    input_item_Release (app->item);
     free (app);
 }
 

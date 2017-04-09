@@ -366,9 +366,6 @@ VLC_API input_item_t *input_item_Hold(input_item_t *);
 /** Releases an input item, i.e. decrements its reference counter. */
 VLC_API void input_item_Release(input_item_t *);
 
-/* Historical hack... */
-#define vlc_gc_decref(i) input_item_Release(i)
-
 typedef enum input_item_meta_request_option_t
 {
     META_REQUEST_OPTION_NONE          = 0x00,

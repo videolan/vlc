@@ -301,7 +301,7 @@ static int vlclua_sd_add_item( lua_State *L )
                     lua_setfield( L, -2, "__metatable" );
                 }
                 lua_setmetatable( L, -2 );
-                vlc_gc_decref( p_input );
+                input_item_Release( p_input );
             }
             while( i_options > 0 )
                 free( ppsz_options[--i_options] );
@@ -397,7 +397,7 @@ static int vlclua_node_add_subitem( lua_State *L )
                         lua_setfield( L, -2, "__metatable" );
                     }
                     lua_setmetatable( L, -2 );
-                    vlc_gc_decref( p_input );
+                    input_item_Release( p_input );
                 }
                 while( i_options > 0 )
                     free( ppsz_options[--i_options] );

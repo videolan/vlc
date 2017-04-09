@@ -121,7 +121,7 @@ static void DestroySource (void *data)
     struct device *d = data;
 
     services_discovery_RemoveItem (d->sd, d->item);
-    vlc_gc_decref (d->item);
+    input_item_Release (d->item);
     free (d);
 }
 
@@ -157,7 +157,7 @@ static int AddSource (services_discovery_t *sd, const pa_source_info *info)
     struct device *d = malloc (sizeof (*d));
     if (unlikely(d == NULL))
     {
-        vlc_gc_decref (item);
+        input_item_Release (item);
         return -1;
     }
     d->index = info->index;
@@ -167,7 +167,7 @@ static int AddSource (services_discovery_t *sd, const pa_source_info *info)
     if (dp == NULL) /* Out-of-memory */
     {
         free (d);
-        vlc_gc_decref (item);
+        input_item_Release (item);
         return -1;
     }
     if (*dp != d) /* Update existing source */
@@ -176,7 +176,7 @@ static int AddSource (services_discovery_t *sd, const pa_source_info *info)
         d = *dp;
         input_item_SetURI (d->item, item->psz_uri);
         input_item_SetName (d->item, item->psz_name);
-        vlc_gc_decref (item);
+        input_item_Release (item);
         return 0;
     }
 

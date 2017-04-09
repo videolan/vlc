@@ -1084,7 +1084,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
 PlMimeData::~PlMimeData()
 {
     foreach( input_item_t *p_item, _inputItems )
-        vlc_gc_decref( p_item );
+        input_item_Release( p_item );
 }
 
 void PlMimeData::appendItem( input_item_t *p_item )

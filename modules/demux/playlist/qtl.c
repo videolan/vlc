@@ -244,13 +244,13 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "href", psz_href );
         SADD_INFO( _("Mime"), psz_mimetype );
         input_item_node_AppendItem( p_subitems, p_input );
-        vlc_gc_decref( p_input );
+        input_item_Release( p_input );
         if( psz_qtnext )
         {
             vlc_xml_decode( psz_qtnext );
             p_input = input_item_New( psz_qtnext, NULL );
             input_item_node_AppendItem( p_subitems, p_input );
-            vlc_gc_decref( p_input );
+            input_item_Release( p_input );
         }
         input_item_node_PostAndDelete( p_subitems );
     }
@@ -261,7 +261,7 @@ error:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
 
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
 
     free( psz_href );
     free( psz_moviename );

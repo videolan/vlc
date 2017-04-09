@@ -85,7 +85,7 @@ static void entry_item_remove( services_discovery_t *p_sd,
         if( p_entry_item->p_entry == p_entry  )
         {
             services_discovery_RemoveItem( p_sd, p_entry_item->p_item );
-            vlc_gc_decref( p_entry_item->p_item );
+            input_item_Release( p_entry_item->p_item );
             vlc_array_remove( &p_sys->entry_item_list, i );
             free( p_entry_item );
             break;
@@ -114,7 +114,7 @@ static void netbios_ns_discover_on_entry_added( void *p_opaque,
         free(psz_mrl);
 
         entry_item_append( p_sd, p_entry, p_item );
-        vlc_gc_decref( p_item );
+        input_item_Release( p_item );
     }
 }
 
@@ -177,7 +177,7 @@ void bdsm_SdClose (vlc_object_t *p_this)
         struct entry_item *p_entry_item;
 
         p_entry_item = vlc_array_item_at_index( &p_sys->entry_item_list, i );
-        vlc_gc_decref( p_entry_item->p_item );
+        input_item_Release( p_entry_item->p_item );
         free( p_entry_item );
     }
     vlc_array_clear( &p_sys->entry_item_list );

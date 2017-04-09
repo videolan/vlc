@@ -341,7 +341,7 @@ void playlist_ItemRelease( playlist_t *p_playlist, playlist_item_t *p_item )
     vlc_event_detach( p_em, vlc_InputItemErrorWhenReadingChanged,
                       input_item_changed, p_playlist );
 
-    vlc_gc_decref( p_item->p_input );
+    input_item_Release( p_item->p_input );
 
     tdelete( p_item, &p->input_tree, playlist_ItemCmpInput );
     tdelete( p_item, &p->id_tree, playlist_ItemCmpId );
@@ -468,7 +468,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
     i_ret = playlist_AddInput( p_playlist, p_input, i_mode, b_playlist );
-    vlc_gc_decref( p_input );
+    input_item_Release( p_input );
     return i_ret;
 }
 
@@ -886,7 +886,7 @@ static int RecursiveInsertCopy (
             {
                 p_new_item = playlist_NodeAddInput( p_playlist, p_new_input,
                                                     p_parent, 0, i_pos );
-                vlc_gc_decref( p_new_input );
+                input_item_Release( p_new_input );
             }
         }
         else

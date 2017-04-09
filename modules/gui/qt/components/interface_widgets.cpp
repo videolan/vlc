@@ -773,12 +773,12 @@ CoverArtLabel::~CoverArtLabel()
     QList< QAction* > artActions = actions();
     foreach( QAction *act, artActions )
         removeAction( act );
-    if ( p_item ) vlc_gc_decref( p_item );
+    if ( p_item ) input_item_Release( p_item );
 }
 
 void CoverArtLabel::setItem( input_item_t *_p_item )
 {
-    if ( p_item ) vlc_gc_decref( p_item );
+    if ( p_item ) input_item_Release( p_item );
     p_item = _p_item;
     if ( p_item ) input_item_Hold( p_item );
 }

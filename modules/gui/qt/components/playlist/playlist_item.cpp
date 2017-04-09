@@ -80,7 +80,7 @@ PLItem::PLItem( playlist_item_t * p_item )
 
 PLItem::~PLItem()
 {
-    vlc_gc_decref( p_input );
+    input_item_Release( p_input );
     qDeleteAll( children );
     children.clear();
 }

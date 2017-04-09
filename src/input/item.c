@@ -1273,7 +1273,7 @@ static void RecursiveNodeDelete( input_item_node_t *p_node )
     for( int i = 0; i < p_node->i_children; i++ )
         RecursiveNodeDelete( p_node->pp_children[i] );
 
-    vlc_gc_decref( p_node->p_item );
+    input_item_Release( p_node->p_item );
     free( p_node->pp_children );
     free( p_node );
 }

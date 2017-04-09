@@ -197,7 +197,8 @@ static void Close( vlc_object_t *p_this )
     free( p_sd->p_sys->pp_input );
     for( i = 0; i < p_sys->i_urls; i++ ) free( p_sys->ppsz_urls[i] );
     free( p_sys->ppsz_urls );
-    for( i = 0; i < p_sys->i_items; i++ ) vlc_gc_decref( p_sys->pp_items[i] );
+    for( i = 0; i < p_sys->i_items; i++ )
+         input_item_Release( p_sys->pp_items[i] );
     free( p_sys->pp_items );
     free( p_sys->psz_request );
     free( p_sys );
@@ -348,7 +349,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
         if( j == i_new_items )
         {
             services_discovery_RemoveItem( p_sd, p_sys->pp_items[i] );
-            vlc_gc_decref( p_sys->pp_items[i] );
+            input_item_Release( p_sys->pp_items[i] );
         }
     }
     free( p_sys->pp_items );
@@ -414,7 +415,7 @@ static void ParseRequest( services_discovery_t *p_sd )
         if( i != p_sys->i_urls )
         {
             services_discovery_RemoveItem( p_sd, p_sys->pp_items[i] );
-            vlc_gc_decref( p_sys->pp_items[i] );
+            input_item_Release( p_sys->pp_items[i] );
             REMOVE_ELEM( p_sys->ppsz_urls, p_sys->i_urls, i );
             REMOVE_ELEM( p_sys->pp_items, p_sys->i_items, i );
         }

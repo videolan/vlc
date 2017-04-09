@@ -245,7 +245,7 @@ static void input_Destructor( vlc_object_t *obj )
     if( priv->p_resource_private )
         input_resource_Release( priv->p_resource_private );
 
-    vlc_gc_decref( priv->p_item );
+    input_item_Release( priv->p_item );
 
     vlc_mutex_destroy( &priv->counters.counters_lock );
 

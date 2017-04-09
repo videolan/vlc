@@ -71,7 +71,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     if( !p_new_input )
         return NULL;
     p_item = playlist_ItemNewFromInput( p_playlist, p_new_input );
-    vlc_gc_decref( p_new_input );
+    input_item_Release( p_new_input );
 
     if( p_item == NULL )  return NULL;
     p_item->i_children = 0;

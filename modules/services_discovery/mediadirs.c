@@ -214,7 +214,7 @@ static void *Run( void *data )
         vlc_event_detach( p_em, vlc_InputItemSubItemAdded,
                           input_item_subitem_added, p_sd );
 
-        vlc_gc_decref( p_root );
+        input_item_Release( p_root );
         free( psz_uri );
     }
 
@@ -303,7 +303,7 @@ static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
         }
     }
 
-    vlc_gc_decref( p_item );
+    input_item_Release( p_item );
     free( psz_uri );
 
     return VLC_SUCCESS;

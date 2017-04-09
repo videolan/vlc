@@ -885,7 +885,7 @@ static int Open( vlc_object_t * p_this )
                 input_item_t *p_item = input_item_New( psz_ref, NULL );
                 input_item_CopyOptions( p_item, p_current );
                 input_item_node_AppendItem( p_subitems, p_item );
-                vlc_gc_decref( p_item );
+                input_item_Release( p_item );
             }
             else
             {

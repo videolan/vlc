@@ -581,7 +581,7 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                                            ( b_play ? PLAYLIST_GO : 0 ),
                                            true );
                     i_count ++; /* increment counter */
-                    vlc_gc_decref( p_input );
+                    input_item_Release( p_input );
                     while( i_options > 0 )
                         free( ppsz_options[--i_options] );
                     free( ppsz_options );

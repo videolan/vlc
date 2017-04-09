@@ -107,9 +107,9 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_current_input = GetCurrentItem(p_demux);
     input_item_t *p_input = input_item_New( psz_url, psz_url );
     input_item_PostSubItem( p_current_input, p_input );
-    vlc_gc_decref( p_input );
+    input_item_Release( p_input );
 
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     free( psz_url );
 
     return 0; /* Needed for correct operation of go back */
@@ -131,9 +131,9 @@ static int DemuxDVD_VR( demux_t *p_demux )
     input_item_t *p_input = input_item_New( psz_url, psz_url );
     input_item_PostSubItem( p_current_input, p_input );
 
-    vlc_gc_decref( p_input );
+    input_item_Release( p_input );
 
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     free( psz_url );
 
     return 0; /* Needed for correct operation of go back */

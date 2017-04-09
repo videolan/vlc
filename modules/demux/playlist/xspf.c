@@ -103,7 +103,7 @@ void Close_xspf(vlc_object_t *p_this)
     demux_sys_t *p_sys = p_demux->p_sys;
     for (int i = 0; i < p_sys->i_tracklist_entries; i++)
         if (p_sys->pp_tracklist[i])
-            vlc_gc_decref(p_sys->pp_tracklist[i]);
+            input_item_Release(p_sys->pp_tracklist[i]);
     free(p_sys->pp_tracklist);
     free(p_sys->psz_base);
     free(p_sys);
@@ -160,7 +160,7 @@ static int Demux(demux_t *p_demux)
     input_item_node_PostAndDelete(p_subitems);
 
 end:
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     if (p_xml_reader)
         xml_ReaderDelete(p_xml_reader);
     return i_ret; /* Needed for correct operation of go back */
@@ -440,7 +440,7 @@ static bool parse_track_node COMPLEX_INTERFACE
              || (size_t)p_sys->i_track_id >= (SIZE_MAX / sizeof(p_new_input)))
             {
                 input_item_node_AppendNode(p_input_node, p_new_node);
-                vlc_gc_decref(p_new_input);
+                input_item_Release(p_new_input);
                 return true;
             }
 
@@ -451,7 +451,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                     (p_sys->i_track_id + 1) * sizeof(*pp));
                 if (!pp)
                 {
-                    vlc_gc_decref(p_new_input);
+                    input_item_Release(p_new_input);
                     input_item_node_Delete(p_new_node);
                     return false;
                 }
@@ -462,7 +462,7 @@ static bool parse_track_node COMPLEX_INTERFACE
             else if (p_sys->pp_tracklist[p_sys->i_track_id] != NULL)
             {
                 msg_Err(p_demux, "track ID %d collision", p_sys->i_track_id);
-                vlc_gc_decref(p_new_input);
+                input_item_Release(p_new_input);
                 input_item_node_Delete(p_new_node);
                 return false;
             }
@@ -514,7 +514,7 @@ static bool parse_track_node COMPLEX_INTERFACE
 
 end:
 
-    vlc_gc_decref(p_new_input);
+    input_item_Release(p_new_input);
     input_item_node_Delete(p_new_node);
     free(psz_value);
     return false;
@@ -676,7 +676,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err(p_demux, "invalid xml stream");
                     FREE_VALUE();
-                    if (b_release_input_item) vlc_gc_decref(p_new_input);
+                    if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
                 /* choose handler */
@@ -685,7 +685,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err(p_demux, "unexpected element <%s>", name);
                     FREE_VALUE();
-                    if (b_release_input_item) vlc_gc_decref(p_new_input);
+                    if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
                 /* complex content is parsed in a separate function */
@@ -702,7 +702,8 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     else
                     {
                         FREE_VALUE();
-                        if (b_release_input_item) vlc_gc_decref(p_new_input);
+                        if (b_release_input_item)
+                            input_item_Release(p_new_input);
                         return false;
                     }
                 }
@@ -715,7 +716,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (unlikely(!psz_value))
                 {
                     FREE_VALUE();
-                    if (b_release_input_item) vlc_gc_decref(p_new_input);
+                    if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
                 break;
@@ -726,7 +727,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!strcmp(name, psz_element))
                 {
                     FREE_VALUE();
-                    if (b_release_input_item) vlc_gc_decref(p_new_input);
+                    if (b_release_input_item) input_item_Release(p_new_input);
                     return true;
                 }
                 /* there MUST have been a start tag for that element name */
@@ -736,7 +737,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     msg_Err(p_demux, "there's no open element left for <%s>",
                              name);
                     FREE_VALUE();
-                    if (b_release_input_item) vlc_gc_decref(p_new_input);
+                    if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
 
@@ -755,7 +756,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 break;
         }
     }
-    if (b_release_input_item) vlc_gc_decref(p_new_input);
+    if (b_release_input_item) input_item_Release(p_new_input);
     free(psz_value);
     return false;
 }
@@ -798,7 +799,7 @@ static bool parse_extitem_node COMPLEX_INTERFACE
     if (p_new_input)
     {
         input_item_node_AppendItem(p_input_node, p_new_input);
-        vlc_gc_decref(p_new_input);
+        input_item_Release(p_new_input);
         p_demux->p_sys->pp_tracklist[i_tid] = NULL;
     }
 

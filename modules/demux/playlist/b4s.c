@@ -204,7 +204,7 @@ static int Demux( demux_t *p_demux )
                         msg_Err( p_demux, "Unsupported meta bitrate" );
 
                     input_item_node_AppendItem( p_subitems, p_input );
-                    vlc_gc_decref( p_input );
+                    input_item_Release( p_input );
                     FREENULL( psz_title );
                     FREENULL( psz_mrl );
                     FREENULL( psz_genre );
@@ -230,7 +230,7 @@ end:
     if( p_subitems )
         input_item_node_PostAndDelete( p_subitems );
 
-    vlc_gc_decref( p_current_input );
+    input_item_Release( p_current_input );
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
     return i_ret;

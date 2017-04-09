@@ -87,7 +87,7 @@ public:
     virtual ~IMEvent()
     {
         if( p_item )
-            vlc_gc_decref( p_item );
+            input_item_Release( p_item );
     }
 
     input_item_t *item() const { return p_item; };

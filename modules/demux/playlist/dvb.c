@@ -68,7 +68,7 @@ int Import_DVB(vlc_object_t *p_this)
     input_item_t *item = ParseLine(line);
     if (item == NULL)
         return VLC_EGENERIC;
-    vlc_gc_decref(item);
+    input_item_Release(item);
 
     msg_Dbg(demux, "found valid channels.conf file");
     demux->pf_control = Control;
@@ -92,11 +92,11 @@ static int Demux(demux_t *demux)
             continue;
 
         input_item_node_AppendItem(subitems, item);
-        vlc_gc_decref(item);
+        input_item_Release(item);
     }
 
     input_item_node_PostAndDelete(subitems);
-    vlc_gc_decref(input);
+    input_item_Release(input);
 
     return 0; /* Needed for correct operation of go back */
 }

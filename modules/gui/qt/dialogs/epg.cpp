@@ -178,7 +178,7 @@ void EpgDialog::updateInfos()
         if ( p_input_item )
         {
             epg->updateEPG( p_input_item );
-            vlc_gc_decref( p_input_item );
+            input_item_Release( p_input_item );
         }
         else
         {

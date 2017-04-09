@@ -272,7 +272,7 @@ static int Demux( demux_t *p_demux )
                 input_item_SetArtURL( p_input, psz_album_art );
 
             input_item_node_AppendItem( p_subitems, p_input );
-            vlc_gc_decref( p_input );
+            input_item_Release( p_input );
         }
 
  error:
@@ -298,7 +298,7 @@ static int Demux( demux_t *p_demux )
         }
     }
     input_item_node_PostAndDelete( p_subitems );
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     var_Destroy( p_demux, "m3u-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
 }

@@ -171,7 +171,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
                         input_item_subitem_tree_added, p_playlist );
-    vlc_gc_decref( p_input );
+    input_item_Release( p_input );
 
     return VLC_SUCCESS;
 }

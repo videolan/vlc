@@ -52,7 +52,7 @@ public:
     virtual ~CmdItemUpdate()
     {
         if( m_pItem )
-            vlc_gc_decref( m_pItem );
+            input_item_Release( m_pItem );
     }
     virtual void execute();
     virtual std::string getType() const { return "playtree update"; }

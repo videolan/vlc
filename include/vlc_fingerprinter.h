@@ -59,7 +59,7 @@ static inline fingerprint_request_t *fingerprint_request_New( input_item_t *p_it
 
 static inline void fingerprint_request_Delete( fingerprint_request_t *p_f )
 {
-    vlc_gc_decref( p_f->p_item );
+    input_item_Release( p_f->p_item );
     free( p_f->results.psz_fingerprint );
     for( size_t i = 0; i < vlc_array_count( & p_f->results.metas_array ); i++ )
         vlc_meta_Delete( (vlc_meta_t *) vlc_array_item_at_index( & p_f->results.metas_array, i ) );

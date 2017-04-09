@@ -281,7 +281,7 @@ MediaServerDesc::MediaServerDesc( const std::string& udn, const std::string& fNa
 MediaServerDesc::~MediaServerDesc()
 {
     if (inputItem)
-        vlc_gc_decref( inputItem );
+        input_item_Release( inputItem );
 }
 
 /*

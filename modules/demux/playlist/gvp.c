@@ -172,12 +172,12 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "docid", psz_docid );
         SADD_INFO( "description", psz_desc );
         input_item_node_AppendItem( p_subitems, p_input );
-        vlc_gc_decref( p_input );
+        input_item_Release( p_input );
     }
 
     input_item_node_PostAndDelete( p_subitems );
 
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
 
     free( psz_version );
     free( psz_url );

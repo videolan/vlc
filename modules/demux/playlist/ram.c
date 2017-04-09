@@ -347,7 +347,7 @@ static int Demux( demux_t *p_demux )
             if( !EMPTY_STR( psz_comments ) ) input_item_SetDescription( p_input, psz_comments );
 
             input_item_node_AppendItem( p_subitems, p_input );
-            vlc_gc_decref( p_input );
+            input_item_Release( p_input );
             free( psz_mrl );
         }
 
@@ -379,7 +379,7 @@ static int Demux( demux_t *p_demux )
         }
     }
     input_item_node_PostAndDelete( p_subitems );
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     var_Destroy( p_demux, "m3u-extvlcopt" );
     free(psz_prefix);
     return 0; /* Needed for correct operation of go back */

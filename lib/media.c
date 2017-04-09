@@ -431,7 +431,7 @@ libvlc_media_t *libvlc_media_new_location( libvlc_instance_t *p_instance,
     p_md = libvlc_media_new_from_input_item( p_instance, p_input_item );
 
     /* The p_input_item is retained in libvlc_media_new_from_input_item */
-    vlc_gc_decref( p_input_item );
+    input_item_Release( p_input_item );
 
     return p_md;
 }
@@ -555,7 +555,7 @@ void libvlc_media_release( libvlc_media_t *p_md )
     if( p_md->p_subitems )
         libvlc_media_list_release( p_md->p_subitems );
 
-    vlc_gc_decref( p_md->p_input_item );
+    input_item_Release( p_md->p_input_item );
 
     vlc_cond_destroy( &p_md->parsed_cond );
     vlc_mutex_destroy( &p_md->parsed_lock );

@@ -587,7 +587,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             char *psz_header;
             char *psz_dup;
 
-            vlc_gc_decref( p_media->vod.p_item );
+            input_item_Release( p_media->vod.p_item );
 
             if( strstr( p_cfg->ppsz_input[0], "://" ) == NULL )
             {
@@ -795,7 +795,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
 
     vlm_media_Clean( &p_media->cfg );
 
-    vlc_gc_decref( p_media->vod.p_item );
+    input_item_Release( p_media->vod.p_item );
 
     if( p_media->vod.p_media )
         p_vlm->p_vod->pf_media_del( p_vlm->p_vod, p_media->vod.p_media );
@@ -895,7 +895,7 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
     vlc_object_release( p_instance->p_parent );
 
     TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
-    vlc_gc_decref( p_instance->p_item );
+    input_item_Release( p_instance->p_item );
     free( p_instance->psz_name );
     free( p_instance );
 }

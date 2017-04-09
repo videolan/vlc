@@ -253,7 +253,7 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
                                              p_input_item );
     if( !p_md )
     {
-        vlc_gc_decref( p_input_item );
+        input_item_Release( p_input_item );
         return -1;
     }
 

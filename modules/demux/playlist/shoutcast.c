@@ -120,7 +120,7 @@ error:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
     if( p_input_node ) input_item_node_Delete( p_input_node );
-    vlc_gc_decref(p_current_input);
+    input_item_Release(p_current_input);
     return i_ret;
 }
 
@@ -176,7 +176,7 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         input_item_CopyOptions( p_input, p_input_node->p_item );
                         free( psz_mrl );
                         input_item_node_AppendItem( p_input_node, p_input );
-                        vlc_gc_decref( p_input );
+                        input_item_Release( p_input );
                     }
                     FREENULL( psz_name );
                 }
@@ -343,7 +343,7 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         if( psz_rt )
                             input_item_SetRating( p_input, psz_rt );
                         input_item_node_AppendItem( p_input_node, p_input );
-                        vlc_gc_decref( p_input );
+                        input_item_Release( p_input );
                     }
                     FREENULL( psz_base );
                     FREENULL( psz_name );

@@ -1561,7 +1561,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     if( p_announce->p_item )
     {
         services_discovery_RemoveItem( p_sd, p_announce->p_item );
-        vlc_gc_decref( p_announce->p_item );
+        input_item_Release( p_announce->p_item );
         p_announce->p_item = NULL;
     }
 

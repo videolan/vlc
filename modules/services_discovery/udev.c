@@ -151,7 +151,7 @@ static void DestroyDevice (void *data)
 
     if (d->sd)
         services_discovery_RemoveItem (d->sd, d->item);
-    vlc_gc_decref (d->item);
+    input_item_Release (d->item);
     free (d);
 }
 
@@ -179,7 +179,7 @@ static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
     struct device *d = malloc (sizeof (*d));
     if (d == NULL)
     {
-        vlc_gc_decref (item);
+        input_item_Release (item);
         return -1;
     }
     d->devnum = udev_device_get_devnum (dev);

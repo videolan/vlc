@@ -400,7 +400,7 @@ static int Demux ( demux_t *p_demux )
         input_item_AddOption( p_child, "rtsp-kasenna", VLC_INPUT_OPTION_TRUSTED );
 
     input_item_PostSubItem( p_current_input, p_child );
-    vlc_gc_decref( p_child );
-    vlc_gc_decref(p_current_input);
+    input_item_Release( p_child );
+    input_item_Release(p_current_input);
     return 0; /* Needed for correct operation of go back */
 }
