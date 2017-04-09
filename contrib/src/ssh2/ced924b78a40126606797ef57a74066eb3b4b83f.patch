@@ -1,0 +1,49 @@
+From ced924b78a40126606797ef57a74066eb3b4b83f Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <siarheit@google.com>
+Date: Mon, 31 Oct 2016 09:04:33 +0000
+Subject: [PATCH] acinclude.m4: fix ./configure --with-libgcrypt
+
+The change fixes passing of bogus gcrypt prefix.
+Reproducible as:
+
+    $ ./configure --with-libgcrypt
+    $ make V=1
+    ...
+    /bin/sh ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Iyes/include -version-info 1:1:0 -no-undefined -export-symbols-regex '^libssh2_.*' -lgcrypt  -lz -Lyes/lib -o libssh2.la -rpath /usr/local/lib channel.lo comp.lo crypt.lo hostkey.lo kex.lo mac.lo misc.lo packet.lo publickey.lo scp.lo session.lo sftp.lo userauth.lo transport.lo version.lo knownhost.lo agent.lo libgcrypt.lo pem.lo keepalive.lo global.lo   -lgcrypt
+    ../libtool: line 7475: cd: yes/lib: No such file or directory
+    libtool:   error: cannot determine absolute directory name of 'yes/lib'
+
+These
+    -Iyes/include
+    -Lyes/lib
+come from libgcrypt code autodetection:
+  if test -n "$use_libgcrypt" && test "$use_libgcrypt" != "no"; then
+     LDFLAGS="$LDFLAGS -L$use_libgcrypt/lib"
+     CFLAGS="$CFLAGS -I$use_libgcrypt/include"
+
+I assume it's a typo to use yes/no flag as a prefix and changed
+it to '$with_libgcrypt_prefix'.
+
+Reported-by: Mikhail Pukhlikov <cynede@gentoo.org>
+Signed-off-by: Sergei Trofimovich <siarheit@google.com>
+---
+ acinclude.m4 | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 734ef07..c78260c 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -412,9 +412,9 @@ AC_DEFUN([LIBSSH2_CHECKFOR_GCRYPT], [
+ 
+   old_LDFLAGS=$LDFLAGS
+   old_CFLAGS=$CFLAGS
+-  if test -n "$use_libgcrypt" && test "$use_libgcrypt" != "no"; then
+-    LDFLAGS="$LDFLAGS -L$use_libgcrypt/lib"
+-    CFLAGS="$CFLAGS -I$use_libgcrypt/include"
++  if test -n "$with_libgcrypt_prefix" && test "$use_libgcrypt" != "no"; then
++    LDFLAGS="$LDFLAGS -L$with_libgcrypt_prefix/lib"
++    CFLAGS="$CFLAGS -I$with_libgcrypt_prefix/include"
+   fi
+   AC_LIB_HAVE_LINKFLAGS([gcrypt], [], [
+     #include <gcrypt.h>
