@@ -437,10 +437,10 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         var_InheritInteger( p_dec, "avcodec-error-resilience" );
 
     if( var_CreateGetBool( p_dec, "grayscale" ) )
-        p_context->flags |= CODEC_FLAG_GRAY;
+        p_context->flags |= AV_CODEC_FLAG_GRAY;
 
     /* ***** Output always the frames ***** */
-    p_context->flags |= CODEC_FLAG_OUTPUT_CORRUPT;
+    p_context->flags |= AV_CODEC_FLAG_OUTPUT_CORRUPT;
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-skiploopfilter" );
     if( i_val >= 4 ) p_context->skip_loop_filter = AVDISCARD_ALL;
@@ -450,7 +450,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     else p_context->skip_loop_filter = AVDISCARD_DEFAULT;
 
     if( var_CreateGetBool( p_dec, "avcodec-fast" ) )
-        p_context->flags2 |= CODEC_FLAG2_FAST;
+        p_context->flags2 |= AV_CODEC_FLAG2_FAST;
 
     /* ***** libavcodec frame skipping ***** */
     p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
@@ -476,7 +476,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->b_direct_rendering = false;
     atomic_init(&p_sys->b_dr_failure, false);
     if( var_CreateGetBool( p_dec, "avcodec-dr" ) &&
-       (p_codec->capabilities & CODEC_CAP_DR1) &&
+       (p_codec->capabilities & AV_CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->p_codec->id != AV_CODEC_ID_TSCC &&
         p_sys->p_codec->id != AV_CODEC_ID_CSCD &&
@@ -758,7 +758,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
     }
 
     p_block = pp_block ? *pp_block : NULL;
-    if(!p_block && !(p_sys->p_codec->capabilities & CODEC_CAP_DELAY) )
+    if(!p_block && !(p_sys->p_codec->capabilities & AV_CODEC_CAP_DELAY) )
         return NULL;
 
     if( p_sys->b_delayed_open )
