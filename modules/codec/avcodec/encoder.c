@@ -596,7 +596,7 @@ int OpenEncoder( vlc_object_t *p_this )
         if( !p_context->max_b_frames  &&
             (  p_enc->fmt_out.i_codec == VLC_CODEC_MPGV ||
                p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ) )
-            p_context->flags |= CODEC_FLAG_LOW_DELAY;
+            p_context->flags |= AV_CODEC_FLAG_LOW_DELAY;
 
         av_reduce( &p_context->sample_aspect_ratio.num,
                    &p_context->sample_aspect_ratio.den,
@@ -654,16 +654,16 @@ int OpenEncoder( vlc_object_t *p_this )
             }
             else
             {
-                p_context->flags |= CODEC_FLAG_INTERLACED_DCT;
+                p_context->flags |= AV_CODEC_FLAG_INTERLACED_DCT;
                 if ( p_sys->b_interlace_me )
-                    p_context->flags |= CODEC_FLAG_INTERLACED_ME;
+                    p_context->flags |= AV_CODEC_FLAG_INTERLACED_ME;
             }
         }
 
         p_context->trellis = p_sys->b_trellis;
 
         if ( p_sys->i_qmin > 0 && p_sys->i_qmin == p_sys->i_qmax )
-            p_context->flags |= CODEC_FLAG_QSCALE;
+            p_context->flags |= AV_CODEC_FLAG_QSCALE;
         /* These codecs cause libavcodec to exit if thread_count is > 1.
            See libavcodec/mpegvideo_enc.c:MPV_encode_init and
            libavcodec/svq3.c , WMV2 calls MPV_encode_init also.
@@ -712,7 +712,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
         if( p_sys->i_quality && !p_enc->fmt_out.i_bitrate )
         {
-            p_context->flags |= CODEC_FLAG_QSCALE;
+            p_context->flags |= AV_CODEC_FLAG_QSCALE;
             p_context->global_quality = p_sys->i_quality;
         }
         else
@@ -904,7 +904,7 @@ int OpenEncoder( vlc_object_t *p_this )
     /* Make sure we get extradata filled by the encoder */
     p_context->extradata_size = 0;
     p_context->extradata = NULL;
-    p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
+    p_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     if( p_enc->i_threads >= 1)
         p_context->thread_count = p_enc->i_threads;
@@ -1042,7 +1042,7 @@ errmsg:
         }
     }
 
-    p_context->flags &= ~CODEC_FLAG_GLOBAL_HEADER;
+    p_context->flags &= ~AV_CODEC_FLAG_GLOBAL_HEADER;
 
     if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
@@ -1052,7 +1052,7 @@ errmsg:
         p_sys->i_sample_bytes = (p_enc->fmt_in.audio.i_bitspersample / 8);
         p_sys->i_frame_size = p_context->frame_size > 1 ?
                                     p_context->frame_size :
-                                    FF_MIN_BUFFER_SIZE;
+                                    AV_INPUT_BUFFER_MIN_SIZE;
         p_sys->i_buffer_out = av_samples_get_buffer_size(NULL,
                 p_sys->p_context->channels, p_sys->i_frame_size,
                 p_sys->p_context->sample_fmt, DEFAULT_ALIGN);
@@ -1331,7 +1331,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
     }
 
     if(unlikely( ( (leftover + buffer_delay) < p_sys->i_buffer_out ) &&
-                 !(p_sys->p_codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME )))
+                 !(p_sys->p_codec->capabilities & AV_CODEC_CAP_SMALL_LAST_FRAME )))
     {
         msg_Dbg( p_enc, "No small last frame support, padding");
         size_t padding_size = p_sys->i_buffer_out - (leftover+buffer_delay);
