@@ -1,5 +1,5 @@
 # libiconv
-LIBICONV_VERSION := 1.14
+LIBICONV_VERSION := 1.15
 LIBICONV_URL := $(GNU)/libiconv/libiconv-$(LIBICONV_VERSION).tar.gz
 
 PKGS += iconv
@@ -18,7 +18,6 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	$(UNPACK)
 	$(APPLY) $(SRC)/iconv/win32.patch
 	$(APPLY) $(SRC)/iconv/bins.patch
-	$(APPLY) $(SRC)/iconv/libiconv-c11.patch
 ifdef HAVE_WIN64
 	$(APPLY) $(SRC)/iconv/libiconv-win64.patch
 endif
