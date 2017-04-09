@@ -1,0 +1,30 @@
+From 2fc4ef54ec61e98e757a49719b859d8ee59af952 Mon Sep 17 00:00:00 2001
+From: Mikhail Gusarov <dottedmag@dottedmag.net>
+Date: Wed, 3 Sep 2014 15:47:19 +0200
+Subject: [PATCH] Add -lgpg-error to .pc to facilitate static linking
+
+Note that this patch is Debian-specific as we know that libssh2 is linked
+to gcrypt.
+
+Patching configure.ac to add gpg-error as a dependent library is not good, as it
+would cause overlinking of libssh2, and there is no separate variable for
+"static dependencies".
+
+All this mess ought to be solved in gcrypt inself by providing .pc file,
+but it is not.
+
+---
+ libssh2.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: libssh2/libssh2.pc.in
+===================================================================
+--- libssh2.orig/libssh2.pc.in
++++ libssh2/libssh2.pc.in
+@@ -13,5 +13,5 @@ Description: Library for SSH-based commu
+ Version: @LIBSSH2VER@
+ Requires.private: @LIBSREQUIRED@
+ Libs: -L${libdir} -lssh2 @LIBS@
+-Libs.private: @LIBS@
++Libs.private: @LIBS@ -lgpg-error
+ Cflags: -I${includedir}
