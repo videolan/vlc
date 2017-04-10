@@ -237,6 +237,12 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
         vout->p->interlacing.date = mdate();
 }
 
+void vout_ReinitInterlacingSupport(vout_thread_t *vout)
+{
+    vout->p->interlacing.is_interlaced = false;
+    var_SetBool(vout, "deinterlace-needed", false);
+}
+
 void vout_SetInterlacingState(vout_thread_t *vout, bool is_interlaced)
 {
      /* Wait 30s before quiting interlacing mode */

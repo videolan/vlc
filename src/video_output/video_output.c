@@ -1489,6 +1489,8 @@ static int ThreadReinit(vout_thread_t *vout,
 
     ThreadStop(vout, &state);
 
+    vout_ReinitInterlacingSupport(vout);
+
     if (!state.cfg.is_fullscreen) {
         state.cfg.display.width  = 0;
         state.cfg.display.height = 0;
