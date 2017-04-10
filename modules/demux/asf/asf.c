@@ -1345,7 +1345,7 @@ static int DemuxInit( demux_t *p_demux )
     return VLC_SUCCESS;
 
 error:
-    ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
+    DemuxEnd( p_demux );
     return VLC_EGENERIC;
 }
 
