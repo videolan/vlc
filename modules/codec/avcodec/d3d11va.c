@@ -284,7 +284,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 
             D3D11_VIDEO_PROCESSOR_STREAM stream = {
                 .Enable = TRUE,
-                .pInputSurface = p_sys_in->inputView,
+                .pInputSurface = p_sys_in->processorInput,
             };
 
             HRESULT hr = ID3D11VideoContext_VideoProcessorBlt(sys->d3dvidctx, sys->videoProcessor,
@@ -1209,8 +1209,8 @@ static void DestroyPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
     ID3D11Texture2D_Release( p_sys->texture[KNOWN_DXGI_INDEX] );
-    if (p_sys->inputView)
-        ID3D11View_Release( (ID3D11View*) p_sys->inputView );
+    if (p_sys->processorInput)
+        ID3D11VideoProcessorInputView_Release( p_sys->processorInput );
 
     free(p_sys);
     free(picture);
@@ -1245,7 +1245,7 @@ static picture_t *DxAllocPicture(vlc_va_t *va, const video_format_t *fmt, unsign
                                                         pic_sys->resource[KNOWN_DXGI_INDEX],
                                                         sys->procEnumerator,
                                                         &inDesc,
-                                                        &pic_sys->inputView);
+                                                        &pic_sys->processorInput);
         if (FAILED(hr))
         {
             msg_Err(va, "Failed to create the processor input ArraySlice=%d. (hr=0x%lX)", inDesc.Texture2D.ArraySlice, hr);

@@ -39,7 +39,7 @@ struct picture_sys_t
     };
     ID3D11DeviceContext           *context;
     unsigned                      slice_index;
-    ID3D11VideoProcessorInputView *inputView; /* when used as processor input */
+    ID3D11VideoProcessorInputView *processorInput; /* when used as processor input */
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
     DXGI_FORMAT                   formatTexture;
 };

@@ -902,6 +902,10 @@ static void ReleasePictureResources(picture_sys_t *p_sys)
         ID3D11VideoDecoderOutputView_Release(p_sys->decoder);
         p_sys->decoder = NULL;
     }
+    if (p_sys->processorInput) {
+        ID3D11VideoProcessorInputView_Release(p_sys->processorInput);
+        p_sys->processorInput = NULL;
+    }
 }
 
 static void DestroyDisplayPoolPicture(picture_t *picture)
