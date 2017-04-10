@@ -159,13 +159,6 @@ static int Open( vlc_object_t * p_this )
     if( ParseHeaders( p_demux, &fmt ) )
         goto error;
 
-    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
-    if( !p_sys->p_es )
-    {
-        es_format_Clean( &fmt );
-        goto error;
-    }
-
     /* Load the FLAC packetizer */
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "flac" );
     if( !p_sys->p_packetizer )
@@ -180,6 +173,14 @@ static int Open( vlc_object_t * p_this )
                   p_sys->attachments[p_sys->i_cover_idx]->psz_name );
         vlc_meta_Set( p_sys->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
+
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
+    if( !p_sys->p_es )
+    {
+        es_format_Clean( &fmt );
+        goto error;
+    }
+
     return VLC_SUCCESS;
 error:
     Close( p_this );
