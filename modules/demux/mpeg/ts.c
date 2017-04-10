@@ -2267,6 +2267,8 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, mtime_t i_pcr )
     for( int i = 0; i < p_pat->programs.i_size; i++ )
     {
         ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
+        if( p_pmt->pcr.b_disable )
+            continue;
         mtime_t i_program_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, i_pcr );
 
         if( p_pmt->i_pid_pcr == 0x1FFF ) /* That program has no dedicated PCR pid ISO/IEC 13818-1 2.4.4.9 */
