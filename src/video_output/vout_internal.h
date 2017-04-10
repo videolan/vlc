@@ -109,6 +109,11 @@ struct vout_thread_sys_t
         int         position;
     } title;
 
+    struct {
+        bool        is_interlaced;
+        mtime_t     date;
+    } interlacing;
+
     /* */
     bool            is_late_dropped;
 

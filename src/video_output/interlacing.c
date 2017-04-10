@@ -30,6 +30,7 @@
 #include <vlc_vout.h>
 
 #include "interlacing.h"
+#include "vout_internal.h"
 
 /*****************************************************************************
  * Deinterlacing
@@ -230,22 +231,28 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
 
     var_SetInteger(vout, "deinterlace", deinterlace_state);
     free(deinterlace_mode);
+
+    vout->p->interlacing.is_interlaced = is_interlaced;
+    if (is_interlaced)
+        vout->p->interlacing.date = mdate();
 }
 
-void vout_SetInterlacingState(vout_thread_t *vout, vout_interlacing_support_t *state, bool is_interlaced)
+void vout_SetInterlacingState(vout_thread_t *vout, bool is_interlaced)
 {
      /* Wait 30s before quiting interlacing mode */
-    const int interlacing_change = (!!is_interlaced) - (!!state->is_interlaced);
-    if ((interlacing_change == 1) ||
-        (interlacing_change == -1 && state->date + 30000000 < mdate())) {
+    const int interlacing_change = (!!is_interlaced)
+                                 - (!!vout->p->interlacing.is_interlaced);
+    if (interlacing_change == 1 ||
+        (interlacing_change == -1 &&
+        vout->p->interlacing.date + 30000000 < mdate()))
+    {
         msg_Dbg(vout, "Detected %s video",
                  is_interlaced ? "interlaced" : "progressive");
         var_SetBool(vout, "deinterlace-needed", is_interlaced);
-
-        state->is_interlaced = is_interlaced;
+        vout->p->interlacing.is_interlaced = is_interlaced;
     }
     if (is_interlaced)
-        state->date = mdate();
+        vout->p->interlacing.date = mdate();
 }
 
 

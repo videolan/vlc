@@ -1627,11 +1627,6 @@ static void *Thread(void *object)
     vout_thread_t *vout = object;
     vout_thread_sys_t *sys = vout->p;
 
-    vout_interlacing_support_t interlacing = {
-        .is_interlaced = false,
-        .date = mdate(),
-    };
-
     mtime_t deadline = VLC_TS_INVALID;
     bool wait = false;
     for (;;) {
@@ -1653,7 +1648,7 @@ static void *Thread(void *object)
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
-        vout_SetInterlacingState(vout, &interlacing, picture_interlaced);
+        vout_SetInterlacingState(vout, picture_interlaced);
         vout_ManageWrapper(vout);
     }
 }
