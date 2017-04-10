@@ -348,6 +348,24 @@ static void set_video_color_settings( encoder_t *p_enc, AVCodecContext *p_contex
     }
 }
 
+static void add_av_option_int( encoder_t *p_enc, AVDictionary** pp_dict, const char* psz_name, int i_value )
+{
+    char buff[32];
+    if ( snprintf( buff, sizeof(buff), "%d", i_value ) < 0 )
+        return;
+    if( av_dict_set( pp_dict, psz_name, buff, 0 ) < 0 )
+        msg_Warn( p_enc, "Failed to set encoder option %s", psz_name );
+}
+
+static void add_av_option_float( encoder_t *p_enc, AVDictionary** pp_dict, const char* psz_name, float f_value )
+{
+    char buff[128];
+    if ( snprintf( buff, sizeof(buff), "%f", f_value ) < 0 )
+        return;
+    if( av_dict_set( pp_dict, psz_name, buff, 0 ) < 0 )
+        msg_Warn( p_enc, "Failed to set encoder option %s", psz_name );
+}
+
 int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
@@ -555,6 +573,7 @@ int OpenEncoder( vlc_object_t *p_this )
         }
     }
     free( psz_val );
+    AVDictionary *options = NULL;
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
@@ -586,7 +605,7 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->lumi_masking = p_sys->f_lumi_masking;
         p_context->dark_masking = p_sys->f_dark_masking;
         p_context->p_masking = p_sys->f_p_masking;
-        p_context->border_masking = p_sys->f_border_masking;
+        add_av_option_float( p_enc, &options, "border_mask", p_sys->f_border_masking );
 
         if( p_sys->i_key_int > 0 )
             p_context->gop_size = p_sys->i_key_int;
@@ -699,12 +718,14 @@ int OpenEncoder( vlc_object_t *p_this )
         if( p_sys->i_qmin > 0 )
         {
             p_context->qmin = p_sys->i_qmin;
-            p_context->mb_lmin = p_context->lmin = p_sys->i_qmin * FF_QP2LAMBDA;
+            p_context->mb_lmin = p_sys->i_qmin * FF_QP2LAMBDA;
+            add_av_option_int( p_enc, &options, "lmin", p_context->mb_lmin);
         }
         if( p_sys->i_qmax > 0 )
         {
             p_context->qmax = p_sys->i_qmax;
-            p_context->mb_lmax = p_context->lmax = p_sys->i_qmax * FF_QP2LAMBDA;
+            p_context->mb_lmax = p_sys->i_qmax * FF_QP2LAMBDA;
+            add_av_option_int( p_enc, &options, "lmax", p_context->mb_lmax);
         }
         p_context->max_qdiff = 3;
 
@@ -717,7 +738,7 @@ int OpenEncoder( vlc_object_t *p_this )
         }
         else
         {
-            p_context->rc_qsquish = 1.0;
+            av_dict_set(&options, "qsquish", "1.0", 0);
             /* Default to 1/2 second buffer for given bitrate unless defined otherwise*/
             if( !p_sys->i_rc_buffer_size )
             {
@@ -731,7 +752,7 @@ int OpenEncoder( vlc_object_t *p_this )
             /* This is from ffmpeg's ffmpeg.c : */
             p_context->rc_initial_buffer_occupancy
                 = p_sys->i_rc_buffer_size * 3/4;
-            p_context->rc_buffer_aggressivity = p_sys->f_rc_buffer_aggressivity;
+            add_av_option_float( p_enc, &options, "rc_buffer_aggressivity", p_sys->f_rc_buffer_aggressivity );
         }
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
@@ -868,19 +889,22 @@ int OpenEncoder( vlc_object_t *p_this )
             if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
             {
                 p_context->qmin = 10;
-                p_context->mb_lmin = p_context->lmin = 10 * FF_QP2LAMBDA;
+                p_context->mb_lmin = 10 * FF_QP2LAMBDA;
+                add_av_option_int( p_enc, &options, "lmin", p_context->mb_lmin );
             }
 
             if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmax" ) )
             {
                 p_context->qmax = 42;
-                p_context->mb_lmax = p_context->lmax = 42 * FF_QP2LAMBDA;
+                p_context->mb_lmax = 42 * FF_QP2LAMBDA;
+                add_av_option_int( p_enc, &options, "lmax", p_context->mb_lmax );
             }
 
         } else if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
         {
                 p_context->qmin = 1;
-                p_context->mb_lmin = p_context->lmin = FF_QP2LAMBDA;
+                p_context->mb_lmin = FF_QP2LAMBDA;
+                add_av_option_int( p_enc, &options, "lmin", p_context->mb_lmin );
         }
 
 
@@ -913,7 +937,6 @@ int OpenEncoder( vlc_object_t *p_this )
 
     int ret;
     char *psz_opts = var_InheritString(p_enc, ENC_CFG_PREFIX "options");
-    AVDictionary *options = NULL;
     if (psz_opts) {
         vlc_av_get_options(psz_opts, &options);
         free(psz_opts);
