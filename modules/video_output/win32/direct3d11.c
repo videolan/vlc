@@ -1198,15 +1198,13 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
+#if defined(HAVE_ID3D11VIDEODECODER)
+    if( sys->context_lock != INVALID_HANDLE_VALUE )
+        WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+#endif
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
         picture_sys_t *p_sys = picture->p_sys;
         D3D11_TEXTURE2D_DESC texDesc;
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock != INVALID_HANDLE_VALUE )
-        {
-            WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
-        }
-#endif
         if (!is_d3d11_opaque(picture->format.i_chroma))
             Direct3D11UnmapPoolTexture(picture);
         ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
@@ -1222,23 +1220,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                                   0, 0, 0, 0,
                                                   p_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_sys->slice_index, &box);
-        ID3D11DeviceContext_Flush(sys->d3dcontext);
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if ( sys->context_lock != INVALID_HANDLE_VALUE)
-            ReleaseMutex( sys->context_lock );
-#endif
-    } else {
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock != INVALID_HANDLE_VALUE )
-        {
-            WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
-        }
-#endif
-        ID3D11DeviceContext_Flush(sys->d3dcontext);
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if ( sys->context_lock != INVALID_HANDLE_VALUE)
-            ReleaseMutex( sys->context_lock );
-#endif
     }
 
     if (subpicture) {
@@ -1249,6 +1230,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         sys->d3dregion_count = subpicture_region_count;
         sys->d3dregions      = subpicture_regions;
     }
+
+    ID3D11DeviceContext_Flush(sys->d3dcontext);
+#if defined(HAVE_ID3D11VIDEODECODER)
+    if ( sys->context_lock != INVALID_HANDLE_VALUE)
+        ReleaseMutex( sys->context_lock );
+#endif
 }
 
 static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad, ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
