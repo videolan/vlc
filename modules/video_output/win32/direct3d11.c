@@ -1223,6 +1223,19 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                                   0, 0, 0, 0,
                                                   p_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_sys->slice_index, &box);
+        ID3D11DeviceContext_Flush(sys->d3dcontext);
+#if defined(HAVE_ID3D11VIDEODECODER)
+        if ( sys->context_lock != INVALID_HANDLE_VALUE)
+            ReleaseMutex( sys->context_lock );
+#endif
+    } else {
+#if defined(HAVE_ID3D11VIDEODECODER)
+        if( sys->context_lock != INVALID_HANDLE_VALUE )
+        {
+            WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+        }
+#endif
+        ID3D11DeviceContext_Flush(sys->d3dcontext);
 #if defined(HAVE_ID3D11VIDEODECODER)
         if ( sys->context_lock != INVALID_HANDLE_VALUE)
             ReleaseMutex( sys->context_lock );
