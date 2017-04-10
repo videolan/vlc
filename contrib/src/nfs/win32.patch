@@ -1,0 +1,65 @@
+diff -ruN nfs/configure.ac nfs.good/configure.ac
+--- nfs/configure.ac	2016-10-09 20:23:11.000000000 +0200
++++ nfs.good/configure.ac	2017-04-10 11:55:45.979424891 +0200
+@@ -79,7 +79,7 @@
+ AC_SUBST(MAYBE_EXAMPLES)
+ 
+ AC_MSG_CHECKING(whether SO_BINDTODEVICE is available)
+-AC_TRY_RUN([
++AC_TRY_COMPILE([
+ /*
+  * Just see if we can compile with SO_BINDTODEVICE
+  */
+@@ -92,7 +92,7 @@
+ }
+ ], ac_cv_have_so_bindtodevice=yes, ac_cv_have_so_bindtodevice=no,
+    [echo $ac_n "compile with SO_BINDTODEVICE. Assuming OK... $ac_c"
+-    ac_cv_have_so_bindtodevice=yes])
++    ac_cv_have_so_bindtodevice])
+ if test "$ac_cv_have_so_bindtodevice" = yes ; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE(HAVE_SO_BINDTODEVICE, 1, [Whether our sockets support SO_BINDTODEVICE])
+diff -ruN nfs/lib/libnfs.c nfs.good/lib/libnfs.c
+--- nfs/lib/libnfs.c	2016-10-09 20:23:11.000000000 +0200
++++ nfs.good/lib/libnfs.c	2017-04-10 11:46:32.471450692 +0200
+@@ -26,8 +26,10 @@
+ #endif
+ 
+ #ifdef WIN32
++ #define __STDC_FORMAT_MACROS 1
++#include <inttypes.h>
+ #include "win32_compat.h"
+-#define PRIu64 "llu"
++//#define PRIu64 "llu"
+ #else
+ #include <inttypes.h>
+ #endif
+diff -ruN nfs/win32/win32_compat.h nfs.good/win32/win32_compat.h
+--- nfs/win32/win32_compat.h	2016-10-09 20:23:11.000000000 +0200
++++ nfs.good/win32/win32_compat.h	2017-04-10 11:43:57.415457919 +0200
+@@ -38,6 +38,7 @@
+ typedef int gid_t;
+ typedef int socklen_t;
+ 
++#ifndef S_IRUSR
+ #define S_IRUSR 0000400
+ #define S_IWUSR 0000200
+ #define S_IXUSR 0000100
+@@ -49,6 +50,7 @@
+ #define S_IROTH 0000004
+ #define S_IWOTH 0000002
+ #define S_IXOTH 0000001
++#endif
+ 
+ #define F_GETFL  3
+ #define F_SETFL  4
+@@ -106,7 +108,9 @@
+ #define poll(x, y, z)        win32_poll(x, y, z)
+ #define inet_pton(x,y,z)     win32_inet_pton(x,y,z)
+ #define open(x, y, z)        _open(x, y, z)
++#ifndef lseek
+ #define lseek(x, y, z)       _lseek(x, y, z)
++#endif
+ #define read(x, y, z)        _read(x, y, z)
+ #define write(x, y, z)       _write(x, y, z)
+ int     getpid(void);
