@@ -243,11 +243,11 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
             vout_control_Push(&vout->p->control, &cmd);
             vout_control_WaitEmpty(&vout->p->control);
+            vout_IntfReinit(vout);
         }
 
         if (!vout->p->dead) {
             msg_Dbg(object, "reusing provided vout");
-            vout_IntfReinit(vout);
             return vout;
         }
         vout_CloseAndRelease(vout);
