@@ -37,6 +37,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_atomic.h>
 #include <vlc_plugin.h>
@@ -160,6 +161,7 @@ static void Destroy( vlc_object_t *p_this )
 #define SHARPEN_FRAME(maxval, data_t)                                   \
     do                                                                  \
     {                                                                   \
+        assert((maxval) >= 0);                                          \
         data_t *restrict p_src = (data_t *)p_pic->p[Y_PLANE].p_pixels;  \
         data_t *restrict p_out = (data_t *)p_outpic->p[Y_PLANE].p_pixels; \
         const unsigned data_sz = sizeof(data_t);                        \
