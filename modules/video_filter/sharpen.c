@@ -156,7 +156,8 @@ static void Destroy( vlc_object_t *p_this )
  * frame.
  *****************************************************************************/
 
-#define IS_YUV_420_10BITS(fmt) (fmt == VLC_CODEC_I420_10L || fmt == VLC_CODEC_I420_10B)
+#define IS_YUV_420_10BITS(fmt) (fmt == VLC_CODEC_I420_10L ||    \
+                                fmt == VLC_CODEC_I420_10B)
 
 #define SHARPEN_FRAME(maxval, data_t)                                   \
     do                                                                  \
