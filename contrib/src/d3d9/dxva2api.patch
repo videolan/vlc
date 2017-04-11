@@ -1,8 +1,20 @@
 --- ../tarballs/dxva2api.idl	2017-04-11 14:13:48.105355400 +0200
-+++ dxva2api/dxva2api.idl	2017-04-11 14:59:17.092294600 +0200
-@@ -15,11 +15,12 @@
++++ dxva2api/dxva2api.idl	2017-04-11 15:00:53.705524600 +0200
+@@ -6,6 +6,8 @@
+ 
+ import "unknwn.idl";
+ 
++cpp_quote("#include <winapifamily.h>")
++
+ /* Fake widl types */
+ cpp_quote("#if 0")
+ typedef DWORD IDirect3DDevice9;
+@@ -14,12 +16,15 @@
+ typedef DWORD D3DPOOL;
  cpp_quote("#endif")
  
++cpp_quote("#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)")
++
  interface IDirectXVideoDecoderService;
 +interface IDirectXVideoProcessorService;
  
@@ -17,7 +29,7 @@
  
  cpp_quote("#define DXVA2_ProcAmp_None 0x0000")
  cpp_quote("#define DXVA2_ProcAmp_Brightness 0x0001")
-@@ -142,19 +143,19 @@
+@@ -142,19 +147,19 @@
  cpp_quote("  DXVA2_VideoTransferMatrix_SMPTE240M   = 3 ")
  cpp_quote("} DXVA2_VideoTransferMatrix;")
  cpp_quote("")
@@ -50,7 +62,7 @@
  
  typedef struct _DXVA2_ConfigPictureDecode {
    GUID   guidConfigBitstreamEncryption;
-@@ -219,40 +220,40 @@
+@@ -219,40 +224,40 @@
    };
  } DXVA2_ExtendedFormat;
  
@@ -119,7 +131,7 @@
  
  typedef struct _DXVA2_VideoDesc {
    UINT                 SampleWidth;
-@@ -317,57 +318,60 @@
+@@ -317,57 +322,60 @@
  cpp_quote("DXVA2_DetailFilterTech_Edge")
  cpp_quote("DXVA2_DetailFilterTech_Sharpening")
  cpp_quote("*/")
@@ -231,7 +243,7 @@
  cpp_quote("/* Constants */")
  cpp_quote("")
  cpp_quote("#define DXVA2_VideoDecoderRenderTarget 0")
-@@ -481,4 +485,82 @@
+@@ -481,4 +489,84 @@
              [in] UINT NumRenderTargets, [out] IDirectXVideoDecoder **ppDecode);
  }
  
@@ -314,3 +326,5 @@
 +}
 +
  cpp_quote("#endif /* _D3D9_H_ */")
++
++cpp_quote("#endif /* WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) */")
