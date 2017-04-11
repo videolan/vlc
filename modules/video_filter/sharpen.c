@@ -157,7 +157,7 @@ static void Destroy( vlc_object_t *p_this )
 
 #define IS_YUV_420_10BITS(fmt) (fmt == VLC_CODEC_I420_10L || fmt == VLC_CODEC_I420_10B)
 
-#define SHARPEN_FRAME(maxval)                                           \
+#define SHARPEN_FRAME(maxval, data_t)                                   \
     do                                                                  \
     {                                                                   \
         data_t *restrict p_src = (data_t *)p_pic->p[Y_PLANE].p_pixels;  \
@@ -210,17 +210,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     if (!IS_YUV_420_10BITS(p_pic->format.i_chroma))
-    {
-        typedef uint8_t data_t;
-
-        SHARPEN_FRAME(255);
-    }
+        SHARPEN_FRAME(255, uint8_t);
     else
-    {
-        typedef uint16_t data_t;
-
-        SHARPEN_FRAME(1023);
-    }
+        SHARPEN_FRAME(1023, uint16_t);
 
     plane_CopyPixels( &p_outpic->p[U_PLANE], &p_pic->p[U_PLANE] );
     plane_CopyPixels( &p_outpic->p[V_PLANE], &p_pic->p[V_PLANE] );
