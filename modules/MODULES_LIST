@@ -124,6 +124,7 @@ $Id$
  * dvdread: input module for accessing DVDs, uses libdvdread
  * dxa9: Convert D3D9 GPU textures to YUV planes
  * dxva2: DxVA2 hardware-accelerated decoding
+ * dxva2_deinterlace: deinterlacer for DxVA 2.0 video decoding
  * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
  * edgedetection: edge detection video filter
  * edummy: dummy encoder
