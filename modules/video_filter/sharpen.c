@@ -38,6 +38,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
@@ -69,8 +70,9 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter", 0 )
-    add_float_with_range( "sharpen-sigma", 0.05, 0.0, 2.0,
+    add_float_with_range( FILTER_PREFIX "sigma", 0.05, 0.0, 2.0,
         SIG_TEXT, SIG_LONGTEXT, false )
+    change_safe()
     add_shortcut( "sharpen" )
     set_callbacks( Create, Destroy )
 vlc_module_end ()
@@ -88,17 +90,8 @@ static const char *const ppsz_filter_options[] = {
 
 struct filter_sys_t
 {
-    vlc_mutex_t lock;
-    int tab_precalc[512];
+    atomic_int sigma;
 };
-
-static void init_precalc_table(filter_sys_t *p_filter, float sigma)
-{
-    for(int i = 0; i < 512; ++i)
-    {
-        p_filter->tab_precalc[i] = (i - 256) * sigma;
-    }
-}
 
 /*****************************************************************************
  * Create: allocates Sharpen video thread output method
@@ -129,10 +122,10 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
 
-    float sigma = var_CreateGetFloatCommand( p_filter, FILTER_PREFIX "sigma" );
-    init_precalc_table(p_filter->p_sys, sigma);
+    atomic_init(&p_filter->p_sys->sigma,
+                var_CreateGetFloatCommand(p_filter, FILTER_PREFIX "sigma")
+                * (1 << 20));
 
-    vlc_mutex_init( &p_filter->p_sys->lock );
     var_AddCallback( p_filter, FILTER_PREFIX "sigma",
                      SharpenCallback, p_filter->p_sys );
 
@@ -151,7 +144,6 @@ static void Destroy( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     var_DelCallback( p_filter, FILTER_PREFIX "sigma", SharpenCallback, p_sys );
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -193,7 +185,7 @@ static void Destroy( vlc_object_t *p_this )
                     (p_src[(i + 1) * i_src_line_len + j + 1] * v[0]);   \
                                                                         \
                 pix = pix >= 0 ? VLC_CLIP(pix, 0, maxval) : -VLC_CLIP(pix * -1, 0, maxval); \
-                p_out[i * i_out_line_len + j] = VLC_CLIP( p_src[i * i_src_line_len + j] + ((pix * sigma) >> 20), 0, maxval); \
+                p_out[i * i_out_line_len + j] = VLC_CLIP( p_src[i * i_src_line_len + j] + ((pix * atomic_load(&p_filter->p_sys->sigma)) >> 20), 0, maxval); \
             }                                                           \
             p_out[i * i_out_line_len + i_visible_pitch / 2 - 1] =       \
                 p_src[i * i_src_line_len + i_visible_pitch / 2 - 1];    \
@@ -209,7 +201,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     const int v[2] = { -1, 3 /* 2^3 = 8 */ };
     const unsigned i_visible_lines = p_pic->p[Y_PLANE].i_visible_lines;
     const unsigned i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
-    const int sigma = var_GetFloat( p_filter, FILTER_PREFIX "sigma" ) * (1 << 20);
 
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
@@ -217,9 +208,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         picture_Release( p_pic );
         return NULL;
     }
-
-    /* perform convolution only on Y plane. Avoid border line. */
-    vlc_mutex_lock( &p_filter->p_sys->lock );
 
     if (!IS_YUV_420_10BITS(p_pic->format.i_chroma))
     {
@@ -234,8 +222,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         SHARPEN_FRAME(1023);
     }
 
-    vlc_mutex_unlock( &p_filter->p_sys->lock );
-
     plane_CopyPixels( &p_outpic->p[U_PLANE], &p_pic->p[U_PLANE] );
     plane_CopyPixels( &p_outpic->p[V_PLANE], &p_pic->p[V_PLANE] );
 
@@ -249,8 +235,8 @@ static int SharpenCallback( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(oldval); VLC_UNUSED(psz_var);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
 
-    vlc_mutex_lock( &p_sys->lock );
-    init_precalc_table( p_sys,  VLC_CLIP( newval.f_float, 0.f, 2.f ) );
-    vlc_mutex_unlock( &p_sys->lock );
+    atomic_store(&p_sys->sigma,
+                 VLC_CLIP(newval.f_float, 0.f, 2.f) * (1 << 20));
+
     return VLC_SUCCESS;
 }
