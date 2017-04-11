@@ -1107,7 +1107,7 @@ static int LoadMFTLibrary(MFHandle *mf)
     return VLC_SUCCESS;
 }
 
-int Open(vlc_object_t *p_this)
+static int Open(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
@@ -1148,7 +1148,7 @@ error:
     return VLC_EGENERIC;
 }
 
-void Close(vlc_object_t *p_this)
+static void Close(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
