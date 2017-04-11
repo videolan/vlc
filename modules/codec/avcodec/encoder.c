@@ -611,7 +611,6 @@ int OpenEncoder( vlc_object_t *p_this )
             p_context->gop_size = p_sys->i_key_int;
         p_context->max_b_frames =
             VLC_CLIP( p_sys->i_b_frames, 0, FF_MAX_B_FRAMES );
-        p_context->b_frame_strategy = 0;
         if( !p_context->max_b_frames  &&
             (  p_enc->fmt_out.i_codec == VLC_CODEC_MPGV ||
                p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ) )
@@ -648,7 +647,7 @@ int OpenEncoder( vlc_object_t *p_this )
         if ( p_sys->f_i_quant_factor != 0.f )
             p_context->i_quant_factor = p_sys->f_i_quant_factor;
 
-        p_context->noise_reduction = p_sys->i_noise_reduction;
+        add_av_option_int( p_enc, &options, "noise_reduction", p_sys->i_noise_reduction );
 
         if ( p_sys->b_mpeg4_matrix )
         {
@@ -658,7 +657,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
         if ( p_sys->b_pre_me )
         {
-            p_context->pre_me = 1;
+            add_av_option_int( p_enc, &options, "mepre", 1 );
             p_context->me_pre_cmp = FF_CMP_CHROMA;
         }
 
