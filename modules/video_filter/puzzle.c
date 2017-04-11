@@ -78,8 +78,8 @@ const char *const ppsz_rotation_descriptions[] = { N_("0"), N_("0/180"), N_("0/9
 
 #define CFG_PREFIX "puzzle-"
 
-int  Open ( vlc_object_t * );
-void Close( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin()
     set_description( N_("Puzzle interactive game video filter") )
@@ -125,7 +125,7 @@ const char *const ppsz_filter_options[] = {
 /**
  * Open the filter
  */
-int Open( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
@@ -212,7 +212,7 @@ int Open( vlc_object_t *p_this )
 /**
  * Close the filter
  */
-void Close( vlc_object_t *p_this ) {
+static void Close( vlc_object_t *p_this ) {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
