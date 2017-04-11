@@ -128,7 +128,6 @@ nobase_vlclib_DATA = \
 	lua/meta/art/03_lastfm.luac \
 	lua/meta/art/01_googleimage.luac \
 	lua/meta/art/00_musicbrainz.luac \
-	lua/meta/fetcher/tvrage.luac \
 	lua/meta/reader/filename.luac \
 	lua/modules/common.luac \
 	lua/modules/dkjson.luac \
@@ -164,7 +163,6 @@ nobase_doc_DATA = \
 	lua/meta/art/README.txt \
 	lua/meta/art/01_googleimage.lua \
 	lua/meta/fetcher/README.txt \
-	lua/meta/fetcher/tvrage.lua \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
 	lua/playlist/README.txt \
@@ -206,7 +204,6 @@ EXTRA_DIST += \
 	lua/meta/art/01_googleimage.lua \
 	lua/meta/art/00_musicbrainz.lua \
 	lua/meta/fetcher/README.txt \
-	lua/meta/fetcher/tvrage.lua \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
 	lua/modules/common.lua \
