@@ -165,6 +165,7 @@ static void Destroy( vlc_object_t *p_this )
         const unsigned data_sz = sizeof(data_t);                        \
         const int i_src_line_len = p_outpic->p[Y_PLANE].i_pitch / data_sz; \
         const int i_out_line_len = p_pic->p[Y_PLANE].i_pitch / data_sz; \
+        const int sigma = atomic_load(&p_filter->p_sys->sigma);         \
                                                                         \
         memcpy(p_out, p_src, i_visible_pitch);                          \
                                                                         \
@@ -174,31 +175,37 @@ static void Destroy( vlc_object_t *p_this )
                                                                         \
             for( unsigned j = data_sz; j < i_visible_pitch - 1; j++ )   \
             {                                                           \
-                pix = (p_src[(i - 1) * i_src_line_len + j - 1] * v[0]) + \
-                    (p_src[(i - 1) * i_src_line_len + j    ] * v[0]) +  \
-                    (p_src[(i - 1) * i_src_line_len + j + 1] * v[0]) +  \
-                    (p_src[(i    ) * i_src_line_len + j - 1] * v[0]) +  \
-                    (p_src[(i    ) * i_src_line_len + j    ] << v[1]) + \
-                    (p_src[(i    ) * i_src_line_len + j + 1] * v[0]) +  \
-                    (p_src[(i + 1) * i_src_line_len + j - 1] * v[0]) +  \
-                    (p_src[(i + 1) * i_src_line_len + j    ] * v[0]) +  \
-                    (p_src[(i + 1) * i_src_line_len + j + 1] * v[0]);   \
+                const int line_idx_1 = (i - 1) * i_src_line_len;        \
+                const int line_idx_2 = i * i_src_line_len;              \
+                const int line_idx_3 = (i + 1) * i_src_line_len;        \
+                int pix =                                               \
+                    (p_src[line_idx_1 + j - 1] * v1) +                  \
+                    (p_src[line_idx_1 + j    ] * v1) +                  \
+                    (p_src[line_idx_1 + j + 1] * v1) +                  \
+                    (p_src[line_idx_2 + j - 1] * v1) +                  \
+                    (p_src[line_idx_2 + j    ] << v2) +                 \
+                    (p_src[line_idx_2 + j + 1] * v1) +                  \
+                    (p_src[line_idx_3 + j - 1] * v1) +                  \
+                    (p_src[line_idx_3 + j    ] * v1) +                  \
+                    (p_src[line_idx_3 + j + 1] * v1);                   \
                                                                         \
-                pix = pix >= 0 ? VLC_CLIP(pix, 0, maxval) : -VLC_CLIP(pix * -1, 0, maxval); \
-                p_out[i * i_out_line_len + j] = VLC_CLIP( p_src[i * i_src_line_len + j] + ((pix * atomic_load(&p_filter->p_sys->sigma)) >> 20), 0, maxval); \
+                pix = (VLC_CLIP(pix, -(maxval), maxval) * sigma) >> 20; \
+                p_out[i * i_out_line_len + j] =                         \
+                    VLC_CLIP( p_src[line_idx_2 + j] + pix, 0, maxval);  \
             }                                                           \
             p_out[i * i_out_line_len + i_visible_pitch / 2 - 1] =       \
                 p_src[i * i_src_line_len + i_visible_pitch / 2 - 1];    \
         }                                                               \
         memcpy(&p_out[(i_visible_lines - 1) * i_out_line_len],          \
-               &p_src[(i_visible_lines - 1) * i_src_line_len], i_visible_pitch); \
-    } while (0);
+               &p_src[(i_visible_lines - 1) * i_src_line_len],          \
+               i_visible_pitch);                                        \
+    } while (0)
 
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int pix;
-    const int v[2] = { -1, 3 /* 2^3 = 8 */ };
+    const int v1 = -1;
+    const int v2 = 3; /* 2^3 = 8 */
     const unsigned i_visible_lines = p_pic->p[Y_PLANE].i_visible_lines;
     const unsigned i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
 
