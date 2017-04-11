@@ -366,7 +366,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     int ret;
 
     if (psz_opts) {
-        options = vlc_av_get_options(psz_opts);
+        vlc_av_get_options(psz_opts, &options);
         free(psz_opts);
     }
 

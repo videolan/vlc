@@ -337,7 +337,7 @@ int OpenDemux( vlc_object_t *p_this )
     for (unsigned i = 1; i < nb_streams; i++)
         options[i] = NULL;
     if (psz_opts) {
-        options[0] = vlc_av_get_options(psz_opts);
+        vlc_av_get_options(psz_opts, &options[0]);
         for (unsigned i = 1; i < nb_streams; i++) {
             av_dict_copy(&options[i], options[0], 0);
         }

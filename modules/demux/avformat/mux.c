@@ -404,7 +404,7 @@ static int Mux( sout_mux_t *p_mux )
         char *psz_opts = var_GetNonEmptyString( p_mux, "sout-avformat-options" );
         AVDictionary *options = NULL;
         if (psz_opts) {
-            options = vlc_av_get_options(psz_opts);
+            vlc_av_get_options(psz_opts, &options);
             free(psz_opts);
         }
         av_dict_set( &p_sys->oc->metadata, "encoding_tool", "VLC "VERSION, 0 );

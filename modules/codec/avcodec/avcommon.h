@@ -45,20 +45,18 @@
 #define AV_OPTIONS_TEXT     "Advanced options"
 #define AV_OPTIONS_LONGTEXT "Advanced options, in the form {opt=val,opt2=val2}."
 
-static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
+static inline void vlc_av_get_options(const char *psz_opts, AVDictionary** pp_dict)
 {
-    AVDictionary *options = NULL;
     config_chain_t *cfg = NULL;
     config_ChainParseOptions(&cfg, psz_opts);
     while (cfg) {
         config_chain_t *next = cfg->p_next;
-        av_dict_set(&options, cfg->psz_name, cfg->psz_value, 0);
+        av_dict_set(pp_dict, cfg->psz_name, cfg->psz_value, 0);
         free(cfg->psz_name);
         free(cfg->psz_value);
         free(cfg);
         cfg = next;
     }
-    return options;
 }
 
 static inline void vlc_init_avutil(vlc_object_t *obj)

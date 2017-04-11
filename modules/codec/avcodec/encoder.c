@@ -915,7 +915,7 @@ int OpenEncoder( vlc_object_t *p_this )
     char *psz_opts = var_InheritString(p_enc, ENC_CFG_PREFIX "options");
     AVDictionary *options = NULL;
     if (psz_opts) {
-        options = vlc_av_get_options(psz_opts);
+        vlc_av_get_options(psz_opts, &options);
         free(psz_opts);
     }
 

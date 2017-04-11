@@ -90,7 +90,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     char *psz_opts = var_InheritString(dec, "avcodec-options");
     AVDictionary *options = NULL;
     if (psz_opts) {
-        options = vlc_av_get_options(psz_opts);
+        vlc_av_get_options(psz_opts, &options);
         free(psz_opts);
     }
 
