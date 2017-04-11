@@ -80,7 +80,7 @@ vlc_module_end ()
 /*****************************************************************************
  * OpenIntf: initialise interface
  *****************************************************************************/
-int Open ( vlc_object_t *p_this )
+static int Open ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
@@ -109,7 +109,7 @@ error:
 /*****************************************************************************
  * CloseIntf: destroy interface
  *****************************************************************************/
-void Close ( vlc_object_t *p_this )
+static void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
