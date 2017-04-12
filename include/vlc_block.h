@@ -77,8 +77,6 @@
 #define BLOCK_FLAG_HEADER        0x0020
 /** This is the last block of the frame */
 #define BLOCK_FLAG_END_OF_FRAME  0x0040
-/** This is not a key frame for bitrate shaping */
-#define BLOCK_FLAG_NO_KEYFRAME   0x0080
 /** This block contains the last part of a sequence  */
 #define BLOCK_FLAG_END_OF_SEQUENCE 0x0100
 /** This block contains a clock reference */

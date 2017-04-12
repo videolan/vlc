@@ -192,6 +192,8 @@ static const char *const ts_standards_list_text[] =
   #error "MAX_SDT_DESC < MAX_PMT"
 #endif
 
+#define BLOCK_FLAG_NO_KEYFRAME (1 << BLOCK_FLAG_PRIVATE_SHIFT) /* This is not a key frame for bitrate shaping */
+
 vlc_module_begin ()
     set_description( N_("TS muxer (libdvbpsi)") )
     set_shortname( "MPEG-TS")
