@@ -76,21 +76,21 @@
 /** Warn that this block is a header one */
 #define BLOCK_FLAG_HEADER        0x0020
 /** This block contains the last part of a sequence  */
-#define BLOCK_FLAG_END_OF_SEQUENCE 0x0100
+#define BLOCK_FLAG_END_OF_SEQUENCE 0x0040
 /** This block contains a clock reference */
-#define BLOCK_FLAG_CLOCK         0x0200
+#define BLOCK_FLAG_CLOCK         0x0080
 /** This block is scrambled */
-#define BLOCK_FLAG_SCRAMBLED     0x0400
+#define BLOCK_FLAG_SCRAMBLED     0x0100
 /** This block has to be decoded but not be displayed */
-#define BLOCK_FLAG_PREROLL       0x0800
+#define BLOCK_FLAG_PREROLL       0x0200
 /** This block is corrupted and/or there is data loss  */
-#define BLOCK_FLAG_CORRUPTED     0x1000
+#define BLOCK_FLAG_CORRUPTED     0x0400
 /** This block contains an interlaced picture with top field stored first */
-#define BLOCK_FLAG_TOP_FIELD_FIRST 0x2000
+#define BLOCK_FLAG_TOP_FIELD_FIRST 0x0800
 /** This block contains an interlaced picture with bottom field stored first */
-#define BLOCK_FLAG_BOTTOM_FIELD_FIRST 0x4000
+#define BLOCK_FLAG_BOTTOM_FIELD_FIRST 0x1000
 /** This block contains a single field from interlaced picture. */
-#define BLOCK_FLAG_SINGLE_FIELD  0x8000
+#define BLOCK_FLAG_SINGLE_FIELD  0x2000
 
 /** This block contains an interlaced picture */
 #define BLOCK_FLAG_INTERLACED_MASK \
