@@ -351,9 +351,11 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
             break;
         case V4L2_FIELD_TOP:
             msg_Dbg (demux, "Interlacing setting: top field only");
+            sys->block_flags = BLOCK_FLAG_TOP_FIELD_FIRST|BLOCK_FLAG_SINGLE_FIELD;
             break;
         case V4L2_FIELD_BOTTOM:
             msg_Dbg (demux, "Interlacing setting: bottom field only");
+            sys->block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST|BLOCK_FLAG_SINGLE_FIELD;
             break;
         case V4L2_FIELD_INTERLACED:
             msg_Dbg (demux, "Interlacing setting: interleaved");

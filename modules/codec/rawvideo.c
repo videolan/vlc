@@ -249,7 +249,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
     if( p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK )
     {
         p_pic->b_progressive = false;
-        p_pic->i_nb_fields = 2;
+        p_pic->i_nb_fields = (p_block->i_flags & BLOCK_FLAG_SINGLE_FIELD) ? 1 : 2;
         if( p_block->i_flags & BLOCK_FLAG_TOP_FIELD_FIRST )
             p_pic->b_top_field_first = true;
         else

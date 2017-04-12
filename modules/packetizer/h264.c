@@ -803,6 +803,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
         /* Top and Bottom field slices */
         case 1:
         case 2:
+            p_pic->i_flags |= BLOCK_FLAG_SINGLE_FIELD;
             p_pic->i_flags |= (!p_sys->slice.i_bottom_field_flag) ? BLOCK_FLAG_TOP_FIELD_FIRST
                                                                   : BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             break;

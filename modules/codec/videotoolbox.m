@@ -1310,8 +1310,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         int i_ret = avcCFromAnnexBCreate(p_dec);
         if (i_ret == VLC_SUCCESS)
         {
-            if ((p_block->i_flags & BLOCK_FLAG_TOP_FIELD_FIRST
-             || p_block->i_flags & BLOCK_FLAG_BOTTOM_FIELD_FIRST)
+            if ((p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK)
              && var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing"))
                 p_sys->b_enable_temporal_processing = true;
 
