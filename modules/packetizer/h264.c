@@ -48,6 +48,8 @@
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
 
+#include <limits.h>
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -82,8 +84,6 @@ struct decoder_sys_t
     bool    b_new_sps;
     bool    b_new_pps;
 
-    bool   b_header;
-
     struct
     {
         block_t *p_block;
@@ -97,20 +97,21 @@ struct decoder_sys_t
     const h264_sequence_parameter_set_t *p_active_sps;
     const h264_picture_parameter_set_t *p_active_pps;
 
-    int    i_recovery_frames;  /* -1 = no recovery */
-
     /* avcC data */
     uint8_t i_avcC_length_size;
 
     /* From SEI for current frame */
     uint8_t i_pic_struct;
     uint8_t i_dpb_output_delay;
+    unsigned i_recovery_frame_cnt;
 
     /* Useful values of the Slice Header */
     h264_slice_t slice;
 
     /* */
     bool b_discontinuity;
+    bool b_recovered;
+    unsigned i_recoveryfnum;
 
     /* POC */
     poc_context_t pocctx;
@@ -130,6 +131,7 @@ struct decoder_sys_t
 };
 
 #define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
+#define BLOCK_FLAG_DROP        (2 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static block_t *Packetize( decoder_t *, block_t ** );
 static block_t *PacketizeAVC1( decoder_t *, block_t ** );
@@ -316,7 +318,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_new_sps = false;
     p_sys->b_new_pps = false;
 
-    p_sys->b_header= false;
     for( i = 0; i <= H264_SPS_ID_MAX; i++ )
     {
         p_sys->sps[i].p_sps = NULL;
@@ -329,11 +330,13 @@ static int Open( vlc_object_t *p_this )
         p_sys->pps[i].p_block = NULL;
     }
     p_sys->p_active_pps = NULL;
-    p_sys->i_recovery_frames = -1;
+    p_sys->i_recovery_frame_cnt = UINT_MAX;
 
     h264_slice_init( &p_sys->slice );
 
     p_sys->b_discontinuity = false;
+    p_sys->b_recovered = false;
+    p_sys->i_recoveryfnum = UINT_MAX;
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
@@ -371,7 +374,7 @@ static int Open( vlc_object_t *p_this )
                                                              &i_size,
                                                              &p_sys->i_avcC_length_size );
             p_dec->fmt_out.i_extra = i_size;
-            p_sys->b_header = !!p_dec->fmt_out.i_extra;
+            p_sys->b_recovered = !!p_dec->fmt_out.i_extra;
 
             if(!p_dec->fmt_out.p_extra)
             {
@@ -516,8 +519,11 @@ static void PacketizeReset( void *p_private, bool b_broken )
         /* From SEI */
         p_sys->i_dpb_output_delay = 0;
         p_sys->i_pic_struct = UINT8_MAX;
+        p_sys->i_recovery_frame_cnt = UINT_MAX;
     }
     p_sys->b_discontinuity = true;
+    p_sys->b_recovered = false;
+    p_sys->i_recoveryfnum = UINT_MAX;
     date_Set( &p_sys->dts, VLC_TS_INVALID );
 }
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
@@ -568,6 +574,13 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     if( i_nal_type >= H264_NAL_SLICE && i_nal_type <= H264_NAL_SLICE_IDR )
     {
         h264_slice_t newslice;
+
+        if( i_nal_type == H264_NAL_SLICE_IDR )
+        {
+            p_sys->b_recovered = true;
+            p_sys->i_recovery_frame_cnt = UINT_MAX;
+            p_sys->i_recoveryfnum = UINT_MAX;
+        }
 
         if( ParseSliceHeader( p_dec, p_frag, &newslice ) )
         {
@@ -663,6 +676,13 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         if( i_frag_dts > VLC_TS_INVALID )
             date_Set( &p_sys->dts, i_frag_dts );
     }
+
+    if( p_pic && (p_pic->i_flags & BLOCK_FLAG_DROP) )
+    {
+        block_Release( p_pic );
+        p_pic = NULL;
+    }
+
     return p_pic;
 }
 
@@ -671,16 +691,6 @@ static block_t *OutputPicture( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
     block_t **pp_pic_last = &p_pic;
-
-    if ( !p_sys->b_header && p_sys->i_recovery_frames != -1 )
-    {
-        if( p_sys->i_recovery_frames == 0 )
-        {
-            msg_Dbg( p_dec, "Recovery from SEI recovery point complete" );
-            p_sys->b_header = true;
-        }
-        --p_sys->i_recovery_frames;
-    }
 
     if( unlikely(!p_sys->p_frame) )
     {
@@ -697,32 +707,55 @@ static block_t *OutputPicture( decoder_t *p_dec )
         return NULL;
     }
 
-    if( p_sys->i_recovery_frames > -1 && p_sys->slice.type != H264_SLICE_TYPE_I )
+    if( !p_sys->b_recovered && p_sys->i_recoveryfnum == UINT_MAX &&
+         p_sys->i_recovery_frame_cnt == UINT_MAX && p_sys->slice.type == H264_SLICE_TYPE_I )
     {
-        DropStoredNAL( p_sys );
-        return NULL;
+        /* No way to recover using SEI, just sync on I Slice */
+        p_sys->b_recovered = true;
+    }
+
+    bool b_need_sps_pps = p_sys->slice.type == H264_SLICE_TYPE_I &&
+                          p_sys->p_active_pps && p_sys->p_active_sps;
+
+    /* Handle SEI recovery */
+    if ( !p_sys->b_recovered && p_sys->i_recovery_frame_cnt != UINT_MAX &&
+         p_sys->i_recoveryfnum == UINT_MAX )
+    {
+        p_sys->i_recoveryfnum = p_sys->slice.i_frame_num + p_sys->i_recovery_frame_cnt;
+        b_need_sps_pps = true; /* SPS/PPS must be inserted for SEI recovery */
+        msg_Dbg( p_dec, "Recovering using SEI, prerolling %u reference pics", p_sys->i_recovery_frame_cnt );
+    }
+
+    if( p_sys->i_recoveryfnum != UINT_MAX )
+    {
+        assert(p_sys->b_recovered == false);
+        const unsigned maxFrameNum = 1 << (p_sps->i_log2_max_frame_num + 4);
+        if( (p_sys->i_recoveryfnum > maxFrameNum &&
+            (unsigned)p_sys->slice.i_frame_num <= maxFrameNum / 2 &&
+            (unsigned)p_sys->slice.i_frame_num >= p_sys->i_recoveryfnum % maxFrameNum ) ||
+            (unsigned)p_sys->slice.i_frame_num >= p_sys->i_recoveryfnum )
+        {
+            p_sys->i_recoveryfnum = UINT_MAX;
+            p_sys->b_recovered = true;
+            msg_Dbg( p_dec, "Recovery from SEI recovery point complete" );
+        }
     }
 
     /* Gather PPS/SPS if required */
     block_t *p_xpsnal = NULL;
     block_t **pp_xpsnal_tail = &p_xpsnal;
-    const bool b_sps_pps_i = p_sys->slice.type == H264_SLICE_TYPE_I &&
-                             p_sys->p_active_pps &&
-                             p_sys->p_active_sps;
-    if( b_sps_pps_i || p_sys->b_new_sps || p_sys->b_new_pps )
+    if( b_need_sps_pps || p_sys->b_new_sps || p_sys->b_new_pps )
     {
-        for( int i = 0; i <= H264_SPS_ID_MAX && (b_sps_pps_i || p_sys->b_new_sps); i++ )
+        for( int i = 0; i <= H264_SPS_ID_MAX && (b_need_sps_pps || p_sys->b_new_sps); i++ )
         {
             if( p_sys->sps[i].p_block )
                 block_ChainLastAppend( &pp_xpsnal_tail, block_Duplicate( p_sys->sps[i].p_block ) );
         }
-        for( int i = 0; i < H264_PPS_ID_MAX && (b_sps_pps_i || p_sys->b_new_pps); i++ )
+        for( int i = 0; i < H264_PPS_ID_MAX && (b_need_sps_pps || p_sys->b_new_pps); i++ )
         {
             if( p_sys->pps[i].p_block )
                 block_ChainLastAppend( &pp_xpsnal_tail, block_Duplicate( p_sys->pps[i].p_block ) );
         }
-        if( b_sps_pps_i && p_xpsnal )
-            p_sys->b_header = true;
     }
 
     /* Now rebuild NAL Sequence, inserting PPS/SPS if any */
@@ -853,9 +886,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
     }
 
 #if 0
-    msg_Err(p_dec, "F/BOC %d/%d POC %d %s ref%d fn %d fp %d %d pts %ld",
+    msg_Err(p_dec, "F/BOC %d/%d POC %d %d rec %d flags %x ref%d fn %d fp %d %d pts %ld",
                     tFOC, bFOC, PictureOrderCount,
-                    (p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I) ? "I" : (p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_P ? "P": "B"),
+                    p_sys->slice.type, p_sys->b_recovered, p_pic->i_flags,
                     p_sys->slice.i_nal_ref_idc, p_sys->slice.i_frame_num, p_sys->slice.i_field_pic_flag,
                     p_pic->i_pts - p_pic->i_dts, p_pic->i_pts % (100*CLOCK_FREQ));
 #endif
@@ -887,15 +920,22 @@ static block_t *OutputPicture( decoder_t *p_dec )
             break;
     }
 
+    if( !p_sys->b_recovered )
+    {
+        if( p_sys->i_recoveryfnum != UINT_MAX ) /* recovering from SEI */
+            p_pic->i_flags |= BLOCK_FLAG_PREROLL;
+        else
+            p_pic->i_flags |= BLOCK_FLAG_DROP;
+    }
+
     p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
-    if( !p_sys->b_header )
-        p_pic->i_flags |= BLOCK_FLAG_PREROLL;
 
     /* reset after output */
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_dpb_output_delay = 0;
     p_sys->i_pic_struct = UINT8_MAX;
+    p_sys->i_recovery_frame_cnt = UINT_MAX;
     p_sys->slice.type = H264_SLICE_TYPE_UNKNOWN;
     p_sys->p_sei = NULL;
     p_sys->pp_sei_last = &p_sys->p_sei;
@@ -1046,12 +1086,9 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
             /* Look for SEI recovery point */
         case HXXX_SEI_RECOVERY_POINT:
         {
-            if( !p_sys->b_header )
-            {
+            if( !p_sys->b_recovered )
                 msg_Dbg( p_dec, "Seen SEI recovery point, %d recovery frames", p_sei_data->recovery.i_frames );
-                if ( p_sys->i_recovery_frames == -1 || p_sei_data->recovery.i_frames < p_sys->i_recovery_frames )
-                    p_sys->i_recovery_frames = p_sei_data->recovery.i_frames;
-            }
+            p_sys->i_recovery_frame_cnt = p_sei_data->recovery.i_frames;
         } break;
 
         default:
