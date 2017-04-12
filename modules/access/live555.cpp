@@ -1983,9 +1983,6 @@ static void StreamRead( void *p_private, unsigned int i_size,
         {
             memcpy( p_block->p_buffer, &header, 4 );
             memcpy( p_block->p_buffer + 4, tk->p_buffer, i_size );
-
-            if( tk->sub->rtpSource()->curPacketMarkerBit() )
-                p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
         }
     }
     else if( tk->fmt.i_codec == VLC_CODEC_H264 || tk->fmt.i_codec == VLC_CODEC_HEVC )

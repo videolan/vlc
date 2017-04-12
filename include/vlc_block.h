@@ -75,8 +75,6 @@
 #define BLOCK_FLAG_TYPE_PB       0x0010
 /** Warn that this block is a header one */
 #define BLOCK_FLAG_HEADER        0x0020
-/** This is the last block of the frame */
-#define BLOCK_FLAG_END_OF_FRAME  0x0040
 /** This block contains the last part of a sequence  */
 #define BLOCK_FLAG_END_OF_SEQUENCE 0x0100
 /** This block contains a clock reference */
