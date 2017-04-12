@@ -945,7 +945,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
         update_late_frame_count( p_dec, p_block, current_time, i_pts);
 
-        if( !b_need_output_picture || ( !p_sys->p_va && !frame->linesize[0] ) )
+        if( !b_need_output_picture || ( !p_sys->p_va && !frame->linesize[0] ) ||
+           ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) ) )
         {
             av_frame_free(&frame);
             continue;
