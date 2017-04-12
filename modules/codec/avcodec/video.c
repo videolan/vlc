@@ -1051,6 +1051,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
         bool format_changed = false;
 #if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
+#define FROM_AVRAT(default_factor, avrat) \
+    (uint64_t)(default_factor) * (avrat).num / (avrat).den
         const AVFrameSideData *metadata =
                 av_frame_get_side_data( frame,
                                         AV_FRAME_DATA_MASTERING_DISPLAY_METADATA );
@@ -1060,8 +1062,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                     (const AVMasteringDisplayMetadata *) metadata->data;
             if ( hdr_meta->has_luminance )
             {
-                p_pic->format.mastering.max_luminance = hdr_meta->max_luminance.num;
-                p_pic->format.mastering.min_luminance = hdr_meta->min_luminance.num;
+#define ST2086_LUMA_FACTOR 10000
+                p_pic->format.mastering.max_luminance =
+                        FROM_AVRAT(ST2086_LUMA_FACTOR, hdr_meta->max_luminance);
+                p_pic->format.mastering.min_luminance =
+                        FROM_AVRAT(ST2086_LUMA_FACTOR, hdr_meta->min_luminance);
             }
             if ( hdr_meta->has_primaries )
             {
@@ -1071,14 +1076,23 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 #define LAV_RED    0
 #define LAV_GREEN  1
 #define LAV_BLUE   2
-                p_pic->format.mastering.primaries[ST2086_RED*2   + 0] = hdr_meta->display_primaries[LAV_RED][0].num;
-                p_pic->format.mastering.primaries[ST2086_RED*2   + 1] = hdr_meta->display_primaries[LAV_RED][1].num;
-                p_pic->format.mastering.primaries[ST2086_GREEN*2 + 0] = hdr_meta->display_primaries[LAV_GREEN][0].num;
-                p_pic->format.mastering.primaries[ST2086_GREEN*2 + 1] = hdr_meta->display_primaries[LAV_GREEN][1].num;
-                p_pic->format.mastering.primaries[ST2086_BLUE*2  + 0] = hdr_meta->display_primaries[LAV_BLUE][0].num;
-                p_pic->format.mastering.primaries[ST2086_BLUE*2  + 1] = hdr_meta->display_primaries[LAV_BLUE][1].num;
-                p_pic->format.mastering.white_point[0] = hdr_meta->white_point[0].num;
-                p_pic->format.mastering.white_point[1] = hdr_meta->white_point[1].num;
+#define ST2086_PRIM_FACTOR 50000
+                p_pic->format.mastering.primaries[ST2086_RED*2   + 0] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->display_primaries[LAV_RED][0]);
+                p_pic->format.mastering.primaries[ST2086_RED*2   + 1] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->display_primaries[LAV_RED][1]);
+                p_pic->format.mastering.primaries[ST2086_GREEN*2 + 0] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->display_primaries[LAV_GREEN][0]);
+                p_pic->format.mastering.primaries[ST2086_GREEN*2 + 1] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->display_primaries[LAV_GREEN][1]);
+                p_pic->format.mastering.primaries[ST2086_BLUE*2  + 0] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->display_primaries[LAV_BLUE][0]);
+                p_pic->format.mastering.primaries[ST2086_BLUE*2  + 1] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->display_primaries[LAV_BLUE][1]);
+                p_pic->format.mastering.white_point[0] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->white_point[0]);
+                p_pic->format.mastering.white_point[1] =
+                        FROM_AVRAT(ST2086_PRIM_FACTOR, hdr_meta->white_point[1]);
             }
 
             if ( memcmp( &p_dec->fmt_out.video.mastering,
@@ -1088,6 +1102,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                 p_dec->fmt_out.video.mastering = p_pic->format.mastering;
                 format_changed = true;
             }
+#undef FROM_AVRAT
         }
 #endif
 #if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 60, 100 ) )
