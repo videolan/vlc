@@ -1,0 +1,12 @@
+diff -ru harfbuzz/configure.ac harfbuzz/configure.ac
+--- harfbuzz/configure.ac	2017-04-11 19:36:57.000000000 +0200
++++ harfbuzz/configure.ac	2017-04-12 10:05:34.000000000 +0200
+@@ -419,7 +419,7 @@
+ 
+ 		if $have_coretext; then
+ 			CORETEXT_CFLAGS=
+-			CORETEXT_LIBS="-framework CoreText -framework CoreGraphics"
++			CORETEXT_LIBS="-framework CoreText -framework CoreGraphics -framework CoreFoundation"
+ 			AC_SUBST(CORETEXT_CFLAGS)
+ 			AC_SUBST(CORETEXT_LIBS)
+ 		fi
