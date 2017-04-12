@@ -100,6 +100,8 @@ struct decoder_sys_t
     cc_storage_t *p_ccs;
 };
 
+#define BLOCK_FLAG_DROP (1 << BLOCK_FLAG_PRIVATE_SHIFT)
+
 static const uint8_t p_hevc_startcode[3] = {0x00, 0x00, 0x01};
 /****************************************************************************
  * Helpers
@@ -144,7 +146,7 @@ static block_t * OutputQueues(decoder_sys_t *p_sys, bool b_valid)
     {
         p_output->i_flags |= i_flags;
         if(!b_valid)
-            p_output->i_flags |= BLOCK_FLAG_CORRUPTED;
+            p_output->i_flags |= BLOCK_FLAG_DROP;
     }
 
     return p_output;
@@ -702,13 +704,13 @@ static block_t *GatherAndValidateChain(block_t *p_outputchain)
 
     if(p_outputchain)
     {
-        if(p_outputchain->i_flags & BLOCK_FLAG_CORRUPTED)
+        if(p_outputchain->i_flags & BLOCK_FLAG_DROP)
             p_output = p_outputchain; /* Avoid useless gather */
         else
             p_output = block_ChainGather(p_outputchain);
     }
 
-    if(p_output && (p_output->i_flags & BLOCK_FLAG_CORRUPTED))
+    if(p_output && (p_output->i_flags & BLOCK_FLAG_DROP))
     {
         block_ChainRelease(p_output); /* Chain! see above */
         p_output = NULL;
@@ -776,7 +778,7 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     {
         /* NAL is a VCL NAL */
         p_output = ParseVCL(p_dec, i_nal_type, p_frag);
-        if (p_output && (p_output->i_flags & BLOCK_FLAG_CORRUPTED))
+        if (p_output && (p_output->i_flags & BLOCK_FLAG_DROP))
             msg_Info(p_dec, "Waiting for VPS/SPS/PPS");
     }
     else
