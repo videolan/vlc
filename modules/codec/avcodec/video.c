@@ -310,7 +310,7 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     dec->fmt_out.video.pose = dec->fmt_in.video.pose;
     if ( dec->fmt_in.video.mastering.max_luminance )
         dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
-    dec->fmt_out.video.ligthing = dec->fmt_in.video.ligthing;
+    dec->fmt_out.video.lighting = dec->fmt_in.video.lighting;
     return decoder_UpdateVideoFormat(dec);
 }
 
@@ -1113,13 +1113,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         {
             const AVContentLightMetadata *light_meta =
                     (const AVContentLightMetadata *) metadata_lt->data;
-            p_pic->format.ligthing.MaxCLL = light_meta->MaxCLL;
-            p_pic->format.ligthing.MaxFALL = light_meta->MaxFALL;
-            if ( memcmp( &p_dec->fmt_out.video.ligthing,
-                         &p_pic->format.ligthing,
-                         sizeof(p_pic->format.ligthing) ) )
+            p_pic->format.lighting.MaxCLL = light_meta->MaxCLL;
+            p_pic->format.lighting.MaxFALL = light_meta->MaxFALL;
+            if ( memcmp( &p_dec->fmt_out.video.lighting,
+                         &p_pic->format.lighting,
+                         sizeof(p_pic->format.lighting) ) )
             {
-                p_dec->fmt_out.video.ligthing  = p_pic->format.ligthing;
+                p_dec->fmt_out.video.lighting  = p_pic->format.lighting;
                 format_changed = true;
             }
         }

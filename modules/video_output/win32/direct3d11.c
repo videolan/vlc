@@ -1319,8 +1319,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         hdr10.WhitePoint[1] = picture->format.mastering.white_point[1];
         hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
         hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
-        hdr10.MaxContentLightLevel = picture->format.ligthing.MaxCLL;
-        hdr10.MaxFrameAverageLightLevel = picture->format.ligthing.MaxFALL;
+        hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
+        hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
         IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
     }
 

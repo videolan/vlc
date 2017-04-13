@@ -856,8 +856,8 @@ static bool ParseSEICallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
         case HXXX_SEI_CONTENT_LIGHT_LEVEL:
         {
             video_format_t *p_fmt = &p_dec->fmt_out.video;
-            p_fmt->ligthing.MaxCLL = p_sei_data->content_light_lvl.MaxCLL;
-            p_fmt->ligthing.MaxFALL = p_sei_data->content_light_lvl.MaxFALL;
+            p_fmt->lighting.MaxCLL = p_sei_data->content_light_lvl.MaxCLL;
+            p_fmt->lighting.MaxFALL = p_sei_data->content_light_lvl.MaxFALL;
         } break;
     }
 

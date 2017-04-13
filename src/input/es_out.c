@@ -3230,15 +3230,15 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            float y = (float)fmt->video.mastering.white_point[1] / 50000.f;
            info_category_AddInfo( p_cat, _("White point"), "x=%.4f y=%.4f", x, y );
        }
-       if ( fmt->video.ligthing.MaxCLL )
+       if ( fmt->video.lighting.MaxCLL )
        {
            info_category_AddInfo( p_cat, _("MaxCLL"), "%d cd/m²",
-                                  fmt->video.ligthing.MaxCLL );
+                                  fmt->video.lighting.MaxCLL );
        }
-       if ( fmt->video.ligthing.MaxFALL )
+       if ( fmt->video.lighting.MaxFALL )
        {
            info_category_AddInfo( p_cat, _("MaxFALL"), "%d cd/m²",
-                                  fmt->video.ligthing.MaxFALL );
+                                  fmt->video.lighting.MaxFALL );
        }
        break;
 
