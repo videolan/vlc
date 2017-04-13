@@ -706,7 +706,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     /* Gather PPS/SPS if required */
     block_t *p_xpsnal = NULL;
     block_t **pp_xpsnal_tail = &p_xpsnal;
-    const bool b_sps_pps_i = p_sys->slice.type != H264_SLICE_TYPE_I &&
+    const bool b_sps_pps_i = p_sys->slice.type == H264_SLICE_TYPE_I &&
                              p_sys->p_active_pps &&
                              p_sys->p_active_sps;
     if( b_sps_pps_i || p_sys->b_new_sps || p_sys->b_new_pps )
