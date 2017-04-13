@@ -3379,7 +3379,7 @@ static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
 
      /* QuickTime "built-in" support case fixups */
     if( p_track->fmt.i_cat == AUDIO_ES &&
-        p_soun->i_compressionid == 0 && p_track->i_sample_size == 1 )
+        p_soun->i_compressionid == 0 && p_track->i_sample_size <= 2 )
     {
         switch( p_track->fmt.i_codec )
         {
@@ -3398,7 +3398,8 @@ static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
         case VLC_CODEC_F32B:
         case VLC_CODEC_F64L:
         case VLC_CODEC_F64B:
-            i_size = ((p_soun->i_samplesize+7)/8) * p_soun->i_channelcount;
+            if( p_track->i_sample_size < ((p_soun->i_samplesize+7U)/8U) * p_soun->i_channelcount )
+                i_size = ((p_soun->i_samplesize+7)/8) * p_soun->i_channelcount;
             break;
         case VLC_CODEC_ALAW:
         case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
