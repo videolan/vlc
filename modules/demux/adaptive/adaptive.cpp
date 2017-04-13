@@ -77,6 +77,7 @@ static void Close   (vlc_object_t *);
 static const AbstractAdaptationLogic::LogicType pi_logics[] = {
                                 AbstractAdaptationLogic::Default,
                                 AbstractAdaptationLogic::Predictive,
+                                AbstractAdaptationLogic::NearOptimal,
                                 AbstractAdaptationLogic::RateBased,
                                 AbstractAdaptationLogic::FixedRate,
                                 AbstractAdaptationLogic::AlwaysLowest,
@@ -85,6 +86,7 @@ static const AbstractAdaptationLogic::LogicType pi_logics[] = {
 static const char *const ppsz_logics_values[] = {
                                 "",
                                 "predictive",
+                                "nearoptimal",
                                 "rate",
                                 "fixedrate",
                                 "lowest",
@@ -92,6 +94,7 @@ static const char *const ppsz_logics_values[] = {
 
 static const char *const ppsz_logics[] = { N_("Default"),
                                            N_("Predictive"),
+                                           N_("Near Optimal"),
                                            N_("Bandwidth Adaptive"),
                                            N_("Fixed Bandwidth"),
                                            N_("Lowest Bandwidth/Quality"),

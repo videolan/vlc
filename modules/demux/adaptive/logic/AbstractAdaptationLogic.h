@@ -59,7 +59,8 @@ namespace adaptive
                     AlwaysLowest,
                     RateBased,
                     FixedRate,
-                    Predictive
+                    Predictive,
+                    NearOptimal,
                 };
 
             protected:

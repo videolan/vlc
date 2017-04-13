@@ -34,6 +34,7 @@
 #include "logic/RateBasedAdaptationLogic.h"
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
 #include "logic/PredictiveAdaptationLogic.hpp"
+#include "logic/NearOptimalAdaptationLogic.hpp"
 #include "tools/Debug.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
@@ -736,6 +737,15 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             if(ratelogic)
                 conn->setDownloadRateObserver(ratelogic);
             logic = ratelogic;
+            break;
+        }
+        case AbstractAdaptationLogic::NearOptimal:
+        {
+            NearOptimalAdaptationLogic *noplogic =
+                    new (std::nothrow) NearOptimalAdaptationLogic(VLC_OBJECT(p_demux));
+            if(noplogic)
+                conn->setDownloadRateObserver(noplogic);
+            logic = noplogic;
             break;
         }
         case AbstractAdaptationLogic::Default:
