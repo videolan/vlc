@@ -868,6 +868,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             p_block->i_dts = VLC_TS_INVALID;
         }
 
+#if LIBAVCODEC_VERSION_CHECK( 57, 0, 0xFFFFFFFFU, 64, 101 )
+        if( !b_need_output_picture )
+            pkt.flags |= AV_PKT_FLAG_DISCARD;
+#endif
+
         int ret = avcodec_send_packet(p_context, &pkt);
         if( ret != 0 && ret != AVERROR(EAGAIN) )
         {
@@ -945,12 +950,20 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
         update_late_frame_count( p_dec, p_block, current_time, i_pts);
 
-        if( !b_need_output_picture || ( !p_sys->p_va && !frame->linesize[0] ) ||
+        if( ( !p_sys->p_va && !frame->linesize[0] ) ||
            ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) ) )
         {
             av_frame_free(&frame);
             continue;
         }
+
+#if !LIBAVCODEC_VERSION_CHECK( 57, 0, 0xFFFFFFFFU, 64, 101 )
+        if( !b_need_output_picture )
+        {
+            av_frame_free(&frame);
+            continue;
+        }
+#endif
 
         if( p_context->pix_fmt == AV_PIX_FMT_PAL8
          && !p_dec->fmt_out.video.p_palette )
