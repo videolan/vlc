@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G1421" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G1421" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment version="1060" identifier="macosx"/>
+        <deployment version="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
@@ -17,22 +17,21 @@
         <window title="Errors and Warnings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ErrorsAndWarnings" animationBehavior="default" id="5" userLabel="Non-Blocking errors" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="304" y="373" width="397" height="209"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="contentRect" x="304" y="373" width="397" height="208"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <value key="minSize" type="size" width="260" height="120"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="397" height="209"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <rect key="frame" x="0.0" y="0.0" width="397" height="208"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <scrollView autohidesScrollers="YES" horizontalLineScroll="47" horizontalPageScroll="10" verticalLineScroll="47" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="7">
-                        <rect key="frame" x="0.0" y="39" width="398" height="170"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="47" horizontalPageScroll="10" verticalLineScroll="47" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7">
+                        <rect key="frame" x="0.0" y="38" width="397" height="170"/>
                         <clipView key="contentView" id="vJx-40-Cca">
-                            <rect key="frame" x="1" y="1" width="396" height="168"/>
+                            <rect key="frame" x="1" y="1" width="395" height="168"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="45" id="8">
-                                    <rect key="frame" x="0.0" y="0.0" width="396" height="168"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="395" height="47"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -47,7 +46,7 @@
                                             <imageCell key="dataCell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" id="18"/>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="error_msg" width="344.99560000000002" minWidth="39.995609999999999" maxWidth="1000" id="10">
+                                        <tableColumn identifier="error_msg" width="343.99560000000002" minWidth="39.995609999999999" maxWidth="1000" id="10">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="errors">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -74,13 +73,12 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="73">
-                            <rect key="frame" x="-30" y="1" width="15" height="168"/>
+                            <rect key="frame" x="380" y="1" width="16" height="0.0"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <button verticalHuggingPriority="750" id="11">
-                        <rect key="frame" x="15" y="7" width="94" height="28"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="11">
+                        <rect key="frame" x="15" y="6" width="73" height="28"/>
                         <buttonCell key="cell" type="push" title="Clean up" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="71">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -90,7 +88,16 @@
                         </connections>
                     </button>
                 </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="7" secondAttribute="trailing" id="4nW-Xc-sPX"/>
+                    <constraint firstItem="7" firstAttribute="top" secondItem="6" secondAttribute="top" id="6AH-w4-raW"/>
+                    <constraint firstItem="11" firstAttribute="top" secondItem="7" secondAttribute="bottom" constant="8" symbolic="YES" id="ZYg-92-5Hf"/>
+                    <constraint firstItem="11" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="20" id="bE6-8W-prE"/>
+                    <constraint firstAttribute="bottom" secondItem="11" secondAttribute="bottom" constant="12" id="jpE-a7-krs"/>
+                    <constraint firstItem="7" firstAttribute="leading" secondItem="6" secondAttribute="leading" id="n7H-w5-oZh"/>
+                </constraints>
             </view>
+            <point key="canvasLocation" x="269.5" y="318"/>
         </window>
     </objects>
 </document>
