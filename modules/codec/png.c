@@ -261,6 +261,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( i_color_type == PNG_COLOR_TYPE_GRAY ||
         i_color_type == PNG_COLOR_TYPE_GRAY_ALPHA )
           png_set_gray_to_rgb( p_png );
+    if( i_color_type & PNG_COLOR_MASK_ALPHA )
+        png_set_alpha_mode( p_png, PNG_ALPHA_STANDARD, PNG_GAMMA_LINEAR );
 
     /* Strip to 8 bits per channel */
     if( i_bit_depth == 16 ) png_set_strip_16( p_png );
