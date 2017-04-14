@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G1421" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -164,7 +164,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="570" height="38"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <box boxType="oldStyle" borderType="none" title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="2410">
+                    <box title="Title" boxType="oldStyle" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="2410">
                         <rect key="frame" x="0.0" y="-2" width="570" height="40"/>
                         <view key="contentView" id="uTV-TS-NBc">
                             <rect key="frame" x="0.0" y="0.0" width="570" height="40"/>
@@ -247,7 +247,7 @@ Gw
             <rect key="frame" x="0.0" y="0.0" width="570" height="571"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <box borderType="line" title="General Settings" translatesAutoresizingMaskIntoConstraints="NO" id="kup-aY-Wqq">
+                <box title="General Settings" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="kup-aY-Wqq">
                     <rect key="frame" x="18" y="433" width="536" height="117"/>
                     <view key="contentView" id="wFl-aV-3Hn">
                         <rect key="frame" x="1" y="1" width="534" height="101"/>
@@ -274,7 +274,7 @@ Gw
                                 <constraints>
                                     <constraint firstAttribute="width" constant="288" id="Kfa-pp-08X"/>
                                 </constraints>
-                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3901">
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3901">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3902"/>
@@ -316,7 +316,7 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="05Z-q1-rGx"/>
                                 </connections>
                             </matrix>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="r3P-eU-tEX">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="r3P-eU-tEX">
                                 <rect key="frame" x="16" y="15" width="185" height="18"/>
                                 <buttonCell key="cell" type="check" title="Enable VLC status bar icon" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vhy-1T-Knj">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -350,7 +350,7 @@ Gw
                         <rect key="frame" x="2" y="2" width="530" height="90"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3556">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3556">
                                 <rect key="frame" x="14" y="36" width="217" height="18"/>
                                 <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="3557">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -360,7 +360,7 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="t18-Rf-im8"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3928">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3928">
                                 <rect key="frame" x="14" y="64" width="161" height="18"/>
                                 <buttonCell key="cell" type="check" title="Allow metadata access" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="3929">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -399,7 +399,7 @@ Gw
                         <rect key="frame" x="2" y="2" width="530" height="125"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3542">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3542">
                                 <rect key="frame" x="15" y="66" width="265" height="18"/>
                                 <buttonCell key="cell" type="check" title="Control playback with the Apple Remote" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3547">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -409,7 +409,7 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="3Jy-4t-gHQ"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3543">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3543">
                                 <rect key="frame" x="15" y="39" width="225" height="18"/>
                                 <buttonCell key="cell" type="check" title="Control playback with media keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3546">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -429,7 +429,7 @@ Gw
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3920">
                                 <rect key="frame" x="223" y="91" width="293" height="26"/>
-                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3921">
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3921">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3922"/>
@@ -438,7 +438,7 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="SxN-sI-55J"/>
                                 </connections>
                             </popUpButton>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3738">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3738">
                                 <rect key="frame" x="15" y="11" width="302" height="18"/>
                                 <buttonCell key="cell" type="check" title="Control system volume with the Apple Remote" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3739">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -466,13 +466,13 @@ Gw
                         <constraint firstAttribute="height" constant="138" id="XGx-54-nEj"/>
                     </constraints>
                 </box>
-                <box borderType="line" title="Playback behaviour" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
+                <box title="Playback behaviour" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
                     <rect key="frame" x="18" y="197" width="534" height="86"/>
                     <view key="contentView" id="BMS-wa-oJS">
                         <rect key="frame" x="1" y="1" width="532" height="70"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3564">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3564">
                                 <rect key="frame" x="16" y="44" width="284" height="18"/>
                                 <buttonCell key="cell" type="check" title="Enable notifications on playlist item change" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3565">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -492,7 +492,7 @@ Gw
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3911">
                                 <rect key="frame" x="223" y="11" width="293" height="26"/>
-                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3912">
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3912">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3913"/>
@@ -515,7 +515,7 @@ Gw
                         <constraint firstAttribute="height" constant="82" id="rRS-wr-FCF"/>
                     </constraints>
                 </box>
-                <box borderType="line" title="lua" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
+                <box title="lua" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
                     <rect key="frame" x="17" y="16" width="536" height="64"/>
                     <view key="contentView" id="Who-VF-GbQ">
                         <rect key="frame" x="1" y="1" width="534" height="48"/>
@@ -586,7 +586,7 @@ Gw
                         <rect key="frame" x="2" y="2" width="531" height="100"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2365">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2365">
                                 <rect key="frame" x="14" y="73" width="190" height="18"/>
                                 <buttonCell key="cell" type="check" title="Enable Last.fm submissions" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3472">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -680,7 +680,7 @@ Gw
                                 <constraints>
                                     <constraint firstAttribute="width" constant="180" id="1rJ-MH-7Hh"/>
                                 </constraints>
-                                <popUpButtonCell key="cell" type="push" title="Default" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2361" id="3471">
+                                <popUpButtonCell key="cell" type="push" title="Default" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2361" id="3471">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2359">
@@ -714,8 +714,8 @@ Gw
                         <rect key="frame" x="2" y="2" width="531" height="167"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2335">
-                                <rect key="frame" x="250" y="82" width="209" height="19"/>
+                            <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2335">
+                                <rect key="frame" x="250" y="82" width="209" height="20"/>
                                 <sliderCell key="cell" continuous="YES" alignment="left" maxValue="200" doubleValue="100" tickMarkPosition="above" sliderType="linear" id="3459">
                                     <font key="font" size="12" name="Helvetica"/>
                                 </sliderCell>
@@ -723,7 +723,7 @@ Gw
                                     <action selector="audioSettingChanged:" target="-2" id="5xq-tt-Vti"/>
                                 </connections>
                             </slider>
-                            <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2336">
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2336">
                                 <rect key="frame" x="465" y="81" width="46" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="46" id="96N-ME-SLD"/>
@@ -752,7 +752,7 @@ Gw
                                     <outlet property="nextKeyView" destination="2346" id="3424"/>
                                 </connections>
                             </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2339">
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2339">
                                 <rect key="frame" x="9" y="56" width="239" height="17"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Force detection of Dolby Surround" id="3462">
                                     <font key="font" metaFont="system"/>
@@ -760,12 +760,12 @@ Gw
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <popUpButton verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2340">
+                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2340">
                                 <rect key="frame" x="250" y="51" width="185" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="180" id="m4P-Bj-cCf"/>
                                 </constraints>
-                                <popUpButtonCell key="cell" type="push" title="Auto" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2344" id="3463">
+                                <popUpButtonCell key="cell" type="push" title="Auto" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2344" id="3463">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2341">
@@ -780,7 +780,7 @@ Gw
                                     <action selector="audioSettingChanged:" target="-2" id="vXp-SU-H1J"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2345">
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2345">
                                 <rect key="frame" x="9" y="22" width="239" height="17"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Preferred Audio language" id="3464">
                                     <font key="font" metaFont="system"/>
@@ -788,7 +788,7 @@ Gw
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2346">
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2346">
                                 <rect key="frame" x="252" y="20" width="259" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="259" id="8Te-oS-vOQ"/>
@@ -802,7 +802,7 @@ Gw
                                     <action selector="audioSettingChanged:" target="-2" id="wGl-6M-AMK"/>
                                 </connections>
                             </textField>
-                            <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3664">
+                            <matrix verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="always" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3664">
                                 <rect key="frame" x="12" y="109" width="499" height="48"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 <size key="cellSize" width="499" height="23"/>
@@ -861,7 +861,7 @@ Gw
                         <constraint firstItem="3664" firstAttribute="top" secondItem="2332" secondAttribute="top" constant="25" id="yNh-fk-NdY"/>
                     </constraints>
                 </box>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="2331">
+                <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2331">
                     <rect key="frame" x="18" y="396" width="101" height="18"/>
                     <buttonCell key="cell" type="check" title="Enable Audio" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3457">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -895,7 +895,7 @@ Gw
                         <rect key="frame" x="2" y="2" width="532" height="87"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2452">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2452">
                                 <rect key="frame" x="15" y="61" width="214" height="18"/>
                                 <buttonCell key="cell" type="check" title="Show video within main window" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3479">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -905,7 +905,7 @@ Gw
                                     <action selector="videoSettingChanged:" target="-2" id="jdL-pA-9Ed"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2451">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2451">
                                 <rect key="frame" x="15" y="10" width="107" height="18"/>
                                 <buttonCell key="cell" type="check" title="Always on top" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3478">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -915,7 +915,7 @@ Gw
                                     <action selector="videoSettingChanged:" target="-2" id="m6x-T2-Ao2"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="rpy-5O-tek">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="rpy-5O-tek">
                                 <rect key="frame" x="15" y="36" width="278" height="18"/>
                                 <buttonCell key="cell" type="check" title="Pause the video playback when minimized" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="v2U-aI-gRI">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -925,7 +925,7 @@ Gw
                                     <action selector="videoSettingChanged:" target="-2" id="sk0-pw-9AE"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3728">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3728">
                                 <rect key="frame" x="270" y="10" width="146" height="18"/>
                                 <buttonCell key="cell" type="check" title="Window decorations" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3729">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -957,7 +957,7 @@ Gw
                         <rect key="frame" x="2" y="2" width="532" height="101"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="5Db-fa-Ffw">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="5Db-fa-Ffw">
                                 <rect key="frame" x="14" y="74" width="130" height="18"/>
                                 <buttonCell key="cell" type="check" title="Start in fullscreen" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="dib-dQ-tMp">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -967,7 +967,7 @@ Gw
                                     <action selector="videoSettingChanged:" target="-2" id="9Dw-qx-0Eo"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="i5X-iK-Hbj">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="i5X-iK-Hbj">
                                 <rect key="frame" x="270" y="74" width="224" height="18"/>
                                 <buttonCell key="cell" type="check" title="Black screens in Fullscreen mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="mR8-Zk-i3R">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -977,7 +977,7 @@ Gw
                                     <action selector="videoSettingChanged:" target="-2" id="cL2-0Y-iKD"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="6mo-Qc-MZV">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="6mo-Qc-MZV">
                                 <rect key="frame" x="14" y="45" width="187" height="18"/>
                                 <buttonCell key="cell" type="check" title="Use native fullscreen mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8UZ-lD-mnI">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -989,7 +989,7 @@ Gw
                             </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="74n-z2-A2G">
                                 <rect key="frame" x="184" y="10" width="170" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Screen 1 (1280 * 800)" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2ni-Sy-Xtp" id="HOa-K5-WKi">
+                                <popUpButtonCell key="cell" type="push" title="Screen 1 (1280 * 800)" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2ni-Sy-Xtp" id="HOa-K5-WKi">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="Q7U-7F-NwP">
@@ -1029,7 +1029,7 @@ Gw
                         <constraint firstItem="74n-z2-A2G" firstAttribute="leading" secondItem="9CN-jv-NQ1" secondAttribute="leading" constant="185" id="fAd-OT-LbT"/>
                     </constraints>
                 </box>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="2448">
+                <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2448">
                     <rect key="frame" x="18" y="461" width="101" height="18"/>
                     <buttonCell key="cell" type="check" title="Enable Video" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3477">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1039,7 +1039,7 @@ Gw
                         <action selector="videoSettingChanged:" target="-2" id="BYl-tW-BeB"/>
                     </connections>
                 </button>
-                <box autoresizesSubviews="NO" borderType="line" title="Video" translatesAutoresizingMaskIntoConstraints="NO" id="3722">
+                <box autoresizesSubviews="NO" title="Video" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="3722">
                     <rect key="frame" x="17" y="136" width="536" height="89"/>
                     <view key="contentView" id="Kie-O4-kEN">
                         <rect key="frame" x="1" y="1" width="534" height="73"/>
@@ -1063,7 +1063,7 @@ Gw
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3704">
                                 <rect key="frame" x="185" y="39" width="170" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3718" id="3715">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3718" id="3715">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3716">
@@ -1080,7 +1080,7 @@ Gw
                             </popUpButton>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3706">
                                 <rect key="frame" x="185" y="11" width="170" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3712" id="3709">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3712" id="3709">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3710">
@@ -1166,7 +1166,7 @@ Gw
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2476">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2476">
                                 <rect key="frame" x="296" y="42" width="155" height="18"/>
                                 <buttonCell key="cell" type="check" title="Sequential numbering" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3491">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1189,7 +1189,7 @@ Gw
                                 <constraints>
                                     <constraint firstAttribute="width" constant="210" id="QXI-vw-6ZO"/>
                                 </constraints>
-                                <popUpButtonCell key="cell" type="push" title="PNG" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2481" id="3493">
+                                <popUpButtonCell key="cell" type="push" title="PNG" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2481" id="3493">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2479">
@@ -1267,7 +1267,7 @@ Gw
                                 <constraints>
                                     <constraint firstAttribute="width" constant="197" id="5lH-sw-4lb"/>
                                 </constraints>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2583" id="3514">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2583" id="3514">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2581">
@@ -1342,7 +1342,7 @@ Gw
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="lem-yf-jZB">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="lem-yf-jZB">
                                 <rect key="frame" x="14" y="16" width="94" height="18"/>
                                 <buttonCell key="cell" type="check" title="Skip frames" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="lfl-mG-es8">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1383,7 +1383,7 @@ Gw
                             </stepper>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2594">
                                 <rect key="frame" x="315" y="76" width="202" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2598" id="3520">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2598" id="3520">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2595">
@@ -1400,7 +1400,7 @@ Gw
                             </popUpButton>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3435">
                                 <rect key="frame" x="315" y="43" width="202" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3439" id="3523">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3439" id="3523">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3436">
@@ -1465,7 +1465,7 @@ Gw
                         <constraint firstAttribute="height" constant="56" id="ymx-sx-dSh"/>
                     </constraints>
                 </box>
-                <box autoresizesSubviews="NO" borderType="line" title="Record directory or filename" translatesAutoresizingMaskIntoConstraints="NO" id="3623">
+                <box autoresizesSubviews="NO" title="Record directory or filename" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="3623">
                     <rect key="frame" x="17" y="340" width="538" height="62"/>
                     <view key="contentView" id="7b2-vV-8CM">
                         <rect key="frame" x="1" y="1" width="536" height="46"/>
@@ -1565,7 +1565,7 @@ Gw
                             </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2544">
                                 <rect key="frame" x="140" y="133" width="249" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2546" id="3502">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2546" id="3502">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2545">
@@ -1590,7 +1590,7 @@ Gw
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2550">
                                 <rect key="frame" x="140" y="103" width="249" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2553" id="3504">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2553" id="3504">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2551">
@@ -1615,7 +1615,7 @@ Gw
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3682">
                                 <rect key="frame" x="140" y="43" width="249" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3688" id="3685">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3688" id="3685">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3686">
@@ -1640,7 +1640,7 @@ Gw
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3691">
                                 <rect key="frame" x="140" y="13" width="249" height="26"/>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3697" id="3694">
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="3697" id="3694">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3695">
@@ -1672,7 +1672,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3569">
-                                <rect key="frame" x="140" y="77" width="194" height="19"/>
+                                <rect key="frame" x="140" y="77" width="194" height="20"/>
                                 <sliderCell key="cell" continuous="YES" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="above" sliderType="linear" id="3573">
                                     <font key="font" size="12" name="Helvetica"/>
                                 </sliderCell>
@@ -1680,7 +1680,7 @@ Gw
                                     <action selector="osdSettingChanged:" target="-2" id="Ng5-zQ-ywZ"/>
                                 </connections>
                             </slider>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3584">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3584">
                                 <rect key="frame" x="392" y="108" width="87" height="18"/>
                                 <buttonCell key="cell" type="check" title="Force Bold" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3585">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1763,7 +1763,7 @@ Gw
                         <rect key="frame" x="2" y="2" width="532" height="36"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2526">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2526">
                                 <rect key="frame" x="14" y="9" width="94" height="18"/>
                                 <buttonCell key="cell" type="check" title="Enable OSD" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3494">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1822,7 +1822,7 @@ Gw
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2532">
                                 <rect key="frame" x="254" y="9" width="264" height="26"/>
-                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2665" id="3498">
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2665" id="3498">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="2533">
@@ -2102,7 +2102,7 @@ Gw
                         <constraints>
                             <constraint firstAttribute="width" constant="125" id="1ju-0u-22Z"/>
                         </constraints>
-                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3790">
+                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3790">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3791">
@@ -2127,7 +2127,7 @@ Gw
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3797">
                         <rect key="frame" x="77" y="123" width="130" height="26"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3804" id="3800">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3804" id="3800">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3801">
@@ -2152,7 +2152,7 @@ Gw
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3805">
                         <rect key="frame" x="77" y="97" width="130" height="26"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3810" id="3808">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3810" id="3808">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3809">
@@ -2177,7 +2177,7 @@ Gw
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3813">
                         <rect key="frame" x="322" y="149" width="130" height="26"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3820" id="3816">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3820" id="3816">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3817">
@@ -2202,7 +2202,7 @@ Gw
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3821">
                         <rect key="frame" x="77" y="71" width="130" height="26"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3826" id="3824">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3826" id="3824">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3825">
@@ -2227,7 +2227,7 @@ Gw
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3829">
                         <rect key="frame" x="322" y="123" width="130" height="26"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3836" id="3832">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3836" id="3832">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3833">
@@ -2252,7 +2252,7 @@ Gw
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3837">
                         <rect key="frame" x="322" y="97" width="130" height="26"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3842" id="3840">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3842" id="3840">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3841">
@@ -2277,7 +2277,7 @@ Gw
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3845">
                         <rect key="frame" x="322" y="71" width="130" height="26"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3852" id="3848">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3852" id="3848">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="3849">
