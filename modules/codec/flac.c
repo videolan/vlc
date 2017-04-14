@@ -628,7 +628,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
 
     if( !p_sys->b_stream_info )
+    {
         ProcessHeader( p_dec );
+        if( !p_sys->b_stream_info )
+        {
+            block_Release( p_block );
+            return VLCDEC_ECRITICAL;
+        }
+    }
 
     p_sys->p_block = p_block;
 
