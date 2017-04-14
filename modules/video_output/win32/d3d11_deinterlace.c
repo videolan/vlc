@@ -132,6 +132,7 @@ static int Open(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     HRESULT hr;
     ID3D11Device *d3ddevice = NULL;
+    ID3D11VideoProcessorEnumerator *processorEnumerator = NULL;
 
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE
      && filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_10B)
@@ -174,7 +175,6 @@ static int Open(vlc_object_t *obj)
 
     const video_format_t *fmt = &dst->format;
 
-    ID3D11VideoProcessorEnumerator *processorEnumerator;
     D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
         .InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
         .InputFrameRate = {
