@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1108" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G1421" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainMenu">
@@ -50,6 +50,7 @@
                 <outlet property="donation" destination="2298" id="ZzJ-yC-jOi"/>
                 <outlet property="double_window" destination="1171" id="DIg-sW-WS6"/>
                 <outlet property="editMenu" destination="205" id="6Mt-eK-QAx"/>
+                <outlet property="errorsAndWarnings" destination="n1B-wa-XGR" id="gNg-1z-gua"/>
                 <outlet property="extensions" destination="4942" id="qSU-2W-Chy"/>
                 <outlet property="extensionsMenu" destination="4943" id="IAw-5Z-Wvo"/>
                 <outlet property="fileMenu" destination="81" id="lbA-s5-6qj"/>
@@ -775,6 +776,12 @@
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="2394">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Errors and Warnings" keyEquivalent="m" id="n1B-wa-XGR">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="showErrorsAndWarnings:" target="-2" id="4xx-kx-Wxo"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Messages..." keyEquivalent="M" id="1003">
                                 <connections>

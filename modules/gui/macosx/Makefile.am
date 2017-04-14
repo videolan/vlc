@@ -32,6 +32,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCMainWindowControlsBar.m VLCMainWindowControlsBar.h \
 	VLCConvertAndSaveWindowController.h VLCConvertAndSaveWindowController.m \
 	VLCCoreInteraction.h VLCCoreInteraction.m \
+	VLCErrorWindowController.h VLCErrorWindowController.m \
 	VLCExtensionsDialogProvider.h VLCExtensionsDialogProvider.m \
 	VLCExtensionsManager.h VLCExtensionsManager.m \
 	VLCHelpWindowController.h VLCHelpWindowController.m \
@@ -106,6 +107,7 @@ nobase_libmacosx_plugin_la_DATA = \
 	UI/ConvertAndSave.nib \
 	UI/CoreDialogs.nib \
 	UI/DetachedVideoWindow.nib \
+	UI/ErrorPanel.nib \
 	UI/FSPanel.nib \
 	UI/Help.nib \
 	UI/LogMessageWindow.nib \
@@ -136,6 +138,7 @@ libmacosx_plugin_la_SOURCES += \
 	UI/ConvertAndSave.xib \
 	UI/CoreDialogs.xib \
 	UI/DetachedVideoWindow.xib \
+	UI/ErrorPanel.xib \
 	UI/FSPanel.xib \
 	UI/Help.xib \
 	UI/LogMessageWindow.xib \

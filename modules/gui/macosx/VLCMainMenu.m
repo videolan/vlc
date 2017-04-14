@@ -31,6 +31,7 @@
 #import "VLCAboutWindowController.h"
 #import "VLCOpenWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
+#import "VLCErrorWindowController.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCHelpWindowController.h"
 #import "VLCVideoEffectsWindowController.h"
@@ -39,6 +40,7 @@
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCVoutView.h"
+#import "VLCCoreDialogProvider.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainWindow.h"
 #import "VLCMainWindowControlsBar.h"
@@ -1205,6 +1207,11 @@
         _addonsController = [[VLCAddonsWindowController alloc] init];
 
     [_addonsController showWindow:self];
+}
+
+- (IBAction)showErrorsAndWarnings:(id)sender
+{
+    [[[[VLCMain sharedInstance] coreDialogProvider] errorPanel] showWindow:self];
 }
 
 - (IBAction)showMessagesPanel:(id)showMessagesPanel

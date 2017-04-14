@@ -30,6 +30,8 @@
  * VLCCoreDialogProvider interface
  *****************************************************************************/
 
+@class VLCErrorWindowController;
+
 @interface VLCCoreDialogProvider : NSObject
 {
     /* authentication dialog */
@@ -51,6 +53,8 @@
     IBOutlet NSTextField *progressTitleLabel;
     IBOutlet NSWindow *progressWindow;
 }
+
+@property (readonly) VLCErrorWindowController* errorPanel;
 
 @property (atomic,readwrite) BOOL progressCancelled;
 
