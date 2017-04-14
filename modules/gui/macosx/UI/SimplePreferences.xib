@@ -847,18 +847,18 @@ Gw
                             <constraint firstItem="2335" firstAttribute="leading" secondItem="sX1-um-Nbr" secondAttribute="leading" constant="252" id="efV-6F-44H"/>
                             <constraint firstItem="2336" firstAttribute="leading" secondItem="2335" secondAttribute="trailing" constant="8" id="etL-aD-xyO"/>
                             <constraint firstItem="2336" firstAttribute="trailing" secondItem="2346" secondAttribute="trailing" id="hsX-v8-qU8"/>
+                            <constraint firstItem="3664" firstAttribute="leading" secondItem="sX1-um-Nbr" secondAttribute="leading" constant="12" id="ipe-4k-4s8"/>
                             <constraint firstItem="2339" firstAttribute="leading" secondItem="sX1-um-Nbr" secondAttribute="leading" constant="11" id="irs-Mc-EXZ"/>
                             <constraint firstItem="2340" firstAttribute="leading" secondItem="2335" secondAttribute="leading" id="lma-5t-iwF"/>
-                            <constraint firstItem="2335" firstAttribute="top" secondItem="3664" secondAttribute="bottom" constant="9" id="sPL-qO-v2S"/>
+                            <constraint firstItem="2335" firstAttribute="top" secondItem="3664" secondAttribute="bottom" constant="9" id="tDz-VB-oVJ"/>
                             <constraint firstItem="2336" firstAttribute="centerY" secondItem="2335" secondAttribute="centerY" id="tpS-N0-gGA"/>
                             <constraint firstItem="2335" firstAttribute="leading" secondItem="sX1-um-Nbr" secondAttribute="leading" constant="252" id="y91-mp-0ZJ"/>
+                            <constraint firstItem="3664" firstAttribute="top" secondItem="sX1-um-Nbr" secondAttribute="top" constant="10" id="ydK-et-WGv"/>
                         </constraints>
                     </view>
                     <constraints>
-                        <constraint firstItem="3664" firstAttribute="leading" secondItem="2332" secondAttribute="leading" constant="11" id="Efn-94-ybA"/>
                         <constraint firstAttribute="height" constant="180" id="Jpc-Wz-hA7"/>
                         <constraint firstAttribute="width" constant="529" id="LEg-Z7-F1m"/>
-                        <constraint firstItem="3664" firstAttribute="top" secondItem="2332" secondAttribute="top" constant="25" id="yNh-fk-NdY"/>
                     </constraints>
                 </box>
                 <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2331">
@@ -1888,7 +1888,7 @@ Gw
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
                                     <tableColumn identifier="action" editable="NO" width="301.5" minWidth="40" maxWidth="1000" id="2671">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Action">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Action">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1901,7 +1901,7 @@ Gw
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                     </tableColumn>
                                     <tableColumn identifier="shortcut" editable="NO" width="220.69820000000001" minWidth="8" maxWidth="1000" id="2672">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Shortcut">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Shortcut">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1955,7 +1955,7 @@ Gw
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2673">
-                    <rect key="frame" x="19" y="378" width="306" height="17"/>
+                    <rect key="frame" x="18" y="378" width="306" height="17"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Select an action to change the associated hotkey:" id="3524">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1964,15 +1964,16 @@ Gw
                 </textField>
             </subviews>
             <constraints>
+                <constraint firstItem="2669" firstAttribute="leading" secondItem="2673" secondAttribute="leading" id="07J-bM-GTd"/>
                 <constraint firstItem="2674" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="2PK-yW-KzL"/>
-                <constraint firstItem="2669" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="EKI-1b-BQQ"/>
+                <constraint firstAttribute="trailing" secondItem="2669" secondAttribute="trailing" constant="20" id="9ma-RK-c6X"/>
+                <constraint firstItem="2673" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="HYF-Bu-NcI"/>
                 <constraint firstItem="2675" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="Kep-UP-GNR"/>
                 <constraint firstAttribute="bottom" secondItem="2674" secondAttribute="bottom" constant="19" id="Ubu-5f-bOl"/>
-                <constraint firstItem="2673" firstAttribute="leading" secondItem="2670" secondAttribute="leading" id="bAY-Hy-uEz"/>
+                <constraint firstItem="2674" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="aa2-ha-RSP"/>
                 <constraint firstItem="2669" firstAttribute="top" secondItem="2673" secondAttribute="bottom" constant="8" id="cl3-aB-HqL"/>
                 <constraint firstItem="2673" firstAttribute="top" secondItem="2668" secondAttribute="top" constant="20" id="cmU-2H-taN"/>
                 <constraint firstAttribute="trailing" secondItem="2675" secondAttribute="trailing" constant="20" id="gZf-hH-gcD"/>
-                <constraint firstAttribute="trailing" secondItem="2669" secondAttribute="trailing" constant="20" id="qxQ-JK-aeG"/>
                 <constraint firstAttribute="bottom" secondItem="2675" secondAttribute="bottom" constant="19" id="yYm-vV-dk7"/>
             </constraints>
         </customView>
