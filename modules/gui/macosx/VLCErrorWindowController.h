@@ -25,16 +25,13 @@
 #import <Cocoa/Cocoa.h>
 
 @interface VLCErrorWindowController : NSWindowController
-{
-    IBOutlet id o_cleanup_button;
-    IBOutlet id o_error_table;
 
-    NSMutableArray *o_errors;
-    NSMutableArray *o_icons;
-}
+@property (readwrite, weak) IBOutlet NSButton    *cleanupButton;
+@property (readwrite, weak) IBOutlet NSTableView *errorTable;
+
 
 - (IBAction)cleanupTable:(id)sender;
 
--(void)addError:(NSString *)o_error withMsg:(NSString *)o_msg;
+- (void)addError:(NSString *)title withMsg:(NSString *)message;
 
 @end

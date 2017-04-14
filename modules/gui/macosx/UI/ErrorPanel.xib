@@ -7,8 +7,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCErrorWindowController">
             <connections>
-                <outlet property="o_cleanup_button" destination="11" id="13"/>
-                <outlet property="o_error_table" destination="8" id="12"/>
+                <outlet property="cleanupButton" destination="11" id="9oD-4y-Lho"/>
+                <outlet property="errorTable" destination="8" id="4tg-CT-oZG"/>
                 <outlet property="window" destination="5" id="75"/>
             </connections>
         </customObject>

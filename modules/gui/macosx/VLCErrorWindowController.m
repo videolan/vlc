@@ -26,6 +26,15 @@
 
 #import "VLCStringUtility.h"
 
+
+@interface VLCErrorWindowController()
+{
+    NSMutableArray *_errors;
+    NSMutableArray *_icons;
+}
+
+@end
+
 @implementation VLCErrorWindowController
 
 - (id)init
@@ -33,8 +42,8 @@
     self = [super initWithWindowNibName:@"ErrorPanel"];
     if (self) {
         /* init data sources */
-        o_errors = [[NSMutableArray alloc] init];
-        o_icons = [[NSMutableArray alloc] init];
+        _errors = [[NSMutableArray alloc] init];
+        _icons = [[NSMutableArray alloc] init];
     }
 
     return self;
@@ -43,34 +52,34 @@
 - (void)windowDidLoad
 {
     /* init strings */
-    [[self window] setTitle: _NS("Errors and Warnings")];
-    [o_cleanup_button setTitle: _NS("Clean up")];
+    [self.window setTitle: _NS("Errors and Warnings")];
+    [self.cleanupButton setTitle: _NS("Clean up")];
 }
 
--(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg
+- (void)addError:(NSString *)title withMsg:(NSString *)message;
 {
     /* format our string as desired */
     NSMutableAttributedString * ourError;
     ourError = [[NSMutableAttributedString alloc] initWithString:
-                [NSString stringWithFormat:@"%@\n%@", o_error, o_msg]
+                [NSString stringWithFormat:@"%@\n%@", title, message]
                                                       attributes:
                 [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize:11] forKey: NSFontAttributeName]];
     [ourError
      addAttribute: NSFontAttributeName
      value: [NSFont boldSystemFontOfSize:11]
-     range: NSMakeRange(0, [o_error length])];
-    [o_errors addObject: ourError];
+     range: NSMakeRange(0, [title length])];
+    [_errors addObject: ourError];
 
-    [o_icons addObject: [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertStopIcon)]];
+    [_icons addObject: [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertStopIcon)]];
 
-    [o_error_table reloadData];
+    [self.errorTable reloadData];
 }
 
 -(IBAction)cleanupTable:(id)sender
 {
-    [o_errors removeAllObjects];
-    [o_icons removeAllObjects];
-    [o_error_table reloadData];
+    [_errors removeAllObjects];
+    [_icons removeAllObjects];
+    [self.errorTable reloadData];
 }
 
 /*----------------------------------------------------------------------------
@@ -78,17 +87,17 @@
  *---------------------------------------------------------------------------*/
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)theDataTable
 {
-    return [o_errors count];
+    return [_errors count];
 }
 
 - (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn:
 (NSTableColumn *)theTableColumn row: (NSInteger)row
 {
     if ([[theTableColumn identifier] isEqualToString: @"error_msg"])
-        return [o_errors objectAtIndex:row];
+        return [_errors objectAtIndex:row];
 
     if ([[theTableColumn identifier] isEqualToString: @"icon"])
-        return [o_icons objectAtIndex:row];
+        return [_icons objectAtIndex:row];
 
     return @"";
 }
