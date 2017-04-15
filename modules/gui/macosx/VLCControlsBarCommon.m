@@ -130,6 +130,7 @@
     [self.timeField setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
 
     // prepare time slider fance gradient view
+    self.timeSliderGradientView.translatesAutoresizingMaskIntoConstraints = YES;
     if (!_darkInterface) {
         NSRect frame;
         frame = [self.timeSliderGradientView frame];

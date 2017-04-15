@@ -833,6 +833,7 @@
         /* Make sure video view gets visible in case the playlist was visible before */
         b_video_view_was_hidden = [_videoView isHidden];
         [_videoView setHidden: NO];
+        _videoView.translatesAutoresizingMaskIntoConstraints = YES;
 
         if (!b_animation) {
             /* We don't animate if we are not visible, instead we
@@ -849,6 +850,7 @@
             [o_temp_view setFrame:[_videoView frame]];
             [[o_fullscreen_window contentView] addSubview:_videoView];
             [_videoView setFrame: [[o_fullscreen_window contentView] frame]];
+            [_videoView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
             NSEnableScreenUpdates();
 
             [screen setFullscreenPresentationOptions];
@@ -876,6 +878,8 @@
         [o_temp_view setFrame:[_videoView frame]];
         [[o_fullscreen_window contentView] addSubview:_videoView];
         [_videoView setFrame: [[o_fullscreen_window contentView] frame]];
+        [_videoView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+
         [o_fullscreen_window makeKeyAndOrderFront:self];
         NSEnableScreenUpdates();
     }
