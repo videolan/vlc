@@ -2714,7 +2714,7 @@ AS_IF([test "${enable_png}" != "no"], [
 AC_CHECK_HEADERS(png.h, [
   VLC_SAVE_FLAGS
   LDFLAGS="${LDFLAGS} -lz $LIBM"
-  AC_CHECK_LIB(png, png_set_rows, [
+  AC_CHECK_LIB(png, png_set_alpha_mode, [
     VLC_ADD_PLUGIN([png])
   ], [], [-lz $LIBM])
   VLC_RESTORE_FLAGS
