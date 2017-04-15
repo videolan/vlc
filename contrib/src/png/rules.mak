@@ -3,7 +3,7 @@ PNG_VERSION := 1.6.29
 PNG_URL := $(SF)/libpng/libpng16/$(PNG_VERSION)/libpng-$(PNG_VERSION).tar.xz
 
 PKGS += png
-ifeq ($(call need_pkg,"libpng"),)
+ifeq ($(call need_pkg,"libpng >= 1.5.4"),)
 PKGS_FOUND += png
 endif
 
