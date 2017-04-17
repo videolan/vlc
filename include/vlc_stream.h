@@ -333,6 +333,7 @@ static inline char *stream_ContentType( stream_t *s )
  * \warning the returned resource is to be freed by the caller
  * \return the mime-type, or `NULL` if unknown
  **/
+VLC_USED
 static inline char *stream_MimeType( stream_t *s )
 {
     char* mime_type = stream_ContentType( s );
