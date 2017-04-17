@@ -51,8 +51,13 @@ static int Demux( demux_t * );
  */
 int Import_iTML( vlc_object_t *p_this )
 {
-    DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".xml", "itml",
-                                      "using iTunes Media Library reader" );
+    demux_t *p_demux = (demux_t *)p_this;
+    CHECK_FILE();
+    if( !demux_IsPathExtension( p_demux, ".xml" )
+     && !demux_IsForced( p_demux, "itml" ) )
+        return VLC_EGENERIC; \
+    STANDARD_DEMUX_INIT_MSG( "using iTunes Media Library reader" );
+
     const uint8_t *p_peek;
     const ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 128 );
     if ( i_peek < 32 ||
