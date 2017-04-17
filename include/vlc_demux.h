@@ -399,16 +399,7 @@ static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_exte
 VLC_USED
 static inline bool demux_IsContentType(demux_t *demux, const char *type)
 {
-    char *mime = stream_ContentType(demux->s);
-    if (mime == NULL)
-        return false;
-
-    size_t len = strlen(type);
-    bool ok = strncasecmp(mime, type, len) == 0
-           && memchr("\t ;", (unsigned char)mime[len], 4) != NULL;
-
-    free(mime);
-    return ok;
+    return stream_IsMimeType(demux->s, type);
 }
 
 VLC_USED

@@ -345,6 +345,23 @@ static inline char *stream_MimeType( stream_t *s )
 }
 
 /**
+ * Checks for a MIME type.
+ *
+ * Checks if the stream has a specific MIME type.
+ */
+VLC_USED
+static inline bool stream_IsMimeType(stream_t *s, const char *type)
+{
+    char *mime = stream_MimeType(s);
+    if (mime == NULL)
+        return false;
+
+    bool ok = strcasecmp(mime, type);
+    free(mime);
+    return ok;
+}
+
+/**
  * Create a stream from a memory buffer.
  *
  * \param obj parent VLC object
