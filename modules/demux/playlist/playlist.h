@@ -90,13 +90,6 @@ do { \
     DEMUX_INIT_COMMON();                    \
     msg_Dbg( p_demux, "%s", msg ); } while(0)
 
-#define DEMUX_BY_EXTENSION_MSG( ext, msg ) \
-    demux_t *p_demux = (demux_t *)p_this; \
-    CHECK_FILE(); \
-    if( !demux_IsPathExtension( p_demux, ext ) ) \
-        return VLC_EGENERIC; \
-    STANDARD_DEMUX_INIT_MSG( msg );
-
 #define CHECK_PEEK( zepeek, size ) do { \
     if( vlc_stream_Peek( p_demux->s , &zepeek, size ) < size ){ \
         msg_Dbg( p_demux, "not enough data" ); return VLC_EGENERIC; } } while(0)
