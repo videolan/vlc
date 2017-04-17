@@ -661,8 +661,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_frame_rate_base =
             code_to_frame_rate[p_frag->p_buffer[7]&0x0f][1];
 
-        if( p_sys->i_frame_rate != p_dec->fmt_out.video.i_frame_rate ||
-            p_dec->fmt_out.video.i_frame_rate_base != p_sys->i_frame_rate_base )
+        if( ( p_sys->i_frame_rate != p_dec->fmt_out.video.i_frame_rate ||
+              p_dec->fmt_out.video.i_frame_rate_base != p_sys->i_frame_rate_base ) &&
+            p_sys->i_frame_rate && p_sys->i_frame_rate_base )
         {
             date_Change( &p_sys->dts, 2 * p_sys->i_frame_rate, p_sys->i_frame_rate_base );
             date_Change( &p_sys->prev_iframe_dts, 2 * p_sys->i_frame_rate, p_sys->i_frame_rate_base );
