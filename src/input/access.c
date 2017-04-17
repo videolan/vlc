@@ -171,7 +171,6 @@ int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list ar
             *va_arg( args, int64_t * ) = 0;
             break;
         case STREAM_IS_DIRECTORY:
-            *va_arg( args, bool * ) = false;
             break;
         default:
             return VLC_EGENERIC;

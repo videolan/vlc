@@ -42,9 +42,8 @@ static int Demux( demux_t *p_demux );
 int Import_Dir ( vlc_object_t *p_this)
 {
     demux_t  *p_demux = (demux_t *)p_this;
-    bool b_dir_can_loop;
 
-    if( vlc_stream_Control( p_demux->s, STREAM_IS_DIRECTORY, &b_dir_can_loop ) )
+    if( vlc_stream_Control( p_demux->s, STREAM_IS_DIRECTORY ) )
         return VLC_EGENERIC;
 
     p_demux->pf_demux = Demux;

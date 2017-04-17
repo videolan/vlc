@@ -85,7 +85,6 @@ static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 #ifndef _WIN32
 static int DirRead( access_t *, input_item_node_t * );
-static int DirControl( access_t *, int, va_list );
 #endif
 
 struct access_sys_t
@@ -244,7 +243,7 @@ static int Open( vlc_object_t *p_this )
 #else
         p_sys->url = url;
         p_access->pf_readdir = DirRead;
-        p_access->pf_control = DirControl;
+        p_access->pf_control = access_vaDirectoryControlHelper;
         i_smb = smbc_opendir( psz_uri );
         i_size = 0;
 #endif
@@ -398,20 +397,6 @@ static int DirRead (access_t *p_access, input_item_node_t *p_node )
     access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
 
     return i_ret;
-}
-
-static int DirControl( access_t *p_access, int i_query, va_list args )
-{
-    switch( i_query )
-    {
-    case STREAM_IS_DIRECTORY:
-        *va_arg( args, bool * ) = true; /* might loop */
-        break;
-    default:
-        return access_vaDirectoryControlHelper( p_access, i_query, args );
-    }
-
-    return VLC_SUCCESS;
 }
 #endif
 

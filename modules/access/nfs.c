@@ -401,21 +401,6 @@ MountRead(access_t *p_access, input_item_node_t *p_node)
     return i_ret;
 }
 
-static int
-DirControl(access_t *p_access, int i_query, va_list args)
-{
-    switch (i_query)
-    {
-    case STREAM_IS_DIRECTORY:
-        *va_arg( args, bool * ) = true; /* might loop */
-        break;
-    default:
-        return access_vaDirectoryControlHelper(p_access, i_query, args);
-    }
-
-    return VLC_SUCCESS;
-}
-
 static void
 nfs_opendir_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
                void *p_private_data)
@@ -712,7 +697,7 @@ Open(vlc_object_t *p_obj)
         {
             p_access->pf_readdir = DirRead;
             p_access->pf_seek = NULL;
-            p_access->pf_control = DirControl;
+            p_access->pf_control = access_vaDirectoryControlHelper;
         }
         else
             vlc_assert_unreachable();
@@ -745,7 +730,7 @@ Open(vlc_object_t *p_obj)
 
         p_access->pf_readdir = MountRead;
         p_access->pf_seek = NULL;
-        p_access->pf_control = DirControl;
+        p_access->pf_control = access_vaDirectoryControlHelper;
     }
 
     return VLC_SUCCESS;

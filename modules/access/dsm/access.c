@@ -614,21 +614,6 @@ static int BrowseDirectory( access_t *p_access, input_item_node_t *p_node )
     return i_ret;
 }
 
-static int DirControl( access_t *p_access, int i_query, va_list args )
-{
-    switch( i_query )
-    {
-    case STREAM_IS_DIRECTORY:
-        *va_arg( args, bool * ) = p_access->pf_readdir == BrowseDirectory;
-                                  /* might loop */
-        break;
-    default:
-        return access_vaDirectoryControlHelper( p_access, i_query, args );
-    }
-
-    return VLC_SUCCESS;
-}
-
 static int BrowserInit( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -637,7 +622,7 @@ static int BrowserInit( access_t *p_access )
         p_access->pf_readdir = BrowseShare;
     else
         p_access->pf_readdir = BrowseDirectory;
-    p_access->pf_control = DirControl;
+    p_access->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
 }

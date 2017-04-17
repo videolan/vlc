@@ -113,7 +113,6 @@ static ssize_t Read( access_t *, void *, size_t );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 static int DirRead( access_t *, input_item_node_t * );
-static int DirControl( access_t *, int, va_list );
 #ifdef ENABLE_SOUT
 static int OutSeek( sout_access_out_t *, off_t );
 static ssize_t Write( sout_access_out_t *, block_t * );
@@ -728,7 +727,7 @@ static int InOpen( vlc_object_t *p_this )
     if( b_directory )
     {
         p_access->pf_readdir = DirRead;
-        p_access->pf_control = DirControl;
+        p_access->pf_control = access_vaDirectoryControlHelper;
     } else
         ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
 
@@ -961,20 +960,6 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
 
     access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
     return i_ret;
-}
-
-static int DirControl( access_t *p_access, int i_query, va_list args )
-{
-    switch( i_query )
-    {
-    case STREAM_IS_DIRECTORY:
-        *va_arg( args, bool * ) = true; /* might loop */
-        break;
-    default:
-        return access_vaDirectoryControlHelper( p_access, i_query, args );
-    }
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

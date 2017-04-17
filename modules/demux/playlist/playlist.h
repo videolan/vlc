@@ -81,9 +81,8 @@ bool CheckMimeType( stream_t * p_stream, const char * psz_ctype );
 
 #define CHECK_FILE() \
 do { \
-    bool b_loop; \
-    if( vlc_stream_Control( ((demux_t *)p_this)->s, STREAM_IS_DIRECTORY, \
-                        &b_loop ) == VLC_SUCCESS ) \
+    if( vlc_stream_Control( ((demux_t *)p_this)->s, \
+                            STREAM_IS_DIRECTORY ) == VLC_SUCCESS ) \
         return VLC_EGENERIC; \
 } while(0)
 
