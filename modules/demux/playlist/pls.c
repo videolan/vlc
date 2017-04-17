@@ -53,12 +53,11 @@ int Import_PLS( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( POKE( p_peek, "[playlist]", 10 ) || POKE( p_peek, "[Reference]", 10 ) ||
-        demux_IsPathExtension( p_demux, ".pls" )   || demux_IsForced( p_demux, "pls" ) )
-    {
-        ;
-    }
-    else return VLC_EGENERIC;
+    if( strncasecmp( (const char *)p_peek, "[playlist]", 10 )
+     && strncasecmp( (const char *)p_peek, "[Reference]", 10 )
+     && !demux_IsPathExtension( p_demux, ".pls" )
+     && !demux_IsForced( p_demux, "pls" ) )
+        return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "found valid PLS playlist file");
     p_demux->pf_demux = Demux;

@@ -89,6 +89,3 @@ do { \
 #define STANDARD_DEMUX_INIT_MSG( msg ) do { \
     DEMUX_INIT_COMMON();                    \
     msg_Dbg( p_demux, "%s", msg ); } while(0)
-
-#define POKE( peek, stuff, size ) (strncasecmp( (const char *)peek, stuff, size )==0)
-
