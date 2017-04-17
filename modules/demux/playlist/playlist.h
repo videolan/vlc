@@ -90,9 +90,5 @@ do { \
     DEMUX_INIT_COMMON();                    \
     msg_Dbg( p_demux, "%s", msg ); } while(0)
 
-#define CHECK_PEEK( zepeek, size ) do { \
-    if( vlc_stream_Peek( p_demux->s , &zepeek, size ) < size ){ \
-        msg_Dbg( p_demux, "not enough data" ); return VLC_EGENERIC; } } while(0)
-
 #define POKE( peek, stuff, size ) (strncasecmp( (const char *)peek, stuff, size )==0)
 
