@@ -73,7 +73,6 @@ int Import_WPL ( vlc_object_t * );
 void Close_WPL ( vlc_object_t * );
 
 int Import_Dir ( vlc_object_t * );
-void Close_Dir ( vlc_object_t * );
 
 
 extern input_item_t * GetCurrentItem(demux_t *p_demux);

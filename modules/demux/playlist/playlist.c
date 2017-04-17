@@ -166,7 +166,7 @@ vlc_module_begin ()
         set_description( N_("Directory import") )
         add_shortcut( "playlist", "directory" )
         set_capability( "demux", 10 )
-        set_callbacks( Import_Dir, Close_Dir )
+        set_callbacks( Import_Dir, NULL )
         add_string( "recursive", "collapse" , RECURSIVE_TEXT,
                     RECURSIVE_LONGTEXT, false )
           change_string_list( psz_recursive_list, psz_recursive_list_text )

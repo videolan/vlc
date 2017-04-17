@@ -33,11 +33,6 @@
 
 #include "playlist.h"
 
-struct demux_sys_t
-{
-    bool b_dir_can_loop;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -52,16 +47,10 @@ int Import_Dir ( vlc_object_t *p_this)
     if( vlc_stream_Control( p_demux->s, STREAM_IS_DIRECTORY, &b_dir_can_loop ) )
         return VLC_EGENERIC;
 
-    STANDARD_DEMUX_INIT_MSG( "reading directory content" );
-    p_demux->p_sys->b_dir_can_loop = b_dir_can_loop;
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
 
     return VLC_SUCCESS;
-}
-
-void Close_Dir ( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    free( p_demux->p_sys );
 }
 
 static int Demux( demux_t *p_demux )
