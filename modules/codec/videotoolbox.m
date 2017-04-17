@@ -256,7 +256,8 @@ static bool ParseH264NAL(decoder_t *p_dec,
                     p_info->b_top_field_first = (sei.i_pic_struct % 2 == 1);
 
                 /* Set frame rate for timings in case of missing rate */
-                if( !p_dec->fmt_in.video.i_frame_rate_base &&
+                if( (!p_dec->fmt_in.video.i_frame_rate_base ||
+                     !p_dec->fmt_in.video.i_frame_rate) &&
                     p_sps->vui.i_time_scale && p_sps->vui.i_num_units_in_tick )
                 {
                     date_Change( &p_sys->pts, p_sps->vui.i_time_scale,
@@ -629,7 +630,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
     const unsigned i_sar_num = p_dec->fmt_out.video.i_sar_num;
     const unsigned i_sar_den = p_dec->fmt_out.video.i_sar_den;
 
-    if( p_dec->fmt_in.video.i_frame_rate_base )
+    if( p_dec->fmt_in.video.i_frame_rate_base && p_dec->fmt_in.video.i_frame_rate )
     {
         date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
                                 p_dec->fmt_in.video.i_frame_rate_base );
