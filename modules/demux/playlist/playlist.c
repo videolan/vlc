@@ -256,15 +256,3 @@ char *ProcessMRL(const char *str, const char *base)
 
     return abs;
 }
-
-/**
- * Checks stream Content-Type against a known one
- */
-bool CheckMimeType( stream_t *stream, const char *mime_type )
-{
-    char* stream_mtype = stream_MimeType( stream );
-    bool const match = stream_mtype && !strcasecmp( mime_type, stream_mtype );
-
-    free( stream_mtype );
-    return match;
-}
