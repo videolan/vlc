@@ -1747,9 +1747,8 @@ static void DeleteDecoder( decoder_t * p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    msg_Dbg( p_dec, "killing decoder fourcc `%4.4s', %u PES in FIFO",
-             (char*)&p_dec->fmt_in.i_codec,
-             (unsigned)block_FifoCount( p_owner->p_fifo ) );
+    msg_Dbg( p_dec, "killing decoder fourcc `%4.4s'",
+             (char*)&p_dec->fmt_in.i_codec );
 
     const bool b_flush_spu = p_dec->fmt_out.i_cat == SPU_ES;
     UnloadDecoder( p_dec );
