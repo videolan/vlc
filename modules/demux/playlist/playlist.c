@@ -51,28 +51,6 @@
 #define SKIP_ADS_LONGTEXT N_( "Use playlist options usually used to prevent " \
     "ads skipping to detect ads and prevent adding them to the playlist." )
 
-static const char *const psz_recursive_list[] = { "none", "collapse", "expand" };
-static const char *const psz_recursive_list_text[] = {
-    N_("None"), N_("Collapse"), N_("Expand"), N_("Expand distant files") };
-
-#define RECURSIVE_TEXT N_("Subdirectory behavior")
-#define RECURSIVE_LONGTEXT N_( \
-        "Select whether subdirectories must be expanded.\n" \
-        "none: subdirectories do not appear in the playlist.\n" \
-        "collapse: subdirectories appear but are expanded on first play.\n" \
-        "expand: all subdirectories are expanded.\n" )
-
-#define IGNORE_TEXT N_("Ignored extensions")
-#define IGNORE_LONGTEXT N_( \
-        "Files with these extensions will not be added to playlist when " \
-        "opening a directory.\n" \
-        "This is useful if you add directories that contain playlist files " \
-        "for instance. Use a comma-separated list of extensions." )
-
-#define SHOW_HIDDENFILES_TEXT N_("Show hidden files")
-#define SHOW_HIDDENFILES_LONGTEXT N_( \
-        "Ignore files starting with '.'" )
-
 vlc_module_begin ()
     add_shortcut( "playlist" )
     set_category( CAT_INPUT )
@@ -162,18 +140,6 @@ vlc_module_begin ()
         add_shortcut( "playlist", "wpl" )
         set_capability( "demux", 10 )
         set_callbacks( Import_WPL, Close_WPL )
-    add_submodule ()
-        set_description( N_("Directory import") )
-        add_shortcut( "playlist", "directory" )
-        set_capability( "demux", 10 )
-        set_callbacks( Import_Dir, NULL )
-        add_string( "recursive", "collapse" , RECURSIVE_TEXT,
-                    RECURSIVE_LONGTEXT, false )
-          change_string_list( psz_recursive_list, psz_recursive_list_text )
-        add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
-                    IGNORE_TEXT, IGNORE_LONGTEXT, false )
-        add_bool( "show-hiddenfiles", false,
-                   SHOW_HIDDENFILES_TEXT, SHOW_HIDDENFILES_LONGTEXT, false )
 vlc_module_end ()
 
 int Control(demux_t *demux, int query, va_list args)

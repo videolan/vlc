@@ -160,6 +160,9 @@ demux_LTLIBRARIES += libavformat_plugin.la
 endif
 endif
 
+libdirectory_demux_plugin_la_SOURCES = demux/directory.c
+demux_LTLIBRARIES += libdirectory_demux_plugin.la
+
 libes_plugin_la_SOURCES  = demux/mpeg/es.c \
                            meta_engine/ID3Tag.h \
                            packetizer/dts_header.c packetizer/dts_header.h
@@ -230,7 +233,6 @@ libplaylist_plugin_la_SOURCES = \
 	demux/playlist/shoutcast.c \
 	demux/playlist/wpl.c \
 	demux/playlist/xspf.c \
-	demux/playlist/directory.c \
 	demux/playlist/playlist.c demux/playlist/playlist.h
 demux_LTLIBRARIES += libplaylist_plugin.la
 
