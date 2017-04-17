@@ -353,7 +353,8 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_H264;
     p_dec->fmt_out.b_packetized = true;
 
-    if( p_dec->fmt_in.video.i_frame_rate_base > 0 )
+    if( p_dec->fmt_in.video.i_frame_rate_base &&
+        p_dec->fmt_in.video.i_frame_rate )
     {
         date_Change( &p_sys->dts, p_dec->fmt_in.video.i_frame_rate * 2,
                                   p_dec->fmt_in.video.i_frame_rate_base );
