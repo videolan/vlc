@@ -680,7 +680,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             msg_Dbg( p_dec, "size %dx%d/%dx%d fps=%.3f",
                  p_dec->fmt_out.video.i_visible_width, p_dec->fmt_out.video.i_visible_height,
                  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height,
-                 p_sys->i_frame_rate / (float)p_sys->i_frame_rate_base );
+                 p_sys->i_frame_rate / (float)(p_sys->i_frame_rate_base ? p_sys->i_frame_rate_base : 1) );
             p_sys->b_inited = 1;
         }
     }
