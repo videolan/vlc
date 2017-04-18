@@ -172,26 +172,50 @@ static int vlclua_playlist_move( lua_State * L )
     return vlclua_push_ret( L, i_ret );
 }
 
+static int vlclua_playlist_add_common(lua_State *L, bool play)
+{
+    vlc_object_t *obj = vlclua_get_this(L);
+    playlist_t *playlist = vlclua_get_playlist_internal(L);
+    int count = 0;
+
+    /* playlist */
+    if (!lua_istable(L, -1))
+    {
+        msg_Warn(obj, "Playlist should be a table.");
+        return 0;
+    }
+
+    lua_pushnil(L);
+
+    /* playlist nil */
+    while (lua_next(L, -2))
+    {
+        input_item_t *item = vlclua_read_input_item(obj, L);
+        if (item != NULL)
+        {
+            /* Play or Enqueue (preparse) */
+            /* FIXME: playlist_AddInput() can fail */
+            playlist_AddInput(playlist, item, play ? PLAYLIST_GO : 0, true);
+            input_item_Release(item);
+            count++;
+        }
+        /* pop the value, keep the key for the next lua_next() call */
+        lua_pop(L, 1);
+    }
+    /* playlist */
+
+    lua_pushinteger(L, count);
+    return 1;
+}
+
 static int vlclua_playlist_add( lua_State *L )
 {
-    int i_count;
-    vlc_object_t *p_this = vlclua_get_this( L );
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    i_count = vlclua_playlist_add_internal( p_this, L, p_playlist,
-                                            NULL, true );
-    lua_pushinteger( L, i_count );
-    return 1;
+    return vlclua_playlist_add_common(L, true);
 }
 
 static int vlclua_playlist_enqueue( lua_State *L )
 {
-    int i_count;
-    vlc_object_t *p_this = vlclua_get_this( L );
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    i_count = vlclua_playlist_add_internal( p_this, L, p_playlist,
-                                            NULL, false );
-    lua_pushinteger( L, i_count );
-    return 1;
+    return vlclua_playlist_add_common(L, false);
 }
 
 static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
