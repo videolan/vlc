@@ -544,25 +544,19 @@ out:
 }
 
 #undef vlclua_playlist_add_internal
-int vlclua_playlist_add_internal(vlc_object_t *obj, lua_State *L,
-                                 playlist_t *playlist, input_item_t *parent,
-                                 bool play)
+void vlclua_playlist_add_internal(vlc_object_t *obj, lua_State *L,
+                                  input_item_t *parent)
 {
-    int count = 0;
-
-    assert(parent != NULL || playlist != NULL);
+    bool post = false;
 
     /* playlist */
     if (!lua_istable(L, -1))
     {
         msg_Warn(obj, "Playlist should be a table.");
-        return 0;
+        return;
     }
 
-    input_item_node_t *node = NULL;
-
-    if (parent != NULL)
-        node = input_item_node_Create(parent);
+    input_item_node_t *node = input_item_node_Create(parent);
 
     lua_pushnil(L);
 
@@ -572,49 +566,41 @@ int vlclua_playlist_add_internal(vlc_object_t *obj, lua_State *L,
         input_item_t *item = vlclua_read_input_item(obj, L);
         if (item != NULL)
         {
-            /* Append item to playlist */
-            if (node != NULL) /* Add to node */
+            /* copy the original URL to the meta data,
+             * if "URL" is still empty */
+            char *url = input_item_GetURL(item);
+            if (url == NULL)
             {
-                /* copy the original URL to the meta data,
-                 * if "URL" is still empty */
-                char *url = input_item_GetURL(item);
-                if (url == NULL)
+                url = input_item_GetURI(parent);
+                if (likely(url != NULL))
                 {
-                    url = input_item_GetURI(parent);
-                    if (likely(url != NULL))
-                    {
-                        EnsureUTF8(url);
-                        msg_Dbg(obj, "meta-URL: %s", url);
-                        input_item_SetURL(item, url);
-                    }
+                    EnsureUTF8(url);
+                    msg_Dbg(obj, "meta-URL: %s", url);
+                    input_item_SetURL(item, url);
                 }
-                free(url);
-
-                input_item_CopyOptions(item, parent);
-                input_item_node_AppendItem(node, item);
             }
-            else if (likely(parent == NULL))
-            /* Play or Enqueue (preparse) */
-                /* FIXME: playlist_AddInput() can fail */
-                playlist_AddInput(playlist, item, play ? PLAYLIST_GO : 0,
-                                  true);
+            free(url);
+
+            input_item_CopyOptions(item, parent);
+
+            if (likely(node != NULL)) /* Add to node */
+                input_item_node_AppendItem(node, item);
 
             input_item_Release(item);
-            count++;
+            post = true;
         }
         /* pop the value, keep the key for the next lua_next() call */
         lua_pop(L, 1);
     }
     /* playlist */
 
-    if (node != NULL)
+    if (likely(node != NULL))
     {
-        if (count > 0)
+        if (post)
             input_item_node_PostAndDelete(node);
         else
             input_item_node_Delete(node);
     }
-    return count;
 }
 
 static int vlc_sd_probe_Open( vlc_object_t *obj )

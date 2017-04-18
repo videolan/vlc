@@ -268,7 +268,7 @@ static int Demux( demux_t *p_demux )
     }
 
     if( lua_gettop( L ) )
-        vlclua_playlist_add_internal( p_demux, L, NULL, p_current_input, 0 );
+        vlclua_playlist_add_internal( p_demux, L, p_current_input );
     else
         msg_Err( p_demux, "Script went completely foobar" );
 
