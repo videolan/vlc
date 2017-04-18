@@ -264,6 +264,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    msg_Dbg( p_this, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
+
     /* Initialization must be done before avcodec_find_decoder() */
     vlc_init_avcodec(p_this);
 

@@ -378,6 +378,8 @@ int OpenEncoder( vlc_object_t *p_this )
     float f_val;
     char *psz_val;
 
+    msg_Dbg( p_this, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
+
     /* Initialization must be done before avcodec_find_encoder() */
     vlc_init_avcodec(p_this);
 

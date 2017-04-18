@@ -94,6 +94,8 @@ int OpenMux( vlc_object_t *p_this )
                               >= sizeof (((AVFormatContext *)NULL)->filename) )
         return VLC_EGENERIC;
 
+    msg_Dbg( p_mux, "using %s %s", AVPROVIDER(LIBAVFORMAT), LIBAVFORMAT_IDENT );
+
     vlc_init_avformat(p_this);
 
     config_ChainParse( p_mux, "sout-avformat-", ppsz_mux_options, p_mux->p_cfg );
