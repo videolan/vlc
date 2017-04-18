@@ -2705,6 +2705,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([OPUS], [], [ogg opus >= 1.0.3], [Opus support], [auto])
 
 dnl
+dnl  Ambisonic channel mixer and binauralizer plugin
+dnl
+PKG_ENABLE_MODULES_VLC([SPATIALAUDIO], [], [spatialaudio], [Ambisonic channel mixer and binauralizer], [auto])
+
+dnl
 dnl  theora decoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([THEORA], [], [ogg theoradec >= 1.0 theoraenc], [experimental theora codec], [auto])

@@ -75,6 +75,15 @@ audio_filter_LTLIBRARIES += \
 	libsimple_channel_mixer_plugin.la \
 	libtrivial_channel_mixer_plugin.la
 
+# Spatial audio: ambisonics / binaural
+libspatialaudio_plugin_la_SOURCES = \
+	audio_filter/channel_mixer/spatialaudio.cpp
+libspatialaudio_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(SPATIALAUDIO_CFLAGS)
+libspatialaudio_plugin_la_LIBADD = $(SPATIALAUDIO_LIBS)
+libspatialaudio_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(audio_filterdir)'
+EXTRA_LTLIBRARIES += libspatialaudio_plugin.la
+audio_filter_LTLIBRARIES += $(LTLIBspatialaudio)
+
 # Converters
 libaudio_format_plugin_la_SOURCES = audio_filter/converter/format.c
 libaudio_format_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
