@@ -74,8 +74,10 @@ void Close_WPL ( vlc_object_t * );
 
 int Import_Dir ( vlc_object_t * );
 
-
-extern input_item_t * GetCurrentItem(demux_t *p_demux);
+static inline input_item_t * GetCurrentItem(demux_t *p_demux)
+{
+    return input_GetItem( p_demux->p_input );
+}
 
 #define CHECK_FILE() \
 do { \

@@ -401,6 +401,5 @@ static int Demux ( demux_t *p_demux )
 
     input_item_PostSubItem( p_current_input, p_child );
     input_item_Release( p_child );
-    input_item_Release(p_current_input);
     return 0; /* Needed for correct operation of go back */
 }

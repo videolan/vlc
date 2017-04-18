@@ -166,13 +166,6 @@ int Control(demux_t *demux, int query, va_list args)
     return VLC_EGENERIC;
 }
 
-input_item_t * GetCurrentItem(demux_t *p_demux)
-{
-    input_item_t *p_current_input = input_GetItem( p_demux->p_input );
-    input_item_Hold(p_current_input);
-    return p_current_input;
-}
-
 /**
  * Computes the base URL.
  *

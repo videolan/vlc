@@ -279,7 +279,6 @@ static int Demux( demux_t* p_demux )
     }
 
     input_item_node_PostAndDelete( p_node );
-    input_item_Release( p_input );
     return 0;
 }
 

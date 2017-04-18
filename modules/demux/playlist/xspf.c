@@ -160,7 +160,6 @@ static int Demux(demux_t *p_demux)
     input_item_node_PostAndDelete(p_subitems);
 
 end:
-    input_item_Release(p_current_input);
     if (p_xml_reader)
         xml_ReaderDelete(p_xml_reader);
     return i_ret; /* Needed for correct operation of go back */

@@ -319,7 +319,6 @@ static int Demux( demux_t *p_demux )
     xml_ReaderDelete( p_xml_reader );
 
     input_item_node_PostAndDelete( p_subitems );
-    input_item_Release(p_current_input);
     return 0; /* Needed for correct operation of go back */
 
 error:
@@ -342,7 +341,6 @@ error:
     if( p_subitems )
         input_item_node_Delete( p_subitems );
 
-    input_item_Release(p_current_input);
     return -1;
 }
 

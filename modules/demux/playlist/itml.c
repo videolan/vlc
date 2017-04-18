@@ -118,8 +118,6 @@ int Demux( demux_t *p_demux )
                       pl_elements );
     input_item_node_PostAndDelete( p_subitems );
 
-    input_item_Release(p_current_input);
-
 end:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );

@@ -502,7 +502,6 @@ error:
         input_item_node_Delete( p_subitems );
     if( p_stream )
         vlc_stream_Delete( p_stream );
-    input_item_Release( p_current_input );
 
     return 0;
 }

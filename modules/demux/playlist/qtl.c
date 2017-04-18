@@ -261,8 +261,6 @@ error:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
 
-    input_item_Release(p_current_input);
-
     free( psz_href );
     free( psz_moviename );
     free( psz_qtnext );

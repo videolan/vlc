@@ -96,7 +96,6 @@ static int Demux(demux_t *demux)
     }
 
     input_item_node_PostAndDelete(subitems);
-    input_item_Release(input);
 
     return 0; /* Needed for correct operation of go back */
 }

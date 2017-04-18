@@ -177,8 +177,6 @@ static int Demux( demux_t *p_demux )
 
     input_item_node_PostAndDelete( p_subitems );
 
-    input_item_Release(p_current_input);
-
     free( psz_version );
     free( psz_url );
     free( psz_docid );

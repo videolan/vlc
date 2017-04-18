@@ -379,7 +379,6 @@ static int Demux( demux_t *p_demux )
         }
     }
     input_item_node_PostAndDelete( p_subitems );
-    input_item_Release(p_current_input);
     var_Destroy( p_demux, "m3u-extvlcopt" );
     free(psz_prefix);
     return 0; /* Needed for correct operation of go back */

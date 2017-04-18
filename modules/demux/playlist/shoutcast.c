@@ -120,7 +120,6 @@ error:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
     if( p_input_node ) input_item_node_Delete( p_input_node );
-    input_item_Release(p_current_input);
     return i_ret;
 }
 

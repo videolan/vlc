@@ -230,7 +230,6 @@ end:
     if( p_subitems )
         input_item_node_PostAndDelete( p_subitems );
 
-    input_item_Release( p_current_input );
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
     return i_ret;
