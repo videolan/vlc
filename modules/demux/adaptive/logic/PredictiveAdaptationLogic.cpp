@@ -168,10 +168,13 @@ void PredictiveAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize, 
 unsigned PredictiveAdaptationLogic::getAvailableBw(unsigned i_bw, const BaseRepresentation *curRep) const
 {
     unsigned i_remain = i_bw;
-    i_remain -= usedBps;
+    if(i_remain > usedBps)
+        i_remain -= usedBps;
+    else
+        i_remain = 0;
     if(curRep)
         i_remain += curRep->getBandwidth();
-    return i_remain;
+    return i_remain > i_bw ? i_remain : i_bw;
 }
 
 void PredictiveAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
