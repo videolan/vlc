@@ -242,6 +242,7 @@ EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
 libdirect3d11_deinterlace_plugin_la_SOURCES = video_output/win32/d3d11_deinterlace.c \
   video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
+libdirect3d11_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11_deinterlace)
 EXTRA_LTLIBRARIES += libdirect3d11_deinterlace_plugin.la
 
