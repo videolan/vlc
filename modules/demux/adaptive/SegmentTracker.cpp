@@ -60,9 +60,10 @@ SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, bool enabled)
     u.buffering.id = &id;
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t current, mtime_t target)
+SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t min, mtime_t current, mtime_t target)
 {
     type = BUFFERING_LEVEL_CHANGE;
+    u.buffering_level.minimum = min;
     u.buffering_level.current = current;
     u.buffering_level.target = target;
     u.buffering.id = &id;
@@ -337,9 +338,9 @@ void SegmentTracker::notifyBufferingState(bool enabled) const
     notify(SegmentTrackerEvent(adaptationSet->getID(), enabled));
 }
 
-void SegmentTracker::notifyBufferingLevel(mtime_t current, mtime_t target) const
+void SegmentTracker::notifyBufferingLevel(mtime_t min, mtime_t current, mtime_t target) const
 {
-    notify(SegmentTrackerEvent(adaptationSet->getID(), current, target));
+    notify(SegmentTrackerEvent(adaptationSet->getID(), min, current, target));
 }
 
 void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
