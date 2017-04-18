@@ -205,7 +205,7 @@ void PredictiveAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
             }
             vlc_mutex_unlock(&lock);
             BwDebug(msg_Info(p_obj, "Stream %s is now known %sactive",
-                             (event.u.buffering.enabled) "" : "in"));
+                             (event.u.buffering.enabled) ? "" : "in"));
         }
         break;
 

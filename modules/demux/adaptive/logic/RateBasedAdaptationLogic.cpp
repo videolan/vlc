@@ -94,8 +94,8 @@ void RateBasedAdaptationLogic::updateDownloadRate(const ID &, size_t size, mtime
     vlc_mutex_lock(&lock);
     bpsAvg = average.push(bps);
 
-    BwDebug(msg_Dbg(p_obj, "alpha1 %lf alpha0 %lf dmax %ld ds %ld", alpha,
-                    (double)deltamax / diffsum, deltamax, diffsum));
+//    BwDebug(msg_Dbg(p_obj, "alpha1 %lf alpha0 %lf dmax %ld ds %ld", alpha,
+//                    (double)deltamax / diffsum, deltamax, diffsum));
     BwDebug(msg_Dbg(p_obj, "bw estimation bps %zu -> avg %zu",
                             bps / 8000, bpsAvg / 8000));
 
