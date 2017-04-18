@@ -66,15 +66,17 @@ static int vlclua_demux_peek( lua_State *L )
 static int vlclua_demux_read( lua_State *L )
 {
     stream_t *s = (stream_t *)vlclua_get_this(L);
-    const uint8_t *p_read;
     int n = luaL_checkint( L, 1 );
-    ssize_t val = vlc_stream_Peek(s->p_source, &p_read, n);
+    char *buf = malloc(n);
 
-    if (val > 0)
+    if (buf != NULL)
     {
-        lua_pushlstring(L, (const char *)p_read, val);
-        int i_seek = vlc_stream_Read(s->p_source, NULL, val);
-        assert(val == i_seek );
+        ssize_t val = vlc_stream_Read(s->p_source, buf, n);
+        if (val > 0)
+            lua_pushlstring(L, buf, val);
+        else
+            lua_pushnil( L );
+        free(buf);
     }
     else
         lua_pushnil( L );
