@@ -147,7 +147,7 @@ vlc_module_begin ()
         add_shortcut( "luaplaylist" )
         set_shortname( N_("Lua Playlist") )
         set_description( N_("Lua Playlist Parser Interface") )
-        set_capability( "demux", 2 )
+        set_capability( "stream_filter", 2 )
         set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist )
 
     add_submodule ()
@@ -541,66 +541,6 @@ out:
            free(optv[--optc]);
     free(optv);
     return item;
-}
-
-#undef vlclua_playlist_add_internal
-void vlclua_playlist_add_internal(vlc_object_t *obj, lua_State *L,
-                                  input_item_t *parent)
-{
-    bool post = false;
-
-    /* playlist */
-    if (!lua_istable(L, -1))
-    {
-        msg_Warn(obj, "Playlist should be a table.");
-        return;
-    }
-
-    input_item_node_t *node = input_item_node_Create(parent);
-
-    lua_pushnil(L);
-
-    /* playlist nil */
-    while (lua_next(L, -2))
-    {
-        input_item_t *item = vlclua_read_input_item(obj, L);
-        if (item != NULL)
-        {
-            /* copy the original URL to the meta data,
-             * if "URL" is still empty */
-            char *url = input_item_GetURL(item);
-            if (url == NULL)
-            {
-                url = input_item_GetURI(parent);
-                if (likely(url != NULL))
-                {
-                    EnsureUTF8(url);
-                    msg_Dbg(obj, "meta-URL: %s", url);
-                    input_item_SetURL(item, url);
-                }
-            }
-            free(url);
-
-            input_item_CopyOptions(item, parent);
-
-            if (likely(node != NULL)) /* Add to node */
-                input_item_node_AppendItem(node, item);
-
-            input_item_Release(item);
-            post = true;
-        }
-        /* pop the value, keep the key for the next lua_next() call */
-        lua_pop(L, 1);
-    }
-    /* playlist */
-
-    if (likely(node != NULL))
-    {
-        if (post)
-            input_item_node_PostAndDelete(node);
-        else
-            input_item_node_Delete(node);
-    }
 }
 
 static int vlc_sd_probe_Open( vlc_object_t *obj )

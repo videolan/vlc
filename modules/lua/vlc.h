@@ -182,9 +182,6 @@ void vlclua_read_custom_meta_data( vlc_object_t *, lua_State *,
 #define vlclua_read_custom_meta_data( a, b, c ) vlclua_read_custom_meta_data( VLC_OBJECT( a ), b, c )
 
 input_item_t *vlclua_read_input_item(vlc_object_t *, lua_State *);
-void vlclua_playlist_add_internal(vlc_object_t *, lua_State *, input_item_t *);
-#define vlclua_playlist_add_internal( a, b, c ) \
-        vlclua_playlist_add_internal( VLC_OBJECT( a ), b, c )
 
 int vlclua_add_modules_path( lua_State *, const char *psz_filename );
 
