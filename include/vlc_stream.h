@@ -356,7 +356,7 @@ static inline bool stream_IsMimeType(stream_t *s, const char *type)
     if (mime == NULL)
         return false;
 
-    bool ok = strcasecmp(mime, type);
+    bool ok = !strcasecmp(mime, type);
     free(mime);
     return ok;
 }
