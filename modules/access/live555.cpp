@@ -1442,7 +1442,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt > 0 )
             {
                 *pi64 = (int64_t)(p_sys->f_npt * 1000000.);
@@ -1451,7 +1451,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt_length > 0 )
             {
                 double d_length = p_sys->f_npt_length * 1000000.0;
@@ -1464,7 +1464,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double* );
+            pf = va_arg( args, double * );
             if( (p_sys->f_npt_length > 0) && (p_sys->f_npt > 0) )
             {
                 *pf = p_sys->f_npt / p_sys->f_npt_length;
@@ -1480,14 +1480,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
                 if( (i_query == DEMUX_SET_TIME) && (p_sys->f_npt > 0) )
                 {
-                    i64 = (int64_t)va_arg( args, int64_t );
+                    i64 = va_arg( args, int64_t );
                     time = (float)(i64 / 1000000.0); /* in second */
                 }
                 else if( i_query == DEMUX_SET_TIME )
                     return VLC_EGENERIC;
                 else
                 {
-                    f = (double)va_arg( args, double );
+                    f = va_arg( args, double );
                     time = f * p_sys->f_npt_length;   /* in second */
                 }
 
@@ -1538,7 +1538,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_SEEK:
-            pb = (bool*)va_arg( args, bool * );
+            pb = va_arg( args, bool * );
             if( p_sys->rtsp && p_sys->f_npt_length > 0 )
                 /* Not always true, but will be handled in SET_PAUSE_STATE */
                 *pb = true;
@@ -1547,7 +1547,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (bool*)va_arg( args, bool * );
+            pb = va_arg( args, bool * );
 
 #if 1       /* Disable for now until we have a clock synchro algo
              * which works with something else than MPEG over UDP */
@@ -1558,7 +1558,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_CAN_CONTROL_RATE:
-            pb = (bool*)va_arg( args, bool * );
+            pb = va_arg( args, bool * );
 
             *pb = (p_sys->rtsp != NULL) &&
                     (p_sys->f_npt_length > 0) &&
@@ -1590,7 +1590,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * Scale < 0 value indicates rewind
              */
 
-            pi_int = (int*)va_arg( args, int * );
+            pi_int = va_arg( args, int * );
             f_scale = (double)INPUT_RATE_DEFAULT / (*pi_int);
             f_old_scale = p_sys->ms->scale();
 
@@ -1679,7 +1679,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_PTS_DELAY:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = INT64_C(1000)
                   * var_InheritInteger( p_demux, "network-caching" );
             return VLC_SUCCESS;
