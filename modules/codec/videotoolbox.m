@@ -1346,8 +1346,10 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     {
         switch (status)
         {
+            case -8960 /* codecErr */:
             case kCVReturnInvalidArgument:
-                msg_Err(p_dec, "decoder failure: invalid argument");
+            case kVTVideoDecoderMalfunctionErr:
+                msg_Err(p_dec, "decoder failure, Abort.");
                 /* The decoder module will be reloaded next time since we already
                  * modified the input block */
                 vlc_mutex_lock(&p_sys->lock);
@@ -1368,8 +1370,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
                     }
                 }
                 break;
-            case -8960 /* codecErr */:
-            case kVTVideoDecoderMalfunctionErr:
             case kVTInvalidSessionErr:
                 RestartVideoToolbox(p_dec, true);
                 break;
