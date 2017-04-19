@@ -34,6 +34,12 @@
 using namespace adaptive::logic;
 using namespace adaptive;
 
+/*
+ * Modified PBA algorithm (streaming for Cellular Networks) for multi streams
+ * Targets optimal quality
+ * https://www.cs.princeton.edu/~jrex/papers/hotmobile15.pdf
+ */
+
 PredictiveStats::PredictiveStats()
 {
     segments_count = 0;
