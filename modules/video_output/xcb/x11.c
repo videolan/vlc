@@ -457,7 +457,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
         const vout_display_cfg_t *p_cfg =
-            (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
+            va_arg (ap, const vout_display_cfg_t *);
         vout_display_place_t place;
 
         vout_display_PlacePicture (&place, &vd->source, p_cfg, false);
