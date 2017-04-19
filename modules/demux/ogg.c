@@ -753,23 +753,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_GET_META:
-            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+            p_meta = va_arg( args, vlc_meta_t * );
             if( p_sys->p_meta )
                 vlc_meta_Merge( p_meta, p_sys->p_meta );
             return VLC_SUCCESS;
 
         case DEMUX_HAS_UNSUPPORTED_META:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool* );
             *pb_bool = true;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_pcr;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
-            i64 = (int64_t)va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
             logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
             if ( !p_stream )
             {
@@ -790,8 +790,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_ATTACHMENTS:
         {
             input_attachment_t ***ppp_attach =
-                (input_attachment_t***)va_arg( args, input_attachment_t*** );
-            int *pi_int = (int*)va_arg( args, int * );
+                va_arg( args, input_attachment_t *** );
+            int *pi_int = va_arg( args, int * );
 
             if( p_sys->i_attachments <= 0 )
                 return VLC_EGENERIC;
@@ -804,7 +804,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             if( p_sys->i_length > 0 )
             {
                 *pf =  (double) p_sys->i_pcr /
@@ -837,7 +837,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
 
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
             if ( p_sys->i_length <= 0 || !b /* || ! STREAM_CAN_FASTSEEK */ )
             {
                 Ogg_ResetStreamsHelper( p_sys );
@@ -861,16 +861,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if ( p_sys->i_length < 0 )
                 return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
                                               1, i_query, args );
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_length * 1000000;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
         {
-            input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
-            int *pi_int    = (int*)va_arg( args, int* );
-            int *pi_title_offset = (int*)va_arg( args, int* );
-            int *pi_seekpoint_offset = (int*)va_arg( args, int* );
+            input_title_t ***ppp_title = va_arg( args, input_title_t *** );
+            int *pi_int = va_arg( args, int* );
+            int *pi_title_offset = va_arg( args, int* );
+            int *pi_seekpoint_offset = va_arg( args, int* );
 
             if( p_sys->i_seekpoints > 0 )
             {
@@ -890,14 +890,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         case DEMUX_SET_TITLE:
         {
-            const int i_title = (int)va_arg( args, int );
+            const int i_title = va_arg( args, int );
             if( i_title > 1 )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
         case DEMUX_SET_SEEKPOINT:
         {
-            const int i_seekpoint = (int)va_arg( args, int );
+            const int i_seekpoint = va_arg( args, int );
             if( i_seekpoint > p_sys->i_seekpoints )
                 return VLC_EGENERIC;
 
