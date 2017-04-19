@@ -1893,12 +1893,12 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
     case STREAM_CAN_FASTSEEK:
     case STREAM_CAN_PAUSE:
     case STREAM_CAN_CONTROL_PACE:
-        pb_bool = (bool*)va_arg( args, bool* );
+        pb_bool = va_arg( args, bool * );
         *pb_bool = false;
         break;
 
     case STREAM_GET_PTS_DELAY:
-        pi_64 = (int64_t*)va_arg( args, int64_t * );
+        pi_64 = va_arg( args, int64_t * );
         *pi_64 =
             INT64_C(1000) * var_InheritInteger( p_access, "live-caching" );
         break;
@@ -1942,18 +1942,18 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_CAN_SEEK:
     case DEMUX_SET_PAUSE_STATE:
     case DEMUX_CAN_CONTROL_PACE:
-        pb = (bool*)va_arg( args, bool * );
+        pb = va_arg( args, bool * );
         *pb = false;
         return VLC_SUCCESS;
 
     case DEMUX_GET_PTS_DELAY:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
         *pi64 =
             INT64_C(1000) * var_InheritInteger( p_demux, "live-caching" );
         return VLC_SUCCESS;
 
     case DEMUX_GET_TIME:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
         *pi64 = mdate() - p_sys->i_start;
         return VLC_SUCCESS;
 
