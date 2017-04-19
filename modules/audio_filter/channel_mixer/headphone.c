@@ -316,7 +316,7 @@ static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data
                 = p_data->p_atomic_operations[i].i_delay * 2 * sizeof (float);
         }
     }
-    p_data->p_overflow_buffer = (float *)malloc( p_data->i_overflow_buffer_size );
+    p_data->p_overflow_buffer = malloc( p_data->i_overflow_buffer_size );
     if( p_data->p_overflow_buffer == NULL )
     {
         free( p_data->p_atomic_operations );
