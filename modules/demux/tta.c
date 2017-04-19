@@ -233,7 +233,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_GET_POSITION:
-            pf = (double*) va_arg( args, double* );
+            pf = va_arg( args, double * );
             i64 = stream_Size( p_demux->s ) - p_sys->i_start;
             if( i64 > 0 )
             {
@@ -246,7 +246,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
             i64 = (int64_t)(f * (stream_Size( p_demux->s ) - p_sys->i_start));
             if( i64 > 0 )
             {
@@ -263,12 +263,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = INT64_C(1000000) * p_sys->i_totalframes * TTA_FRAMETIME;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = INT64_C(1000000) * p_sys->i_currentframe * TTA_FRAMETIME;
             return VLC_SUCCESS;
 
