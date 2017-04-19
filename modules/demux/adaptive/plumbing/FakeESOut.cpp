@@ -376,10 +376,10 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
         {
             int i_group;
             if( i_query == ES_OUT_SET_GROUP_PCR )
-                i_group = static_cast<int>(va_arg( args, int ));
+                i_group = va_arg( args, int );
             else
                 i_group = 0;
-            int64_t  pcr = static_cast<int64_t>(va_arg( args, int64_t ));
+            int64_t  pcr = va_arg( args, int64_t );
             pcr += me->getTimestampOffset();
             AbstractCommand *command = me->commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );
             if( likely(command) )
@@ -393,7 +393,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
         case ES_OUT_SET_GROUP_META:
         {
             static_cast<void>(va_arg( args, int )); /* ignore group */
-            const vlc_meta_t *p_meta = static_cast<const vlc_meta_t *>(va_arg( args, const vlc_meta_t * ));
+            const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
             AbstractCommand *command = me->commandsqueue->factory()->createEsOutMetaCommand( -1, p_meta );
             if( likely(command) )
             {
@@ -407,7 +407,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
         case ES_OUT_GET_ES_STATE:
         {
             static_cast<void>(va_arg( args, es_out_id_t * ));
-            bool *pb = static_cast<bool *>(va_arg( args, bool * ));
+            bool *pb = va_arg( args, bool * );
             *pb = true;
             // ft
         }
