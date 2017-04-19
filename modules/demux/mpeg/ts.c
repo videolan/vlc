@@ -880,7 +880,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case DEMUX_GET_POSITION:
-        pf = (double*) va_arg( args, double* );
+        pf = va_arg( args, double * );
 
         /* Access control test is because EPG for recordings is not relevant */
         if( p_sys->b_access_control )
@@ -919,8 +919,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         break;
 
     case DEMUX_SET_POSITION:
-        f = (double) va_arg( args, double );
-        b_bool = (int) va_arg( args, int ); /* precise */
+        f = va_arg( args, double );
+        b_bool = (bool) va_arg( args, int ); /* precise */
 
         if(!p_sys->b_canseek)
             break;
@@ -967,7 +967,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         break;
 
     case DEMUX_SET_TIME:
-        i64 = (int64_t)va_arg( args, int64_t );
+        i64 = va_arg( args, int64_t );
 
         if( p_sys->b_canseek && p_pmt && p_pmt->pcr.i_first > -1 &&
            !SeekToTime( p_demux, p_pmt, p_pmt->pcr.i_first + TO_SCALE(i64) ) )
@@ -980,7 +980,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         break;
 
     case DEMUX_GET_TIME:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
 
         if( p_sys->b_access_control )
         {
@@ -1001,7 +1001,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         break;
 
     case DEMUX_GET_LENGTH:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
 
         if( p_sys->b_access_control )
         {
@@ -1032,7 +1032,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         vlc_list_t *p_list;
 
         i_int = va_arg( args, int );
-        p_list = (vlc_list_t *)va_arg( args, vlc_list_t * );
+        p_list = va_arg( args, vlc_list_t * );
         msg_Dbg( p_demux, "DEMUX_SET_GROUP %d %p", i_int, (void *)p_list );
 
         if( i_int != 0 ) /* If not default program */
@@ -1070,7 +1070,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_ES:
     {
-        i_int = (int)va_arg( args, int );
+        i_int = va_arg( args, int );
         msg_Dbg( p_demux, "DEMUX_SET_ES %d", i_int );
 
         if( !p_sys->b_es_all ) /* Won't change anything */
@@ -1101,12 +1101,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return vlc_stream_vaControl( p_sys->stream, STREAM_GET_META, args );
 
     case DEMUX_CAN_RECORD:
-        pb_bool = (bool*)va_arg( args, bool * );
+        pb_bool = va_arg( args, bool * );
         *pb_bool = true;
         return VLC_SUCCESS;
 
     case DEMUX_SET_RECORD_STATE:
-        b_bool = (bool)va_arg( args, int );
+        b_bool = va_arg( args, int );
 
         if( !b_bool )
             vlc_stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE,
