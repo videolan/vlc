@@ -310,7 +310,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case DEMUX_GET_POSITION:
-        pf = (double*) va_arg( args, double* );
+        pf = va_arg( args, double* );
         if( p_sys->i_length > 0 )
         {
             double current = date_Get( &p_sys->pts );
@@ -321,7 +321,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_EGENERIC;
 
     case DEMUX_SET_POSITION:
-        f = (double) va_arg( args, double );
+        f = va_arg( args, double );
 
         i64 = f * p_sys->i_length;
         if( i64 >= 0 && i64 <= p_sys->i_length )
@@ -334,17 +334,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_EGENERIC;
 
     case DEMUX_GET_TIME:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
         *pi64 = date_Get( &p_sys->pts );
         return VLC_SUCCESS;
 
     case DEMUX_GET_LENGTH:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
         *pi64 = p_sys->i_length;
         return VLC_SUCCESS;
 
     case DEMUX_SET_TIME:
-        i64 = (int64_t)va_arg( args, int64_t );
+        i64 = va_arg( args, int64_t );
 
         if( i64 >= 0 && i64 <= p_sys->i_length )
         {
@@ -357,13 +357,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_HAS_UNSUPPORTED_META:
     {
-        bool *pb_bool = (bool*)va_arg( args, bool* );
+        bool *pb_bool = va_arg( args, bool* );
         *pb_bool = false; /* FIXME I am not sure of this one */
         return VLC_SUCCESS;
     }
     case DEMUX_GET_META:
     {
-        vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+        vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
         unsigned i_num_samples = ModPlug_NumSamples( p_sys->f ),
                  i_num_instruments = ModPlug_NumInstruments( p_sys->f );
         unsigned i_num_patterns = ModPlug_NumPatterns( p_sys->f ),
