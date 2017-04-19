@@ -700,17 +700,17 @@ static int Control(demux_t *demux, int query, va_list args)
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_SEEK:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (bool*)va_arg(args, bool *);
+            pb = va_arg(args, bool *);
             *pb = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            pi64 = (int64_t*)va_arg(args, int64_t *);
+            pi64 = va_arg(args, int64_t *);
             *pi64 = INT64_C(1000) * var_InheritInteger(demux, "live-caching");
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg(args, int64_t *);
+            pi64 = va_arg(args, int64_t *);
             vlc_mutex_lock(&sys->pts_lock);
             *pi64 = sys->last_pts;
             vlc_mutex_unlock(&sys->pts_lock);
