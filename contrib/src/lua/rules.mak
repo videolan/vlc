@@ -35,7 +35,7 @@ PKGS_FOUND += lua luac
 endif
 
 $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
-	$(call download,$(LUA_URL))
+	$(call download_pkg,$(LUA_URL),lua)
 
 .sum-lua: lua-$(LUA_VERSION).tar.gz
 
