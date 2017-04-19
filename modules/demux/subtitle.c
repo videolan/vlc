@@ -647,19 +647,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
             if( *pi64 < 0 )
                *pi64 = p_sys->i_next_demux_date;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
-            i64 = (int64_t)va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
             for( size_t i = 0; i + 1< p_sys->subtitles.i_count; i++ )
             {
                 if( p_sys->subtitles.p_array[i + 1].i_start >= i64 )
@@ -673,7 +673,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             break;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             if( p_sys->subtitles.i_current >= p_sys->subtitles.i_count )
             {
                 *pf = 1.0;
@@ -692,7 +692,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
             if( p_sys->subtitles.i_count && p_sys->i_length )
             {
                 i64 = VLC_TS_0 + f * p_sys->i_length;
@@ -702,7 +702,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
-            p_sys->i_next_demux_date = (int64_t)va_arg( args, int64_t ) - VLC_TS_0;
+            p_sys->i_next_demux_date = va_arg( args, int64_t ) - VLC_TS_0;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
