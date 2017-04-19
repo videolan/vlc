@@ -395,7 +395,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case STREAM_CAN_FASTSEEK:
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool * );
             *pb_bool = false;
             break;
 
@@ -404,13 +404,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            pi_64 = va_arg( args, int64_t * );
             *pi_64 = DEFAULT_PTS_DELAY;
             break;
 
         case STREAM_GET_SIGNAL:
-            pf1 = (double*)va_arg( args, double * );
-            pf2 = (double*)va_arg( args, double * );
+            pf1 = va_arg( args, double * );
+            pf2 = va_arg( args, double * );
 
             *pf1 = *pf2 = 0;
             if( !FrontendGetStatistic( &sys->dvb, &stat ) )
