@@ -1658,11 +1658,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             *pf = ControlGetPosition( p_demux );
             return VLC_SUCCESS;
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
             if ( !p_sys->b_seekable )
             {
                 return VLC_EGENERIC;
@@ -1674,7 +1674,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_time;
             return VLC_SUCCESS;
 
@@ -1682,7 +1682,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             int i_percent = 0;
 
-            i64 = (int64_t)va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
             if( !p_sys->b_seekable )
             {
                 return VLC_EGENERIC;
@@ -1699,12 +1699,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return Seek( p_demux, i64, i_percent );
         }
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_length * (mtime_t)CLOCK_FREQ;
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             *pf = 0.0;
             for( i = 0; i < (int)p_sys->i_track; i++ )
             {
@@ -1718,7 +1718,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_META:
-            p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+            p_meta = va_arg( args, vlc_meta_t * );
             vlc_meta_Merge( p_meta,  p_sys->meta );
             return VLC_SUCCESS;
 
