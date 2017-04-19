@@ -159,7 +159,7 @@ int DASHManager::doControl(int i_query, va_list args)
             if(!mpd->programInfo.Get())
                 break;
 
-            vlc_meta_t *p_meta = (vlc_meta_t *) va_arg (args, vlc_meta_t*);
+            vlc_meta_t *p_meta = va_arg (args, vlc_meta_t *);
             vlc_meta_t *meta = vlc_meta_New();
             if (meta == NULL)
                 return VLC_EGENERIC;

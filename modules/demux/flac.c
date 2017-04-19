@@ -484,31 +484,31 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     if( i_query == DEMUX_GET_META )
     {
-        vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+        vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
         if( p_demux->p_sys->p_meta )
             vlc_meta_Merge( p_meta, p_demux->p_sys->p_meta );
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_HAS_UNSUPPORTED_META )
     {
-        bool *pb_bool = (bool*)va_arg( args, bool* );
+        bool *pb_bool = va_arg( args, bool* );
         *pb_bool = true;
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_GET_LENGTH )
     {
-        int64_t *pi64 = (int64_t*)va_arg( args, int64_t * );
+        int64_t *pi64 = va_arg( args, int64_t * );
         *pi64 = ControlGetLength( p_demux );
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_SET_TIME )
     {
-        int64_t i_time = (int64_t)va_arg( args, int64_t );
+        int64_t i_time = va_arg( args, int64_t );
         return ControlSetTime( p_demux, i_time );
     }
     else if( i_query == DEMUX_SET_POSITION )
     {
-        const double f = (double)va_arg( args, double );
+        const double f = va_arg( args, double );
         int64_t i_length = ControlGetLength( p_demux );
         if( i_length > 0 )
             return ControlSetTime( p_demux, i_length * f );
@@ -523,7 +523,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else if( i_query == DEMUX_GET_TIME )
     {
-        int64_t *pi64 = (int64_t*)va_arg( args, int64_t * );
+        int64_t *pi64 = va_arg( args, int64_t * );
         *pi64 = ControlGetTime( p_demux );
         return VLC_SUCCESS;
     }
@@ -532,7 +532,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         const int64_t i_length = ControlGetLength(p_demux);
         if( i_length > 0 )
         {
-            double *pf = (double*)va_arg( args, double * );
+            double *pf = va_arg( args, double * );
             double current = ControlGetTime(p_demux);
             *pf = current / (double)i_length;
             return VLC_SUCCESS;
@@ -542,8 +542,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     else if( i_query == DEMUX_GET_ATTACHMENTS )
     {
         input_attachment_t ***ppp_attach =
-            (input_attachment_t***)va_arg( args, input_attachment_t*** );
-        int *pi_int = (int*)va_arg( args, int * );
+            va_arg( args, input_attachment_t *** );
+        int *pi_int = va_arg( args, int * );
 
         if( p_sys->i_attachments <= 0 )
             return VLC_EGENERIC;
@@ -558,10 +558,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else if( i_query == DEMUX_GET_TITLE_INFO )
     {
-        input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
-        int *pi_int    = (int*)va_arg( args, int* );
-        int *pi_title_offset = (int*)va_arg( args, int* );
-        int *pi_seekpoint_offset = (int*)va_arg( args, int* );
+        input_title_t ***ppp_title = va_arg( args, input_title_t *** );
+        int *pi_int = va_arg( args, int * );
+        int *pi_title_offset = va_arg( args, int * );
+        int *pi_seekpoint_offset = va_arg( args, int * );
 
         if( !p_sys->i_title_seekpoints )
             return VLC_EGENERIC;
@@ -597,14 +597,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else if( i_query == DEMUX_SET_TITLE )
     {
-        const int i_title = (int)va_arg( args, int );
+        const int i_title = va_arg( args, int );
         if( i_title != 0 )
             return VLC_EGENERIC;
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_SET_SEEKPOINT )
     {
-        const int i_seekpoint = (int)va_arg( args, int );
+        const int i_seekpoint = va_arg( args, int );
         if( !p_sys->i_title_seekpoints || i_seekpoint >= p_sys->i_title_seekpoints )
             return VLC_EGENERIC;
         return ControlSetTime( p_demux, p_sys->pp_title_seekpoints[i_seekpoint]->i_time_offset );
