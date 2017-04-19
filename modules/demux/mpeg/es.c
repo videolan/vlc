@@ -394,12 +394,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_HAS_UNSUPPORTED_META:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool * );
             *pb_bool = true;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_pts + p_sys->i_time_offset;
             return VLC_SUCCESS;
 
@@ -426,7 +426,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_EGENERIC;
                 }
 
-                pi64 = (int64_t *)va_arg( args, int64_t * );
+                pi64 = va_arg( args, int64_t * );
                 *pi64 = (p_sys->i_pts + p_sys->i_time_offset) / f_pos;
                 return VLC_SUCCESS;
             }
