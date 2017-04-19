@@ -1635,7 +1635,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             if( i_duration > 0 )
             {
                 *pf = (double)p_sys->i_time / (double)i_duration;
@@ -1647,7 +1647,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
             if ( p_demux->pf_demux == DemuxAsLeaf )
                 return LeafSeekToPos( p_demux, f );
             else if( p_sys->i_timescale > 0 )
@@ -1659,7 +1659,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             if( p_sys->i_timescale > 0 )
             {
                 *pi64 = MP4_rescale( p_sys->i_time,
@@ -1669,14 +1669,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
-            i64 = (int64_t)va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
             if ( p_demux->pf_demux == DemuxAsLeaf )
                 return LeafSeekToTime( p_demux, i64 );
             else
                 return Seek( p_demux, i64 );
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             if( p_sys->i_timescale > 0 )
             {
                 *pi64 = MP4_rescale( i_duration,
@@ -1686,7 +1686,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:
-            pf = (double*)va_arg( args, double* );
+            pf = va_arg( args, double * );
             *pf = p_sys->f_fps;
             return VLC_SUCCESS;
 
@@ -1806,7 +1806,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_META:
         {
-            vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t*);
+            vlc_meta_t *p_meta = va_arg( args, vlc_meta_t *);
 
             MP4_Box_t *p_data = NULL;
             MP4_Box_t *p_udta = NULL;
@@ -1860,10 +1860,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TITLE_INFO:
         {
-            input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
-            int *pi_int    = (int*)va_arg( args, int* );
-            int *pi_title_offset = (int*)va_arg( args, int* );
-            int *pi_seekpoint_offset = (int*)va_arg( args, int* );
+            input_title_t ***ppp_title = va_arg( args, input_title_t *** );
+            int *pi_int = va_arg( args, int* );
+            int *pi_title_offset = va_arg( args, int* );
+            int *pi_seekpoint_offset = va_arg( args, int* );
 
             if( !p_sys->p_title )
                 return VLC_EGENERIC;
@@ -1877,14 +1877,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         case DEMUX_SET_TITLE:
         {
-            const int i_title = (int)va_arg( args, int );
+            const int i_title = va_arg( args, int );
             if( !p_sys->p_title || i_title != 0 )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
         case DEMUX_SET_SEEKPOINT:
         {
-            const int i_seekpoint = (int)va_arg( args, int );
+            const int i_seekpoint = va_arg( args, int );
             if( !p_sys->p_title )
                 return VLC_EGENERIC;
             return Seek( p_demux, p_sys->p_title->seekpoint[i_seekpoint]->i_time_offset );
