@@ -632,7 +632,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_TITLE:
-            i = (int)va_arg( args, int );
+            i = va_arg( args, int );
             if( i == 0 && dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root )
                   != DVDNAV_STATUS_OK )
             {
@@ -696,7 +696,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             dvdnav_get_title_string(p_sys->dvdnav, &title_name);
             if( (NULL != title_name) && ('\0' != title_name[0]) )
             {
-                vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+                vlc_meta_t *p_meta = va_arg( args, vlc_meta_t* );
                 vlc_meta_Set( p_meta, vlc_meta_Title, title_name );
                 return VLC_SUCCESS;
             }
