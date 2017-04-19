@@ -750,7 +750,7 @@ Control( vout_display_t *vd, int i_query, va_list ap )
 
         msg_Dbg( vd, "VOUT_DISPLAY_CHANGE_SOURCE_ASPECT" );
 
-        p_source = (const video_format_t *)va_arg( ap, const video_format_t * );
+        p_source = va_arg( ap, const video_format_t * );
 
         video_format_ApplyRotation( &fmt, p_source );
         vout_display_PlacePicture( &place, &fmt, vd->cfg, false );
