@@ -739,6 +739,7 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             logic = ratelogic;
             break;
         }
+        case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::NearOptimal:
         {
             NearOptimalAdaptationLogic *noplogic =
@@ -748,7 +749,6 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             logic = noplogic;
             break;
         }
-        case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::Predictive:
         {
             AbstractAdaptationLogic *predictivelogic =
