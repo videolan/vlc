@@ -223,7 +223,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys  = p_demux->p_sys;
     if( DEMUX_GET_TIME == i_query )
     {
-        int64_t *pi64 = (int64_t*)va_arg( args, int64_t * );
+        int64_t *pi64 = va_arg( args, int64_t * );
         *pi64 = p_sys->i_dts;
         return VLC_SUCCESS;
     }
@@ -233,7 +233,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             return VLC_EGENERIC;
         }
-        double *pd = (double*)va_arg( args, double * );
+        double *pd = va_arg( args, double * );
         *pd = (float) p_sys->p_packetizer->fmt_out.video.i_frame_rate
             / p_sys->p_packetizer->fmt_out.video.i_frame_rate_base;
         return VLC_SUCCESS;
