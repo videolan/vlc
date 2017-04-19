@@ -782,12 +782,12 @@ static int Control( demux_t *p_demux, int query, va_list args )
     {
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = ( bool* ) va_arg ( args, bool* );
+            pb = va_arg ( args, bool* );
             *pb = true;
             break;
 
         case DEMUX_CAN_SEEK:
-            pb = (bool *)va_arg( args, bool * );
+            pb = va_arg( args, bool * );
             if( p_sys->PictureEssType != ESS_MPEG2_VES )
                 *pb = true;
             else
@@ -798,7 +798,7 @@ static int Control( demux_t *p_demux, int query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
-            pf = ( double* ) va_arg ( args, double* );
+            pf = va_arg( args, double * );
             if( p_sys->frames_total != 0 )
                 *pf = (double) p_sys->frame_no / (double) p_sys->frames_total;
             else {
@@ -808,22 +808,22 @@ static int Control( demux_t *p_demux, int query, va_list args )
             break;
 
         case DEMUX_SET_POSITION:
-            f = ( double ) va_arg ( args, double );
+            f = va_arg( args, double );
             p_sys->frame_no = (int) ( f * p_sys->frames_total );
             break;
 
         case DEMUX_GET_LENGTH:
-            pi64 = ( int64_t* ) va_arg ( args, int64_t* );
+            pi64 = va_arg ( args, int64_t * );
             *pi64 =  ( p_sys->frames_total * p_sys->frame_rate_denom / p_sys->frame_rate_num ) * CLOCK_FREQ;
             break;
 
         case DEMUX_GET_TIME:
-            pi64 = ( int64_t* ) va_arg ( args, int64_t* );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_pts >= 0 ? p_sys->i_pts : 0;
             break;
 
         case DEMUX_SET_TIME:
-            i64 = ( int64_t ) va_arg ( args, int64_t );
+            i64 = va_arg( args, int64_t );
             msg_Warn( p_demux, "DEMUX_SET_TIME"  );
             p_sys->frame_no = i64 * p_sys->frame_rate_num / ( CLOCK_FREQ * p_sys->frame_rate_denom );
             p_sys->i_pts= i64;
@@ -831,7 +831,7 @@ static int Control( demux_t *p_demux, int query, va_list args )
             es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, ( mtime_t ) i64 );
             break;
         case DEMUX_GET_PTS_DELAY:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 =
                 INT64_C(1000) * var_InheritInteger( p_demux, "file-caching" );
             return VLC_SUCCESS;
