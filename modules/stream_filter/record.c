@@ -143,7 +143,7 @@ static int Control( stream_t *s, int i_query, va_list args )
     bool b_active = (bool)va_arg( args, int );
     const char *psz_extension = NULL;
     if( b_active )
-        psz_extension = (const char*)va_arg( args, const char* );
+        psz_extension = va_arg( args, const char* );
 
     if( !sys->f == !b_active )
         return VLC_SUCCESS;
