@@ -388,7 +388,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_GET_POSITION:
-            pf = (double*) va_arg( args, double* );
+            pf = va_arg( args, double * );
 
             /* read stream size maybe failed in rtsp streaming, 
                so use duration to determin the position at first  */
@@ -409,7 +409,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
 
             if( p_sys->i_our_duration > 0 )
             {
@@ -429,7 +429,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_POSITION:
-            f = (double) va_arg( args, double );
+            f = va_arg( args, double );
             i64 = (int64_t) ( stream_Size( p_demux->s ) * f );
 
             if( !p_sys->p_index && i64 != 0 )
@@ -452,11 +452,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( !p_sys->p_index )
                 return VLC_EGENERIC;
 
-            i64 = (int64_t) va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
             return ControlSeekTime( p_demux, i64 );
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
  
             if( p_sys->i_our_duration <= 0 )
             {
@@ -470,7 +470,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_META:
         {
-            vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+            vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
 
             /* the core will crash if we provide NULL strings, so check
              * every string first */

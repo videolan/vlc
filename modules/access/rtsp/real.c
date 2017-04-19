@@ -432,7 +432,7 @@ static rmff_header_t *real_parse_sdp(access_t *p_access, char *data, char **stre
   desc=sdpplin_parse(p_access, data);
   if( !desc ) return NULL;
 
-  buf= (char *)malloc(MLTI_BUF_MAX_SIZE);
+  buf = malloc(MLTI_BUF_MAX_SIZE);
   if( !buf ) goto error;
 
   header = calloc( 1, sizeof(rmff_header_t) );
