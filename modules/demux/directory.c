@@ -53,7 +53,7 @@ static int Control(demux_t *demux, int query, va_list args)
     {
         case DEMUX_IS_PLAYLIST:
         {
-            bool *pb_bool = (bool*)va_arg( args, bool * );
+            bool *pb_bool = va_arg( args, bool * );
             *pb_bool = true;
             return VLC_SUCCESS;
         }
