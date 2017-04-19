@@ -483,11 +483,8 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
             continue;
 
         int i_tk = PS_ID_TO_TK( i_id );
-        if( !tk[i_tk].b_configured &&
-            !ps_track_fill( &tk[i_tk], p_psm, i_id, NULL, false ) )
-        {
-                tk[i_tk].b_configured = true;
-        }
+        if( !tk[i_tk].b_configured )
+            ps_track_fill( &tk[i_tk], p_psm, i_id, NULL, false );
     }
     return VLC_SUCCESS;
 }

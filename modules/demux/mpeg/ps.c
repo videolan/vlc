@@ -469,9 +469,11 @@ static int Demux( demux_t *p_demux )
             {
                 ps_track_t *tk = &p_sys->tk[i];
 
-                if( tk->b_seen && !tk->es && tk->fmt.i_cat != UNKNOWN_ES )
+                if( !tk->b_configured && tk->fmt.i_cat != UNKNOWN_ES )
                 {
-                    tk->es = es_out_Add( p_demux->out, &tk->fmt );
+                    if( tk->b_seen )
+                        tk->es = es_out_Add( p_demux->out, &tk->fmt );
+                     /* else create when seeing packet */
                     tk->b_configured = true;
                 }
             }
@@ -545,6 +547,12 @@ static int Demux( demux_t *p_demux )
                     msg_Dbg( p_demux, "es id=0x%x format unknown", i_id );
                 }
             }
+
+            /* Late creation from system header */
+            if( !tk->b_seen && tk->b_configured && !tk->es && tk->fmt.i_cat != UNKNOWN_ES )
+                tk->es = es_out_Add( p_demux->out, &tk->fmt );
+
+            tk->b_seen = true;
 
             /* The popular VCD/SVCD subtitling WinSubMux does not
              * renumber the SCRs when merging subtitles into the PES */
