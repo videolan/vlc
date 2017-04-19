@@ -134,7 +134,7 @@ static int Control(demux_t *demux, int query, va_list args)
     }
     case DEMUX_SET_POSITION:
     {
-        double f = (double)va_arg( args, double );
+        double f = va_arg( args, double );
         if(sys->count && sys->index[sys->count-1].stop > 0)
         {
             int64_t i64 = f * sys->index[sys->count-1].stop;
@@ -144,7 +144,7 @@ static int Control(demux_t *demux, int query, va_list args)
     }
     case DEMUX_GET_POSITION:
     {
-        double *pf = (double*)va_arg(args, double *);
+        double *pf = va_arg(args, double *);
         if(sys->current >= sys->count)
         {
             *pf = 1.0;
