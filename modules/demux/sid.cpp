@@ -243,7 +243,7 @@ static int Control (demux_t *demux, int query, va_list args)
         }
 
         case DEMUX_GET_META : {
-            vlc_meta_t *p_meta = (vlc_meta_t *) va_arg (args, vlc_meta_t*);
+            vlc_meta_t *p_meta = va_arg (args, vlc_meta_t *);
 
             /* These are specified in the sid tune class as 0 = Title, 1 = Artist, 2 = Copyright/Publisher */
             vlc_meta_SetTitle( p_meta, sys->tuneInfo.infoString[0] );
@@ -255,8 +255,8 @@ static int Control (demux_t *demux, int query, va_list args)
 
         case DEMUX_GET_TITLE_INFO :
             if ( sys->tuneInfo.songs > 1 ) {
-                input_title_t ***ppp_title = (input_title_t***) va_arg (args, input_title_t***);
-                int *pi_int    = (int*)va_arg( args, int* );
+                input_title_t ***ppp_title = va_arg (args, input_title_t ***);
+                int *pi_int = va_arg( args, int* );
 
                 *pi_int = sys->tuneInfo.songs;
                 *ppp_title = (input_title_t**) malloc( sizeof (input_title_t*) * sys->tuneInfo.songs);
@@ -270,7 +270,7 @@ static int Control (demux_t *demux, int query, va_list args)
             return VLC_EGENERIC;
 
         case DEMUX_SET_TITLE : {
-            int i_idx = (int) va_arg (args, int);
+            int i_idx = va_arg (args, int);
             sys->tune->selectSong (i_idx+1);
             bool result = (sys->player->load (sys->tune) >=0 );
             if (!result)
