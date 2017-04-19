@@ -67,14 +67,14 @@ static int Control( stream_t *p_stream, int i_query, va_list args )
     case STREAM_CAN_FASTSEEK:
         if( !p_sys->b_fastseek || !p_sys->b_seek )
         {
-            *((bool*)va_arg( args, bool* )) = false;
+            *va_arg( args, bool* ) = false;
             return VLC_SUCCESS;
         }
         break;
     case STREAM_CAN_SEEK:
         if( !p_sys->b_seek )
         {
-            *((bool*)va_arg( args, bool* )) = false;
+            *va_arg( args, bool* ) = false;
             return VLC_SUCCESS;
         }
         break;
