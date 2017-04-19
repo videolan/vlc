@@ -1000,19 +1000,19 @@ static int Control( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
         case STREAM_CAN_SEEK:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool * );
             *pb_bool = true;
             break;
         case STREAM_CAN_FASTSEEK:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool * );
             *pb_bool = false;
             break;
         case STREAM_CAN_PAUSE:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool * );
             *pb_bool = true;    /* FIXME */
             break;
         case STREAM_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool * );
             *pb_bool = true;    /* FIXME */
             break;
         case STREAM_GET_SIZE:
@@ -1022,13 +1022,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case STREAM_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            pi_64 = va_arg( args, int64_t * );
             *pi_64 = INT64_C(1000)
                    * var_InheritInteger( p_access, "network-caching" );
             break;
 
         case STREAM_SET_PAUSE_STATE:
-            pb_bool = (bool*)va_arg( args, bool* );
+            pb_bool = va_arg( args, bool * );
             if ( !pb_bool )
                  return Seek( p_access, sys->offset );
             break;
