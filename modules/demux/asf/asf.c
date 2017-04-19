@@ -423,12 +423,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
     case DEMUX_GET_LENGTH:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
         *pi64 = p_sys->i_length;
         return VLC_SUCCESS;
 
     case DEMUX_GET_TIME:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
+        pi64 = va_arg( args, int64_t * );
         if( p_sys->i_time < 0 ) return VLC_EGENERIC;
         *pi64 = p_sys->i_time;
         return VLC_SUCCESS;
@@ -444,7 +444,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             va_list acpy;
             va_copy( acpy, args );
-            i64 = (int64_t)va_arg( acpy, int64_t );
+            i64 = va_arg( acpy, int64_t );
             va_end( acpy );
 
             if( !SeekIndex( p_demux, i64, -1 ) )
@@ -454,7 +454,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_ES:
     {
-        i = (int)va_arg( args, int );
+        i = va_arg( args, int );
         int i_ret;
         if ( i >= 0 )
         {
@@ -503,7 +503,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_sys->i_time < 0 ) return VLC_EGENERIC;
         if( p_sys->i_length > 0 )
         {
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             *pf = p_sys->i_time / (double)p_sys->i_length;
             return VLC_SUCCESS;
         }
@@ -525,7 +525,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             va_list acpy;
             va_copy( acpy, args );
-            f = (double)va_arg( acpy, double );
+            f = va_arg( acpy, double );
             va_end( acpy );
 
             if( !SeekIndex( p_demux, -1, f ) )
@@ -534,7 +534,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return SeekPercent( p_demux, i_query, args );
 
     case DEMUX_GET_META:
-        p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+        p_meta = va_arg( args, vlc_meta_t * );
         vlc_meta_Merge( p_meta, p_sys->meta );
         return VLC_SUCCESS;
 
@@ -542,7 +542,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if ( p_sys->p_fp &&
              ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) )
         {
-            bool *pb_bool = (bool*)va_arg( args, bool * );
+            bool *pb_bool = va_arg( args, bool * );
             *pb_bool = false;
             return VLC_SUCCESS;
         }
