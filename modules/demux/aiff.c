@@ -293,7 +293,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int64_t i_end   = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
             int64_t i_tell  = vlc_stream_Tell( p_demux->s );
 
-            pf = (double*) va_arg( args, double* );
+            pf = va_arg( args, double * );
 
             if( i_start < i_end )
             {
@@ -308,7 +308,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int64_t i_start = p_sys->i_ssnd_start;
             int64_t i_end  = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
 
-            f = (double) va_arg( args, double );
+            f = va_arg( args, double );
 
             if( i_start < i_end )
             {
@@ -326,7 +326,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_time;
             return VLC_SUCCESS;
 
@@ -334,7 +334,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             int64_t i_end  = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
 
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             if( p_sys->i_ssnd_start < i_end )
             {
                 *pi64 = (int64_t)1000000 * ( i_end - p_sys->i_ssnd_start ) / p_sys->i_ssnd_fsize / p_sys->fmt.audio.i_rate;
