@@ -33,8 +33,9 @@
 
 struct priv
 {
-    SurfaceTexture *stex;
+    AWindowHandler *awh;
     const float *transform_mtx;
+    bool stex_attached;
 
     struct {
         GLint uSTMatrix;
@@ -68,12 +69,12 @@ tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
     (void) tex_width; (void) tex_height;
     struct priv *priv = tc->priv;
     assert(textures[0] != 0);
-    priv->stex = SurfaceTexture_create(VLC_OBJECT(tc->gl), textures[0]);
-    if (priv->stex == NULL)
+    if (SurfaceTexture_attachToGLContext(priv->awh, textures[0]) != 0)
     {
-        msg_Err(tc->gl, "tc_anop_get_pool: SurfaceTexture_create failed");
+        msg_Err(tc->gl, "SurfaceTexture_attachToGLContext failed");
         return VLC_EGENERIC;
     }
+    priv->stex_attached = true;
     return VLC_SUCCESS;
 }
 
@@ -98,8 +99,8 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
         };
 
         p_picsys->hw.b_vd_ref = true;
-        p_picsys->hw.p_surface = SurfaceTexture_getANativeWindow(priv->stex);
-        p_picsys->hw.p_jsurface = SurfaceTexture_getSurface(priv->stex);
+        p_picsys->hw.p_surface = SurfaceTexture_getANativeWindow(priv->awh);
+        p_picsys->hw.p_jsurface = SurfaceTexture_getSurface(priv->awh);
         p_picsys->hw.i_index = -1;
         vlc_mutex_init(&p_picsys->hw.lock);
 
@@ -147,7 +148,7 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     AndroidOpaquePicture_Release(pic->p_sys, true);
 
-    if (SurfaceTexture_waitAndUpdateTexImage(priv->stex, &priv->transform_mtx)
+    if (SurfaceTexture_waitAndUpdateTexImage(priv->awh, &priv->transform_mtx)
         != VLC_SUCCESS)
     {
         priv->transform_mtx = NULL;
@@ -184,8 +185,9 @@ static void
 tc_anop_release(const opengl_tex_converter_t *tc)
 {
     struct priv *priv = tc->priv;
-    if (priv->stex != NULL)
-        SurfaceTexture_release(priv->stex);
+
+    if (priv->stex_attached)
+        SurfaceTexture_detachFromGLContext(priv->awh);
 
     free(priv);
 }
@@ -194,7 +196,8 @@ GLuint
 opengl_tex_converter_anop_init(const video_format_t *fmt,
                                opengl_tex_converter_t *tc)
 {
-    if (fmt->i_chroma != VLC_CODEC_ANDROID_OPAQUE)
+    if (fmt->i_chroma != VLC_CODEC_ANDROID_OPAQUE
+     || !tc->gl->surface->handle.anativewindow)
         return 0;
 
     tc->priv = malloc(sizeof(struct priv));
@@ -202,8 +205,9 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
         return 0;
 
     struct priv *priv = tc->priv;
-    priv->stex = NULL;
+    priv->awh = tc->gl->surface->handle.anativewindow;
     priv->transform_mtx = NULL;
+    priv->stex_attached = false;
 
     tc->pf_allocate_textures = tc_anop_allocate_textures;
     tc->pf_get_pool       = tc_anop_get_pool;

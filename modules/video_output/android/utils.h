@@ -34,11 +34,11 @@
 #include <vlc_common.h>
 
 typedef struct AWindowHandler AWindowHandler;
-typedef struct SurfaceTexture SurfaceTexture;
 
 enum AWindow_ID {
     AWindow_Video,
     AWindow_Subtitles,
+    AWindow_SurfaceTexture,
     AWindow_Max,
 };
 
@@ -177,35 +177,43 @@ int AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
                                   int i_sar_num, int i_sar_den);
 
 /**
- * Construct a new Java SurfaceTexture to stream images to a given OpenGL
- * texture
+ * Attach a SurfaceTexture to the OpenGL ES context that is current on the
+ * calling thread.
  *
  * See SurfaceTexture Android documentation.
+ * \return 0 on success, -1 on error.
  */
-SurfaceTexture *
-SurfaceTexture_create(vlc_object_t *p_obj, int tex_name);
+int
+SurfaceTexture_attachToGLContext(AWindowHandler *p_awh, int tex_name);
 
 /**
- * Release a SurfaceTexture
+ * Detach a SurfaceTexture from the OpenGL ES context that owns the OpenGL ES
+ * texture object.
  */
 void
-SurfaceTexture_release(SurfaceTexture *p_stex);
+SurfaceTexture_detachFromGLContext(AWindowHandler *p_awh);
 
 /**
- * Get a Java Surface from the SurfaceTexture
+ * Get a Java Surface from the attached SurfaceTexture
  *
  * This object can be used with mediacodec_jni.
  */
-jobject
-SurfaceTexture_getSurface(SurfaceTexture *p_stex);
+static inline jobject
+SurfaceTexture_getSurface(AWindowHandler *p_awh)
+{
+    return AWindowHandler_getSurface(p_awh, AWindow_SurfaceTexture);
+}
 
 /**
- * Get a ANativeWindow from the SurfaceTexture
+ * Get a ANativeWindow from the attached SurfaceTexture
  *
  * This pointer can be used with mediacodec_ndk.
  */
-ANativeWindow *
-SurfaceTexture_getANativeWindow(SurfaceTexture *p_stex);
+static inline ANativeWindow *
+SurfaceTexture_getANativeWindow(AWindowHandler *p_awh)
+{
+    return AWindowHandler_getANativeWindow(p_awh, AWindow_SurfaceTexture);
+}
 
 /**
  * Wait for a new frame and update it
@@ -221,5 +229,5 @@ SurfaceTexture_getANativeWindow(SurfaceTexture *p_stex);
  * \return VLC_SUCCESS or a VLC error
  */
 int
-SurfaceTexture_waitAndUpdateTexImage(SurfaceTexture *p_stex,
+SurfaceTexture_waitAndUpdateTexImage(AWindowHandler *p_awh,
                                      const float **pp_transform_mtx);
