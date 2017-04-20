@@ -1296,7 +1296,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     {
         /* decoding didn't start yet, which is ok for H264, let's see
          * if we can use this block to get going */
-        assert(p_sys->codec == kCMVideoCodecType_H264 && !p_sys->hh.b_is_xvcC);
+        assert(p_sys->codec == kCMVideoCodecType_H264);
         if (p_sys->session)
         {
             msg_Dbg(p_dec, "SPS/PPS changed: draining H264 decoder");
