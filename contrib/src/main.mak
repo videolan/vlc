@@ -101,8 +101,12 @@ endif
 endif
 
 ifdef HAVE_ANDROID
+ifneq ($(findstring $(origin CC),undefined default),)
 CC :=  clang
+endif
+ifneq ($(findstring $(origin CXX),undefined default),)
 CXX := clang++
+endif
 endif
 
 ifdef HAVE_MACOSX
