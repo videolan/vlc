@@ -789,6 +789,7 @@ static int SetupDecoderExtradata(decoder_t *p_dec)
                                           p_dec->fmt_in.i_extra);
         if (i_ret != VLC_SUCCESS)
             return i_ret;
+        assert(p_sys->hh.pf_process_block != NULL);
 
         if (p_dec->fmt_in.p_extra)
         {
@@ -1284,7 +1285,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
 
     bool b_config_changed = false;
-    if (p_sys->codec == kCMVideoCodecType_H264 && p_sys->hh.pf_process_block)
+    if (p_sys->codec == kCMVideoCodecType_H264)
     {
         p_block = p_sys->hh.pf_process_block(&p_sys->hh, p_block, &b_config_changed);
         if (!p_block)

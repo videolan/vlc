@@ -386,6 +386,15 @@ helper_process_block_h264_annexb2avcc(struct hxxx_helper *hh, block_t *p_block,
     return p_block ? hxxx_AnnexB_to_xVC(p_block, hh->i_nal_length_size) : NULL;
 }
 
+static block_t *
+helper_process_block_dummy(struct hxxx_helper *hh, block_t *p_block,
+                           bool *p_config_changed)
+{
+    (void) hh;
+    (void) p_config_changed;
+    return p_block;
+}
+
 int
 hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                       size_t i_extra)
@@ -408,7 +417,7 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
     if (hh->b_is_xvcC)
     {
         if (hh->b_need_xvcC)
-            hh->pf_process_block = NULL;
+            hh->pf_process_block = helper_process_block_dummy;
         else
             hh->pf_process_block = helper_process_block_xvcc2annexb;
     }
@@ -426,7 +435,7 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                 if (hh->b_need_xvcC)
                     return VLC_EGENERIC; /* TODO */
                 else
-                    hh->pf_process_block = NULL;
+                    hh->pf_process_block = helper_process_block_dummy;
                 break;
             default:
                 vlc_assert_unreachable();
