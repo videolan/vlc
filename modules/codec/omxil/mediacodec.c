@@ -428,22 +428,8 @@ static int UpdateVout(decoder_t *p_dec)
                                    &p_dec->fmt_out.video);
     }
 
-    bool b_invalid_size = !p_dec->fmt_out.video.i_width
-                      && !p_dec->fmt_out.video.i_height;
-    if (b_invalid_size)
-    {
-        if (p_dec->fmt_out.i_codec != VLC_CODEC_ANDROID_OPAQUE)
-            return VLC_EGENERIC;
-        /* The correct video size will come from MediaCodec, setup a dummy
-         * one in order to get the surface */
-        p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_height = 1;
-    }
-
     if (decoder_UpdateVideoFormat(p_dec) != 0)
         return VLC_EGENERIC;
-
-    if (b_invalid_size)
-        p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_height = 0;
 
     if (p_dec->fmt_out.i_codec != VLC_CODEC_ANDROID_OPAQUE)
         return VLC_SUCCESS;
@@ -471,15 +457,8 @@ static int StartMediaCodec(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     union mc_api_args args;
 
-    if ((p_sys->api.i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->i_csd_count
-     && !p_sys->b_adaptive)
-        return VLC_ENOOBJ;
-
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        if (!p_sys->b_adaptive
-         && (!p_dec->fmt_out.video.i_width || !p_dec->fmt_out.video.i_height))
-            return VLC_ENOOBJ;
         args.video.i_width = p_dec->fmt_out.video.i_width;
         args.video.i_height = p_dec->fmt_out.video.i_height;
         args.video.i_angle = p_sys->video.i_angle;
@@ -540,6 +519,12 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
+        /* Not all mediacodec versions can handle a size of 0. Hopefully, the
+         * packetizer will trigger a decoder restart when a new video size is
+         * found. */
+        if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
+            return VLC_EGENERIC;
+
         switch (p_dec->fmt_in.i_codec) {
         case VLC_CODEC_HEVC: mime = "video/hevc"; break;
         case VLC_CODEC_H264: mime = "video/avc"; break;
@@ -717,26 +702,24 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     if (ParseExtra(p_dec) != VLC_SUCCESS)
         goto bailout;
 
-    i_ret = StartMediaCodec(p_dec);
-    switch (i_ret)
+    if ((p_sys->api.i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->i_csd_count
+     && !p_sys->b_adaptive)
     {
-    case VLC_SUCCESS:
-        break;
-    case VLC_ENOOBJ:
         switch (p_dec->fmt_in.i_codec)
         {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
-            msg_Warn(p_dec, "late opening for codec %4.4s",
-                     (const char *)&p_dec->fmt_in.i_codec);
-            break;
+            break; /* CSDs will come from hxxx_helper */
         default:
-            msg_Warn(p_dec, "late opening with %4.4s not handled",
+            msg_Warn(p_dec, "Not CSD found for %4.4s",
                      (const char *) &p_dec->fmt_in.i_codec);
             goto bailout;
         }
-        break;
-    default:
+    }
+
+    i_ret = StartMediaCodec(p_dec);
+    if (i_ret != VLC_SUCCESS)
+    {
         msg_Err(p_dec, "StartMediaCodec failed");
         goto bailout;
     }
@@ -1268,6 +1251,10 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
     bool b_dequeue_timeout = false;
 
     assert(p_sys->api.b_started);
+
+    if ((p_sys->api.i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->i_csd_count
+     && !p_sys->b_adaptive)
+        return VLC_EGENERIC; /* Wait for CSDs */
 
     /* Queue CSD blocks and input blocks */
     while (b_drain || (p_block = GetNextBlock(p_sys, p_in_block)))
