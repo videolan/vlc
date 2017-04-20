@@ -23,57 +23,28 @@
 #include <vlc_common.h>
 #include "libmp4.h"
 
-typedef struct mp4_fragment_t mp4_fragment_t;
-
-struct mp4_fragment_t
+typedef struct mp4_fragments_index_t
 {
-    uint64_t i_chunk_range_min_offset;
-    uint64_t i_chunk_range_max_offset;
+    uint64_t *pi_pos;
+    stime_t  *p_times; // movie scaled
+    unsigned i_entries;
+    stime_t i_last_time; // movie scaled
+    unsigned i_tracks;
+} mp4_fragments_index_t;
 
-    struct
-    {
-        unsigned int i_track_ID;
-        stime_t i_duration; // movie scaled
-    } *p_durations;
+void MP4_Fragments_Index_Delete( mp4_fragments_index_t *p_index );
+mp4_fragments_index_t * MP4_Fragments_Index_New( unsigned i_tracks, unsigned i_num );
 
-    unsigned int i_durations;
+stime_t MP4_Fragment_Index_GetTrackStartTime( mp4_fragments_index_t *p_index,
+                                              unsigned i_track_index, uint64_t i_moof_pos );
+stime_t MP4_Fragment_Index_GetTrackDuration( mp4_fragments_index_t *p_index, unsigned i_track_index );
 
-    MP4_Box_t *p_moox;
-    mp4_fragment_t *p_next;
-};
+bool MP4_Fragments_Index_Lookup( mp4_fragments_index_t *p_index,
+                                 stime_t *pi_time, uint64_t *pi_pos, unsigned i_track_index );
 
-typedef struct
-{
-    mp4_fragment_t moov; /* known fragments (moof following moov) */
-    mp4_fragment_t *p_last;
-} mp4_fragments_t;
+#ifdef MP4_VERBOSE
+void MP4_Fragments_Index_Dump( vlc_object_t *p_obj, const mp4_fragments_index_t *p_index,
+                                uint32_t i_movie_timescale, unsigned i_tracks );
+#endif
 
-static inline mp4_fragment_t * MP4_Fragment_Moov(mp4_fragments_t *p_fragments)
-{
-    return &p_fragments->moov;
-}
-
-mp4_fragment_t * MP4_Fragment_New( MP4_Box_t *, unsigned );
-void MP4_Fragment_Clean(mp4_fragment_t *);
-
-static inline void MP4_Fragment_Delete( mp4_fragment_t *p_fragment )
-{
-    MP4_Fragment_Clean( p_fragment );
-    free( p_fragment );
-}
-
-bool MP4_Fragments_Init(mp4_fragments_t *);
-void MP4_Fragments_Clean(mp4_fragments_t *, void (*pf_box_clean)(MP4_Box_t *));
-void MP4_Fragments_Insert(mp4_fragments_t *, mp4_fragment_t *);
-void MP4_Fragments_Remove( mp4_fragments_t *, mp4_fragment_t * );
-
-stime_t GetTrackTotalDuration( mp4_fragments_t *p_frags, unsigned int i_track_ID );
-mp4_fragment_t * GetFragmentByAtomPos( mp4_fragments_t *p_frags, uint64_t i_pos );
-mp4_fragment_t * GetFragmentByPos( mp4_fragments_t *p_frags, uint64_t i_pos, bool b_exact );
-mp4_fragment_t * GetFragmentByTime( mp4_fragments_t *p_frags, const mtime_t i_time,
-                                    unsigned i_tracks_id, unsigned *pi_tracks_id,
-                                    uint32_t i_movie_timescale );
-stime_t GetTrackFragmentTimeOffset( mp4_fragments_t *p_frags, mp4_fragment_t *p_fragment,
-                                    unsigned int i_track_ID );
-void DumpFragments( vlc_object_t *p_obj, mp4_fragments_t *p_frags, uint32_t i_movie_timescale );
 #endif
