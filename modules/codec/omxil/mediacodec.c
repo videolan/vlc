@@ -286,11 +286,8 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         return i_ret;
     assert(hh->pf_process_block != NULL);
 
-    if (!hh->b_is_xvcC && p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
-    {
+    if (p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
         p_sys->b_adaptive = true;
-        return VLC_SUCCESS;
-    }
 
     p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
@@ -309,16 +306,8 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         return i_ret;
     assert(hh->pf_process_block != NULL);
 
-    if (!hh->b_is_xvcC)
-    {
-        if (p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
-        {
-            p_sys->b_adaptive = true;
-            return VLC_SUCCESS;
-        }
-        else /* TODO */
-            return VLC_EGENERIC;
-    }
+    if (p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
+        p_sys->b_adaptive = true;
 
     p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
@@ -1501,9 +1490,10 @@ static int VideoHXXX_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct hxxx_helper *hh = &p_sys->video.hh;
-    bool b_config_changed;
+    bool b_config_changed = false;
+    bool *p_config_changed = p_sys->b_adaptive ? NULL : &b_config_changed;
 
-    *pp_block = hh->pf_process_block(hh, *pp_block, &b_config_changed);
+    *pp_block = hh->pf_process_block(hh, *pp_block, p_config_changed);
     if (!*pp_block)
         return 0;
     if (b_config_changed)
