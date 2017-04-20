@@ -1351,7 +1351,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
         if (!p_sys->b_drained)
         {
             msg_Err(p_dec, "OutThread timed out");
-            p_sys->b_aborted = true;
+            AbortDecoderLocked(p_dec);
         }
         p_sys->b_drained = false;
     }
