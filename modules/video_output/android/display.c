@@ -127,6 +127,7 @@ struct vout_display_sys_t
     android_window *p_window;
     android_window *p_sub_window;
 
+    bool b_displayed;
     bool b_sub_invalid;
     filter_t *p_spu_blend;
     picture_t *p_sub_pic;
@@ -857,7 +858,8 @@ static void Close(vlc_object_t *p_this)
 
     if (sys->p_window)
     {
-        ClearSurface(vd);
+        if (sys->b_displayed)
+            ClearSurface(vd);
         AndroidWindow_Destroy(vd, sys->p_window);
     }
 
@@ -1159,6 +1161,8 @@ static void Display(vout_display_t *vd, picture_t *picture,
 
     if (subpicture)
         subpicture_Delete(subpicture);
+
+    sys->b_displayed = true;
 }
 
 static void CopySourceAspect(video_format_t *p_dest,
