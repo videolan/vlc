@@ -59,6 +59,10 @@ struct hxxx_helper
             size_t i_annexb_config_nal;
         } hevc;
     };
+
+    /* Process the block: do the AnnexB <-> xvcC conversion if needed. If
+     * p_config_changed is not NULL, parse nals to detect a SPS/PPS or a video
+     * size change. */
     block_t * (*pf_process_block)(struct hxxx_helper *hh, block_t *p_block,
                                   bool *p_config_changed);
 };
