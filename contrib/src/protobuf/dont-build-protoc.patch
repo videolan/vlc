@@ -1,0 +1,13 @@
+--- protobuf/src/Makefile.am.old	2017-04-20 17:58:28.941775687 +0200
++++ protobuf/src/Makefile.am	2017-04-20 17:57:40.629763450 +0200
+@@ -481,7 +481,10 @@
+   google/protobuf/compiler/csharp/csharp_wrapper_field.cc      \
+   google/protobuf/compiler/csharp/csharp_wrapper_field.h
+ 
++EXTRA_PROGRAMS = protoc
++if !USE_EXTERNAL_PROTOC
+ bin_PROGRAMS = protoc
++endif
+ protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
+ protoc_SOURCES = google/protobuf/compiler/main.cc
+ 
