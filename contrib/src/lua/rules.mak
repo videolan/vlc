@@ -64,9 +64,9 @@ ifdef HAVE_WIN32
 	cd $(UNPACK_DIR) && sed -i.orig -e 's/lua luac/lua.exe luac.exe/' Makefile
 endif
 	cd $(UNPACK_DIR)/src && sed -i.orig \
-		-e 's/CC=/#CC=/' \
-		-e 's/= *strip/=$(STRIP)/' \
-		-e 's/= *ranlib/= $(RANLIB)/' \
+		-e 's%CC=%#CC=%' \
+		-e 's%= *strip%=$(STRIP)%' \
+		-e 's%= *ranlib%= $(RANLIB)%' \
 		Makefile
 	$(MOVE)
 
