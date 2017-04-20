@@ -418,32 +418,42 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
-    if (hh->b_is_xvcC)
+    switch (hh->i_codec)
     {
-        if (hh->b_need_xvcC)
-            hh->pf_process_block = helper_process_block_dummy;
-        else
-            hh->pf_process_block = helper_process_block_xvcc2annexb;
-    }
-    else
-    {
-        switch (hh->i_codec)
-        {
-            case VLC_CODEC_H264:
+        case VLC_CODEC_H264:
+            if (hh->b_is_xvcC)
+            {
+                if (hh->b_need_xvcC)
+                    hh->pf_process_block = helper_process_block_dummy;
+                else
+                    hh->pf_process_block = helper_process_block_xvcc2annexb;
+            }
+            else /* AnnexB */
+            {
                 if (hh->b_need_xvcC)
                     hh->pf_process_block = helper_process_block_h264_annexb2avcc;
                 else
                     hh->pf_process_block = helper_process_block_h264_annexb;
-                break;
-            case VLC_CODEC_HEVC:
+            }
+            break;
+        case VLC_CODEC_HEVC:
+            if (hh->b_is_xvcC)
+            {
+                if (hh->b_need_xvcC)
+                    hh->pf_process_block = helper_process_block_dummy;
+                else
+                    hh->pf_process_block = helper_process_block_xvcc2annexb;
+            }
+            else /* AnnexB */
+            {
                 if (hh->b_need_xvcC)
                     return VLC_EGENERIC; /* TODO */
                 else
                     hh->pf_process_block = helper_process_block_dummy;
-                break;
-            default:
-                vlc_assert_unreachable();
-        }
+            }
+            break;
+        default:
+            vlc_assert_unreachable();
     }
     return VLC_SUCCESS;;
 }
