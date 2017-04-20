@@ -1,0 +1,24 @@
+--- libgcrypt/configure.ac.old	2017-04-20 16:49:00.239092950 +0200
++++ libgcrypt/configure.ac	2017-04-20 16:57:18.205011934 +0200
+@@ -215,7 +215,6 @@
+ print_egd_notice=no
+ have_w32_system=no
+ have_w32ce_system=no
+-have_pthread=no
+ 
+ 
+ # Setup some stuff depending on host.
+@@ -751,10 +750,9 @@
+ # Check whether pthreads is available
+ #
+ if test "$have_w32_system" != yes; then
+-  AC_CHECK_LIB(pthread,pthread_create,have_pthread=yes)
+-  if test "$have_pthread" = yes; then
+-    AC_DEFINE(HAVE_PTHREAD, 1 ,[Define if we have pthread.])
+-  fi
++  AC_SEARCH_LIBS(pthread_create, pthread,[
++      AC_DEFINE(HAVE_PTHREAD, 1 ,[Define if we have pthread.])
++  ])
+ fi
+ 
+ 

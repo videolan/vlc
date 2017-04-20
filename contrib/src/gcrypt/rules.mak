@@ -12,6 +12,7 @@ $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(UNPACK)
 	$(APPLY) $(SRC)/gcrypt/disable-tests-compilation.patch
+	$(APPLY) $(SRC)/gcrypt/fix-pthread-detection.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/gcrypt/winrt.patch
 endif
