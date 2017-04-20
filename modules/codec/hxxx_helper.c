@@ -354,18 +354,6 @@ hevc_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
 }
 
 static block_t *
-helper_process_block_xvcc2annexb(struct hxxx_helper *hh, block_t *p_block,
-                                 bool *p_config_changed)
-{
-    assert(helper_nal_length_valid(hh));
-    if (p_config_changed != NULL)
-        *p_config_changed = false;
-    h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
-                       hh->i_nal_length_size);
-    return p_block;
-}
-
-static block_t *
 helper_process_block_h264_annexb(struct hxxx_helper *hh, block_t *p_block,
                                  bool *p_config_changed)
 {
@@ -379,6 +367,18 @@ helper_process_block_h264_annexb(struct hxxx_helper *hh, block_t *p_block,
             return NULL;
         }
     }
+    return p_block;
+}
+
+static block_t *
+helper_process_block_xvcc2annexb(struct hxxx_helper *hh, block_t *p_block,
+                                 bool *p_config_changed)
+{
+    assert(helper_nal_length_valid(hh));
+    if (p_config_changed != NULL)
+        *p_config_changed = false;
+    h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
+                       hh->i_nal_length_size);
     return p_block;
 }
 
