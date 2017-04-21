@@ -24,7 +24,7 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK)
-ifeq ($(CC), clang)
+ifneq (,$(filter %clang,$(CC)))
 	$(APPLY) $(SRC)/vorbis/clang.patch
 endif
 	$(UPDATE_AUTOCONFIG)
