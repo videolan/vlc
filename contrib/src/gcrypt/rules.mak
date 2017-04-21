@@ -56,6 +56,9 @@ endif
 ifeq ($(ANDROID_ABI), x86_64)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
 endif
+ifeq ($(ARCH),aarch64)
+GCRYPT_CONF += --disable-arm-crypto-support
+endif
 endif
 ifdef HAVE_TIZEN
 ifeq ($(TIZEN_ABI), x86)
