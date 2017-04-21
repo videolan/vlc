@@ -84,7 +84,10 @@
                                             <progressIndicator hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="21" userLabel="Buffering bar">
                                                 <rect key="frame" x="0.0" y="1" width="170" height="12"/>
                                             </progressIndicator>
-                                            <slider hidden="YES" canDrawConcurrently="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="TimeLineSlider">
+                                            <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="VLCThreePartImageView">
+                                                <rect key="frame" x="1" y="1" width="60" height="12"/>
+                                            </customView>
+                                            <slider hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="TimeLineSlider">
                                                 <rect key="frame" x="0.0" y="0.0" width="170" height="17"/>
                                                 <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" doubleValue="3260.3068524096384" tickMarkPosition="above" sliderType="linear" id="23">
                                                     <font key="font" size="12" name="Helvetica"/>
@@ -93,9 +96,6 @@
                                                     <action selector="timeSliderAction:" target="3" id="46"/>
                                                 </connections>
                                             </slider>
-                                            <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="VLCThreePartImageView">
-                                                <rect key="frame" x="1" y="1" width="60" height="12"/>
-                                            </customView>
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="21" firstAttribute="left" secondItem="6" secondAttribute="left" id="45y-XZ-FLX"/>
