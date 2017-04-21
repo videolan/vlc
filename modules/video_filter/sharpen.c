@@ -109,7 +109,7 @@ static int Create( vlc_object_t *p_this )
         (p_chroma->pixel_size != 1 &&
          p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420_10L &&
          p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420_10B)) {
-        msg_Err( p_filter, "Unsupported chroma (%4.4s)", (char*)&fourcc );
+        msg_Dbg( p_filter, "Unsupported chroma (%4.4s)", (char*)&fourcc );
         return VLC_EGENERIC;
     }
 
