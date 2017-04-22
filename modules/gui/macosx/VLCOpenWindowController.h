@@ -129,7 +129,7 @@
 /* open subtitle file */
 @property (readwrite, weak) IBOutlet NSButton *fileSubCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *fileSubSettingsButton;
-@property (readwrite, weak) IBOutlet NSPanel *fileSubSheet;
+@property (readwrite) IBOutlet NSPanel *fileSubSheet;
 @property (readwrite, weak) IBOutlet NSTextField *fileSubPathLabel;
 @property (readwrite, weak) IBOutlet NSTextField *fileSubPathTextField;
 @property (readwrite, weak) IBOutlet NSImageView *fileSubIconView;

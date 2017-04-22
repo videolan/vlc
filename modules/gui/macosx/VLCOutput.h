@@ -28,7 +28,7 @@
 
 @interface VLCOutput : NSObject
 
-@property (readwrite, weak) IBOutlet NSPanel *outputSheet;
+@property (readwrite) IBOutlet NSPanel *outputSheet;
 @property (readwrite, weak) IBOutlet NSButton *okButton;
 
 @property (readwrite, weak) IBOutlet NSBox *optionsBox;

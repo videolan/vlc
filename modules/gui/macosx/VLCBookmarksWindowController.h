@@ -36,7 +36,7 @@
 @property (readwrite, weak) IBOutlet NSTableView *dataTable;
 
 /* edit window */
-@property (readwrite, weak) IBOutlet NSWindow *editBookmarksWindow;
+@property (readwrite) IBOutlet NSWindow *editBookmarksWindow;
 @property (readwrite, weak) IBOutlet NSButton *editOKButton;
 @property (readwrite, weak) IBOutlet NSButton *editCancelButton;
 @property (readwrite, weak) IBOutlet NSTextField *editNameLabel;
