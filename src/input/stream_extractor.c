@@ -184,10 +184,7 @@ se_DirControl( stream_t* stream, int req, va_list args )
     (void)stream;
 
     if( req == STREAM_IS_DIRECTORY )
-    {
-        *va_arg( args, bool* ) = true;
         return VLC_SUCCESS;
-    }
 
     return VLC_EGENERIC;
 }
