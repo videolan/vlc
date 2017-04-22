@@ -175,29 +175,6 @@
     [self.volumeSlider setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
     [self.volumeUpButton setEnabled: b_mute];
 
-    // remove fullscreen button for lion fullscreen
-    if (self.nativeFullscreenMode) {
-        NSRect frame;
-
-        // == [fullscreenButton frame].size.width;
-        // button is already removed!
-        float f_width = 29.;
-#define moveItem(item) \
-frame = [item frame]; \
-frame.origin.x = f_width + frame.origin.x; \
-[item setFrame: frame]
-
-        moveItem(self.effectsButton);
-        moveItem(self.volumeUpButton);
-        moveItem(self.volumeSlider);
-        moveItem(self.volumeTrackImageView);
-        moveItem(self.volumeDownButton);
-#undef moveItem
-
-        // time field and progress bar are moved in super method!
-    }
-
-
     b_show_jump_buttons = config_GetInt(getIntf(), "macosx-show-playback-buttons");
     if (b_show_jump_buttons)
         [self addJumpButtons:YES];

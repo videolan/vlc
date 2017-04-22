@@ -153,17 +153,6 @@
 
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
-        // TODO remove frame calculations
-        CGFloat f_width = [self.fullscreenButton frame].size.width;
-
-        NSRect frame = [self.timeField frame];
-        frame.origin.x += f_width;
-        [self.timeField setFrame: frame];
-
-        frame = [self.progressView frame];
-        frame.size.width = f_width + frame.size.width;
-        [self.progressView setFrame: frame];
-
         [self.fullscreenButton removeFromSuperview];
     }
 
