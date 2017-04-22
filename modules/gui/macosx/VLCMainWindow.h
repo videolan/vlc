@@ -71,6 +71,7 @@ typedef enum {
 @property (readwrite, weak) IBOutlet NSView             *podcastView;
 @property (readwrite, weak) IBOutlet NSButton           *podcastAddButton;
 @property (readwrite, weak) IBOutlet NSButton           *podcastRemoveButton;
+@property (weak) IBOutlet NSLayoutConstraint *tableViewToPodcastConstraint;
 
 // Podcast Subscribe Window outlets
 @property (readwrite)       IBOutlet NSWindow           *podcastSubscribeWindow;

@@ -1306,34 +1306,18 @@ static const float f_min_window_height = 307.;
 
 - (void)showPodcastControls
 {
-    NSRect podcastViewDimensions = [_podcastView frame];
-    NSRect rightSplitRect = [_splitViewRight frame];
-    NSRect playlistTableRect = [_playlistScrollView frame];
+    _tableViewToPodcastConstraint.priority = 999;
+    _podcastView.hidden = NO;
 
-    podcastViewDimensions.size.width = rightSplitRect.size.width;
-    podcastViewDimensions.origin.x = podcastViewDimensions.origin.y = .0;
-    [_podcastView setFrame:podcastViewDimensions];
-
-    playlistTableRect.origin.y = playlistTableRect.origin.y + podcastViewDimensions.size.height;
-    playlistTableRect.size.height = playlistTableRect.size.height - podcastViewDimensions.size.height;
-    [_playlistScrollView setFrame:playlistTableRect];
-    [_playlistScrollView setNeedsDisplay:YES];
-
-    [_splitViewRight addSubview:_podcastView positioned:NSWindowAbove relativeTo:_splitViewRight];
     b_podcastView_displayed = YES;
 }
 
 - (void)hidePodcastControls
 {
     if (b_podcastView_displayed) {
-        NSRect podcastViewDimensions = [_podcastView frame];
-        NSRect playlistTableRect = [_playlistScrollView frame];
+        _tableViewToPodcastConstraint.priority = 1;
+        _podcastView.hidden = YES;
 
-        playlistTableRect.origin.y = playlistTableRect.origin.y - podcastViewDimensions.size.height;
-        playlistTableRect.size.height = playlistTableRect.size.height + podcastViewDimensions.size.height;
-
-        [_podcastView removeFromSuperviewWithoutNeedingDisplay];
-        [_playlistScrollView setFrame:playlistTableRect];
         b_podcastView_displayed = NO;
     }
 }

@@ -362,14 +362,58 @@
                                                     <constraint firstItem="4722" firstAttribute="top" secondItem="U2A-0F-udY" secondAttribute="top" id="tIs-Fh-Jsd"/>
                                                 </constraints>
                                             </customView>
+                                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5260" userLabel="Podcast">
+                                                <rect key="frame" x="0.0" y="0.0" width="477" height="23"/>
+                                                <subviews>
+                                                    <imageView translatesAutoresizingMaskIntoConstraints="NO" id="5261">
+                                                        <rect key="frame" x="0.0" y="-4" width="477" height="27"/>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="topbar_background" id="5262"/>
+                                                    </imageView>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5263">
+                                                        <rect key="frame" x="5" y="3" width="67" height="17"/>
+                                                        <buttonCell key="cell" type="roundRect" title="Subscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5264">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="addPodcast:" target="21" id="5299"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5302">
+                                                        <rect key="frame" x="392" y="3" width="81" height="17"/>
+                                                        <buttonCell key="cell" type="roundRect" title="Unsubscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5303">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="removePodcast:" target="21" id="5334"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="5261" secondAttribute="trailing" id="1nM-pX-AJn"/>
+                                                    <constraint firstAttribute="bottom" secondItem="5261" secondAttribute="bottom" constant="-4" id="2BV-hb-uw2"/>
+                                                    <constraint firstItem="5261" firstAttribute="top" secondItem="5260" secondAttribute="top" id="A6X-Wg-BQE"/>
+                                                    <constraint firstItem="5302" firstAttribute="centerY" secondItem="5260" secondAttribute="centerY" id="FDB-Ao-9mv"/>
+                                                    <constraint firstAttribute="trailing" secondItem="5302" secondAttribute="trailing" constant="4" id="KJC-Ja-hJ4"/>
+                                                    <constraint firstItem="5261" firstAttribute="leading" secondItem="5260" secondAttribute="leading" id="T1s-FQ-h2g"/>
+                                                    <constraint firstItem="5263" firstAttribute="leading" secondItem="5260" secondAttribute="leading" constant="5" id="WZN-5t-aG1"/>
+                                                    <constraint firstAttribute="height" constant="23" id="f1Z-p5-sev"/>
+                                                    <constraint firstItem="5263" firstAttribute="centerY" secondItem="5260" secondAttribute="centerY" id="tHx-Kh-uf3"/>
+                                                </constraints>
+                                            </customView>
                                         </subviews>
                                         <constraints>
+                                            <constraint firstItem="5260" firstAttribute="top" secondItem="U2A-0F-udY" secondAttribute="bottom" priority="1" id="AIy-oz-19u"/>
                                             <constraint firstAttribute="trailing" secondItem="U2A-0F-udY" secondAttribute="trailing" id="BB8-la-xdJ"/>
                                             <constraint firstItem="gff-CR-TiL" firstAttribute="top" secondItem="4682" secondAttribute="top" id="MHI-aR-Ycf"/>
+                                            <constraint firstAttribute="trailing" secondItem="5260" secondAttribute="trailing" id="XeB-D8-G5P"/>
                                             <constraint firstItem="U2A-0F-udY" firstAttribute="top" secondItem="gff-CR-TiL" secondAttribute="bottom" id="ad4-k9-Lhq"/>
                                             <constraint firstItem="U2A-0F-udY" firstAttribute="leading" secondItem="4682" secondAttribute="leading" id="e7f-Ia-ZvZ"/>
+                                            <constraint firstItem="5260" firstAttribute="leading" secondItem="4682" secondAttribute="leading" id="hMd-13-gV5"/>
+                                            <constraint firstAttribute="bottom" secondItem="5260" secondAttribute="bottom" id="hyT-jU-bih"/>
                                             <constraint firstItem="gff-CR-TiL" firstAttribute="leading" secondItem="4682" secondAttribute="leading" id="vsZ-Ek-eBa"/>
-                                            <constraint firstAttribute="bottom" secondItem="U2A-0F-udY" secondAttribute="bottom" id="wxj-fU-8zZ"/>
+                                            <constraint firstAttribute="bottom" secondItem="U2A-0F-udY" secondAttribute="bottom" priority="750" id="wxj-fU-8zZ"/>
                                             <constraint firstAttribute="trailing" secondItem="gff-CR-TiL" secondAttribute="trailing" id="z4y-R6-tbz"/>
                                         </constraints>
                                     </customView>
@@ -558,7 +602,7 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="247" height="14"/>
                                             </customView>
                                             <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4701" customClass="VLCThreePartImageView">
-                                                <rect key="frame" x="12" y="-187" width="80" height="118"/>
+                                                <rect key="frame" x="-19" y="111" width="70" height="8"/>
                                             </customView>
                                             <progressIndicator hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="3584" userLabel="Buffering Bar">
                                                 <rect key="frame" x="0.0" y="1" width="247" height="12"/>
@@ -792,6 +836,7 @@
                 <outlet property="splitView" destination="4680" id="30m-4q-XzK"/>
                 <outlet property="splitViewLeft" destination="4681" id="ryK-3z-wuu"/>
                 <outlet property="splitViewRight" destination="4682" id="REX-fd-CCP"/>
+                <outlet property="tableViewToPodcastConstraint" destination="AIy-oz-19u" id="NaG-yj-Yoh"/>
                 <outlet property="titlebarView" destination="4850" id="5625"/>
                 <outlet property="videoView" destination="4665" id="5622"/>
                 <outlet property="videoViewBottomConstraint" destination="ZVn-EJ-9CG" id="8F2-BP-yVS"/>
@@ -827,36 +872,6 @@
                 <outlet property="volumeUpButton" destination="3652" id="vXR-KC-L2N"/>
             </connections>
         </customObject>
-        <customView id="5260" userLabel="Podcast">
-            <rect key="frame" x="0.0" y="0.0" width="403" height="19"/>
-            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-            <subviews>
-                <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5261">
-                    <rect key="frame" x="0.0" y="-6" width="403" height="25"/>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="topbar_background" id="5262"/>
-                </imageView>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5263">
-                    <rect key="frame" x="5" y="-1" width="101" height="17"/>
-                    <buttonCell key="cell" type="roundRect" title="Subscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5264">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="addPodcast:" target="21" id="5299"/>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5302">
-                    <rect key="frame" x="298" y="-1" width="101" height="17"/>
-                    <buttonCell key="cell" type="roundRect" title="Unsubscribe" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5303">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="removePodcast:" target="21" id="5334"/>
-                    </connections>
-                </button>
-            </subviews>
-        </customView>
         <window title="Subscribe to a podcast" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5265" userLabel="Add Podcast">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
