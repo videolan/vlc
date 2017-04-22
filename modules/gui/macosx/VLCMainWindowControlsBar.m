@@ -49,11 +49,11 @@
     NSImage * _shuffleOnImage;
     NSImage * _pressedShuffleOnImage;
 
-    NSButton * _previousButton;
-    NSButton * _nextButton;
-
     BOOL b_show_jump_buttons;
     BOOL b_show_playmode_buttons;
+
+    NSLayoutConstraint *_hidePrevButtonConstraint;
+    NSLayoutConstraint *_hideNextButtonConstraint;
 
     NSLayoutConstraint *_hideEffectsButtonConstraint;
 
@@ -105,6 +105,13 @@
     [[self.effectsButton cell] accessibilitySetOverrideValue:_NS("Click to show an Audio Effects panel featuring an equalizer and further filters.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.effectsButton cell] accessibilitySetOverrideValue:[self.effectsButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
+    [self.prevButton setToolTip: _NS("Previous")];
+    [[self.prevButton cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.prevButton cell] accessibilitySetOverrideValue:[self.prevButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.nextButton setToolTip: _NS("Next")];
+    [[self.nextButton cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.nextButton cell] accessibilitySetOverrideValue:[self.nextButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+
     if (!self.darkInterface) {
         [self.stopButton setImage: imageFromRes(@"stop")];
         [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
@@ -137,6 +144,11 @@
 
         [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons")];
         [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
+
+        [self.prevButton setImage: imageFromRes(@"previous-6btns")];
+        [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
+        [self.nextButton setImage: imageFromRes(@"next-6btns")];
+        [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
     } else {
         [self.stopButton setImage: imageFromRes(@"stop_dark")];
         [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed_dark")];
@@ -169,6 +181,11 @@
 
         [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
         [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
+
+        [self.prevButton setImage: imageFromRes(@"previous-6btns-dark")];
+        [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-dark-pressed")];
+        [self.nextButton setImage: imageFromRes(@"next-6btns-dark")];
+        [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-dark-pressed")];
     }
     [self.repeatButton setImage: _repeatImage];
     [self.repeatButton setAlternateImage: _pressedRepeatImage];
@@ -209,11 +226,23 @@
     if (!b_show_playmode_buttons)
         [self removePlaymodeButtons:YES];
 
-    b_show_jump_buttons = config_GetInt(getIntf(), "macosx-show-playback-buttons");
-    if (b_show_jump_buttons)
-        [self addJumpButtons:YES];
-
-
+    _hidePrevButtonConstraint = [NSLayoutConstraint constraintWithItem:self.prevButton
+                                                               attribute:NSLayoutAttributeWidth
+                                                               relatedBy:NSLayoutRelationEqual
+                                                                  toItem:nil
+                                                               attribute:NSLayoutAttributeNotAnAttribute
+                                                              multiplier:1
+                                                                constant:0];
+    _hideNextButtonConstraint = [NSLayoutConstraint constraintWithItem:self.nextButton
+                                                             attribute:NSLayoutAttributeWidth
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:nil
+                                                             attribute:NSLayoutAttributeNotAnAttribute
+                                                            multiplier:1
+                                                              constant:0];
+    b_show_jump_buttons = var_InheritBool(getIntf(), "macosx-show-playback-buttons");
+    if (!b_show_jump_buttons)
+        [self removeJumpButtons:YES];
 
     [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
 
@@ -281,78 +310,8 @@
 
 - (void)addJumpButtons:(BOOL)b_fast
 {
-    NSRect preliminaryFrame = [self.backwardButton frame];
-    BOOL b_enabled = [self.backwardButton isEnabled];
-    preliminaryFrame.size.width = 29.;
-    _previousButton = [[NSButton alloc] initWithFrame:preliminaryFrame];
-    [_previousButton setButtonType: NSMomentaryChangeButton];
-    [_previousButton setBezelStyle:NSRegularSquareBezelStyle];
-    [_previousButton setBordered:NO];
-    [_previousButton setTarget:self];
-    [_previousButton setAction:@selector(prev:)];
-    [_previousButton setToolTip: _NS("Previous")];
-    [[_previousButton cell] accessibilitySetOverrideValue:_NS("Previous") forAttribute:NSAccessibilityTitleAttribute];
-    [[_previousButton cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [_previousButton setEnabled: b_enabled];
-
-    _nextButton = [[NSButton alloc] initWithFrame:preliminaryFrame];
-    [_nextButton setButtonType: NSMomentaryChangeButton];
-    [_nextButton setBezelStyle:NSRegularSquareBezelStyle];
-    [_nextButton setBordered:NO];
-    [_nextButton setTarget:self];
-    [_nextButton setAction:@selector(next:)];
-    [_nextButton setToolTip: _NS("Next")];
-    [[_nextButton cell] accessibilitySetOverrideValue:_NS("Next") forAttribute:NSAccessibilityTitleAttribute];
-    [[_nextButton cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [_nextButton setEnabled: b_enabled];
-
-    if (self.darkInterface) {
-        [_previousButton setImage: imageFromRes(@"previous-6btns-dark")];
-        [_previousButton setAlternateImage: imageFromRes(@"previous-6btns-dark-pressed")];
-        [_nextButton setImage: imageFromRes(@"next-6btns-dark")];
-        [_nextButton setAlternateImage: imageFromRes(@"next-6btns-dark-pressed")];
-    } else {
-        [_previousButton setImage: imageFromRes(@"previous-6btns")];
-        [_previousButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
-        [_nextButton setImage: imageFromRes(@"next-6btns")];
-        [_nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
-    }
-
-    NSRect frame;
-    frame = [self.backwardButton frame];
-    frame.size.width--;
-    [self.backwardButton setFrame:frame];
-    frame = [self.forwardButton frame];
-    frame.size.width--;
-    [self.forwardButton setFrame:frame];
-
-#define moveItem(item) \
-frame = [item frame]; \
-frame.origin.x = frame.origin.x + f_space; \
-if (b_fast) \
-    [item setFrame: frame]; \
-else \
-    [[item animator] setFrame: frame]
-
-    float f_space = 29.;
-    moveItem(self.backwardButton);
-    f_space = 28.;
-    moveItem(self.playButton);
-    moveItem(self.forwardButton);
-    f_space = 28. * 2;
-    moveItem(self.stopButton);
-    moveItem(self.playlistButton);
-    moveItem(self.repeatButton);
-    moveItem(self.shuffleButton);
-#undef moveItem
-
-    frame = [self.progressView frame];
-    frame.size.width = frame.size.width - f_space;
-    frame.origin.x = frame.origin.x + f_space;
-    if (b_fast)
-        [self.progressView setFrame: frame];
-    else
-        [[self.progressView animator] setFrame: frame];
+    [self.prevButton removeConstraint:_hidePrevButtonConstraint];
+    [self.nextButton removeConstraint:_hideNextButtonConstraint];
 
     if (self.darkInterface) {
         [[self.forwardButton animator] setImage:imageFromRes(@"forward-6btns-dark")];
@@ -366,73 +325,16 @@ else \
         [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-6btns-pressed")];
     }
 
-    preliminaryFrame.origin.x = [_previousButton frame].origin.x + [_previousButton frame].size.width + [self.backwardButton frame].size.width + [self.playButton frame].size.width + [self.forwardButton frame].size.width;
-    [_nextButton setFrame: preliminaryFrame];
-
-    // wait until the animation is done, if displayed
-    if (b_fast) {
-        [self.bottomBarView addSubview:_previousButton];
-        [self.bottomBarView addSubview:_nextButton];
-    } else {
-        [self.bottomBarView performSelector:@selector(addSubview:) withObject:_previousButton afterDelay:.2];
-        [self.bottomBarView performSelector:@selector(addSubview:) withObject:_nextButton afterDelay:.2];
-    }
-
     [self toggleForwardBackwardMode: YES];
 }
 
 - (void)removeJumpButtons:(BOOL)b_fast
 {
-    if (!_previousButton || !_nextButton)
+    if (!self.prevButton || !self.nextButton)
         return;
 
-    if (b_fast) {
-        [_previousButton setHidden: YES];
-        [_nextButton setHidden: YES];
-    } else {
-        [[_previousButton animator] setHidden: YES];
-        [[_nextButton animator] setHidden: YES];
-    }
-    [_previousButton removeFromSuperviewWithoutNeedingDisplay];
-    [_nextButton removeFromSuperviewWithoutNeedingDisplay];
-    _previousButton = nil;
-    _nextButton = nil;
-
-    NSRect frame;
-    frame = [self.backwardButton frame];
-    frame.size.width++;
-    [self.backwardButton setFrame:frame];
-    frame = [self.forwardButton frame];
-    frame.size.width++;
-    [self.forwardButton setFrame:frame];
-
-#define moveItem(item) \
-frame = [item frame]; \
-frame.origin.x = frame.origin.x - f_space; \
-if (b_fast) \
-    [item setFrame: frame]; \
-else \
-    [[item animator] setFrame: frame]
-
-    float f_space = 29.;
-    moveItem(self.backwardButton);
-    f_space = 28.;
-    moveItem(self.playButton);
-    moveItem(self.forwardButton);
-    f_space = 28. * 2;
-    moveItem(self.stopButton);
-    moveItem(self.playlistButton);
-    moveItem(self.repeatButton);
-    moveItem(self.shuffleButton);
-#undef moveItem
-
-    frame = [self.progressView frame];
-    frame.size.width = frame.size.width + f_space;
-    frame.origin.x = frame.origin.x - f_space;
-    if (b_fast)
-        [self.progressView setFrame: frame];
-    else
-        [[self.progressView animator] setFrame: frame];
+    [self.prevButton addConstraint:_hidePrevButtonConstraint];
+    [self.nextButton addConstraint:_hideNextButtonConstraint];
 
     if (self.darkInterface) {
         [[self.forwardButton animator] setImage:imageFromRes(@"forward-3btns-dark")];
@@ -447,8 +349,6 @@ else \
     }
 
     [self toggleForwardBackwardMode: NO];
-
-    [self.bottomBarView setNeedsDisplay:YES];
 }
 
 - (void)togglePlaymodeButtons
@@ -646,8 +546,8 @@ else \
     [self.stopButton setEnabled: b_input];
 
     if (b_show_jump_buttons) {
-        [_previousButton setEnabled: (b_seekable || b_plmul || b_chapters)];
-        [_nextButton setEnabled: (b_seekable || b_plmul || b_chapters)];
+        [self.prevButton setEnabled: (b_seekable || b_plmul || b_chapters)];
+        [self.nextButton setEnabled: (b_seekable || b_plmul || b_chapters)];
     }
 
     [[[VLCMain sharedInstance] mainMenu] setRateControlsEnabled: b_control];

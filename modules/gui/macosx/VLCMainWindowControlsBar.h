@@ -38,6 +38,9 @@
 
 @property (readwrite, strong) IBOutlet NSButton *stopButton;
 
+@property (readwrite, strong) IBOutlet NSButton *prevButton;
+@property (readwrite, strong) IBOutlet NSButton *nextButton;
+
 @property (readwrite, strong) IBOutlet NSButton *playlistButton;
 @property (readwrite, strong) IBOutlet NSButton *repeatButton;
 @property (readwrite, strong) IBOutlet NSButton *shuffleButton;
