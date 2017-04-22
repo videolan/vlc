@@ -54,8 +54,8 @@
 
 - (void)awakeFromNib
 {
-    _darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
-    _nativeFullscreenMode = NO;
+    _darkInterface = var_InheritBool(getIntf(), "macosx-interfacestyle");
+    _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     [self.dropView setDrawBorder: NO];
 
@@ -153,6 +153,7 @@
 
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
+        // TODO remove frame calculations
         CGFloat f_width = [self.fullscreenButton frame].size.width;
 
         NSRect frame = [self.timeField frame];
@@ -163,7 +164,7 @@
         frame.size.width = f_width + frame.size.width;
         [self.progressView setFrame: frame];
 
-        [self.fullscreenButton removeFromSuperviewWithoutNeedingDisplay];
+        [self.fullscreenButton removeFromSuperview];
     }
 
     if (config_GetInt(getIntf(), "macosx-show-playback-buttons"))

@@ -239,6 +239,16 @@
                                     <constraint firstItem="9" firstAttribute="leading" secondItem="6" secondAttribute="trailing" constant="4" id="P5c-gH-8J6"/>
                                     <constraint firstItem="6" firstAttribute="centerY" secondItem="Vae-cT-EEI" secondAttribute="centerY" id="cvI-P6-Eda"/>
                                     <constraint firstAttribute="bottom" secondItem="7" secondAttribute="bottom" id="eiE-5I-gND"/>
+                                    <constraint firstAttribute="trailing" secondItem="9" secondAttribute="trailing" priority="250" constant="7" id="fzk-WE-wjs">
+                                        <attributedString key="userComments">
+                                            <fragment content="optional constraint if fullscreen button is not there">
+                                                <attributes>
+                                                    <font key="NSFont" metaFont="smallSystem"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                </attributes>
+                                            </fragment>
+                                        </attributedString>
+                                    </constraint>
                                     <constraint firstAttribute="trailing" secondItem="7" secondAttribute="trailing" id="ixf-mR-2yO"/>
                                     <constraint firstItem="Vae-cT-EEI" firstAttribute="leading" secondItem="65" secondAttribute="leading" constant="6" id="ju1-w7-CzH"/>
                                     <constraint firstItem="8" firstAttribute="leading" secondItem="9" secondAttribute="trailing" constant="5" id="qs6-O2-pGr"/>
