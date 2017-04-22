@@ -160,6 +160,8 @@
 		1C3114281E508D1B00D4DD76 /* VLCFullScreenPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */; };
 		1C3114291E508D1B00D4DD76 /* VLCRendererDialog.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224191E4D2A9000833BE1 /* VLCRendererDialog.xib */; };
 		1C31142A1E508D1B00D4DD76 /* VLCStatusBarIconMainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */; };
+		1C69FDF51EAB30C7007724ED /* Windows.h in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F416020F6200C698B7 /* Windows.h */; };
+		1C69FDF61EAB30C7007724ED /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
 		1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */; };
 		6B3BE42C1E6217CB008D098A /* VLCHUDImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */; };
 		6B3BE4321E621F24008D098A /* VLCHUDToggleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */; };
@@ -1918,6 +1920,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C69FDF51EAB30C7007724ED /* Windows.h in Sources */,
+				1C69FDF61EAB30C7007724ED /* Windows.m in Sources */,
 				1C31140E1E508D1B00D4DD76 /* About.xib in Sources */,
 				6B3BE42C1E6217CB008D098A /* VLCHUDImageButton.m in Sources */,
 				1C31140F1E508D1B00D4DD76 /* AddonManager.xib in Sources */,

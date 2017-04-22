@@ -678,19 +678,23 @@
         [[[VLCMain sharedInstance] mainWindow] recreateHideMouseTimer];
 
     if (_darkInterface) {
-        [self.titlebarView removeFromSuperviewWithoutNeedingDisplay];
+        [self.titlebarView setHidden:YES];
+        self.videoViewTopConstraint.priority = 1;
 
-        NSRect winrect;
+        // shrink window height
         CGFloat f_titleBarHeight = [self.titlebarView frame].size.height;
-        winrect = [self frame];
+        NSRect winrect = [self frame];
 
         winrect.size.height = winrect.size.height - f_titleBarHeight;
         [self setFrame: winrect display:NO animate:NO];
     }
 
+    // TODO remove
     [_videoView setFrame: [[self contentView] frame]];
+
     if (![_videoView isHidden]) {
         [[self.controlsBar bottomBarView] setHidden: YES];
+        self.videoViewBottomConstraint.priority = 1;
     }
 
     [self setMovableByWindowBackground: NO];
@@ -738,24 +742,17 @@
     [NSCursor setHiddenUntilMouseMoves: NO];
     [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive];
 
-
     if (_darkInterface) {
-        NSRect winrect;
+        [self.titlebarView setHidden:NO];
+        self.videoViewTopConstraint.priority = 999;
+
+        NSRect winrect = [self frame];
         CGFloat f_titleBarHeight = [self.titlebarView frame].size.height;
-
-        winrect = [_videoView frame];
-        winrect.size.height -= f_titleBarHeight;
-        [_videoView setFrame: winrect];
-
-        winrect = [self frame];
-        [self.titlebarView setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight,
-                                              winrect.size.width, f_titleBarHeight)];
-        [[self contentView] addSubview: self.titlebarView];
-
         winrect.size.height = winrect.size.height + f_titleBarHeight;
         [self setFrame: winrect display:NO animate:NO];
     }
 
+    // TODO remove
     NSRect videoViewFrame = [_videoView frame];
     videoViewFrame.origin.y += [self.controlsBar height];
     videoViewFrame.size.height -= [self.controlsBar height];
@@ -763,6 +760,7 @@
 
     if (![_videoView isHidden]) {
         [[self.controlsBar bottomBarView] setHidden: NO];
+        self.videoViewBottomConstraint.priority = 999;
     }
 
     [self setMovableByWindowBackground: YES];

@@ -1380,24 +1380,14 @@ static const float f_min_window_height = 307.;
         [self setHasShadow:NO];
         [self setHasShadow:YES];
 
-        NSRect winrect = [self frame];
-        CGFloat f_titleBarHeight = [self.titlebarView frame].size.height;
-
         [self setTitle: _NS("VLC media player")];
-        [self.titlebarView setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight, winrect.size.width, f_titleBarHeight)];
-        [[self contentView] addSubview: self.titlebarView positioned: NSWindowAbove relativeTo: nil];
 
     } else {
+        [self.titlebarView removeFromSuperview];
+        self.titlebarView = nil;
+
         [self setBackgroundColor: [NSColor blackColor]];
     }
-
-    NSRect videoViewRect = [[self contentView] bounds];
-    if (darkInterface)
-        videoViewRect.size.height -= [self.titlebarView frame].size.height;
-    CGFloat f_bottomBarHeight = [[self controlsBar] height];
-    videoViewRect.size.height -= f_bottomBarHeight;
-    videoViewRect.origin.y = f_bottomBarHeight;
-    [self.videoView setFrame: videoViewRect];
 
     if (darkInterface) {
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [self.videoView frame]];
