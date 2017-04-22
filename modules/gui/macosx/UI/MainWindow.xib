@@ -93,16 +93,16 @@
                         <constraints>
                             <constraint firstItem="4897" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="2ij-98-UM8"/>
                             <constraint firstItem="4895" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="5L5-iR-hzi"/>
-                            <constraint firstItem="4895" firstAttribute="leading" secondItem="4850" secondAttribute="leading" constant="7" id="5rk-de-0OR"/>
+                            <constraint firstItem="4895" firstAttribute="left" secondItem="4850" secondAttribute="left" constant="7" id="5rk-de-0OR"/>
                             <constraint firstItem="4896" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="ObI-6s-vN3"/>
-                            <constraint firstAttribute="trailing" secondItem="4898" secondAttribute="trailing" constant="4" id="P0a-sl-gz9"/>
+                            <constraint firstAttribute="right" secondItem="4898" secondAttribute="right" constant="4" id="P0a-sl-gz9"/>
                             <constraint firstItem="4899" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="S8e-hh-HbK"/>
-                            <constraint firstItem="4898" firstAttribute="leading" secondItem="4899" secondAttribute="trailing" constant="58" id="TnQ-Lu-s8V"/>
-                            <constraint firstItem="4897" firstAttribute="leading" secondItem="4896" secondAttribute="trailing" constant="6" id="XTh-J6-ocw"/>
+                            <constraint firstItem="4898" firstAttribute="left" secondItem="4899" secondAttribute="right" constant="58" id="TnQ-Lu-s8V"/>
+                            <constraint firstItem="4897" firstAttribute="left" secondItem="4896" secondAttribute="right" constant="6" id="XTh-J6-ocw"/>
                             <constraint firstAttribute="height" constant="22" id="buN-9i-9oy"/>
-                            <constraint firstItem="4896" firstAttribute="leading" secondItem="4895" secondAttribute="trailing" constant="6" id="jS6-Nc-Whc"/>
+                            <constraint firstItem="4896" firstAttribute="left" secondItem="4895" secondAttribute="right" constant="6" id="jS6-Nc-Whc"/>
                             <constraint firstItem="4898" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="tj5-SN-vII"/>
-                            <constraint firstItem="4899" firstAttribute="leading" secondItem="4897" secondAttribute="trailing" constant="6" id="wQh-pU-b7u"/>
+                            <constraint firstItem="4899" firstAttribute="left" secondItem="4897" secondAttribute="right" constant="6" id="wQh-pU-b7u"/>
                         </constraints>
                         <connections>
                             <outlet property="fullscreenButton" destination="4898" id="lbk-lI-Uov"/>

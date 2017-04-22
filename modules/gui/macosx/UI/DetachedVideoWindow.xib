@@ -90,17 +90,17 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="6c1-oq-5vw"/>
-                            <constraint firstAttribute="trailing" secondItem="27" secondAttribute="trailing" constant="4" id="EUa-A3-U77"/>
-                            <constraint firstItem="26" firstAttribute="leading" secondItem="25" secondAttribute="trailing" constant="6" id="EgY-Oe-oRg"/>
+                            <constraint firstAttribute="right" secondItem="27" secondAttribute="right" constant="4" id="EUa-A3-U77"/>
+                            <constraint firstItem="26" firstAttribute="left" secondItem="25" secondAttribute="right" constant="6" id="EgY-Oe-oRg"/>
                             <constraint firstItem="28" firstAttribute="centerY" secondItem="1" secondAttribute="centerY" id="FVC-gH-9JQ"/>
-                            <constraint firstItem="25" firstAttribute="leading" secondItem="24" secondAttribute="trailing" constant="6" id="JgK-vs-BrQ"/>
+                            <constraint firstItem="25" firstAttribute="left" secondItem="24" secondAttribute="right" constant="6" id="JgK-vs-BrQ"/>
                             <constraint firstItem="25" firstAttribute="centerY" secondItem="1" secondAttribute="centerY" id="Lw5-nW-6lW"/>
-                            <constraint firstItem="24" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="7" id="NvG-rV-YhY"/>
+                            <constraint firstItem="24" firstAttribute="left" secondItem="1" secondAttribute="left" constant="7" id="NvG-rV-YhY"/>
                             <constraint firstItem="27" firstAttribute="centerY" secondItem="1" secondAttribute="centerY" id="YIS-Te-ToL"/>
                             <constraint firstItem="24" firstAttribute="centerY" secondItem="1" secondAttribute="centerY" id="aUJ-zT-GaH"/>
-                            <constraint firstItem="27" firstAttribute="leading" secondItem="28" secondAttribute="trailing" constant="58" id="pUY-UB-1Wm"/>
+                            <constraint firstItem="27" firstAttribute="left" secondItem="28" secondAttribute="right" constant="58" id="pUY-UB-1Wm"/>
                             <constraint firstItem="26" firstAttribute="centerY" secondItem="1" secondAttribute="centerY" id="rKd-Tw-gjS"/>
-                            <constraint firstItem="28" firstAttribute="leading" secondItem="26" secondAttribute="trailing" constant="6" id="uRA-WS-6cJ"/>
+                            <constraint firstItem="28" firstAttribute="left" secondItem="26" secondAttribute="right" constant="6" id="uRA-WS-6cJ"/>
                         </constraints>
                         <connections>
                             <outlet property="fullscreenButton" destination="27" id="Q7Q-c7-2mT"/>
