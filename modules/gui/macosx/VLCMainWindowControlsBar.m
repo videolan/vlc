@@ -54,6 +54,11 @@
 
     BOOL b_show_jump_buttons;
     BOOL b_show_playmode_buttons;
+
+    NSLayoutConstraint *_hideEffectsButtonConstraint;
+
+    NSLayoutConstraint *_hideRepeatButtonConstraint;
+    NSLayoutConstraint *_hideShuffleButtonConstraint;
 }
 
 - (void)addJumpButtons:(BOOL)b_fast;
@@ -175,16 +180,40 @@
     [self.volumeSlider setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
     [self.volumeUpButton setEnabled: b_mute];
 
+    // configure optional buttons
+    _hideEffectsButtonConstraint = [NSLayoutConstraint constraintWithItem:self.effectsButton
+                                                      attribute:NSLayoutAttributeWidth
+                                                      relatedBy:NSLayoutRelationEqual
+                                                         toItem:nil
+                                                      attribute:NSLayoutAttributeNotAnAttribute
+                                                     multiplier:1
+                                                       constant:0];
+    if (!var_InheritBool(getIntf(), "macosx-show-effects-button"))
+        [self removeEffectsButton:YES];
+
+    _hideRepeatButtonConstraint = [NSLayoutConstraint constraintWithItem:self.repeatButton
+                                                                attribute:NSLayoutAttributeWidth
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:nil
+                                                                attribute:NSLayoutAttributeNotAnAttribute
+                                                               multiplier:1
+                                                                 constant:0];
+    _hideShuffleButtonConstraint = [NSLayoutConstraint constraintWithItem:self.shuffleButton
+                                                               attribute:NSLayoutAttributeWidth
+                                                               relatedBy:NSLayoutRelationEqual
+                                                                  toItem:nil
+                                                               attribute:NSLayoutAttributeNotAnAttribute
+                                                              multiplier:1
+                                                                constant:0];
+    b_show_playmode_buttons = var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
+    if (!b_show_playmode_buttons)
+        [self removePlaymodeButtons:YES];
+
     b_show_jump_buttons = config_GetInt(getIntf(), "macosx-show-playback-buttons");
     if (b_show_jump_buttons)
         [self addJumpButtons:YES];
 
-    b_show_playmode_buttons = config_GetInt(getIntf(), "macosx-show-playmode-buttons");
-    if (!b_show_playmode_buttons)
-        [self removePlaymodeButtons:YES];
 
-    if (!config_GetInt(getIntf(), "macosx-show-effects-button"))
-        [self removeEffectsButton:YES];
 
     [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
 
@@ -207,49 +236,15 @@
     if (!self.effectsButton)
         return;
 
-    if (b_fast) {
-        [self.effectsButton setHidden: NO];
-    } else {
-        [[self.effectsButton animator] setHidden: NO];
-    }
-
-#define moveItem(item) \
-frame = [item frame]; \
-frame.origin.x = frame.origin.x - f_space; \
-if (b_fast) \
-[item setFrame: frame]; \
-else \
-[[item animator] setFrame: frame]
-
-    NSRect frame;
-    CGFloat f_space = [self.effectsButton frame].size.width;
-    // extra margin between button and volume up button
-    if (self.nativeFullscreenMode)
-        f_space += 2;
-
-
-    moveItem(self.volumeUpButton);
-    moveItem(self.volumeSlider);
-    moveItem(self.volumeTrackImageView);
-    moveItem(self.volumeDownButton);
-    moveItem(self.timeField);
-#undef moveItem
-
-
-    frame = [self.progressView frame];
-    frame.size.width = frame.size.width - f_space;
-    if (b_fast)
-        [self.progressView setFrame: frame];
-    else
-        [[self.progressView animator] setFrame: frame];
+    [self.effectsButton removeConstraint:_hideEffectsButtonConstraint];
 
     if (!self.nativeFullscreenMode) {
         if (self.darkInterface) {
-            [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
-            [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
+            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
+            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
         } else {
-            [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons")];
-            [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
+            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-double-buttons")];
+            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
         }
     }
 
@@ -261,36 +256,7 @@ else \
     if (!self.effectsButton)
         return;
 
-    [self.effectsButton setHidden: YES];
-
-#define moveItem(item) \
-frame = [item frame]; \
-frame.origin.x = frame.origin.x + f_space; \
-if (b_fast) \
-[item setFrame: frame]; \
-else \
-[[item animator] setFrame: frame]
-
-    NSRect frame;
-    CGFloat f_space = [self.effectsButton frame].size.width;
-    // extra margin between button and volume up button
-    if (self.nativeFullscreenMode)
-        f_space += 2;
-
-    moveItem(self.volumeUpButton);
-    moveItem(self.volumeSlider);
-    moveItem(self.volumeTrackImageView);
-    moveItem(self.volumeDownButton);
-    moveItem(self.timeField);
-#undef moveItem
-
-
-    frame = [self.progressView frame];
-    frame.size.width = frame.size.width + f_space;
-    if (b_fast)
-        [self.progressView setFrame: frame];
-    else
-        [[self.progressView animator] setFrame: frame];
+    [self.effectsButton addConstraint:_hideEffectsButtonConstraint];
 
     if (!self.nativeFullscreenMode) {
         if (self.darkInterface) {
@@ -301,8 +267,6 @@ else \
             [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
         }
     }
-
-    [self.bottomBarView setNeedsDisplay:YES];
 }
 
 - (void)toggleJumpButtons
@@ -499,8 +463,8 @@ else \
 
 - (void)addPlaymodeButtons:(BOOL)b_fast
 {
-    NSRect frame;
-    CGFloat f_space = [self.repeatButton frame].size.width + [self.shuffleButton frame].size.width - 6.;
+    [self.repeatButton removeConstraint:_hideRepeatButtonConstraint];
+    [self.shuffleButton removeConstraint:_hideShuffleButtonConstraint];
 
     if (self.darkInterface) {
         [[self.playlistButton animator] setImage:imageFromRes(@"playlist_dark")];
@@ -509,33 +473,12 @@ else \
         [[self.playlistButton animator] setImage:imageFromRes(@"playlist-btn")];
         [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-btn-pressed")];
     }
-    frame = [self.playlistButton frame];
-    frame.size.width--;
-    [self.playlistButton setFrame:frame];
-
-    if (b_fast) {
-        [self.repeatButton setHidden: NO];
-        [self.shuffleButton setHidden: NO];
-    } else {
-        [[self.repeatButton animator] setHidden: NO];
-        [[self.shuffleButton animator] setHidden: NO];
-    }
-
-    frame = [self.progressView frame];
-    frame.size.width = frame.size.width - f_space;
-    frame.origin.x = frame.origin.x + f_space;
-    if (b_fast)
-        [self.progressView setFrame: frame];
-    else
-        [[self.progressView animator] setFrame: frame];
 }
 
 - (void)removePlaymodeButtons:(BOOL)b_fast
 {
-    NSRect frame;
-    CGFloat f_space = [self.repeatButton frame].size.width + [self.shuffleButton frame].size.width - 6.;
-    [self.repeatButton setHidden: YES];
-    [self.shuffleButton setHidden: YES];
+    [self.repeatButton addConstraint:_hideRepeatButtonConstraint];
+    [self.shuffleButton addConstraint:_hideShuffleButtonConstraint];
 
     if (self.darkInterface) {
         [[self.playlistButton animator] setImage:imageFromRes(@"playlist-1btn-dark")];
@@ -544,17 +487,6 @@ else \
         [[self.playlistButton animator] setImage:imageFromRes(@"playlist-1btn")];
         [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-1btn-pressed")];
     }
-    frame = [self.playlistButton frame];
-    frame.size.width++;
-    [self.playlistButton setFrame:frame];
-
-    frame = [self.progressView frame];
-    frame.size.width = frame.size.width + f_space;
-    frame.origin.x = frame.origin.x - f_space;
-    if (b_fast)
-        [self.progressView setFrame: frame];
-    else
-        [[self.progressView animator] setFrame: frame];
 }
 
 #pragma mark -
