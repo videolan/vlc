@@ -263,6 +263,11 @@
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     }
 
+    if (!_darkInterface && self.titlebarView) {
+        [self.titlebarView removeFromSuperview];
+        self.titlebarView = nil;
+    }
+
     [super awakeFromNib];
 }
 

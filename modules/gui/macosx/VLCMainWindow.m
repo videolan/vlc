@@ -260,22 +260,7 @@ static const float f_min_window_height = 307.;
         [self setHasShadow:NO];
         [self setHasShadow:YES];
 
-        NSRect winrect = [self frame];
-        CGFloat f_titleBarHeight = [self.titlebarView frame].size.height;
-
-        [self.titlebarView setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight,
-                                              winrect.size.width, f_titleBarHeight)];
-        [[self contentView] addSubview: self.titlebarView positioned: NSWindowAbove relativeTo: _splitView];
-
-        if (winrect.size.height > 100) {
-            [self setFrame: winrect display:YES animate:YES];
-            self.previousSavedFrame = winrect;
-        }
-
-        winrect = _splitView.frame;
-        winrect.size.height = winrect.size.height - f_titleBarHeight;
-        [_splitView setFrame: winrect];
-        [self.videoView setFrame: winrect];
+        self.previousSavedFrame = [self frame];
 
         o_color_backdrop = [[VLCColorView alloc] initWithFrame:_splitView.frame];
         [[self contentView] addSubview:o_color_backdrop positioned:NSWindowBelow relativeTo:_splitView];
@@ -1382,9 +1367,6 @@ static const float f_min_window_height = 307.;
         [self setTitle: _NS("VLC media player")];
 
     } else {
-        [self.titlebarView removeFromSuperview];
-        self.titlebarView = nil;
-
         [self setBackgroundColor: [NSColor blackColor]];
     }
 
