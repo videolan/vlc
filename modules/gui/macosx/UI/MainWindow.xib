@@ -102,7 +102,7 @@
                                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="top" imageScaling="axesIndependently" image="topbar_background" id="4693"/>
                                                     </imageView>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5610">
-                                                        <rect key="frame" x="6" y="5" width="307" height="14"/>
+                                                        <rect key="frame" x="6" y="5" width="33" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="5611">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="highlightColor" catalog="System" colorSpace="catalog"/>
@@ -127,7 +127,6 @@
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="23" id="4D5-Wx-lTu"/>
                                                     <constraint firstItem="5610" firstAttribute="centerY" secondItem="gff-CR-TiL" secondAttribute="centerY" id="6Do-lj-4Id"/>
-                                                    <constraint firstItem="5614" firstAttribute="leading" secondItem="5610" secondAttribute="trailing" constant="8" id="B6f-N1-MUG"/>
                                                     <constraint firstItem="5610" firstAttribute="leading" secondItem="gff-CR-TiL" secondAttribute="leading" constant="8" id="S9e-Wf-aoV"/>
                                                     <constraint firstAttribute="trailing" secondItem="4692" secondAttribute="trailing" id="UQn-vu-gKi"/>
                                                     <constraint firstAttribute="trailing" secondItem="5614" secondAttribute="trailing" constant="8" id="Uhi-LR-5w5"/>
@@ -440,7 +439,7 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="303" height="14"/>
                                             </customView>
                                             <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4701" customClass="VLCThreePartImageView">
-                                                <rect key="frame" x="-185" y="-127" width="14" height="62"/>
+                                                <rect key="frame" x="124" y="-191" width="101" height="54"/>
                                             </customView>
                                             <progressIndicator hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="3584" userLabel="Buffering Bar">
                                                 <rect key="frame" x="0.0" y="1" width="303" height="12"/>
