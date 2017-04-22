@@ -610,15 +610,14 @@ static const float f_min_window_height = 307.;
 - (void)showDropZone
 {
     b_dropzone_active = YES;
-    [_splitViewRight addSubview:_dropzoneView positioned:NSWindowAbove relativeTo:_playlistScrollView];
-    [_dropzoneView setFrame:_playlistScrollView.frame];
+    [_dropzoneView setHidden:NO];
     [_playlistScrollView setHidden:YES];
 }
 
 - (void)hideDropZone
 {
     b_dropzone_active = NO;
-    [_dropzoneView removeFromSuperview];
+    [_dropzoneView setHidden:YES];
     [_playlistScrollView setHidden:NO];
 }
 
