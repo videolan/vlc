@@ -439,11 +439,14 @@
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="4919" customClass="VLCThreePartImageView">
                                                 <rect key="frame" x="0.0" y="0.0" width="191" height="14"/>
                                             </customView>
-                                            <progressIndicator hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="3584">
+                                            <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4701" customClass="VLCThreePartImageView">
+                                                <rect key="frame" x="1" y="1" width="60" height="12"/>
+                                            </customView>
+                                            <progressIndicator hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="3584" userLabel="Buffering Bar">
                                                 <rect key="frame" x="0.0" y="1" width="191" height="12"/>
                                             </progressIndicator>
-                                            <slider hidden="YES" canDrawConcurrently="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4422" customClass="TimeLineSlider">
-                                                <rect key="frame" x="0.0" y="-2" width="191" height="18"/>
+                                            <slider hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4422" customClass="TimeLineSlider">
+                                                <rect key="frame" x="0.0" y="0.0" width="191" height="17"/>
                                                 <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" doubleValue="3204.0777439024391" tickMarkPosition="above" sliderType="linear" id="4425">
                                                     <font key="font" size="12" name="Helvetica"/>
                                                 </sliderCell>
@@ -451,12 +454,9 @@
                                                     <action selector="timeSliderAction:" target="5339" id="5370"/>
                                                 </connections>
                                             </slider>
-                                            <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4701" customClass="VLCThreePartImageView">
-                                                <rect key="frame" x="89" y="-128" width="198" height="142"/>
-                                            </customView>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="4422" firstAttribute="centerY" secondItem="5335" secondAttribute="centerY" id="Czk-qS-fTt"/>
+                                            <constraint firstItem="4422" firstAttribute="centerY" secondItem="5335" secondAttribute="centerY" constant="-1" id="Czk-qS-fTt"/>
                                             <constraint firstItem="4919" firstAttribute="leading" secondItem="5335" secondAttribute="leading" id="G4c-AN-5uA"/>
                                             <constraint firstItem="4919" firstAttribute="top" secondItem="5335" secondAttribute="top" id="OJz-TZ-fOg"/>
                                             <constraint firstAttribute="trailing" secondItem="3584" secondAttribute="trailing" id="RLD-z0-Ztm"/>
@@ -589,7 +589,6 @@
                                     <constraint firstItem="4423" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="HUU-wF-duH"/>
                                     <constraint firstItem="jlp-Z2-Qdl" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="Hnv-b4-wWi"/>
                                     <constraint firstItem="5335" firstAttribute="leading" secondItem="mrr-Bw-co0" secondAttribute="trailing" constant="6" id="I5r-X9-Qdm"/>
-                                    <constraint firstItem="4423" firstAttribute="leading" secondItem="5335" secondAttribute="trailing" constant="4" id="JtZ-BC-B20"/>
                                     <constraint firstItem="5335" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="MpQ-gv-fno"/>
                                     <constraint firstItem="dff-fl-Mde" firstAttribute="leading" secondItem="3652" secondAttribute="trailing" constant="2" id="TVP-Cr-bfO"/>
                                     <constraint firstItem="4417" firstAttribute="trailing" secondItem="3649" secondAttribute="trailing" id="WUo-ur-GGy"/>
