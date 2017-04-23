@@ -82,7 +82,12 @@ int main (void)
 
     /* Insert some values */
     for( i = 0; i < size; i++ )
+    {
         vlc_dictionary_insert( &dict, our_keys[i], (void *)i );
+        assert( vlc_dictionary_has_key(&dict, our_keys[i]) );
+        for( int j = i + 1; j < size; j++ )
+            assert( !vlc_dictionary_has_key(&dict, our_keys[j]) );
+    }
 
     test_dictionary_validity( &dict, our_keys, size );
 
