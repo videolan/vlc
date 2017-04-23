@@ -432,7 +432,13 @@ vlc_dictionary_has_key( const vlc_dictionary_t * p_dict, const char * psz_key )
         return 0;
 
     int i_pos = DictHash( psz_key, p_dict->i_size );
-    return p_dict->p_entries[i_pos] != NULL;
+    const vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
+    for( ; p_entry != NULL; p_entry = p_entry->p_next )
+    {
+        if( !strcmp( psz_key, p_entry->psz_key ) )
+            break;
+    }
+    return p_entry != NULL;
 }
 
 static inline void *
