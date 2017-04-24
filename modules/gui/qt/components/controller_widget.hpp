@@ -90,7 +90,6 @@ private:
     intf_thread_t* p_intf;
 };
 
-#define VOLUME_MAX 125
 class SoundWidget : public QWidget
 {
     Q_OBJECT

@@ -39,6 +39,8 @@
 #include <QWidgetAction>
 #include <QMouseEvent>
 
+#define VOLUME_MAX 125
+
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny, bool b_special )
                          : QWidget( _parent ), p_intf( _p_intf),
