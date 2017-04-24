@@ -479,17 +479,17 @@ static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_nod
     /* Merge dics backwards without overwriting */
     for( ; p_node; p_node = p_node->p_parent )
     {
-        const char *psz_regionid = (const char *)
-                vlc_dictionary_value_for_key( &p_node->attr_dict, "region" );
-        if( psz_regionid )
-            DictMergeWithRegionID( p_ctx, psz_regionid, &merged );
+        DictionnaryMerge( &p_node->attr_dict, &merged );
 
         const char *psz_styleid = (const char *)
                 vlc_dictionary_value_for_key( &p_node->attr_dict, "style" );
         if( psz_styleid )
             DictMergeWithStyleID( p_ctx, psz_styleid, &merged );
 
-        DictionnaryMerge( &p_node->attr_dict, &merged );
+        const char *psz_regionid = (const char *)
+                vlc_dictionary_value_for_key( &p_node->attr_dict, "region" );
+        if( psz_regionid )
+            DictMergeWithRegionID( p_ctx, psz_regionid, &merged );
     }
 
     if( merged.i_size && merged.p_entries[0] && (p_ttml_style = ttml_style_New()) )
