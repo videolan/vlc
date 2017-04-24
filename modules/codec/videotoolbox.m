@@ -1254,7 +1254,6 @@ static void Drain(decoder_t *p_dec)
 static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    frame_info_t *p_info = NULL;
 
     if (p_sys->b_vt_flush) {
         RestartVideoToolbox(p_dec, false);
@@ -1323,15 +1322,17 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             goto skip;
     }
 
-
-    p_info = CreateReorderInfo(p_dec, p_block);
+    frame_info_t *p_info = CreateReorderInfo(p_dec, p_block);
     if(unlikely(!p_info))
         goto skip;
 
     CMSampleBufferRef sampleBuffer =
         VTSampleBufferCreate(p_dec, p_sys->videoFormatDescription, p_block);
     if (unlikely(!sampleBuffer))
+    {
+        free(p_info);
         goto skip;
+    }
 
     VTDecodeInfoFlags flagOut;
     VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
@@ -1342,10 +1343,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
                                           decoderFlags, p_info, &flagOut);
     if (HandleVTStatus(p_dec, status) == VLC_SUCCESS)
-    {
         p_sys->b_vt_feed = true;
-        p_info = NULL;
-    }
     else
     {
         switch (status)
@@ -1378,12 +1376,10 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
                 RestartVideoToolbox(p_dec, true);
                 break;
         }
-        p_info = NULL;
     }
     CFRelease(sampleBuffer);
 
 skip:
-    free(p_info);
     block_Release(p_block);
     return VLCDEC_SUCCESS;
 }
