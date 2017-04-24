@@ -528,6 +528,7 @@ static void *ThreadPlatform( void *obj, char *platform_name )
 
 #if HAS_QT56
     QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+    QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
 #endif
 
     /* Start the QApplication here */
