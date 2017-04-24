@@ -413,7 +413,6 @@ DEPS_res = \
 	pixmaps/types/type_node.png \
 	pixmaps/types/type_playlist.png \
 	pixmaps/types/type_unknown.xpm \
-	pixmaps/util/wait0.png \
 	pixmaps/util/wait1.png \
 	pixmaps/util/wait2.png \
 	pixmaps/util/wait3.png \
