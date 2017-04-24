@@ -507,7 +507,7 @@ VLMAWidget::VLMAWidget( const QString& _name, const QString& _input,
     objLayout->addWidget( modifyButton, 0, 5 );
 
     QToolButton *deleteButton = new QToolButton;
-    deleteButton->setIcon( QIcon( ":/menu/quit" ) );
+    deleteButton->setIcon( QIcon( ":/pixmaps/clear" ) );
     deleteButton->setToolTip("Delete");
     objLayout->addWidget( deleteButton, 0, 6 );
 

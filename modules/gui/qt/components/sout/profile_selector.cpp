@@ -626,7 +626,7 @@ void VLCProfileEditor::muxSelected()
     else if ( !caps["muxers"].contains( current->property("module").toString() ) &&
               !caps["muxers"].contains( "mux_" + current->property("module").toString() ) )
         ui.muxerwarning->setText(
-                    QString( "<img src=\":/menu/quit\"/> %1" )
+                    QString( "<img src=\":/pixmaps/clear\"/> %1" )
                     .arg( qtr( "This muxer is missing. Using this profile will fail" ) )
                     );
     else

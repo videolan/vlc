@@ -193,7 +193,7 @@ void ExtensionsManager::menu( QMenu *current )
             }
 
             submenu->addSeparator();
-            action = submenu->addAction( QIcon( ":/menu/quit" ),
+            action = submenu->addAction( QIcon( ":/pixmaps/clear" ),
                                          qtr( "Deactivate" ) );
             menuMapper->setMapping( action, MENU_MAP( 0, i_ext ) );
             CONNECT( action, triggered(), menuMapper, map() );

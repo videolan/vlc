@@ -307,7 +307,6 @@ DEPS_res = \
 	pixmaps/menus/messages_16px.png \
 	pixmaps/menus/playlist_16px.png \
 	pixmaps/menus/preferences_16px.png \
-	pixmaps/menus/quit_16px.png \
 	pixmaps/menus/settings_16px.png \
 	pixmaps/menus/stream_16px.png \
 	pixmaps/next.png \
