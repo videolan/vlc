@@ -1346,17 +1346,13 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         p_sys->b_vt_feed = true;
     else
     {
+        bool b_abort = false;
         switch (status)
         {
             case -8960 /* codecErr */:
             case kCVReturnInvalidArgument:
             case kVTVideoDecoderMalfunctionErr:
-                msg_Err(p_dec, "decoder failure, Abort.");
-                /* The decoder module will be reloaded next time since we already
-                 * modified the input block */
-                vlc_mutex_lock(&p_sys->lock);
-                p_dec->p_sys->b_abort = true;
-                vlc_mutex_unlock(&p_sys->lock);
+                b_abort = true;
                 break;
             case -8969 /* codecBadDataErr */:
             case kVTVideoDecoderBadDataErr:
@@ -1368,13 +1364,22 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
                     if (status != 0)
                     {
                         free( p_info );
-                        StopVideoToolbox(p_dec, true);
+                        b_abort = true;
                     }
                 }
                 break;
             case kVTInvalidSessionErr:
                 RestartVideoToolbox(p_dec, true);
                 break;
+        }
+        if (b_abort)
+        {
+            msg_Err(p_dec, "decoder failure, Abort.");
+            /* The decoder module will be reloaded next time since we already
+             * modified the input block */
+            vlc_mutex_lock(&p_sys->lock);
+            p_dec->p_sys->b_abort = true;
+            vlc_mutex_unlock(&p_sys->lock);
         }
     }
     CFRelease(sampleBuffer);
