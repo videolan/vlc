@@ -1270,7 +1270,10 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     vlc_mutex_lock(&p_sys->lock);
     if (p_sys->b_abort) { /* abort from output thread (DecoderCallback) */
         vlc_mutex_unlock(&p_sys->lock);
-        goto reload;
+        /* Add an empty variable so that videotoolbox won't be loaded again for
+        * this ES */
+        var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID);
+        return VLCDEC_RELOAD;
     }
     vlc_mutex_unlock(&p_sys->lock);
 
@@ -1383,12 +1386,6 @@ skip:
     free(p_info);
     block_Release(p_block);
     return VLCDEC_SUCCESS;
-
-reload:
-    /* Add an empty variable so that videotoolbox won't be loaded again for
-     * this ES */
-    var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID);
-    return VLCDEC_RELOAD;
 }
 
 static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
