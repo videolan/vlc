@@ -79,6 +79,65 @@ struct vlc_va_sys_t
     VASurfaceID  surfaces[32];
 };
 
+static int GetVaProfile(AVCodecContext *ctx, VAProfile *va_profile,
+                        unsigned *pic_count)
+{
+    VAProfile i_profile;
+    unsigned count = 3;
+
+    switch(ctx->codec_id)
+    {
+    case AV_CODEC_ID_MPEG1VIDEO:
+    case AV_CODEC_ID_MPEG2VIDEO:
+        i_profile = VAProfileMPEG2Main;
+        count = 4;
+        break;
+    case AV_CODEC_ID_MPEG4:
+        i_profile = VAProfileMPEG4AdvancedSimple;
+        break;
+    case AV_CODEC_ID_WMV3:
+        i_profile = VAProfileVC1Main;
+        break;
+    case AV_CODEC_ID_VC1:
+        i_profile = VAProfileVC1Advanced;
+        break;
+    case AV_CODEC_ID_H264:
+        i_profile = VAProfileH264High;
+        count = 18;
+        break;
+    case AV_CODEC_ID_HEVC:
+        if (ctx->profile == FF_PROFILE_HEVC_MAIN)
+            i_profile = VAProfileHEVCMain;
+        else if (ctx->profile == FF_PROFILE_HEVC_MAIN_10)
+            i_profile = VAProfileHEVCMain10;
+        else
+            return VLC_EGENERIC;
+        count = 18;
+        break;
+    case AV_CODEC_ID_VP8:
+        i_profile = VAProfileVP8Version0_3;
+        count = 5;
+        break;
+    case AV_CODEC_ID_VP9:
+        if (ctx->profile == FF_PROFILE_VP9_0)
+            i_profile = VAProfileVP9Profile0;
+#if VA_CHECK_VERSION( 0, 39, 0 )
+        else if (ctx->profile == FF_PROFILE_VP9_2)
+            i_profile = VAProfileVP9Profile2;
+#endif
+        else
+            return VLC_EGENERIC;
+        count = 10;
+        break;
+    default:
+        return VLC_EGENERIC;
+    }
+
+    *va_profile = i_profile;
+    *pic_count = count + ctx->thread_count;
+    return VLC_SUCCESS;
+}
+
 static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 {
     vlc_va_sys_t *sys = va->sys;
@@ -298,57 +357,9 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     VAProfile i_profile, *p_profiles_list;
     bool b_supported_profile = false;
     int i_profiles_nb = 0;
-    unsigned count = 3;
-
-    /* */
-    switch( ctx->codec_id )
-    {
-    case AV_CODEC_ID_MPEG1VIDEO:
-    case AV_CODEC_ID_MPEG2VIDEO:
-        i_profile = VAProfileMPEG2Main;
-        count = 4;
-        break;
-    case AV_CODEC_ID_MPEG4:
-        i_profile = VAProfileMPEG4AdvancedSimple;
-        break;
-    case AV_CODEC_ID_WMV3:
-        i_profile = VAProfileVC1Main;
-        break;
-    case AV_CODEC_ID_VC1:
-        i_profile = VAProfileVC1Advanced;
-        break;
-    case AV_CODEC_ID_H264:
-        i_profile = VAProfileH264High;
-        count = 18;
-        break;
-    case AV_CODEC_ID_HEVC:
-        if (ctx->profile == FF_PROFILE_HEVC_MAIN)
-            i_profile = VAProfileHEVCMain;
-        else if (ctx->profile == FF_PROFILE_HEVC_MAIN_10)
-            i_profile = VAProfileHEVCMain10;
-        else
-            return VLC_EGENERIC;
-        count = 18;
-        break;
-    case AV_CODEC_ID_VP8:
-        i_profile = VAProfileVP8Version0_3;
-        count = 5;
-        break;
-    case AV_CODEC_ID_VP9:
-        if (ctx->profile == FF_PROFILE_VP9_0)
-            i_profile = VAProfileVP9Profile0;
-#if VA_CHECK_VERSION( 0, 39, 0 )
-        else if (ctx->profile == FF_PROFILE_VP9_2)
-            i_profile = VAProfileVP9Profile2;
-#endif
-        else
-            return VLC_EGENERIC;
-        count = 10;
-        break;
-    default:
+    unsigned count;
+    if (GetVaProfile(ctx, &i_profile, &count) != VLC_SUCCESS)
         return VLC_EGENERIC;
-    }
-    count += ctx->thread_count;
 
     vlc_va_sys_t *sys;
     void *mem;
