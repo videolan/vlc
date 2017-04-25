@@ -189,7 +189,8 @@ static int Open(vlc_object_t *this)
         sys->gl->swap = OpenglESSwap;
         sys->gl->getProcAddress = OurGetProcAddress;
 
-        vlc_gl_MakeCurrent(sys->gl);
+        if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
+            goto bailout;
         sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
                                            sys->gl, &vd->cfg->viewpoint);
         vlc_gl_ReleaseCurrent(sys->gl);
@@ -362,8 +363,8 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
     @synchronized (sys->glESView) {
-        if (likely([sys->glESView isAppActive])) {
-            vlc_gl_MakeCurrent(sys->gl);
+        if (likely([sys->glESView isAppActive]) && vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
+        {
             vout_display_opengl_Display(sys->vgl, &vd->source);
             vlc_gl_ReleaseCurrent(sys->gl);
         }
@@ -378,9 +379,8 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    if (likely([sys->glESView isAppActive]))
+    if (likely([sys->glESView isAppActive]) && vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
-        vlc_gl_MakeCurrent(sys->gl);
         vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
@@ -390,13 +390,11 @@ static picture_pool_t *PicturePool(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->picturePool)
+    if (!sys->picturePool && vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
-        vlc_gl_MakeCurrent(sys->gl);
         sys->picturePool = vout_display_opengl_GetPool(sys->vgl, requested_count);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
-    assert(sys->picturePool);
     return sys->picturePool;
 }
 
