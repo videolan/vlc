@@ -349,7 +349,11 @@ static void *Thread( void *p_data )
     filter_sys_t *p_sys = p_filter->p_sys;
     vlc_gl_t *gl = p_sys->gl;
 
-    vlc_gl_MakeCurrent(gl);
+    if (vlc_gl_MakeCurrent(gl) != VLC_SUCCESS)
+    {
+        msg_Err(p_filter, "Can't attach gl context");
+        return NULL;
+    }
     initOpenGLScene();
     vlc_gl_ReleaseCurrent(gl);
 
