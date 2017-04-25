@@ -279,7 +279,11 @@ static int Open (vlc_object_t *this)
 
         const vlc_fourcc_t *subpicture_chromas;
 
-        vlc_gl_MakeCurrent(sys->gl);
+        if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
+        {
+            msg_Err(vd, "Can't attach gl context");
+            goto error;
+        }
         sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, sys->gl,
                                             &vd->cfg->viewpoint);
         vlc_gl_ReleaseCurrent(sys->gl);
@@ -372,13 +376,11 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->pool)
+    if (!sys->pool && vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
-        vlc_gl_MakeCurrent(sys->gl);
         sys->pool = vout_display_opengl_GetPool (sys->vgl, requested_count);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
-    assert(sys->pool);
     return sys->pool;
 }
 
@@ -387,18 +389,22 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
 
     vout_display_sys_t *sys = vd->sys;
 
-    vlc_gl_MakeCurrent(sys->gl);
-    vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
-    vlc_gl_ReleaseCurrent(sys->gl);
+    if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
+    {
+        vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
+        vlc_gl_ReleaseCurrent(sys->gl);
+    }
 }
 
 static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
     [sys->glView setVoutFlushing:YES];
-    vlc_gl_MakeCurrent(sys->gl);
-    vout_display_opengl_Display (sys->vgl, &vd->source);
-    vlc_gl_ReleaseCurrent(sys->gl);
+    if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
+    {
+        vout_display_opengl_Display (sys->vgl, &vd->source);
+        vlc_gl_ReleaseCurrent(sys->gl);
+    }
     [sys->glView setVoutFlushing:NO];
     picture_Release (pic);
     sys->has_first_frame = true;
