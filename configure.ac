@@ -3803,8 +3803,28 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
+
+  dnl
+  dnl If possible, use xcrun to find the right ibtool
+  dnl
+
+  AC_PATH_PROG([XCRUN], [xcrun], [no])
+  AS_IF([test ! "x${XCRUN}" = "xno"], [
+    AC_MSG_CHECKING([for ibtool (using xcrun)])
+    XIB="$(eval $XCRUN -f ibtool 2>/dev/null || echo no)"
+    AC_MSG_RESULT([${XIB}])
+  ], [
+    AC_MSG_WARN([Looking for tools without using xcrun])
+  ])
+
+  AS_IF([test "x${XIB}" = "xno"], [
+    AC_PATH_PROG(XIB, [ibtool], [no])
+    AS_IF([test "x${XIB}" = "xno"], [
+      AC_MSG_ERROR([ibtool was not found, but is required for --enable-macosx])
+    ])
+  ])
+
   VLC_ADD_PLUGIN([macosx])
-  AC_PATH_PROGS(XIB, [ibtool], ibtool, ["/usr/bin"])
 fi
 AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no" -a "${SYS}" = "darwin"])
 
