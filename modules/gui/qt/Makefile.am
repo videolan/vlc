@@ -25,6 +25,9 @@ if HAVE_QT5_X11
 libqt_plugin_la_CXXFLAGS += $(QT5_X11_CFLAGS) -DQT5_HAS_X11
 libqt_plugin_la_LIBADD += $(QT5_X11_LIBS) $(X_LIBS) $(X_PRE_LIB) -lX11
 endif
+if HAVE_XCB
+libqt_plugin_la_CXXFLAGS += -DQT5_HAS_XCB
+endif
 if HAVE_WAYLAND
 libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND \
 	-DQPNI_HEADER=\<$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h\>

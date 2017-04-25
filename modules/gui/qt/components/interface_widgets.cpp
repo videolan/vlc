@@ -53,6 +53,9 @@
 #if defined (QT5_HAS_X11)
 # include <X11/Xlib.h>
 # include <QX11Info>
+# if defined(QT5_HAS_XCB)
+#  include <xcb/xproto.h>
+# endif
 #endif
 #ifdef QT5_HAS_WAYLAND
 # include QPNI_HEADER
@@ -257,10 +260,36 @@ void VideoWidget::setSize( unsigned int w, unsigned int h )
     sync();
 }
 
+bool VideoWidget::nativeEvent( const QByteArray& eventType, void* message, long* )
+{
+#if defined(QT5_HAS_XCB)
+    if ( eventType == "xcb_generic_event_t" )
+    {
+        const xcb_generic_event_t* xev = reinterpret_cast<const xcb_generic_event_t*>( message );
+
+        if ( xev->response_type == XCB_CONFIGURE_NOTIFY )
+            reportSize();
+    }
+#endif
+#ifdef _WIN32
+    if ( eventType == "windows_generic_MSG" )
+    {
+        MSG* msg = static_cast<MSG*>( message );
+        if ( msg->message == WM_SIZE )
+            reportSize();
+    }
+#endif
+    // Let Qt handle that event in any case
+    return false;
+}
+
 void VideoWidget::resizeEvent( QResizeEvent *event )
 {
     QWidget::resizeEvent( event );
 
+    if ( p_intf->p_sys->voutWindowType == VOUT_WINDOW_TYPE_XID ||
+        p_intf->p_sys->voutWindowType == VOUT_WINDOW_TYPE_HWND )
+        return;
     reportSize();
 }
 
