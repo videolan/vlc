@@ -140,7 +140,6 @@ parts:
       - wayland-protocols
       - zlib1g-dev
       - zsh
-    after: [desktop-qt5]
 
   env:
     plugin: nil
@@ -165,6 +164,7 @@ parts:
       - libglib2.0-0
       - libpulse0
       - libqt5core5a
+      - libqt5gui5
       - librsvg2-2
       - libsdl-image1.2
       - libsdl1.2debian
