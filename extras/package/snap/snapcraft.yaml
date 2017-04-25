@@ -97,7 +97,6 @@ parts:
       - libresid-builder-dev
       - librsvg2-dev
       - libsamplerate0-dev
-      - libschroedinger-dev
       - libsdl-image1.2-dev
       - libsdl1.2-dev
       - libshine-dev
