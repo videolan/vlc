@@ -714,14 +714,22 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         char *next = config_ChainCreate(&name, &cfg, current);
 
         if (name && *name) {
-            vout_filter_t *e = xmalloc(sizeof(*e));
-            e->name = name;
-            e->cfg  = cfg;
-            if (!strcmp(e->name, "deinterlace") ||
-                !strcmp(e->name, "postproc")) {
-                vlc_array_append(&array_static, e);
-            } else {
-                vlc_array_append(&array_interactive, e);
+            vout_filter_t *e = malloc(sizeof(*e));
+
+            if (e) {
+                e->name = name;
+                e->cfg  = cfg;
+                if (!strcmp(e->name, "deinterlace") ||
+                    !strcmp(e->name, "postproc")) {
+                    vlc_array_append(&array_static, e);
+                } else {
+                    vlc_array_append(&array_interactive, e);
+                }
+            }
+            else {
+                if (cfg)
+                    config_ChainDestroy(cfg);
+                free(name);
             }
         } else {
             if (cfg)
