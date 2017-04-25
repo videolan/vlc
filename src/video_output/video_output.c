@@ -698,6 +698,7 @@ typedef struct {
 static void ThreadChangeFilters(vout_thread_t *vout,
                                 const video_format_t *source,
                                 const char *filters,
+                                int deinterlace,
                                 bool is_locked)
 {
     ThreadFilterFlush(vout, is_locked);
@@ -707,6 +708,19 @@ static void ThreadChangeFilters(vout_thread_t *vout,
 
     vlc_array_init(&array_static);
     vlc_array_init(&array_interactive);
+
+    if ((vout->p->filter.has_deint =
+         deinterlace == 1 || (deinterlace == -1 && vout->p->filter.has_deint)))
+    {
+        vout_filter_t *e = malloc(sizeof(*e));
+
+        if (e)
+        {
+            free(config_ChainCreate(&e->name, &e->cfg, "deinterlace"));
+            vlc_array_append(&array_static, e);
+        }
+    }
+
     char *current = filters ? strdup(filters) : NULL;
     while (current) {
         config_chain_t *cfg;
@@ -719,12 +733,10 @@ static void ThreadChangeFilters(vout_thread_t *vout,
             if (e) {
                 e->name = name;
                 e->cfg  = cfg;
-                if (!strcmp(e->name, "deinterlace") ||
-                    !strcmp(e->name, "postproc")) {
+                if (!strcmp(e->name, "postproc"))
                     vlc_array_append(&array_static, e);
-                } else {
+                else
                     vlc_array_append(&array_interactive, e);
-                }
             }
             else {
                 if (cfg)
@@ -825,7 +837,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
                     }
                 }
                 if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.format))
-                    ThreadChangeFilters(vout, &decoded->format, vout->p->filter.configuration, true);
+                    ThreadChangeFilters(vout, &decoded->format, vout->p->filter.configuration, -1, true);
             }
         }
 
@@ -1564,7 +1576,11 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadDisplayOsdTitle(vout, cmd.u.string);
         break;
     case VOUT_CONTROL_CHANGE_FILTERS:
-        ThreadChangeFilters(vout, NULL, cmd.u.string, false);
+        ThreadChangeFilters(vout, NULL, cmd.u.string, -1, false);
+        break;
+    case VOUT_CONTROL_CHANGE_INTERLACE:
+        ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
+                            cmd.u.boolean ? 1 : 0, false);
         break;
     case VOUT_CONTROL_CHANGE_SUB_SOURCES:
         ThreadChangeSubSources(vout, cmd.u.string);

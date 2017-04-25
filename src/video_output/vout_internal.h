@@ -124,6 +124,7 @@ struct vout_thread_sys_t
         video_format_t  format;
         struct filter_chain_t *chain_static;
         struct filter_chain_t *chain_interactive;
+        bool            has_deint;
     } filter;
 
     /* */
