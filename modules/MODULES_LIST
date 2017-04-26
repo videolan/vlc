@@ -1,5 +1,6 @@
-List of vlc plugins (475)
+List of vlc plugins (490):
 $Id$
+
  * a52: A/52 audio decoder plugin, using liba52
  * aa: Ascii art video output
  * access_alsa: Alsa access module
