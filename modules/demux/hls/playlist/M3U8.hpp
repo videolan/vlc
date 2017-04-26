@@ -22,6 +22,8 @@
 #define M3U8_H_
 
 #include "../adaptive/playlist/AbstractPlaylist.hpp"
+#include <vlc_threads.h>
+#include <map>
 
 namespace hls
 {
@@ -35,11 +37,14 @@ namespace hls
                 M3U8(vlc_object_t *);
                 virtual ~M3U8();
 
+                std::vector<std::uint8_t>       getEncryptionKey(const std::string &);
                 virtual bool                    isLive() const;
                 virtual void                    debug();
 
             private:
                 std::string data;
+                vlc_mutex_t keystore_lock;
+                std::map<std::string, std::vector<std::uint8_t>> keystore;
         };
     }
 }

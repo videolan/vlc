@@ -179,7 +179,7 @@ bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representati
     return false;
 }
 
-void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const std::list<Tag *> &tagslist)
+void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::list<Tag *> &tagslist)
 {
     SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
 
@@ -309,17 +309,8 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                         keyurl.prepend(Helper::getDirectoryPath(rep->getPlaylistUrl().toString()).append("/"));
                     }
 
-                    block_t *p_block = Retrieve::HTTP(p_obj, keyurl.toString());
-                    if(p_block)
-                    {
-                        if(p_block->i_buffer == 16)
-                        {
-                            encryption.key.resize(16);
-                            memcpy(&encryption.key[0], p_block->p_buffer, 16);
-                        }
-                        block_Release(p_block);
-                    }
-
+                    M3U8 *m3u8 = dynamic_cast<M3U8 *>(rep->getPlaylist());
+                    encryption.key = m3u8->getEncryptionKey(keyurl.toString());
                     if(keytag->getAttributeByName("IV"))
                     {
                         encryption.iv.clear();
