@@ -277,6 +277,7 @@ static int   onIntfEvent(vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void *);
 
 static void  blurayResetParser(demux_t *p_demux);
+static void  notifyDiscontinuity( demux_sys_t *p_sys );
 
 #define FROM_TICKS(a) ((a)*CLOCK_FREQ / INT64_C(90000))
 #define TO_TICKS(a)   ((a)*INT64_C(90000)/CLOCK_FREQ)
@@ -1828,6 +1829,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS) {
             /* make sure GUI restores the old setting in title menu ... */
             p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            notifyDiscontinuity( p_sys );
             return VLC_EGENERIC;
         }
         break;
@@ -1870,6 +1872,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     {
         int64_t i_time = va_arg(args, int64_t);
         bd_seek_time(p_sys->bluray, TO_TICKS(i_time));
+        notifyDiscontinuity( p_sys );
         return VLC_SUCCESS;
     }
     case DEMUX_GET_TIME:
@@ -1890,6 +1893,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     {
         double f_position = va_arg(args, double);
         bd_seek_time(p_sys->bluray, TO_TICKS(f_position*CUR_LENGTH));
+        notifyDiscontinuity( p_sys );
         return VLC_SUCCESS;
     }
 
@@ -1989,6 +1993,36 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 /*****************************************************************************
  * libbluray event handling
  *****************************************************************************/
+static void notifyDiscontinuity( demux_sys_t *p_sys )
+{
+    for( size_t i=0; i< vlc_array_count(&p_sys->es); i++ )
+    {
+        const fmt_es_pair_t *p_pair = vlc_array_item_at_index( &p_sys->es, i );
+        if( !p_pair->p_es )
+            continue;
+
+        const uint16_t i_pid = p_pair->i_id;
+
+        block_t *p_block = block_Alloc(192);
+        if (!p_block)
+            return;
+
+        uint8_t ts_header[] = {
+            0x00, 0x00, 0x00, 0x00,                /* TP extra header (ATC) */
+            0x47,
+            (i_pid & 0x1f00) >> 8, i_pid & 0xFF,   /* PID */
+            0x20,                                  /* adaptation field, no payload */
+            183,                                   /* adaptation field length */
+            0x80,                                  /* adaptation field: discontinuity indicator */
+        };
+
+        memcpy(p_block->p_buffer, ts_header, sizeof(ts_header));
+        memset(&p_block->p_buffer[sizeof(ts_header)], 0xFF, 192 - sizeof(ts_header));
+        p_block->i_buffer = 192;
+
+        vlc_demux_chained_Send(p_sys->p_parser, p_block);
+    }
+}
 
 static void streamFlush( demux_sys_t *p_sys )
 {
