@@ -1549,6 +1549,12 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 if ( p_block )
                 {
                     ts_pes_es_t *p_es_send = p_es;
+                    if( p_es_send->i_next_block_flags )
+                    {
+                        p_block->i_flags |= p_es_send->i_next_block_flags;
+                        p_es_send->i_next_block_flags = 0;
+                    }
+
                     while( p_es_send )
                     {
                         if( p_es_send->p_program->b_selected )
@@ -1816,17 +1822,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
                 continue;
 
             for( ts_pes_es_t *p_es = p_pes->p_es; p_es; p_es = p_es->p_next )
-            {
-                if( p_es->id && p_es->p_program->b_selected )
-                {
-                    block_t *p_block = block_Alloc(0);
-                    if( p_block )
-                    {
-                        p_block->i_flags = BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
-                        es_out_Send( p_demux->out, p_es->id, p_block );
-                    }
-                }
-            }
+                p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
 
             pid->i_cc = 0xff;
 
@@ -2571,11 +2567,11 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size
     if( p_pkt->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
         p_pes->gather.i_saved = 0;
-        /* Propagate to output block to notify packetizers/decoders */
-        if( p_pes->gather.p_data )
-            p_pes->gather.p_data->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         /* Flush/output current */
         b_ret |= PushPESBlock( p_demux, pid, NULL, true );
+        /* Propagate to output block to notify packetizers/decoders */
+        if( p_pes->p_es )
+            p_pes->p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
 
     if ( unlikely(p_pes->gather.i_saved > 0) )

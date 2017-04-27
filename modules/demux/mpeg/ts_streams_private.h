@@ -82,6 +82,7 @@ struct ts_pes_es_t
     es_format_t  fmt;
     es_out_id_t *id;
     uint16_t i_sl_es_id;
+    int         i_next_block_flags;
     ts_pes_es_t *p_extraes; /* Some private streams encapsulate several ES (eg. DVB subtitles) */
     ts_pes_es_t *p_next; /* Next es on same pid from different pmt (shared pid) */
     /* J2K stuff */

@@ -170,6 +170,7 @@ ts_pes_es_t * ts_pes_es_New( ts_pmt_t *p_program )
         p_es->p_program = p_program;
         p_es->id = NULL;
         p_es->i_sl_es_id = 0;
+        p_es->i_next_block_flags = 0;
         p_es->p_extraes = NULL;
         p_es->p_next = NULL;
         p_es->b_interlaced = false;
