@@ -440,8 +440,19 @@ int OpenDemux( vlc_object_t* p_this )
     }
     else
     {
-        const char *psz_ns = strnstr( psz_xml, "=\"http://www.w3.org/ns/ttml\"",
-                                      i_xml -( (ptrdiff_t)psz_tt - (ptrdiff_t)psz_xml ) );
+        const char * const rgsz[] =
+        {
+            "=\"http://www.w3.org/ns/ttml\"",
+            "=\"http://www.w3.org/2004/11/ttaf1\"",
+            "=\"http://www.w3.org/2006/04/ttaf1\"",
+            "=\"http://www.w3.org/2006/10/ttaf1\"",
+        };
+        const char *psz_ns;
+        for( size_t i=0; i<ARRAY_SIZE(rgsz) && !psz_ns; i++ )
+        {
+            psz_ns = strnstr( psz_xml, rgsz[i],
+                              i_xml -( (ptrdiff_t)psz_tt - (ptrdiff_t)psz_xml ) );
+        }
         free( psz_alloc );
         if( !psz_ns )
             return VLC_EGENERIC;
