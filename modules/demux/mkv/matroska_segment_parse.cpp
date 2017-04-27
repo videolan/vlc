@@ -380,7 +380,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         E_CASE( KaxTrackLanguage, lang )
         {
             free( vars.tk->fmt.psz_language );
-            vars.tk->fmt.psz_language = strdup( std::string( lang ).c_str() );
+            const std::string slang ( lang );
+            vars.tk->fmt.psz_language = strndup( slang.c_str (), slang.find_first_of( '-' ) );
             debug( vars, "Track Language=`%s'", vars.tk->fmt.psz_language );
         }
         E_CASE( KaxCodecID, codecid )
