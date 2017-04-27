@@ -384,6 +384,9 @@ static picture_pool_t *Direct3D9CreatePicturePool(vout_display_t *vd, unsigned c
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
 
+    if ( vd->sys->sys.pool != NULL )
+        return vd->sys->sys.pool;
+
     pictures = calloc(count, sizeof(*pictures));
     if (!pictures)
         goto error;
