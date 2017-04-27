@@ -32,6 +32,7 @@
 #include <vlc_memory.h>
 #include <vlc_memstream.h>
 #include <vlc_es_out.h>
+#include <vlc_charset.h>          /* FromCharset */
 
 #include <assert.h>
 #include <stdlib.h>
@@ -395,22 +396,53 @@ int OpenDemux( vlc_object_t* p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    uint8_t *p_peek;
-    ssize_t i_peek = vlc_stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
-    if( unlikely( i_peek <= 0 ) )
+    const uint8_t *p_peek;
+    ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 2048 );
+    if( unlikely( i_peek <= 32 ) )
         return VLC_EGENERIC;
 
+    const char *psz_xml = (const char *) p_peek;
+    size_t i_xml  = i_peek;
+
+    char *psz_alloc = NULL;
+    switch( GetQWBE(p_peek) )
+    {
+        /* See RFC 3023 Part 4 */
+        case 0xFFFE3C003F007800UL: /* UTF16 BOM<?xml */
+        case 0xFEFF003C003F0078UL: /* UTF16 BOM<?xml */
+            psz_alloc = FromCharset( "UTF-16", p_peek, i_peek );
+            break;
+        case 0x3C003F0078006D00UL: /* UTF16-LE <?xml */
+            psz_alloc = FromCharset( "UTF-16LE", p_peek, i_peek );
+            break;
+        case 0x003C003F0078006DUL: /* UTF16-BE <?xml */
+            psz_alloc = FromCharset( "UTF-16BE", p_peek, i_peek );
+            break;
+        case 0x3C3F786D6C207665UL: /* UTF8 <?xml */
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+
+    if( psz_alloc )
+    {
+        psz_xml = psz_alloc;
+        i_xml = strlen( psz_alloc );
+    }
+
     /* Simplified probing. Valid TTML must have a namespace declaration */
-    const char *psz_tt = strnstr( (const char*) p_peek, "tt ", i_peek );
-    if( !psz_tt || (ptrdiff_t)psz_tt == (ptrdiff_t)p_peek ||
+    const char *psz_tt = strnstr( psz_xml, "tt ", i_xml );
+    if( !psz_tt || (ptrdiff_t)psz_tt == (ptrdiff_t)psz_xml ||
         (psz_tt[-1] != ':' && psz_tt[-1] != '<') )
     {
+        free( psz_alloc );
         return VLC_EGENERIC;
     }
     else
     {
-        const char *psz_ns = strnstr( (const char*) p_peek, "=\"http://www.w3.org/ns/ttml\"",
-                                      i_peek -( (ptrdiff_t)psz_tt - (ptrdiff_t)p_peek ) );
+        const char *psz_ns = strnstr( psz_xml, "=\"http://www.w3.org/ns/ttml\"",
+                                      i_xml -( (ptrdiff_t)psz_tt - (ptrdiff_t)psz_xml ) );
+        free( psz_alloc );
         if( !psz_ns )
             return VLC_EGENERIC;
     }
