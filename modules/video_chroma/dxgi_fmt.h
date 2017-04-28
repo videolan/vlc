@@ -51,4 +51,12 @@ typedef struct ID3D11Device ID3D11Device;
 bool isXboxHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
 
+static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
+                                        DXGI_FORMAT format, UINT supportFlags)
+{
+    UINT i_formatSupport;
+    return SUCCEEDED( ID3D11Device_CheckFormatSupport(d3ddevice, format,
+                                                      &i_formatSupport) )
+            && ( i_formatSupport & supportFlags ) == supportFlags;
+}
 #endif /* include-guard */

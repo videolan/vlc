@@ -578,12 +578,11 @@ static const d3d_format_t *GetOutputFormat(vout_display_t *vd, vlc_fourcc_t i_sr
                                            bool blendable)
 {
     vout_display_sys_t *sys = vd->sys;
-    UINT i_formatSupport;
-    UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (blendable)
-        i_quadSupportFlags |= D3D11_FORMAT_SUPPORT_BLENDABLE;
+        supportFlags |= D3D11_FORMAT_SUPPORT_BLENDABLE;
     if (b_allow_opaque && is_d3d11_opaque(i_src_chroma))
-        i_quadSupportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
+        supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
 
     for (const d3d_format_t *output_format = GetRenderFormatList();
          output_format->name != NULL; ++output_format)
@@ -595,13 +594,9 @@ static const d3d_format_t *GetOutputFormat(vout_display_t *vd, vlc_fourcc_t i_sr
         if (!b_allow_opaque && is_d3d11_opaque(output_format->fourcc))
             continue;
 
-        if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
-                                                       output_format->formatTexture,
-                                                       &i_formatSupport)) &&
-                ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
-        {
+        if( DeviceSupportsFormat( sys->d3ddevice, output_format->formatTexture,
+                                  supportFlags ) )
             return output_format;
-        }
     }
     return NULL;
 }

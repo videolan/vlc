@@ -834,15 +834,11 @@ static bool SetupProcessor(vlc_va_t *va, const video_format_t *fmt)
     {
         // check if we can create render texture of that format
         // check the decoder can output to that format
-        const UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
         for (const d3d_format_t *output = GetRenderFormatList();
              output->name != NULL; ++output)
         {
-            UINT i_formatSupport;
-            if( SUCCEEDED( ID3D11Device_CheckFormatSupport((ID3D11Device*) dx_sys->d3ddev,
-                                                           output->formatTexture,
-                                                           &i_formatSupport)) &&
-                    ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
+            if( DeviceSupportsFormat((ID3D11Device*) dx_sys->d3ddev, output->formatTexture,
+                                     D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD))
             {
                 msg_Dbg(va, "Render pixel format %s supported", DxgiFormatToStr(output->formatTexture) );
 
@@ -923,18 +919,14 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
             continue;
         }
 
-        // check if we can create render texture of that format
-        // check the decoder can output to that format
-        const UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-        UINT i_formatSupport;
-        if( SUCCEEDED( ID3D11Device_CheckFormatSupport((ID3D11Device*) dx_sys->d3ddev,
-                                                       processorInput[idx],
-                                                       &i_formatSupport)) &&
-                ( i_formatSupport & i_quadSupportFlags ) != i_quadSupportFlags )
-        {
-            msg_Dbg(va, "Format %s needs a processor", DxgiFormatToStr(processorInput[idx]));
+       // check if we can create render texture of that format
+       // check the decoder can output to that format
+       if ( !DeviceSupportsFormat((ID3D11Device*) dx_sys->d3ddev, processorInput[idx],
+                                  D3D11_FORMAT_SUPPORT_SHADER_LOAD) )
+       {
+           msg_Dbg(va, "Format %s needs a processor", DxgiFormatToStr(processorInput[idx]));
 #ifdef ID3D11VideoContext_VideoProcessorBlt
-            if (!SetupProcessor( va, fmt ))
+           if (!SetupProcessor( va, fmt ))
                 continue;
             msg_Dbg(va, "Using processor %s to %s", DxgiFormatToStr(processorInput[idx]), DxgiFormatToStr(va->sys->processorFormat));
 #else
