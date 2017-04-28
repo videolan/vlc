@@ -1005,11 +1005,6 @@ void AudioFilterControlWidget::build()
     free( psz_af );
 }
 
-AudioFilterControlWidget::~AudioFilterControlWidget()
-{
-
-}
-
 void AudioFilterControlWidget::enable( bool b_enable ) const
 {
     ChangeAFiltersString( p_intf, qtu(name), b_enable );

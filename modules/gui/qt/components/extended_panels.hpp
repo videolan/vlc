@@ -130,7 +130,6 @@ class AudioFilterControlWidget : public QWidget
 
 public:
     AudioFilterControlWidget( intf_thread_t *, QWidget *, const char *name );
-    virtual ~AudioFilterControlWidget();
 
 protected:
     virtual void build();
