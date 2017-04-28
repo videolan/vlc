@@ -834,25 +834,11 @@ static bool SetupProcessor(vlc_va_t *va, const video_format_t *fmt)
     {
         // check if we can create render texture of that format
         // check the decoder can output to that format
-        for (const d3d_format_t *output = GetRenderFormatList();
-             output->name != NULL; ++output)
-        {
-            if( DeviceSupportsFormat((ID3D11Device*) dx_sys->d3ddev, output->formatTexture,
-                                     D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD))
-            {
-                msg_Dbg(va, "Render pixel format %s supported", DxgiFormatToStr(output->formatTexture) );
-
-                hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator,
-                                                                              output->formatTexture, &flags);
-                if (FAILED(hr) || !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
-                    msg_Dbg(va, "Processor format %s not supported for output", DxgiFormatToStr(output->formatTexture));
-                else
-                {
-                    processorOutput = output->formatTexture;
-                    break;
-                }
-            }
-        }
+        const d3d_format_t *found;
+        found = FindD3D11Format( (ID3D11Device*) dx_sys->d3ddev, 0, 0, true,
+                                 D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT);
+        if (found)
+            processorOutput = found->formatTexture;
     }
 
     if (processorOutput != DXGI_FORMAT_UNKNOWN)

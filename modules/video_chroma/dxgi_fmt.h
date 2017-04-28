@@ -59,4 +59,30 @@ static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
                                                       &i_formatSupport) )
             && ( i_formatSupport & supportFlags ) == supportFlags;
 }
+
+static inline const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
+                                                  vlc_fourcc_t i_src_chroma,
+                                                  uint8_t bits_per_channel,
+                                                  bool allow_opaque,
+                                                  UINT supportFlags)
+{
+    supportFlags |= D3D11_FORMAT_SUPPORT_TEXTURE2D;
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+         output_format->name != NULL; ++output_format)
+    {
+        if (i_src_chroma && i_src_chroma != output_format->fourcc)
+            continue;
+        if (bits_per_channel && bits_per_channel > output_format->bitsPerChannel)
+            continue;
+        if (!allow_opaque && (output_format->fourcc == VLC_CODEC_D3D11_OPAQUE ||
+                              output_format->fourcc == VLC_CODEC_D3D11_OPAQUE_10B))
+            continue;
+
+        if( DeviceSupportsFormat( d3ddevice, output_format->formatTexture,
+                                  supportFlags ) )
+            return output_format;
+    }
+    return NULL;
+}
+
 #endif /* include-guard */

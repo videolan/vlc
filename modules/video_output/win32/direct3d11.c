@@ -573,34 +573,6 @@ static void Close(vlc_object_t *object)
     free(vd->sys);
 }
 
-static const d3d_format_t *GetOutputFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma,
-                                           uint8_t bits_per_channel, bool b_allow_opaque,
-                                           bool blendable)
-{
-    vout_display_sys_t *sys = vd->sys;
-    UINT supportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-    if (blendable)
-        supportFlags |= D3D11_FORMAT_SUPPORT_BLENDABLE;
-    if (b_allow_opaque && is_d3d11_opaque(i_src_chroma))
-        supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-
-    for (const d3d_format_t *output_format = GetRenderFormatList();
-         output_format->name != NULL; ++output_format)
-    {
-        if (i_src_chroma && i_src_chroma != output_format->fourcc)
-            continue;
-        if (bits_per_channel && bits_per_channel > output_format->bitsPerChannel)
-            continue;
-        if (!b_allow_opaque && is_d3d11_opaque(output_format->fourcc))
-            continue;
-
-        if( DeviceSupportsFormat( sys->d3ddevice, output_format->formatTexture,
-                                  supportFlags ) )
-            return output_format;
-    }
-    return NULL;
-}
-
 /* map texture planes to resource views */
 static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
                               int slice_index, picture_sys_t *picsys)
@@ -1592,7 +1564,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     D3D11SetColorSpace(vd);
 
     // look for the requested pixel format first
-    sys->picQuadConfig = GetOutputFormat(vd, fmt->i_chroma, 0, true, false);
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+    if (is_d3d11_opaque(fmt->i_chroma))
+        supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
+    sys->picQuadConfig = FindD3D11Format(sys->d3ddevice, fmt->i_chroma, 0, true, supportFlags);
 
     // look for any pixel format that we can handle with enough pixels per channel
     if ( !sys->picQuadConfig )
@@ -1614,12 +1589,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             break;
         }
 
-        sys->picQuadConfig = GetOutputFormat(vd, 0, bits_per_channel, false, false);
+        sys->picQuadConfig = FindD3D11Format(sys->d3ddevice, 0, bits_per_channel, false, D3D11_FORMAT_SUPPORT_SHADER_LOAD);
     }
 
     // look for any pixel format that we can handle
     if ( !sys->picQuadConfig )
-        sys->picQuadConfig = GetOutputFormat(vd, 0, 0, false, false);
+        sys->picQuadConfig = FindD3D11Format(sys->d3ddevice, 0, 0, false, D3D11_FORMAT_SUPPORT_SHADER_LOAD);
 
     if ( !sys->picQuadConfig )
     {
@@ -1632,9 +1607,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     DxgiFormatMask( sys->picQuadConfig->formatTexture, fmt );
 
     /* check the region pixel format */
-    sys->d3dregion_format = GetOutputFormat(vd, VLC_CODEC_RGBA, 0, false, true);
+    sys->d3dregion_format = FindD3D11Format(sys->d3ddevice, VLC_CODEC_RGBA, 0, false,
+                                            D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_BLENDABLE);
     if (!sys->d3dregion_format)
-        sys->d3dregion_format = GetOutputFormat(vd, VLC_CODEC_BGRA, 0, false, true);
+        sys->d3dregion_format = FindD3D11Format(sys->d3ddevice, VLC_CODEC_BGRA, 0, false,
+                                                D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_BLENDABLE);
 
     UpdateRects(vd, NULL, NULL, true);
 
