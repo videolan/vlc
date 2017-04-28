@@ -1838,6 +1838,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     {
         int i_chapter = va_arg(args, int);
         bd_seek_chapter(p_sys->bluray, i_chapter);
+        notifyDiscontinuity( p_sys );
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
         break;
     }
