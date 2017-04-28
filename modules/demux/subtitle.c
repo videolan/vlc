@@ -1908,8 +1908,8 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
             if( (*(psz_text + 1 ) ) == '~' || (*(psz_text + 1 ) ) == '{' ||
                 (*(psz_text + 1 ) ) == '\\' )
                 psz_text++;
-            else if( *(psz_text + 1 ) == '\r' ||  *(psz_text + 1 ) == '\n' ||
-                     *(psz_text + 1 ) == '\0' )
+            else if( ( *(psz_text + 1 ) == '\r' ||  *(psz_text + 1 ) == '\n' ) &&
+                     *(psz_text + 1 ) != '\0' )
             {
                 psz_text++;
             }
