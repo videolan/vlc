@@ -310,7 +310,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                     }
 
                     M3U8 *m3u8 = dynamic_cast<M3U8 *>(rep->getPlaylist());
-                    encryption.key = m3u8->getEncryptionKey(keyurl.toString());
+                    if(likely(m3u8))
+                        encryption.key = m3u8->getEncryptionKey(keyurl.toString());
                     if(keytag->getAttributeByName("IV"))
                     {
                         encryption.iv.clear();
