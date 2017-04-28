@@ -582,6 +582,8 @@ static const d3d_format_t *GetOutputFormat(vout_display_t *vd, vlc_fourcc_t i_sr
     UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (blendable)
         i_quadSupportFlags |= D3D11_FORMAT_SUPPORT_BLENDABLE;
+    if (b_allow_opaque && is_d3d11_opaque(i_src_chroma))
+        i_quadSupportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
 
     for (const d3d_format_t *output_format = GetRenderFormatList();
          output_format->name != NULL; ++output_format)
