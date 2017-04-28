@@ -216,11 +216,8 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                     return NULL;
                 break;
             }
-            /* Even frame size is likely incorrect FSIZE #18166.
-             * Sync minus one byte, we can always sync 1 byte further */
-            p_sys->i_input_size = p_sys->i_next_offset
-                                = (p_sys->dts.i_frame_size % 2) ? p_sys->dts.i_frame_size - 1
-                                                                : p_sys->dts.i_frame_size;
+
+            p_sys->i_input_size = p_sys->i_next_offset = p_sys->dts.i_frame_size;
             p_sys->i_state = STATE_NEXT_SYNC;
 
         case STATE_NEXT_SYNC:
@@ -250,6 +247,17 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 if( !vlc_dts_header_IsSync( p_header, VLC_DTS_HEADER_SIZE ) )
                 {
+                    /* Even frame size is likely incorrect FSIZE #18166 */
+                    if( (p_sys->dts.i_frame_size % 2) && p_sys->i_next_offset > 0 &&
+                        block_PeekOffsetBytes( &p_sys->bytestream,
+                                               p_sys->i_next_offset - 1, p_header,
+                                               VLC_DTS_HEADER_SIZE ) == 0 &&
+                         vlc_dts_header_IsSync( p_header, VLC_DTS_HEADER_SIZE ) )
+                    {
+                        p_sys->i_input_size = p_sys->i_next_offset = p_sys->dts.i_frame_size - 1;
+                        /* reenter */
+                        break;
+                    }
                     msg_Dbg( p_dec, "emulated sync word "
                              "(no sync on following frame)" );
                     p_sys->i_state = STATE_NOSYNC;
