@@ -148,14 +148,9 @@ static void* EncoderThread( void *obj )
     return NULL;
 }
 
-static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic,
-                                block_t *p_cc, bool p_cc_present[4] )
+static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 {
     sout_stream_id_sys_t *id = p_dec->p_queue_ctx;
-
-    (void) p_cc_present;
-    if( unlikely( p_cc != NULL ) )
-        block_Release( p_cc );
 
     vlc_mutex_lock(&id->fifo.lock);
     *id->fifo.pic.last = p_pic;

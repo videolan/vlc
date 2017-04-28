@@ -174,10 +174,11 @@ struct decoder_t
     int             (*pf_get_display_rate)( decoder_t * );
 
     /* XXX use decoder_QueueVideo or decoder_QueueVideoWithCc */
-    int             (*pf_queue_video)( decoder_t *, picture_t *, block_t *p_cc,
-                                       bool p_cc_present[4] );
+    int             (*pf_queue_video)( decoder_t *, picture_t * );
     /* XXX use decoder_QueueAudio */
     int             (*pf_queue_audio)( decoder_t *, block_t * );
+    /* XXX use decoder_QueueCC */
+    int             (*pf_queue_cc)( decoder_t *, block_t *, bool p_cc_present[4] );
     /* XXX use decoder_QueueSub */
     int             (*pf_queue_sub)( decoder_t *, subpicture_t *);
     void             *p_queue_ctx;
@@ -300,22 +301,23 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 {
     assert( p_pic->p_next == NULL );
     assert( dec->pf_queue_video != NULL );
-    return dec->pf_queue_video( dec, p_pic, NULL, NULL );
+    return dec->pf_queue_video( dec, p_pic );
 }
 
 /**
- * This function queues a single picture with CC to the video output
+ * This function queues queues the Closed Captions
  *
- * This function also queues the Closed Captions associated with the picture.
- *
- * \return 0 if the picture is queued, -1 on error
+ * \return 0 if queued, -1 on error
  */
-static inline int decoder_QueueVideoWithCc( decoder_t *dec, picture_t *p_pic,
-                                            block_t *p_cc, bool p_cc_present[4] )
+static inline int decoder_QueueCc( decoder_t *dec, block_t *p_cc,
+                                   bool p_cc_present[4] )
 {
-    assert( p_pic->p_next == NULL );
-    assert( dec->pf_queue_video != NULL );
-    return dec->pf_queue_video( dec, p_pic, p_cc, p_cc_present );
+    if( dec->pf_queue_cc == NULL )
+    {
+        block_Release( p_cc );
+        return -1;
+    }
+    return dec->pf_queue_cc( dec, p_cc, p_cc_present );
 }
 
 /**

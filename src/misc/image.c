@@ -121,13 +121,8 @@ void image_HandlerDelete( image_handler_t *p_image )
  *
  */
 
-static int ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic,
-                            block_t *p_cc, bool p_cc_present[4] )
+static int ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
-    (void) p_cc_present;
-    if( unlikely( p_cc != NULL ) )
-        block_Release( p_cc );
-
     image_handler_t *p_image = p_dec->p_queue_ctx;
     picture_fifo_Push( p_image->outfifo, p_pic );
     return 0;
