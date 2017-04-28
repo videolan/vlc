@@ -1949,7 +1949,6 @@ static void Close ( vlc_object_t * p_this )
     {
         MP4_TrackDestroy( p_demux, &p_sys->track[i_track] );
     }
-    free( p_sys->track );
 
     if( p_sys->p_title )
         vlc_input_title_Delete( p_sys->p_title );
@@ -1958,6 +1957,7 @@ static void Close ( vlc_object_t * p_this )
 
     LeafResetContext( p_sys );
 
+    free( p_sys->track );
     free( p_sys );
 }
 
