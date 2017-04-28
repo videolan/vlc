@@ -1994,15 +1994,12 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 /*****************************************************************************
  * libbluray event handling
  *****************************************************************************/
-static void notifyDiscontinuity( demux_sys_t *p_sys )
+static void notifyStreamsDiscontinuity( vlc_demux_chained_t *p_parser,
+                                        const BLURAY_STREAM_INFO *p_sinfo, size_t i_sinfo )
 {
-    for( size_t i=0; i< vlc_array_count(&p_sys->es); i++ )
+    for( size_t i=0; i< i_sinfo; i++ )
     {
-        const fmt_es_pair_t *p_pair = vlc_array_item_at_index( &p_sys->es, i );
-        if( !p_pair->p_es )
-            continue;
-
-        const uint16_t i_pid = p_pair->i_id;
+        const uint16_t i_pid = p_sinfo[i].pid;
 
         block_t *p_block = block_Alloc(192);
         if (!p_block)
@@ -2021,9 +2018,28 @@ static void notifyDiscontinuity( demux_sys_t *p_sys )
         memset(&p_block->p_buffer[sizeof(ts_header)], 0xFF, 192 - sizeof(ts_header));
         p_block->i_buffer = 192;
 
-        vlc_demux_chained_Send(p_sys->p_parser, p_block);
+        vlc_demux_chained_Send(p_parser, p_block);
     }
 }
+
+#define DONOTIFY(memb) notifyStreamsDiscontinuity( p_sys->p_parser, p_clip->memb##_streams, \
+                                                   p_clip->memb##_stream_count )
+
+static void notifyDiscontinuity( demux_sys_t *p_sys )
+{
+    const BLURAY_CLIP_INFO *p_clip = p_sys->p_clip_info;
+    if( p_clip )
+    {
+        DONOTIFY(audio);
+        DONOTIFY(video);
+        DONOTIFY(pg);
+        DONOTIFY(ig);
+        DONOTIFY(sec_audio);
+        DONOTIFY(sec_video);
+    }
+}
+
+#undef DONOTIFY
 
 static void streamFlush( demux_sys_t *p_sys )
 {
