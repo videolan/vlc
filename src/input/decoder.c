@@ -910,11 +910,11 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
     block_t *p_cc;
     bool pb_present[4];
 
-    assert( p_dec_cc->pf_get_cc != NULL );
-
     /* Do not try retreiving CC if not wanted (sout) or cannot be retreived */
     if( !p_owner->cc.b_supported )
         return;
+
+    assert( p_dec_cc->pf_get_cc != NULL );
 
     p_cc = p_dec_cc->pf_get_cc( p_dec_cc, pb_present );
     if( !p_cc )
@@ -954,7 +954,8 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 
     if( unlikely( p_cc != NULL ) )
     {
-        if( ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
+        if( p_owner->cc.b_supported &&
+           ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
             DecoderExtractCc( p_dec, p_cc, p_cc_present );
         else
             block_Release( p_cc );
@@ -1719,14 +1720,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     }
 
     /* */
-    p_owner->cc.b_supported = false;
-    if( p_sout == NULL )
-    {
-        if( p_owner->p_packetizer && p_owner->p_packetizer->pf_get_cc )
-            p_owner->cc.b_supported = true;
-        if( p_dec->pf_get_cc )
-            p_owner->cc.b_supported = true;
-    }
+    p_owner->cc.b_supported = ( p_sout == NULL );
 
     for( unsigned i = 0; i < 4; i++ )
     {
