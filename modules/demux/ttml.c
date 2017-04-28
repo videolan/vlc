@@ -447,7 +447,7 @@ int OpenDemux( vlc_object_t* p_this )
             "=\"http://www.w3.org/2006/04/ttaf1\"",
             "=\"http://www.w3.org/2006/10/ttaf1\"",
         };
-        const char *psz_ns;
+        const char *psz_ns = NULL;
         for( size_t i=0; i<ARRAY_SIZE(rgsz) && !psz_ns; i++ )
         {
             psz_ns = strnstr( psz_xml, rgsz[i],
