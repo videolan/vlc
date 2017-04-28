@@ -1537,20 +1537,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     //scd.Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
-    IDXGIAdapter *dxgiadapter;
-    static const D3D_FEATURE_LEVEL featureLevels[] =
-    {
-        0xc000 /* D3D_FEATURE_LEVEL_12_1 */,
-        0xc100 /* D3D_FEATURE_LEVEL_12_0 */,
-        D3D_FEATURE_LEVEL_11_1,
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0,
-        D3D_FEATURE_LEVEL_9_3,
-        D3D_FEATURE_LEVEL_9_2,
-        D3D_FEATURE_LEVEL_9_1,
-    };
-
     static const D3D_DRIVER_TYPE driverAttempts[] = {
         D3D_DRIVER_TYPE_HARDWARE,
         D3D_DRIVER_TYPE_WARP,
@@ -1562,7 +1548,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     for (UINT driver = 0; driver < ARRAYSIZE(driverAttempts); driver++) {
         D3D_FEATURE_LEVEL i_feature_level;
         hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
-                    featureLevels, 6, D3D11_SDK_VERSION,
+                    NULL, 0, D3D11_SDK_VERSION,
                     &sys->d3ddevice, &i_feature_level, &sys->d3dcontext);
         if (SUCCEEDED(hr)) {
 #ifndef NDEBUG
@@ -1579,7 +1565,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    dxgiadapter = D3D11DeviceAdapter(sys->d3ddevice);
+    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3ddevice);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not get the DXGI Adapter");
        return VLC_EGENERIC;
