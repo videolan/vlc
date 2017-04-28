@@ -1517,6 +1517,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 # endif
 
+    if (is_d3d11_opaque(fmt->i_chroma))
+        creationFlags |= D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
+
     DXGI_SWAP_CHAIN_DESC1 scd;
     memset(&scd, 0, sizeof(scd));
     scd.BufferCount = 2;
