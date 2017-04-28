@@ -626,7 +626,8 @@ static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
 
 static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
                             video_format_t *fmt, unsigned pool_size,
-                            ID3D11Texture2D *textures[])
+                            ID3D11Texture2D *textures[],
+                            bool pool_type_display, bool processor_input)
 {
     vout_display_sys_t *sys = vd->sys;
     int plane;
@@ -640,9 +641,13 @@ static int AllocateTextures(vout_display_t *vd, const d3d_format_t *cfg,
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.CPUAccessFlags = 0;
     texDesc.Format = cfg->formatTexture;
-    texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    if (is_d3d11_opaque(fmt->i_chroma)) {
+    if (pool_type_display)
+        texDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+    if (processor_input)
+        texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+    if (is_d3d11_opaque(fmt->i_chroma))
         texDesc.BindFlags |= D3D11_BIND_DECODER;
+    if (is_d3d11_opaque(fmt->i_chroma) || processor_input) {
         texDesc.Usage = D3D11_USAGE_DEFAULT;
         texDesc.CPUAccessFlags = 0;
     } else {
@@ -724,7 +729,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         surface_fmt.i_height = (surface_fmt.i_height + 0x7F) & ~0x7F;
     }
 
-    if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, pool_size, textures))
+    if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, pool_size, textures,
+                         true, false))
         goto error;
 
     if (vd->info.is_slow) {
@@ -788,7 +794,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         /* we need a staging texture */
         video_format_t staging_fmt;
         video_format_Copy(&staging_fmt, &surface_fmt);
-        if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures))
+        if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures, true,
+                             false))
             goto error;
 
         sys->picQuad.i_x_offset = 0;
@@ -2768,7 +2775,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(vd, sys->d3dregion_format, &r->fmt, 1, textures)) {
+            if (AllocateTextures(vd, sys->d3dregion_format, &r->fmt, 1, textures, true, false)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
