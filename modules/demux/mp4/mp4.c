@@ -136,8 +136,9 @@ struct demux_sys_t
 /*****************************************************************************
  * Declaration of local function
  *****************************************************************************/
-static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool, bool );
-static void MP4_TrackDestroy( demux_t *, mp4_track_t * );
+static void MP4_TrackSetup( demux_t *, mp4_track_t *, MP4_Box_t  *, bool, bool );
+static void MP4_TrackInit( mp4_track_t * );
+static void MP4_TrackClean( es_out_t *, mp4_track_t * );
 
 static void MP4_Block_Send( demux_t *, mp4_track_t *, block_t * );
 
@@ -385,14 +386,20 @@ LoadInitFragError:
     return VLC_EGENERIC;
 }
 
-static int AllocateTracks( demux_t *p_demux, unsigned i_tracks )
+static int CreateTracks( demux_t *p_demux, unsigned i_tracks )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->track = calloc( i_tracks, sizeof( mp4_track_t ) );
+    if( SIZE_MAX / i_tracks < sizeof(mp4_track_t) )
+        return VLC_EGENERIC;
+
+    p_sys->track = malloc( i_tracks * sizeof(mp4_track_t)  );
     if( p_sys->track == NULL )
         return VLC_ENOMEM;
     p_sys->i_tracks = i_tracks;
+
+    for( unsigned i=0; i<i_tracks; i++ )
+        MP4_TrackInit( &p_sys->track[i] );
 
     return VLC_SUCCESS;
 }
@@ -892,7 +899,7 @@ static int Open( vlc_object_t * p_this )
     }
     msg_Dbg( p_demux, "found %u track%c", i_tracks, i_tracks ? 's':' ' );
 
-    if( AllocateTracks( p_demux, i_tracks ) != VLC_SUCCESS )
+    if( CreateTracks( p_demux, i_tracks ) != VLC_SUCCESS )
         goto error;
 
     /* Search the first chap reference (like quicktime) and
@@ -918,7 +925,7 @@ static int Open( vlc_object_t * p_this )
     for( i = 0; i < p_sys->i_tracks; i++ )
     {
         p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
-        MP4_TrackCreate( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
+        MP4_TrackSetup( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
 
         if( p_sys->track[i].b_ok && !p_sys->track[i].b_chapters_source )
         {
@@ -1032,12 +1039,13 @@ static int Open( vlc_object_t * p_this )
 
 error:
     if( vlc_stream_Tell( p_demux->s ) > 0 )
-        vlc_stream_Seek( p_demux->s, 0 );
+    {
+        if( vlc_stream_Seek( p_demux->s, 0 ) != VLC_SUCCESS )
+            msg_Warn( p_demux, "Can't reset stream position from probing" );
+    }
 
-    if( p_sys->p_root )
-        MP4_BoxFree( p_sys->p_root );
+    Close( p_this );
 
-    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -1943,20 +1951,19 @@ static void Close ( vlc_object_t * p_this )
 
     msg_Dbg( p_demux, "freeing all memory" );
 
+    LeafResetContext( p_sys );
+
     MP4_BoxFree( p_sys->p_root );
-    for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
-    {
-        MP4_TrackDestroy( p_demux, &p_sys->track[i_track] );
-    }
 
     if( p_sys->p_title )
         vlc_input_title_Delete( p_sys->p_title );
 
     MP4_Fragments_Index_Delete( p_sys->p_fragsindex );
 
-    LeafResetContext( p_sys );
-
+    for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+        MP4_TrackClean( p_demux->out, &p_sys->track[i_track] );
     free( p_sys->track );
+
     free( p_sys );
 }
 
@@ -3002,12 +3009,12 @@ static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
 }
 #endif
 /****************************************************************************
- * MP4_TrackCreate:
+ * MP4_TrackSetup:
  ****************************************************************************
  * Parse track information and create all needed data to run a track
  * If it succeed b_ok is set to 1 else to 0
  ****************************************************************************/
-static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
+static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
                              MP4_Box_t *p_box_trak,
                              bool b_create_es, bool b_force_enable )
 {
@@ -3017,8 +3024,6 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
     char language[4] = { '\0' };
     char sdp_media_type[8] = { '\0' };
-
-    es_format_Init( &p_track->fmt, UNKNOWN_ES, 0 );
 
     const MP4_Box_t *p_tkhd = MP4_BoxGet( p_box_trak, "tkhd" );
     if( !p_tkhd )
@@ -3292,16 +3297,16 @@ static void DestroyChunk( mp4_chunk_t *ck )
 }
 
 /****************************************************************************
- * MP4_TrackDestroy:
+ * MP4_TrackClean:
  ****************************************************************************
- * Destroy a track created by MP4_TrackCreate.
+ * Cleans a track created by MP4_TrackCreate.
  ****************************************************************************/
-static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
+static void MP4_TrackClean( es_out_t *out, mp4_track_t *p_track )
 {
     es_format_Clean( &p_track->fmt );
 
     if( p_track->p_es )
-        es_out_Del( p_demux->out, p_track->p_es );
+        es_out_Del( out, p_track->p_es );
 
     if( p_track->chunk )
     {
@@ -3315,6 +3320,12 @@ static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
 
     if ( p_track->asfinfo.p_frame )
         block_ChainRelease( p_track->asfinfo.p_frame );
+}
+
+static void MP4_TrackInit( mp4_track_t *p_track )
+{
+    memset( p_track, 0, sizeof(mp4_track_t) );
+    es_format_Init( &p_track->fmt, 0, 0 );
 }
 
 static void MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track, bool b_select )
