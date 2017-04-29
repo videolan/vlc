@@ -22,18 +22,23 @@
 #   include "config.h"
 #endif
 
+#include <stdalign.h>
+
 #if defined(__GNUC__)
-#  define DECLARE_ASM_CONST(n,t,v)    static const t __attribute__((used)) __attribute__ ((aligned (n))) v
-#elif defined(_MSC_VER)
-#    define DECLARE_ASM_CONST(n,t,v)    __declspec(align(n)) static const t v
+# define ATTR_USED __attribute__((used))
+#else
+# define ATTR_USED
 #endif
 
 typedef intptr_t x86_reg;
 typedef struct { uint64_t a, b; } xmm_reg;
 
-DECLARE_ASM_CONST(16, xmm_reg, pb_1) = {0x0101010101010101ULL, 0x0101010101010101ULL};
-DECLARE_ASM_CONST(16, xmm_reg, pw_1) = {0x0001000100010001ULL, 0x0001000100010001ULL};
-
+const ATTR_USED alignas (16) xmm_reg pb_1 = {
+    0x0101010101010101ULL, 0x0101010101010101ULL
+};
+const ATTR_USED alignas (16) xmm_reg pw_1 = {
+    0x0001000100010001ULL, 0x0001000100010001ULL
+};
 
 #ifdef CAN_COMPILE_SSSE3
 #if defined(__SSE__) || defined(__GNUC__) || defined(__clang__)
