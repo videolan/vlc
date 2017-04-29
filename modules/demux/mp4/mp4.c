@@ -3053,13 +3053,12 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
         return;
     }
 
-    p_track->i_timescale = BOXDATA(p_mdhd)->i_timescale;
-    if( p_track->i_timescale == 0 )
+    if( BOXDATA(p_mdhd)->i_timescale == 0 )
     {
-        p_track->i_timescale = p_sys->i_timescale;
         msg_Warn( p_demux, "Invalid track timescale " );
         return;
     }
+    p_track->i_timescale = BOXDATA(p_mdhd)->i_timescale;
 
     memcpy( &language, BOXDATA(p_mdhd)->rgs_language, 3 );
     p_track->b_mac_encoding = BOXDATA(p_mdhd)->b_mac_encoding;
@@ -3326,6 +3325,7 @@ static void MP4_TrackInit( mp4_track_t *p_track )
 {
     memset( p_track, 0, sizeof(mp4_track_t) );
     es_format_Init( &p_track->fmt, 0, 0 );
+    p_track->i_timescale = 1;
 }
 
 static void MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track, bool b_select )
