@@ -4110,7 +4110,7 @@ static int ProbeFragments( demux_t *p_demux, bool b_force, bool *pb_fragmented )
 
             free( pi_track_times );
 #ifdef MP4_VERBOSE
-            MP4_Fragments_Index_Dump( VLC_OBJECT(p_demux), p_sys->p_fragsindex, p_sys->i_timescale, p_sys->i_tracks );
+            MP4_Fragments_Index_Dump( VLC_OBJECT(p_demux), p_sys->p_fragsindex, p_sys->i_timescale );
 #endif
         }
     }

@@ -44,7 +44,7 @@ bool MP4_Fragments_Index_Lookup( mp4_fragments_index_t *p_index,
 
 #ifdef MP4_VERBOSE
 void MP4_Fragments_Index_Dump( vlc_object_t *p_obj, const mp4_fragments_index_t *p_index,
-                                uint32_t i_movie_timescale, unsigned i_tracks );
+                                uint32_t i_movie_timescale );
 #endif
 
 #endif
