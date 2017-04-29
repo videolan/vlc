@@ -771,7 +771,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_mvhd = MP4_BoxGet( p_sys->p_moov, "mvhd" );
-    if( p_mvhd && BOXDATA(p_mvhd) )
+    if( p_mvhd && BOXDATA(p_mvhd) && BOXDATA(p_mvhd)->i_timescale )
     {
         p_sys->i_timescale = BOXDATA(p_mvhd)->i_timescale;
         p_sys->i_moov_duration = p_sys->i_duration = BOXDATA(p_mvhd)->i_duration;
@@ -779,8 +779,8 @@ static int Open( vlc_object_t * p_this )
     }
     else
     {
-        p_sys->i_timescale = CLOCK_FREQ;
         msg_Warn( p_demux, "No valid mvhd found" );
+        goto error;
     }
 
     if( ( p_rmra = MP4_BoxGet( p_sys->p_root,  "/moov/rmra" ) ) )
