@@ -700,6 +700,7 @@ static int Open( vlc_object_t * p_this )
     if( LoadInitFrag( p_demux ) != VLC_SUCCESS )
         goto error;
 
+    MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
 
     if( ( p_ftyp = MP4_BoxGet( p_sys->p_root, "/ftyp" ) ) )
     {
@@ -780,53 +781,6 @@ static int Open( vlc_object_t * p_this )
     {
         p_sys->i_timescale = CLOCK_FREQ;
         msg_Warn( p_demux, "No valid mvhd found" );
-    }
-
-    p_mvex = MP4_BoxGet( p_sys->p_moov, "mvex" );
-    if( p_mvex != NULL )
-    {
-        const MP4_Box_t *p_mehd = MP4_BoxGet( p_mvex, "mehd");
-        if ( p_mehd && BOXDATA(p_mehd) )
-        {
-            if( BOXDATA(p_mehd)->i_fragment_duration > p_sys->i_duration )
-            {
-                p_sys->b_fragmented = true;
-                p_sys->i_duration = BOXDATA(p_mehd)->i_fragment_duration;
-            }
-        }
-
-        if ( p_sys->b_seekable )
-        {
-            if( !p_sys->b_fragmented /* as unknown */ )
-            {
-                /* Probe remaining to check if there's really fragments
-                   or if that file is just ready to append fragments */
-                ProbeFragments( p_demux, (p_sys->i_duration == 0), &p_sys->b_fragmented );
-            }
-
-            if( vlc_stream_Seek( p_demux->s, p_sys->p_moov->i_pos ) != VLC_SUCCESS )
-                goto error;
-        }
-        else /* Handle as fragmented by default as we can't see moof */
-        {
-            p_sys->context.p_fragment_atom = p_sys->p_moov;
-            p_sys->context.i_current_box_type = ATOM_moov;
-            p_sys->b_fragmented = true;
-        }
-    }
-
-    MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
-
-    if( p_sys->b_fragmented )
-    {
-        p_demux->pf_demux = DemuxAsLeaf;
-        msg_Dbg( p_demux, "Set experimental DemuxLeaf mode" );
-    }
-
-    if( !p_sys->b_seekable && p_demux->pf_demux == Demux )
-    {
-        msg_Warn( p_demux, "MP4 plugin discarded (not seekable)" );
-        goto error;
     }
 
     if( ( p_rmra = MP4_BoxGet( p_sys->p_root,  "/moov/rmra" ) ) )
@@ -1004,6 +958,51 @@ static int Open( vlc_object_t * p_this )
             msg_Dbg( p_demux, "ignoring track[Id 0x%x]",
                      p_sys->track[i].i_track_ID );
         }
+    }
+
+    p_mvex = MP4_BoxGet( p_sys->p_moov, "mvex" );
+    if( p_mvex != NULL )
+    {
+        const MP4_Box_t *p_mehd = MP4_BoxGet( p_mvex, "mehd");
+        if ( p_mehd && BOXDATA(p_mehd) )
+        {
+            if( BOXDATA(p_mehd)->i_fragment_duration > p_sys->i_duration )
+            {
+                p_sys->b_fragmented = true;
+                p_sys->i_duration = BOXDATA(p_mehd)->i_fragment_duration;
+            }
+        }
+
+        if ( p_sys->b_seekable )
+        {
+            if( !p_sys->b_fragmented /* as unknown */ )
+            {
+                /* Probe remaining to check if there's really fragments
+                   or if that file is just ready to append fragments */
+                ProbeFragments( p_demux, (p_sys->i_duration == 0), &p_sys->b_fragmented );
+            }
+
+            if( vlc_stream_Seek( p_demux->s, p_sys->p_moov->i_pos ) != VLC_SUCCESS )
+                goto error;
+        }
+        else /* Handle as fragmented by default as we can't see moof */
+        {
+            p_sys->context.p_fragment_atom = p_sys->p_moov;
+            p_sys->context.i_current_box_type = ATOM_moov;
+            p_sys->b_fragmented = true;
+        }
+    }
+
+    if( p_sys->b_fragmented )
+    {
+        p_demux->pf_demux = DemuxAsLeaf;
+        msg_Dbg( p_demux, "Set experimental DemuxLeaf mode" );
+    }
+
+    if( !p_sys->b_seekable && p_demux->pf_demux == Demux )
+    {
+        msg_Warn( p_demux, "MP4 plugin discarded (not seekable)" );
+        goto error;
     }
 
     if( !p_sys->b_fragmented && p_sys->i_tracks > 1 && !p_sys->b_fastseekable )
@@ -3051,7 +3050,11 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
     p_track->i_timescale = BOXDATA(p_mdhd)->i_timescale;
     if( p_track->i_timescale == 0 )
+    {
+        p_track->i_timescale = p_sys->i_timescale;
+        msg_Warn( p_demux, "Invalid track timescale " );
         return;
+    }
 
     memcpy( &language, BOXDATA(p_mdhd)->rgs_language, 3 );
     p_track->b_mac_encoding = BOXDATA(p_mdhd)->b_mac_encoding;
