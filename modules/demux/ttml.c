@@ -432,7 +432,7 @@ int OpenDemux( vlc_object_t* p_this )
 
     /* Simplified probing. Valid TTML must have a namespace declaration */
     const char *psz_tt = strnstr( psz_xml, "tt ", i_xml );
-    if( !psz_tt || (ptrdiff_t)psz_tt == (ptrdiff_t)psz_xml ||
+    if( !psz_tt || psz_tt == psz_xml ||
         (psz_tt[-1] != ':' && psz_tt[-1] != '<') )
     {
         free( psz_alloc );
