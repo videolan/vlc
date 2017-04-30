@@ -451,7 +451,7 @@ int OpenDemux( vlc_object_t* p_this )
         for( size_t i=0; i<ARRAY_SIZE(rgsz) && !psz_ns; i++ )
         {
             psz_ns = strnstr( psz_xml, rgsz[i],
-                              i_xml -( (ptrdiff_t)psz_tt - (ptrdiff_t)psz_xml ) );
+                              i_xml - (psz_tt - psz_xml) );
         }
         free( psz_alloc );
         if( !psz_ns )
