@@ -1523,16 +1523,17 @@ static int LeafSeekToTime( demux_t *p_demux, mtime_t i_nztime )
         p_sys->b_index_probed = true;
     }
 
-    if( (uint64_t)MP4_rescale( i_nztime, CLOCK_FREQ, p_sys->i_timescale ) < p_sys->i_moov_duration )
+    const unsigned i_seek_track_index = GetSeekTrackIndex( p_sys );
+    const unsigned i_seek_track_ID = p_sys->track[i_seek_track_index].i_track_ID;
+
+    if( MP4_rescale( i_nztime, CLOCK_FREQ, p_sys->track[i_seek_track_index].i_timescale ) <
+                     GetMoovTrackDuration( p_sys, i_seek_track_ID ) )
     {
         i64 = p_sys->p_moov->i_pos;
         i_segment_type = ATOM_moov;
     }
     else
     {
-        const unsigned i_seek_track_index = GetSeekTrackIndex( p_sys );
-        const unsigned i_seek_track_ID = p_sys->track[i_seek_track_index].i_track_ID;
-
         bool b_buildindex = false;
         mtime_t i_sync_time = i_nztime;
         if( LeafGetMoofByTfraIndex( p_demux, i_nztime, i_seek_track_ID, &i64, &i_sync_time ) == VLC_SUCCESS )
