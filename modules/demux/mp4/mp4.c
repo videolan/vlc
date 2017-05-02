@@ -980,6 +980,10 @@ static int Open( vlc_object_t * p_this )
             }
         }
 
+        const MP4_Box_t *p_sidx = MP4_BoxGet( p_sys->p_root, "sidx");
+        if( p_sidx )
+            p_sys->b_fragmented = true;
+
         if ( p_sys->b_seekable )
         {
             if( !p_sys->b_fragmented /* as unknown */ )
