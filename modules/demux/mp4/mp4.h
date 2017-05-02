@@ -61,6 +61,13 @@ typedef struct
 
 } mp4_chunk_t;
 
+typedef struct
+{
+    uint64_t i_offset;
+    stime_t  i_first_dts;
+    const MP4_Box_t *p_trun;
+} mp4_run_t;
+
 typedef enum RTP_timstamp_synchronization_s
 {
     UNKNOWN_SYNC = 0, UNSYNCHRONIZED = 1, SYNCHRONIZED = 2, RESERVED = 3
@@ -114,7 +121,7 @@ typedef struct
         else i_sample_size is size for all sample */
     uint32_t         i_sample_size;
     uint32_t         *p_sample_size; /* XXX perhaps add file offset if take
-                                    too much time to do sumations each time*/
+//                                    too much time to do sumations each time*/
 
     uint32_t     i_sample_first; /* i_sample_first value
                                                    of the next chunk */
@@ -143,10 +150,19 @@ typedef struct
     struct
     {
         /* for moof parsing */
-        const MP4_Box_t *p_traf;
-        const MP4_Box_t *p_tfhd;
-        const MP4_Box_t *p_trun;
-        uint64_t   i_traf_base_offset;
+        /* tfhd defaults */
+        uint32_t i_default_sample_size;
+        uint32_t i_default_sample_duration;
+
+        struct
+        {
+            mp4_run_t *p_array;
+            uint32_t   i_current;
+            uint32_t   i_count;
+        } runs;
+        uint64_t i_trun_sample;
+        uint64_t i_trun_sample_pos;
+
     } context;
 
     /* ASF packets handling */
