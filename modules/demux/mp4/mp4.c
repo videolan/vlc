@@ -4183,13 +4183,11 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
 
     uint32_t dur = 0, len;
     uint32_t chunk_size = 0;
-    mtime_t i_nzdts = MP4_rescale( p_track->i_time, p_track->i_timescale, CLOCK_FREQ );
-    mtime_t i_nzpts;
 
     for( uint32_t i = 0; i < p_trun->i_sample_count; i++)
     {
-        i_nzdts += MP4_rescale( dur, p_track->i_timescale, CLOCK_FREQ );
-        i_nzpts = i_nzdts;
+        const stime_t i_dts = p_track->i_time;
+        stime_t i_pts = i_dts;
 
         if( p_trun->i_flags & MP4_TRUN_SAMPLE_DURATION )
             dur = p_trun->p_samples[i].i_duration;
@@ -4201,14 +4199,11 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
         if( p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET )
         {
             if ( p_trun->i_version == 1 )
-                i_nzpts += MP4_rescale( (int32_t) p_trun->p_samples[i].i_composition_time_offset,
-                                        p_track->i_timescale, CLOCK_FREQ );
+                i_pts += (int32_t) p_trun->p_samples[i].i_composition_time_offset;
             else if( p_trun->p_samples[i].i_composition_time_offset < 0xFF000000 )
-                i_nzpts += MP4_rescale( p_trun->p_samples[i].i_composition_time_offset,
-                                        p_track->i_timescale, CLOCK_FREQ );
+                i_pts += p_trun->p_samples[i].i_composition_time_offset;
             else /* version 0 with negative */
-                i_nzpts += MP4_rescale( (int32_t) p_trun->p_samples[i].i_composition_time_offset,
-                                        p_track->i_timescale, CLOCK_FREQ );
+                i_pts += (int32_t) p_trun->p_samples[i].i_composition_time_offset;
         }
 
         if( p_trun->i_flags & MP4_TRUN_SAMPLE_SIZE )
@@ -4241,19 +4236,19 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
 
         if ( p_demux->p_sys->i_pcr < VLC_TS_0 )
         {
-            p_demux->p_sys->i_pcr = i_nzdts;
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_nzdts );
+            p_demux->p_sys->i_pcr = MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_demux->p_sys->i_pcr );
         }
 
         if ( p_block )
         {
             if ( p_track->p_es )
             {
-                p_block->i_dts = VLC_TS_0 + i_nzdts;
+                p_block->i_dts = VLC_TS_0 + MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
                 if( p_track->fmt.i_cat == VIDEO_ES && !( p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET ) )
                     p_block->i_pts = VLC_TS_INVALID;
                 else
-                    p_block->i_pts = VLC_TS_0 + i_nzpts;
+                    p_block->i_pts = VLC_TS_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ );
                 p_block->i_length = MP4_rescale( dur, p_track->i_timescale, CLOCK_FREQ );
                 MP4_Block_Send( p_demux, p_track, p_block );
             }
