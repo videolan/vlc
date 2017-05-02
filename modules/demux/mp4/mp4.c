@@ -165,6 +165,8 @@ static bool GetMoofDataRange( MP4_Box_t *p_moov, MP4_Box_t *p_moof,
 static int  ProbeFragments( demux_t *p_demux, bool b_force, bool *pb_fragmented );
 static int  ProbeIndex( demux_t *p_demux );
 
+static int LeafGetMoofBySidxIndex( demux_t *p_demux, mtime_t i_target_time,
+                                   uint64_t *pi_moof_pos, mtime_t *pi_sampletime );
 static int LeafGetMoofByTfraIndex( demux_t *p_demux, const mtime_t i_target_time, unsigned i_track_ID,
                                    uint64_t *pi_moof_pos, mtime_t *pi_sampletime );
 static int LeafGetTrackAndChunkByMOOVPos( demux_t *p_demux, uint64_t *pi_pos,
@@ -1539,6 +1541,10 @@ static int LeafSeekToTime( demux_t *p_demux, mtime_t i_nztime )
         if( LeafGetMoofByTfraIndex( p_demux, i_nztime, i_seek_track_ID, &i64, &i_sync_time ) == VLC_SUCCESS )
         {
             msg_Dbg( p_demux, "seeking to sync point %" PRId64, i_sync_time );
+        }
+        else if( LeafGetMoofBySidxIndex( p_demux, i_nztime, &i64, &i_sync_time ) == VLC_SUCCESS )
+        {
+            msg_Dbg( p_demux, "seeking to sidx moof pos %" PRId64 " %" PRId64, i64, i_sync_time );
         }
         else if( !p_sys->b_fragments_probed && !p_sys->b_fastseekable )
         {
@@ -4613,6 +4619,35 @@ static int LeafMapTrafTrunContextes( demux_t *p_demux, MP4_Box_t *p_moof )
     }
 
     return VLC_SUCCESS;
+}
+
+static int LeafGetMoofBySidxIndex( demux_t *p_demux, mtime_t i_target_time,
+                                   uint64_t *pi_moof_pos, mtime_t *pi_sampletime )
+{
+    const MP4_Box_t *p_sidx = MP4_BoxGet( p_demux->p_sys->p_root, "sidx" );
+    const MP4_Box_data_sidx_t *p_data;
+    if( !p_sidx || !((p_data = BOXDATA(p_sidx))) || !p_data->i_timescale )
+        return VLC_EGENERIC;
+
+    i_target_time = MP4_rescale( i_target_time, CLOCK_FREQ, p_data->i_timescale );
+
+    /* sidx refers to offsets from end of sidx pos in the file + first offset */
+    uint64_t i_pos = p_data->i_first_offset + p_sidx->i_pos + p_sidx->i_size;
+    stime_t i_time = 0;
+    for( uint16_t i=0; i<p_data->i_reference_count; i++ )
+    {
+        if( i_time + p_data->p_items[i].i_subsegment_duration > i_target_time )
+        {
+            *pi_sampletime = MP4_rescale( i_time, p_data->i_timescale,
+                                          p_demux->p_sys->i_timescale );
+            *pi_moof_pos = i_pos;
+            return VLC_SUCCESS;
+        }
+        i_pos += p_data->p_items[i].i_referenced_size;
+        i_time += p_data->p_items[i].i_subsegment_duration;
+    }
+
+    return VLC_EGENERIC;
 }
 
 static int LeafGetMoofByTfraIndex( demux_t *p_demux, const mtime_t i_target_time, unsigned i_track_ID,
