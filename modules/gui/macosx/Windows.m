@@ -661,8 +661,8 @@
 
     NSInteger i_currLevel = [self level];
     // self.fullscreen and _inFullscreenTransition must not be true yet
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
-    [self setLevel:NSNormalWindowLevel];
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSMainMenuWindowLevel + 1];
+    [self setLevel:NSMainMenuWindowLevel + 1];
     i_originalLevel = i_currLevel;
 
     _inFullscreenTransition = YES;
@@ -815,8 +815,8 @@
     /* Make sure we don't see the window flashes in float-on-top mode */
     NSInteger i_currLevel = [self level];
     // self.fullscreen must not be true yet
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
-    [self setLevel:NSNormalWindowLevel];
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSMainMenuWindowLevel + 1];
+    [self setLevel:NSMainMenuWindowLevel + 1];
     i_originalLevel = i_currLevel; // would be overwritten by previous call
 
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
@@ -832,6 +832,7 @@
         [o_fullscreen_window setCanBecomeMainWindow: YES];
         [o_fullscreen_window setHasActiveVideo: YES];
         [o_fullscreen_window setFullscreen: YES];
+        [o_fullscreen_window setLevel:NSMainMenuWindowLevel + 1];
 
         /* Make sure video view gets visible in case the playlist was visible before */
         b_video_view_was_hidden = [_videoView isHidden];
@@ -861,8 +862,6 @@
             [o_fullscreen_window setFrame:screen_rect display:YES animate:NO];
 
             [o_fullscreen_window orderFront:self animate:YES];
-
-            [o_fullscreen_window setLevel:NSNormalWindowLevel];
 
             if (blackout_other_displays) {
                 CGDisplayFade(token, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO);
