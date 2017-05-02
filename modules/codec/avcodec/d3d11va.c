@@ -389,6 +389,9 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
                                                              &p_sys->decoder );
         if (FAILED(hr)) {
             msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%0lx)", p_sys->slice_index, hr);
+            D3D11_TEXTURE2D_DESC texDesc;
+            ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
+            assert(texDesc.BindFlags & D3D11_BIND_DECODER);
             p_sys->decoder = NULL;
         }
     }
