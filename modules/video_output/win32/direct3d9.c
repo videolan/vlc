@@ -543,10 +543,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     CommonDisplay(vd);
 }
-static int ControlResetDevice(vout_display_t *vd)
-{
-    return Direct3D9Reset(vd);
-}
+
 static int ControlReopenDevice(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -627,7 +624,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_RESET_PICTURES:
         /* FIXME what to do here in case of failure */
         if (sys->reset_device) {
-            if (ControlResetDevice(vd)) {
+            if (Direct3D9Reset(vd)) {
                 msg_Err(vd, "Failed to reset device");
                 return VLC_EGENERIC;
             }
