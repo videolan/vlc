@@ -691,7 +691,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
             UpdateRects(vd, cfg, source, true);
         } else {
             cfg    = va_arg(args, const vout_display_cfg_t *);
-            UpdateRects(vd, cfg, NULL, false);
+            UpdateRects(vd, cfg, NULL, true);
         }
         return VLC_SUCCESS;
     }
