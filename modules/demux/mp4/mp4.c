@@ -4594,28 +4594,23 @@ static int LeafMapTrafTrunContextes( demux_t *p_demux, MP4_Box_t *p_moof )
     }
 
     /* map contexts */
-    while ( p_traf )
+    for ( ; p_traf; p_traf = p_traf->p_next )
     {
-        if ( p_traf->i_type == ATOM_traf )
+        MP4_Box_t *p_tfhd;
+        if ( p_traf->i_type != ATOM_traf ||
+            !(p_tfhd = MP4_BoxGet( p_traf, "tfhd" )) )
+            continue;
+
+        mp4_track_t *p_track = MP4_GetTrackByTrackID( p_demux, BOXDATA(p_tfhd)->i_track_ID );
+        if( !p_track )
+            continue;
+
+        p_track->context.p_trun = MP4_BoxGet( p_traf, "trun" );
+        if( p_track->context.p_trun )
         {
-            MP4_Box_t *p_tfhd = MP4_BoxGet( p_traf, "tfhd" );
-            for ( uint32_t i=0; p_tfhd && i<p_sys->i_tracks; i++ )
-            {
-                mp4_track_t *p_track = &p_sys->track[i];
-                if ( BOXDATA(p_tfhd)->i_track_ID == p_track->i_track_ID )
-                {
-                    MP4_Box_t *p_trun = MP4_BoxGet( p_traf, "trun" );
-                    if ( p_trun )
-                    {
-                        p_track->context.p_tfhd = p_tfhd;
-                        p_track->context.p_traf = p_traf;
-                        p_track->context.p_trun = p_trun;
-                    }
-                    p_tfhd = NULL; /* break loop */
-                }
-            }
+            p_track->context.p_tfhd = p_tfhd;
+            p_track->context.p_traf = p_traf;
         }
-        p_traf = p_traf->p_next;
     }
 
     return VLC_SUCCESS;
