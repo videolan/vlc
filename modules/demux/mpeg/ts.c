@@ -686,6 +686,7 @@ static int Demux( demux_t *p_demux )
             {
                 msg_Dbg( p_demux, "Creating delayed ES" );
                 AddAndCreateES( p_demux, p_pid, true );
+                UpdatePESFilters( p_demux, p_sys->b_es_all );
             }
 
             /* Emulate HW filter */
@@ -2780,6 +2781,4 @@ void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delayed )
                 DoCreateES( p_demux, p_pmt->e_streams.p_elems[j]->u.p_pes->p_es, NULL );
         }
     }
-
-    UpdatePESFilters( p_demux, p_sys->b_es_all );
 }
