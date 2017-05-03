@@ -375,14 +375,14 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxTrackName, tname )
         {
             vars.tk->fmt.psz_description = ToUTF8( UTFstring( tname ) );
-            debug( vars, "Track Name=%s", vars.tk->fmt.psz_description ) ;
+            debug( vars, "Track Name=%s", vars.tk->fmt.psz_description ? vars.tk->fmt.psz_description : "(null)" );
         }
         E_CASE( KaxTrackLanguage, lang )
         {
             free( vars.tk->fmt.psz_language );
             const std::string slang ( lang );
             vars.tk->fmt.psz_language = strndup( slang.c_str (), slang.find_first_of( '-' ) );
-            debug( vars, "Track Language=`%s'", vars.tk->fmt.psz_language );
+            debug( vars, "Track Language=`%s'", vars.tk->fmt.psz_language ? vars.tk->fmt.psz_language : "(null)" );
         }
         E_CASE( KaxCodecID, codecid )
         {
