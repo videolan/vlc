@@ -1184,10 +1184,10 @@ LIBVLC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi, cons
  */
 typedef struct libvlc_video_viewpoint_t
 {
-    float f_yaw;           /**< view point yaw in degrees */
-    float f_pitch;         /**< view point pitch in degrees */
-    float f_roll;          /**< view point roll in degrees */
-    float f_field_of_view; /**< field of view in degrees (default 80.0f) */
+    float f_yaw;           /**< view point yaw in degrees  ]-180;180] */
+    float f_pitch;         /**< view point pitch in degrees  ]-90;90] */
+    float f_roll;          /**< view point roll in degrees ]-180;180] */
+    float f_field_of_view; /**< field of view in degrees ]0;180[ (default 80.)*/
 } libvlc_video_viewpoint_t;
 
 /**
