@@ -1357,6 +1357,8 @@ static const char *const mouse_wheel_texts[] = {
 
 #define AUDIO_TRACK_KEY_TEXT N_("Cycle audio track")
 #define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages).")
+#define SUBTITLE_REVERSE_TRACK_KEY_TEXT N_("Cycle subtitle track in reverse order")
+#define SUBTITLE_REVERSE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks in reverse order.")
 #define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks.")
 #define SUBTITLE_TOGGLE_KEY_TEXT N_("Toggle subtitles")
@@ -2200,6 +2202,7 @@ vlc_module_begin ()
 #   define KEY_AUDIO_TRACK        "l"
 #   define KEY_SUBTITLE_TRACK     "s"
 #   define KEY_SUBTITLE_TOGGLE    "Shift+s"
+#   define KEY_SUBTITLE_REVTRACK  "Alt+s"
 #   define KEY_PROGRAM_SID_NEXT   "x"
 #   define KEY_PROGRAM_SID_PREV   "Shift+x"
 #   define KEY_ASPECT_RATIO       "a"
@@ -2342,6 +2345,7 @@ vlc_module_begin ()
 #   define KEY_AUDIO_TRACK        "b"
 #   define KEY_SUBTITLE_TRACK     "v"
 #   define KEY_SUBTITLE_TOGGLE    "Shift+v"
+#   define KEY_SUBTITLE_REVTRACK  "Alt+v"
 #   define KEY_PROGRAM_SID_NEXT   "x"
 #   define KEY_PROGRAM_SID_PREV   "Shift+x"
 #   define KEY_ASPECT_RATIO       "a"
@@ -2514,6 +2518,8 @@ vlc_module_begin ()
              AUDIO_TRACK_KEY_LONGTEXT, false )
     add_key( "key-audiodevice-cycle", KEY_AUDIODEVICE_CYCLE, AUDI_DEVICE_CYCLE_KEY_TEXT,
              AUDI_DEVICE_CYCLE_KEY_LONGTEXT, false )
+    add_key("key-subtitle-revtrack", KEY_SUBTITLE_REVTRACK,
+             SUBTITLE_REVERSE_TRACK_KEY_TEXT, SUBTITLE_REVERSE_TRACK_KEY_LONGTEXT, false)
     add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK,
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, false )
     add_key( "key-subtitle-toggle", KEY_SUBTITLE_TOGGLE,
