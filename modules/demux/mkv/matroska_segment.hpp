@@ -162,7 +162,7 @@ private:
     void ParseSeekHead( KaxSeekHead *seekhead );
     void ParseTracks( KaxTracks *tracks );
     void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters );
-    void ParseTrackEntry( KaxTrackEntry *m );
+    void ParseTrackEntry( const KaxTrackEntry* m );
     bool ParseCluster( KaxCluster *cluster, bool b_update_start_time = true, ScopeMode read_fully = SCOPE_ALL_DATA );
     bool ParseSimpleTags( SimpleTag* out, KaxTagSimple *tag, int level = 50 );
     void IndexAppendCluster( KaxCluster *cluster );

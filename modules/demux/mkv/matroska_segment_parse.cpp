@@ -200,7 +200,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
  * ParseTrackEntry:
  *****************************************************************************/
 
-void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
+void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 {
     bool bSupported = true;
 
