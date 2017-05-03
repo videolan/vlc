@@ -927,7 +927,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 chapter_translation_c *p_translate = new chapter_translation_c();
 
                 TranslationHandler::Dispatcher().iterate(
-                    trans.begin(), trans.end(), TranslationHandler::Payload( p_translate ) 
+                    trans.begin(), trans.end(), TranslationHandler::Payload( p_translate )
                 );
 
                 vars.obj->translations.push_back( p_translate );
