@@ -1128,7 +1128,7 @@ generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
             {
                 tc->pf_update  = tc_pbo_update;
                 tc->pf_release = tc_pbo_release;
-                msg_Err(tc->gl, "PBO support enabled");
+                msg_Dbg(tc->gl, "PBO support enabled");
             }
         }
 #endif
