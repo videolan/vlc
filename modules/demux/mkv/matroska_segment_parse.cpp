@@ -695,6 +695,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     if( track.i_number == 0 )
     {
         msg_Warn( &sys.demuxer, "Missing KaxTrackNumber, discarding track!" );
+        es_format_Clean( &track.fmt );
+        free(track.p_extra_data);
         return;
     }
 
@@ -705,11 +707,13 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
             track.i_extra_data && track.p_extra_data &&
             zlib_decompress_extra( &sys.demuxer, &track ) )
+            // zlib_decompress_extra will clean the track itself
             return;
 #endif
         if( TrackInit( &track ) )
         {
             msg_Err(&sys.demuxer, "Couldn't init track %u", track.i_number );
+            es_format_Clean( &track.fmt );
             free(track.p_extra_data);
             return;
         }
