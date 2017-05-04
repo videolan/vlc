@@ -1,0 +1,10 @@
+--- faad2/include/neaacdec.orig.h	2017-05-04 13:46:52.553943436 +0200
++++ faad2/include/neaacdec.h	2017-05-04 13:46:47.667989456 +0200
+@@ -70,6 +70,7 @@
+ #endif
+ 
+ #define FAAD2_VERSION "2.7"
++#define FAAD2_VIDEOLAN_PATCHED
+ 
+ /* object types for AAC */
+ #define MAIN       1

@@ -440,6 +440,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             p_sys->b_ps = frame.ps;
         }
 
+#ifndef FAAD2_VIDEOLAN_PATCHED
         /* PS Enabled FAAD PCA bug hotfix (contribs has patch) */
         if( frame.channels == 8 )
         {
@@ -480,6 +481,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 break;
             }
         }
+#endif
 
         /* Convert frame.channel_position to our own channel values */
         p_dec->fmt_out.audio.i_physical_channels = 0;
