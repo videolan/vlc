@@ -74,7 +74,6 @@
         <file alias="repeat_all">pixmaps/playlist/repeat_all.png</file>
         <file alias="repeat_one">pixmaps/playlist/repeat_one.png</file>
         <file alias="shuffle_on">pixmaps/playlist/shuffle_on.png</file>
-        <file alias="jump_to">pixmaps/playlist/jumpto.png</file>
     </qresource>
     <qresource prefix="/type">
         <file alias="capture-card">pixmaps/types/capture-card_16px.png</file>
@@ -90,7 +89,6 @@
         <file alias="playlist">pixmaps/types/type_playlist.png</file>
     </qresource>
     <qresource prefix="/">
-        <file alias="down_arrow">pixmaps/arrow_down_dark.png</file>
         <file alias="update">pixmaps/update.png</file>
         <file alias="noart.png">pixmaps/noart.png</file>
         <file alias="noart64">pixmaps/noart-64.png</file>

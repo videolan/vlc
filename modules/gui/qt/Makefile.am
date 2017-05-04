@@ -295,7 +295,6 @@ EXTRA_DIST = $(libqt_plugin_la_UI)
 # Resources
 
 DEPS_res = \
-	pixmaps/arrow_down_dark.png \
 	pixmaps/clear.png \
 	pixmaps/eject.png \
 	pixmaps/faster.png \
@@ -321,13 +320,11 @@ DEPS_res = \
 	pixmaps/play.png \
 	pixmaps/play_16px.png \
 	pixmaps/playlist/add.png \
-	pixmaps/playlist/jumpto.png \
 	pixmaps/playlist/playlist.png \
 	pixmaps/playlist/remove.png \
 	pixmaps/playlist/repeat_all.png \
 	pixmaps/playlist/repeat_off.png \
 	pixmaps/playlist/repeat_one.png \
-	pixmaps/playlist/shuffle_off.png \
 	pixmaps/playlist/shuffle_on.png \
 	pixmaps/playlist/dropzone.png \
 	pixmaps/playlist/sidebar-icons/capture.png \
