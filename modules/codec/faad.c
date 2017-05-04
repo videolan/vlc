@@ -458,12 +458,27 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         }
 
         /* Hotfix channels misdetection/repetition for FDK 7.1 */
-        const uint8_t fdk71config[] = { 1, 2, 3, 6, 7, 6, 7, 9 };
-        if( frame.channels == 8 && !memcmp( frame.channel_position, fdk71config, 8 ) )
+        struct
         {
-            msg_Warn( p_dec, "Patching for FDK encoded 7.1 4 Front channel repeat bug" );
-            frame.channel_position[3] = 4;
-            frame.channel_position[4] = 5;
+            const uint8_t chans;
+            const uint8_t faulty[8];
+            const uint8_t fixed[8];
+        } const channel_repeat_fixes[] = {
+            { 7, { 2, 3, 2, 3, 2, 3, 6 },    { 1, 2, 3, 6, 7, 8, 9 }    }, /* 3F 3R LFE #18273 */
+            { 8, { 1, 2, 3, 6, 7, 6, 7, 9 }, { 1, 2, 3, 6, 7, 4, 5, 9 } }, /* FDK encoded 7.1 */
+        };
+
+        for( size_t i=0; i<ARRAY_SIZE(channel_repeat_fixes); i++ )
+        {
+            if( channel_repeat_fixes[i].chans == frame.channels &&
+                !memcmp( frame.channel_position, channel_repeat_fixes[i].faulty,
+                                                 channel_repeat_fixes[i].chans ) )
+            {
+                msg_Warn( p_dec, "Patching for Front channel repeat bug" );
+                memcpy( frame.channel_position, channel_repeat_fixes[i].fixed,
+                                                channel_repeat_fixes[i].chans );
+                break;
+            }
         }
 
         /* Convert frame.channel_position to our own channel values */
