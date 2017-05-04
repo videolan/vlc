@@ -1514,17 +1514,22 @@ static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
         vertices[i].y  = vertices_coords[vertex_order[i]][1];
     }
 
-    vertices[0].tu = .0f;
-    vertices[0].tv = .0f;
+    float right = has_src ? (float)src_clipped->right / (float)src->right : 1.0f;
+    float left = has_src ? (float)src_clipped->left / (float)src->right : .0f;
+    float top = has_src ? (float)src_clipped->top / (float)src->bottom : .0f;
+    float bottom = has_src ? (float)src_clipped->bottom / (float)src->bottom : 1.0f;
 
-    vertices[1].tu = has_src ? (float)src_clipped->right / (float)src->right : 1.0f;
-    vertices[1].tv = .0f;
+    vertices[0].tu = left;
+    vertices[0].tv = top;
 
-    vertices[2].tu = has_src ? (float)src_clipped->right / (float)src->right : 1.0f;
-    vertices[2].tv = has_src ? ((float)src_clipped->bottom) / (float)src->bottom : 1.0f;
+    vertices[1].tu = right;
+    vertices[1].tv = top;
 
-    vertices[3].tu = .0f;
-    vertices[3].tv = has_src ? ((float)src_clipped->bottom) / (float)src->bottom : 1.0f;
+    vertices[2].tu = right;
+    vertices[2].tv = bottom;
+
+    vertices[3].tu = left;
+    vertices[3].tv = bottom;
 
     for (int i = 0; i < 4; i++) {
         /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
