@@ -205,6 +205,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     es_format_Copy( &filter->fmt_out, fmt_out );
     filter->b_allow_fmt_out_change = chain->b_allow_fmt_out_change;
     filter->p_cfg = cfg;
+    filter->psz_name = name;
 
     filter->owner = chain->callbacks;
     filter->owner.sys = chain;

@@ -77,6 +77,8 @@ struct filter_t
     es_format_t         fmt_out;
     bool                b_allow_fmt_out_change;
 
+    /* Name of the "video filter" shortcut that is requested, can be NULL */
+    const char *        psz_name;
     /* Filter configuration */
     config_chain_t *    p_cfg;
 
