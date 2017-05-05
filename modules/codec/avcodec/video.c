@@ -1463,7 +1463,8 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if (!can_hwaccel)
         return swfmt;
 
-#if !LIBAVCODEC_VERSION_CHECK(57, 30, 1, 83, 101)
+#if (LIBAVCODEC_VERSION_MICRO >= 100) \
+  && (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 83, 101))
     if (p_context->active_thread_type)
     {
         msg_Warn(p_dec, "thread type %d: disabling hardware acceleration",
