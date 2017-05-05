@@ -4664,7 +4664,12 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
     MP4_ReadBoxContainerChildren( s, p_fakeroot, stoplist );
 
     p_tmp_box = p_fakeroot->p_first;
-    while( p_tmp_box )
+    if( p_tmp_box == NULL )
+    {
+        MP4_BoxFree( p_fakeroot );
+        return NULL;
+    }
+    else while( p_tmp_box )
     {
         p_fakeroot->i_size += p_tmp_box->i_size;
         p_tmp_box = p_tmp_box->p_next;
