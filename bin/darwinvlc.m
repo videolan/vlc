@@ -265,7 +265,7 @@ int main(int i_argc, const char *ppsz_argv[])
 
     ppsz_argv++; i_argc--; /* skip executable path */
 
-    /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
+    /* When VLC.app is run by double clicking in Mac OS X < 10.9, the 2nd arg
      * is the PSN - process serial number (a unique PID-ish thingie)
      * still ok for real Darwin & when run from command line
      * for example -psn_0_9306113 */
