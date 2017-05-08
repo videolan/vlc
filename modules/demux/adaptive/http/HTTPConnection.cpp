@@ -250,7 +250,7 @@ int HTTPConnection::parseReply()
         line = readLine();
     }
 
-    if((replycode == 301 || replycode == 307) &&
+    if((replycode == 301 || replycode == 302 || replycode == 307 || replycode == 308) &&
        !locationparams.getUrl().empty())
     {
         msg_Info(p_object, "%d redirection to %s", replycode, locationparams.getUrl().c_str());
