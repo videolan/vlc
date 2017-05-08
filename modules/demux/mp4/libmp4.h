@@ -1869,6 +1869,11 @@ static const UUID_t XML360BoxUUID = {
                   0x88, 0x14, 0x58, 0x7a, 0x02, 0x52, 0x1f, 0xdd } };
 
 /*****************************************************************************
+ * MP4_Seek : non seekable stream safe seek
+ ****************************************************************************/
+int MP4_Seek( stream_t *p_stream, uint64_t i_pos );
+
+/*****************************************************************************
  * MP4_BoxGetNextChunk : Parse the entire moof box.
  *****************************************************************************
  *  The first box is a virtual box "root" and is the father of the boxes

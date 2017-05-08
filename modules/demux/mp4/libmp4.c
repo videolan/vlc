@@ -77,7 +77,7 @@ static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_
 static void MP4_Box_Clean_Specific( MP4_Box_t *p_box );
 static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );
 
-static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
+int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
 {
     /* Prevent prefetch breakage */
     uint64_t i_size = stream_Size( p_stream );
@@ -102,9 +102,10 @@ static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
         return VLC_SUCCESS;
     else if( i_toread > (1<<17) )
         return VLC_EGENERIC;
-    else
-        return vlc_stream_Read( p_stream, NULL,
-                                i_toread ) != (ssize_t)i_toread;
+
+    if( vlc_stream_Read( p_stream, NULL, i_toread ) != (ssize_t)i_toread )
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
