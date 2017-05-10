@@ -2326,6 +2326,3 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 }
 
 @end
-
-//#undef CONFIG_ITEM_LIST_STRING
-//#undef CONFIG_ITEM_RANGED_INTEGER
