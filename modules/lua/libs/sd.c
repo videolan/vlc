@@ -33,6 +33,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_playlist.h>
@@ -44,6 +45,17 @@
 
 
 /*** Input item ***/
+
+static int vlclua_sd_item_delete( lua_State *L )
+{
+    input_item_t **pp_item = luaL_checkudata( L, 1, "input_item_t" );
+    input_item_t *p_item = *pp_item;
+
+    assert( p_item != NULL );
+    input_item_Release( p_item );
+    *pp_item = NULL;
+    return 1;
+}
 
 #define vlclua_item_luareg( a ) \
 { "set_" # a, vlclua_item_set_ ## a },
@@ -200,6 +212,8 @@ static input_item_t *vlclua_sd_create_item( services_discovery_t *p_sd,
         lua_newtable( L );
         luaL_register( L, NULL, vlclua_item_reg );
         lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, vlclua_sd_item_delete );
+        lua_setfield( L, -2, "__gc" );
         lua_pushliteral( L, "none of your business" );
         lua_setfield( L, -2, "__metatable" );
     }
@@ -211,6 +225,17 @@ static input_item_t *vlclua_sd_create_item( services_discovery_t *p_sd,
 
 /*** Input item tree node ***/
 
+static int vlclua_sd_node_delete( lua_State *L )
+{
+    input_item_t **pp_item = luaL_checkudata( L, 1, "node" );
+    input_item_t *p_item = *pp_item;
+
+    assert( p_item != NULL );
+    input_item_Release( p_item );
+    *pp_item = NULL;
+    return 1;
+}
+
 static int vlclua_node_add_subitem( lua_State *L )
 {
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
@@ -221,10 +246,8 @@ static int vlclua_node_add_subitem( lua_State *L )
 
     input_item_t *p_input = vlclua_sd_create_item( p_sd, L );
     if( p_input != NULL )
-    {
         input_item_PostSubItem( *pp_node, p_input );
-        input_item_Release( p_input );
-    }
+
     return 1;
 }
 
@@ -274,6 +297,8 @@ static input_item_t *vlclua_sd_create_node( services_discovery_t *p_sd,
         lua_newtable( L );
         luaL_register( L, NULL, vlclua_node_reg );
         lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, vlclua_sd_node_delete );
+        lua_setfield( L, -2, "__gc" );
     }
     lua_setmetatable( L, -2 );
 
@@ -317,7 +342,6 @@ static int vlclua_sd_add_common( services_discovery_t *p_sd, lua_State *L,
         services_discovery_AddItem( p_sd, p_input, NULL );
     lua_pop( L, 1 );
 
-    input_item_Release( p_input );
     return 1;
 }
 
