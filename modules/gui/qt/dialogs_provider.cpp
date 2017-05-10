@@ -697,22 +697,6 @@ void DialogsProvider::savePlayingToPlaylist()
     saveAPlaylist(THEPL, THEPL->p_playing);
 }
 
-void DialogsProvider::saveRecentsToPlaylist()
-{
-    playlist_item_t *p_node_recents = RecentsMRL::getInstance(p_intf)->toPlaylist(0);
-
-    if (p_node_recents == NULL)
-    {
-        msg_Warn(p_intf, "cannot create playlist from recents");
-        return;
-    }
-
-    saveAPlaylist(THEPL, p_node_recents);
-    playlist_Lock(THEPL);
-    playlist_NodeDelete(THEPL, p_node_recents, false);
-    playlist_Unlock(THEPL);
-}
-
 /****************************************************************************
  * Sout emulation
  ****************************************************************************/

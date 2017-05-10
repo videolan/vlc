@@ -59,7 +59,6 @@ class RecentsMRL : public QObject, public Singleton<RecentsMRL>
 public:
     void addRecent( const QString & );
     QStringList recentList();
-    playlist_item_t *toPlaylist(int length);
     QSignalMapper *signalMapper;
 
     int time( const QString &mrl );

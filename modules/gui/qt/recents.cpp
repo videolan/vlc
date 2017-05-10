@@ -156,27 +156,6 @@ void RecentsMRL::save()
     getSettings()->setValue( "RecentsMRL/times", times );
 }
 
-playlist_item_t *RecentsMRL::toPlaylist(int length)
-{
-    vlc_playlist_locker locker(THEPL);
-
-    playlist_item_t *p_node_recent = playlist_NodeCreate(THEPL, _("Recently Played"), THEPL->p_root, PLAYLIST_END, PLAYLIST_RO_FLAG);
-
-    if ( p_node_recent == NULL )  return NULL;
-
-    if (length == 0 || recents.count() < length)
-        length = recents.count();
-
-    for (int i = 0; i < length; i++)
-    {
-        input_item_t *p_input = input_item_New(qtu(recents.at(i)), NULL);
-        playlist_NodeAddInput(THEPL, p_input, p_node_recent, 0, PLAYLIST_END);
-    }
-
-    /* locker goes out of scope and node is invalidated here */
-    return NULL;
-}
-
 void RecentsMRL::playMRL( const QString &mrl )
 {
     Open::openMRL( p_intf, mrl );

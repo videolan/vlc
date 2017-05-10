@@ -1619,7 +1619,6 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
 
             recentsMenu->addSeparator();
             recentsMenu->addAction( qtr("&Clear"), rmrl, SLOT( clear() ) );
-            addDPStaticEntry( recentsMenu, qtr("&Save To Playlist"), "", SLOT( saveRecentsToPlaylist() ), "" );
             recentsMenu->setEnabled( true );
         }
     }
