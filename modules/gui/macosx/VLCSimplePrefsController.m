@@ -113,7 +113,7 @@ static const char *const ppsz_language_text[] =
 {
     N_("Auto"),
     "American English",
-    "ﻉﺮﺒﻳ",
+    "عربي",
     "বাংলা",
     "Português Brasileiro",
     "British English",
@@ -152,7 +152,7 @@ static const char *const ppsz_language_text[] =
     "ភាសាខ្មែរ",
     "नेपाली",
     "Occitan",
-    "ﻑﺍﺮﺳی",
+    "فارسی",
     "Polski",
     "Português",
     "ਪੰਜਾਬੀ",
