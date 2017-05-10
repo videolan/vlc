@@ -42,7 +42,7 @@
         SHARD_APPIDINFOIDLIST   = 0x00000005,
         SHARD_LINK              = 0x00000006,
         SHARD_APPIDINFOLINK     = 0x00000007,
-        SHARD_SHELLITEM         = 0x00000008 
+        SHARD_SHELLITEM         = 0x00000008
     } SHARD; */
     #define SHARD_PATHW 0x00000003
 
