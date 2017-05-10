@@ -2308,7 +2308,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
             labelString = _NS((char *)p_item->psz_text);
         else
             labelString = @"";
-        
+
         NSDictionary *boldAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                         [NSFont boldSystemFontOfSize:[NSFont systemFontSize]],
                                         NSFontAttributeName,
@@ -2318,7 +2318,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
         ADD_LABEL(self.label, mainFrame, 1, 0, @"", @"")
         [self.label setAttributedStringValue: o_bold_string];
         [self.label sizeToFit];
-        
+
         [self.label setAutoresizingMask:NSViewNotSizable];
         [self addSubview: self.label];
     }
