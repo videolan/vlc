@@ -140,6 +140,8 @@ static input_item_t *vlclua_sd_create_item( services_discovery_t *p_sd,
        : psz_path;
 
     input_item_t *p_input = input_item_New( psz_path, psz_title );
+    lua_pop( L, 2 );
+
     if( unlikely(p_input == NULL) )
         return NULL;
 
@@ -148,9 +150,9 @@ static input_item_t *vlclua_sd_create_item( services_discovery_t *p_sd,
     char **ppsz_options = NULL;
     int i_options = 0;
 
-    lua_pushvalue( L, -3 );
+    lua_pushvalue( L, -1 );
     vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
-    lua_pop( L, 3 );
+    lua_pop( L, 1 );
 
     input_item_AddOptions( p_input, i_options, (const char **)ppsz_options,
                            VLC_INPUT_OPTION_TRUSTED );
