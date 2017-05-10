@@ -432,14 +432,14 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 /**
  Create an image mask for the NSVisualEffectView
  with rounded corners in the given rect
- 
+
  This is necessary as clipping the VisualEffectView using the layers
  rounded corners is not possible when using the NSColor clearColor
  as background color.
- 
+
  \note  The returned image will have the necessary \c capInsets and
         \c capResizingMode set.
- 
+
  \param bounds  The rect for the image size
  */
 - (NSImage *)maskImageWithBounds:(NSRect)bounds
@@ -458,10 +458,10 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
 /**
  Injects the visual effect view in the Windows view hierarchy
- 
+
  This is necessary as we can't use the NSVisualEffect view on
  all macOS Versions and therefore need to dynamically insert it.
- 
+
  \warning Never call both, \c injectVisualEffectView and \c injectBackgroundView
  */
 - (void)injectVisualEffectView
@@ -484,10 +484,10 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
 /**
  Injects the standard background view in the Windows view hierarchy
- 
+
  This is necessary on macOS versions that do not support the
  NSVisualEffectView that usually is injected.
- 
+
  \warning Never call both, \c injectVisualEffectView and \c injectBackgroundView
  */
 - (void)injectBackgroundView
