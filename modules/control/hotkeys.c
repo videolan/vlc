@@ -1193,6 +1193,15 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
         case ACTIONID_UNZOOM:
             if( p_vout )
             {
+                bool b_autoscale = var_GetBool( p_vout, "autoscale" );
+                if( b_autoscale )
+                {
+                    DisplayMessage( p_vout, _("Original Size") );
+                    var_SetBool( p_vout, "autoscale", false );
+                    var_SetFloat( p_vout, "zoom", 1.f );
+                    break;
+                }
+
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "zoom", &val );
                 if( var_Change( p_vout, "zoom", VLC_VAR_GETCHOICES,
