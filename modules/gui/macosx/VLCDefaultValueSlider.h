@@ -39,16 +39,16 @@
 /**
  Sets the default value to which the slider will snap and draw a tickmark for.
  To unset the defaultValue, set it to \c DBL_MAX
- 
+
  \note value must be in the value range of the slider and be smaller than \c DBL_MAX
- 
+
  \param value The default value
  */
 - (void)setDefaultValue:(double)value;
 
 /**
  Get the default value
- 
+
  \note It the returned value is \c DBL_MAX, there is no defaultValue set.
  */
 - (double)defaultValue;
