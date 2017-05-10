@@ -124,7 +124,6 @@ private:
 
     void openDialog( int );
     void addFromSimple( bool, bool );
-    void saveAPlaylist(playlist_t *p_playlist, playlist_item_t *p_node);
 
 public slots:
     void playlistDialog();

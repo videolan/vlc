@@ -620,7 +620,7 @@ void DialogsProvider::openAPlaylist()
     }
 }
 
-void DialogsProvider::saveAPlaylist(playlist_t *p_playlist, playlist_item_t *p_node)
+void DialogsProvider::savePlayingToPlaylist()
 {
     static const struct
     {
@@ -686,15 +686,10 @@ void DialogsProvider::saveAPlaylist(playlist_t *p_playlist, playlist_item_t *p_n
 
     if ( psz_selected_module )
     {
-        playlist_Export( p_playlist, qtu( toNativeSeparators( file ) ),
+        playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
                          true, psz_selected_module );
         getSettings()->setValue( "last-playlist-ext", psz_last_playlist_ext );
     }
-}
-
-void DialogsProvider::savePlayingToPlaylist()
-{
-    saveAPlaylist(THEPL, THEPL->p_playing);
 }
 
 /****************************************************************************
