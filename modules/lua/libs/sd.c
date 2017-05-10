@@ -146,7 +146,6 @@ static int vlclua_node_add_subitem( lua_State *L )
                     input_item_AddOptions( p_input, i_options,
                                            (const char **)ppsz_options,
                                            VLC_INPUT_OPTION_TRUSTED );
-                    input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
 
                     vlclua_read_meta_data( p_sd, L, p_input );
                     /* This one is to be tested... */
@@ -157,8 +156,7 @@ static int vlclua_node_add_subitem( lua_State *L )
                     else if( !lua_isnil( L, -1 ) )
                         msg_Warn( p_sd, "Item duration should be a number (in seconds)." );
                     lua_pop( L, 1 );
-                    input_item_node_AppendItem( p_input_node, p_input );
-                    input_item_node_PostAndDelete( p_input_node );
+
                     input_item_t **udata = (input_item_t **)
                                            lua_newuserdata( L, sizeof( input_item_t * ) );
                     *udata = p_input;
@@ -171,6 +169,8 @@ static int vlclua_node_add_subitem( lua_State *L )
                         lua_setfield( L, -2, "__metatable" );
                     }
                     lua_setmetatable( L, -2 );
+
+                    input_item_PostSubItem( *pp_node, p_input );
                     input_item_Release( p_input );
                 }
                 while( i_options > 0 )
@@ -207,8 +207,6 @@ static int vlclua_node_add_subnode( lua_State *L )
 
                 if( p_input )
                 {
-                    input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
-
                     lua_getfield( L, -1, "arturl" );
                     if( lua_isstring( L, -1 ) && strcmp( lua_tostring( L, -1 ), "" ) )
                     {
@@ -218,8 +216,7 @@ static int vlclua_node_add_subnode( lua_State *L )
                         input_item_SetArtURL( p_input, psz_value );
                         free( psz_value );
                     }
-                    input_item_node_AppendItem( p_input_node, p_input );
-                    input_item_node_PostAndDelete( p_input_node );
+
                     input_item_t **udata = (input_item_t **)
                                            lua_newuserdata( L, sizeof( input_item_t * ) );
                     *udata = p_input;
@@ -230,6 +227,8 @@ static int vlclua_node_add_subnode( lua_State *L )
                         lua_setfield( L, -2, "__index" );
                     }
                     lua_setmetatable( L, -2 );
+
+                    input_item_PostSubItem( *pp_node, p_input );
                 }
             }
             else
