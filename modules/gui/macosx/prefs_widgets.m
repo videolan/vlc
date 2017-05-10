@@ -923,10 +923,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         else
             self.viewType = CONFIG_ITEM_STRING;
 
-        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, -3, labelString, o_textfieldTooltip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -1010,7 +1010,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, -3, labelString, o_textfieldTooltip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -1105,13 +1105,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_LOADFILE;
 
-        o_itemTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_itemTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* is it a directory */
         b_directory = ([self type] == CONFIG_ITEM_DIRECTORY) ? YES : NO;
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, 3, labelString, o_itemTooltip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -1201,10 +1201,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_MODULE;
 
-        o_popupTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_popupTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
 
         ADD_LABEL(self.label, mainFrame, 0, -1, labelString, o_popupTooltip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
@@ -1333,7 +1333,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         labelString = _NS((char *)p_item->psz_text);
@@ -1422,10 +1422,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_STRING_LIST;
 
-        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, -3, labelString, o_textfieldTooltip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -1512,10 +1512,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame: mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, -3, labelString, toolTip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -1622,10 +1622,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, -2, labelString, toolTip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -1713,10 +1713,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, -3, labelString, toolTip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -1824,9 +1824,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self != nil) {
         self.viewType = CONFIG_ITEM_BOOL;
 
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the checkbox */
         ADD_CHECKBOX(o_checkbox, mainFrame, 0,
@@ -1869,10 +1869,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_KEY;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
         ADD_LABEL(self.label, mainFrame, 0, -1, labelString, toolTip)
         [self.label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: self.label];
@@ -2083,7 +2083,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         self.viewType = CONFIG_ITEM_MODULE_LIST;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
         /* add the label */
         labelString = _NS((char *)p_item->psz_text);
@@ -2093,7 +2093,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
 
         /* build the textfield */
         if (p_item->value.psz)
-            o_textfieldString = _NS((char *)p_item->value.psz);
+            o_textfieldString = _NS(p_item->value.psz);
         else
             o_textfieldString = @"";
         ADD_TEXTFIELD(o_textfield, mainFrame, [self.label frame].size.width + 2,
@@ -2268,7 +2268,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 
     if ([super initWithFrame:mainFrame item:p_item] != nil) {
         /* add the label */
-        labelString = _NS((char *)p_item->psz_text);
+        labelString = _NS(p_item->psz_text);
 
         NSDictionary *boldAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                         [NSFont boldSystemFontOfSize:[NSFont systemFontSize]],
