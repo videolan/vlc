@@ -398,7 +398,8 @@ endif
 libdxva2_plugin_la_SOURCES = \
 	codec/avcodec/dxva2.c codec/avcodec/directx_va.c codec/avcodec/directx_va.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
-	packetizer/hevc_nal.c packetizer/hevc_nal.h
+	packetizer/hevc_nal.c packetizer/hevc_nal.h \
+	video_chroma/d3d9_fmt.h
 libdxva2_plugin_la_LIBADD = $(LIBCOM) -lshlwapi -luuid
 if HAVE_AVCODEC_DXVA2
 codec_LTLIBRARIES += libdxva2_plugin.la

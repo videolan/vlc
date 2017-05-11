@@ -48,6 +48,7 @@
 #include <windows.h>
 #include <d3d9.h>
 #include <d3dx9effect.h>
+#include "../../video_chroma/d3d9_fmt.h"
 
 #include "common.h"
 #include "builtin_shaders.h"
@@ -147,8 +148,6 @@ struct vout_display_sys_t
     struct d3d_region_t     *d3dregion;
     const d3d_format_t      *d3dtexture_format;  /* Rendering texture(s) format */
 
-    picture_sys_t           *picsys;
-
     /* */
     bool                    reset_device;
     bool                    reopen_device;
@@ -159,11 +158,6 @@ struct vout_display_sys_t
     vlc_mutex_t    lock;
     bool           ch_desktop;
     bool           desktop_requested;
-};
-
-struct picture_sys_t
-{
-    LPDIRECT3DSURFACE9 surface;
 };
 
 static const d3d_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t chroma, D3DFORMAT target);
@@ -343,7 +337,7 @@ static void Close(vlc_object_t *object)
 
 static void DestroyPicture(picture_t *picture)
 {
-    IDirect3DSurface9_Release(picture->p_sys->surface);
+    ReleasePictureSys(picture->p_sys);
 
     free(picture->p_sys);
     free(picture);

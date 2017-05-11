@@ -36,11 +36,7 @@
 #include <initguid.h>
 #include <d3d9.h>
 #include <dxva2api.h>
-
-struct picture_sys_t
-{
-    LPDIRECT3DSURFACE9 surface;
-};
+#include "../../video_chroma/d3d9_fmt.h"
 
 struct filter_sys_t
 {

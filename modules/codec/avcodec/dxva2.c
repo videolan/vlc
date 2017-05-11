@@ -40,6 +40,7 @@
 #define DXVA2API_USE_BITFIELDS
 #define COBJMACROS
 #include <libavcodec/dxva2.h>
+#include "../../video_chroma/d3d9_fmt.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
@@ -132,11 +133,6 @@ struct vlc_va_sys_t
 
     /* avcodec internals */
     struct dxva_context hw;
-};
-
-struct picture_sys_t
-{
-    LPDIRECT3DSURFACE9 surface;
 };
 
 static picture_t *DxAllocPicture(vlc_va_t *, const video_format_t *, unsigned index);

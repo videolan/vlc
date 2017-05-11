@@ -50,11 +50,7 @@ vlc_module_end ()
 
 #include <windows.h>
 #include <d3d9.h>
-
-struct picture_sys_t
-{
-    LPDIRECT3DSURFACE9 surface;
-};
+#include "d3d9_fmt.h"
 
 static bool GetLock(filter_t *p_filter, LPDIRECT3DSURFACE9 d3d,
                     D3DLOCKED_RECT *p_lock, D3DSURFACE_DESC *p_desc)
