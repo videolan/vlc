@@ -855,36 +855,10 @@ error:
     return sys->sys.pool;
 }
 
-static void ReleasePictureResources(picture_sys_t *p_sys)
-{
-    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-        if (p_sys->resourceView[i]) {
-            ID3D11ShaderResourceView_Release(p_sys->resourceView[i]);
-            p_sys->resourceView[i] = NULL;
-        }
-        if (p_sys->texture[i]) {
-            ID3D11Texture2D_Release(p_sys->texture[i]);
-            p_sys->texture[i] = NULL;
-        }
-    }
-    if (p_sys->context) {
-        ID3D11DeviceContext_Release(p_sys->context);
-        p_sys->context = NULL;
-    }
-    if (p_sys->decoder) {
-        ID3D11VideoDecoderOutputView_Release(p_sys->decoder);
-        p_sys->decoder = NULL;
-    }
-    if (p_sys->processorInput) {
-        ID3D11VideoProcessorInputView_Release(p_sys->processorInput);
-        p_sys->processorInput = NULL;
-    }
-}
-
 static void DestroyDisplayPoolPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
-    ReleasePictureResources( p_sys );
+    ReleasePictureSys( p_sys );
     free(p_sys);
     free(picture);
 }
@@ -2640,7 +2614,7 @@ static void ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pVertexShaderConstants);
         quad->pVertexShaderConstants = NULL;
     }
-    ReleasePictureResources(&quad->picSys);
+    ReleasePictureSys(&quad->picSys);
 }
 
 static void Direct3D11DestroyResources(vout_display_t *vd)
@@ -2653,7 +2627,7 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
     sys->d3dregion_count = 0;
 
-    ReleasePictureResources(&sys->stagingSys);
+    ReleasePictureSys(&sys->stagingSys);
 
     if (sys->flatVSShader)
     {
