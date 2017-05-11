@@ -1020,7 +1020,7 @@ static int MP4_ReadBox_trun(  stream_t *p_stream, MP4_Box_t *p_box )
         if( p_box->data.p_trun->i_flags & MP4_TRUN_SAMPLE_FLAGS )
             MP4_GET4BYTES( p_sample->i_flags );
         if( p_box->data.p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET )
-            MP4_GET4BYTES( p_sample->i_composition_time_offset );
+            MP4_GET4BYTES( p_sample->i_composition_time_offset.v0 );
     }
 
 #ifdef MP4_ULTRA_VERBOSE

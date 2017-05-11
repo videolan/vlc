@@ -4210,11 +4210,11 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
         if( p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET )
         {
             if ( p_trun->i_version == 1 )
-                i_pts += (int32_t) p_trun->p_samples[i].i_composition_time_offset;
-            else if( p_trun->p_samples[i].i_composition_time_offset < 0xFF000000 )
-                i_pts += p_trun->p_samples[i].i_composition_time_offset;
+                i_pts += p_trun->p_samples[i].i_composition_time_offset.v1;
+            else if( p_trun->p_samples[i].i_composition_time_offset.v0 < 0xFF000000 )
+                i_pts += p_trun->p_samples[i].i_composition_time_offset.v0;
             else /* version 0 with negative */
-                i_pts += (int32_t) p_trun->p_samples[i].i_composition_time_offset;
+                i_pts += p_trun->p_samples[i].i_composition_time_offset.v1;
         }
 
         if( p_trun->i_flags & MP4_TRUN_SAMPLE_SIZE )
