@@ -81,7 +81,7 @@ static int Open (vlc_object_t *obj)
         if (item == NULL)
             break;
 
-        services_discovery_AddItem (sd, item, _("Local drives"));
+        services_discovery_AddItem (sd, item, NULL);
     }
     return VLC_SUCCESS;
 }
