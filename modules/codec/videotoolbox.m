@@ -32,6 +32,7 @@
 #import "hxxx_helper.h"
 #import <vlc_bits.h>
 #import <vlc_boxes.h>
+#import "vt_utils.h"
 #import "../packetizer/h264_nal.h"
 #import "../packetizer/h264_slice.h"
 #import "../packetizer/hxxx_nal.h"
@@ -98,10 +99,6 @@ static void copy420YpCbCr8Planar(picture_t *, CVPixelBufferRef buffer,
                                  unsigned i_width, unsigned i_height);
 static BOOL deviceSupportsAdvancedProfiles();
 static BOOL deviceSupportsAdvancedLevels();
-
-struct picture_sys_t {
-    CFTypeRef pixelBuffer;
-};
 
 typedef struct frame_info_t frame_info_t;
 
@@ -1562,21 +1559,11 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             return;
         }
 
-        if (unlikely(!p_pic->p_sys)) {
-            vlc_mutex_lock(&p_sys->lock);
-            p_dec->p_sys->b_abort = true;
-            vlc_mutex_unlock(&p_sys->lock);
-            picture_Release(p_pic);
+        if (cvpxpic_attach(p_pic, imageBuffer) != VLC_SUCCESS)
+        {
             free(p_info);
             return;
         }
-
-        /* Can happen if the pic was discarded */
-        if (p_pic->p_sys->pixelBuffer != nil)
-            CFRelease(p_pic->p_sys->pixelBuffer);
-
-        /* will be freed by the vout */
-        p_pic->p_sys->pixelBuffer = CVPixelBufferRetain(imageBuffer);
 
         p_info->p_picture = p_pic;
 

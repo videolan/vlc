@@ -21,7 +21,6 @@
  *****************************************************************************/
 
 #include <QuartzCore/QuartzCore.h>
-#include <VideoToolbox/VideoToolbox.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -31,11 +30,8 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include "../codec/vt_utils.h"
 #include "copy.h"
-
-struct picture_sys_t {
-    CVPixelBufferRef pixelBuffer;
-};
 
 static int  Activate(vlc_object_t *);
 
@@ -48,16 +44,12 @@ vlc_module_end ()
 static void CVPX_I420(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     VLC_UNUSED(p_filter);
-    picture_sys_t *picsys = src->p_sys;
+    assert(src->context != NULL);
 
-    if (picsys == NULL)
-        return;
+    CVPixelBufferRef pixelBuffer = cvpxpic_get_ref(src);
 
-    if (picsys->pixelBuffer == nil)
-        return;
-
-    unsigned width = CVPixelBufferGetWidthOfPlane(picsys->pixelBuffer, 0);
-    unsigned height = CVPixelBufferGetHeightOfPlane(picsys->pixelBuffer, 0);
+    unsigned width = CVPixelBufferGetWidthOfPlane(pixelBuffer, 0);
+    unsigned height = CVPixelBufferGetHeightOfPlane(pixelBuffer, 0);
 
     if (width == 0 || height == 0)
         return;
@@ -65,11 +57,11 @@ static void CVPX_I420(filter_t *p_filter, picture_t *src, picture_t *dst)
     uint8_t *pp_plane[2];
     size_t pi_pitch[2];
 
-    CVPixelBufferLockBaseAddress(picsys->pixelBuffer, kCVPixelBufferLock_ReadOnly);
+    CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
 
     for (int i = 0; i < 2; i++) {
-        pp_plane[i] = CVPixelBufferGetBaseAddressOfPlane(picsys->pixelBuffer, i);
-        pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(picsys->pixelBuffer, i);
+        pp_plane[i] = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, i);
+        pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, i);
     }
 
     copy_cache_t cache;
@@ -81,7 +73,7 @@ static void CVPX_I420(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     CopyCleanCache(&cache);
 
-    CVPixelBufferUnlockBaseAddress(picsys->pixelBuffer, kCVPixelBufferLock_ReadOnly);
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
 }
 
 VIDEO_FILTER_WRAPPER(CVPX_I420)
