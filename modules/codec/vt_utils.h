@@ -24,6 +24,10 @@
 #include <VideoToolbox/VideoToolbox.h>
 #include <vlc_picture.h>
 
+CFMutableDictionaryRef cfdict_create(CFIndex capacity);
+
+void cfdict_set_int32(CFMutableDictionaryRef dict, CFStringRef key, int value);
+
 /*
  * Attach a cvpx buffer to a picture
  *

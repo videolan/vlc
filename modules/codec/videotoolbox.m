@@ -94,7 +94,6 @@ static int DecodeBlock(decoder_t *, block_t *);
 static void Flush(decoder_t *);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
-void VTDictionarySetInt32(CFMutableDictionaryRef, CFStringRef, int);
 static void copy420YpCbCr8Planar(picture_t *, CVPixelBufferRef buffer,
                                  unsigned i_width, unsigned i_height);
 static BOOL deviceSupportsAdvancedProfiles();
@@ -599,10 +598,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
 
     assert(p_sys->extradataInfo != nil);
 
-    p_sys->decoderConfiguration =
-        CFDictionaryCreateMutable(kCFAllocatorDefault, 2,
-                                  &kCFTypeDictionaryKeyCallBacks,
-                                  &kCFTypeDictionaryValueCallBacks);
+    p_sys->decoderConfiguration = cfdict_create(2);
     if (p_sys->decoderConfiguration == NULL)
         return VLC_ENOMEM;
 
@@ -618,10 +614,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
                          p_sys->extradataInfo);
 
     /* pixel aspect ratio */
-    CFMutableDictionaryRef pixelaspectratio =
-        CFDictionaryCreateMutable(kCFAllocatorDefault, 2,
-                                  &kCFTypeDictionaryKeyCallBacks,
-                                  &kCFTypeDictionaryValueCallBacks);
+    CFMutableDictionaryRef pixelaspectratio = cfdict_create(2);
 
     const unsigned i_video_width = p_dec->fmt_out.video.i_width;
     const unsigned i_video_height = p_dec->fmt_out.video.i_height;
@@ -635,12 +628,12 @@ static int StartVideoToolbox(decoder_t *p_dec)
     }
     else date_Init( &p_sys->pts, 2 * 30000, 1001 );
 
-    VTDictionarySetInt32(pixelaspectratio,
-                         kCVImageBufferPixelAspectRatioHorizontalSpacingKey,
-                         i_sar_num);
-    VTDictionarySetInt32(pixelaspectratio,
-                         kCVImageBufferPixelAspectRatioVerticalSpacingKey,
-                         i_sar_den);
+    cfdict_set_int32(pixelaspectratio,
+                     kCVImageBufferPixelAspectRatioHorizontalSpacingKey,
+                     i_sar_num);
+    cfdict_set_int32(pixelaspectratio,
+                     kCVImageBufferPixelAspectRatioVerticalSpacingKey,
+                     i_sar_den);
     CFDictionarySetValue(p_sys->decoderConfiguration,
                          kCVImageBufferPixelAspectRatioKey,
                          pixelaspectratio);
@@ -681,10 +674,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
     }
 
     /* destination pixel buffer attributes */
-    p_sys->destinationPixelBufferAttributes = CFDictionaryCreateMutable(kCFAllocatorDefault,
-                                                                        2,
-                                                                        &kCFTypeDictionaryKeyCallBacks,
-                                                                        &kCFTypeDictionaryValueCallBacks);
+    p_sys->destinationPixelBufferAttributes = cfdict_create(2);
 
 #if !TARGET_OS_IPHONE
     CFDictionarySetValue(p_sys->destinationPixelBufferAttributes,
@@ -696,15 +686,13 @@ static int StartVideoToolbox(decoder_t *p_dec)
                          kCFBooleanTrue);
 #endif
 
-    VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
-                         kCVPixelBufferWidthKey,
-                         i_video_width);
-    VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
-                         kCVPixelBufferHeightKey,
-                         i_video_height);
-    VTDictionarySetInt32(p_sys->destinationPixelBufferAttributes,
-                         kCVPixelBufferBytesPerRowAlignmentKey,
-                         i_video_width * 2);
+    cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+                     kCVPixelBufferWidthKey, i_video_width);
+    cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+                     kCVPixelBufferHeightKey, i_video_height);
+    cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+                     kCVPixelBufferBytesPerRowAlignmentKey,
+                     i_video_width * 2);
 
     /* setup decoder callback record */
     VTDecompressionOutputCallbackRecord decoderCallbackRecord;
@@ -1081,10 +1069,7 @@ static int ExtradataInfoCreate(decoder_t *p_dec, CFStringRef name, void *p_data,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    p_sys->extradataInfo =
-        CFDictionaryCreateMutable(kCFAllocatorDefault, 1,
-                                  &kCFTypeDictionaryKeyCallBacks,
-                                  &kCFTypeDictionaryValueCallBacks);
+    p_sys->extradataInfo = cfdict_create(1);
     if (p_sys->extradataInfo == nil)
         return VLC_EGENERIC;
 
@@ -1155,14 +1140,6 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     block_buf = nil;
 
     return sample_buf;
-}
-
-void VTDictionarySetInt32(CFMutableDictionaryRef dict, CFStringRef key, int value)
-{
-    CFNumberRef number;
-    number = CFNumberCreate(NULL, kCFNumberSInt32Type, &value);
-    CFDictionarySetValue(dict, key, number);
-    CFRelease(number);
 }
 
 static void copy420YpCbCr8Planar(picture_t *p_pic,

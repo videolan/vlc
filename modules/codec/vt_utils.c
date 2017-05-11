@@ -24,6 +24,22 @@
 
 #include "vt_utils.h"
 
+CFMutableDictionaryRef
+cfdict_create(CFIndex capacity)
+{
+    return CFDictionaryCreateMutable(kCFAllocatorDefault, capacity,
+                                     &kCFTypeDictionaryKeyCallBacks,
+                                     &kCFTypeDictionaryValueCallBacks);
+}
+
+void
+cfdict_set_int32(CFMutableDictionaryRef dict, CFStringRef key, int value)
+{
+    CFNumberRef number = CFNumberCreate(NULL, kCFNumberSInt32Type, &value);
+    CFDictionarySetValue(dict, key, number);
+    CFRelease(number);
+}
+
 struct cvpxpic_ctx
 {
     void (*pf_destroy)(void *); /* must be first @ref picture_Release() */
