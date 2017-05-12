@@ -56,6 +56,9 @@ void ffmpeg_CloseCodec( decoder_t *p_dec );
 #define DR_TEXT N_("Direct rendering")
 /* FIXME Does somebody who knows what it does, explain */
 
+#define CORRUPTED_TEXT N_("Show corrupted frames")
+#define CORRUPTED_LONGTEXT N_("Prefer visual artifacts instead of missing frames")
+
 #define ERROR_TEXT N_("Error resilience")
 #define ERROR_LONGTEXT N_( \
     "libavcodec can do error resilience.\n" \

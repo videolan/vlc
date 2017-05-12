@@ -58,6 +58,7 @@ struct decoder_sys_t
 
     /* for frame skipping algo */
     bool b_hurry_up;
+    bool b_show_corrupted;
     bool b_from_preroll;
     enum AVDiscard i_skip_frame;
 
@@ -454,6 +455,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* ***** libavcodec frame skipping ***** */
     p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
+    p_sys->b_show_corrupted = var_CreateGetBool( p_dec, "avcodec-corrupted" );
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-skip-frame" );
     if( i_val >= 4 ) p_context->skip_frame = AVDISCARD_ALL;
@@ -951,7 +953,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         update_late_frame_count( p_dec, p_block, current_time, i_pts);
 
         if( ( !p_sys->p_va && !frame->linesize[0] ) ||
-           ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) ) )
+           ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) &&
+             !p_sys->b_show_corrupted ) )
         {
             av_frame_free(&frame);
             continue;
