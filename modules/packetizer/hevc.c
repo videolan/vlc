@@ -748,13 +748,11 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     if(p_sys->b_need_ts)
     {
         if(p_frag->i_dts > VLC_TS_INVALID)
-        {
             date_Set(&p_sys->dts, p_frag->i_dts);
-            *pb_ts_used = true;
-        }
         p_sys->pts = p_frag->i_pts;
         if(date_Get( &p_sys->dts ) != VLC_TS_INVALID)
             p_sys->b_need_ts = false;
+        *pb_ts_used = true;
     }
 
     if(unlikely(p_frag->i_buffer < 5))
@@ -789,8 +787,11 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     p_output = GatherAndValidateChain(p_output);
     if(p_output)
     {
-        p_sys->b_need_ts = true;
         SetOutputBlockProperties( p_dec, p_output );
+        if(p_frag->i_dts > VLC_TS_INVALID)
+            date_Set(&p_sys->dts, p_frag->i_dts);
+        p_sys->pts = p_frag->i_pts;
+        *pb_ts_used = true;
     }
 
     return p_output;
