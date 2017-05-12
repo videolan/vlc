@@ -46,7 +46,7 @@ typedef struct
     uint16_t   i_style_flags;     /**< Formatting style flags */
 
     /* Font style */
-    float      f_font_relsize;    /**< The font size in % */
+    float      f_font_relsize;    /**< The font size in video height % */
     int        i_font_size;       /**< The font size in pixels */
     int        i_font_color;      /**< The color of the text 0xRRGGBB
                                        (native endianness) */
