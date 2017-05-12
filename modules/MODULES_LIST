@@ -1,4 +1,4 @@
-List of vlc plugins (490):
+List of vlc plugins (492):
 $Id$
 
  * a52: A/52 audio decoder plugin, using liba52
@@ -115,6 +115,7 @@ $Id$
  * direct3d9_adjust: adjust filter for Direct3D9 video decoding
  * direct3d9_deinterlace: deinterlacer for Direct3D9/DxVA video decoding
  * directdraw: video output module using the DirectDraw API
+ * directory_demux: Ouput folder contents to playlist
  * directsound: audio output module using the DirectSound API
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
@@ -361,6 +362,7 @@ $Id$
  * shm: Shared memory framebuffer access module
  * sid: Sidplay demuxer
  * simple_channel_mixer: channel mixer
+ * simple_channel_mixer_arm_neon: channel mixer, optimized for ARM Neon
  * skins2: Skinnable interface, new generation
  * skiptags: APE & ID3 tags-skipping stream filter
  * smb: SMB shares access module
