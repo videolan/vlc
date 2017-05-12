@@ -95,7 +95,14 @@ static void CVPX_I420(filter_t *p_filter, picture_t *sourcePicture, picture_t *d
         pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(picsys->pixelBuffer, i);
     }
 
-    CopyFromNv12ToI420(destinationPicture, pp_plane, pi_pitch, height);
+    copy_cache_t cache;
+
+    if (CopyInitCache(&cache, width))
+        return;
+
+    CopyFromNv12ToI420(destinationPicture, pp_plane, pi_pitch, height, &cache);
+
+    CopyCleanCache(&cache);
 
     CVPixelBufferUnlockBaseAddress(picsys->pixelBuffer, kCVPixelBufferLock_ReadOnly);
 }

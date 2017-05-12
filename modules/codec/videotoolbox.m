@@ -1160,6 +1160,7 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
 {
     uint8_t *pp_plane[2];
     size_t pi_pitch[2];
+    copy_cache_t cache;
 
     if (!buffer || i_width == 0 || i_height == 0)
         return;
@@ -1171,7 +1172,12 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
         pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(buffer, i);
     }
 
-    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_height);
+    if (CopyInitCache(&cache, i_width))
+        return;
+
+    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_height, &cache);
+
+    CopyCleanCache(&cache);
 
     CVPixelBufferUnlockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
 }

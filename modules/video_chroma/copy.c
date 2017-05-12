@@ -369,6 +369,21 @@ static void SSE_CopyFromNv12ToNv12(picture_t *dst,
     asm volatile ("emms");
 }
 
+static void
+SSE_CopyFromNv12ToI420(picture_t *dest, uint8_t *src[2],
+                       size_t src_pitch[2], unsigned int height,
+                       copy_cache_t *cache, unsigned int cpu)
+{
+    SSE_CopyPlane(dest->p[0].p_pixels, dest->p[0].i_pitch,
+                  src[0], src_pitch[0], cache->buffer, cache->size,
+                  height, cpu);
+    SSE_SplitPlanes(dest->p[1].p_pixels, dest->p[1].i_pitch,
+                    dest->p[2].p_pixels, dest->p[2].i_pitch,
+                    src[1], src_pitch[1], cache->buffer, cache->size,
+                    height / 2, cpu);
+    asm volatile ("emms");
+}
+
 static void SSE_CopyFromI420ToNv12(picture_t *dst,
                              uint8_t *src[3], size_t src_pitch[3],
                              unsigned height,
@@ -473,8 +488,17 @@ void CopyFromNv12ToNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
 }
 
 void CopyFromNv12ToI420(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
-                        unsigned height)
+                        unsigned height, copy_cache_t *cache)
 {
+#ifdef CAN_COMPILE_SSE2
+    unsigned    cpu = vlc_CPU();
+
+    if (vlc_CPU_SSE2())
+        return SSE_CopyFromNv12ToI420(dst, src, src_pitch, height, cache, cpu);
+#else
+    VLC_UNUSED(cache);
+#endif
+
     CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
               src[0], src_pitch[0], height);
     SplitPlanes(dst->p[1].p_pixels, dst->p[1].i_pitch,
