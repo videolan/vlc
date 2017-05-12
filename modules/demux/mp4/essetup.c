@@ -925,22 +925,28 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         }
         case( ATOM_eac3 ):
         {
-            const MP4_Box_t *p_dec3 = MP4_BoxGet(  p_sample, "dec3", 0 );
-
             p_track->fmt.i_codec = VLC_CODEC_EAC3;
+            /* TS 102.366. F6 The values of the ChannelCount and SampleSize fields
+             *             within the EC3SampleEntry Box shall be ignored. */
+            p_track->fmt.audio.i_channels = 0;
+            p_track->fmt.audio.i_bitspersample = 0;
+
+            const MP4_Box_t *p_dec3 = MP4_BoxGet(  p_sample, "dec3", 0 );
             if( p_dec3 && BOXDATA(p_dec3) )
             {
-                p_track->fmt.audio.i_channels = 0;
                 p_track->fmt.i_bitrate = BOXDATA(p_dec3)->i_data_rate * 1000;
-                p_track->fmt.audio.i_bitspersample = 0;
             }
             break;
         }
         case( ATOM_ac3 ):
         {
-            MP4_Box_t *p_dac3 = MP4_BoxGet(  p_sample, "dac3", 0 );
-
             p_track->fmt.i_codec = VLC_CODEC_A52;
+            /* TS 102.366. F3 The values of the ChannelCount and SampleSize fields
+             *             within the AC3SampleEntry Box shall be ignored */
+            p_track->fmt.audio.i_channels = 0;
+            p_track->fmt.audio.i_bitspersample = 0;
+
+            MP4_Box_t *p_dac3 = MP4_BoxGet(  p_sample, "dac3", 0 );
             if( p_dac3 && BOXDATA(p_dac3) )
             {
                 static const int pi_bitrate[] = {
@@ -950,11 +956,9 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     256, 320, 384, 448,
                     512, 576, 640,
                 };
-                p_track->fmt.audio.i_channels = 0;
                 p_track->fmt.i_bitrate = 0;
                 if( BOXDATA(p_dac3)->i_bitrate_code < sizeof(pi_bitrate)/sizeof(*pi_bitrate) )
                     p_track->fmt.i_bitrate = pi_bitrate[BOXDATA(p_dac3)->i_bitrate_code] * 1000;
-                p_track->fmt.audio.i_bitspersample = 0;
             }
             break;
         }
