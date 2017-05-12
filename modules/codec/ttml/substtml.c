@@ -217,7 +217,7 @@ static void FillTextStyle( const char *psz_attr, const char *psz_val,
         char* psz_end = NULL;
         float size = us_strtof( psz_val, &psz_end );
         if( *psz_end == '%' )
-            p_text_style->f_font_relsize = size;
+            p_text_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE * size / 100.0;
         else
             p_text_style->i_font_size = (int)( size + 0.5 );
     }
