@@ -232,7 +232,7 @@
 
 - (IBAction)resetPrefs:(id)sender
 {
-#warning implement me
+    [[[VLCMain sharedInstance] simplePreferences] resetPreferences:sender];
 }
 
 - (void)loadConfigTree
