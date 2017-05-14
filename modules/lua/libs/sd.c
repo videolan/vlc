@@ -34,6 +34,7 @@
 #endif
 
 #include <assert.h>
+#include <math.h>
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_playlist.h>
@@ -179,7 +180,7 @@ static input_item_t *vlclua_sd_create_item( services_discovery_t *p_sd,
 
     lua_getfield( L, -1, "duration" );
     if( lua_isnumber( L, -1 ) )
-        input_item_SetDuration( p_input, (lua_tonumber( L, -1 )*1e6) );
+        p_input->i_duration = llround(lua_tonumber( L, -1 ) * 1e6);
     else if( !lua_isnil( L, -1 ) )
         msg_Warn( p_sd, "Item duration should be a number (in seconds)." );
     lua_pop( L, 1 );
