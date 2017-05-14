@@ -774,7 +774,7 @@ aviindex:
             if( i_do_index == 0 )
             {
                 const char *psz_msg = _(
-                    "Because this AVI file index is broken or missing, "
+                    "Because this file index is broken or missing, "
                     "seeking will not work correctly.\n"
                     "VLC won't repair your file but can temporary fix this "
                     "problem by building an index in memory.\n"
@@ -785,7 +785,7 @@ aviindex:
                                                   _("Do not play"),
                                                   _("Build index then play"),
                                                   _("Play as is"),
-                                                  _("Broken or missing AVI Index"),
+                                                  _("Broken or missing Index"),
                                                   "%s", psz_msg ) )
                 {
                     case 0:
