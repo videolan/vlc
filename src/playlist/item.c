@@ -428,13 +428,13 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
  * Add an item to the playlist or the media library
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
- * \param i_mode the mode used when adding
+ * \param play_now whether to start playing immediately or not
  * \return VLC_SUCCESS or a VLC error code
  */
-int playlist_Add( playlist_t *p_playlist, const char *psz_uri, int i_mode )
+int playlist_Add( playlist_t *p_playlist, const char *psz_uri, bool play_now )
 {
     return playlist_AddExt( p_playlist, psz_uri, NULL,
-                            i_mode, 0, NULL, 0, true );
+                            play_now ? PLAYLIST_GO : 0, 0, NULL, 0, true );
 }
 
 /**

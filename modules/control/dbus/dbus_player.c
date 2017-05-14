@@ -229,7 +229,7 @@ DBUS_METHOD( OpenUri )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    playlist_Add( PL, psz_mrl, PLAYLIST_GO );
+    playlist_Add( PL, psz_mrl, true );
 
     REPLY_SEND;
 }
