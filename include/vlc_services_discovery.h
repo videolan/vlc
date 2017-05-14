@@ -43,8 +43,8 @@ extern "C" {
 struct services_discovery_owner_t
 {
     void *sys; /**< Private data for the owner callbacks */
-    void (*item_added)(struct services_discovery_t *sd, input_item_t *item,
-                       const char *category);
+    void (*item_added)(struct services_discovery_t *sd, input_item_t *parent,
+                       input_item_t *item, const char *category);
     void (*item_removed)(struct services_discovery_t *sd, input_item_t *item);
 };
 
@@ -148,22 +148,40 @@ VLC_USED;
 VLC_API void vlc_sd_Destroy( services_discovery_t * );
 
 /**
+ * Added top-level service callback.
+ *
+ * This is a convenience wrapper for services_discovery_AddSubItem().
+ * It covers the most comomn case wherby the added item is a top-level service,
+ * i.e. it has no parent node.
+ */
+static inline void services_discovery_AddItem(services_discovery_t *sd,
+                                              input_item_t *item)
+{
+    return sd->owner.item_added(sd, NULL, item, NULL);
+}
+
+/**
  * Added service callback.
  *
  * A services discovery module invokes this function when it "discovers" a new
  * service, i.e. a new input item.
  *
- * @note The function does not take ownership of the input item; it might
- * however add one of more references. The caller is responsible for releasing
- * its reference to the input item.
+ * @note This callback does not take ownership of the input item; it might
+ * however (and most probably will) add one of more references to the item.
+ *
+ * The caller is responsible for releasing its own reference(s) eventually.
+ * Keeping a reference is necessary to call services_discovery_RemoveItem() or
+ * to alter the item later. However, if the caller will never remove nor alter
+ * the item, it can drop its reference(s) immediately.
  *
  * @param sd services discoverer / services discovery module instance
  * @param item input item to add
  */
-static inline void services_discovery_AddItem(services_discovery_t *sd,
-                                              input_item_t *item)
+static inline void services_discovery_AddSubItem(services_discovery_t *sd,
+                                                 input_item_t *parent,
+                                                 input_item_t *item)
 {
-    return sd->owner.item_added(sd, item, NULL);
+    return sd->owner.item_added(sd, parent, item, NULL);
 }
 
 /**
@@ -177,7 +195,7 @@ static inline void services_discovery_AddItemCat(services_discovery_t *sd,
                                                  input_item_t *item,
                                                  const char *category)
 {
-    return sd->owner.item_added(sd, item, category);
+    return sd->owner.item_added(sd, item, NULL, category);
 }
 
 /**

@@ -58,6 +58,7 @@ struct libvlc_media_discoverer_t
  **************************************************************************/
 
 static void services_discovery_item_added( services_discovery_t *sd,
+                                           input_item_t *parent,
                                            input_item_t *p_item,
                                            const char *psz_cat )
 {
@@ -68,6 +69,11 @@ static void services_discovery_item_added( services_discovery_t *sd,
     p_md = libvlc_media_new_from_input_item( p_mdis->p_libvlc_instance,
                                              p_item );
 
+    if( parent != NULL )
+    {
+        /* Flatten items list for now. TODO: tree support. */
+    }
+    else
     /* If we have a category, that mean we have to group the items having
      * that category in a media_list. */
     if( psz_cat )

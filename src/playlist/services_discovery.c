@@ -40,11 +40,14 @@ struct vlc_sd_internal_t
 
  /* A new item has been added to a certain sd */
 static void playlist_sd_item_added(services_discovery_t *sd,
-                                   input_item_t *p_input, const char *psz_cat)
+                                   input_item_t *parent, input_item_t *p_input,
+                                   const char *psz_cat)
 {
+    assert(parent == NULL || psz_cat == NULL);
+
     vlc_sd_internal_t *sds = sd->owner.sys;
     playlist_t *playlist = (playlist_t *)sd->obj.parent;
-    playlist_item_t *parent;
+    playlist_item_t *node;
     const char *longname = (sd->description != NULL) ? sd->description : "?";
 
     msg_Dbg(sd, "adding %s", p_input->psz_name ? p_input->psz_name : "(null)");
@@ -55,18 +58,21 @@ static void playlist_sd_item_added(services_discovery_t *sd,
                                         PLAYLIST_END,
                                         PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
 
-    /* If p_parent is in root category (this is clearly a hack) and we have a cat */
-    if (psz_cat == NULL)
-        parent = sds->node;
+    if (parent != NULL)
+        node = playlist_ItemGetByInput(playlist, parent);
     else
-    {
-        parent = playlist_ChildSearchName(sds->node, psz_cat);
-        if (parent == NULL)
-            parent = playlist_NodeCreate(playlist, psz_cat, sds->node,
-                                         PLAYLIST_END, PLAYLIST_RO_FLAG);
+    if (psz_cat == NULL)
+        node = sds->node;
+    else
+    {   /* Parent is NULL (root) and category is specified.
+         * This is clearly a hack. TODO: remove this. */
+        node = playlist_ChildSearchName(sds->node, psz_cat);
+        if (node == NULL)
+            node = playlist_NodeCreate(playlist, psz_cat, sds->node,
+                                       PLAYLIST_END, PLAYLIST_RO_FLAG);
     }
 
-    playlist_NodeAddInput(playlist, p_input, parent, 0, PLAYLIST_END);
+    playlist_NodeAddInput(playlist, p_input, node, 0, PLAYLIST_END);
     playlist_Unlock(playlist);
 }
 
