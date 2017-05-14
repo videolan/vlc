@@ -102,7 +102,8 @@ static void parse_meta( demux_t* p_demux, input_item_t* p_input )
         goto done;
 
     if( !strcasecmp( psz_meta_name, "TotalDuration" ) )
-        input_item_SetDuration( p_input, atoll( psz_meta_content ) );
+        input_item_AddInfo( p_input, _("Playlist"), _("Total duration"),
+                            "%lld", atoll( psz_meta_content ) );
     else
         if( !strcasecmp( psz_meta_name, "Author" ) )
             input_item_SetPublisher( p_input, psz_meta_content );
