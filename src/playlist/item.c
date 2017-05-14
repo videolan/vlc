@@ -483,8 +483,10 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
     item = b_playlist ? p_playlist->p_playing
                       : p_playlist->p_media_library;
 
-    item = playlist_NodeAddInput( p_playlist, p_input, item,
-                                  play_now ? PLAYLIST_GO : 0, PLAYLIST_END );
+    item = playlist_NodeAddInput( p_playlist, p_input, item, 0, PLAYLIST_END );
+
+    if( likely(item != NULL) && play_now )
+        playlist_ViewPlay( p_playlist, NULL, item );
     PL_UNLOCK;
     return (item != NULL) ? VLC_SUCCESS : VLC_ENOMEM;
 }
