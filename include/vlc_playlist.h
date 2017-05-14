@@ -306,6 +306,12 @@ VLC_API void playlist_Deactivate( playlist_t * );
  */
 VLC_API void playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked, ...  );
 
+static inline void playlist_ViewPlay(playlist_t *pl, playlist_item_t *node,
+                                     playlist_item_t *item)
+{
+    playlist_Control(pl, PLAYLIST_VIEWPLAY, pl_Locked, node, item);
+}
+
 /** Get current playing input. The object is retained.
  */
 VLC_API input_thread_t * playlist_CurrentInput( playlist_t *p_playlist ) VLC_USED;
