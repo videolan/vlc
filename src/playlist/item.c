@@ -463,8 +463,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     if( p_input == NULL )
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
-    i_ret = playlist_AddInput( p_playlist, p_input,
-                               play_now ? PLAYLIST_GO : 0, b_playlist );
+    i_ret = playlist_AddInput( p_playlist, p_input, play_now, b_playlist );
     input_item_Release( p_input );
     return i_ret;
 }
@@ -479,7 +478,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
  * \return VLC_SUCCESS or VLC_ENOMEM or VLC_EGENERIC
 */
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
-                       int i_mode, bool b_playlist )
+                       bool play_now, bool b_playlist )
 {
     playlist_item_t *item;
 
@@ -487,8 +486,8 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
     item = b_playlist ? p_playlist->p_playing
                       : p_playlist->p_media_library;
 
-    item = playlist_NodeAddInput( p_playlist, p_input, item, i_mode,
-                                  PLAYLIST_END );
+    item = playlist_NodeAddInput( p_playlist, p_input, item,
+                                  play_now ? PLAYLIST_GO : 0, PLAYLIST_END );
     PL_UNLOCK;
     return (item != NULL) ? VLC_SUCCESS : VLC_ENOMEM;
 }
