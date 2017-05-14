@@ -702,19 +702,14 @@ void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item )
  */
 mtime_t playlist_GetNodeDuration( playlist_item_t* node )
 {
-    mtime_t mt_duration = 0;
+    mtime_t duration = input_item_GetDuration( node->p_input );
+    if( duration == -1 )
+        duration = 0;
 
-    if( node->i_children != -1 )
-        for( int i = 0; i < node->i_children; i++ )
-        {
-            input_item_t* p_input = node->pp_children[i]->p_input;
-            if ( p_input->i_type == ITEM_TYPE_NODE )
-                mt_duration += playlist_GetNodeDuration( node->pp_children[i] );
-            else
-                mt_duration += input_item_GetDuration( p_input );
-        }
+    for( int i = 0; i < node->i_children; i++ )
+        duration += playlist_GetNodeDuration( node->pp_children[i] );
 
-    return mt_duration;
+    return duration;
 }
 
 /***************************************************************************
