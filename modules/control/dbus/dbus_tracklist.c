@@ -209,8 +209,7 @@ DBUS_METHOD( GoTo )
 
         if( item->i_id == i_track_id )
         {
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
-                              item->p_parent, item );
+            playlist_ViewPlay( p_playlist, item->p_parent, item );
             break;
         }
     }
