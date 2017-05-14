@@ -266,7 +266,7 @@ static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
         free( psz_string );
     }
     input_item_SetDate( p_input, p_track->date );
-    input_item_SetDuration( p_input, p_track->duration * 1000 );
+    p_input->i_duration = p_track->duration * INT64_C(1000);
     services_discovery_AddItem( p_sd, p_input );
     p_sd->p_sys->pp_items[p_sd->p_sys->i_count++] = p_input;
 }
