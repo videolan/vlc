@@ -65,6 +65,7 @@ struct services_discovery_sys_t
     xcb_atom_t        net_wm_name;
     xcb_window_t      root_window;
     void             *apps;
+    input_item_t     *apps_root;
 };
 
 static void *Run (void *);
@@ -163,6 +164,11 @@ static int Open (vlc_object_t *obj)
     }
 
     p_sys->apps = NULL;
+    p_sys->apps_root = input_item_NewExt("vlc://nop", _("Applications"), -1,
+                                         ITEM_TYPE_NODE, ITEM_LOCAL);
+    if (likely(p_sys->apps_root != NULL))
+        services_discovery_AddItem(sd, p_sys->apps_root);
+
     UpdateApps (sd);
 
     if (vlc_clone (&p_sys->thread, Run, sd, VLC_THREAD_PRIORITY_LOW))
@@ -172,6 +178,8 @@ static int Open (vlc_object_t *obj)
 error:
     xcb_disconnect (p_sys->conn);
     tdestroy (p_sys->apps, DelApp);
+    if (p_sys->apps_root != NULL)
+        input_item_Release(p_sys->apps_root);
     free (p_sys);
     return VLC_EGENERIC;
 }
@@ -189,6 +197,8 @@ static void Close (vlc_object_t *obj)
     vlc_join (p_sys->thread, NULL);
     xcb_disconnect (p_sys->conn);
     tdestroy (p_sys->apps, DelApp);
+    if (p_sys->apps_root != NULL)
+        input_item_Release(p_sys->apps_root);
     free (p_sys);
 }
 
@@ -272,7 +282,7 @@ static struct app *AddApp (services_discovery_t *sd, xcb_window_t xid)
     app->xid = xid;
     app->item = item;
     app->owner = sd;
-    services_discovery_AddItemCat(sd, item, _("Applications"));
+    input_item_PostSubItem(p_sys->apps_root, item);
     return app;
 }
 
