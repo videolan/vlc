@@ -80,8 +80,7 @@ void Playtree::action( VarTree *pElem )
         playlist_ItemGetById( m_pPlaylist, pElem->getId() );
     if( pItem )
     {
-        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY,
-                          pl_Locked, pItem->p_parent, pItem );
+        playlist_ViewPlay( m_pPlaylist, pItem->p_parent, pItem );
     }
 
     playlist_Unlock( m_pPlaylist );
