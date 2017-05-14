@@ -74,7 +74,6 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     input_item_Release( p_new_input );
 
     if( p_item == NULL )  return NULL;
-    p_item->i_children = 0;
 
     if( p_parent != NULL )
         playlist_NodeInsert( p_parent, p_item, i_pos );
