@@ -1270,8 +1270,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             p_item = p_parent = p_playlist->items.p_elems[i_pos-1];
             while( p_parent->p_parent )
                 p_parent = p_parent->p_parent;
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
-                    p_parent, p_item );
+            playlist_ViewPlay( p_playlist, p_parent, p_item );
         }
         else
             msg_rc( vlc_ngettext("Playlist has only %u element",
