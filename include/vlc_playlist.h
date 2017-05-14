@@ -200,9 +200,6 @@ enum
     ORDER_REVERSE = 1,
 };
 
-/* Used by playlist_Import */
-#define PLAYLIST_GO              0x0004
-
 #define PLAYLIST_END           -1
 
 enum pl_locked_state
