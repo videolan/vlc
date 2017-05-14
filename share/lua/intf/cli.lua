@@ -253,7 +253,7 @@ function playlist(name,client,arg)
     if name == "search" then
         client:append("+----[ Search - "..(arg or "`reset'").." ]")
     else
-        client:append("+----[ Playlist - "..playlist.name.." ]")
+        client:append("+----[ Playlist - "..name.." ]")
     end
     if playlist.children then
         for _, item in ipairs(playlist.children) do
