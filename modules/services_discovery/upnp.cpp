@@ -344,7 +344,7 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
         input_item_SetArtworkURL( p_input_item, desc->iconUrl.c_str() );
     desc->inputItem = p_input_item;
     input_item_SetDescription( p_input_item, desc->UDN.c_str() );
-    services_discovery_AddItem( m_sd, p_input_item, NULL );
+    services_discovery_AddItem( m_sd, p_input_item );
     m_list.push_back( desc );
 
     return true;

@@ -175,7 +175,7 @@ items_add_input( struct discovery_sys *p_sys, services_discovery_t *p_sd,
     p_item->p_renderer_item = NULL;
     p_item->i_last_seen = mdate();
     vlc_array_append( &p_sys->items, p_item );
-    services_discovery_AddItem( p_sd, p_input_item, NULL );
+    services_discovery_AddItem( p_sd, p_input_item );
 
     return VLC_SUCCESS;
 }

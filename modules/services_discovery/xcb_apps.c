@@ -272,7 +272,7 @@ static struct app *AddApp (services_discovery_t *sd, xcb_window_t xid)
     app->xid = xid;
     app->item = item;
     app->owner = sd;
-    services_discovery_AddItem (sd, item, _("Applications"));
+    services_discovery_AddItemCat(sd, item, _("Applications"));
     return app;
 }
 
@@ -352,6 +352,6 @@ static void AddDesktop(services_discovery_t *sd)
     if (item == NULL)
         return;
 
-    services_discovery_AddItem (sd, item, NULL);
+    services_discovery_AddItem(sd, item);
     input_item_Release (item);
 }

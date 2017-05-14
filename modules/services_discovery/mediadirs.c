@@ -254,7 +254,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     if( p_sys->i_type == Picture )
         formatSnapshotItem( p_item );
 
-    services_discovery_AddItem( p_sd, p_item, NULL );
+    services_discovery_AddItem( p_sd, p_item );
 }
 
 static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
@@ -278,7 +278,7 @@ static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
         if( fileType( p_sd, psz_file ) == Picture )
         {
             formatSnapshotItem( p_item );
-            services_discovery_AddItem( p_sd, p_item, NULL );
+            services_discovery_AddItem( p_sd, p_item );
 
             msg_Dbg( p_sd, "New snapshot added : %s", psz_file );
         }
@@ -287,7 +287,7 @@ static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
     {
         if( fileType( p_sd, psz_file ) == Audio )
         {
-            services_discovery_AddItem( p_sd, p_item, NULL );
+            services_discovery_AddItem( p_sd, p_item );
 
             msg_Dbg( p_sd, "New recorded audio added : %s", psz_file );
         }
@@ -297,7 +297,7 @@ static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
         if( fileType( p_sd, psz_file ) == Video ||
             fileType( p_sd, psz_file ) == Unknown )
         {
-            services_discovery_AddItem( p_sd, p_item, NULL );
+            services_discovery_AddItem( p_sd, p_item );
 
             msg_Dbg( p_sd, "New recorded video added : %s", psz_file );
         }

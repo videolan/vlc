@@ -81,7 +81,7 @@ static int Open (vlc_object_t *obj)
         if (item == NULL)
             break;
 
-        services_discovery_AddItem (sd, item, NULL);
+        services_discovery_AddItem(sd, item);
     }
     return VLC_SUCCESS;
 }

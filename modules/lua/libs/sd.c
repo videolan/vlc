@@ -337,9 +337,9 @@ static int vlclua_sd_add_common( services_discovery_t *p_sd, lua_State *L,
 
     lua_getfield( L, -2, "category" );
     if( lua_isstring( L, -1 ) )
-        services_discovery_AddItem( p_sd, p_input, luaL_checkstring( L, -1 ) );
+        services_discovery_AddItemCat( p_sd, p_input, luaL_checkstring( L, -1 ) );
     else
-        services_discovery_AddItem( p_sd, p_input, NULL );
+        services_discovery_AddItem( p_sd, p_input );
     lua_pop( L, 1 );
 
     return 1;

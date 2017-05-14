@@ -327,7 +327,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
             input_item_AddOption( p_input, "demux=podcast", VLC_INPUT_OPTION_TRUSTED );
 
             INSERT_ELEM( pp_new_items, i_new_items, i_new_items, p_input );
-            services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
+            services_discovery_AddItem( p_sd, p_input );
 
             INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
                          input_CreateAndStart( p_sd, p_input, NULL ) );
@@ -402,7 +402,7 @@ static void ParseRequest( services_discovery_t *p_sd )
             input_item_AddOption( p_input, "demux=podcast", VLC_INPUT_OPTION_TRUSTED );
 
             INSERT_ELEM( p_sys->pp_items, p_sys->i_items, p_sys->i_items, p_input );
-            services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
+            services_discovery_AddItem( p_sd, p_input );
 
             INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
                          input_CreateAndStart( p_sd, p_input, NULL ) );

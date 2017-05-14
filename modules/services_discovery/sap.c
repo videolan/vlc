@@ -900,7 +900,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
         if (likely(str != NULL))
             for (char *p = strchr(str, '.'); p != NULL; p = strchr(p, '.'))
                 *(p++) = '|';
-        services_discovery_AddItem(p_sd, p_input, str ? str : psz_value);
+        services_discovery_AddItemCat(p_sd, p_input, str ? str : psz_value);
         free(str);
     }
     else
@@ -908,7 +908,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
         /* backward compatibility with VLC 0.7.3-2.0.0 senders */
         psz_value = GetAttribute(p_sap->p_sdp->pp_attributes,
                                  p_sap->p_sdp->i_attributes, "x-plgroup");
-        services_discovery_AddItem(p_sd, p_input, psz_value);
+        services_discovery_AddItemCat(p_sd, p_input, psz_value);
     }
 
     TAB_APPEND( p_sys->i_announces, p_sys->pp_announces, p_sap );

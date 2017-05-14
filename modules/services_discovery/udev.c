@@ -198,7 +198,7 @@ static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
         *dp = d;
     }
 
-    services_discovery_AddItem (sd, item, NULL);
+    services_discovery_AddItem(sd, item);
     d->sd = sd;
     return 0;
 }

@@ -159,12 +159,23 @@ VLC_API void vlc_sd_Destroy( services_discovery_t * );
  *
  * @param sd services discoverer / services discovery module instance
  * @param item input item to add
+ */
+static inline void services_discovery_AddItem(services_discovery_t *sd,
+                                              input_item_t *item)
+{
+    return sd->owner.item_added(sd, item, NULL);
+}
+
+/**
+ * Added service backward compatibility callback.
+ *
  * @param category Optional name of a group that the item belongs in
  *                 (for backward compatibility with legacy modules)
  */
-static inline void services_discovery_AddItem(services_discovery_t *sd,
-                                              input_item_t *item,
-                                              const char *category)
+VLC_DEPRECATED
+static inline void services_discovery_AddItemCat(services_discovery_t *sd,
+                                                 input_item_t *item,
+                                                 const char *category)
 {
     return sd->owner.item_added(sd, item, category);
 }

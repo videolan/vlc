@@ -331,7 +331,7 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
     NSString *uri = [NSString stringWithFormat:@"%@://%@:%ld", protocol, netService.hostName, netService.port];
     input_item_t *p_input_item = input_item_NewDirectory([uri UTF8String], [netService.name UTF8String], ITEM_NET );
     if (p_input_item != NULL) {
-        services_discovery_AddItem( p_sd, p_input_item, NULL);
+        services_discovery_AddItem(p_sd, p_input_item);
         [_inputItemsForNetServices addObject:[NSValue valueWithPointer:p_input_item]];
         [_resolvedNetServices addObject:netService];
     }
