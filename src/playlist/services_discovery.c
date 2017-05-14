@@ -71,7 +71,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
                                        PLAYLIST_END, PLAYLIST_RO_FLAG);
     }
 
-    playlist_NodeAddInput(playlist, p_input, node, 0, PLAYLIST_END);
+    playlist_NodeAddInput(playlist, p_input, node, PLAYLIST_END);
     playlist_Unlock(playlist);
 }
 

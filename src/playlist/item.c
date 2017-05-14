@@ -36,8 +36,7 @@
 #include <vlc_rand.h>
 #include "playlist_internal.h"
 
-static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
-                           playlist_item_t * );
+static void playlist_Preparse( playlist_t *, playlist_item_t * );
 static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
 
 static int RecursiveAddIntoParent (
@@ -483,7 +482,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
     item = b_playlist ? p_playlist->p_playing
                       : p_playlist->p_media_library;
 
-    item = playlist_NodeAddInput( p_playlist, p_input, item, 0, PLAYLIST_END );
+    item = playlist_NodeAddInput( p_playlist, p_input, item, PLAYLIST_END );
 
     if( likely(item != NULL) && play_now )
         playlist_ViewPlay( p_playlist, NULL, item );
@@ -497,7 +496,6 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
  * \param p_playlist the playlist to add into
  * \param p_input the input item to add
  * \param p_parent the parent item to add into
- * \param i_mode the mode used when addin
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of its size
@@ -505,8 +503,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
  */
 playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
                                          input_item_t *p_input,
-                                         playlist_item_t *p_parent,
-                                         int i_mode, int i_pos )
+                                         playlist_item_t *p_parent, int i_pos )
 {
     PL_ASSERT_LOCKED;
 
@@ -521,8 +518,8 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
 
     playlist_NodeInsert( p_parent, p_item, i_pos );
     playlist_SendAddNotify( p_playlist, p_item );
+    playlist_Preparse( p_playlist, p_item );
 
-    GoAndPreparse( p_playlist, i_mode, p_item );
     return p_item;
 }
 
@@ -715,22 +712,13 @@ mtime_t playlist_GetNodeDuration( playlist_item_t* node )
  * The following functions are local
  ***************************************************************************/
 
-/* Enqueue an item for preparsing, and play it, if needed */
-static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
-                           playlist_item_t *p_item )
+/* Enqueue an item for preparsing */
+static void playlist_Preparse( playlist_t *p_playlist,
+                               playlist_item_t *p_item )
 {
     playlist_private_t *sys = pl_priv(p_playlist);
 
     PL_ASSERT_LOCKED;
-    if( (i_mode & PLAYLIST_GO ) )
-    {
-        sys->request.b_request = true;
-        sys->request.i_skip = 0;
-        sys->request.p_item = p_item;
-        if( sys->p_input != NULL )
-            input_Stop( sys->p_input );
-        vlc_cond_signal( &sys->signal );
-    }
     /* Preparse if no artist/album info, and hasn't been preparsed already
        and if user has some preparsing option (auto-preparse variable)
        enabled*/
@@ -789,7 +777,7 @@ static int RecursiveAddIntoParent (
         {
             p_new_item = playlist_NodeAddInput( p_playlist,
                                                 p_child_node->p_item,
-                                                p_parent, 0, i_pos );
+                                                p_parent, i_pos );
             if( !p_new_item ) return i_pos;
 
             i_pos++;
@@ -838,7 +826,7 @@ static int RecursiveInsertCopy (
             if( likely(p_new_input != NULL) )
             {
                 p_new_item = playlist_NodeAddInput( p_playlist, p_new_input,
-                                                    p_parent, 0, i_pos );
+                                                    p_parent, i_pos );
                 input_item_Release( p_new_input );
             }
         }

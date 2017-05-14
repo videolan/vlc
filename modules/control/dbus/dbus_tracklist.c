@@ -109,7 +109,7 @@ DBUS_METHOD( AddTrack )
         }
     }
 
-    plitem = playlist_NodeAddInput( p_playlist, item, node, 0, i_pos );
+    plitem = playlist_NodeAddInput( p_playlist, item, node, i_pos );
     if( likely(plitem != NULL) && b_play )
         playlist_ViewPlay( p_playlist, NULL, plitem );
 

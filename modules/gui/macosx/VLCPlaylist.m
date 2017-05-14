@@ -639,8 +639,8 @@
             continue;
 
         int i_pos = (i_position == -1) ? PLAYLIST_END : i_position + i_current_offset++;
-        playlist_item_t *p_item = playlist_NodeAddInput(p_playlist, p_input, p_parent,
-                                                        0, i_pos);
+        playlist_item_t *p_item = playlist_NodeAddInput(p_playlist, p_input,
+                                                        p_parent, i_pos);
         if (!p_item)
             continue;
 

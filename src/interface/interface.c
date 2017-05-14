@@ -177,7 +177,7 @@ int intf_InsertItem(libvlc_int_t *libvlc, const char *mrl, unsigned optc,
     if (input_item_AddOptions(item, optc, optv, flags) == VLC_SUCCESS)
     {
         playlist_Lock(playlist);
-        if (playlist_NodeAddInput(playlist, item, playlist->p_playing, 0,
+        if (playlist_NodeAddInput(playlist, item, playlist->p_playing,
                                   0) != NULL)
             ret = 0;
         playlist_Unlock(playlist);

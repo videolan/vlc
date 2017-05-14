@@ -1312,7 +1312,7 @@ static void AddItem(intf_thread_t *intf, const char *path)
     if (node == NULL)
         node = playlist->p_playing;
 
-    playlist_NodeAddInput(playlist, item, node, 0, PLAYLIST_END);
+    playlist_NodeAddInput(playlist, item, node, PLAYLIST_END);
     playlist_Unlock(playlist);
 
     input_item_Release(item);

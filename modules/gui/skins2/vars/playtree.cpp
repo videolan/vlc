@@ -338,7 +338,7 @@ void Playtree::insertItems( VarTree& elem, const std::list<std::string>& files, 
         if( pItem == NULL)
             continue;
 
-        pPlItem = playlist_NodeAddInput( m_pPlaylist, pItem, p_node, 0, i_pos );
+        pPlItem = playlist_NodeAddInput( m_pPlaylist, pItem, p_node, i_pos );
 
         if( likely(pPlItem != NULL) && first )
         {
