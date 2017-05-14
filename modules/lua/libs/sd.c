@@ -236,19 +236,22 @@ static int vlclua_sd_node_delete( lua_State *L )
     return 1;
 }
 
+static int vlclua_sd_add_sub_common( services_discovery_t *p_sd,
+                                     input_item_t **pp_node,
+                                     input_item_t *p_input )
+{
+    if( *pp_node != NULL && p_input != NULL )
+        services_discovery_AddSubItem( p_sd, *pp_node, p_input );
+    return 1;
+}
+
 static int vlclua_node_add_subitem( lua_State *L )
 {
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
-
     input_item_t **pp_node = (input_item_t **)luaL_checkudata( L, 1, "node" );
-    if( *pp_node == NULL )
-        return 1;
 
-    input_item_t *p_input = vlclua_sd_create_item( p_sd, L );
-    if( p_input != NULL )
-        input_item_PostSubItem( *pp_node, p_input );
-
-    return 1;
+    return vlclua_sd_add_sub_common( p_sd, pp_node,
+                                     vlclua_sd_create_item( p_sd, L ) );
 }
 
 static const luaL_Reg vlclua_node_reg[];
@@ -308,16 +311,10 @@ static input_item_t *vlclua_sd_create_node( services_discovery_t *p_sd,
 static int vlclua_node_add_subnode( lua_State *L )
 {
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
-
     input_item_t **pp_node = (input_item_t **)luaL_checkudata( L, 1, "node" );
-    if( *pp_node == NULL )
-        return 1;
 
-    input_item_t *p_input = vlclua_sd_create_node( p_sd, L );
-    if( p_input != NULL )
-        input_item_PostSubItem( *pp_node, p_input );
-
-    return 1;
+    return vlclua_sd_add_sub_common( p_sd, pp_node,
+                                     vlclua_sd_create_node( p_sd, L ) );
 }
 
 static const luaL_Reg vlclua_node_reg[] = {
