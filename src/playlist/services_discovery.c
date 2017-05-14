@@ -54,7 +54,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
 
     playlist_Lock(playlist);
     if (sds->node == NULL)
-        sds->node = playlist_NodeCreate(playlist, longname, playlist->p_root,
+        sds->node = playlist_NodeCreate(playlist, longname, &playlist->root,
                                         PLAYLIST_END,
                                         PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
 
@@ -137,7 +137,7 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
      * has not discovered any item. */
     if (sds->node == NULL && sds->sd->description != NULL)
         sds->node = playlist_NodeCreate(playlist, sds->sd->description,
-                                        playlist->p_root, PLAYLIST_END,
+                                        &playlist->root, PLAYLIST_END,
                                         PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
 
     TAB_APPEND(pl_priv(playlist)->i_sds, pl_priv(playlist)->pp_sds, sds);

@@ -158,9 +158,9 @@ struct playlist_t
     int                   i_current_index; /**< Index in current array */
 
     /* Predefined items */
-    playlist_item_t *     p_root;
-    playlist_item_t *     p_playing;
-    playlist_item_t *     p_media_library;
+    playlist_item_t  root;
+    playlist_item_t *p_playing;
+    playlist_item_t *p_media_library;
 };
 
 /* A bit of macro magic to generate an enum out of the following list,

@@ -233,24 +233,31 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->b_tree = var_InheritBool( p_parent, "playlist-tree" );
     pl_priv(p_playlist)->b_preparse = var_InheritBool( p_parent, "auto-preparse" );
 
+    p_playlist->root.p_input = NULL;
+    p_playlist->root.pp_children = NULL;
+    p_playlist->root.i_children = 0;
+    p_playlist->root.i_nb_played = 0;
+    p_playlist->root.i_id = 0;
+    p_playlist->root.i_flags = 0;
+
     /* Create the root, playing items and meida library nodes */
-    playlist_item_t *root, *playing, *ml;
+    playlist_item_t *playing, *ml;
 
     PL_LOCK;
-    root = playlist_NodeCreate( p_playlist, NULL, NULL, PLAYLIST_END, 0 );
-    playing = playlist_NodeCreate( p_playlist, _( "Playlist" ), root,
-                                   PLAYLIST_END, PLAYLIST_RO_FLAG | PLAYLIST_NO_INHERIT_FLAG );
+    playing = playlist_NodeCreate( p_playlist, _( "Playlist" ),
+                                   &p_playlist->root, PLAYLIST_END,
+                                   PLAYLIST_RO_FLAG|PLAYLIST_NO_INHERIT_FLAG );
     if( var_InheritBool( p_parent, "media-library") )
-        ml = playlist_NodeCreate( p_playlist, _( "Media Library" ), root,
-                                  PLAYLIST_END, PLAYLIST_RO_FLAG | PLAYLIST_NO_INHERIT_FLAG );
+        ml = playlist_NodeCreate( p_playlist, _( "Media Library" ),
+                                  &p_playlist->root, PLAYLIST_END,
+                                  PLAYLIST_RO_FLAG|PLAYLIST_NO_INHERIT_FLAG );
     else
         ml = NULL;
     PL_UNLOCK;
 
-    if( unlikely(root == NULL || playing == NULL) )
+    if( unlikely(playing == NULL) )
         abort();
 
-    p_playlist->p_root = root;
     p_playlist->p_playing = playing;
     p_playlist->p_media_library = ml;
 
@@ -333,7 +340,10 @@ void playlist_Destroy( playlist_t *p_playlist )
     ARRAY_RESET( p_playlist->current );
 
     /* Remove all remaining items */
-    playlist_NodeDelete( p_playlist, p_playlist->p_root, true );
+    if( p_playlist->p_media_library != NULL )
+        playlist_NodeDelete( p_playlist, p_playlist->p_media_library, true );
+    playlist_NodeDelete( p_playlist, p_playlist->p_playing, true );
+    assert( p_playlist->root.i_children <= 0 );
     PL_UNLOCK;
 
     vlc_cond_destroy( &p_sys->signal );

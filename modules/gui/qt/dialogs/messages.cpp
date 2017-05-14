@@ -378,7 +378,7 @@ void MessagesDialog::updatePLTree()
 
     {
         vlc_playlist_locker pl_lock ( THEPL );
-        pldebugTree->addTopLevelItem( PLWalk( p_playlist->p_root ) );
+        pldebugTree->addTopLevelItem( PLWalk( &p_playlist->root ) );
     }
 
     pldebugTree->expandAll();

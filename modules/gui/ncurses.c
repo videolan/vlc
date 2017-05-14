@@ -416,7 +416,7 @@ static void PlaylistRebuild(intf_thread_t *intf)
     playlist_t *p_playlist = pl_Get(intf);
 
     PlaylistDestroy(sys);
-    PlaylistAddNode(sys, p_playlist->p_root, "");
+    PlaylistAddNode(sys, &p_playlist->root, "");
 }
 
 static int ItemChanged(vlc_object_t *p_this, const char *variable,
@@ -1341,7 +1341,7 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
     case 'o':
     case 'O':
         playlist_Lock(p_playlist);
-        playlist_RecursiveNodeSort(p_playlist, p_playlist->p_root,
+        playlist_RecursiveNodeSort(p_playlist, &p_playlist->root,
                                    SORT_TITLE_NODES_FIRST,
                                    (key == 'o')? ORDER_NORMAL : ORDER_REVERSE);
         sys->need_update = true;

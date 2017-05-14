@@ -256,9 +256,9 @@ void Playtree::buildTree()
     clear();
     playlist_Lock( m_pPlaylist );
 
-    for( int i = 0; i < m_pPlaylist->p_root->i_children; i++ )
+    for( int i = 0; i < m_pPlaylist->root.i_children; i++ )
     {
-        buildNode( m_pPlaylist->p_root->pp_children[i], *this );
+        buildNode( m_pPlaylist->root.pp_children[i], *this );
     }
 
     playlist_Unlock( m_pPlaylist );
