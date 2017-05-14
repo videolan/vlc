@@ -47,7 +47,7 @@ static void addonFoundCallback( addons_manager_t *manager,
     VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *) manager->owner.sys;
 
     @autoreleasepool {
-        [controller performSelectorOnMainThread:@selector(addAddon:) withObject:[NSValue valueWithPointer:entry] waitUntilDone:NO];
+        [controller performSelectorOnMainThread:@selector(addAddon:) withObject:[[VLCAddonListItem alloc] initWithAddon:entry] waitUntilDone:NO];
     }
 }
 
@@ -66,7 +66,7 @@ static void addonChangedCallback( addons_manager_t *manager,
     VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *) manager->owner.sys;
 
     @autoreleasepool {
-        [controller performSelectorOnMainThread:@selector(addonChanged:) withObject:[NSValue valueWithPointer:entry] waitUntilDone:NO];
+        [controller performSelectorOnMainThread:@selector(addonChanged:) withObject:[[VLCAddonListItem alloc] initWithAddon:entry] waitUntilDone:NO];
     }
 }
 
@@ -246,12 +246,11 @@ static void addonChangedCallback( addons_manager_t *manager,
 
 #pragma mark - data handling
 
-- (void)addAddon:(NSValue *)o_value
+- (void)addAddon:(VLCAddonListItem *)entry
 {
-    addon_entry_t *p_entry = [o_value pointerValue];
     /* no skin support on OS X so far */
-    if (p_entry->e_type != ADDON_SKIN2)
-        [_addons addObject:[[VLCAddonListItem alloc] initWithAddon:p_entry]];
+    if ([entry type] != ADDON_SKIN2)
+        [_addons addObject:entry];
 }
 
 - (void)discoveryEnded
@@ -260,7 +259,7 @@ static void addonChangedCallback( addons_manager_t *manager,
     [_spinner stopAnimation:nil];
 }
 
-- (void)addonChanged:(NSValue *)o_value
+- (void)addonChanged:(VLCAddonListItem *)entry
 {
     [self _refactorDataModel];
     if (_shouldRefreshSideBarOnAddonChange) {
