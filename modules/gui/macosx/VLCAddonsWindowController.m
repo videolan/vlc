@@ -60,8 +60,8 @@ static void addonsDiscoveryEndedCallback( addons_manager_t *manager )
     }
 }
 
-static void addonsChangedCallback( addons_manager_t *manager,
-                                   addon_entry_t *entry )
+static void addonChangedCallback( addons_manager_t *manager,
+                                  addon_entry_t *entry )
 {
     VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *) manager->owner.sys;
 
