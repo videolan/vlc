@@ -233,15 +233,15 @@ vlc_rd_get_names(vlc_object_t *p_obj, char ***pppsz_names,
     return VLC_SUCCESS;
 }
 
-static void
-rd_destructor(vlc_object_t *p_obj)
+void vlc_rd_release(vlc_renderer_discovery_t *p_rd)
 {
-    vlc_renderer_discovery_t * p_rd =(vlc_renderer_discovery_t *)p_obj;
-    assert(!p_rd->p_module); /* Forgot to call Stop */
+    if (p_rd->p_module != NULL)
+        module_unneed(p_rd, p_rd->p_module);
 
     config_ChainDestroy(p_rd->p_cfg);
     free(p_rd->psz_name);
     vlc_event_manager_fini(&p_rd->event_manager);
+    vlc_object_release(p_rd);
 }
 
 vlc_renderer_discovery_t *
@@ -259,7 +259,7 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name)
     vlc_event_manager_register_event_type(p_em, vlc_RendererDiscoveryItemAdded);
     vlc_event_manager_register_event_type(p_em, vlc_RendererDiscoveryItemRemoved);
 
-    vlc_object_set_destructor(p_rd, rd_destructor);
+    p_rd->p_module = NULL;
     return p_rd;
 }
 
@@ -283,13 +283,6 @@ vlc_rd_start(vlc_renderer_discovery_t *p_rd)
     }
 
     return VLC_SUCCESS;
-}
-
-void
-vlc_rd_stop(vlc_renderer_discovery_t * p_rd)
-{
-    module_unneed(p_rd, p_rd->p_module);
-    p_rd->p_module = NULL;
 }
 
 void

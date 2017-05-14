@@ -143,7 +143,7 @@ vlc_rd_get_names(vlc_object_t *p_obj, char ***pppsz_names,
 VLC_API vlc_renderer_discovery_t *
 vlc_rd_new(vlc_object_t *p_obj, const char *psz_name) VLC_USED;
 
-#define vlc_rd_release(p_rd) vlc_object_release(p_rd)
+VLC_API void vlc_rd_release(vlc_renderer_discovery_t *p_rd);
 
 /**
  * Get the event manager of the renderer discovery module
@@ -162,12 +162,6 @@ vlc_rd_event_manager(vlc_renderer_discovery_t *p_rd);
  */
 VLC_API int
 vlc_rd_start(vlc_renderer_discovery_t *p_rd);
-
-/**
- * Stop the renderer discovery module
- */
-VLC_API void
-vlc_rd_stop(vlc_renderer_discovery_t *p_rd);
 
 /**
  * @}

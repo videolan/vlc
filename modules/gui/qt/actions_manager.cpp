@@ -41,21 +41,15 @@
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
     : p_intf( _p_i )
     , p_rd( NULL )
-    , b_rd_started( false )
 { }
 
 ActionsManager::~ActionsManager()
 {
     if ( p_rd != NULL )
     {
-        if (b_rd_started)
-        {
-            vlc_event_manager_t *em = vlc_rd_event_manager( p_rd );
-            vlc_event_detach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
-            vlc_event_detach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
-
-            vlc_rd_stop( p_rd );
-        }
+        vlc_event_manager_t *em = vlc_rd_event_manager( p_rd );
+        vlc_event_detach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
+        vlc_event_detach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
         vlc_rd_release( p_rd );
     }
 }
@@ -292,7 +286,7 @@ void ActionsManager::renderer_event_received( const vlc_event_t * p_event, void 
 
 void ActionsManager::ScanRendererAction(bool checked)
 {
-    if (checked == b_rd_started)
+    if (checked == (p_rd != NULL))
         return; /* nothing changed */
 
     if (checked)
@@ -348,11 +342,12 @@ void ActionsManager::ScanRendererAction(bool checked)
             vlc_event_attach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
             vlc_event_attach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
 
-            b_rd_started = vlc_rd_start( p_rd ) == VLC_SUCCESS;
-            if ( !b_rd_started )
+            if( vlc_rd_start( p_rd ) != VLC_SUCCESS )
             {
                 vlc_event_detach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
                 vlc_event_detach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
+                vlc_rd_release( p_rd );
+                p_rd = NULL;
             }
         }
     }
@@ -364,9 +359,9 @@ void ActionsManager::ScanRendererAction(bool checked)
             vlc_event_detach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
             vlc_event_detach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
 
-            vlc_rd_stop( p_rd );
+            vlc_rd_release( p_rd );
+            p_rd = NULL;
         }
-        b_rd_started = false;
     }
 }
 

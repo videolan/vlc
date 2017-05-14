@@ -157,10 +157,9 @@ error:
 void
 libvlc_renderer_discoverer_release( libvlc_renderer_discoverer_t *p_lrd )
 {
-    if( p_lrd->p_rd != NULL )
-        vlc_rd_release( p_lrd->p_rd );
+    libvlc_renderer_discoverer_stop( p_lrd );
 
-    if( p_lrd->p_event_manager != NULL )
+    if( p_lrd->p_event_manager == NULL )
         libvlc_event_manager_release( p_lrd->p_event_manager );
 
     free( p_lrd );
@@ -175,7 +174,8 @@ libvlc_renderer_discoverer_start( libvlc_renderer_discoverer_t *p_lrd )
 void
 libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_lrd )
 {
-    vlc_rd_stop( p_lrd->p_rd );
+    if( p_lrd->p_rd != NULL )
+        vlc_rd_release( p_lrd->p_rd );
 
     for( int i = 0; i < p_lrd->i_items; ++i )
         vlc_renderer_item_release( p_lrd->pp_items[i] );

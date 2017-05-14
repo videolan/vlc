@@ -54,52 +54,49 @@ static void renderer_event_received(const vlc_event_t *p_event, void *user_data)
         if (!name)
             [NSException raise:NSInvalidArgumentException
                         format:@"name must not be nil"];
-
-        // Create renderer object
-        p_intf = getIntf();
-        p_rd = vlc_rd_new(VLC_OBJECT(p_intf), name);
-
-        if (p_rd) {
-            _name = [NSString stringWithUTF8String:name];
-            _longName = (!longname) ? nil : [NSString stringWithUTF8String:longname];
-            _discoveryStarted = false;
-        } else {
-            msg_Err(p_intf, "Could not create '%s' renderer discovery service", name);
-            self = nil;
-        }
+        _name = [NSString stringWithUTF8String:name];
+        _longName = (!longname) ? nil : [NSString stringWithUTF8String:longname];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    if (_discoveryStarted)
-        [self stopDiscovery];
-    if (p_rd != NULL)
-        vlc_rd_release(p_rd);
+    [self stopDiscovery];
 }
 
 - (bool)startDiscovery
 {
+    p_intf = getIntf();
+
     msg_Dbg(p_intf, "Starting renderer discovery service %s", _name.UTF8String);
-    [self attachEventHandlers];
-    int ret = vlc_rd_start(p_rd);
-    if (ret == VLC_SUCCESS) {
-        _discoveryStarted = true;
-        return true;
+    // Create renderer object
+    p_rd = vlc_rd_new(VLC_OBJECT(p_intf), _name.UTF8String);
+
+    if (p_rd) {
     } else {
-        msg_Err(p_intf, "Could not start '%s' renderer discovery", _name.UTF8String);
-        [self detachEventHandler];
+        msg_Err(p_intf, "Could not create '%s' renderer discovery service", _name.UTF8String);
         return false;
     }
+
+    [self attachEventHandlers];
+    int ret = vlc_rd_start(p_rd);
+    if (ret != VLC_SUCCESS) {
+        msg_Err(p_intf, "Could not start '%s' renderer discovery", _name.UTF8String);
+        [self detachEventHandler];
+        vlc_rd_release(p_rd);
+        p_rd = NULL;
+        return false;
+    }
+    return true;
 }
 
 - (void)stopDiscovery
 {
-    if (_discoveryStarted) {
+    if (p_rd != NULL) {
         [self detachEventHandler];
-        vlc_rd_stop(p_rd);
-        _discoveryStarted = false;
+        vlc_rd_release(p_rd);
+        p_rd = NULL;
     }
 }
 
