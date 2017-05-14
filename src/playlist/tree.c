@@ -77,7 +77,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     p_item->i_children = 0;
 
     if( p_parent != NULL )
-        playlist_NodeInsert( p_playlist, p_item, p_parent, i_pos );
+        playlist_NodeInsert( p_parent, p_item, i_pos );
     playlist_SendAddNotify( p_playlist, p_item );
 
     p_item->i_flags |= i_flags;
@@ -150,13 +150,9 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     playlist_ItemRelease( p_playlist, p_root );
 }
 
-int playlist_NodeInsert( playlist_t *p_playlist,
-                         playlist_item_t *p_item,
-                         playlist_item_t *p_parent,
+int playlist_NodeInsert( playlist_item_t *p_parent, playlist_item_t *p_item,
                          int i_position )
 {
-    PL_ASSERT_LOCKED;
-    (void)p_playlist;
     assert( p_parent && p_parent->i_children != -1 );
     if( i_position == -1 ) i_position = p_parent->i_children ;
     assert( i_position <= p_parent->i_children);

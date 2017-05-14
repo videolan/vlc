@@ -124,8 +124,7 @@ int playlist_InsertInputItemTree ( playlist_t *,
         playlist_item_t *, input_item_node_t *, int, bool );
 
 /* Tree walking */
-int playlist_NodeInsert(playlist_t *, playlist_item_t*, playlist_item_t *,
-                        int);
+int playlist_NodeInsert(playlist_item_t*, playlist_item_t *, int);
 
 void playlist_ItemRelease( playlist_t *, playlist_item_t * );
 

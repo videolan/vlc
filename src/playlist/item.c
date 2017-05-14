@@ -753,7 +753,7 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     PL_ASSERT_LOCKED;
     ARRAY_APPEND(p_playlist->items, p_item);
 
-    playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
+    playlist_NodeInsert( p_node, p_item, i_pos );
     playlist_SendAddNotify( p_playlist, p_item );
 }
 
