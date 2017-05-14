@@ -77,22 +77,31 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
 {
     vlc_sd_internal_t *sds = sd->owner.sys;
     playlist_t *p_playlist = (playlist_t *)sd->obj.parent;
-    playlist_item_t *p_sd_node = sds->node;
+    playlist_item_t *node, *item;
 
     PL_LOCK;
-    playlist_item_t *p_item =
-        playlist_ItemFindFromInputAndRoot( p_playlist, p_input, p_sd_node );
-    if( !p_item )
+    item = playlist_ItemGetByInput(p_playlist, p_input);
+    if (unlikely(item == NULL))
     {
-        PL_UNLOCK; return;
+        msg_Err(sd, "removing item not added"); /* SD plugin bug */
+        PL_UNLOCK;
+        return;
     }
-    playlist_item_t *p_parent = p_item->p_parent;
+
+#ifndef NDEBUG
+    /* Check that the item belonged to the SD */
+    for (playlist_item_t *i = item->p_parent; i != sds->node; i = i->p_parent)
+        assert(i != NULL);
+#endif
+
+    node = item->p_parent;
     /* if the item was added under a category and the category node
        becomes empty, delete that node as well */
-    if( p_parent->i_children > 1 || p_parent == p_sd_node )
-        playlist_NodeDelete( p_playlist, p_item, false );
+    if (node != sds->node && node->i_children == 1)
+        playlist_NodeDelete(p_playlist, node, true);
     else
-        playlist_NodeDelete( p_playlist, p_parent, true );
+        playlist_NodeDelete(p_playlist, item, true);
+
     PL_UNLOCK;
 }
 
