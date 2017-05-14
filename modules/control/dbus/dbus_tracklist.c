@@ -89,7 +89,7 @@ DBUS_METHOD( AddTrack )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     playlist_t *p_playlist = PL;
-    playlist_item_t *node;
+    playlist_item_t *node, *plitem;
 
     PL_LOCK;
     node = p_playlist->p_playing;
@@ -109,8 +109,10 @@ DBUS_METHOD( AddTrack )
         }
     }
 
-    playlist_NodeAddInput( p_playlist, item, node,
-                           (b_play == TRUE) ? PLAYLIST_GO : 0, i_pos );
+    plitem = playlist_NodeAddInput( p_playlist, item, node, 0, i_pos );
+    if( likely(plitem != NULL) && b_play )
+        playlist_ViewPlay( p_playlist, NULL, plitem );
+
     PL_UNLOCK;
 
     input_item_Release( item );
