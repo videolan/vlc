@@ -98,10 +98,8 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
     /* if the item was added under a category and the category node
        becomes empty, delete that node as well */
     if (node != sds->node && node->i_children == 1)
-        playlist_NodeDelete(p_playlist, node, true);
-    else
-        playlist_NodeDelete(p_playlist, item, true);
-
+        item = node;
+    playlist_NodeDelete(p_playlist, item, true);
     PL_UNLOCK;
 }
 
