@@ -3718,7 +3718,6 @@ AS_IF([test "${enable_qt}" != "no"], [
     ])
 ])
 AS_IF([test "${enable_qt}" != "no"], [
-  VLC_ADD_PLUGIN([qt])
   ALIASES="${ALIASES} qvlc"
 ])
 AC_SUBST(QT_VERSION)

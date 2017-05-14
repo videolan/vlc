@@ -39,9 +39,6 @@ if UPDATE_CHECK
 libqt_plugin_la_CPPFLAGS += -DUPDATE_CHECK
 endif
 
-gui_LTLIBRARIES += $(LTLIBqt)
-EXTRA_LTLIBRARIES += libqt_plugin.la
-
 libqt_plugin_la_SOURCES = \
 	gui/qt/qt.cpp gui/qt/qt.hpp \
 	gui/qt/menus.cpp gui/qt/menus.hpp \
@@ -449,4 +446,7 @@ nodist_libqt_plugin_la_SOURCES += gui/qt/resources.cpp
 gui/qt/resources.cpp: gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
 
+if ENABLE_QT
+gui_LTLIBRARIES += libqt_plugin.la
 BUILT_SOURCES += $(nodist_libqt_plugin_la_SOURCES)
+endif
