@@ -63,8 +63,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
         parent = playlist_ChildSearchName(sds->node, psz_cat);
         if (parent == NULL)
             parent = playlist_NodeCreate(playlist, psz_cat, sds->node,
-                                         PLAYLIST_END,
-                                         PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
+                                         PLAYLIST_END, PLAYLIST_RO_FLAG);
     }
 
     playlist_NodeAddInput(playlist, p_input, parent, 0, PLAYLIST_END);
