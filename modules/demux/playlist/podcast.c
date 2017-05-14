@@ -263,7 +263,7 @@ static int Demux( demux_t *p_demux )
 
                     /* Set the duration if available */
                     if( psz_item_duration )
-                        input_item_SetDuration( p_input, strTimeToMTime( psz_item_duration ) );
+                        p_input->i_duration = strTimeToMTime( psz_item_duration );
 
 #define ADD_INFO( info, field ) \
     if( field ) { \

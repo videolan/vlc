@@ -541,10 +541,7 @@ static bool set_item_info SIMPLE_INTERFACE
     else if (!strcmp(psz_name, "trackNum"))
         input_item_SetTrackNum(p_input, psz_value);
     else if (!strcmp(psz_name, "duration"))
-    {
-        long i_num = atol(psz_value);
-        input_item_SetDuration(p_input, (mtime_t) i_num*1000);
-    }
+        p_input->i_duration = atol(psz_value) * INT64_C(1000);
     else if (!strcmp(psz_name, "annotation"))
         input_item_SetDescription(p_input, psz_value);
     else if (!strcmp(psz_name, "info"))

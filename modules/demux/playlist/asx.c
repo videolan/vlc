@@ -294,8 +294,8 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                     input_item_SetURL( p_entry, psz_moreinfo );
                 if( psz_description )
                     input_item_SetDescription( p_entry, psz_description );
-                if( i_duration > 0)
-                    input_item_SetDuration( p_entry, i_duration );
+                if( i_duration > 0 )
+                    p_entry->i_duration = i_duration;
 
                 input_item_node_AppendItem( p_subitems, p_entry );
 
