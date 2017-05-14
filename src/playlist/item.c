@@ -193,10 +193,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
                     p_play_item = p_play_item->pp_children[0];
             }
 
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                                  pl_Locked,
-                                  get_current_status_node( p_playlist ),
-                                  p_play_item );
+            playlist_ViewPlay( p_playlist, NULL, p_play_item );
         }
     }
 
