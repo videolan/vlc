@@ -329,36 +329,26 @@ static const luaL_Reg vlclua_node_reg[] = {
 
 /*** Services discovery instance ***/
 
-static int vlclua_sd_add_common( services_discovery_t *p_sd, lua_State *L,
+static int vlclua_sd_add_common( services_discovery_t *p_sd,
                                  input_item_t *p_input )
 {
-    if( p_input == NULL )
-        return 1;
-
-    lua_getfield( L, -2, "category" );
-    if( lua_isstring( L, -1 ) )
-        services_discovery_AddItemCat( p_sd, p_input, luaL_checkstring( L, -1 ) );
-    else
+    if( p_input != NULL )
         services_discovery_AddItem( p_sd, p_input );
-    lua_pop( L, 1 );
-
     return 1;
 }
 
 static int vlclua_sd_add_item( lua_State *L )
 {
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
-    input_item_t *p_input = vlclua_sd_create_item( p_sd, L );
 
-    return vlclua_sd_add_common( p_sd, L, p_input );
+    return vlclua_sd_add_common( p_sd, vlclua_sd_create_item( p_sd, L ) );
 }
 
 static int vlclua_sd_add_node( lua_State *L )
 {
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
-    input_item_t *p_input = vlclua_sd_create_node( p_sd, L );
 
-    return vlclua_sd_add_common( p_sd, L, p_input );
+    return vlclua_sd_add_common( p_sd, vlclua_sd_create_node( p_sd, L ) );
 }
 
 static int vlclua_sd_remove_item( lua_State *L )
