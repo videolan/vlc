@@ -304,7 +304,7 @@
     playlist_item_t *p_node = playlist_ItemGetById(p_playlist, [[[self model] rootItem] plItemId]);
 
     if (p_item && p_node) {
-        playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item);
+        playlist_ViewPlay(p_playlist, p_node, p_item);
     }
     PL_UNLOCK;
 }
@@ -645,7 +645,7 @@
             continue;
 
         if (i == 0 && b_start) {
-            playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_parent, p_item);
+            playlist_ViewPlay(p_playlist, p_parent, p_item);
         }
         input_item_Release(p_input);
     }
