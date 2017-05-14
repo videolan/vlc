@@ -1313,8 +1313,9 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_item )
         {
             msg_rc( "trying to enqueue %s to playlist", newval.psz_string );
-            if( playlist_AddInput( p_playlist, p_item,
-                                   0, true ) != VLC_SUCCESS )
+            int ret =  playlist_AddInput( p_playlist, p_item, 0, true );
+            input_item_Release( p_item );
+            if( ret != VLC_SUCCESS )
             {
                 return VLC_EGENERIC;
             }
