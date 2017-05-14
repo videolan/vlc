@@ -330,8 +330,8 @@ sd.add_item( ... ): Add an item to the service discovery.
 sd.remove_item( item ): remove the item.
 
 n = vlc.sd.add_node( {title="Node"} )
-n:add_subitem( ... ): Same as sd.add_item(), but as a subitem of n.
-n:add_subnode( ... ): Same as sd.add_node(), but as a subnode of n.
+n:add_subitem( ... ): Same as sd.add_item(), but as a child item of node n.
+n:add_subnode( ... ): Same as sd.add_node(), but as a subnode of node n.
 
 d = vlc.sd.add_item( ... ) Get an item object to perform following set operations on it:
 d:set_name(): the item's name in playlist
