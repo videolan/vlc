@@ -592,36 +592,6 @@ int playlist_InsertInputItemTree (
  * Playlist item misc operations
  *****************************************************************************/
 
-/**
- * Find an item within a root, given its input id.
- *
- * \param p_playlist the playlist object
- * \param p_item the input item
- * \param p_root root playlist item
- * \return the first found item, or NULL if not found
- */
-playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
-                                                    input_item_t *p_item,
-                                                    playlist_item_t *p_root )
-{
-    for( int i = 0 ; i< p_root->i_children ; i++ )
-    {
-        if( p_root->pp_children[i]->p_input == p_item )
-        {
-            return p_root->pp_children[i];
-        }
-        else if( p_root->pp_children[i]->i_children >= 0 )
-        {
-            playlist_item_t *p_search =
-                 playlist_ItemFindFromInputAndRoot( p_playlist, p_item,
-                                                    p_root->pp_children[i] );
-            if( p_search ) return p_search;
-        }
-    }
-    return NULL;
-}
-
-
 static int ItemIndex ( playlist_item_t *p_item )
 {
     int idx;
