@@ -286,8 +286,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
         p_parent = p_parent->p_parent;
     }
     if( p_parent )
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
-                p_parent, p_item );
+        playlist_ViewPlay( p_playlist, p_parent, p_item );
 }
 
 /****************** Base model mandatory implementations *****************/
