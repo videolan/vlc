@@ -36,8 +36,6 @@
 #include <vlc_rand.h>
 #include "playlist_internal.h"
 
-static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-                     playlist_item_t *p_node, int i_pos );
 static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
                            playlist_item_t * );
 static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
@@ -519,11 +517,15 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     assert( p_parent && p_parent->i_children != -1 );
 
     playlist_item_t *p_item = playlist_ItemNewFromInput( p_playlist, p_input );
-    if( likely(p_item != NULL) )
-    {
-        AddItem( p_playlist, p_item, p_parent, i_pos );
-        GoAndPreparse( p_playlist, i_mode, p_item );
-    }
+    if( unlikely(p_item == NULL) )
+        return NULL;
+
+    ARRAY_APPEND(p_playlist->items, p_item);
+
+    playlist_NodeInsert( p_parent, p_item, i_pos );
+    playlist_SendAddNotify( p_playlist, p_item );
+
+    GoAndPreparse( p_playlist, i_mode, p_item );
     return p_item;
 }
 
@@ -744,17 +746,6 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
                                 p_item );
     free( psz_artist );
     free( psz_album );
-}
-
-/* Add the playlist item to the requested node and fire a notification */
-static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-                     playlist_item_t *p_node, int i_pos )
-{
-    PL_ASSERT_LOCKED;
-    ARRAY_APPEND(p_playlist->items, p_item);
-
-    playlist_NodeInsert( p_node, p_item, i_pos );
-    playlist_SendAddNotify( p_playlist, p_item );
 }
 
 /* Actually convert an item to a node */
