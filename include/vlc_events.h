@@ -124,11 +124,6 @@ typedef enum vlc_event_type_t {
     /* Renderer Discovery events */
     vlc_RendererDiscoveryItemAdded=vlc_InputItemPreparseEnded+6,
     vlc_RendererDiscoveryItemRemoved,
-
-    /* Addons Manager events */
-    vlc_AddonFound,
-    vlc_AddonsDiscoveryEnded,
-    vlc_AddonChanged
 } vlc_event_type_t;
 
 /* Event definition */
@@ -185,12 +180,6 @@ typedef struct vlc_event_t
         {
             vlc_renderer_item_t * p_item;
         } renderer_discovery_item_removed;
-
-        /* Addons */
-        struct vlc_addon_generic_event
-        {
-            addon_entry_t * p_entry;
-        } addon_generic_event;
     } u;
 } vlc_event_t;
 

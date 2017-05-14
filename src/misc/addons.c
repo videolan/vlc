@@ -26,7 +26,6 @@
 #include <vlc_atomic.h>
 #include <vlc_modules.h>
 #include <vlc_arrays.h>
-#include <vlc_events.h>
 #include "libvlc.h"
 
 #include <vlc_addons.h>
@@ -124,7 +123,8 @@ void addon_entry_Release( addon_entry_t * p_entry )
     free( owner );
 }
 
-addons_manager_t *addons_manager_New( vlc_object_t *p_this )
+addons_manager_t *addons_manager_New( vlc_object_t *p_this,
+    const struct addons_manager_owner *restrict owner )
 {
     addons_manager_t *p_manager = malloc( sizeof(addons_manager_t) );
     if ( !p_manager ) return NULL;
@@ -136,14 +136,7 @@ addons_manager_t *addons_manager_New( vlc_object_t *p_this )
         return NULL;
     }
 
-    p_manager->p_event_manager = malloc( sizeof(vlc_event_manager_t) );
-    if ( !p_manager->p_event_manager )
-    {
-        free( p_manager->p_priv );
-        free( p_manager );
-        return NULL;
-    }
-
+    p_manager->owner = *owner;
     p_manager->p_priv->p_parent = p_this;
 
 #define INIT_QUEUE( name ) \
@@ -155,12 +148,6 @@ addons_manager_t *addons_manager_New( vlc_object_t *p_this )
     INIT_QUEUE( finder )
     INIT_QUEUE( installer )
     ARRAY_INIT( p_manager->p_priv->finder.uris );
-
-    vlc_event_manager_t *em = p_manager->p_event_manager;
-    vlc_event_manager_init( em, p_manager );
-    vlc_event_manager_register_event_type(em, vlc_AddonFound);
-    vlc_event_manager_register_event_type(em, vlc_AddonsDiscoveryEnded);
-    vlc_event_manager_register_event_type(em, vlc_AddonChanged);
 
     return p_manager;
 }
@@ -187,8 +174,6 @@ void addons_manager_Delete( addons_manager_t *p_manager )
         vlc_join( p_manager->p_priv->installer.thread, NULL );
     }
 
-    vlc_event_manager_fini( p_manager->p_event_manager );
-
 #define FREE_QUEUE( name ) \
     FOREACH_ARRAY( addon_entry_t *p_entry, p_manager->p_priv->name.entries )\
         addon_entry_Release( p_entry );\
@@ -205,7 +190,6 @@ void addons_manager_Delete( addons_manager_t *p_manager )
     ARRAY_RESET( p_manager->p_priv->finder.uris );
 
     free( p_manager->p_priv );
-    free( p_manager->p_event_manager );
     free( p_manager );
 }
 
@@ -273,10 +257,7 @@ static void MergeSources( addons_manager_t *p_manager,
         if ( !p_manager_entry )
         {
             ARRAY_APPEND( p_manager->p_priv->finder.entries, p_entry );
-            vlc_event_t event;
-            event.type = vlc_AddonFound;
-            event.u.addon_generic_event.p_entry = p_entry;
-            vlc_event_send( p_manager->p_event_manager, &event );
+            p_manager->owner.addon_found( p_manager, p_entry );
         }
         else
         {
@@ -361,11 +342,7 @@ static void *FinderThread( void *p_data )
             vlc_object_release( p_finder );
         }
 
-        vlc_event_t event;
-        event.type = vlc_AddonsDiscoveryEnded;
-        event.u.addon_generic_event.p_entry = NULL;
-        vlc_event_send( p_manager->p_event_manager, &event );
-
+        p_manager->owner.discovery_ended( p_manager );
         vlc_restorecancel( i_cancel );
         vlc_testcancel();
     }
@@ -437,8 +414,6 @@ static void *InstallerThread( void *p_data )
 {
     addons_manager_t *p_manager = p_data;
     int i_ret;
-    vlc_event_t event;
-    event.type = vlc_AddonChanged;
 
     for( ;; )
     {
@@ -466,8 +441,7 @@ static void *InstallerThread( void *p_data )
             vlc_mutex_unlock( &p_entry->lock );
 
             /* notify */
-            event.u.addon_generic_event.p_entry = p_entry;
-            vlc_event_send( p_manager->p_event_manager, &event );
+            p_manager->owner.addon_changed( p_manager, p_entry );
 
             i_ret = installOrRemoveAddon( p_manager, p_entry, false );
 
@@ -481,8 +455,7 @@ static void *InstallerThread( void *p_data )
             vlc_mutex_unlock( &p_entry->lock );
 
             /* notify */
-            event.u.addon_generic_event.p_entry = p_entry;
-            vlc_event_send( p_manager->p_event_manager, &event );
+            p_manager->owner.addon_changed( p_manager, p_entry );
 
             i_ret = installOrRemoveAddon( p_manager, p_entry, true );
 
@@ -493,8 +466,7 @@ static void *InstallerThread( void *p_data )
         vlc_mutex_unlock( &p_entry->lock );
         /* !DO WORK */
 
-        event.u.addon_generic_event.p_entry = p_entry;
-        vlc_event_send( p_manager->p_event_manager, &event );
+        p_manager->owner.addon_changed( p_manager, p_entry );
 
         addon_entry_Release( p_entry );
 

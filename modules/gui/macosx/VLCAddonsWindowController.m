@@ -20,7 +20,6 @@
  *****************************************************************************/
 
 #import <vlc_common.h>
-#import <vlc_events.h>
 #import <vlc_addons.h>
 
 #import "VLCAddonsWindowController.h"
@@ -42,17 +41,32 @@
 
 @end
 
-static void addonsEventsCallback( const vlc_event_t *event, void *data )
+static void addonFoundCallback( addons_manager_t *manager,
+                                addon_entry_t *entry )
 {
-    VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *)data;
+    VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *) manager->owner.sys;
 
     @autoreleasepool {
-        if (event->type == vlc_AddonFound)
-            [controller performSelectorOnMainThread:@selector(addAddon:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
-        else if (event->type == vlc_AddonsDiscoveryEnded)
-            [controller performSelectorOnMainThread:@selector(discoveryEnded) withObject:nil waitUntilDone:NO];
-        else if (event->type == vlc_AddonChanged)
-            [controller performSelectorOnMainThread:@selector(addonChanged:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
+        [controller performSelectorOnMainThread:@selector(addAddon:) withObject:[NSValue valueWithPointer:entry] waitUntilDone:NO];
+    }
+}
+
+static void addonsDiscoveryEndedCallback( addons_manager_t *manager )
+{
+    VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *) manager->owner.sys;
+
+    @autoreleasepool {
+        [controller performSelectorOnMainThread:@selector(discoveryEnded) withObject:nil waitUntilDone:NO];
+    }
+}
+
+static void addonsChangedCallback( addons_manager_t *manager,
+                                   addon_entry_t *entry )
+{
+    VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *) manager->owner.sys;
+
+    @autoreleasepool {
+        [controller performSelectorOnMainThread:@selector(addonChanged:) withObject:[NSValue valueWithPointer:entry] waitUntilDone:NO];
     }
 }
 
@@ -117,14 +131,17 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     [[[_addonsTable tableColumnWithIdentifier:@"author"] headerCell] setStringValue:_NS("Author")];
     [[[_addonsTable tableColumnWithIdentifier:@"type"] headerCell] setStringValue:_NS("Type")];
 
-    _manager = addons_manager_New((vlc_object_t *)getIntf());
+    struct addons_manager_owner owner =
+    {
+        (__bridge void *)self,
+        addonFoundCallback,
+        addonsDiscoveryEndedCallback,
+        addonChangedCallback,
+    };
+
+    _manager = addons_manager_New((vlc_object_t *)getIntf(), &owner);
     if (!_manager)
         return;
-
-    vlc_event_manager_t *p_em = _manager->p_event_manager;
-    vlc_event_attach(p_em, vlc_AddonFound, addonsEventsCallback, (__bridge void *)self);
-    vlc_event_attach(p_em, vlc_AddonsDiscoveryEnded, addonsEventsCallback, (__bridge void *)self);
-    vlc_event_attach(p_em, vlc_AddonChanged, addonsEventsCallback, (__bridge void *)self);
 
     [self _findInstalled];
 }

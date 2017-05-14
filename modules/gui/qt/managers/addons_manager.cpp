@@ -30,13 +30,15 @@ const QEvent::Type AddonManagerEvent::DiscoveryEndedEvent =
 
 AddonsManager::AddonsManager( intf_thread_t *p_intf )
 {
-    p_manager = addons_manager_New( VLC_OBJECT(p_intf) );
-    if ( !p_manager ) return;
+    struct addons_manager_owner owner =
+    {
+        this,
+        addonFoundCallback,
+        addonsDiscoveryEndedCallback,
+        addonChangedCallback,
+    };
 
-    vlc_event_manager_t *p_em = p_manager->p_event_manager;
-    vlc_event_attach( p_em, vlc_AddonFound, addonsEventsCallback, this );
-    vlc_event_attach( p_em, vlc_AddonsDiscoveryEnded, addonsEventsCallback, this );
-    vlc_event_attach( p_em, vlc_AddonChanged, addonsEventsCallback, this );
+    p_manager = addons_manager_New( VLC_OBJECT(p_intf), &owner );
 }
 
 AddonsManager::~AddonsManager()
@@ -97,27 +99,29 @@ QString AddonsManager::getAddonType( int i_type )
     }
 }
 
-void AddonsManager::addonsEventsCallback( const vlc_event_t *event, void *data )
+void AddonsManager::addonFoundCallback( addons_manager_t *manager,
+                                        addon_entry_t *entry )
 {
-    AddonsManager *me = ( AddonsManager * ) data;
-    QEvent *ev = NULL;
+    AddonsManager *me = (AddonsManager *) manager->owner.sys;
+    QEvent *ev = new AddonManagerEvent( AddonManagerEvent::AddedEvent,
+                                        entry );
+    QApplication::postEvent( me, ev );
+}
 
-    if ( event->type == vlc_AddonFound )
-    {
-        ev = new AddonManagerEvent( AddonManagerEvent::AddedEvent,
-                                    event->u.addon_generic_event.p_entry );
-    }
-    else if ( event->type == vlc_AddonsDiscoveryEnded )
-    {
-        ev = new QEvent( AddonManagerEvent::DiscoveryEndedEvent );
-    }
-    else if ( event->type == vlc_AddonChanged )
-    {
-        ev = new AddonManagerEvent( AddonManagerEvent::ChangedEvent,
-                                    event->u.addon_generic_event.p_entry );
-    }
+void AddonsManager::addonsDiscoveryEndedCallback( addons_manager_t *manager )
+{
+    AddonsManager *me = (AddonsManager *) manager->owner.sys;
+    QEvent *ev = new QEvent( AddonManagerEvent::DiscoveryEndedEvent );
+    QApplication::postEvent( me, ev );
+}
 
-    if ( ev ) QApplication::postEvent( me, ev );
+void AddonsManager::addonChangedCallback( addons_manager_t *manager,
+                                          addon_entry_t *entry )
+{
+    AddonsManager *me = (AddonsManager *) manager->owner.sys;
+    QEvent *ev = new AddonManagerEvent( AddonManagerEvent::ChangedEvent,
+                                        entry );
+    QApplication::postEvent( me, ev );
 }
 
 void AddonsManager::customEvent( QEvent *event )
