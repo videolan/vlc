@@ -285,7 +285,6 @@ playlist.get( [what, [tree]] ): Get the playlist.
       .id: The item's id.
       .flags: a table with the following members if the corresponding flag is
               set:
-          .skip
           .disabled
           .ro
       .name:

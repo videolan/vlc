@@ -136,7 +136,6 @@ struct playlist_item_t
 };
 
 typedef enum {
-    PLAYLIST_SKIP_FLAG         = 0x0002,  /**< Must playlist skip after it ? */
     PLAYLIST_DBL_FLAG          = 0x0004,  /**< Is it disabled ? */
     PLAYLIST_RO_FLAG           = 0x0008,  /**< Write-enabled ? */
     PLAYLIST_SUBITEM_STOP_FLAG = 0x0040,  /**< Must playlist stop if the item gets subitems ?*/

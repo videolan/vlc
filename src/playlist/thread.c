@@ -380,27 +380,10 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
         }
 
         /* */
-        if( get_current_status_item( p_playlist ) )
-        {
-            playlist_item_t *p_parent = get_current_status_item( p_playlist );
-            while( p_parent )
-            {
-                if( p_parent->i_flags & PLAYLIST_SKIP_FLAG )
-                {
-                    msg_Dbg( p_playlist, "blocking item, stopping") ;
-                    return NULL;
-                }
-                p_parent = p_parent->p_parent;
-            }
-        }
 
         PL_DEBUG( "changing item without a request (current %i/%i)",
                   p_playlist->i_current_index, p_playlist->current.i_size );
         /* Can't go to next from current item */
-        if( get_current_status_item( p_playlist ) &&
-            get_current_status_item( p_playlist )->i_flags & PLAYLIST_SKIP_FLAG )
-            return NULL;
-
         if( p_sys->b_reset_currently_playing )
             ResetCurrentlyPlaying( p_playlist,
                                    get_current_status_item( p_playlist ) );
@@ -424,9 +407,6 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
             return NULL;
 
         p_new = ARRAY_VAL( p_playlist->current, p_playlist->i_current_index );
-        /* The new item can't be autoselected  */
-        if( p_new != NULL && p_new->i_flags & PLAYLIST_SKIP_FLAG )
-            return NULL;
     }
     return p_new;
 }
