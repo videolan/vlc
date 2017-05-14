@@ -171,6 +171,7 @@ static int Open (vlc_object_t *obj)
 
 error:
     xcb_disconnect (p_sys->conn);
+    tdestroy (p_sys->apps, DelApp);
     free (p_sys);
     return VLC_EGENERIC;
 }
