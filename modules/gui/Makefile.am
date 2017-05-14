@@ -1,13 +1,10 @@
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 
-DIST_SUBDIRS += gui/macosx gui/qt
+DIST_SUBDIRS += gui/macosx
 
 if ENABLE_MACOSX_UI
 SUBDIRS += gui/macosx
-endif
-if ENABLE_QT
-SUBDIRS += gui/qt
 endif
 
 libncurses_plugin_la_SOURCES = gui/ncurses.c
@@ -29,4 +26,5 @@ libminimal_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' -Wl,-fram
 EXTRA_LTLIBRARIES += libminimal_macosx_plugin.la
 gui_LTLIBRARIES += $(LTLIBminimal_macosx)
 
+include gui/qt/Makefile.am
 include gui/skins2/Makefile.am

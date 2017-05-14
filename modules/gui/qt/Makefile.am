@@ -1,6 +1,3 @@
-include $(top_srcdir)/modules/common.am
-guidir = $(pluginsdir)/gui
-
 ## Howto
 # For each Q_OBJECT:
 #   - Add *.moc.cpp to nodist_..._SOURCES
@@ -14,7 +11,8 @@ guidir = $(pluginsdir)/gui
 
 SUFFIXES += .ui .h .hpp .moc.cpp
 
-libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
@@ -41,95 +39,115 @@ if UPDATE_CHECK
 libqt_plugin_la_CPPFLAGS += -DUPDATE_CHECK
 endif
 
-gui_LTLIBRARIES =  $(LTLIBqt)
-EXTRA_LTLIBRARIES = libqt_plugin.la
+gui_LTLIBRARIES += $(LTLIBqt)
+EXTRA_LTLIBRARIES += libqt_plugin.la
 
 libqt_plugin_la_SOURCES = \
-	qt.cpp qt.hpp \
-	menus.cpp menus.hpp \
-	main_interface.cpp main_interface.hpp \
-	dialogs_provider.cpp dialogs_provider.hpp \
-	input_manager.cpp input_manager.hpp \
-	actions_manager.cpp actions_manager.hpp \
-	extensions_manager.cpp extensions_manager.hpp \
-	managers/addons_manager.cpp managers/addons_manager.hpp \
-	recents.cpp recents.hpp \
-	adapters/seekpoints.cpp adapters/seekpoints.hpp \
-	adapters/chromaprint.cpp adapters/chromaprint.hpp \
-	adapters/variables.cpp adapters/variables.hpp \
-	dialogs/playlist.cpp dialogs/playlist.hpp \
-	dialogs/bookmarks.cpp dialogs/bookmarks.hpp \
-	dialogs/preferences.cpp dialogs/preferences.hpp \
-	dialogs/mediainfo.cpp dialogs/mediainfo.hpp \
-	dialogs/epg.cpp dialogs/epg.hpp \
-	dialogs/extended.cpp dialogs/extended.hpp \
-	dialogs/messages.cpp dialogs/messages.hpp \
-	dialogs/errors.cpp dialogs/errors.hpp \
-	dialogs/external.cpp dialogs/external.hpp \
-	dialogs/plugins.cpp dialogs/plugins.hpp \
-	dialogs/sout.cpp dialogs/sout.hpp \
-	dialogs/convert.cpp dialogs/convert.hpp \
-	dialogs/help.cpp dialogs/help.hpp \
-	dialogs/gototime.cpp dialogs/gototime.hpp \
-	dialogs/toolbar.cpp dialogs/toolbar.hpp \
-	dialogs/open.cpp dialogs/open.hpp \
-	dialogs/openurl.cpp dialogs/openurl.hpp \
-	dialogs/vlm.cpp dialogs/vlm.hpp \
-	dialogs/firstrun.cpp dialogs/firstrun.hpp \
-	dialogs/podcast_configuration.cpp dialogs/podcast_configuration.hpp \
-	dialogs/extensions.cpp dialogs/extensions.hpp \
-	dialogs/fingerprintdialog.cpp dialogs/fingerprintdialog.hpp \
-	components/extended_panels.cpp components/extended_panels.hpp \
-	components/info_panels.cpp components/info_panels.hpp \
-	components/info_widgets.cpp components/info_widgets.hpp \
-	components/preferences_widgets.cpp components/preferences_widgets.hpp \
-	components/complete_preferences.cpp \
-	components/complete_preferences.hpp \
-	components/simple_preferences.cpp components/simple_preferences.hpp \
-	components/open_panels.cpp components/open_panels.hpp \
-	components/interface_widgets.cpp components/interface_widgets.hpp \
-	components/controller.cpp components/controller.hpp \
-	components/controller_widget.cpp components/controller_widget.hpp \
-	components/epg/EPGChannels.cpp components/epg/EPGChannels.hpp \
-	components/epg/EPGItem.cpp components/epg/EPGItem.hpp \
-	components/epg/EPGProgram.cpp components/epg/EPGProgram.hpp \
-	components/epg/EPGRuler.cpp components/epg/EPGRuler.hpp \
-	components/epg/EPGView.cpp components/epg/EPGView.hpp \
-	components/epg/EPGWidget.cpp components/epg/EPGWidget.hpp \
-	components/playlist/views.cpp components/playlist/views.hpp \
-	components/playlist/vlc_model.cpp components/playlist/vlc_model.hpp \
-	components/playlist/playlist_model.cpp \
-	components/playlist/playlist_model.hpp \
-	components/playlist/playlist_item.cpp \
-	components/playlist/playlist_item.hpp \
-	components/playlist/standardpanel.cpp \
-	components/playlist/standardpanel.hpp \
-	components/playlist/playlist.cpp components/playlist/playlist.hpp \
-	components/playlist/selector.cpp components/playlist/selector.hpp \
-	components/playlist/sorting.h \
-	components/sout/profile_selector.cpp \
-	components/sout/profile_selector.hpp \
-	components/sout/sout_widgets.cpp components/sout/sout_widgets.hpp \
-	components/sout/profiles.hpp \
-	util/animators.cpp util/animators.hpp \
-	util/input_slider.cpp util/input_slider.hpp \
-	util/timetooltip.cpp util/timetooltip.hpp \
-	util/customwidgets.cpp util/customwidgets.hpp \
-	util/searchlineedit.cpp util/searchlineedit.hpp \
-	util/registry.cpp util/registry.hpp \
-	util/qmenuview.cpp util/qmenuview.hpp \
-	util/qt_dirs.cpp util/qt_dirs.hpp \
-	util/pictureflow.cpp util/pictureflow.hpp \
-	util/validators.cpp util/validators.hpp \
-	util/buttons/BrowseButton.cpp util/buttons/BrowseButton.hpp \
-	util/buttons/DeckButtonsLayout.cpp util/buttons/DeckButtonsLayout.hpp \
-	util/buttons/RoundButton.cpp util/buttons/RoundButton.hpp \
-	util/qvlcframe.hpp \
-	util/qvlcapp.hpp \
-	util/singleton.hpp \
-	styles/seekstyle.cpp styles/seekstyle.hpp
+	gui/qt/qt.cpp gui/qt/qt.hpp \
+	gui/qt/menus.cpp gui/qt/menus.hpp \
+	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
+	gui/qt/dialogs_provider.cpp gui/qt/dialogs_provider.hpp \
+	gui/qt/input_manager.cpp gui/qt/input_manager.hpp \
+	gui/qt/actions_manager.cpp gui/qt/actions_manager.hpp \
+	gui/qt/extensions_manager.cpp gui/qt/extensions_manager.hpp \
+	gui/qt/managers/addons_manager.cpp gui/qt/managers/addons_manager.hpp \
+	gui/qt/recents.cpp gui/qt/recents.hpp \
+	gui/qt/adapters/seekpoints.cpp gui/qt/adapters/seekpoints.hpp \
+	gui/qt/adapters/chromaprint.cpp gui/qt/adapters/chromaprint.hpp \
+	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
+	gui/qt/dialogs/playlist.cpp gui/qt/dialogs/playlist.hpp \
+	gui/qt/dialogs/bookmarks.cpp gui/qt/dialogs/bookmarks.hpp \
+	gui/qt/dialogs/preferences.cpp gui/qt/dialogs/preferences.hpp \
+	gui/qt/dialogs/mediainfo.cpp gui/qt/dialogs/mediainfo.hpp \
+	gui/qt/dialogs/epg.cpp gui/qt/dialogs/epg.hpp \
+	gui/qt/dialogs/extended.cpp gui/qt/dialogs/extended.hpp \
+	gui/qt/dialogs/messages.cpp gui/qt/dialogs/messages.hpp \
+	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
+	gui/qt/dialogs/external.cpp gui/qt/dialogs/external.hpp \
+	gui/qt/dialogs/plugins.cpp gui/qt/dialogs/plugins.hpp \
+	gui/qt/dialogs/sout.cpp gui/qt/dialogs/sout.hpp \
+	gui/qt/dialogs/convert.cpp gui/qt/dialogs/convert.hpp \
+	gui/qt/dialogs/help.cpp gui/qt/dialogs/help.hpp \
+	gui/qt/dialogs/gototime.cpp gui/qt/dialogs/gototime.hpp \
+	gui/qt/dialogs/toolbar.cpp gui/qt/dialogs/toolbar.hpp \
+	gui/qt/dialogs/open.cpp gui/qt/dialogs/open.hpp \
+	gui/qt/dialogs/openurl.cpp gui/qt/dialogs/openurl.hpp \
+	gui/qt/dialogs/vlm.cpp gui/qt/dialogs/vlm.hpp \
+	gui/qt/dialogs/firstrun.cpp gui/qt/dialogs/firstrun.hpp \
+	gui/qt/dialogs/podcast_configuration.cpp \
+	gui/qt/dialogs/podcast_configuration.hpp \
+	gui/qt/dialogs/extensions.cpp gui/qt/dialogs/extensions.hpp \
+	gui/qt/dialogs/fingerprintdialog.cpp \
+	gui/qt/dialogs/fingerprintdialog.hpp \
+	gui/qt/components/extended_panels.cpp \
+	gui/qt/components/extended_panels.hpp \
+	gui/qt/components/info_panels.cpp gui/qt/components/info_panels.hpp \
+	gui/qt/components/info_widgets.cpp gui/qt/components/info_widgets.hpp \
+	gui/qt/components/preferences_widgets.cpp \
+	gui/qt/components/preferences_widgets.hpp \
+	gui/qt/components/complete_preferences.cpp \
+	gui/qt/components/complete_preferences.hpp \
+	gui/qt/components/simple_preferences.cpp \
+	gui/qt/components/simple_preferences.hpp \
+	gui/qt/components/open_panels.cpp gui/qt/components/open_panels.hpp \
+	gui/qt/components/interface_widgets.cpp \
+	gui/qt/components/interface_widgets.hpp \
+	gui/qt/components/controller.cpp gui/qt/components/controller.hpp \
+	gui/qt/components/controller_widget.cpp \
+	gui/qt/components/controller_widget.hpp \
+	gui/qt/components/epg/EPGChannels.cpp \
+	gui/qt/components/epg/EPGChannels.hpp \
+	gui/qt/components/epg/EPGItem.cpp \
+	gui/qt/components/epg/EPGItem.hpp \
+	gui/qt/components/epg/EPGProgram.cpp \
+	gui/qt/components/epg/EPGProgram.hpp \
+	gui/qt/components/epg/EPGRuler.cpp gui/qt/components/epg/EPGRuler.hpp \
+	gui/qt/components/epg/EPGView.cpp gui/qt/components/epg/EPGView.hpp \
+	gui/qt/components/epg/EPGWidget.cpp \
+	gui/qt/components/epg/EPGWidget.hpp \
+	gui/qt/components/playlist/views.cpp \
+	gui/qt/components/playlist/views.hpp \
+	gui/qt/components/playlist/vlc_model.cpp \
+	gui/qt/components/playlist/vlc_model.hpp \
+	gui/qt/components/playlist/playlist_model.cpp \
+	gui/qt/components/playlist/playlist_model.hpp \
+	gui/qt/components/playlist/playlist_item.cpp \
+	gui/qt/components/playlist/playlist_item.hpp \
+	gui/qt/components/playlist/standardpanel.cpp \
+	gui/qt/components/playlist/standardpanel.hpp \
+	gui/qt/components/playlist/playlist.cpp \
+	gui/qt/components/playlist/playlist.hpp \
+	gui/qt/components/playlist/selector.cpp \
+	gui/qt/components/playlist/selector.hpp \
+	gui/qt/components/playlist/sorting.h \
+	gui/qt/components/sout/profile_selector.cpp \
+	gui/qt/components/sout/profile_selector.hpp \
+	gui/qt/components/sout/sout_widgets.cpp \
+	gui/qt/components/sout/sout_widgets.hpp \
+	gui/qt/components/sout/profiles.hpp \
+	gui/qt/util/animators.cpp gui/qt/util/animators.hpp \
+	gui/qt/util/input_slider.cpp gui/qt/util/input_slider.hpp \
+	gui/qt/util/timetooltip.cpp gui/qt/util/timetooltip.hpp \
+	gui/qt/util/customwidgets.cpp gui/qt/util/customwidgets.hpp \
+	gui/qt/util/searchlineedit.cpp gui/qt/util/searchlineedit.hpp \
+	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
+	gui/qt/util/qmenuview.cpp gui/qt/util/qmenuview.hpp \
+	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
+	gui/qt/util/pictureflow.cpp gui/qt/util/pictureflow.hpp \
+	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
+	gui/qt/util/buttons/BrowseButton.cpp \
+	gui/qt/util/buttons/BrowseButton.hpp \
+	gui/qt/util/buttons/DeckButtonsLayout.cpp \
+	gui/qt/util/buttons/DeckButtonsLayout.hpp \
+	gui/qt/util/buttons/RoundButton.cpp \
+	gui/qt/util/buttons/RoundButton.hpp \
+	gui/qt/util/qvlcframe.hpp \
+	gui/qt/util/qvlcapp.hpp \
+	gui/qt/util/singleton.hpp \
+	gui/qt/styles/seekstyle.cpp gui/qt/styles/seekstyle.hpp
 if HAVE_WIN32
-libqt_plugin_la_SOURCES += main_interface_win32.cpp main_interface_win32.hpp
+libqt_plugin_la_SOURCES += \
+	gui/qt/main_interface_win32.cpp gui/qt/main_interface_win32.hpp
 endif
 
 # Meta-object compilation
@@ -146,102 +164,102 @@ moc_verbose__0 = $(moc_verbose_0)
 dialogs_provider.moc.cpp dialogs/vlm.moc.cpp: $(top_builddir)/config.h
 
 nodist_libqt_plugin_la_SOURCES = \
-	main_interface.moc.cpp \
-	menus.moc.cpp \
-	dialogs_provider.moc.cpp \
-	input_manager.moc.cpp \
-	actions_manager.moc.cpp \
-	extensions_manager.moc.cpp \
-	managers/addons_manager.moc.cpp \
-	recents.moc.cpp \
-	adapters/seekpoints.moc.cpp \
-	adapters/chromaprint.moc.cpp \
-	adapters/variables.moc.cpp \
-	dialogs/playlist.moc.cpp \
-	dialogs/bookmarks.moc.cpp \
-	dialogs/mediainfo.moc.cpp \
-	dialogs/extended.moc.cpp \
-	dialogs/messages.moc.cpp \
-	dialogs/epg.moc.cpp \
-	dialogs/errors.moc.cpp \
-	dialogs/external.moc.cpp \
-	dialogs/plugins.moc.cpp \
-	dialogs/preferences.moc.cpp \
-	dialogs/sout.moc.cpp \
-	dialogs/convert.moc.cpp \
-	dialogs/help.moc.cpp \
-	dialogs/gototime.moc.cpp \
-	dialogs/toolbar.moc.cpp \
-	dialogs/open.moc.cpp \
-	dialogs/openurl.moc.cpp \
-	dialogs/podcast_configuration.moc.cpp \
-	dialogs/vlm.moc.cpp \
-	dialogs/firstrun.moc.cpp \
-	dialogs/extensions.moc.cpp \
-	dialogs/fingerprintdialog.moc.cpp \
-	components/extended_panels.moc.cpp \
-	components/info_panels.moc.cpp \
-	components/info_widgets.moc.cpp \
-	components/preferences_widgets.moc.cpp \
-	components/complete_preferences.moc.cpp \
-	components/simple_preferences.moc.cpp \
-	components/open_panels.moc.cpp \
-	components/interface_widgets.moc.cpp \
-	components/controller.moc.cpp \
-	components/controller_widget.moc.cpp \
-	components/epg/EPGChannels.moc.cpp \
-	components/epg/EPGProgram.moc.cpp \
-	components/epg/EPGRuler.moc.cpp \
-	components/epg/EPGView.moc.cpp \
-	components/epg/EPGWidget.moc.cpp \
-	components/playlist/views.moc.cpp \
-	components/playlist/vlc_model.moc.cpp \
-	components/playlist/playlist_model.moc.cpp \
-	components/playlist/playlist.moc.cpp \
-	components/playlist/standardpanel.moc.cpp \
-	components/playlist/selector.moc.cpp \
-	components/sout/profile_selector.moc.cpp \
-	components/sout/sout_widgets.moc.cpp \
-	util/animators.moc.cpp \
-	util/input_slider.moc.cpp \
-	util/timetooltip.moc.cpp \
-	util/customwidgets.moc.cpp \
-	util/searchlineedit.moc.cpp \
-	util/qmenuview.moc.cpp \
-	util/qvlcapp.moc.cpp \
-	util/pictureflow.moc.cpp \
-	util/validators.moc.cpp \
-	util/buttons/RoundButton.moc.cpp \
-	util/buttons/DeckButtonsLayout.moc.cpp \
-	util/buttons/BrowseButton.moc.cpp \
-	styles/seekstyle.moc.cpp
+	gui/qt/main_interface.moc.cpp \
+	gui/qt/menus.moc.cpp \
+	gui/qt/dialogs_provider.moc.cpp \
+	gui/qt/input_manager.moc.cpp \
+	gui/qt/actions_manager.moc.cpp \
+	gui/qt/extensions_manager.moc.cpp \
+	gui/qt/managers/addons_manager.moc.cpp \
+	gui/qt/recents.moc.cpp \
+	gui/qt/adapters/seekpoints.moc.cpp \
+	gui/qt/adapters/chromaprint.moc.cpp \
+	gui/qt/adapters/variables.moc.cpp \
+	gui/qt/dialogs/playlist.moc.cpp \
+	gui/qt/dialogs/bookmarks.moc.cpp \
+	gui/qt/dialogs/mediainfo.moc.cpp \
+	gui/qt/dialogs/extended.moc.cpp \
+	gui/qt/dialogs/messages.moc.cpp \
+	gui/qt/dialogs/epg.moc.cpp \
+	gui/qt/dialogs/errors.moc.cpp \
+	gui/qt/dialogs/external.moc.cpp \
+	gui/qt/dialogs/plugins.moc.cpp \
+	gui/qt/dialogs/preferences.moc.cpp \
+	gui/qt/dialogs/sout.moc.cpp \
+	gui/qt/dialogs/convert.moc.cpp \
+	gui/qt/dialogs/help.moc.cpp \
+	gui/qt/dialogs/gototime.moc.cpp \
+	gui/qt/dialogs/toolbar.moc.cpp \
+	gui/qt/dialogs/open.moc.cpp \
+	gui/qt/dialogs/openurl.moc.cpp \
+	gui/qt/dialogs/podcast_configuration.moc.cpp \
+	gui/qt/dialogs/vlm.moc.cpp \
+	gui/qt/dialogs/firstrun.moc.cpp \
+	gui/qt/dialogs/extensions.moc.cpp \
+	gui/qt/dialogs/fingerprintdialog.moc.cpp \
+	gui/qt/components/extended_panels.moc.cpp \
+	gui/qt/components/info_panels.moc.cpp \
+	gui/qt/components/info_widgets.moc.cpp \
+	gui/qt/components/preferences_widgets.moc.cpp \
+	gui/qt/components/complete_preferences.moc.cpp \
+	gui/qt/components/simple_preferences.moc.cpp \
+	gui/qt/components/open_panels.moc.cpp \
+	gui/qt/components/interface_widgets.moc.cpp \
+	gui/qt/components/controller.moc.cpp \
+	gui/qt/components/controller_widget.moc.cpp \
+	gui/qt/components/epg/EPGChannels.moc.cpp \
+	gui/qt/components/epg/EPGProgram.moc.cpp \
+	gui/qt/components/epg/EPGRuler.moc.cpp \
+	gui/qt/components/epg/EPGView.moc.cpp \
+	gui/qt/components/epg/EPGWidget.moc.cpp \
+	gui/qt/components/playlist/views.moc.cpp \
+	gui/qt/components/playlist/vlc_model.moc.cpp \
+	gui/qt/components/playlist/playlist_model.moc.cpp \
+	gui/qt/components/playlist/playlist.moc.cpp \
+	gui/qt/components/playlist/standardpanel.moc.cpp \
+	gui/qt/components/playlist/selector.moc.cpp \
+	gui/qt/components/sout/profile_selector.moc.cpp \
+	gui/qt/components/sout/sout_widgets.moc.cpp \
+	gui/qt/util/animators.moc.cpp \
+	gui/qt/util/input_slider.moc.cpp \
+	gui/qt/util/timetooltip.moc.cpp \
+	gui/qt/util/customwidgets.moc.cpp \
+	gui/qt/util/searchlineedit.moc.cpp \
+	gui/qt/util/qmenuview.moc.cpp \
+	gui/qt/util/qvlcapp.moc.cpp \
+	gui/qt/util/pictureflow.moc.cpp \
+	gui/qt/util/validators.moc.cpp \
+	gui/qt/util/buttons/RoundButton.moc.cpp \
+	gui/qt/util/buttons/DeckButtonsLayout.moc.cpp \
+	gui/qt/util/buttons/BrowseButton.moc.cpp \
+	gui/qt/styles/seekstyle.moc.cpp
 
 if HAVE_WIN32
-nodist_libqt_plugin_la_SOURCES += main_interface_win32.moc.cpp
+nodist_libqt_plugin_la_SOURCES += gui/qt/main_interface_win32.moc.cpp
 endif
 
 nodist_libqt_plugin_la_SOURCES += \
-	ui/equalizer.h \
-	ui/video_effects.h \
-	ui/open_file.h \
-	ui/open_disk.h \
-	ui/open_net.h \
-	ui/open_capture.h \
-	ui/open.h \
-	ui/vlm.h \
-	ui/podcast_configuration.h \
-	ui/profiles.h \
-	ui/sprefs_audio.h \
-	ui/sprefs_input.h \
-	ui/sprefs_interface.h \
-	ui/sprefs_subtitles.h \
-	ui/sprefs_video.h \
-	ui/streampanel.h \
-	ui/messages_panel.h \
-	ui/about.h \
-	ui/update.h \
-	ui/fingerprintdialog.h \
-	ui/sout.h
+	gui/qt/ui/equalizer.h \
+	gui/qt/ui/video_effects.h \
+	gui/qt/ui/open_file.h \
+	gui/qt/ui/open_disk.h \
+	gui/qt/ui/open_net.h \
+	gui/qt/ui/open_capture.h \
+	gui/qt/ui/open.h \
+	gui/qt/ui/vlm.h \
+	gui/qt/ui/podcast_configuration.h \
+	gui/qt/ui/profiles.h \
+	gui/qt/ui/sprefs_audio.h \
+	gui/qt/ui/sprefs_input.h \
+	gui/qt/ui/sprefs_interface.h \
+	gui/qt/ui/sprefs_subtitles.h \
+	gui/qt/ui/sprefs_video.h \
+	gui/qt/ui/streampanel.h \
+	gui/qt/ui/messages_panel.h \
+	gui/qt/ui/about.h \
+	gui/qt/ui/update.h \
+	gui/qt/ui/fingerprintdialog.h \
+	gui/qt/ui/sout.h
 
 # User interface compilation
 
@@ -261,31 +279,31 @@ MOC_CPPFLAGS += -D_WIN32
 endif
 
 libqt_plugin_la_UI = \
-	ui/equalizer.ui \
-	ui/video_effects.ui \
-	ui/open_file.ui \
-	ui/open_disk.ui \
-	ui/open_net.ui \
-	ui/open_capture.ui \
-	ui/open.ui \
-	ui/podcast_configuration.ui \
-	ui/profiles.ui \
-	ui/sprefs_audio.ui \
-	ui/sprefs_input.ui \
-	ui/sprefs_interface.ui \
-	ui/sprefs_subtitles.ui \
-	ui/sprefs_video.ui \
-	ui/streampanel.ui \
-	ui/messages_panel.ui \
-	ui/about.ui \
-	ui/update.ui \
-	ui/sout.ui \
-	ui/vlm.ui \
-	ui/fingerprintdialog.ui
-EXTRA_DIST = $(libqt_plugin_la_UI)
+	gui/qt/ui/equalizer.ui \
+	gui/qt/ui/video_effects.ui \
+	gui/qt/ui/open_file.ui \
+	gui/qt/ui/open_disk.ui \
+	gui/qt/ui/open_net.ui \
+	gui/qt/ui/open_capture.ui \
+	gui/qt/ui/open.ui \
+	gui/qt/ui/podcast_configuration.ui \
+	gui/qt/ui/profiles.ui \
+	gui/qt/ui/sprefs_audio.ui \
+	gui/qt/ui/sprefs_input.ui \
+	gui/qt/ui/sprefs_interface.ui \
+	gui/qt/ui/sprefs_subtitles.ui \
+	gui/qt/ui/sprefs_video.ui \
+	gui/qt/ui/streampanel.ui \
+	gui/qt/ui/messages_panel.ui \
+	gui/qt/ui/about.ui \
+	gui/qt/ui/update.ui \
+	gui/qt/ui/sout.ui \
+	gui/qt/ui/vlm.ui \
+	gui/qt/ui/fingerprintdialog.ui
+EXTRA_DIST += $(libqt_plugin_la_UI)
 
 .ui.h:
-	$(AM_V_at)mkdir -p -- ui
+	$(AM_V_at)mkdir -p -- gui/qt/ui
 	$(AM_V_at)rm -f $@ $@.tmp
 	$(AM_V_at)echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@.tmp
 	$(uic_verbose)$(UIC) -tr "Q_" $< >> $@.tmp
@@ -294,142 +312,141 @@ EXTRA_DIST = $(libqt_plugin_la_UI)
 
 # Resources
 
-DEPS_res = \
-	pixmaps/clear.png \
-	pixmaps/eject.png \
-	pixmaps/faster.png \
-	pixmaps/faster2.png \
-	pixmaps/go-next.png \
-	pixmaps/addons/addon.png \
-	pixmaps/addons/addon_broken.png \
-	pixmaps/addons/score.png \
-	pixmaps/menus/exit_16px.png \
-	pixmaps/menus/help_16px.png \
-	pixmaps/menus/info_16px.png \
-	pixmaps/menus/messages_16px.png \
-	pixmaps/menus/playlist_16px.png \
-	pixmaps/menus/preferences_16px.png \
-	pixmaps/menus/settings_16px.png \
-	pixmaps/menus/stream_16px.png \
-	pixmaps/next.png \
-	pixmaps/next_16px.png \
-	pixmaps/noart-64.png \
-	pixmaps/noart.png \
-	pixmaps/pause.png \
-	pixmaps/pause_16px.png \
-	pixmaps/play.png \
-	pixmaps/play_16px.png \
-	pixmaps/playlist/add.png \
-	pixmaps/playlist/playlist.png \
-	pixmaps/playlist/remove.png \
-	pixmaps/playlist/repeat_all.png \
-	pixmaps/playlist/repeat_off.png \
-	pixmaps/playlist/repeat_one.png \
-	pixmaps/playlist/shuffle_on.png \
-	pixmaps/playlist/dropzone.png \
-	pixmaps/playlist/sidebar-icons/capture.png \
-	pixmaps/playlist/sidebar-icons/pictures.png \
-	pixmaps/playlist/sidebar-icons/disc.png \
-	pixmaps/playlist/sidebar-icons/playlist.png \
-	pixmaps/playlist/sidebar-icons/lan.png \
-	pixmaps/playlist/sidebar-icons/podcast.png \
-	pixmaps/playlist/sidebar-icons/library.png \
-	pixmaps/playlist/sidebar-icons/screen.png \
-	pixmaps/playlist/sidebar-icons/movie.png \
-	pixmaps/playlist/sidebar-icons/mtp.png \
-	pixmaps/playlist/sidebar-icons/music.png \
-	pixmaps/playlist/sidebar-icons/network.png \
-	pixmaps/playlist/sidebar-icons/sd/appletrailers.png \
-	pixmaps/playlist/sidebar-icons/sd/icecast.png \
-	pixmaps/playlist/sidebar-icons/sd/katsomo.png \
-	pixmaps/playlist/sidebar-icons/sd/fmc.png \
-	pixmaps/playlist/sidebar-icons/sd/frenchtv.png \
-	pixmaps/playlist/sidebar-icons/sd/jamendo.png \
-	pixmaps/playlist/sidebar-icons/sd/assembleenationale.png \
-	pixmaps/prefs/advprefs_audio.png \
-	pixmaps/prefs/advprefs_codec.png \
-	pixmaps/prefs/advprefs_extended.png \
-	pixmaps/prefs/advprefs_intf.png \
-	pixmaps/prefs/advprefs_playlist.png \
-	pixmaps/prefs/advprefs_sout.png \
-	pixmaps/prefs/advprefs_video.png \
-	pixmaps/prefs/spref_cone_Audio_64.png \
-	pixmaps/prefs/spref_cone_Hotkeys_64.png \
-	pixmaps/prefs/spref_cone_Input_64.png \
-	pixmaps/prefs/spref_cone_Interface_64.png \
-	pixmaps/prefs/spref_cone_Subtitles_64.png \
-	pixmaps/prefs/spref_cone_Video_64.png \
-	pixmaps/previous.png \
-	pixmaps/previous_16px.png \
-	pixmaps/profile_new.png \
-	pixmaps/sample_complete.png \
-	pixmaps/sample_minimal.png \
-	pixmaps/sample_skins.png \
-	pixmaps/slower.png \
-	pixmaps/slower2.png \
-	pixmaps/space.png \
-	pixmaps/stop.png \
-	pixmaps/stop_16px.png \
-	pixmaps/toolbar/arrows.png \
-	pixmaps/toolbar/aspect-ratio.png \
-	pixmaps/toolbar/atob.png \
-	pixmaps/toolbar/atob_noa.png \
-	pixmaps/toolbar/atob_nob.png \
-	pixmaps/toolbar/renderer.png \
-	pixmaps/toolbar/defullscreen.png \
-	pixmaps/toolbar/dvd_menu.png \
-	pixmaps/toolbar/dvd_next.png \
-	pixmaps/toolbar/dvd_prev.png \
-	pixmaps/toolbar/extended_16px.png \
-	pixmaps/toolbar/frame-by-frame.png \
-	pixmaps/toolbar/fullscreen.png \
-	pixmaps/toolbar/play_reverse.png \
-	pixmaps/toolbar/record_16px.png \
-	pixmaps/toolbar/snapshot.png \
-	pixmaps/toolbar/skip_for.png \
-	pixmaps/toolbar/skip_back.png \
-	pixmaps/toolbar/tv.png \
-	pixmaps/toolbar/tvtelx.png \
-	pixmaps/toolbar/visu.png \
-	pixmaps/toolbar/volume-high.png \
-	pixmaps/toolbar/volume-low.png \
-	pixmaps/toolbar/volume-medium.png \
-	pixmaps/toolbar/volume-muted.png \
-	pixmaps/toolbar/volume-slider-inside.png \
-	pixmaps/toolbar/volume-slider-outside.png \
-	pixmaps/types/capture-card_16px.png \
-	pixmaps/types/disc_16px.png \
-	pixmaps/types/file-asym_16px.png \
-	pixmaps/types/file-wide_16px.png \
-	pixmaps/types/folder-blue_16px.png \
-	pixmaps/types/folder-grey_16px.png \
-	pixmaps/types/harddisk_16px.png \
-	pixmaps/types/network_16px.png \
-	pixmaps/types/tape_16px.png \
-	pixmaps/types/type_directory.png \
-	pixmaps/types/type_file.png \
-	pixmaps/types/type_stream.png \
-	pixmaps/types/type_node.png \
-	pixmaps/types/type_playlist.png \
-	pixmaps/types/type_unknown.xpm \
-	pixmaps/util/wait1.png \
-	pixmaps/util/wait2.png \
-	pixmaps/util/wait3.png \
-	pixmaps/util/wait4.png \
-	pixmaps/win7/win7thumbnail_pause.png \
-	pixmaps/win7/win7thumbnail_prev.png \
-	pixmaps/win7/win7thumbnail_next.png \
-	pixmaps/win7/win7thumbnail_play.png \
-	pixmaps/update.png \
-	pixmaps/valid.png \
-	pixmaps/search_clear.png \
-	pixmaps/lock.png
-EXTRA_DIST += vlc.qrc $(DEPS_res)
+libqt_plugin_la_RES = \
+	gui/qt/pixmaps/clear.png \
+	gui/qt/pixmaps/eject.png \
+	gui/qt/pixmaps/faster.png \
+	gui/qt/pixmaps/faster2.png \
+	gui/qt/pixmaps/go-next.png \
+	gui/qt/pixmaps/addons/addon.png \
+	gui/qt/pixmaps/addons/addon_broken.png \
+	gui/qt/pixmaps/addons/score.png \
+	gui/qt/pixmaps/menus/exit_16px.png \
+	gui/qt/pixmaps/menus/help_16px.png \
+	gui/qt/pixmaps/menus/info_16px.png \
+	gui/qt/pixmaps/menus/messages_16px.png \
+	gui/qt/pixmaps/menus/playlist_16px.png \
+	gui/qt/pixmaps/menus/preferences_16px.png \
+	gui/qt/pixmaps/menus/settings_16px.png \
+	gui/qt/pixmaps/menus/stream_16px.png \
+	gui/qt/pixmaps/next.png \
+	gui/qt/pixmaps/next_16px.png \
+	gui/qt/pixmaps/noart-64.png \
+	gui/qt/pixmaps/noart.png \
+	gui/qt/pixmaps/pause.png \
+	gui/qt/pixmaps/pause_16px.png \
+	gui/qt/pixmaps/play.png \
+	gui/qt/pixmaps/play_16px.png \
+	gui/qt/pixmaps/playlist/add.png \
+	gui/qt/pixmaps/playlist/playlist.png \
+	gui/qt/pixmaps/playlist/remove.png \
+	gui/qt/pixmaps/playlist/repeat_all.png \
+	gui/qt/pixmaps/playlist/repeat_off.png \
+	gui/qt/pixmaps/playlist/repeat_one.png \
+	gui/qt/pixmaps/playlist/shuffle_on.png \
+	gui/qt/pixmaps/playlist/dropzone.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/capture.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/pictures.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/disc.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/playlist.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/lan.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/podcast.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/library.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/screen.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/movie.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/mtp.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/music.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/network.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/appletrailers.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/icecast.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/katsomo.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/fmc.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/frenchtv.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/jamendo.png \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/assembleenationale.png \
+	gui/qt/pixmaps/prefs/advprefs_audio.png \
+	gui/qt/pixmaps/prefs/advprefs_codec.png \
+	gui/qt/pixmaps/prefs/advprefs_extended.png \
+	gui/qt/pixmaps/prefs/advprefs_intf.png \
+	gui/qt/pixmaps/prefs/advprefs_playlist.png \
+	gui/qt/pixmaps/prefs/advprefs_sout.png \
+	gui/qt/pixmaps/prefs/advprefs_video.png \
+	gui/qt/pixmaps/prefs/spref_cone_Audio_64.png \
+	gui/qt/pixmaps/prefs/spref_cone_Hotkeys_64.png \
+	gui/qt/pixmaps/prefs/spref_cone_Input_64.png \
+	gui/qt/pixmaps/prefs/spref_cone_Interface_64.png \
+	gui/qt/pixmaps/prefs/spref_cone_Subtitles_64.png \
+	gui/qt/pixmaps/prefs/spref_cone_Video_64.png \
+	gui/qt/pixmaps/previous.png \
+	gui/qt/pixmaps/previous_16px.png \
+	gui/qt/pixmaps/profile_new.png \
+	gui/qt/pixmaps/sample_complete.png \
+	gui/qt/pixmaps/sample_minimal.png \
+	gui/qt/pixmaps/sample_skins.png \
+	gui/qt/pixmaps/slower.png \
+	gui/qt/pixmaps/slower2.png \
+	gui/qt/pixmaps/space.png \
+	gui/qt/pixmaps/stop.png \
+	gui/qt/pixmaps/stop_16px.png \
+	gui/qt/pixmaps/toolbar/arrows.png \
+	gui/qt/pixmaps/toolbar/aspect-ratio.png \
+	gui/qt/pixmaps/toolbar/atob.png \
+	gui/qt/pixmaps/toolbar/atob_noa.png \
+	gui/qt/pixmaps/toolbar/atob_nob.png \
+	gui/qt/pixmaps/toolbar/renderer.png \
+	gui/qt/pixmaps/toolbar/defullscreen.png \
+	gui/qt/pixmaps/toolbar/dvd_menu.png \
+	gui/qt/pixmaps/toolbar/dvd_next.png \
+	gui/qt/pixmaps/toolbar/dvd_prev.png \
+	gui/qt/pixmaps/toolbar/extended_16px.png \
+	gui/qt/pixmaps/toolbar/frame-by-frame.png \
+	gui/qt/pixmaps/toolbar/fullscreen.png \
+	gui/qt/pixmaps/toolbar/play_reverse.png \
+	gui/qt/pixmaps/toolbar/record_16px.png \
+	gui/qt/pixmaps/toolbar/snapshot.png \
+	gui/qt/pixmaps/toolbar/skip_for.png \
+	gui/qt/pixmaps/toolbar/skip_back.png \
+	gui/qt/pixmaps/toolbar/tv.png \
+	gui/qt/pixmaps/toolbar/tvtelx.png \
+	gui/qt/pixmaps/toolbar/visu.png \
+	gui/qt/pixmaps/toolbar/volume-high.png \
+	gui/qt/pixmaps/toolbar/volume-low.png \
+	gui/qt/pixmaps/toolbar/volume-medium.png \
+	gui/qt/pixmaps/toolbar/volume-muted.png \
+	gui/qt/pixmaps/toolbar/volume-slider-inside.png \
+	gui/qt/pixmaps/toolbar/volume-slider-outside.png \
+	gui/qt/pixmaps/types/capture-card_16px.png \
+	gui/qt/pixmaps/types/disc_16px.png \
+	gui/qt/pixmaps/types/file-asym_16px.png \
+	gui/qt/pixmaps/types/file-wide_16px.png \
+	gui/qt/pixmaps/types/folder-blue_16px.png \
+	gui/qt/pixmaps/types/folder-grey_16px.png \
+	gui/qt/pixmaps/types/harddisk_16px.png \
+	gui/qt/pixmaps/types/network_16px.png \
+	gui/qt/pixmaps/types/tape_16px.png \
+	gui/qt/pixmaps/types/type_directory.png \
+	gui/qt/pixmaps/types/type_file.png \
+	gui/qt/pixmaps/types/type_stream.png \
+	gui/qt/pixmaps/types/type_node.png \
+	gui/qt/pixmaps/types/type_playlist.png \
+	gui/qt/pixmaps/types/type_unknown.xpm \
+	gui/qt/pixmaps/util/wait1.png \
+	gui/qt/pixmaps/util/wait2.png \
+	gui/qt/pixmaps/util/wait3.png \
+	gui/qt/pixmaps/util/wait4.png \
+	gui/qt/pixmaps/win7/win7thumbnail_pause.png \
+	gui/qt/pixmaps/win7/win7thumbnail_prev.png \
+	gui/qt/pixmaps/win7/win7thumbnail_next.png \
+	gui/qt/pixmaps/win7/win7thumbnail_play.png \
+	gui/qt/pixmaps/update.png \
+	gui/qt/pixmaps/valid.png \
+	gui/qt/pixmaps/search_clear.png \
+	gui/qt/pixmaps/lock.png
+EXTRA_DIST += gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 
-nodist_libqt_plugin_la_SOURCES += resources.cpp
+nodist_libqt_plugin_la_SOURCES += gui/qt/resources.cpp
 
-resources.cpp: vlc.qrc $(DEPS_res)
+gui/qt/resources.cpp: gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
-
 
 BUILT_SOURCES += $(nodist_libqt_plugin_la_SOURCES)
