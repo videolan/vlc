@@ -1367,7 +1367,6 @@ static int DemuxMoov( demux_t *p_demux )
                     continue;
 
                 mtime_t i_nzdts = MP4_TrackGetDTS( p_demux, tk_tmp );
-                assert(i_nzdts >= p_sys->i_pcr);
                 if ( i_nzdts <= i_nztime + DEMUX_TRACK_MAX_PRELOAD )
                 {
                     /* Found a better candidate to avoid seeking */
