@@ -72,7 +72,7 @@ static void LoadLocalStorage( addons_manager_t *p_manager );
  * Public functions
  *****************************************************************************/
 
-addon_entry_t * addon_entry_New()
+addon_entry_t * addon_entry_New(void)
 {
     addon_entry_owner_t *owner = calloc( 1, sizeof(addon_entry_owner_t) );
     if( unlikely(owner == NULL) )
