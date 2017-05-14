@@ -136,10 +136,10 @@ struct playlist_item_t
 };
 
 typedef enum {
-    PLAYLIST_DBL_FLAG          = 0x0004,  /**< Is it disabled ? */
-    PLAYLIST_RO_FLAG           = 0x0008,  /**< Write-enabled ? */
-    PLAYLIST_SUBITEM_STOP_FLAG = 0x0040,  /**< Must playlist stop if the item gets subitems ?*/
-    PLAYLIST_NO_INHERIT_FLAG   = 0x0080,  /**< Childs must not inherit flags from parent node */
+    PLAYLIST_DBL_FLAG          = 0x04,  /**< Is it disabled ? */
+    PLAYLIST_RO_FLAG           = 0x08,  /**< Write-enabled ? */
+    PLAYLIST_SUBITEM_STOP_FLAG = 0x40,  /**< Must playlist stop if the item gets subitems ?*/
+    PLAYLIST_NO_INHERIT_FLAG   = 0x80,  /**< Will children inherit flags the R/O flag ? */
 } playlist_item_flags_e;
 
 /** Playlist status */
