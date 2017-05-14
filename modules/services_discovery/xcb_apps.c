@@ -282,7 +282,7 @@ static struct app *AddApp (services_discovery_t *sd, xcb_window_t xid)
     app->xid = xid;
     app->item = item;
     app->owner = sd;
-    input_item_PostSubItem(p_sys->apps_root, item);
+    services_discovery_AddSubItem(sd, p_sys->apps_root, item);
     return app;
 }
 
