@@ -1403,8 +1403,7 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
                 item = NULL;
             }
 
-            playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, true,
-                             parent, item);
+            playlist_ViewPlay(p_playlist, parent, item);
         } else {   /* We only want to set the current node */
             playlist_Control(p_playlist, PLAYLIST_STOP, true);
             if (sys->node != NULL)
