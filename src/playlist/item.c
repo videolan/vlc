@@ -433,8 +433,8 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
  */
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri, bool play_now )
 {
-    return playlist_AddExt( p_playlist, psz_uri, NULL,
-                            play_now ? PLAYLIST_GO : 0, 0, NULL, 0, true );
+    return playlist_AddExt( p_playlist, psz_uri, NULL, play_now,
+                            0, NULL, 0, true );
 }
 
 /**
@@ -443,7 +443,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri, bool play_now )
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
- * \param i_mode the mode used when adding
+ * \param play_now whether to start playing immediately or not
  * \param i_options the number of options
  * \param ppsz_options an array of options
  * \param i_option_flags options flags
@@ -451,7 +451,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri, bool play_now )
  * \return VLC_SUCCESS or a VLC error code
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
-                     const char *psz_name, int i_mode,
+                     const char *psz_name, bool play_now,
                      int i_options, const char *const *ppsz_options,
                      unsigned i_option_flags,
                      bool b_playlist )
@@ -463,7 +463,8 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     if( p_input == NULL )
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
-    i_ret = playlist_AddInput( p_playlist, p_input, i_mode, b_playlist );
+    i_ret = playlist_AddInput( p_playlist, p_input,
+                               play_now ? PLAYLIST_GO : 0, b_playlist );
     input_item_Release( p_input );
     return i_ret;
 }
