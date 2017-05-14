@@ -26,7 +26,6 @@
 
 #include <vlc_common.h>
 #include <vlc_atomic.h>
-#include <vlc_events.h>
 #include <vlc_renderer_discovery.h>
 #include <vlc_probe.h>
 #include <vlc_modules.h>
@@ -240,12 +239,12 @@ void vlc_rd_release(vlc_renderer_discovery_t *p_rd)
 
     config_ChainDestroy(p_rd->p_cfg);
     free(p_rd->psz_name);
-    vlc_event_manager_fini(&p_rd->event_manager);
     vlc_object_release(p_rd);
 }
 
 vlc_renderer_discovery_t *
-vlc_rd_new(vlc_object_t *p_obj, const char *psz_name)
+vlc_rd_new(vlc_object_t *p_obj, const char *psz_name,
+           const struct vlc_renderer_discovery_owner *restrict owner)
 {
     vlc_renderer_discovery_t *p_rd;
 
@@ -254,19 +253,10 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name)
         return NULL;
     free(config_ChainCreate(&p_rd->psz_name, &p_rd->p_cfg, psz_name));
 
-    vlc_event_manager_t *p_em = &p_rd->event_manager;
-    vlc_event_manager_init(p_em, p_rd);
-    vlc_event_manager_register_event_type(p_em, vlc_RendererDiscoveryItemAdded);
-    vlc_event_manager_register_event_type(p_em, vlc_RendererDiscoveryItemRemoved);
+    p_rd->owner = *owner;
 
     p_rd->p_module = NULL;
     return p_rd;
-}
-
-VLC_API vlc_event_manager_t *
-vlc_rd_event_manager(vlc_renderer_discovery_t *p_rd)
-{
-    return &p_rd->event_manager;
 }
 
 int
@@ -283,24 +273,4 @@ vlc_rd_start(vlc_renderer_discovery_t *p_rd)
     }
 
     return VLC_SUCCESS;
-}
-
-void
-vlc_rd_add_item(vlc_renderer_discovery_t * p_rd, vlc_renderer_item_t * p_item)
-{
-    vlc_event_t event;
-    event.type = vlc_RendererDiscoveryItemAdded;
-    event.u.renderer_discovery_item_added.p_new_item = p_item;
-
-    vlc_event_send(&p_rd->event_manager, &event);
-}
-
-void
-vlc_rd_remove_item(vlc_renderer_discovery_t * p_rd, vlc_renderer_item_t * p_item)
-{
-    vlc_event_t event;
-    event.type = vlc_RendererDiscoveryItemRemoved;
-    event.u.renderer_discovery_item_removed.p_item = p_item;
-
-    vlc_event_send(&p_rd->event_manager, &event);
 }

@@ -120,10 +120,6 @@ typedef enum vlc_event_type_t {
     vlc_InputItemInfoChanged,
     vlc_InputItemErrorWhenReadingChanged,
     vlc_InputItemPreparseEnded,
-
-    /* Renderer Discovery events */
-    vlc_RendererDiscoveryItemAdded=vlc_InputItemPreparseEnded+6,
-    vlc_RendererDiscoveryItemRemoved,
 } vlc_event_type_t;
 
 /* Event definition */
@@ -170,16 +166,6 @@ typedef struct vlc_event_t
         {
             int new_status;
         } input_item_preparse_ended;
-
-        /* Renderer discovery events */
-        struct vlc_renderer_discovery_item_added
-        {
-            vlc_renderer_item_t * p_new_item;
-        } renderer_discovery_item_added;
-        struct vlc_renderer_discovery_item_removed
-        {
-            vlc_renderer_item_t * p_item;
-        } renderer_discovery_item_removed;
     } u;
 } vlc_event_t;
 

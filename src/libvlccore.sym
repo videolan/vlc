@@ -765,7 +765,6 @@ vlc_renderer_item_flags
 vlc_rd_get_names
 vlc_rd_new
 vlc_rd_release
-vlc_rd_event_manager
 vlc_rd_start
 vlc_rd_add_item
 vlc_rd_remove_item
