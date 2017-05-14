@@ -717,18 +717,18 @@ static void playlist_Preparse( playlist_t *p_playlist,
                                playlist_item_t *p_item )
 {
     playlist_private_t *sys = pl_priv(p_playlist);
+    input_item_t *input = p_item->p_input;
 
     PL_ASSERT_LOCKED;
     /* Preparse if no artist/album info, and hasn't been preparsed already
        and if user has some preparsing option (auto-preparse variable)
        enabled*/
-    char *psz_artist = input_item_GetArtist( p_item->p_input );
-    char *psz_album = input_item_GetAlbum( p_item->p_input );
+    char *psz_artist = input_item_GetArtist( input );
+    char *psz_album = input_item_GetAlbum( input );
 
-    if( sys->b_preparse && !input_item_IsPreparsed( p_item->p_input )
+    if( sys->b_preparse && !input_item_IsPreparsed( input )
      && (EMPTY_STR(psz_artist) || EMPTY_STR(psz_album)) )
-        libvlc_MetadataRequest( p_playlist->obj.libvlc, p_item->p_input, 0, -1,
-                                p_item );
+        libvlc_MetadataRequest( p_playlist->obj.libvlc, input, 0, -1, p_item );
     free( psz_artist );
     free( psz_album );
 }
