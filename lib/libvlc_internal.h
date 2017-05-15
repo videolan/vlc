@@ -85,6 +85,12 @@ struct libvlc_instance_t
     } dialog;
 };
 
+struct libvlc_event_manager_t
+{
+    void * p_obj;
+    vlc_array_t listeners;
+    vlc_mutex_t lock;
+};
 
 /***************************************************************************
  * Other internal functions
@@ -95,6 +101,9 @@ void libvlc_threads_init (void);
 void libvlc_threads_deinit (void);
 
 /* Events */
+void libvlc_event_manager_init(libvlc_event_manager_t *, void *);
+void libvlc_event_manager_destroy(libvlc_event_manager_t *);
+
 libvlc_event_manager_t * libvlc_event_manager_new(void * p_obj);
 
 void libvlc_event_manager_release(
