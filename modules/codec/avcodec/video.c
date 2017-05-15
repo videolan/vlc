@@ -46,6 +46,8 @@
 #include "avcodec.h"
 #include "va.h"
 
+#include "../codec/cc.h"
+
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
@@ -55,6 +57,9 @@ struct decoder_sys_t
 
     /* Video decoder specific part */
     mtime_t i_pts;
+
+    /* Closed captions for decoders */
+    cc_data_t cc;
 
     /* for frame skipping algo */
     bool b_hurry_up;
@@ -300,6 +305,7 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     if (val)
         return val;
 
+    const int i_cc_reorder = dec->fmt_out.subs.cc.i_reorder_depth;
     fmt_out.p_palette = dec->fmt_out.video.p_palette;
     dec->fmt_out.video.p_palette = NULL;
 
@@ -312,6 +318,9 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     if ( dec->fmt_in.video.mastering.max_luminance )
         dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
     dec->fmt_out.video.lighting = dec->fmt_in.video.lighting;
+
+    dec->fmt_out.subs.cc.i_reorder_depth = i_cc_reorder;
+
     return decoder_UpdateVideoFormat(dec);
 }
 
@@ -376,6 +385,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
     p_sys->pix_fmt = AV_PIX_FMT_NONE;
     p_sys->profile = -1;
     p_sys->level = -1;
+    cc_Init( &p_sys->cc );
 
     post_mt( p_sys );
     ret = ffmpeg_OpenCodec( p_dec );
@@ -586,6 +596,7 @@ static void Flush( decoder_t *p_dec )
 
     p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
     p_sys->i_late_frames = 0;
+    cc_Flush( &p_sys->cc );
 
     /* Abort pictures in order to unblock all avcodec workers threads waiting
      * for a picture. This will avoid a deadlock between avcodec_flush_buffers
@@ -610,6 +621,7 @@ static bool check_block_validity( decoder_sys_t *p_sys, block_t *block )
     if( block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
+        cc_Flush( &p_sys->cc );
 
         p_sys->i_late_frames = 0;
         if( block->i_flags & BLOCK_FLAG_CORRUPTED )
@@ -1127,6 +1139,28 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             }
         }
 #endif
+
+        const AVFrameSideData *p_avcc = av_frame_get_side_data( frame, AV_FRAME_DATA_A53_CC );
+        if( p_avcc )
+        {
+            cc_Extract( &p_sys->cc, CC_PAYLOAD_RAW, true, p_avcc->data, p_avcc->size );
+            if( p_sys->cc.i_data )
+            {
+                block_t *p_cc = block_Alloc( p_sys->cc.i_data );
+                if( p_cc )
+                {
+                    memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
+                    if( p_sys->cc.b_reorder )
+                        p_cc->i_dts = p_cc->i_pts = i_pts;
+                    else
+                        p_cc->i_pts = p_cc->i_dts;
+                    p_dec->fmt_out.subs.cc.i_reorder_depth = 4;
+                    decoder_QueueCc( p_dec, p_cc, p_sys->cc.pb_present );
+                }
+                cc_Flush( &p_sys->cc );
+            }
+        }
+
         av_frame_free(&frame);
 
         if (format_changed)
@@ -1174,6 +1208,8 @@ void EndVideoDec( decoder_t *p_dec )
         avcodec_flush_buffers( p_sys->p_context );
 
     wait_mt( p_sys );
+
+    cc_Flush( &p_sys->cc );
 
     ffmpeg_CloseCodec( p_dec );
 
