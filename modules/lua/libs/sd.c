@@ -44,18 +44,43 @@
 #include "../vlc.h"
 #include "../libs.h"
 
+static int vlclua_sd_delete_common( input_item_t **pp_item )
+{
+    assert(pp_item != NULL);
+
+    input_item_t *p_item = *pp_item;
+    if (p_item != NULL) /* item may be NULL if already removed earlier */
+        input_item_Release( p_item );
+
+    return 1;
+}
+
+static int vlclua_sd_remove_common( lua_State *L, input_item_t **pp_item )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
+
+    if (pp_item == NULL)
+        return luaL_error( L, "expected item" );
+
+    input_item_t *p_item = *pp_item;
+    if (*pp_item == NULL)
+        return luaL_error( L, "already removed item" );
+
+    services_discovery_RemoveItem( p_sd, p_item );
+    input_item_Release( p_item );
+    /* Make sure we won't try to remove it again */
+    *pp_item = NULL;
+    return 1;
+}
+
 
 /*** Input item ***/
 
 static int vlclua_sd_item_delete( lua_State *L )
 {
     input_item_t **pp_item = luaL_checkudata( L, 1, "input_item_t" );
-    input_item_t *p_item = *pp_item;
 
-    assert( p_item != NULL );
-    input_item_Release( p_item );
-    *pp_item = NULL;
-    return 1;
+    return vlclua_sd_delete_common( pp_item );
 }
 
 #define vlclua_item_luareg( a ) \
@@ -229,12 +254,8 @@ static input_item_t *vlclua_sd_create_item( services_discovery_t *p_sd,
 static int vlclua_sd_node_delete( lua_State *L )
 {
     input_item_t **pp_item = luaL_checkudata( L, 1, "node" );
-    input_item_t *p_item = *pp_item;
 
-    assert( p_item != NULL );
-    input_item_Release( p_item );
-    *pp_item = NULL;
-    return 1;
+    return vlclua_sd_delete_common( pp_item );
 }
 
 static int vlclua_sd_add_sub_common( services_discovery_t *p_sd,
@@ -351,30 +372,16 @@ static int vlclua_sd_add_node( lua_State *L )
 
 static int vlclua_sd_remove_item( lua_State *L )
 {
-    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
-    if( !lua_isnil( L, 1 ) )
-    {
-        input_item_t **pp_input = luaL_checkudata( L, 1, "input_item_t" );
-        if( *pp_input )
-            services_discovery_RemoveItem( p_sd, *pp_input );
-        /* Make sure we won't try to remove it again */
-        *pp_input = NULL;
-    }
-    return 1;
+    input_item_t **pp_input = luaL_checkudata( L, 1, "input_item_t" );
+
+    return vlclua_sd_remove_common( L, pp_input );
 }
 
 static int vlclua_sd_remove_node( lua_State *L )
 {
-    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
-    if( !lua_isnil( L, 1 ) )
-    {
-        input_item_t **pp_input = luaL_checkudata( L, 1, "node" );
-        if( *pp_input )
-            services_discovery_RemoveItem( p_sd, *pp_input );
-        /* Make sure we won't try to remove it again */
-        *pp_input = NULL;
-    }
-    return 1;
+    input_item_t **pp_input = luaL_checkudata( L, 1, "node" );
+
+    return vlclua_sd_remove_common( L, pp_input );
 }
 
 static const luaL_Reg vlclua_sd_sd_reg[] = {
