@@ -451,20 +451,19 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
             /* Yeah yeah, such a clever idea, let's put xx/xx inside TRACKNUMBER
              * Oh, and let's not use TRACKTOTAL or TOTALTRACKS... */
             short unsigned u_track, u_total;
-            if( sscanf( &psz_comment[strlen("TRACKNUMBER=")], "%hu/%hu", &u_track, &u_total ) == 2 )
+            int nb_values = sscanf( &psz_comment[strlen("TRACKNUMBER=")], "%hu/%hu", &u_track, &u_total );
+            if( nb_values >= 1 )
             {
                 char str[6];
                 snprintf(str, 6, "%u", u_track);
                 vlc_meta_Set( p_meta, vlc_meta_TrackNumber, str );
                 hasMetaFlags |= XIPHMETA_TrackNum;
-                snprintf(str, 6, "%u", u_total);
-                vlc_meta_Set( p_meta, vlc_meta_TrackTotal, str );
-                hasMetaFlags |= XIPHMETA_TrackTotal;
-            }
-            else
-            {
-                vlc_meta_Set( p_meta, vlc_meta_TrackNumber, &psz_comment[strlen("TRACKNUMBER=")] );
-                hasMetaFlags |= XIPHMETA_TrackNum;
+                if( nb_values >= 2 )
+                {
+                    snprintf(str, 6, "%u", u_total);
+                    vlc_meta_Set( p_meta, vlc_meta_TrackTotal, str );
+                    hasMetaFlags |= XIPHMETA_TrackTotal;
+                }
             }
         }
         else IF_EXTRACT_ONCE("TRACKTOTAL=", TrackTotal )
