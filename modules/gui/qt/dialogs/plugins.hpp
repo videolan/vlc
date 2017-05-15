@@ -219,6 +219,7 @@ class AddonsListModel: public ExtensionListModel
 
 public:
     AddonsListModel( AddonsManager *AM, QObject *parent = 0 );
+    virtual ~AddonsListModel();
     QVariant data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
     QModelIndex index( int row, int column = 0,
                        const QModelIndex& = QModelIndex() ) const Q_DECL_OVERRIDE;

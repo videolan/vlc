@@ -870,6 +870,11 @@ AddonsListModel::AddonsListModel( AddonsManager *AM_, QObject *parent )
 
 }
 
+AddonsListModel::~AddonsListModel()
+{
+    qDeleteAll( addons );
+}
+
 void AddonsListModel::addonAdded(  addon_entry_t *p_entry )
 {
     beginInsertRows( QModelIndex(), addons.count(), addons.count() );
