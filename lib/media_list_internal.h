@@ -36,7 +36,7 @@
 
 struct libvlc_media_list_t
 {
-    libvlc_event_manager_t *    p_event_manager;
+    libvlc_event_manager_t      event_manager;
     libvlc_instance_t *         p_libvlc_instance;
     int                         i_refcount;
     vlc_mutex_t                 object_lock;
