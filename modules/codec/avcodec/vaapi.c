@@ -121,7 +121,8 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
             pp_plane[i] = (uint8_t*)p_base + image.offsets[i_src_plane];
             pi_pitch[i] = image.pitches[i_src_plane];
         }
-        CopyFromYv12( p_picture, pp_plane, pi_pitch, sys->height, &sys->image_cache );
+        CopyFromYv12ToYv12( p_picture, pp_plane, pi_pitch,
+                            sys->height, &sys->image_cache );
     }
     else
     {
@@ -134,7 +135,8 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
             pp_plane[i] = (uint8_t*)p_base + image.offsets[i];
             pi_pitch[i] = image.pitches[i];
         }
-        CopyFromNv12( p_picture, pp_plane, pi_pitch, sys->height, &sys->image_cache );
+        CopyFromNv12ToYv12( p_picture, pp_plane, pi_pitch,
+                            sys->height, &sys->image_cache );
     }
 
     vaUnmapBuffer(sys->hw_ctx.display, image.buf);

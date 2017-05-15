@@ -105,7 +105,8 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
             plane[1] = plane[2];
             plane[2] = V;
         }
-        CopyFromYv12(dst, plane, pitch, src->format.i_height, p_copy_cache);
+        CopyFromYv12ToYv12(dst, plane, pitch,
+                           src->format.i_height, p_copy_cache);
     } else if (desc.Format == MAKEFOURCC('N','V','1','2')) {
         uint8_t *plane[2] = {
             lock.pBits,
@@ -115,7 +116,8 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
             lock.Pitch,
             lock.Pitch,
         };
-        CopyFromNv12(dst, plane, pitch, src->format.i_height, p_copy_cache);
+        CopyFromNv12ToYv12(dst, plane, pitch,
+                           src->format.i_height, p_copy_cache);
     } else {
         msg_Err(p_filter, "Unsupported DXA9 conversion from 0x%08X to YV12", desc.Format);
     }

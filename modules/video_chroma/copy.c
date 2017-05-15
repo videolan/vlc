@@ -320,10 +320,10 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
     }
 }
 
-static void SSE_CopyFromNv12(picture_t *dst,
-                             uint8_t *src[2], size_t src_pitch[2],
-                             unsigned height,
-                             copy_cache_t *cache, unsigned cpu)
+static void SSE_CopyFromNv12ToYv12(picture_t *dst,
+                                   uint8_t *src[2], size_t src_pitch[2],
+                                   unsigned height,
+                                   copy_cache_t *cache, unsigned cpu)
 {
     SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
                   src[0], src_pitch[0],
@@ -337,10 +337,10 @@ static void SSE_CopyFromNv12(picture_t *dst,
     asm volatile ("emms");
 }
 
-static void SSE_CopyFromYv12(picture_t *dst,
-                             uint8_t *src[3], size_t src_pitch[3],
-                             unsigned height,
-                             copy_cache_t *cache, unsigned cpu)
+static void SSE_CopyFromYv12ToYv12(picture_t *dst,
+                                   uint8_t *src[3], size_t src_pitch[3],
+                                   unsigned height,
+                                   copy_cache_t *cache, unsigned cpu)
 {
     for (unsigned n = 0; n < 3; n++) {
         const unsigned d = n > 0 ? 2 : 1;
@@ -436,14 +436,13 @@ static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
     }
 }
 
-void CopyFromNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
-                  unsigned height, copy_cache_t *cache)
+void CopyFromNv12ToYv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
+                        unsigned height, copy_cache_t *cache)
 {
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
-        return SSE_CopyFromNv12(dst, src, src_pitch, height,
-                                cache, cpu);
+        return SSE_CopyFromNv12ToYv12(dst, src, src_pitch, height, cache, cpu);
 #else
     (void) cache;
 #endif
@@ -562,14 +561,13 @@ void CopyFromI420_10ToP010(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
 }
 
 
-void CopyFromYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
-                  unsigned height, copy_cache_t *cache)
+void CopyFromYv12ToYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
+                        unsigned height, copy_cache_t *cache)
 {
 #ifdef CAN_COMPILE_SSE2
     unsigned cpu = vlc_CPU();
     if (vlc_CPU_SSE2())
-        return SSE_CopyFromYv12(dst, src, src_pitch, height,
-                                cache, cpu);
+        return SSE_CopyFromYv12ToYv12(dst, src, src_pitch, height, cache, cpu);
 #else
     (void) cache;
 #endif

@@ -35,11 +35,11 @@ int  CopyInitCache(copy_cache_t *cache, unsigned width);
 void CopyCleanCache(copy_cache_t *cache);
 
 /* Copy planes from NV12 to YV12 */
-void CopyFromNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
-                  unsigned height, copy_cache_t *cache);
+void CopyFromNv12ToYv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
+                        unsigned height, copy_cache_t *cache);
 /* Copy planes from YV12 to YV12 */
-void CopyFromYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
-                  unsigned height, copy_cache_t *cache);
+void CopyFromYv12ToYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
+                        unsigned height, copy_cache_t *cache);
 
 void CopyFromNv12ToNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
                         unsigned height, copy_cache_t *cache);
