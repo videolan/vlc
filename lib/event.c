@@ -100,35 +100,6 @@ void libvlc_event_manager_destroy(libvlc_event_manager_t *em)
 }
 
 /**************************************************************************
- *       libvlc_event_manager_new (internal) :
- *
- * Init an object's event manager.
- **************************************************************************/
-libvlc_event_manager_t *
-libvlc_event_manager_new( void * p_obj )
-{
-    libvlc_event_manager_t * p_em;
-
-    p_em = malloc(sizeof( libvlc_event_manager_t ));
-    if( !p_em )
-        libvlc_printerr( "Not enough memory" );
-    else
-        libvlc_event_manager_init( p_em, p_obj );
-    return p_em;
-}
-
-/**************************************************************************
- *       libvlc_event_manager_release (internal) :
- *
- * Release an object's event manager.
- **************************************************************************/
-void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
-{
-    libvlc_event_manager_destroy( p_em );
-    free( p_em );
-}
-
-/**************************************************************************
  *       libvlc_event_send (internal) :
  *
  * Send a callback.
