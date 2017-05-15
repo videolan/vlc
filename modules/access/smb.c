@@ -246,6 +246,8 @@ static int Open( vlc_object_t *p_this )
         p_access->pf_control = access_vaDirectoryControlHelper;
         i_smb = smbc_opendir( psz_uri );
         i_size = 0;
+        if( i_smb < 0 )
+            vlc_UrlClean( &p_sys->url );
 #endif
     }
     else
@@ -253,6 +255,7 @@ static int Open( vlc_object_t *p_this )
         ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
         i_smb = smbc_open( psz_uri, O_RDONLY, 0 );
         i_size = filestat.st_size;
+        vlc_UrlClean( &url );
     }
     free( psz_uri );
 
@@ -260,7 +263,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_location, vlc_strerror_c(errno) );
-        vlc_UrlClean( &p_sys->url );
         free( p_sys );
         return VLC_EGENERIC;
     }
