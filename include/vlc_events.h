@@ -186,17 +186,17 @@ typedef void ( *vlc_event_callback_t )( const vlc_event_t *, void * );
  * p_obj points to the object that owns the event manager, and from
  * which events are sent
  */
-VLC_API int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj );
+int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj );
 
 /*
  * Destroy
  */
-VLC_API void vlc_event_manager_fini( vlc_event_manager_t * p_em );
+void vlc_event_manager_fini( vlc_event_manager_t * p_em );
 
 /*
  * Send an event to the listener attached to this p_em.
  */
-VLC_API void vlc_event_send( vlc_event_manager_t * p_em, vlc_event_t * );
+void vlc_event_send( vlc_event_manager_t * p_em, vlc_event_t * );
 
 /*
  * Add a callback for an event.
