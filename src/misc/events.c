@@ -83,7 +83,7 @@ group_contains_listener( vlc_event_listeners_group_t * group,
  * necessarily a vlc_object_t (an input_item_t is not a vlc_object_t
  * for instance).
  */
-int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj )
+void vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj )
 {
     p_em->p_obj = p_obj;
     vlc_mutex_init( &p_em->object_lock );
@@ -98,8 +98,6 @@ int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj )
 
     for( size_t i = 0; i < ARRAY_SIZE(p_em->events); i++ )
        ARRAY_INIT( p_em->events[i].listeners );
-
-    return VLC_SUCCESS;
 }
 
 /**
