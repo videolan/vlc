@@ -101,7 +101,7 @@ static int VlmEvent( vlc_object_t *p_this, const char * name,
     return 0;
 }
 
-static void libvlc_vlm_release_internal( libvlc_instance_t *p_instance )
+void libvlc_vlm_release( libvlc_instance_t *p_instance )
 {
     vlm_t *p_vlm = p_instance->libvlc_vlm.p_vlm;
     if( !p_instance->libvlc_vlm.p_vlm )
@@ -141,16 +141,11 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance )
         var_AddCallback( (vlc_object_t *)p_instance->libvlc_vlm.p_vlm,
                          "intf-event", VlmEvent,
                          p_instance->libvlc_vlm.p_event_manager );
-        p_instance->libvlc_vlm.pf_release = libvlc_vlm_release_internal;
+        p_instance->libvlc_vlm.pf_release = libvlc_vlm_release;
         libvlc_retain( p_instance );
     }
 
     return VLC_SUCCESS;
-}
-
-void libvlc_vlm_release( libvlc_instance_t *p_instance )
-{
-    libvlc_vlm_release_internal( p_instance );
 }
 
 #define VLM_RET(p,ret) do { \
