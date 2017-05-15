@@ -96,18 +96,6 @@
  * Event Type
  *****************************************************************************/
 
-/* Private structure defined in misc/events.c */
-struct vlc_event_listeners_group_t;
-
-/* Event manager type */
-typedef struct vlc_event_manager_t
-{
-    void * p_obj;
-    vlc_mutex_t object_lock;
-    vlc_mutex_t event_sending_lock;
-    DECL_ARRAY(struct vlc_event_listeners_group_t *) listeners_groups;
-} vlc_event_manager_t;
-
 /* List of event */
 typedef enum vlc_event_type_t {
     /* Input item events */
@@ -121,6 +109,26 @@ typedef enum vlc_event_type_t {
     vlc_InputItemErrorWhenReadingChanged,
     vlc_InputItemPreparseEnded,
 } vlc_event_type_t;
+
+typedef struct vlc_event_listeners_group_t
+{
+    DECL_ARRAY(struct vlc_event_listener_t *) listeners;
+
+   /* Used in vlc_event_send() to make sure to behave
+      Correctly when vlc_event_detach was called during
+      a callback */
+    bool          b_sublistener_removed;
+
+} vlc_event_listeners_group_t;
+
+/* Event manager type */
+typedef struct vlc_event_manager_t
+{
+    void * p_obj;
+    vlc_mutex_t object_lock;
+    vlc_mutex_t event_sending_lock;
+    vlc_event_listeners_group_t events[vlc_InputItemPreparseEnded + 1];
+} vlc_event_manager_t;
 
 /* Event definition */
 typedef struct vlc_event_t

@@ -52,18 +52,6 @@ typedef struct vlc_event_listener_t
     vlc_event_callback_t pf_callback;
 } vlc_event_listener_t;
 
-typedef struct vlc_event_listeners_group_t
-{
-    vlc_event_type_t    event_type;
-    DECL_ARRAY(struct vlc_event_listener_t *) listeners;
-
-   /* Used in vlc_event_send() to make sure to behave
-      Correctly when vlc_event_detach was called during
-      a callback */
-    bool          b_sublistener_removed;
-
-} vlc_event_listeners_group_t;
-
 static bool
 listeners_are_equal( vlc_event_listener_t * listener1,
                      vlc_event_listener_t * listener2 )
@@ -107,7 +95,10 @@ int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj )
      * will never gets triggered.
      * */
     vlc_mutex_init_recursive( &p_em->event_sending_lock );
-    ARRAY_INIT( p_em->listeners_groups );
+
+    for( size_t i = 0; i < ARRAY_SIZE(p_em->events); i++ )
+       ARRAY_INIT( p_em->events[i].listeners );
+
     return VLC_SUCCESS;
 }
 
@@ -116,20 +107,20 @@ int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj )
  */
 void vlc_event_manager_fini( vlc_event_manager_t * p_em )
 {
-    struct vlc_event_listeners_group_t * listeners_group;
     struct vlc_event_listener_t * listener;
 
     vlc_mutex_destroy( &p_em->object_lock );
     vlc_mutex_destroy( &p_em->event_sending_lock );
 
-    FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
-        FOREACH_ARRAY( listener, listeners_group->listeners )
+    for( size_t i = 0; i < ARRAY_SIZE(p_em->events); i++ )
+    {
+        struct vlc_event_listeners_group_t *slot = p_em->events + i;
+
+        FOREACH_ARRAY( listener, slot->listeners )
             free( listener );
         FOREACH_END()
-        ARRAY_RESET( listeners_group->listeners );
-        free( listeners_group );
-    FOREACH_END()
-    ARRAY_RESET( p_em->listeners_groups );
+        ARRAY_RESET( slot->listeners );
+    }
 }
 
 /**
@@ -139,19 +130,7 @@ int vlc_event_manager_register_event_type(
         vlc_event_manager_t * p_em,
         vlc_event_type_t event_type )
 {
-    vlc_event_listeners_group_t * listeners_group;
-    listeners_group = malloc(sizeof(vlc_event_listeners_group_t));
-
-    if( !listeners_group )
-        return VLC_ENOMEM;
-
-    listeners_group->event_type = event_type;
-    ARRAY_INIT( listeners_group->listeners );
-
-    vlc_mutex_lock( &p_em->object_lock );
-    ARRAY_APPEND( p_em->listeners_groups, listeners_group );
-    vlc_mutex_unlock( &p_em->object_lock );
-
+    (void) p_em; (void) event_type;
     return VLC_SUCCESS;
 }
 
@@ -161,10 +140,11 @@ int vlc_event_manager_register_event_type(
 void vlc_event_send( vlc_event_manager_t * p_em,
                      vlc_event_t * p_event )
 {
-    vlc_event_listeners_group_t * listeners_group = NULL;
+    vlc_event_listeners_group_t *slot = &p_em->events[p_event->type];
     vlc_event_listener_t * listener;
     vlc_event_listener_t * array_of_cached_listeners = NULL;
     vlc_event_listener_t * cached_listener;
+
     int i, i_cached_listeners = 0;
 
     /* Fill event with the sending object now */
@@ -173,60 +153,45 @@ void vlc_event_send( vlc_event_manager_t * p_em,
     vlc_mutex_lock( &p_em->event_sending_lock ) ;
     vlc_mutex_lock( &p_em->object_lock );
 
-    FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
-        if( listeners_group->event_type == p_event->type )
-        {
-            if( listeners_group->listeners.i_size <= 0 )
-                break;
+    if( slot->listeners.i_size <= 0 )
+    {
+        vlc_mutex_unlock( &p_em->object_lock );
+        vlc_mutex_unlock( &p_em->event_sending_lock ) ;
+        return;
+    }
 
-            /* Save the function to call */
-            i_cached_listeners = listeners_group->listeners.i_size;
-            array_of_cached_listeners = malloc(
+    /* Save the function to call */
+    i_cached_listeners = slot->listeners.i_size;
+    array_of_cached_listeners = malloc(
                     sizeof(vlc_event_listener_t)*i_cached_listeners );
-            if( !array_of_cached_listeners )
-            {
-                vlc_mutex_unlock( &p_em->object_lock );
-                vlc_mutex_unlock( &p_em->event_sending_lock ) ;
-                return;
-            }
+    if( unlikely(!array_of_cached_listeners) )
+        abort();
 
-            cached_listener = array_of_cached_listeners;
-            FOREACH_ARRAY( listener, listeners_group->listeners )
-                memcpy( cached_listener, listener, sizeof(vlc_event_listener_t));
-                cached_listener++;
-            FOREACH_END()
-
-            break;
-        }
+    cached_listener = array_of_cached_listeners;
+    FOREACH_ARRAY( listener, slot->listeners )
+        memcpy( cached_listener, listener, sizeof(vlc_event_listener_t) );
+        cached_listener++;
     FOREACH_END()
 
     /* Track item removed from *this* thread, with a simple flag. Indeed
      * event_sending_lock is a recursive lock. This has the advantage of
      * allowing to remove an event listener from within a callback */
-    listeners_group->b_sublistener_removed = false;
+    slot->b_sublistener_removed = false;
 
     vlc_mutex_unlock( &p_em->object_lock );
 
     /* Call the function attached */
     cached_listener = array_of_cached_listeners;
 
-    if( !listeners_group || !array_of_cached_listeners )
-    {
-        free( array_of_cached_listeners );
-        vlc_mutex_unlock( &p_em->event_sending_lock );
-        return;
-    }
-
-
     for( i = 0; i < i_cached_listeners; i++ )
     {
-        if( listeners_group->b_sublistener_removed )
+        if( slot->b_sublistener_removed )
         {
             /* If a callback was removed inside one of our callback, this gets
              * called */
             bool valid_listener;
             vlc_mutex_lock( &p_em->object_lock );
-            valid_listener = group_contains_listener( listeners_group, cached_listener );
+            valid_listener = group_contains_listener( slot, cached_listener );
             vlc_mutex_unlock( &p_em->object_lock );
             if( !valid_listener )
             {
@@ -251,8 +216,9 @@ int vlc_event_attach( vlc_event_manager_t * p_em,
                       vlc_event_callback_t pf_callback,
                       void *p_user_data )
 {
-    vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;
+    vlc_event_listeners_group_t *slot = &p_em->events[event_type];
+
     listener = malloc(sizeof(vlc_event_listener_t));
     if( !listener )
         return VLC_ENOMEM;
@@ -261,16 +227,9 @@ int vlc_event_attach( vlc_event_manager_t * p_em,
     listener->pf_callback = pf_callback;
 
     vlc_mutex_lock( &p_em->object_lock );
-    FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
-        if( listeners_group->event_type == event_type )
-        {
-            ARRAY_APPEND( listeners_group->listeners, listener );
-            vlc_mutex_unlock( &p_em->object_lock );
-            return VLC_SUCCESS;
-        }
-    FOREACH_END()
-    /* Unknown event = BUG */
-    vlc_assert_unreachable();
+    ARRAY_APPEND( slot->listeners, listener );
+    vlc_mutex_unlock( &p_em->object_lock );
+    return VLC_SUCCESS;
 }
 
 /**
@@ -282,32 +241,28 @@ void vlc_event_detach( vlc_event_manager_t *p_em,
                        vlc_event_callback_t pf_callback,
                        void *p_user_data )
 {
-    vlc_event_listeners_group_t * listeners_group;
+    vlc_event_listeners_group_t *slot = &p_em->events[event_type];
     struct vlc_event_listener_t * listener;
 
     vlc_mutex_lock( &p_em->event_sending_lock );
     vlc_mutex_lock( &p_em->object_lock );
-    FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
-        if( listeners_group->event_type == event_type )
-        {
-            FOREACH_ARRAY( listener, listeners_group->listeners )
-                if( listener->pf_callback == pf_callback &&
-                    listener->p_user_data == p_user_data )
-                {
-                    /* Tell vlc_event_send, we did remove an item from that group,
-                       in case vlc_event_send is in our caller stack  */
-                    listeners_group->b_sublistener_removed = true;
 
-                    /* that's our listener */
-                    ARRAY_REMOVE( listeners_group->listeners,
-                        fe_idx /* This comes from the macro (and that's why
-                                  I hate macro) */ );
-                    free( listener );
-                    vlc_mutex_unlock( &p_em->event_sending_lock );
-                    vlc_mutex_unlock( &p_em->object_lock );
-                    return;
-                }
-            FOREACH_END()
+    FOREACH_ARRAY( listener, slot->listeners )
+        if( listener->pf_callback == pf_callback &&
+            listener->p_user_data == p_user_data )
+        {
+            /* Tell vlc_event_send, we did remove an item from that group,
+               in case vlc_event_send is in our caller stack  */
+            slot->b_sublistener_removed = true;
+
+            /* that's our listener */
+            ARRAY_REMOVE( slot->listeners,
+                          fe_idx /* This comes from the macro (and that's why
+                                    I hate macro) */ );
+            free( listener );
+            vlc_mutex_unlock( &p_em->event_sending_lock );
+            vlc_mutex_unlock( &p_em->object_lock );
+            return;
         }
     FOREACH_END()
 
