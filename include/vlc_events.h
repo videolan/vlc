@@ -70,8 +70,6 @@
  * {
  *        ...
  *        vlc_event_manager_init( &p_self->p_event_manager, p_self, p_a_libvlc_object );
- *        vlc_event_manager_register_event_type(p_self->p_event_manager,
- *                vlc_MyCoolObjectDidSomething, p_e)
  *        ...
  * }
  *
@@ -194,12 +192,6 @@ VLC_API int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj );
  * Destroy
  */
 VLC_API void vlc_event_manager_fini( vlc_event_manager_t * p_em );
-
-/*
- * Tells a specific event manager that it will handle event_type object
- */
-VLC_API int vlc_event_manager_register_event_type( vlc_event_manager_t * p_em,
-                                                   vlc_event_type_t );
 
 /*
  * Send an event to the listener attached to this p_em.

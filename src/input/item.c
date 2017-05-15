@@ -1099,15 +1099,6 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
     TAB_INIT( p_input->i_slaves, p_input->pp_slaves );
 
     vlc_event_manager_init( p_em, p_input );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemAdded );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemTreeAdded );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemDurationChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemPreparsedChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemNameChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemInfoChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemPreparseEnded );
 
     if( type != ITEM_TYPE_UNKNOWN )
         p_input->i_type = type;

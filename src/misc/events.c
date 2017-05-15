@@ -124,17 +124,6 @@ void vlc_event_manager_fini( vlc_event_manager_t * p_em )
 }
 
 /**
- * Register the event manager
- */
-int vlc_event_manager_register_event_type(
-        vlc_event_manager_t * p_em,
-        vlc_event_type_t event_type )
-{
-    (void) p_em; (void) event_type;
-    return VLC_SUCCESS;
-}
-
-/**
  * Send an event to the listener attached to this p_em.
  */
 void vlc_event_send( vlc_event_manager_t * p_em,
