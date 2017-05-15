@@ -496,7 +496,10 @@ static int Open(vlc_object_t *p_this)
     if ( p_finder->psz_uri &&
          strcmp( "repo://"ADDONS_MODULE_SHORTCUT, p_finder->psz_uri ) &&
          memcmp( "repo://", p_finder->psz_uri, 8 ) )
+    {
+        free( p_finder->p_sys );
         return VLC_EGENERIC;
+    }
 
     p_finder->pf_find = Find;
     p_finder->pf_retrieve = Retrieve;
