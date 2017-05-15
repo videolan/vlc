@@ -63,9 +63,7 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     }
 
     p_new->p_libvlc_int = p_libvlc_int;
-    p_new->libvlc_vlm.p_vlm = NULL;
-    p_new->libvlc_vlm.p_event_manager = NULL;
-    p_new->libvlc_vlm.pf_release = NULL;
+    p_new->vlm = NULL;
     p_new->ref_count = 1;
     p_new->p_callback_list = NULL;
     vlc_mutex_init(&p_new->instance_lock);
@@ -100,8 +98,8 @@ void libvlc_release( libvlc_instance_t *p_instance )
     if( refs == 0 )
     {
         vlc_mutex_destroy( lock );
-        if( p_instance->libvlc_vlm.pf_release )
-            p_instance->libvlc_vlm.pf_release( p_instance );
+        if( p_instance->vlm != NULL )
+            libvlc_vlm_release( p_instance );
         libvlc_Quit( p_instance->p_libvlc_int );
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int );
