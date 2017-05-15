@@ -134,7 +134,7 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance )
             return VLC_ENOMEM;
         p_instance->vlm->p_vlm = NULL;
         libvlc_event_manager_init( &p_instance->vlm->event_manager,
-                                   &p_instance->vlm->p_vlm );
+                                   p_instance->vlm );
     }
 
     if( !p_instance->vlm->p_vlm )
