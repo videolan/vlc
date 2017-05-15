@@ -133,7 +133,7 @@ static void input_item_preparsed_changed( const vlc_event_t *p_event,
         libvlc_event_t event;
         event.type = libvlc_MediaParsedChanged;
         event.u.media_parsed_changed.new_status = libvlc_media_parsed_status_done;
-        libvlc_event_send( p_md->p_event_manager, &event );
+        libvlc_event_send( &p_md->event_manager, &event );
     }
 }
 
