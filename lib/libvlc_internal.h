@@ -57,16 +57,10 @@ VLC_API void libvlc_SetExitHandler( libvlc_int_t *, void (*) (void *), void * );
  * Opaque structures for libvlc API
  ***************************************************************************/
 
-typedef struct libvlc_vlm_t
-{
-    vlm_t                  *p_vlm;
-    libvlc_event_manager_t *p_event_manager;
-} libvlc_vlm_t;
-
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
-    libvlc_vlm_t *vlm;
+    struct libvlc_vlm_t *vlm;
     unsigned      ref_count;
     vlc_mutex_t   instance_lock;
     struct libvlc_callback_entry_list_t *p_callback_list;

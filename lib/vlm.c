@@ -34,6 +34,12 @@
 
 #include "libvlc_internal.h"
 
+typedef struct libvlc_vlm_t
+{
+    vlm_t                  *p_vlm;
+    libvlc_event_manager_t *p_event_manager;
+} libvlc_vlm_t;
+
 /* VLM events callback. Transmit to libvlc */
 static int VlmEvent( vlc_object_t *p_this, const char * name,
                      vlc_value_t old_val, vlc_value_t newval, void *param )
