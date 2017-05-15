@@ -248,7 +248,7 @@ input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
     event.type = libvlc_MediaPlayerSeekableChanged;
     event.u.media_player_seekable_changed.new_seekable = newval.b_bool;
 
-    libvlc_event_send( p_mi->p_event_manager, &event );
+    libvlc_event_send( &p_mi->event_manager, &event );
     return VLC_SUCCESS;
 }
 
@@ -266,7 +266,7 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
     event.type = libvlc_MediaPlayerPausableChanged;
     event.u.media_player_pausable_changed.new_pausable = newval.b_bool;
 
-    libvlc_event_send( p_mi->p_event_manager, &event );
+    libvlc_event_send( &p_mi->event_manager, &event );
     return VLC_SUCCESS;
 }
 
@@ -284,7 +284,7 @@ input_scrambled_changed( vlc_object_t * p_this, char const * psz_cmd,
     event.type = libvlc_MediaPlayerScrambledChanged;
     event.u.media_player_scrambled_changed.new_scrambled = newval.b_bool;
 
-    libvlc_event_send( p_mi->p_event_manager, &event );
+    libvlc_event_send( &p_mi->event_manager, &event );
     return VLC_SUCCESS;
 }
 
@@ -336,7 +336,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         }
 
         set_state( p_mi, libvlc_state, false );
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_DEAD )
     {
@@ -344,7 +344,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         event.type = libvlc_MediaPlayerStopped;
 
         set_state( p_mi, libvlc_state, false );
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_POSITION )
     {
@@ -355,27 +355,27 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         event.type = libvlc_MediaPlayerPositionChanged;
         event.u.media_player_position_changed.new_position =
                                           var_GetFloat( p_input, "position" );
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
 
         /* */
         event.type = libvlc_MediaPlayerTimeChanged;
         event.u.media_player_time_changed.new_time =
            from_mtime(var_GetInteger( p_input, "time" ));
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_LENGTH )
     {
         event.type = libvlc_MediaPlayerLengthChanged;
         event.u.media_player_length_changed.new_length =
            from_mtime(var_GetInteger( p_input, "length" ));
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_CACHE )
     {
         event.type = libvlc_MediaPlayerBuffering;
         event.u.media_player_buffering.new_cache = (100 *
             var_GetFloat( p_input, "cache" ));
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_VOUT )
     {
@@ -394,19 +394,19 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 
         event.type = libvlc_MediaPlayerVout;
         event.u.media_player_vout.new_count = i_vout;
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if ( newval.i_int == INPUT_EVENT_TITLE )
     {
         event.type = libvlc_MediaPlayerTitleChanged;
         event.u.media_player_title_changed.new_title = var_GetInteger( p_input, "title" );
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if ( newval.i_int == INPUT_EVENT_CHAPTER )
     {
         event.type = libvlc_MediaPlayerChapterChanged;
         event.u.media_player_chapter_changed.new_chapter = var_GetInteger( p_input, "chapter" );
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
     else if ( newval.i_int == INPUT_EVENT_ES )
     {
@@ -441,7 +441,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                 event.type = libvlc_MediaPlayerESSelected;
                 event.u.media_player_es_changed.i_type = es_list[i].type;
                 event.u.media_player_es_changed.i_id = es_list[i].new_es;
-                libvlc_event_send( p_mi->p_event_manager, &event );
+                libvlc_event_send( &p_mi->event_manager, &event );
             }
         }
     }
@@ -504,7 +504,7 @@ static int input_es_changed( vlc_object_t *p_this,
     }
     event.u.media_player_es_changed.i_id = i_id;
 
-    libvlc_event_send(mp->p_event_manager, &event);
+    libvlc_event_send(&mp->event_manager, &event);
 
     return VLC_SUCCESS;
 }
@@ -523,7 +523,7 @@ static int snapshot_was_taken(vlc_object_t *p_this, char const *psz_cmd,
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerSnapshotTaken;
     event.u.media_player_snapshot_taken.psz_filename = newval.psz_string;
-    libvlc_event_send(mp->p_event_manager, &event);
+    libvlc_event_send(&mp->event_manager, &event);
 
     return VLC_SUCCESS;
 }
@@ -539,7 +539,7 @@ static int corks_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
 
         event.type = cur.i_int ? libvlc_MediaPlayerCorked
                                : libvlc_MediaPlayerUncorked;
-        libvlc_event_send(mp->p_event_manager, &event);
+        libvlc_event_send(&mp->event_manager, &event);
     }
     VLC_UNUSED(name); VLC_UNUSED(opaque);
     return VLC_SUCCESS;
@@ -553,7 +553,7 @@ static int audio_device_changed(vlc_object_t *obj, const char *name,
 
     event.type = libvlc_MediaPlayerAudioDevice;
     event.u.media_player_audio_device.device = cur.psz_string;
-    libvlc_event_send(mp->p_event_manager, &event);
+    libvlc_event_send(&mp->event_manager, &event);
     VLC_UNUSED(name); VLC_UNUSED(old); VLC_UNUSED(opaque);
     return VLC_SUCCESS;
 }
@@ -569,7 +569,7 @@ static int mute_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
 
         event.type = cur.b_bool ? libvlc_MediaPlayerMuted
                                 : libvlc_MediaPlayerUnmuted;
-        libvlc_event_send(mp->p_event_manager, &event);
+        libvlc_event_send(&mp->event_manager, &event);
     }
     VLC_UNUSED(name); VLC_UNUSED(opaque);
     return VLC_SUCCESS;
@@ -583,7 +583,7 @@ static int volume_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
 
     event.type = libvlc_MediaPlayerAudioVolume;
     event.u.media_player_audio_volume.volume = cur.f_float;
-    libvlc_event_send(mp->p_event_manager, &event);
+    libvlc_event_send(&mp->event_manager, &event);
     VLC_UNUSED(name); VLC_UNUSED(old); VLC_UNUSED(opaque);
     return VLC_SUCCESS;
 }
@@ -744,13 +744,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_SetAddress( mp, "viewpoint", &mp->viewpoint );
     vlc_mutex_init (&mp->input.lock);
     mp->i_refcount = 1;
-    mp->p_event_manager = libvlc_event_manager_new(mp);
-    if (unlikely(mp->p_event_manager == NULL))
-    {
-        input_resource_Release(mp->input.p_resource);
-        vlc_object_release(mp);
-        return NULL;
-    }
+    libvlc_event_manager_init(&mp->event_manager, mp);
     vlc_mutex_init(&mp->object_lock);
 
     var_AddCallback(mp, "corks", corks_changed, NULL);
@@ -816,7 +810,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     input_resource_Release( p_mi->input.p_resource );
     vlc_mutex_destroy( &p_mi->input.lock );
 
-    libvlc_event_manager_release( p_mi->p_event_manager );
+    libvlc_event_manager_destroy(&p_mi->event_manager);
     libvlc_media_release( p_mi->p_md );
     vlc_mutex_destroy( &p_mi->object_lock );
 
@@ -896,7 +890,7 @@ void libvlc_media_player_set_media(
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerMediaChanged;
     event.u.media_player_media_changed.new_media = p_md;
-    libvlc_event_send( p_mi->p_event_manager, &event );
+    libvlc_event_send( &p_mi->event_manager, &event );
 
 }
 
@@ -923,7 +917,7 @@ libvlc_media_player_get_media( libvlc_media_player_t *p_mi )
 libvlc_event_manager_t *
 libvlc_media_player_event_manager( libvlc_media_player_t *p_mi )
 {
-    return p_mi->p_event_manager;
+    return &p_mi->event_manager;
 }
 
 static void add_es_callbacks( input_thread_t *p_input_thread, libvlc_media_player_t *p_mi )
@@ -1067,7 +1061,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
         /* Construct and send the event */
         libvlc_event_t event;
         event.type = libvlc_MediaPlayerStopped;
-        libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_event_send( &p_mi->event_manager, &event );
     }
 
     input_resource_Terminate( p_mi->input.p_resource );
@@ -1471,7 +1465,7 @@ void libvlc_media_player_set_title( libvlc_media_player_t *p_mi,
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerTitleChanged;
     event.u.media_player_title_changed.new_title = i_title;
-    libvlc_event_send( p_mi->p_event_manager, &event );
+    libvlc_event_send( &p_mi->event_manager, &event );
 }
 
 int libvlc_media_player_get_title( libvlc_media_player_t *p_mi )
