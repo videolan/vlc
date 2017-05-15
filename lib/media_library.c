@@ -34,7 +34,7 @@
 
 struct libvlc_media_library_t
 {
-    libvlc_event_manager_t * p_event_manager;
+    libvlc_event_manager_t   event_manager;
     libvlc_instance_t *      p_libvlc_instance;
     int                      i_refcount;
     libvlc_media_list_t *    p_mlist;
@@ -69,13 +69,7 @@ libvlc_media_library_new( libvlc_instance_t * p_inst )
     p_mlib->i_refcount = 1;
     p_mlib->p_mlist = NULL;
 
-    p_mlib->p_event_manager = libvlc_event_manager_new( p_mlib );
-    if( unlikely(p_mlib->p_event_manager == NULL) )
-    {
-        free(p_mlib);
-        return NULL;
-    }
-
+    libvlc_event_manager_init( &p_mlib->event_manager, p_mlib );
     libvlc_retain( p_inst );
     return p_mlib;
 }
@@ -90,7 +84,7 @@ void libvlc_media_library_release( libvlc_media_library_t * p_mlib )
     if( p_mlib->i_refcount > 0 )
         return;
 
-    libvlc_event_manager_release( p_mlib->p_event_manager );
+    libvlc_event_manager_destroy( &p_mlib->event_manager );
     libvlc_release( p_mlib->p_libvlc_instance );
     free( p_mlib );
 }
