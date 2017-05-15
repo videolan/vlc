@@ -34,9 +34,9 @@
 
 struct libvlc_renderer_discoverer_t
 {
+    libvlc_event_manager_t  event_manager;
     vlc_object_t *          p_object;
     vlc_renderer_discovery_t *p_rd;
-    libvlc_event_manager_t *p_event_manager;
 
     int                     i_items;
     vlc_renderer_item_t **  pp_items;
@@ -67,7 +67,7 @@ static void renderer_discovery_item_added( vlc_renderer_discovery_t *rd,
         .u.renderer_discoverer_item_added.item =
             (libvlc_renderer_item_t*) p_item,
     };
-    libvlc_event_send( p_lrd->p_event_manager, &event );
+    libvlc_event_send( &p_lrd->event_manager, &event );
 }
 
 static void renderer_discovery_item_removed( vlc_renderer_discovery_t *rd,
@@ -85,7 +85,7 @@ static void renderer_discovery_item_removed( vlc_renderer_discovery_t *rd,
         .u.renderer_discoverer_item_deleted.item =
             (libvlc_renderer_item_t*) p_item,
     };
-    libvlc_event_send( p_lrd->p_event_manager, &event );
+    libvlc_event_send( &p_lrd->event_manager, &event );
 
     vlc_renderer_item_release( p_item );
 }
@@ -128,26 +128,16 @@ libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
     memcpy( p_lrd->name, psz_name, len );
     TAB_INIT( p_lrd->i_items, p_lrd->pp_items );
     p_lrd->p_rd = NULL;
-
-    p_lrd->p_event_manager = libvlc_event_manager_new( p_lrd );
-    if( unlikely(p_lrd->p_event_manager == NULL) )
-        goto error;
+    libvlc_event_manager_init( &p_lrd->event_manager, p_lrd );
 
     return p_lrd;
-
-error:
-    libvlc_renderer_discoverer_release( p_lrd );
-    return NULL;
 }
 
 void
 libvlc_renderer_discoverer_release( libvlc_renderer_discoverer_t *p_lrd )
 {
     libvlc_renderer_discoverer_stop( p_lrd );
-
-    if( p_lrd->p_event_manager == NULL )
-        libvlc_event_manager_release( p_lrd->p_event_manager );
-
+    libvlc_event_manager_destroy( &p_lrd->event_manager );
     free( p_lrd );
 }
 
@@ -181,7 +171,7 @@ libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_lrd )
 libvlc_event_manager_t *
 libvlc_renderer_discoverer_event_manager( libvlc_renderer_discoverer_t *p_lrd )
 {
-    return p_lrd->p_event_manager;
+    return &p_lrd->event_manager;
 }
 
 void
