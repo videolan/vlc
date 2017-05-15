@@ -36,8 +36,8 @@
 
 typedef struct libvlc_vlm_t
 {
+    libvlc_event_manager_t  event_manager;
     vlm_t                  *p_vlm;
-    libvlc_event_manager_t *p_event_manager;
 } libvlc_vlm_t;
 
 /* VLM events callback. Transmit to libvlc */
@@ -117,9 +117,8 @@ void libvlc_vlm_release( libvlc_instance_t *p_instance )
     vlm_Control( p_vlm, VLM_CLEAR_SCHEDULES );
 
     var_DelCallback( (vlc_object_t *)p_vlm, "intf-event", VlmEvent,
-                     p_instance->vlm->p_event_manager );
-    libvlc_event_manager_release( p_instance->vlm->p_event_manager );
-    p_instance->vlm->p_event_manager = NULL;
+                     &p_instance->vlm->event_manager );
+    libvlc_event_manager_destroy( &p_instance->vlm->event_manager );
     vlm_Delete( p_vlm );
     free( p_instance->vlm );
     p_instance->vlm = NULL;
@@ -134,15 +133,8 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance )
         if( p_instance->vlm == NULL )
             return VLC_ENOMEM;
         p_instance->vlm->p_vlm = NULL;
-        p_instance->vlm->p_event_manager = NULL;
-    }
-
-    if( !p_instance->vlm->p_event_manager )
-    {
-        p_instance->vlm->p_event_manager =
-            libvlc_event_manager_new( p_instance->vlm->p_vlm );
-        if( unlikely(p_instance->vlm->p_event_manager == NULL) )
-            return VLC_ENOMEM;
+        libvlc_event_manager_init( &p_instance->vlm->event_manager,
+                                   &p_instance->vlm->p_vlm );
     }
 
     if( !p_instance->vlm->p_vlm )
@@ -155,7 +147,7 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance )
         }
         var_AddCallback( (vlc_object_t *)p_instance->vlm->p_vlm,
                          "intf-event", VlmEvent,
-                         p_instance->vlm->p_event_manager );
+                         &p_instance->vlm->event_manager );
         libvlc_retain( p_instance );
     }
 
@@ -748,5 +740,5 @@ libvlc_vlm_get_event_manager( libvlc_instance_t *p_instance )
 {
     if( libvlc_vlm_init( p_instance ) )
         return NULL;
-    return p_instance->vlm->p_event_manager;
+    return &p_instance->vlm->event_manager;
 }
