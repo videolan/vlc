@@ -427,4 +427,62 @@ clear:
     }
 }
 
+/* Called when the user hits CMD + C or copy is clicked in the edit menu
+ */
+- (void) copy:(id)sender {
+    NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
+    NSIndexSet *selectionIndices = [_dataTable selectedRowIndexes];
+
+
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
+    int i_bookmarks;
+    seekpoint_t **pp_bookmarks;
+
+    if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS)
+        return;
+
+    [pasteBoard clearContents];
+    NSUInteger index = [selectionIndices firstIndex];
+
+    while(index != NSNotFound) {
+        /* Get values */
+        if (index >= i_bookmarks)
+            break;
+        NSString *name = toNSStr(pp_bookmarks[index]->psz_name);
+        NSString *time = [self timeStringForBookmark:pp_bookmarks[index]];
+
+        NSString *message = [NSString stringWithFormat:@"%@ - %@", name, time];
+        [pasteBoard writeObjects:@[message]];
+
+        /* Get next index */
+        index = [selectionIndices indexGreaterThanIndex:index];
+    }
+
+    // Clear the bookmark list
+    for (int i = 0; i < i_bookmarks; i++)
+        vlc_seekpoint_Delete(pp_bookmarks[i]);
+    free(pp_bookmarks);
+}
+
+#pragma mark -
+#pragma mark UI validation
+
+/* Validate the copy menu item
+ */
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
+{
+    SEL theAction = [anItem action];
+
+    if (theAction == @selector(copy:)) {
+        if ([[_dataTable selectedRowIndexes] count] > 0) {
+            return YES;
+        }
+        return NO;
+    }
+    /* Indicate that we handle the validation method,
+     * even if we don’t implement the action
+     */
+    return YES;
+}
+
 @end
