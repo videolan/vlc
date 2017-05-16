@@ -337,6 +337,8 @@ void ActionsManager::ScanRendererAction(bool checked)
                 else
                     vlc_rd_release( p_rd );
             }
+            free( *ppsz_name );
+            free( *ppsz_longname );
         }
         free( ppsz_names );
         free( ppsz_longnames );
