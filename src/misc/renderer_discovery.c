@@ -234,9 +234,7 @@ vlc_rd_get_names(vlc_object_t *p_obj, char ***pppsz_names,
 
 void vlc_rd_release(vlc_renderer_discovery_t *p_rd)
 {
-    if (p_rd->p_module != NULL)
-        module_unneed(p_rd, p_rd->p_module);
-
+    module_unneed(p_rd, p_rd->p_module);
     config_ChainDestroy(p_rd->p_cfg);
     free(p_rd->psz_name);
     vlc_object_release(p_rd);
@@ -254,23 +252,14 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name,
     free(config_ChainCreate(&p_rd->psz_name, &p_rd->p_cfg, psz_name));
 
     p_rd->owner = *owner;
-
-    p_rd->p_module = NULL;
-    return p_rd;
-}
-
-int
-vlc_rd_start(vlc_renderer_discovery_t *p_rd)
-{
-    assert(!p_rd->p_module);
-
     p_rd->p_module = module_need(p_rd, "renderer_discovery",
                                  p_rd->psz_name, true);
     if (p_rd->p_module == NULL)
     {
         msg_Err(p_rd, "no suitable renderer discovery module");
-        return VLC_EGENERIC;
+        vlc_object_release(p_rd);
+        p_rd = NULL;
     }
 
-    return VLC_SUCCESS;
+    return p_rd;
 }

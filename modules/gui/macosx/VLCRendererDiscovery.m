@@ -89,19 +89,11 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
     // Create renderer object
     p_rd = vlc_rd_new(VLC_OBJECT(p_intf), _name.UTF8String, &owner);
 
-    if (p_rd) {
-    } else {
+    if (!p_rd) {
         msg_Err(p_intf, "Could not create '%s' renderer discovery service", _name.UTF8String);
         return false;
     }
 
-    int ret = vlc_rd_start(p_rd);
-    if (ret != VLC_SUCCESS) {
-        msg_Err(p_intf, "Could not start '%s' renderer discovery", _name.UTF8String);
-        vlc_rd_release(p_rd);
-        p_rd = NULL;
-        return false;
-    }
     return true;
 }
 

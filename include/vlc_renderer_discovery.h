@@ -147,15 +147,6 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name,
 VLC_API void vlc_rd_release(vlc_renderer_discovery_t *p_rd);
 
 /**
- * Start the renderer discovery module
- *
- * Once started, the module can send new vlc_renderer_item_t via the
- * vlc_RendererDiscoveryItemAdded event.
- */
-VLC_API int
-vlc_rd_start(vlc_renderer_discovery_t *p_rd);
-
-/**
  * @}
  * @defgroup vlc_renderer_discovery_module VLC renderer module
  * @{
