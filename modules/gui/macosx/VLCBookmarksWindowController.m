@@ -176,11 +176,7 @@
     }
 
     [_editNameTextField setStringValue: toNSStr(pp_bookmarks[row]->psz_name)];
-    mtime_t total = pp_bookmarks[row]->i_time_offset;
-    unsigned hour = ( total / ( CLOCK_FREQ * 3600 ) );
-    unsigned min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
-    float    sec = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );
-    [_editTimeTextField setStringValue: [NSString stringWithFormat:@"%02d:%02d:%06.3f", hour, min, sec]];
+    [_editTimeTextField setStringValue:[self timeStringForBookmark:pp_bookmarks[row]]];
 
     /* Just keep the pointer value to check if it
      * changes. Note, we don't need to keep a reference to the object.
@@ -340,6 +336,18 @@ clear:
     [_dataTable reloadData];
 }
 
+- (NSString *)timeStringForBookmark:(seekpoint_t *)bookmark
+{
+    assert(bookmark != NULL);
+
+    mtime_t total = bookmark->i_time_offset;
+    unsigned hour = ( total / ( CLOCK_FREQ * 3600 ) );
+    unsigned min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
+    float    sec = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );
+
+    return [NSString stringWithFormat:@"%02d:%02d:%06.3f", hour, min, sec];
+}
+
 /*****************************************************************************
  * data source methods
  *****************************************************************************/
@@ -386,11 +394,7 @@ clear:
         if ([identifier isEqualToString: @"description"])
             ret = toNSStr(pp_bookmarks[row]->psz_name);
 		else if ([identifier isEqualToString: @"time_offset"]) {
-            int total = pp_bookmarks[row]->i_time_offset/ 1000000;
-            int hour = total / (60*60);
-            int min = (total - hour*60*60) / 60;
-            int sec = total - hour*60*60 - min*60;
-            ret = [NSString stringWithFormat:@"%02d:%02d:%02d", hour, min, sec];
+            ret = [self timeStringForBookmark:pp_bookmarks[row]];
         }
 
         // Clear the bookmark list
