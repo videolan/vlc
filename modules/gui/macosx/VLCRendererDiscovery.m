@@ -78,7 +78,7 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
 {
     struct vlc_renderer_discovery_owner owner =
     {
-        self,
+        (__bridge void *) self,
         renderer_event_item_added,
         renderer_event_item_removed,
     };
