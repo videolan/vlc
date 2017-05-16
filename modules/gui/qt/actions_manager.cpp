@@ -328,14 +328,15 @@ void ActionsManager::ScanRendererAction(bool checked)
         {
             msg_Dbg( p_intf, "starting renderer discovery service %s", *ppsz_longname );
             vlc_renderer_discovery_t* p_rd = vlc_rd_new( VLC_OBJECT(p_intf), *ppsz_name, &owner );
-            if( !p_rd )
-                msg_Err( p_intf, "Could not start renderer discovery services" );
-            else
+            if( p_rd != NULL )
             {
                 if ( vlc_rd_start( p_rd ) == VLC_SUCCESS )
                     m_rds.push_back( p_rd );
                 else
+                {
+                    msg_Err( p_intf, "Could not start renderer discovery service %s", *ppsz_name );
                     vlc_rd_release( p_rd );
+                }
             }
             free( *ppsz_name );
             free( *ppsz_longname );
