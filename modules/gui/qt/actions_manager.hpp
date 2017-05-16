@@ -30,6 +30,7 @@
 
 #include "qt.hpp"
 #include "util/singleton.hpp"
+#include <QVector>
 
 #include <QObject>
 class QAction;
@@ -74,7 +75,7 @@ private:
     virtual ~ActionsManager();
 
     intf_thread_t* const p_intf;
-    vlc_renderer_discovery_t *p_rd;
+    QVector<vlc_renderer_discovery_t*> m_rds;
 
     static void renderer_event_item_added( vlc_renderer_discovery_t *,
                                            vlc_renderer_item_t * );

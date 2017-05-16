@@ -40,12 +40,11 @@
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
     : p_intf( _p_i )
-    , p_rd( NULL )
 { }
 
 ActionsManager::~ActionsManager()
 {
-    if ( p_rd != NULL )
+    foreach ( vlc_renderer_discovery_t* p_rd, m_rds )
         vlc_rd_release( p_rd );
 }
 
@@ -283,7 +282,7 @@ void ActionsManager::renderer_event_item_removed(
 
 void ActionsManager::ScanRendererAction(bool checked)
 {
-    if (checked == (p_rd != NULL))
+    if (checked == !m_rds.empty())
         return; /* nothing changed */
 
     if (checked)
@@ -327,35 +326,26 @@ void ActionsManager::ScanRendererAction(bool checked)
         char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
         for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
         {
-            /* TODO launch all discovery services for renderers */
             msg_Dbg( p_intf, "starting renderer discovery service %s", *ppsz_longname );
-            if ( p_rd == NULL )
+            vlc_renderer_discovery_t* p_rd = vlc_rd_new( VLC_OBJECT(p_intf), *ppsz_name, &owner );
+            if( !p_rd )
+                msg_Err( p_intf, "Could not start renderer discovery services" );
+            else
             {
-                p_rd = vlc_rd_new( VLC_OBJECT(p_intf), *ppsz_name, &owner );
-                if( !p_rd )
-                    msg_Err( p_intf, "Could not start renderer discovery services" );
+                if ( vlc_rd_start( p_rd ) == VLC_SUCCESS )
+                    m_rds.push_back( p_rd );
+                else
+                    vlc_rd_release( p_rd );
             }
-            break;
         }
         free( ppsz_names );
         free( ppsz_longnames );
-
-        if ( p_rd != NULL )
-        {
-            if( vlc_rd_start( p_rd ) != VLC_SUCCESS )
-            {
-                vlc_rd_release( p_rd );
-                p_rd = NULL;
-            }
-        }
     }
     else
     {
-        if ( p_rd != NULL )
-        {
+        foreach ( vlc_renderer_discovery_t* p_rd, m_rds )
             vlc_rd_release( p_rd );
-            p_rd = NULL;
-        }
+        m_rds.clear();
     }
 }
 
