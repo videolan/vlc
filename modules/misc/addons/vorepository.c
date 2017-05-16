@@ -148,7 +148,11 @@ static int ParseManifest( addons_finder_t *p_finder, addon_entry_t *p_entry,
         case XML_READER_TEXT:
             if ( data_pointer.e_type == TYPE_NONE || !p_entry ) break;
             if ( data_pointer.e_type == TYPE_STRING )
+            {
+                if( data_pointer.u_data.ppsz )
+                    free( data_pointer.u_data.ppsz );
                 *data_pointer.u_data.ppsz = strdup( p_node );
+            }
             else
             if ( data_pointer.e_type == TYPE_LONG )
                 *data_pointer.u_data.pl = atol( p_node );
@@ -285,7 +289,11 @@ static int ParseCategoriesInfo( addons_finder_t *p_finder, stream_t *p_stream )
         case XML_READER_TEXT:
             if ( data_pointer.e_type == TYPE_NONE || !p_entry ) break;
             if ( data_pointer.e_type == TYPE_STRING )
+            {
+                if( data_pointer.u_data.ppsz )
+                    free( *data_pointer.u_data.ppsz );
                 *data_pointer.u_data.ppsz = strdup( p_node );
+            }
             else
             if ( data_pointer.e_type == TYPE_LONG )
                 *data_pointer.u_data.pl = atol( p_node );
