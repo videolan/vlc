@@ -31,8 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_picture.h>
-#include <vlc_filter.h> /* need for the DXA9 to YV12 conversion */
-#include <vlc_modules.h>
 #include <vlc_plugin.h>
 
 #include "directx_va.h"
@@ -128,9 +126,6 @@ struct vlc_va_sys_t
     /* Video decoder */
     DXVA2_ConfigPictureDecode    cfg;
 
-    /* Option conversion */
-    filter_t                 *filter;
-
     /* avcodec internals */
     struct dxva_context hw;
 };
@@ -157,66 +152,10 @@ static void DxDestroyVideoDecoder(vlc_va_t *);
 static int DxResetVideoDecoder(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
 
-static void DeleteFilter( filter_t * p_filter )
-{
-    if( p_filter->p_module )
-        module_unneed( p_filter, p_filter->p_module );
-
-    es_format_Clean( &p_filter->fmt_in );
-    es_format_Clean( &p_filter->fmt_out );
-
-    vlc_object_release( p_filter );
-}
-
-static picture_t *video_new_buffer(filter_t *p_filter)
-{
-    return p_filter->owner.sys;
-}
-
-static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
-                               vlc_fourcc_t src_chroma )
-{
-    filter_t *p_filter;
-
-    p_filter = vlc_object_create( p_this, sizeof(filter_t) );
-    if (unlikely(p_filter == NULL))
-        return NULL;
-
-    p_filter->owner.video.buffer_new = (picture_t *(*)(filter_t *))video_new_buffer;
-
-    vlc_fourcc_t fmt_out;
-    switch (src_chroma)
-    {
-    case VLC_CODEC_D3D9_OPAQUE_10B:
-        fmt_out = VLC_CODEC_P010;
-        break;
-    case VLC_CODEC_D3D9_OPAQUE:
-        fmt_out = VLC_CODEC_YV12;
-        break;
-    }
-
-    es_format_InitFromVideo( &p_filter->fmt_in,  &p_fmt_in->video );
-    es_format_InitFromVideo( &p_filter->fmt_out, &p_fmt_in->video );
-    p_filter->fmt_in.i_codec  = p_filter->fmt_in.video.i_chroma  = src_chroma;
-    p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma = fmt_out;
-    p_filter->p_module = module_need( p_filter, "video converter", NULL, false );
-
-    if( !p_filter->p_module )
-    {
-        msg_Dbg( p_filter, "no video converter found" );
-        DeleteFilter( p_filter );
-        return NULL;
-    }
-
-    return p_filter;
-}
-
 /* */
 static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
 {
-    vlc_va_sys_t *sys = va->sys;
-
-    *chroma = sys->filter == NULL ? sys->i_chroma : VLC_CODEC_YV12;
+    *chroma = va->sys->i_chroma;
 }
 
 void SetupAVCodecContext(vlc_va_t *va)
@@ -237,39 +176,26 @@ static int Extract(vlc_va_t *va, picture_t *picture, uint8_t *data)
 {
     directx_sys_t *dx_sys = &va->sys->dx_sys;
     LPDIRECT3DSURFACE9 d3d = (LPDIRECT3DSURFACE9)(uintptr_t)data;
-    if ( picture->format.i_chroma == VLC_CODEC_D3D9_OPAQUE ||
-         picture->format.i_chroma == VLC_CODEC_D3D9_OPAQUE_10B )
-    {
-        picture_sys_t *p_sys = picture->p_sys;
-        LPDIRECT3DSURFACE9 output = p_sys->surface;
+    picture_sys_t *p_sys = picture->p_sys;
+    LPDIRECT3DSURFACE9 output = p_sys->surface;
 
-        assert(d3d != output);
+    assert(d3d != output);
 #ifndef NDEBUG
-        LPDIRECT3DDEVICE9 srcDevice, dstDevice;
-        IDirect3DSurface9_GetDevice(d3d, &srcDevice);
-        IDirect3DSurface9_GetDevice(output, &dstDevice);
-        assert(srcDevice == dstDevice);
+    LPDIRECT3DDEVICE9 srcDevice, dstDevice;
+    IDirect3DSurface9_GetDevice(d3d, &srcDevice);
+    IDirect3DSurface9_GetDevice(output, &dstDevice);
+    assert(srcDevice == dstDevice);
 #endif
 
-        HRESULT hr;
-        RECT visibleSource;
-        visibleSource.left = 0;
-        visibleSource.top = 0;
-        visibleSource.right = picture->format.i_visible_width;
-        visibleSource.bottom = picture->format.i_visible_height;
-        hr = IDirect3DDevice9_StretchRect( (IDirect3DDevice9*) dx_sys->d3ddev, d3d, &visibleSource, output, &visibleSource, D3DTEXF_NONE);
-        if (FAILED(hr)) {
-            msg_Err(va, "Failed to copy the hw surface to the decoder surface (hr=0x%0lx)", hr );
-            return VLC_EGENERIC;
-        }
-    }
-    else if (va->sys->filter != NULL) {
-        va->sys->filter->owner.sys = picture;
-        vlc_va_surface_t *surface = picture->context;
-        picture_Hold( surface->p_pic );
-        va->sys->filter->pf_video_filter( va->sys->filter, surface->p_pic );
-    } else {
-        msg_Err(va, "Unsupported output picture format %08X", picture->format.i_chroma );
+    HRESULT hr;
+    RECT visibleSource;
+    visibleSource.left = 0;
+    visibleSource.top = 0;
+    visibleSource.right = picture->format.i_visible_width;
+    visibleSource.bottom = picture->format.i_visible_height;
+    hr = IDirect3DDevice9_StretchRect( (IDirect3DDevice9*) dx_sys->d3ddev, d3d, &visibleSource, output, &visibleSource, D3DTEXF_NONE);
+    if (FAILED(hr)) {
+        msg_Err(va, "Failed to copy the hw surface to the decoder surface (hr=0x%0lx)", hr );
         return VLC_EGENERIC;
     }
 
@@ -302,12 +228,6 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
     vlc_va_sys_t *sys = va->sys;
 
     (void) ctx;
-
-    if (sys->filter)
-    {
-        DeleteFilter( sys->filter );
-        sys->filter = NULL;
-    }
 
     directx_va_Close(va, &sys->dx_sys);
 
@@ -385,13 +305,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     err = directx_va_Open(va, &sys->dx_sys, ctx, fmt, true);
     if (err!=VLC_SUCCESS)
         goto error;
-
-    if (p_sys == NULL)
-    {
-        sys->filter = CreateFilter( VLC_OBJECT(va), fmt, sys->i_chroma);
-        if (sys->filter == NULL)
-            goto error;
-    }
 
     err = directx_va_Setup(va, &sys->dx_sys, ctx);
     if (err != VLC_SUCCESS)
