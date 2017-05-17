@@ -226,19 +226,6 @@ void input_item_CopyOptions( input_item_t *p_child,
     free( optv );
 }
 
-static void post_subitems( input_item_node_t *p_node )
-{
-    for( int i = 0; i < p_node->i_children; i++ )
-    {
-        vlc_event_send( &p_node->p_item->event_manager, &(vlc_event_t) {
-            .type = vlc_InputItemSubItemAdded,
-            .u.input_item_subitem_added.p_new_child =
-                p_node->pp_children[i]->p_item } );
-
-        post_subitems( p_node->pp_children[i] );
-    }
-}
-
 /* This won't hold the item, but can tell to interested third parties
  * Like the playlist, that there is a new sub item. With this design
  * It is not the input item's responsibility to keep all the ref of
@@ -1316,8 +1303,6 @@ void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t 
 
 void input_item_node_PostAndDelete( input_item_node_t *p_root )
 {
-    post_subitems( p_root );
-
     vlc_event_send( &p_root->p_item->event_manager, &(vlc_event_t) {
         .type = vlc_InputItemSubItemTreeAdded,
         .u.input_item_subitem_tree_added.p_root = p_root } );

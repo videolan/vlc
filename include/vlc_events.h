@@ -98,7 +98,6 @@
 typedef enum vlc_event_type_t {
     /* Input item events */
     vlc_InputItemMetaChanged,
-    vlc_InputItemSubItemAdded,
     vlc_InputItemSubItemTreeAdded,
     vlc_InputItemDurationChanged,
     vlc_InputItemPreparsedChanged,
