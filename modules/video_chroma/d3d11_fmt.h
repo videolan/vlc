@@ -42,6 +42,7 @@ struct picture_sys_t
     ID3D11VideoProcessorInputView *processorInput; /* when used as processor input */
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
     DXGI_FORMAT                   formatTexture;
+    void                          *va_surface;
 };
 
 /* index to use for texture/resource that use a known DXGI format

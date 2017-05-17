@@ -27,6 +27,7 @@
 struct picture_sys_t
 {
     LPDIRECT3DSURFACE9 surface;
+    void               *va_surface;
 };
 
 static inline void ReleasePictureSys(picture_sys_t *p_sys)

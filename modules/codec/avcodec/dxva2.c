@@ -221,7 +221,7 @@ static int CheckDevice(vlc_va_t *va)
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
-    pic->context = va_surface;
+    pic->p_sys->va_surface = va_surface;
     return va_surface ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
@@ -258,8 +258,8 @@ static void ReleasePic(void *opaque, uint8_t *data)
 {
     (void)data;
     picture_t *pic = opaque;
-    directx_va_Release(pic->context);
-    pic->context = NULL;
+    directx_va_Release(pic->p_sys->va_surface);
+    pic->p_sys->va_surface = NULL;
     picture_Release(pic);
 }
 

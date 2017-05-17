@@ -179,7 +179,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 {
     vlc_va_sys_t *sys = va->sys;
     ID3D11VideoDecoderOutputView *src = (ID3D11VideoDecoderOutputView*)(uintptr_t)data;
-    vlc_va_surface_t *surface = output->context; /* when coming from our local pool */
+    vlc_va_surface_t *surface = output->p_sys->va_surface;
     int ret = VLC_SUCCESS;
 
     picture_sys_t *p_sys_out = surface ? surface->p_pic->p_sys : output->p_sys;
@@ -300,8 +300,11 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     {
         assert(!va->sys->b_extern_pool);
         vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
-        pic->context = va_surface;
-        return va_surface ? VLC_SUCCESS : VLC_EGENERIC;
+        if (!va_surface)
+            return VLC_EGENERIC;
+        pic->p_sys = va_surface->p_pic->p_sys;
+        pic->p_sys->va_surface = va_surface;
+        return VLC_SUCCESS;
     }
 
     if (p_sys->decoder == NULL)
@@ -332,11 +335,13 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_EGENERIC;
     *data = p_sys->decoder;
     return VLC_SUCCESS;
-#else
-    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
-    pic->context = va_surface;
-    return va_surface ? VLC_SUCCESS : VLC_EGENERIC;
 #endif
+    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
+    if (!va_surface)
+        return VLC_EGENERIC;
+    pic->p_sys = va_surface->p_pic->p_sys;
+    pic->p_sys->va_surface = va_surface;
+    return VLC_SUCCESS;
 }
 
 static void Close(vlc_va_t *va, AVCodecContext *ctx)
@@ -371,8 +376,8 @@ static void ReleasePic(void *opaque, uint8_t *data)
 {
     (void)data;
     picture_t *pic = opaque;
-    directx_va_Release(pic->context);
-    pic->context = NULL;
+    directx_va_Release(pic->p_sys->va_surface);
+    pic->p_sys->va_surface = NULL;
     picture_Release(pic);
 }
 
