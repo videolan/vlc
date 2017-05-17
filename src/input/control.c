@@ -192,18 +192,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 input_SendEventMetaInfo( p_input );
             return i_ret;
         }
-        case INPUT_GET_INFO:
-        {
-            char *psz_cat = (char *)va_arg( args, char * );
-            char *psz_name = (char *)va_arg( args, char * );
-            char **ppsz_value = (char **)va_arg( args, char ** );
-            int i_ret = VLC_EGENERIC;
-            *ppsz_value = NULL;
-
-            *ppsz_value = input_item_GetInfo( priv->p_item, psz_cat,
-                                              psz_name );
-            return i_ret;
-        }
 
         case INPUT_ADD_BOOKMARK:
             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
