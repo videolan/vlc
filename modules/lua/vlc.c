@@ -214,17 +214,6 @@ int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list )
         i++;
     free( datadir );
 
-#if !(defined(__APPLE__) || defined(_WIN32))
-    char *psz_libpath = config_GetLibDir();
-    if( likely(psz_libpath != NULL) )
-    {
-        if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
-                             psz_libpath, luadirname ) != -1) )
-            i++;
-        free( psz_libpath );
-    }
-#endif
-
     char *psz_datapath = config_GetDataDir();
     if( likely(psz_datapath != NULL) )
     {
