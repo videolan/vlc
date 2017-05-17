@@ -479,8 +479,7 @@ opengl_link_program(struct prgm *prgm, GLuint fragment_shader)
             int charsWritten;
             tc->api->GetProgramInfoLog(prgm->id, infoLength, &charsWritten,
                                        infolog);
-            msg_Err(tc->gl, "shader program %4.4s: %s",
-                    (const char *) &tc->chroma, infolog);
+            msg_Err(tc->gl, "shader program: %s", infolog);
             free(infolog);
         }
 
@@ -489,8 +488,7 @@ opengl_link_program(struct prgm *prgm, GLuint fragment_shader)
         tc->api->GetProgramiv(prgm->id, GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE)
         {
-            msg_Err(tc->gl, "Unable to use program %4.4s\n",
-                    (const char *) &tc->chroma);
+            msg_Err(tc->gl, "Unable to use program");
             goto error;
         }
     }
@@ -531,8 +529,7 @@ opengl_link_program(struct prgm *prgm, GLuint fragment_shader)
     assert(ret == VLC_SUCCESS);
     if (ret != VLC_SUCCESS)
     {
-        msg_Err(tc->gl, "Unable to get locations from %4.4s tex_conv\n",
-                (const char *) &tc->chroma);
+        msg_Err(tc->gl, "Unable to get locations from tex_conv");
         goto error;
     }
 
@@ -651,19 +648,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                          HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
 #endif
 
-    /* Initialize with default chroma */
-    vgl->fmt = *fmt;
-    vgl->fmt.i_chroma = VLC_CODEC_RGB32;
-#   if defined(WORDS_BIGENDIAN)
-    vgl->fmt.i_rmask  = 0xff000000;
-    vgl->fmt.i_gmask  = 0x00ff0000;
-    vgl->fmt.i_bmask  = 0x0000ff00;
-#   else
-    vgl->fmt.i_rmask  = 0x000000ff;
-    vgl->fmt.i_gmask  = 0x0000ff00;
-    vgl->fmt.i_bmask  = 0x00ff0000;
-#   endif
-
     vgl->prgm = &vgl->prgms[0];
     vgl->sub_prgm = &vgl->prgms[1];
 
@@ -675,7 +659,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    GLuint fshader = opengl_tex_converter_subpictures_init(&vgl->fmt,
+    GLuint fshader = opengl_tex_converter_subpictures_init(fmt,
                                                            &vgl->sub_prgm->tc);
     int ret = opengl_link_program(vgl->sub_prgm, fshader);
     if (ret != VLC_SUCCESS)
@@ -698,12 +682,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         ret = opengl_link_program(vgl->prgm, fshader);
         if (ret == VLC_SUCCESS)
         {
-            assert(vgl->prgm->tc.chroma != 0 && vgl->prgm->tc.tex_target != 0 &&
+            assert(vgl->prgm->tc.tex_target != 0 &&
                    vgl->prgm->tc.tex_count > 0 &&  vgl->prgm->tc.pf_update != NULL &&
                    vgl->prgm->tc.pf_fetch_locations != NULL &&
                    vgl->prgm->tc.pf_prepare_shader != NULL);
+
             vgl->fmt = *fmt;
-            vgl->fmt.i_chroma = vgl->prgm->tc.chroma;
             break;
         }
     }

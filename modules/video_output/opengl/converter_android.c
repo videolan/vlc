@@ -193,8 +193,7 @@ tc_anop_release(const opengl_tex_converter_t *tc)
 }
 
 GLuint
-opengl_tex_converter_anop_init(const video_format_t *fmt,
-                               opengl_tex_converter_t *tc)
+opengl_tex_converter_anop_init(video_format_t *fmt, opengl_tex_converter_t *tc)
 {
     if (fmt->i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || !tc->gl->surface->handle.anativewindow)
@@ -219,7 +218,6 @@ opengl_tex_converter_anop_init(const video_format_t *fmt,
     tc->tex_count = 1;
     tc->texs[0] = (struct opengl_tex_cfg) { { 1, 1 }, { 1, 1 } };
 
-    tc->chroma       = VLC_CODEC_ANDROID_OPAQUE;
     tc->tex_target   = GL_TEXTURE_EXTERNAL_OES;
 
     /* The transform Matrix (uSTMatrix) given by the SurfaceTexture is not

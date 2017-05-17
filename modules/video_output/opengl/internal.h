@@ -159,11 +159,12 @@ typedef struct opengl_tex_converter_t opengl_tex_converter_t;
  * The implementation should initialize every members of the struct in regards
  * of the video format.
  *
- * \param fmt video format
+ * \param fmt video format, fmt->i_chroma can be modified in order to match a
+ * shader
  * \param fc OpenGL tex converter that needs to be filled on success
  * \return VLC_SUCCESS or a VLC error
  */
-typedef GLuint (*opengl_tex_converter_init_cb)(const video_format_t *fmt,
+typedef GLuint (*opengl_tex_converter_init_cb)(video_format_t *fmt,
                                                opengl_tex_converter_t *fc);
 
 /*
@@ -179,9 +180,6 @@ struct opengl_tex_converter_t
     const char *glexts;
     /* Set it to request a special orientation (by default = fmt.orientation) */
     video_orientation_t orientation;
-
-    /* Video chroma used by this configuration, cannot be 0 */
-    vlc_fourcc_t chroma;
 
     /* Number of textures, cannot be 0 */
     unsigned tex_count;
@@ -330,18 +328,18 @@ opengl_tex_converter_subpictures_init(const video_format_t *,
                                       opengl_tex_converter_t *);
 
 GLuint
-opengl_tex_converter_generic_init(const video_format_t *,
+opengl_tex_converter_generic_init(video_format_t *,
                                   opengl_tex_converter_t *);
 
 #ifdef __ANDROID__
 GLuint
-opengl_tex_converter_anop_init(const video_format_t *,
+opengl_tex_converter_anop_init(video_format_t *,
                                opengl_tex_converter_t *);
 #endif
 
 #ifdef VLCGL_CONV_CVPX
 GLuint
-opengl_tex_converter_cvpx_init(const video_format_t *fmt,
+opengl_tex_converter_cvpx_init(video_format_t *fmt,
                                opengl_tex_converter_t *tc);
 #endif
 

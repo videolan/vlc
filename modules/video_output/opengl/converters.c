@@ -264,7 +264,6 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             tc->yuv_coefficients[i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.f;
     }
 
-    tc->chroma = chroma;
     tc->yuv_color = true;
 
     *swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9 ||
@@ -273,15 +272,14 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 }
 
 static int
-tc_rgba_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
-                  vlc_fourcc_t chroma)
+tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
+                 vlc_fourcc_t chroma)
 {
     (void) tex_target;
 
-    if (chroma != VLC_CODEC_RGBA && chroma != VLC_CODEC_RGB32)
+    if (chroma != VLC_CODEC_RGB32)
         return VLC_EGENERIC;
 
-    tc->chroma = VLC_CODEC_RGBA;
     tc->tex_count = 1;
     tc->texs[0] = (struct opengl_tex_cfg) {
         { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
@@ -361,7 +359,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
         ret = tc_yuv_base_init(tc, tex_target, chroma, yuv_space,
                                &yuv_swap_uv, swizzle_per_tex);
     else
-        ret = tc_rgba_base_init(tc, tex_target, chroma);
+        ret = tc_rgb_base_init(tc, tex_target, chroma);
 
     if (ret != VLC_SUCCESS)
         return 0;
@@ -993,7 +991,6 @@ tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
 static GLuint
 xyz12_shader_init(opengl_tex_converter_t *tc)
 {
-    tc->chroma  = VLC_CODEC_XYZ12;
     tc->tex_count = 1;
     tc->tex_target = GL_TEXTURE_2D;
     tc->texs[0] = (struct opengl_tex_cfg) {
@@ -1044,8 +1041,7 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
 }
 
 static GLuint
-generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
-             bool allow_dr)
+generic_init(video_format_t *fmt, opengl_tex_converter_t *tc, bool allow_dr)
 {
     const vlc_chroma_description_t *desc =
         vlc_fourcc_GetChromaDescription(fmt->i_chroma);
@@ -1077,10 +1073,29 @@ generic_init(const video_format_t *fmt, opengl_tex_converter_t *tc,
         }
 
         const vlc_fourcc_t *list = get_fallback(fmt->i_chroma);
-        while (*list && fragment_shader == 0)
+        while (*list)
         {
             fragment_shader =
                 opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list, space);
+            if (fragment_shader != 0)
+            {
+                fmt->i_chroma = *list;
+
+                if (fmt->i_chroma == VLC_CODEC_RGB32)
+                {
+#if defined(WORDS_BIGENDIAN)
+                    fmt->i_rmask  = 0xff000000;
+                    fmt->i_gmask  = 0x00ff0000;
+                    fmt->i_bmask  = 0x0000ff00;
+#else
+                    fmt->i_rmask  = 0x000000ff;
+                    fmt->i_gmask  = 0x0000ff00;
+                    fmt->i_bmask  = 0x00ff0000;
+#endif
+                    video_format_FixRgb(fmt);
+                }
+                break;
+            }
             list++;
         }
     }
@@ -1151,11 +1166,13 @@ GLuint
 opengl_tex_converter_subpictures_init(const video_format_t *fmt,
                                       opengl_tex_converter_t *tc)
 {
-    return generic_init(fmt, tc, false);
+    video_format_t sub_fmt = *fmt;
+    sub_fmt.i_chroma = VLC_CODEC_RGB32;
+    return generic_init(&sub_fmt, tc, false);
 }
 
 GLuint
-opengl_tex_converter_generic_init(const video_format_t *fmt,
+opengl_tex_converter_generic_init(video_format_t *fmt,
                                   opengl_tex_converter_t *tc)
 {
     return generic_init(fmt, tc, true);

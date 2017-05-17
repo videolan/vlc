@@ -229,8 +229,7 @@ tc_cvpx_release(const opengl_tex_converter_t *tc)
 }
 
 GLuint
-opengl_tex_converter_cvpx_init(const video_format_t *fmt,
-                               opengl_tex_converter_t *tc)
+opengl_tex_converter_cvpx_init(video_format_t *fmt, opengl_tex_converter_t *tc)
 {
     if (fmt->i_chroma != VLC_CODEC_CVPX_UYVY
      && fmt->i_chroma != VLC_CODEC_CVPX_NV12
@@ -308,7 +307,6 @@ opengl_tex_converter_cvpx_init(const video_format_t *fmt,
     }
 
     tc->priv              = priv;
-    tc->chroma            = fmt->i_chroma;
     tc->pf_get_pool       = tc_cvpx_get_pool;
     tc->pf_update         = tc_cvpx_update;
     tc->pf_release        = tc_cvpx_release;
