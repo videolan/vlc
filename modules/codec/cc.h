@@ -26,8 +26,6 @@
 
 #include <vlc_bits.h>
 
-#define BLOCK_FLAG_ORDERED_CAPTIONS (0x01 << BLOCK_FLAG_PRIVATE_SHIFT)
-
 #define CC_PKT_BYTE0(field) (0xFC | (0x03 & field))
 
 /* CC have a maximum rate of 9600 bit/s (per field?) */

@@ -481,9 +481,11 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
         } while( i_bytes >= 2 );
     }
 
-    block_Release( p_block );
+    p_newblock->i_pts = p_block->i_dts;
     p_newblock->i_buffer = i_copied;
-    p_newblock->i_flags = BLOCK_FLAG_ORDERED_CAPTIONS;
+    p_newblock->i_flags = BLOCK_FLAG_TYPE_P;
+    block_Release( p_block );
+
     return p_newblock;
 }
 
