@@ -276,8 +276,11 @@ static int ReadDir(stream_t *s, input_item_node_t *node)
 int Import_LuaPlaylist(vlc_object_t *obj)
 {
     stream_t *s = (stream_t *)obj;
-    struct vlclua_playlist *sys = malloc(sizeof (*sys));
 
+    if( !vlc_stream_Control( s->p_source, STREAM_IS_DIRECTORY ) )
+        return VLC_EGENERIC;
+
+    struct vlclua_playlist *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
