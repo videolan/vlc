@@ -41,8 +41,6 @@
 #include <vlc_picture.h>
 #include <vlc_plugin.h>
 #include <vlc_charset.h>
-#include <vlc_filter.h>
-#include <vlc_modules.h>
 #include <vlc_codec.h>
 
 #include "directx_va.h"
@@ -127,9 +125,6 @@ struct vlc_va_sys_t
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
 
-    /* Option conversion */
-    filter_t                     *filter;
-
     /* avcodec internals */
     struct AVD3D11VAContext      hw;
 
@@ -161,9 +156,7 @@ static picture_t *DxAllocPicture(vlc_va_t *, const video_format_t *, unsigned in
 /* */
 static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
 {
-    vlc_va_sys_t *sys = va->sys;
-
-    *chroma = sys->filter == NULL ? sys->i_chroma : VLC_CODEC_YV12;
+    *chroma = va->sys->i_chroma;
 }
 
 void SetupAVCodecContext(vlc_va_t *va)
@@ -182,60 +175,6 @@ void SetupAVCodecContext(vlc_va_t *va)
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 }
 
-static void DeleteFilter( filter_t * p_filter )
-{
-    if( p_filter->p_module )
-        module_unneed( p_filter, p_filter->p_module );
-
-    es_format_Clean( &p_filter->fmt_in );
-    es_format_Clean( &p_filter->fmt_out );
-
-    vlc_object_release( p_filter );
-}
-
-static picture_t *video_new_buffer(filter_t *p_filter)
-{
-    return p_filter->owner.sys;
-}
-
-static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
-                               vlc_fourcc_t src_chroma )
-{
-    filter_t *p_filter;
-
-    p_filter = vlc_object_create( p_this, sizeof(filter_t) );
-    if (unlikely(p_filter == NULL))
-        return NULL;
-
-    vlc_fourcc_t fmt_out;
-    switch (src_chroma)
-    {
-    case VLC_CODEC_D3D11_OPAQUE_10B:
-        fmt_out = VLC_CODEC_P010;
-        break;
-    case VLC_CODEC_D3D11_OPAQUE:
-        fmt_out = VLC_CODEC_YV12;
-        break;
-    }
-
-    p_filter->owner.video.buffer_new = (picture_t *(*)(filter_t *))video_new_buffer;
-
-    es_format_InitFromVideo( &p_filter->fmt_in,  &p_fmt_in->video );
-    es_format_InitFromVideo( &p_filter->fmt_out, &p_fmt_in->video );
-    p_filter->fmt_in.i_codec  = p_filter->fmt_in.video.i_chroma  = src_chroma;
-    p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma = fmt_out;
-    p_filter->p_module = module_need( p_filter, "video converter", NULL, false );
-
-    if( !p_filter->p_module )
-    {
-        msg_Dbg( p_filter, "no video converter found" );
-        DeleteFilter( p_filter );
-        return NULL;
-    }
-
-    return p_filter;
-}
-
 static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -243,108 +182,91 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
     vlc_va_surface_t *surface = output->context;
     int ret = VLC_SUCCESS;
 
-    switch (output->format.i_chroma)
-    {
-    case VLC_CODEC_D3D11_OPAQUE:
-    case VLC_CODEC_D3D11_OPAQUE_10B:
-    {
-        picture_sys_t *p_sys_out = output->p_sys;
+    picture_sys_t *p_sys_out = output->p_sys;
 
-        assert(p_sys_out->texture[KNOWN_DXGI_INDEX] != NULL);
+    assert(p_sys_out->texture[KNOWN_DXGI_INDEX] != NULL);
 
 #ifdef ID3D11VideoContext_VideoProcessorBlt
-        if (sys->videoProcessor)
+    if (sys->videoProcessor)
+    {
+        picture_sys_t *p_sys_in = surface->p_pic->p_sys;
+        assert(p_sys_in->decoder == src);
+
+        if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
+            WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
+        }
+
+        // extract the decoded video to a the output Texture
+        if (p_sys_out->decoder == NULL)
         {
-            picture_sys_t *p_sys_in = surface->p_pic->p_sys;
-            assert(p_sys_in->decoder == src);
-
-            if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
-                WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
-            }
-
-            // extract the decoded video to a the output Texture
-            if (p_sys_out->decoder == NULL)
-            {
-                D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc = {
-                    .ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D,
-                };
-
-                HRESULT hr = ID3D11VideoDevice_CreateVideoProcessorOutputView((ID3D11VideoDevice*) sys->dx_sys.d3ddec,
-                                                                 p_sys_out->resource[KNOWN_DXGI_INDEX],
-                                                                 sys->procEnumerator,
-                                                                 &outDesc,
-                                                                 (ID3D11VideoProcessorOutputView**) &p_sys_out->decoder);
-                if (FAILED(hr))
-                {
-                    msg_Err(va, "Failed to create the processor output. (hr=0x%lX)", hr);
-                    ret = VLC_EGENERIC;
-                    goto done;
-                }
-            }
-
-            D3D11_VIDEO_PROCESSOR_STREAM stream = {
-                .Enable = TRUE,
-                .pInputSurface = p_sys_in->processorInput,
+            D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc = {
+                .ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D,
             };
 
-            HRESULT hr = ID3D11VideoContext_VideoProcessorBlt(sys->d3dvidctx, sys->videoProcessor,
-                                                      (ID3D11VideoProcessorOutputView*) p_sys_out->decoder,
-                                                      0, 1, &stream);
+            HRESULT hr = ID3D11VideoDevice_CreateVideoProcessorOutputView((ID3D11VideoDevice*) sys->dx_sys.d3ddec,
+                                                             p_sys_out->resource[KNOWN_DXGI_INDEX],
+                                                             sys->procEnumerator,
+                                                             &outDesc,
+                                                             (ID3D11VideoProcessorOutputView**) &p_sys_out->decoder);
             if (FAILED(hr))
             {
-                msg_Err(va, "Failed to process the video. (hr=0x%lX)", hr);
+                msg_Err(va, "Failed to create the processor output. (hr=0x%lX)", hr);
                 ret = VLC_EGENERIC;
-            }
-done:
-            if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
-                ReleaseMutex( sys->context_mutex );
+                goto done;
             }
         }
+
+        D3D11_VIDEO_PROCESSOR_STREAM stream = {
+            .Enable = TRUE,
+            .pInputSurface = p_sys_in->processorInput,
+        };
+
+        HRESULT hr = ID3D11VideoContext_VideoProcessorBlt(sys->d3dvidctx, sys->videoProcessor,
+                                                  (ID3D11VideoProcessorOutputView*) p_sys_out->decoder,
+                                                  0, 1, &stream);
+        if (FAILED(hr))
+        {
+            msg_Err(va, "Failed to process the video. (hr=0x%lX)", hr);
+            ret = VLC_EGENERIC;
+        }
+done:
+        if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
+            ReleaseMutex( sys->context_mutex );
+        }
+    }
 #endif
 #if !D3D11_DIRECT_DECODE
 #ifdef ID3D11VideoContext_VideoProcessorBlt
-        else
+    else
 #endif
-        {
-            picture_sys_t *p_sys_in = surface->p_pic->p_sys;
-            assert(p_sys_in->decoder == src);
+    {
+        picture_sys_t *p_sys_in = surface->p_pic->p_sys;
+        assert(p_sys_in->decoder == src);
 
-            if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
-                WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
-            }
-
-            D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
-            ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
-
-            D3D11_TEXTURE2D_DESC dstDesc;
-            ID3D11Texture2D_GetDesc( p_sys_out->texture[KNOWN_DXGI_INDEX], &dstDesc);
-
-            /* copy decoder slice to surface */
-            D3D11_BOX copyBox = {
-                .right = dstDesc.Width, .bottom = dstDesc.Height, .back = 1,
-            };
-            ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, p_sys_out->resource[KNOWN_DXGI_INDEX],
-                                                      p_sys_out->slice_index, 0, 0, 0,
-                                                      p_sys_in->resource[KNOWN_DXGI_INDEX],
-                                                      viewDesc.Texture2D.ArraySlice,
-                                                      &copyBox);
-            if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
-                ReleaseMutex( sys->context_mutex );
-            }
+        if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
+            WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
         }
+
+        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+        ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
+
+        D3D11_TEXTURE2D_DESC dstDesc;
+        ID3D11Texture2D_GetDesc( p_sys_out->texture[KNOWN_DXGI_INDEX], &dstDesc);
+
+        /* copy decoder slice to surface */
+        D3D11_BOX copyBox = {
+            .right = dstDesc.Width, .bottom = dstDesc.Height, .back = 1,
+        };
+        ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, p_sys_out->resource[KNOWN_DXGI_INDEX],
+                                                  p_sys_out->slice_index, 0, 0, 0,
+                                                  p_sys_in->resource[KNOWN_DXGI_INDEX],
+                                                  viewDesc.Texture2D.ArraySlice,
+                                                  &copyBox);
+        if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
+            ReleaseMutex( sys->context_mutex );
+        }
+    }
 #endif
-    }
-        break;
-    case VLC_CODEC_YV12:
-        va->sys->filter->owner.sys = output;
-        picture_Hold( surface->p_pic );
-        va->sys->filter->pf_video_filter( va->sys->filter, surface->p_pic );
-        break;
-    default:
-        msg_Err(va, "Unsupported output picture format %08X", output->format.i_chroma );
-        ret = VLC_EGENERIC;
-        break;
-    }
 
     return ret;
 }
@@ -409,12 +331,6 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
     vlc_va_sys_t *sys = va->sys;
 
     (void) ctx;
-
-    if (sys->filter)
-    {
-        DeleteFilter( sys->filter );
-        sys->filter = NULL;
-    }
 
     directx_va_Close(va, &sys->dx_sys);
 
@@ -511,16 +427,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 #endif
     if (err!=VLC_SUCCESS)
         goto error;
-
-    if (p_sys == NULL && sys->videoProcessor == NULL)
-    {
-        sys->filter = CreateFilter( VLC_OBJECT(va), fmt, sys->i_chroma);
-        if (sys->filter == NULL)
-        {
-            err = VLC_EGENERIC;
-            goto error;
-        }
-    }
 
     err = directx_va_Setup(va, &sys->dx_sys, ctx);
     if (err != VLC_SUCCESS)
