@@ -66,7 +66,9 @@ typedef struct vlc_event_listener_t
 void vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj )
 {
     p_em->p_obj = p_obj;
-    vlc_mutex_init( &p_em->lock );
+    /* This is an unsafe work-around for a long-standing playlist bug.
+     * Do not rely on this. */
+    vlc_mutex_init_recursive( &p_em->lock );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_em->events); i++ )
        ARRAY_INIT( p_em->events[i].listeners );
