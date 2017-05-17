@@ -220,7 +220,9 @@ static int CheckDevice(vlc_va_t *va)
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
-    return directx_va_Get(va, &va->sys->dx_sys, pic, data);
+    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
+    pic->context = va_surface;
+    return va_surface ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static void Close(vlc_va_t *va, AVCodecContext *ctx)
@@ -250,6 +252,15 @@ static vlc_fourcc_t d3d9va_fourcc(enum PixelFormat swfmt)
         default:
             return VLC_CODEC_D3D9_OPAQUE;
     }
+}
+
+static void ReleasePic(void *opaque, uint8_t *data)
+{
+    (void)data;
+    picture_t *pic = opaque;
+    directx_va_Release(pic->context);
+    pic->context = NULL;
+    picture_Release(pic);
 }
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
@@ -316,7 +327,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->description = DxDescribe(sys);
     va->setup   = Setup;
     va->get     = Get;
-    va->release = directx_va_Release;
+    va->release = ReleasePic;
     va->extract = Extract;
     return VLC_SUCCESS;
 

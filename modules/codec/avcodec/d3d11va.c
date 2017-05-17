@@ -299,7 +299,9 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     if (p_sys == NULL)
     {
         assert(!va->sys->b_extern_pool);
-        return directx_va_Get(va, &va->sys->dx_sys, pic, data);
+        vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
+        pic->context = va_surface;
+        return va_surface ? VLC_SUCCESS : VLC_EGENERIC;
     }
 
     if (p_sys->decoder == NULL)
@@ -331,7 +333,9 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     *data = p_sys->decoder;
     return VLC_SUCCESS;
 #else
-    return directx_va_Get(va, &va->sys->dx_sys, pic, data);
+    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
+    pic->context = va_surface;
+    return va_surface ? VLC_SUCCESS : VLC_EGENERIC;
 #endif
 }
 
@@ -363,6 +367,14 @@ static vlc_fourcc_t d3d11va_fourcc(enum PixelFormat swfmt)
     }
 }
 
+static void ReleasePic(void *opaque, uint8_t *data)
+{
+    (void)data;
+    picture_t *pic = opaque;
+    directx_va_Release(pic->context);
+    pic->context = NULL;
+    picture_Release(pic);
+}
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
@@ -448,9 +460,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->setup   = Setup;
     va->get     = Get;
 #if D3D11_DIRECT_DECODE
-    va->release = sys->b_extern_pool ? NULL : directx_va_Release;
+    va->release = sys->b_extern_pool ? NULL : ReleasePic;
 #else
-    va->release = directx_va_Release;
+    va->release = ReleasePic;
 #endif
     va->extract = Extract;
 
