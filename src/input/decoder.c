@@ -135,6 +135,7 @@ struct decoder_owner_sys_t
     {
         bool b_supported;
         bool pb_present[4];
+        uint8_t i_reorder_depth;
         decoder_t *pp_decoder[4];
     } cc;
 
@@ -873,7 +874,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 #endif
 
 static void DecoderPlayCc( decoder_t *p_dec, block_t *p_cc,
-                             bool pb_present[4] )
+                           bool pb_present[4], const subs_format_t *p_fmt )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     bool b_processed = false;
@@ -886,6 +887,7 @@ static void DecoderPlayCc( decoder_t *p_dec, block_t *p_cc,
         if( p_owner->cc.pp_decoder[i] )
             i_cc_decoder++;
     }
+    p_owner->cc.i_reorder_depth = p_fmt->cc.i_reorder_depth;
 
     for( int i = 0; i < 4; i++ )
     {
@@ -919,7 +921,7 @@ static void PacketizerGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
     p_cc = p_dec_cc->pf_get_cc( p_dec_cc, pb_present );
     if( !p_cc )
         return;
-    DecoderPlayCc( p_dec, p_cc, pb_present );
+    DecoderPlayCc( p_dec, p_cc, pb_present, &p_dec_cc->fmt_out.subs );
 }
 
 static int DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
@@ -931,7 +933,7 @@ static int DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
     {
         if( p_owner->cc.b_supported &&
            ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
-            DecoderPlayCc( p_videodec, p_cc, p_cc_present );
+            DecoderPlayCc( p_videodec, p_cc, p_cc_present, &p_videodec->fmt_out.subs );
         else
             block_Release( p_cc );
     }
@@ -1742,6 +1744,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
         p_owner->cc.pb_present[i] = false;
         p_owner->cc.pp_decoder[i] = NULL;
     }
+    p_owner->cc.i_reorder_depth = 0;
     p_owner->i_ts_delay = 0;
     return p_dec;
 }
@@ -2115,6 +2118,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         es_format_t fmt;
 
         es_format_Init( &fmt, SPU_ES, fcc[i_channel] );
+        fmt.subs.cc.i_reorder_depth = p_owner->cc.i_reorder_depth;
         p_cc = input_DecoderNew( p_owner->p_input, &fmt,
                               p_dec->p_owner->p_clock, p_owner->p_sout );
         if( !p_cc )
