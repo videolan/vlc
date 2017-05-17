@@ -1045,7 +1045,7 @@ generic_init(video_format_t *fmt, opengl_tex_converter_t *tc, bool allow_dr)
 {
     const vlc_chroma_description_t *desc =
         vlc_fourcc_GetChromaDescription(fmt->i_chroma);
-    if (!desc || desc->plane_count == 0)
+    if (!desc)
         return 0;
 
     GLuint fragment_shader = 0;
