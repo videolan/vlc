@@ -143,20 +143,15 @@ static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
     return p_subitems;
 }
 
-/**************************************************************************
- * input_item_subitem_added (Private) (vlc event Callback)
- **************************************************************************/
-static void input_item_subitem_added( const vlc_event_t *p_event,
-                                       void * user_data )
+static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
+                                               input_item_t *item )
 {
-    libvlc_media_t * p_md = user_data;
     libvlc_media_t * p_md_child;
     libvlc_media_list_t *p_subitems;
     libvlc_event_t event;
 
-    p_md_child = libvlc_media_new_from_input_item(
-                p_md->p_libvlc_instance,
-                p_event->u.input_item_subitem_added.p_new_child );
+    p_md_child = libvlc_media_new_from_input_item( p_md->p_libvlc_instance,
+                                                   item );
 
     /* Add this to our media list */
     p_subitems = media_get_subitems( p_md, true );
@@ -173,7 +168,23 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
 
     /* Send the event */
     libvlc_event_send( &p_md->event_manager, &event );
-    libvlc_media_release( p_md_child );
+    return p_md_child;
+}
+
+static void input_item_add_subnode( libvlc_media_t *md,
+                                    input_item_node_t *node )
+{
+    for( int i = 0; i < node->i_children; i++ )
+    {
+        input_item_node_t *child = node->pp_children[i];
+        libvlc_media_t *md_child = input_item_add_subitem( md, child->p_item );
+
+        if( md_child != NULL )
+        {
+            input_item_add_subnode( md_child, child );
+            libvlc_media_release( md_child );
+        }
+    }
 }
 
 /**************************************************************************
@@ -182,9 +193,15 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
 static void input_item_subitemtree_added( const vlc_event_t * p_event,
                                           void * user_data )
 {
-    VLC_UNUSED( p_event );
     libvlc_media_t * p_md = user_data;
     libvlc_event_t event;
+    input_item_node_t *node = p_event->u.input_item_subitem_tree_added.p_root;
+
+    /* FIXME FIXME FIXME
+     * Recursive function calls seem much simpler for this. But playlists are
+     * untrusted and can be arbitrarily deep (e.g. with XSPF). So recursion can
+     * potentially lead to plain old stack overflow. */
+    input_item_add_subnode( p_md, node );
 
     /* Construct the event */
     event.type = libvlc_MediaSubItemTreeAdded;
@@ -310,10 +327,6 @@ static void input_item_preparse_ended( const vlc_event_t * p_event,
 static void install_input_item_observer( libvlc_media_t *p_md )
 {
     vlc_event_attach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemSubItemAdded,
-                      input_item_subitem_added,
-                      p_md );
-    vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemMetaChanged,
                       input_item_meta_changed,
                       p_md );
@@ -336,10 +349,6 @@ static void install_input_item_observer( libvlc_media_t *p_md )
  **************************************************************************/
 static void uninstall_input_item_observer( libvlc_media_t *p_md )
 {
-    vlc_event_detach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemSubItemAdded,
-                      input_item_subitem_added,
-                      p_md );
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemMetaChanged,
                       input_item_meta_changed,
