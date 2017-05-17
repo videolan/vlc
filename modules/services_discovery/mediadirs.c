@@ -97,7 +97,7 @@ vlc_module_end ()
 
 static void* Run( void* );
 
-static void input_item_subitem_added( const vlc_event_t*, void* );
+static void input_subnode_added( const vlc_event_t*, void* );
 static int onNewFileAdded( vlc_object_t*, char const *,
                            vlc_value_t, vlc_value_t, void *);
 
@@ -206,13 +206,13 @@ static void *Run( void *data )
 
 
         vlc_event_manager_t *p_em = &p_root->event_manager;
-        vlc_event_attach( p_em, vlc_InputItemSubItemAdded,
-                          input_item_subitem_added, p_sd );
+        vlc_event_attach( p_em, vlc_InputItemSubItemTreeAdded,
+                          input_subnode_added, p_sd );
 
         input_Read( p_sd, p_root );
 
-        vlc_event_detach( p_em, vlc_InputItemSubItemAdded,
-                          input_item_subitem_added, p_sd );
+        vlc_event_detach( p_em, vlc_InputItemSubItemTreeAdded,
+                          input_subnode_added, p_sd );
 
         input_item_Release( p_root );
         free( psz_uri );
@@ -242,19 +242,22 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Callbacks and helper functions
  *****************************************************************************/
-static void input_item_subitem_added( const vlc_event_t * p_event,
-                                      void * user_data )
+static void input_subnode_added( const vlc_event_t *p_event, void *user_data )
 {
     services_discovery_t *p_sd = user_data;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
+    input_item_node_t *root = p_event->u.input_item_subitem_tree_added.p_root;
 
-    /* retrieve new item */
-    input_item_t *p_item = p_event->u.input_item_subitem_added.p_new_child;
+    for( int i = 0; i < root->i_children; i++ )
+    {
+        input_item_node_t *child = root->pp_children[i];
+        input_item_t *item = child->p_item;
 
-    if( p_sys->i_type == Picture )
-        formatSnapshotItem( p_item );
+        if( p_sys->i_type == Picture )
+            formatSnapshotItem( item );
 
-    services_discovery_AddItem( p_sd, p_item );
+        services_discovery_AddItem( p_sd, item );
+    }
 }
 
 static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
