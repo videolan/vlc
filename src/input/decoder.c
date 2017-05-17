@@ -1429,6 +1429,17 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     if ( p_dec->pf_flush != NULL )
         p_dec->pf_flush( p_dec );
 
+    /* flush CC sub decoders */
+    if( p_owner->cc.b_supported )
+    {
+        for( int i=0; i<4; i++ )
+        {
+            decoder_t *p_subdec = p_owner->cc.pp_decoder[i];
+            if( p_subdec && p_subdec->pf_flush )
+                p_subdec->pf_flush( p_subdec );
+        }
+    }
+
 #ifdef ENABLE_SOUT
     if ( p_owner->p_sout_input != NULL )
     {
