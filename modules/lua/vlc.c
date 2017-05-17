@@ -220,13 +220,6 @@ int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list )
         if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
                               psz_datapath, luadirname ) != -1) )
             i++;
-
-#if defined(__APPLE__)
-        if( likely(asprintf( &ppsz_dir_list[i],
-                             "%s"DIR_SEP"share"DIR_SEP"lua"DIR_SEP"%s",
-                             psz_datapath, luadirname ) != -1) )
-            i++;
-#endif
         free( psz_datapath );
     }
 
