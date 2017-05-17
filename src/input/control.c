@@ -205,19 +205,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return i_ret;
         }
 
-        case INPUT_SET_NAME:
-        {
-            char *psz_name = (char *)va_arg( args, char * );
-
-            if( !psz_name ) return VLC_EGENERIC;
-
-            input_item_SetName( priv->p_item, psz_name );
-
-            if( !priv->b_preparsing )
-                input_SendEventMetaName( p_input, psz_name );
-            return VLC_SUCCESS;
-        }
-
         case INPUT_ADD_BOOKMARK:
             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
             p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );

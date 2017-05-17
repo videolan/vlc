@@ -115,10 +115,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             case INPUT_EVENT_SIGNAL:
                 break;
 
-            case INPUT_EVENT_ITEM_NAME:
-                [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-                break;
-
             case INPUT_EVENT_AUDIO_DELAY:
             case INPUT_EVENT_SUBTITLE_DELAY:
                 [inputManager performSelectorOnMainThread:@selector(updateDelays) withObject:nil waitUntilDone:NO];

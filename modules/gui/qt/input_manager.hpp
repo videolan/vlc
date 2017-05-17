@@ -59,7 +59,6 @@ public:
         StatisticsUpdate,
         InterfaceAoutUpdate, /* 10 */
         MetaChanged,
-        NameChanged,
         InfoChanged,
         SynchroChanged,
         CachingEvent,

@@ -250,9 +250,6 @@ void InputManager::customEvent( QEvent *event )
     case IMEvent::ItemStateChanged:
         UpdateStatus();
         break;
-    case IMEvent::NameChanged:
-        UpdateName();
-        break;
     case IMEvent::MetaChanged:
         UpdateMeta();
         UpdateName(); /* Needed for NowPlaying */
@@ -376,9 +373,6 @@ static int InputEvent( vlc_object_t *, const char *,
         break;
     case INPUT_EVENT_ITEM_INFO: /* Codec Info */
         event = new IMEvent( IMEvent::InfoChanged );
-        break;
-    case INPUT_EVENT_ITEM_NAME:
-        event = new IMEvent( IMEvent::NameChanged );
         break;
 
     case INPUT_EVENT_AUDIO_DELAY:

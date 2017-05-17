@@ -360,8 +360,6 @@ typedef enum input_event_type_e
     INPUT_EVENT_ITEM_META,
     /* input_item_t info has changed */
     INPUT_EVENT_ITEM_INFO,
-    /* input_item_t name has changed */
-    INPUT_EVENT_ITEM_NAME,
     /* input_item_t epg has changed */
     INPUT_EVENT_ITEM_EPG,
 
@@ -440,7 +438,6 @@ enum input_query_e
     INPUT_MERGE_INFOS,/* arg1= info_category_t *              res=cannot fail */
     INPUT_GET_INFO,   /* arg1= char* arg2= char* arg3= char** res=can fail */
     INPUT_DEL_INFO,   /* arg1= char* arg2= char*              res=can fail */
-    INPUT_SET_NAME,   /* arg1= char* res=can fail    */
 
     /* bookmarks */
     INPUT_GET_BOOKMARK,    /* arg1= seekpoint_t *               res=can fail */

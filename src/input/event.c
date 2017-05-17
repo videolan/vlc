@@ -189,9 +189,6 @@ void input_SendEventCache( input_thread_t *p_input, double f_level )
     Trigger( p_input, INPUT_EVENT_CACHE );
 }
 
-/* FIXME: review them because vlc_event_send might be
- * moved inside input_item* functions.
- */
 void input_SendEventMeta( input_thread_t *p_input )
 {
     Trigger( p_input, INPUT_EVENT_ITEM_META );
@@ -200,18 +197,6 @@ void input_SendEventMeta( input_thread_t *p_input )
 void input_SendEventMetaInfo( input_thread_t *p_input )
 {
     Trigger( p_input, INPUT_EVENT_ITEM_INFO );
-}
-
-void input_SendEventMetaName( input_thread_t *p_input, const char *psz_name )
-{
-    Trigger( p_input, INPUT_EVENT_ITEM_NAME );
-
-    /* FIXME remove this ugliness */
-    vlc_event_t event;
-
-    event.type = vlc_InputItemNameChanged;
-    event.u.input_item_name_changed.new_name = psz_name;
-    vlc_event_send( &input_priv(p_input)->p_item->event_manager, &event );
 }
 
 void input_SendEventMetaEpg( input_thread_t *p_input )
