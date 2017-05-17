@@ -526,6 +526,10 @@ struct subs_format_t
         int i_magazine;
         int i_page;
     } teletext;
+    struct
+    {
+        uint8_t i_reorder_depth; /* Reorder depth or transport video */
+    } cc;
 
     text_style_t *p_style; /* Default styles to use */
 };
