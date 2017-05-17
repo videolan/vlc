@@ -293,6 +293,12 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
 #if D3D11_DIRECT_DECODE
     picture_sys_t *p_sys = pic->p_sys;
+    if (p_sys == NULL)
+    {
+        assert(!va->sys->b_extern_pool);
+        return directx_va_Get(va, &va->sys->dx_sys, pic, data);
+    }
+
     if (p_sys->decoder == NULL)
     {
         HRESULT hr;
@@ -439,7 +445,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->setup   = Setup;
     va->get     = Get;
 #if D3D11_DIRECT_DECODE
-    va->release = NULL;
+    va->release = sys->b_extern_pool ? NULL : directx_va_Release;
 #else
     va->release = directx_va_Release;
 #endif
