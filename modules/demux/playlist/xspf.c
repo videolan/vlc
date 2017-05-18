@@ -39,8 +39,6 @@
 #include <vlc_url.h>
 #include "playlist.h"
 
-#define FREE_VALUE() do { free(psz_value);psz_value=NULL; } while(0)
-
 #define SIMPLE_INTERFACE  (input_item_t    *p_input,\
                            const char      *psz_name,\
                            char            *psz_value)
@@ -256,7 +254,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         /* complex content is parsed in a separate function */
         if (p_handler->cmplx)
         {
-            FREE_VALUE();
+            FREENULL(psz_value);
             if (!p_handler->pf_handler.cmplx(p_demux, p_input_node,
                         p_xml_reader, p_handler->name))
                 return false;
@@ -266,7 +264,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
 
     /* simple element content */
     case XML_READER_TEXT:
-        FREE_VALUE();
+        FREENULL(psz_value);
         psz_value = strdup(name);
         if (unlikely(!psz_value))
             goto end;
@@ -289,7 +287,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
 
         if (p_handler->pf_handler.smpl)
             p_handler->pf_handler.smpl(p_input_item, p_handler->name, psz_value);
-        FREE_VALUE();
+        FREENULL(psz_value);
         p_handler = NULL;
         break;
     }
@@ -402,7 +400,7 @@ static bool parse_track_node COMPLEX_INTERFACE
         /* complex content is parsed in a separate function */
         if (p_handler->cmplx)
         {
-            FREE_VALUE();
+            FREENULL(psz_value);
 
             if (!p_handler->pf_handler.cmplx(p_demux, p_new_node,
                                              p_xml_reader, p_handler->name)) {
@@ -506,7 +504,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                 p_handler->pf_handler.smpl(p_new_input, p_handler->name,
                                             psz_value);
         }
-        FREE_VALUE();
+        FREENULL(psz_value);
         p_handler = NULL;
         break;
     }
@@ -672,7 +670,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!*name)
                 {
                     msg_Err(p_demux, "invalid xml stream");
-                    FREE_VALUE();
+                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
@@ -681,7 +679,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!p_handler)
                 {
                     msg_Err(p_demux, "unexpected element <%s>", name);
-                    FREE_VALUE();
+                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
@@ -694,11 +692,11 @@ static bool parse_extension_node COMPLEX_INTERFACE
                                                      p_handler->name))
                     {
                         p_handler = NULL;
-                        FREE_VALUE();
+                        FREENULL(psz_value);
                     }
                     else
                     {
-                        FREE_VALUE();
+                        FREENULL(psz_value);
                         if (b_release_input_item)
                             input_item_Release(p_new_input);
                         return false;
@@ -708,11 +706,11 @@ static bool parse_extension_node COMPLEX_INTERFACE
 
             case XML_READER_TEXT:
                 /* simple element content */
-                FREE_VALUE();
+                FREENULL(psz_value);
                 psz_value = strdup(name);
                 if (unlikely(!psz_value))
                 {
-                    FREE_VALUE();
+                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
@@ -723,7 +721,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 /* leave if the current parent node is terminated */
                 if (!strcmp(name, psz_element))
                 {
-                    FREE_VALUE();
+                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return true;
                 }
@@ -733,7 +731,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err(p_demux, "there's no open element left for <%s>",
                              name);
-                    FREE_VALUE();
+                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
@@ -748,7 +746,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     p_handler->pf_handler.smpl(p_input_item, p_handler->name,
                                                 psz_value);
                 }
-                FREE_VALUE();
+                FREENULL(psz_value);
                 p_handler = NULL;
                 break;
         }
