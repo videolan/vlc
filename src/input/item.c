@@ -559,11 +559,21 @@ int input_item_AddOption( input_item_t *p_input, const char *psz_option,
         err = VLC_ENOMEM;
         goto out;
     }
+
     p_input->optflagv = flagv;
-    flagv[p_input->optflagc++] = flags;
+
+    char* psz_option_dup = strdup( psz_option );
+    if( unlikely( !psz_option_dup ) )
+    {
+        err = VLC_ENOMEM;
+        goto out;
+    }
 
     INSERT_ELEM( p_input->ppsz_options, p_input->i_options,
-                 p_input->i_options, strdup( psz_option ) );
+                 p_input->i_options, psz_option_dup );
+
+    flagv[p_input->optflagc++] = flags;
+
 out:
     vlc_mutex_unlock( &p_input->lock );
     return err;
