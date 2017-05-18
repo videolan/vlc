@@ -149,10 +149,13 @@ values2key( const char* const* ppsz_values, bool b_search )
         vlc_memstream_printf( &ms, "*" );
 
     /* Path section */
-    if ( ppsz_values[KEY_PATH] && ppsz_values[KEY_PATH][0] == '/')
-        vlc_memstream_printf( &ms, "%s", ppsz_values[KEY_PATH] );
-    else if ( ppsz_values[KEY_PATH] && ppsz_values[KEY_PATH][0] != '/' )
-        vlc_memstream_printf( &ms, "/%s", ppsz_values[KEY_PATH] );
+    if( ppsz_values[KEY_PATH] )
+    {
+        if( ppsz_values[KEY_PATH][0] != '/' )
+            vlc_memstream_putc( &ms, '/' );
+
+        vlc_memstream_puts( &ms, ppsz_values[KEY_PATH] );
+    }
     else if ( b_search )
         vlc_memstream_printf( &ms, "*" );
 
