@@ -301,10 +301,11 @@ static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
 
     if (xmp_marker == NULL || xmp_marker->data_length < 32)
         return;
-    char *psz_rdf = malloc(xmp_marker->data_length - 29);
+    char *psz_rdf = malloc(xmp_marker->data_length - 29 + 1);
     if (unlikely(psz_rdf == NULL))
         return;
     memcpy(psz_rdf, xmp_marker->data + 29, xmp_marker->data_length - 29);
+    psz_rdf[xmp_marker->data_length - 29] = '\0';
 
     /* Try to find the string "GSpherical:Spherical" because the v1
         spherical video spec says the tag must be there. */
