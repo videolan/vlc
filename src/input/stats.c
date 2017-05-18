@@ -141,14 +141,9 @@ void stats_CounterClean( counter_t *p_c )
 {
     if( p_c )
     {
-        int i = p_c->i_samples - 1 ;
-        while( i >= 0 )
-        {
-            counter_sample_t *p_s = p_c->pp_samples[i];
-            REMOVE_ELEM( p_c->pp_samples, p_c->i_samples, i );
-            free( p_s );
-            i--;
-        }
+        for( int i = 0; i < p_c->i_samples; i++ )
+            free( p_c->pp_samples[i] );
+        TAB_CLEAN(p_c->i_samples, p_c->pp_samples);
         free( p_c );
     }
 }
