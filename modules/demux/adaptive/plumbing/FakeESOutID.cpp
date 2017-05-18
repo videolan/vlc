@@ -27,13 +27,13 @@
 
 using namespace adaptive;
 
-FakeESOutID::FakeESOutID( FakeESOut *fakeesout_, const es_format_t *p_fmt )
+FakeESOutID::FakeESOutID( FakeESOut *fakeesout, const es_format_t *p_fmt )
+    : fakeesout( fakeesout )
+    , p_real_es_id( NULL )
+    , pending_delete( false )
 {
-    p_real_es_id = NULL;
-    fakeesout = fakeesout_;
     es_format_Init( &fmt, 0, 0 );
     es_format_Copy( &fmt, p_fmt );
-    pending_delete = false;
 }
 
 FakeESOutID::~FakeESOutID()
