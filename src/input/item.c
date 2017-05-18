@@ -1261,14 +1261,8 @@ static void RecursiveNodeDelete( input_item_node_t *p_node )
 void input_item_node_Delete( input_item_node_t *p_node )
 {
     if( p_node->p_parent )
-        for( int i = 0; i < p_node->p_parent->i_children; i++ )
-            if( p_node->p_parent->pp_children[i] == p_node )
-            {
-                REMOVE_ELEM( p_node->p_parent->pp_children,
-                        p_node->p_parent->i_children,
-                        i );
-                break;
-            }
+        TAB_REMOVE(p_node->p_parent->i_children, p_node->p_parent->pp_children,
+                   p_node);
 
     RecursiveNodeDelete( p_node );
 }

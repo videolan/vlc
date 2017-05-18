@@ -131,16 +131,7 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     /* Remove the item from its parent */
     playlist_item_t *p_parent = p_root->p_parent;
     if( p_parent != NULL )
-    {
-        for( int i = 0; i < p_parent->i_children ; i++ )
-        {
-            if( p_parent->pp_children[i] == p_root )
-            {
-                REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i );
-                assert( p_root->p_parent == p_parent );
-            }
-        }
-    }
+        TAB_REMOVE(p_parent->i_children, p_parent->pp_children, p_root);
 
     playlist_ItemRelease( p_playlist, p_root );
 }

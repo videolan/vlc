@@ -1564,16 +1564,8 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
         p_announce->p_item = NULL;
     }
 
-    for( i = 0; i< p_sd->p_sys->i_announces; i++)
-    {
-        if( p_sd->p_sys->pp_announces[i] == p_announce )
-        {
-            REMOVE_ELEM( p_sd->p_sys->pp_announces, p_sd->p_sys->i_announces,
-                         i);
-            break;
-        }
-    }
-
+    TAB_REMOVE(p_sd->p_sys->i_announces, p_sd->p_sys->pp_announces,
+               p_announce);
     free( p_announce );
 
     return VLC_SUCCESS;
