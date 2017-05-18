@@ -32,10 +32,14 @@
 using namespace adaptive;
 
 FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
+    : real_es_out( es )
+    , extrainfo( NULL )
+    , commandsqueue( queue )
+    , fakeesout( new es_out_t )
+    , timestamps_offset( 0 )
+    , timestamps_expected( 0 )
+    , timestamps_check_done( false )
 {
-    real_es_out = es;
-    fakeesout = new es_out_t;
-
     fakeesout->pf_add = esOutAdd_Callback;
     fakeesout->pf_control = esOutControl_Callback;
     fakeesout->pf_del = esOutDel_Callback;
@@ -43,12 +47,6 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     fakeesout->pf_send = esOutSend_Callback;
     fakeesout->p_sys = (es_out_sys_t*) this;
 
-    commandsqueue = queue;
-
-    timestamps_offset = 0;
-    timestamps_expected = 0;
-    timestamps_check_done = false;
-    extrainfo = NULL;
     vlc_mutex_init(&lock);
 }
 
