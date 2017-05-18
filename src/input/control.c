@@ -195,7 +195,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         }
 
         case INPUT_ADD_BOOKMARK:
-            p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
+            p_bkmk = va_arg( args, seekpoint_t * );
             p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );
 
             vlc_mutex_lock( &priv->p_item->lock );
@@ -206,22 +206,33 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                      p_bkmk->psz_name = NULL;
             }
 
-            TAB_APPEND( priv->i_bookmark, priv->pp_bookmark, p_bkmk );
+            if( p_bkmk->psz_name )
+                TAB_APPEND( priv->i_bookmark, priv->pp_bookmark, p_bkmk );
+            else
+            {
+                vlc_seekpoint_Delete( p_bkmk );
+                p_bkmk = NULL;
+            }
             vlc_mutex_unlock( &priv->p_item->lock );
 
             UpdateBookmarksOption( p_input );
 
-            return VLC_SUCCESS;
+            return p_bkmk ? VLC_SUCCESS : VLC_EGENERIC;
 
         case INPUT_CHANGE_BOOKMARK:
-            p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
-            i_bkmk = (int)va_arg( args, int );
+            p_bkmk = va_arg( args, seekpoint_t * );
+            i_bkmk = va_arg( args, int );
+
+            p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );
+
+            if( !p_bkmk )
+                return VLC_EGENERIC;
 
             vlc_mutex_lock( &priv->p_item->lock );
             if( i_bkmk < priv->i_bookmark )
             {
                 vlc_seekpoint_Delete( priv->pp_bookmark[i_bkmk] );
-                priv->pp_bookmark[i_bkmk] = vlc_seekpoint_Duplicate( p_bkmk );
+                priv->pp_bookmark[i_bkmk] = p_bkmk;
             }
             vlc_mutex_unlock( &priv->p_item->lock );
 
