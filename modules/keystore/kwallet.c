@@ -693,11 +693,9 @@ kwallet_has_folder( vlc_keystore* p_keystore, const char* psz_folder_name, bool 
 
     /* argument init */
     dbus_message_iter_init_append( msg, &args );
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder_name ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
+    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder_name ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
         goto end;
 
     /* sending message */
@@ -754,11 +752,9 @@ kwallet_create_folder( vlc_keystore* p_keystore, const char* psz_folder_name )
 
     /* argument init */
     dbus_message_iter_init_append( msg, &args );
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder_name ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
+    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder_name ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
         goto end;
 
     /* sending message */
@@ -821,11 +817,9 @@ kwallet_open( vlc_keystore* p_keystore )
 
     /* Init args */
     dbus_message_iter_init_append(msg, &args);
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_wallet ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT64, &ull_win_id ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
+    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_wallet ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT64, &ull_win_id ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
         goto end;
 
     /* sending message */
@@ -892,13 +886,10 @@ kwallet_has_entry( vlc_keystore* p_keystore, char* psz_entry_name, bool *b_has_e
 
     /* argument init */
     dbus_message_iter_init_append( msg, &args );
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
+    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
         goto end;
 
     /* sending message */
@@ -952,15 +943,11 @@ kwallet_write_password( vlc_keystore* p_keystore, char* psz_entry_name, const ch
 
     /* argument init */
     dbus_message_iter_init_append( msg, &args );
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_secret ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
+    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_secret ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
         goto end;
 
     /* sending message */
@@ -1025,13 +1012,10 @@ kwallet_remove_entry( vlc_keystore* p_keystore, char* psz_entry_name )
 
     /* argument init */
     dbus_message_iter_init_append( msg, &args );
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) )
-        goto end;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
+    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
         goto end;
 
     /* sending message */
@@ -1091,13 +1075,10 @@ kwallet_read_password_list( vlc_keystore* p_keystore, char* psz_entry_name,
 
     /* argument init */
     dbus_message_iter_init_append( msg, &args );
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) )
-        goto error;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) )
-        goto error;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) )
-        goto error;
-    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
+    if ( !dbus_message_iter_append_basic( &args, DBUS_TYPE_INT32, &p_sys->i_handle ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_folder ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_entry_name ) ||
+         !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_sys->psz_app_id ) )
         goto error;
 
     /* sending message */
