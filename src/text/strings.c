@@ -47,6 +47,7 @@
 
 #include <vlc_strings.h>
 #include <vlc_charset.h>
+#include <vlc_arrays.h>
 #include <libvlc.h>
 #include <errno.h>
 
@@ -254,7 +255,7 @@ void vlc_xml_decode( char *psz_value )
                 const struct xml_entity_s *ent;
 
                 ent = bsearch (psz_value + 1, xml_entities,
-                               sizeof (xml_entities) / sizeof (*ent),
+                               ARRAY_SIZE (xml_entities),
                                sizeof (*ent), cmp_entity);
                 if (ent != NULL)
                 {
