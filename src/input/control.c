@@ -586,8 +586,8 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
 
         /* Append bookmark to option-buffer */
         /* TODO: escape inappropriate values */
-        vlc_memstream_printf( &vstr, "%s{name=%s,time=%" PRId64 "}",
-            i > 0 ? "," : "", sp->psz_name, sp->i_time_offset / CLOCK_FREQ );
+        vlc_memstream_printf( &vstr, "%s{name=%s,time=%.3f}",
+            i > 0 ? "," : "", sp->psz_name, ( 1. * sp->i_time_offset ) / CLOCK_FREQ );
     }
 
     vlc_mutex_unlock( &priv->p_item->lock );
