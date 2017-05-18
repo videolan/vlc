@@ -129,7 +129,7 @@ struct decoder_t
      * return CC for the pictures returned by the last pf_packetize call only,
      * pb_present will be used to known which cc channel are present (but
      * globaly, not necessary for the current packet. Video decoders should use
-     * the decoder_QueueVideoWithCc() function to pass closed captions. */
+     * the decoder_QueueCc() function to pass closed captions. */
     block_t *           ( * pf_get_cc )      ( decoder_t *, bool pb_present[4] );
 
     /* Meta data at codec level
