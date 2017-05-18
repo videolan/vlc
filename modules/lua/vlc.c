@@ -548,8 +548,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             if( temp )
                 *temp = '\0';
 
-            if( vlc_dictionary_value_for_key( &name_d, *ppsz_file ) ==
-                    kVLCDictionaryNotFound )
+            if( !vlc_dictionary_has_key( &name_d, *ppsz_file ) )
                 vlc_dictionary_insert( &name_d, *ppsz_file, &name_d );
             free( *ppsz_file );
         }
