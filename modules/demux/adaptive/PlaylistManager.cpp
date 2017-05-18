@@ -163,7 +163,7 @@ bool PlaylistManager::start()
     updateControlsPosition();
 
     b_thread = !vlc_clone(&thread, managerThread,
-                          reinterpret_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT);
+                          static_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT);
     if(!b_thread)
         return false;
 
@@ -674,7 +674,7 @@ void PlaylistManager::Run()
 
 void * PlaylistManager::managerThread(void *opaque)
 {
-    (reinterpret_cast<PlaylistManager *>(opaque))->Run();
+    static_cast<PlaylistManager *>(opaque)->Run();
     return NULL;
 }
 
