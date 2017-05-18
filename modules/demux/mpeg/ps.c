@@ -138,7 +138,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
     if( i_peek < 16 )
     {
-        msg_Err( p_demux, "cannot peek" );
+        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
 

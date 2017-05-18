@@ -208,7 +208,7 @@ static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_o
         int i_peek = i_offset + TS_PACKET_SIZE_MAX * 3 + i_sync + 1;
         if( ( vlc_stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
         {
-            msg_Err( p_demux, "cannot peek" );
+            msg_Dbg( p_demux, "cannot peek" );
             return -1;
         }
         if( p_peek[i_offset + i_sync + 1 * TS_PACKET_SIZE_188] == 0x47 &&

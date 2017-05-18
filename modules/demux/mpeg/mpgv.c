@@ -93,7 +93,7 @@ static int Open( vlc_object_t * p_this )
 
     if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Err( p_demux, "cannot peek" );
+        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
 

@@ -1062,7 +1062,7 @@ static int AacProbe( demux_t *p_demux, int64_t *pi_offset )
     /* peek the begining (10 is for adts header) */
     if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
     {
-        msg_Err( p_demux, "cannot peek" );
+        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
     if( !strncmp( (char *)p_peek, "ADIF", 4 ) )
