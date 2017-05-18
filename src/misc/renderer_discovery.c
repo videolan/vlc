@@ -257,6 +257,8 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name,
     if (p_rd->p_module == NULL)
     {
         msg_Err(p_rd, "no suitable renderer discovery module");
+        free(p_rd->psz_name);
+        config_ChainDestroy(p_rd->p_cfg);
         vlc_object_release(p_rd);
         p_rd = NULL;
     }
