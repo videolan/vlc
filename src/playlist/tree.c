@@ -116,9 +116,6 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     /* Check if it is the current item */
     if( get_current_status_item( p_playlist ) == p_root )
     {
-        /* Stop */
-        playlist_Control( p_playlist, PLAYLIST_STOP, pl_Locked );
-        msg_Info( p_playlist, "stopping playback" );
         /* This item can't be the next one to be played ! */
         set_current_status_item( p_playlist, NULL );
     }
