@@ -32,12 +32,11 @@
 using namespace adaptive;
 
 ChunksSourceStream::ChunksSourceStream(vlc_object_t *p_obj_, ChunksSource *source_)
-{
-    p_block = NULL;
-    b_eof = false;
-    p_obj = p_obj_;
-    source = source_;
-}
+    : p_block( NULL )
+    , b_eof( false )
+    , p_obj( p_obj_ )
+    , source( source_ )
+{ }
 
 ChunksSourceStream::~ChunksSourceStream()
 {
