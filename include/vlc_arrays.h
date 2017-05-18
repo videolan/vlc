@@ -113,12 +113,6 @@ static inline void *realloc_down( void *ptr, size_t size )
 #define TAB_INSERT( count, tab, p, index )      \
     TAB_INSERT_CAST( , count, tab, p, index )
 
-#define INSERT_ELEM( p_ar, i_oldsize, i_pos, elem ) \
-    TAB_INSERT( i_oldsize, p_ar, elem, i_pos )
-
-#define REMOVE_ELEM( p_ar, i_size, i_pos )  \
-    TAB_ERASE( i_size, p_ar, i_pos )
-
 /**
  * Binary search in a sorted array. The key must be comparable by < and >
  * \param entries array of entries
