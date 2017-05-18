@@ -50,8 +50,11 @@ bool Downloader::start()
 
 Downloader::~Downloader()
 {
+    vlc_mutex_lock( &lock );
     killed = true;
     vlc_cond_signal(&waitcond);
+    vlc_mutex_unlock( &lock );
+
     if(thread_handle_valid)
         vlc_join(thread_handle, NULL);
     vlc_mutex_destroy(&lock);
