@@ -110,13 +110,9 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     PL_LOCK;
 
-    if( pl_priv(p_playlist)->p_input == NULL )
-    {
-        PL_UNLOCK;
-        return VLC_SUCCESS;
-    }
+    if( pl_priv(p_playlist)->p_input )
+        var_SetFloat( pl_priv( p_playlist )->p_input, "rate", newval.f_float );
 
-    var_SetFloat( pl_priv( p_playlist )->p_input, "rate", newval.f_float );
     PL_UNLOCK;
     return VLC_SUCCESS;
 }
