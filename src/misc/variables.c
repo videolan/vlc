@@ -503,10 +503,11 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
         {
             int i = p_var->choices.i_count;
 
-            INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
-                         i, *p_val );
-            INSERT_ELEM( p_var->choices_text.p_values,
-                         p_var->choices_text.i_count, i, *p_val );
+            TAB_APPEND(p_var->choices.i_count,
+                       p_var->choices.p_values, *p_val);
+            assert(i == p_var->choices_text.i_count);
+            TAB_APPEND(p_var->choices_text.i_count,
+                       p_var->choices_text.p_values, *p_val);
             p_var->ops->pf_dup( &p_var->choices.p_values[i] );
             p_var->choices_text.p_values[i].psz_string =
                 ( p_val2 && p_val2->psz_string ) ?
@@ -850,10 +851,7 @@ static void AddCallback( vlc_object_t *p_this, const char *psz_name,
         p_table = &p_var->value_callbacks;
     else
         p_table = &p_var->list_callbacks;
-    INSERT_ELEM( p_table->p_entries,
-                 p_table->i_entries,
-                 p_table->i_entries,
-                 entry);
+    TAB_APPEND(p_table->i_entries, p_table->p_entries, entry);
 
     vlc_mutex_unlock( &p_priv->var_lock );
 }

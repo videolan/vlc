@@ -77,9 +77,8 @@ static inline void info_category_ReplaceInfo(info_category_t *cat,
     if (old) {
         info_Delete(cat->pp_infos[index]);
         cat->pp_infos[index] = info;
-    } else {
-        INSERT_ELEM(cat->pp_infos, cat->i_infos, cat->i_infos, info);
-    }
+    } else
+        TAB_APPEND(cat->i_infos, cat->pp_infos, info);
 }
 
 static inline info_t *info_category_VaAddInfo(info_category_t *cat,
@@ -91,7 +90,7 @@ static inline info_t *info_category_VaAddInfo(info_category_t *cat,
         info = info_New(name, NULL);
         if (!info)
             return NULL;
-        INSERT_ELEM(cat->pp_infos, cat->i_infos, cat->i_infos, info);
+        TAB_APPEND(cat->i_infos, cat->pp_infos, info);
     } else
         free(info->psz_value);
     if (vasprintf(&info->psz_value, format, args) == -1)

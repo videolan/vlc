@@ -1471,8 +1471,7 @@ static int InitSocket( services_discovery_t *p_sd, const char *psz_address,
         return VLC_EGENERIC;
 
     shutdown( i_fd, SHUT_WR );
-    INSERT_ELEM (p_sd->p_sys->pi_fd, p_sd->p_sys->i_fd,
-                 p_sd->p_sys->i_fd, i_fd);
+    TAB_APPEND(p_sd->p_sys->i_fd, p_sd->p_sys->pi_fd, i_fd);
     return VLC_SUCCESS;
 }
 

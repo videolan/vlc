@@ -202,8 +202,7 @@ void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
 
             p_new->value = 0;
 
-            INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
-                         p_counter->i_samples, p_new );
+            TAB_APPEND(p_counter->i_samples, p_counter->pp_samples, p_new);
         }
         if( p_counter->i_samples == 1 )
         {

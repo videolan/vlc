@@ -463,7 +463,7 @@ int RtspTrackAttach( rtsp_stream_t *rtsp, const char *name,
         vlc_rand_bytes (&track.seq_init, sizeof (track.seq_init));
         vlc_rand_bytes (&track.ssrc, sizeof (track.ssrc));
 
-        INSERT_ELEM(session->trackv, session->trackc, session->trackc, track);
+        TAB_APPEND(session->trackc, session->trackv, track);
         tr = session->trackv + session->trackc - 1;
     }
 
@@ -879,8 +879,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         else
                             ssrc = id->ssrc;
 
-                        INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc,
-                                     track );
+                        TAB_APPEND(ses->trackc, ses->trackv, track);
                     }
                     else if (tr->setup_fd == -1)
                     {

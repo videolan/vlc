@@ -569,8 +569,7 @@ int input_item_AddOption( input_item_t *p_input, const char *psz_option,
         goto out;
     }
 
-    INSERT_ELEM( p_input->ppsz_options, p_input->i_options,
-                 p_input->i_options, psz_option_dup );
+    TAB_APPEND(p_input->i_options, p_input->ppsz_options, psz_option_dup);
 
     flagv[p_input->optflagc++] = flags;
 
@@ -685,7 +684,7 @@ int input_item_AddSlave(input_item_t *p_item, input_item_slave_t *p_slave)
 
     vlc_mutex_lock( &p_item->lock );
 
-    INSERT_ELEM( p_item->pp_slaves, p_item->i_slaves, p_item->i_slaves, p_slave );
+    TAB_APPEND(p_item->i_slaves, p_item->pp_slaves, p_slave);
 
     vlc_mutex_unlock( &p_item->lock );
     return VLC_SUCCESS;
@@ -753,8 +752,7 @@ static int InputItemVaAddInfo( input_item_t *p_i,
         p_cat = info_category_New( psz_cat );
         if( !p_cat )
             return VLC_ENOMEM;
-        INSERT_ELEM( p_i->pp_categories, p_i->i_categories, p_i->i_categories,
-                     p_cat );
+        TAB_APPEND(p_i->i_categories, p_i->pp_categories, p_cat);
     }
     info_t *p_info = info_category_VaAddInfo( p_cat, psz_name, psz_format, args );
     if( !p_info || !p_info->psz_value )
@@ -832,10 +830,7 @@ void input_item_ReplaceInfos( input_item_t *p_item, info_category_t *p_cat )
         p_item->pp_categories[i_cat] = p_cat;
     }
     else
-    {
-        INSERT_ELEM( p_item->pp_categories, p_item->i_categories, p_item->i_categories,
-                     p_cat );
-    }
+        TAB_APPEND(p_item->i_categories, p_item->pp_categories, p_cat);
     vlc_mutex_unlock( &p_item->lock );
 
     vlc_event_send( &p_item->event_manager,
@@ -854,10 +849,7 @@ void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
         info_category_Delete( p_cat );
     }
     else
-    {
-        INSERT_ELEM( p_item->pp_categories, p_item->i_categories, p_item->i_categories,
-                     p_cat );
-    }
+        TAB_APPEND(p_item->i_categories, p_item->pp_categories, p_cat);
     vlc_mutex_unlock( &p_item->lock );
 
     vlc_event_send( &p_item->event_manager,
@@ -1304,10 +1296,7 @@ input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_
 void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t *p_child )
 {
     assert( p_parent && p_child && p_child->p_parent == NULL );
-    INSERT_ELEM( p_parent->pp_children,
-                 p_parent->i_children,
-                 p_parent->i_children,
-                 p_child );
+    TAB_APPEND(p_parent->i_children, p_parent->pp_children, p_child);
     p_child->p_parent = p_parent;
 }
 

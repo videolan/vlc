@@ -1032,7 +1032,7 @@ static void GetVarSlaves( input_thread_t *p_input,
 
         if( unlikely( p_slave == NULL ) )
             break;
-        INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_slave );
+        TAB_APPEND(i_slaves, pp_slaves, p_slave);
     }
     free( psz_org );
 
@@ -1063,7 +1063,7 @@ static void LoadSlaves( input_thread_t *p_input )
             free( psz_uri );
             if( p_slave )
             {
-                INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_slave );
+                TAB_APPEND(i_slaves, pp_slaves, p_slave);
                 psz_subtitle = p_slave->psz_uri;
             }
         }
@@ -1105,7 +1105,7 @@ static void LoadSlaves( input_thread_t *p_input )
     {
         input_item_slave_t *p_slave = p_item->pp_slaves[i];
         if( !SlaveExists( pp_slaves, i_slaves, p_slave->psz_uri ) )
-            INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_slave );
+            TAB_APPEND(i_slaves, pp_slaves, p_slave);
         else
             input_item_slave_Delete( p_slave );
     }
@@ -1238,7 +1238,7 @@ static void InitPrograms( input_thread_t * p_input )
                  prgm = strtok_r( NULL, ",", &buf ) )
             {
                 vlc_value_t val = { .i_int = atoi( prgm ) };
-                INSERT_ELEM( list.p_values, list.i_count, list.i_count, val );
+                TAB_APPEND(list.i_count, list.p_values, val);
             }
 
             if( list.i_count > 0 )

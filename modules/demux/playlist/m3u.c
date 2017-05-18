@@ -228,8 +228,7 @@ static int Demux( demux_t *p_demux )
 
                 psz_option = pf_dup( psz_parse );
                 if( psz_option )
-                    INSERT_ELEM( ppsz_options, i_options, i_options,
-                                 psz_option );
+                    TAB_APPEND( i_options, ppsz_options, psz_option );
             }
             /* Special case for jamendo which provide the albumart */
             else if( !strncasecmp( psz_parse, "EXTALBUMARTURL:",

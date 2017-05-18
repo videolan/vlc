@@ -294,7 +294,7 @@ static int Demux( demux_t *p_demux )
                         if( i_start )
                         {
                             if( asprintf( &temp, ":start-time=%d", i_start ) != -1 )
-                                INSERT_ELEM( ppsz_options, i_options, i_options, temp );
+                                TAB_APPEND( i_options, ppsz_options, temp );
                         }
                     }
                     else if( !strcmp( psz_param, "end" ) )
@@ -304,7 +304,7 @@ static int Demux( demux_t *p_demux )
                         if( i_stop )
                         {
                             if( asprintf( &temp, ":stop-time=%d", i_stop ) != -1 )
-                                INSERT_ELEM( ppsz_options, i_options, i_options, temp );
+                                TAB_APPEND( i_options, ppsz_options, temp );
                         }
                     }
                     else if( !strcmp( psz_param, "title" ) )
@@ -320,7 +320,7 @@ static int Demux( demux_t *p_demux )
                     }
                     else
                     {   /* TODO: insert option anyway? Currently ignores*/
-                        /* INSERT_ELEM( ppsz_options, i_options, i_options, psz_option ); */
+                        //TAB_APPEND( i_options, ppsz_options, psz_option );
                     }
                 }
             }

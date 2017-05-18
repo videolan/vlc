@@ -319,24 +319,23 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
                 break;
         if( i == p_sys->i_urls )
         {
-            INSERT_ELEM( ppsz_new_urls, i_new_urls, i_new_urls,
-                         strdup( psz_urls ) );
+            TAB_APPEND( i_new_urls, ppsz_new_urls, strdup( psz_urls ) );
 
             input_item_t *p_input;
             p_input = input_item_New( psz_urls, psz_urls );
             input_item_AddOption( p_input, "demux=podcast", VLC_INPUT_OPTION_TRUSTED );
 
-            INSERT_ELEM( pp_new_items, i_new_items, i_new_items, p_input );
+            TAB_APPEND( i_new_items, pp_new_items, p_input );
             services_discovery_AddItem( p_sd, p_input );
 
-            INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
+            TAB_APPEND( p_sys->i_input, p_sys->pp_input,
                          input_CreateAndStart( p_sd, p_input, NULL ) );
         }
         else
         {
-            INSERT_ELEM( ppsz_new_urls, i_new_urls, i_new_urls,
+            TAB_APPEND( i_new_urls, ppsz_new_urls,
                          strdup( p_sys->ppsz_urls[i]) );
-            INSERT_ELEM( pp_new_items, i_new_items, i_new_items, p_sys->pp_items[i] );
+            TAB_APPEND( i_new_items, pp_new_items, p_sys->pp_items[i] );
         }
         if( psz_tok )
             psz_urls = psz_tok+1;
@@ -394,18 +393,18 @@ static void ParseRequest( services_discovery_t *p_sd )
               break;
         if( i == p_sys->i_urls )
         {
-            INSERT_ELEM( p_sys->ppsz_urls, p_sys->i_urls, p_sys->i_urls,
-              strdup( psz_request ) );
+            TAB_APPEND( p_sys->i_urls, p_sys->ppsz_urls,
+                        strdup( psz_request ) );
 
             input_item_t *p_input;
             p_input = input_item_New( psz_request, psz_request );
             input_item_AddOption( p_input, "demux=podcast", VLC_INPUT_OPTION_TRUSTED );
 
-            INSERT_ELEM( p_sys->pp_items, p_sys->i_items, p_sys->i_items, p_input );
+            TAB_APPEND( p_sys->i_items, p_sys->pp_items, p_input );
             services_discovery_AddItem( p_sd, p_input );
 
-            INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
-                         input_CreateAndStart( p_sd, p_input, NULL ) );
+            TAB_APPEND( p_sys->i_input, p_sys->pp_input,
+                        input_CreateAndStart( p_sd, p_input, NULL ) );
             SaveUrls( p_sd );
         }
     }

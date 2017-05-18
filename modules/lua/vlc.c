@@ -432,8 +432,7 @@ void vlclua_read_options( vlc_object_t *p_this, lua_State *L,
             {
                 char *psz_option = strdup( lua_tostring( L, -1 ) );
                 msg_Dbg( p_this, "Option: %s", psz_option );
-                INSERT_ELEM( *pppsz_options, *pi_options, *pi_options,
-                             psz_option );
+                TAB_APPEND( *pi_options, *pppsz_options, psz_option );
             }
             else
             {

@@ -352,7 +352,7 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
                     if( p_sub )
                     {
                         p_sub->b_forced = true;
-                        INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_sub );
+                        TAB_APPEND(i_slaves, pp_slaves, p_sub);
                     }
                     free( psz_uri );
                 }

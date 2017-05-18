@@ -687,8 +687,7 @@ int access_fsdir_additem(struct access_fsdir *p_fsdir,
             return VLC_ENOMEM;
         }
 
-        INSERT_ELEM(p_fsdir->pp_slaves, p_fsdir->i_slaves,
-                    p_fsdir->i_slaves, p_fsdir_slave);
+        TAB_APPEND(p_fsdir->i_slaves, p_fsdir->pp_slaves, p_fsdir_slave);
     }
 
     if (fsdir_is_ignored(p_fsdir, psz_filename))

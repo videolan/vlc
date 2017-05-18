@@ -295,8 +295,7 @@ static void ReadDir(intf_thread_t *intf)
 
         dir_entry->file = IsFile(sys->current_dir, entry);
         dir_entry->path = xstrdup(entry);
-        INSERT_ELEM(sys->dir_entries, sys->n_dir_entries,
-             sys->n_dir_entries, dir_entry);
+        TAB_APPEND(sys->n_dir_entries, sys->dir_entries, dir_entry);
         continue;
     }
 
@@ -375,8 +374,7 @@ static bool PlaylistAddChild(intf_sys_t *sys, playlist_item_t *p_child,
     free(name);
     p_pl_item->item = input_item_Hold(p_child->p_input);
 
-    INSERT_ELEM(sys->plist, sys->plist_entries,
-                 sys->plist_entries, p_pl_item);
+    TAB_APPEND(sys->plist_entries, sys->plist, p_pl_item);
 
     return true;
 
