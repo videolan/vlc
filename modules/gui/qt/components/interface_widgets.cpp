@@ -265,7 +265,7 @@ bool VideoWidget::nativeEvent( const QByteArray& eventType, void* message, long*
 #if defined(QT5_HAS_XCB)
     if ( eventType == "xcb_generic_event_t" )
     {
-        const xcb_generic_event_t* xev = reinterpret_cast<const xcb_generic_event_t*>( message );
+        const xcb_generic_event_t* xev = static_cast<const xcb_generic_event_t*>( message );
 
         if ( xev->response_type == XCB_CONFIGURE_NOTIFY )
             reportSize();
