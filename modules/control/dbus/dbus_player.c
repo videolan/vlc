@@ -782,7 +782,6 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
     DBusMessageIter changed_properties, invalidated_properties;
     const char *psz_interface_name = DBUS_MPRIS_PLAYER_INTERFACE;
     char **ppsz_properties = NULL;
-    int i_properties = 0;
 
     SIGNAL_INIT( DBUS_INTERFACE_PROPERTIES,
                  DBUS_MPRIS_OBJECT_PATH,
@@ -795,7 +794,6 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
                                            &changed_properties ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    i_properties = vlc_dictionary_keys_count( p_changed_properties );
     ppsz_properties = vlc_dictionary_all_keys( p_changed_properties );
 
     if( unlikely(!ppsz_properties) )
@@ -804,7 +802,7 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
     }
 
-    for( int i = 0; i < i_properties; i++ )
+    for( int i = 0; ppsz_properties[i]; i++ )
     {
         PROPERTY_MAPPING_BEGIN
         PROPERTY_ENTRY( Metadata,       "a{sv}" )
