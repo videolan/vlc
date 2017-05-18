@@ -34,6 +34,7 @@
 #include <vlc_demux.h>
 
 #include <vlc_xml.h>
+#include <vlc_arrays.h>
 #include <vlc_strings.h>
 #include <vlc_url.h>
 #include "playlist.h"
@@ -167,12 +168,12 @@ end:
 
 static const xml_elem_hnd_t *get_handler(const xml_elem_hnd_t *tab, size_t n, const char *name)
 {
-    for (size_t i = 0; i < n / sizeof(xml_elem_hnd_t); i++)
+    for (size_t i = 0; i < n; i++)
         if (!strcmp(name, tab[i].name))
             return &tab[i];
     return NULL;
 }
-#define get_handler(tab, name) get_handler(tab, sizeof tab, name)
+#define get_handler(tab, name) get_handler(tab, ARRAY_SIZE(tab), name)
 
 /**
  * \brief parse the root node of a XSPF playlist
