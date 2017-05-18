@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_memstream.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -564,62 +565,38 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
 static void UpdateBookmarksOption( input_thread_t *p_input )
 {
-    input_thread_private_t *priv =input_priv(p_input);
+    input_thread_private_t *priv = input_priv(p_input);
+    struct vlc_memstream vstr;
+
+    vlc_memstream_open( &vstr );
+    vlc_memstream_puts( &vstr, "bookmarks=" );
 
     vlc_mutex_lock( &priv->p_item->lock );
-
-    /* Update the "bookmark" list */
     var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
+
     for( int i = 0; i < priv->i_bookmark; i++ )
     {
-        vlc_value_t val, text;
+        seekpoint_t const* sp = priv->pp_bookmark[i];
 
-        val.i_int = i;
-        text.psz_string = priv->pp_bookmark[i]->psz_name;
+        /* Add bookmark to choice-list */
         var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
-                    &val, &text );
+                    &(vlc_value_t){ .i_int = i },
+                    &(vlc_value_t){ .psz_string = sp->psz_name } );
+
+        /* Append bookmark to option-buffer */
+        /* TODO: escape inappropriate values */
+        vlc_memstream_printf( &vstr, "%s{name=%s,time=%" PRId64 "}",
+            i > 0 ? "," : "", sp->psz_name, sp->i_time_offset / CLOCK_FREQ );
     }
 
-    /* Create the "bookmarks" option value */
-    const char *psz_format = "{name=%s,time=%"PRId64"}";
-    int i_len = strlen( "bookmarks=" );
-    for( int i = 0; i < priv->i_bookmark; i++ )
-    {
-        const seekpoint_t *p_bookmark = priv->pp_bookmark[i];
-
-        i_len += snprintf( NULL, 0, psz_format,
-                           p_bookmark->psz_name,
-                           p_bookmark->i_time_offset/1000000 );
-    }
-
-    char *psz_value = malloc( i_len + priv->i_bookmark + 1 );
-
-    if( psz_value != NULL )
-    {
-        strcpy( psz_value, "bookmarks=" );
-
-        char *psz_next = psz_value + strlen( "bookmarks=" );
-
-        for( int i = 0; i < priv->i_bookmark && psz_value != NULL; i++ )
-        {
-            const seekpoint_t *p_bookmark = priv->pp_bookmark[i];
-
-            psz_next += sprintf( psz_next, psz_format,
-                                 p_bookmark->psz_name,
-                                 p_bookmark->i_time_offset/1000000 );
-
-            if( i < priv->i_bookmark - 1)
-                *psz_next++ = ',';
-        }
-    }
     vlc_mutex_unlock( &priv->p_item->lock );
 
-    if( psz_value != NULL )
+    if( vlc_memstream_close( &vstr ) == VLC_SUCCESS )
     {
-        input_item_AddOption( priv->p_item, psz_value,
-                              VLC_INPUT_OPTION_UNIQUE );
-        free( psz_value );
+        input_item_AddOption( priv->p_item, vstr.ptr, VLC_INPUT_OPTION_UNIQUE );
+        free( vstr.ptr );
     }
+
     input_SendEventBookmark( p_input );
 }
 
