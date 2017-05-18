@@ -1529,7 +1529,7 @@ void rtp_del_sink( sout_stream_id_sys_t *id, int fd )
         if (id->sinkv[i].rtp_fd == fd)
         {
             sink = id->sinkv[i];
-            REMOVE_ELEM( id->sinkv, id->sinkc, i );
+            TAB_ERASE(id->sinkc, id->sinkv, i);
             break;
         }
     }

@@ -810,7 +810,7 @@ int input_item_DelInfo( input_item_t *p_i,
     {
         /* Remove the complete categorie */
         info_category_Delete( p_cat );
-        REMOVE_ELEM( p_i->pp_categories, p_i->i_categories, i_cat );
+        TAB_ERASE(p_i->i_categories, p_i->pp_categories, i_cat);
     }
     vlc_mutex_unlock( &p_i->lock );
 

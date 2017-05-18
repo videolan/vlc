@@ -248,7 +248,7 @@ noreturn static void *Run( void *data )
                 input_Close( p_input );
 
                 p_sd->p_sys->pp_input[i] = NULL;
-                REMOVE_ELEM( p_sys->pp_input, p_sys->i_input, i );
+                TAB_ERASE(p_sys->i_input, p_sys->pp_input, i);
                 i--;
             }
         }
@@ -411,16 +411,15 @@ static void ParseRequest( services_discovery_t *p_sd )
     else if ( !strcmp( psz_request, "RM" ) )
     {
         psz_request = psz_tok + 1;
-        for( i = 0; i<p_sys->i_urls; i++ )
-          if( !strcmp(p_sys->ppsz_urls[i],psz_request) )
-            break;
-        if( i != p_sys->i_urls )
-        {
-            services_discovery_RemoveItem( p_sd, p_sys->pp_items[i] );
-            input_item_Release( p_sys->pp_items[i] );
-            REMOVE_ELEM( p_sys->ppsz_urls, p_sys->i_urls, i );
-            REMOVE_ELEM( p_sys->pp_items, p_sys->i_items, i );
-        }
+        for( i = 0; i < p_sys->i_urls; i++ )
+            if( !strcmp(p_sys->ppsz_urls[i], psz_request) )
+            {
+                services_discovery_RemoveItem( p_sd, p_sys->pp_items[i] );
+                input_item_Release( p_sys->pp_items[i] );
+                TAB_ERASE(p_sys->i_urls, p_sys->ppsz_urls, i );
+                TAB_ERASE(p_sys->i_items, p_sys->pp_items, i );
+                break;
+            }
         SaveUrls( p_sd );
     }
 

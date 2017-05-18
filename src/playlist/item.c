@@ -611,7 +611,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     playlist_item_t *p_detach = p_item->p_parent;
     int i_index = ItemIndex( p_item );
 
-    REMOVE_ELEM( p_detach->pp_children, p_detach->i_children, i_index );
+    TAB_ERASE(p_detach->i_children, p_detach->pp_children, i_index);
 
     if( p_detach == p_node && i_index < i_newpos )
         i_newpos--;
@@ -649,7 +649,7 @@ int playlist_TreeMoveMany( playlist_t *p_playlist,
         playlist_item_t *p_item = pp_items[i];
         int i_index = ItemIndex( p_item );
         playlist_item_t *p_parent = p_item->p_parent;
-        REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i_index );
+        TAB_ERASE(p_parent->i_children, p_parent->pp_children, i_index);
         if ( p_parent == p_node && i_index < i_newpos ) i_newpos--;
     }
     for( int i = i_items - 1; i >= 0; i-- )

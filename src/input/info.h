@@ -116,7 +116,7 @@ static inline int info_category_DeleteInfo(info_category_t *cat, const char *nam
     int index;
     if (info_category_FindInfo(cat, &index, name)) {
         info_Delete(cat->pp_infos[index]);
-        REMOVE_ELEM(cat->pp_infos, cat->i_infos, index);
+        TAB_ERASE(cat->i_infos, cat->pp_infos, index);
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;

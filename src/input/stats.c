@@ -181,7 +181,7 @@ void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
         if( p_counter->i_samples == 3 )
         {
             p_old = p_counter->pp_samples[2];
-            REMOVE_ELEM( p_counter->pp_samples, p_counter->i_samples, 2 );
+            TAB_ERASE(p_counter->i_samples, p_counter->pp_samples, 2);
             free( p_old );
         }
         break;

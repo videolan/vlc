@@ -315,7 +315,7 @@ static void* Run( void *data )
 
         /* Execute one query (protected against cancellation) */
         char *psz_query = p_sys->ppsz_query[p_sys->i_query - 1];
-        REMOVE_ELEM( p_sys->ppsz_query, p_sys->i_query, p_sys->i_query - 1 );
+        TAB_ERASE(p_sys->i_query, p_sys->ppsz_query, p_sys->i_query - 1);
         vlc_mutex_unlock( &p_sys->lock );
 
         cancel = vlc_savecancel();

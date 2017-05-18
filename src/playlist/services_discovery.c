@@ -172,7 +172,7 @@ int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
 
         if (!strcmp(name, entry->name))
         {
-            REMOVE_ELEM(priv->pp_sds, priv->i_sds, i);
+            TAB_ERASE(priv->i_sds, priv->pp_sds, i);
             sds = entry;
             break;
         }
