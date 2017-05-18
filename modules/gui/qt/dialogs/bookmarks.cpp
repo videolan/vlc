@@ -138,16 +138,16 @@ void BookmarksDialog::update()
 
     for( int i = 0; i < i_bookmarks; i++ )
     {
-        // List with the differents elements of the row
+        mtime_t total = pp_bookmarks[i]->i_time_offset;
+        unsigned hours   = ( total / ( CLOCK_FREQ * 3600 ) );
+        unsigned minutes = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
+        float    seconds = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );
+
         QStringList row;
         row << QString( qfu( pp_bookmarks[i]->psz_name ) );
         row << qfu("-");
-        int total = pp_bookmarks[i]->i_time_offset/ 1000000;
-        int hour = total / (60*60);
-        int min = (total - hour*60*60) / 60;
-        int sec = total - hour*60*60 - min*60;
-        QString str;
-        row << str.sprintf("%02d:%02d:%02d", hour, min, sec );
+        row << QString().sprintf( "%02u:%02u:%06.3f", hours, minutes, seconds );
+
         QTreeWidgetItem *item = new QTreeWidgetItem( bookmarksList, row );
         item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEditable |
                         Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
@@ -243,11 +243,11 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
     {
         fields = item->text( column ).split( ":", QString::SkipEmptyParts );
         if( fields.count() == 1 )
-            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() );
+            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toFloat() );
         else if( fields.count() == 2 )
             p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 60 + fields[1].toInt() );
         else if( fields.count() == 3 )
-            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toInt() );
+            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toFloat() );
         else
         {
             msg_Err( p_intf, "Invalid string format for time" );
