@@ -464,8 +464,6 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
     DBusConnection  *p_conn = p_intf->p_sys->p_conn;
     DBusMessageIter changed_properties, invalidated_properties;
     const char *psz_interface_name = DBUS_MPRIS_TRACKLIST_INTERFACE;
-    char **ppsz_properties = NULL;
-    int i_properties = 0;
 
     SIGNAL_INIT( DBUS_INTERFACE_PROPERTIES,
                  DBUS_MPRIS_OBJECT_PATH,
@@ -487,26 +485,11 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
                                                     &invalidated_properties )) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    i_properties    = vlc_dictionary_keys_count( p_changed_properties );
-    ppsz_properties = vlc_dictionary_all_keys( p_changed_properties );
 
-    if( unlikely(!ppsz_properties) )
-    {
-        dbus_message_iter_abandon_container( &args, &invalidated_properties );
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-    }
-
-    for( int i = 0; i < i_properties; i++ )
-    {
-        if( !strcmp( ppsz_properties[i], "Tracks" ) )
-            dbus_message_iter_append_basic( &invalidated_properties,
-                                            DBUS_TYPE_STRING,
-                                            &ppsz_properties[i] );
-
-        free( ppsz_properties[i] );
-    }
-
-    free( ppsz_properties );
+    if( vlc_dictionary_has_key( p_changed_properties, "Tracks" ) )
+        dbus_message_iter_append_basic( &invalidated_properties,
+                                        DBUS_TYPE_STRING,
+                                        &(char const*){ "Tracks" } );
 
     if( unlikely(!dbus_message_iter_close_container( &args,
                     &invalidated_properties )) )
