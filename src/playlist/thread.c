@@ -373,7 +373,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
             msg_Dbg( p_playlist,"repeating item" );
             return get_current_status_item( p_playlist );
         }
-        if( b_playstop )
+        if( b_playstop && get_current_status_item( p_playlist ) )
         {
             msg_Dbg( p_playlist,"stopping (play and stop)" );
             return NULL;
