@@ -452,14 +452,11 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      unsigned i_option_flags,
                      bool b_playlist )
 {
-    int i_ret;
-    input_item_t *p_input;
-
-    p_input = input_item_New( psz_uri, psz_name );
-    if( p_input == NULL )
+    input_item_t *p_input = input_item_New( psz_uri, psz_name );
+    if( !p_input )
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
-    i_ret = playlist_AddInput( p_playlist, p_input, play_now, b_playlist );
+    int i_ret = playlist_AddInput( p_playlist, p_input, play_now, b_playlist );
     input_item_Release( p_input );
     return i_ret;
 }
