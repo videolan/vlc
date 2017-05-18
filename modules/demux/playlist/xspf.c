@@ -702,7 +702,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 psz_value = strdup(name);
                 if (unlikely(!psz_value))
                 {
-                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
