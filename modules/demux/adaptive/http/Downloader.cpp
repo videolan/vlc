@@ -40,7 +40,7 @@ bool Downloader::start()
 {
     if(!thread_handle_valid &&
        vlc_clone(&thread_handle, downloaderThread,
-                 reinterpret_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT))
+                 static_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT))
     {
         return false;
     }
@@ -74,7 +74,7 @@ void Downloader::cancel(HTTPChunkBufferedSource *source)
 
 void * Downloader::downloaderThread(void *opaque)
 {
-    Downloader *instance = reinterpret_cast<Downloader *>(opaque);
+    Downloader *instance = static_cast<Downloader *>(opaque);
     int canc = vlc_savecancel();
     instance->Run();
     vlc_restorecancel( canc );
