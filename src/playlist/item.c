@@ -616,7 +616,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     if( p_detach == p_node && i_index < i_newpos )
         i_newpos--;
 
-    INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
+    TAB_INSERT(p_node->i_children, p_node->pp_children, p_item, i_newpos);
     p_item->p_parent = p_node;
 
     pl_priv( p_playlist )->b_reset_currently_playing = true;
@@ -655,7 +655,7 @@ int playlist_TreeMoveMany( playlist_t *p_playlist,
     for( int i = i_items - 1; i >= 0; i-- )
     {
         playlist_item_t *p_item = pp_items[i];
-        INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
+        TAB_INSERT(p_node->i_children, p_node->pp_children, p_item, i_newpos);
         p_item->p_parent = p_node;
     }
 

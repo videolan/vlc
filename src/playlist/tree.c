@@ -152,10 +152,8 @@ int playlist_NodeInsert( playlist_item_t *p_parent, playlist_item_t *p_item,
     if( i_position == -1 ) i_position = p_parent->i_children ;
     assert( i_position <= p_parent->i_children);
 
-    INSERT_ELEM( p_parent->pp_children,
-                 p_parent->i_children,
-                 i_position,
-                 p_item );
+    TAB_INSERT(p_parent->i_children, p_parent->pp_children,
+               p_item, i_position);
     p_item->p_parent = p_parent;
 
     /* Inherit special flags from parent (sd cases) */
