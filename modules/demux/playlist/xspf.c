@@ -646,14 +646,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
             msg_Dbg(p_demux, "Skipping \"%s\" extension tag", psz_application);
             free(psz_application);
             free(psz_title);
-            /* Skip all children */
-            for (unsigned lvl = 1; lvl;)
-                switch (xml_ReaderNextNode(p_xml_reader, NULL))
-                {
-                    case XML_READER_STARTELEM: lvl++; break;
-                    case XML_READER_ENDELEM:   lvl--; break;
-                    case 0: case -1: return -1;
-                }
+            skip_element( NULL, NULL, p_xml_reader, NULL );
             return true;
         }
     }
@@ -812,8 +805,13 @@ static bool skip_element COMPLEX_INTERFACE
     for (unsigned lvl = 1; lvl;)
         switch (xml_ReaderNextNode(p_xml_reader, NULL))
         {
-            case XML_READER_STARTELEM: lvl++; break;
-            case XML_READER_ENDELEM:   lvl--; break;
+            case XML_READER_STARTELEM:
+            {
+                if( !xml_ReaderIsEmptyElement( p_xml_reader ) )
+                    ++lvl;
+                break;
+            }
+            case XML_READER_ENDELEM: lvl--; break;
             case 0: case -1: return false;
         }
 
