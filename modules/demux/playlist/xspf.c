@@ -209,14 +209,12 @@ static bool parse_playlist_node COMPLEX_INTERFACE
     const char *name, *value;
     while ((name = xml_ReaderNextAttr(p_xml_reader, &value)) != NULL)
     {
-        /* attribute: version */
         if (!strcmp(name, "version"))
         {
             b_version_found = true;
             if (strcmp(value, "0") && strcmp(value, "1"))
                 msg_Warn(p_demux, "unsupported XSPF version %s", value);
         }
-        /* attribute: xmlns */
         else if (!strcmp(name, "xmlns") || !strcmp(name, "xmlns:vlc"))
             ;
         else if (!strcmp(name, "xml:base"))
@@ -224,7 +222,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
             free(p_demux->p_sys->psz_base);
             p_demux->p_sys->psz_base = strdup(value);
         }
-        /* unknown attribute */
         else
             msg_Warn(p_demux, "invalid <playlist> attribute: \"%s\"", name);
     }
@@ -232,12 +229,10 @@ static bool parse_playlist_node COMPLEX_INTERFACE
     if (!b_version_found)
         msg_Warn(p_demux, "<playlist> requires \"version\" attribute");
 
-    /* parse the child elements - we only take care of <trackList> */
     psz_value = NULL;
     while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > 0)
         switch (i_node)
     {
-    /*  element start tag  */
     case XML_READER_STARTELEM:
         FREENULL(psz_value);
 
@@ -246,7 +241,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
             msg_Err(p_demux, "invalid XML stream");
             goto end;
         }
-        /* choose handler */
         p_handler = get_handler(pl_elements, name);
         if (!p_handler)
         {
@@ -263,7 +257,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         }
         break;
 
-    /* simple element content */
     case XML_READER_TEXT:
         FREENULL(psz_value);
         psz_value = strdup(name);
@@ -271,7 +264,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
             goto end;
         break;
 
-    /* element end tag */
     case XML_READER_ENDELEM:
         /* leave if the current parent node <playlist> is terminated */
         if (!strcmp(name, psz_element))
@@ -384,7 +376,6 @@ static bool parse_track_node COMPLEX_INTERFACE
     while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > 0)
         switch (i_node)
     {
-    /*  element start tag  */
     case XML_READER_STARTELEM:
         FREENULL(psz_value);
 
@@ -393,7 +384,6 @@ static bool parse_track_node COMPLEX_INTERFACE
             msg_Err(p_demux, "invalid XML stream");
             goto end;
         }
-        /* choose handler */
         p_handler = get_handler(track_elements, name);
         if (!p_handler)
         {
@@ -414,7 +404,6 @@ static bool parse_track_node COMPLEX_INTERFACE
         }
         break;
 
-    /* simple element content */
     case XML_READER_TEXT:
         free(psz_value);
         psz_value = strdup(name);
@@ -422,7 +411,6 @@ static bool parse_track_node COMPLEX_INTERFACE
             goto end;
         break;
 
-    /* element end tag */
     case XML_READER_ENDELEM:
         /* leave if the current parent node <track> is terminated */
         if (!strcmp(name, psz_element))
@@ -529,7 +517,6 @@ static bool set_item_info SIMPLE_INTERFACE
     if (!psz_name || !psz_value || !p_input)
         return false;
 
-    /* re-convert xml special characters inside psz_value */
     vlc_xml_decode(psz_value);
 
     /* handle each info element in a separate "if" clause */
@@ -561,7 +548,6 @@ static bool set_option SIMPLE_INTERFACE
     if (!psz_name || !psz_value || !p_input)
         return false;
 
-    /* re-convert xml special characters inside psz_value */
     vlc_xml_decode(psz_value);
 
     input_item_AddOption(p_input, psz_value, 0);
@@ -593,7 +579,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
     const char *name, *value;
     while ((name = xml_ReaderNextAttr(p_xml_reader, &value)) != NULL)
     {
-        /* attribute: title */
         if (!strcmp(name, "title"))
         {
             free(psz_title);
@@ -601,13 +586,11 @@ static bool parse_extension_node COMPLEX_INTERFACE
             if (likely(psz_title != NULL))
                 vlc_xml_decode(psz_title);
         }
-        /* extension attribute: application */
         else if (!strcmp(name, "application"))
         {
             free(psz_application);
             psz_application = strdup(value);
         }
-        /* unknown attribute */
         else
             msg_Warn(p_demux, "invalid <%s> attribute:\"%s\"", psz_element,
                       name);
@@ -652,7 +635,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
     {
         switch (i_node)
         {
-            /*  element start tag  */
             case XML_READER_STARTELEM:
                 FREENULL(psz_value);
 
@@ -661,7 +643,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     msg_Err(p_demux, "invalid xml stream");
                     goto error;
                 }
-                /* choose handler */
                 p_handler = get_handler(pl_elements, name);
                 if (!p_handler)
                 {
@@ -684,14 +665,12 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 break;
 
             case XML_READER_TEXT:
-                /* simple element content */
                 FREENULL(psz_value);
                 psz_value = strdup(name);
                 if (unlikely(!psz_value))
                     goto error;
                 break;
 
-            /* element end tag */
             case XML_READER_ENDELEM:
                 /* leave if the current parent node is terminated */
                 if (!strcmp(name, psz_element))
