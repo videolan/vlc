@@ -168,7 +168,6 @@ struct input_item_node_t
     input_item_t *         p_item;
     int                    i_children;
     input_item_node_t      **pp_children;
-    input_item_node_t      *p_parent;
 };
 
 VLC_API void input_item_CopyOptions( input_item_t *p_child, input_item_t *p_parent );

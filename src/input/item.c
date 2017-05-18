@@ -1241,28 +1241,20 @@ input_item_node_t *input_item_node_Create( input_item_t *p_input )
     p_node->p_item = p_input;
     input_item_Hold( p_input );
 
-    p_node->p_parent = NULL;
     p_node->i_children = 0;
     p_node->pp_children = NULL;
 
     return p_node;
 }
 
-static void RecursiveNodeDelete( input_item_node_t *p_node )
+void input_item_node_Delete( input_item_node_t *p_node )
 {
     for( int i = 0; i < p_node->i_children; i++ )
-        RecursiveNodeDelete( p_node->pp_children[i] );
+        input_item_node_Delete( p_node->pp_children[i] );
 
     input_item_Release( p_node->p_item );
     free( p_node->pp_children );
     free( p_node );
-}
-
-void input_item_node_Delete( input_item_node_t *p_node )
-{
-    if( p_node->p_parent )
-        input_item_node_RemoveNode(node->p_parent, node);
-    RecursiveNodeDelete( p_node );
 }
 
 input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_item_t *p_item )
@@ -1285,18 +1277,18 @@ input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_
     return p_new_child;
 }
 
-void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t *p_child )
+void input_item_node_AppendNode( input_item_node_t *p_parent,
+                                 input_item_node_t *p_child )
 {
-    assert( p_parent && p_child && p_child->p_parent == NULL );
+    assert(p_parent != NULL);
+    assert(p_child != NULL);
     TAB_APPEND(p_parent->i_children, p_parent->pp_children, p_child);
-    p_child->p_parent = p_parent;
 }
 
 void input_item_node_RemoveNode( input_item_node_t *parent,
                                  input_item_node_t *child )
 {
     TAB_REMOVE(parent->i_children, parent->pp_children, child);
-    child->p_parent = NULL;
 }
 
 void input_item_node_PostAndDelete( input_item_node_t *p_root )
