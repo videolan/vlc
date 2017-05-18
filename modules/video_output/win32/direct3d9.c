@@ -1562,7 +1562,14 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, NULL, destination, NULL, D3DTEXF_NONE);
+    RECT copy_rect = sys->sys.rect_src_clipped;
+    // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
+    // When copying the entire buffer, the margin end up being blended in the actual picture
+    // on nVidia (regardless of even/odd dimensions)
+    if ( copy_rect.right & 1 ) copy_rect.right++;
+    if ( copy_rect.bottom & 1 ) copy_rect.bottom++;
+    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &copy_rect, destination,
+                                      &copy_rect, D3DTEXF_NONE);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx",
