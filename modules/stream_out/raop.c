@@ -722,6 +722,10 @@ static void WriteAuxHeaders( struct vlc_memstream *restrict stream,
                              vlc_dictionary_t *p_req_headers )
 {
     char **ppsz_keys = vlc_dictionary_all_keys( p_req_headers );
+
+    if( unlikely( !ppsz_keys ) )
+        return;
+
     for( size_t i = 0; ppsz_keys[i] != NULL; i++ )
     {
         char *name = ppsz_keys[i];
