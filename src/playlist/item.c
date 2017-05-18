@@ -476,11 +476,9 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
                        bool play_now, bool b_playlist )
 {
-    playlist_item_t *item;
-
     PL_LOCK;
-    item = b_playlist ? p_playlist->p_playing
-                      : p_playlist->p_media_library;
+    playlist_item_t *item = b_playlist ? p_playlist->p_playing
+                                       : p_playlist->p_media_library;
 
     item = playlist_NodeAddInput( p_playlist, p_input, item, PLAYLIST_END );
 
