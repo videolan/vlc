@@ -259,7 +259,7 @@ static int Control( demux_t *p_demux_filter, int i_query, va_list args)
 int Open(vlc_object_t *p_this)
 {
     demux_t *p_demux = reinterpret_cast<demux_t*>(p_this);
-    chromecast_common *p_renderer = reinterpret_cast<chromecast_common *>(
+    chromecast_common *p_renderer = static_cast<chromecast_common *>(
                 var_InheritAddress( p_demux, CC_SHARED_VAR_NAME ) );
     if ( p_renderer == NULL )
     {
