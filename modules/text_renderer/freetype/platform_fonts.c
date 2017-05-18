@@ -424,6 +424,10 @@ void DumpDictionary( filter_t *p_filter, const vlc_dictionary_t *p_dict,
                      bool b_dump_fonts, int i_max_families )
 {
     char **ppsz_keys = vlc_dictionary_all_keys( p_dict );
+
+    if( unlikely( !ppsz_keys ) )
+        return;
+
     for( int i = 0; ppsz_keys[ i ]; ++i )
     {
         vlc_family_t *p_family = vlc_dictionary_value_for_key( p_dict, ppsz_keys[ i ] );
