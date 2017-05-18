@@ -1254,10 +1254,13 @@ void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     }
 
     /* Check the type of the object variable */
-    /* This HACK is needed so we have a radio button for audio and video tracks
-       instread of a checkbox */
+    /* This HACK is needed so that we have:
+     *  - a radio button for audio/video tracks instread of a checkbox, and;
+     *  - an always enabled bookmark menu (even if there are no bookmarks)
+     **/
     if( !strcmp( psz_var, "audio-es" )
-     || !strcmp( psz_var, "video-es" ) )
+     || !strcmp( psz_var, "video-es" )
+     || !strcmp( psz_var, "bookmark" ) )
         i_type = VLC_VAR_INTEGER | VLC_VAR_HASCHOICE;
     else
         i_type = var_Type( p_object, psz_var );
