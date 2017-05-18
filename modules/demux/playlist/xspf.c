@@ -406,6 +406,7 @@ static bool parse_track_node COMPLEX_INTERFACE
             if (!p_handler->pf_handler.cmplx(p_demux, p_new_node,
                                              p_xml_reader, p_handler->name)) {
                 input_item_node_Delete(p_new_node);
+                input_item_Release(p_new_input);
                 return false;
             }
 
