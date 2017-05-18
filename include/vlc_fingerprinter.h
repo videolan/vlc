@@ -77,7 +77,7 @@ struct fingerprinter_thread_t
 
     void ( *pf_enqueue ) ( struct fingerprinter_thread_t *f, fingerprint_request_t *r );
     fingerprint_request_t * ( *pf_getresults ) ( struct fingerprinter_thread_t *f );
-    void ( *pf_apply ) ( fingerprint_request_t *, int i_resultid );
+    void ( *pf_apply ) ( fingerprint_request_t *, size_t i_resultid );
 };
 typedef struct fingerprinter_thread_t fingerprinter_thread_t;
 

@@ -46,7 +46,7 @@ fingerprint_request_t * Chromaprint::fetchResults()
     return p_fingerprinter->pf_getresults( p_fingerprinter );
 }
 
-void Chromaprint::apply( fingerprint_request_t *p_r, int i_id )
+void Chromaprint::apply( fingerprint_request_t *p_r, size_t i_id )
 {
     p_fingerprinter->pf_apply( p_r, i_id );
 }

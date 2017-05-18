@@ -114,7 +114,7 @@ static fingerprint_request_t * GetResult( fingerprinter_thread_t *f )
     return r;
 }
 
-static void ApplyResult( fingerprint_request_t *p_r, int i_resultid )
+static void ApplyResult( fingerprint_request_t *p_r, size_t i_resultid )
 {
     if ( i_resultid >= vlc_array_count( & p_r->results.metas_array ) ) return;
 

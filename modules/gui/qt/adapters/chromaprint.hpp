@@ -40,7 +40,7 @@ public:
     static int results_available( vlc_object_t *p_this, const char *,
                                   vlc_value_t, vlc_value_t newval, void *param );
     fingerprint_request_t * fetchResults();
-    void apply( fingerprint_request_t *, int i_id );
+    void apply( fingerprint_request_t *, size_t i_id );
     static bool isSupported( QString uri );
 
 signals:
