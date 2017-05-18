@@ -1503,6 +1503,12 @@ do { \
         free( priv->attachment_demux);
         priv->attachment_demux = NULL;
     }
+
+    /* clean bookmarks */
+    for( int i = 0; i < priv->i_bookmark; ++i )
+        vlc_seekpoint_Delete( priv->pp_bookmark[i] );
+    TAB_CLEAN( priv->i_bookmark, priv->pp_bookmark );
+
     vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
     /* */
