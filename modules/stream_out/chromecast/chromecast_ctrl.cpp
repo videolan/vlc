@@ -206,7 +206,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
  *****************************************************************************/
 void* intf_sys_t::ChromecastThread(void* p_data)
 {
-    intf_sys_t *p_sys = reinterpret_cast<intf_sys_t*>(p_data);
+    intf_sys_t *p_sys = static_cast<intf_sys_t*>(p_data);
     p_sys->mainLoop();
     return NULL;
 }
@@ -731,57 +731,57 @@ void intf_sys_t::setState( States state )
 
 mtime_t intf_sys_t::get_time(void *pt)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     vlc_mutex_locker locker( &p_this->m_lock );
     return p_this->getPlaybackTimestamp();
 }
 
 double intf_sys_t::get_position(void *pt)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     vlc_mutex_locker locker( &p_this->m_lock );
     return p_this->getPlaybackPosition();
 }
 
 void intf_sys_t::set_length(void *pt, mtime_t length)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->m_length = length;
 }
 
 void intf_sys_t::wait_app_started(void *pt)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     vlc_mutex_locker locker( &p_this->m_lock);
     p_this->waitAppStarted();
 }
 
 void intf_sys_t::request_seek(void *pt, mtime_t pos)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->requestPlayerSeek(pos);
 }
 
 void intf_sys_t::wait_seek_done(void *pt)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->waitSeekDone();
 }
 
 void intf_sys_t::set_pause_state(void *pt, bool paused)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->setPauseState( paused );
 }
 
 void intf_sys_t::set_title(void *pt, const char *psz_title)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->setTitle( psz_title );
 }
 
 void intf_sys_t::set_artwork(void *pt, const char *psz_artwork)
 {
-    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->setArtwork( psz_artwork );
 }
