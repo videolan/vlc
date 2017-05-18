@@ -163,15 +163,11 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
     //control playback only if it was the current playing item that got subitems
     if( b_current )
     {
-        if( last_pos == pos || ( b_stop && !b_flat ) || !b_autostart )
+        if( ( b_stop && !b_flat ) || !b_autostart )
         {
-            /* We stop, either because no sub-item was actually created, or some
-            flags/settings want us to do so at this point */
-            PL_UNLOCK;
             playlist_Stop( p_playlist );
-            return;
         }
-        else
+        else if( last_pos != pos ) /* any children? */
         {
             /* Continue to play, either random or the first new item */
             playlist_item_t *p_play_item;
