@@ -2265,12 +2265,15 @@ InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
     char const* extra;
     if( stream_extractor_AttachParsed( stream, anchor, &extra ) )
     {
-        msg_Err( source, "unable to attach stream-extractors for" );
+        msg_Err( source, "unable to attach stream-extractors for %s",
+            (*stream)->psz_url );
+
         return VLC_EGENERIC;
     }
 
     if( vlc_stream_directory_Attach( stream, NULL ) )
-        msg_Dbg( source, "attach of directory extractor failed" );
+        msg_Dbg( source, "attachment of directory-extractor failed for %s",
+            (*stream)->psz_url );
 
     MRLSections( extra ? extra : "",
         &source->i_title_start, &source->i_title_end,
