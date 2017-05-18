@@ -170,10 +170,10 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
             QPlatformNativeInterface *qni = qApp->platformNativeInterface();
             assert(qni != NULL);
 
-            p_wnd->handle.wl = reinterpret_cast<wl_surface*>(
+            p_wnd->handle.wl = static_cast<wl_surface*>(
                 qni->nativeResourceForWindow(QByteArrayLiteral("surface"),
                                              window));
-            p_wnd->display.wl = reinterpret_cast<wl_display*>(
+            p_wnd->display.wl = static_cast<wl_display*>(
                 qni->nativeResourceForIntegration(QByteArrayLiteral("wl_display")));
             break;
         }
