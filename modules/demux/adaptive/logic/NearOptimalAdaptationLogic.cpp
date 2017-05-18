@@ -44,19 +44,18 @@ using namespace adaptive;
 #define bufferTargetS  (CLOCK_FREQ * 30) /* Qmax */
 
 NearOptimalContext::NearOptimalContext()
-{
-    buffering_min = minimumBufferS;
-    buffering_level = 0;
-    buffering_target = bufferTargetS;
-    last_download_rate = 0;
-}
+    : buffering_min( minimumBufferS )
+    , buffering_level( 0 )
+    , buffering_target( bufferTargetS )
+    , last_download_rate( 0 )
+{ }
 
-NearOptimalAdaptationLogic::NearOptimalAdaptationLogic(vlc_object_t *p_obj_):
-    AbstractAdaptationLogic()
+NearOptimalAdaptationLogic::NearOptimalAdaptationLogic( vlc_object_t *p_obj )
+    : AbstractAdaptationLogic()
+    , p_obj( p_obj )
+    , usedBps( 0 )
+    , currentBps( 0 )
 {
-    p_obj = p_obj_;
-    usedBps = 0;
-    currentBps = 0;
     vlc_mutex_init(&lock);
 }
 
