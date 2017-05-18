@@ -291,15 +291,11 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             break;
 
         case INPUT_CLEAR_BOOKMARKS:
-
             vlc_mutex_lock( &priv->p_item->lock );
-            while( priv->i_bookmark > 0 )
-            {
-                p_bkmk = priv->pp_bookmark[priv->i_bookmark - 1];
+            for( int i = 0; i < priv->i_bookmark; ++i )
+                vlc_seekpoint_Delete( priv->pp_bookmark[i] );
 
-                TAB_REMOVE( priv->i_bookmark, priv->pp_bookmark, p_bkmk );
-                vlc_seekpoint_Delete( p_bkmk );
-            }
+            TAB_CLEAN( priv->i_bookmark, priv->pp_bookmark );
             vlc_mutex_unlock( &priv->p_item->lock );
 
             UpdateBookmarksOption( p_input );
