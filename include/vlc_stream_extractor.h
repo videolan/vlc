@@ -99,10 +99,9 @@ typedef struct stream_directory_t {
  *  - See the \ref mrl specification for further information.
  *  - The returned resource shall be deleted through \ref vlc_stream_Delete.
  *
- * \warning This function is only be used when \ref mrl functionality is
- *          explicitly needed, \ref vlc_stream_NewURL shall be used where
- *          applicable (and functionality associated with \ref MRL is not
- *          wanted nor needed).
+ * \warning This function is only to be used when \ref mrl functionality is
+ *          explicitly needed. \ref vlc_stream_NewURL shall be used where
+ *          applicable.
  *
  * \param obj the owner of the requested stream
  * \param mrl the mrl for which the stream_t should be created
