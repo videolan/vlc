@@ -617,6 +617,8 @@ static void fsdir_attach_slaves(struct access_fsdir *p_fsdir)
              * added in the parent node */
             if (p_fsdir_slave->p_node != NULL)
             {
+                input_item_node_RemoveNode(p_fsdir->p_node,
+                                           p_fsdir_slave->p_node);
                 input_item_node_Delete(p_fsdir_slave->p_node);
                 p_fsdir_slave->p_node = NULL;
             }
