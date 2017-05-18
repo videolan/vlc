@@ -421,7 +421,7 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
 /**
  * Playlist add
  *
- * Add an item to the playlist or the media library
+ * Add an item to the playlist
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
  * \param play_now whether to start playing immediately or not
