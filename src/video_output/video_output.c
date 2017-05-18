@@ -714,7 +714,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     {
         vout_filter_t *e = malloc(sizeof(*e));
 
-        if (e)
+        if (likely(e))
         {
             free(config_ChainCreate(&e->name, &e->cfg, "deinterlace"));
             vlc_array_append(&array_static, e);
@@ -730,7 +730,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         if (name && *name) {
             vout_filter_t *e = malloc(sizeof(*e));
 
-            if (e) {
+            if (likely(e)) {
                 e->name = name;
                 e->cfg  = cfg;
                 if (!strcmp(e->name, "postproc"))
