@@ -208,6 +208,16 @@ static int Open( vlc_object_t *p_this )
     /* Ifo allocation & initialisation */
     if( !( p_vmg_file = ifoOpen( p_dvdread, 0 ) ) )
     {
+        char rgsz_volid[32];
+        if( DVDUDFVolumeInfo( p_dvdread, rgsz_volid, 32, NULL, 0 ) )
+        {
+            if( DVDISOVolumeInfo( p_dvdread, rgsz_volid, 32, NULL, 0 ) == 0 )
+            {
+                vlc_dialog_display_error( p_demux, _("Playback failure"),
+                              _("Cannot play a non UDF mastered DVD. (Found ISO9660 '%s')"), rgsz_volid );
+                msg_Err( p_demux, "Invalid UDF DVD. (Found ISO9660 '%s')", rgsz_volid );
+            }
+        }
         msg_Warn( p_demux, "cannot open VMG info" );
         return VLC_EGENERIC;
     }
