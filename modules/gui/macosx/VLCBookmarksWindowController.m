@@ -176,11 +176,11 @@
     }
 
     [_editNameTextField setStringValue: toNSStr(pp_bookmarks[row]->psz_name)];
-    int total = pp_bookmarks[row]->i_time_offset/ 1000000;
-    int hour = total / (60*60);
-    int min = (total - hour*60*60) / 60;
-    int sec = total - hour*60*60 - min*60;
-    [_editTimeTextField setStringValue: [NSString stringWithFormat:@"%02d:%02d:%02d", hour, min, sec]];
+    mtime_t total = pp_bookmarks[i]->i_time_offset;
+    unsigned hour = ( total / ( CLOCK_FREQ * 3600 ) );
+    unsigned min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
+    float    sec = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );
+    [_editTimeTextField setStringValue: [NSString stringWithFormat:@"%02d:%02d:%06.3f", hour, min, sec]];
 
     /* Just keep the pointer value to check if it
      * changes. Note, we don't need to keep a reference to the object.
@@ -234,11 +234,11 @@
     NSArray * components = [[_editTimeTextField stringValue] componentsSeparatedByString:@":"];
     NSUInteger componentCount = [components count];
     if (componentCount == 1)
-        pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] longLongValue]);
+        pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] floatValue]);
     else if (componentCount == 2)
         pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] longLongValue] * 60 + [[components objectAtIndex:1] longLongValue]);
     else if (componentCount == 3)
-        pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] longLongValue] * 3600 + [[components objectAtIndex:1] longLongValue] * 60 + [[components objectAtIndex:2] longLongValue]);
+        pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] longLongValue] * 3600 + [[components objectAtIndex:1] longLongValue] * 60 + [[components objectAtIndex:2] floatValue]);
     else {
         msg_Err(getIntf(), "Invalid string format for time");
         goto clear;
