@@ -243,6 +243,13 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 /**************************************************************************
  * release (Public)
  **************************************************************************/
+static void
+MediaListDictValueRelease( void* mlist, void* obj )
+{
+    libvlc_media_list_release( mlist );
+    (void)obj;
+}
+
 void
 libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 {
@@ -251,17 +258,9 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 
     libvlc_media_list_release( p_mdis->p_mlist );
 
-    /* Free catname_to_submedialist and all the mlist */
-    char ** all_keys = vlc_dictionary_all_keys( &p_mdis->catname_to_submedialist );
-    for( int i = 0; all_keys[i]; i++ )
-    {
-        libvlc_media_list_t * p_catmlist = vlc_dictionary_value_for_key( &p_mdis->catname_to_submedialist, all_keys[i] );
-        libvlc_media_list_release( p_catmlist );
-        free( all_keys[i] );
-    }
-    free( all_keys );
+    vlc_dictionary_clear( &p_mdis->catname_to_submedialist,
+        MediaListDictValueRelease, NULL );
 
-    vlc_dictionary_clear( &p_mdis->catname_to_submedialist, NULL, NULL );
     libvlc_event_manager_destroy( &p_mdis->event_manager );
     libvlc_release( p_mdis->p_libvlc_instance );
 
