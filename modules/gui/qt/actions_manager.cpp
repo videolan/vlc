@@ -235,7 +235,7 @@ bool ActionsManager::isItemSout( QVariant & m_obj, const char *psz_sout, bool as
 void ActionsManager::renderer_event_item_added(
     vlc_renderer_discovery_t *rd, vlc_renderer_item_t *p_item )
 {
-    intf_thread_t *p_intf = reinterpret_cast<intf_thread_t*>(rd->owner.sys);
+    intf_thread_t *p_intf = static_cast<intf_thread_t*>(rd->owner.sys);
     QAction *firstSeparator = NULL;
 
     foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
