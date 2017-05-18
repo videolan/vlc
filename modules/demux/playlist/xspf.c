@@ -618,9 +618,8 @@ static bool parse_extension_node COMPLEX_INTERFACE
     {
         if (!psz_title)
         {
-            free(psz_application);
             msg_Warn(p_demux, "<vlc:node> requires \"title\" attribute");
-            return false;
+            goto error;
         }
         p_new_input = input_item_NewDirectory("vlc://nop", psz_title,
                                               ITEM_NET_UNKNOWN);
@@ -635,23 +634,18 @@ static bool parse_extension_node COMPLEX_INTERFACE
     {
         if (!psz_application)
         {
-            free(psz_title);
             msg_Warn(p_demux, "<extension> requires \"application\" attribute");
-            return false;
+            goto error;
         }
         /* Skip the extension if the application is not vlc
            This will skip all children of the current node */
         else if (strcmp(psz_application, "http://www.videolan.org/vlc/playlist/0"))
         {
             msg_Dbg(p_demux, "Skipping \"%s\" extension tag", psz_application);
-            free(psz_application);
-            free(psz_title);
             skip_element( NULL, NULL, p_xml_reader, NULL );
-            return true;
+            goto success;
         }
     }
-    free(psz_application);
-    free(psz_title);
 
     /* parse the child elements */
     while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > 0)
@@ -665,16 +659,14 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!*name)
                 {
                     msg_Err(p_demux, "invalid xml stream");
-                    if (p_new_input) input_item_Release(p_new_input);
-                    return false;
+                    goto error;
                 }
                 /* choose handler */
                 p_handler = get_handler(pl_elements, name);
                 if (!p_handler)
                 {
                     msg_Err(p_demux, "unexpected element <%s>", name);
-                    if (p_new_input) input_item_Release(p_new_input);
-                    return false;
+                    goto error;
                 }
                 /* complex content is parsed in a separate function */
                 if (p_handler->cmplx)
@@ -687,11 +679,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                         p_handler = NULL;
                     }
                     else
-                    {
-                        if (p_new_input)
-                            input_item_Release(p_new_input);
-                        return false;
-                    }
+                        goto error;
                 }
                 break;
 
@@ -700,30 +688,22 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 FREENULL(psz_value);
                 psz_value = strdup(name);
                 if (unlikely(!psz_value))
-                {
-                    if (p_new_input) input_item_Release(p_new_input);
-                    return false;
-                }
+                    goto error;
                 break;
 
             /* element end tag */
             case XML_READER_ENDELEM:
                 /* leave if the current parent node is terminated */
                 if (!strcmp(name, psz_element))
-                {
-                    FREENULL(psz_value);
-                    if (p_new_input) input_item_Release(p_new_input);
-                    return true;
-                }
+                    goto success;
+
                 /* there MUST have been a start tag for that element name */
                 if (!p_handler || !p_handler->name
                     || strcmp(p_handler->name, name))
                 {
                     msg_Err(p_demux, "there's no open element left for <%s>",
                              name);
-                    FREENULL(psz_value);
-                    if (p_new_input) input_item_Release(p_new_input);
-                    return false;
+                    goto error;
                 }
 
                 /* special tag <vlc:id> */
@@ -742,9 +722,18 @@ static bool parse_extension_node COMPLEX_INTERFACE
         }
     }
 
-    if (p_new_input) input_item_Release(p_new_input);
+success: ;
+    bool b_success = true;
+out:
+    if (p_new_input)
+        input_item_Release(p_new_input);
+    free(psz_application);
+    free(psz_title);
     free(psz_value);
-    return false;
+    return b_success;
+error:
+    b_success = false;
+    goto out;
 }
 
 /**
