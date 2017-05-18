@@ -913,6 +913,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             {
                 size_t i_extra = p_dfLa->data.p_binary->i_blob;
                 uint8_t *p_extra = malloc(i_extra);
+                if( likely( p_extra ) )
                 {
                     p_track->fmt.i_extra = i_extra;
                     p_track->fmt.p_extra = p_extra;
