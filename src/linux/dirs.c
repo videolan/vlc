@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <linux/limits.h>
 
 #include <vlc_common.h>
 #include "libvlc.h"
@@ -31,6 +32,23 @@
 
 char *config_GetLibDir (void)
 {
+    static struct
+    {
+        vlc_mutex_t lock;
+        char path[PATH_MAX];
+    } cache = {
+        VLC_STATIC_MUTEX, "",
+    };
+
+    /* Reading and parsing /proc/self/maps is slow, so cache the value since
+     * it's guaranteed not to change during the life-time of the process. */
+    vlc_mutex_lock(&cache.lock);
+    if (cache.path[0] != '\0')
+    {
+        char *ret = strdup(cache.path);
+        vlc_mutex_unlock(&cache.lock);
+        return ret;
+    }
     char *path = NULL;
 
     /* Find the path to libvlc (i.e. ourselves) */
@@ -72,7 +90,12 @@ char *config_GetLibDir (void)
     free (line);
     fclose (maps);
 error:
-    return (path != NULL) ? path : strdup (PKGLIBDIR);
+    if (path == NULL)
+        path = strdup(PKGLIBDIR);
+    if (likely(path != NULL && sizeof(cache.path) > strlen(path)))
+        strcpy(cache.path, path);
+    vlc_mutex_unlock(&cache.lock);
+    return path;
 }
 
 char *config_GetDataDir (void)
