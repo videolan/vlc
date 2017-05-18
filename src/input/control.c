@@ -594,8 +594,26 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
 
     if( vlc_memstream_close( &vstr ) == VLC_SUCCESS )
     {
-        input_item_AddOption( priv->p_item, vstr.ptr, VLC_INPUT_OPTION_UNIQUE );
-        free( vstr.ptr );
+        bool b_overwritten = false;
+
+        for( int i = 0; i < priv->p_item->i_options; ++i )
+        {
+            char** ppsz_option = &priv->p_item->ppsz_options[i];
+
+            if( strncmp( *ppsz_option, "bookmarks=", 10 ) == 0 )
+            {
+                free( *ppsz_option );
+                *ppsz_option = vstr.ptr;
+                b_overwritten = true;
+            }
+        }
+
+        if( !b_overwritten )
+        {
+            input_item_AddOption( priv->p_item, vstr.ptr,
+                                  VLC_INPUT_OPTION_UNIQUE );
+            free( vstr.ptr );
+        }
     }
 
     input_SendEventBookmark( p_input );
