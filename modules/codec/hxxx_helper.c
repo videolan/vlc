@@ -180,7 +180,7 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
             hnal->h264_sps = p_sps;
             *p_config_changed = true;
             hh->h264.i_current_sps = p_sps->i_id;
-            msg_Dbg(hh->p_obj, "new SPS parsed: %u\n", p_sps->i_id);
+            msg_Dbg(hh->p_obj, "new SPS parsed: %u", p_sps->i_id);
         }
         else if (i_nal_type == H264_NAL_PPS)
         {
@@ -205,7 +205,7 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
 
             hnal->h264_pps = p_pps;
             *p_config_changed = true;
-            msg_Dbg(hh->p_obj, "new PPS parsed: %u\n", p_pps->i_id);
+            msg_Dbg(hh->p_obj, "new PPS parsed: %u", p_pps->i_id);
         }
         else if (i_nal_type <= H264_NAL_SLICE_IDR
               && i_nal_type != H264_NAL_UNKNOWN)
