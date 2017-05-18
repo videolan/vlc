@@ -62,10 +62,8 @@ typedef struct
 
 static inline void cc_Init( cc_data_t *c )
 {
-    int i;
-
-    for( i = 0; i < 4; i++ )
-        c-> pb_present[i] = false; 
+    for( int i = 0; i < 4; i++ )
+        c->pb_present[i] = false;
     c->i_data = 0;
     c->b_reorder = false;
     c->i_payload_type = CC_PAYLOAD_NONE;
