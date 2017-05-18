@@ -239,6 +239,8 @@ static bool parse_playlist_node COMPLEX_INTERFACE
     {
     /*  element start tag  */
     case XML_READER_STARTELEM:
+        FREENULL(psz_value);
+
         if (!*name)
         {
             msg_Err(p_demux, "invalid XML stream");
@@ -254,7 +256,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         /* complex content is parsed in a separate function */
         if (p_handler->cmplx)
         {
-            FREENULL(psz_value);
             if (!p_handler->pf_handler.cmplx(p_demux, p_input_node,
                         p_xml_reader, p_handler->name))
                 return false;
@@ -385,6 +386,8 @@ static bool parse_track_node COMPLEX_INTERFACE
     {
     /*  element start tag  */
     case XML_READER_STARTELEM:
+        FREENULL(psz_value);
+
         if (!*name)
         {
             msg_Err(p_demux, "invalid XML stream");
@@ -400,8 +403,6 @@ static bool parse_track_node COMPLEX_INTERFACE
         /* complex content is parsed in a separate function */
         if (p_handler->cmplx)
         {
-            FREENULL(psz_value);
-
             if (!p_handler->pf_handler.cmplx(p_demux, p_new_node,
                                              p_xml_reader, p_handler->name)) {
                 input_item_node_Delete(p_new_node);
@@ -660,10 +661,11 @@ static bool parse_extension_node COMPLEX_INTERFACE
         {
             /*  element start tag  */
             case XML_READER_STARTELEM:
+                FREENULL(psz_value);
+
                 if (!*name)
                 {
                     msg_Err(p_demux, "invalid xml stream");
-                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
@@ -672,7 +674,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!p_handler)
                 {
                     msg_Err(p_demux, "unexpected element <%s>", name);
-                    FREENULL(psz_value);
                     if (b_release_input_item) input_item_Release(p_new_input);
                     return false;
                 }
@@ -685,11 +686,9 @@ static bool parse_extension_node COMPLEX_INTERFACE
                                                      p_handler->name))
                     {
                         p_handler = NULL;
-                        FREENULL(psz_value);
                     }
                     else
                     {
-                        FREENULL(psz_value);
                         if (b_release_input_item)
                             input_item_Release(p_new_input);
                         return false;
