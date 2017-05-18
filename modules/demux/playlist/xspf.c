@@ -578,7 +578,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
     char *psz_title = NULL;
     char *psz_application = NULL;
     int i_node;
-    bool b_release_input_item = false;
     const xml_elem_hnd_t *p_handler = NULL;
     input_item_t *p_new_input = NULL;
 
@@ -629,7 +628,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
             p_input_node =
                 input_item_node_AppendItem(p_input_node, p_new_input);
             p_input_item = p_new_input;
-            b_release_input_item = true;
         }
     }
     else if (!strcmp(psz_element, "extension"))
@@ -666,7 +664,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!*name)
                 {
                     msg_Err(p_demux, "invalid xml stream");
-                    if (b_release_input_item) input_item_Release(p_new_input);
+                    if (p_new_input) input_item_Release(p_new_input);
                     return false;
                 }
                 /* choose handler */
@@ -674,7 +672,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!p_handler)
                 {
                     msg_Err(p_demux, "unexpected element <%s>", name);
-                    if (b_release_input_item) input_item_Release(p_new_input);
+                    if (p_new_input) input_item_Release(p_new_input);
                     return false;
                 }
                 /* complex content is parsed in a separate function */
@@ -689,7 +687,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     }
                     else
                     {
-                        if (b_release_input_item)
+                        if (p_new_input)
                             input_item_Release(p_new_input);
                         return false;
                     }
@@ -702,7 +700,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 psz_value = strdup(name);
                 if (unlikely(!psz_value))
                 {
-                    if (b_release_input_item) input_item_Release(p_new_input);
+                    if (p_new_input) input_item_Release(p_new_input);
                     return false;
                 }
                 break;
@@ -713,7 +711,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if (!strcmp(name, psz_element))
                 {
                     FREENULL(psz_value);
-                    if (b_release_input_item) input_item_Release(p_new_input);
+                    if (p_new_input) input_item_Release(p_new_input);
                     return true;
                 }
                 /* there MUST have been a start tag for that element name */
@@ -723,7 +721,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                     msg_Err(p_demux, "there's no open element left for <%s>",
                              name);
                     FREENULL(psz_value);
-                    if (b_release_input_item) input_item_Release(p_new_input);
+                    if (p_new_input) input_item_Release(p_new_input);
                     return false;
                 }
 
@@ -742,7 +740,8 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 break;
         }
     }
-    if (b_release_input_item) input_item_Release(p_new_input);
+
+    if (p_new_input) input_item_Release(p_new_input);
     free(psz_value);
     return false;
 }
