@@ -508,6 +508,7 @@ kwallet_network_wallet( vlc_keystore* p_keystore )
     {
         msg_Err( p_keystore, "kwallet_network_wallet : "
                  "dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
 
@@ -572,6 +573,7 @@ kwallet_is_enabled( vlc_keystore* p_keystore, int i_sid, bool* b_is_enabled )
     {
         msg_Err( p_keystore, "kwallet_is_enabled : "
                  "dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
 
@@ -717,6 +719,7 @@ kwallet_has_folder( vlc_keystore* p_keystore, const char* psz_folder_name, bool 
     {
         msg_Err( p_keystore, "kwallet_has_folder :"
                  " dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
 
@@ -775,6 +778,7 @@ kwallet_create_folder( vlc_keystore* p_keystore, const char* psz_folder_name )
     {
         msg_Err( p_keystore, "kwallet_create_folder :"
                  " dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
 
@@ -840,6 +844,7 @@ kwallet_open( vlc_keystore* p_keystore )
     {
         msg_Err( p_keystore, "kwallet_open :"
                  " dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
     p_sys->i_handle = ui_reply;
@@ -910,6 +915,7 @@ kwallet_has_entry( vlc_keystore* p_keystore, char* psz_entry_name, bool *b_has_e
     {
         msg_Err( p_keystore, "kwallet_has_entry :"
                  " dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
     *b_has_entry = b_reply;
@@ -967,6 +973,7 @@ kwallet_write_password( vlc_keystore* p_keystore, char* psz_entry_name, const ch
     {
         msg_Err( p_keystore, "kwallet_write_password :"
                  " dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
 
@@ -1035,6 +1042,7 @@ kwallet_remove_entry( vlc_keystore* p_keystore, char* psz_entry_name )
     {
         msg_Err( p_keystore, "kwallet_remove entry :"
                  " dbus_message_get_args failed\n%s", error.message );
+        dbus_error_free( &error );
         goto end;
     }
 
