@@ -305,8 +305,12 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 }
 
 /**
- * This function queues queues the Closed Captions
+ * This function queues the Closed Captions
  *
+ * \param dec the decoder object
+ * \param p_cc the closed-caption to queue
+ * \param p_cc_present array-of-bool where each entry indicates whether the
+ *                     given channel is present or not
  * \return 0 if queued, -1 on error
  */
 static inline int decoder_QueueCc( decoder_t *dec, block_t *p_cc,
