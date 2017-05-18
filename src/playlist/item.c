@@ -165,7 +165,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
     {
         if( ( b_stop && !b_flat ) || !b_autostart )
         {
-            playlist_Stop( p_playlist );
+            playlist_Control( p_playlist, PLAYLIST_STOP, pl_Locked );
         }
         else if( last_pos != pos ) /* any children? */
         {
