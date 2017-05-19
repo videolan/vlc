@@ -839,6 +839,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->b_discontinuity = false;
             tk->i_next_block_flags = 0;
             tk->i_lastpts   = VLC_TS_INVALID;
+            tk->i_offset    = 0;
             tk->i_pcr       = VLC_TS_INVALID;
             tk->f_npt       = 0.;
             tk->b_selected  = true;
