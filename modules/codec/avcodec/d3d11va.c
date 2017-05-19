@@ -179,10 +179,10 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 {
     vlc_va_sys_t *sys = va->sys;
     ID3D11VideoDecoderOutputView *src = (ID3D11VideoDecoderOutputView*)(uintptr_t)data;
-    vlc_va_surface_t *surface = output->context;
+    vlc_va_surface_t *surface = output->context; /* when coming from our local pool */
     int ret = VLC_SUCCESS;
 
-    picture_sys_t *p_sys_out = output->p_sys;
+    picture_sys_t *p_sys_out = surface ? surface->p_pic->p_sys : output->p_sys;
 
     assert(p_sys_out->texture[KNOWN_DXGI_INDEX] != NULL);
 
@@ -267,6 +267,9 @@ done:
         }
     }
 #endif
+    if (!output->p_sys && surface->p_pic && surface->p_pic->p_sys)
+        /* HW decoding in a software pipe, pass the texture to upstream filters */
+        output->p_sys = surface->p_pic->p_sys;
 
     return ret;
 }
