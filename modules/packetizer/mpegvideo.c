@@ -526,9 +526,12 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
             p_pic->i_pts = date_Get( &datepts );
 
-            date_Increment( &p_sys->dts,  i_num_fields );
+            if( date_Get( &p_sys->dts ) != VLC_TS_INVALID )
+            {
+                date_Increment( &p_sys->dts,  i_num_fields );
 
-            p_pic->i_length = date_Get( &p_sys->dts ) - p_pic->i_dts;
+                p_pic->i_length = date_Get( &p_sys->dts ) - p_pic->i_dts;
+            }
             p_sys->i_prev_temporal_ref = p_sys->i_temporal_ref;
         }
         else /* General case, use demuxer's dts/pts when set or interpolate */
@@ -570,9 +573,12 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
                 p_pic->i_pts = VLC_TS_INVALID;
             }
 
-            date_Increment( &p_sys->dts,  i_num_fields );
+            if( date_Get( &p_sys->dts ) != VLC_TS_INVALID )
+            {
+                date_Increment( &p_sys->dts,  i_num_fields );
 
-            p_pic->i_length = date_Get( &p_sys->dts ) - p_pic->i_dts;
+                p_pic->i_length = date_Get( &p_sys->dts ) - p_pic->i_dts;
+            }
         }
 
 #if 0
