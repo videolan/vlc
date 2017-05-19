@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCDebugMessageWindowController">
             <connections>
                 <outlet property="arrayController" destination="0Or-bh-QJU" id="Wo9-Rk-Jkb"/>
-                <outlet property="clipView" destination="jLc-G4-HUQ" id="UtI-Q9-OBb"/>
                 <outlet property="detailView" destination="ESj-Mw-X94" id="YDo-hQ-k1t"/>
                 <outlet property="messageTable" destination="Cpc-IS-2Wn" id="epz-ce-UQA"/>
                 <outlet property="splitView" destination="5ZT-Oc-K6D" id="K9Q-Lz-SNd"/>
