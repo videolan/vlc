@@ -222,22 +222,22 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             p_bkmk = va_arg( args, seekpoint_t * );
             i_bkmk = va_arg( args, int );
 
-            p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );
-
-            if( !p_bkmk )
-                return VLC_EGENERIC;
-
             vlc_mutex_lock( &priv->p_item->lock );
             if( i_bkmk < priv->i_bookmark )
             {
-                vlc_seekpoint_Delete( priv->pp_bookmark[i_bkmk] );
-                priv->pp_bookmark[i_bkmk] = p_bkmk;
+                p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );
+                if( p_bkmk )
+                {
+                    vlc_seekpoint_Delete( priv->pp_bookmark[i_bkmk] );
+                    priv->pp_bookmark[i_bkmk] = p_bkmk;
+                }
             }
+            else p_bkmk = NULL;
             vlc_mutex_unlock( &priv->p_item->lock );
 
             UpdateBookmarksOption( p_input );
 
-            return VLC_SUCCESS;
+            return p_bkmk ? VLC_SUCCESS : VLC_EGENERIC;
 
         case INPUT_DEL_BOOKMARK:
             i_bkmk = va_arg( args, int );
