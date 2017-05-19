@@ -341,11 +341,11 @@ clear:
     assert(bookmark != NULL);
 
     mtime_t total = bookmark->i_time_offset;
-    unsigned hour = ( total / ( CLOCK_FREQ * 3600 ) );
-    unsigned min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
+    uint64_t hour = ( total / ( CLOCK_FREQ * 3600 ) );
+    uint64_t min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
     float    sec = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );
 
-    return [NSString stringWithFormat:@"%02d:%02d:%06.3f", hour, min, sec];
+    return [NSString stringWithFormat:@"%02llu:%02llu:%06.3f", hour, min, sec];
 }
 
 /*****************************************************************************
