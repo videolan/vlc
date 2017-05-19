@@ -9,7 +9,7 @@ PKGS_FOUND += vpx
 endif
 
 $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
-	$(call download,$(VPX_URL))
+	$(call download_pkg,$(VPX_URL),vpx)
 
 .sum-vpx: libvpx-$(VPX_VERSION).tar.bz2
 
