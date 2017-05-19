@@ -176,7 +176,7 @@
     }
 
     [_editNameTextField setStringValue: toNSStr(pp_bookmarks[row]->psz_name)];
-    mtime_t total = pp_bookmarks[i]->i_time_offset;
+    mtime_t total = pp_bookmarks[row]->i_time_offset;
     unsigned hour = ( total / ( CLOCK_FREQ * 3600 ) );
     unsigned min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
     float    sec = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );
