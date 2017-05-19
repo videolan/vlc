@@ -1104,10 +1104,7 @@ static void DxDestroySurfaces(vlc_va_t *va)
 static void DestroyPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
-    ID3D11Texture2D_Release( p_sys->texture[KNOWN_DXGI_INDEX] );
-    if (p_sys->processorInput)
-        ID3D11VideoProcessorInputView_Release( p_sys->processorInput );
-
+    ReleasePictureSys(p_sys);
     free(p_sys);
     free(picture);
 }
