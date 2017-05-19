@@ -838,7 +838,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     if( p_pic->i_pts == VLC_TS_INVALID )
     {
-        if( p_sys->prevdatedpoc.pts > VLC_TS_INVALID )
+        if( p_sys->prevdatedpoc.pts > VLC_TS_INVALID &&
+            date_Get( &p_sys->dts ) != VLC_TS_INVALID )
         {
             date_t pts = p_sys->dts;
             date_Set( &pts, p_sys->prevdatedpoc.pts );
@@ -857,7 +858,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
         {
             p_pic->i_pts = p_pic->i_dts;
         }
-        else if( p_sys->slice.type == H264_SLICE_TYPE_I )
+        else if( p_sys->slice.type == H264_SLICE_TYPE_I &&
+                 date_Get( &p_sys->dts ) != VLC_TS_INVALID )
         {
             /* Hell no PTS on IDR. We're totally blind */
             date_t pts = p_sys->dts;
@@ -898,7 +900,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_sys->b_discontinuity )
     {
         /* save for next pic fixups */
-        date_Increment( &p_sys->dts, i_num_clock_ts );
+        if( date_Get( &p_sys->dts ) != VLC_TS_INVALID )
+            date_Increment( &p_sys->dts, i_num_clock_ts );
     }
     else
     {
