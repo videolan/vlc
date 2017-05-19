@@ -719,7 +719,11 @@ static int DecoderTimedWait( decoder_t *p_dec, mtime_t deadline )
 
 static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
 {
-    if( p->i_flags & (BLOCK_FLAG_PREROLL|BLOCK_FLAG_DISCONTINUITY) )
+    if( p->i_flags & BLOCK_FLAG_PREROLL )
+        *pi_preroll = INT64_MAX;
+    /* Check if we can use the packet for end of preroll */
+    else if( (p->i_flags & BLOCK_FLAG_DISCONTINUITY) &&
+             (p->i_buffer == 0 || (p->i_flags & BLOCK_FLAG_CORRUPTED)) )
         *pi_preroll = INT64_MAX;
     else if( p->i_dts > VLC_TS_INVALID )
         *pi_preroll = __MIN( *pi_preroll, p->i_dts );
