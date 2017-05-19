@@ -636,6 +636,7 @@ static int satip_open(vlc_object_t *obj)
 
     sys->udp_sock = -1;
     sys->rtcp_sock = -1;
+    sys->tcp_sock = -1;
 
     /* convert url to lowercase, some famous m3u playlists for satip contain
      * uppercase parameters while most (all?) satip servers do only understand
