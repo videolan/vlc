@@ -822,6 +822,8 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
         mkv_track_t& track = it->second;
 
         track.i_skip_until_fpos = -1;
+        if( track.i_last_dts > VLC_TS_INVALID )
+            track.b_discontinuity = true;
         track.i_last_dts        = VLC_TS_INVALID;
     }
 
@@ -850,7 +852,6 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 
         track.i_skip_until_fpos = it->second.fpos;
         track.i_last_dts        = it->second.pts;
-        track.b_discontinuity   = true;
 
         msg_Dbg( &sys.demuxer, "seek: preroll{ track: %u, pts: %" PRId64 ", fpos: %" PRIu64 " } ",
           it->first, it->second.pts, it->second.fpos );
