@@ -298,7 +298,7 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
                             uint8_t *cache, size_t cache_size,
                             unsigned height, unsigned cpu)
 {
-    const unsigned w16 = (2*src_pitch+15) & ~15;
+    const unsigned w16 = (src_pitch+15) & ~15;
     const unsigned hstep = cache_size / w16;
     assert(hstep > 0);
 
@@ -307,7 +307,7 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
 
         /* Copy a bunch of line into our cache */
         CopyFromUswc(cache, w16, src, src_pitch,
-                     2*src_pitch, hblock, cpu);
+                     src_pitch, hblock, cpu);
 
         /* Copy from our cache to the destination */
         SSE_SplitUV(dstu, dstu_pitch, dstv, dstv_pitch,
