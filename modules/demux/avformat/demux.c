@@ -711,7 +711,7 @@ void CloseDemux( vlc_object_t *p_this )
     }
 
     for( int i = 0; i < p_sys->i_attachments; i++ )
-        free( p_sys->attachments[i] );
+        vlc_input_attachment_Delete( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     if( p_sys->p_title )
