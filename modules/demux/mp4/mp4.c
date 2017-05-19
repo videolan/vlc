@@ -4248,7 +4248,7 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
         block_t *p_block = vlc_stream_Block( p_demux->s, len );
         uint32_t i_read = ( p_block ) ? p_block->i_buffer : 0;
         p_track->context.i_trun_sample_pos += i_read;
-        if( i_read < len )
+        if( i_read < len || p_block == NULL )
         {
             free( p_block );
             return VLC_DEMUXER_EOF;
