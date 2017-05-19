@@ -62,7 +62,9 @@ struct vlc_va_sys_t
 #endif
     struct vaapi_context hw_ctx;
 
+#ifndef VLC_VA_BACKEND_DR /* XLIB or DRM */
     picture_pool_t *pool;
+#endif
 };
 
 static int GetVaProfile(AVCodecContext *ctx, VAProfile *va_profile,
@@ -129,6 +131,109 @@ static int Extract(vlc_va_t *va, picture_t *pic, uint8_t *data)
     (void) va; (void) pic; (void) data;
     return VLC_SUCCESS;
 }
+
+#ifdef VLC_VA_BACKEND_DR
+
+static int GetDR(vlc_va_t *va, picture_t *pic, uint8_t **data)
+{
+    (void) va;
+
+    vlc_vaapi_PicAttachContext(pic);
+    *data = (void *) (uintptr_t) vlc_vaapi_PicGetSurface(pic);
+
+    return VLC_SUCCESS;
+}
+
+static void DeleteDR(vlc_va_t *va, AVCodecContext *avctx)
+{
+    vlc_va_sys_t *sys = va->sys;
+    vlc_object_t *o = VLC_OBJECT(va);
+
+    (void) avctx;
+
+    vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
+    vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
+    vlc_vaapi_ReleaseInstance(sys->hw_ctx.display);
+    free(sys);
+}
+
+static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
+                    const es_format_t *fmt, picture_sys_t *p_sys)
+{
+    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD)
+        return VLC_EGENERIC;
+
+    (void) fmt;
+    vlc_object_t *o = VLC_OBJECT(va);
+
+    int ret = VLC_EGENERIC;
+    vlc_va_sys_t *sys = NULL;
+
+    /* The picture must be allocated by the vout */
+    VADisplay *va_dpy = vlc_vaapi_GetInstance();
+    if (va_dpy == NULL)
+        return VLC_EGENERIC;
+
+    VASurfaceID *render_targets;
+    unsigned num_render_targets =
+        vlc_vaapi_PicSysGetRenderTargets(p_sys, &render_targets);
+    if (num_render_targets == 0)
+        goto error;
+
+    VAProfile i_profile;
+    unsigned count;
+    if (GetVaProfile(ctx, &i_profile, &count) != VLC_SUCCESS)
+        goto error;
+
+    sys = malloc(sizeof *sys);
+    if (unlikely(sys == NULL))
+    {
+        ret = VLC_ENOMEM;
+        goto error;
+    }
+    memset(sys, 0, sizeof (*sys));
+
+    /* */
+    sys->hw_ctx.display = va_dpy;
+    sys->hw_ctx.config_id = VA_INVALID_ID;
+    sys->hw_ctx.context_id = VA_INVALID_ID;
+
+    sys->hw_ctx.config_id =
+        vlc_vaapi_CreateConfigChecked(o, sys->hw_ctx.display, i_profile,
+                                      VAEntrypointVLD, VA_FOURCC_NV12);
+    if (sys->hw_ctx.config_id == VA_INVALID_ID)
+        goto error;
+
+    /* Create a context */
+    sys->hw_ctx.context_id =
+        vlc_vaapi_CreateContext(o, sys->hw_ctx.display, sys->hw_ctx.config_id,
+                                ctx->coded_width, ctx->coded_height, VA_PROGRESSIVE,
+                                render_targets, num_render_targets);
+    if (sys->hw_ctx.context_id == VA_INVALID_ID)
+        goto error;
+
+    ctx->hwaccel_context = &sys->hw_ctx;
+    va->sys = sys;
+    va->description = vaQueryVendorString(sys->hw_ctx.display);
+    va->get = GetDR;
+    va->release = NULL;
+    va->extract = Extract;
+    return VLC_SUCCESS;
+
+error:
+    if (sys != NULL)
+    {
+        if (sys->hw_ctx.context_id != VA_INVALID_ID)
+            vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
+        if (sys->hw_ctx.config_id != VA_INVALID_ID)
+            vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
+        free(sys);
+    }
+    vlc_vaapi_ReleaseInstance(va_dpy);
+    return ret;
+}
+
+#else /* XLIB or DRM */
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
@@ -308,16 +413,23 @@ error:
     free(sys);
     return VLC_EGENERIC;
 }
+#endif
 
 vlc_module_begin ()
 #if defined (VLC_VA_BACKEND_XLIB)
     set_description( N_("VA-API video decoder via X11") )
+    set_capability( "hw decoder", 0 )
+    set_callbacks( Create, Delete )
 #elif defined (VLC_VA_BACKEND_DRM)
     set_description( N_("VA-API video decoder via DRM") )
-#endif
     set_capability( "hw decoder", 0 )
+    set_callbacks( Create, Delete )
+#elif defined (VLC_VA_BACKEND_DR)
+    set_description( N_("VA-API direct video decoder") )
+    set_capability( "hw decoder", 100 )
+    set_callbacks( CreateDR, DeleteDR )
+#endif
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
-    set_callbacks( Create, Delete )
     add_shortcut( "vaapi" )
 vlc_module_end ()
