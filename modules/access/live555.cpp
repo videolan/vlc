@@ -2054,7 +2054,19 @@ static void StreamRead( void *p_private, unsigned int i_size,
                 if( i_pts != tk->i_lastpts )
                     p_block->i_pts = VLC_TS_0 + i_pts;
                 /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
-                p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
+                switch( tk->fmt.i_codec )
+                {
+                    case VLC_CODEC_MPGV:
+                    case VLC_CODEC_H264:
+                    case VLC_CODEC_HEVC:
+                    case VLC_CODEC_VP8:
+                        p_block->i_dts = VLC_TS_INVALID;
+                        break;
+                    default:
+                        p_block->i_dts = VLC_TS_0 + i_pts;
+                        break;
+                }
+
                 if( unlikely(tk->i_next_block_flags) )
                 {
                     p_block->i_flags |= tk->i_next_block_flags;
