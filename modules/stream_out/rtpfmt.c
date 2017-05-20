@@ -150,7 +150,7 @@ static char *rtp_xiph_b64_oob_config(void *p_extra, size_t i_extra,
     return config;
 }
 
-static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
+static void sprintf_hexa( char *s, const uint8_t *p_data, int i_data )
 {
     static const char hex[16] = "0123456789abcdef";
 
