@@ -35,6 +35,7 @@
 
 #include "rtp.h"
 #include "../demux/xiph.h"
+#include "../packetizer/hxxx_nal.h"
 
 #include <assert.h>
 
@@ -286,71 +287,40 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
 
             if( p_fmt->i_extra > 0 )
             {
-                uint8_t *p_buffer = p_fmt->p_extra;
-                int     i_buffer = p_fmt->i_extra;
                 char    *p_64_sps = NULL;
                 char    *p_64_pps = NULL;
                 char    hexa[6+1];
 
-                while( i_buffer > 4 )
+                hxxx_iterator_ctx_t it;
+                hxxx_iterator_init( &it, p_fmt->p_extra, p_fmt->i_extra, 0 );
+
+                const uint8_t *p_nal;
+                size_t i_nal;
+                while( hxxx_annexb_iterate_next( &it, &p_nal, &i_nal ) )
                 {
-                    int i_offset    = 0;
-                    int i_size      = 0;
-
-                    while( p_buffer[0] != 0 || p_buffer[1] != 0 ||
-                           p_buffer[2] != 1 )
-                    {
-                        p_buffer++;
-                        i_buffer--;
-                        if( i_buffer == 0 ) break;
-                    }
-
-                    if( i_buffer < 4 || memcmp(p_buffer, "\x00\x00\x01", 3 ) )
-                    {
-                        msg_Dbg( obj, "No startcode found..");
-                        break;
-                    }
-                    p_buffer += 3;
-                    i_buffer -= 3;
-
-                    const int i_nal_type = p_buffer[0]&0x1f;
-
-                    msg_Dbg( obj, "we found a startcode for NAL with TYPE:%d", i_nal_type );
-
-                    i_size = i_buffer;
-                    for( i_offset = 0; i_offset+2 < i_buffer ; i_offset++)
-                    {
-                        if( !memcmp(p_buffer + i_offset, "\x00\x00\x01", 3 ) )
-                        {
-                            /* we found another startcode */
-                            while( i_offset > 0 && 0 == p_buffer[ i_offset - 1 ] )
-                                i_offset--;
-                            i_size = i_offset;
-                            break;
-                        }
-                    }
-
-                    if( i_size == 0 )
+                    if( i_nal < 2 )
                     {
                         msg_Dbg( obj, "No-info found in nal ");
                         continue;
                     }
 
-                    if( i_nal_type == 7 )
+                    const int i_nal_type = p_nal[0]&0x1f;
+
+                    msg_Dbg( obj, "we found a startcode for NAL with TYPE:%d", i_nal_type );
+
+                    if( i_nal_type == 7 && i_nal >= 4 )
                     {
                         free( p_64_sps );
-                        p_64_sps = vlc_b64_encode_binary( p_buffer, i_size );
-                        /* XXX: nothing ensures that i_size >= 4 ?? */
-                        sprintf_hexa( hexa, &p_buffer[1], 3 );
+                        p_64_sps = vlc_b64_encode_binary( p_nal, i_nal );
+                        sprintf_hexa( hexa, &p_nal[1], 3 );
                     }
                     else if( i_nal_type == 8 )
                     {
                         free( p_64_pps );
-                        p_64_pps = vlc_b64_encode_binary( p_buffer, i_size );
+                        p_64_pps = vlc_b64_encode_binary( p_nal, i_nal );
                     }
-                    i_buffer -= i_size;
-                    p_buffer += i_size;
                 }
+
                 /* */
                 if( p_64_sps && p_64_pps &&
                     ( asprintf( &rtp_fmt->fmtp,
@@ -1159,15 +1129,11 @@ rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
     int i_nal_hdr;
     int i_nal_type;
 
-    if( i_data < 5 )
+    if( i_data < 2 )
         return VLC_SUCCESS;
 
-    i_nal_hdr = p_data[3];
+    i_nal_hdr = p_data[0];
     i_nal_type = i_nal_hdr&0x1f;
-
-    /* Skip start code */
-    p_data += 3;
-    i_data -= 3;
 
     /* */
     if( i_data <= i_max )
@@ -1220,40 +1186,17 @@ rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
 
 static int rtp_packetize_h264( sout_stream_id_sys_t *id, block_t *in )
 {
-    const uint8_t *p_buffer = in->p_buffer;
-    int i_buffer = in->i_buffer;
+    hxxx_iterator_ctx_t it;
+    hxxx_iterator_init( &it, in->p_buffer, in->i_buffer, 0 );
 
-    while( i_buffer > 4 && ( p_buffer[0] != 0 || p_buffer[1] != 0 || p_buffer[2] != 1 ) )
+    const uint8_t *p_nal;
+    size_t i_nal;
+    while( hxxx_annexb_iterate_next( &it, &p_nal, &i_nal ) )
     {
-        i_buffer--;
-        p_buffer++;
-    }
-
-    /* Split nal units */
-    while( i_buffer > 4 )
-    {
-        int i_offset;
-        int i_size = i_buffer;
-        int i_skip = i_buffer;
-
-        /* search nal end */
-        for( i_offset = 4; i_offset+2 < i_buffer ; i_offset++)
-        {
-            if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && p_buffer[i_offset+2] == 1 )
-            {
-                /* we found another startcode */
-                i_size = i_offset - ( p_buffer[i_offset-1] == 0 ? 1 : 0);
-                i_skip = i_offset;
-                break;
-            }
-        }
         /* TODO add STAP-A to remove a lot of overhead with small slice/sei/... */
-        rtp_packetize_h264_nal( id, p_buffer, i_size,
+        rtp_packetize_h264_nal( id, p_nal, i_nal,
                 (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts), in->i_dts,
-                (i_size >= i_buffer), in->i_length * i_size / in->i_buffer );
-
-        i_buffer -= i_skip;
-        p_buffer += i_skip;
+                it.p_head + 3 >= it.p_tail, in->i_length * i_nal / in->i_buffer );
     }
 
     block_Release(in);
