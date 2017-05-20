@@ -728,8 +728,11 @@ static void SetOutputBlockProperties(decoder_t *p_dec, block_t *p_output)
         uint8_t i_num_clock_ts = hevc_get_num_clock_ts(p_sys->p_active_sps,
                                                        p_sys->p_timing);
         const mtime_t i_start = date_Get(&p_sys->dts);
-        date_Increment(&p_sys->dts, i_num_clock_ts);
-        p_output->i_length = date_Get(&p_sys->dts) - i_start;
+        if( i_start != VLC_TS_INVALID )
+        {
+            date_Increment(&p_sys->dts, i_num_clock_ts);
+            p_output->i_length = date_Get(&p_sys->dts) - i_start;
+        }
         p_sys->pts = VLC_TS_INVALID;
     }
     hevc_release_sei_pic_timing(p_sys->p_timing);
