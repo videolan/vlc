@@ -16,10 +16,8 @@ VLC.app: install
 	rm -Rf $@
 	## Copy Contents
 	cp -R $(prefix)/share/macosx/ $@
-	## Copy .strings file
-	cp -R $(top_builddir)/modules/gui/macosx/UI/InfoPlist.strings $@/Contents/Resources/UI
-	## Rename interface files (UI) folder
-	mv $@/Contents/Resources/UI $@/Contents/Resources/English.lproj
+	## Copy .strings file and .nib files
+	cp -R $(top_builddir)/modules/gui/macosx/UI $@/Contents/Resources/English.lproj
 	## Copy Info.plist and convert to binary
 	cp -R $(top_builddir)/share/macosx/Info.plist $@/Contents/
 	xcrun plutil -convert binary1 $@/Contents/Info.plist
