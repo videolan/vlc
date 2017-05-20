@@ -736,53 +736,39 @@ static int rtp_packetize_mpv( sout_stream_id_sys_t *id, block_t *in )
     int     b_start_slice = 0;
 
     /* preparse this packet to get some info */
-    if( in->i_buffer > 4 )
+    hxxx_iterator_ctx_t it;
+    hxxx_iterator_init( &it, in->p_buffer, in->i_buffer, 0 );
+    const uint8_t *p_seq;
+    size_t i_seq;
+    while( hxxx_annexb_iterate_next( &it, &p_seq, &i_seq ) )
     {
-        uint8_t *p = p_data;
-        int      i_rest = in->i_buffer;
-
-        for( ;; )
+        const uint8_t *p = p_seq;
+        if( *p == 0xb3 )
         {
-            while( i_rest > 4 &&
-                   ( p[0] != 0x00 || p[1] != 0x00 || p[2] != 0x01 ) )
-            {
-                p++;
-                i_rest--;
-            }
-            if( i_rest <= 4 )
-            {
-                break;
-            }
-            p += 3;
-            i_rest -= 4;
+            /* sequence start code */
+            b_sequence_start = 1;
+        }
+        else if( *p == 0x00 && i_seq >= 5 )
+        {
+            /* picture */
+            i_temporal_ref = ( p[1] << 2) |((p[2]>>6)&0x03);
+            i_picture_coding_type = (p[2] >> 3)&0x07;
 
-            if( *p == 0xb3 )
+            if( i_picture_coding_type == 2 ||
+                i_picture_coding_type == 3 )
             {
-                /* sequence start code */
-                b_sequence_start = 1;
-            }
-            else if( *p == 0x00 && i_rest >= 4 )
-            {
-                /* picture */
-                i_temporal_ref = ( p[1] << 2) |((p[2]>>6)&0x03);
-                i_picture_coding_type = (p[2] >> 3)&0x07;
-
-                if( i_rest >= 4 && ( i_picture_coding_type == 2 ||
-                                    i_picture_coding_type == 3 ) )
+                i_ffv = (p[3] >> 2)&0x01;
+                i_ffc = ((p[3]&0x03) << 1)|((p[4]>>7)&0x01);
+                if( i_seq > 5 && i_picture_coding_type == 3 )
                 {
-                    i_ffv = (p[3] >> 2)&0x01;
-                    i_ffc = ((p[3]&0x03) << 1)|((p[4]>>7)&0x01);
-                    if( i_rest > 4 && i_picture_coding_type == 3 )
-                    {
-                        i_fbv = (p[4]>>6)&0x01;
-                        i_bfc = (p[4]>>3)&0x07;
-                    }
+                    i_fbv = (p[4]>>6)&0x01;
+                    i_bfc = (p[4]>>3)&0x07;
                 }
             }
-            else if( *p <= 0xaf )
-            {
-                b_start_slice = 1;
-            }
+        }
+        else if( *p <= 0xaf )
+        {
+            b_start_slice = 1;
         }
     }
 
