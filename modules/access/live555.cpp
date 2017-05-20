@@ -2068,6 +2068,9 @@ static void StreamRead( void *p_private, unsigned int i_size,
                         break;
                 }
 
+                if( i_truncated_bytes )
+                    p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
+
                 if( unlikely(tk->i_next_block_flags) )
                 {
                     p_block->i_flags |= tk->i_next_block_flags;
