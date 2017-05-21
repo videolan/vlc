@@ -251,9 +251,15 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         }
 
         p_pic = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
-        *p_fmt_out = p_image->p_filter->fmt_out.video;
+
+        video_format_Clean( p_fmt_out );
+        video_format_Copy( p_fmt_out, &p_image->p_filter->fmt_out.video );
     }
-    else *p_fmt_out = p_image->p_dec->fmt_out.video;
+    else
+    {
+        video_format_Clean( p_fmt_out );
+        video_format_Copy( p_fmt_out, &p_image->p_dec->fmt_out.video );
+    }
 
     return p_pic;
 }
