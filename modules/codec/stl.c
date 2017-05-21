@@ -157,7 +157,7 @@ static void GroupParseTeletext(stl_sg_t *p_group, uint8_t code)
     /* See ETS 300 706 Table 26 as EBU 3264 does only name values
        and does not explain at all */
 
-    static const uint32_t const colors[] =
+    static const uint32_t colors[] =
     {
         0x000000,
         0xFF0000,
