@@ -29,7 +29,6 @@
 #define FREE_VALUE()    FREENULL( psz_value )
 #define FREE_KEY()      FREENULL( psz_key )
 #define FREE_ATT()      FREE_VALUE()
-#define FREE_ATT_KEY()  do{ FREE_VALUE();FREE_KEY();} while(0)
 
 #define UNKNOWN_CONTENT 0
 #define SIMPLE_CONTENT 1

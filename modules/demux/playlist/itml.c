@@ -199,7 +199,8 @@ static bool parse_dict( demux_t *p_demux, input_item_node_t *p_input_node,
                                                  NULL ) )
                 {
                     p_handler = NULL;
-                    FREE_ATT_KEY();
+                    FREENULL( psz_key );
+                    FREENULL( psz_value );
                 }
                 else
                     goto end;
