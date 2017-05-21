@@ -242,7 +242,7 @@ static bool parse_dict( demux_t *p_demux, input_item_node_t *p_input_node,
             {
                 p_handler->pf_handler.smpl( p_track, psz_key, psz_value );
             }
-            FREE_ATT();
+            FREENULL(psz_value);
             p_handler = NULL;
             break;
         }
