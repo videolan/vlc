@@ -190,6 +190,34 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
 
             playlist_ViewPlay( p_playlist, NULL, p_play_item );
         }
+        else if( b_flat && p_playlist->current.i_size > 0 )
+        {
+            /* If the playlist is flat, empty nodes are automatically deleted;
+             * meaning that moving from the current index (the index of a now
+             * removed node) to the next would result in a skip of one entry
+             * (as the empty node is deleted, the logical next item would be
+             * the one that now resides in its place).
+             *
+             * Imagine [ A, B, C, D ], where B (at index 1) is currently being
+             * played and deleted. C is the logically next item, but since the
+             * list now looks like [ A, C, D ], advancing to index 2 would mean
+             * D is played - and not C.
+             *
+             * By positioning the playlist-head at index 0 (A), when the
+             * playlist advance to the next item, C will correctly be played.
+             *
+             * Note: Of course, if the deleted item is at index 0, we should
+             * play whatever item is at position 0 since we cannot advance to
+             * index -1 (as there cannot possibly be any item there).
+             **/
+
+            if( last_pos )
+                ResetCurrentlyPlaying( p_playlist,
+                    ARRAY_VAL( p_playlist->current, last_pos - 1 ) );
+            else
+                playlist_ViewPlay( p_playlist, NULL,
+                    ARRAY_VAL( p_playlist->current, 0 ) );
+        }
     }
 
     PL_UNLOCK;
