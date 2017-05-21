@@ -100,14 +100,15 @@ void playlist_NodeDeleteExplicit( playlist_t *p_playlist,
 {
     PL_ASSERT_LOCKED;
 
-    /* Delete the children */
-    for( int i = p_root->i_children - 1 ; i >= 0; i-- )
-        playlist_NodeDeleteExplicit( p_playlist, p_root->pp_children[i], flags );
-
     /* Delete the node */
     if( p_root->i_flags & PLAYLIST_RO_FLAG &&
         !( flags & PLAYLIST_DELETE_FORCE ) )
         return;
+
+    /* Delete the children */
+    for( int i = p_root->i_children - 1 ; i >= 0; i-- )
+        playlist_NodeDeleteExplicit( p_playlist,
+            p_root->pp_children[i], flags | PLAYLIST_DELETE_FORCE );
 
     pl_priv(p_playlist)->b_reset_currently_playing = true;
 
