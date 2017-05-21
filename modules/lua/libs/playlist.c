@@ -144,7 +144,7 @@ static int vlclua_playlist_delete( lua_State * L )
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( p_item != NULL )
-       playlist_NodeDelete( p_playlist, p_item, false );
+       playlist_NodeDelete( p_playlist, p_item );
     PL_UNLOCK;
 
     return vlclua_push_ret( L, (p_item != NULL) ? 0 : -1 );

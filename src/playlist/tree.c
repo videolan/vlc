@@ -89,17 +89,23 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
  * \param p_playlist the playlist
  * \param p_root the node
  */
-void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
-                          bool b_force )
+void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root )
+{
+    playlist_NodeDeleteExplicit( p_playlist, p_root, 0 );
+}
+
+void playlist_NodeDeleteExplicit( playlist_t *p_playlist,
+    playlist_item_t *p_root, int flags )
 {
     PL_ASSERT_LOCKED;
 
     /* Delete the children */
     for( int i = p_root->i_children - 1 ; i >= 0; i-- )
-        playlist_NodeDelete( p_playlist, p_root->pp_children[i], b_force );
+        playlist_NodeDeleteExplicit( p_playlist, p_root->pp_children[i], flags );
 
     /* Delete the node */
-    if( p_root->i_flags & PLAYLIST_RO_FLAG && !b_force )
+    if( p_root->i_flags & PLAYLIST_RO_FLAG &&
+        !( flags & PLAYLIST_DELETE_FORCE ) )
         return;
 
     pl_priv(p_playlist)->b_reset_currently_playing = true;

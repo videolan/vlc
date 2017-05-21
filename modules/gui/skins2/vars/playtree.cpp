@@ -59,7 +59,7 @@ void Playtree::delSelected()
                 playlist_ItemGetById( m_pPlaylist, it->getId() );
             if( pItem )
             {
-                playlist_NodeDelete( m_pPlaylist, pItem, false );
+                playlist_NodeDelete( m_pPlaylist, pItem );
             }
             playlist_Unlock( m_pPlaylist );
 

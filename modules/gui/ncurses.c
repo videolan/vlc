@@ -1365,7 +1365,7 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
 
         PL_LOCK;
         item = playlist_ItemGetByInput(p_playlist, input);
-        playlist_NodeDelete(p_playlist, item, false);
+        playlist_NodeDelete(p_playlist, item);
 
         if (sys->box_idx >= sys->box_lines_total - 1)
             sys->box_idx = sys->box_lines_total - 2;

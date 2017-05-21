@@ -210,7 +210,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         PL_LOCK;
         playlist_item_t *p_root = playlist_ItemGetById(p_playlist, [item plItemId]);
         if( p_root != NULL )
-            playlist_NodeDelete(p_playlist, p_root, false);
+            playlist_NodeDelete(p_playlist, p_root);
         PL_UNLOCK;
     }];
 }

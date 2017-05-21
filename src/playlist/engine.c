@@ -329,8 +329,14 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     /* Remove all remaining items */
     if( p_playlist->p_media_library != NULL )
-        playlist_NodeDelete( p_playlist, p_playlist->p_media_library, true );
-    playlist_NodeDelete( p_playlist, p_playlist->p_playing, true );
+    {
+        playlist_NodeDeleteExplicit( p_playlist, p_playlist->p_media_library,
+            PLAYLIST_DELETE_FORCE );
+    }
+
+    playlist_NodeDeleteExplicit( p_playlist, p_playlist->p_playing,
+        PLAYLIST_DELETE_FORCE );
+
     assert( p_playlist->root.i_children <= 0 );
     PL_UNLOCK;
 

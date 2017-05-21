@@ -126,6 +126,27 @@ int playlist_InsertInputItemTree ( playlist_t *,
 /* Tree walking */
 int playlist_NodeInsert(playlist_item_t*, playlist_item_t *, int);
 
+/**
+ * Flags for playlist_NodeDeleteExplicit
+ * \defgroup playlist_NodeDeleteExplicit_flags
+ * @{
+ **/
+#define PLAYLIST_DELETE_FORCE 0x01 /**< delete node even if read-only */
+/** @} */
+
+/**
+ * Delete a node with explicit semantics
+ *
+ * This function acts like \ref playlist_NodeDelete with the advantage of the
+ * caller being able control some of the semantics of the function.
+ *
+ * \ref p_playlist the playlist where the node is to be deleted
+ * \ref p_node the node to delete
+ * \ref flags a bitfield consisting of \ref playlist_NodeDeleteExplicit_flags
+ **/
+void playlist_NodeDeleteExplicit(playlist_t*, playlist_item_t*,
+    int flags);
+
 void playlist_ItemRelease( playlist_t *, playlist_item_t * );
 
 void ResetCurrentlyPlaying( playlist_t *p_playlist, playlist_item_t *p_cur );

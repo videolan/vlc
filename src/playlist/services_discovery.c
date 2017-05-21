@@ -103,7 +103,7 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
        becomes empty, delete that node as well */
     if (node != sds->node && node->i_children == 1)
         item = node;
-    playlist_NodeDelete(p_playlist, item, true);
+    playlist_NodeDeleteExplicit(p_playlist, item, PLAYLIST_DELETE_FORCE );
     PL_UNLOCK;
 }
 
@@ -153,7 +153,7 @@ static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
     /* Remove the sd playlist node if it exists */
     playlist_Lock(playlist);
     if (sds->node != NULL)
-        playlist_NodeDelete(playlist, sds->node, true);
+        playlist_NodeDeleteExplicit(playlist, sds->node, PLAYLIST_DELETE_FORCE );
     playlist_Unlock(playlist);
 
     free(sds);
