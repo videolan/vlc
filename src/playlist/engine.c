@@ -149,6 +149,8 @@ static int RateOffsetCallback( vlc_object_t *obj, char const *psz_cmd,
         }
     }
 
+    msg_Dbg( p_playlist, "adjusting rate from %f to %f (%s)",
+        current_rate, rate, faster ? "faster" : "slower" );
 
     return var_SetFloat( p_playlist, "rate", rate );
 }
