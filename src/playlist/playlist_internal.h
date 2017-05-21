@@ -132,6 +132,9 @@ int playlist_NodeInsert(playlist_item_t*, playlist_item_t *, int);
  * @{
  **/
 #define PLAYLIST_DELETE_FORCE 0x01 /**< delete node even if read-only */
+#define PLAYLIST_DELETE_STOP_IF_CURRENT 0x02 /**< stop playlist playback if
+                                                  node is currently the one
+                                                  played */
 /** @} */
 
 /**

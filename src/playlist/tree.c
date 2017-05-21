@@ -91,7 +91,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
  */
 void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root )
 {
-    playlist_NodeDeleteExplicit( p_playlist, p_root, 0 );
+    playlist_NodeDeleteExplicit( p_playlist, p_root,
+        PLAYLIST_DELETE_STOP_IF_CURRENT );
 }
 
 void playlist_NodeDeleteExplicit( playlist_t *p_playlist,
@@ -124,6 +125,9 @@ void playlist_NodeDeleteExplicit( playlist_t *p_playlist,
     {
         /* This item can't be the next one to be played ! */
         set_current_status_item( p_playlist, NULL );
+
+        if( flags & PLAYLIST_DELETE_STOP_IF_CURRENT )
+            playlist_Control( p_playlist, PLAYLIST_STOP, pl_Locked );
     }
 
     for( i = 0; i < p_playlist->current.i_size; i++ )
