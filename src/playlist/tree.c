@@ -121,10 +121,9 @@ void playlist_NodeDeleteExplicit( playlist_t *p_playlist,
             ARRAY_REMOVE( p_playlist->items, i );
     }
 
-    /* Check if it is the current item */
     if( get_current_status_item( p_playlist ) == p_root )
     {
-        /* This item can't be the next one to be played ! */
+        /* a deleted item cannot be currently playing */
         set_current_status_item( p_playlist, NULL );
 
         if( flags & PLAYLIST_DELETE_STOP_IF_CURRENT )
