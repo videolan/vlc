@@ -26,9 +26,6 @@
  */
 
 /* defines */
-#define FREE_VALUE()    FREENULL( psz_value )
-#define FREE_KEY()      FREENULL( psz_key )
-
 #define UNKNOWN_CONTENT 0
 #define SIMPLE_CONTENT 1
 #define COMPLEX_CONTENT 2
