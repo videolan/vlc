@@ -326,9 +326,9 @@ static bool parse_track_dict( demux_t *p_demux, input_item_node_t *p_input_node,
 
     if( !p_track->location )
     {
-        msg_Err( p_demux, "Track needs Location" );
+        msg_Warn( p_demux, "ignoring track without Location entry" );
         free_track( p_track );
-        return false;
+        return true;
     }
 
     msg_Info( p_demux, "Adding '%s'", p_track->location );
