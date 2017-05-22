@@ -3190,17 +3190,13 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        }
        if ( fmt->video.mastering.max_luminance )
        {
-           float luminance = (float)fmt->video.mastering.max_luminance /
-                                    10000.f;
            info_category_AddInfo( p_cat, _("Max luminance"), "%.4f cd/m²",
-                                  luminance );
+               fmt->video.mastering.max_luminance / 10000.f );
        }
        if ( fmt->video.mastering.min_luminance )
        {
-           float luminance = (float)fmt->video.mastering.min_luminance /
-                                    10000.f;
            info_category_AddInfo( p_cat, _("Min luminance"), "%.4f cd/m²",
-                                  luminance );
+               fmt->video.mastering.min_luminance / 10000.f );
        }
        if ( fmt->video.mastering.primaries[4] &&
             fmt->video.mastering.primaries[5] )
