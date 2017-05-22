@@ -1830,9 +1830,9 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS) {
             /* make sure GUI restores the old setting in title menu ... */
             p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-            notifyDiscontinuity( p_sys );
             return VLC_EGENERIC;
         }
+        notifyDiscontinuity( p_sys );
         break;
     }
     case DEMUX_SET_SEEKPOINT:
