@@ -33,26 +33,26 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
+#include <vlc_access.h>
 #include <vlc_charset.h>
 
 #include "playlist.h"
 
-static int Demux(demux_t *);
+static int ReadDir(stream_t *, input_item_node_t *);
 static input_item_t *ParseLine(char *line);
 
 /** Detect dvb-utils zap channels.conf format */
 int Import_DVB(vlc_object_t *p_this)
 {
-    demux_t *demux = (demux_t *)p_this;
+    stream_t *demux = (stream_t *)p_this;
 
     CHECK_FILE(demux);
-    if (!demux_IsPathExtension(demux, ".conf" ) && !demux->obj.force )
+    if (!stream_HasExtension(demux, ".conf" ) && !demux->obj.force )
         return VLC_EGENERIC;
 
     /* Check if this really is a channels file */
     const uint8_t *peek;
-    int len = vlc_stream_Peek(demux->s, &peek, 1023);
+    int len = vlc_stream_Peek(demux->p_source, &peek, 1023);
     if (len <= 0)
         return VLC_EGENERIC;
 
@@ -71,20 +71,18 @@ int Import_DVB(vlc_object_t *p_this)
     input_item_Release(item);
 
     msg_Dbg(demux, "found valid channels.conf file");
-    demux->pf_control = Control;
-    demux->pf_demux = Demux;
+    demux->pf_control = access_vaDirectoryControlHelper;
+    demux->pf_readdir = ReadDir;
 
     return VLC_SUCCESS;
 }
 
 /** Parses the whole channels.conf file */
-static int Demux(demux_t *demux)
+static int ReadDir(stream_t *s, input_item_node_t *subitems)
 {
-    input_item_t *input = GetCurrentItem(demux);
-    input_item_node_t *subitems = input_item_node_Create(input);
     char *line;
 
-    while ((line = vlc_stream_ReadLine(demux->s)) != NULL)
+    while ((line = vlc_stream_ReadLine(s->p_source)) != NULL)
     {
         input_item_t *item = ParseLine(line);
         free(line);
@@ -95,9 +93,7 @@ static int Demux(demux_t *demux)
         input_item_Release(item);
     }
 
-    input_item_node_PostAndDelete(subitems);
-
-    return 0; /* Needed for correct operation of go back */
+    return VLC_SUCCESS;
 }
 
 static int cmp(const void *k, const void *e)

@@ -125,6 +125,8 @@ Demuxers:
  * Fix Quicktime Mp4 inside MKV and unpacketized VC1
  * Support for isofLaC
  * Improved fLaC seeking
+ * Replaced --demux dvb-open option with --stream-filter dvb to parse
+   channels.conf digital TV channel list files
 
 Stream filter:
  * Added ADF stream filter
