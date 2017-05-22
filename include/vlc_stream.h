@@ -315,6 +315,15 @@ static inline int64_t stream_Size( stream_t *s )
     return i_pos;
 }
 
+VLC_USED
+static inline bool stream_HasExtension( stream_t *s, const char *extension )
+{
+    const char *name = (s->psz_filepath != NULL) ? s->psz_filepath
+                                                 : s->psz_url;
+    const char *ext = strrchr( name, '.' );
+    return ext != NULL && !strcasecmp( ext, extension );
+}
+
 /**
  * Get the Content-Type of a stream, or NULL if unknown.
  * Result must be free()'d.
