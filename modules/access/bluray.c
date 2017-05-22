@@ -1748,8 +1748,6 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
         return VLC_EGENERIC;
     }
 
-    blurayResetParser(p_demux);
-
     return VLC_SUCCESS;
 }
 
@@ -1832,6 +1830,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
             p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             return VLC_EGENERIC;
         }
+        blurayResetParser( p_demux );
         notifyDiscontinuity( p_sys );
         break;
     }
