@@ -147,7 +147,7 @@ int Import_ASX( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    CHECK_FILE();
+    CHECK_FILE(p_demux);
 
     char *type = stream_MimeType( p_demux->s );
 

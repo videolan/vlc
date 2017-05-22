@@ -47,7 +47,7 @@ static int Demux( demux_t * );
 int Import_iTML( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    CHECK_FILE();
+    CHECK_FILE(p_demux);
     if( !demux_IsPathExtension( p_demux, ".xml" )
      && !demux_IsForced( p_demux, "itml" ) )
         return VLC_EGENERIC; \

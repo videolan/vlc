@@ -72,9 +72,9 @@ static inline input_item_t * GetCurrentItem(demux_t *p_demux)
     return input_GetItem( p_demux->p_input );
 }
 
-#define CHECK_FILE() \
+#define CHECK_FILE(obj) \
 do { \
-    if( vlc_stream_Control( ((demux_t *)p_this)->s, \
+    if( vlc_stream_Control( (obj)->s, \
                             STREAM_IS_DIRECTORY ) == VLC_SUCCESS ) \
         return VLC_EGENERIC; \
 } while(0)

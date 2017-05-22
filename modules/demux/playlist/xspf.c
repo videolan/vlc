@@ -85,7 +85,7 @@ int Import_xspf(vlc_object_t *p_this)
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    CHECK_FILE();
+    CHECK_FILE(p_demux);
 
     if( !demux_IsPathExtension( p_demux, ".xspf" )
      && !demux_IsContentType( p_demux, "application/xspf+xml" ) )

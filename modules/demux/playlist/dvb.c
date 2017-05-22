@@ -46,7 +46,7 @@ int Import_DVB(vlc_object_t *p_this)
 {
     demux_t *demux = (demux_t *)p_this;
 
-    CHECK_FILE();
+    CHECK_FILE(demux);
     if (!demux_IsPathExtension(demux, ".conf" ) && !demux->obj.force )
         return VLC_EGENERIC;
 
