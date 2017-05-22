@@ -98,7 +98,7 @@ vlc_module_begin ()
     add_submodule ()
         set_description( N_("New winamp 5.2 shoutcast import") )
         add_shortcut( "shout-winamp" )
-        set_capability( "demux", 0 )
+        set_capability( "stream_filter", 0 )
         set_callbacks( Import_Shoutcast, NULL )
         add_bool( "shoutcast-show-adult", false,
                    SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, false )
