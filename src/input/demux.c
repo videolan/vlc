@@ -65,7 +65,6 @@ static const char *demux_NameFromMimeType(const char *mime)
         { "audio/aac",           "m4a"     },
         { "audio/aacp",          "m4a"     },
         { "audio/mpeg",          "mp3"     },
-        { "application/rss+xml", "podcast" },
         //{ "video/MP1S",          "es,mpgv" }, !b_force
         { "video/dv",            "rawdv"   },
         { "video/MP2P",          "ps"      },
