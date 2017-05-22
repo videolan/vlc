@@ -420,6 +420,13 @@ vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys, uint8_t **
     return surface;
 }
 
+void directx_va_AddRef(vlc_va_surface_t *surface)
+{
+    vlc_mutex_lock( surface->p_lock );
+    surface->refcount++;
+    vlc_mutex_unlock( surface->p_lock );
+}
+
 void directx_va_Release(vlc_va_surface_t *surface)
 {
     vlc_mutex_lock( surface->p_lock );
