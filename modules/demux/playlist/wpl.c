@@ -25,16 +25,10 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
+#include <vlc_access.h>
 #include <vlc_xml.h>
 
 #include "playlist.h"
-
-struct demux_sys_t
-{
-    xml_reader_t* p_reader;
-    char* psz_prefix;
-};
 
 static int consume_tag( xml_reader_t* p_reader, char const* psz_tag )
 {
@@ -61,21 +55,21 @@ static int consume_tag( xml_reader_t* p_reader, char const* psz_tag )
     return VLC_EGENERIC;
 }
 
-static int consume_volatile_tag( demux_t* p_demux, char const* psz_tag )
+static int consume_volatile_tag( stream_t* p_demux, char const* psz_tag )
 {
     char* psz_copy = strdup( psz_tag );
     int ret = VLC_ENOMEM;
 
     if( likely( psz_copy ) )
-        ret = consume_tag( p_demux->p_sys->p_reader, psz_copy );
+        ret = consume_tag( p_demux->p_sys, psz_copy );
 
     free( psz_copy );
     return ret;
 }
 
-static void parse_meta( demux_t* p_demux, input_item_t* p_input )
+static void parse_meta( stream_t* p_demux, input_item_t* p_input )
 {
-    xml_reader_t* p_reader = p_demux->p_sys->p_reader;
+    xml_reader_t *p_reader = p_demux->p_sys;
     bool const b_empty = xml_ReaderIsEmptyElement( p_reader ) == 1;
 
     char *psz_meta_name = NULL, *psz_meta_content = NULL;
@@ -121,9 +115,9 @@ done:
     free( psz_meta_content );
 }
 
-static int parse_title_element( demux_t* p_demux, input_item_t* p_input )
+static int parse_title_element( stream_t* p_demux, input_item_t* p_input )
 {
-    xml_reader_t* p_reader = p_demux->p_sys->p_reader;
+    xml_reader_t *p_reader = p_demux->p_sys;
     char const* psz_title;
 
     if( xml_ReaderIsEmptyElement( p_reader ) )
@@ -138,9 +132,9 @@ static int parse_title_element( demux_t* p_demux, input_item_t* p_input )
     return VLC_SUCCESS;
 }
 
-static void read_head( demux_t* p_demux, input_item_t* p_input )
+static void read_head( stream_t* p_demux, input_item_t* p_input )
 {
-    xml_reader_t* p_reader = p_demux->p_sys->p_reader;
+    xml_reader_t *p_reader = p_demux->p_sys;
     char const* psz_name;
     int i_type;
 
@@ -170,23 +164,23 @@ static void read_head( demux_t* p_demux, input_item_t* p_input )
     }
 }
 
-static void read_body( demux_t* p_demux, input_item_node_t* p_node )
+static void read_body( stream_t* p_demux, input_item_node_t* p_node )
 {
-    demux_sys_t* p_sys = p_demux->p_sys;
+    xml_reader_t *p_reader = p_demux->p_sys;
     const char* psz_name;
     int i_type;
 
-    i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
+    i_type = xml_ReaderNextNode( p_reader, &psz_name );
     if ( i_type != XML_READER_STARTELEM || strcasecmp( psz_name, "seq" ) )
     {
         msg_Err( p_demux, "Expected opening <seq> tag. Got <%s> with type %d", psz_name, i_type );
         return;
     }
 
-    if( xml_ReaderIsEmptyElement( p_sys->p_reader ) == 1 )
+    if( xml_ReaderIsEmptyElement( p_reader ) == 1 )
         return;
 
-    while ( ( i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name ) ) > 0 )
+    while ( ( i_type = xml_ReaderNextNode( p_reader, &psz_name ) ) > 0 )
     {
         if ( i_type == XML_READER_ENDELEM && !strcasecmp( psz_name, "seq" ) )
             break;
@@ -195,16 +189,16 @@ static void read_body( demux_t* p_demux, input_item_node_t* p_node )
         {
             if( !strcasecmp( psz_name, "media" ) )
             {
-                const bool b_empty = xml_ReaderIsEmptyElement( p_sys->p_reader );
+                const bool b_empty = xml_ReaderIsEmptyElement( p_reader );
 
                 const char *psz_attr = NULL, *psz_val = NULL;
-                while ((psz_attr = xml_ReaderNextAttr( p_sys->p_reader, &psz_val )))
+                while ((psz_attr = xml_ReaderNextAttr( p_reader, &psz_val )))
                 {
                     if ( !psz_val || *psz_val == '\0' )
                         continue;
                     if (!strcasecmp( psz_attr, "src" ) )
                     {
-                        char* mrl = ProcessMRL( psz_val, p_sys->psz_prefix );
+                        char* mrl = ProcessMRL( psz_val, p_demux->psz_url );
                         if ( unlikely( !mrl ) )
                             return;
                         input_item_t* p_item = input_item_New( mrl, NULL );
@@ -218,7 +212,7 @@ static void read_body( demux_t* p_demux, input_item_node_t* p_node )
                 }
 
                 if( b_empty == false )
-                    consume_tag( p_sys->p_reader, "media" );
+                    consume_tag( p_reader, "media" );
 
                 continue;
             }
@@ -228,34 +222,26 @@ static void read_body( demux_t* p_demux, input_item_node_t* p_node )
         }
     }
 
-    i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
+    i_type = xml_ReaderNextNode( p_reader, &psz_name );
     if ( i_type != XML_READER_ENDELEM || strcasecmp( psz_name, "body" ) )
         msg_Err( p_demux, "Expected closing <body> tag. Got: <%s> with type %d", psz_name, i_type );
 }
 
-static int Demux( demux_t* p_demux )
+static int Demux( stream_t* p_demux, input_item_node_t *p_node )
 {
+    xml_reader_t *p_reader = p_demux->p_sys;
     const char* psz_name;
     int i_type;
 
-    demux_sys_t* p_sys = p_demux->p_sys;
-    p_sys->psz_prefix = FindPrefix( p_demux );
-    if( unlikely(p_sys->psz_prefix == NULL) )
-        return VLC_DEMUXER_EOF;
-
-    if( xml_ReaderNextNode( p_sys->p_reader, &psz_name ) != XML_READER_STARTELEM ||
-        strcasecmp( psz_name, "smil" ) || xml_ReaderIsEmptyElement( p_sys->p_reader ) == 1 )
+    if( xml_ReaderNextNode( p_reader, &psz_name ) != XML_READER_STARTELEM ||
+        strcasecmp( psz_name, "smil" ) || xml_ReaderIsEmptyElement( p_reader ) == 1 )
     {
-        return VLC_DEMUXER_EOF;
+        return VLC_EGENERIC;
     }
 
     input_item_t* p_input = GetCurrentItem( p_demux );
-    input_item_node_t* p_node = input_item_node_Create( p_input );
 
-    if( unlikely( !p_node ) )
-        return VLC_DEMUXER_EOF;
-
-    while( ( i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name ) ) > 0 )
+    while( ( i_type = xml_ReaderNextNode( p_reader, &psz_name ) ) > 0 )
     {
         if( i_type == XML_READER_ENDELEM && !strcasecmp( psz_name, "smil" ) )
             break;
@@ -279,62 +265,48 @@ static int Demux( demux_t* p_demux )
         }
     }
 
-    input_item_node_PostAndDelete( p_node );
-    return 0;
+    return VLC_SUCCESS;
 }
 
 void Close_WPL( vlc_object_t* p_this )
 {
-    demux_t *p_demux = (demux_t*)p_this;
-    demux_sys_t* p_sys = p_demux->p_sys;
+    stream_t *p_demux = (stream_t*)p_this;
 
-    free( p_sys->psz_prefix );
-    if ( p_sys->p_reader )
-        xml_ReaderDelete( p_sys->p_reader );
-    free( p_sys );
+    xml_ReaderDelete( p_demux->p_sys );
 }
 
 int Import_WPL( vlc_object_t* p_this )
 {
-    demux_t* p_demux = (demux_t*)p_this;
+    stream_t* p_demux = (stream_t*)p_this;
 
     CHECK_FILE(p_demux);
-    if( !demux_IsPathExtension( p_demux, ".wpl" ) &&
-        !demux_IsPathExtension( p_demux, ".zpl" ) )
+    if( !stream_HasExtension( p_demux, ".wpl" ) &&
+        !stream_HasExtension( p_demux, ".zpl" ) )
         return VLC_EGENERIC;
 
-    DEMUX_INIT_COMMON();
-
-    demux_sys_t* p_sys = p_demux->p_sys;
     uint8_t *p_peek;
-    ssize_t i_peek = vlc_stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
+    ssize_t i_peek = vlc_stream_Peek( p_demux->p_source, (const uint8_t **) &p_peek, 2048 );
     if( unlikely( i_peek <= 0 ) )
-    {
-        Close_WPL( p_this );
         return VLC_EGENERIC;
-    }
 
-    stream_t *p_probestream = vlc_stream_MemoryNew( p_demux->s, p_peek, i_peek, true );
+    stream_t *p_probestream = vlc_stream_MemoryNew( p_demux->p_source, p_peek, i_peek, true );
     if( unlikely( !p_probestream ) )
-    {
-        Close_WPL( p_this );
         return VLC_EGENERIC;
-    }
 
-    p_sys->p_reader = xml_ReaderCreate( p_this, p_probestream );
-    if ( !p_sys->p_reader )
+    xml_reader_t *p_reader = xml_ReaderCreate( p_this, p_probestream );
+    if ( p_reader == NULL )
     {
         msg_Err( p_demux, "Failed to create an XML reader" );
-        Close_WPL( p_this );
         vlc_stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
+    p_demux->p_sys = p_reader;
 
-    const int i_flags = p_sys->p_reader->obj.flags;
-    p_sys->p_reader->obj.flags |= OBJECT_FLAGS_QUIET;
+    const int i_flags = p_reader->obj.flags;
+    p_reader->obj.flags |= OBJECT_FLAGS_QUIET;
     const char* psz_name;
-    int type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
-    p_sys->p_reader->obj.flags = i_flags;
+    int type = xml_ReaderNextNode( p_reader, &psz_name );
+    p_reader->obj.flags = i_flags;
     if ( type != XML_READER_STARTELEM || strcasecmp( psz_name, "smil" ) )
     {
         msg_Err( p_demux, "Invalid WPL playlist. Root element should have been <smil>" );
@@ -343,10 +315,12 @@ int Import_WPL( vlc_object_t* p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->p_reader = xml_ReaderReset( p_sys->p_reader, p_demux->s );
+    p_demux->p_sys = xml_ReaderReset( p_reader, p_demux->p_source );
     vlc_stream_Delete( p_probestream );
 
     msg_Dbg( p_demux, "Found valid WPL playlist" );
+    p_demux->pf_readdir = Demux;
+    p_demux->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
 }
