@@ -103,7 +103,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
+#include <vlc_access.h>
 #include "playlist.h"
 
 /*****************************************************************************
@@ -129,20 +129,20 @@ struct demux_sys_t
     bool  b_rtsp_kasenna; /* kasenna style RTSP */
 };
 
-static int Demux ( demux_t *p_demux );
+static int ReadDir( stream_t *, input_item_node_t * );
 
 /*****************************************************************************
  * Activate: initializes m3u demux structures
  *****************************************************************************/
 int Import_SGIMB( vlc_object_t * p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
+    stream_t *p_demux = (stream_t *)p_this;
     const uint8_t *p_peek;
     int i_size;
 
     CHECK_FILE(p_demux);
     /* Lets check the content to see if this is a sgi mediabase file */
-    i_size = vlc_stream_Peek( p_demux->s, &p_peek, MAX_LINE );
+    i_size = vlc_stream_Peek( p_demux->p_source, &p_peek, MAX_LINE );
     i_size -= sizeof("sgiNameServerHost=") - 1;
     if ( i_size > 0 )
     {
@@ -154,21 +154,28 @@ int Import_SGIMB( vlc_object_t * p_this )
         }
         if ( !strncasecmp( (char *)p_peek, "sgiNameServerHost=", i_len ) )
         {
-            STANDARD_DEMUX_INIT_MSG( "using SGIMB playlist reader" );
-            p_demux->p_sys->psz_uri = NULL;
-            p_demux->p_sys->psz_server = NULL;
-            p_demux->p_sys->psz_location = NULL;
-            p_demux->p_sys->psz_name = NULL;
-            p_demux->p_sys->psz_user = NULL;
-            p_demux->p_sys->psz_password = NULL;
-            p_demux->p_sys->psz_mcast_ip = NULL;
-            p_demux->p_sys->i_mcast_port = 0;
-            p_demux->p_sys->i_packet_size = 0;
-            p_demux->p_sys->i_duration = 0;
-            p_demux->p_sys->i_port = 0;
-            p_demux->p_sys->i_sid = 0;
-            p_demux->p_sys->b_rtsp_kasenna = false;
-            p_demux->p_sys->b_concert = false;
+            demux_sys_t *p_sys = malloc(sizeof (*p_sys));
+            if( unlikely(p_sys == NULL) )
+                return VLC_ENOMEM;
+
+            msg_Dbg( p_demux, "using SGIMB playlist reader" );
+            p_demux->pf_readdir = ReadDir;
+            p_demux->pf_control = access_vaDirectoryControlHelper;
+            p_demux->p_sys = p_sys;
+            p_sys->psz_uri = NULL;
+            p_sys->psz_server = NULL;
+            p_sys->psz_location = NULL;
+            p_sys->psz_name = NULL;
+            p_sys->psz_user = NULL;
+            p_sys->psz_password = NULL;
+            p_sys->psz_mcast_ip = NULL;
+            p_sys->i_mcast_port = 0;
+            p_sys->i_packet_size = 0;
+            p_sys->i_duration = 0;
+            p_sys->i_port = 0;
+            p_sys->i_sid = 0;
+            p_sys->b_rtsp_kasenna = false;
+            p_sys->b_concert = false;
 
             return VLC_SUCCESS;
         }
@@ -194,7 +201,7 @@ void Close_SGIMB( vlc_object_t *p_this )
     return;
 }
 
-static int ParseLine ( demux_t *p_demux, char *psz_line )
+static int ParseLine ( stream_t *p_demux, char *psz_line )
 {
     char        *psz_bol;
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -311,20 +318,13 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Demux: reads and demuxes data packets
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
- *****************************************************************************/
-static int Demux ( demux_t *p_demux )
+static int ReadDir( stream_t *p_demux, input_item_node_t *node )
 {
     demux_sys_t     *p_sys = p_demux->p_sys;
     input_item_t    *p_child = NULL;
     char            *psz_line;
 
-    input_item_t *p_current_input = GetCurrentItem(p_demux);
-
-    while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
+    while( ( psz_line = vlc_stream_ReadLine( p_demux->p_source ) ) )
     {
         ParseLine( p_demux, psz_line );
         free( psz_line );
@@ -383,7 +383,6 @@ static int Demux ( demux_t *p_demux )
         return -1;
     }
 
-    input_item_CopyOptions( p_child, p_current_input );
     if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
     {
         char *psz_option;
@@ -399,7 +398,7 @@ static int Demux ( demux_t *p_demux )
     if( !p_sys->psz_mcast_ip && p_sys->b_rtsp_kasenna )
         input_item_AddOption( p_child, "rtsp-kasenna", VLC_INPUT_OPTION_TRUSTED );
 
-    input_item_PostSubItem( p_current_input, p_child );
+    input_item_node_AppendItem( node, p_child );
     input_item_Release( p_child );
-    return 0; /* Needed for correct operation of go back */
+    return VLC_SUCCESS;
 }
