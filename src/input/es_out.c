@@ -3061,7 +3061,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
 
         if( fmt->video.i_visible_width > 0 &&
             fmt->video.i_visible_height > 0 )
-            info_category_AddInfo( p_cat, _("Display resolution"), "%ux%u",
+            info_category_AddInfo( p_cat, _("Video resolution"), "%ux%u",
                                    fmt->video.i_visible_width,
                                    fmt->video.i_visible_height);
 
