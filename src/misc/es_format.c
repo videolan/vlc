@@ -435,38 +435,21 @@ void video_format_Print( vlc_object_t *p_this,
 void es_format_Init( es_format_t *fmt,
                      int i_cat, vlc_fourcc_t i_codec )
 {
+    memset(fmt, 0, sizeof (*fmt));
     fmt->i_cat                  = i_cat;
     fmt->i_codec                = i_codec;
-    fmt->i_original_fourcc      = 0;
     fmt->i_profile              = -1;
     fmt->i_level                = -1;
     fmt->i_id                   = -1;
-    fmt->i_group                = 0;
     fmt->i_priority             = ES_PRIORITY_SELECTABLE_MIN;
     fmt->psz_language           = NULL;
     fmt->psz_description        = NULL;
-
-    fmt->i_extra_languages      = 0;
     fmt->p_extra_languages      = NULL;
 
-    switch (fmt->i_cat)
-    {
-        case AUDIO_ES:
-            memset(&fmt->audio, 0, sizeof (fmt->audio));
-            memset(&fmt->audio_replay_gain, 0,
-                   sizeof (fmt->audio_replay_gain));
-            break;
-        case VIDEO_ES:
-            video_format_Init(&fmt->video, 0);
-            break;
-        case SPU_ES:
-            memset(&fmt->subs, 0, sizeof (fmt->subs));
-            break;
-    }
+    if (fmt->i_cat == VIDEO_ES)
+        video_format_Init(&fmt->video, 0);
 
     fmt->b_packetized           = true;
-    fmt->i_bitrate              = 0;
-    fmt->i_extra                = 0;
     fmt->p_extra                = NULL;
 }
 
