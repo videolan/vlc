@@ -166,7 +166,7 @@ int Control(demux_t *demux, int query, va_list args)
  *
  * Rebuilds the base URL for the playlist.
  */
-char *FindPrefix(demux_t *p_demux)
+char *(FindPrefix)(demux_t *p_demux)
 {
     char *url;
 

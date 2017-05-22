@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc_input.h>
+#include <vlc_demux.h>
 
 int Control(demux_t *, int, va_list);
 char *ProcessMRL( const char *, const char * );
@@ -67,17 +68,23 @@ void Close_WPL ( vlc_object_t * );
 
 int Import_Dir ( vlc_object_t * );
 
-static inline input_item_t * GetCurrentItem(demux_t *p_demux)
-{
-    return input_GetItem( p_demux->p_input );
-}
+#define GetCurrentItem(obj) input_GetItem((obj)->p_input)
+#define GetSource(obj) \
+    (_Generic((obj), \
+             demux_t *: ((demux_t *)(obj))->s, \
+             stream_t *: ((stream_t *)(obj))->p_source))
 
 #define CHECK_FILE(obj) \
 do { \
-    if( vlc_stream_Control( (obj)->s, \
+    if( vlc_stream_Control( GetSource(obj), \
                             STREAM_IS_DIRECTORY ) == VLC_SUCCESS ) \
         return VLC_EGENERIC; \
 } while(0)
+
+#define FindPrefix(obj) \
+    (_Generic((obj), \
+              demux_t *: FindPrefix((demux_t *)(obj)), \
+              stream_t *: strdup(((stream_t *)(obj))->psz_url)))
 
 #define STANDARD_DEMUX_INIT_MSG( msg ) do { \
     DEMUX_INIT_COMMON();                    \
