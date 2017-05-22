@@ -31,7 +31,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
+#include <vlc_access.h>
 
 #include <vlc_xml.h>
 #include <vlc_arrays.h>
@@ -42,7 +42,7 @@
 #define SIMPLE_INTERFACE  (input_item_t    *p_input,\
                            const char      *psz_name,\
                            char            *psz_value)
-#define COMPLEX_INTERFACE (demux_t            *p_demux,\
+#define COMPLEX_INTERFACE (stream_t           *p_demux,\
                            input_item_node_t  *p_input_node,\
                            xml_reader_t       *p_xml_reader,\
                            const char         *psz_element)
@@ -76,29 +76,36 @@ struct demux_sys_t
     char * psz_base;
 };
 
-static int Demux(demux_t *);
+static int ReadDir(stream_t *, input_item_node_t *);
 
 /**
  * \brief XSPF submodule initialization function
  */
 int Import_xspf(vlc_object_t *p_this)
 {
-    demux_t *p_demux = (demux_t *)p_this;
+    stream_t *p_demux = (stream_t *)p_this;
 
     CHECK_FILE(p_demux);
 
-    if( !demux_IsPathExtension( p_demux, ".xspf" )
-     && !demux_IsContentType( p_demux, "application/xspf+xml" ) )
+    if( !stream_HasExtension( p_demux, ".xspf" )
+     && !stream_IsMimeType( p_demux->p_source, "application/xspf+xml" ) )
         return VLC_EGENERIC;
 
-    STANDARD_DEMUX_INIT_MSG("using XSPF playlist reader");
+    demux_sys_t *sys = calloc(1, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    msg_Dbg(p_demux, "using XSPF playlist reader");
+    p_demux->p_sys = sys;
+    p_demux->pf_readdir = ReadDir;
+    p_demux->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
 }
 
 void Close_xspf(vlc_object_t *p_this)
 {
-    demux_t *p_demux = (demux_t *)p_this;
+    stream_t *p_demux = (stream_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
     for (int i = 0; i < p_sys->i_tracklist_entries; i++)
         if (p_sys->pp_tracklist[i])
@@ -111,19 +118,20 @@ void Close_xspf(vlc_object_t *p_this)
 /**
  * \brief demuxer function for XSPF parsing
  */
-static int Demux(demux_t *p_demux)
+static int ReadDir(stream_t *p_demux, input_item_node_t *p_subitems)
 {
+    demux_sys_t *sys = p_demux->p_sys;
     int i_ret = -1;
     xml_reader_t *p_xml_reader = NULL;
     const char *name = NULL;
-    input_item_t *p_current_input = GetCurrentItem(p_demux);
-    p_demux->p_sys->pp_tracklist = NULL;
-    p_demux->p_sys->i_tracklist_entries = 0;
-    p_demux->p_sys->i_track_id = -1;
-    p_demux->p_sys->psz_base = FindPrefix(p_demux);
+
+    sys->pp_tracklist = NULL;
+    sys->i_tracklist_entries = 0;
+    sys->i_track_id = -1;
+    sys->psz_base = strdup(p_demux->psz_filepath);
 
     /* create new xml parser from stream */
-    p_xml_reader = xml_ReaderCreate(p_demux, p_demux->s);
+    p_xml_reader = xml_ReaderCreate(p_demux, p_demux->p_source);
     if (!p_xml_reader)
         goto end;
 
@@ -141,22 +149,17 @@ static int Demux(demux_t *p_demux)
         goto end;
     }
 
-    input_item_node_t *p_subitems =
-        input_item_node_Create(p_current_input);
-
     i_ret = parse_playlist_node(p_demux, p_subitems,
                                  p_xml_reader, "playlist") ? 0 : -1;
 
-    for (int i = 0 ; i < p_demux->p_sys->i_tracklist_entries ; i++)
+    for (int i = 0 ; i < sys->i_tracklist_entries ; i++)
     {
-        input_item_t *p_new_input = p_demux->p_sys->pp_tracklist[i];
+        input_item_t *p_new_input = sys->pp_tracklist[i];
         if (p_new_input)
         {
             input_item_node_AppendItem(p_subitems, p_new_input);
         }
     }
-
-    input_item_node_PostAndDelete(p_subitems);
 
 end:
     if (p_xml_reader)
@@ -182,6 +185,7 @@ static const xml_elem_hnd_t *get_handler(const xml_elem_hnd_t *tab, size_t n, co
  */
 static bool parse_playlist_node COMPLEX_INTERFACE
 {
+    demux_sys_t *sys = p_demux->p_sys;
     input_item_t *p_input_item = p_input_node->p_item;
     char *psz_value = NULL;
     bool b_version_found = false;
@@ -219,8 +223,8 @@ static bool parse_playlist_node COMPLEX_INTERFACE
             ;
         else if (!strcmp(name, "xml:base"))
         {
-            free(p_demux->p_sys->psz_base);
-            p_demux->p_sys->psz_base = strdup(value);
+            free(sys->psz_base);
+            sys->psz_base = strdup(value);
         }
         else
             msg_Warn(p_demux, "invalid <playlist> attribute: \"%s\"", name);
@@ -560,6 +564,7 @@ static bool set_option SIMPLE_INTERFACE
  */
 static bool parse_extension_node COMPLEX_INTERFACE
 {
+    demux_sys_t *sys = p_demux->p_sys;
     input_item_t *p_input_item = p_input_node->p_item;
     char *psz_value = NULL;
     char *psz_title = NULL;
@@ -688,7 +693,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 /* special tag <vlc:id> */
                 if (!strcmp(p_handler->name, "vlc:id") && psz_value )
                 {
-                    p_demux->p_sys->i_track_id = atoi(psz_value);
+                    sys->i_track_id = atoi(psz_value);
                 }
                 else if (p_handler->pf_handler.smpl)
                 {
@@ -721,6 +726,7 @@ error:
 static bool parse_extitem_node COMPLEX_INTERFACE
 {
     VLC_UNUSED(psz_element);
+    demux_sys_t *sys = p_demux->p_sys;
     input_item_t *p_new_input = NULL;
     int i_tid = -1;
 
@@ -743,18 +749,18 @@ static bool parse_extitem_node COMPLEX_INTERFACE
         return false;
     }
 
-    if (i_tid >= p_demux->p_sys->i_tracklist_entries)
+    if (i_tid >= sys->i_tracklist_entries)
     {
         msg_Warn(p_demux, "invalid \"tid\" attribute");
         return false;
     }
 
-    p_new_input = p_demux->p_sys->pp_tracklist[ i_tid ];
+    p_new_input = sys->pp_tracklist[ i_tid ];
     if (p_new_input)
     {
         input_item_node_AppendItem(p_input_node, p_new_input);
         input_item_Release(p_new_input);
-        p_demux->p_sys->pp_tracklist[i_tid] = NULL;
+        sys->pp_tracklist[i_tid] = NULL;
     }
 
     return true;
