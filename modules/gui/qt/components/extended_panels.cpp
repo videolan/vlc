@@ -274,7 +274,7 @@ static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_
         return;
     }
 
-    QString result = ChangeFiltersString( p_intf, "audio-filteR", psz_name, b_add );
+    QString result = ChangeFiltersString( p_intf, "audio-filter", psz_name, b_add );
     config_PutPsz( p_intf, "audio-filter", qtu( result ) );
 }
 
