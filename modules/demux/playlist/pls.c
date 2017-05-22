@@ -30,49 +30,44 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
+#include <vlc_access.h>
 
 #include "playlist.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Demux( demux_t *p_demux);
+static int ReadDir( stream_t *, input_item_node_t * );
 
 /*****************************************************************************
  * Import_PLS: main import function
  *****************************************************************************/
 int Import_PLS( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
+    stream_t *p_demux = (stream_t *)p_this;
     const uint8_t *p_peek;
 
     CHECK_FILE(p_demux);
 
-    if( vlc_stream_Peek( p_demux->s , &p_peek, 10 ) < 10 ) {
+    if( vlc_stream_Peek( p_demux->p_source , &p_peek, 10 ) < 10 ) {
         msg_Dbg( p_demux, "not enough data" );
         return VLC_EGENERIC;
     }
 
     if( strncasecmp( (const char *)p_peek, "[playlist]", 10 )
      && strncasecmp( (const char *)p_peek, "[Reference]", 10 )
-     && !demux_IsPathExtension( p_demux, ".pls" )
-     && !demux_IsForced( p_demux, "pls" ) )
+     && !stream_HasExtension( p_demux, ".pls" ) )
         return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "found valid PLS playlist file");
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
+    p_demux->pf_readdir = ReadDir;
+    p_demux->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
 }
 
-static int Demux( demux_t *p_demux )
+static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 {
-    char *psz_prefix = FindPrefix( p_demux );
-    if( unlikely(psz_prefix == NULL) )
-        return VLC_DEMUXER_EOF;
-
     char          *psz_name = NULL;
     char          *psz_line;
     char          *psz_mrl = NULL;
@@ -84,9 +79,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
-
-    while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
+    while( ( psz_line = vlc_stream_ReadLine( p_demux->p_source ) ) )
     {
         if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) ||
             !strncasecmp( psz_line, "[Reference]", sizeof("[Reference]")-1 ) )
@@ -156,7 +149,7 @@ static int Demux( demux_t *p_demux )
         {
             free( psz_mrl_orig );
             psz_mrl_orig =
-            psz_mrl = ProcessMRL( psz_value, psz_prefix );
+            psz_mrl = ProcessMRL( psz_value, p_demux->psz_url );
 
             if( !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
             {
@@ -193,8 +186,5 @@ static int Demux( demux_t *p_demux )
     free( psz_name );
     psz_name = NULL;
 
-    input_item_node_PostAndDelete( p_subitems );
-
-    free( psz_prefix );
-    return 0; /* Needed for correct operation of go back */
+    return VLC_SUCCESS;
 }
