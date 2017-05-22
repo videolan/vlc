@@ -33,7 +33,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
+#include <vlc_access.h>
 #include <vlc_xml.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
@@ -46,7 +46,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Demux( demux_t *p_demux);
+static int ReadDir( stream_t *, input_item_node_t * );
 
 static mtime_t ParseTime(xml_reader_t *p_xml_reader)
 {
@@ -132,10 +132,10 @@ static void ReadElement( xml_reader_t *p_xml_reader, char **ppsz_txt )
      */
 }
 
-static bool PeekASX( demux_t *p_demux )
+static bool PeekASX( stream_t *s )
 {
     const uint8_t *p_peek;
-    return ( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) == 12
+    return ( vlc_stream_Peek( s->p_source, &p_peek, 12 ) == 12
              && !memcmp( p_peek, "<asx version", 12 ) );
 }
 
@@ -145,19 +145,18 @@ static bool PeekASX( demux_t *p_demux )
 
 int Import_ASX( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
+    stream_t *p_demux = (stream_t *)p_this;
 
     CHECK_FILE(p_demux);
 
-    char *type = stream_MimeType( p_demux->s );
+    char *type = stream_MimeType( p_demux->p_source );
 
-    if( demux_IsPathExtension( p_demux, ".asx" )
-     || demux_IsPathExtension( p_demux, ".wax" )
-     || demux_IsPathExtension( p_demux, ".wvx" )
+    if( stream_HasExtension( p_demux, ".asx" )
+     || stream_HasExtension( p_demux, ".wax" )
+     || stream_HasExtension( p_demux, ".wvx" )
      || (type != NULL && (strcasecmp(type, "video-x-ms-asf") == 0
                        || strcasecmp(type, "audio/x-ms-wax") == 0)
-                      && PeekASX( p_demux ) )
-     || demux_IsForced( p_demux, "asx-open" ) )
+                      && PeekASX( p_demux ) ) )
     {
         msg_Dbg( p_demux, "found valid ASX playlist" );
         free(type);
@@ -168,8 +167,8 @@ int Import_ASX( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
+    p_demux->pf_control = access_vaDirectoryControlHelper;
+    p_demux->pf_readdir = ReadDir;
     return VLC_SUCCESS;
 }
 
@@ -319,11 +318,12 @@ end:
     free( psz_description );
 }
 
-static stream_t* UTF8Stream( demux_t *p_demux )
+static stream_t* UTF8Stream( stream_t *p_demux )
 {
+    stream_t *s = p_demux->p_source;
     uint64_t streamSize;
 
-     if (vlc_stream_GetSize( p_demux->s, &streamSize ) != VLC_SUCCESS)
+     if (vlc_stream_GetSize( s, &streamSize ) != VLC_SUCCESS)
          return NULL;
      // Don't attempt to convert/store huge streams
      if( streamSize > 1024 * 1024 )
@@ -334,7 +334,7 @@ static stream_t* UTF8Stream( demux_t *p_demux )
      size_t i_read = 0;
      do
      {
-         ssize_t i_ret = vlc_stream_Read( p_demux->s, psz_source + i_read,
+         ssize_t i_ret = vlc_stream_Read( s, psz_source + i_read,
                                           streamSize > 1024 ? 1024 : streamSize );
          if ( i_ret <= 0 )
              break;
@@ -357,34 +357,35 @@ static stream_t* UTF8Stream( demux_t *p_demux )
      return p_stream;
 }
 
-static int Demux( demux_t *p_demux )
+static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 {
+    if (unlikely(p_demux->psz_url == NULL))
+        return VLC_EGENERIC;
+
     const char *psz_node = NULL;
     char *psz_txt = NULL;
-    char *psz_base = FindPrefix( p_demux );
+    char *psz_base = strdup( p_demux->psz_url );
     if (unlikely(psz_base == NULL))
-        return VLC_DEMUXER_EOF;
+        return VLC_ENOMEM;
 
     char *psz_title_asx = NULL;
     char *psz_entryref = NULL;
 
     xml_reader_t *p_xml_reader = NULL;
     input_item_t *p_current_input = GetCurrentItem( p_demux );
-    input_item_node_t *p_subitems = NULL;
     stream_t* p_stream = UTF8Stream( p_demux );
 
     bool b_first_node = false;
     int i_type;
     int i_n_entry = 0;
 
-    p_xml_reader = xml_ReaderCreate( p_demux, p_stream ? p_stream : p_demux->s );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_stream ? p_stream
+                                                       : p_demux->p_source );
     if( !p_xml_reader )
     {
         msg_Err( p_demux, "Cannot parse ASX input file as XML");
         goto error;
     }
-
-    p_subitems = input_item_node_Create( p_current_input );
 
     do
     {
@@ -486,10 +487,6 @@ static int Demux( demux_t *p_demux )
     }
     while( i_type != XML_READER_ENDELEM || strncasecmp( psz_node, "ASX", 3 ) );
 
-    input_item_node_PostAndDelete( p_subitems );
-    p_subitems = NULL;
-
-
 error:
     free( psz_base );
     free( psz_title_asx );
@@ -498,8 +495,6 @@ error:
 
     if( p_xml_reader)
         xml_ReaderDelete( p_xml_reader );
-    if( p_subitems )
-        input_item_node_Delete( p_subitems );
     if( p_stream )
         vlc_stream_Delete( p_stream );
 
