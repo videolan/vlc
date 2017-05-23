@@ -56,6 +56,7 @@ private:
     void clean();
     void setFilterOption( const char *psz_module, const char *psz_option, int,
                           double, const char * );
+    void changeVFiltersString( const char *psz_name, bool b_add );
 
 private slots:
     void updateFilters();
@@ -246,6 +247,7 @@ private:
     void initSubsDuration();
     void subsdelayClean();
     void subsdelaySetFactor( double );
+    void changeVFiltersString( const char *psz_name, bool b_add );
 public slots:
     void update();
 private slots:

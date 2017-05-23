@@ -301,19 +301,10 @@ static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *ps
     return list.join( ":" );
 }
 
-static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
+static void UpdateVFiltersString( struct intf_thread_t *p_intf,
+                                  const char *psz_filter_type, const char *value )
 {
-    const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
-
-    if( psz_filter_type == NULL )
-        return;
-
-    QString result = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
-
-    /* Vout is not kept, so put that in the config */
-    config_PutPsz( p_intf, psz_filter_type, qtu( result ) );
-
-    var_SetString( THEPL, psz_filter_type, qtu( result ) );
+    var_SetString( THEPL, psz_filter_type, value );
 
     /* Try to set non splitter filters on the fly */
     if( strcmp( psz_filter_type, "video-splitter" ) )
@@ -321,10 +312,23 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
         QVector<vout_thread_t*> p_vouts = THEMIM->getVouts();
         foreach( vout_thread_t *p_vout, p_vouts )
         {
-            var_SetString( p_vout, psz_filter_type, qtu( result ) );
+            var_SetString( p_vout, psz_filter_type, value );
             vlc_object_release( p_vout );
         }
     }
+}
+
+void ExtVideo::changeVFiltersString( const char *psz_name, bool b_add )
+{
+    const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
+    if( psz_filter_type == NULL )
+        return;
+
+    QString result = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
+
+    config_PutPsz( p_intf, psz_filter_type, qtu( result ) );
+
+    UpdateVFiltersString( p_intf, psz_filter_type, qtu( result ) );
 }
 
 void ExtVideo::updateFilters()
@@ -334,7 +338,7 @@ void ExtVideo::updateFilters()
     QCheckBox *checkbox = qobject_cast<QCheckBox*>( sender() );
     QGroupBox *groupbox = qobject_cast<QGroupBox*>( sender() );
 
-    ChangeVFiltersString( p_intf, qtu( module ),
+    changeVFiltersString( qtu( module ),
                           checkbox ? checkbox->isChecked()
                                    : groupbox->isChecked() );
 }
@@ -559,8 +563,8 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
         msg_Warn( p_intf, "Module %s's %s variable isn't a command. Brute-restarting the filter.",
                  psz_module,
                  psz_option );
-        ChangeVFiltersString( p_intf, psz_module, false );
-        ChangeVFiltersString( p_intf, psz_module, true );
+        changeVFiltersString( psz_module, false );
+        changeVFiltersString( psz_module, true );
     }
 
     foreach( vout_thread_t *p_vout, p_vouts )
@@ -1516,7 +1520,7 @@ void SyncControls::adjustSubsDuration( double f_factor )
     if( THEMIM->getInput() && b_userAction )
     {
         subsdelaySetFactor( f_factor );
-        ChangeVFiltersString( p_intf, "subsdelay", f_factor > 0 );
+        changeVFiltersString( "subsdelay", f_factor > 0 );
     }
 }
 
@@ -1549,7 +1553,7 @@ void SyncControls::initSubsDuration()
 void SyncControls::subsdelayClean()
 {
     /* Remove subsdelay filter */
-    ChangeVFiltersString( p_intf, "subsdelay", false );
+    changeVFiltersString( "subsdelay", false );
 }
 
 void SyncControls::subsdelaySetFactor( double f_factor )
@@ -1564,6 +1568,19 @@ void SyncControls::subsdelaySetFactor( double f_factor )
         var_SetFloat( p_obj, SUBSDELAY_CFG_FACTOR, f_factor );
         vlc_object_release( p_obj );
     }
+}
+
+void SyncControls::changeVFiltersString( const char *psz_name, bool b_add )
+{
+    const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
+    if( psz_filter_type == NULL )
+        return;
+
+    QString result = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
+
+    config_PutPsz( p_intf, psz_filter_type, qtu( result ) );
+
+    UpdateVFiltersString( p_intf, psz_filter_type, qtu( result ) );
 }
 
 
