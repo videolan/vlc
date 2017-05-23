@@ -493,7 +493,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     }
 }
 
-void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_module, const char *psz_option,
+void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
         int i_int, double f_float, const char *psz_string )
 {
     QVector<vout_thread_t*> p_vouts = THEMIM->getVouts();
@@ -622,7 +622,7 @@ void ExtVideo::updateFilterOptions()
         val = combobox->itemData( combobox->currentIndex() ).toString();
     }
 
-    setFilterOption( p_intf, qtu( module ), qtu( option ), i_int, f_float, qtu( val ));
+    setFilterOption( qtu( module ), qtu( option ), i_int, f_float, qtu( val ) );
 }
 
 /**********************************************************************

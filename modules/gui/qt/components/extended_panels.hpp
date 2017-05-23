@@ -54,8 +54,8 @@ private:
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
     void clean();
-    static void setFilterOption( struct intf_thread_t *, const char *psz_module,
-                                 const char *psz_option, int, double, const char * );
+    void setFilterOption( const char *psz_module, const char *psz_option, int,
+                          double, const char * );
 
 private slots:
     void updateFilters();
