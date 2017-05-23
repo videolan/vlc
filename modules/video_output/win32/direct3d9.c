@@ -1497,7 +1497,6 @@ static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
         { dst->right, dst->bottom },
         { dst->left,  dst->bottom },
     };
-    bool has_src = src != NULL && src_clipped != NULL;
 
     /* Compute index remapping necessary to implement the rotation. */
     int vertex_order[4];
@@ -1508,10 +1507,10 @@ static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
         vertices[i].y  = vertices_coords[vertex_order[i]][1];
     }
 
-    float right = has_src ? (float)src_clipped->right / (float)src->right : 1.0f;
-    float left = has_src ? (float)src_clipped->left / (float)src->right : .0f;
-    float top = has_src ? (float)src_clipped->top / (float)src->bottom : .0f;
-    float bottom = has_src ? (float)src_clipped->bottom / (float)src->bottom : 1.0f;
+    float right = (float)src_clipped->right / (float)src->right;
+    float left = (float)src_clipped->left / (float)src->right;
+    float top = (float)src_clipped->top / (float)src->bottom;
+    float bottom = (float)src_clipped->bottom / (float)src->bottom;
 
     vertices[0].tu = left;
     vertices[0].tv = top;
@@ -1693,10 +1692,23 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         RECT dst;
         dst.left   = video.left + scale_w * r->i_x,
-        dst.right  = dst.left + scale_w * r->fmt.i_width,
+        dst.right  = dst.left + scale_w * r->fmt.i_visible_width,
         dst.top    = video.top  + scale_h * r->i_y,
-        dst.bottom = dst.top  + scale_h * r->fmt.i_height,
-        Direct3D9SetupVertices(d3dr->vertex, NULL, NULL,
+        dst.bottom = dst.top  + scale_h * r->fmt.i_visible_height;
+
+        RECT src;
+        src.left = 0;
+        src.right = r->fmt.i_width;
+        src.top = 0;
+        src.bottom = r->fmt.i_height;
+
+        RECT src_clipped;
+        src_clipped.left = r->fmt.i_x_offset;
+        src_clipped.right = r->fmt.i_x_offset + r->fmt.i_visible_width;
+        src_clipped.top = r->fmt.i_y_offset;
+        src_clipped.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
+
+        Direct3D9SetupVertices(d3dr->vertex, &src, &src_clipped,
                               &dst, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
     }
 }
