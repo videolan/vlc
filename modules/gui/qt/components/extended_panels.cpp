@@ -301,19 +301,6 @@ static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *ps
     return list.join( ":" );
 }
 
-static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
-{
-    module_t *p_obj = module_find( psz_name );
-    if( !p_obj )
-    {
-        msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
-        return;
-    }
-
-    QString result = ChangeFiltersString( p_intf, "audio-filter", psz_name, b_add );
-    config_PutPsz( p_intf, "audio-filter", qtu( result ) );
-}
-
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
 {
     const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
@@ -977,7 +964,16 @@ void AudioFilterControlWidget::build()
 
 void AudioFilterControlWidget::enable( bool b_enable ) const
 {
-    ChangeAFiltersString( p_intf, qtu(name), b_enable );
+    module_t *p_obj = module_find( qtu(name) );
+    if( !p_obj )
+    {
+        msg_Err( p_intf, "Unable to find filter module \"%s\".", qtu(name) );
+        return;
+    }
+
+    QString result = ChangeFiltersString( p_intf, "audio-filter", qtu(name),
+                                          b_enable );
+    config_PutPsz( p_intf, "audio-filter", qtu( result ) );
     playlist_EnableAudioFilter( THEPL, qtu(name), b_enable );
 }
 
