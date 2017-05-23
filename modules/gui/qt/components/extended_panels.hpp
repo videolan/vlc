@@ -47,8 +47,6 @@ class ExtVideo: public QObject
     friend class ExtendedDialog;
 public:
     ExtVideo( struct intf_thread_t *, QTabWidget * );
-    static void setPostprocessing( struct intf_thread_t *, int q);
-    static int getPostprocessing( struct intf_thread_t *p_intf);
 private:
     Ui::ExtVideoWidget ui;
     QSignalMapper* filterMapper;

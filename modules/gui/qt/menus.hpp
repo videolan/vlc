@@ -94,7 +94,6 @@ public:
     };
     Q_DECLARE_FLAGS(actionflags, actionflag)
 
-    static QMenu *ppMenu;
     static QMenu *rendererMenu;
     static QActionGroup *rendererGroup;
 
@@ -132,7 +131,6 @@ private:
     }
 
     static QMenu *HelpMenu( QWidget * );
-    static QMenu *PPMenu( intf_thread_t *p_intf );
     static QMenu *RendererMenu( intf_thread_t *p_intf );
 
     /* Popups Menus */

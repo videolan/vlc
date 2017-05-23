@@ -209,15 +209,6 @@ void ActionsManager::skipBackward()
         THEMIM->getIM()->jumpBwd();
 }
 
-void ActionsManager::PPaction( QAction *a )
-{
-    int i_q = -1;
-    if( a != NULL )
-        i_q = a->data().toInt();
-
-    ExtVideo::setPostprocessing( p_intf, i_q );
-}
-
 bool ActionsManager::isItemSout( QVariant & m_obj, const char *psz_sout, bool as_output )
 {
     if ( psz_sout == NULL )

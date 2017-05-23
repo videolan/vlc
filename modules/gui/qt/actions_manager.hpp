@@ -91,7 +91,6 @@ public slots:
     void record();
     void skipForward();
     void skipBackward();
-    void PPaction( QAction * );
     void ScanRendererAction( bool );
     void RendererSelected( QAction * );
 
