@@ -144,9 +144,9 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 
         uint8_t *plane[3] = {
             (uint8_t*)lock.pData,
-            (uint8_t*)lock.pData + pitch[0] * src->format.i_height,
-            (uint8_t*)lock.pData + pitch[0] * src->format.i_height
-                                 + pitch[1] * src->format.i_height / 2,
+            (uint8_t*)lock.pData + pitch[0] * desc.Height,
+            (uint8_t*)lock.pData + pitch[0] * desc.Height
+                                 + pitch[1] * desc.Height / 2,
         };
 
         CopyFromYv12ToYv12(dst, plane, pitch,
@@ -154,7 +154,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     } else if (desc.Format == DXGI_FORMAT_NV12) {
         uint8_t *plane[2] = {
             lock.pData,
-            (uint8_t*)lock.pData + lock.RowPitch * src->format.i_height
+            (uint8_t*)lock.pData + lock.RowPitch * desc.Height
         };
         size_t  pitch[2] = {
             lock.RowPitch,
@@ -214,7 +214,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     if (desc.Format == DXGI_FORMAT_NV12) {
         uint8_t *plane[2] = {
             lock.pData,
-            (uint8_t*)lock.pData + lock.RowPitch * src->format.i_height
+            (uint8_t*)lock.pData + lock.RowPitch * desc.Height
         };
         size_t  pitch[2] = {
             lock.RowPitch,
