@@ -1154,8 +1154,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                         p_cc->i_dts = p_cc->i_pts = i_pts;
                     else
                         p_cc->i_pts = p_cc->i_dts;
-                    p_dec->fmt_out.subs.cc.i_reorder_depth = 4;
-                    decoder_QueueCc( p_dec, p_cc, p_sys->cc.pb_present );
+                    decoder_QueueCc( p_dec, p_cc, p_sys->cc.pb_present, 4 );
                 }
                 cc_Flush( &p_sys->cc );
             }

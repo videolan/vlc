@@ -874,7 +874,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 #endif
 
 static void DecoderPlayCc( decoder_t *p_dec, block_t *p_cc,
-                           bool pb_present[4], const subs_format_t *p_fmt )
+                           bool pb_present[4], int i_reorder_depth )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     bool b_processed = false;
@@ -887,7 +887,7 @@ static void DecoderPlayCc( decoder_t *p_dec, block_t *p_cc,
         if( p_owner->cc.pp_decoder[i] )
             i_cc_decoder++;
     }
-    p_owner->cc.i_reorder_depth = p_fmt->cc.i_reorder_depth;
+    p_owner->cc.i_reorder_depth = i_reorder_depth;
 
     for( int i = 0; i < 4; i++ )
     {
@@ -918,14 +918,15 @@ static void PacketizerGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
 
     assert( p_dec_cc->pf_get_cc != NULL );
 
-    p_cc = p_dec_cc->pf_get_cc( p_dec_cc, pb_present );
+    int i_reorder_depth;
+    p_cc = p_dec_cc->pf_get_cc( p_dec_cc, pb_present, &i_reorder_depth );
     if( !p_cc )
         return;
-    DecoderPlayCc( p_dec, p_cc, pb_present, &p_dec_cc->fmt_out.subs );
+    DecoderPlayCc( p_dec, p_cc, pb_present, i_reorder_depth );
 }
 
 static int DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
-                           bool p_cc_present[4] )
+                           bool p_cc_present[4], int i_reorder_depth )
 {
     decoder_owner_sys_t *p_owner = p_videodec->p_owner;
 
@@ -933,7 +934,7 @@ static int DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
     {
         if( p_owner->cc.b_supported &&
            ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
-            DecoderPlayCc( p_videodec, p_cc, p_cc_present, &p_videodec->fmt_out.subs );
+            DecoderPlayCc( p_videodec, p_cc, p_cc_present, i_reorder_depth );
         else
             block_Release( p_cc );
     }

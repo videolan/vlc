@@ -129,7 +129,7 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
 
 static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag );
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] );
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int * );
 
 static const uint8_t p_vc1_startcode[3] = { 0x00, 0x00, 0x01 };
 /*****************************************************************************
@@ -762,13 +762,14 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 /*****************************************************************************
  * GetCc:
  *****************************************************************************/
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_depth )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_cc;
 
     for( int i = 0; i < 4; i++ )
         pb_present[i] = p_sys->cc.pb_present[i];
+    *pi_reorder_depth = 0;
 
     if( p_sys->cc.i_data <= 0 )
         return NULL;

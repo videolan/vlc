@@ -130,7 +130,7 @@ struct decoder_t
      * pb_present will be used to known which cc channel are present (but
      * globaly, not necessary for the current packet. Video decoders should use
      * the decoder_QueueCc() function to pass closed captions. */
-    block_t *           ( * pf_get_cc )      ( decoder_t *, bool pb_present[4] );
+    block_t *           ( * pf_get_cc )      ( decoder_t *, bool pb_present[4], int * );
 
     /* Meta data at codec level
      *  The decoder owner set it back to NULL once it has retreived what it needs.
@@ -178,7 +178,7 @@ struct decoder_t
     /* XXX use decoder_QueueAudio */
     int             (*pf_queue_audio)( decoder_t *, block_t * );
     /* XXX use decoder_QueueCC */
-    int             (*pf_queue_cc)( decoder_t *, block_t *, bool p_cc_present[4] );
+    int             (*pf_queue_cc)( decoder_t *, block_t *, bool p_cc_present[4], int );
     /* XXX use decoder_QueueSub */
     int             (*pf_queue_sub)( decoder_t *, subpicture_t *);
     void             *p_queue_ctx;
@@ -311,17 +311,19 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
  * \param p_cc the closed-caption to queue
  * \param p_cc_present array-of-bool where each entry indicates whether the
  *                     given channel is present or not
+ * \param i_depth the closed-caption to queue reorder depth, or simply 0
+ *                     if using the old mpgv block flag tagging
  * \return 0 if queued, -1 on error
  */
 static inline int decoder_QueueCc( decoder_t *dec, block_t *p_cc,
-                                   bool p_cc_present[4] )
+                                   bool p_cc_present[4], int i_depth )
 {
     if( dec->pf_queue_cc == NULL )
     {
         block_Release( p_cc );
         return -1;
     }
-    return dec->pf_queue_cc( dec, p_cc, p_cc_present );
+    return dec->pf_queue_cc( dec, p_cc, p_cc_present, i_depth );
 }
 
 /**
