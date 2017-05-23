@@ -1558,9 +1558,6 @@ void SyncControls::subsdelayClean()
 
 void SyncControls::subsdelaySetFactor( double f_factor )
 {
-    /* Set the factor in the preferences */
-    config_PutFloat( p_intf, SUBSDELAY_CFG_FACTOR, f_factor );
-
     /* Try to find an instance of subsdelay, and set its factor */
     vlc_object_t *p_obj = ( vlc_object_t * ) vlc_object_find_name( p_intf->obj.libvlc, "subsdelay" );
     if( p_obj )
@@ -1577,8 +1574,6 @@ void SyncControls::changeVFiltersString( const char *psz_name, bool b_add )
         return;
 
     QString result = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
-
-    config_PutPsz( p_intf, psz_filter_type, qtu( result ) );
 
     UpdateVFiltersString( p_intf, psz_filter_type, qtu( result ) );
 }
