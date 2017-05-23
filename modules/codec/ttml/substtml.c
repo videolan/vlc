@@ -492,7 +492,7 @@ static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_nod
             DictMergeWithRegionID( p_ctx, psz_regionid, &merged );
     }
 
-    if( merged.i_size && merged.p_entries[0] && (p_ttml_style = ttml_style_New()) )
+    if( vlc_dictionary_keys_count( &merged ) && (p_ttml_style = ttml_style_New()) )
     {
         DictToTTMLStyle( &merged, p_ttml_style );
     }
