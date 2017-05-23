@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include "dialogs/extended.hpp"
 
 #include "main_interface.hpp" /* Needed for external MI size */
@@ -61,16 +63,20 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     QTabWidget *audioTab = new QTabWidget( audioWidget );
 
     equal = new Equalizer( p_intf, audioTab );
+    CONNECT( equal, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
     audioTab->addTab( equal, qtr( "Equalizer" ) );
 
     Compressor *compres = new Compressor( p_intf, audioTab );
+    CONNECT( compres, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
     audioTab->addTab( compres, qtr( "Compressor" ) );
 
     Spatializer *spatial = new Spatializer( p_intf, audioTab );
+    CONNECT( spatial, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
     audioLayout->addWidget( audioTab );
 
     StereoWidener *stereowiden = new StereoWidener( p_intf, audioTab );
+    CONNECT( stereowiden, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
     audioTab->addTab( stereowiden, qtr( "Stereo Widener" ) );
     audioLayout->addWidget( audioTab );
 
@@ -82,6 +88,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     QTabWidget *videoTab = new QTabWidget( videoWidget );
 
     videoEffect = new ExtVideo( p_intf, videoTab );
+    CONNECT( videoEffect, configChanged(QString, QVariant), this, putVideoConfig(QString, QVariant) );
     videoLayout->addWidget( videoTab );
     videoTab->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
 
@@ -97,24 +104,21 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     }
 
     layout->addWidget( mainTabW );
-
-    /* Bottom buttons / checkbox line */
-    QHBoxLayout *buttonsLayout = new QHBoxLayout();
-    layout->addLayout( buttonsLayout );
-
-    writeChangesBox = new QCheckBox( qtr("&Write changes to config") );
-    buttonsLayout->addWidget( writeChangesBox );
-    CONNECT( writeChangesBox, toggled(bool), compres, setSaveToConfig(bool) );
-    CONNECT( writeChangesBox, toggled(bool), spatial, setSaveToConfig(bool) );
-    CONNECT( writeChangesBox, toggled(bool), equal, setSaveToConfig(bool) );
     CONNECT( mainTabW, currentChanged(int), this, currentTabChanged(int) );
 
-    QDialogButtonBox *closeButtonBox = new QDialogButtonBox( Qt::Horizontal, this );
-    closeButtonBox->addButton(
-        new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
-    buttonsLayout->addWidget( closeButtonBox );
+    /* Bottom buttons */
+    QDialogButtonBox *buttonBox = new QDialogButtonBox( Qt::Horizontal, this );
 
-    CONNECT( closeButtonBox, rejected(), this, close() );
+    m_applyButton = new QPushButton( qtr("&Save"), this );
+    m_applyButton->setEnabled( false );
+    buttonBox->addButton( m_applyButton, QDialogButtonBox::ApplyRole );
+
+    buttonBox->addButton(
+        new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
+    layout->addWidget( buttonBox );
+
+    CONNECT( buttonBox, rejected(), this, close() );
+    CONNECT( m_applyButton, clicked(), this, saveConfig() );
 
     /* Restore geometry or move this dialog on the left pane of the MI */
     if( !restoreGeometry( getSettings()->value("EPanel/geometry").toByteArray() ) )
@@ -156,5 +160,53 @@ void ExtendedDialog::changedItem( int i_status )
 
 void ExtendedDialog::currentTabChanged( int i )
 {
-    writeChangesBox->setVisible( i == AUDIO_TAB );
+    if( i == AUDIO_TAB || i == VIDEO_TAB )
+    {
+        m_applyButton->setVisible( true );
+        m_applyButton->setEnabled( !m_hashConfigs[i].isEmpty() );
+    }
+    else
+        m_applyButton->setVisible( false );
+}
+
+void ExtendedDialog::putAudioConfig( const QString& name, const QVariant value )
+{
+    m_hashConfigs[AUDIO_TAB].insert( name, value );
+    m_applyButton->setEnabled( true );
+}
+
+void ExtendedDialog::putVideoConfig( const QString& name, const QVariant value )
+{
+    m_hashConfigs[VIDEO_TAB].insert( name, value );
+    m_applyButton->setEnabled( true );
+}
+
+void ExtendedDialog::saveConfig()
+{
+    assert( currentTab() == AUDIO_TAB || currentTab() == VIDEO_TAB );
+    QHash<QString, QVariant> *hashConfig = &m_hashConfigs[currentTab()];
+
+    for( QHash<QString, QVariant>::iterator i = hashConfig->begin();
+         i != hashConfig->end(); ++i )
+    {
+        QVariant &value = i.value();
+        switch( static_cast<QMetaType::Type>(value.type()) )
+        {
+            case QMetaType::QString:
+                config_PutPsz( p_intf, qtu(i.key()), qtu(value.toString()) );
+                break;
+            case QMetaType::Int:
+                config_PutInt( p_intf, qtu(i.key()), value.toInt() ) ;
+                break;
+            case QMetaType::Double:
+            case QMetaType::Float:
+                config_PutFloat( p_intf, qtu(i.key()), value.toFloat() ) ;
+                break;
+            default:
+                vlc_assert_unreachable();
+        }
+    }
+    config_SaveConfigFile( p_intf );
+    hashConfig->clear();
+    m_applyButton->setEnabled( false );
 }

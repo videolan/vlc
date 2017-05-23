@@ -288,7 +288,7 @@ void ExtVideo::clean()
 
 static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
 {
-    char* psz_chain = config_GetPsz( p_intf, psz_filter_type );
+    char* psz_chain = var_GetString( THEPL, psz_filter_type );
 
     QString const chain = QString( psz_chain ? psz_chain : "" );
     QStringList list = chain.split( ':', QString::SplitBehavior::SkipEmptyParts );
@@ -326,7 +326,7 @@ void ExtVideo::changeVFiltersString( const char *psz_name, bool b_add )
 
     QString result = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
 
-    config_PutPsz( p_intf, psz_filter_type, qtu( result ) );
+    emit configChanged( qfu( psz_filter_type ), result );
 
     UpdateVFiltersString( p_intf, psz_filter_type, qtu( result ) );
 }
@@ -505,7 +505,7 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
     {
         if( i_int == -1 )
             msg_Warn( p_intf, "Could not find the correct Integer widget" );
-        config_PutInt( p_intf, psz_option, i_int );
+        emit configChanged( qfu( psz_option ), QVariant( i_int ) );
         if( i_type == VLC_VAR_INTEGER )
         {
             val.i_int = i_int;
@@ -521,7 +521,7 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
     {
         if( f_float == -1 )
             msg_Warn( p_intf, "Could not find the correct Float widget" );
-        config_PutFloat( p_intf, psz_option, f_float );
+        emit configChanged( qfu( psz_option ), QVariant( f_float ) );
         var_SetFloat( THEPL, psz_option, f_float );
         val.f_float = f_float;
     }
@@ -532,7 +532,7 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
             msg_Warn( p_intf, "Could not find the correct String widget" );
             psz_string = "";
         }
-        config_PutPsz( p_intf, psz_option, psz_string );
+        emit configChanged( qfu( psz_option ), QVariant( psz_string ) );
         var_SetString( THEPL, psz_option, psz_string );
         val.psz_string = (char *) psz_string;
     }
@@ -831,7 +831,6 @@ void ExtV4l2::ValueChange( int value )
 FilterSliderData::FilterSliderData( QObject *parent, QSlider *_slider ) :
     QObject( parent ), slider( _slider )
 {
-    b_save_to_config = false;
 }
 
 FilterSliderData::FilterSliderData( QObject *parent,
@@ -842,7 +841,6 @@ FilterSliderData::FilterSliderData( QObject *parent,
     QObject( parent ), slider( _slider ), valueLabel( _label ),
     nameLabel( _nameLabel ), p_data( _p_data ), p_intf( _p_intf )
 {
-    b_save_to_config = false;
     slider->setMinimum( p_data->f_min / p_data->f_resolution );
     slider->setMaximum( p_data->f_max / p_data->f_resolution );
     nameLabel->setText( p_data->descs );
@@ -894,7 +892,7 @@ float FilterSliderData::initialValue()
     return f;
 }
 
-void FilterSliderData::onValueChanged( int i ) const
+void FilterSliderData::onValueChanged( int i )
 {
     float f = ((float) i) * p_data->f_resolution;
     vlc_object_t *p_aout = (vlc_object_t *) THEMIM->getAout();
@@ -906,22 +904,22 @@ void FilterSliderData::onValueChanged( int i ) const
     writeToConfig();
 }
 
-void FilterSliderData::writeToConfig() const
+void FilterSliderData::writeToConfig()
 {
-    if ( !b_save_to_config ) return;
     float f = ((float) slider->value()) * p_data->f_resolution;
-    config_PutFloat( p_intf, qtu(p_data->name), f );
-}
-
-void FilterSliderData::setSaveToConfig( bool b )
-{
-    b_save_to_config = b;
+    emit configChanged( p_data->name, QVariant( f ) );
 }
 
 AudioFilterControlWidget::AudioFilterControlWidget
 ( intf_thread_t *_p_intf, QWidget *parent, const char *_name ) :
     QWidget( parent ), p_intf( _p_intf ), name( _name ), i_smallfont(0)
 {}
+
+void AudioFilterControlWidget::connectConfigChanged( FilterSliderData *slider )
+{
+    connect( slider, SIGNAL( configChanged(QString, QVariant) ),
+             this, SIGNAL( configChanged(QString, QVariant) ) );
+}
 
 void AudioFilterControlWidget::build()
 {
@@ -953,6 +951,7 @@ void AudioFilterControlWidget::build()
         ctrlLayout->addWidget( nameLabel, 2, i, Qt::AlignHCenter );
         i++;
         sliderDatas << filter;
+        connectConfigChanged( filter );
     }
 
     char *psz_af = var_InheritString( THEPL, "audio-filter" );
@@ -966,7 +965,7 @@ void AudioFilterControlWidget::build()
     free( psz_af );
 }
 
-void AudioFilterControlWidget::enable( bool b_enable ) const
+void AudioFilterControlWidget::enable( bool b_enable )
 {
     module_t *p_obj = module_find( qtu(name) );
     if( !p_obj )
@@ -977,14 +976,8 @@ void AudioFilterControlWidget::enable( bool b_enable ) const
 
     QString result = ChangeFiltersString( p_intf, "audio-filter", qtu(name),
                                           b_enable );
-    config_PutPsz( p_intf, "audio-filter", qtu( result ) );
+    emit configChanged( qfu("audio-filter"), result );
     playlist_EnableAudioFilter( THEPL, qtu(name), b_enable );
-}
-
-void AudioFilterControlWidget::setSaveToConfig( bool b_save )
-{
-    foreach( FilterSliderData *f, sliderDatas )
-        f->setSaveToConfig( b_save );
 }
 
 /**********************************************************************
@@ -1056,7 +1049,7 @@ float EqualizerSliderData::initialValue()
     return f;
 }
 
-void EqualizerSliderData::onValueChanged( int i ) const
+void EqualizerSliderData::onValueChanged( int i )
 {
     QStringList bands = getBandsFromAout();
     if ( bands.count() > index )
@@ -1073,15 +1066,14 @@ void EqualizerSliderData::onValueChanged( int i ) const
     }
 }
 
-void EqualizerSliderData::writeToConfig() const
+void EqualizerSliderData::writeToConfig()
 {
-    if ( !b_save_to_config ) return;
     QStringList bands = getBandsFromAout();
     if ( bands.count() > index )
     {
         float f = (float) slider->value() * p_data->f_resolution;
         bands[ index ] = QLocale( QLocale::C ).toString( f );
-        config_PutPsz( p_intf, qtu(p_data->name), qtu(bands.join( " " )) );
+        emit configChanged( p_data->name, QVariant( bands.join( " " ) ) );
     }
 }
 
@@ -1140,6 +1132,7 @@ void Equalizer::build()
     ui.preampValue->setFont( smallFont );
     preamp = new FilterSliderData( this, p_intf,
         ui.preampSlider, ui.preampValue, ui.preampLabel, & preamp_values );
+    connectConfigChanged( preamp );
 
     /* fix sliders spacing accurately */
     int i_width = qMax( QFontMetrics( smallFont ).width( "500 Hz" ),
@@ -1163,6 +1156,7 @@ void Equalizer::build()
         ctrlLayout->addWidget( nameLabel, 1, i, Qt::AlignHCenter );
         sliderDatas << filter; /* keep track for applying presets */
         i++;
+        connectConfigChanged( filter );
     }
 
     /* Add the listed presets */
@@ -1226,12 +1220,6 @@ void Equalizer::build()
         vlc_object_release( p_aout );
 }
 
-void Equalizer::setSaveToConfig( bool b_save )
-{
-    AudioFilterControlWidget::setSaveToConfig( b_save );
-    preamp->setSaveToConfig( b_save );
-}
-
 void Equalizer::setCorePreset( int i_preset )
 {
     if( i_preset < 1 )
@@ -1250,11 +1238,11 @@ void Equalizer::setCorePreset( int i_preset )
         var_SetString( p_aout , "equalizer-preset" , preset_list[i_preset] );
         vlc_object_release( p_aout );
     }
-    config_PutPsz( p_intf, "equalizer-preset", preset_list[i_preset] );
+    emit configChanged( qfu( "equalizer-preset" ), QVariant( qfu( preset_list[i_preset] ) ) );
 }
 
 /* Function called when the set2Pass button is activated */
-void Equalizer::enable2Pass( bool b_enable ) const
+void Equalizer::enable2Pass( bool b_enable )
 {
     vlc_object_t *p_aout= (vlc_object_t *)THEMIM->getAout();
 
@@ -1263,7 +1251,7 @@ void Equalizer::enable2Pass( bool b_enable ) const
         var_SetBool( p_aout, "equalizer-2pass", b_enable );
         vlc_object_release( p_aout );
     }
-    config_PutInt( p_intf, "equalizer-2pass", b_enable );
+    emit configChanged( qfu( "equalizer-2pass" ), QVariant( b_enable ) );
 }
 
 /**********************************************************************

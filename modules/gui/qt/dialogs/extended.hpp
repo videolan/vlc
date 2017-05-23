@@ -52,10 +52,14 @@ private:
     ExtVideo *videoEffect;
     Equalizer *equal;
     QTabWidget *mainTabW;
-    QCheckBox *writeChangesBox;
+    QPushButton *m_applyButton;
+    QHash<QString, QVariant> m_hashConfigs[2];
 private slots:
     void changedItem( int );
     void currentTabChanged( int );
+    void saveConfig();
+    void putAudioConfig( const QString& name, const QVariant value );
+    void putVideoConfig( const QString& name, const QVariant value );
 
     friend class    Singleton<ExtendedDialog>;
 };

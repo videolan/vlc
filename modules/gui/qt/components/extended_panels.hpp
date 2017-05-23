@@ -64,6 +64,8 @@ private slots:
     void cropChange();
     void browseLogo();
     void browseEraseFile();
+signals:
+    void configChanged( QString name, QVariant value );
 };
 
 class ExtV4l2 : public QWidget
@@ -110,18 +112,19 @@ public:
 protected:
     FilterSliderData( QObject *parent, QSlider *slider );
     virtual float initialValue();
+    virtual void writeToConfig();
     QSlider *slider;
     QLabel *valueLabel;
     QLabel *nameLabel;
     const slider_data_t *p_data;
     intf_thread_t *p_intf;
-    bool b_save_to_config;
 
 public slots:
-    virtual void onValueChanged( int i ) const;
+    virtual void onValueChanged( int i );
     virtual void updateText( int i );
-    virtual void writeToConfig() const;
-    void setSaveToConfig( bool );
+
+signals:
+    void configChanged( QString name, QVariant value );
 };
 
 class AudioFilterControlWidget : public QWidget
@@ -133,6 +136,7 @@ public:
 
 protected:
     virtual void build();
+    void connectConfigChanged( FilterSliderData *slider );
     QVector<FilterSliderData::slider_data_t> controls;
     QVector<FilterSliderData *> sliderDatas;
     QGroupBox *slidersBox;
@@ -141,8 +145,10 @@ protected:
     int i_smallfont;
 
 protected slots:
-    void enable( bool ) const;
-    virtual void setSaveToConfig( bool );
+    void enable( bool );
+
+signals:
+    void configChanged( QString name, QVariant value );
 };
 
 class EqualizerSliderData : public FilterSliderData
@@ -159,10 +165,10 @@ protected:
     float initialValue() Q_DECL_OVERRIDE;
     int index;
     QStringList getBandsFromAout() const;
+    void writeToConfig();
 
 public slots:
-    void onValueChanged( int i ) const Q_DECL_OVERRIDE;
-    void writeToConfig() const Q_DECL_OVERRIDE;
+    void onValueChanged( int i ) Q_DECL_OVERRIDE;
 };
 
 class Equalizer: public AudioFilterControlWidget
@@ -175,16 +181,13 @@ public:
 protected:
     void build() Q_DECL_OVERRIDE;
 
-protected slots:
-    void setSaveToConfig( bool ) Q_DECL_OVERRIDE;
-
 private:
     FilterSliderData *preamp;
     FilterSliderData::slider_data_t preamp_values;
 
 private slots:
     void setCorePreset( int );
-    void enable2Pass( bool ) const;
+    void enable2Pass( bool );
 };
 
 class Compressor: public AudioFilterControlWidget
