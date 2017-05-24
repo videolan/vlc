@@ -336,7 +336,7 @@ char *vlc_stream_ReadLine( stream_t *s )
             p_line[i_line-2] == '\n') ) i_line--;
 
         /* Make sure the \0 is there */
-        p_line[i_line-1] = '\0';
+        p_line[i_line] = '\0';
 
         return p_line;
     }
