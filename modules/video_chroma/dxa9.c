@@ -95,9 +95,9 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 
         uint8_t *plane[3] = {
             (uint8_t*)lock.pBits,
-            (uint8_t*)lock.pBits + pitch[0] * src->format.i_height,
-            (uint8_t*)lock.pBits + pitch[0] * src->format.i_height
-                                 + pitch[1] * src->format.i_height / 2,
+            (uint8_t*)lock.pBits + pitch[0] * desc.Height,
+            (uint8_t*)lock.pBits + pitch[0] * desc.Height
+                                 + pitch[1] * desc.Height / 2,
         };
 
         if (imc3) {
@@ -110,7 +110,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     } else if (desc.Format == MAKEFOURCC('N','V','1','2')) {
         uint8_t *plane[2] = {
             lock.pBits,
-            (uint8_t*)lock.pBits + lock.Pitch * src->format.i_height
+            (uint8_t*)lock.pBits + lock.Pitch * desc.Height
         };
         size_t  pitch[2] = {
             lock.Pitch,
@@ -144,7 +144,7 @@ static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     if (desc.Format == MAKEFOURCC('N','V','1','2')) {
         uint8_t *plane[2] = {
             lock.pBits,
-            (uint8_t*)lock.pBits + lock.Pitch * src->format.i_height
+            (uint8_t*)lock.pBits + lock.Pitch * desc.Height
         };
         size_t  pitch[2] = {
             lock.Pitch,
