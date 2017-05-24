@@ -53,9 +53,29 @@
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 
-static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add );
-static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
-static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
+static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz_name )
+{
+    module_t *p_obj = module_find( psz_name );
+    if( !p_obj )
+    {
+        msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
+        return NULL;
+    }
+
+    if( module_provides( p_obj, "video splitter" ) )
+        return "video-splitter";
+    else if( module_provides( p_obj, "video filter" ) )
+        return "video-filter";
+    else if( module_provides( p_obj, "sub source" ) )
+        return "sub-source";
+    else if( module_provides( p_obj, "sub filter" ) )
+        return "sub-filter";
+    else
+    {
+        msg_Err( p_intf, "Unknown video filter type." );
+        return NULL;
+    }
+}
 
 static const QString ModuleFromWidgetName( QObject *obj )
 {
@@ -275,30 +295,6 @@ static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_
 
     QString result = ChangeFiltersString( p_intf, "audio-filter", psz_name, b_add );
     config_PutPsz( p_intf, "audio-filter", qtu( result ) );
-}
-
-static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz_name )
-{
-    module_t *p_obj = module_find( psz_name );
-    if( !p_obj )
-    {
-        msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
-        return NULL;
-    }
-
-    if( module_provides( p_obj, "video splitter" ) )
-        return "video-splitter";
-    else if( module_provides( p_obj, "video filter" ) )
-        return "video-filter";
-    else if( module_provides( p_obj, "sub source" ) )
-        return "sub-source";
-    else if( module_provides( p_obj, "sub filter" ) )
-        return "sub-filter";
-    else
-    {
-        msg_Err( p_intf, "Unknown video filter type." );
-        return NULL;
-    }
 }
 
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
