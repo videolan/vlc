@@ -67,14 +67,14 @@ typedef struct
     const TCHAR           *psz_decoder_dll;
 
     /* Direct3D */
-    IUnknown              *d3ddev;
+    D3D_Device            *d3ddev;
 
     /* Video service */
     GUID                   input;
-    IUnknown               *d3ddec;
+    D3D_DecoderDevice      *d3ddec;
 
     /* Video decoder */
-    IUnknown               *decoder;
+    D3D_DecoderType        *decoder;
 
     /* */
     int          surface_count;
@@ -86,7 +86,7 @@ typedef struct
 
     vlc_mutex_t      surface_lock;
     vlc_va_surface_t surface[MAX_SURFACE_COUNT];
-    IUnknown         *hw_surface[MAX_SURFACE_COUNT];
+    D3D_DecoderSurface  *hw_surface[MAX_SURFACE_COUNT];
 
     /**
      * Check that the decoder device is still available
