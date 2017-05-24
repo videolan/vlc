@@ -46,12 +46,14 @@
 #include <vlc_spu.h>
 #include <vlc_vout_osd.h>
 #include <vlc_image.h>
+#include <vlc_plugin.h>
 
 #include <libvlc.h>
 #include "vout_internal.h"
 #include "interlacing.h"
 #include "display.h"
 #include "window.h"
+#include "../misc/variables.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -649,6 +651,68 @@ int vout_HideWindowMouse(vout_thread_t *vout, bool hide)
 }
 
 /* */
+static int FilterProxyCallback(vlc_object_t *p_this, char const *psz_var,
+                         vlc_value_t oldval, vlc_value_t newval,
+                         void *p_data)
+{
+    (void) p_this; (void) oldval;
+    var_Set((filter_t *)p_data, psz_var, newval);
+    return 0;
+}
+
+static void ThreadAddFilterCallbacks(vout_thread_t *vout, filter_t *filter)
+{
+    /* Duplicate every command variables from the filter, and add a proxy
+     * callback to trigger filters events from the vout. */
+
+    char **names = var_GetAllNames(VLC_OBJECT(filter));
+    if (names == NULL)
+        return;
+
+    for (char **pname = names; *pname != NULL; pname++)
+    {
+        char *name = *pname;
+        int var_type = var_Type(filter, name);
+        if ((var_type & VLC_VAR_ISCOMMAND))
+        {
+            assert(var_Type(vout, name) == 0);
+            var_Create(vout, name, var_type | VLC_VAR_DOINHERIT);
+            var_AddCallback(vout, name, FilterProxyCallback, filter);
+        }
+        free(name);
+    }
+    free(names);
+}
+
+static int ThreadDelFilterCallbacks(filter_t *filter, void *opaque)
+{
+    vout_thread_t *vout = opaque;
+    char **names = var_GetAllNames(VLC_OBJECT(filter));
+    if (names == NULL)
+        return VLC_SUCCESS;
+
+    for (char **pname = names; *pname != NULL; pname++)
+    {
+        char *name = *pname;
+        int var_type = var_Type(filter, name);
+        if ((var_type & VLC_VAR_ISCOMMAND))
+        {
+            var_DelCallback(vout, name, FilterProxyCallback, filter);
+            var_Destroy(vout, name);
+        }
+        free(name);
+    }
+    free(names);
+    return VLC_SUCCESS;
+}
+
+static void ThreadDelAllFilterCallbacks(vout_thread_t *vout)
+{
+    assert(vout->p->filter.chain_interactive != NULL);
+    filter_chain_ForEach(vout->p->filter.chain_interactive,
+                         ThreadDelFilterCallbacks, vout);
+}
+
 static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
 {
     vout_thread_t *vout = filter->owner.sys;
@@ -702,6 +766,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
                                 bool is_locked)
 {
     ThreadFilterFlush(vout, is_locked);
+    ThreadDelAllFilterCallbacks(vout);
 
     vlc_array_t array_static;
     vlc_array_t array_interactive;
@@ -770,10 +835,16 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         for (size_t i = 0; i < vlc_array_count(array); i++) {
             vout_filter_t *e = vlc_array_item_at_index(array, i);
             msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
-            if (!filter_chain_AppendFilter(chain, e->name, e->cfg, NULL, NULL)) {
+            filter_t *filter = filter_chain_AppendFilter(chain, e->name, e->cfg,
+                               NULL, NULL);
+            if (!filter)
+            {
                 msg_Err(vout, "Failed to add filter '%s'", e->name);
                 config_ChainDestroy(e->cfg);
             }
+            else if (a == 1) /* Add callbacks for interactive filters */
+                ThreadAddFilterCallbacks(vout, filter);
+
             free(e->name);
             free(e);
         }
@@ -1430,7 +1501,10 @@ static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
     return VLC_SUCCESS;
 error:
     if (vout->p->filter.chain_interactive != NULL)
+    {
+        ThreadDelAllFilterCallbacks(vout);
         filter_chain_Delete(vout->p->filter.chain_interactive);
+    }
     if (vout->p->filter.chain_static != NULL)
         filter_chain_Delete(vout->p->filter.chain_static);
     video_format_Clean(&vout->p->filter.format);
@@ -1453,7 +1527,8 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
         vout_CloseWrapper(vout, state);
     }
 
-    /* Destroy the video filters2 */
+    /* Destroy the video filters */
+    ThreadDelAllFilterCallbacks(vout);
     filter_chain_Delete(vout->p->filter.chain_interactive);
     filter_chain_Delete(vout->p->filter.chain_static);
     video_format_Clean(&vout->p->filter.format);
