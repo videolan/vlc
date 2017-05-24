@@ -273,7 +273,7 @@ VLC_API bool aout_CheckChannelExtraction( int *pi_selection, uint32_t *pi_layout
  * aout_CheckChannelExtraction.
  *
  * XXX this function does not work in place (p_dst and p_src must not overlap).
- * XXX Only 8, 16, 24, 32, 64 bits per sample are supported.
+ * XXX Only 8, 16, 32, 64 bits per sample are supported.
  */
 VLC_API void aout_ChannelExtract( void *p_dst, int i_dst_channels, const void *p_src, int i_src_channels, int i_sample_count, const int *pi_selection, int i_bits_per_sample );
 
