@@ -1689,7 +1689,7 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
                      text_t *txt, subtitle_t *p_subtitle, size_t i_idx )
 {
     VLC_UNUSED( i_idx );
-    char         *psz_text, *psz_orig = NULL;
+    char         *psz_text, *psz_orig;
     char         *psz_text2, *psz_orig2;
     int h1, h2, m1, m2, s1, s2, f1, f2;
 
@@ -1705,7 +1705,6 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
     /* Parse the main lines */
     for( ;; )
     {
-        free( psz_orig );
         const char *s = TextGetLine( txt );
         if( !s )
             return VLC_EGENERIC;
@@ -1796,10 +1795,16 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
                 sscanf( &psz_text[shift], "%d", &p_props->jss.i_time_resolution );
                 break;
             }
+            free( psz_orig );
+            continue;
+        }
+        else
+            /* Unkown type line, probably a comment */
+        {
+            free( psz_orig );
+            continue;
         }
     }
-    free( psz_orig );
-    psz_orig = NULL;
 
     while( psz_text[ strlen( psz_text ) - 1 ] == '\\' )
     {
