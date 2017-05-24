@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_block.h>
@@ -322,8 +323,8 @@ char *vlc_stream_ReadLine( stream_t *s )
 
             if( vlc_iconv( priv->text.conv, &p_in, &i_in, &p_out, &i_out ) == (size_t)-1 )
             {
-                msg_Err( s, "iconv failed" );
-                msg_Dbg( s, "original: %d, in %d, out %d", i_line, (int)i_in, (int)i_out );
+                msg_Err( s, "conversion error: %s", vlc_strerror_c( errno ) );
+                msg_Dbg( s, "original: %d, in %zu, out %zu", i_line, i_in, i_out );
             }
             free( p_line );
             p_line = psz_new_line;
