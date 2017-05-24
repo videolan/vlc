@@ -332,8 +332,9 @@ char *vlc_stream_ReadLine( stream_t *s )
         }
 
         /* Remove trailing LF/CR */
-        while( i_line >= 2 && ( p_line[i_line-2] == '\r' ||
-            p_line[i_line-2] == '\n') ) i_line--;
+        while( i_line >= 1 &&
+               (p_line[i_line - 1] == '\r' || p_line[i_line - 1] == '\n') )
+            i_line--;
 
         /* Make sure the \0 is there */
         p_line[i_line] = '\0';
