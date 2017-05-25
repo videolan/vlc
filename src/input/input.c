@@ -94,7 +94,7 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
 static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux );
 static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
-                                const char *psz_access, const char *psz_path );
+                                const char **psz_access, const char *psz_path );
 
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
                               const demux_t ***ppp_attachment_demux,
@@ -2422,7 +2422,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         char **tab;
 
         TAB_INIT( count, tab );
-        InputGetExtraFiles( p_input, &count, &tab, psz_access, psz_path );
+        InputGetExtraFiles( p_input, &count, &tab, &psz_access, psz_path );
         if( count > 0 )
         {
             char *list = NULL;
@@ -2445,7 +2445,6 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
                 var_SetString( p_input, "concat-list", list );
                 free( list );
             }
-            psz_access = "concat";
         }
         TAB_CLEAN( count, tab );
     }
@@ -2891,22 +2890,23 @@ exit:
 
 static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
-                                const char *psz_access, const char *psz_path )
+                                const char **ppsz_access, const char *psz_path )
 {
     static const struct pattern
     {
+        const char *psz_access_force;
         const char *psz_match;
         const char *psz_format;
         int i_start;
         int i_stop;
     } patterns[] = {
         /* XXX the order is important */
-        { ".001", "%s.%.3d", 2, 999 },
+        { "concat", ".001", "%s.%.3d", 2, 999 },
     };
 
     TAB_INIT( *pi_list, *pppsz_list );
 
-    if( ( psz_access && *psz_access && strcmp( psz_access, "file" ) ) || !psz_path )
+    if( ( **ppsz_access && strcmp( *ppsz_access, "file" ) ) || !psz_path )
         return;
 
     const size_t i_path = strlen(psz_path);
@@ -2923,6 +2923,9 @@ static void InputGetExtraFiles( input_thread_t *p_input,
         {
             InputGetExtraFilesPattern( p_input, pi_list, pppsz_list, psz_path,
                 pat->psz_match, pat->psz_format, pat->i_start, pat->i_stop );
+
+            if( *pi_list > 0 && pat->psz_access_force )
+                *ppsz_access = pat->psz_access_force;
             return;
         }
     }
