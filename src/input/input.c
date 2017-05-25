@@ -2902,6 +2902,10 @@ static void InputGetExtraFiles( input_thread_t *p_input,
     } patterns[] = {
         /* XXX the order is important */
         { "concat", ".001", "%s.%.3d", 2, 999 },
+        { NULL, ".part1.rar","%s.part%.1d.rar", 2, 9 },
+        { NULL, ".part01.rar","%s.part%.2d.rar", 2, 99, },
+        { NULL, ".part001.rar", "%s.part%.3d.rar", 2, 999 },
+        { NULL, ".rar", "%s.r%.2d", 0, 99 },
     };
 
     TAB_INIT( *pi_list, *pppsz_list );
