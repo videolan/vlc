@@ -75,9 +75,7 @@ struct decoder_sys_t
     bool b_stream_info;
 };
 
-#define FLAC_MAX_CHANNELS 8
-
-static const int pi_channels_maps[FLAC_MAX_CHANNELS + 1] =
+static const int pi_channels_maps[FLAC__MAX_CHANNELS + 1] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -98,7 +96,7 @@ static const int pi_channels_maps[FLAC_MAX_CHANNELS + 1] =
 };
 
 /* XXX it supposes our internal format is WG4 */
-static const uint8_t ppi_reorder[1+FLAC_MAX_CHANNELS][FLAC_MAX_CHANNELS] =
+static const uint8_t ppi_reorder[1+FLAC__MAX_CHANNELS][FLAC__MAX_CHANNELS] =
 {
     { },
     { 0, },
