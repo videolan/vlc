@@ -2889,16 +2889,15 @@ static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
                                 const char *psz_access, const char *psz_path )
 {
-    static const struct
+    static const struct pattern
     {
         const char *psz_match;
         const char *psz_format;
         int i_start;
         int i_stop;
-    } p_pattern[] = {
+    } patterns[] = {
         /* XXX the order is important */
-        { ".001",         "%s.%.3d",        2, 999 },
-        { NULL, NULL, 0, 0 }
+        { ".001", "%s.%.3d", 2, 999 },
     };
 
     TAB_INIT( *pi_list, *pppsz_list );
@@ -2908,18 +2907,18 @@ static void InputGetExtraFiles( input_thread_t *p_input,
 
     const size_t i_path = strlen(psz_path);
 
-    for( int i = 0; p_pattern[i].psz_match != NULL; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE( patterns ); ++i )
     {
-        const size_t i_ext = strlen(p_pattern[i].psz_match );
+        const struct pattern* pat = &patterns[i];
+        const size_t i_ext = strlen( pat->psz_match );
 
         if( i_path < i_ext )
             continue;
-        if( !strcmp( &psz_path[i_path-i_ext], p_pattern[i].psz_match ) )
+
+        if( !strcmp( &psz_path[i_path-i_ext], pat->psz_match ) )
         {
-            InputGetExtraFilesPattern( p_input, pi_list, pppsz_list,
-                                       psz_path,
-                                       p_pattern[i].psz_match, p_pattern[i].psz_format,
-                                       p_pattern[i].i_start, p_pattern[i].i_stop );
+            InputGetExtraFilesPattern( p_input, pi_list, pppsz_list, psz_path,
+                pat->psz_match, pat->psz_format, pat->i_start, pat->i_stop );
             return;
         }
     }
