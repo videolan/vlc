@@ -2845,7 +2845,6 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
 {
     int i_list;
     char **ppsz_list;
-
     TAB_INIT( i_list, ppsz_list );
 
     char *psz_base = strdup( psz_path );
@@ -2860,24 +2859,29 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
     /* Try to list files */
     for( int i = i_start; i <= i_stop; i++ )
     {
-        struct stat st;
-        char *psz_file;
-
-        if( asprintf( &psz_file, psz_format, psz_base, i ) < 0 )
+        char *psz_probe;
+        if( asprintf( &psz_probe, psz_format, psz_base, i ) < 0 )
             break;
 
-        char *psz_tmp_path = get_path( psz_file );
+        char *psz_path = get_path( psz_probe );
 
-        if( vlc_stat( psz_tmp_path, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
+        struct stat st;
+        if( psz_path == NULL ||
+            vlc_stat( psz_path, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
         {
-            free( psz_file );
-            free( psz_tmp_path );
+            free( psz_path );
+            free( psz_probe );
             break;
         }
 
-        msg_Dbg( p_input, "Detected extra file `%s'", psz_file );
-        TAB_APPEND( i_list, ppsz_list, psz_file );
-        free( psz_tmp_path );
+        msg_Dbg( p_input, "Detected extra file `%s'", psz_path );
+
+        char* psz_uri = vlc_path2uri( psz_path, NULL );
+        if( psz_uri )
+            TAB_APPEND( i_list, ppsz_list, psz_uri );
+
+        free( psz_path );
+        free( psz_probe );
     }
     free( psz_base );
 exit:
