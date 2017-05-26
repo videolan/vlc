@@ -299,9 +299,6 @@ char *vlc_stream_ReadLine( stream_t *s )
 
     if( i_read > 0 )
     {
-        memset(p_line + i_line, 0, priv->text.char_width);
-        i_line += priv->text.char_width; /* the added \0 */
-
         if( priv->text.char_width > 1 )
         {
             int i_new_line = 0;
