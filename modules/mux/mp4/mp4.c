@@ -635,6 +635,8 @@ static int Mux(sout_mux_t *p_mux)
                         p_data->i_length = CLOCK_FREQ *
                                            p_stream->mux.fmt.video.i_frame_rate_base /
                                            p_stream->mux.fmt.video.i_frame_rate;
+                        if( p_data->i_flags & BLOCK_FLAG_SINGLE_FIELD )
+                            p_data->i_length >>= 1;
                         msg_Dbg( p_mux, "video track %u fixup to %"PRId64" for sample %u",
                                  p_stream->mux.i_track_id, p_data->i_length, p_stream->mux.i_entry_count );
                     }
