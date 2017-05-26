@@ -408,20 +408,26 @@ int OpenDemux( vlc_object_t* p_this )
     switch( GetQWBE(p_peek) )
     {
         /* See RFC 3023 Part 4 */
-        case 0xFFFE3C003F007800UL: /* UTF16 BOM<?xml */
-        case 0xFEFF003C003F0078UL: /* UTF16 BOM<?xml */
+        case 0xFFFE3C003F007800UL: /* UTF16 BOM<? */
+        case 0xFFFE3C003F007400UL: /* UTF16 BOM<t */
+        case 0xFEFF003C003F0078UL: /* UTF16 BOM<? */
+        case 0xFEFF003C003F0074UL: /* UTF16 BOM<t */
             psz_alloc = FromCharset( "UTF-16", p_peek, i_peek );
             break;
-        case 0x3C003F0078006D00UL: /* UTF16-LE <?xml */
+        case 0x3C003F0078006D00UL: /* UTF16-LE <?xm */
+        case 0x3C003F0074007400UL: /* UTF16-LE <tt */
             psz_alloc = FromCharset( "UTF-16LE", p_peek, i_peek );
             break;
-        case 0x003C003F0078006DUL: /* UTF16-BE <?xml */
+        case 0x003C003F0078006DUL: /* UTF16-BE <?xm */
+        case 0x003C003F00740074UL: /* UTF16-BE <tt */
             psz_alloc = FromCharset( "UTF-16BE", p_peek, i_peek );
             break;
-        case 0x3C3F786D6C207665UL: /* UTF8 <?xml */
+        case 0xEFBBBF3C3F786D20UL: /* UTF8 BOM<?xml */
+        case 0xEFBBBF3C74742078UL: /* UTF8 BOM<tt x*/
             break;
         default:
-            return VLC_EGENERIC;
+            if(GetDWBE(p_peek) != 0x3C747420U) /* tt node without xml document marker */
+                return VLC_EGENERIC;
     }
 
     if( psz_alloc )
