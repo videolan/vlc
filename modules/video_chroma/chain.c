@@ -230,7 +230,7 @@ static int BuildChromaResize( filter_t *p_filter )
 static int BuildChromaChain( filter_t *p_filter )
 {
     es_format_t fmt_mid;
-    int i_ret;
+    int i_ret = VLC_EGENERIC;
 
     /* Now try chroma format list */
     for( int i = 0; pi_allowed_chromas[i]; i++ )
