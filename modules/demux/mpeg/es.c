@@ -40,6 +40,7 @@
 #include "../../packetizer/a52.h"
 #include "../../packetizer/dts_header.h"
 #include "../meta_engine/ID3Tag.h"
+#include "../meta_engine/ID3Text.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -96,8 +97,6 @@ typedef struct
 {
     char  psz_version[10];
     int   i_lowpass;
-    float pf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
-    float pf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
 } lame_extra_t;
 
 typedef struct
@@ -156,6 +155,9 @@ struct demux_sys_t
         lame_extra_t lame;
         bool b_lame;
     } xing;
+
+    float rgf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
+    float rgf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
 
     sync_table_t mllt;
 };
@@ -244,23 +246,18 @@ static int OpenCommon( demux_t *p_demux,
         return VLC_EGENERIC;
     }
 
-    if( p_sys->xing.b_lame )
+    es_format_t *p_fmt = &p_sys->p_packetizer->fmt_out;
+    for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
     {
-        lame_extra_t *p_lame = &p_sys->xing.lame;
-        es_format_t *p_fmt = &p_sys->p_packetizer->fmt_out;
-
-        for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
+        if ( p_sys->rgf_replay_gain[i] != 0.0 )
         {
-            if ( p_lame->pf_replay_gain[i] != 0 )
-            {
-                p_fmt->audio_replay_gain.pb_gain[i] = true;
-                p_fmt->audio_replay_gain.pf_gain[i] = p_lame->pf_replay_gain[i];
-            }
-            if ( p_lame->pf_replay_peak[i] != 0 )
-            {
-                p_fmt->audio_replay_gain.pb_peak[i] = true;
-                p_fmt->audio_replay_gain.pf_peak[i] = p_lame->pf_replay_peak[i];
-            }
+            p_fmt->audio_replay_gain.pb_gain[i] = true;
+            p_fmt->audio_replay_gain.pf_gain[i] = p_sys->rgf_replay_gain[i];
+        }
+        if ( p_sys->rgf_replay_peak[i] != 0.0 )
+        {
+            p_fmt->audio_replay_gain.pb_peak[i] = true;
+            p_fmt->audio_replay_gain.pf_peak[i] = p_sys->rgf_replay_peak[i];
         }
     }
 
@@ -914,6 +911,51 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
         }
         return VLC_EGENERIC;
     }
+    else if( i_tag == VLC_FOURCC('T', 'X', 'X', 'X') )
+    {
+        char *psz_alloc;
+        const char *psz = ID3TextConvert( p_payload, i_payload, &psz_alloc );
+        if( psz )
+        {
+            const size_t i_len = 21 + 2;
+            if( i_len < i_payload )
+            {
+                if( !strcasecmp( psz, "REPLAYGAIN_TRACK_GAIN" ) )
+                {
+                    free( psz_alloc );
+                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
+                                       p_payload[0], &psz_alloc );
+                    if( psz )
+                        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz );
+                }
+                else if( !strcasecmp( psz, "REPLAYGAIN_TRACK_PEAK" ) )
+                {
+                    free( psz_alloc );
+                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
+                                       p_payload[0], &psz_alloc );
+                    if( psz )
+                        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz );
+                }
+                else if( !strcasecmp( psz, "REPLAYGAIN_ALBUM_GAIN" ) )
+                {
+                    free( psz_alloc );
+                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
+                                       p_payload[0], &psz_alloc );
+                    if( psz )
+                        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz );
+                }
+                else if( !strcasecmp( psz, "REPLAYGAIN_ALBUM_PEAK" ) )
+                {
+                    free( psz_alloc );
+                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
+                                       p_payload[0], &psz_alloc );
+                    if( psz )
+                        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz );
+                }
+            }
+            free( psz_alloc );
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -1027,9 +1069,9 @@ static int MpgaInit( demux_t *p_demux )
         uint16_t track = MpgaXingGetWBE( &p_xing, &i_xing, 0 );
         uint16_t album = MpgaXingGetWBE( &p_xing, &i_xing, 0 );
 
-        p_lame->pf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertPeak( peak );
-        p_lame->pf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertGain( track );
-        p_lame->pf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = (float) MpgaXingLameConvertGain( album );
+        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertPeak( peak );
+        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertGain( track );
+        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = (float) MpgaXingLameConvertGain( album );
 
         MpgaXingSkip( &p_xing, &i_xing, 1 ); /* flags */
     }
