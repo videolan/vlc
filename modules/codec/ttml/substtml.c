@@ -662,6 +662,7 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
     p_segment = text_segment_New( p_ttnode->psz_text );
     if( p_segment )
     {
+        bool b_preserve_space = false;
         ttml_style_t *s = InheritTTMLStyles( p_ctx, p_ttnode->p_parent );
         if( s )
         {
@@ -671,8 +672,7 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
             p_segment->style = s->font_style;
             s->font_style = NULL;
 
-            if( !s->b_preserve_space )
-                StripSpacing( p_segment );
+            b_preserve_space = s->b_preserve_space;
             if( s->b_direction_set )
                 BIDIConvert( p_segment, s->i_direction );
 
@@ -686,6 +686,9 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
 
             ttml_style_Delete( s );
         }
+
+        if( !b_preserve_space )
+            StripSpacing( p_segment );
     }
 
     *p_region->pp_last_segment = p_segment;
