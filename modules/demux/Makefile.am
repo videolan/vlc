@@ -165,6 +165,7 @@ demux_LTLIBRARIES += libdirectory_demux_plugin.la
 
 libes_plugin_la_SOURCES  = demux/mpeg/es.c \
                            meta_engine/ID3Tag.h \
+                           meta_engine/ID3Text.h \
                            packetizer/dts_header.c packetizer/dts_header.h
 demux_LTLIBRARIES += libes_plugin.la
 
