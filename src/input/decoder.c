@@ -285,6 +285,20 @@ static vout_thread_t *aout_request_vout( void *p_private,
     return p_vout;
 }
 
+static bool aout_replaygain_changed( const audio_replay_gain_t *a,
+                                     const audio_replay_gain_t *b )
+{
+    for( size_t i=0; i<AUDIO_REPLAY_GAIN_MAX; i++ )
+    {
+        if( a->pb_gain[i] != b->pb_gain[i] ||
+            a->pb_peak[i] != b->pb_peak[i] ||
+            a->pb_gain[i] != b->pb_gain[i] ||
+            a->pb_peak[i] != b->pb_peak[i] )
+            return true;
+    }
+    return false;
+}
+
 static int aout_update_format( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -302,6 +316,18 @@ static int aout_update_format( decoder_t *p_dec )
         aout_DecDelete( p_aout );
 
         input_resource_PutAout( p_owner->p_resource, p_aout );
+    }
+
+    /* Check if only replay gain has changed */
+    if( aout_replaygain_changed( &p_dec->fmt_in.audio_replay_gain,
+                                 &p_owner->fmt.audio_replay_gain ) )
+    {
+        p_dec->fmt_out.audio_replay_gain = p_dec->fmt_in.audio_replay_gain;
+        if( p_owner->p_aout )
+        {
+            p_owner->fmt.audio_replay_gain = p_dec->fmt_in.audio_replay_gain;
+            var_TriggerCallback( p_owner->p_aout, "audio-replay-gain-mode" );
+        }
     }
 
     if( p_owner->p_aout == NULL )
