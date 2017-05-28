@@ -279,6 +279,17 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* */
             mpeg2_custom_fbuf( p_sys->p_mpeg2dec, 1 );
 
+            if( p_sys->p_synchro )
+                decoder_SynchroRelease( p_sys->p_synchro );
+
+            if( p_sys->p_info->sequence->frame_period <= 0 )
+                p_sys->p_synchro = NULL;
+            else
+                p_sys->p_synchro =
+                decoder_SynchroInit( p_dec, (uint32_t)(UINT64_C(1001000000) *
+                                27 / p_sys->p_info->sequence->frame_period) );
+            p_sys->b_after_sequence_header = true;
+
             /* Set the first 2 reference frames */
             GetAR( p_dec );
             for( int i = 0; i < 2; i++ )
@@ -292,17 +303,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 }
                 PutPicture( p_dec, p_picture );
             }
-
-            if( p_sys->p_synchro )
-                decoder_SynchroRelease( p_sys->p_synchro );
-
-            if( p_sys->p_info->sequence->frame_period <= 0 )
-                p_sys->p_synchro = NULL;
-            else
-                p_sys->p_synchro =
-                decoder_SynchroInit( p_dec, (uint32_t)(UINT64_C(1001000000) *
-                                27 / p_sys->p_info->sequence->frame_period) );
-            p_sys->b_after_sequence_header = true;
             break;
         }
 
