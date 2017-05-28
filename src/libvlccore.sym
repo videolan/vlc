@@ -82,15 +82,6 @@ decoder_GetDisplayRate
 decoder_GetInputAttachments
 decoder_NewAudioBuffer
 decoder_NewSubpicture
-decoder_SynchroChoose
-decoder_SynchroDate
-decoder_SynchroDecode
-decoder_SynchroEnd
-decoder_SynchroInit
-decoder_SynchroNewPicture
-decoder_SynchroRelease
-decoder_SynchroReset
-decoder_SynchroTrash
 demux_Delete
 demux_PacketizerDestroy
 demux_PacketizerNew

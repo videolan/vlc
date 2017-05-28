@@ -43,11 +43,10 @@
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
 #include <vlc_cpu.h>
-#include "../codec/cc.h"
+#include "cc.h"
+#include "synchro.h"
 
 #include <mpeg2.h>
-
-#include <vlc_codec_synchro.h>
 
 /*****************************************************************************
  * decoder_sys_t : libmpeg2 decoder descriptor

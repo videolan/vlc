@@ -101,7 +101,7 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_codec.h>
-#include <vlc_codec_synchro.h>
+#include "synchro.h"
 
 /*
  * Local prototypes

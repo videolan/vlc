@@ -107,7 +107,6 @@ pluginsinclude_HEADERS = \
 nodist_pluginsinclude_HEADERS = ../include/vlc_about.h
 
 noinst_HEADERS = \
-	../include/vlc_codec_synchro.h \
 	../include/vlc_codecs.h \
 	../include/vlc_extensions.h \
 	../include/vlc_fixups.h \
@@ -231,7 +230,6 @@ libvlccore_la_SOURCES = \
 	input/clock.c \
 	input/control.c \
 	input/decoder.c \
-	input/decoder_synchro.c \
 	input/demux.c \
 	input/demux_chained.c \
 	input/es_out.c \

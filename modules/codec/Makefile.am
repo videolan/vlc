@@ -99,7 +99,8 @@ codec_LTLIBRARIES += $(LTLIBwma_fixed)
 libcdg_plugin_la_SOURCES = codec/cdg.c
 codec_LTLIBRARIES += libcdg_plugin.la
 
-liblibmpeg2_plugin_la_SOURCES = codec/libmpeg2.c
+liblibmpeg2_plugin_la_SOURCES = codec/libmpeg2.c \
+	codec/synchro.c codec/synchro.h
 liblibmpeg2_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_libmpeg2)
 liblibmpeg2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 liblibmpeg2_plugin_la_LIBADD = $(LIBS_libmpeg2)
