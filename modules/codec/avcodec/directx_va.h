@@ -40,10 +40,11 @@
 #include "va.h"
 
 #include <unknwn.h>
+#include <stdatomic.h>
 
 /* */
 typedef struct {
-    int                refcount;
+    atomic_uintptr_t     refcount;
     unsigned int       order;
     vlc_mutex_t        *p_lock;
     picture_t          *p_pic;

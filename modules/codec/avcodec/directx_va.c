@@ -355,7 +355,7 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
             dx_sys->surface_count = i;
             return VLC_ENOMEM;
         }
-        surface->refcount = 0;
+        atomic_init(&surface->refcount, 1);
         surface->order = 0;
         surface->p_lock = &dx_sys->surface_lock;
         surface->p_pic = dx_sys->pf_alloc_surface_pic(va, &fmt, i);
@@ -404,7 +404,7 @@ vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys)
 
     for (i = 0; i < dx_sys->surface_count; i++) {
         vlc_va_surface_t *surface = dx_sys->surface[i];
-        if (((old == -1 || surface->order < dx_sys->surface[old]->order)) && !surface->refcount)
+        if (((old == -1 || surface->order < dx_sys->surface[old]->order)) && atomic_load(&surface->refcount))
             old = i;
         if (old_used == -1 || surface->order < dx_sys->surface[old_used]->order)
             old_used = i;
@@ -419,7 +419,7 @@ vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys)
 
     vlc_va_surface_t *surface = dx_sys->surface[i];
 
-    surface->refcount = 1;
+    atomic_store(&surface->refcount,1);
     surface->order = ++dx_sys->surface_order;
     surface->decoderSurface = dx_sys->hw_surface[i];
 
@@ -431,14 +431,14 @@ vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys)
 void directx_va_AddRef(vlc_va_surface_t *surface)
 {
     vlc_mutex_lock( surface->p_lock );
-    surface->refcount++;
+    atomic_fetch_add(&surface->refcount, 1);
     vlc_mutex_unlock( surface->p_lock );
 }
 
 void directx_va_Release(vlc_va_surface_t *surface)
 {
     vlc_mutex_lock( surface->p_lock );
-    surface->refcount--;
+    atomic_fetch_sub(&surface->refcount, 1);
     vlc_mutex_unlock( surface->p_lock );
 }
 
