@@ -83,7 +83,7 @@ typedef struct
     int          surface_height;
 
     vlc_mutex_t      surface_lock;
-    vlc_va_surface_t surface[MAX_SURFACE_COUNT];
+    vlc_va_surface_t     *surface[MAX_SURFACE_COUNT];
     D3D_DecoderSurface  *hw_surface[MAX_SURFACE_COUNT];
 
     /**
