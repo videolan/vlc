@@ -830,6 +830,9 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
         texDesc.BindFlags = D3D11_BIND_DECODER;
         texDesc.CPUAccessFlags = 0;
 
+        if (DeviceSupportsFormat(dx_sys->d3ddev, texDesc.Format, D3D11_FORMAT_SUPPORT_SHADER_LOAD))
+            texDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
         ID3D11Texture2D *p_texture;
         hr = ID3D11Device_CreateTexture2D( dx_sys->d3ddev, &texDesc, NULL, &p_texture );
         if (FAILED(hr)) {
