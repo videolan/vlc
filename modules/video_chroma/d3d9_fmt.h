@@ -23,7 +23,7 @@
 #ifndef VLC_VIDEOCHROMA_D3D9_FMT_H_
 #define VLC_VIDEOCHROMA_D3D9_FMT_H_
 
-/* VLC_CODEC_D3D9_OPAQUE */
+/* owned by the vout for VLC_CODEC_D3D9_OPAQUE */
 struct picture_sys_t
 {
     LPDIRECT3DSURFACE9 surface;

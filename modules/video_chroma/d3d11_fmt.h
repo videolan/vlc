@@ -29,7 +29,7 @@
 
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
-/* VLC_CODEC_D3D11_OPAQUE */
+/* owned by the vout for VLC_CODEC_D3D11_OPAQUE */
 struct picture_sys_t
 {
     ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
