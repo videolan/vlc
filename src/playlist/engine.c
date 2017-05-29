@@ -443,6 +443,10 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_playlist, "video-splitter", VideoSplitterCallback, NULL );
 
+    var_Create( p_playlist, "video-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "sub-source", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
     /* sout variables */
     var_Create( p_playlist, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "demux-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -456,6 +460,7 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Audio output parameters */
+    var_Create( p_playlist, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "audio-device", VLC_VAR_STRING );
     var_Create( p_playlist, "mute", VLC_VAR_BOOL );
     var_Create( p_playlist, "volume", VLC_VAR_FLOAT );
