@@ -110,6 +110,7 @@ struct vlc_va_sys_t
 {
     directx_sys_t                dx_sys;
     vlc_fourcc_t                 i_chroma;
+    UINT                         totalTextureSlices;
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                    dxgidebug_dll;
@@ -434,12 +435,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
             sys->d3dctx = p_sys->context;
             sys->d3dvidctx = d3dvidctx;
-            sys->b_extern_pool = true;
 
             assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);
             D3D11_TEXTURE2D_DESC dstDesc;
             ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
             sys->render = dstDesc.Format;
+            va->sys->totalTextureSlices = dstDesc.ArraySize;
         }
     }
 
@@ -825,6 +826,16 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
         }
 
         msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
+        if ( va->sys->render == processorInput[idx] )
+        {
+            /* NVIDIA cards crash when calling CreateVideoDecoderOutputView
+             * on more than 30 slices */
+            if (va->sys->totalTextureSlices <= 30 || !isNvidiaHardware(dx_sys->d3ddev))
+                va->sys->b_extern_pool = true;
+            else
+                msg_Warn( va, "NVIDIA GPU with too many slices (%d) detected, use internal pool",
+                          va->sys->totalTextureSlices );
+        }
         va->sys->render = processorInput[idx];
         free(psz_decoder_name);
         return VLC_SUCCESS;

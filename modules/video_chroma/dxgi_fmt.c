@@ -160,3 +160,19 @@ bool isXboxHardware(ID3D11Device *d3ddev)
     IDXGIAdapter_Release(p_adapter);
     return result;
 }
+
+bool isNvidiaHardware(ID3D11Device *d3ddev)
+{
+    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(d3ddev);
+    if (!p_adapter)
+        return NULL;
+
+    bool result = false;
+    DXGI_ADAPTER_DESC adapterDesc;
+    if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
+        result = adapterDesc.VendorId == 0x10DE;
+    }
+
+    IDXGIAdapter_Release(p_adapter);
+    return result;
+}

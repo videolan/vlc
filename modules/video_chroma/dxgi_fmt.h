@@ -49,6 +49,7 @@ extern void DxgiFormatMask(DXGI_FORMAT format, video_format_t *);
 
 typedef struct ID3D11Device ID3D11Device;
 bool isXboxHardware(ID3D11Device *d3ddev);
+bool isNvidiaHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
 
 static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
