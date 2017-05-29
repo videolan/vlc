@@ -4438,6 +4438,7 @@ static const struct
     { ATOM_gssd,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_gsst,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_gstd,    MP4_ReadBox_Metadata,    ATOM_ilst },
+    { ATOM_ITUN,    MP4_ReadBox_Metadata,    ATOM_ilst }, /* iTunesInfo */
 
     /* udta */
     { ATOM_0x40PRM, MP4_ReadBox_Binary,    ATOM_udta },
@@ -4503,7 +4504,9 @@ static const struct
 
     /* iTunes/Quicktime meta info */
     { ATOM_meta,    MP4_ReadBox_meta,    0 },
-    { ATOM_data,    MP4_ReadBox_data,    0 },
+    { ATOM_data,    MP4_ReadBox_data,    0 }, /* ilst/@too and others, ITUN/data */
+    { ATOM_mean,    MP4_ReadBox_Binary,  ATOM_ITUN },
+    { ATOM_name,    MP4_ReadBox_Binary,  ATOM_ITUN },
 
     /* found in smoothstreaming */
     { ATOM_traf,    MP4_ReadBoxContainer,    ATOM_moof },

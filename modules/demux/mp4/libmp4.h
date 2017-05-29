@@ -275,6 +275,7 @@ typedef int64_t stime_t;
 #define ATOM_user VLC_FOURCC( 'u', 's', 'e', 'r' )
 #define ATOM_key  VLC_FOURCC( 'k', 'e', 'y', ' ' )
 #define ATOM_iviv VLC_FOURCC( 'i', 'v', 'i', 'v' )
+#define ATOM_mean VLC_FOURCC( 'm', 'e', 'a', 'n' )
 #define ATOM_name VLC_FOURCC( 'n', 'a', 'm', 'e' )
 #define ATOM_priv VLC_FOURCC( 'p', 'r', 'i', 'v' )
 #define ATOM_drmi VLC_FOURCC( 'd', 'r', 'm', 'i' )
@@ -354,6 +355,7 @@ typedef int64_t stime_t;
 #define ATOM_HMMT VLC_FOURCC( 'H', 'M', 'M', 'T' )
 #define ATOM_disk VLC_FOURCC( 'd', 'i', 's', 'k' )
 #define ATOM_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
+#define ATOM_ITUN VLC_FOURCC( '-', '-', '-', '-' )
 
 #define ATOM_meta VLC_FOURCC( 'm', 'e', 't', 'a' )
 #define ATOM_atID VLC_FOURCC( 'a', 't', 'I', 'D' )
