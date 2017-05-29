@@ -354,6 +354,7 @@ typedef int64_t stime_t;
 #define ATOM_chpl VLC_FOURCC( 'c', 'h', 'p', 'l' )
 #define ATOM_HMMT VLC_FOURCC( 'H', 'M', 'M', 'T' )
 #define ATOM_disk VLC_FOURCC( 'd', 'i', 's', 'k' )
+#define ATOM_ID32 VLC_FOURCC( 'I', 'D', '3', '2' )
 #define ATOM_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 #define ATOM_ITUN VLC_FOURCC( '-', '-', '-', '-' )
 
@@ -383,6 +384,7 @@ typedef int64_t stime_t;
 
 #define HANDLER_mdta VLC_FOURCC('m', 'd', 't', 'a')
 #define HANDLER_mdir VLC_FOURCC('m', 'd', 'i', 'r')
+#define HANDLER_ID32 ATOM_ID32
 
 #define SAMPLEGROUP_rap  VLC_FOURCC('r', 'a', 'p', ' ')
 

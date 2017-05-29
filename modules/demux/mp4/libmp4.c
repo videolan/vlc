@@ -4504,6 +4504,7 @@ static const struct
 
     /* iTunes/Quicktime meta info */
     { ATOM_meta,    MP4_ReadBox_meta,    0 },
+    { ATOM_ID32,    MP4_ReadBox_Binary,  ATOM_meta }, /* ID3v2 in 3GPP / ETSI TS 126 244 8.3 */
     { ATOM_data,    MP4_ReadBox_data,    0 }, /* ilst/@too and others, ITUN/data */
     { ATOM_mean,    MP4_ReadBox_Binary,  ATOM_ITUN },
     { ATOM_name,    MP4_ReadBox_Binary,  ATOM_ITUN },

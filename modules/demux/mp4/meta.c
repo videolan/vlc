@@ -28,6 +28,9 @@
 #include <vlc_meta.h>
 #include <vlc_charset.h>
 
+#include "../meta_engine/ID3Tag.h"
+#include "../meta_engine/ID3Meta.h"
+
 #include <assert.h>
 
 static const struct
@@ -487,6 +490,27 @@ static void SetupmdtaMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box, MP4_Box_t *p_ke
     }
 }
 
+static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload,
+                                 size_t i_payload, void *p_priv )
+{
+    vlc_meta_t *p_meta = (vlc_meta_t *) p_priv;
+
+    (void) ID3HandleTag( p_payload, i_payload, i_tag, p_meta, NULL );
+
+    return VLC_SUCCESS;
+}
+
+static void SetupID3v2Meta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
+{
+    const MP4_Box_t *p_binary = MP4_BoxGet( p_box, "ID32" );
+    if( p_binary == NULL || !BOXDATA(p_binary) || BOXDATA(p_binary)->i_blob < 6 + 20 + 1 )
+        return;
+
+    /* ID3v2 in 3GPP / ETSI TS 126 244 8.3, Header size 4 + 2 */
+    ID3TAG_Parse( &((uint8_t *)BOXDATA(p_binary)->p_blob)[6], BOXDATA(p_binary)->i_blob - 6,
+                  ID3TAG_Parse_Handler, p_meta );
+}
+
 void SetupMeta( vlc_meta_t *p_meta, MP4_Box_t *p_udta )
 {
     uint32_t i_handler = 0;
@@ -503,6 +527,10 @@ void SetupMeta( vlc_meta_t *p_meta, MP4_Box_t *p_udta )
                 SetupmdtaMeta( p_meta, p_box, p_keys );
                 break;
             }
+
+            case HANDLER_ID32:
+                SetupID3v2Meta( p_meta, p_box );
+                break;
 
             case HANDLER_mdir:
             default:
