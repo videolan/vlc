@@ -377,7 +377,7 @@ void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
     {
         if (dx_sys->surface[i]->p_pic)
             picture_Release(dx_sys->surface[i]->p_pic);
-        free(dx_sys->surface[i]);
+        directx_va_Release(dx_sys->surface[i]);
     }
 
     if (dx_sys->decoder)
@@ -430,7 +430,9 @@ void directx_va_AddRef(vlc_va_surface_t *surface)
 
 void directx_va_Release(vlc_va_surface_t *surface)
 {
-    atomic_fetch_sub(&surface->refcount, 1);
+    if (atomic_fetch_sub(&surface->refcount, 1) != 1)
+        return;
+    free(surface);
 }
 
 void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
