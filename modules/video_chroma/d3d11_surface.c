@@ -256,7 +256,7 @@ ok:
 static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
-    picture_sys_t *p_sys = src->p_sys;
+    picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;
@@ -388,7 +388,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = (filter_sys_t*) p_filter->p_sys;
-    picture_sys_t *p_sys = src->p_sys;
+    picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;

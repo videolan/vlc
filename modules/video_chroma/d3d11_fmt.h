@@ -23,6 +23,8 @@
 #ifndef VLC_VIDEOCHROMA_D3D11_FMT_H_
 #define VLC_VIDEOCHROMA_D3D11_FMT_H_
 
+#include <vlc_picture.h>
+
 #include <d3d11.h>
 #include <assert.h>
 
@@ -46,7 +48,14 @@ struct picture_sys_t
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
     DXGI_FORMAT                   decoderFormat;
     DXGI_FORMAT                   formatTexture;
-    vlc_va_surface_t              *va_surface;
+};
+
+/* owned by the hardware decoder */
+struct va_pic_context
+{
+    picture_context_t         s;
+    vlc_va_surface_t          *va_surface;
+    struct picture_sys_t      picsys;
 };
 
 /* index to use for texture/resource that use a known DXGI format

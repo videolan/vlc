@@ -657,6 +657,9 @@ error:
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 {
+    /* compensate for extra hardware decoding pulling extra pictures from our pool */
+    pool_size += 2;
+
     vout_display_sys_t *sys = vd->sys;
     ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
     picture_t **pictures = NULL;
@@ -1104,8 +1107,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if( sys->context_lock != INVALID_HANDLE_VALUE )
         WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
 #endif
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
+    picture_sys_t *p_sys = pic_ctx ? &pic_ctx->picsys : picture->p_sys;
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
-        picture_sys_t *p_sys = picture->p_sys;
         D3D11_TEXTURE2D_DESC texDesc;
         if (!is_d3d11_opaque(picture->format.i_chroma))
             Direct3D11UnmapPoolTexture(picture);
@@ -1122,6 +1126,33 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                                   0, 0, 0, 0,
                                                   p_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_sys->slice_index, &box);
+    }
+    else
+    {
+        /* copy pixels from the context texture to the picture_sys texture */
+        D3D11_TEXTURE2D_DESC texDesc;
+        ID3D11Texture2D_GetDesc(p_sys->texture[0], &texDesc);
+        if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+        {
+            /* for performance reason we don't want to allocate this during
+             * display, do it preferrably when creating the texture */
+            assert(p_sys->resourceView[0]!=NULL);
+        }
+        else
+        {
+            D3D11_BOX box = {
+                .top = picture->format.i_y_offset,
+                .bottom = picture->format.i_y_offset + texDesc.Height,
+                .left = picture->format.i_x_offset,
+                .right = picture->format.i_x_offset + texDesc.Width,
+                .back = 1,
+            };
+            ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
+                                                      p_sys->resource[KNOWN_DXGI_INDEX],
+                                                      p_sys->slice_index, 0, 0, 0,
+                                                      pic_ctx->picsys.resource[KNOWN_DXGI_INDEX],
+                                                      pic_ctx->picsys.slice_index, &box);
+        }
     }
 
     if (subpicture) {
@@ -1187,8 +1218,11 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     /* Render the quad */
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
         DisplayD3DPicture(sys, &sys->picQuad, sys->stagingSys.resourceView);
-    else
-        DisplayD3DPicture(sys, &sys->picQuad, picture->p_sys->resourceView);
+    else {
+        struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
+        picture_sys_t *p_sys = pic_ctx ? &pic_ctx->picsys : picture->p_sys;
+        DisplayD3DPicture(sys, &sys->picQuad, p_sys->resourceView);
+    }
 
     if (subpicture) {
         // draw the additional vertices

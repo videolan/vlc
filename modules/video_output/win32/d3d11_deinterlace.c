@@ -62,24 +62,26 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     filter_sys_t *sys = filter->p_sys;
     HRESULT hr;
 
-    if (!src->p_sys->processorInput)
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)src->context;
+    picture_sys_t *p_sys = pic_ctx ? &pic_ctx->picsys : src->p_sys;
+    if (!p_sys->processorInput)
     {
         D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inDesc = {
             .FourCC = 0,
             .ViewDimension = D3D11_VPIV_DIMENSION_TEXTURE2D,
             .Texture2D.MipSlice = 0,
-            .Texture2D.ArraySlice = src->p_sys->slice_index,
+            .Texture2D.ArraySlice = p_sys->slice_index,
         };
 
         hr = ID3D11VideoDevice_CreateVideoProcessorInputView(sys->d3dviddev,
-                                                             src->p_sys->resource[KNOWN_DXGI_INDEX],
+                                                             p_sys->resource[KNOWN_DXGI_INDEX],
                                                              sys->procEnumerator,
                                                              &inDesc,
-                                                             &src->p_sys->processorInput);
+                                                             &p_sys->processorInput);
         if (FAILED(hr))
         {
 #ifndef NDEBUG
-            msg_Dbg(filter,"Failed to create processor input for slice %d. (hr=0x%lX)", src->p_sys->slice_index, hr);
+            msg_Dbg(filter,"Failed to create processor input for slice %d. (hr=0x%lX)", p_sys->slice_index, hr);
 #endif
             return src;
         }
@@ -91,7 +93,7 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
 
     D3D11_VIDEO_PROCESSOR_STREAM stream = {
         .Enable = TRUE,
-        .pInputSurface = src->p_sys->processorInput,
+        .pInputSurface = p_sys->processorInput,
     };
 
     D3D11_VIDEO_FRAME_FORMAT frameFormat = src->b_top_field_first ?
@@ -143,6 +145,11 @@ static int Open(vlc_object_t *obj)
     picture_t *dst = filter_NewPicture(filter);
     if (dst == NULL)
         return VLC_EGENERIC;
+    if (!dst->p_sys && !dst->context)
+    {
+        msg_Dbg(filter, "D3D11 opaque without a texture");
+        return VLC_EGENERIC;
+    }
 
     D3D11_TEXTURE2D_DESC dstDesc;
     ID3D11Texture2D_GetDesc(dst->p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);

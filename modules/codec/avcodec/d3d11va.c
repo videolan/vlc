@@ -132,6 +132,8 @@ struct vlc_va_sys_t
 
     /* avcodec internals */
     struct AVD3D11VAContext      hw;
+
+    ID3D11ShaderResourceView     *resourceView[MAX_SURFACE_COUNT * D3D11_MAX_SHADER_VIEW];
 };
 
 /* */
@@ -174,44 +176,11 @@ void SetupAVCodecContext(vlc_va_t *va)
 
 static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 {
-    picture_sys_t *p_sys_out = output->p_sys;
-    assert(p_sys_out->texture[KNOWN_DXGI_INDEX] != NULL);
-
-#if D3D11_DIRECT_DECODE
     VLC_UNUSED(va); VLC_UNUSED(data);
-#else
-    {
-        vlc_va_sys_t *sys = va->sys;
-        ID3D11VideoDecoderOutputView *src = (ID3D11VideoDecoderOutputView*)(uintptr_t)data;
-        ID3D11Resource *p_texture;
-        ID3D11VideoDecoderOutputView_GetResource(src, &p_texture);
-
-        if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
-            WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
-        }
-
-        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
-        ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
-
-        D3D11_TEXTURE2D_DESC dstDesc;
-        ID3D11Texture2D_GetDesc( p_sys_out->texture[KNOWN_DXGI_INDEX], &dstDesc);
-
-        /* copy decoder slice to surface */
-        D3D11_BOX copyBox = {
-            .right = dstDesc.Width, .bottom = dstDesc.Height, .back = 1,
-        };
-        ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, p_sys_out->resource[KNOWN_DXGI_INDEX],
-                                                  p_sys_out->slice_index, 0, 0, 0,
-                                                  p_texture,
-                                                  viewDesc.Texture2D.ArraySlice,
-                                                  &copyBox);
-        ID3D11Resource_Release(p_texture);
-        if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
-            ReleaseMutex( sys->context_mutex );
-        }
-    }
-#endif
-
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)output->context;
+    if (!va->sys->b_extern_pool)
+        directx_va_AddRef(pic_ctx->va_surface);
+    assert(data == (void*)pic_ctx->picsys.decoder);
     return VLC_SUCCESS;
 }
 
@@ -233,57 +202,119 @@ static int CheckDevice(vlc_va_t *va)
     return VLC_SUCCESS;
 }
 
+static void d3d11_pic_context_destroy(struct picture_context_t *opaque)
+{
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
+    if (pic_ctx->va_surface)
+        directx_va_Release(pic_ctx->va_surface);
+    ReleasePictureSys(&pic_ctx->picsys);
+    free(pic_ctx);
+}
+
+static struct va_pic_context *CreatePicContext(vlc_va_surface_t *va_surface,
+                                                  ID3D11VideoDecoderOutputView *decoderSurface,
+                                                  ID3D11Resource *p_resource,
+                                                  ID3D11DeviceContext *context,
+                                                  UINT slice,
+                                                  ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
+{
+    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx==NULL))
+        goto done;
+    pic_ctx->s.destroy = d3d11_pic_context_destroy;
+    pic_ctx->va_surface = va_surface;
+    pic_ctx->picsys.context = context;
+    pic_ctx->picsys.slice_index = slice;
+    pic_ctx->picsys.decoder = decoderSurface;
+    for (int i=0;i<D3D11_MAX_SHADER_VIEW; i++)
+    {
+        pic_ctx->picsys.resource[i] = p_resource;
+        pic_ctx->picsys.resourceView[i] = resourceView[i];
+    }
+    pic_ctx->picsys.context = context;
+done:
+    return pic_ctx;
+}
+
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
 #if D3D11_DIRECT_DECODE
-    picture_sys_t *p_sys = pic->p_sys;
-    if (p_sys == NULL)
+    if (va->sys->b_extern_pool)
     {
-        assert(!va->sys->b_extern_pool);
-        vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys);
-        if (!va_surface)
-            return VLC_EGENERIC;
-        *data = va_surface->decoderSurface;
-        pic->p_sys = va_surface->p_pic->p_sys;
-        pic->p_sys->va_surface = va_surface;
-        return VLC_SUCCESS;
-    }
+        /* copy the original picture_sys_t in the va_pic_context */
+        if (!pic->context)
+        {
+            assert(pic->p_sys!=NULL);
+            if (!pic->p_sys->decoder)
+            {
+                HRESULT hr;
+                D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+                ZeroMemory(&viewDesc, sizeof(viewDesc));
+                viewDesc.DecodeProfile = va->sys->dx_sys.input;
+                viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
+                viewDesc.Texture2D.ArraySlice = pic->p_sys->slice_index;
 
-    if (p_sys->decoder == NULL)
-    {
-        HRESULT hr;
+                hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( va->sys->dx_sys.d3ddec,
+                                                                     pic->p_sys->resource[KNOWN_DXGI_INDEX],
+                                                                     &viewDesc,
+                                                                     &pic->p_sys->decoder );
+                if (FAILED(hr))
+                    return VLC_EGENERIC;
+            }
 
-        directx_sys_t *dx_sys = &va->sys->dx_sys;
-
-        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
-        ZeroMemory(&viewDesc, sizeof(viewDesc));
-        viewDesc.DecodeProfile = dx_sys->input;
-        viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
-        viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
-
-        hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( dx_sys->d3ddec,
-                                                             p_sys->resource[KNOWN_DXGI_INDEX],
-                                                             &viewDesc,
-                                                             &p_sys->decoder );
-        if (FAILED(hr)) {
-            msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%0lx)", p_sys->slice_index, hr);
-            D3D11_TEXTURE2D_DESC texDesc;
-            ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
-            assert(texDesc.BindFlags & D3D11_BIND_DECODER);
-            p_sys->decoder = NULL;
+            pic->context = (picture_context_t*)CreatePicContext( NULL,
+                                             pic->p_sys->decoder,
+                                             pic->p_sys->resource[KNOWN_DXGI_INDEX],
+                                             va->sys->d3dctx,
+                                             pic->p_sys->slice_index,
+                                             pic->p_sys->resourceView );
+            if (pic->context == NULL)
+                return VLC_EGENERIC;
         }
     }
-    if (p_sys->decoder == NULL)
-        return VLC_EGENERIC;
-    *data = p_sys->decoder;
-    return VLC_SUCCESS;
+    else
 #endif
-    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys);
-    if (!va_surface)
-        return VLC_EGENERIC;
-    *data = va_surface->decoderSurface;
-    pic->p_sys = va_surface->p_pic->p_sys;
-    pic->p_sys->va_surface = va_surface;
+    {
+        ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
+        vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys);
+        if (unlikely(va_surface==NULL))
+            return VLC_EGENERIC;
+
+        ID3D11Resource *p_resource;
+        ID3D11VideoDecoderOutputView_GetResource(va_surface->decoderSurface, &p_resource);
+
+        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+        ID3D11VideoDecoderOutputView_GetDesc(va_surface->decoderSurface, &viewDesc);
+
+        for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+            resourceView[i] = va->sys->resourceView[viewDesc.Texture2D.ArraySlice*D3D11_MAX_SHADER_VIEW + i];
+
+        struct va_pic_context *pic_ctx = CreatePicContext( va_surface,
+                                                              va_surface->decoderSurface,
+                                                              p_resource,
+                                                              va->sys->d3dctx,
+                                                              viewDesc.Texture2D.ArraySlice,
+                                                              resourceView );
+
+        ID3D11Resource_Release(p_resource);
+        if (unlikely(pic_ctx==NULL))
+        {
+            directx_va_Release(va_surface);
+            return VLC_ENOMEM;
+        }
+        ID3D11VideoDecoderOutputView_AddRef(pic_ctx->picsys.decoder);
+        ID3D11DeviceContext_AddRef(pic_ctx->picsys.context);
+        for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+        {
+            if (pic_ctx->picsys.resource[i])
+                ID3D11Resource_AddRef(pic_ctx->picsys.resource[i]);
+            if (pic_ctx->picsys.resourceView[i])
+                ID3D11ShaderResourceView_AddRef(pic_ctx->picsys.resourceView[i]);
+        }
+
+        pic->context = &pic_ctx->s;
+    }
+    *data = (uint8_t*)((struct va_pic_context *)pic->context)->picsys.decoder;
     return VLC_SUCCESS;
 }
 
@@ -319,8 +350,8 @@ static void ReleasePic(void *opaque, uint8_t *data)
 {
     (void)data;
     picture_t *pic = opaque;
-    directx_va_Release(pic->p_sys->va_surface);
-    pic->p_sys->va_surface = NULL;
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)pic->context;
+    directx_va_Release(pic_ctx->va_surface);
     picture_Release(pic);
 }
 
@@ -735,6 +766,18 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
     viewDesc.DecodeProfile = dx_sys->input;
     viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
 
+    const d3d_format_t *textureFmt = NULL;
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+         output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == sys->render &&
+            (output_format->fourcc == VLC_CODEC_D3D11_OPAQUE || output_format->fourcc == VLC_CODEC_D3D11_OPAQUE_10B))
+        {
+            textureFmt = output_format;
+            break;
+        }
+    }
+
     if (sys->b_extern_pool)
     {
 #if D3D11_DIRECT_DECODE
@@ -784,7 +827,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
                 sys->b_extern_pool = false;
                 break;
             }
-            sys->dx_sys.hw_surface[surface_idx] = pic->p_sys->decoder;
+
+            AllocateShaderView(VLC_OBJECT(va), dx_sys->d3ddev, textureFmt, pic->p_sys->texture[KNOWN_DXGI_INDEX], pic->p_sys->slice_index, pic->p_sys->resourceView);
+
+            dx_sys->hw_surface[surface_idx] = pic->p_sys->decoder;
         }
 
         if (!sys->b_extern_pool)
@@ -849,6 +895,9 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
                 ID3D11Texture2D_Release(p_texture);
                 return VLC_EGENERIC;
             }
+
+            if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+                AllocateShaderView(VLC_OBJECT(va), dx_sys->d3ddev, textureFmt, p_texture, dx_sys->surface_count, &sys->resourceView[dx_sys->surface_count * D3D11_MAX_SHADER_VIEW]);
         }
     }
     msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d)",
@@ -932,6 +981,15 @@ static void DxDestroySurfaces(vlc_va_t *va)
         ID3D11VideoDecoderOutputView_GetResource( dx_sys->hw_surface[0], &p_texture );
         ID3D11Resource_Release(p_texture);
         ID3D11Resource_Release(p_texture);
+    }
+    for (int i = 0; i < dx_sys->surface_count; i++)
+    {
+        ID3D11VideoDecoderOutputView_Release( dx_sys->hw_surface[i] );
+        for (int j = 0; j < D3D11_MAX_SHADER_VIEW; j++)
+        {
+            if (va->sys->resourceView[i*D3D11_MAX_SHADER_VIEW + j])
+                ID3D11ShaderResourceView_Release(va->sys->resourceView[i*D3D11_MAX_SHADER_VIEW + j]);
+        }
     }
 }
 
