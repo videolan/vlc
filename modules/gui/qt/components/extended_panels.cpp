@@ -429,39 +429,25 @@ void ExtVideo::setWidgetValue( QObject *widget )
     QString option = OptionFromWidgetName( widget );
     //std::cout << "Option name: " << option.toStdString() << std::endl;
 
-    vlc_object_t *p_obj = ( vlc_object_t * )
-        vlc_object_find_name( p_intf->obj.libvlc, qtu( module ) );
-    int i_type;
     vlc_value_t val;
-
-    if( !p_obj )
+    int i_type = config_GetType( p_intf, qtu( option ) ) & VLC_VAR_CLASS;
+    switch( i_type )
     {
-#if 0
-        msg_Dbg( p_intf,
-                 "Module instance %s not found, looking in config values.",
-                 qtu( module ) );
-#endif
-        i_type = config_GetType( p_intf, qtu( option ) ) & VLC_VAR_CLASS;
-        switch( i_type )
-        {
-            case VLC_VAR_INTEGER:
-            case VLC_VAR_BOOL:
-                val.i_int = config_GetInt( p_intf, qtu( option ) );
-                break;
-            case VLC_VAR_FLOAT:
-                val.f_float = config_GetFloat( p_intf, qtu( option ) );
-                break;
-            case VLC_VAR_STRING:
-                val.psz_string = config_GetPsz( p_intf, qtu( option ) );
-                break;
-        }
+        case VLC_VAR_INTEGER:
+        case VLC_VAR_BOOL:
+        case VLC_VAR_FLOAT:
+        case VLC_VAR_STRING:
+            break;
+        default:
+            msg_Err( p_intf,
+                     "Module %s's %s variable is of an unsupported type ( %d )",
+                     qtu( module ), qtu( option ), i_type );
+            return;
     }
-    else
-    {
-        i_type = var_Type( p_obj, qtu( option ) ) & VLC_VAR_CLASS;
-        var_Get( p_obj, qtu( option ), &val );
-        vlc_object_release( p_obj );
-    }
+    if( var_Create( THEPL, qtu( option ), i_type | VLC_VAR_DOINHERIT ) )
+        return;
+    if( var_GetChecked( THEPL, qtu( option ), i_type, &val ) )
+        return;
 
     /* Try to cast to all the widgets we're likely to encounter. Only
      * one of the casts is expected to work. */
@@ -505,13 +491,6 @@ void ExtVideo::setWidgetValue( QObject *widget )
         else msg_Warn( p_intf, "Could not find the correct String widget" );
         free( val.psz_string );
     }
-    else
-        if( p_obj )
-            msg_Err( p_intf,
-                     "Module %s's %s variable is of an unsupported type ( %d )",
-                     qtu( module ),
-                     qtu( option ),
-                     i_type );
 }
 
 void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_module, const char *psz_option,
@@ -537,15 +516,22 @@ void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_mo
             msg_Warn( p_intf, "Could not find the correct Integer widget" );
         config_PutInt( p_intf, psz_option, i_int );
         if( i_type == VLC_VAR_INTEGER )
+        {
             val.i_int = i_int;
+            var_SetInteger( THEPL, psz_option, i_int );
+        }
         else
+        {
+            var_SetBool( THEPL, psz_option, i_int );
             val.b_bool = i_int;
+        }
     }
     else if( i_type == VLC_VAR_FLOAT )
     {
         if( f_float == -1 )
             msg_Warn( p_intf, "Could not find the correct Float widget" );
         config_PutFloat( p_intf, psz_option, f_float );
+        var_SetFloat( THEPL, psz_option, f_float );
         val.f_float = f_float;
     }
     else if( i_type == VLC_VAR_STRING )
@@ -556,6 +542,7 @@ void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_mo
             psz_string = "";
         }
         config_PutPsz( p_intf, psz_option, psz_string );
+        var_SetString( THEPL, psz_option, psz_string );
         val.psz_string = (char *) psz_string;
     }
     else
