@@ -143,9 +143,6 @@ static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 static char *DxDescribe(directx_sys_t *);
 
-static int D3dCreateDeviceManager(vlc_va_t *);
-static void D3dDestroyDeviceManager(vlc_va_t *);
-
 static int DxCreateVideoService(vlc_va_t *);
 static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
@@ -407,8 +404,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->pf_check_device            = CheckDevice;
     dx_sys->pf_create_device           = D3dCreateDevice;
     dx_sys->pf_destroy_device          = D3dDestroyDevice;
-    dx_sys->pf_create_device_manager   = D3dCreateDeviceManager;
-    dx_sys->pf_destroy_device_manager  = D3dDestroyDeviceManager;
     dx_sys->pf_create_video_service    = DxCreateVideoService;
     dx_sys->pf_destroy_video_service   = DxDestroyVideoService;
     dx_sys->pf_create_decoder_surfaces = DxCreateDecoderSurfaces;
@@ -610,57 +605,6 @@ static char *DxDescribe(directx_sys_t *dx_sys)
 
     IDXGIAdapter_Release(p_adapter);
     return description;
-}
-
-/**
- * It creates a Direct3D device manager
- */
-static int D3dCreateDeviceManager(vlc_va_t *va)
-{
-    VLC_UNUSED(va);
-#if 0
-    vlc_va_sys_t *sys = va->sys;
-
-    HRESULT (WINAPI *CreateDeviceManager9)(UINT *pResetToken,
-                                           IDirect3DDeviceManager9 **);
-    CreateDeviceManager9 =
-      (void *)GetProcAddress(sys->hdxva2_dll,
-                             "DXVA2CreateDirect3DDeviceManager9");
-
-    if (!CreateDeviceManager9) {
-        msg_Err(va, "cannot load function");
-        return VLC_EGENERIC;
-    }
-    msg_Dbg(va, "OurDirect3DCreateDeviceManager9 Success!");
-
-    UINT token;
-    IDirect3DDeviceManager9 *devmng;
-    if (FAILED(CreateDeviceManager9(&token, &devmng))) {
-        msg_Err(va, " OurDirect3DCreateDeviceManager9 failed");
-        return VLC_EGENERIC;
-    }
-    sys->token  = token;
-    sys->devmng = devmng;
-    msg_Info(va, "obtained IDirect3DDeviceManager9");
-
-    HRESULT hr = IDirect3DDeviceManager9_ResetDevice(devmng, dx_sys->d3ddev, token);
-    if (FAILED(hr)) {
-        msg_Err(va, "IDirect3DDeviceManager9_ResetDevice failed: %08x", (unsigned)hr);
-        return VLC_EGENERIC;
-    }
-#endif
-    return VLC_SUCCESS;
-}
-/**
- * It destroys a Direct3D device manager
- */
-static void D3dDestroyDeviceManager(vlc_va_t *va)
-{
-    VLC_UNUSED(va);
-#if 0
-    if (va->devmng)
-        IDirect3DDeviceManager9_Release(va->devmng);
-#endif
 }
 
 /**

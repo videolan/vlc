@@ -476,7 +476,8 @@ int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
     }
     msg_Dbg(va, "CreateDevice succeed");
 
-    if (dx_sys->pf_create_device_manager(va)) {
+    if (dx_sys->pf_create_device_manager &&
+        dx_sys->pf_create_device_manager(va) != VLC_SUCCESS) {
         msg_Err(va, "CreateDeviceManager failed");
         goto error;
     }
@@ -600,7 +601,8 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
 
 void DestroyDeviceManager(vlc_va_t *va, directx_sys_t *dx_sys)
 {
-    dx_sys->pf_destroy_device_manager(va);
+    if (dx_sys->pf_destroy_device_manager)
+        dx_sys->pf_destroy_device_manager(va);
 }
 
 void DestroyDevice(vlc_va_t *va, directx_sys_t *dx_sys)
