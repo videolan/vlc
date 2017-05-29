@@ -157,7 +157,6 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER( puzzle )
     SETUP_VFILTER_OPTION( puzzleRowsSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( puzzleColsSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( puzzleBlackSlotCheck, stateChanged( int ) )
 
     SETUP_VFILTER( magnify )
 
