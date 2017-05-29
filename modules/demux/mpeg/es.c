@@ -41,6 +41,7 @@
 #include "../../packetizer/dts_header.h"
 #include "../meta_engine/ID3Tag.h"
 #include "../meta_engine/ID3Text.h"
+#include "../meta_engine/ID3Meta.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -913,47 +914,38 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
     }
     else if( i_tag == VLC_FOURCC('T', 'X', 'X', 'X') )
     {
-        char *psz_alloc;
-        const char *psz = ID3TextConvert( p_payload, i_payload, &psz_alloc );
-        if( psz )
+        vlc_meta_t *p_meta = vlc_meta_New();
+        if( p_meta )
         {
-            const size_t i_len = 21 + 2;
-            if( i_len < i_payload )
+            bool b_updated;
+            if( ID3HandleTag( p_payload, i_payload, i_tag, p_meta, &b_updated ) )
             {
-                if( !strcasecmp( psz, "REPLAYGAIN_TRACK_GAIN" ) )
+                char ** ppsz_keys = vlc_meta_CopyExtraNames( p_meta );
+                if( ppsz_keys )
                 {
-                    free( psz_alloc );
-                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
-                                       p_payload[0], &psz_alloc );
-                    if( psz )
-                        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz );
-                }
-                else if( !strcasecmp( psz, "REPLAYGAIN_TRACK_PEAK" ) )
-                {
-                    free( psz_alloc );
-                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
-                                       p_payload[0], &psz_alloc );
-                    if( psz )
-                        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz );
-                }
-                else if( !strcasecmp( psz, "REPLAYGAIN_ALBUM_GAIN" ) )
-                {
-                    free( psz_alloc );
-                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
-                                       p_payload[0], &psz_alloc );
-                    if( psz )
-                        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz );
-                }
-                else if( !strcasecmp( psz, "REPLAYGAIN_ALBUM_PEAK" ) )
-                {
-                    free( psz_alloc );
-                    psz = ID3TextConv( &p_payload[i_len], i_payload - i_len,
-                                       p_payload[0], &psz_alloc );
-                    if( psz )
-                        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz );
+                    for( size_t i = 0; ppsz_keys[i]; ++i )
+                    {
+                        float *pf = NULL;
+                        if(     !strcasecmp( ppsz_keys[i], "REPLAYGAIN_TRACK_GAIN" ) )
+                            pf = &p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK];
+                        else if( !strcasecmp( ppsz_keys[i], "REPLAYGAIN_TRACK_PEAK" ) )
+                            pf = &p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK];
+                        else if( !strcasecmp( ppsz_keys[i], "REPLAYGAIN_ALBUM_GAIN" ) )
+                            pf = &p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM];
+                        else if( !strcasecmp( ppsz_keys[i], "REPLAYGAIN_ALBUM_PEAK" ) )
+                            pf = &p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_ALBUM];
+                        if( pf )
+                        {
+                            const char *psz_val = vlc_meta_GetExtra( p_meta, ppsz_keys[i] );
+                            if( psz_val )
+                                *pf = us_atof( psz_val );
+                        }
+                        free( ppsz_keys[i] );
+                    }
+                    free( ppsz_keys );
                 }
             }
-            free( psz_alloc );
+            vlc_meta_Delete( p_meta );
         }
     }
 
