@@ -195,7 +195,7 @@ static inline void services_discovery_AddItemCat(services_discovery_t *sd,
                                                  input_item_t *item,
                                                  const char *category)
 {
-    return sd->owner.item_added(sd, item, NULL, category);
+    return sd->owner.item_added(sd, NULL, item, category);
 }
 
 /**
