@@ -178,31 +178,9 @@ void SetupAVCodecContext(vlc_va_t *va)
 
 static int Extract(vlc_va_t *va, picture_t *picture, uint8_t *data)
 {
-    directx_sys_t *dx_sys = &va->sys->dx_sys;
-    LPDIRECT3DSURFACE9 d3d = (LPDIRECT3DSURFACE9)(uintptr_t)data;
-    picture_sys_t *p_sys = picture->p_sys;
-    LPDIRECT3DSURFACE9 output = p_sys->surface;
-
-    assert(d3d != output);
-#ifndef NDEBUG
-    LPDIRECT3DDEVICE9 srcDevice, dstDevice;
-    IDirect3DSurface9_GetDevice(d3d, &srcDevice);
-    IDirect3DSurface9_GetDevice(output, &dstDevice);
-    assert(srcDevice == dstDevice);
-#endif
-
-    HRESULT hr;
-    RECT visibleSource;
-    visibleSource.left = 0;
-    visibleSource.top = 0;
-    visibleSource.right = picture->format.i_visible_width;
-    visibleSource.bottom = picture->format.i_visible_height;
-    hr = IDirect3DDevice9_StretchRect( dx_sys->d3ddev, d3d, &visibleSource, output, &visibleSource, D3DTEXF_NONE);
-    if (FAILED(hr)) {
-        msg_Err(va, "Failed to copy the hw surface to the decoder surface (hr=0x%0lx)", hr );
-        return VLC_EGENERIC;
-    }
-
+    VLC_UNUSED(va); VLC_UNUSED(data);
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
+    directx_va_AddRef(pic_ctx->va_surface);
     return VLC_SUCCESS;
 }
 
@@ -222,13 +200,49 @@ static int CheckDevice(vlc_va_t *va)
     return VLC_SUCCESS;
 }
 
+static void d3d9_pic_context_destroy(struct picture_context_t *opaque)
+{
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
+    if (pic_ctx->va_surface)
+    {
+        ReleasePictureSys(&pic_ctx->picsys);
+        directx_va_Release(pic_ctx->va_surface);
+        free(pic_ctx);
+    }
+}
+
+static struct picture_context_t *CreatePicContext(vlc_va_surface_t *);
+
+static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
+{
+    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
+    return CreatePicContext(src_ctx->va_surface);
+}
+
+static struct picture_context_t *CreatePicContext(vlc_va_surface_t *va_surface)
+{
+    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    pic_ctx->va_surface = va_surface;
+    directx_va_AddRef(pic_ctx->va_surface);
+    pic_ctx->s.destroy = d3d9_pic_context_destroy;
+    pic_ctx->s.copy    = d3d9_pic_context_copy;
+    pic_ctx->picsys.surface = va_surface->decoderSurface;
+    IDirect3DSurface9_AddRef(pic_ctx->picsys.surface);
+    return &pic_ctx->s;
+}
+
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys);
     if (unlikely(va_surface==NULL))
         return VLC_EGENERIC;
+    pic->context = CreatePicContext(va_surface);
+    directx_va_Release(va_surface);
+    if (unlikely(pic->context==NULL))
+        return VLC_EGENERIC;
     *data = (uint8_t*)va_surface->decoderSurface;
-    pic->p_sys->va_surface = va_surface;
     return VLC_SUCCESS;
 }
 
@@ -265,8 +279,8 @@ static void ReleasePic(void *opaque, uint8_t *data)
 {
     (void)data;
     picture_t *pic = opaque;
-    directx_va_Release(pic->p_sys->va_surface);
-    pic->p_sys->va_surface = NULL;
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)pic->context;
+    directx_va_Release(pic_ctx->va_surface);
     picture_Release(pic);
 }
 

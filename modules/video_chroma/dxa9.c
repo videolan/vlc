@@ -70,10 +70,11 @@ static bool GetLock(filter_t *p_filter, LPDIRECT3DSURFACE9 d3d,
 static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
+    picture_sys_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
 
     D3DSURFACE_DESC desc;
     D3DLOCKED_RECT lock;
-    if (!GetLock(p_filter, src->p_sys->surface, &lock, &desc))
+    if (!GetLock(p_filter, p_sys->surface, &lock, &desc))
         return;
 
     if (dst->format.i_chroma == VLC_CODEC_I420) {
@@ -129,16 +130,17 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     /* */
-    IDirect3DSurface9_UnlockRect(src->p_sys->surface);
+    IDirect3DSurface9_UnlockRect(p_sys->surface);
 }
 
 static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
+    picture_sys_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
 
     D3DSURFACE_DESC desc;
     D3DLOCKED_RECT lock;
-    if (!GetLock(p_filter, src->p_sys->surface, &lock, &desc))
+    if (!GetLock(p_filter, p_sys->surface, &lock, &desc))
         return;
 
     if (desc.Format == MAKEFOURCC('N','V','1','2')) {
@@ -157,7 +159,7 @@ static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     /* */
-    IDirect3DSurface9_UnlockRect(src->p_sys->surface);
+    IDirect3DSurface9_UnlockRect(p_sys->surface);
 }
 
 VIDEO_FILTER_WRAPPER (DXA9_YV12)
