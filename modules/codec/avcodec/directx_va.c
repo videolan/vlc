@@ -262,9 +262,6 @@ static const directx_va_mode_t DXVA_MODES[] = {
 
 static int FindVideoServiceConversion(vlc_va_t *, directx_sys_t *, const es_format_t *fmt);
 static void DestroyVideoDecoder(vlc_va_t *, directx_sys_t *);
-static void DestroyVideoService(vlc_va_t *, directx_sys_t *);
-static void DestroyDeviceManager(vlc_va_t *, directx_sys_t *);
-static void DestroyDevice(vlc_va_t *, directx_sys_t *);
 
 char *directx_va_GetDecoderName(const GUID *guid)
 {
@@ -441,9 +438,14 @@ void directx_va_Release(vlc_va_surface_t *surface)
 void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
 {
     DestroyVideoDecoder(va, dx_sys);
-    DestroyVideoService(va, dx_sys);
-    DestroyDeviceManager(va, dx_sys);
-    DestroyDevice(va, dx_sys);
+    dx_sys->pf_destroy_video_service(va);
+    if (dx_sys->d3ddec)
+        IUnknown_Release(dx_sys->d3ddec);
+    if (dx_sys->pf_destroy_device_manager)
+        dx_sys->pf_destroy_device_manager(va);
+    dx_sys->pf_destroy_device(va);
+    if (dx_sys->d3ddev)
+        IUnknown_Release( dx_sys->d3ddev );
 
     if (dx_sys->hdecoder_dll)
         FreeLibrary(dx_sys->hdecoder_dll);
@@ -532,13 +534,6 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
     return is_supported;
 }
 
-void DestroyVideoService(vlc_va_t *va, directx_sys_t *dx_sys)
-{
-    dx_sys->pf_destroy_video_service(va);
-    if (dx_sys->d3ddec)
-        IUnknown_Release(dx_sys->d3ddec);
-}
-
 /**
  * Find the best suited decoder mode GUID and render format.
  */
@@ -595,17 +590,4 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
 
     p_list.pf_release(&p_list);
     return err;
-}
-
-void DestroyDeviceManager(vlc_va_t *va, directx_sys_t *dx_sys)
-{
-    if (dx_sys->pf_destroy_device_manager)
-        dx_sys->pf_destroy_device_manager(va);
-}
-
-void DestroyDevice(vlc_va_t *va, directx_sys_t *dx_sys)
-{
-    dx_sys->pf_destroy_device(va);
-    if (dx_sys->d3ddev)
-        IUnknown_Release( dx_sys->d3ddev );
 }
