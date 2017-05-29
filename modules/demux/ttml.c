@@ -408,25 +408,25 @@ int OpenDemux( vlc_object_t* p_this )
     switch( GetQWBE(p_peek) )
     {
         /* See RFC 3023 Part 4 */
-        case 0xFFFE3C003F007800UL: /* UTF16 BOM<? */
-        case 0xFFFE3C003F007400UL: /* UTF16 BOM<t */
-        case 0xFEFF003C003F0078UL: /* UTF16 BOM<? */
-        case 0xFEFF003C003F0074UL: /* UTF16 BOM<t */
+        case UINT64_C(0xFFFE3C003F007800): /* UTF16 BOM<? */
+        case UINT64_C(0xFFFE3C003F007400): /* UTF16 BOM<t */
+        case UINT64_C(0xFEFF003C003F0078): /* UTF16 BOM<? */
+        case UINT64_C(0xFEFF003C003F0074): /* UTF16 BOM<t */
             psz_alloc = FromCharset( "UTF-16", p_peek, i_peek );
             break;
-        case 0x3C003F0078006D00UL: /* UTF16-LE <?xm */
-        case 0x3C003F0074007400UL: /* UTF16-LE <tt */
+        case UINT64_C(0x3C003F0078006D00): /* UTF16-LE <?xm */
+        case UINT64_C(0x3C003F0074007400): /* UTF16-LE <tt */
             psz_alloc = FromCharset( "UTF-16LE", p_peek, i_peek );
             break;
-        case 0x003C003F0078006DUL: /* UTF16-BE <?xm */
-        case 0x003C003F00740074UL: /* UTF16-BE <tt */
+        case UINT64_C(0x003C003F0078006D): /* UTF16-BE <?xm */
+        case UINT64_C(0x003C003F00740074): /* UTF16-BE <tt */
             psz_alloc = FromCharset( "UTF-16BE", p_peek, i_peek );
             break;
-        case 0xEFBBBF3C3F786D20UL: /* UTF8 BOM<?xml */
-        case 0xEFBBBF3C74742078UL: /* UTF8 BOM<tt x*/
+        case UINT64_C(0xEFBBBF3C3F786D20): /* UTF8 BOM<?xml */
+        case UINT64_C(0xEFBBBF3C74742078): /* UTF8 BOM<tt x*/
             break;
         default:
-            if(GetDWBE(p_peek) != 0x3C747420U) /* tt node without xml document marker */
+            if(GetDWBE(p_peek) != UINT32_C(0x3C747420)) /* tt node without xml document marker */
                 return VLC_EGENERIC;
     }
 
