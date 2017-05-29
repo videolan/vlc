@@ -2837,6 +2837,24 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     case AUDIO_ES:
         if ( !SetupAudioES( p_demux, p_track, p_sample ) )
             return VLC_EGENERIC;
+        if( p_sys->p_meta )
+        {
+            audio_replay_gain_t *p_arg = &p_track->fmt.audio_replay_gain;
+            const char *psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_gain" );
+            if( psz_meta )
+            {
+                double f_gain = us_atof( psz_meta );
+                p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
+                p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain != 0;
+            }
+            psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_peak" );
+            if( psz_meta )
+            {
+                double f_gain = us_atof( psz_meta );
+                p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
+                p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain > 0;
+            }
+        }
         break;
 
     case SPU_ES:
