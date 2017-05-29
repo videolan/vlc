@@ -1549,8 +1549,6 @@ static void FreeSDP( sdp_t *p_sdp )
 static int RemoveAnnounce( services_discovery_t *p_sd,
                            sap_announce_t *p_announce )
 {
-    int i;
-
     if( p_announce->p_sdp )
     {
         FreeSDP( p_announce->p_sdp );
