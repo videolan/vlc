@@ -782,7 +782,5 @@ libmacosx_plugin_la_RES += \
 	gui/macosx/Resources/vlc.scriptSuite \
 	gui/macosx/Resources/vlc.scriptTerminology
 
-EXTRA_DIST += $(libmacosx_plugin_la_RES)
-
-
+dist_libmacosx_plugin_la_DATA = $(libmacosx_plugin_la_RES)
 libmacosx_plugin_ladir = $(prefix)/share/macosx/Contents/Resources
