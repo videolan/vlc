@@ -104,13 +104,18 @@ static QString OptionFromWidgetName( QObject *obj )
 
 static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, QWidget *widget )
 {
-    vlc_object_t *p_obj = ( vlc_object_t * )
-        vlc_object_find_name( p_intf->obj.libvlc, psz_name );
+    const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
+    if( psz_filter_type == NULL )
+        return;
+
+    char *psz_filters = var_InheritString( THEPL, psz_filter_type );
+    if( psz_filters == NULL )
+        return;
+
     QCheckBox *checkbox = qobject_cast<QCheckBox*>( widget );
     QGroupBox *groupbox = qobject_cast<QGroupBox*>( widget );
-    if( p_obj )
+    if( filterIsPresent( qfu(psz_filters), qfu(psz_name) ) )
     {
-        vlc_object_release( p_obj ); \
         if( checkbox ) checkbox->setChecked( true ); \
         else if (groupbox) groupbox->setChecked( true ); \
     }
@@ -119,6 +124,7 @@ static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, Q
         if( checkbox ) checkbox->setChecked( false );
         else if (groupbox) groupbox->setChecked( false );
     }
+    free( psz_filters );
 }
 
 #define SETUP_VFILTER( widget ) \
@@ -320,13 +326,10 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
     /* Vout is not kept, so put that in the config */
     config_PutPsz( p_intf, psz_filter_type, qtu( result ) );
 
-    /* Try to set on the fly */
-    if( !strcmp( psz_filter_type, "video-splitter" ) )
-    {
-        playlist_t *p_playlist = THEPL;
-        var_SetString( p_playlist, psz_filter_type, qtu( result ) );
-    }
-    else
+    var_SetString( THEPL, psz_filter_type, qtu( result ) );
+
+    /* Try to set non splitter filters on the fly */
+    if( strcmp( psz_filter_type, "video-splitter" ) )
     {
         vout_thread_t *p_vout = THEMIM->getVout();
         if( p_vout )
