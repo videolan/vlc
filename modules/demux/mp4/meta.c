@@ -22,7 +22,7 @@
 #endif
 
 #include "mp4.h"
-#include "id3genres.h"                             /* for ATOM_gnre */
+#include "../meta_engine/ID3Genres.h"  /* for ATOM_gnre */
 #include "languages.h"
 
 #include <vlc_meta.h>
@@ -403,8 +403,8 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
             const uint16_t i_genre = GetWBE(BOXDATA(p_data)->p_blob);
-            if( i_genre && i_genre <= NUM_GENRES )
-                vlc_meta_SetGenre( p_meta, ppsz_genres[i_genre - 1] );
+            if( i_genre && i_genre <= ID3_GENRES_COUNT )
+                vlc_meta_SetGenre( p_meta, ID3_ppsz_genres[i_genre - 1] );
         }
         break;
     }

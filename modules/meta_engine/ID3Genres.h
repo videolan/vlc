@@ -1,8 +1,7 @@
 /*****************************************************************************
- * id3genres.h: list of genres for id3 genre tags
+ * ID3Genres.h: list of genres for id3 genre tags
  *****************************************************************************
  * Copyright (C) 2002-2003 VLC authors and VideoLAN
- * $Id$
  *
  * Author: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *         list found at http://www.id3.org/id3v2.4.0-frames.txt
@@ -25,10 +24,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef ID3GENRES_H
+#define ID3GENRES_H
 
-#define NUM_GENRES 148
+#define ID3_GENRES_COUNT 148
 
-static const char *ppsz_genres[] = {
+static const char *ID3_ppsz_genres[] = {
     N_("Blues"),
     N_("Classic Rock"),
     N_("Country"),
@@ -178,3 +179,5 @@ static const char *ppsz_genres[] = {
     N_("JPop"),
     N_("Synthpop")
 };
+
+#endif

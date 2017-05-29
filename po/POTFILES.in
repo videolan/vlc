@@ -468,7 +468,6 @@ modules/demux/mkv/util.hpp
 modules/demux/mkv/virtual_segment.cpp
 modules/demux/mkv/virtual_segment.hpp
 modules/demux/mod.c
-modules/demux/mp4/id3genres.h
 modules/demux/mp4/libmp4.c
 modules/demux/mp4/libmp4.h
 modules/demux/mp4/mp4.c
@@ -942,6 +941,7 @@ modules/lua/meta.c
 modules/lua/vlc.c
 modules/lua/vlc.h
 modules/meta_engine/folder.c
+modules/meta_engine/ID3Genres.h
 modules/meta_engine/taglib.cpp
 modules/misc/audioscrobbler.c
 modules/misc/gnutls.c
