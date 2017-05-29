@@ -575,15 +575,17 @@ static void Close(vlc_object_t *object)
 }
 
 /* map texture planes to resource views */
-static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
-                              int slice_index, picture_sys_t *picsys)
+static int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
+                              const d3d_format_t *format,
+                              ID3D11Texture2D *p_texture, UINT slice_index,
+                              ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
 {
     HRESULT hr;
-    vout_display_sys_t *sys = vd->sys;
     int i;
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc = { 0 };
     D3D11_TEXTURE2D_DESC texDesc;
-    ID3D11Texture2D_GetDesc(picsys->texture[0], &texDesc);
+    ID3D11Texture2D_GetDesc(p_texture, &texDesc);
+    assert(texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE);
 
     if (texDesc.ArraySize == 1)
     {
@@ -599,14 +601,14 @@ static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
     }
     for (i=0; i<D3D11_MAX_SHADER_VIEW; i++)
     {
-        if (!picsys->texture[i])
-            picsys->resourceView[i] = NULL;
+        resviewDesc.Format = format->resourceFormat[i];
+        if (resviewDesc.Format == DXGI_FORMAT_UNKNOWN)
+            resourceView[i] = NULL;
         else
         {
-            resviewDesc.Format = format->resourceFormat[i];
-            hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, picsys->resource[i], &resviewDesc, &picsys->resourceView[i]);
+            hr = ID3D11Device_CreateShaderResourceView(d3ddevice, (ID3D11Resource*)p_texture, &resviewDesc, &resourceView[i]);
             if (FAILED(hr)) {
-                msg_Err(vd, "Could not Create the Texture ResourceView %d slice %d. (hr=0x%lX)", i, slice_index, hr);
+                msg_Err(obj, "Could not Create the Texture ResourceView %d slice %d. (hr=0x%lX)", i, slice_index, hr);
                 break;
             }
         }
@@ -616,8 +618,8 @@ static int AllocateShaderView(vout_display_t *vd, const d3d_format_t *format,
     {
         while (--i >= 0)
         {
-            ID3D11ShaderResourceView_Release(picsys->resourceView[i]);
-            picsys->resourceView[i] = NULL;
+            ID3D11ShaderResourceView_Release(resourceView[i]);
+            resourceView[i] = NULL;
         }
         return VLC_EGENERIC;
     }
@@ -808,7 +810,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
             sys->stagingSys.texture[plane] = textures[plane];
 
-        if (AllocateShaderView(vd, sys->picQuadConfig, 0, &sys->stagingSys))
+        if (AllocateShaderView(VLC_OBJECT(vd), sys->d3ddevice, sys->picQuadConfig,
+                               textures[0], 0, sys->stagingSys.resourceView))
             goto error;
     } else
 #endif
@@ -819,7 +822,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         sys->picQuad.i_height   = surface_fmt.i_height;
 
         for (picture_count = 0; picture_count < pool_size; picture_count++) {
-            if (AllocateShaderView(vd, sys->picQuadConfig, picture_count, pictures[picture_count]->p_sys))
+            if (AllocateShaderView(VLC_OBJECT(vd), sys->d3ddevice, sys->picQuadConfig,
+                                   pictures[picture_count]->p_sys->texture[0], picture_count,
+                                   pictures[picture_count]->p_sys->resourceView))
                 goto error;
         }
     }
@@ -2782,7 +2787,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++) {
                 d3dquad->picSys.texture[plane] = textures[plane];
             }
-            if (AllocateShaderView(vd, sys->d3dregion_format, 0, &d3dquad->picSys)) {
+            if (AllocateShaderView(VLC_OBJECT(vd), sys->d3ddevice, sys->d3dregion_format,
+                                   d3dquad->picSys.texture[0], 0,
+                                   d3dquad->picSys.resourceView)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 free(d3dquad);
