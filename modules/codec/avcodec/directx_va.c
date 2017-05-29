@@ -356,7 +356,6 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
             return VLC_ENOMEM;
         }
         atomic_init(&surface->refcount, 1);
-        surface->p_lock = &dx_sys->surface_lock;
         surface->p_pic = dx_sys->pf_alloc_surface_pic(va, &fmt, i);
         dx_sys->surface[i] = surface;
     }
@@ -448,16 +447,12 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
 
     if (dx_sys->hdecoder_dll)
         FreeLibrary(dx_sys->hdecoder_dll);
-
-    vlc_mutex_destroy( &dx_sys->surface_lock );
 }
 
 int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
                     AVCodecContext *ctx, const es_format_t *fmt, bool b_dll)
 {
     dx_sys->codec_id = ctx->codec_id;
-
-    vlc_mutex_init( &dx_sys->surface_lock );
 
     if (b_dll) {
         /* Load dll*/

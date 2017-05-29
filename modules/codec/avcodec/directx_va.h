@@ -45,7 +45,6 @@
 /* */
 typedef struct {
     atomic_uintptr_t     refcount;
-    vlc_mutex_t        *p_lock;
     picture_t          *p_pic;
     D3D_DecoderSurface *decoderSurface;
 } vlc_va_surface_t;
@@ -82,7 +81,6 @@ typedef struct
     int          surface_width;
     int          surface_height;
 
-    vlc_mutex_t      surface_lock;
     vlc_va_surface_t     *surface[MAX_SURFACE_COUNT];
     D3D_DecoderSurface  *hw_surface[MAX_SURFACE_COUNT];
 
