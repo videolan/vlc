@@ -517,23 +517,17 @@ void ExtVideo::setWidgetValue( QObject *widget )
 void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_module, const char *psz_option,
         int i_int, double f_float, const char *psz_string )
 {
-    vlc_object_t *p_obj = ( vlc_object_t * )vlc_object_find_name( p_intf->obj.libvlc, psz_module );
-    int i_type;
-    bool b_is_command;
+    QVector<vout_thread_t*> p_vouts = THEMIM->getVouts();
+    int i_type = 0;
+    bool b_is_command = false;
 
-    if( !p_obj )
+    if( !p_vouts.isEmpty() )
     {
-        msg_Warn( p_intf, "Module %s not found. You'll need to restart the filter to take the change into account.", psz_module );
-        i_type = config_GetType( p_intf, psz_option );
-        b_is_command = false;
-    }
-    else
-    {
-        i_type = var_Type( p_obj, psz_option );
-        if( i_type == 0 )
-            i_type = config_GetType( p_intf, psz_option );
+        i_type = var_Type( p_vouts.at(0), psz_option );
         b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     }
+    if( i_type == 0 )
+        i_type = config_GetType( p_intf, psz_option );
 
     vlc_value_t val;
     i_type &= VLC_VAR_CLASS;
@@ -575,8 +569,18 @@ void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_mo
     }
 
     if( b_is_command )
-        var_SetChecked( p_obj, psz_option, i_type, val );
-    else
+    {
+        foreach( vout_thread_t *p_vout, p_vouts )
+        {
+            var_SetChecked( p_vout, psz_option, i_type, val );
+#ifndef NDEBUG
+            int i_cur_type = var_Type( p_vout, psz_option );
+            assert( ( i_cur_type & VLC_VAR_CLASS ) == i_type );
+            assert( !!( i_cur_type & VLC_VAR_ISCOMMAND ) == b_is_command );
+#endif
+        }
+    }
+    else if( !p_vouts.isEmpty() )
     {
         msg_Warn( p_intf, "Module %s's %s variable isn't a command. Brute-restarting the filter.",
                  psz_module,
@@ -585,7 +589,8 @@ void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_mo
         ChangeVFiltersString( p_intf, psz_module, true );
     }
 
-    if( p_obj ) vlc_object_release( p_obj );
+    foreach( vout_thread_t *p_vout, p_vouts )
+        vlc_object_release( p_vout );
 }
 
 void ExtVideo::updateFilterOptions()
