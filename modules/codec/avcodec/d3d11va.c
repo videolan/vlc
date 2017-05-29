@@ -174,11 +174,7 @@ void SetupAVCodecContext(vlc_va_t *va)
 
 static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 {
-    vlc_va_surface_t *surface = output->p_sys->va_surface;
-    int ret = VLC_SUCCESS;
-
-    picture_sys_t *p_sys_out = surface ? surface->p_pic->p_sys : output->p_sys;
-
+    picture_sys_t *p_sys_out = output->p_sys;
     assert(p_sys_out->texture[KNOWN_DXGI_INDEX] != NULL);
 
 #if D3D11_DIRECT_DECODE
@@ -187,8 +183,8 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
     {
         vlc_va_sys_t *sys = va->sys;
         ID3D11VideoDecoderOutputView *src = (ID3D11VideoDecoderOutputView*)(uintptr_t)data;
-        picture_sys_t *p_sys_in = surface->p_pic->p_sys;
-        assert(p_sys_in->decoder == src);
+        ID3D11Resource *p_texture;
+        ID3D11VideoDecoderOutputView_GetResource(src, &p_texture);
 
         if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
             WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
@@ -206,19 +202,17 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         };
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, p_sys_out->resource[KNOWN_DXGI_INDEX],
                                                   p_sys_out->slice_index, 0, 0, 0,
-                                                  p_sys_in->resource[KNOWN_DXGI_INDEX],
+                                                  p_texture,
                                                   viewDesc.Texture2D.ArraySlice,
                                                   &copyBox);
+        ID3D11Resource_Release(p_texture);
         if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
             ReleaseMutex( sys->context_mutex );
         }
     }
 #endif
-    if (!output->p_sys && surface->p_pic && surface->p_pic->p_sys)
-        /* HW decoding in a software pipe, pass the texture to upstream filters */
-        output->p_sys = surface->p_pic->p_sys;
 
-    return ret;
+    return VLC_SUCCESS;
 }
 
 static int CheckDevice(vlc_va_t *va)
