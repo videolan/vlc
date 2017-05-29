@@ -162,7 +162,7 @@ static int Open(vlc_object_t *obj)
 
     hr = ID3D11DeviceContext_QueryInterface(dst->p_sys->context, &IID_ID3D11VideoContext, (void **)&sys->d3dvidctx);
     if (FAILED(hr)) {
-       msg_Err(filter, "Could not Query ID3D11VideoDevice Interface from the picture. (hr=0x%lX)", hr);
+       msg_Err(filter, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
        goto error;
     }
 

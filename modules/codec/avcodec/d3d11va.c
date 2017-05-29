@@ -427,7 +427,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         ID3D11VideoContext *d3dvidctx = NULL;
         HRESULT hr = ID3D11DeviceContext_QueryInterface(p_sys->context, &IID_ID3D11VideoContext, (void **)&d3dvidctx);
         if (FAILED(hr)) {
-           msg_Err(va, "Could not Query ID3D11VideoDevice Interface from the picture. (hr=0x%lX)", hr);
+           msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
         } else {
             ID3D11DeviceContext_GetDevice( p_sys->context, &dx_sys->d3ddev );
             HANDLE context_lock = INVALID_HANDLE_VALUE;
@@ -527,7 +527,7 @@ static int D3dCreateDevice(vlc_va_t *va)
     ID3D11VideoContext *d3dvidctx = NULL;
     hr = ID3D11DeviceContext_QueryInterface(d3dctx, &IID_ID3D11VideoContext, (void **)&d3dvidctx);
     if (FAILED(hr)) {
-       msg_Err(va, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
+       msg_Err(va, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
     va->sys->d3dvidctx = d3dvidctx;

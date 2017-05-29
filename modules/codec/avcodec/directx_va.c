@@ -477,12 +477,12 @@ int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
     msg_Dbg(va, "CreateDevice succeed");
 
     if (dx_sys->pf_create_device_manager(va)) {
-        msg_Err(va, "D3dCreateDeviceManager failed");
+        msg_Err(va, "CreateDeviceManager failed");
         goto error;
     }
 
     if (dx_sys->pf_create_video_service(va)) {
-        msg_Err(va, "DxCreateVideoService failed");
+        msg_Err(va, "CreateVideoService failed");
         goto error;
     }
 
