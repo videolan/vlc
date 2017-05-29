@@ -321,7 +321,7 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
     }
 
     if ( avctx->active_thread_type & FF_THREAD_FRAME )
-        surface_count += dx_sys->thread_count;
+        surface_count += avctx->thread_count;
 
     if (surface_count > MAX_SURFACE_COUNT)
         return VLC_EGENERIC;
@@ -492,8 +492,6 @@ int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
         msg_Err(va, "FindVideoServiceConversion failed");
         goto error;
     }
-
-    dx_sys->thread_count = ctx->thread_count;
 
     return VLC_SUCCESS;
 
