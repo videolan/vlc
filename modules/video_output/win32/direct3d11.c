@@ -150,6 +150,7 @@ struct vout_display_sys_t
     const d3d_format_t       *picQuadConfig;
     ID3D11PixelShader        *picQuadPixelShader;
 
+    DXGI_FORMAT              decoderFormat;
     picture_sys_t            stagingSys;
 
     ID3D11RenderTargetView   *d3drenderTargetView;
@@ -769,6 +770,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
         picsys->slice_index = picture_count;
         picsys->formatTexture = sys->picQuadConfig->formatTexture;
+        picsys->decoderFormat = sys->decoderFormat;
         picsys->context = sys->d3dcontext;
 
         picture_resource_t resource = {
@@ -1455,9 +1457,17 @@ static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_four
     return FindD3D11Format( vd->sys->d3ddevice, i_src_chroma, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
 }
 
-static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t bit_depth)
+static const d3d_format_t *GetDirectDecoderFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
+{
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
+    return FindD3D11Format( vd->sys->d3ddevice, i_src_chroma, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
+}
+
+static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t bit_depth, bool from_processor)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+    if (from_processor)
+        supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
     return FindD3D11Format( vd->sys->d3ddevice, 0, bit_depth, false, supportFlags );
 }
 
@@ -1567,6 +1577,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     // look for the requested pixel format first
     sys->picQuadConfig = GetDirectRenderingFormat(vd, fmt->i_chroma);
 
+    /* look for a decoder format that can be decoded but not used in shaders */
+    const d3d_format_t *decoder_format = NULL;
+    if ( !sys->picQuadConfig && is_d3d11_opaque(fmt->i_chroma) )
+        decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
+
     // look for any pixel format that we can handle with enough pixels per channel
     if ( !sys->picQuadConfig )
     {
@@ -1587,21 +1602,26 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             break;
         }
 
-        sys->picQuadConfig = GetDisplayFormatByDepth(vd, bits_per_channel);
+        sys->picQuadConfig = GetDisplayFormatByDepth(vd, bits_per_channel, decoder_format!=NULL);
     }
 
     // look for any pixel format that we can handle
     if ( !sys->picQuadConfig )
-        sys->picQuadConfig = GetDisplayFormatByDepth(vd, 0);
+        sys->picQuadConfig = GetDisplayFormatByDepth(vd, 0, false);
 
     if ( !sys->picQuadConfig )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
     }
+
+    /* we will need a converter from 420_OPAQUE to our display format */
+    if ( decoder_format )
+        sys->decoderFormat = decoder_format->formatTexture;
+    fmt->i_chroma = sys->picQuadConfig->fourcc;
+
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuadConfig->name,
                  (char *)&fmt->i_chroma );
-    fmt->i_chroma = sys->picQuadConfig->fourcc;
     DxgiFormatMask( sys->picQuadConfig->formatTexture, fmt );
 
     /* check the region pixel format */
