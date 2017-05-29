@@ -108,6 +108,7 @@ struct demux_sys_t
 
     /* */
     input_title_t *p_title;
+    vlc_meta_t    *p_meta;
 
     /* ASF in MP4 */
     asf_packet_sys_t asfpacketsys;
@@ -126,6 +127,15 @@ struct demux_sys_t
 #define DEMUX_TRACK_MAX_PRELOAD (CLOCK_FREQ * 15) /* maximum preloading, to deal with interleaving */
 
 #define VLC_DEMUXER_EOS (VLC_DEMUXER_EGENERIC - 1)
+
+const uint32_t rgi_pict_atoms[2] = { ATOM_PICT, ATOM_pict };
+const char *psz_meta_roots[] = { "/moov/udta/meta/ilst",
+                                 "/moov/meta/ilst",
+                                 "/moov/udta/meta",
+                                 "/moov/udta",
+                                 "/meta/ilst",
+                                 "/udta",
+                                 NULL };
 
 /*****************************************************************************
  * Declaration of local function
@@ -173,6 +183,8 @@ static void MP4ASF_ResetFrames( demux_sys_t *p_sys );
 /* RTP Hint track */
 static block_t * MP4_RTPHint_Convert( demux_t *p_demux, block_t *p_block, vlc_fourcc_t i_codec );
 static block_t * MP4_RTPHintToFrame( demux_t *p_demux, block_t *p_block, uint32_t packetcount );
+
+static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta );
 
 /* Helpers */
 
@@ -914,6 +926,10 @@ static int Open( vlc_object_t * p_this )
             p_chap->data.p_tref_generic->i_entry_count > 0 && !p_sys->p_tref_chap )
             p_sys->p_tref_chap = p_chap;
     }
+
+    /* Set and store metadata */
+    if( (p_sys->p_meta = vlc_meta_New()) )
+        MP4_LoadMeta( p_sys, p_sys->p_meta );
 
     /* now process each track and extract all useful information */
     for( i = 0; i < p_sys->i_tracks; i++ )
@@ -1776,6 +1792,61 @@ static bool imageTypeCompatible( const MP4_Box_data_data_t *p_data )
     p_data->e_wellknowntype == DATA_WKT_BMP );
 }
 
+static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta )
+{
+    MP4_Box_t *p_data = NULL;
+    MP4_Box_t *p_udta = NULL;
+    bool b_attachment_set = false;
+
+    if( !p_meta )
+        return VLC_EGENERIC;
+
+    for( int i_index = 0; psz_meta_roots[i_index] && !p_udta; i_index++ )
+    {
+        p_udta = MP4_BoxGet( p_sys->p_root, psz_meta_roots[i_index] );
+        if ( p_udta )
+        {
+            p_data = MP4_BoxGet( p_udta, "covr/data" );
+            if ( p_data && imageTypeCompatible( BOXDATA(p_data) ) )
+            {
+                char *psz_attachment;
+                if ( -1 != asprintf( &psz_attachment, "attachment://%s/covr/data[0]",
+                                     psz_meta_roots[i_index] ) )
+                {
+                    vlc_meta_SetArtURL( p_meta, psz_attachment );
+                    b_attachment_set = true;
+                    free( psz_attachment );
+                }
+            }
+        }
+    }
+
+    const MP4_Box_t *p_pnot;
+    if ( !b_attachment_set && (p_pnot = MP4_BoxGet( p_sys->p_root, "pnot" )) )
+    {
+        for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms) && !b_attachment_set; i++ )
+        {
+            if ( rgi_pict_atoms[i] == BOXDATA(p_pnot)->i_type )
+            {
+                char rgsz_path[26];
+                snprintf( rgsz_path, 26, "attachment://%4.4s[%"PRIu16"]",
+                          (char*)&rgi_pict_atoms[i], BOXDATA(p_pnot)->i_index - 1 );
+                vlc_meta_SetArtURL( p_meta, rgsz_path );
+                b_attachment_set = true;
+            }
+        }
+    }
+
+    if( p_udta == NULL )
+    {
+        if( !b_attachment_set )
+            return VLC_EGENERIC;
+    }
+    else SetupMeta( p_meta, p_udta );
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -1786,14 +1857,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     double f, *pf;
     int64_t i64, *pi64;
 
-    const char *psz_roots[] = { "/moov/udta/meta/ilst",
-                                "/moov/meta/ilst",
-                                "/moov/udta/meta",
-                                "/moov/udta",
-                                "/meta/ilst",
-                                "/udta",
-                                NULL };
-    const uint32_t rgi_pict_atoms[2] = { ATOM_PICT, ATOM_pict };
     const uint64_t i_duration = __MAX(p_sys->i_duration, p_sys->i_cumulated_duration);
 
     switch( i_query )
@@ -1868,9 +1931,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int i_index = 0;
 
             /* Count number of total attachments */
-            for( ; psz_roots[i_index] && !p_udta; i_index++ )
+            for( ; psz_meta_roots[i_index] && !p_udta; i_index++ )
             {
-                p_udta = MP4_BoxGet( p_sys->p_root, psz_roots[i_index] );
+                p_udta = MP4_BoxGet( p_sys->p_root, psz_meta_roots[i_index] );
                 if ( p_udta )
                     i_count += MP4_BoxCount( p_udta, "covr/data" );
             }
@@ -1919,7 +1982,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                         continue;
                     }
 
-                    if ( asprintf( &psz_filename, "%s/covr/data[%"PRIu64"]", psz_roots[i_index - 1],
+                    if ( asprintf( &psz_filename, "%s/covr/data[%"PRIu64"]", psz_meta_roots[i_index - 1],
                                    (uint64_t) i_box_count - 1 ) >= 0 )
                     {
                         (*ppp_attach)[i_count++] =
@@ -1976,52 +2039,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             vlc_meta_t *p_meta = va_arg( args, vlc_meta_t *);
 
-            MP4_Box_t *p_data = NULL;
-            MP4_Box_t *p_udta = NULL;
-            bool b_attachment_set = false;
+            if( !p_sys->p_meta )
+                return VLC_EGENERIC;
 
-            for( int i_index = 0; psz_roots[i_index] && !p_udta; i_index++ )
-            {
-                p_udta = MP4_BoxGet( p_sys->p_root, psz_roots[i_index] );
-                if ( p_udta )
-                {
-                    p_data = MP4_BoxGet( p_udta, "covr/data" );
-                    if ( p_data && imageTypeCompatible( BOXDATA(p_data) ) )
-                    {
-                        char *psz_attachment;
-                        if ( -1 != asprintf( &psz_attachment, "attachment://%s/covr/data[0]",
-                                             psz_roots[i_index] ) )
-                        {
-                            vlc_meta_SetArtURL( p_meta, psz_attachment );
-                            b_attachment_set = true;
-                            free( psz_attachment );
-                        }
-                    }
-                }
-            }
-
-            const MP4_Box_t *p_pnot;
-            if ( !b_attachment_set && (p_pnot = MP4_BoxGet( p_sys->p_root, "pnot" )) )
-            {
-                for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms) && !b_attachment_set; i++ )
-                {
-                    if ( rgi_pict_atoms[i] == BOXDATA(p_pnot)->i_type )
-                    {
-                        char rgsz_path[26];
-                        snprintf( rgsz_path, 26, "attachment://%4.4s[%"PRIu16"]",
-                                  (char*)&rgi_pict_atoms[i], BOXDATA(p_pnot)->i_index - 1 );
-                        vlc_meta_SetArtURL( p_meta, rgsz_path );
-                        b_attachment_set = true;
-                    }
-                }
-            }
-
-            if( p_udta == NULL )
-            {
-                if( !b_attachment_set )
-                    return VLC_EGENERIC;
-            }
-            else SetupMeta( p_meta, p_udta );
+            vlc_meta_Merge( p_meta, p_sys->p_meta );
 
             return VLC_SUCCESS;
         }
@@ -2099,6 +2120,9 @@ static void Close ( vlc_object_t * p_this )
 
     if( p_sys->p_title )
         vlc_input_title_Delete( p_sys->p_title );
+
+    if( p_sys->p_meta )
+        vlc_meta_Delete( p_sys->p_meta );
 
     MP4_Fragments_Index_Delete( p_sys->p_fragsindex );
 
