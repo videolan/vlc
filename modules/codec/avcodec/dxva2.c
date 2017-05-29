@@ -224,9 +224,12 @@ static int CheckDevice(vlc_va_t *va)
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
-    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
+    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys);
+    if (unlikely(va_surface==NULL))
+        return VLC_EGENERIC;
+    *data = (uint8_t*)va_surface->decoderSurface;
     pic->p_sys->va_surface = va_surface;
-    return va_surface ? VLC_SUCCESS : VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static void Close(vlc_va_t *va, AVCodecContext *ctx)

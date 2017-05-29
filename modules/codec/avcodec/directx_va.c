@@ -390,7 +390,7 @@ void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
 }
 
 /* FIXME it is nearly common with VAAPI */
-vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys, uint8_t **data)
+vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys)
 {
     /* Check the device */
     if (dx_sys->pf_check_device(va)!=VLC_SUCCESS)
@@ -421,7 +421,7 @@ vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys, uint8_t **
 
     surface->refcount = 1;
     surface->order = ++dx_sys->surface_order;
-    *data = (void *)dx_sys->hw_surface[i];
+    surface->decoderSurface = dx_sys->hw_surface[i];
 
     vlc_mutex_unlock( &dx_sys->surface_lock );
 

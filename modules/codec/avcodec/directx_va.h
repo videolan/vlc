@@ -47,6 +47,7 @@ typedef struct {
     unsigned int       order;
     vlc_mutex_t        *p_lock;
     picture_t          *p_pic;
+    D3D_DecoderSurface *decoderSurface;
 } vlc_va_surface_t;
 
 typedef struct input_list_t {
@@ -135,7 +136,7 @@ typedef struct
 int directx_va_Open(vlc_va_t *, directx_sys_t *, AVCodecContext *ctx, const es_format_t *fmt, bool b_dll);
 void directx_va_Close(vlc_va_t *, directx_sys_t *);
 int directx_va_Setup(vlc_va_t *, directx_sys_t *, AVCodecContext *avctx);
-vlc_va_surface_t *directx_va_Get(vlc_va_t *, directx_sys_t *, uint8_t **data);
+vlc_va_surface_t *directx_va_Get(vlc_va_t *, directx_sys_t *);
 void directx_va_AddRef(vlc_va_surface_t *surface);
 void directx_va_Release(vlc_va_surface_t *surface);
 char *directx_va_GetDecoderName(const GUID *guid);

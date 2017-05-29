@@ -246,9 +246,10 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     if (p_sys == NULL)
     {
         assert(!va->sys->b_extern_pool);
-        vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
+        vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys);
         if (!va_surface)
             return VLC_EGENERIC;
+        *data = va_surface->decoderSurface;
         pic->p_sys = va_surface->p_pic->p_sys;
         pic->p_sys->va_surface = va_surface;
         return VLC_SUCCESS;
@@ -283,9 +284,10 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     *data = p_sys->decoder;
     return VLC_SUCCESS;
 #endif
-    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys, data);
+    vlc_va_surface_t *va_surface = directx_va_Get(va, &va->sys->dx_sys);
     if (!va_surface)
         return VLC_EGENERIC;
+    *data = va_surface->decoderSurface;
     pic->p_sys = va_surface->p_pic->p_sys;
     pic->p_sys->va_surface = va_surface;
     return VLC_SUCCESS;
