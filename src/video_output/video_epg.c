@@ -143,6 +143,15 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
     return region;
 }
 
+static char * vout_OSDPrintTime(time_t t)
+{
+    char *psz;
+    struct tm tms;
+    localtime_r(&t, &tms);
+    if(asprintf(&psz, "%2.2d:%2.2d", tms.tm_hour, tms.tm_min) < 0)
+       psz = NULL;
+    return psz;
+}
 
 static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
                                               int64_t epgtime,
@@ -194,35 +203,31 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
         return head;
 
     /* Format the hours of the beginning and the end of the current program. */
-    struct tm tm_start, tm_end;
-    time_t t_start = epg->p_current->i_start;
-    time_t t_end = epg->p_current->i_start + epg->p_current->i_duration;
-    localtime_r(&t_start, &tm_start);
-    localtime_r(&t_end, &tm_end);
-    char text_start[128];
-    char text_end[128];
-    snprintf(text_start, sizeof(text_start), "%2.2d:%2.2d",
-             tm_start.tm_hour, tm_start.tm_min);
-    snprintf(text_end, sizeof(text_end), "%2.2d:%2.2d",
-             tm_end.tm_hour, tm_end.tm_min);
+    char *psz_start = vout_OSDPrintTime(epg->p_current->i_start);
+    char *psz_end = vout_OSDPrintTime(epg->p_current->i_start +
+                                      epg->p_current->i_duration);
 
     /* Display those hours. */
     last_ptr = &(*last_ptr)->p_next;
-    *last_ptr = vout_OSDEpgText(text_start,
+    *last_ptr = vout_OSDEpgText(psz_start,
                                 x + visible_width  * (EPG_LEFT + 0.02),
                                 y + visible_height * (EPG_TOP + 0.15),
                                 visible_height * EPG_TIME_SIZE,
                                 0x00ffffff);
 
     if (!*last_ptr)
-        return head;
+        goto end;
 
     last_ptr = &(*last_ptr)->p_next;
-    *last_ptr = vout_OSDEpgText(text_end,
+    *last_ptr = vout_OSDEpgText(psz_end,
                                 x + visible_width  * (1 - EPG_LEFT - 0.085),
                                 y + visible_height * (EPG_TOP + 0.15),
                                 visible_height * EPG_TIME_SIZE,
                                 0x00ffffff);
+
+end:
+    free(psz_start);
+    free(psz_end);
 
     return head;
 }
