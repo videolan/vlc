@@ -101,15 +101,35 @@ static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
     return region;
 }
 
+static text_segment_t * vout_OSDSegment(const char *psz_text, int size, uint32_t color)
+{
+    text_segment_t *p_segment = text_segment_New(psz_text);
+    if(unlikely(!p_segment))
+        return NULL;
 
-static subpicture_region_t * vout_OSDEpgText(const char *text,
-                                             int x, int y,
-                                             int size, uint32_t color)
+    /* Set text style */
+    p_segment->style = text_style_Create(STYLE_NO_DEFAULTS);
+    if (unlikely(!p_segment->style))
+    {
+        text_segment_Delete(p_segment);
+        return NULL;
+    }
+
+    p_segment->style->i_font_size  = __MAX(size ,1 );
+    p_segment->style->i_font_color = color;
+    p_segment->style->i_font_alpha = STYLE_ALPHA_OPAQUE;
+    p_segment->style->i_features |= STYLE_HAS_FONT_ALPHA | STYLE_HAS_FONT_COLOR;
+
+    return p_segment;
+}
+
+static subpicture_region_t * vout_OSDTextRegion(text_segment_t *p_segment,
+                                                int x, int y )
 {
     video_format_t fmt;
     subpicture_region_t *region;
 
-    if (!text)
+    if (!p_segment)
         return NULL;
 
     /* Create a new subpicture region */
@@ -121,34 +141,19 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
     if (!region)
         return NULL;
 
-    /* Set subpicture parameters */
-    region->p_text   = text_segment_New(text);
-    if ( unlikely( !region->p_text ) )
-    {
-        subpicture_region_Delete( region );
-        return NULL;
-    }
-    region->i_align  = 0;
+    region->p_text   = p_segment;
+    region->i_align  = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
     region->i_x      = x;
     region->i_y      = y;
 
-    /* Set text style */
-    text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
-    if ( unlikely( !p_style ) )
-    {
-        text_segment_Delete( region->p_text );
-        subpicture_region_Delete( region );
-        return NULL;
-    }
-    region->p_text->style = p_style;
-    if (p_style) {
-        p_style->i_font_size  = __MAX(size ,1 );
-        p_style->i_font_color = color;
-        p_style->i_font_alpha = STYLE_ALPHA_OPAQUE;
-        p_style->i_features |= STYLE_HAS_FONT_ALPHA | STYLE_HAS_FONT_COLOR;
-    }
-
     return region;
+}
+
+static subpicture_region_t * vout_OSDEpgText(const char *text,
+                                             int x, int y,
+                                             int size, uint32_t color)
+{
+    return vout_OSDTextRegion(vout_OSDSegment(text, size, color), x, y);
 }
 
 static char * vout_OSDPrintTime(time_t t)
