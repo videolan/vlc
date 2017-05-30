@@ -515,7 +515,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
 }
 
 void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_module, const char *psz_option,
-        int i_int, double f_float, QString val )
+        int i_int, double f_float, const char *psz_string )
 {
     vlc_object_t *p_obj = ( vlc_object_t * )vlc_object_find_name( p_intf->obj.libvlc, psz_module );
     int i_type;
@@ -535,44 +535,48 @@ void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_mo
         b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     }
 
+    vlc_value_t val;
     i_type &= VLC_VAR_CLASS;
     if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
     {
         if( i_int == -1 )
             msg_Warn( p_intf, "Could not find the correct Integer widget" );
         config_PutInt( p_intf, psz_option, i_int );
-        if( b_is_command )
-        {
-            if( i_type == VLC_VAR_INTEGER )
-                var_SetInteger( p_obj, psz_option, i_int );
-            else
-                var_SetBool( p_obj, psz_option, i_int );
-        }
+        if( i_type == VLC_VAR_INTEGER )
+            val.i_int = i_int;
+        else
+            val.b_bool = i_int;
     }
     else if( i_type == VLC_VAR_FLOAT )
     {
         if( f_float == -1 )
             msg_Warn( p_intf, "Could not find the correct Float widget" );
         config_PutFloat( p_intf, psz_option, f_float );
-        if( b_is_command )
-            var_SetFloat( p_obj, psz_option, f_float );
+        val.f_float = f_float;
     }
     else if( i_type == VLC_VAR_STRING )
     {
-        if( val.isNull() )
+        if( psz_string == NULL )
+        {
             msg_Warn( p_intf, "Could not find the correct String widget" );
-        config_PutPsz( p_intf, psz_option, qtu( val ) );
-        if( b_is_command )
-            var_SetString( p_obj, psz_option, qtu( val ) );
+            psz_string = "";
+        }
+        config_PutPsz( p_intf, psz_option, psz_string );
+        val.psz_string = (char *) psz_string;
     }
     else
+    {
         msg_Err( p_intf,
                  "Module %s's %s variable is of an unsupported type ( %d )",
                  psz_module,
                  psz_option,
                  i_type );
+        b_is_command = false;
+    }
 
-    if( !b_is_command )
+    if( b_is_command )
+        var_SetChecked( p_obj, psz_option, i_type, val );
+    else
     {
         msg_Warn( p_intf, "Module %s's %s variable isn't a command. Brute-restarting the filter.",
                  psz_module,
@@ -626,7 +630,7 @@ void ExtVideo::updateFilterOptions()
         val = combobox->itemData( combobox->currentIndex() ).toString();
     }
 
-    setFilterOption( p_intf, qtu( module ), qtu( option ), i_int, f_float, val);
+    setFilterOption( p_intf, qtu( module ), qtu( option ), i_int, f_float, qtu( val ));
 }
 
 /**********************************************************************
