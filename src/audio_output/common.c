@@ -564,8 +564,7 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
     }
     else
     {
-        psz_list = var_CreateGetString( p_obj->obj.libvlc, psz_variable );
-        var_Destroy( p_obj->obj.libvlc, psz_variable );
+        psz_list = var_InheritString( p_obj, psz_variable );
     }
 
     /* Split the string into an array of filters */
@@ -650,10 +649,9 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
     free( ppsz_filter );
     free( psz_list );
 
+    var_SetString( p_obj, psz_variable, psz_new );
     if( p_aout )
         var_SetString( p_aout, psz_variable, psz_new );
-    else
-        config_PutPsz( p_obj, psz_variable, psz_new );
     free( psz_new );
 
     return true;
