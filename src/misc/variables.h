@@ -57,4 +57,15 @@ void DumpVariables(vlc_object_t *obj);
 
 extern void var_DestroyAll( vlc_object_t * );
 
+/**
+ * Return a list of all variable names
+ *
+ * There is no warranty that the returned variables will be still alive after
+ * the return of this function.
+ *
+ * @return a NULL terminated list of char *, each elements and the return value
+ * must be freed by the caller
+ */
+char **var_GetAllNames(vlc_object_t *);
+
 #endif

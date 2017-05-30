@@ -37,6 +37,7 @@
 #include <limits.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_charset.h>
 #include "libvlc.h"
 #include "variables.h"
@@ -1375,4 +1376,37 @@ void DumpVariables(vlc_object_t *obj)
     else
         twalk(vlc_internals(obj)->var_root, DumpVariable);
     vlc_mutex_unlock(&vlc_internals(obj)->var_lock);
+}
+
+static _Thread_local void *twalk_ctx;
+
+static void TwalkGetNames(const void *data, const VISIT which, const int depth)
+{
+    if (which != postorder && which != leaf)
+        return;
+    (void) depth;
+
+    const variable_t *var = *(const variable_t **)data;
+    DECL_ARRAY(char *) *names = twalk_ctx;
+    char *dup = strdup(var->psz_name);
+    if (dup != NULL)
+        ARRAY_APPEND(*names, dup);
+}
+
+char **var_GetAllNames(vlc_object_t *obj)
+{
+    vlc_object_internals_t *priv = vlc_internals(obj);
+
+    DECL_ARRAY(char *) names;
+    ARRAY_INIT(names);
+
+    vlc_mutex_lock(&priv->var_lock);
+    twalk_ctx = &names;
+    twalk(priv->var_root, TwalkGetNames);
+    vlc_mutex_unlock(&priv->var_lock);
+
+    if (names.i_size == 0)
+        return NULL;
+    ARRAY_APPEND(names, NULL);
+    return names.p_elems;
 }
