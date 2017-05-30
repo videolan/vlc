@@ -267,8 +267,8 @@ void ExtVideo::cropChange()
     if( ui.leftRightCropSync->isChecked() )
         ui.cropRightPx->setValue( ui.cropLeftPx->value() );
 
-    vout_thread_t *p_vout = THEMIM->getVout();
-    if( p_vout )
+    QVector<vout_thread_t*> p_vouts = THEMIM->getVouts();
+    foreach( vout_thread_t *p_vout, p_vouts )
     {
         var_SetInteger( p_vout, "crop-top", ui.cropTopPx->value() );
         var_SetInteger( p_vout, "crop-bottom", ui.cropBotPx->value() );
@@ -331,8 +331,8 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
     /* Try to set non splitter filters on the fly */
     if( strcmp( psz_filter_type, "video-splitter" ) )
     {
-        vout_thread_t *p_vout = THEMIM->getVout();
-        if( p_vout )
+        QVector<vout_thread_t*> p_vouts = THEMIM->getVouts();
+        foreach( vout_thread_t *p_vout, p_vouts )
         {
             var_SetString( p_vout, psz_filter_type, qtu( result ) );
             vlc_object_release( p_vout );
