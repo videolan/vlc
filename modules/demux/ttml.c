@@ -404,6 +404,7 @@ int OpenDemux( vlc_object_t* p_this )
     const char *psz_xml = (const char *) p_peek;
     size_t i_xml  = i_peek;
 
+    /* Try to probe without xml module/loading the full document */
     char *psz_alloc = NULL;
     switch( GetQWBE(p_peek) )
     {
@@ -422,7 +423,8 @@ int OpenDemux( vlc_object_t* p_this )
         case UINT64_C(0x003C003F00740074): /* UTF16-BE <tt */
             psz_alloc = FromCharset( "UTF-16BE", p_peek, i_peek );
             break;
-        case UINT64_C(0xEFBBBF3C3F786D20): /* UTF8 BOM<?xml */
+        case UINT64_C(0xEFBBBF3C3F786D6C): /* UTF8 BOM<?xml */
+        case UINT64_C(0x3C3F786D6C207665): /* UTF8 <?xml ve */
         case UINT64_C(0xEFBBBF3C74742078): /* UTF8 BOM<tt x*/
             break;
         default:
