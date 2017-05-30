@@ -53,6 +53,17 @@
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 
+static bool filterIsPresent( const QString &filters, const QString &filter )
+{
+    QStringList list = filters.split( ':', QString::SplitBehavior::SkipEmptyParts );
+    foreach( const QString &filterCmp, list )
+    {
+        if( filterCmp.compare( filter ) == 0 )
+            return true;
+    }
+    return false;
+}
+
 static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz_name )
 {
     module_t *p_obj = module_find( psz_name );
@@ -956,7 +967,7 @@ void AudioFilterControlWidget::build()
 
     char *psz_af = var_InheritString( THEPL, "audio-filter" );
 
-    if( psz_af && strstr( psz_af, qtu(name) ) != NULL )
+    if( psz_af && filterIsPresent( qfu(psz_af), name ) )
         slidersBox->setChecked( true );
     else
         slidersBox->setChecked( false );
@@ -1198,7 +1209,7 @@ void Equalizer::build()
     CONNECT( ui.enableCheck, toggled(bool), ui.preampValue, setEnabled(bool) );
     CONNECT( ui.enableCheck, toggled(bool), ui.preampLabel, setEnabled(bool) );
 
-    if( psz_af && strstr( psz_af, qtu(name) ) != NULL )
+    if( psz_af && filterIsPresent( qfu(psz_af), name ) )
         ui.enableCheck->setChecked( true );
     else
         ui.enableCheck->setChecked( false );
