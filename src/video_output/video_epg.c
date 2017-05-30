@@ -38,6 +38,7 @@
 #define EPG_LEFT 0.1
 #define EPG_NAME_SIZE 0.05
 #define EPG_PROGRAM_SIZE 0.03
+#define EPG_TIME_SIZE 0.03
 
 static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
                                                int width, int height,
@@ -210,7 +211,7 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
     *last_ptr = vout_OSDEpgText(text_start,
                                 x + visible_width  * (EPG_LEFT + 0.02),
                                 y + visible_height * (EPG_TOP + 0.15),
-                                visible_height * EPG_PROGRAM_SIZE,
+                                visible_height * EPG_TIME_SIZE,
                                 0x00ffffff);
 
     if (!*last_ptr)
@@ -220,7 +221,7 @@ static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
     *last_ptr = vout_OSDEpgText(text_end,
                                 x + visible_width  * (1 - EPG_LEFT - 0.085),
                                 y + visible_height * (EPG_TOP + 0.15),
-                                visible_height * EPG_PROGRAM_SIZE,
+                                visible_height * EPG_TIME_SIZE,
                                 0x00ffffff);
 
     return head;
