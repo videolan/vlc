@@ -270,6 +270,7 @@ public:
     }
 
     vout_thread_t* getVout();
+    QVector<vout_thread_t*> getVouts() const;
     audio_output_t *getAout();
 
     bool getPlayExitState();

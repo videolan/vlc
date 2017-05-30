@@ -1034,6 +1034,28 @@ vout_thread_t* MainInputManager::getVout()
     return p_input ? input_GetVout( p_input ) : NULL;
 }
 
+QVector<vout_thread_t*> MainInputManager::getVouts() const
+{
+    vout_thread_t **pp_vout;
+    size_t i_vout;
+
+    if( p_input == NULL
+     || input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) != VLC_SUCCESS
+     || i_vout == 0 )
+        return QVector<vout_thread_t*>();
+
+    QVector<vout_thread_t*> vector = QVector<vout_thread_t*>();
+    vector.reserve( i_vout );
+    for( size_t i = 0; i < i_vout; i++ )
+    {
+        assert( pp_vout[i] );
+        vector.append( pp_vout[i] );
+    }
+    free( pp_vout );
+
+    return vector;
+}
+
 audio_output_t * MainInputManager::getAout()
 {
     return playlist_GetAout( THEPL );
