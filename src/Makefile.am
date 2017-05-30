@@ -287,6 +287,7 @@ libvlccore_la_SOURCES = \
 	video_output/video_epg.c \
 	video_output/video_widgets.c \
 	video_output/vout_subpictures.c \
+	video_output/vout_spuregion_helper.h \
 	video_output/window.c \
 	video_output/window.h \
 	video_output/opengl.c \
