@@ -40,6 +40,14 @@
 #define EPG_PROGRAM_SIZE 0.03
 #define EPG_TIME_SIZE 0.03
 
+#define RGB2YUV( R, G, B ) \
+    ((0.257 * R) + (0.504 * G) + (0.098 * B) + 16), \
+    (-(0.148 * R) - (0.291 * G) + (0.439 * B) + 128),\
+    ((0.439 * R) - (0.368 * G) - (0.071 * B) + 128)
+
+#define HEX2YUV( rgb ) \
+    RGB2YUV( (rgb >> 16), ((rgb & 0xFF00) >> 8), (rgb & 0xFF) )
+
 static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
                                                int width, int height,
                                                float ratio)
@@ -48,10 +56,10 @@ static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
     video_palette_t palette = {
         .i_entries = 4,
         .palette = {
-            [0] = { 0xff, 0x80, 0x80, 0x00 },
-            [1] = { 0x00, 0x80, 0x80, 0x00 },
-            [2] = { 0xff, 0x80, 0x80, 0xff },
-            [3] = { 0x00, 0x80, 0x80, 0xff },
+            [0] = { HEX2YUV(0xffffff), 0x00 }, /* Bar fill remain/background */
+            [1] = { HEX2YUV(0x000000), 0x00 },
+            [2] = { HEX2YUV(0xffffff), 0xff }, /* Bar fill */
+            [3] = { HEX2YUV(0x000000), 0xff }, /* Bar outline */
         },
     };
 
