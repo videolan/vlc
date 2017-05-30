@@ -157,7 +157,7 @@ static inline void *realloc_down( void *ptr, size_t size )
     if( (array).i_alloc < 10 )                                              \
         _ARRAY_ALLOC(array, 10 )                                            \
     else if( (array).i_alloc == (array).i_size )                            \
-        _ARRAY_ALLOC(array, (int)(array.i_alloc * 1.5) )                    \
+        _ARRAY_ALLOC(array, (int)((array).i_alloc * 1.5) )                    \
 }
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
