@@ -33,6 +33,7 @@ endif
 endif
 
 .speexdsp: speexdsp
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SPEEXDSP_CONF)
 	cd $< && $(MAKE)
 	cd $< && ../../../contrib/src/pkg-static.sh speexdsp.pc
