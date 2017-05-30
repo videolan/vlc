@@ -34,7 +34,7 @@ fi
 
 check_sed() {
 tmp="`pwd`/check_sed"
-trap "rm $tmp{,-e} 2>/dev/null" EXIT
+trap "rm \"$tmp\" \"$tmp-e\" 2>/dev/null" EXIT
 echo "test file for GNU sed" > $tmp
 if ! sed -i -e 's/sed//' $tmp >/dev/null 2>&1
 then
