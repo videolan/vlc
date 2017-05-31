@@ -376,7 +376,7 @@ static inline int decoder_UpdateAudioFormat( decoder_t *dec )
  * output buffer. It must be released with block_Release() or returned it to
  * the caller as a decoder_QueueAudio parameter.
  */
-VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
+VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_nb_samples ) VLC_USED;
 
 /**
  * This function will return a new subpicture usable by a decoder as an output
