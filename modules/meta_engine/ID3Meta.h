@@ -24,7 +24,7 @@
 #include "ID3Text.h"
 
 #define vlc_meta_extra vlc_meta_Title
-struct
+static struct
 {
     uint32_t i_tag;
     vlc_meta_type_t type;
