@@ -202,7 +202,7 @@ QSize VideoWidget::physicalSize() const
     HWND hwnd;
     RECT rect;
 
-    QWindow *window = stable->windowHandle();
+    QWindow *window = windowHandle();
     hwnd = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
 
     GetClientRect(hwnd, &rect);
