@@ -958,15 +958,7 @@ void AudioFilterControlWidget::build()
         sliderDatas << filter;
     }
 
-    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
-    char *psz_af;
-    if( p_aout )
-    {
-        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        vlc_object_release( p_aout );
-    }
-    else
-        psz_af = config_GetPsz( p_intf, "audio-filter" );
+    char *psz_af = var_InheritString( THEPL, "audio-filter" );
 
     if( psz_af && strstr( psz_af, qtu(name) ) != NULL )
         slidersBox->setChecked( true );
@@ -1201,7 +1193,7 @@ void Equalizer::build()
         vlc_object_release( p_aout );
     }
     else
-        psz_af = config_GetPsz( p_intf, "audio-filter" );
+        psz_af = var_InheritString( THEPL, "audio-filter" );
 
     /* To enable or disable subwidgets */
     /* If that list grows, better iterate over layout's childs */
