@@ -1188,10 +1188,7 @@ void Equalizer::build()
     vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
     char *psz_af;
     if( p_aout )
-    {
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        vlc_object_release( p_aout );
-    }
     else
         psz_af = var_InheritString( THEPL, "audio-filter" );
 
@@ -1219,6 +1216,8 @@ void Equalizer::build()
     /* Connect and set 2 Pass checkbox */
     ui.eq2PassCheck->setChecked( var_InheritBool( p_aout, "equalizer-2pass" ) );
     CONNECT( ui.eq2PassCheck, toggled(bool), this, enable2Pass(bool) );
+    if( p_aout )
+        vlc_object_release( p_aout );
 }
 
 void Equalizer::setSaveToConfig( bool b_save )
