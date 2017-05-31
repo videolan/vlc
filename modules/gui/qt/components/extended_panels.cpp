@@ -503,8 +503,6 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
     i_type &= VLC_VAR_CLASS;
     if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
     {
-        if( i_int == -1 )
-            msg_Warn( p_intf, "Could not find the correct Integer widget" );
         emit configChanged( qfu( psz_option ), QVariant( i_int ) );
         if( i_type == VLC_VAR_INTEGER )
         {
@@ -519,8 +517,6 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
     }
     else if( i_type == VLC_VAR_FLOAT )
     {
-        if( f_float == -1 )
-            msg_Warn( p_intf, "Could not find the correct Float widget" );
         emit configChanged( qfu( psz_option ), QVariant( f_float ) );
         var_SetFloat( THEPL, psz_option, f_float );
         val.f_float = f_float;
@@ -528,10 +524,7 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
     else if( i_type == VLC_VAR_STRING )
     {
         if( psz_string == NULL )
-        {
-            msg_Warn( p_intf, "Could not find the correct String widget" );
             psz_string = "";
-        }
         emit configChanged( qfu( psz_option ), QVariant( psz_string ) );
         var_SetString( THEPL, psz_option, psz_string );
         val.psz_string = (char *) psz_string;
