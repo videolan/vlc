@@ -259,8 +259,9 @@ static void OSDEpgUpdate(subpicture_t *subpic,
     fmt.i_visible_width = fmt.i_visible_width * fmt.i_sar_num / fmt.i_sar_den;
     fmt.i_x_offset      = fmt.i_x_offset      * fmt.i_sar_num / fmt.i_sar_den;
 
-    subpic->i_original_picture_width  = fmt.i_width;
-    subpic->i_original_picture_height = fmt.i_height;
+    subpic->i_original_picture_width  = fmt.i_visible_width;
+    subpic->i_original_picture_height = fmt.i_visible_height;
+
     subpic->p_region = vout_BuildOSDEpg(sys->epg,
                                         sys->time,
                                         fmt.i_x_offset,
