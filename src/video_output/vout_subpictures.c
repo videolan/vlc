@@ -284,7 +284,7 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
  * A few scale functions helpers.
  */
 
-#define SCALE_UNIT (1000)
+#define SCALE_UNIT (10000)
 typedef struct {
     unsigned w;
     unsigned h;
