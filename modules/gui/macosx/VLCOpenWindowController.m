@@ -44,6 +44,23 @@
 
 #import <vlc_url.h>
 
+NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
+
+@interface VLCOpenTextField : NSTextField
+- (void)mouseDown:(NSEvent *)theEvent;
+@end
+
+@implementation VLCOpenTextField
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
+                                                        object: self];
+    [super mouseDown: theEvent];
+}
+
+@end
+
 struct display_info_t
 {
     CGRect rect;

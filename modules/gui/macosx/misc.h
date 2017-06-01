@@ -188,9 +188,3 @@ typedef NSInteger NSByteCountFormatterCountStyle;
 
 + (NSString *)stringFromByteCount:(long long)byteCount countStyle:(NSByteCountFormatterCountStyle)countStyle;
 @end
-
-extern NSString *const VLCOpenTextFieldWasClicked;
-
-@interface VLCOpenTextField : NSTextField
-- (void)mouseDown:(NSEvent *)theEvent;
-@end

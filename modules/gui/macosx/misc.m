@@ -31,8 +31,6 @@
 #import "VLCCoreInteraction.h"
 #import <vlc_keys.h>
 
-NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
-
 /*****************************************************************************
  * VLCDragDropView
  *****************************************************************************/
@@ -734,17 +732,6 @@ end:
     returnString = [NSString stringWithFormat:@"%@ %@", [theFormatter stringFromNumber:[NSNumber numberWithFloat:returnValue]], suffix];
 
     return returnString;
-}
-
-@end
-
-@implementation VLCOpenTextField
-
-- (void)mouseDown:(NSEvent *)theEvent
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
-                                                        object: self];
-    [super mouseDown: theEvent];
 }
 
 @end
