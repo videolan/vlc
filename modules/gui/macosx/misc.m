@@ -470,11 +470,8 @@ void _drawFrameInRect(NSRect frameRect)
  * we need this to catch our click-event in the controller window
  *****************************************************************************/
 
-@interface VLCTimeField()
+@interface VLCTimeField ()
 {
-    NSShadow * o_string_shadow;
-    NSTextAlignment textAlignment;
-
     NSString *o_remaining_identifier;
     BOOL b_time_remaining;
 }
@@ -492,33 +489,11 @@ void _drawFrameInRect(NSRect frameRect)
     [defaults registerDefaults:appDefaults];
 }
 
+
 - (void)setRemainingIdentifier:(NSString *)o_string
 {
     o_remaining_identifier = o_string;
     b_time_remaining = [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
-}
-
-- (void)setAlignment:(NSTextAlignment)alignment
-{
-    textAlignment = alignment;
-    [self setStringValue:[self stringValue]];
-}
-
-- (void)setStringValue:(NSString *)string
-{
-    if (!o_string_shadow) {
-        o_string_shadow = [[NSShadow alloc] init];
-        [o_string_shadow setShadowColor: [NSColor colorWithCalibratedWhite:1.0 alpha:0.5]];
-        [o_string_shadow setShadowOffset:NSMakeSize(0.0, -1.0)];
-        [o_string_shadow setShadowBlurRadius:0.0];
-    }
-
-    NSMutableAttributedString *o_attributed_string = [[NSMutableAttributedString alloc] initWithString:string attributes: nil];
-    NSUInteger i_stringLength = [string length];
-
-    [o_attributed_string addAttribute: NSShadowAttributeName value: o_string_shadow range: NSMakeRange(0, i_stringLength)];
-    [o_attributed_string setAlignment: textAlignment range: NSMakeRange(0, i_stringLength)];
-    [self setAttributedStringValue: o_attributed_string];
 }
 
 - (void)mouseDown: (NSEvent *)ourEvent
