@@ -159,37 +159,44 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
             goto error;
     }
 
-    if (cfg->is_sequential) {
-        for (int num = cfg->sequence; ; num++) {
-            struct stat st;
+    struct stat st;
+    bool b_is_folder = false;
 
-            if (asprintf(&filename, "%s" DIR_SEP "%s%05d.%s",
-                         cfg->path, prefix, num, cfg->format) < 0) {
-                free(prefix);
-                goto error;
+    if ( vlc_stat( cfg->path, &st ) == 0 )
+        b_is_folder = S_ISDIR( st.st_mode );
+    if ( b_is_folder ) {
+        if (cfg->is_sequential) {
+            for (int num = cfg->sequence; ; num++) {
+                if (asprintf(&filename, "%s" DIR_SEP "%s%05d.%s",
+                             cfg->path, prefix, num, cfg->format) < 0) {
+                    free(prefix);
+                    goto error;
+                }
+                if (vlc_stat(filename, &st)) {
+                    *sequential = num;
+                    break;
+                }
+                free(filename);
             }
-            if (vlc_stat(filename, &st)) {
-                *sequential = num;
-                break;
-            }
-            free(filename);
+        } else {
+            struct timespec ts;
+            struct tm curtime;
+            char buffer[128];
+
+            timespec_get(&ts, TIME_UTC);
+            if (localtime_r(&ts.tv_sec, &curtime) == NULL)
+                gmtime_r(&ts.tv_sec, &curtime);
+            if (strftime(buffer, sizeof(buffer), "%Y-%m-%d-%Hh%Mm%Ss",
+                         &curtime) == 0)
+                strcpy(buffer, "error");
+
+            if (asprintf(&filename, "%s" DIR_SEP "%s%s%03lu.%s",
+                         cfg->path, prefix, buffer, ts.tv_nsec / 1000000,
+                         cfg->format) < 0)
+                filename = NULL;
         }
     } else {
-        struct timespec ts;
-        struct tm curtime;
-        char buffer[128];
-
-        timespec_get(&ts, TIME_UTC);
-        if (localtime_r(&ts.tv_sec, &curtime) == NULL)
-            gmtime_r(&ts.tv_sec, &curtime);
-        if (strftime(buffer, sizeof(buffer), "%Y-%m-%d-%Hh%Mm%Ss",
-                     &curtime) == 0)
-            strcpy(buffer, "error");
-
-        if (asprintf(&filename, "%s" DIR_SEP "%s%s%03lu.%s",
-                     cfg->path, prefix, buffer, ts.tv_nsec / 1000000,
-                     cfg->format) < 0)
-            filename = NULL;
+        filename = strdup( cfg->path );
     }
     free(prefix);
 
