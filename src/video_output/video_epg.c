@@ -306,16 +306,41 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
                 if(p_event)
                 {
                     if(!vlc_epg_AddEvent(epg, p_event))
-                    {
-                        vlc_epg_Delete(epg);
                         vlc_epg_event_Delete(p_event);
-                        epg = NULL;
-                    }
-                    else vlc_epg_SetCurrent(epg, p_event->i_start);
+                    else
+                        vlc_epg_SetCurrent(epg, p_event->i_start);
                 }
             }
-            if(epg && tmp->psz_name)
+
+            /* Add next event if any */
+            vlc_epg_event_t *p_next = NULL;
+            for(size_t i=0; i<tmp->i_event; i++)
+            {
+                vlc_epg_event_t *p_evt = tmp->pp_event[i];
+                if((!p_next || p_next->i_start > p_evt->i_start) &&
+                   (!p_current_event || (p_evt->i_id != p_current_event->i_id &&
+                                         p_evt->i_start >= p_current_event->i_start +
+                                                           p_current_event->i_duration )))
+                {
+                    p_next = tmp->pp_event[i];
+                }
+            }
+            if( p_next )
+            {
+                vlc_epg_event_t *p_event = vlc_epg_event_Duplicate(p_next);
+                if(!vlc_epg_AddEvent(epg, p_event))
+                    vlc_epg_event_Delete(p_event);
+            }
+
+            if(epg->i_event > 0)
+            {
                 epg->psz_name = strdup(tmp->psz_name);
+            }
+            else
+            {
+                vlc_epg_Delete(epg);
+                epg = NULL;
+            }
         }
     }
     epg_time = input->i_epg_time;
