@@ -128,8 +128,8 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
          return NULL;
     }
 
-    p_subpic->i_original_picture_width  = fmt_out.i_width;
-    p_subpic->i_original_picture_height = fmt_out.i_height;
+    p_subpic->i_original_picture_width  = fmt_out.i_visible_width;
+    p_subpic->i_original_picture_height = fmt_out.i_visible_height;
 
     fmt_out.i_sar_num =
     fmt_out.i_sar_den = 0;
