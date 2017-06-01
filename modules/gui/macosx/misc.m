@@ -465,66 +465,6 @@ void _drawFrameInRect(NSRect frameRect)
 @end
 
 /*****************************************************************************
- * VLCTimeField implementation
- *****************************************************************************
- * we need this to catch our click-event in the controller window
- *****************************************************************************/
-
-@interface VLCTimeField ()
-{
-    NSString *o_remaining_identifier;
-    BOOL b_time_remaining;
-}
-@end
-
-@implementation VLCTimeField
-+ (void)initialize
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"NO", @"DisplayTimeAsTimeRemaining",
-                                 @"YES", @"DisplayFullscreenTimeAsTimeRemaining",
-                                 nil];
-
-    [defaults registerDefaults:appDefaults];
-}
-
-
-- (void)setRemainingIdentifier:(NSString *)o_string
-{
-    o_remaining_identifier = o_string;
-    b_time_remaining = [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
-}
-
-- (void)mouseDown: (NSEvent *)ourEvent
-{
-    if ( [ourEvent clickCount] > 1 )
-        [[[VLCMain sharedInstance] mainMenu] goToSpecificTime: nil];
-    else
-    {
-        if (o_remaining_identifier) {
-            b_time_remaining = [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
-            b_time_remaining = !b_time_remaining;
-            [[NSUserDefaults standardUserDefaults] setObject:(b_time_remaining ? @"YES" : @"NO") forKey:o_remaining_identifier];
-        } else {
-            b_time_remaining = !b_time_remaining;
-        }
-    }
-
-    [[self nextResponder] mouseDown:ourEvent];
-}
-
-- (BOOL)timeRemaining
-{
-    if (o_remaining_identifier)
-        return [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
-    else
-        return b_time_remaining;
-}
-
-@end
-
-/*****************************************************************************
  * VLCMainWindowSplitView implementation
  * comment 1 + 2 taken from NSSplitView.h (10.7 SDK)
  *****************************************************************************/

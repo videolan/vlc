@@ -25,6 +25,8 @@
 #import <Cocoa/Cocoa.h>
 #import "misc.h"
 
+#import "VLCTimeField.h"
+
 @class VLCResizeControl;
 
 /*****************************************************************************

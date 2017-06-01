@@ -26,9 +26,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "misc.h"
 #import "Windows.h"
 #import "VLCDefaultValueSlider.h"
+#import "VLCTimeField.h"
 
 @interface VLCFSPanelController : NSWindowController
 

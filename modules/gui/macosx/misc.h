@@ -109,20 +109,6 @@
 @end
 
 /*****************************************************************************
- * VLCTimeField interface
- *****************************************************************************
- * we need the implementation to catch our click-event in the controller window
- *****************************************************************************/
-
-@interface VLCTimeField : NSTextField
-
-@property (readonly) BOOL timeRemaining;
-
-- (void)setRemainingIdentifier:(NSString *)o_string;
-
-@end
-
-/*****************************************************************************
  * VLCMainWindowSplitView interface
  *****************************************************************************/
 @interface VLCMainWindowSplitView : NSSplitView

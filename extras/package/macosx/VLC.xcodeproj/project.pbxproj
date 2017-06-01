@@ -80,6 +80,7 @@
 		6B81662A1EBFC34300C26F1B /* VLCDefaultValueSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B6A499D1DFD9B23009128AC /* VLCDefaultValueSliderCell.m */; };
 		6B81662B1EBFC35D00C26F1B /* VLCVoutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */; };
 		6B81662C1EBFC38100C26F1B /* VLCUIWidgets.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */; };
+		6BF093F91EE0182B0049D8B0 /* VLCTimeField.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -688,6 +689,8 @@
 		6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCRendererDiscovery.m; sourceTree = "<group>"; };
 		6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCFSPanelController.h; sourceTree = "<group>"; };
 		6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCFSPanelController.m; sourceTree = "<group>"; };
+		6BF093F71EE0182B0049D8B0 /* VLCTimeField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCTimeField.h; sourceTree = "<group>"; };
+		6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCTimeField.m; sourceTree = "<group>"; };
 		6BF557CF1E4E0E2500C03C9D /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = "Button-Icons/VLCPauseTemplate.pdf"; sourceTree = "<group>"; };
 		7D5678EB1D5BA1DC002698F3 /* VLCApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCApplication.h; sourceTree = "<group>"; };
 		7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCApplication.m; sourceTree = "<group>"; };
@@ -910,6 +913,8 @@
 				CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */,
 				8ED6C27F03E2EB1C0059A3A7 /* misc.h */,
 				8ED6C28003E2EB1C0059A3A7 /* misc.m */,
+				6BF093F71EE0182B0049D8B0 /* VLCTimeField.h */,
+				6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */,
 				6B4D50A51E7AB52C004479B5 /* NSScreen+VLCAdditions.h */,
 				6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */,
 				6B4D50941E7A7D16004479B5 /* NSSound+VLCAdditions.h */,
@@ -1842,6 +1847,7 @@
 				1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */,
 				1C3114051E508C8800D4DD76 /* SideBarItem.m in Sources */,
 				6B4D50961E7A7D16004479B5 /* NSSound+VLCAdditions.m in Sources */,
+				6BF093F91EE0182B0049D8B0 /* VLCTimeField.m in Sources */,
 				1C3114071E508C8800D4DD76 /* PXSourceList.m in Sources */,
 				1C31140B1E508C8800D4DD76 /* SPInvocationGrabbing.m in Sources */,
 				1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */,

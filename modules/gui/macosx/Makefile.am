@@ -90,7 +90,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCDefaultValueSlider.h gui/macosx/VLCDefaultValueSlider.m \
 	gui/macosx/VLCDefaultValueSliderCell.h gui/macosx/VLCDefaultValueSliderCell.m \
 	gui/macosx/VLCHUDImageButton.h gui/macosx/VLCHUDImageButton.m \
-	gui/macosx/VLCHUDToggleButton.h gui/macosx/VLCHUDToggleButton.m
+	gui/macosx/VLCHUDToggleButton.h gui/macosx/VLCHUDToggleButton.m \
+	gui/macosx/VLCTimeField.h gui/macosx/VLCTimeField.m
 
 # User interface compilation
 
