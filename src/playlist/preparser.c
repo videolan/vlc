@@ -76,7 +76,8 @@ static int PreparserOpenInput( void* preparser_, void* item_, void** out )
 
 static int PreparserProbeInput( void* preparser_, void* input_ )
 {
-    return input_GetState( input_ ) == END_S;
+    int state = input_GetState( input_ );
+    return state == END_S || state == ERROR_S;
     VLC_UNUSED( preparser_ );
 }
 
@@ -88,8 +89,18 @@ static void PreparserCloseInput( void* preparser_, void* input_ )
 
     var_DelCallback( input, "intf-event", InputEvent, preparser->worker );
 
-    int status = input_GetState( input ) == END_S
-        ? ITEM_PREPARSE_DONE : ITEM_PREPARSE_TIMEOUT;
+    int status;
+    switch( input_GetState( input ) )
+    {
+        case END_S:
+            status = ITEM_PREPARSE_DONE;
+            break;
+        case ERROR_S:
+            status = ITEM_PREPARSE_FAILED;
+            break;
+        default:
+            status = ITEM_PREPARSE_TIMEOUT;
+    }
 
     input_Stop( input );
     input_Close( input );
