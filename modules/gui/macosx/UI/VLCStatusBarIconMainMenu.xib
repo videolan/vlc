@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12118" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment identifier="macosx"/>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCStatusBarIcon">
@@ -119,7 +119,7 @@
                         <action selector="toggelProgressTime:" target="-2" id="S3e-vr-guH"/>
                     </connections>
                 </button>
-                <button id="p8X-zU-PwN" customClass="VLCHUDImageButton">
+                <button id="p8X-zU-PwN" customClass="VLCImageButton">
                     <rect key="frame" x="76" y="20" width="28" height="24"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCPreviousTemplate" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="PSI-Wi-u0R">
@@ -130,18 +130,21 @@
                         <action selector="statusBarIconPrevious:" target="-2" id="kAL-hK-8qL"/>
                     </connections>
                 </button>
-                <button id="lvI-lN-t4O" customClass="VLCHUDToggleButton">
+                <button id="lvI-lN-t4O" customClass="VLCImageButton">
                     <rect key="frame" x="109" y="20" width="28" height="24"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCPlayTemplate" imagePosition="only" alignment="center" alternateImage="VLCPauseTemplate" imageScaling="proportionallyUpOrDown" inset="2" id="nqu-wV-vI1">
                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="toggle" value="YES"/>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="statusBarIconTogglePlayPause:" target="-2" id="K38-Dr-lNS"/>
                     </connections>
                 </button>
-                <button id="NHj-Vf-SPF" customClass="VLCHUDImageButton">
+                <button id="NHj-Vf-SPF" customClass="VLCImageButton">
                     <rect key="frame" x="141" y="20" width="28" height="24"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCNextTemplate" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="BIa-Vy-yD2">

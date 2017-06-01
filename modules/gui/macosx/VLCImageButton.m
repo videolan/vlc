@@ -1,10 +1,11 @@
 /*****************************************************************************
- * VLCHUDImageButton.m
+ * VLCImageButton.m
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Cameron Mozie <camsw0rld14@gmail.com>
+ *          Marvin Scholz <epirat07 at gmail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,18 +22,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCHUDImageButton.h"
+#import "VLCImageButton.h"
 
-@implementation VLCHUDImageButton
+@implementation VLCImageButton
+
+@synthesize toggle = _toggle;
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     self =  [super initWithCoder:coder];
     if (self) {
-        [(NSButtonCell*)[self cell] setHighlightsBy:NSPushInCellMask];
-        [(NSButtonCell*)[self cell] setShowsStateBy:NSNoCellMask];
+        _toggle = NO;
     }
     return self;
+}
+
+- (void)awakeFromNib
+{
+    [(NSButtonCell*)[self cell] setHighlightsBy:NSPushInCellMask];
+    [(NSButtonCell*)[self cell] setShowsStateBy:(_toggle) ? NSContentsCellMask : NSNoCellMask];
+}
+
+- (void)setToggle:(BOOL)toggle
+{
+    _toggle = toggle;
+    [(NSButtonCell*)[self cell] setShowsStateBy:(_toggle) ? NSContentsCellMask : NSNoCellMask];
 }
 
 @end

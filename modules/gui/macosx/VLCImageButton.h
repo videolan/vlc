@@ -1,10 +1,11 @@
 /*****************************************************************************
- * VLCHUDToggleButton.h
+ * VLCImageButton.h
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Cameron Mozie <camsw0rld14@gmail.com>
+ *          Marvin Scholz <epirat07 at gmail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCHUDImageButton.h"
+#import <Cocoa/Cocoa.h>
 
-@interface VLCHUDToggleButton : VLCHUDImageButton
+@interface VLCImageButton : NSButton
+
+@property (nonatomic) IBInspectable BOOL toggle;
 
 @end

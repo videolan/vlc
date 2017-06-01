@@ -70,8 +70,7 @@
 		1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
 		1C69FDF61EAB30C7007724ED /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
 		1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */; };
-		6B3BE42C1E6217CB008D098A /* VLCHUDImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */; };
-		6B3BE4321E621F24008D098A /* VLCHUDToggleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */; };
+		6B3BE42C1E6217CB008D098A /* VLCImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE42B1E6217CB008D098A /* VLCImageButton.m */; };
 		6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */; };
 		6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */; };
 		6B4D50961E7A7D16004479B5 /* NSSound+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50951E7A7D16004479B5 /* NSSound+VLCAdditions.m */; };
@@ -114,10 +113,8 @@
 		633121CB1B51122700E636DA /* VLCResumeDialogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCResumeDialogController.m; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCScrollingClipView.m; sourceTree = "<group>"; };
-		6B3BE42A1E6217CB008D098A /* VLCHUDImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDImageButton.h; sourceTree = "<group>"; };
-		6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDImageButton.m; sourceTree = "<group>"; };
-		6B3BE4301E621F24008D098A /* VLCHUDToggleButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDToggleButton.h; sourceTree = "<group>"; };
-		6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDToggleButton.m; sourceTree = "<group>"; };
+		6B3BE42A1E6217CB008D098A /* VLCImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCImageButton.h; sourceTree = "<group>"; };
+		6B3BE42B1E6217CB008D098A /* VLCImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCImageButton.m; sourceTree = "<group>"; };
 		6B4D508E1E79781F004479B5 /* VLCHotkeyChangeWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHotkeyChangeWindow.h; sourceTree = "<group>"; };
 		6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHotkeyChangeWindow.m; sourceTree = "<group>"; };
 		6B4D50911E7979CB004479B5 /* VLCSimplePrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCSimplePrefsWindow.h; sourceTree = "<group>"; };
@@ -850,10 +847,8 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				6B3BE42A1E6217CB008D098A /* VLCHUDImageButton.h */,
-				6B3BE42B1E6217CB008D098A /* VLCHUDImageButton.m */,
-				6B3BE4301E621F24008D098A /* VLCHUDToggleButton.h */,
-				6B3BE4311E621F24008D098A /* VLCHUDToggleButton.m */,
+				6B3BE42A1E6217CB008D098A /* VLCImageButton.h */,
+				6B3BE42B1E6217CB008D098A /* VLCImageButton.m */,
 				1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */,
 				1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */,
 				1C67C8A31D58C0980079E1C1 /* VLCHelpWindowController.h */,
@@ -1841,7 +1836,7 @@
 				6B8166291EBFC34300C26F1B /* VLCDefaultValueSlider.m in Sources */,
 				6B81662A1EBFC34300C26F1B /* VLCDefaultValueSliderCell.m in Sources */,
 				1C69FDF61EAB30C7007724ED /* Windows.m in Sources */,
-				6B3BE42C1E6217CB008D098A /* VLCHUDImageButton.m in Sources */,
+				6B3BE42C1E6217CB008D098A /* VLCImageButton.m in Sources */,
 				6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */,
 				1C3114031E508C8800D4DD76 /* AppleRemote.m in Sources */,
 				1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */,
@@ -1853,7 +1848,6 @@
 				1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */,
 				1C3113EF1E508C7600D4DD76 /* VLCRendererDiscovery.m in Sources */,
 				1C3113F11E508C7600D4DD76 /* VLCRendererItem.m in Sources */,
-				6B3BE4321E621F24008D098A /* VLCHUDToggleButton.m in Sources */,
 				1C3113F31E508C7600D4DD76 /* VLCRendererDialog.m in Sources */,
 				1C3113F51E508C7600D4DD76 /* VLCHUDTextFieldCell.m in Sources */,
 				1C3113F71E508C7600D4DD76 /* VLCHUDButtonCell.m in Sources */,
