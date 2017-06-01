@@ -1418,7 +1418,7 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track );
  *
  * \param p_mi media player instance
  * \param num number of video output (typically 0 for the first/only one)
- * \param psz_filepath the path where to save the screenshot to
+ * \param psz_filepath the path of a file or a folder to save the screenshot into
  * \param i_width the snapshot's width
  * \param i_height the snapshot's height
  * \return 0 on success, -1 if the video was not found
