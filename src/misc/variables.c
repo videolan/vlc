@@ -1400,8 +1400,8 @@ char **var_GetAllNames(vlc_object_t *obj)
     DECL_ARRAY(char *) names;
     ARRAY_INIT(names);
 
-    vlc_mutex_lock(&priv->var_lock);
     twalk_ctx = &names;
+    vlc_mutex_lock(&priv->var_lock);
     twalk(priv->var_root, TwalkGetNames);
     vlc_mutex_unlock(&priv->var_lock);
 
