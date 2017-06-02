@@ -691,14 +691,15 @@ static void SpuRenderRegion(spu_t *spu,
      */
     const bool using_palette = region->fmt.i_chroma == VLC_CODEC_YUVP;
     const bool force_palette = using_palette && sys->force_palette;
-    const bool force_crop    = force_palette && sys->force_crop;
+    const bool crop_requested = (force_palette && sys->force_crop) ||
+                                region->i_max_width || region->i_max_height;
     bool changed_palette     = false;
 
     /* Compute the margin which is expressed in destination pixel unit
      * The margin is applied only to subtitle and when no forced crop is
      * requested (dvd menu) */
     int y_margin = 0;
-    if (!force_crop && subpic->b_subtitle)
+    if (!crop_requested && subpic->b_subtitle)
         y_margin = spu_invscale_h(sys->margin, scale_size);
 
     /* Place the picture
@@ -873,11 +874,32 @@ static void SpuRenderRegion(spu_t *spu,
     }
 
     /* Force cropping if requested */
-    if (force_crop) {
-        int crop_x     = spu_scale_w(sys->crop.x,     scale_size);
-        int crop_y     = spu_scale_h(sys->crop.y,     scale_size);
-        int crop_width = spu_scale_w(sys->crop.width, scale_size);
-        int crop_height= spu_scale_h(sys->crop.height,scale_size);
+    if (crop_requested) {
+        int crop_x, crop_y, crop_width, crop_height;
+        if(sys->force_crop){
+            crop_x     = sys->crop.x;
+            crop_y     = sys->crop.y;
+            crop_width = sys->crop.width;
+            crop_height= sys->crop.height;
+        }
+        else
+        {
+            crop_x = x_offset;
+            crop_y = y_offset;
+            crop_width = region_fmt.i_visible_width;
+            crop_height = region_fmt.i_visible_height;
+        }
+
+        if(region->i_max_width && region->i_max_width < crop_width)
+            crop_width = region->i_max_width;
+
+        if(region->i_max_height && region->i_max_height < crop_height)
+            crop_height = region->i_max_height;
+
+        crop_x     = spu_scale_w(crop_x,     scale_size);
+        crop_y     = spu_scale_h(crop_y,     scale_size);
+        crop_width = spu_scale_w(crop_width, scale_size);
+        crop_height= spu_scale_h(crop_height,scale_size);
 
         /* Find the intersection */
         if (crop_x + crop_width <= x_offset ||
