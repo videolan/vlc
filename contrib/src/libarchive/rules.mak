@@ -18,6 +18,9 @@ libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-Fix-build-failure-without-STATVFS.patch
 	$(APPLY) $(SRC)/libarchive/android.patch
+ifdef HAVE_WINSTORE
+	$(APPLY) $(SRC)/libarchive/no-windows-files.patch
+endif
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
