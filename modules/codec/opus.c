@@ -264,7 +264,8 @@ static int ProcessHeaders( decoder_t *p_dec )
 
     /* If we have no header (e.g. from RTP), make one. */
     bool b_dummy_header = false;
-    if( !i_extra )
+    if( !i_extra ||
+        (i_extra > 10 && memcmp( &p_extra[2], "OpusHead", 8 )) ) /* Borked muxers */
     {
         OpusHeader header;
         opus_prepare_header( p_dec->fmt_in.audio.i_channels,
