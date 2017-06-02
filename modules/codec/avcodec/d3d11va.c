@@ -530,10 +530,13 @@ static int D3dCreateDevice(vlc_va_t *va)
  */
 static void D3dDestroyDevice(vlc_va_t *va)
 {
+    directx_sys_t *dx_sys = &va->sys->dx_sys;
     if (va->sys->d3dvidctx)
         ID3D11VideoContext_Release(va->sys->d3dvidctx);
     if (va->sys->d3dctx)
         ID3D11DeviceContext_Release(va->sys->d3dctx);
+    if (dx_sys->d3ddev)
+        ID3D11Device_Release(dx_sys->d3ddev);
 }
 /**
  * It describes our Direct3D object

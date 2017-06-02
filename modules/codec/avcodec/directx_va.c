@@ -438,8 +438,6 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
     if (dx_sys->pf_destroy_device_manager)
         dx_sys->pf_destroy_device_manager(va);
     dx_sys->pf_destroy_device(va);
-    if (dx_sys->d3ddev)
-        IUnknown_Release( dx_sys->d3ddev );
 
     if (dx_sys->hdecoder_dll)
         FreeLibrary(dx_sys->hdecoder_dll);
