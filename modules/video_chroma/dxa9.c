@@ -117,7 +117,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
             lock.Pitch,
         };
         CopyFromNv12ToYv12(dst, plane, pitch,
-                           src->format.i_height, p_copy_cache);
+                           src->format.i_visible_height + src->format.i_y_offset, p_copy_cache);
     } else {
         msg_Err(p_filter, "Unsupported DXA9 conversion from 0x%08X to YV12", desc.Format);
     }
@@ -150,7 +150,8 @@ static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
             lock.Pitch,
             lock.Pitch,
         };
-        CopyFromNv12ToNv12(dst, plane, pitch, src->format.i_height, p_copy_cache);
+        CopyFromNv12ToNv12(dst, plane, pitch,
+                           src->format.i_visible_height + src->format.i_y_offset, p_copy_cache);
     } else {
         msg_Err(p_filter, "Unsupported DXA9 conversion from 0x%08X to NV12", desc.Format);
     }
