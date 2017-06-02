@@ -27,7 +27,11 @@
 
 + (void)load
 {
-    id controller = [[VLCDocumentController alloc] init];
+    /* For the custom document controller to be used by the app,
+     * it needs to be created before the default NSDocumentController
+     * is created.
+     */
+    (void)[[VLCDocumentController alloc] init];
 }
 
 - (IBAction)clearRecentDocuments:(id)sender
