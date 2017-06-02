@@ -562,8 +562,11 @@ static int DxCreateVideoService(vlc_va_t *va)
  */
 static void DxDestroyVideoService(vlc_va_t *va)
 {
+    directx_sys_t *dx_sys = &va->sys->dx_sys;
     if (va->sys->device)
         IDirect3DDeviceManager9_CloseDeviceHandle(va->sys->devmng, va->sys->device);
+    if (dx_sys->d3ddec)
+        IDirectXVideoDecoderService_Release(dx_sys->d3ddec);
 }
 
 static void ReleaseInputList(input_list_t *p_list)

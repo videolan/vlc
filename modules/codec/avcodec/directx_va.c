@@ -433,8 +433,6 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
 {
     DestroyVideoDecoder(va, dx_sys);
     dx_sys->pf_destroy_video_service(va);
-    if (dx_sys->d3ddec)
-        IUnknown_Release(dx_sys->d3ddec);
     if (dx_sys->pf_destroy_device_manager)
         dx_sys->pf_destroy_device_manager(va);
     dx_sys->pf_destroy_device(va);
