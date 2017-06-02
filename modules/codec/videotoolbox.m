@@ -143,6 +143,7 @@ struct decoder_sys_t
     bool                        b_invalid_pic_reorder_max;
     bool                        b_poc_based_reorder;
     bool                        b_enable_temporal_processing;
+    bool                        b_handle_deint;
 
     bool                        b_format_propagated;
     bool                        b_abort;
@@ -722,6 +723,23 @@ static int StartVideoToolbox(decoder_t *p_dec)
 
     if (HandleVTStatus(p_dec, status) != VLC_SUCCESS)
         return VLC_EGENERIC;
+
+    /* Check if the current session supports deinterlacing and temporal
+     * processing */
+    CFDictionaryRef supportedProps = NULL;
+    status = VTSessionCopySupportedPropertyDictionary(p_sys->session,
+                                                      &supportedProps);
+    p_sys->b_handle_deint = status == noErr &&
+        CFDictionaryContainsKey(supportedProps,
+                                kVTDecompressionPropertyKey_FieldMode);
+    p_sys->b_enable_temporal_processing = status == noErr &&
+        CFDictionaryContainsKey(supportedProps,
+                                kVTDecompressionProperty_DeinterlaceMode_Temporal);
+    if (!p_sys->b_handle_deint)
+        msg_Warn(p_dec, "VT decoder doesn't handle deinterlacing");
+
+    if (status == noErr)
+        CFRelease(supportedProps);
 
     return VLC_SUCCESS;
 }
@@ -1563,7 +1581,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         p_info->p_picture = p_pic;
 
         p_pic->date = pts.value;
-        p_pic->b_progressive = p_info->b_progressive;
+        p_pic->b_progressive = p_sys->b_handle_deint || p_info->b_progressive;
         if(!p_pic->b_progressive)
         {
             p_pic->i_nb_fields = p_info->i_num_ts;
