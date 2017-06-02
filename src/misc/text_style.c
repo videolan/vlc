@@ -65,6 +65,7 @@ text_style_t *text_style_Create( int i_defaults )
     p_style->i_outline_width = 1;
     p_style->i_shadow_width = 0;
     p_style->i_spacing = -1;
+    p_style->e_wrapinfo = STYLE_WRAP_DEFAULT;
 
     return p_style;
 }
@@ -120,6 +121,7 @@ void text_style_Merge( text_style_t *p_dst, const text_style_t *p_src, bool b_ov
         MERGE(i_background_alpha,   STYLE_HAS_BACKGROUND_ALPHA);
         MERGE(i_karaoke_background_color, STYLE_HAS_K_BACKGROUND_COLOR);
         MERGE(i_karaoke_background_alpha, STYLE_HAS_K_BACKGROUND_ALPHA);
+        MERGE(e_wrapinfo,            STYLE_HAS_WRAP_INFO);
         p_dst->i_features |= p_src->i_features;
         p_dst->i_style_flags |= p_src->i_style_flags;
     }
