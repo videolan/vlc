@@ -1302,6 +1302,14 @@ static int LayoutLine( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
+static inline void ReleaseGlyphBitMaps(glyph_bitmaps_t *p_bitmaps)
+{
+    if( p_bitmaps->p_glyph )
+        FT_Done_Glyph( p_bitmaps->p_glyph );
+    if( p_bitmaps->p_outline )
+        FT_Done_Glyph( p_bitmaps->p_outline );
+}
+
 static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                             int i_max_pixel_width, line_desc_t **pp_lines,
                             bool b_grid )
@@ -1360,11 +1368,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                  * At this point p_shadow points to either p_glyph or p_outline,
                  * so we should not free it explicitly.
                  */
-                if( p_paragraph->p_glyph_bitmaps[ i ].p_glyph )
-                    FT_Done_Glyph( p_paragraph->p_glyph_bitmaps[ i ].p_glyph );
-                if( p_paragraph->p_glyph_bitmaps[ i ].p_outline )
-                    FT_Done_Glyph( p_paragraph->p_glyph_bitmaps[ i ].p_outline );
-
+                ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
                 i_line_start = i + 1;
                 continue;
             }
@@ -1415,12 +1419,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
 error:
     for( int i = i_line_start; i < p_paragraph->i_size; ++i )
-    {
-        if( p_paragraph->p_glyph_bitmaps[ i ].p_glyph )
-            FT_Done_Glyph( p_paragraph->p_glyph_bitmaps[ i ].p_glyph );
-        if( p_paragraph->p_glyph_bitmaps[ i ].p_outline )
-            FT_Done_Glyph( p_paragraph->p_glyph_bitmaps[ i ].p_outline );
-    }
+        ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
     if( p_first_line )
         FreeLines( p_first_line );
     return VLC_EGENERIC;
