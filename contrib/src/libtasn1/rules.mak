@@ -20,6 +20,6 @@ endif
 	$(MOVE)
 
 .libtasn1: libtasn1
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-doc
 	cd $< && $(MAKE) install
 	touch $@
