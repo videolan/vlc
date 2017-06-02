@@ -37,7 +37,6 @@
 #import "../packetizer/h264_slice.h"
 #import "../packetizer/hxxx_nal.h"
 #import "../packetizer/hxxx_sei.h"
-#import "../video_chroma/copy.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 #import <VideoToolbox/VTErrors.h>
@@ -94,8 +93,6 @@ static int DecodeBlock(decoder_t *, block_t *);
 static void Flush(decoder_t *);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
-static void copy420YpCbCr8Planar(picture_t *, CVPixelBufferRef buffer,
-                                 unsigned i_width, unsigned i_height);
 static BOOL deviceSupportsAdvancedProfiles();
 static BOOL deviceSupportsAdvancedLevels();
 
@@ -1140,35 +1137,6 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     block_buf = nil;
 
     return sample_buf;
-}
-
-static void copy420YpCbCr8Planar(picture_t *p_pic,
-                                 CVPixelBufferRef buffer,
-                                 unsigned i_width,
-                                 unsigned i_height)
-{
-    uint8_t *pp_plane[2];
-    size_t pi_pitch[2];
-    copy_cache_t cache;
-
-    if (!buffer || i_width == 0 || i_height == 0)
-        return;
-
-    CVPixelBufferLockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
-
-    for (int i = 0; i < 2; i++) {
-        pp_plane[i] = CVPixelBufferGetBaseAddressOfPlane(buffer, i);
-        pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(buffer, i);
-    }
-
-    if (CopyInitCache(&cache, i_width))
-        return;
-
-    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_height, &cache);
-
-    CopyCleanCache(&cache);
-
-    CVPixelBufferUnlockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
 }
 
 static int HandleVTStatus(decoder_t *p_dec, OSStatus status)
