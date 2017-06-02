@@ -1,17 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="12120"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCHelpWindowController">
             <connections>
-                <outlet property="o_help_bwd_btn" destination="2257" id="2336"/>
-                <outlet property="o_help_fwd_btn" destination="2258" id="2335"/>
-                <outlet property="o_help_home_btn" destination="2256" id="2337"/>
-                <outlet property="o_help_web_view" destination="2241" id="2341"/>
+                <outlet property="backButton" destination="2257" id="c2X-ol-C9I"/>
+                <outlet property="forwardButton" destination="2258" id="iEY-oD-cv3"/>
+                <outlet property="helpWebView" destination="2241" id="cMX-Wb-U2g"/>
+                <outlet property="homeButton" destination="2256" id="sWB-6l-roa"/>
                 <outlet property="window" destination="2239" id="2342"/>
             </connections>
         </customObject>
@@ -21,7 +22,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="336" y="164" width="480" height="400"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="2240">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="400"/>
@@ -47,7 +48,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2257">
-                        <rect key="frame" x="55" y="8" width="32" height="25"/>
+                        <rect key="frame" x="55" y="8" width="30" height="25"/>
                         <buttonCell key="cell" type="roundTextured" title="←" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="2276">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="systemBold" size="18"/>
@@ -57,7 +58,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2258">
-                        <rect key="frame" x="95" y="8" width="32" height="25"/>
+                        <rect key="frame" x="93" y="8" width="30" height="25"/>
                         <buttonCell key="cell" type="roundTextured" title="→" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="2277">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="systemBold" size="18"/>

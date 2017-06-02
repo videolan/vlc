@@ -36,7 +36,6 @@
 {
     self = [super initWithWindowNibName:@"Help"];
     if (self) {
-
         [self setWindowFrameAutosaveName:@"help"];
     }
 
@@ -45,10 +44,10 @@
 
 - (void)windowDidLoad
 {
-    [[self window] setTitle: _NS("VLC media player Help")];
-    [o_help_fwd_btn setToolTip: _NS("Next")];
-    [o_help_bwd_btn setToolTip: _NS("Previous")];
-    [o_help_home_btn setToolTip: _NS("Index")];
+    [[self window] setTitle:_NS("VLC media player Help")];
+    [forwardButton setToolTip:_NS("Next")];
+    [backButton setToolTip:_NS("Previous")];
+    [homeButton setToolTip:_NS("Index")];
 }
 
 - (void)showHelp
@@ -59,15 +58,15 @@
 
 - (IBAction)helpGoHome:(id)sender
 {
-    [[o_help_web_view mainFrame] loadHTMLString: _NS(I_LONGHELP)
-                                        baseURL: [NSURL URLWithString:@"http://videolan.org"]];
+    [[helpWebView mainFrame] loadHTMLString:_NS(I_LONGHELP)
+                                    baseURL:[NSURL URLWithString:@"http://videolan.org"]];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
-    /* delegate to update button states (we're the frameLoadDelegate for our help's webview)« */
-    [o_help_fwd_btn setEnabled: [o_help_web_view canGoForward]];
-    [o_help_bwd_btn setEnabled: [o_help_web_view canGoBack]];
+    /* Update back/forward button states whenever a new page is loaded */
+    [forwardButton setEnabled:[helpWebView canGoForward]];
+    [backButton setEnabled:[helpWebView canGoBack]];
 }
 
 @end
