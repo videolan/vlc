@@ -920,7 +920,7 @@ static int ZeroNsmAdvance( paragraph_t *p_paragraph )
  */
 static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                        bool b_use_glyph_indices, bool b_overwrite_advance,
-                       int *pi_max_advance_x )
+                       unsigned *pi_max_advance_x )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0 )
     {
@@ -1443,18 +1443,17 @@ error:
     return VLC_EGENERIC;
 }
 
-int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
-                FT_BBox *p_bbox, int *pi_max_face_height,
-
+int LayoutText( filter_t *p_filter,
                 const uni_char_t *psz_text, text_style_t **pp_styles,
-                uint32_t *pi_k_dates, int i_len, bool b_grid )
+                uint32_t *pi_k_dates, int i_len, bool b_grid, unsigned i_max_width,
+                line_desc_t **pp_lines, FT_BBox *p_bbox, int *pi_max_face_height )
 {
     line_desc_t *p_first_line = 0;
     line_desc_t **pp_line = &p_first_line;
     paragraph_t *p_paragraph = 0;
     int i_paragraph_start = 0;
     int i_max_height = 0;
-    int i_max_advance_x = 0;
+    unsigned i_max_advance_x = 0;
 
     for( int i = 0; i <= i_len; ++i )
     {
@@ -1508,19 +1507,17 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
 #endif
 
             /*
-             * Set max line width to allow for outline and shadow glyphs,
+             * Check max line width to allow for outline and shadow glyphs,
              * and any extra width caused by visual reordering
              */
-            int i_max_width = ( int ) p_filter->fmt_out.video.i_visible_width - i_max_advance_x;
-
-            if( i_max_width <= 0 )
+            if( i_max_width <= i_max_advance_x )
             {
                 msg_Err( p_filter, "LayoutText(): Invalid max width" );
                 goto error;
             }
 
             if( LayoutParagraph( p_filter, p_paragraph,
-                                 i_max_width, pp_line, b_grid ) )
+                                 i_max_width - i_max_advance_x, pp_line, b_grid ) )
                 goto error;
 
             FreeParagraph( p_paragraph );
