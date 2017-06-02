@@ -113,7 +113,7 @@ typedef struct
     int (*pf_create_decoder_surfaces)(vlc_va_t *, int codec_id,
                                       const video_format_t *fmt);
     /**
-     * Destroy resources allocated with the surfaces except from hw_surface objects
+     * Destroy resources allocated with the surfaces and the associated decoder
      */
     void (*pf_destroy_surfaces)(vlc_va_t *);
     /**

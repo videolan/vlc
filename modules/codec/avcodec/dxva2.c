@@ -782,7 +782,12 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
 
 static void DxDestroyVideoDecoder(vlc_va_t *va)
 {
-    VLC_UNUSED(va);
+    directx_sys_t *dx_sys = &va->sys->dx_sys;
+    if (dx_sys->decoder)
+    {
+        IDirectXVideoDecoder_Release(dx_sys->decoder);
+        dx_sys->decoder = NULL;
+    }
 }
 
 static int DxResetVideoDecoder(vlc_va_t *va)

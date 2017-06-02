@@ -376,10 +376,6 @@ void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
         directx_va_Release(dx_sys->surface[i]);
     }
 
-    if (dx_sys->decoder)
-        IUnknown_Release( dx_sys->decoder );
-
-    dx_sys->decoder = NULL;
     dx_sys->surface_count = 0;
 }
 

@@ -1001,4 +1001,9 @@ static void DxDestroySurfaces(vlc_va_t *va)
                 ID3D11ShaderResourceView_Release(va->sys->resourceView[i*D3D11_MAX_SHADER_VIEW + j]);
         }
     }
+    if (dx_sys->decoder)
+    {
+        ID3D11VideoDecoder_Release(dx_sys->decoder);
+        dx_sys->decoder = NULL;
+    }
 }
