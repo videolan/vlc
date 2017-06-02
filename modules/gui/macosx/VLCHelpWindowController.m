@@ -58,7 +58,11 @@
 
 - (IBAction)helpGoHome:(id)sender
 {
-    [[helpWebView mainFrame] loadHTMLString:_NS(I_LONGHELP)
+    NSString *htmlWithStyle = [NSString
+                               stringWithFormat:@"<style>body { font-family: -apple-system, %@; }</style>%@",
+                               ((OSX_YOSEMITE) ? @"Helvetica Neue" : @"Lucida Grande"), _NS(I_LONGHELP)];
+
+    [[helpWebView mainFrame] loadHTMLString:htmlWithStyle
                                     baseURL:[NSURL URLWithString:@"http://videolan.org"]];
 }
 
