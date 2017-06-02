@@ -52,6 +52,12 @@ static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN, 0 };
 static const int PROF_HEVC_MAIN10[]  = { FF_PROFILE_HEVC_MAIN,
                                          FF_PROFILE_HEVC_MAIN_10, 0 };
 
+#include <winapifamily.h>
+#if defined(WINAPI_FAMILY)
+# undef WINAPI_FAMILY
+#endif
+#define WINAPI_FAMILY WINAPI_PARTITION_DESKTOP
+
 #include <d3d9.h>
 #include <dxva2api.h>
 
