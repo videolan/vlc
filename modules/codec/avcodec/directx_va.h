@@ -42,11 +42,7 @@
 #include <unknwn.h>
 #include <stdatomic.h>
 
-/* */
-struct vlc_va_surface_t {
-    atomic_uintptr_t     refcount;
-    D3D_DecoderSurface *decoderSurface;
-};
+#include "va_surface_internal.h"
 
 typedef struct input_list_t {
     void (*pf_release)(struct input_list_t *);
@@ -57,9 +53,7 @@ typedef struct input_list_t {
 #define MAX_SURFACE_COUNT (64)
 typedef struct
 {
-    int          codec_id;
-    int          width;
-    int          height;
+    va_pool_t             va_pool;
 
     /* DLL */
     HINSTANCE             hdecoder_dll;
@@ -75,28 +69,6 @@ typedef struct
     /* Video decoder */
     D3D_DecoderType        *decoder;
 
-    /* */
-    unsigned     surface_count;
-    int          surface_width;
-    int          surface_height;
-
-    vlc_va_surface_t     *surface[MAX_SURFACE_COUNT];
-    D3D_DecoderSurface  *hw_surface[MAX_SURFACE_COUNT];
-
-    /**
-     * Check that the decoder device is still available
-     */
-    int (*pf_check_device)(vlc_va_t *);
-
-    int (*pf_create_device)(vlc_va_t *);
-    void (*pf_destroy_device)(vlc_va_t *);
-
-    int (*pf_create_device_manager)(vlc_va_t *);
-    void (*pf_destroy_device_manager)(vlc_va_t *);
-
-    int (*pf_create_video_service)(vlc_va_t *);
-    void (*pf_destroy_video_service)(vlc_va_t *);
-
     /**
      * Read the list of possible input GUIDs
      */
@@ -107,29 +79,11 @@ typedef struct
      */
     int (*pf_setup_output)(vlc_va_t *, const GUID *input, const video_format_t *fmt);
 
-    /**
-     * Create the DirectX surfaces in hw_surface and the decoder in decoder
-     */
-    int (*pf_create_decoder_surfaces)(vlc_va_t *, int codec_id,
-                                      const video_format_t *fmt,
-                                      unsigned surface_count);
-    /**
-     * Destroy resources allocated with the surfaces and the associated decoder
-     */
-    void (*pf_destroy_surfaces)(vlc_va_t *);
-    /**
-     * Set the avcodec hw context after the decoder is created
-     */
-    void (*pf_setup_avcodec_ctx)(vlc_va_t *);
-
 } directx_sys_t;
 
 int directx_va_Open(vlc_va_t *, directx_sys_t *, AVCodecContext *ctx, const es_format_t *fmt, bool b_dll);
 void directx_va_Close(vlc_va_t *, directx_sys_t *);
 int directx_va_Setup(vlc_va_t *, directx_sys_t *, AVCodecContext *avctx);
-vlc_va_surface_t *directx_va_Get(vlc_va_t *, directx_sys_t *);
-void directx_va_AddRef(vlc_va_surface_t *surface);
-void directx_va_Release(vlc_va_surface_t *surface);
 char *directx_va_GetDecoderName(const GUID *guid);
 
 #endif /* AVCODEC_DIRECTX_VA_H */
