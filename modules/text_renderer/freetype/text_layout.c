@@ -1340,6 +1340,13 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         i_total_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
     }
 
+    if( i_total_width == 0 )
+    {
+        for( int i=0; i < p_paragraph->i_size; ++i )
+            ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+        return VLC_SUCCESS;
+    }
+
     int i_line_count = i_total_width / i_max_width + 1;
     i_preferred_width = i_total_width / i_line_count;
 
