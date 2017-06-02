@@ -1345,6 +1345,8 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
     for( int i = 0; i <= p_paragraph->i_size; ++i )
     {
+        const run_desc_t *p_run = &p_paragraph->p_runs[p_paragraph->pi_run_ids[i]];
+
         if( i == p_paragraph->i_size )
         {
             if( i_line_start < i )
@@ -1386,7 +1388,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
         i_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
 
-        if( i_last_space_width >= i_preferred_width
+        if( ( i_last_space_width >= i_preferred_width && p_run->p_style->e_wrapinfo == STYLE_WRAP_DEFAULT )
          || i_width >= i_max_width )
         {
             if( i_line_start == i )
@@ -1405,6 +1407,15 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             if( LayoutLine( p_filter, p_paragraph, i_line_start,
                             i_end_offset, pp_line, b_grid ) )
                 goto error;
+
+            /* Handle early end of renderable content;
+               We're over size and we can't break space */
+            if( p_run->p_style->e_wrapinfo == STYLE_WRAP_NONE )
+            {
+                for( ; i < p_paragraph->i_size; ++i )
+                    ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+                break;
+            }
 
             pp_line = &( *pp_line )->p_next;
             i_line_start = i_end_offset;
