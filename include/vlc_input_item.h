@@ -174,18 +174,6 @@ VLC_API void input_item_CopyOptions( input_item_t *p_child, input_item_t *p_pare
 VLC_API void input_item_SetName( input_item_t *p_item, const char *psz_name );
 
 /**
- * Add one subitem to this item
- *
- * This won't hold the item, but can tell to interested third parties
- * Like the playlist, that there is a new sub item. With this design
- * It is not the input item's responsibility to keep all the ref of
- * the input item children.
- *
- * Sends a vlc_InputItemSubItemTreeAdded event
- */
-VLC_API void input_item_PostSubItem( input_item_t *p_parent, input_item_t *p_child );
-
-/**
  * Start adding multiple subitems.
  *
  * Create a root node to hold a tree of subitems for given item
