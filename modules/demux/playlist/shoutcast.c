@@ -38,7 +38,7 @@
 #include <vlc_strings.h>
 
 /* duplicate from modules/services_discovery/shout.c */
-#define SHOUTCAST_BASE_URL "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml"
+#define SHOUTCAST_BASE_URL "http://www.shoutcast.com/sbin/newxml.phtml"
 #define SHOUTCAST_TUNEIN_BASE_URL "http://www.shoutcast.com"
 #define SHOUTCAST_TV_TUNEIN_URL "http://www.shoutcast.com/sbin/tunein-tvstation.pls?id="
 
@@ -173,6 +173,7 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         vlc_xml_decode( psz_mrl );
                         p_input = input_item_New( psz_mrl, psz_name );
                         input_item_CopyOptions( p_input, p_input_node->p_item );
+                        input_item_AddOption( p_input, "demux=shout-winamp", VLC_INPUT_OPTION_TRUSTED );
                         free( psz_mrl );
                         input_item_node_AppendItem( p_input_node, p_input );
                         input_item_Release( p_input );
