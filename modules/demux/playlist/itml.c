@@ -39,11 +39,6 @@
 #include "itml.h"
 #include "playlist.h"
 
-struct demux_sys_t
-{
-    int i_ntracks;
-};
-
 static int Demux( demux_t * );
 
 /**
@@ -56,23 +51,19 @@ int Import_iTML( vlc_object_t *p_this )
     if( !demux_IsPathExtension( p_demux, ".xml" )
      && !demux_IsForced( p_demux, "itml" ) )
         return VLC_EGENERIC; \
-    STANDARD_DEMUX_INIT_MSG( "using iTunes Media Library reader" );
 
     const uint8_t *p_peek;
     const ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 128 );
     if ( i_peek < 32 ||
          !strnstr( (const char *) p_peek, "<!DOCTYPE plist ", i_peek ) )
-    {
-        Close_iTML( p_this );
         return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
 
-void Close_iTML( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    free( p_demux->p_sys );
+    msg_Dbg( p_demux, "using iTunes Media Library reader" );
+
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+
+    return VLC_SUCCESS;
 }
 
 /**
@@ -84,7 +75,8 @@ int Demux( demux_t *p_demux )
     const char *node;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
-    p_demux->p_sys->i_ntracks = 0;
+
+    p_demux->p_sys = (void *)(uintptr_t)0;
 
     /* create new xml parser from stream */
     p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
@@ -292,8 +284,8 @@ static bool parse_tracks_dict( demux_t *p_demux, input_item_node_t *p_input_node
     parse_dict( p_demux, p_input_node, NULL, p_xml_reader,
                 "dict", tracks_elements );
 
-    msg_Info( p_demux, "added %i tracks successfully",
-              p_demux->p_sys->i_ntracks );
+    msg_Info( p_demux, "added %zi tracks successfully",
+              (size_t)p_demux->p_sys );
 
     return true;
 }
@@ -340,7 +332,7 @@ static bool parse_track_dict( demux_t *p_demux, input_item_node_t *p_input_node,
     add_meta( p_new_input, p_track );
     input_item_Release( p_new_input );
 
-    p_demux->p_sys->i_ntracks++;
+    p_demux->p_sys = (void *)((uintptr_t)p_demux->p_sys + 1);
 
     free_track( p_track );
     return i_ret;
