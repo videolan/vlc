@@ -63,9 +63,6 @@ void Close_GVP ( vlc_object_t * );
 int Import_IFO ( vlc_object_t * );
 void Close_IFO ( vlc_object_t * );
 
-int Import_VideoPortal ( vlc_object_t * );
-void Close_VideoPortal ( vlc_object_t * );
-
 int Import_iTML ( vlc_object_t * );
 
 int Import_WPL ( vlc_object_t * );
