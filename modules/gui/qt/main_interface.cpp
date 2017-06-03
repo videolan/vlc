@@ -733,8 +733,16 @@ void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
         showVideo();
 
         /* Ask videoWidget to resize correctly, if we are in normal mode */
-        if( b_autoresize )
+        if( b_autoresize ) {
+#if HAS_QT56
+            qreal factor = videoWidget->devicePixelRatioF();
+
+            i_width = qRound( (qreal) i_width / factor );
+            i_height = qRound( (qreal) i_height / factor );
+#endif
+
             videoWidget->setSize( i_width, i_height );
+        }
     }
 }
 
