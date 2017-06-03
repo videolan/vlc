@@ -188,7 +188,7 @@ int Import_SGIMB( vlc_object_t * p_this )
  *****************************************************************************/
 void Close_SGIMB( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t*)p_this;
+    stream_t *p_demux = (stream_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
     free( p_sys->psz_uri );
     free( p_sys->psz_server );
