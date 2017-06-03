@@ -132,45 +132,6 @@ vlc_module_begin ()
         set_callbacks( Import_WPL, Close_WPL )
 vlc_module_end ()
 
-int Control(demux_t *demux, int query, va_list args)
-{
-    (void) demux;
-    switch( query )
-    {
-        case DEMUX_IS_PLAYLIST:
-        {
-            bool *pb_bool = va_arg( args, bool * );
-            *pb_bool = true;
-            return VLC_SUCCESS;
-        }
-        case DEMUX_GET_META:
-        {
-            return vlc_stream_vaControl(demux->s, STREAM_GET_META, args);
-        }
-        case DEMUX_HAS_UNSUPPORTED_META:
-        {
-            *(va_arg( args, bool * )) = false;
-            return VLC_SUCCESS;
-        }
-    }
-    return VLC_EGENERIC;
-}
-
-/**
- * Computes the base URL.
- *
- * Rebuilds the base URL for the playlist.
- */
-char *(FindPrefix)(demux_t *p_demux)
-{
-    char *url;
-
-    if (unlikely(asprintf(&url, "%s://%s", p_demux->psz_access,
-                          p_demux->psz_location) == -1))
-        url = NULL;
-    return url;
-}
-
 /**
  * Resolves a playlist location.
  *
