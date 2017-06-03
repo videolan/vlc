@@ -25,11 +25,6 @@
 
 char *ProcessMRL( const char *, const char * );
 
-int Import_Old ( vlc_object_t * );
-
-int Import_Native ( vlc_object_t * );
-void Close_Native ( vlc_object_t * );
-
 int Import_M3U ( vlc_object_t * );
 
 int Import_RAM ( vlc_object_t * );
@@ -61,8 +56,6 @@ int Import_iTML ( vlc_object_t * );
 
 int Import_WPL ( vlc_object_t * );
 void Close_WPL ( vlc_object_t * );
-
-int Import_Dir ( vlc_object_t * );
 
 #define GetCurrentItem(obj) input_GetItem((obj)->p_input)
 #define GetSource(obj) ((obj)->p_source)
