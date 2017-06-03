@@ -486,7 +486,6 @@ modules/demux/ogg.c
 modules/demux/playlist/asx.c
 modules/demux/playlist/b4s.c
 modules/demux/playlist/dvb.c
-modules/demux/playlist/gvp.c
 modules/demux/playlist/ifo.c
 modules/demux/playlist/itml.c
 modules/demux/playlist/itml.h

@@ -222,7 +222,6 @@ libplaylist_plugin_la_SOURCES = \
 	demux/playlist/asx.c \
 	demux/playlist/b4s.c \
 	demux/playlist/dvb.c \
-	demux/playlist/gvp.c \
 	demux/playlist/ifo.c \
 	demux/playlist/itml.c \
 	demux/playlist/itml.h \

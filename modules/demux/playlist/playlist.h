@@ -57,9 +57,6 @@ void Close_SGIMB ( vlc_object_t * );
 
 int Import_QTL ( vlc_object_t * );
 
-int Import_GVP ( vlc_object_t * );
-void Close_GVP ( vlc_object_t * );
-
 int Import_IFO ( vlc_object_t * );
 void Close_IFO ( vlc_object_t * );
 
