@@ -870,7 +870,10 @@ static int Open( vlc_object_t * p_this )
             }
             free( psz_ref );
         }
-        input_item_node_PostAndDelete( p_subitems );
+
+        /* FIXME: create a stream_filter sub-module for this */
+        if (es_out_Control(p_demux->out, ES_OUT_POST_SUBNODE, p_subitems))
+            input_item_node_Delete(p_subitems);
     }
 
     if( !(p_mvhd = MP4_BoxGet( p_sys->p_root, "/moov/mvhd" ) ) )
