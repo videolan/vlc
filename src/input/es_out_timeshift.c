@@ -723,6 +723,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
             return VLC_EGENERIC;
         /* fall through */
     case ES_OUT_GET_GROUP_FORCED:
+    case ES_OUT_POST_SUBNODE:
         return es_out_vaControl( p_sys->p_out, i_query, args );
 
     case ES_OUT_MODIFY_PCR_SYSTEM:

@@ -2765,6 +2765,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         return VLC_SUCCESS;
     }
 
+    case ES_OUT_POST_SUBNODE:
+    {
+        input_item_node_t *node = va_arg(args, input_item_node_t *);
+        input_item_node_PostAndDelete(node);
+        return VLC_SUCCESS;
+    }
+
     default:
         msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
         return VLC_EGENERIC;

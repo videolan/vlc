@@ -94,6 +94,8 @@ enum es_out_query_e
     ES_OUT_GET_PCR_SYSTEM, /* arg1=mtime_t *, arg2=mtime_t * res=can fail */
     ES_OUT_MODIFY_PCR_SYSTEM, /* arg1=int is_absolute, arg2=mtime_t, res=can fail */
 
+    ES_OUT_POST_SUBNODE, /* arg1=input_item_node_t *, res=can fail */
+
     /* First value usable for private control */
     ES_OUT_PRIVATE_START = 0x10000,
 };
