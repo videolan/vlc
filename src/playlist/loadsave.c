@@ -151,7 +151,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
         return VLC_EGENERIC;
     }
 
-    char *psz_uri = vlc_path2uri( psz_file, "file/xspf-open" );
+    char *psz_uri = vlc_path2uri( psz_file, "file/directory" );
     free( psz_file );
     if( psz_uri == NULL )
         return VLC_ENOMEM;

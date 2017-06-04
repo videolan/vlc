@@ -128,7 +128,7 @@ static int ReadDir(stream_t *p_demux, input_item_node_t *p_subitems)
     sys->pp_tracklist = NULL;
     sys->i_tracklist_entries = 0;
     sys->i_track_id = -1;
-    sys->psz_base = strdup(p_demux->psz_filepath);
+    sys->psz_base = strdup(p_demux->psz_url);
 
     /* create new xml parser from stream */
     p_xml_reader = xml_ReaderCreate(p_demux, p_demux->p_source);
