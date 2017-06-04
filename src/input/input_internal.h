@@ -275,4 +275,7 @@ void input_SplitMRL( const char **, const char **, const char **,
 void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
                                           const vlc_meta_t *p_meta );
 
+/* item.c */
+void input_item_node_PostAndDelete( input_item_node_t *p_node );
+
 #endif

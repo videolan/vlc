@@ -202,18 +202,6 @@ void input_item_node_RemoveNode( input_item_node_t *parent,
 VLC_API void input_item_node_Delete( input_item_node_t *p_node );
 
 /**
- * End adding multiple subitems.
- *
- * Sends a vlc_InputItemSubItemTreeAdded event to notify that the item pointed to
- * by the given root node has created new subitems that are pointed to by all the
- * children of the node.
- *
- * In the end deletes the node and all its children nodes.
- */
-VLC_API void input_item_node_PostAndDelete( input_item_node_t *p_node );
-
-
-/**
  * Option flags
  */
 enum input_item_option_e
