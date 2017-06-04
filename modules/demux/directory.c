@@ -42,7 +42,9 @@ static int Demux( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    input_item_node_PostAndDelete( p_node );
+    if (es_out_Control(p_demux->out, ES_OUT_POST_SUBNODE, p_node))
+        input_item_node_Delete(p_node);
+
     return VLC_SUCCESS;
 }
 
