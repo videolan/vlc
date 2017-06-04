@@ -1329,7 +1329,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
     FT_Pos i_total_width = 0;
     FT_Pos i_last_space_width = 0;
     int i_last_space = -1;
-    line_desc_t *p_first_line = 0;
+    line_desc_t *p_first_line = NULL;
     line_desc_t **pp_line = &p_first_line;
 
     for( int i = 0; i < p_paragraph->i_size; ++i )
@@ -1400,9 +1400,12 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         {
             if( i_line_start == i )
             {
-                msg_Err( p_filter,
-                         "LayoutParagraph(): Width of single glyph exceeds maximum" );
-                goto error;
+                /* If wrapping, algorithm would not end shifting lines down.
+                 *  Not wrapping, that can't be rendered anymore. */
+                msg_Dbg( p_filter, "LayoutParagraph(): First glyph width in line exceeds maximum, skipping" );
+                for( ; i < p_paragraph->i_size; ++i )
+                    ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+                return VLC_SUCCESS;
             }
 
             int i_end_offset;
