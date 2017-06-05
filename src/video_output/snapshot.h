@@ -30,9 +30,9 @@ typedef struct {
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
-	bool        is_available;
-	int         request_count;
-	picture_t   *picture;
+    bool        is_available;
+    int         request_count;
+    picture_t   *picture;
 
 } vout_snapshot_t;
 
