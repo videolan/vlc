@@ -65,7 +65,7 @@ static picture_context_t *SurfaceCopy(picture_context_t *ctx)
         return NULL;
 
     fnew->context.destroy = SurfaceDestroy;
-    fnew->copy = SurfaceCopy;
+    fnew->context.copy = SurfaceCopy;
     fnew->frame = frame;
     fnew->structure = fold->structure;
     fnew->procamp = fold->procamp;
@@ -98,7 +98,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
     }
 
     field->context.destroy = SurfaceDestroy;
-    field->copy = SurfaceCopy;
+    field->context.copy = SurfaceCopy;
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
     field->procamp = procamp_default;

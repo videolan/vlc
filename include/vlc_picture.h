@@ -59,6 +59,7 @@ typedef struct plane_t
 typedef struct picture_context_t
 {
     void (*destroy)(struct picture_context_t *);
+    struct picture_context_t *(*copy)(struct picture_context_t *);
 } picture_context_t;
 
 /**

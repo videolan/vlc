@@ -274,7 +274,6 @@ typedef struct vlc_vdp_video_frame
 typedef struct vlc_vdp_video_field
 {
     picture_context_t context;
-    struct picture_context_t *(*copy)(struct picture_context_t *);
     vlc_vdp_video_frame_t *frame;
     VdpVideoMixerPictureStructure structure;
     VdpProcamp procamp;
@@ -303,6 +302,6 @@ static inline void vlc_vdp_video_destroy(vlc_vdp_video_field_t *f)
 static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
     vlc_vdp_video_field_t *fold)
 {
-    return (vlc_vdp_video_field_t *)fold->copy(&fold->context);
+    return (vlc_vdp_video_field_t *)fold->context.copy(&fold->context);
 }
 #endif
