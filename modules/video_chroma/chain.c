@@ -91,7 +91,7 @@ static picture_t *BufferNew( filter_t *p_filter )
     return filter_NewPicture( p_parent );
 }
 
-#define CHAIN_LEVEL_MAX 1
+#define CHAIN_LEVEL_MAX 2
 
 /*****************************************************************************
  * Activate: allocate a chroma function
