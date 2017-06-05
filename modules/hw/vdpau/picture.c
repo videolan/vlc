@@ -56,6 +56,23 @@ static void SurfaceDestroy(struct picture_context_t *ctx)
     free(frame);
 }
 
+vlc_vdp_video_field_t *vlc_vdp_video_copy(vlc_vdp_video_field_t *fold)
+{
+    vlc_vdp_video_frame_t *frame = fold->frame;
+    vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
+    if (unlikely(fnew == NULL))
+        return NULL;
+
+    fnew->context.destroy = SurfaceDestroy;
+    fnew->frame = frame;
+    fnew->structure = fold->structure;
+    fnew->procamp = fold->procamp;
+    fnew->sharpen = fold->sharpen;
+
+    atomic_fetch_add(&frame->refs, 1);
+    return fnew;
+}
+
 static const VdpProcamp procamp_default =
 {
     .struct_version = VDP_PROCAMP_VERSION,
@@ -104,21 +121,4 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
     assert(pic->context == NULL);
     pic->context = &field->context;
     return VDP_STATUS_OK;
-}
-
-vlc_vdp_video_field_t *vlc_vdp_video_copy(vlc_vdp_video_field_t *fold)
-{
-    vlc_vdp_video_frame_t *frame = fold->frame;
-    vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
-    if (unlikely(fnew == NULL))
-        return NULL;
-
-    fnew->context.destroy = SurfaceDestroy;
-    fnew->frame = frame;
-    fnew->structure = fold->structure;
-    fnew->procamp = fold->procamp;
-    fnew->sharpen = fold->sharpen;
-
-    atomic_fetch_add(&frame->refs, 1);
-    return fnew;
 }
