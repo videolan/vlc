@@ -766,15 +766,13 @@ static void vout_EnableFilter( vlc_object_t *p_parent, const char *psz_name,
 
             /* Remove trailing : : */
             if( *(psz_string+strlen(psz_string ) -1 ) == ':' )
-            {
                 *(psz_string+strlen(psz_string ) -1 ) = '\0';
-            }
-         }
-         else
-         {
-             free( psz_string );
-             return;
-         }
+        }
+        else
+        {
+            free( psz_string );
+            return;
+        }
     }
 
     var_SetString( p_parent, psz_filter_type, psz_string );
