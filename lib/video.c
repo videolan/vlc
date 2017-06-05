@@ -807,8 +807,9 @@ typedef const struct {
 } opt_t;
 
 static void
-set_int( libvlc_media_player_t *p_mi, const char *restrict name,
-         const opt_t *restrict opt, int value )
+set_value( libvlc_media_player_t *p_mi, const char *restrict name,
+           const opt_t *restrict opt, unsigned i_expected_type,
+           const vlc_value_t *val )
 {
     if( !opt ) return;
 
@@ -819,7 +820,7 @@ set_int( libvlc_media_player_t *p_mi, const char *restrict name,
             vout_thread_t *vout = GetVout( p_mi, 0 );
             vlc_object_t *p_parent = vout ? VLC_OBJECT( vout ) :
                                             VLC_OBJECT( p_mi );
-            vout_EnableFilter( p_parent, opt->name, value );
+            vout_EnableFilter( p_parent, opt->name, val->i_int );
             if (vout != NULL)
             {   /* Fill sub-source */
                 var_TriggerCallback( vout, "sub-source" );
@@ -828,13 +829,17 @@ set_int( libvlc_media_player_t *p_mi, const char *restrict name,
             break;
         }
         case VLC_VAR_INTEGER:
-            var_SetInteger( p_mi, opt->name, value );
-            break;
         case VLC_VAR_FLOAT:
-            var_SetFloat( p_mi, opt->name, value );
+        case VLC_VAR_STRING:
+            if( i_expected_type != opt->type )
+            {
+                libvlc_printerr( "Invalid argument to %s", name );
+                return;
+            }
+            var_SetChecked( p_mi, opt->name, opt->type, *val );
             break;
         default:
-            libvlc_printerr( "Invalid argument to %s in %s", name, "set int" );
+            libvlc_printerr( "Invalid argument to %s", name );
             return;
     }
 }
@@ -862,21 +867,6 @@ get_int( libvlc_media_player_t *p_mi, const char *restrict name,
     }
 }
 
-static void
-set_float( libvlc_media_player_t *p_mi, const char *restrict name,
-            const opt_t *restrict opt, float value )
-{
-    if( !opt ) return;
-
-    if( opt->type != VLC_VAR_FLOAT )
-    {
-        libvlc_printerr( "Invalid argument to %s in %s", name, "set float" );
-        return;
-    }
-
-    var_SetFloat( p_mi, opt->name, value );
-}
-
 static float
 get_float( libvlc_media_player_t *p_mi, const char *restrict name,
             const opt_t *restrict opt )
@@ -890,21 +880,6 @@ get_float( libvlc_media_player_t *p_mi, const char *restrict name,
     }
 
     return var_GetFloat( p_mi, opt->name );
-}
-
-static void
-set_string( libvlc_media_player_t *p_mi, const char *restrict name,
-            const opt_t *restrict opt, const char *restrict psz_value )
-{
-    if( !opt ) return;
-
-    if( opt->type != VLC_VAR_STRING )
-    {
-        libvlc_printerr( "Invalid argument to %s in %s", name, "set string" );
-        return;
-    }
-
-    var_SetString( p_mi, opt->name, psz_value );
 }
 
 static char *
@@ -970,7 +945,8 @@ char * libvlc_video_get_marquee_string( libvlc_media_player_t *p_mi,
 void libvlc_video_set_marquee_int( libvlc_media_player_t *p_mi,
                          unsigned option, int value )
 {
-    set_int( p_mi, "marq", marq_option_bynumber(option), value );
+    set_value( p_mi, "marq", marq_option_bynumber(option), VLC_VAR_INTEGER,
+               &(vlc_value_t) { .i_int = value } );
 }
 
 /*****************************************************************************
@@ -979,7 +955,8 @@ void libvlc_video_set_marquee_int( libvlc_media_player_t *p_mi,
 void libvlc_video_set_marquee_string( libvlc_media_player_t *p_mi,
                 unsigned option, const char * value )
 {
-    set_string( p_mi, "marq", marq_option_bynumber(option), value );
+    set_value( p_mi, "marq", marq_option_bynumber(option), VLC_VAR_STRING,
+               &(vlc_value_t){ .psz_string = (char *)value } );
 }
 
 
@@ -1011,14 +988,16 @@ logo_option_bynumber( unsigned option )
 void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
                                    unsigned option, const char *psz_value )
 {
-    set_string( p_mi,"logo",logo_option_bynumber(option), psz_value );
+    set_value( p_mi,"logo",logo_option_bynumber(option), VLC_VAR_STRING,
+               &(vlc_value_t){ .psz_string = (char *)psz_value } );
 }
 
 
 void libvlc_video_set_logo_int( libvlc_media_player_t *p_mi,
                                 unsigned option, int value )
 {
-    set_int( p_mi, "logo", logo_option_bynumber(option), value );
+    set_value( p_mi, "logo", logo_option_bynumber(option), VLC_VAR_INTEGER,
+               &(vlc_value_t) { .i_int = value } );
 }
 
 
@@ -1056,7 +1035,8 @@ adjust_option_bynumber( unsigned option )
 void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
                                   unsigned option, int value )
 {
-    set_int( p_mi, "adjust", adjust_option_bynumber(option), value );
+    set_value( p_mi, "adjust", adjust_option_bynumber(option), VLC_VAR_INTEGER,
+               &(vlc_value_t) { .i_int = value } );
 }
 
 
@@ -1070,7 +1050,8 @@ int libvlc_video_get_adjust_int( libvlc_media_player_t *p_mi,
 void libvlc_video_set_adjust_float( libvlc_media_player_t *p_mi,
                                     unsigned option, float value )
 {
-    set_float( p_mi, "adjust", adjust_option_bynumber(option), value );
+    set_value( p_mi, "adjust", adjust_option_bynumber(option), VLC_VAR_FLOAT,
+               &(vlc_value_t) { .f_float = value } );
 }
 
 
