@@ -274,6 +274,7 @@ typedef struct vlc_vdp_video_frame
 typedef struct vlc_vdp_video_field
 {
     picture_context_t context;
+    struct picture_context_t *(*copy)(struct picture_context_t *);
     vlc_vdp_video_frame_t *frame;
     VdpVideoMixerPictureStructure structure;
     VdpProcamp procamp;
@@ -299,5 +300,9 @@ static inline void vlc_vdp_video_destroy(vlc_vdp_video_field_t *f)
  * Performs a shallow copy of a VDPAU video surface context
  * (the underlying VDPAU video surface is shared).
  */
-vlc_vdp_video_field_t *vlc_vdp_video_copy(vlc_vdp_video_field_t *);
+static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
+    vlc_vdp_video_field_t *fold)
+{
+    return (vlc_vdp_video_field_t *)fold->copy(&fold->context);
+}
 #endif

@@ -56,21 +56,23 @@ static void SurfaceDestroy(struct picture_context_t *ctx)
     free(frame);
 }
 
-vlc_vdp_video_field_t *vlc_vdp_video_copy(vlc_vdp_video_field_t *fold)
+static picture_context_t *SurfaceCopy(picture_context_t *ctx)
 {
+    vlc_vdp_video_field_t *fold = (vlc_vdp_video_field_t *)ctx;
     vlc_vdp_video_frame_t *frame = fold->frame;
     vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
     if (unlikely(fnew == NULL))
         return NULL;
 
     fnew->context.destroy = SurfaceDestroy;
+    fnew->copy = SurfaceCopy;
     fnew->frame = frame;
     fnew->structure = fold->structure;
     fnew->procamp = fold->procamp;
     fnew->sharpen = fold->sharpen;
 
     atomic_fetch_add(&frame->refs, 1);
-    return fnew;
+    return &fnew->context;
 }
 
 static const VdpProcamp procamp_default =
@@ -96,6 +98,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
     }
 
     field->context.destroy = SurfaceDestroy;
+    field->copy = SurfaceCopy;
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
     field->procamp = procamp_default;
