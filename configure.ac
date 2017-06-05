@@ -1284,7 +1284,7 @@ asm volatile("xorps %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
     ])
   ])
 
-  AS_IF([test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"], [
+  AS_IF([test "${ac_cv_sse_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE, 1, [Define to 1 if SSE inline assembly is available.])
   ])
 
@@ -1299,7 +1299,7 @@ asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
       ac_cv_sse2_inline=no
     ])
   ])
-  AS_IF([test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"], [
+  AS_IF([test "${ac_cv_sse2_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE2, 1, [Define to 1 if SSE2 inline assembly is available.])
     have_sse2="yes"
   ])
