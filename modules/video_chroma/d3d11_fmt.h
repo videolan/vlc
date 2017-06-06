@@ -29,6 +29,8 @@
 
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
+typedef struct vlc_va_surface_t vlc_va_surface_t;
+
 /* owned by the vout for VLC_CODEC_D3D11_OPAQUE */
 struct picture_sys_t
 {
@@ -43,7 +45,7 @@ struct picture_sys_t
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
     DXGI_FORMAT                   decoderFormat;
     DXGI_FORMAT                   formatTexture;
-    void                          *va_surface;
+    vlc_va_surface_t              *va_surface;
 };
 
 /* index to use for texture/resource that use a known DXGI format

@@ -43,11 +43,11 @@
 #include <stdatomic.h>
 
 /* */
-typedef struct {
+struct vlc_va_surface_t {
     atomic_uintptr_t     refcount;
     picture_t          *p_pic;
     D3D_DecoderSurface *decoderSurface;
-} vlc_va_surface_t;
+};
 
 typedef struct input_list_t {
     void (*pf_release)(struct input_list_t *);
