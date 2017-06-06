@@ -357,7 +357,6 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
             return VLC_ENOMEM;
         }
         atomic_init(&surface->refcount, 1);
-        surface->p_pic = dx_sys->pf_alloc_surface_pic(va, &fmt, i);
         dx_sys->surface[i] = surface;
     }
 
@@ -372,12 +371,8 @@ void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
     dx_sys->pf_destroy_surfaces(va);
 
     for (int i = 0; i < dx_sys->surface_count; i++)
-        IUnknown_Release( dx_sys->hw_surface[i] );
-
-    for (int i = 0; i < dx_sys->surface_count; i++)
     {
-        if (dx_sys->surface[i]->p_pic)
-            picture_Release(dx_sys->surface[i]->p_pic);
+        IUnknown_Release( dx_sys->hw_surface[i] );
         directx_va_Release(dx_sys->surface[i]);
     }
 

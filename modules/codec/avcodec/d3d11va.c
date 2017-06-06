@@ -150,8 +150,6 @@ static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id, const video_format_
 static void DxDestroySurfaces(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
 
-static picture_t *DxAllocPicture(vlc_va_t *, const video_format_t *, unsigned index);
-
 /* */
 static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
 {
@@ -394,7 +392,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->pf_setup_avcodec_ctx       = SetupAVCodecContext;
     dx_sys->pf_get_input_list          = DxGetInputList;
     dx_sys->pf_setup_output            = DxSetupOutput;
-    dx_sys->pf_alloc_surface_pic       = DxAllocPicture;
     dx_sys->psz_decoder_dll            = TEXT("D3D11.DLL");
 
     va->sys = sys;
@@ -1005,41 +1002,3 @@ static void DxDestroySurfaces(vlc_va_t *va)
         }
     }
 }
-
-static void DestroyPicture(picture_t *picture)
-{
-    picture_sys_t *p_sys = picture->p_sys;
-    ReleasePictureSys(p_sys);
-    free(p_sys);
-    free(picture);
-}
-
-static picture_t *DxAllocPicture(vlc_va_t *va, const video_format_t *fmt, unsigned index)
-{
-    vlc_va_sys_t *sys = va->sys;
-    if (sys->b_extern_pool)
-        return sys->extern_pics[index];
-
-    video_format_t src_fmt = *fmt;
-    src_fmt.i_chroma = sys->i_chroma;
-    picture_sys_t *pic_sys = calloc(1, sizeof(*pic_sys));
-    if (unlikely(pic_sys == NULL))
-        return NULL;
-
-    pic_sys->decoder = sys->dx_sys.hw_surface[index];
-    ID3D11VideoDecoderOutputView_GetResource(pic_sys->decoder, &pic_sys->resource[KNOWN_DXGI_INDEX]);
-    pic_sys->context  = sys->d3dctx;
-
-    picture_resource_t res = {
-        .p_sys      = pic_sys,
-        .pf_destroy = DestroyPicture,
-    };
-    picture_t *pic = picture_NewFromResource(&src_fmt, &res);
-    if (unlikely(pic == NULL))
-    {
-        free(pic_sys);
-        return NULL;
-    }
-    return pic;
-}
-

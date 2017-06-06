@@ -45,7 +45,6 @@
 /* */
 struct vlc_va_surface_t {
     atomic_uintptr_t     refcount;
-    picture_t          *p_pic;
     D3D_DecoderSurface *decoderSurface;
 };
 
@@ -121,12 +120,6 @@ typedef struct
      * Set the avcodec hw context after the decoder is created
      */
     void (*pf_setup_avcodec_ctx)(vlc_va_t *);
-    /**
-     * @brief pf_alloc_surface_pic
-     * @param fmt
-     * @return
-     */
-    picture_t *(*pf_alloc_surface_pic)(vlc_va_t *, const video_format_t *, unsigned);
 
 } directx_sys_t;
 
