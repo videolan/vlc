@@ -42,14 +42,14 @@ cfdict_set_int32(CFMutableDictionaryRef dict, CFStringRef key, int value)
 
 struct cvpxpic_ctx
 {
-    void (*pf_destroy)(void *); /* must be first @ref picture_Release() */
+    picture_context_t s;
     CVPixelBufferRef cvpx;
 };
 
 static void
-cvpxpic_destroy_cb(void *opaque)
+cvpxpic_destroy_cb(picture_context_t *opaque)
 {
-    struct cvpxpic_ctx *ctx = opaque;
+    struct cvpxpic_ctx *ctx = (struct cvpxpic_ctx *)opaque;
 
     CFRelease(ctx->cvpx);
     free(opaque);
@@ -65,9 +65,9 @@ cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx)
         picture_Release(p_pic);
         return VLC_ENOMEM;
     }
-    ctx->pf_destroy = cvpxpic_destroy_cb;
+    ctx->s.destroy = cvpxpic_destroy_cb;
     ctx->cvpx = CVPixelBufferRetain(cvpx);
-    p_pic->context = ctx;
+    p_pic->context = &ctx->s;
 
     return VLC_SUCCESS;
 }
