@@ -53,4 +53,15 @@ void CopyFromI420ToNv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
 void CopyFromI420_10ToP010(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
                         unsigned height, copy_cache_t *cache);
 
+/**
+ * This functions sets the internal plane pointers/dimensions for the given
+ * buffer.
+ * This is useful when mapping opaque surfaces into CPU planes.
+ *
+ * picture is the picture to update
+ * data is the buffer pointer to use as the start of data for all the planes
+ * pitch is the internal line pitch for the buffer
+ */
+int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch);
+
 #endif
