@@ -55,6 +55,18 @@ cvpxpic_destroy_cb(picture_context_t *opaque)
     free(opaque);
 }
 
+static picture_context_t *
+cvpxpic_copy_cb(struct picture_context_t *opaque)
+{
+    struct cvpxpic_ctx *src_ctx = (struct cvpxpic_ctx *)opaque;
+    struct cvpxpic_ctx *dst_ctx = malloc(sizeof(struct cvpxpic_ctx));
+    if (dst_ctx == NULL)
+        return NULL;
+    *dst_ctx = *src_ctx;
+    dst_ctx->cvpx = CVPixelBufferRetain(dst_ctx->cvpx);
+    return &dst_ctx->s;
+}
+
 int
 cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx)
 {
@@ -66,6 +78,7 @@ cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx)
         return VLC_ENOMEM;
     }
     ctx->s.destroy = cvpxpic_destroy_cb;
+    ctx->s.copy = cvpxpic_copy_cb;
     ctx->cvpx = CVPixelBufferRetain(cvpx);
     p_pic->context = &ctx->s;
 
