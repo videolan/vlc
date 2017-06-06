@@ -135,10 +135,11 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
     else
         i_ret = pf_build( p_filter );
 
+    var_Destroy( p_filter, MODULE_STRING "-level" );
+
     if( i_ret )
     {
         /* Hum ... looks like this really isn't going to work. Too bad. */
-        var_Destroy( p_filter, MODULE_STRING "-level" );
         filter_chain_Delete( p_sys->p_chain );
         free( p_sys );
         return VLC_EGENERIC;
@@ -182,7 +183,6 @@ static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
-    var_Destroy( p_filter, MODULE_STRING "-level" );
     filter_chain_Delete( p_filter->p_sys->p_chain );
     free( p_filter->p_sys );
 }
@@ -280,7 +280,6 @@ static int BuildChromaChain( filter_t *p_filter )
             break;
     }
 
-    var_Destroy( p_filter, MODULE_STRING "-level" );
     return i_ret;
 }
 
@@ -333,7 +332,6 @@ static int BuildFilterChain( filter_t *p_filter )
     else
         filter_chain_Reset( p_filter->p_sys->p_chain, &p_filter->fmt_in, &p_filter->fmt_out );
 
-    var_Destroy( p_filter, MODULE_STRING "-level" );
     return i_ret;
 }
 
