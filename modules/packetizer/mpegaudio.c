@@ -97,7 +97,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty( &p_sys->bytestream );
     p_sys->b_discontinuity = true;
@@ -110,12 +110,16 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
+    if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate ||
+        date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
     {
         msg_Dbg( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
                   p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
 
-        date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
+        if( p_sys->end_date.i_divider_num == 0 )
+            date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
+        else
+            date_Change( &p_sys->end_date, p_sys->i_rate, 1 );
         date_Set( &p_sys->end_date, p_sys->i_pts );
     }
 
@@ -619,7 +623,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
-    date_Set( &p_sys->end_date, 0 );
+    date_Init( &p_sys->end_date, 1, 1 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     block_BytestreamInit( &p_sys->bytestream );
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_discontinuity = false;
