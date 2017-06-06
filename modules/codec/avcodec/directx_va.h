@@ -45,7 +45,6 @@
 /* */
 typedef struct {
     atomic_uintptr_t     refcount;
-    unsigned int       order;
     vlc_mutex_t        *p_lock;
     picture_t          *p_pic;
     D3D_DecoderSurface *decoderSurface;
@@ -80,7 +79,6 @@ typedef struct
 
     /* */
     int          surface_count;
-    int          surface_order;
     int          surface_width;
     int          surface_height;
 

@@ -356,7 +356,6 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
             return VLC_ENOMEM;
         }
         atomic_init(&surface->refcount, 1);
-        surface->order = 0;
         surface->p_lock = &dx_sys->surface_lock;
         surface->p_pic = dx_sys->pf_alloc_surface_pic(va, &fmt, i);
         dx_sys->surface[i] = surface;
@@ -389,57 +388,50 @@ void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
     dx_sys->surface_count = 0;
 }
 
-/* FIXME it is nearly common with VAAPI */
+static vlc_va_surface_t *GetSurface(directx_sys_t *dx_sys)
+{
+    for (int i = 0; i < dx_sys->surface_count; i++) {
+        vlc_va_surface_t *surface = dx_sys->surface[i];
+        uintptr_t expected = 1;
+
+        if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
+        {
+            /* TODO do a copy to allow releasing locally and keep forward alive atomic_fetch_sub(&surface->refs, 1);*/
+            surface->decoderSurface = dx_sys->hw_surface[i];
+            return surface;
+        }
+    }
+    return NULL;
+}
+
 vlc_va_surface_t *directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys)
 {
     /* Check the device */
     if (dx_sys->pf_check_device(va)!=VLC_SUCCESS)
         return NULL;
 
-    vlc_mutex_lock( &dx_sys->surface_lock );
+    unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
+    vlc_va_surface_t *field;
 
-    /* Grab the oldest unused surface, in case none are, use the oldest used one
-     * XXX using the used one is a workaround in case a problem happens with libavcodec */
-    int i, old = -1, old_used = -1;
-
-    for (i = 0; i < dx_sys->surface_count; i++) {
-        vlc_va_surface_t *surface = dx_sys->surface[i];
-        if (((old == -1 || surface->order < dx_sys->surface[old]->order)) && atomic_load(&surface->refcount))
-            old = i;
-        if (old_used == -1 || surface->order < dx_sys->surface[old_used]->order)
-            old_used = i;
-    }
-    if (old >= 0)
-        i = old;
-    else if (old_used >= 0)
+    while ((field = GetSurface(dx_sys)) == NULL)
     {
-        msg_Warn(va, "couldn't find a free decoding buffer, using index %d", old_used);
-        i = old_used;
+        if (--tries == 0)
+            return NULL;
+        /* Pool empty. Wait for some time as in src/input/decoder.c.
+         * XXX: Both this and the core should use a semaphore or a CV. */
+        msleep(VOUT_OUTMEM_SLEEP);
     }
-
-    vlc_va_surface_t *surface = dx_sys->surface[i];
-
-    atomic_store(&surface->refcount,1);
-    surface->order = ++dx_sys->surface_order;
-    surface->decoderSurface = dx_sys->hw_surface[i];
-
-    vlc_mutex_unlock( &dx_sys->surface_lock );
-
-    return surface;
+    return field;
 }
 
 void directx_va_AddRef(vlc_va_surface_t *surface)
 {
-    vlc_mutex_lock( surface->p_lock );
     atomic_fetch_add(&surface->refcount, 1);
-    vlc_mutex_unlock( surface->p_lock );
 }
 
 void directx_va_Release(vlc_va_surface_t *surface)
 {
-    vlc_mutex_lock( surface->p_lock );
     atomic_fetch_sub(&surface->refcount, 1);
-    vlc_mutex_unlock( surface->p_lock );
 }
 
 void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
