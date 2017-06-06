@@ -1311,8 +1311,8 @@ static inline void ReleaseGlyphBitMaps(glyph_bitmaps_t *p_bitmaps)
 }
 
 static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
-                            int i_max_pixel_width, line_desc_t **pp_lines,
-                            bool b_grid )
+                            unsigned i_max_width, unsigned i_max_advance_x,
+                            line_desc_t **pp_lines, bool b_grid )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0 )
     {
@@ -1322,9 +1322,21 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         return VLC_EGENERIC;
     }
 
+    /*
+     * Check max line width to allow for outline and shadow glyphs,
+     * and any extra width caused by visual reordering
+     */
+    if( i_max_width <= i_max_advance_x )
+    {
+        msg_Err( p_filter, "LayoutParagraph(): Invalid max width" );
+        return VLC_EGENERIC;
+    }
+
+    i_max_width <<= 6;
+    i_max_advance_x <<= 6;
+
     int i_line_start = 0;
     FT_Pos i_width = 0;
-    FT_Pos i_max_width = i_max_pixel_width << 6;
     FT_Pos i_preferred_width = 0;
     FT_Pos i_total_width = 0;
     FT_Pos i_last_space_width = 0;
@@ -1347,7 +1359,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         return VLC_SUCCESS;
     }
 
-    int i_line_count = i_total_width / i_max_width + 1;
+    int i_line_count = i_total_width / (i_max_width - i_max_advance_x) + 1;
     i_preferred_width = i_total_width / i_line_count;
 
     for( int i = 0; i <= p_paragraph->i_size; ++i )
@@ -1509,18 +1521,8 @@ int LayoutText( filter_t *p_filter,
                 goto error;
 #endif
 
-            /*
-             * Check max line width to allow for outline and shadow glyphs,
-             * and any extra width caused by visual reordering
-             */
-            if( i_max_width <= i_max_advance_x )
-            {
-                msg_Err( p_filter, "LayoutText(): Invalid max width" );
-                goto error;
-            }
-
             if( LayoutParagraph( p_filter, p_paragraph,
-                                 i_max_width - i_max_advance_x, pp_line, b_grid ) )
+                                 i_max_width, i_max_advance_x, pp_line, b_grid ) )
                 goto error;
 
             FreeParagraph( p_paragraph );
