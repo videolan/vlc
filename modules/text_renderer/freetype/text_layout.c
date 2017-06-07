@@ -1364,8 +1364,6 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
     for( int i = 0; i <= p_paragraph->i_size; ++i )
     {
-        const run_desc_t *p_run = &p_paragraph->p_runs[p_paragraph->pi_run_ids[i]];
-
         if( i == p_paragraph->i_size )
         {
             if( i_line_start < i )
@@ -1404,6 +1402,8 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             i_last_space = i;
             i_last_space_width = i_width;
         }
+
+        const run_desc_t *p_run = &p_paragraph->p_runs[p_paragraph->pi_run_ids[i]];
 
         i_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
 
