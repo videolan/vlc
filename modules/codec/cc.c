@@ -1259,3 +1259,255 @@ static eia608_status_t Eia608Parse( eia608_t *h, int i_channel_selected, const u
     }
     return i_screen_status;
 }
+
+
+
+
+
+//Based on the Eia708 Wikipedia page
+//For SetPenAttributes function, Code is based on CCExtractor code
+
+enum eia708_Caption_Commands{
+    ETX = 0x03,  //EndOfText
+    CW0 = 0x80,  //SetCurrentWindow0–7
+    CW1 = 0x81,
+    CW2 = 0x82,
+    CW3 = 0x83,
+    CW4 = 0x84,
+    CW5 = 0x85,
+    CW6 = 0x86,
+    CW7 = 0x87,
+    CLW = 0x88,  //ClearWindows
+    DSW = 0x89,  //DisplayWindows
+    HDW = 0x8A,  //HideWindows
+    TGW = 0x8B,  //ToggleWindows
+    DLW = 0x8C,  //DeleteWindows
+    DLY = 0x8D,  //Delay
+    DLC = 0x8E,  //DelayCancel
+    RST = 0x8F,  //Reset    
+    SPA = 0x90,  //SetPenAttributes
+    SPC = 0x91,  //SetPenColor 
+    SPL = 0x92,  //SetPenLocation 
+    SWA = 0x97,
+    DF0 = 0x98,  //DefineWindow0–7
+    DF1 = 0x99,
+    DF2=0x9A,
+    DF3=0x9B,
+    DF4=0x9C,
+    DF5=0x9D,
+    DF6=0x9E,
+    DF7=0x9F     //  priority, anchor number, anchor vertical, anchor horizontal, row count, column count, locked, visible, centered, style ID
+};
+
+/*The SetPenAttributes command specifies how certain attributes of subsequent 
+characters are to be rendered in the current window, until the next SetPenAttributes command
+*/
+
+enum eia708_PenAttribs_Size{
+    penSize_Small = 0,
+    penSize_Standard = 1,
+    penSize_Large = 2,
+    penSize_IllegalVal = 3
+};
+
+enum eia708_PenAttribs_Offset{
+    PenOffset_Subscript = 0,
+    PenOffset_Normal = 1,
+    PenOffset_Superscript = 2,
+    PenOffset_IllegalVal = 3
+};
+
+enum eia708_PenAttribs_TextTag{
+    PenTextTag_Dialog=0,
+    PenTextTag_Source_or_speaker_id=1,
+    PenTextTag_Electronically_reproduced_voice=2,
+    PenTextTag_Dialog_in_other_language=3,
+    PenTextTag_Voiceover=4,
+    PenTextTag_Audible_translation=5,
+    PenTextTag_Subtitle_translation=6,
+    PenTextTag_Voice_quality_description=7,
+    PenTextTag_Song_lyrics=8,
+    PenTextTag_Sound_effect_description=9,
+    PenTextTag_Musical_score_description=10,
+    PenTextTag_Oath=11,
+    PenTextTag_Undefined_0=12,
+    PenTextTag_Undefined_1=13,
+    PenTextTag_Undefined_2=14,
+    PenTextTag_Invisible=15 
+};
+
+enum eia708_PenAttribs_FontTag{
+    PenFontTag_Default=0, 
+    PenFontTag_Monospaced_serif=1,
+    PenFontTag_Proportional_serif=2,
+    PenFontTag_Monospaced_sanserif=3,
+    PenFontTag_Proportional_sanserif=4,
+    PenFontTag_Casual=5,
+    PenFontTag_Cursive=6,
+    PenFontTag_Smallcaps=7
+};
+
+enum eia708_PenAttribs_EdgeType{
+    PenEdgeType_None=0,
+    PenEdgeType_Raised=1,
+    PenEdgeType_Depressed=2,
+    PenEdgeType_Uniform=3,
+    PenEdgeType_Left_drop_shadow=4,
+    PenEdgeType_Right_drop_shadow=5,
+    PenEdgeType_Illegal_val0=6,
+    PenEdgeType_Illegal_val1=7
+};
+
+enum eia708_PenAttribs_Underline{
+    PenUnderLine_No = 0,
+    PenUnderline_Yes = 1
+};
+
+enum eia708_PenAttribs_Italic{
+    PenItalic_No = 0,
+    PenItalic_Yes = 1
+};
+
+enum eia708_PenColor_Opacity{
+    PenOpacity_SOLID=0,
+    PenOpacity_FLASH=1,
+    PenOpacity_TRANSLUCENT=2,
+    PenOpacity_TRANSPARENT=3
+};
+
+typedef struct eia708_PenColor
+{
+    int fg_color;
+    int fg_opacity;
+    int bg_color;
+    int bg_opacity;
+    int edge_color;
+} eia708_PenColor;
+
+typedef struct eia708_PenAttribs
+{
+    int PenSize;
+    int Offset;
+    int TextTag;
+    int FontTag;
+    int EdgeType;
+    int UnderLine;
+    int Italic;
+} eia708_PenAttribs;
+
+enum eia708_WindowAttribs_Justify{
+    WindowJustify_LEFT=0, 
+    WindowJustify_RIGHT=1,
+    WindowJustify_CENTER=2,
+    WindowJustify_FULL=3
+};
+
+enum eia708_WindowAttribs_AnchorID{
+    WindowAnchorID_UPPER_LEFT=0,
+    WindowAnchorID_UPPER_CENTER=1,
+    WindowAnchorID_UPPER_RIGHT=2,
+    WindowAnchorID_MIDDLE_LEFT=3,
+    WindowAnchorID_MIDDLE_CENTER=4,
+    WindowAnchorID_MIDDLE_RIGHT=5,
+    WindowAnchorID_LOWER_LEFT=6,
+    WindowAnchorID_LOWER_CENTER=7,
+    WindowAnchorID_LOWER_RIGHT=8 
+};
+
+typedef struct eia708_WindowAttribs
+{
+    int fill_color;
+    int fill_opacity;
+    int border_color;
+    int border_type01;
+    int justify;
+    int scroll_dir;
+    int print_dir;
+    int word_wrap;
+    int border_type;
+    int display_eff;
+    int effect_dir;
+    int effect_speed;
+} eia708_WindowAttribs;
+
+
+typedef struct eia708_window
+{
+    int is_defined;
+    int number; // Handy, in case we only have a pointer to the window
+    int priority;
+    int col_lock;
+    int row_lock;
+    int visible;
+    int null;
+    int anchor_vertical;
+    int relative_pos;
+    int anchor_horizontal;
+    int row_count;
+    int anchor_ID;
+    int col_count;
+    int pen_style;
+    int win_style;
+    uint8_t Window_commands[8]; // Commands used to create this window 
+    eia708_WindowAttribs attribs;  // SetWindowAttributes, SetPenAttributes, SetPenColor, 
+    eia708_PenAttribs pen;
+    eia708_PenColor PenColor;
+    int pen_row;     //Pen Location for SetPenLocation
+    int pen_column;
+} eia708_window;
+
+//Couldn't figure out the structure of eia708 service packet/block.
+
+typedef struct{
+    eia708_window windows[10];
+    int current_window;
+}eia708_t;
+
+static void eia708_SetPenAttributes (eia708_t *service, uint8_t *data)
+{
+    //based on ccextractor code
+    if (service->current_window==-1)
+    {
+        // Handle by creating window
+        return;
+    }
+
+    service->windows[service->current_window].pen.PenSize   = (data[1]) & 0x3;
+    service->windows[service->current_window].pen.Offset    = (data[1]>>2) & 0x3;
+    service->windows[service->current_window].pen.TextTag   = (data[1]>>4) & 0xf;
+    service->windows[service->current_window].pen.FontTag   = (data[2]) & 0x7;
+    service->windows[service->current_window].pen.EdgeType  = (data[2]>>3) & 0x7;
+    service->windows[service->current_window].pen.UnderLine = (data[2]>>4) & 0x1;
+    service->windows[service->current_window].pen.Italic    = (data[2]>>5) & 0x1;
+}
+
+
+static void eia708_SetPenColor (eia708_t *service, uint8_t *data)
+{
+
+    if (service->current_window==-1)
+    {
+        // Handle by creating window
+        return;
+    }
+    service->windows[service->current_window].PenColor.fg_color   = (data[1]) & 0x3f;
+    service->windows[service->current_window].PenColor.fg_opacity = (data[1]>>6) & 0x03;
+    service->windows[service->current_window].PenColor.bg_color   = (data[2]   ) & 0x3f;
+    service->windows[service->current_window].PenColor.bg_opacity = (data[2]>>6) & 0x03;
+    service->windows[service->current_window].PenColor.edge_color = (data[3]>>6) & 0x3f;
+}
+
+static void eia708_SetPenLocation (eia708_t *service, uint8_t *data)
+{
+    if (service->current_window==-1)
+    { 
+        // Handle by creating window
+        return;
+    }
+    service->windows[service->current_window].pen_row    = data[1] & 0x0f;
+    service->windows[service->current_window].pen_column = data[2] & 0x3f;
+}
+
+
+
+
