@@ -135,17 +135,15 @@ static void *vlc_h1_stream_fatal(struct vlc_h1_conn *conn)
     return NULL;
 }
 
-static_assert(offsetof(struct vlc_h1_conn, conn) == 0, "Cast error");
-
 static struct vlc_h1_conn *vlc_h1_stream_conn(struct vlc_http_stream *stream)
 {
-    return (void *)(((char *)stream) - offsetof(struct vlc_h1_conn, stream));
+    return container_of(stream, struct vlc_h1_conn, stream);
 }
 
 static struct vlc_http_stream *vlc_h1_stream_open(struct vlc_http_conn *c,
                                                 const struct vlc_http_msg *req)
 {
-    struct vlc_h1_conn *conn = (struct vlc_h1_conn *)c;
+    struct vlc_h1_conn *conn = container_of(c, struct vlc_h1_conn, conn);
     size_t len;
     ssize_t val;
 
@@ -307,7 +305,7 @@ static void vlc_h1_conn_destroy(struct vlc_h1_conn *conn)
 
 static void vlc_h1_conn_release(struct vlc_http_conn *c)
 {
-    struct vlc_h1_conn *conn = (struct vlc_h1_conn *)c;
+    struct vlc_h1_conn *conn = container_of(c, struct vlc_h1_conn, conn);
 
     assert(!conn->released);
     conn->released = true;

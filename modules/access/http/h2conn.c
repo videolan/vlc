@@ -60,8 +60,6 @@ struct vlc_h2_conn
     vlc_thread_t thread; /**< Receive thread */
 };
 
-static_assert(offsetof(struct vlc_h2_conn, conn) == 0, "Cast error");
-
 static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn);
 
 /** HTTP/2 stream */
@@ -237,11 +235,10 @@ static int vlc_h2_stream_unlock(struct vlc_h2_stream *s)
     return vlc_interrupt_unregister();
 }
 
-static_assert(offsetof(struct vlc_h2_stream, stream) == 0, "Cast error");
-
 static struct vlc_http_msg *vlc_h2_stream_wait(struct vlc_http_stream *stream)
 {
-    struct vlc_h2_stream *s = (struct vlc_h2_stream *)stream;
+    struct vlc_h2_stream *s =
+        container_of(stream, struct vlc_h2_stream, stream);
     struct vlc_h2_conn *conn = s->conn;
     struct vlc_http_msg *m;
 
@@ -272,7 +269,8 @@ static struct vlc_http_msg *vlc_h2_stream_wait(struct vlc_http_stream *stream)
  */
 static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
 {
-    struct vlc_h2_stream *s = (struct vlc_h2_stream *)stream;
+    struct vlc_h2_stream *s =
+        container_of(stream, struct vlc_h2_stream, stream);
     struct vlc_h2_conn *conn = s->conn;
     struct vlc_h2_frame *f;
 
@@ -339,7 +337,8 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
  */
 static void vlc_h2_stream_close(struct vlc_http_stream *stream, bool aborted)
 {
-    struct vlc_h2_stream *s = (struct vlc_h2_stream *)stream;
+    struct vlc_h2_stream *s =
+        container_of(stream, struct vlc_h2_stream, stream);
     struct vlc_h2_conn *conn = s->conn;
     bool destroy = false;
     uint_fast32_t code = VLC_H2_NO_ERROR;
@@ -401,7 +400,7 @@ static const struct vlc_http_stream_cbs vlc_h2_stream_callbacks =
 static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
                                                 const struct vlc_http_msg *msg)
 {
-    struct vlc_h2_conn *conn = (struct vlc_h2_conn *)c;
+    struct vlc_h2_conn *conn = container_of(c, struct vlc_h2_conn, conn);
     struct vlc_h2_stream *s = malloc(sizeof (*s));
     if (unlikely(s == NULL))
         return NULL;
@@ -697,7 +696,7 @@ static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn)
 
 static void vlc_h2_conn_release(struct vlc_http_conn *c)
 {
-    struct vlc_h2_conn *conn = (struct vlc_h2_conn *)c;
+    struct vlc_h2_conn *conn = container_of(c, struct vlc_h2_conn, conn);
     bool destroy;
 
     vlc_mutex_lock(&conn->lock);

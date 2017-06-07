@@ -46,8 +46,6 @@ struct vlc_chunked_stream
     bool error;
 };
 
-static_assert(offsetof(struct vlc_chunked_stream, stream) == 0, "Cast error");
-
 static void *vlc_chunked_fatal(struct vlc_chunked_stream *s)
 {
     s->error = true;
@@ -64,7 +62,8 @@ static struct vlc_http_msg *vlc_chunked_wait(struct vlc_http_stream *stream)
 
 static block_t *vlc_chunked_read(struct vlc_http_stream *stream)
 {
-    struct vlc_chunked_stream *s = (struct vlc_chunked_stream *)stream;
+    struct vlc_chunked_stream *s =
+        container_of(stream, struct vlc_chunked_stream, stream);
     block_t *block = NULL;
 
     if (s->eof)
@@ -134,7 +133,8 @@ static block_t *vlc_chunked_read(struct vlc_http_stream *stream)
 
 static void vlc_chunked_close(struct vlc_http_stream *stream, bool abort)
 {
-    struct vlc_chunked_stream *s = (struct vlc_chunked_stream *)stream;
+    struct vlc_chunked_stream *s =
+        container_of(stream, struct vlc_chunked_stream, stream);
 
     if (!s->eof) /* Abort connection if stream is closed before end */
         vlc_chunked_fatal(s);
