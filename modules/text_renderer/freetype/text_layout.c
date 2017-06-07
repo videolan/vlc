@@ -1413,11 +1413,11 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         }
 
         const run_desc_t *p_run = &p_paragraph->p_runs[p_paragraph->pi_run_ids[i]];
+        const int i_advance_x = p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
 
-        i_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
-
-        if( ( i_last_space_width >= i_preferred_width && p_run->p_style->e_wrapinfo == STYLE_WRAP_DEFAULT )
-         || i_width >= i_max_width )
+        if( ( i_last_space_width + i_advance_x >= i_preferred_width &&
+              p_run->p_style->e_wrapinfo == STYLE_WRAP_DEFAULT )
+            || i_width + i_advance_x >= i_max_width )
         {
             if( i_line_start == i )
             {
@@ -1449,11 +1449,17 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             }
 
             pp_line = &( *pp_line )->p_next;
-            i_line_start = i_newline_start;
-            i = i_line_start - 1;
-            i_width = 0;
+
+            /* If we created a line up to previous space, we only keep the difference for
+               our current width since that split */
+            if( i_newline_start == i_last_space )
+                i_width = i_width - i_last_space_width;
+            else
+                i_width = 0;
             i_last_space_width = 0;
+            i_line_start = i_newline_start;
         }
+        i_width += i_advance_x;
     }
 
     *pp_lines = p_first_line;
