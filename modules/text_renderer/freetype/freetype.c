@@ -1138,9 +1138,15 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     else if( p_region_in->i_x > 0 && (unsigned)p_region_in->i_x < i_max_width )
         i_max_width -= p_region_in->i_x;
 
+    unsigned i_max_height = p_filter->fmt_out.video.i_visible_height;
+    if( p_region_in->i_max_height > 0 && (unsigned) p_region_in->i_max_height < i_max_height )
+        i_max_height = p_region_in->i_max_height;
+    else if( p_region_in->i_y > 0 && (unsigned)p_region_in->i_y < i_max_height )
+        i_max_height -= p_region_in->i_y;
+
     rv = LayoutText( p_filter,
                      psz_text, pp_styles, pi_k_durations, i_text_length, p_region_in->b_gridmode,
-                     i_max_width, &p_lines, &bbox, &i_max_face_height );
+                     i_max_width, i_max_height, &p_lines, &bbox, &i_max_face_height );
 
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;

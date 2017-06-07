@@ -72,11 +72,13 @@ line_desc_t *NewLine( int i_count );
  * \param i_len length of the arrays \p psz_text, \p pp_styles, and \p pi_k_dates [IN]
  * \param b_grid true for grid-mode text [IN]
  * \param i_max_width maximum available width to layout text [IN]
+ * \param i_max_height maximum available height to layout text [IN]
  * \param pp_lines the list of line_desc_t's with rendered glyphs [OUT]
  * \param p_bbox the bounding box of all the lines [OUT]
  * \param pi_max_face_height maximum line height [OUT]
  */
 int LayoutText( filter_t *p_filter,
                 const uni_char_t *psz_text, text_style_t **pp_styles,
-                uint32_t *pi_k_dates, int i_len, bool b_grid, unsigned i_max_width,
+                uint32_t *pi_k_dates, int i_len, bool b_grid,
+                unsigned i_max_width, unsigned i_max_height,
                 line_desc_t **pp_lines, FT_BBox *p_bbox, int *pi_max_face_height );

@@ -1460,15 +1460,17 @@ error:
 
 int LayoutText( filter_t *p_filter,
                 const uni_char_t *psz_text, text_style_t **pp_styles,
-                uint32_t *pi_k_dates, int i_len, bool b_grid, unsigned i_max_width,
+                uint32_t *pi_k_dates, int i_len, bool b_grid,
+                unsigned i_max_width, unsigned i_max_height,
                 line_desc_t **pp_lines, FT_BBox *p_bbox, int *pi_max_face_height )
 {
     line_desc_t *p_first_line = 0;
     line_desc_t **pp_line = &p_first_line;
     paragraph_t *p_paragraph = 0;
     int i_paragraph_start = 0;
-    int i_max_height = 0;
+    unsigned i_total_height = 0;
     unsigned i_max_advance_x = 0;
+    int i_max_face_height = 0;
 
     for( int i = 0; i <= i_len; ++i )
     {
@@ -1528,9 +1530,28 @@ int LayoutText( filter_t *p_filter,
             FreeParagraph( p_paragraph );
             p_paragraph = 0;
 
-            for( ; *pp_line; pp_line = &( *pp_line )->p_next )
-                i_max_height = __MAX( i_max_height, ( *pp_line )->i_height );
-
+            for( ; *pp_line; pp_line = &(*pp_line)->p_next )
+            {
+                i_total_height += (*pp_line)->i_height;
+                if( i_max_height > 0 && i_total_height > i_max_height )
+                {
+                    i_total_height = i_max_height + 1;
+                    line_desc_t *p_todelete = *pp_line;
+                    while( p_todelete ) /* Drop extra lines */
+                    {
+                        line_desc_t *p_next = p_todelete->p_next;
+                        FreeLine( p_todelete );
+                        p_todelete = p_next;
+                    }
+                    *pp_line = NULL;
+                    i = i_len + 1; /* force no more paragraphs */
+                    break; /* ! no p_next ! */
+                }
+                else if( (*pp_line)->i_height > i_max_face_height )
+                {
+                    i_max_face_height = (*pp_line)->i_height;
+                }
+            }
             i_paragraph_start = i + 1;
         }
     }
@@ -1550,12 +1571,12 @@ int LayoutText( filter_t *p_filter,
         p_line->bbox.yMax -= i_base_line;
         BBoxEnlarge( &bbox, &p_line->bbox );
 
-        i_base_line += i_max_height;
+        i_base_line += i_max_face_height;
     }
 
+    *pi_max_face_height = i_max_face_height;
     *pp_lines = p_first_line;
     *p_bbox = bbox;
-    *pi_max_face_height = i_max_height;
     return VLC_SUCCESS;
 
 error:
