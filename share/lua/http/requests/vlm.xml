@@ -31,10 +31,12 @@ local function insert_children(c,t)
       for _, d in ipairs(c.children) do
         table.insert(t,d.value or d.name)
         if d.value then
-        print("V"..d.value.."|")
+        local dv = string.gsub(d.value,"&","&amp;")
+        print("V"..dv.."|")
         end
         if d.name then
-        print("N"..d.name.."|")
+        local dn = string.gsub(d.name,"&","&amp;")
+        print("N"..dn.."|")
         end
       end
     end
@@ -44,7 +46,8 @@ local function print_table(name,t)
   if #t ~= 0 then
     for _,v in ipairs(t) do
       print("<"..name..">")
-        print(v)
+        local ve = string.gsub(v,"&","&amp;");
+        print(ve)
       print("</"..name..">")
     end
   end
