@@ -1942,7 +1942,7 @@ dnl  Screen capture module
 dnl
 AC_ARG_ENABLE(screen,
   [AS_HELP_STRING([--enable-screen],
-    [disable screen capture (default enabled)])])
+    [support screen captures (default enabled)])])
 if test "${enable_screen}" != "no"; then
   if test "${SYS}" = "darwin"; then
     AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
