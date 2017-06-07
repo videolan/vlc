@@ -842,6 +842,9 @@ typedef struct {
 
 VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t );
 
+#define container_of(ptr, type, member) \
+    ((type *)(((char *)(ptr)) - offsetof(type, member)))
+
 /* Aligned memory allocator */
 
 #ifdef __MINGW32__
