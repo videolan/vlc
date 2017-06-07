@@ -41,6 +41,11 @@ struct va_pic_context
     vlc_va_surface_t           *va_surface;
 };
 
+static inline void AcquirePictureSys(picture_sys_t *p_sys)
+{
+    IDirect3DSurface9_AddRef(p_sys->surface);
+}
+
 static inline void ReleasePictureSys(picture_sys_t *p_sys)
 {
     IDirect3DSurface9_Release(p_sys->surface);

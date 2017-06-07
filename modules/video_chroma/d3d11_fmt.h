@@ -62,6 +62,22 @@ struct va_pic_context
  * (ie not DXGI_FORMAT_UNKNWON) */
 #define KNOWN_DXGI_INDEX   0
 
+static inline void AcquirePictureSys(picture_sys_t *p_sys)
+{
+    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
+        if (p_sys->resourceView[i])
+            ID3D11ShaderResourceView_AddRef(p_sys->resourceView[i]);
+        if (p_sys->texture[i])
+            ID3D11Texture2D_AddRef(p_sys->texture[i]);
+    }
+    if (p_sys->context)
+        ID3D11DeviceContext_AddRef(p_sys->context);
+    if (p_sys->decoder)
+        ID3D11VideoDecoderOutputView_AddRef(p_sys->decoder);
+    if (p_sys->processorInput)
+        ID3D11VideoProcessorInputView_AddRef(p_sys->processorInput);
+}
+
 static inline void ReleasePictureSys(picture_sys_t *p_sys)
 {
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {

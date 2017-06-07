@@ -231,6 +231,7 @@ static struct va_pic_context *CreatePicContext(vlc_va_surface_t *va_surface,
         pic_ctx->picsys.resource[i] = p_resource;
         pic_ctx->picsys.resourceView[i] = resourceView[i];
     }
+    AcquirePictureSys(&pic_ctx->picsys);
     pic_ctx->picsys.context = context;
 done:
     return pic_ctx;
@@ -302,16 +303,6 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
             directx_va_Release(va_surface);
             return VLC_ENOMEM;
         }
-        ID3D11VideoDecoderOutputView_AddRef(pic_ctx->picsys.decoder);
-        ID3D11DeviceContext_AddRef(pic_ctx->picsys.context);
-        for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
-        {
-            if (pic_ctx->picsys.resource[i])
-                ID3D11Resource_AddRef(pic_ctx->picsys.resource[i]);
-            if (pic_ctx->picsys.resourceView[i])
-                ID3D11ShaderResourceView_AddRef(pic_ctx->picsys.resourceView[i]);
-        }
-
         pic->context = &pic_ctx->s;
     }
     *data = (uint8_t*)((struct va_pic_context *)pic->context)->picsys.decoder;

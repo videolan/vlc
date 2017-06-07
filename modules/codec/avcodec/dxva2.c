@@ -229,7 +229,7 @@ static struct picture_context_t *CreatePicContext(vlc_va_surface_t *va_surface)
     pic_ctx->s.destroy = d3d9_pic_context_destroy;
     pic_ctx->s.copy    = d3d9_pic_context_copy;
     pic_ctx->picsys.surface = va_surface->decoderSurface;
-    IDirect3DSurface9_AddRef(pic_ctx->picsys.surface);
+    AcquirePictureSys(&pic_ctx->picsys);
     return &pic_ctx->s;
 }
 
