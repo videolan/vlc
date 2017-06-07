@@ -1310,6 +1310,15 @@ static inline void ReleaseGlyphBitMaps(glyph_bitmaps_t *p_bitmaps)
         FT_Done_Glyph( p_bitmaps->p_outline );
 }
 
+static inline bool IsWhitespaceAt( paragraph_t *p_paragraph, size_t i )
+{
+    return ( p_paragraph->p_code_points[ i ] == ' '
+#ifdef HAVE_FRIBIDI
+            || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_WS
+#endif
+    );
+}
+
 static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                             unsigned i_max_width, unsigned i_max_advance_x,
                             line_desc_t **pp_lines, bool b_grid )
@@ -1349,8 +1358,12 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 #ifdef HAVE_FRIBIDI
         p_paragraph->pi_reordered_indices[ i ] = i;
 #endif
-        i_total_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
+        if( !IsWhitespaceAt( p_paragraph, i ) || i != i_last_space + 1 )
+            i_total_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
+        else
+            i_last_space = i;
     }
+    i_last_space = -1;
 
     if( i_total_width == 0 )
     {
@@ -1374,11 +1387,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             break;
         }
 
-        if( p_paragraph->p_code_points[ i ] == ' '
-#ifdef HAVE_FRIBIDI
-            || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_WS
-#endif
-          )
+        if( IsWhitespaceAt( p_paragraph, i ) )
         {
             if( i_line_start == i )
             {
