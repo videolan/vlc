@@ -158,7 +158,7 @@ typedef struct libvlc_priv_t
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
 {
-    return (libvlc_priv_t *)libvlc;
+    return container_of(libvlc, libvlc_priv_t, public_data);
 }
 
 int intf_InsertItem(libvlc_int_t *, const char *mrl, unsigned optc,
