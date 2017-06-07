@@ -1,6 +1,7 @@
 README for the VLC media player
 ===============================
 
+
 VLC is a popular libre and open source media player and multimedia engine,
 used by a large number of individuals, professionals, companies and
 institutions. Using open source technologies and libraries, VLC has been
@@ -12,17 +13,20 @@ The VideoLAN project was started at the university École Centrale Paris who
 relicensed VLC under the GPLv2 license in February 2001. Since then, VLC has
 been downloaded close to one billion times.
 
+
 Links:
 ======
 
-The VLC web site  . . . . . http://www.videolan.org/
-Support . . . . . . . . . . http://www.videolan.org/support/
-Forums  . . . . . . . . . . http://forum.videolan.org/
-Wiki  . . . . . . . . . . . http://wiki.videolan.org/
-The Developers site . . . . http://wiki.videolan.org/Developers_Corner
-VLC hacking guide . . . . . http://wiki.videolan.org/Hacker_Guide
-Bugtracker  . . . . . . . . http://trac.videolan.org/vlc/
-The VideoLAN web site . . . http://www.videolan.org/
+
+* The VLC web site  . . . . . http://www.videolan.org/vlc
+* Support . . . . . . . . . . http://www.videolan.org/support/
+* Forums  . . . . . . . . . . http://forum.videolan.org/
+* Wiki  . . . . . . . . . . . http://wiki.videolan.org/
+* The Developers site . . . . http://wiki.videolan.org/Developers_Corner
+* VLC hacking guide . . . . . http://wiki.videolan.org/Hacker_Guide
+* Bugtracker  . . . . . . . . http://trac.videolan.org/vlc/
+* The VideoLAN web site . . . http://www.videolan.org/
+
 
 Source Code Content:
 ===================
@@ -34,6 +38,7 @@ INSTALL            - Installation and building instructions.
 NEWS               - Important modifications between the releases.
 README             - This file.
 THANKS             - VLC contributors.
+
 
 bin/               - VLC binaries.
 bindings/          - libVLC bindings to other languages.
@@ -55,3 +60,4 @@ po/                - VLC translations.
 share/             - Common Resources files.
 src/               - libvlccore source code.
 test/              - testing system.
+
