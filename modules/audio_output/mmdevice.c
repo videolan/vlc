@@ -209,11 +209,6 @@ static int MuteSet(audio_output_t *aout, bool mute)
 }
 
 /*** Audio session events ***/
-static inline aout_sys_t *vlc_AudioSessionEvents_sys(IAudioSessionEvents *this)
-{
-    return (void *)(((char *)this) - offsetof(aout_sys_t, session_events));
-}
-
 static STDMETHODIMP
 vlc_AudioSessionEvents_QueryInterface(IAudioSessionEvents *this, REFIID riid,
                                       void **ppv)
@@ -235,14 +230,14 @@ vlc_AudioSessionEvents_QueryInterface(IAudioSessionEvents *this, REFIID riid,
 static STDMETHODIMP_(ULONG)
 vlc_AudioSessionEvents_AddRef(IAudioSessionEvents *this)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     return InterlockedIncrement(&sys->refs);
 }
 
 static STDMETHODIMP_(ULONG)
 vlc_AudioSessionEvents_Release(IAudioSessionEvents *this)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     return InterlockedDecrement(&sys->refs);
 }
 
@@ -250,7 +245,7 @@ static STDMETHODIMP
 vlc_AudioSessionEvents_OnDisplayNameChanged(IAudioSessionEvents *this,
                                             LPCWSTR wname, LPCGUID ctx)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "display name changed: %ls", wname);
@@ -262,7 +257,7 @@ static STDMETHODIMP
 vlc_AudioSessionEvents_OnIconPathChanged(IAudioSessionEvents *this,
                                          LPCWSTR wpath, LPCGUID ctx)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "icon path changed: %ls", wpath);
@@ -275,7 +270,7 @@ vlc_AudioSessionEvents_OnSimpleVolumeChanged(IAudioSessionEvents *this,
                                              float vol, BOOL mute,
                                              LPCGUID ctx)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "simple volume changed: %f, muting %sabled", vol,
@@ -292,7 +287,7 @@ vlc_AudioSessionEvents_OnChannelVolumeChanged(IAudioSessionEvents *this,
                                               DWORD count, float *vols,
                                               DWORD changed, LPCGUID ctx)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     audio_output_t *aout = sys->aout;
 
     if (changed != (DWORD)-1)
@@ -310,7 +305,7 @@ vlc_AudioSessionEvents_OnGroupingParamChanged(IAudioSessionEvents *this,
                                               LPCGUID param, LPCGUID ctx)
 
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "grouping parameter changed");
@@ -323,7 +318,7 @@ static STDMETHODIMP
 vlc_AudioSessionEvents_OnStateChanged(IAudioSessionEvents *this,
                                       AudioSessionState state)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "state changed: %d", state);
@@ -334,7 +329,7 @@ static STDMETHODIMP
 vlc_AudioSessionEvents_OnSessionDisconnected(IAudioSessionEvents *this,
                                            AudioSessionDisconnectReason reason)
 {
-    aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, session_events);
     audio_output_t *aout = sys->aout;
 
     switch (reason)
@@ -380,11 +375,6 @@ static const struct IAudioSessionEventsVtbl vlc_AudioSessionEvents =
     vlc_AudioSessionEvents_OnSessionDisconnected,
 };
 
-static inline aout_sys_t *vlc_AudioVolumeDuckNotification_sys(IAudioVolumeDuckNotification *this)
-{
-    return (void *)(((char *)this) - offsetof(aout_sys_t, duck));
-}
-
 static STDMETHODIMP
 vlc_AudioVolumeDuckNotification_QueryInterface(
     IAudioVolumeDuckNotification *this, REFIID riid, void **ppv)
@@ -406,14 +396,14 @@ vlc_AudioVolumeDuckNotification_QueryInterface(
 static STDMETHODIMP_(ULONG)
 vlc_AudioVolumeDuckNotification_AddRef(IAudioVolumeDuckNotification *this)
 {
-    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, duck);
     return InterlockedIncrement(&sys->refs);
 }
 
 static STDMETHODIMP_(ULONG)
 vlc_AudioVolumeDuckNotification_Release(IAudioVolumeDuckNotification *this)
 {
-    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, duck);
     return InterlockedDecrement(&sys->refs);
 }
 
@@ -421,7 +411,7 @@ static STDMETHODIMP
 vlc_AudioVolumeDuckNotification_OnVolumeDuckNotification(
     IAudioVolumeDuckNotification *this, LPCWSTR sid, UINT32 count)
 {
-    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, duck);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "volume ducked by %ls of %u sessions", sid, count);
@@ -434,7 +424,7 @@ static STDMETHODIMP
 vlc_AudioVolumeDuckNotification_OnVolumeUnduckNotification(
     IAudioVolumeDuckNotification *this, LPCWSTR sid)
 {
-    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, duck);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "volume unducked by %ls", sid);
@@ -532,11 +522,6 @@ static HRESULT DeviceUpdated(audio_output_t *aout, LPCWSTR wid)
     return S_OK;
 }
 
-static inline aout_sys_t *vlc_MMNotificationClient_sys(IMMNotificationClient *this)
-{
-    return (void *)(((char *)this) - offsetof(aout_sys_t, device_events));
-}
-
 static STDMETHODIMP
 vlc_MMNotificationClient_QueryInterface(IMMNotificationClient *this,
                                         REFIID riid, void **ppv)
@@ -558,14 +543,14 @@ vlc_MMNotificationClient_QueryInterface(IMMNotificationClient *this,
 static STDMETHODIMP_(ULONG)
 vlc_MMNotificationClient_AddRef(IMMNotificationClient *this)
 {
-    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, device_events);
     return InterlockedIncrement(&sys->refs);
 }
 
 static STDMETHODIMP_(ULONG)
 vlc_MMNotificationClient_Release(IMMNotificationClient *this)
 {
-    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, device_events);
     return InterlockedDecrement(&sys->refs);
 }
 
@@ -574,7 +559,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
                                                EDataFlow flow, ERole role,
                                                LPCWSTR wid)
 {
-    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, device_events);
     audio_output_t *aout = sys->aout;
 
     if (flow != eRender)
@@ -590,7 +575,7 @@ static STDMETHODIMP
 vlc_MMNotificationClient_OnDeviceAdded(IMMNotificationClient *this,
                                        LPCWSTR wid)
 {
-    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, device_events);
     audio_output_t *aout = sys->aout;
 
     msg_Dbg(aout, "device %ls added", wid);
@@ -601,7 +586,7 @@ static STDMETHODIMP
 vlc_MMNotificationClient_OnDeviceRemoved(IMMNotificationClient *this,
                                          LPCWSTR wid)
 {
-    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, device_events);
     audio_output_t *aout = sys->aout;
     char *id = FromWide(wid);
 
@@ -618,7 +603,7 @@ static STDMETHODIMP
 vlc_MMNotificationClient_OnDeviceStateChanged(IMMNotificationClient *this,
                                               LPCWSTR wid, DWORD state)
 {
-    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, device_events);
     audio_output_t *aout = sys->aout;
 
     switch (state) {
@@ -654,7 +639,7 @@ vlc_MMNotificationClient_OnPropertyValueChanged(IMMNotificationClient *this,
                                                 LPCWSTR wid,
                                                 const PROPERTYKEY key)
 {
-    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    aout_sys_t *sys = container_of(this, aout_sys_t, device_events);
     audio_output_t *aout = sys->aout;
 
     if (key.pid == PKEY_Device_FriendlyName.pid)
