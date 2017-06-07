@@ -193,9 +193,6 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     if( !p )
         return NULL;
 
-    static_assert( offsetof( playlist_private_t, public_data ) == 0,
-                   "playlist_private_t.public_data must be at offset 0" );
-
     p_playlist = &p->public_data;
 
     p->input_tree = NULL;

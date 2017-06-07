@@ -89,7 +89,7 @@ typedef struct playlist_private_t
     bool     b_preparse; /**< Preparse items */
 } playlist_private_t;
 
-#define pl_priv( pl ) ((playlist_private_t *)(pl))
+#define pl_priv( pl ) container_of(pl, playlist_private_t, public_data)
 
 /*****************************************************************************
  * Prototypes
