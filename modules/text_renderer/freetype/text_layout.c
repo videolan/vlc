@@ -1062,24 +1062,24 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
 
 static int LayoutLine( filter_t *p_filter,
                        paragraph_t *p_paragraph,
-                       int i_start_offset, int i_end_offset,
+                       int i_first_char, int i_last_char,
                        line_desc_t **pp_line, bool b_grid )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0
-     || i_start_offset >= i_end_offset
-     || i_start_offset < 0 || i_start_offset >= p_paragraph->i_size
-     || i_end_offset <= 0  || i_end_offset > p_paragraph->i_size )
+     || i_first_char < 0 || i_last_char < 0
+     || i_first_char > i_last_char
+     || i_last_char >= p_paragraph->i_size )
     {
         msg_Err( p_filter,
                  "LayoutLine() invalid parameters. "
                  "Paragraph size: %d. Runs count: %d. "
-                 "Start offset: %d. End offset: %d",
+                 "Start char: %d. End char: %d",
                  p_paragraph->i_size, p_paragraph->i_runs_count,
-                 i_start_offset, i_end_offset );
+                 i_first_char, i_last_char );
         return VLC_EGENERIC;
     }
 
-    line_desc_t *p_line = NewLine( i_end_offset - i_start_offset );
+    line_desc_t *p_line = NewLine( 1 + i_last_char - i_first_char );
 
     if( !p_line )
         return VLC_ENOMEM;
@@ -1099,14 +1099,14 @@ static int LayoutLine( filter_t *p_filter,
     int i_ul_thickness = 0;
 
 #ifdef HAVE_FRIBIDI
-    fribidi_reorder_line( 0, p_paragraph->p_types + i_start_offset,
-                          i_end_offset - i_start_offset,
+    fribidi_reorder_line( 0, &p_paragraph->p_types[i_first_char],
+                          1 + i_last_char - i_first_char,
                           0, p_paragraph->paragraph_type,
-                          p_paragraph->p_levels + i_start_offset,
-                          0, p_paragraph->pi_reordered_indices + i_start_offset );
+                          &p_paragraph->p_levels[i_first_char],
+                          0, &p_paragraph->pi_reordered_indices[i_first_char] );
 #endif
 
-    for( int i = i_start_offset; i < i_end_offset; ++i, ++i_line_index )
+    for( int i = i_first_char; i <= i_last_char; ++i, ++i_line_index )
     {
         int i_paragraph_index;
 #ifdef HAVE_FRIBIDI
@@ -1368,7 +1368,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         {
             if( i_line_start < i )
                 if( LayoutLine( p_filter, p_paragraph,
-                                i_line_start, i, pp_line, b_grid ) )
+                                i_line_start, i - 1, pp_line, b_grid ) )
                     goto error;
 
             break;
@@ -1420,14 +1420,14 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                 return VLC_SUCCESS;
             }
 
-            int i_end_offset;
+            int i_newline_start;
             if( i_last_space > i_line_start )
-                i_end_offset = i_last_space;
+                i_newline_start = i_last_space;
             else
-                i_end_offset = i;
+                i_newline_start = i;
 
             if( LayoutLine( p_filter, p_paragraph, i_line_start,
-                            i_end_offset, pp_line, b_grid ) )
+                            i_newline_start - 1, pp_line, b_grid ) )
                 goto error;
 
             /* Handle early end of renderable content;
@@ -1440,7 +1440,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             }
 
             pp_line = &( *pp_line )->p_next;
-            i_line_start = i_end_offset;
+            i_line_start = i_newline_start;
             i = i_line_start - 1;
             i_width = 0;
             i_last_space_width = 0;
