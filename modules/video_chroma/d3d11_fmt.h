@@ -107,14 +107,14 @@ static inline void ReleasePictureSys(picture_sys_t *p_sys)
 /* map texture planes to resource views */
 static inline int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
                               const d3d_format_t *format,
-                              ID3D11Texture2D *p_texture, UINT slice_index,
+                              ID3D11Texture2D *p_texture[D3D11_MAX_SHADER_VIEW], UINT slice_index,
                               ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
 {
     HRESULT hr;
     int i;
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc = { 0 };
     D3D11_TEXTURE2D_DESC texDesc;
-    ID3D11Texture2D_GetDesc(p_texture, &texDesc);
+    ID3D11Texture2D_GetDesc(p_texture[0], &texDesc);
     assert(texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE);
 
     if (texDesc.ArraySize == 1)
@@ -136,7 +136,7 @@ static inline int AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
             resourceView[i] = NULL;
         else
         {
-            hr = ID3D11Device_CreateShaderResourceView(d3ddevice, (ID3D11Resource*)p_texture, &resviewDesc, &resourceView[i]);
+            hr = ID3D11Device_CreateShaderResourceView(d3ddevice, (ID3D11Resource*)p_texture[i], &resviewDesc, &resourceView[i]);
             if (FAILED(hr)) {
                 msg_Err(obj, "Could not Create the Texture ResourceView %d slice %d. (hr=0x%lX)", i, slice_index, hr);
                 break;

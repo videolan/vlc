@@ -761,7 +761,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             sys->stagingSys.texture[plane] = textures[plane];
 
         if (AllocateShaderView(VLC_OBJECT(vd), sys->d3ddevice, sys->picQuadConfig,
-                               textures[0], 0, sys->stagingSys.resourceView))
+                               textures, 0, sys->stagingSys.resourceView))
             goto error;
     } else
 #endif
@@ -773,7 +773,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
         for (picture_count = 0; picture_count < pool_size; picture_count++) {
             if (AllocateShaderView(VLC_OBJECT(vd), sys->d3ddevice, sys->picQuadConfig,
-                                   pictures[picture_count]->p_sys->texture[0], picture_count,
+                                   pictures[picture_count]->p_sys->texture, picture_count,
                                    pictures[picture_count]->p_sys->resourceView))
                 goto error;
         }
@@ -2769,7 +2769,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 d3dquad->picSys.texture[plane] = textures[plane];
             }
             if (AllocateShaderView(VLC_OBJECT(vd), sys->d3ddevice, sys->d3dregion_format,
-                                   d3dquad->picSys.texture[0], 0,
+                                   d3dquad->picSys.texture, 0,
                                    d3dquad->picSys.resourceView)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);

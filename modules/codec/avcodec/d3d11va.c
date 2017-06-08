@@ -819,7 +819,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
                 break;
             }
 
-            AllocateShaderView(VLC_OBJECT(va), dx_sys->d3ddev, textureFmt, pic->p_sys->texture[KNOWN_DXGI_INDEX], pic->p_sys->slice_index, pic->p_sys->resourceView);
+            AllocateShaderView(VLC_OBJECT(va), dx_sys->d3ddev, textureFmt, pic->p_sys->texture, pic->p_sys->slice_index, pic->p_sys->resourceView);
 
             dx_sys->hw_surface[surface_idx] = pic->p_sys->decoder;
         }
@@ -888,7 +888,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
             }
 
             if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
-                AllocateShaderView(VLC_OBJECT(va), dx_sys->d3ddev, textureFmt, p_texture, dx_sys->surface_count, &sys->resourceView[dx_sys->surface_count * D3D11_MAX_SHADER_VIEW]);
+            {
+                ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {p_texture, p_texture, p_texture};
+                AllocateShaderView(VLC_OBJECT(va), dx_sys->d3ddev, textureFmt, textures, dx_sys->surface_count, &sys->resourceView[dx_sys->surface_count * D3D11_MAX_SHADER_VIEW]);
+            }
         }
     }
     msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d)",
