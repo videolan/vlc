@@ -53,8 +53,8 @@ fi
 ###
 ###  classic bootstrap stuff
 ###
-
-autoreconf --install --force --verbose ${ACLOCAL_ARGS}
+test "$AUTORECONF" || AUTORECONF=autoreconf
+$AUTORECONF --install --force --verbose ${ACLOCAL_ARGS}
 rm -f po/Makevars.template
 
 ##
