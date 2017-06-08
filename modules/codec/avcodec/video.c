@@ -917,6 +917,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                 *error = true;
             }
             av_frame_free(&frame);
+            /* After draining, we need to reset decoder with a flush */
+            if( ret == AVERROR_EOF )
+                avcodec_flush_buffers( p_sys->p_context );
             break;
         }
         bool not_received_frame = ret;

@@ -447,7 +447,13 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
             if (unlikely(frame == NULL))
                 break;
         }
-        else av_frame_free( &frame );
+        else
+        {
+            /* After draining, we need to reset decoder with a flush */
+            if( ret == AVERROR_EOF )
+                avcodec_flush_buffers( p_sys->p_context );
+            av_frame_free( &frame );
+        }
     };
 
     return ( p_sys->p_decoded ) ? DequeueOneDecodedFrame( p_sys ) : NULL;
