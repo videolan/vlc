@@ -1430,10 +1430,10 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             }
 
             int i_newline_start;
-            if( i_last_space > i_line_start )
-                i_newline_start = i_last_space;
+            if( i_last_space > i_line_start && p_run->p_style->e_wrapinfo == STYLE_WRAP_DEFAULT )
+                i_newline_start = i_last_space; /* we break line on last space */
             else
-                i_newline_start = i;
+                i_newline_start = i; /* we break line on last char */
 
             if( LayoutLine( p_filter, p_paragraph, i_line_start,
                             i_newline_start - 1, pp_line, b_grid ) )
