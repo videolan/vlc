@@ -748,6 +748,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         /* we need a staging texture */
         video_format_t staging_fmt;
         video_format_Copy(&staging_fmt, &surface_fmt);
+        staging_fmt.i_width = staging_fmt.i_visible_width;
+        staging_fmt.i_height = staging_fmt.i_visible_height;
         if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures, true,
                              false))
             goto error;
