@@ -29,7 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 
-#define D3D11_MAX_SHADER_VIEW  2
+#define D3D11_MAX_SHADER_VIEW  3
 
 typedef struct
 {
