@@ -266,7 +266,7 @@ playlist.add( ... ): Add a bunch of items to the playlist.
       .duration: stream duration in seconds (OPTIONAL)
       .meta: custom meta data (OPTIONAL, meta data)
              A .meta field is a table of custom meta key value pairs.
-             example: .meta = { ["GVP docid"] = "-5784010886294950089", ["GVP version] = "1.1", Hello = "World!" }
+             example: .meta = { ["GVP docid"] = "-5784010886294950089", ["GVP version"] = "1.1", Hello = "World!" }
   Invalid playlist items will be discarded by VLC.
 playlist.enqueue( ... ): like playlist.add() except that track isn't played.
 playlist.get( [what, [tree]] ): Get the playlist.
