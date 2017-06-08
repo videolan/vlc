@@ -296,7 +296,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
                                         AWindow_Video);
     if (anw == NULL)
         goto error;
-    window = &anw,
+    window = &anw;
 # if defined (__ANDROID__) || defined (ANDROID)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 # endif
