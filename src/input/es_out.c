@@ -2773,7 +2773,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
 
     default:
-        msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
+        msg_Err( p_sys->p_input, "unknown query 0x%x in %s", i_query,
+                 __func__  );
         return VLC_EGENERIC;
     }
 }

@@ -559,7 +559,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         }
 
         default:
-            msg_Err( p_input, "unknown query in input_vaControl" );
+            msg_Err( p_input, "unknown query 0x%x in %s", i_query, __func__ );
             return VLC_EGENERIC;
     }
 }
