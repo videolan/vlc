@@ -475,6 +475,13 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_TEST_AND_CLEAR_FLAGS:
         case DEMUX_GET_TITLE:
         case DEMUX_GET_SEEKPOINT:
+        case DEMUX_NAV_ACTIVATE:
+        case DEMUX_NAV_UP:
+        case DEMUX_NAV_DOWN:
+        case DEMUX_NAV_LEFT:
+        case DEMUX_NAV_RIGHT:
+        case DEMUX_NAV_POPUP:
+        case DEMUX_NAV_MENU:
             return VLC_EGENERIC;
 
         case DEMUX_SET_TITLE:
