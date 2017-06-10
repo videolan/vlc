@@ -89,7 +89,7 @@
 {
     b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
-    if (!b_nativeFullscreenMode || OSX_YOSEMITE || OSX_EL_CAPITAN || OSX_SIERRA) {
+    if (!b_nativeFullscreenMode || OSX_YOSEMITE_AND_HIGHER) {
         [_fullscreenButton setHidden: YES];
     }
 
@@ -123,9 +123,9 @@
 - (NSImage *)getButtonImage:(NSString *)o_id
 {
     NSString *o_name = @"";
-    if (OSX_YOSEMITE || OSX_EL_CAPITAN) {
+    if (OSX_YOSEMITE_AND_HIGHER) {
         o_name = @"yosemite-";
-    } else { // OSX_LION, OSX_MOUNTAIN_LION, OSX_MAVERICKS
+    } else { // OSX_LION_AND_HIGHER, OSX_MOUNTAIN_LION_AND_HIGHER, OSX_MAVERICKS_AND_HIGHER
         o_name = @"lion-";
     }
 
@@ -151,7 +151,7 @@
     _greenOnClickImage = [self getButtonImage:@"window-zoom-on"];
 
     // these files are only available in the yosemite variant
-    if (OSX_YOSEMITE || OSX_EL_CAPITAN) {
+    if (OSX_YOSEMITE_AND_HIGHER) {
         _fullscreenImage = [self getButtonImage:@"window-fullscreen"];
         _fullscreenHoverImage = [self getButtonImage:@"window-fullscreen-over"];
         _fullscreenOnClickImage = [self getButtonImage:@"window-fullscreen-on"];
@@ -186,7 +186,7 @@
 {
     // default image for old version, or if native fullscreen is
     // disabled on yosemite, or if alt key is pressed
-    if (!(OSX_YOSEMITE || OSX_EL_CAPITAN) || !b_nativeFullscreenMode || b_alt_pressed) {
+    if (!OSX_YOSEMITE_AND_HIGHER || !b_nativeFullscreenMode || b_alt_pressed) {
 
         if (b_mouse_over) {
             [_greenButton setImage: _greenHoverImage];
@@ -219,7 +219,7 @@
     else if (sender == _yellowButton)
         [[self window] miniaturize: sender];
     else if (sender == _greenButton) {
-        if ((OSX_YOSEMITE || OSX_EL_CAPITAN) && b_nativeFullscreenMode && !b_alt_pressed) {
+        if (OSX_YOSEMITE_AND_HIGHER && b_nativeFullscreenMode && !b_alt_pressed) {
             [[self window] toggleFullScreen:self];
         } else {
             [[self window] performZoom: sender];

@@ -37,7 +37,7 @@ static bool b_old_spaces_style = YES;
     /* init our fake object attribute */
     blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
 
-    if (!OSX_LION && !OSX_MOUNTAIN_LION) {
+    if (OSX_MAVERICKS_AND_HIGHER) {
         NSUserDefaults *userDefaults = [[NSUserDefaults alloc] init];
         [userDefaults addSuiteNamed:@"com.apple.spaces"];
         /* this is system settings -> mission control -> monitors using different spaces */

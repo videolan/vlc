@@ -82,7 +82,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
 #ifdef MAC_OS_X_VERSION_10_10
     /* Inject correct background view depending on OS support */
-    if (OSX_YOSEMITE_OR_HIGHER) {
+    if (OSX_YOSEMITE_AND_HIGHER) {
         [self injectVisualEffectView];
     } else {
         [self injectBackgroundView];

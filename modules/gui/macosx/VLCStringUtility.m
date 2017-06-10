@@ -533,7 +533,7 @@ NSString *toNSStr(const char *str) {
 NSImage *imageFromRes(NSString *o_id)
 {
     NSString *result = @"";
-    if (OSX_YOSEMITE || OSX_EL_CAPITAN || OSX_SIERRA) {
+    if (OSX_YOSEMITE_AND_HIGHER) {
         result = [result stringByAppendingString:@"ys-"];
     }
 
