@@ -75,7 +75,6 @@
 
     NSRect frameBeforePlayback;
 }
-- (void)resizePlaylistAfterCollapse;
 - (void)makeSplitViewVisible;
 - (void)makeSplitViewHidden;
 - (void)showPodcastControls;
@@ -176,9 +175,6 @@ static const float f_min_window_height = 307.;
     [self reloadSidebar];
     [_sidebarView selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
 
-    // Setup view frame sizes
-    [_dropzoneView setFrame:_playlistScrollView.frame];
-    [_splitViewLeft setFrame:_sidebarView.frame];
 
     /*
      * Set up translatable strings for the UI elements
@@ -229,13 +225,6 @@ static const float f_min_window_height = 307.;
     else
         [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
 
-    /* the default small size of the search field is slightly different on Lion, let's work-around that */
-    NSRect frame;
-    frame = [_searchField frame];
-    frame.origin.y = frame.origin.y + 2.0;
-    frame.size.height = frame.size.height - 1.0;
-    [_searchField setFrame:frame];
-
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
 
@@ -266,7 +255,6 @@ static const float f_min_window_height = 307.;
         [[self contentView] addSubview:o_color_backdrop positioned:NSWindowBelow relativeTo:_splitView];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     } else {
-        [self.videoView setFrame:_splitView.frame];
         [_playlistScrollView setBorderType:NSNoBorder];
         [_sidebarScrollView setBorderType:NSNoBorder];
     }
@@ -282,7 +270,7 @@ static const float f_min_window_height = 307.;
     }
 
     /* sanity check for the window size */
-    frame = [self frame];
+    NSRect frame = [self frame];
     NSSize screenSize = [[self screen] frame].size;
     if (screenSize.width <= frame.size.width || screenSize.height <= frame.size.height) {
         self.nativeVideoSize = screenSize;
@@ -408,33 +396,6 @@ static const float f_min_window_height = 307.;
     if (isAReload) {
         [_sidebarView expandItem:nil expandChildren:YES];
     }
-}
-
-- (void)resizePlaylistAfterCollapse
-{
-    // no animation here since we might be in the middle of another resize animation
-    NSRect rightSplitRect = [_splitViewRight frame];
-
-    NSRect plrect;
-    plrect.size.height = rightSplitRect.size.height - 20.0; // actual pl top bar height, which differs from its frame
-    plrect.size.width = rightSplitRect.size.width;
-    plrect.origin.x = plrect.origin.y = 0.;
-
-    NSRect dropzoneboxRect = _dropzoneBox.frame;
-    dropzoneboxRect.origin.x = (plrect.size.width - dropzoneboxRect.size.width) / 2;
-    dropzoneboxRect.origin.y = (plrect.size.height - dropzoneboxRect.size.height) / 2;
-
-    [_dropzoneView setFrame:plrect];
-    [_dropzoneBox setFrame:dropzoneboxRect];
-
-    if (b_podcastView_displayed) {
-        plrect.size.height -= [_podcastView frame].size.height;
-        plrect.origin.y = [_podcastView frame].size.height;
-    }
-    [_playlistScrollView setFrame:plrect];
-
-    [_dropzoneView setNeedsDisplay:YES];
-    [_playlistScrollView setNeedsDisplay:YES];
 }
 
 - (void)makeSplitViewVisible
@@ -608,9 +569,6 @@ static const float f_min_window_height = 307.;
 
 - (void)hideSplitView:(BOOL)resize
 {
-    // cancel pending pl resizes, in case of fast toggle between both modes
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resizePlaylistAfterCollapse) object:nil];
-
     if (resize) {
         NSRect winrect = [self frame];
         f_lastSplitViewHeight = [_splitView frame].size.height;
@@ -646,10 +604,6 @@ static const float f_min_window_height = 307.;
         winrect.origin.y = winrect.origin.y - f_lastSplitViewHeight;
         [self setFrame:winrect display:YES animate:YES];
     }
-
-    // cancel pending pl resizes, in case of fast toggle between both modes
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resizePlaylistAfterCollapse) object:nil];
-    [self performSelector:@selector(resizePlaylistAfterCollapse) withObject: nil afterDelay:0.75];
 
     b_splitview_removed = NO;
 }
@@ -839,32 +793,6 @@ static const float f_min_window_height = 307.;
     }
 }
 
-#pragma mark -
-#pragma mark Lion native fullscreen handling
-- (void)windowWillEnterFullScreen:(NSNotification *)notification
-{
-    [super windowWillEnterFullScreen:notification];
-
-    // update split view frame after removing title bar
-    if (self.darkInterface) {
-        NSRect frame = [[self contentView] frame];
-        frame.origin.y += [self.controlsBar height];
-        frame.size.height -= [self.controlsBar height];
-        [_splitView setFrame:frame];
-    }
-}
-
-- (void)windowWillExitFullScreen:(NSNotification *)notification
-{
-    [super windowWillExitFullScreen: notification];
-
-    // update split view frame after readding title bar
-    if (self.darkInterface) {
-        NSRect frame = [_splitView frame];
-        frame.size.height -= [self.titlebarView frame].size.height;
-        [_splitView setFrame:frame];
-    }
-}
 #pragma mark -
 #pragma mark Fullscreen support
 

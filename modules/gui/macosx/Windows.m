@@ -694,9 +694,6 @@
         [self setFrame: winrect display:NO animate:NO];
     }
 
-    // TODO remove
-    [_videoView setFrame: [[self contentView] frame]];
-
     if (![_videoView isHidden]) {
         [[self.controlsBar bottomBarView] setHidden: YES];
         self.videoViewBottomConstraint.priority = 1;
@@ -756,12 +753,6 @@
         winrect.size.height = winrect.size.height + f_titleBarHeight;
         [self setFrame: winrect display:NO animate:NO];
     }
-
-    // TODO remove
-    NSRect videoViewFrame = [_videoView frame];
-    videoViewFrame.origin.y += [self.controlsBar height];
-    videoViewFrame.size.height -= [self.controlsBar height];
-    [_videoView setFrame: videoViewFrame];
 
     if (![_videoView isHidden]) {
         [[self.controlsBar bottomBarView] setHidden: NO];
@@ -1063,6 +1054,8 @@
     NSDisableScreenUpdates();
     [_videoView removeFromSuperviewWithoutNeedingDisplay];
     [[o_temp_view superview] replaceSubview:o_temp_view with:_videoView];
+    // TODO Replace tmpView by an existing view (e.g. middle view)
+    // TODO Use constraints for fullscreen window, reinstate constraints once the video view is added to the main window again
     [_videoView setFrame:[o_temp_view frame]];
     if ([[_videoView subviews] count] > 0)
         [self makeFirstResponder: [[_videoView subviews] firstObject]];
