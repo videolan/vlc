@@ -325,8 +325,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         }
 
         IOReturn success;
-        /* work-around a bug in 10.7.4 and 10.7.5, so check for 10.7.x < 10.7.4 and 10.8 */
-        if (NSAppKitVersionNumber < 1115.2) {
+        /* work-around a bug for OSX Lion, 10.7.4 and 10.7.5 only */
+        if (NSAppKitVersionNumber >= 1138.45  && !OSX_MOUNTAIN_LION_AND_HIGHER) {
             /* fall-back on the 10.5 mode, which also works on 10.7.4 and 10.7.5 */
             if ([o_main activeVideoPlayback] && shouldDisableScreensaver)
                 success = IOPMAssertionCreate(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
