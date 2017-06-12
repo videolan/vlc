@@ -52,6 +52,8 @@
 #include "access.h"
 #include "filter.h"
 
+#include "../src/win32/mta_holder.h"
+
 #define INSTANCEDATA_OF_PROPERTY_PTR(x) ((PKSPROPERTY((x))) + 1)
 #define INSTANCEDATA_OF_PROPERTY_SIZE(x) (sizeof((x)) - sizeof(KSPROPERTY))
 
@@ -658,6 +660,12 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     if( p_sys->pp_streams.empty() ) return VLC_EGENERIC;
 
+    if( vlc_mta_acquire( p_this ) == false )
+    {
+        msg_Err( p_this, "Failed to acquire MTA" );
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -821,6 +829,8 @@ static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
 
     vlc_mutex_destroy( &p_sys->lock );
     vlc_cond_destroy( &p_sys->wait );
+
+    vlc_mta_release( p_this );
 
     free( p_sys );
 }
