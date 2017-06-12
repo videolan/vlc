@@ -56,7 +56,7 @@ struct decoder_sys_t
     AVCODEC_COMMON_MEMBERS
 
     /* Video decoder specific part */
-    mtime_t i_pts;
+    date_t  pts;
 
     /* Closed captions for decoders */
     cc_data_t cc;
@@ -305,6 +305,16 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     if (val)
         return val;
 
+    /* always have date in fields/ticks units */
+    if(dec->p_sys->pts.i_divider_num)
+        date_Change(&dec->p_sys->pts, fmt_out.i_frame_rate *
+                                      __MAX(ctx->ticks_per_frame, 1),
+                                      fmt_out.i_frame_rate_base);
+    else
+        date_Init(&dec->p_sys->pts, fmt_out.i_frame_rate *
+                                    __MAX(ctx->ticks_per_frame, 1),
+                                    fmt_out.i_frame_rate_base);
+
     const int i_cc_reorder = dec->fmt_out.subs.cc.i_reorder_depth;
     fmt_out.p_palette = dec->fmt_out.video.p_palette;
     dec->fmt_out.video.p_palette = NULL;
@@ -545,7 +555,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_dec->i_extra_picture_buffers = 2 * p_context->thread_count;
 
     /* ***** misc init ***** */
-    p_sys->i_pts = VLC_TS_INVALID;
+    date_Init(&p_sys->pts, 1, 30001);
+    date_Set(&p_sys->pts, VLC_TS_INVALID);
     p_sys->b_first_frame = true;
     p_sys->i_late_frames = 0;
     p_sys->b_from_preroll = false;
@@ -594,7 +605,7 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
 
-    p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
+    date_Set(&p_sys->pts, VLC_TS_INVALID); /* To make sure we recover properly */
     p_sys->i_late_frames = 0;
     cc_Flush( &p_sys->cc );
 
@@ -620,7 +631,7 @@ static bool check_block_validity( decoder_sys_t *p_sys, block_t *block )
 
     if( block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
+        date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
         cc_Flush( &p_sys->cc );
 
         p_sys->i_late_frames = 0;
@@ -652,10 +663,7 @@ static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_
 
     if( current_time - p_sys->i_late_frames_start > (5*CLOCK_FREQ))
     {
-        if( p_sys->i_pts > VLC_TS_INVALID )
-        {
-            p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
-        }
+        date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
         if( block )
             block_Release( block );
         p_sys->i_late_frames--;
@@ -691,27 +699,16 @@ static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
 
-    if( p_sys->i_pts <= VLC_TS_INVALID )
+    if( date_Get( &p_sys->pts ) == VLC_TS_INVALID ||
+        p_sys->pts.i_divider_num == 0 )
         return;
 
-    /* interpolate the next PTS */
-    if( p_dec->fmt_in.video.i_frame_rate > 0 &&
-        p_dec->fmt_in.video.i_frame_rate_base > 0 )
-    {
-        p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
-            p_dec->fmt_in.video.i_frame_rate_base /
-            (2 * p_dec->fmt_in.video.i_frame_rate);
-    }
-    else if( p_context->time_base.den > 0 )
-    {
-        int i_tick = p_context->ticks_per_frame;
-        if( i_tick <= 0 )
-            i_tick = 1;
+    int i_tick = p_context->ticks_per_frame;
+    if( i_tick <= 0 )
+        i_tick = 1;
 
-        p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
-            i_tick * p_context->time_base.num /
-            (2 * p_context->time_base.den);
-    }
+    /* interpolate the next PTS */
+    date_Increment( &p_sys->pts, i_tick + frame->repeat_pict );
 }
 
 static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t current_time, mtime_t i_pts )
@@ -1061,11 +1058,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             i_pts = frame->pkt_dts;
 
         if( i_pts == AV_NOPTS_VALUE )
-            i_pts = p_sys->i_pts;
+            i_pts = date_Get( &p_sys->pts );
 
         /* Interpolate the next PTS */
         if( i_pts > VLC_TS_INVALID )
-            p_sys->i_pts = i_pts;
+            date_Set( &p_sys->pts, i_pts );
 
         interpolate_next_pts( p_dec, frame );
 
