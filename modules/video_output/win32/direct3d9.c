@@ -47,7 +47,9 @@
 
 #include <windows.h>
 #include <d3d9.h>
+#ifdef HAVE_D3DX9EFFECT_H
 #include <d3dx9effect.h>
+#endif
 #include "../../video_chroma/d3d9_fmt.h"
 
 #include "common.h"
@@ -1293,6 +1295,7 @@ static void Direct3D9DestroyScene(vout_display_t *vd)
 
 static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source, size_t source_length)
 {
+#ifdef HAVE_D3DX9EFFECT_H
     vout_display_sys_t *sys = vd->sys;
 
     HRESULT (WINAPI * OurD3DXCompileShader)(
@@ -1343,6 +1346,9 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
+#else
+    return VLC_EGENERIC;
+#endif
 }
 
 #define MAX_SHADER_FILE_SIZE 1024*1024
