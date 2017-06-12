@@ -666,6 +666,8 @@ static block_t * ParseAUTail(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
         case HEVC_NAL_EOS:
         case HEVC_NAL_EOB:
             p_ret = OutputQueues(p_sys, true);
+            if( p_ret )
+                p_ret->i_flags |= BLOCK_FLAG_END_OF_SEQUENCE;
             break;
 
         case HEVC_NAL_SUFF_SEI:
