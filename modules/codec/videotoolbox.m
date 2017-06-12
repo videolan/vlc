@@ -1306,7 +1306,11 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
                                           decoderFlags, p_info, &flagOut);
     if (HandleVTStatus(p_dec, status) == VLC_SUCCESS)
+    {
         p_sys->b_vt_feed = true;
+        if( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE )
+            Drain( p_dec );
+    }
     else
     {
         bool b_abort = false;
