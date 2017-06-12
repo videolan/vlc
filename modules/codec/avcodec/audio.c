@@ -51,9 +51,6 @@ struct decoder_sys_t
 {
     AVCODEC_COMMON_MEMBERS
 
-    block_t *p_decoded;
-    block_t **pp_decoded_last;
-
     /*
      * Output properties
      */
@@ -192,16 +189,6 @@ static block_t *vlc_av_frame_Wrap(AVFrame *frame)
     return block;
 }
 
-static block_t * DequeueOneDecodedFrame( decoder_sys_t *p_sys )
-{
-    block_t *p_decoded = p_sys->p_decoded;
-    p_sys->p_decoded = p_sys->p_decoded->p_next;
-    if( p_sys->p_decoded == NULL )
-        p_sys->pp_decoded_last = &p_sys->p_decoded;
-    p_decoded->p_next = NULL;
-    return p_decoded;
-}
-
 /*****************************************************************************
  * EndAudio: decoder destruction
  *****************************************************************************
@@ -210,13 +197,6 @@ static block_t * DequeueOneDecodedFrame( decoder_sys_t *p_sys )
  *****************************************************************************/
 void EndAudioDec( decoder_t *p_dec )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    if( p_sys->p_decoded )
-    {
-        block_ChainRelease( p_sys->p_decoded );
-        p_sys->p_decoded = NULL;
-        p_sys->pp_decoded_last = &p_sys->p_decoded;
-    }
     ffmpeg_CloseCodec( p_dec );
 }
 
@@ -235,9 +215,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     {
         return VLC_ENOMEM;
     }
-
-    p_sys->p_decoded = NULL;
-    p_sys->pp_decoded_last = &p_sys->p_decoded;
 
     p_context->refcounted_frames = true;
     p_sys->p_context = p_context;
@@ -290,24 +267,18 @@ static void Flush( decoder_t *p_dec )
     if( ctx->codec_id == AV_CODEC_ID_MP2 ||
         ctx->codec_id == AV_CODEC_ID_MP3 )
         p_sys->i_reject_count = 3;
-
-    if( p_sys->p_decoded )
-    {
-        block_ChainRelease( p_sys->p_decoded );
-        p_sys->p_decoded = NULL;
-        p_sys->pp_decoded_last = &p_sys->p_decoded;
-    }
 }
 
 /*****************************************************************************
  * DecodeBlock: Called to decode one frame
  *****************************************************************************/
-static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
+static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
     AVFrame *frame = NULL;
     block_t *p_block = NULL;
+    bool b_error = false;
 
     if( !ctx->extradata_size && p_dec->fmt_in.i_extra && p_sys->b_delayed_open)
     {
@@ -321,10 +292,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
             p_block = *pp_block;
         goto drop;
     }
-
-    /* Flushing or decoding, we return any block ready from multiple frames output */
-    if( p_sys->p_decoded )
-        return DequeueOneDecodedFrame( p_sys );
 
     if( pp_block == NULL ) /* Drain request */
     {
@@ -358,10 +325,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
 
         if( (p_block->i_flags & BLOCK_FLAG_PRIVATE_REALLOCATED) == 0 )
         {
-            p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+            *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
             if( !p_block )
-                return NULL;
-            *pp_block = p_block;
+                goto end;
             p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
             memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
 
@@ -439,7 +405,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
                 p_converted->i_length = date_Increment( &p_sys->end_date,
                                                       p_converted->i_nb_samples ) - p_converted->i_pts;
 
-                block_ChainLastAppend( &p_sys->pp_decoded_last, p_converted );
+                decoder_QueueAudio( p_dec, p_converted );
             }
 
             /* Prepare new frame */
@@ -456,30 +422,35 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error )
         }
     };
 
-    return ( p_sys->p_decoded ) ? DequeueOneDecodedFrame( p_sys ) : NULL;
+    return VLCDEC_SUCCESS;
 
 end:
-    *error = true;
+    b_error = true;
+drop:
     if( pp_block )
     {
         assert( *pp_block == p_block );
         *pp_block = NULL;
     }
-drop:
     if( p_block != NULL )
         block_Release(p_block);
     if( frame != NULL )
         av_frame_free( &frame );
-    return NULL;
+
+    return (b_error) ? VLCDEC_ECRITICAL : VLCDEC_SUCCESS;
 }
 
 static int DecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
-    bool error = false;
-    block_t **pp_block = p_block ? &p_block : NULL, *p_out;
-    while( ( p_out = DecodeBlock( p_dec, pp_block, &error ) ) != NULL )
-        decoder_QueueAudio( p_dec, p_out );
-    return error ? VLCDEC_ECRITICAL : VLCDEC_SUCCESS;
+    block_t **pp_block = p_block ? &p_block : NULL;
+    int i_ret;
+    do
+    {
+        i_ret = DecodeBlock( p_dec, pp_block );
+    }
+    while( i_ret == VLCDEC_SUCCESS && pp_block && *pp_block );
+
+    return i_ret;
 }
 
 static block_t * ConvertAVFrame( decoder_t *p_dec, AVFrame *frame )
