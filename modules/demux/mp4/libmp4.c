@@ -1507,6 +1507,32 @@ static int MP4_ReadBox_ctts( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_cslg( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_cslg_t, NULL );
+
+    unsigned i_version, i_flags;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( i_flags );
+    VLC_UNUSED(i_flags);
+
+    if( i_version > 1 )
+        MP4_READBOX_EXIT( 0 );
+
+#define READ_CSLG(readbytes) {\
+    readbytes( p_box->data.p_cslg->ct_to_dts_shift );\
+    readbytes( p_box->data.p_cslg->i_least_delta );\
+    readbytes( p_box->data.p_cslg->i_max_delta );\
+    readbytes( p_box->data.p_cslg->i_composition_starttime );\
+    readbytes( p_box->data.p_cslg->i_composition_endtime ); }
+
+    if( i_version == 0 )
+        READ_CSLG(MP4_GET4BYTES)
+    else
+        READ_CSLG(MP4_GET8BYTES)
+
+    MP4_READBOX_EXIT( 1 );
+}
 
 static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
 {
@@ -4210,6 +4236,7 @@ static const struct
     { ATOM_dref,    MP4_ReadBox_LtdContainer, 0 },
     { ATOM_stts,    MP4_ReadBox_stts,         ATOM_stbl },
     { ATOM_ctts,    MP4_ReadBox_ctts,         ATOM_stbl },
+    { ATOM_cslg,    MP4_ReadBox_cslg,         ATOM_stbl },
     { ATOM_stsd,    MP4_ReadBox_LtdContainer, ATOM_stbl },
     { ATOM_stsz,    MP4_ReadBox_stsz,         ATOM_stbl },
     { ATOM_stsc,    MP4_ReadBox_stsc,         ATOM_stbl },
