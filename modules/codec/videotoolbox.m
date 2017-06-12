@@ -103,6 +103,7 @@ struct frame_info_t
     picture_t *p_picture;
     int i_poc;
     int i_foc;
+    bool b_forced;
     bool b_flush;
     bool b_field;
     bool b_progressive;
@@ -394,6 +395,9 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
     }
 
     p_info->i_length = p_block->i_length;
+
+    /* required for still pictures/menus */
+    p_info->b_forced = (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
 
     if (date_Get(&p_sys->pts) == VLC_TS_INVALID)
         date_Set(&p_sys->pts, p_block->i_dts);
@@ -1513,6 +1517,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         p_info->p_picture = p_pic;
 
         p_pic->date = pts.value;
+        p_pic->b_force = p_info->b_forced;
         p_pic->b_progressive = p_sys->b_handle_deint || p_info->b_progressive;
         if(!p_pic->b_progressive)
         {
