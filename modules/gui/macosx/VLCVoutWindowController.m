@@ -597,7 +597,6 @@ void WindowClose(vout_window_t *p_wnd)
     [[main bookmarks] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[main trackSyncPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[main resumeDialog] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[[[[VLCMain sharedInstance] mainWindow] fspanel] window] setLevel:currentStatusWindowLevel];
 }
 
 @end
