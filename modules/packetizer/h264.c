@@ -644,6 +644,16 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         block_ChainLastAppend( &p_sys->pp_sei_last, p_frag );
         p_frag = NULL;
     }
+    else if( i_nal_type == H264_NAL_END_OF_SEQ || i_nal_type == H264_NAL_END_OF_STREAM )
+    {
+        /* Early end of packetization */
+        block_ChainLastAppend( &p_sys->pp_sei_last, p_frag );
+        p_frag = NULL;
+        /* important for still pictures/menus */
+        p_sys->i_next_block_flags |= BLOCK_FLAG_END_OF_SEQUENCE;
+        if( p_sys->b_slice )
+            p_pic = OutputPicture( p_dec );
+    }
     else if( i_nal_type == H264_NAL_AU_DELIMITER ||
              ( i_nal_type >= H264_NAL_PREFIX && i_nal_type <= H264_NAL_RESERVED_18 ) )
     {
