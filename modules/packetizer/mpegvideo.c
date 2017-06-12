@@ -418,6 +418,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         }
 
         p_pic = block_ChainGather( p_sys->p_frame );
+        if( p_pic == NULL )
+            return p_pic;
 
         if( b_eos )
             p_pic->i_flags |= BLOCK_FLAG_END_OF_SEQUENCE;
