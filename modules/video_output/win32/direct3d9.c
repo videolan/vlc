@@ -814,9 +814,9 @@ static int Direct3D9FillPresentationParameters(vout_display_t *vd)
     d3dpp->Windowed               = TRUE;
     d3dpp->hDeviceWindow          = vd->sys->sys.hvideownd;
     d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
-                                          d3ddm.Width);
+                                          vd->source.i_width);
     d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
-                                          d3ddm.Height);
+                                          vd->source.i_height);
     d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
     d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
     d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
