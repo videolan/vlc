@@ -78,6 +78,9 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCHUDRadiobuttonCell.h gui/macosx/VLCHUDRadiobuttonCell.m \
 	gui/macosx/VLCHUDTextFieldCell.h gui/macosx/VLCHUDTextFieldCell.m \
 	gui/macosx/VLCHUDScroller.h gui/macosx/VLCHUDScroller.m \
+	gui/macosx/VLCHUDOutlineView.h gui/macosx/VLCHUDOutlineView.m \
+	gui/macosx/VLCHUDTableCornerView.h gui/macosx/VLCHUDTableCornerView.m \
+	gui/macosx/VLCHUDTableHeaderCell.h gui/macosx/VLCHUDTableHeaderCell.m \
 	gui/macosx/VLCInputManager.h gui/macosx/VLCInputManager.m \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \
