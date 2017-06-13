@@ -588,7 +588,8 @@ static int Demux( demux_t * p_demux )
                     if ( pagestamp < 0 )
                     {
                         p_block->i_pts = VLC_TS_INVALID;
-                        p_block->i_flags |= BLOCK_FLAG_PREROLL;
+                        if( p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
+                            p_block->i_flags |= BLOCK_FLAG_PREROLL;
                     }
                     else
                         p_block->i_pts = VLC_TS_0 + p_sys->i_nzpcr_offset + pagestamp;
@@ -1366,7 +1367,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         {
             if( p_stream->i_skip_frames >= p_block->i_nb_samples )
             {
-                p_block->i_flags |= BLOCK_FLAG_PREROLL;
+                if( p_demux->p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
+                    p_block->i_flags |= BLOCK_FLAG_PREROLL;
                 p_stream->i_skip_frames -= p_block->i_nb_samples;
                 p_block->i_nb_samples = 0;
             }
@@ -1378,7 +1380,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         }
         else
         {
-            p_block->i_flags |= BLOCK_FLAG_PREROLL;
+            if( p_demux->p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
+                p_block->i_flags |= BLOCK_FLAG_PREROLL;
             p_stream->i_skip_frames--;
         }
     }
