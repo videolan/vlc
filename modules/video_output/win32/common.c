@@ -622,10 +622,12 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
             .bottom = cfg->display.height,
         };
 
-        AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
-        SetWindowPos(sys->hwnd, 0, 0, 0,
-                     rect_window.right - rect_window.left,
-                     rect_window.bottom - rect_window.top, SWP_NOMOVE);
+        if (!cfg->is_fullscreen) {
+            AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
+            SetWindowPos(sys->hwnd, 0, 0, 0,
+                         rect_window.right - rect_window.left,
+                         rect_window.bottom - rect_window.top, SWP_NOMOVE);
+        }
         UpdateRects(vd, cfg, NULL, false);
         return VLC_SUCCESS;
     }
