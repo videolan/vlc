@@ -23,6 +23,7 @@
 #ifndef LIBVLC_VARIABLES_H
 # define LIBVLC_VARIABLES_H 1
 
+# include <stdalign.h>
 # include <vlc_atomic.h>
 
 /**
@@ -48,10 +49,13 @@ struct vlc_object_internals
     vlc_object_internals_t *prev;  /* previous sibling */
     vlc_object_internals_t *first; /* first child */
     vlc_mutex_t tree_lock;
+
+    max_align_t aligned_end[];
 };
 
-# define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
-# define vlc_externals( priv ) ((vlc_object_t *)((priv) + 1))
+# define vlc_internals(obj) \
+    container_of(VLC_OBJECT(obj), struct vlc_object_internals, aligned_end)
+# define vlc_externals(priv ) ((vlc_object_t *)((priv)->aligned_end))
 
 void DumpVariables(vlc_object_t *obj);
 
