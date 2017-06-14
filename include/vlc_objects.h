@@ -67,4 +67,8 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 #define vlc_list_children(a) \
     vlc_list_children( VLC_OBJECT(a) )
 
+VLC_API VLC_MALLOC void *vlc_malloc(vlc_object_t *, size_t);
+VLC_API VLC_MALLOC void *vlc_calloc(vlc_object_t *, size_t, size_t);
+VLC_API void vlc_free(vlc_object_t *, void *);
+
 /** @} */

@@ -122,3 +122,45 @@ void vlc_objres_remove(vlc_object_t *obj, void *data,
         pp = &res->prev;
     }
 }
+
+static void dummy_release(void *data)
+{
+    (void) data;
+}
+
+static bool ptrcmp(void *a, void *b)
+{
+    return a == b;
+}
+
+void *vlc_malloc(vlc_object_t *obj, size_t size)
+{
+    void *ptr = vlc_objres_new(size, dummy_release);
+    if (likely(ptr != NULL))
+        vlc_objres_push(obj, ptr);
+    return ptr;
+}
+
+void *vlc_calloc(vlc_object_t *obj, size_t nmemb, size_t size)
+{
+    size_t tabsize = nmemb * size;
+
+    if (unlikely(tabsize < nmemb))
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
+
+    void *ptr = vlc_objres_new(tabsize, dummy_release);
+    if (likely(ptr != NULL))
+    {
+        memset(ptr, 0, tabsize);
+        vlc_objres_push(obj, ptr);
+    }
+    return ptr;
+}
+
+void vlc_free(vlc_object_t *obj, void *ptr)
+{
+    vlc_objres_remove(obj, ptr, ptrcmp);
+}
