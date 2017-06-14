@@ -40,7 +40,7 @@
  * same (width/height/chroma/fps), at least for now.
  */
 static const char deinterlace_modes[][9]= {
-    ""
+    "auto",
     "discard",
     "blend",
     "mean",
