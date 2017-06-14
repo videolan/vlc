@@ -145,7 +145,7 @@ static int Open(vlc_object_t *obj)
     picture_t *dst = filter_NewPicture(filter);
     if (dst == NULL)
         return VLC_EGENERIC;
-    if (!dst->p_sys && !dst->context)
+    if (!dst->p_sys)
     {
         msg_Dbg(filter, "D3D11 opaque without a texture");
         return VLC_EGENERIC;
