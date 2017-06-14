@@ -349,12 +349,12 @@ static const char * const  ppsz_deinterlace_text[] = {
 #define DEINTERLACE_MODE_LONGTEXT N_( \
     "Deinterlace method to use for video processing.")
 static const char * const ppsz_deinterlace_mode[] = {
-    "discard", "blend", "mean", "bob",
+    "auto", "discard", "blend", "mean", "bob",
     "linear", "x", "yadif", "yadif2x", "phosphor",
     "ivtc"
 };
 static const char * const ppsz_deinterlace_mode_text[] = {
-    N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
+    N_("Auto"), N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
     N_("Linear"), "X", "Yadif", "Yadif (2x)", N_("Phosphor"),
     N_("Film NTSC (IVTC)")
 };
@@ -1610,7 +1610,7 @@ vlc_module_begin ()
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
         change_safe()
-    add_string( "deinterlace-mode", "blend",
+    add_string( "deinterlace-mode", "auto",
                 DEINTERLACE_MODE_TEXT, DEINTERLACE_MODE_LONGTEXT, false )
         change_string_list( ppsz_deinterlace_mode, ppsz_deinterlace_mode_text )
         change_safe()
