@@ -468,7 +468,9 @@ ifndef WITH_OPTIMIZATION
 else
 	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
 endif
+ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_RC_COMPILER $(HOST)-windres)" >> $@
+endif
 endif
 ifdef HAVE_DARWIN_OS
 	echo "set(CMAKE_SYSTEM_NAME Darwin)" >> $@
