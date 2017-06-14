@@ -784,6 +784,11 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
             break;
         }
     }
+    if (unlikely(textureFmt==NULL))
+    {
+        msg_Dbg(va, "no hardware decoder matching %s", DxgiFormatToStr(sys->render));
+        return VLC_EGENERIC;
+    }
 
     if (sys->b_extern_pool)
     {
