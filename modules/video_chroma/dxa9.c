@@ -319,8 +319,10 @@ static int OpenConverter( vlc_object_t *obj )
     }
 
     filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
-    if (!p_sys)
-         return VLC_ENOMEM;
+    if (!p_sys) {
+         err = VLC_ENOMEM;
+         goto done;
+    }
     CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width );
     p_filter->p_sys = p_sys;
     err = VLC_SUCCESS;
