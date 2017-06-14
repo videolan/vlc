@@ -463,6 +463,11 @@ else
 	echo "set(CMAKE_SYSTEM_NAME Windows)" >> $@
 endif
 endif
+ifndef WITH_OPTIMIZATION
+	echo "set(CMAKE_BUILD_TYPE Debug)" >> $@
+else
+	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
+endif
 	echo "set(CMAKE_RC_COMPILER $(HOST)-windres)" >> $@
 endif
 ifdef HAVE_DARWIN_OS
