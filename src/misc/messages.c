@@ -410,7 +410,7 @@ void vlc_LogSet(libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
     vlc_rwlock_unlock(&logger->lock);
 
     if (module != NULL)
-        vlc_module_unload(module, vlc_logger_unload, sys);
+        vlc_module_unload(vlc, module, vlc_logger_unload, sys);
 
     /* Announce who we are */
     msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
@@ -427,7 +427,7 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
         return;
 
     if (logger->module != NULL)
-        vlc_module_unload(logger->module, vlc_logger_unload, logger->sys);
+        vlc_module_unload(vlc, logger->module, vlc_logger_unload, logger->sys);
     else
     /* Flush early log messages (corner case: no call to vlc_LogInit()) */
     if (logger->log == vlc_vaLogEarly)

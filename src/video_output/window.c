@@ -108,7 +108,7 @@ void vout_window_Delete(vout_window_t *window)
         vlc_inhibit_Destroy (w->inhibit);
     }
 
-    vlc_module_unload(w->module, vout_window_stop, window);
+    vlc_module_unload(window, w->module, vout_window_stop, window);
     vlc_object_release(window);
 }
 
