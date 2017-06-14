@@ -17,7 +17,9 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-Fix-build-failure-without-STATVFS.patch
+ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/libarchive/android.patch
+endif
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/no-windows-files.patch
 endif
