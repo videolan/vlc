@@ -468,7 +468,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     else if (picture->context)
     {
         const struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
-        if (picture->p_sys && pic_ctx->picsys.surface != picture->p_sys->surface)
+        if (pic_ctx->picsys.surface != picture->p_sys->surface)
         {
             HRESULT hr;
             RECT visibleSource;
