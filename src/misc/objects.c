@@ -199,6 +199,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     priv->prev = NULL;
     priv->first = NULL;
     vlc_mutex_init (&priv->tree_lock);
+    priv->resources = NULL;
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
     obj->obj.object_type = typename;
@@ -314,6 +315,8 @@ char *vlc_object_get_name(const vlc_object_t *obj)
 static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
+
+    assert(p_priv->resources == NULL);
 
     /* Call the custom "subclass" destructor */
     if( p_priv->pf_destructor )

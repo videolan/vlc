@@ -336,6 +336,7 @@ libvlccore_la_SOURCES = \
 	misc/messages.c \
 	misc/mime.c \
 	misc/objects.c \
+	misc/objres.c \
 	misc/variables.h \
 	misc/variables.c \
 	misc/error.c \

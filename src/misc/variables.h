@@ -26,6 +26,8 @@
 # include <stdalign.h>
 # include <vlc_atomic.h>
 
+struct vlc_res;
+
 /**
  * Private LibVLC data for each object.
  */
@@ -49,6 +51,9 @@ struct vlc_object_internals
     vlc_object_internals_t *prev;  /* previous sibling */
     vlc_object_internals_t *first; /* first child */
     vlc_mutex_t tree_lock;
+
+    /* Object resources */
+    struct vlc_res *resources;
 
     max_align_t aligned_end[];
 };

@@ -183,6 +183,10 @@ static int module_load (vlc_object_t *obj, module_t *m,
         ret = init (m->pf_activate, ap);
         va_end (ap);
     }
+
+    if (ret != VLC_SUCCESS)
+        vlc_objres_clear(obj);
+
     return ret;
 }
 
@@ -339,7 +343,8 @@ void vlc_module_unload(vlc_object_t *obj, module_t *module,
         deinit(module->pf_deactivate, ap);
         va_end(ap);
     }
-    (void) obj;
+
+    vlc_objres_clear(obj);
 }
 
 
