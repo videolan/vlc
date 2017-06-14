@@ -1053,8 +1053,34 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 #undef RAD
 }
 
+static void UpdateSize(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+#if defined(HAVE_ID3D11VIDEODECODER)
+    if( sys->context_lock != INVALID_HANDLE_VALUE )
+    {
+        WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+    }
+#endif
+    msg_Dbg(vd, "Detected size change %dx%d", RECTWidth(sys->sys.rect_dest_clipped),
+            RECTHeight(sys->sys.rect_dest_clipped));
+
+    UpdateBackBuffer(vd);
+
+    UpdatePicQuadPosition(vd);
+#if defined(HAVE_ID3D11VIDEODECODER)
+    if( sys->context_lock != INVALID_HANDLE_VALUE )
+    {
+        ReleaseMutex( sys->context_lock );
+    }
+#endif
+}
+
 static int Control(vout_display_t *vd, int query, va_list args)
 {
+    vout_display_sys_t *sys = vd->sys;
+    RECT size_before = sys->sys.rect_dest_clipped;
+
     int res = CommonControl( vd, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
@@ -1065,6 +1091,12 @@ static int Control(vout_display_t *vd, int query, va_list args)
             SetQuadVSProjection( vd, &vd->sys->picQuad, &cfg->viewpoint );
             res = VLC_SUCCESS;
         }
+    }
+
+    if (RECTWidth(size_before)  != RECTWidth(sys->sys.rect_dest_clipped) ||
+        RECTHeight(size_before) != RECTHeight(sys->sys.rect_dest_clipped))
+    {
+        UpdateSize(vd);
     }
 
     return res;
@@ -1080,24 +1112,7 @@ static void Manage(vout_display_t *vd)
     if (RECTWidth(size_before)  != RECTWidth(sys->sys.rect_dest_clipped) ||
         RECTHeight(size_before) != RECTHeight(sys->sys.rect_dest_clipped))
     {
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock != INVALID_HANDLE_VALUE )
-        {
-            WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
-        }
-#endif
-        msg_Dbg(vd, "Manage detected size change %dx%d", RECTWidth(sys->sys.rect_dest_clipped),
-                RECTHeight(sys->sys.rect_dest_clipped));
-
-        UpdateBackBuffer(vd);
-
-        UpdatePicQuadPosition(vd);
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock != INVALID_HANDLE_VALUE )
-        {
-            ReleaseMutex( sys->context_lock );
-        }
-#endif
+        UpdateSize(vd);
     }
 }
 
