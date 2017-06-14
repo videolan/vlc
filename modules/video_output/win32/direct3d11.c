@@ -1147,6 +1147,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     else
     {
         /* copy pixels from the context texture to the picture_sys texture */
+        assert(pic_ctx!=NULL);
         D3D11_TEXTURE2D_DESC texDesc;
         ID3D11Texture2D_GetDesc(p_sys->texture[0], &texDesc);
         if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
