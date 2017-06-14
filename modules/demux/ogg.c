@@ -789,7 +789,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *pi64 = p_sys->i_pcr;
                 return VLC_SUCCESS;
             }
-            break;
+            return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
