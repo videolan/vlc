@@ -1553,7 +1553,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 
     IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3ddevice);
-    if (FAILED(hr)) {
+    if (unlikely(dxgiadapter==NULL)) {
        msg_Err(vd, "Could not get the DXGI Adapter");
        return VLC_EGENERIC;
     }
