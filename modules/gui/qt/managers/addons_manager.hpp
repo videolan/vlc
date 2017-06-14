@@ -28,7 +28,6 @@
 #include "qt.hpp"
 #include "util/singleton.hpp"
 
-#include <vlc_events.h>
 #include <vlc_addons.h>
 
 #include <QObject>
