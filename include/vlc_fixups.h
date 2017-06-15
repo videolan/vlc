@@ -45,6 +45,18 @@
 # endif
 #endif
 
+#ifndef __cplusplus
+# ifdef HAVE_THREADS_H
+#  include <threads.h>
+# elif !defined(thread_local)
+#  ifdef HAVE_THREAD_LOCAL
+#   define thread_local _Thread_local
+#  elif defined(_MSC_VER)
+#   define thread_local __declspec(thread)
+#  endif
+# endif
+#endif
+
 #if !defined (HAVE_GMTIME_R) || !defined (HAVE_LOCALTIME_R) \
  || !defined (HAVE_TIMEGM)
 # include <time.h> /* time_t */

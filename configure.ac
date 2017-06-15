@@ -757,6 +757,17 @@ AC_CHECK_LIB(m,sincos, [
   AC_LIBOBJ([sincos])
 ])
 
+AC_MSG_CHECKING([_Thread_local support])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([_Thread_local int foo = 0;
+                   int main() {}])], [
+    AC_MSG_RESULT([ok])
+    AC_DEFINE(HAVE_THREAD_LOCAL, 1, [Defined to 1 if C11 _Thread_local storage qualifier is supported])
+],[ AC_MSG_RESULT([no])])
+
+dnl __STDC_NO_THREADS__ can't be trusted on some platforms.
+dnl check for its availability explicitely
+AC_CHECK_HEADERS([threads.h])
+
 dnl Check for dynamic plugins
 LIBDL=""
 have_dynamic_objects="no"
