@@ -43,16 +43,6 @@
 #include "interrupt.h"
 #include "libvlc.h"
 
-#ifndef NDEBUG
-static void vlc_interrupt_destructor(void *data)
-{
-    vlc_interrupt_t *ctx = data;
-
-    assert(ctx->attached);
-    ctx->attached = false;
-}
-#endif
-
 static unsigned vlc_interrupt_refs = 0;
 static vlc_rwlock_t vlc_interrupt_lock = VLC_STATIC_RWLOCK;
 static vlc_threadvar_t vlc_interrupt_var;
@@ -65,19 +55,12 @@ void vlc_interrupt_init(vlc_interrupt_t *ctx)
     vlc_rwlock_wrlock(&vlc_interrupt_lock);
     assert(vlc_interrupt_refs < UINT_MAX);
     if (vlc_interrupt_refs++ == 0)
-#ifndef NDEBUG
-        vlc_threadvar_create(&vlc_interrupt_var, vlc_interrupt_destructor);
-#else
         vlc_threadvar_create(&vlc_interrupt_var, NULL);
-#endif
     vlc_rwlock_unlock(&vlc_interrupt_lock);
 
     vlc_mutex_init(&ctx->lock);
     ctx->interrupted = false;
     atomic_init(&ctx->killed, false);
-#ifndef NDEBUG
-    ctx->attached = false;
-#endif
     ctx->callback = NULL;
 }
 
@@ -96,7 +79,6 @@ vlc_interrupt_t *vlc_interrupt_create(void)
 void vlc_interrupt_deinit(vlc_interrupt_t *ctx)
 {
     assert(ctx->callback == NULL);
-    assert(!ctx->attached);
     vlc_mutex_destroy(&ctx->lock);
 
     vlc_rwlock_wrlock(&vlc_interrupt_lock);
@@ -139,18 +121,6 @@ vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *newctx)
     assert(vlc_interrupt_refs > 0);
 
     oldctx = vlc_threadvar_get(vlc_interrupt_var);
-#ifndef NDEBUG
-    if (oldctx != NULL)
-    {
-        assert(oldctx->attached);
-        oldctx->attached = false;
-    }
-    if (newctx != NULL)
-    {
-        assert(!newctx->attached);
-        newctx->attached = true;
-    }
-#endif
     vlc_threadvar_set(vlc_interrupt_var, newctx);
 
     return oldctx;

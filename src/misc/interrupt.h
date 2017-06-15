@@ -32,9 +32,6 @@ struct vlc_interrupt
 {
     vlc_mutex_t lock;
     bool interrupted;
-#ifndef NDEBUG
-    bool attached;
-#endif
     atomic_bool killed;
     void (*callback)(void *);
     void *data;
