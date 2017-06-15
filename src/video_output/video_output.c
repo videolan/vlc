@@ -1320,8 +1320,7 @@ static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
         vout_window_SetFullScreen(window, fullscreen);
     else
     if (vout->p->display.vd != NULL)
-        vout_display_SendEvent(vout->p->display.vd,
-                               VOUT_DISPLAY_EVENT_FULLSCREEN, fullscreen);
+        vout_display_SendEventFullscreen(vout->p->display.vd, fullscreen);
 }
 
 static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
@@ -1333,8 +1332,7 @@ static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
 #if defined(_WIN32) || defined(__OS2__)
     else /* FIXME: remove this event */
     if (vout->p->display.vd != NULL)
-        vout_display_SendEvent(vout->p->display.vd,
-                               VOUT_DISPLAY_EVENT_WINDOW_STATE, state);
+        vout_display_SendWindowState(vout->p->display.vd, state);
 #endif
 }
 
