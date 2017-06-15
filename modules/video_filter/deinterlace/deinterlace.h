@@ -77,9 +77,9 @@ typedef enum { DEINTERLACE_DISCARD, DEINTERLACE_MEAN,    DEINTERLACE_BLEND,
  * @see Deinterlace()
  */
 typedef struct {
-    mtime_t pi_date[METADATA_SIZE];
-    int     pi_nb_fields[METADATA_SIZE];
-    bool    pb_top_field_first[METADATA_SIZE];
+    mtime_t pi_date;
+    int     pi_nb_fields;
+    bool    pb_top_field_first;
 } metadata_history_t;
 
 #define HISTORY_SIZE (3)
@@ -109,7 +109,7 @@ struct filter_sys_t
      * Metadata history (PTS, nb_fields, TFF). Used for framerate doublers.
      * @see metadata_history_t
      */
-    metadata_history_t meta;
+    metadata_history_t meta[METADATA_SIZE];
 
     /** Output frame timing / framerate doubler control
         (see extra documentation in deinterlace.h) */

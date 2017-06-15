@@ -316,15 +316,11 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 
     /* Slide the metadata history. */
     for( int i = 1; i < METADATA_SIZE; i++ )
-    {
-        p_sys->meta.pi_date[i-1]            = p_sys->meta.pi_date[i];
-        p_sys->meta.pi_nb_fields[i-1]       = p_sys->meta.pi_nb_fields[i];
-        p_sys->meta.pb_top_field_first[i-1] = p_sys->meta.pb_top_field_first[i];
-    }
+        p_sys->meta[i-1] = p_sys->meta[i];
     /* The last element corresponds to the current input frame. */
-    p_sys->meta.pi_date[METADATA_SIZE-1]            = p_pic->date;
-    p_sys->meta.pi_nb_fields[METADATA_SIZE-1]       = p_pic->i_nb_fields;
-    p_sys->meta.pb_top_field_first[METADATA_SIZE-1] = p_pic->b_top_field_first;
+    p_sys->meta[METADATA_SIZE-1].pi_date            = p_pic->date;
+    p_sys->meta[METADATA_SIZE-1].pi_nb_fields       = p_pic->i_nb_fields;
+    p_sys->meta[METADATA_SIZE-1].pb_top_field_first = p_pic->b_top_field_first;
 
     /* Remember the frame offset that we should use for this frame.
        The value in p_sys will be updated to reflect the correct value
@@ -338,8 +334,8 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     if( i_frame_offset != CUSTOM_PTS )
     {
         /* Pick the correct values from the history. */
-        b_top_field_first = p_sys->meta.pb_top_field_first[i_meta_idx];
-        i_nb_fields       = p_sys->meta.pi_nb_fields[i_meta_idx];
+        b_top_field_first = p_sys->meta[i_meta_idx].pb_top_field_first;
+        i_nb_fields       = p_sys->meta[i_meta_idx].pi_nb_fields;
     }
     else
     {
@@ -374,7 +370,7 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
         /* Find oldest valid logged date.
            The current input frame doesn't count. */
         for( ; i < iend; i++ )
-            if( p_sys->meta.pi_date[i] > VLC_TS_INVALID )
+            if( p_sys->meta[i].pi_date > VLC_TS_INVALID )
                 break;
         if( i < iend )
         {
@@ -382,9 +378,9 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
                (except the new frame) represent. */
             int i_fields_total = 0;
             for( int j = i ; j < iend; j++ )
-                i_fields_total += p_sys->meta.pi_nb_fields[j];
+                i_fields_total += p_sys->meta[j].pi_nb_fields;
             /* One field took this long. */
-            i_field_dur = (p_pic->date - p_sys->meta.pi_date[i]) / i_fields_total;
+            i_field_dur = (p_pic->date - p_sys->meta[i].pi_date) / i_fields_total;
         }
         /* Note that we default to field duration 0 if it could not be
            determined. This behaves the same as the old code - leaving the
@@ -512,7 +508,7 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     assert( i_frame_offset <= METADATA_SIZE  ||  i_frame_offset == CUSTOM_PTS );
     if( i_frame_offset != CUSTOM_PTS )
     {
-        mtime_t i_base_pts = p_sys->meta.pi_date[i_meta_idx];
+        mtime_t i_base_pts = p_sys->meta[i_meta_idx].pi_date;
 
         /* Note: in the usual case (i_frame_offset = 0  and
                  b_double_rate = false), this effectively does nothing.
@@ -568,9 +564,9 @@ void Flush( filter_t *p_filter )
 
     for( int i = 0; i < METADATA_SIZE; i++ )
     {
-        p_sys->meta.pi_date[i] = VLC_TS_INVALID;
-        p_sys->meta.pi_nb_fields[i] = 2;
-        p_sys->meta.pb_top_field_first[i] = true;
+        p_sys->meta[i].pi_date = VLC_TS_INVALID;
+        p_sys->meta[i].pi_nb_fields = 2;
+        p_sys->meta[i].pb_top_field_first = true;
     }
     p_sys->i_frame_offset = 0; /* reset to default value (first frame after
                                   flush cannot have offset) */
@@ -653,9 +649,9 @@ notsupp:
 
     for( int i = 0; i < METADATA_SIZE; i++ )
     {
-        p_sys->meta.pi_date[i] = VLC_TS_INVALID;
-        p_sys->meta.pi_nb_fields[i] = 2;
-        p_sys->meta.pb_top_field_first[i] = true;
+        p_sys->meta[i].pi_date = VLC_TS_INVALID;
+        p_sys->meta[i].pi_nb_fields = 2;
+        p_sys->meta[i].pb_top_field_first = true;
     }
     p_sys->i_frame_offset = 0; /* start with default value (first-ever frame
                                   cannot have offset) */
