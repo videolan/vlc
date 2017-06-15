@@ -117,7 +117,7 @@ int CommonInit(vout_display_t *vd)
 
     if (vd->cfg->is_fullscreen) {
         if (CommonControlSetFullscreen(vd, true))
-            vout_display_SendEventFullscreen(vd, false);
+            vout_display_SendEventFullscreen(vd, false, false);
     }
 
     DisableScreensaver (vd);

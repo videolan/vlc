@@ -305,7 +305,7 @@ static int Open(vlc_object_t *object)
 
     /* Fix state in case of desktop mode */
     if (sys->sys.use_desktop && vd->cfg->is_fullscreen)
-        vout_display_SendEventFullscreen(vd, false);
+        vout_display_SendEventFullscreen(vd, false, false);
 
     return VLC_SUCCESS;
 error:
@@ -615,13 +615,13 @@ static int ControlReopenDevice(vout_display_t *vd)
     if (sys->sys.use_desktop) {
         /* Disable fullscreen/on_top while using desktop */
         if (sys->desktop_save.is_fullscreen)
-            vout_display_SendEventFullscreen(vd, false);
+            vout_display_SendEventFullscreen(vd, false, false);
         if (sys->desktop_save.is_on_top)
             vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_NORMAL);
     } else {
         /* Restore fullscreen/on_top */
         if (sys->desktop_save.is_fullscreen)
-            vout_display_SendEventFullscreen(vd, true);
+            vout_display_SendEventFullscreen(vd, true, false);
         if (sys->desktop_save.is_on_top)
             vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
     }

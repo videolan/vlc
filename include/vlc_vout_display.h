@@ -362,9 +362,10 @@ static inline void vout_display_SendEventKey(vout_display_t *vd, int key)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_KEY, key);
 }
-static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen)
+static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen,
+                                                    bool is_window_fullscreen)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
+    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen, is_window_fullscreen);
 }
 #if defined(_WIN32)
 static inline void vout_display_SendWindowState(vout_display_t *vd, unsigned state)
