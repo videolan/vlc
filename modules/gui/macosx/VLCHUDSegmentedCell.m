@@ -33,6 +33,7 @@
 //	POSSIBILITY OF SUCH DAMAGE.
 
 #import "VLCHUDSegmentedCell.h"
+#import "CompatibilityFixes.h"
 
 @interface NSSegmentedCell (Private)
 
@@ -65,6 +66,10 @@
 
 - (void)drawWithFrame:(NSRect)frame inView:(NSView *)view
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawWithFrame:frame inView:view];
+    }
+
     for (NSInteger segment = 0; segment < self.segmentCount; segment++) {
         NSRect segmentRect = [self rectForSegment:segment inFrame:frame];
         [self drawBackgroundForSegment:segment inFrame:segmentRect];
@@ -80,6 +85,10 @@
 
 - (void)drawSegment:(NSInteger)segment inFrame:(NSRect)frame withView:(NSView *)view
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawSegment:segment inFrame:frame withView:view];
+    }
+
     NSString *segmentText = [self labelForSegment:segment];
 
     NSSize textSize = [segmentText sizeWithAttributes:nil];
