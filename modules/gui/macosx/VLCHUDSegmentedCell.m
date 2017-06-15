@@ -65,11 +65,11 @@
 
 - (void)drawWithFrame:(NSRect)frame inView:(NSView *)view
 {
-    [_strokeColor setStroke];
     for (NSInteger segment = 0; segment < self.segmentCount; segment++) {
         NSRect segmentRect = [self rectForSegment:segment inFrame:frame];
         [self drawBackgroundForSegment:segment inFrame:segmentRect];
         [self drawSegment:segment inFrame:segmentRect withView:view];
+        [self drawDividerForSegment:segment inFrame:segmentRect];
     }
 
     NSBezierPath* rectanglePath = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(frame, 0.55, 0.55) xRadius:3.0 yRadius:3.0];
@@ -129,6 +129,22 @@
     }
     [fillPath closePath];
     [gradient drawInBezierPath:fillPath angle:90];
+}
+
+- (void)drawDividerForSegment:(NSInteger)segment inFrame:(NSRect)frame
+{
+    if (segment == 0) {
+        // Do not draw for first segment
+        return;
+    }
+
+    // Draw divider on the left of the segment
+    NSBezierPath* dividerPath = [NSBezierPath bezierPath];
+    [dividerPath moveToPoint:NSMakePoint(NSMinX(frame), NSMinY(frame))];
+    [dividerPath lineToPoint:NSMakePoint(NSMinX(frame), NSMaxY(frame))];
+    [_strokeColor setStroke];
+    [dividerPath setLineWidth:1.0];
+    [dividerPath stroke];
 }
 
 - (BOOL)_canAnimate {
