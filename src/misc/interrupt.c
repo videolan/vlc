@@ -43,21 +43,13 @@
 #include "interrupt.h"
 #include "libvlc.h"
 
-static unsigned vlc_interrupt_refs = 0;
-static vlc_rwlock_t vlc_interrupt_lock = VLC_STATIC_RWLOCK;
-static vlc_threadvar_t vlc_interrupt_var;
+static thread_local vlc_interrupt_t *vlc_interrupt_var;
 
 /**
  * Initializes an interruption context.
  */
 void vlc_interrupt_init(vlc_interrupt_t *ctx)
 {
-    vlc_rwlock_wrlock(&vlc_interrupt_lock);
-    assert(vlc_interrupt_refs < UINT_MAX);
-    if (vlc_interrupt_refs++ == 0)
-        vlc_threadvar_create(&vlc_interrupt_var, NULL);
-    vlc_rwlock_unlock(&vlc_interrupt_lock);
-
     vlc_mutex_init(&ctx->lock);
     ctx->interrupted = false;
     atomic_init(&ctx->killed, false);
@@ -80,12 +72,6 @@ void vlc_interrupt_deinit(vlc_interrupt_t *ctx)
 {
     assert(ctx->callback == NULL);
     vlc_mutex_destroy(&ctx->lock);
-
-    vlc_rwlock_wrlock(&vlc_interrupt_lock);
-    assert(vlc_interrupt_refs > 0);
-    if (--vlc_interrupt_refs == 0)
-        vlc_threadvar_delete(&vlc_interrupt_var);
-    vlc_rwlock_unlock(&vlc_interrupt_lock);
 }
 
 void vlc_interrupt_destroy(vlc_interrupt_t *ctx)
@@ -112,29 +98,15 @@ void vlc_interrupt_raise(vlc_interrupt_t *ctx)
 
 vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *newctx)
 {
-    vlc_interrupt_t *oldctx;
+    vlc_interrupt_t *oldctx = vlc_interrupt_var;
 
-    /* This function is called to push or pop an interrupt context. Either way
-     * either newctx or oldctx (or both) are non-NULL. Thus vlc_interrupt_refs
-     * must be larger than zero and vlc_interrupt_var must be valid. And so the
-     * read/write lock is not needed. */
-    assert(vlc_interrupt_refs > 0);
-
-    oldctx = vlc_threadvar_get(vlc_interrupt_var);
-    vlc_threadvar_set(vlc_interrupt_var, newctx);
-
+    vlc_interrupt_var = newctx;
     return oldctx;
 }
 
 static vlc_interrupt_t *vlc_interrupt_get(void)
 {
-    vlc_interrupt_t *ctx = NULL;
-
-    vlc_rwlock_rdlock(&vlc_interrupt_lock);
-    if (vlc_interrupt_refs > 0)
-        ctx = vlc_threadvar_get(vlc_interrupt_var);
-    vlc_rwlock_unlock(&vlc_interrupt_lock);
-    return ctx;
+    return vlc_interrupt_var;
 }
 
 /**
