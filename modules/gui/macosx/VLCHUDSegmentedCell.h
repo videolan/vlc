@@ -36,15 +36,11 @@
 
 @interface VLCHUDSegmentedCell : NSSegmentedCell
 
-@property (strong) NSShadow *dropShadow;
 @property (strong) NSColor *strokeColor;
 @property (strong) NSGradient *highlightGradient;
 @property (strong) NSGradient *normalGradient;
 @property (strong) NSGradient *disabledNormalGradient;
 @property (strong) NSColor *cellTextColor;
 @property (strong) NSColor *disabledCellTextColor;
-
--(void)drawInteriorForSegment:(NSInteger)segment withFrame:(NSRect)rect;
--(BOOL)hasText;
 
 @end
