@@ -1378,7 +1378,7 @@ void DumpVariables(vlc_object_t *obj)
     vlc_mutex_unlock(&vlc_internals(obj)->var_lock);
 }
 
-static _Thread_local void *twalk_ctx;
+static thread_local void *twalk_ctx;
 
 static void TwalkGetNames(const void *data, const VISIT which, const int depth)
 {
