@@ -398,6 +398,7 @@ static const float f_min_window_height = 307.;
     }
 }
 
+// Show split view and hide the video view
 - (void)makeSplitViewVisible
 {
     if (self.darkInterface)
@@ -418,13 +419,14 @@ static const float f_min_window_height = 307.;
     [self.videoView setHidden:YES];
     [_splitView setHidden:NO];
     if (self.nativeFullscreenMode && [self fullscreen]) {
-        [[self.controlsBar bottomBarView] setHidden:NO];
+        [self showControlsBar];
         [self.fspanel setNonActive];
     }
 
     [self makeFirstResponder:_playlistScrollView];
 }
 
+// Hides the split view and makes the vout view in foreground
 - (void)makeSplitViewHidden
 {
     if (self.darkInterface)
@@ -435,7 +437,7 @@ static const float f_min_window_height = 307.;
     [_splitView setHidden:YES];
     [self.videoView setHidden:NO];
     if (self.nativeFullscreenMode && [self fullscreen]) {
-        [[self.controlsBar bottomBarView] setHidden:YES];
+        [self hideControlsBar];
         [self.fspanel setActive];
     }
 
@@ -502,6 +504,7 @@ static const float f_min_window_height = 307.;
             [_splitView setHidden: NO];
             [_playlistScrollView setHidden: NO];
             [self.videoView setHidden: YES];
+            [self showControlsBar];
         }
     }
 
