@@ -595,6 +595,18 @@
 #pragma mark -
 #pragma mark Lion native fullscreen handling
 
+- (void)hideControlsBar
+{
+    [[self.controlsBar bottomBarView] setHidden: YES];
+    self.videoViewBottomConstraint.priority = 1;
+}
+
+- (void)showControlsBar
+{
+    [[self.controlsBar bottomBarView] setHidden: NO];
+    self.videoViewBottomConstraint.priority = 999;
+}
+
 - (void)becomeKeyWindow
 {
     [super becomeKeyWindow];
@@ -695,8 +707,7 @@
     }
 
     if (![_videoView isHidden]) {
-        [[self.controlsBar bottomBarView] setHidden: YES];
-        self.videoViewBottomConstraint.priority = 1;
+        [self hideControlsBar];
     }
 
     [self setMovableByWindowBackground: NO];
@@ -755,8 +766,7 @@
     }
 
     if (![_videoView isHidden]) {
-        [[self.controlsBar bottomBarView] setHidden: NO];
-        self.videoViewBottomConstraint.priority = 999;
+        [self showControlsBar];
     }
 
     [self setMovableByWindowBackground: YES];

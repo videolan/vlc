@@ -783,11 +783,11 @@ static const float f_min_window_height = 307.;
     }
 
     if (self.nativeFullscreenMode) {
-        if ([self hasActiveVideo] && [self fullscreen]) {
-            [[self.controlsBar bottomBarView] setHidden: b_videoPlayback];
+        if ([self hasActiveVideo] && [self fullscreen] && b_videoPlayback) {
+            [self hideControlsBar];
             [self.fspanel setActive];
         } else {
-            [[self.controlsBar bottomBarView] setHidden: NO];
+            [self showControlsBar];
             [self.fspanel setNonActive];
         }
     }
