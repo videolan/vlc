@@ -104,11 +104,6 @@ vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *newctx)
     return oldctx;
 }
 
-static vlc_interrupt_t *vlc_interrupt_get(void)
-{
-    return vlc_interrupt_var;
-}
-
 /**
  * Prepares to enter interruptible wait.
  * @param cb callback to interrupt the wait (i.e. wake up the thread)
@@ -120,7 +115,7 @@ static void vlc_interrupt_prepare(vlc_interrupt_t *ctx,
                                   void (*cb)(void *), void *data)
 {
     assert(ctx != NULL);
-    assert(ctx == vlc_interrupt_get());
+    assert(ctx == vlc_interrupt_var);
 
     vlc_mutex_lock(&ctx->lock);
     assert(ctx->callback == NULL);
@@ -148,7 +143,7 @@ static int vlc_interrupt_finish(vlc_interrupt_t *ctx)
     int ret = 0;
 
     assert(ctx != NULL);
-    assert(ctx == vlc_interrupt_get());
+    assert(ctx == vlc_interrupt_var);
 
     /* Wait for pending callbacks to prevent access by other threads. */
     vlc_mutex_lock(&ctx->lock);
@@ -164,14 +159,14 @@ static int vlc_interrupt_finish(vlc_interrupt_t *ctx)
 
 void vlc_interrupt_register(void (*cb)(void *), void *opaque)
 {
-    vlc_interrupt_t *ctx = vlc_interrupt_get();
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
     if (ctx != NULL)
         vlc_interrupt_prepare(ctx, cb, opaque);
 }
 
 int vlc_interrupt_unregister(void)
 {
-    vlc_interrupt_t *ctx = vlc_interrupt_get();
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
     return (ctx != NULL) ? vlc_interrupt_finish(ctx) : 0;
 }
 
@@ -190,7 +185,7 @@ void vlc_interrupt_kill(vlc_interrupt_t *ctx)
 
 bool vlc_killed(void)
 {
-    vlc_interrupt_t *ctx = vlc_interrupt_get();
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
 
     return (ctx != NULL) && atomic_load(&ctx->killed);
 }
@@ -202,7 +197,7 @@ static void vlc_interrupt_sem(void *opaque)
 
 int vlc_sem_wait_i11e(vlc_sem_t *sem)
 {
-    vlc_interrupt_t *ctx = vlc_interrupt_get();
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
     if (ctx == NULL)
         return vlc_sem_wait(sem), 0;
 
@@ -232,7 +227,7 @@ static void vlc_mwait_i11e_cleanup(void *opaque)
 
 int vlc_mwait_i11e(mtime_t deadline)
 {
-    vlc_interrupt_t *ctx = vlc_interrupt_get();
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
     if (ctx == NULL)
         return mwait(deadline), 0;
 
@@ -267,7 +262,7 @@ void vlc_interrupt_forward_start(vlc_interrupt_t *to, void *data[2])
 {
     data[0] = data[1] = NULL;
 
-    vlc_interrupt_t *from = vlc_interrupt_get();
+    vlc_interrupt_t *from = vlc_interrupt_var;
     if (from == NULL)
         return;
 
@@ -376,7 +371,7 @@ static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
 
 int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
 {
-    vlc_interrupt_t *ctx = vlc_interrupt_get();
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
     if (ctx == NULL)
         return poll(fds, nfds, timeout);
 
@@ -573,7 +568,7 @@ static void vlc_poll_i11e_cleanup(void *opaque)
 
 int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
 {
-    vlc_interrupt_t *ctx = vlc_interrupt_get();
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
     if (ctx == NULL)
         return vlc_poll(fds, nfds, timeout);
 
