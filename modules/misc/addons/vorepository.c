@@ -88,7 +88,7 @@ static int ParseManifest( addons_finder_t *p_finder, addon_entry_t *p_entry,
     const char *attr, *value;
 
     /* temp reading */
-    const char *psz_filename = NULL;
+    char *psz_filename = NULL;
     int i_filetype = -1;
 
     xml_reader_t *p_xml_reader = xml_ReaderCreate( p_finder, p_stream );
@@ -184,6 +184,7 @@ static int ParseManifest( addons_finder_t *p_finder, addon_entry_t *p_entry,
                     }
                 }
                 /* reset temp */
+                free( psz_filename );
                 psz_filename = NULL;
                 i_filetype = -1;
             }
