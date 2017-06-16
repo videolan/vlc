@@ -149,7 +149,7 @@ static int ParseManifest( addons_finder_t *p_finder, addon_entry_t *p_entry,
             if ( data_pointer.e_type == TYPE_STRING )
             {
                 if( data_pointer.u_data.ppsz )
-                    free( data_pointer.u_data.ppsz );
+                    free( *data_pointer.u_data.ppsz );
                 *data_pointer.u_data.ppsz = strdup( p_node );
             }
             else
