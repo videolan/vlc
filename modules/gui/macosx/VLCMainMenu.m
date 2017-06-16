@@ -262,14 +262,29 @@
     [self refreshAudioDeviceList];
 
     /* setup subtitles menu */
-#warning subtitles styles menu disabled due to missing adaptation to VLC 3.0
-#if 0
-    [self setupMenu: _subtitle_sizeMenu withIntList:"freetype-rel-fontsize" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_textcolorMenu withIntList:"freetype-color" andSelector:@selector(switchSubtitleOption:)];
     [_subtitle_bgopacity_sld setIntValue: config_GetInt(VLC_OBJECT(p_intf), "freetype-background-opacity")];
     [self setupMenu: _subtitle_bgcolorMenu withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_outlinethicknessMenu withIntList:"freetype-outline-thickness" andSelector:@selector(switchSubtitleOption:)];
-#endif
+
+    /* Build size menu based on different scale factors */
+    struct {
+        const char *const name;
+        int scaleValue;
+    } scaleValues[] = {
+        { N_("Smaller"), 50},
+        { N_("Small"),   75},
+        { N_("Normal"), 100},
+        { N_("Large"),  125},
+        { N_("Larger"), 150},
+        { NULL, 0 }
+    };
+
+    for(int i = 0; scaleValues[i].name; i++) {
+        NSMenuItem *menuItem = [_subtitle_sizeMenu addItemWithTitle: _NS(scaleValues[i].name) action:@selector(switchSubtitleSize:) keyEquivalent:@""];
+        [menuItem setTag:scaleValues[i].scaleValue];
+        [menuItem setTarget: self];
+    }
 }
 
 - (void)setupMenu: (NSMenu*)menu withIntList: (char *)psz_name andSelector:(SEL)selector
@@ -1017,6 +1032,18 @@
     if (i_returnValue == NSOKButton)
         [[VLCCoreInteraction sharedInstance] addSubtitlesToCurrentInput:[openPanel URLs]];
 }
+
+- (void)switchSubtitleSize:(id)sender
+{
+    int intValue = [sender tag];
+
+    vout_thread_t *vout = getVout();
+    if (vout) {
+        var_SetInteger(vout, "sub-text-scale", intValue);
+        vlc_object_release(vout);
+    }
+}
+
 
 - (void)switchSubtitleOption:(id)sender
 {
