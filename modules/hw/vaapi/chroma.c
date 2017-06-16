@@ -307,6 +307,8 @@ static int Open(vlc_object_t *obj)
         msg_Err(obj, "unable to allocate memory");
         return VLC_ENOMEM;
     }
+    filter_sys->derive_failed = false;
+    filter_sys->image_fallback_failed = false;
 
     if (is_upload)
     {
