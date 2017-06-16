@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_codecs.h>
 #include <vlc_codec.h>
+#include <vlc_picture.h>
 
 
 #define D3D_DecoderSurface  void
@@ -110,7 +111,7 @@ done:
     return err;
 }
 
-static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
+static picture_context_t *GetSurface(vlc_va_t *va, va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++) {
         vlc_va_surface_t *surface = va_pool->surface[i];
@@ -118,28 +119,33 @@ static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
 
         if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
         {
-            /* TODO do a copy to allow releasing locally and keep forward alive atomic_fetch_sub(&surface->refs, 1);*/
-            surface->decoderSurface = va_pool->hw_surface[i];
-            return surface;
+            picture_context_t *field = va_pool->pf_new_surface_context(va, surface, va_pool->hw_surface[i]);
+            if (!field)
+            {
+                atomic_fetch_sub(&surface->refcount, 1);
+                continue;
+            }
+            return field;
         }
     }
     return NULL;
 }
 
-vlc_va_surface_t *va_pool_Get(vlc_va_t *va, va_pool_t *va_pool)
+int va_pool_Get(vlc_va_t *va, picture_t *pic, va_pool_t *va_pool)
 {
     unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
-    vlc_va_surface_t *field;
+    picture_context_t *field;
 
-    while ((field = GetSurface(va_pool)) == NULL)
+    while ((field = GetSurface(va, va_pool)) == NULL)
     {
         if (--tries == 0)
-            return NULL;
+            return VLC_ENOITEM;
         /* Pool empty. Wait for some time as in src/input/decoder.c.
          * XXX: Both this and the core should use a semaphore or a CV. */
         msleep(VOUT_OUTMEM_SLEEP);
     }
-    return field;
+    pic->context = field;
+    return VLC_SUCCESS;
 }
 
 void va_surface_AddRef(vlc_va_surface_t *surface)

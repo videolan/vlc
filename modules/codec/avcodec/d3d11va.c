@@ -237,6 +237,35 @@ done:
     return pic_ctx;
 }
 
+static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface, ID3D11VideoDecoderOutputView *surface)
+{
+    ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
+    ID3D11Resource *p_resource;
+    ID3D11VideoDecoderOutputView_GetResource(surface, &p_resource);
+
+    D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+    ID3D11VideoDecoderOutputView_GetDesc(surface, &viewDesc);
+
+    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+        resourceView[i] = va->sys->resourceView[viewDesc.Texture2D.ArraySlice*D3D11_MAX_SHADER_VIEW + i];
+
+    struct va_pic_context *pic_ctx = CreatePicContext(va_surface,
+                                                  surface,
+                                                  p_resource,
+                                                  va->sys->d3dctx,
+                                                  viewDesc.Texture2D.ArraySlice,
+                                                  resourceView);
+    ID3D11Resource_Release(p_resource);
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    /* all the resources are acquired during surfaces init, and a second time in
+     * CreatePicContext(), undo one of them otherwise we need an extra release
+     * when the pool is emptied */
+    ReleasePictureSys(&pic_ctx->picsys);
+    va_surface->decoderSurface = surface;
+    return &pic_ctx->s;
+}
+
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
 #if D3D11_DIRECT_DECODE
@@ -276,34 +305,9 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     else
 #endif
     {
-        ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
-        vlc_va_surface_t *va_surface = va_pool_Get(va, &va->sys->dx_sys.va_pool);
-        if (unlikely(va_surface==NULL))
-            return VLC_EGENERIC;
-
-        ID3D11Resource *p_resource;
-        ID3D11VideoDecoderOutputView_GetResource(va_surface->decoderSurface, &p_resource);
-
-        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
-        ID3D11VideoDecoderOutputView_GetDesc(va_surface->decoderSurface, &viewDesc);
-
-        for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
-            resourceView[i] = va->sys->resourceView[viewDesc.Texture2D.ArraySlice*D3D11_MAX_SHADER_VIEW + i];
-
-        struct va_pic_context *pic_ctx = CreatePicContext( va_surface,
-                                                              va_surface->decoderSurface,
-                                                              p_resource,
-                                                              va->sys->d3dctx,
-                                                              viewDesc.Texture2D.ArraySlice,
-                                                              resourceView );
-
-        ID3D11Resource_Release(p_resource);
-        if (unlikely(pic_ctx==NULL))
-        {
-            va_surface_Release(va_surface);
-            return VLC_ENOMEM;
-        }
-        pic->context = &pic_ctx->s;
+        int res = va_pool_Get(va, pic, &va->sys->dx_sys.va_pool);
+        if (unlikely(res != VLC_SUCCESS))
+            return res;
     }
     *data = (uint8_t*)((struct va_pic_context *)pic->context)->picsys.decoder;
     return VLC_SUCCESS;
@@ -372,6 +376,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->va_pool.pf_create_decoder_surfaces = DxCreateDecoderSurfaces;
     dx_sys->va_pool.pf_destroy_surfaces        = DxDestroySurfaces;
     dx_sys->va_pool.pf_setup_avcodec_ctx       = SetupAVCodecContext;
+    dx_sys->va_pool.pf_new_surface_context     = NewSurfacePicContext;
     dx_sys->pf_get_input_list          = DxGetInputList;
     dx_sys->pf_setup_output            = DxSetupOutput;
     dx_sys->psz_decoder_dll            = TEXT("D3D11.DLL");

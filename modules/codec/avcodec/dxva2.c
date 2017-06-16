@@ -193,15 +193,18 @@ static void d3d9_pic_context_destroy(struct picture_context_t *opaque)
     }
 }
 
-static struct picture_context_t *CreatePicContext(vlc_va_surface_t *);
+static struct va_pic_context *CreatePicContext(vlc_va_surface_t *, IDirect3DSurface9 *);
 
 static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
 {
     struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    return CreatePicContext(src_ctx->va_surface);
+    struct va_pic_context *pic_ctx = CreatePicContext(src_ctx->va_surface, src_ctx->picsys.surface);
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    return &pic_ctx->s;
 }
 
-static struct picture_context_t *CreatePicContext(vlc_va_surface_t *va_surface)
+static struct va_pic_context *CreatePicContext(vlc_va_surface_t *va_surface, IDirect3DSurface9 *surface)
 {
     struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx==NULL))
@@ -210,8 +213,18 @@ static struct picture_context_t *CreatePicContext(vlc_va_surface_t *va_surface)
     va_surface_AddRef(pic_ctx->va_surface);
     pic_ctx->s.destroy = d3d9_pic_context_destroy;
     pic_ctx->s.copy    = d3d9_pic_context_copy;
-    pic_ctx->picsys.surface = va_surface->decoderSurface;
+    pic_ctx->picsys.surface = surface;
     AcquirePictureSys(&pic_ctx->picsys);
+    return pic_ctx;
+}
+
+static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface, IDirect3DSurface9 *surface)
+{
+    VLC_UNUSED(va);
+    struct va_pic_context *pic_ctx = CreatePicContext(va_surface, surface);
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    va_surface->decoderSurface = surface;
     return &pic_ctx->s;
 }
 
@@ -229,15 +242,10 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_EGENERIC;
     }
 
-    vlc_va_surface_t *va_surface = va_pool_Get(va, &sys->dx_sys.va_pool);
-    if (unlikely(va_surface==NULL))
-        return VLC_EGENERIC;
-    pic->context = CreatePicContext(va_surface);
-    va_surface_Release(va_surface);
-    if (unlikely(pic->context==NULL))
-        return VLC_EGENERIC;
-    *data = (uint8_t*)va_surface->decoderSurface;
-    return VLC_SUCCESS;
+    int res = va_pool_Get(va, pic, &sys->dx_sys.va_pool);
+    if (likely(res==VLC_SUCCESS))
+        *data = (uint8_t*)((struct va_pic_context*)pic->context)->picsys.surface;
+    return res;
 }
 
 static void Close(vlc_va_t *va, void **ctx)
@@ -309,6 +317,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->va_pool.pf_create_decoder_surfaces = DxCreateVideoDecoder;
     dx_sys->va_pool.pf_destroy_surfaces        = DxDestroyVideoDecoder;
     dx_sys->va_pool.pf_setup_avcodec_ctx       = SetupAVCodecContext;
+    dx_sys->va_pool.pf_new_surface_context     = NewSurfacePicContext;
     dx_sys->pf_get_input_list          = DxGetInputList;
     dx_sys->pf_setup_output            = DxSetupOutput;
     dx_sys->psz_decoder_dll            = TEXT("DXVA2.DLL");

@@ -71,12 +71,17 @@ typedef struct
      */
     void (*pf_setup_avcodec_ctx)(vlc_va_t *);
 
+    /**
+     * Create a new context for the surface being acquired
+     */
+    picture_context_t* (*pf_new_surface_context)(vlc_va_t *, vlc_va_surface_t *, D3D_DecoderSurface *);
+
 } va_pool_t;
 
 int va_pool_Open(vlc_va_t *, va_pool_t *, AVCodecContext *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
 int va_pool_Setup(vlc_va_t *, va_pool_t *, AVCodecContext *, unsigned count, int alignment);
-vlc_va_surface_t *va_pool_Get(vlc_va_t *, va_pool_t *);
+int va_pool_Get(vlc_va_t *, picture_t *, va_pool_t *);
 void va_surface_AddRef(vlc_va_surface_t *surface);
 void va_surface_Release(vlc_va_surface_t *surface);
 
