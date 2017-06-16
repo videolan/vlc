@@ -1146,8 +1146,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
     else
     {
-        /* copy pixels from the context texture to the picture_sys texture */
-        assert(pic_ctx!=NULL);
         D3D11_TEXTURE2D_DESC texDesc;
         ID3D11Texture2D_GetDesc(p_sys->texture[0], &texDesc);
         if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
@@ -1155,21 +1153,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             /* for performance reason we don't want to allocate this during
              * display, do it preferrably when creating the texture */
             assert(p_sys->resourceView[0]!=NULL);
-        }
-        else
-        {
-            D3D11_BOX box = {
-                .top = picture->format.i_y_offset,
-                .bottom = picture->format.i_y_offset + texDesc.Height,
-                .left = picture->format.i_x_offset,
-                .right = picture->format.i_x_offset + texDesc.Width,
-                .back = 1,
-            };
-            ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
-                                                      p_sys->resource[KNOWN_DXGI_INDEX],
-                                                      p_sys->slice_index, 0, 0, 0,
-                                                      pic_ctx->picsys.resource[KNOWN_DXGI_INDEX],
-                                                      pic_ctx->picsys.slice_index, &box);
         }
     }
 
