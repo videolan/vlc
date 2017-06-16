@@ -218,7 +218,10 @@ static int ListSkins( addons_finder_t *p_finder )
             break;
 
         if ( FileBelongsToManagedAddon( p_finder, ADDON_SKIN2, psz_file ) )
+        {
+            free( psz_file );
              continue;
+        }
 
         char *psz_uri;
         if( asprintf( &psz_uri, "file://%s/%s#!/theme.xml", psz_dir, psz_file ) >= 0)
