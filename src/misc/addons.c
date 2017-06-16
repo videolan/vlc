@@ -116,6 +116,7 @@ void addon_entry_Release( addon_entry_t * p_entry )
     FOREACH_ARRAY( p_file, p_entry->files )
     free( p_file->psz_filename );
     free( p_file->psz_download_uri );
+    free( p_file );
     FOREACH_END()
     ARRAY_RESET( p_entry->files );
 
