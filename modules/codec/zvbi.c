@@ -278,9 +278,9 @@ static int Open( vlc_object_t *p_this )
 
     es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_CODEC_SPU );
     if( p_sys->b_text )
-        p_dec->fmt_out.video.i_chroma = VLC_CODEC_TEXT;
+        p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
     else
-        p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBA;
+        p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
 
     p_dec->pf_decode = Decode;
     return VLC_SUCCESS;
