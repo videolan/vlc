@@ -231,9 +231,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    /* Some broadcasters in countries with level 1 and level 1.5 still not send a G0 to do 
+    /* Some broadcasters in countries with level 1 and level 1.5 still not send a G0 to do
      * matches against table 32 of ETSI 300 706. We try to do some best effort guessing
-     * This is not perfect, but might handle some cases where we know the vbi language 
+     * This is not perfect, but might handle some cases where we know the vbi language
      * is known. It would be better if people started sending G0 */
     for( int i = 0; ppsz_default_triplet[i] != NULL; i++ )
     {
