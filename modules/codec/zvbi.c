@@ -276,11 +276,8 @@ static int Open( vlc_object_t *p_this )
     /* Listen for keys */
     var_AddCallback( p_dec->obj.libvlc, "key-pressed", EventKey, p_dec );
 
-    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_CODEC_SPU );
-    if( p_sys->b_text )
-        p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
-    else
-        p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
+    es_format_Init( &p_dec->fmt_out, SPU_ES,
+                    p_sys->b_text ? VLC_CODEC_TEXT : VLC_CODEC_RGBA );
 
     p_dec->pf_decode = Decode;
     return VLC_SUCCESS;
