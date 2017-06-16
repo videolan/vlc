@@ -47,11 +47,6 @@ typedef struct
     vlc_va_surface_t    *surface[MAX_SURFACE_COUNT];
     D3D_DecoderSurface  *hw_surface[MAX_SURFACE_COUNT];
 
-    /**
-     * Check that the decoder device is still available
-     */
-    int (*pf_check_device)(vlc_va_t *);
-
     int (*pf_create_device)(vlc_va_t *);
     void (*pf_destroy_device)(vlc_va_t *);
 

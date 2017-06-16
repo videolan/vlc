@@ -183,24 +183,6 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
     return VLC_SUCCESS;
 }
 
-static int CheckDevice(vlc_va_t *va)
-{
-    VLC_UNUSED(va);
-#ifdef TODO
-    /* Check the device */
-    /* see MFCreateDXGIDeviceManager in mfplat.dll, not avail in Win7 */
-    HRESULT hr = IDirect3DDeviceManager9_TestDevice(sys->devmng, sys->device);
-    if (hr == DXVA2_E_NEW_VIDEO_DEVICE) {
-        if (DxResetVideoDecoder(va))
-            return VLC_EGENERIC;
-    } else if (FAILED(hr)) {
-        msg_Err(va, "IDirect3DDeviceManager9_TestDevice %u", (unsigned)hr);
-        return VLC_EGENERIC;
-    }
-#endif
-    return VLC_SUCCESS;
-}
-
 static void d3d11_pic_context_destroy(struct picture_context_t *opaque)
 {
     struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
@@ -383,7 +365,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     dx_sys = &sys->dx_sys;
 
-    dx_sys->va_pool.pf_check_device            = CheckDevice;
     dx_sys->va_pool.pf_create_device           = D3dCreateDevice;
     dx_sys->va_pool.pf_destroy_device          = D3dDestroyDevice;
     dx_sys->va_pool.pf_create_video_service    = DxCreateVideoService;

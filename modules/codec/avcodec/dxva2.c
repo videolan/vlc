@@ -182,22 +182,6 @@ static int Extract(vlc_va_t *va, picture_t *picture, uint8_t *data)
     return VLC_SUCCESS;
 }
 
-static int CheckDevice(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
-
-    /* Check the device */
-    HRESULT hr = IDirect3DDeviceManager9_TestDevice(sys->devmng, sys->device);
-    if (hr == DXVA2_E_NEW_VIDEO_DEVICE) {
-        if (DxResetVideoDecoder(va))
-            return VLC_EGENERIC;
-    } else if (FAILED(hr)) {
-        msg_Err(va, "IDirect3DDeviceManager9_TestDevice %u", (unsigned)hr);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
 static void d3d9_pic_context_destroy(struct picture_context_t *opaque)
 {
     struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
@@ -233,7 +217,19 @@ static struct picture_context_t *CreatePicContext(vlc_va_surface_t *va_surface)
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
-    vlc_va_surface_t *va_surface = va_pool_Get(va, &va->sys->dx_sys.va_pool);
+    vlc_va_sys_t *sys = va->sys;
+
+    /* Check the device */
+    HRESULT hr = IDirect3DDeviceManager9_TestDevice(sys->devmng, sys->device);
+    if (hr == DXVA2_E_NEW_VIDEO_DEVICE) {
+        if (DxResetVideoDecoder(va))
+            return VLC_EGENERIC;
+    } else if (FAILED(hr)) {
+        msg_Err(va, "IDirect3DDeviceManager9_TestDevice %u", (unsigned)hr);
+        return VLC_EGENERIC;
+    }
+
+    vlc_va_surface_t *va_surface = va_pool_Get(va, &sys->dx_sys.va_pool);
     if (unlikely(va_surface==NULL))
         return VLC_EGENERIC;
     pic->context = CreatePicContext(va_surface);
@@ -304,7 +300,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     dx_sys = &sys->dx_sys;
 
-    dx_sys->va_pool.pf_check_device            = CheckDevice;
     dx_sys->va_pool.pf_create_device           = D3dCreateDevice;
     dx_sys->va_pool.pf_destroy_device          = D3dDestroyDevice;
     dx_sys->va_pool.pf_create_device_manager   = D3dCreateDeviceManager;

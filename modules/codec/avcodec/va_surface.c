@@ -128,10 +128,6 @@ static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
 
 vlc_va_surface_t *va_pool_Get(vlc_va_t *va, va_pool_t *va_pool)
 {
-    /* Check the device */
-    if (va_pool->pf_check_device(va)!=VLC_SUCCESS)
-        return NULL;
-
     unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
     vlc_va_surface_t *field;
 
