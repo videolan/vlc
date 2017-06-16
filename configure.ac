@@ -2339,6 +2339,7 @@ AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
 have_vaapi="no"
 have_vaapi_drm="no"
 have_vaapi_x11="no"
+have_vaapi_wl="no"
 AS_IF([test "${enable_libva}" != "no"], [
   PKG_CHECK_MODULES([LIBVA], [libva >= 0.38], [
     have_vaapi="yes"
@@ -2359,10 +2360,16 @@ AS_IF([test "${enable_libva}" != "no"], [
   ], [
     AC_MSG_WARN([${LIBVA_X11_PKG_ERRORS}.])
   ])
+  PKG_CHECK_MODULES(LIBVA_WL, [libva-wayland], [
+    have_vaapi_wl="yes"
+  ], [
+    AC_MSG_WARN([${LIBVA_WL_PKG_ERRORS}.])
+  ])
 ])
 AM_CONDITIONAL([HAVE_VAAPI], [test "${have_vaapi}" = "yes"])
 AM_CONDITIONAL([HAVE_VAAPI_DRM], [test "${have_vaapi_drm}" = "yes"])
 AM_CONDITIONAL([HAVE_VAAPI_X11], [test "${have_vaapi_x11}" = "yes"])
+AM_CONDITIONAL([HAVE_VAAPI_WL], [test "${have_vaapi_wl}" = "yes"])
 
 have_avcodec_vaapi="no"
 AS_IF([test "${have_vaapi}" = "yes" -a "${have_avcodec}" = "yes"], [
