@@ -44,7 +44,6 @@
 
 static int   Open ( vlc_object_t * );
 static void  Close ( vlc_object_t * );
-static int   Find ( addons_finder_t *p_finder );
 static int   Retrieve ( addons_finder_t *p_finder, addon_entry_t *p_entry );
 static int   OpenDesignated ( vlc_object_t * );
 static int   FindDesignated ( addons_finder_t *p_finder );
