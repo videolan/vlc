@@ -1036,12 +1036,7 @@
 - (void)switchSubtitleSize:(id)sender
 {
     int intValue = [sender tag];
-
-    vout_thread_t *vout = getVout();
-    if (vout) {
-        var_SetInteger(vout, "sub-text-scale", intValue);
-        vlc_object_release(vout);
-    }
+    var_SetInteger(pl_Get(getIntf()), "sub-text-scale", intValue);
 }
 
 
