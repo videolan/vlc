@@ -462,6 +462,9 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "mute", VLC_VAR_BOOL );
     var_Create( p_playlist, "volume", VLC_VAR_FLOAT );
     var_SetFloat( p_playlist, "volume", -1.f );
+
+    var_Create( p_playlist, "sub-text-scale",
+               VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
 }
 
 playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )
