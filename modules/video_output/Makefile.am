@@ -243,7 +243,7 @@ libdirect3d9_deinterlace_plugin_la_LIBADD = $(LIBCOM)
 libdirect3d9_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBdirect3d9)
-vout_LTLIBRARIES += $(LTLIBdirect3d9_deinterlace)
+video_filter_LTLIBRARIES += $(LTLIBdirect3d9_deinterlace)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la libdirect3d9_deinterlace_plugin.la
 endif
 
@@ -268,7 +268,7 @@ EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 libdirect3d11_deinterlace_plugin_la_SOURCES = video_output/win32/d3d11_deinterlace.c \
   video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
 libdirect3d11_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-vout_LTLIBRARIES += $(LTLIBdirect3d11_deinterlace)
+video_filter_LTLIBRARIES += $(LTLIBdirect3d11_deinterlace)
 EXTRA_LTLIBRARIES += libdirect3d11_deinterlace_plugin.la
 
 libdirectdraw_plugin_la_SOURCES = video_output/win32/directdraw.c \
