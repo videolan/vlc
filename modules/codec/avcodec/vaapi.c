@@ -354,6 +354,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (vlc_vaapi_SetInstance(sys->hw_ctx.display))
     {
         msg_Err(va, "VAAPI instance already in use");
+        sys->hw_ctx.display = NULL;
         goto error;
     }
 
