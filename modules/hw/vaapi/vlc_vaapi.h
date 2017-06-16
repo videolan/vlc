@@ -27,6 +27,10 @@
 
 #include <va/va.h>
 
+#include <vlc_common.h>
+#include <vlc_fourcc.h>
+#include <vlc_picture_pool.h>
+
 /**************************
  * VA instance management *
  **************************/
@@ -159,5 +163,38 @@ vlc_vaapi_RenderPicture(vlc_object_t *o, VADisplay dpy, VAContextID ctx,
  * (specified with vlc_vaapi_RenderPicture) on the current surface. */
 int
 vlc_vaapi_EndPicture(vlc_object_t *o, VADisplay dpy, VAContextID ctx);
+
+/*****************
+ * VAAPI helpers *
+ *****************/
+
+/* Creates a VAConfigID */
+VAConfigID
+vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
+                              VAProfile i_profile, VAEntrypoint entrypoint,
+                              int va_force_fourcc);
+
+/* Create a pool backed by VASurfaceID. render_targets will destroyed once
+ * the pool and every pictures are released. */
+picture_pool_t *
+vlc_vaapi_PoolNew(vlc_object_t *o, VADisplay va_dpy,
+                  unsigned count, VASurfaceID **render_targets,
+                  const video_format_t *restrict fmt,
+                  unsigned va_rt_format, int va_force_fourcc);
+
+/* Get render targets from a pic_sys allocated by the vaapi pool (see
+ * vlc_vaapi_PoolNew()) */
+unsigned
+vlc_vaapi_PicSysGetRenderTargets(picture_sys_t *sys,
+                                 VASurfaceID **render_targets);
+
+/* Attachs the VASurface to the picture context, the picture must be allocated
+ * by a vaapi pool (see vlc_vaapi_PoolNew()) */
+void
+vlc_vaapi_PicAttachContext(picture_t *pic);
+
+/* Get the VASurfaceID attached to the pic */
+VASurfaceID
+vlc_vaapi_PicGetSurface(picture_t *pic);
 
 #endif /* VLC_VAAPI_H */
