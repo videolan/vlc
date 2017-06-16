@@ -44,6 +44,35 @@ static inline vout_thread_t *getVout(void)
     return p_vout;
 }
 
+/**
+ * Returns an array containing all the vouts.
+ *
+ * \return all vouts or nil if none is found
+ */
+static inline NSArray<NSValue *> *getVouts(void)
+{
+    input_thread_t *p_input = getInput();
+    vout_thread_t **pp_vouts;
+    size_t i_num_vouts;
+
+    if (!p_input
+        || input_Control(p_input, INPUT_GET_VOUTS, &pp_vouts, &i_num_vouts)
+        || !i_num_vouts)
+        return nil;
+
+    NSMutableArray<NSValue *> *vouts =
+        [NSMutableArray arrayWithCapacity:i_num_vouts];
+
+    for (size_t i = 0; i < i_num_vouts; ++i)
+    {
+        assert(pp_vouts[i]);
+        [vouts addObject:[NSValue valueWithPointer:pp_vouts[i]]];
+    }
+
+    free(pp_vouts);
+    return vouts;
+}
+
 static inline vout_thread_t *getVoutForActiveWindow(void)
 {
     vout_thread_t *p_vout = nil;
