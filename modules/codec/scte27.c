@@ -503,8 +503,7 @@ static int Open(vlc_object_t *object)
     sys->segment_buffer = NULL;
 
     dec->pf_decode = Decode;
-    es_format_Init(&dec->fmt_out, SPU_ES, VLC_CODEC_SPU);
-    dec->fmt_out.video.i_chroma = VLC_CODEC_YUVP;
+    es_format_Init(&dec->fmt_out, SPU_ES, VLC_CODEC_YUVP);
 
     return VLC_SUCCESS;
 }
