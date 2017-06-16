@@ -27,6 +27,7 @@
 #import "VLCPopupPanelController.h"
 #import "VLCTextfieldPanelController.h"
 #import "VLCCoreInteraction.h"
+#import "VLCHexNumberFormatter.h"
 
 @interface VLCVideoEffectsWindowController()
 {
@@ -97,14 +98,19 @@
     [_transformCheckbox setTitle:_NS("Transform")];
     [_transformPopup removeAllItems];
     [_transformPopup addItemWithTitle: _NS("Rotate by 90 degrees")];
+    [[_transformPopup lastItem] setRepresentedObject: @"90"];
     [[_transformPopup lastItem] setTag: 90];
     [_transformPopup addItemWithTitle: _NS("Rotate by 180 degrees")];
+    [[_transformPopup lastItem] setRepresentedObject: @"180"];
     [[_transformPopup lastItem] setTag: 180];
     [_transformPopup addItemWithTitle: _NS("Rotate by 270 degrees")];
+    [[_transformPopup lastItem] setRepresentedObject: @"270"];
     [[_transformPopup lastItem] setTag: 270];
     [_transformPopup addItemWithTitle: _NS("Flip horizontally")];
+    [[_transformPopup lastItem] setRepresentedObject: @"hflip"];
     [[_transformPopup lastItem] setTag: 1];
     [_transformPopup addItemWithTitle: _NS("Flip vertically")];
+    [[_transformPopup lastItem] setRepresentedObject: @"vflip"];
     [[_transformPopup lastItem] setTag: 2];
     [_zoomCheckbox setTitle:_NS("Magnification/Zoom")];
     [_puzzleCheckbox setTitle:_NS("Puzzle game")];
@@ -118,6 +124,7 @@
 
     [_thresholdCheckbox setTitle:_NS("Color threshold")];
     [_thresholdColorLabel setStringValue:_NS("Color")];
+    [_thresholdColorTextField setFormatter:[[VLCHexNumberFormatter alloc] init]];
     [_thresholdSaturationLabel setStringValue:_NS("Saturation")];
     [_thresholdSimilarityLabel setStringValue:_NS("Similarity")];
     [_sepiaCheckbox setTitle:_NS("Sepia")];
@@ -127,15 +134,19 @@
     [_gradientModeLabel setStringValue:_NS("Mode")];
     [_gradientModePopup removeAllItems];
     [_gradientModePopup addItemWithTitle: _NS("Gradient")];
+    [[_gradientModePopup lastItem] setRepresentedObject: @"gradient"];
     [[_gradientModePopup lastItem] setTag: 1];
     [_gradientModePopup addItemWithTitle: _NS("Edge")];
+    [[_gradientModePopup lastItem] setRepresentedObject: @"edge"];
     [[_gradientModePopup lastItem] setTag: 2];
     [_gradientModePopup addItemWithTitle: _NS("Hough")];
+    [[_gradientModePopup lastItem] setRepresentedObject: @"hough"];
     [[_gradientModePopup lastItem] setTag: 3];
     [_gradientColorCheckbox setTitle:_NS("Color")];
     [_gradientCartoonCheckbox setTitle:_NS("Cartoon")];
     [_extractCheckbox setTitle:_NS("Color extraction")];
     [_extractLabel setStringValue:_NS("Color")];
+    [_extractTextField setFormatter:[[VLCHexNumberFormatter alloc] init]];
     [_invertCheckbox setTitle:_NS("Invert colors")];
     [_posterizeCheckbox setTitle:_NS("Posterize")];
     [_posterizeLabel setStringValue:_NS("Posterize level")];
@@ -146,7 +157,6 @@
     [_wavesCheckbox setTitle:_NS("Waves")];
     [_psychedelicCheckbox setTitle:_NS("Psychedelic")];
     [_anaglyphCheckbox setTitle:_NS("Anaglyph")];
-
     [_addTextCheckbox setTitle:_NS("Add text")];
     [_addTextTextLabel setStringValue:_NS("Text")];
     [_addTextPositionLabel setStringValue:_NS("Position")];
@@ -200,7 +210,6 @@
                                                  name:VLCInputChangedNotification
                                                object:nil];
 
-
     [self resetValues];
 }
 
@@ -248,6 +257,79 @@
 
     [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
     [self profileSelectorAction:self];
+}
+
+- (void)setWidgetValue: (id)widget forOption: (char *)psz_option enabled: (bool)b_state
+{
+    intf_thread_t *p_intf = getIntf();
+
+    vlc_value_t val;
+    int i_type = config_GetType(p_intf, psz_option) & VLC_VAR_CLASS;
+    switch (i_type)
+    {
+    case VLC_VAR_BOOL:
+    case VLC_VAR_INTEGER:
+        val.i_int = config_GetInt(p_intf, psz_option);
+        break;
+    case VLC_VAR_FLOAT:
+        val.f_float = config_GetFloat(p_intf, psz_option);
+        break;
+    case VLC_VAR_STRING:
+        val.psz_string = config_GetPsz(p_intf, psz_option);
+        break;
+    default:
+        msg_Err(p_intf, "%s variable is of an unsupported type (%d)", psz_option, i_type);
+        return;
+    }
+
+    if (i_type == VLC_VAR_BOOL || i_type == VLC_VAR_INTEGER)
+    {
+        if ([widget isKindOfClass: [NSSlider class]])
+        {
+            [widget setIntValue: val.i_int];
+            [widget setToolTip: [NSString stringWithFormat:@"%lli", val.i_int]];
+        }
+        else if ([widget isKindOfClass: [NSButton class]])
+            [widget setState: val.i_int ? NSOnState : NSOffState];
+        else if ([widget isKindOfClass: [NSTextField class]])
+            [widget setIntValue: val.i_int];
+        else if ([widget isKindOfClass: [NSStepper class]])
+            [widget setIntValue: val.i_int];
+        else if ([widget isKindOfClass: [NSPopUpButton class]])
+            [widget selectItemWithTag: val.i_int];
+        else
+            msg_Warn(p_intf, "Could not find the correct Integer widget");
+    }
+    else if (i_type == VLC_VAR_FLOAT)
+    {
+        if ([widget isKindOfClass: [NSSlider class]])
+        {
+            [widget setFloatValue: val.f_float];
+            [widget setToolTip: [NSString stringWithFormat:@"%0.3f", val.f_float]];
+        }
+        else
+            msg_Warn(p_intf, "Could not find the correct Float widget");
+    }
+    else if (i_type == VLC_VAR_STRING)
+    {
+        if ([widget isKindOfClass: [NSPopUpButton class]])
+        {
+            for (NSMenuItem *item in [widget itemArray])
+                if ([item representedObject] &&
+                    !strcmp([[item representedObject] UTF8String], val.psz_string))
+                {
+                    [widget selectItemWithTitle: [item title]];
+                    break;
+                }
+        }
+        else if ([widget isKindOfClass: [NSTextField class]])
+            [widget setStringValue: toNSStr(val.psz_string)];
+        else
+            msg_Warn(p_intf, "Could not find the correct String widget");
+        free(val.psz_string);
+    }
+
+    [widget setEnabled: b_state];
 }
 
 - (void)resetValues
@@ -327,25 +409,13 @@
     }
 
     /* fetch and show the various values */
-    [_adjustHueSlider setFloatValue: config_GetFloat(p_intf, "hue")];
-    [_adjustContrastSlider setFloatValue: config_GetFloat(p_intf, "contrast")];
-    [_adjustBrightnessSlider setFloatValue: config_GetFloat(p_intf, "brightness")];
-    [_adjustSaturationSlider setFloatValue: config_GetFloat(p_intf, "saturation")];
-    [_adjustBrightnessCheckbox setState:(config_GetInt(p_intf, "brightness-threshold") != 0 ? NSOnState : NSOffState)];
-    [_adjustGammaSlider setFloatValue: config_GetFloat(p_intf, "gamma")];
-    [_adjustBrightnessSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "brightness")]];
-    [_adjustContrastSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "contrast")]];
-    [_adjustGammaSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "gamma")]];
-    [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", config_GetFloat(p_intf, "hue")]];
-    [_adjustSaturationSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "saturation")]];
     b_state = [_adjustCheckbox state];
-
-    [_adjustBrightnessSlider setEnabled: b_state];
-    [_adjustBrightnessCheckbox setEnabled: b_state];
-    [_adjustContrastSlider setEnabled: b_state];
-    [_adjustGammaSlider setEnabled: b_state];
-    [_adjustHueSlider setEnabled: b_state];
-    [_adjustSaturationSlider setEnabled: b_state];
+    [self setWidgetValue: _adjustHueSlider forOption: "hue" enabled: b_state];
+    [self setWidgetValue: _adjustContrastSlider forOption: "contrast" enabled: b_state];
+    [self setWidgetValue: _adjustBrightnessSlider forOption: "brightness" enabled: b_state];
+    [self setWidgetValue: _adjustSaturationSlider forOption: "saturation" enabled: b_state];
+    [self setWidgetValue: _adjustBrightnessCheckbox forOption: "brightness-threshold" enabled: b_state];
+    [self setWidgetValue: _adjustGammaSlider forOption: "gamma" enabled: b_state];
     [_adjustBrightnessLabel setEnabled: b_state];
     [_adjustContrastLabel setEnabled: b_state];
     [_adjustGammaLabel setEnabled: b_state];
@@ -353,19 +423,13 @@
     [_adjustSaturationLabel setEnabled: b_state];
     [_adjustResetButton setEnabled: b_state];
 
-    [_sharpenSlider setFloatValue: config_GetFloat(p_intf, "sharpen-sigma")];
-    [_sharpenSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "sharpen-sigma")]];
-    [_sharpenSlider setEnabled: [_sharpenCheckbox state]];
+    [self setWidgetValue: _sharpenSlider forOption: "sharpen-sigma" enabled: [_sharpenCheckbox state]];
     [_sharpenLabel setEnabled: [_sharpenCheckbox state]];
 
-    [_bandingSlider setIntValue: config_GetInt(p_intf, "gradfun-radius")];
-    [_bandingSlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "gradfun-radius")]];
-    [_bandingSlider setEnabled: [_bandingCheckbox state]];
+    [self setWidgetValue: _bandingSlider forOption: "gradfun-radius" enabled: [_bandingCheckbox state]];
     [_bandingLabel setEnabled: [_bandingCheckbox state]];
 
-    [_grainSlider setFloatValue: config_GetFloat(p_intf, "grain-variance")];
-    [_grainSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "grain-variance")]];
-    [_grainSlider setEnabled: [_grainCheckbox state]];
+    [self setWidgetValue: _grainSlider forOption: "grain-variance" enabled: [_grainCheckbox state]];
     [_grainLabel setEnabled: [_grainCheckbox state]];
 
     [self setCropLeftValue: 0];
@@ -375,119 +439,71 @@
     [_cropSyncTopBottomCheckbox setState: NSOffState];
     [_cropSyncLeftRightCheckbox setState: NSOffState];
 
-    tmpChar = config_GetPsz(p_intf, "transform-type");
-    tmpString = toNSStr(tmpChar);
-    if ([tmpString isEqualToString:@"hflip"])
-        [_transformPopup selectItemWithTag: 1];
-    else if ([tmpString isEqualToString:@"vflip"])
-        [_transformPopup selectItemWithTag: 2];
-    else
-        [_transformPopup selectItemWithTag:[tmpString intValue]];
-    FREENULL(tmpChar);
-    [_transformPopup setEnabled: [_transformCheckbox state]];
+    [self setWidgetValue: _transformPopup forOption: "transform-type" enabled: [_transformCheckbox state]];
 
-    [self setPuzzleColumnsValue: config_GetInt(p_intf, "puzzle-cols")];
-    [self setPuzzleRowsValue: config_GetInt(p_intf, "puzzle-rows")];
     b_state = [_puzzleCheckbox state];
-    [_puzzleRowsTextField setEnabled: b_state];
-    [_puzzleRowsStepper setEnabled: b_state];
+    [self setWidgetValue: _puzzleColumnsTextField forOption: "puzzle-cols" enabled: b_state];
+    [self setWidgetValue: _puzzleColumnsStepper forOption: "puzzle-cols" enabled: b_state];
+    [self setWidgetValue: _puzzleRowsTextField forOption: "puzzle-rows" enabled: b_state];
+    [self setWidgetValue: _puzzleRowsStepper forOption: "puzzle-rows" enabled: b_state];
     [_puzzleRowsLabel setEnabled: b_state];
-    [_puzzleColumnsTextField setEnabled: b_state];
-    [_puzzleColumnsStepper setEnabled: b_state];
     [_puzzleColumnsLabel setEnabled: b_state];
 
-    [self setCloneValue: config_GetInt(p_intf, "clone-count")];
     b_state = [_cloneCheckbox state];
+    [self setWidgetValue: _cloneNumberTextField forOption: "clone-count" enabled: b_state];
+    [self setWidgetValue: _cloneNumberStepper forOption: "clone-count" enabled: b_state];
     [_cloneNumberLabel setEnabled: b_state];
-    [_cloneNumberTextField setEnabled: b_state];
-    [_cloneNumberStepper setEnabled: b_state];
 
     b_state = [_wallCheckbox state];
-    [self setWallRowsValue: config_GetInt(p_intf, "wall-rows")];
+    [self setWidgetValue: _wallNumbersOfRowsTextField forOption: "wall-rows" enabled: b_state];
+    [self setWidgetValue: _wallNumbersOfRowsStepper forOption: "wall-rows" enabled: b_state];
+    [self setWidgetValue: _wallNumberOfColumnsTextField forOption: "wall-cols" enabled: b_state];
+    [self setWidgetValue: _wallNumberOfColumnsStepper forOption: "wall-cols" enabled: b_state];
     [_wallNumbersOfRowsLabel setEnabled: b_state];
-    [_wallNumbersOfRowsTextField setEnabled: b_state];
-    [_wallNumbersOfRowsStepper setEnabled: b_state];
-    [self setWallColumnsValue: config_GetInt(p_intf, "wall-cols")];
     [_wallNumberOfColumnsLabel setEnabled: b_state];
-    [_wallNumberOfColumnsTextField setEnabled: b_state];
-    [_wallNumberOfColumnsStepper setEnabled: b_state];
-
-    [_thresholdColorTextField setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "colorthres-color")] uppercaseString]];
-    [_thresholdSaturationSlider setIntValue: config_GetInt(p_intf, "colorthres-saturationthres")];
-    [_thresholdSaturationSlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-saturationthres")]];
-    [_thresholdSimilaritySlider setIntValue: config_GetInt(p_intf, "colorthres-similaritythres")];
-    [_thresholdSimilaritySlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-similaritythres")]];
 
     b_state = [_thresholdCheckbox state];
-    [_thresholdColorTextField setEnabled: b_state];
+    [self setWidgetValue: _thresholdColorTextField forOption: "colorthres-color" enabled: b_state];
+    [self setWidgetValue: _thresholdSaturationSlider forOption: "colorthres-saturationthres" enabled: b_state];
+    [self setWidgetValue: _thresholdSimilaritySlider forOption: "colorthres-similaritythres" enabled: b_state];
     [_thresholdColorLabel setEnabled: b_state];
-    [_thresholdSaturationSlider setEnabled: b_state];
     [_thresholdSaturationLabel setEnabled: b_state];
-    [_thresholdSimilaritySlider setEnabled: b_state];
     [_thresholdSimilarityLabel setEnabled: b_state];
 
-    [self setSepiaValue: config_GetInt(p_intf, "sepia-intensity")];
     b_state = [_sepiaCheckbox state];
-    [_sepiaTextField setEnabled: b_state];
-    [_sepiaStepper setEnabled: b_state];
+    [self setWidgetValue: _sepiaTextField forOption: "sepia-intensity" enabled: b_state];
+    [self setWidgetValue: _sepiaStepper forOption: "sepia-intensity" enabled: b_state];
     [_sepiaLabel setEnabled: b_state];
 
-    tmpChar = config_GetPsz(p_intf, "gradient-mode");
-    tmpString = toNSStr(tmpChar);
-    if ([tmpString isEqualToString:@"hough"])
-        [_gradientModePopup selectItemWithTag: 3];
-    else if ([tmpString isEqualToString:@"edge"])
-        [_gradientModePopup selectItemWithTag: 2];
-    else
-        [_gradientModePopup selectItemWithTag: 1];
-    FREENULL(tmpChar);
-    [_gradientCartoonCheckbox setState: config_GetInt(p_intf, "gradient-cartoon")];
-    [_gradientColorCheckbox setState: config_GetInt(p_intf, "gradient-type")];
     b_state = [_gradientCheckbox state];
-    [_gradientModePopup setEnabled: b_state];
+    [self setWidgetValue: _gradientModePopup forOption: "gradient-mode" enabled: b_state];
+    [self setWidgetValue: _gradientCartoonCheckbox forOption: "gradient-cartoon" enabled: b_state];
+    [self setWidgetValue: _gradientColorCheckbox forOption: "gradient-type" enabled: b_state];
     [_gradientModeLabel setEnabled: b_state];
-    [_gradientCartoonCheckbox setEnabled: b_state];
-    [_gradientColorCheckbox setEnabled: b_state];
 
-    [_extractTextField setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "extract-component")] uppercaseString]];
-    [_extractTextField setEnabled: [_extractCheckbox state]];
+    [self setWidgetValue: _extractTextField forOption: "extract-component" enabled: [_extractCheckbox state]];
     [_extractLabel setEnabled: [_extractCheckbox state]];
 
-    [self setPosterizeValue: config_GetInt(p_intf, "posterize-level")];
     b_state = [_posterizeCheckbox state];
-    [_posterizeTextField setEnabled: b_state];
-    [_posterizeStepper setEnabled: b_state];
+    [self setWidgetValue: _posterizeTextField forOption: "posterize-level" enabled: b_state];
+    [self setWidgetValue: _posterizeStepper forOption: "posterize-level" enabled: b_state];
     [_posterizeLabel setEnabled: b_state];
 
-    [_blurSlider setIntValue: config_GetInt(p_intf, "blur-factor")];
-    [_blurSlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "blur-factor")]];
-    [_blurSlider setEnabled: [_blurCheckbox state]];
+    [self setWidgetValue: _blurSlider forOption: "blur-factor" enabled: [_blurCheckbox state]];
     [_blurLabel setEnabled: [_blurCheckbox state]];
 
-    tmpChar = config_GetPsz(p_intf, "marq-marquee");
-    [_addTextTextTextField setStringValue:toNSStr(tmpChar)];
-    if (tmpChar)
-        FREENULL(tmpChar);
-    [_addTextPositionPopup selectItemWithTag: config_GetInt(p_intf, "marq-position")];
     b_state = [_addTextCheckbox state];
-    [_addTextPositionPopup setEnabled: b_state];
+    [self setWidgetValue: _addTextTextTextField forOption: "marq-marquee" enabled: b_state];
+    [self setWidgetValue: _addTextPositionPopup forOption: "marq-position" enabled: b_state];
     [_addTextPositionLabel setEnabled: b_state];
     [_addTextTextLabel setEnabled: b_state];
-    [_addTextTextTextField setEnabled: b_state];
 
-    tmpChar = config_GetPsz(p_intf, "logo-file");
-    [_addLogoLogoTextField setStringValue: toNSStr(tmpChar)];
-    if (tmpChar)
-        FREENULL(tmpChar);
-    [_addLogoPositionPopup selectItemWithTag: config_GetInt(p_intf, "logo-position")];
-    [_addLogoTransparencySlider setIntValue: config_GetInt(p_intf, "logo-opacity")];
-    [_addLogoTransparencySlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "logo-opacity")]];
     b_state = [_addLogoCheckbox state];
-    [_addLogoPositionPopup setEnabled: b_state];
+    [self setWidgetValue: _addLogoLogoTextField forOption: "logo-file" enabled: b_state];
+    [self setWidgetValue: _addLogoPositionPopup forOption: "logo-position" enabled: b_state];
+    [self setWidgetValue: _addLogoTransparencySlider forOption: "logo-opacity" enabled: b_state];
     [_addLogoPositionLabel setEnabled: b_state];
-    [_addLogoLogoTextField setEnabled: b_state];
     [_addLogoLogoLabel setEnabled: b_state];
-    [_addLogoTransparencySlider setEnabled: b_state];
     [_addLogoTransparencyLabel setEnabled: b_state];
 }
 
