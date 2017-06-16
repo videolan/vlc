@@ -735,6 +735,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
+    playlist_t *p_playlist = pl_Get(p_intf);
     char *psz_string, *psz_parser;
 
     const char *psz_filter_type = [self getFilterType:psz_name];
@@ -745,8 +746,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     msg_Dbg(p_intf, "will set filter '%s'", psz_name);
 
-
-    psz_string = config_GetPsz(p_intf, psz_filter_type);
+    psz_string = var_InheritString(p_playlist, psz_filter_type);
 
     if (b_on) {
         if (psz_string == NULL) {
@@ -777,13 +777,10 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             return;
         }
     }
-    config_PutPsz(p_intf, psz_filter_type, psz_string);
+    var_SetString(p_playlist, psz_filter_type, psz_string);
 
-    /* Try to set on the fly */
-    if (!strcmp(psz_filter_type, "video-splitter")) {
-        playlist_t *p_playlist = pl_Get(p_intf);
-        var_SetString(p_playlist, psz_filter_type, psz_string);
-    } else {
+    /* Try to set non splitter filters on the fly */
+    if (strcmp(psz_filter_type, "video-splitter")) {
         vout_thread_t *p_vout = getVout();
         if (p_vout) {
             var_SetString(p_vout, psz_filter_type, psz_string);

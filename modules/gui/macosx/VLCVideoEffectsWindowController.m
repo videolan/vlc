@@ -253,13 +253,14 @@
 - (void)resetValues
 {
     intf_thread_t *p_intf = getIntf();
+    playlist_t *p_playlist = pl_Get(p_intf);
     NSString *tmpString;
     char *tmpChar;
     BOOL b_state;
 
     /* do we have any filter enabled? if yes, show it. */
     char * psz_vfilters;
-    psz_vfilters = config_GetPsz(p_intf, "video-filter");
+    psz_vfilters = var_InheritString(p_playlist, "video-filter");
     if (psz_vfilters) {
         [_adjustCheckbox setState: (NSInteger)strstr(psz_vfilters, "adjust")];
         [_sharpenCheckbox setState: (NSInteger)strstr(psz_vfilters, "sharpen")];
@@ -305,7 +306,7 @@
         [_anaglyphCheckbox setState: NSOffState];
     }
 
-    psz_vfilters = config_GetPsz(p_intf, "sub-source");
+    psz_vfilters = var_InheritString(p_playlist, "sub-source");
     if (psz_vfilters) {
         [_addTextCheckbox setState: (NSInteger)strstr(psz_vfilters, "marq")];
         [_addLogoCheckbox setState: (NSInteger)strstr(psz_vfilters, "logo")];
@@ -315,7 +316,7 @@
         [_addLogoCheckbox setState: NSOffState];
     }
 
-    psz_vfilters = config_GetPsz(p_intf, "video-splitter");
+    psz_vfilters = var_InheritString(p_playlist, "video-splitter");
     if (psz_vfilters) {
         [_cloneCheckbox setState: (NSInteger)strstr(psz_vfilters, "clone")];
         [_wallCheckbox setState: (NSInteger)strstr(psz_vfilters, "wall")];
