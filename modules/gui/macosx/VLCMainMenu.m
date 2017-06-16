@@ -105,7 +105,6 @@
 #endif
 
     NSString* keyString;
-    playlist_t *p_playlist;
     vlc_value_t val;
     VLCStringUtility *stringUtility = [VLCStringUtility sharedInstance];
     char *key;
@@ -262,6 +261,13 @@
     [self refreshAudioDeviceList];
 
     /* setup subtitles menu */
+    // Persist those variables on the playlist
+    playlist_t *p_playlist = pl_Get(getIntf());
+    var_Create(p_playlist, "freetype-color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create(p_playlist, "freetype-background-opacity", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create(p_playlist, "freetype-background-color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create(p_playlist, "freetype-outline-thickness", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+
     [self setupMenu: _subtitle_textcolorMenu withIntList:"freetype-color" andSelector:@selector(switchSubtitleOption:)];
     [_subtitle_bgopacity_sld setIntValue: config_GetInt(VLC_OBJECT(p_intf), "freetype-background-opacity")];
     [self setupMenu: _subtitle_bgcolorMenu withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
@@ -1045,8 +1051,7 @@
     int intValue = [sender tag];
     NSString *representedObject = [sender representedObject];
 
-#warning this won't work anymore and is heritably bad
-    config_PutInt(getIntf(), [representedObject UTF8String], intValue);
+    var_SetInteger(pl_Get(getIntf()), [representedObject UTF8String], intValue);
 
     NSMenu *menu = [sender menu];
     NSUInteger count = (NSUInteger) [menu numberOfItems];
@@ -1057,7 +1062,7 @@
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
 {
-    config_PutInt(getIntf(), "freetype-background-opacity", [sender intValue]);
+    var_SetInteger(pl_Get(getIntf()), "freetype-background-opacity", [sender intValue]);
 }
 
 - (IBAction)telxTransparent:(id)sender
