@@ -3293,13 +3293,18 @@ AS_IF([test "${enable_directx}" != "no"], [
     VLC_ADD_PLUGIN([direct3d9])
     AC_CHECK_HEADERS(d3dx9effect.h)
 
-    AC_CHECK_FUNCS([IDirectXVideoProcessorService_GetVideoProcessorDeviceGuids],
-      [
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
+        [[#define COBJMACROS
+          #include <d3d9.h>
+          #include <dxva2api.h>
+          #ifndef IDirectXVideoProcessorService_GetVideoProcessorDeviceGuids
+          # error dxva2 too old
+          #endif
+        ]],[[;]])
+      ],[
         VLC_ADD_PLUGIN([direct3d9_deinterlace direct3d9_adjust])
       ],
-      [AC_MSG_WARN([Could not find required IDirectXVideoDecoder in dxva2api.h])],
-      [#include <d3d9.h>
-       #include <dxva2api.h>])
+      [AC_MSG_WARN([Could not find required IDirectXVideoDecoder in dxva2api.h])])
 
   ])
 ])
