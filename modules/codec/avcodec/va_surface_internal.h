@@ -35,8 +35,6 @@
 #define MAX_SURFACE_COUNT (64)
 typedef struct
 {
-    int          codec_id;
-
     /* */
     unsigned     surface_count;
     int          surface_width;
@@ -76,9 +74,9 @@ typedef struct
 
 } va_pool_t;
 
-int va_pool_Open(vlc_va_t *, va_pool_t *, AVCodecContext *);
+int va_pool_Open(vlc_va_t *, va_pool_t *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
-int va_pool_Setup(vlc_va_t *, va_pool_t *, AVCodecContext *, unsigned count, int alignment);
+int va_pool_Setup(vlc_va_t *, va_pool_t *, const AVCodecContext *, unsigned count, int alignment);
 int va_pool_Get(vlc_va_t *, picture_t *, va_pool_t *);
 void va_surface_AddRef(vlc_va_surface_t *surface);
 void va_surface_Release(vlc_va_surface_t *surface);

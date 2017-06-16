@@ -48,7 +48,7 @@ static void DestroyVideoDecoder(vlc_va_t *va, va_pool_t *va_pool)
 }
 
 /* */
-int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, AVCodecContext *avctx, unsigned count, int alignment)
+int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned count, int alignment)
 {
     int err = VLC_ENOMEM;
     unsigned i = va_pool->surface_count;
@@ -169,10 +169,8 @@ void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
     va_pool->pf_destroy_device(va);
 }
 
-int va_pool_Open(vlc_va_t *va, va_pool_t *va_pool, AVCodecContext *ctx)
+int va_pool_Open(vlc_va_t *va, va_pool_t *va_pool)
 {
-    va_pool->codec_id = ctx->codec_id;
-
     /* */
     if (va_pool->pf_create_device(va)) {
         msg_Err(va, "Failed to create device");

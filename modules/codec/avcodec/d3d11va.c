@@ -355,6 +355,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     int err = VLC_EGENERIC;
     directx_sys_t *dx_sys;
 
+    ctx->hwaccel_context = NULL;
+
     if (pix_fmt != AV_PIX_FMT_D3D11VA_VLD)
         return VLC_EGENERIC;
 
@@ -412,14 +414,14 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->i_chroma = d3d11va_fourcc(ctx->sw_pix_fmt);
 
 #if VLC_WINSTORE_APP
-    err = directx_va_Open(va, &sys->dx_sys, ctx, fmt, false);
+    err = directx_va_Open(va, &sys->dx_sys, false);
 #else
-    err = directx_va_Open(va, &sys->dx_sys, ctx, fmt, dx_sys->d3ddev == NULL || va->sys->d3dctx == NULL);
+    err = directx_va_Open(va, &sys->dx_sys, dx_sys->d3ddev == NULL || va->sys->d3dctx == NULL);
 #endif
     if (err!=VLC_SUCCESS)
         goto error;
 
-    err = directx_va_Setup(va, &sys->dx_sys, ctx);
+    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt);
     if (err != VLC_SUCCESS)
         goto error;
 

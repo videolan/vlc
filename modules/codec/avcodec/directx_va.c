@@ -159,7 +159,7 @@ DEFINE_GUID(DXVA_ModeVP9_VLD_Profile0,              0x463707f8, 0xa1d0, 0x4585, 
 typedef struct {
     const char   *name;
     const GUID   *guid;
-    int          codec;
+    enum AVCodecID codec;
     const int    *p_profiles; // NULL or ends with 0
 } directx_va_mode_t;
 
@@ -261,7 +261,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static int FindVideoServiceConversion(vlc_va_t *, directx_sys_t *, const es_format_t *fmt);
+static int FindVideoServiceConversion(vlc_va_t *, directx_sys_t *, const es_format_t *, const AVCodecContext *);
 
 char *directx_va_GetDecoderName(const GUID *guid)
 {
@@ -277,12 +277,19 @@ char *directx_va_GetDecoderName(const GUID *guid)
 }
 
 /* */
-int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
+int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *avctx,
+                     const es_format_t *fmt)
 {
+    /* */
+    if (FindVideoServiceConversion(va, dx_sys, fmt, avctx)) {
+        msg_Err(va, "FindVideoServiceConversion failed");
+        return VLC_EGENERIC;
+    }
+
     int surface_alignment = 16;
     unsigned surface_count = 2;
 
-    switch ( dx_sys->va_pool.codec_id )
+    switch ( avctx->codec_id )
     {
     case AV_CODEC_ID_MPEG2VIDEO:
         /* decoding MPEG-2 requires additional alignment on some Intel GPUs,
@@ -317,8 +324,7 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
         FreeLibrary(dx_sys->hdecoder_dll);
 }
 
-int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
-                    AVCodecContext *ctx, const es_format_t *fmt, bool b_dll)
+int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys, bool b_dll)
 {
     if (b_dll) {
         /* Load dll*/
@@ -330,14 +336,8 @@ int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
         msg_Dbg(va, "DLLs loaded");
     }
 
-    if (va_pool_Open(va, &dx_sys->va_pool, ctx) != VLC_SUCCESS)
+    if (va_pool_Open(va, &dx_sys->va_pool) != VLC_SUCCESS)
         goto error;
-
-    /* */
-    if (FindVideoServiceConversion(va, dx_sys, fmt)) {
-        msg_Err(va, "FindVideoServiceConversion failed");
-        goto error;
-    }
 
     return VLC_SUCCESS;
 
@@ -381,7 +381,8 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
 /**
  * Find the best suited decoder mode GUID and render format.
  */
-static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const es_format_t *fmt)
+static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
+                                      const es_format_t *fmt, const AVCodecContext *avctx)
 {
     input_list_t p_list = { 0 };
     int err = dx_sys->pf_get_input_list(va, &p_list);
@@ -404,7 +405,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
     /* Try all supported mode by our priority */
     const directx_va_mode_t *mode = DXVA_MODES;
     for (; mode->name; ++mode) {
-        if (!mode->codec || mode->codec != dx_sys->va_pool.codec_id)
+        if (!mode->codec || mode->codec != avctx->codec_id)
             continue;
 
         /* */

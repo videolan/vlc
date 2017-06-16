@@ -294,6 +294,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (pix_fmt != AV_PIX_FMT_DXVA2_VLD)
         return VLC_EGENERIC;
 
+    ctx->hwaccel_context = NULL;
+
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -334,11 +336,11 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     sys->i_chroma = d3d9va_fourcc(ctx->sw_pix_fmt);
 
-    err = directx_va_Open(va, &sys->dx_sys, ctx, fmt, true);
+    err = directx_va_Open(va, &sys->dx_sys, true);
     if (err!=VLC_SUCCESS)
         goto error;
 
-    err = directx_va_Setup(va, &sys->dx_sys, ctx);
+    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt);
     if (err != VLC_SUCCESS)
         goto error;
 

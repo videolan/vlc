@@ -81,9 +81,9 @@ typedef struct
 
 } directx_sys_t;
 
-int directx_va_Open(vlc_va_t *, directx_sys_t *, AVCodecContext *ctx, const es_format_t *fmt, bool b_dll);
+int directx_va_Open(vlc_va_t *, directx_sys_t *, bool b_dll);
 void directx_va_Close(vlc_va_t *, directx_sys_t *);
-int directx_va_Setup(vlc_va_t *, directx_sys_t *, AVCodecContext *avctx);
+int directx_va_Setup(vlc_va_t *, directx_sys_t *, const AVCodecContext *avctx, const es_format_t *);
 char *directx_va_GetDecoderName(const GUID *guid);
 
 #endif /* AVCODEC_DIRECTX_VA_H */
