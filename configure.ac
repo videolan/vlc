@@ -3295,7 +3295,7 @@ AS_IF([test "${enable_directx}" != "no"], [
 
     AC_CHECK_FUNCS([IDirectXVideoProcessorService_GetVideoProcessorDeviceGuids],
       [
-        VLC_ADD_PLUGIN([dxva2_deinterlace])
+        VLC_ADD_PLUGIN([direct3d9_deinterlace])
       ],
       [AC_MSG_WARN([Could not find required IDirectXVideoDecoder in dxva2api.h])],
       [#include <d3d9.h>
