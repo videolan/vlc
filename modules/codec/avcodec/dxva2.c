@@ -224,7 +224,6 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
     struct va_pic_context *pic_ctx = CreatePicContext(va_surface, surface);
     if (unlikely(pic_ctx==NULL))
         return NULL;
-    va_surface->decoderSurface = surface;
     return &pic_ctx->s;
 }
 

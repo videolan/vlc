@@ -262,7 +262,6 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
      * CreatePicContext(), undo one of them otherwise we need an extra release
      * when the pool is emptied */
     ReleasePictureSys(&pic_ctx->picsys);
-    va_surface->decoderSurface = surface;
     return &pic_ctx->s;
 }
 

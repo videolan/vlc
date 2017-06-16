@@ -34,7 +34,6 @@
 /* */
 struct vlc_va_surface_t {
     atomic_uintptr_t     refcount;
-    D3D_DecoderSurface  *decoderSurface;
 };
 
 #endif /* AVCODEC_VA_SURFACE_H */
