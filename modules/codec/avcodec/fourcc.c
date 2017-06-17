@@ -508,19 +508,12 @@ int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
     return false;
 }
 
-int GetVlcFourcc( unsigned i_ffmpeg_codec, int *pi_cat,
-                  vlc_fourcc_t *pi_fourcc, const char **ppsz_name )
+vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec )
 {
     for( unsigned i = 0; i < codecs_count; i++ )
     {
         if( codecs_table[i].i_codec == i_ffmpeg_codec )
-        {
-            if( pi_cat ) *pi_cat = codecs_table[i].i_cat;
-            if( pi_fourcc ) *pi_fourcc = codecs_table[i].i_fourcc;
-            if( ppsz_name ) *ppsz_name = vlc_fourcc_GetDescription( codecs_table[i].i_cat, codecs_table[i].i_fourcc );
-
-            return true;
-        }
+            return codecs_table[i].i_fourcc;
     }
-    return false;
+    return 0;
 }

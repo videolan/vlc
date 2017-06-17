@@ -373,10 +373,9 @@ int OpenDemux( vlc_object_t *p_this )
         const AVCodecParameters *cp = s->codecpar;
         es_out_id_t  *es = NULL;
         es_format_t  fmt;
-        vlc_fourcc_t fcc;
         const char *psz_type = "unknown";
-
-        if( !GetVlcFourcc( cp->codec_id, NULL, &fcc, NULL ) )
+        vlc_fourcc_t fcc = GetVlcFourcc( cp->codec_id );
+        if( !fcc )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
 #if LIBAVFORMAT_VERSION_INT >= ((54<<16)+(2<<8)+0)
