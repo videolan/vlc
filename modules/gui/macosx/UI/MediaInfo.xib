@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G16b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -78,17 +78,17 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="34" width="506" height="476"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
-            <view key="contentView" id="3">
+            <view key="contentView" misplaced="YES" id="3">
                 <rect key="frame" x="0.0" y="0.0" width="506" height="476"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView drawsBackground="NO" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="418">
-                        <rect key="frame" x="-21" y="-1" width="542" height="444"/>
+                    <tabView misplaced="YES" drawsBackground="NO" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="418">
+                        <rect key="frame" x="-21" y="11" width="542" height="432"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="1" id="419">
                                 <view key="view" id="422">
-                                    <rect key="frame" x="0.0" y="0.0" width="542" height="436"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="542" height="432"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="427">
@@ -103,12 +103,12 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="429">
-                                            <rect key="frame" x="35" y="418" width="373" height="14"/>
+                                            <rect key="frame" x="35" y="414" width="373" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="369" id="QQR-jU-J5W"/>
                                             </constraints>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Title" id="430">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -126,9 +126,9 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="510">
-                                            <rect key="frame" x="35" y="40" width="475" height="14"/>
+                                            <rect key="frame" x="35" y="40" width="475" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Location" id="511">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -145,9 +145,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="432">
-                                            <rect key="frame" x="35" y="374" width="330" height="14"/>
+                                            <rect key="frame" x="35" y="371" width="330" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Artist" id="433">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -164,12 +164,12 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="436">
-                                            <rect key="frame" x="411" y="374" width="93" height="14"/>
+                                            <rect key="frame" x="411" y="371" width="93" height="13"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="89" id="R0Z-z4-bc9"/>
                                             </constraints>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Date" id="437">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -186,9 +186,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="440">
-                                            <rect key="frame" x="35" y="330" width="330" height="14"/>
+                                            <rect key="frame" x="35" y="328" width="330" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Album" id="445">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -205,9 +205,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="442">
-                                            <rect key="frame" x="411" y="330" width="93" height="14"/>
+                                            <rect key="frame" x="411" y="328" width="93" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Track Number" id="443">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -224,9 +224,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="462">
-                                            <rect key="frame" x="35" y="286" width="307" height="14"/>
+                                            <rect key="frame" x="35" y="285" width="307" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Genre" id="467">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -243,9 +243,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="477">
-                                            <rect key="frame" x="35" y="242" width="307" height="14"/>
+                                            <rect key="frame" x="35" y="242" width="307" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now Playing" id="478">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -262,9 +262,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="482">
-                                            <rect key="frame" x="35" y="110" width="232" height="14"/>
+                                            <rect key="frame" x="35" y="113" width="232" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Publisher" id="483">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -281,9 +281,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="505">
-                                            <rect key="frame" x="273" y="109" width="232" height="14"/>
+                                            <rect key="frame" x="273" y="108" width="232" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Encoded by" id="506">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -300,15 +300,15 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="487">
-                                            <rect key="frame" x="35" y="154" width="307" height="14"/>
+                                            <rect key="frame" x="35" y="156" width="307" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Copyright" id="488">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <textField focusRingType="none" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="497">
-                                            <rect key="frame" x="37" y="176" width="300" height="19"/>
+                                            <rect key="frame" x="37" y="177" width="300" height="19"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="300" id="fNh-e9-7HF"/>
                                             </constraints>
@@ -322,9 +322,9 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="498">
-                                            <rect key="frame" x="35" y="198" width="307" height="14"/>
+                                            <rect key="frame" x="35" y="199" width="307" height="13"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description" id="499">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -341,18 +341,18 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="464">
-                                            <rect key="frame" x="343" y="286" width="93" height="14"/>
+                                            <rect key="frame" x="343" y="285" width="93" height="13"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="89" id="qse-Y4-EaG"/>
                                             </constraints>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Language" id="465">
-                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <imageView translatesAutoresizingMaskIntoConstraints="NO" id="88">
-                                            <rect key="frame" x="345" y="119" width="160" height="130"/>
+                                            <rect key="frame" x="345" y="118" width="160" height="130"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="130" id="f2E-e5-UdD"/>
                                                 <constraint firstAttribute="width" constant="160" id="gEI-GS-p8S"/>
@@ -945,7 +945,7 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
+                    <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
                         <rect key="frame" x="124" y="448" width="258" height="24"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="WVH-Tg-9g5"/>
@@ -962,7 +962,7 @@
                             <action selector="takeSelectedTabViewItemFromSender:" target="418" id="Z4V-Lm-ikS"/>
                         </connections>
                     </segmentedControl>
-                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
+                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
                         <rect key="frame" x="0.0" y="440" width="506" height="5"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="1" id="ivG-J4-70G"/>
