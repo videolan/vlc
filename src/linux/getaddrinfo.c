@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <netdb.h>
+#include <signal.h>
 
 #include <vlc_common.h>
 #include <vlc_interrupt.h>
