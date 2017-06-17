@@ -669,7 +669,7 @@ static int InOpen( vlc_object_t *p_this )
     bool          b_directory;
 
     /* Init p_access */
-    p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
+    p_sys = p_access->p_sys = (access_sys_t*)vlc_calloc( p_this, 1, sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
     p_sys->data = NULL;
@@ -746,7 +746,6 @@ error:
 exit_error:
     vlc_UrlClean( &p_sys->url );
     vlc_tls_Delete( p_sys->p_creds );
-    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -756,7 +755,7 @@ static int OutOpen( vlc_object_t *p_this )
     sout_access_out_t *p_access = (sout_access_out_t *)p_this;
     access_sys_t      *p_sys;
 
-    p_sys = calloc( 1, sizeof( *p_sys ) );
+    p_sys = vlc_calloc( p_this, 1, sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -795,7 +794,6 @@ static int OutOpen( vlc_object_t *p_this )
 exit_error:
     vlc_UrlClean( &p_sys->url );
     vlc_tls_Delete( p_sys->p_creds );
-    free( p_sys );
     return VLC_EGENERIC;
 }
 #endif
@@ -822,7 +820,6 @@ static void Close( vlc_object_t *p_access, access_sys_t *p_sys )
     /* free memory */
     vlc_UrlClean( &p_sys->url );
     vlc_tls_Delete( p_sys->p_creds );
-    free( p_sys );
 }
 
 static void InClose( vlc_object_t *p_this )

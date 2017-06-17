@@ -100,7 +100,7 @@ static int Open( vlc_object_t *p_this )
     if( p_access->b_preparsing )
         return VLC_EGENERIC;
 
-    sys = malloc( sizeof( *sys ) );
+    sys = vlc_malloc( p_this, sizeof( *sys ) );
     if( unlikely( sys == NULL ) )
         return VLC_ENOMEM;
 
@@ -115,7 +115,7 @@ static int Open( vlc_object_t *p_this )
     int  i_bind_port = 1234, i_server_port = 0;
 
     if( unlikely(psz_name == NULL) )
-        goto error;
+        return VLC_ENOMEM;
 
     /* Parse psz_name syntax :
      * [serveraddr[:serverport]][@[bindaddr]:[bindport]] */
@@ -165,8 +165,6 @@ static int Open( vlc_object_t *p_this )
     if( sys->fd == -1 )
     {
         msg_Err( p_access, "cannot open socket" );
-error:
-        free( sys );
         return VLC_EGENERIC;
     }
 
@@ -188,7 +186,6 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *sys = p_access->p_sys;
 
     net_Close( sys->fd );
-    free( sys );
 }
 
 /*****************************************************************************

@@ -73,7 +73,7 @@ static int Open(vlc_object_t *object)
     if (!input)
         return VLC_EGENERIC;
 
-    access_sys_t *sys = malloc(sizeof (*sys));
+    access_sys_t *sys = vlc_malloc(object, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -84,7 +84,6 @@ static int Open(vlc_object_t *object)
     if (sys->attachment == NULL) {
         msg_Err(access, "Failed to find the attachment '%s'",
                 access->psz_location);
-        free(sys);
         return VLC_EGENERIC;
     }
 
@@ -106,7 +105,6 @@ static void Close(vlc_object_t *object)
     access_sys_t *sys = access->p_sys;
 
     vlc_input_attachment_Delete(sys->attachment);
-    free(sys);
 }
 
 /* */

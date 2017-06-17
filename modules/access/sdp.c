@@ -27,7 +27,6 @@
 #include <vlc_access.h>
 
 static int Open (vlc_object_t *);
-static void Close (vlc_object_t *);
 
 vlc_module_begin ()
     set_shortname (N_("SDP"))
@@ -36,7 +35,7 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_INPUT_ACCESS)
 
     set_capability ("access", 0)
-    set_callbacks (Open, Close)
+    set_callbacks (Open, NULL)
     add_shortcut ("sdp")
 vlc_module_end()
 
@@ -56,7 +55,7 @@ static int Open (vlc_object_t *obj)
     access_t *access = (access_t *)obj;
     size_t len = strlen (access->psz_location);
 
-    access_sys_t *sys = malloc (sizeof(*sys) + len);
+    access_sys_t *sys = vlc_malloc(obj, sizeof(*sys) + len);
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -72,14 +71,6 @@ static int Open (vlc_object_t *obj)
     access->p_sys = sys;
 
     return VLC_SUCCESS;
-}
-
-static void Close (vlc_object_t *obj)
-{
-    access_t *access = (access_t *)obj;
-    access_sys_t *sys = access->p_sys;
-
-    free (sys);
 }
 
 static ssize_t Read (access_t *access, void *buf, size_t len)

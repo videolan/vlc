@@ -176,7 +176,7 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
-    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = vlc_calloc( p_this, 1, sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -201,7 +201,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_demux, "Bad MRL, please check the option line "
                           "(MRL was: %s)",
                           p_demux->psz_location );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -209,14 +208,12 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->p_dccontext )
     {
         msg_Err( p_demux, "Failed to initialise libdc1394");
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
     if( FindCamera( p_sys, p_demux ) != VLC_SUCCESS )
     {
         dc1394_free( p_sys->p_dccontext );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -224,7 +221,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "No camera found !!" );
         dc1394_free( p_sys->p_dccontext );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -390,7 +386,6 @@ static void Close( vlc_object_t *p_this )
     dc1394_free(p_sys->p_dccontext);
 
     free( p_sys->video_device );
-    free( p_sys );
 }
 
 #if 0

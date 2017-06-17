@@ -385,7 +385,7 @@ static int Open( vlc_object_t *p_this )
     demux_t      *p_demux = (demux_t*)p_this;
     demux_sys_t  *p_sys;
 
-    p_sys = calloc( 1, sizeof(demux_sys_t) );
+    p_sys = vlc_calloc( p_this, 1, sizeof(demux_sys_t) );
     if( !p_sys ) return VLC_ENOMEM;
 
     p_sys->f_fps = var_InheritFloat( p_demux, CFG_PREFIX "fps" );
@@ -398,7 +398,6 @@ static int Open( vlc_object_t *p_this )
     if ( !i_chroma || vlc_fourcc_IsYUV( i_chroma ) )
     {
         msg_Err( p_demux, "Only RGB chroma are supported" );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -406,7 +405,6 @@ static int Open( vlc_object_t *p_this )
     if ( !p_chroma_desc )
     {
         msg_Err( p_demux, "Unable to get RGB chroma description" );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -421,7 +419,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Dbg( p_demux, "Unable to set up client for %s",
                  vlc_fourcc_GetDescription( VIDEO_ES, i_chroma ) );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -466,7 +463,7 @@ static int Open( vlc_object_t *p_this )
     if( !rfbInitClient( p_sys->p_client, NULL, NULL ) )
     {
         msg_Err( p_demux, "can't connect to RFB server" );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     p_sys->i_starttime = mdate();
@@ -474,17 +471,13 @@ static int Open( vlc_object_t *p_this )
     if ( vlc_clone( &p_sys->thread, DemuxThread, p_demux, VLC_THREAD_PRIORITY_INPUT ) != VLC_SUCCESS )
     {
         msg_Err( p_demux, "can't spawn thread" );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     p_demux->pf_demux = NULL;
     p_demux->pf_control = Control;
 
     return VLC_SUCCESS;
-
-error:
-    free( p_sys );
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -505,6 +498,4 @@ static void Close( vlc_object_t *p_this )
 
     if ( p_sys->p_block )
         block_Release( p_sys->p_block );
-
-    free( p_sys );
 }

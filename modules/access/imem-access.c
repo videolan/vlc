@@ -112,7 +112,7 @@ static int Open(vlc_object_t *object)
 {
     access_t *access = (access_t *)object;
 
-    access_sys_t *sys = malloc(sizeof (*sys));
+    access_sys_t *sys = vlc_malloc(object, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -130,11 +130,11 @@ static int Open(vlc_object_t *object)
     if (open_cb == NULL)
         open_cb = open_cb_default;
     if (sys->read_cb == NULL)
-        goto error;
+        return VLC_EGENERIC;
 
     if (open_cb(opaque, &sys->opaque, &sys->size)) {
         msg_Err(access, "open error");
-        goto error;
+        return VLC_EGENERIC;
     }
 
     access->pf_read = Read;
@@ -144,9 +144,6 @@ static int Open(vlc_object_t *object)
 
     access->p_sys = sys;
     return VLC_SUCCESS;
-error:
-    free(sys);
-    return VLC_EGENERIC;
 }
 
 static void Close(vlc_object_t *object)
@@ -156,7 +153,6 @@ static void Close(vlc_object_t *object)
 
     if (sys->close_cb != NULL)
         sys->close_cb(sys->opaque);
-    free(sys);
 }
 
 vlc_module_begin()

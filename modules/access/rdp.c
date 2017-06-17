@@ -425,7 +425,7 @@ static int Open( vlc_object_t *p_this )
     demux_t      *p_demux = (demux_t*)p_this;
     demux_sys_t  *p_sys;
 
-    p_sys = calloc( 1, sizeof(demux_sys_t) );
+    p_sys = vlc_calloc( p_this, 1, sizeof(demux_sys_t) );
     if( !p_sys ) return VLC_ENOMEM;
 
     p_sys->f_fps = var_InheritFloat( p_demux, CFG_PREFIX "fps" );
@@ -440,7 +440,6 @@ static int Open( vlc_object_t *p_this )
     if ( !p_sys->p_instance )
     {
         msg_Err( p_demux, "rdp instantiation error" );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -490,7 +489,6 @@ static int Open( vlc_object_t *p_this )
 error:
     freerdp_free( p_sys->p_instance );
     free( p_sys->psz_hostname );
-    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -518,5 +516,4 @@ static void Close( vlc_object_t *p_this )
         block_Release( p_sys->p_block );
 
     free( p_sys->psz_hostname );
-    free( p_sys );
 }

@@ -626,7 +626,7 @@ static int satip_open(vlc_object_t *obj)
 
     bool multicast = var_InheritBool(access, "satip-multicast");
 
-    access->p_sys = sys = calloc(1, sizeof(*sys));
+    access->p_sys = sys = vlc_calloc(obj, 1, sizeof(*sys));
     if (sys == NULL)
         return VLC_ENOMEM;
 
@@ -804,7 +804,6 @@ error:
 
     free(sys->content_base);
     free(sys->control);
-    free(sys);
     return VLC_EGENERIC;
 }
 
@@ -824,5 +823,4 @@ static void satip_close(vlc_object_t *obj)
     net_Close(sys->tcp_sock);
     free(sys->content_base);
     free(sys->control);
-    free(sys);
 }

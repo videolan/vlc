@@ -255,15 +255,13 @@ static int Open(vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
 
-    demux_sys_t *sys = malloc(sizeof (*sys));
+    demux_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
     sys->context = vlc_pa_connect(obj, &sys->mainloop);
-    if (sys->context == NULL) {
-        free(sys);
+    if (sys->context == NULL)
         return VLC_EGENERIC;
-    }
 
     sys->stream = NULL;
     sys->es = NULL;
@@ -396,5 +394,4 @@ static void Close (vlc_object_t *obj)
     }
 
     vlc_pa_disconnect(obj, sys->context, sys->mainloop);
-    free(sys);
 }

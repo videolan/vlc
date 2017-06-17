@@ -117,7 +117,6 @@ static void CloseFile (demux_sys_t *);
 static void DemuxIPC (void *);
 static void CloseIPC (demux_sys_t *);
 #endif
-static void no_detach (demux_sys_t *);
 
 struct demux_sys_t
 {
@@ -139,10 +138,9 @@ struct demux_sys_t
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *sys = malloc (sizeof (*sys));
+    demux_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-    sys->detach = no_detach;
 
     uint32_t chroma;
     uint16_t width = 0, height = 0;
@@ -168,7 +166,7 @@ static int Open (vlc_object_t *obj)
             chroma = VLC_CODEC_XWD; bpp = 0;
             break;
         default:
-            goto error;
+            return VLC_EGENERIC;
     }
     if (bpp != 0)
     {
@@ -187,7 +185,7 @@ static int Open (vlc_object_t *obj)
                      vlc_strerror_c(errno));
         free (path);
         if (sys->fd == -1)
-            goto error;
+            return VLC_EGENERIC;
 
         sys->detach = CloseFile;
         Demux = DemuxFile;
@@ -197,18 +195,18 @@ static int Open (vlc_object_t *obj)
 #ifdef HAVE_SYS_SHM_H
         sys->mem.length = width * height * (bpp >> 3);
         if (sys->mem.length == 0)
-            goto error;
+            return VLC_EGENERIC;
 
         int id = var_InheritInteger (demux, "shm-id");
         if (id == IPC_PRIVATE)
-            goto error;
+            return VLC_EGENERIC;
         void *mem = shmat (id, NULL, SHM_RDONLY);
 
         if (mem == (const void *)(-1))
         {
             msg_Err (demux, "cannot attach segment %d: %s", id,
                      vlc_strerror_c(errno));
-            goto error;
+            return VLC_EGENERIC;
         }
         sys->mem.addr = mem;
         sys->detach = CloseIPC;
@@ -251,7 +249,6 @@ static int Open (vlc_object_t *obj)
 
 error:
     sys->detach (sys);
-    free (sys);
     return VLC_EGENERIC;
 }
 
@@ -266,12 +263,6 @@ static void Close (vlc_object_t *obj)
 
     vlc_timer_destroy (sys->timer);
     sys->detach (sys);
-    free (sys);
-}
-
-static void no_detach (demux_sys_t *sys)
-{
-    (void) sys;
 }
 
 /**

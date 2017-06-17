@@ -341,8 +341,7 @@ static uint16_t channel_maps[] = {
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *sys = malloc (sizeof (*sys));
-
+    demux_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -361,7 +360,6 @@ static int Open (vlc_object_t *obj)
     {
         msg_Err (demux, "cannot open ALSA device \"%s\": %s", device,
                  snd_strerror (val));
-        free (sys);
         return VLC_EGENERIC;
     }
     sys->pcm = pcm;
@@ -510,7 +508,6 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 error:
     snd_pcm_close (pcm);
-    free (sys);
     return VLC_EGENERIC;
 }
 
@@ -523,5 +520,4 @@ static void Close (vlc_object_t *obj)
     vlc_join (sys->thread, NULL);
 
     snd_pcm_close (sys->pcm);
-    free (sys);
 }

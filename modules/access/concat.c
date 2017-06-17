@@ -188,7 +188,7 @@ static int Open(vlc_object_t *obj)
     if (list == NULL)
         return VLC_EGENERIC;
 
-    access_sys_t *sys = malloc(sizeof (*sys));
+    access_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
     {
         free(list);
@@ -298,7 +298,6 @@ static void Close(vlc_object_t *obj)
     }
 
     var_Destroy(access, "concat-list");
-    free(sys);
 }
 
 #define INPUT_LIST_TEXT N_("Inputs list")

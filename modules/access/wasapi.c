@@ -388,7 +388,7 @@ static int Open(vlc_object_t *obj)
     if (demux->psz_location != NULL && *demux->psz_location != '\0')
         return VLC_EGENERIC; /* TODO non-default device */
 
-    demux_sys_t *sys = malloc(sizeof (*sys));
+    demux_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -460,7 +460,6 @@ error:
     for (unsigned i = 0; i < 2; i++)
         if (sys->events[i] != NULL)
             CloseHandle(sys->events[i]);
-    free(sys);
     return VLC_ENOMEM;
 }
 
@@ -482,7 +481,6 @@ static void Close (vlc_object_t *obj)
     CoUninitialize();
     for (unsigned i = 0; i < 2; i++)
         CloseHandle(sys->events[i]);
-    free(sys);
 }
 
 #define LOOPBACK_TEXT N_("Loopback mode")

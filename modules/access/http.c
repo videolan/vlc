@@ -157,7 +157,7 @@ static int Open( vlc_object_t *p_this )
     int ret = VLC_EGENERIC;
     vlc_credential credential;
 
-    access_sys_t *p_sys = malloc( sizeof(*p_sys) );
+    access_sys_t *p_sys = vlc_malloc( p_this, sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
@@ -185,7 +185,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "invalid URL" );
         vlc_UrlClean( &p_sys->url );
-        free( p_sys );
         return VLC_EGENERIC;
     }
     if( p_sys->url.i_port <= 0 )
@@ -376,7 +375,6 @@ error:
 
     Disconnect( p_access );
 
-    free( p_sys );
     return ret;
 }
 
@@ -407,8 +405,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_password );
 
     Disconnect( p_access );
-
-    free( p_sys );
 }
 
 /* Read data from the socket */

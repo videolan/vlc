@@ -621,10 +621,10 @@ static int
 Open(vlc_object_t *p_obj)
 {
     access_t *p_access = (access_t *)p_obj;
-    access_sys_t *p_sys = calloc(1, sizeof (*p_sys));
+    access_sys_t *p_sys = vlc_calloc(p_obj, 1, sizeof (*p_sys));
 
     if (unlikely(p_sys == NULL))
-        goto error;
+        return VLC_ENOMEM;
     p_access->p_sys = p_sys;
 
     p_sys->b_auto_guid = var_InheritBool(p_obj, "nfs-auto-guid");
@@ -770,5 +770,4 @@ Close(vlc_object_t *p_obj)
 
     free(p_sys->psz_url_decoded);
     free(p_sys->psz_url_decoded_slash);
-    free(p_sys);
 }

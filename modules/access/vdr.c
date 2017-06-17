@@ -188,7 +188,7 @@ static int Open( vlc_object_t *p_this )
         !S_ISDIR( st.st_mode ) )
         return VLC_EGENERIC;
 
-    access_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
+    access_sys_t *p_sys = vlc_calloc( p_this, 1, sizeof( *p_sys ) );
 
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
@@ -229,7 +229,6 @@ static void Close( vlc_object_t * p_this )
     size_t count = p_sys->p_marks->i_seekpoint;
     TAB_CLEAN( count, p_sys->offsets );
     vlc_input_title_Delete( p_sys->p_marks );
-    free( p_sys );
 }
 
 /*****************************************************************************

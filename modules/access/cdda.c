@@ -223,17 +223,11 @@ static int DemuxOpen(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     if (track == 0 /* Whole disc -> use access plugin */)
-    {
-        ioctl_Close(obj, dev);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
-    demux_sys_t *sys = malloc(sizeof (*sys));
+    demux_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
-    {
-        ioctl_Close(obj, dev);
-        return VLC_ENOMEM;
-    }
+        goto error;
 
     demux->p_sys = sys;
     sys->vcddev = dev;
@@ -275,7 +269,6 @@ static int DemuxOpen(vlc_object_t *obj)
 
 error:
     ioctl_Close(obj, dev);
-    free(sys);
     return VLC_EGENERIC;
 }
 
@@ -285,7 +278,6 @@ static void DemuxClose(vlc_object_t *obj)
     demux_sys_t *sys = demux->p_sys;
 
     ioctl_Close(obj, sys->vcddev);
-    free(sys);
 }
 
 /*****************************************************************************
@@ -628,7 +620,7 @@ static int AccessOpen(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    access_sys_t *sys = malloc(sizeof (*sys));
+    access_sys_t *sys = vlc_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
     {
         ioctl_Close(obj, dev);
@@ -679,7 +671,6 @@ static int AccessOpen(vlc_object_t *obj)
 error:
     free(sys->p_sectors);
     ioctl_Close(obj, dev);
-    free(sys);
     return VLC_EGENERIC;
 }
 
@@ -703,7 +694,6 @@ static void AccessClose(vlc_object_t *obj)
 
     free(sys->p_sectors);
     ioctl_Close(obj, sys->vcddev);
-    free(sys);
 }
 
 /*****************************************************************************

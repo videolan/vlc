@@ -225,7 +225,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Init p_access */
     p_sys =
-    p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
+    p_access->p_sys = vlc_calloc( p_this, 1, sizeof( access_sys_t ) );
     if( !p_sys )
     {
         free( psz_uri );
@@ -236,7 +236,6 @@ static int Open( vlc_object_t *p_this )
     if( b_is_dir )
     {
 #ifdef _WIN32
-        free( p_sys );
         free( psz_uri );
         vlc_UrlClean( &url );
         return VLC_EGENERIC;
@@ -263,7 +262,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_location, vlc_strerror_c(errno) );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -289,7 +287,6 @@ static void Close( vlc_object_t *p_this )
     else
 #endif
         smbc_close( p_sys->i_smb );
-    free( p_sys );
 }
 
 /*****************************************************************************

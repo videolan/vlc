@@ -653,7 +653,7 @@ static int blurayOpen(vlc_object_t *object)
     }
 
     /* */
-    p_demux->p_sys = p_sys = calloc(1, sizeof(*p_sys));
+    p_demux->p_sys = p_sys = vlc_calloc(obj, 1, sizeof(*p_sys));
     if (unlikely(!p_sys))
         return VLC_ENOMEM;
 
@@ -902,7 +902,6 @@ static void blurayClose(vlc_object_t *object)
     vlc_mutex_destroy(&p_sys->read_block_lock);
 
     free(p_sys->psz_bd_path);
-    free(p_sys);
 }
 
 /*****************************************************************************

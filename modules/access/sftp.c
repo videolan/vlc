@@ -197,7 +197,7 @@ static int Open( vlc_object_t* p_this )
     if( !p_access->psz_location )
         return VLC_EGENERIC;
 
-    p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
+    p_sys = p_access->p_sys = vlc_calloc( p_this, 1, sizeof( access_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
 
     p_sys->i_socket = -1;
@@ -452,7 +452,6 @@ static void Close( vlc_object_t* p_this )
         net_Close( p_sys->i_socket );
 
     free( p_sys->psz_base_url );
-    free( p_sys );
 }
 
 

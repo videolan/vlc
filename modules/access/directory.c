@@ -53,7 +53,7 @@ struct access_sys_t
  *****************************************************************************/
 int DirInit (access_t *access, DIR *dir)
 {
-    access_sys_t *sys = malloc(sizeof (*sys));
+    access_sys_t *sys = vlc_malloc(VLC_OBJECT(access), sizeof (*sys));
     if (unlikely(sys == NULL))
         goto error;
 
@@ -77,7 +77,6 @@ int DirInit (access_t *access, DIR *dir)
 
 error:
     closedir(dir);
-    free(sys);
     return VLC_ENOMEM;
 }
 
@@ -108,7 +107,6 @@ void DirClose(vlc_object_t *obj)
 
     free(sys->base_uri);
     closedir(sys->dir);
-    free(sys);
 }
 
 int DirRead (access_t *access, input_item_node_t *node)

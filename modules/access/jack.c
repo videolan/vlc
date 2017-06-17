@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this )
     p_demux->pf_control = Control;
 
     /* Allocate structure */
-    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = vlc_calloc( p_this, 1, sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -152,7 +152,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_jack_client == NULL )
     {
         msg_Err( p_demux, "failed to connect to JACK server" );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -173,7 +172,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->pp_jack_port_input == NULL )
     {
         jack_client_close( p_sys->p_jack_client );
-        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -187,7 +185,6 @@ static int Open( vlc_object_t *p_this )
     {
         free( p_sys->pp_jack_port_input );
         jack_client_close( p_sys->p_jack_client );
-        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -205,7 +202,6 @@ static int Open( vlc_object_t *p_this )
             jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
             free( p_sys->pp_jack_port_input );
             jack_client_close( p_sys->p_jack_client );
-            free( p_sys );
             return VLC_EGENERIC;
         }
     }
@@ -220,7 +216,6 @@ static int Open( vlc_object_t *p_this )
         jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
         free( p_sys->pp_jack_port_input );
         jack_client_close( p_sys->p_jack_client );
-        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -237,7 +232,6 @@ static int Open( vlc_object_t *p_this )
         jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
         free( p_sys->pp_jack_port_input );
         jack_client_close( p_sys->p_jack_client );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -314,7 +308,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->pp_jack_port_input );
     free( p_sys->pp_jack_buffer );
     free( p_sys->pp_jack_port_table );
-    free( p_sys );
 }
 
 

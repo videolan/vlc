@@ -124,7 +124,7 @@ static int SetupAvioCb(vlc_object_t *access)
 int OpenAvio(vlc_object_t *object)
 {
     access_t *access = (access_t*)object;
-    access_sys_t *sys = malloc(sizeof(*sys));
+    access_sys_t *sys = vlc_malloc(object, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
     sys->context = NULL;
@@ -140,10 +140,8 @@ int OpenAvio(vlc_object_t *object)
                       access->psz_location) < 0)
         url = NULL;
 
-    if (!url) {
-        free(sys);
+    if (!url)
         return VLC_ENOMEM;
-    }
 
     /* */
     vlc_init_avformat(object);
@@ -172,7 +170,7 @@ int OpenAvio(vlc_object_t *object)
         msg_Err(access, "Failed to open %s: %s", url,
                 vlc_strerror_c(AVUNERROR(ret)));
         free(url);
-        goto error;
+        return VLC_EGENERIC;
     }
     free(url);
 
@@ -181,7 +179,7 @@ int OpenAvio(vlc_object_t *object)
     if (SetupAvioCb(VLC_OBJECT(access))) {
         msg_Err(access, "Module already in use");
         avio_close(sys->context);
-        goto error;
+        return VLC_EGENERIC;
     }
 #endif
 
@@ -202,10 +200,6 @@ int OpenAvio(vlc_object_t *object)
     access->p_sys = sys;
 
     return VLC_SUCCESS;
-
-error:
-    free(sys);
-    return VLC_EGENERIC;
 }
 
 /* */
@@ -221,7 +215,7 @@ int OutOpenAvio(vlc_object_t *object)
 
     config_ChainParse( access, "sout-avio-", ppsz_sout_options, access->p_cfg );
 
-    sout_access_out_sys_t *sys = malloc(sizeof(*sys));
+    sout_access_out_sys_t *sys = vlc_malloc(object, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
     sys->context = NULL;
@@ -230,7 +224,7 @@ int OutOpenAvio(vlc_object_t *object)
     vlc_init_avformat(object);
 
     if (!access->psz_path)
-        goto error;
+        return VLC_EGENERIC;
 
     int ret;
 #if LIBAVFORMAT_VERSION_MAJOR < 54
@@ -252,14 +246,14 @@ int OutOpenAvio(vlc_object_t *object)
     if (ret < 0) {
         errno = AVUNERROR(ret);
         msg_Err(access, "Failed to open %s", access->psz_path);
-        goto error;
+        return VLC_EGENERIC;
     }
 
 #if LIBAVFORMAT_VERSION_MAJOR < 54
     /* We can accept only one active user at any time */
     if (SetupAvioCb(VLC_OBJECT(access))) {
         msg_Err(access, "Module already in use");
-        goto error;
+        return VLC_EGENERIC;
     }
 #endif
 
@@ -269,10 +263,6 @@ int OutOpenAvio(vlc_object_t *object)
     access->p_sys = sys;
 
     return VLC_SUCCESS;
-
-error:
-    free(sys);
-    return VLC_EGENERIC;
 }
 
 void CloseAvio(vlc_object_t *object)
@@ -285,7 +275,6 @@ void CloseAvio(vlc_object_t *object)
 #endif
 
     avio_close(sys->context);
-    free(sys);
 }
 
 void OutCloseAvio(vlc_object_t *object)
@@ -298,7 +287,6 @@ void OutCloseAvio(vlc_object_t *object)
 #endif
 
     avio_close(sys->context);
-    free(sys);
 }
 
 static ssize_t Read(access_t *access, void *data, size_t size)
