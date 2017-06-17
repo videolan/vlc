@@ -42,15 +42,32 @@
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor);
 void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family);
 
+static char* getCStringCopyForCFStringRef(CFStringRef cfstring, CFStringEncoding encoding)
+{
+    // Try to get pointer directly
+    const char *cptr = CFStringGetCStringPtr(cfstring, encoding);
+    if (cptr) {
+        return strdup(cptr);
+    }
+
+    // If it fails, use CFStringGetCString
+    CFIndex len = CFStringGetLength(cfstring);
+    CFIndex size = CFStringGetMaximumSizeForEncoding(len, encoding);
+    char *buffer = calloc(len + 1, sizeof(char));
+
+    if (CFStringGetCString(cfstring, buffer, size, encoding)) {
+        return buffer;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+}
+
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 {
     CFURLRef url = CTFontDescriptorCopyAttribute(fontDescriptor, kCTFontURLAttribute);
     CFStringRef path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
-    char *cpath = (char *)CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
-    char *retPath = NULL;
-    if (cpath) {
-        retPath = strdup(cpath);
-    }
+    char *retPath = getCStringCopyForCFStringRef(path, kCFStringEncodingUTF8);
     CFRelease(path);
     CFRelease(url);
     return retPath;
