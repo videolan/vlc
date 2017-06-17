@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1217" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCPlaylist">
@@ -13,6 +12,7 @@
                 <outlet property="infoPlaylistMenuItem" destination="9" id="uIr-Np-fpB"/>
                 <outlet property="playPlaylistMenuItem" destination="12" id="Dv9-jX-Q4W"/>
                 <outlet property="playlistMenu" destination="1" id="i0k-dj-ZpJ"/>
+                <outlet property="recursiveCollapsePlaylistMenuItem" destination="4xC-4n-AL0" id="xSX-gh-auF"/>
                 <outlet property="recursiveExpandPlaylistMenuItem" destination="5" id="vFK-br-qmx"/>
                 <outlet property="revealInFinderPlaylistMenuItem" destination="3" id="IrJ-gR-Zqp"/>
                 <outlet property="selectAllPlaylistMenuItem" destination="14" id="drx-ij-QhT"/>
@@ -43,13 +43,15 @@
                 <menuItem isSeparatorItem="YES" id="8">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Expand Node" id="5">
+                <menuItem title="Expand All" id="5">
                     <connections>
-                        <action selector="recursiveExpandNode:" target="-2" id="29"/>
+                        <action selector="recursiveExpandOrCollapseNode:" target="-2" id="eXQ-bT-oYi"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="10">
-                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                <menuItem title="Collapse All" id="4xC-4n-AL0">
+                    <connections>
+                        <action selector="recursiveExpandOrCollapseNode:" target="-2" id="uUM-ci-hOU"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Media Information..." id="9">
                     <connections>

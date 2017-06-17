@@ -229,7 +229,8 @@
 {
     [_playPlaylistMenuItem setTitle: _NS("Play")];
     [_deletePlaylistMenuItem setTitle: _NS("Delete")];
-    [_recursiveExpandPlaylistMenuItem setTitle: _NS("Expand Node")];
+    [_recursiveExpandPlaylistMenuItem setTitle: _NS("Expand All")];
+    [_recursiveCollapsePlaylistMenuItem setTitle: _NS("Collapse All")];
     [_selectAllPlaylistMenuItem setTitle: _NS("Select All")];
     [_infoPlaylistMenuItem setTitle: _NS("Media Information...")];
     [_revealInFinderPlaylistMenuItem setTitle: _NS("Reveal in Finder")];
@@ -453,7 +454,7 @@
         return [_outlineView numberOfRows] > 0;
     } else if ([item action] == @selector(playItem:)) {
         return [_outlineView numberOfSelectedRows] > 0;
-    } else if ([item action] == @selector(recursiveExpandNode:)) {
+    } else if ([item action] == @selector(recursiveExpandOrCollapseNode:)) {
         return [_outlineView numberOfSelectedRows] > 0;
     } else if ([item action] == @selector(showInfoPanel:)) {
         return [_outlineView numberOfSelectedRows] > 0;
@@ -662,8 +663,10 @@
     PL_UNLOCK;
 }
 
-- (IBAction)recursiveExpandNode:(id)sender
+- (IBAction)recursiveExpandOrCollapseNode:(id)sender
 {
+    bool expand = (sender == _recursiveExpandPlaylistMenuItem);
+
     NSIndexSet * selectedRows = [_outlineView selectedRowIndexes];
     NSUInteger count = [selectedRows count];
     NSUInteger indexes[count];
@@ -678,7 +681,9 @@
          expand an already expanded node, even if children nodes are collapsed. */
         if ([_outlineView isExpandable:item]) {
             [_outlineView collapseItem: item collapseChildren: YES];
-            [_outlineView expandItem: item expandChildren: YES];
+
+            if (expand)
+                [_outlineView expandItem: item expandChildren: YES];
         }
 
         selectedRows = [_outlineView selectedRowIndexes];

@@ -36,6 +36,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *revealInFinderPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *selectAllPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *recursiveExpandPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *recursiveCollapsePlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *addFilesToPlaylistMenuItem;
 
 @property (nonatomic, readwrite, weak) VLCPlaylistView *outlineView;
@@ -58,7 +59,7 @@
 - (IBAction)revealItemInFinder:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
-- (IBAction)recursiveExpandNode:(id)sender;
+- (IBAction)recursiveExpandOrCollapseNode:(id)sender;
 - (IBAction)showInfoPanel:(id)sender;
 - (IBAction)addFilesToPlaylist:(id)sender;
 
