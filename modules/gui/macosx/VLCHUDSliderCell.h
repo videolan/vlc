@@ -1,5 +1,5 @@
 //
-//  VLCHUDSliderCell.m
+//  VLCHUDSliderCell.h
 //  BGHUDAppKit
 //
 //  Created by BinaryGod on 5/30/08.
