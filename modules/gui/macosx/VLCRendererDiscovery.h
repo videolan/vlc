@@ -37,7 +37,7 @@
 /**
  The delegate that is called when a \c VLCRendererItem is added or deleted
  */
-@property (weak) id<VLCRendererDiscoveryDelegate> delegate;
+@property (assign) id<VLCRendererDiscoveryDelegate> delegate;
 
 /**
  The name of the renderer discovery module
