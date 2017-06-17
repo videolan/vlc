@@ -34,7 +34,9 @@
 #include <vlc_atomic.h>
 #include "picture.h"
 
-static const uintptr_t pool_max = CHAR_BIT * sizeof (unsigned long long);
+#define POOL_MAX (CHAR_BIT * sizeof (unsigned long long))
+
+static_assert ((POOL_MAX & (POOL_MAX - 1)) == 0, "Not a power of two");
 
 struct picture_pool_t {
     int       (*pic_lock)(picture_t *);
@@ -56,7 +58,7 @@ static void picture_pool_Destroy(picture_pool_t *pool)
 
     vlc_cond_destroy(&pool->wait);
     vlc_mutex_destroy(&pool->lock);
-    vlc_free(pool);
+    free(pool);
 }
 
 void picture_pool_Release(picture_pool_t *pool)
@@ -70,8 +72,8 @@ static void picture_pool_ReleasePicture(picture_t *clone)
 {
     picture_priv_t *priv = (picture_priv_t *)clone;
     uintptr_t sys = (uintptr_t)priv->gc.opaque;
-    picture_pool_t *pool = (void *)(sys & ~(pool_max - 1));
-    unsigned offset = sys & (pool_max - 1);
+    picture_pool_t *pool = (void *)(sys & ~(POOL_MAX - 1));
+    unsigned offset = sys & (POOL_MAX - 1);
     picture_t *picture = pool->picture[offset];
 
     free(clone);
@@ -115,11 +117,14 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
 
 picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
-    if (unlikely(cfg->picture_count > pool_max))
+    if (unlikely(cfg->picture_count > POOL_MAX))
         return NULL;
 
-    picture_pool_t *pool = vlc_memalign(pool_max,
-        sizeof (*pool) + cfg->picture_count * sizeof (picture_t *));
+    picture_pool_t *pool;
+    size_t size = sizeof (*pool) + cfg->picture_count * sizeof (picture_t *);
+
+    size += (-size) & (POOL_MAX - 1);
+    pool = aligned_alloc(POOL_MAX, size);
     if (unlikely(pool == NULL))
         return NULL;
 
@@ -127,7 +132,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     pool->pic_unlock = cfg->unlock;
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
-    if (cfg->picture_count == pool_max)
+    if (cfg->picture_count == POOL_MAX)
         pool->available = ~0ULL;
     else
         pool->available = (1ULL << cfg->picture_count) - 1;
