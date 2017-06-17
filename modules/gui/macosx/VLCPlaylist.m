@@ -444,8 +444,12 @@
     } else if ([item action] == @selector(deleteItem:)) {
         return [_outlineView numberOfSelectedRows] > 0 && _model.editAllowed;
     } else if ([item action] == @selector(selectAll:)) {
-        return [_outlineView numberOfRows] >= 0;
+        return [_outlineView numberOfRows] > 0;
     } else if ([item action] == @selector(playItem:)) {
+        return [_outlineView numberOfSelectedRows] > 0;
+    } else if ([item action] == @selector(recursiveExpandNode:)) {
+        return [_outlineView numberOfSelectedRows] > 0;
+    } else if ([item action] == @selector(showInfoPanel:)) {
         return [_outlineView numberOfSelectedRows] > 0;
     }
 
@@ -681,24 +685,13 @@
     if (!b_playlistmenu_nib_loaded)
         b_playlistmenu_nib_loaded = [NSBundle loadNibNamed:@"PlaylistMenu" owner:self];
 
-    NSPoint pt;
-    bool b_rows;
-    bool b_item_sel;
-
-    pt = [_outlineView convertPoint: [o_event locationInWindow] fromView: nil];
+    NSPoint pt = [_outlineView convertPoint: [o_event locationInWindow] fromView: nil];
     int row = [_outlineView rowAtPoint:pt];
     if (row != -1 && ![[_outlineView selectedRowIndexes] containsIndex: row])
         [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
-    b_item_sel = (row != -1 && [_outlineView selectedRow] != -1);
-    b_rows = [_outlineView numberOfRows] != 0;
-
-    playlist_t *p_playlist = pl_Get(getIntf());
-    bool b_del_allowed = [[self model] editAllowed];
-
-    // TODO move other items to menu validation protocol
-    [_infoPlaylistMenuItem setEnabled: b_item_sel];
-    [_recursiveExpandPlaylistMenuItem setEnabled: b_item_sel];
+    // TODO Reenable once per-item info panel is supported again
+    _infoPlaylistMenuItem.hidden = YES;
 
     return _playlistMenu;
 }
