@@ -38,6 +38,13 @@
 //					provided by [tylerb](GitHub).
 
 #import "VLCHUDTextFieldCell.h"
+#import "CompatibilityFixes.h"
+
+@interface NSTextFieldCell (Private)
+
+- (void)_drawKeyboardFocusRingWithFrame:(NSRect)rect inView:(NSView*)view;
+
+@end
 
 @interface VLCHUDTextFieldCell () {
     bool fillsBackground;
@@ -73,6 +80,10 @@
 
 - (void)commonInit
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return;
+    }
+
     // Init colors
     _focusRing = [[NSShadow alloc] init];
     [_focusRing setShadowColor:NSColor.whiteColor];
@@ -102,6 +113,10 @@
 
 - (NSText *)setUpFieldEditorAttributes:(NSText *)textObj
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super setUpFieldEditorAttributes:textObj];
+    }
+
     NSText *newText = [super setUpFieldEditorAttributes:textObj];
     NSColor *textColor = _cellTextColor;
     [(NSTextView *)newText setInsertionPointColor:textColor];
@@ -110,6 +125,10 @@
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawWithFrame:cellFrame inView:controlView];
+    }
+
     // Adjust Rect
     cellFrame = NSInsetRect(cellFrame, 0.5f, 0.5f);
 
@@ -273,6 +292,12 @@
 
 - (void)_drawKeyboardFocusRingWithFrame:(NSRect)rect inView:(NSView*)view
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        if ([super respondsToSelector:@selector(_drawKeyboardFocusRingWithFrame:inView:)]) {
+            [super _drawKeyboardFocusRingWithFrame:rect inView:view];
+        }
+    }
+
     // Do nothing
 }
 
