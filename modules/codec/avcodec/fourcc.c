@@ -36,19 +36,18 @@
  * Codec fourcc -> libavcodec Codec_id mapping
  * Sorted by AVCodecID enumeration order
  *****************************************************************************/
-static const struct
+struct vlc_avcodec_fourcc
 {
     vlc_fourcc_t i_fourcc;
     unsigned i_codec;
     int i_cat;
-} codecs_table[] =
+};
+
+/*
+ * Video Codecs
+ */
+static const struct vlc_avcodec_fourcc video_codecs[] =
 {
-    { 0, AV_CODEC_ID_NONE, UNKNOWN_ES },
-
-    /*
-     * Video Codecs
-     */
-
     { VLC_CODEC_MP2V, AV_CODEC_ID_MPEG2VIDEO, VIDEO_ES }, /* prefer MPEG2 over MPEG1 */
     { VLC_CODEC_MPGV, AV_CODEC_ID_MPEG2VIDEO, VIDEO_ES }, /* prefer MPEG2 over MPEG1 */
     { VLC_CODEC_MP1V, AV_CODEC_ID_MPEG1VIDEO, VIDEO_ES },
@@ -290,11 +289,13 @@ static const struct
 #if LIBAVCODEC_VERSION_CHECK( 57, 999, 999, 79, 100 )
     { VLC_CODEC_FMVC, AV_CODEC_ID_FMVC, VIDEO_ES },
 #endif
+};
 
-    /*
-     *  Audio Codecs
-     */
-
+/*
+ *  Audio Codecs
+ */
+static const struct vlc_avcodec_fourcc audio_codecs[] =
+{
     /* PCM */
     { VLC_CODEC_S16L, AV_CODEC_ID_PCM_S16LE, AUDIO_ES },
     { VLC_CODEC_S16B, AV_CODEC_ID_PCM_S16BE, AUDIO_ES },
@@ -458,8 +459,11 @@ static const struct
     /* ffmpeg only: AV_CODEC_ID_PAF_AUDIO */
     /* ffmpeg only: AV_CODEC_ID_EVRC */
     /* ffmpeg only: AV_CODEC_ID_SMV */
+};
 
-    /* Subtitle streams */
+/* Subtitle streams */
+static const struct vlc_avcodec_fourcc spu_codecs[] =
+{
     { VLC_CODEC_SPU, AV_CODEC_ID_DVD_SUBTITLE, SPU_ES },
     { VLC_CODEC_DVBS, AV_CODEC_ID_DVB_SUBTITLE, SPU_ES },
     { VLC_CODEC_SUBT, AV_CODEC_ID_TEXT, SPU_ES },
@@ -487,33 +491,59 @@ static const struct
     /* ffmpeg only: AV_CODEC_ID_ASS */
 };
 
-static const size_t codecs_count = sizeof (codecs_table)
-                                 / sizeof (codecs_table[0]);
-
 int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
                     unsigned *pi_ffmpeg_codec, const char **ppsz_name )
 {
-    i_fourcc = vlc_fourcc_GetCodec( UNKNOWN_ES, i_fourcc );
-    for( unsigned i = 0; i < codecs_count; i++ )
-    {
-        if( codecs_table[i].i_fourcc == i_fourcc )
-        {
-            if( pi_cat ) *pi_cat = codecs_table[i].i_cat;
-            if( pi_ffmpeg_codec ) *pi_ffmpeg_codec = codecs_table[i].i_codec;
-            if( ppsz_name ) *ppsz_name = vlc_fourcc_GetDescription( UNKNOWN_ES, i_fourcc );//char *)codecs_table[i].psz_name;
+    const struct vlc_avcodec_fourcc *mapping;
 
-            return true;
-        }
+    i_fourcc = vlc_fourcc_GetCodec( UNKNOWN_ES, i_fourcc );
+
+    for( size_t i = 0; i < ARRAY_SIZE(video_codecs); i++ )
+    {
+        mapping = video_codecs + i;
+        if( mapping->i_fourcc == i_fourcc )
+            goto found;
+    }
+    for( size_t i = 0; i < ARRAY_SIZE(audio_codecs); i++ )
+    {
+        mapping = audio_codecs + i;
+        if( mapping->i_fourcc == i_fourcc )
+            goto found;
+    }
+    for( size_t i = 0; i < ARRAY_SIZE(spu_codecs); i++ )
+    {
+        mapping = spu_codecs + i;
+        if( mapping->i_fourcc == i_fourcc )
+            goto found;
     }
     return false;
+
+found:
+    if( pi_cat != NULL )
+        *pi_cat = mapping->i_cat;
+    if( pi_ffmpeg_codec != NULL )
+        *pi_ffmpeg_codec = mapping->i_codec;
+    if( ppsz_name )
+        *ppsz_name = vlc_fourcc_GetDescription( mapping->i_cat, i_fourcc );
+    return true;
 }
 
 vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec )
 {
-    for( unsigned i = 0; i < codecs_count; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(video_codecs); i++ )
     {
-        if( codecs_table[i].i_codec == i_ffmpeg_codec )
-            return codecs_table[i].i_fourcc;
+        if( video_codecs[i].i_codec == i_ffmpeg_codec )
+            return video_codecs[i].i_fourcc;
+    }
+    for( size_t i = 0; i < ARRAY_SIZE(audio_codecs); i++ )
+    {
+        if( audio_codecs[i].i_codec == i_ffmpeg_codec )
+            return audio_codecs[i].i_fourcc;
+    }
+    for( size_t i = 0; i < ARRAY_SIZE(spu_codecs); i++ )
+    {
+        if( spu_codecs[i].i_codec == i_ffmpeg_codec )
+            return spu_codecs[i].i_fourcc;
     }
     return 0;
 }
