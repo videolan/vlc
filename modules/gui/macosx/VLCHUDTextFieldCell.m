@@ -1,147 +1,279 @@
-/*****************************************************************************
- * VLCHUDTextFieldCell.m: Custom textfield cell UI for dark HUD Panels
- *****************************************************************************
- * Copyright (C) 2016 VLC authors and VideoLAN
- * $Id$
- *
- * Authors: Marvin Scholz <epirat07 -at- gmail -dot- com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
+//
+//  VLCHUDTextFieldCell.m
+//  BGHUDAppKit
+//
+//  Created by BinaryGod on 6/2/08.
+//
+//		Copyright (c) 2008, Tim Davis (BinaryMethod.com, binary.god@gmail.com)
+//  All rights reserved.
+//
+//		Redistribution and use in source and binary forms, with or without modification,
+//  are permitted provided that the following conditions are met:
+//
+//		Redistributions of source code must retain the above copyright notice, this
+//	list of conditions and the following disclaimer.
+//
+//		Redistributions in binary form must reproduce the above copyright notice,
+//	this list of conditions and the following disclaimer in the documentation and/or
+//	other materials provided with the distribution.
+//
+//		Neither the name of the BinaryMethod.com nor the names of its contributors
+//	may be used to endorse or promote products derived from this software without
+//	specific prior written permission.
+//
+//	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS AS IS AND
+//	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+//	IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+//	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+//	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+//	OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+//	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//	POSSIBILITY OF SUCH DAMAGE.
+//
+//  History
+//
+//		8/30/2010 - Fixed placeholder alignment not rendering while in design view,
+//					provided by [tylerb](GitHub).
 
 #import "VLCHUDTextFieldCell.h"
 
 @interface VLCHUDTextFieldCell () {
-    BOOL myCustomDrawsBackground;
-    BOOL myCustomDrawsBorder;
+    bool fillsBackground;
 }
 
 @end
 
 @implementation VLCHUDTextFieldCell
 
-- (instancetype) initWithCoder:(NSCoder *)coder
+#pragma mark Drawing Functions
+
+- (instancetype)initTextCell:(NSString *)aString
 {
-    self = [super initWithCoder:coder];
+    self = [super initTextCell: aString];
+
     if (self) {
-        [self setupSelf];
+        [self commonInit];
     }
 
     return self;
 }
 
-- (instancetype) initTextCell:(NSString *)aString
+- (instancetype)initWithCoder:(NSCoder *)decoder
 {
-    self = [super initTextCell:aString];
+    self = [super initWithCoder:decoder];
+
     if (self) {
-        [self setupSelf];
+        [self commonInit];
     }
 
     return self;
 }
 
-- (instancetype) initImageCell:(NSImage *)image
+- (void)commonInit
 {
-    self = [super initImageCell:image];
-    if (self) {
-        [self setupSelf];
+    // Init colors
+    _focusRing = [[NSShadow alloc] init];
+    [_focusRing setShadowColor:NSColor.whiteColor];
+    [_focusRing setShadowBlurRadius:3];
+    [_focusRing setShadowOffset:NSMakeSize(0, 0)];
+
+    _strokeColor = [NSColor colorWithDeviceRed:0.749f green:0.761f blue:0.788f alpha:1.0f];
+    _disabledStrokeColor = [NSColor colorWithDeviceRed:0.749f green:0.761f blue:0.788f alpha:0.2f];
+    _selectionHighlightActiveColor = [NSColor darkGrayColor];
+    _selectionTextActiveColor = [NSColor whiteColor];
+    _selectionHighlightInActiveColor = [NSColor darkGrayColor];
+    _selectionTextInActiveColor = [NSColor whiteColor];
+    _placeholderTextColor = [NSColor grayColor];
+    _cellTextColor = [NSColor whiteColor];
+    _disabledStrokeColor = [NSColor colorWithDeviceRed:1 green:1 blue:1 alpha:0.2f];
+    _textFillColor = [NSColor colorWithDeviceRed:.224f green:.224f blue:.224f alpha:.95f];
+
+    // Init some properties
+    [self setTextColor:_cellTextColor];
+
+    if ([self drawsBackground]) {
+        fillsBackground = YES;
     }
 
-    return self;
+    [self setDrawsBackground: NO];
 }
 
-- (void)setupSelf
+- (NSText *)setUpFieldEditorAttributes:(NSText *)textObj
 {
-    myCustomDrawsBorder = self.bordered || self.bezeled;
-    myCustomDrawsBackground = self.drawsBackground;
-    _enabledTextColor  = [NSColor whiteColor];
-    _disabledTextColor = [NSColor grayColor];
-    _enabledBorderColor = [NSColor yellowColor];
-    _disabledBorderColor = [NSColor greenColor];
-    _enabledBackgroundColor = [NSColor purpleColor];
-    _disabledBackgroundColor = [NSColor blackColor];
-    _borderWidth = 1.0;
-
-    /* Disable border, enable bezeled, disable background
-     * in case we need background (TextField instead of Label)
-     *
-     * This is kind of redundant, as enabling bezeled will
-     * disable bordered anyway, but I've done it for clarity.
-     *
-     * ORDER IS IMPORTANT!
-     * Disabling background and enabling bezeled afterwards
-     * will re-enable background!
-     */
-    if (self.drawsBackground) {
-        [self setBordered:NO];
-        [self setBezeled:YES];
-        [self setDrawsBackground:NO];
-    } else {
-        [self setBordered:YES];
-        [self setBezeled:NO];
-        [self setDrawsBackground:NO];
-    }
-}
-
-- (NSText *)setUpFieldEditorAttributes:(NSText *)text
-{
-    NSText *newText = [super setUpFieldEditorAttributes:text];
-
-    // Set the text color for entered text
-    [newText setTextColor:_enabledTextColor];
-
-    // Set the cursor color
-    [(NSTextView *)newText setInsertionPointColor:_enabledTextColor];
+    NSText *newText = [super setUpFieldEditorAttributes:textObj];
+    NSColor *textColor = _cellTextColor;
+    [(NSTextView *)newText setInsertionPointColor:textColor];
     return newText;
 }
 
-
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    NSRect borderRect = NSInsetRect(cellFrame, _borderWidth, _borderWidth);
+    // Adjust Rect
+    cellFrame = NSInsetRect(cellFrame, 0.5f, 0.5f);
 
-    if (self.enabled) {
-        [_enabledBackgroundColor setFill];
-        [_enabledBorderColor setStroke];
-        [self setTextColor:_enabledTextColor];
+    // Create Path
+    NSBezierPath *path = [NSBezierPath bezierPath];
+
+    if ([self bezelStyle] == NSTextFieldRoundedBezel) {
+
+        [path appendBezierPathWithArcWithCenter:NSMakePoint(cellFrame.origin.x + (cellFrame.size.height /2), cellFrame.origin.y + (cellFrame.size.height /2))
+                                         radius:cellFrame.size.height /2
+                                     startAngle:90
+                                       endAngle:270];
+
+        [path appendBezierPathWithArcWithCenter:NSMakePoint(cellFrame.origin.x + (cellFrame.size.width - (cellFrame.size.height /2)), cellFrame.origin.y + (cellFrame.size.height /2))
+                                         radius:cellFrame.size.height /2
+                                     startAngle:270
+                                       endAngle:90];
+
+        [path closePath];
+
     } else {
-        [_disabledBackgroundColor setFill];
-        [_disabledBorderColor setStroke];
-        [self setTextColor:_disabledTextColor];
+        [path appendBezierPathWithRoundedRect: cellFrame xRadius: 3.0f yRadius: 3.0f];
     }
 
-    // Draw background
-    if (myCustomDrawsBackground) {
-        NSRectFill(cellFrame);
+    // Draw Background
+    if (fillsBackground) {
+        [_textFillColor set];
+        [path fill];
     }
 
-    // Draw Border
-    if (myCustomDrawsBorder) {
-        NSBezierPath *borderPath = [NSBezierPath bezierPathWithRect:borderRect];
-        [borderPath setLineWidth:_borderWidth];
-        [borderPath stroke];
+    if ([self isBezeled] || [self isBordered]) {
+
+        [NSGraphicsContext saveGraphicsState];
+
+        if ([super showsFirstResponder] && [[[self controlView] window] isKeyWindow] &&
+           ([self focusRingType] == NSFocusRingTypeDefault ||
+            [self focusRingType] == NSFocusRingTypeExterior)) {
+               [_focusRing set];
+           }
+
+        // Check State
+        if ([self isEnabled]) {
+            [_strokeColor set];
+        } else {
+            [_disabledStrokeColor set];
+        }
+
+        [path setLineWidth:1.0f];
+        [path stroke];
+
+        [NSGraphicsContext restoreGraphicsState];
     }
 
-    /* Call draw interior to position text correctly
-     *
-     * For this to work, bezeled has to be enabled and drawsBackground
-     * needs to be disabled, else we still get a background drawn.
-     * When using bordered instead of bezeled, we get wrong cursor position.
-     */
-    [self drawInteriorWithFrame:cellFrame inView:controlView];
+    // Get TextView for this editor
+    NSTextView* view = (NSTextView*)[[controlView window] fieldEditor: NO forObject: controlView];
+
+    // If window/app is active draw the highlight/text in active colors
+    if (![self isHighlighted]) {
+
+        if ([view selectedRange].length > 0) {
+
+            // Get Attributes of the selected text
+            NSMutableDictionary *dict = [[view selectedTextAttributes] mutableCopy];
+
+            if ([[[self controlView] window] isKeyWindow]) {
+                [dict setObject:_selectionHighlightActiveColor
+                         forKey:NSBackgroundColorAttributeName];
+
+                [view setTextColor:_selectionTextActiveColor
+                             range:[view selectedRange]];
+            } else {
+                [dict setObject:_selectionHighlightInActiveColor
+                         forKey:NSBackgroundColorAttributeName];
+
+                [view setTextColor:_selectionTextInActiveColor
+                             range:[view selectedRange]];
+            }
+
+            [view setSelectedTextAttributes:dict];
+        } else {
+            // Only change color (marks view as dirty) if it had a selection at some point,
+            // thus changing the colors.
+            if ([view textColor] != _cellTextColor) {
+                [self setTextColor:_cellTextColor];
+                [view setTextColor:_cellTextColor];
+            }
+        }
+    } else {
+
+        if ([self isEnabled]) {
+            if ([self isHighlighted]) {
+                if ([[[self controlView] window] isKeyWindow]){
+                    [self setTextColor:_selectionTextActiveColor];
+                } else {
+                    [self setTextColor:_selectionTextInActiveColor];
+                }
+            } else {
+                [self setTextColor:_cellTextColor];
+            }
+        } else {
+            [self setTextColor:_disabledCellTextColor];
+        }
+    }
+
+    // Check to see if the attributed placeholder has been set or not
+    if (![self placeholderAttributedString] && [self placeholderString]) {
+
+        NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+
+        // Set the paragraph style
+        [style setAlignment: [self alignment]];
+
+        // Attributed string doesn't exist lets create it
+        NSDictionary *attributes = @{
+                                     NSForegroundColorAttributeName : _placeholderTextColor,
+                                     NSParagraphStyleAttributeName  : style
+                                     };
+        NSAttributedString *attributedPlaceholder = [[NSAttributedString alloc] initWithString:self.placeholderString attributes:attributes];
+        [self setPlaceholderAttributedString:attributedPlaceholder];
+    } else if ([self placeholderAttributedString] && [[self placeholderAttributedString] length] > 0) {
+
+        // Check to see if the proper styles have been applied
+        if ([[[self placeholderAttributedString] attribute:NSParagraphStyleAttributeName atIndex:1 effectiveRange:nil] alignment] != [self alignment]) {
+
+            NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+
+            // Set the paragraph style
+            [style setAlignment:[self alignment]];
+            
+            // Get current attr string
+            NSMutableAttributedString *adjPlaceholder = [[NSMutableAttributedString alloc] initWithAttributedString:[self placeholderAttributedString]];
+            
+            // Add style attr
+            [adjPlaceholder addAttribute:NSParagraphStyleAttributeName value:style range:NSMakeRange(0, [adjPlaceholder length])];
+            
+            // Reset Placeholder to correct placeholder
+            [self setPlaceholderAttributedString:adjPlaceholder];
+        }
+    }
+    
+    // Adjust Frame so Text Draws correctly
+    switch (self.controlSize) {
+        case NSRegularControlSize:
+            cellFrame.origin.y += (self.bezelStyle != NSTextFieldRoundedBezel) ? 1 : 0;
+            break;
+            
+        case NSSmallControlSize:
+            cellFrame.origin.y += (self.bezelStyle == NSTextFieldRoundedBezel) ? 1 : 0;
+            break;
+            
+        case NSMiniControlSize:
+            cellFrame.origin.x += (self.bezelStyle == NSTextFieldRoundedBezel) ? 1 : 0;
+            break;
+            
+        default:
+            break;
+    }
+
+    [self drawInteriorWithFrame: cellFrame inView: controlView];
 }
 
+- (void)_drawKeyboardFocusRingWithFrame:(NSRect)rect inView:(NSView*)view
+{
+    // Do nothing
+}
 
 @end
