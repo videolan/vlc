@@ -177,6 +177,8 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
                 FREENULL(path);
                 continue;
             }
+        } else {
+            continue;
         }
 
         addNewFontToFamily(p_filter, iter, path, p_family);
