@@ -716,9 +716,6 @@
 
     [[self model] sortForColumn:identifier withMode:type];
 
-    // TODO rework, why do we need a full call here?
-//    [self playlistUpdated];
-
     /* Clear indications of any existing column sorting */
     NSUInteger count = [[_outlineView tableColumns] count];
     for (NSUInteger i = 0 ; i < count ; i++)
@@ -759,12 +756,6 @@
         b_is_playing = p_current_item->i_id == [item plItemId];
     }
     PL_UNLOCK;
-
-    /*
-     TODO: repaint all items bold:
-     [self isItem: [o_playing_item pointerValue] inNode: [item pointerValue] checkItemExistence:YES locked:NO]
-     || [o_playing_item isEqual: item]
-     */
 
     if (b_is_playing)
         [cell setFont: [[NSFontManager sharedFontManager] convertFont:fontToUse toHaveTrait:NSBoldFontMask]];
