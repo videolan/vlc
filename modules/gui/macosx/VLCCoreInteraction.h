@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_common.h>
 #import <Cocoa/Cocoa.h>
 
 @interface VLCCoreInteraction : NSObject
@@ -85,10 +86,7 @@
 - (BOOL)fixPreferences;
 
 - (void)setVideoFilter: (const char *)psz_name on:(BOOL)b_on;
-- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter integer: (int)i_value;
-- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter float: (float)f_value;
-- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter string: (const char *)psz_value;
-- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter boolean: (BOOL)b_value;
+- (void)setVideoFilterProperty: (const char *)psz_property forFilter: (const char *)psz_filter withValue: (vlc_value_t)value;
 
 - (BOOL)keyEvent:(NSEvent *)o_event;
 - (void)updateCurrentlyUsedHotkeys;

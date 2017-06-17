@@ -987,7 +987,7 @@
         [self _enablePostProcessing];
         [sender setState:NSOnState];
 
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postproc" integer:[sender tag]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postproc" withValue:(vlc_value_t){ .i_int = [sender tag] }];
     }
 }
 
