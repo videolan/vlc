@@ -1389,7 +1389,7 @@
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>BreakpadProduct</key>
-	<string>VLC-macOS</string>
+	<string>VLC</string>
 	<key>BreakpadVendor</key>
 	<string>VideoLAN</string>
 	<key>BreakpadRequestComments</key>
