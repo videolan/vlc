@@ -258,25 +258,31 @@
     if (!item)
         return;
 
-    // select item
+    // Search for item row for selection
     NSInteger itemIndex = [_outlineView rowForItem:item];
     if (itemIndex < 0) {
-        // expand if needed
-        while (item != nil) {
-            VLCPLItem *parent = [item parent];
-
-            if (![_outlineView isExpandable: parent])
-                break;
-            if (![_outlineView isItemExpanded: parent])
-                [_outlineView expandItem: parent];
-            item = parent;
+        // Expand if needed. This must be done from root to child
+        // item in order to work
+        NSMutableArray *itemsToExpand = [NSMutableArray array];
+        VLCPLItem *tmpItem = [item parent];
+        while (tmpItem != nil) {
+            [itemsToExpand addObject:tmpItem];
+            tmpItem = [tmpItem parent];
         }
 
-        // search for row again
-        itemIndex = [_outlineView rowForItem:item];
-        if (itemIndex < 0) {
-            return;
+        for(int i = itemsToExpand.count - 1; i >= 0; i--) {
+            VLCPLItem *currentItem = [itemsToExpand objectAtIndex:i];
+            [_outlineView expandItem: currentItem];
         }
+    }
+
+    // Update highlight for currently playing item
+    [_outlineView reloadData];
+
+    // Search for row again
+    itemIndex = [_outlineView rowForItem:item];
+    if (itemIndex < 0) {
+        return;
     }
 
     [_outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: itemIndex] byExtendingSelection: NO];
