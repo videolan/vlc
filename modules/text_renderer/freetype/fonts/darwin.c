@@ -172,12 +172,8 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
         path = getPathForFontDescription(iter);
 
         /* check if the path is empty, which can happen in rare circumstances */
-        if (path != NULL) {
-            if (strcmp("", path) == 0) {
-                FREENULL(path);
-                continue;
-            }
-        } else {
+        if (path == NULL || *path == '\0') {
+            FREENULL(path);
             continue;
         }
 
