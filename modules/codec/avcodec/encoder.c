@@ -391,19 +391,24 @@ int OpenEncoder( vlc_object_t *p_this )
         i_codec_id = AV_CODEC_ID_MPEG1VIDEO;
         psz_namecodec = "MPEG-1 video";
     }
-    else if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
+    else if( GetFfmpegCodec( VIDEO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
                              &psz_namecodec ) )
+        i_cat = VIDEO_ES;
+    else if( GetFfmpegCodec( AUDIO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
+                             &psz_namecodec ) )
+        i_cat = AUDIO_ES;
+    else if( GetFfmpegCodec( SPU_ES, p_enc->fmt_out.i_codec, &i_codec_id,
+                             &psz_namecodec ) )
+        i_cat = SPU_ES;
+    else
+    if( FindFfmpegChroma( p_enc->fmt_out.i_codec ) != AV_PIX_FMT_NONE )
     {
-        if( FindFfmpegChroma( p_enc->fmt_out.i_codec ) == AV_PIX_FMT_NONE )
-            return VLC_EGENERIC; /* handed chroma output */
-
-        i_cat      = VIDEO_ES;
+        i_cat = VIDEO_ES;
         i_codec_id = AV_CODEC_ID_RAWVIDEO;
         psz_namecodec = "Raw video";
     }
-
-    if( i_cat == UNKNOWN_ES )
-        return VLC_EGENERIC;
+    else
+        return VLC_EGENERIC; /* handed chroma output */
 
     if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {

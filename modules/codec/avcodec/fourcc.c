@@ -490,51 +490,45 @@ static const struct vlc_avcodec_fourcc spu_codecs[] =
     /* ffmpeg only: AV_CODEC_ID_ASS */
 };
 
-int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
-                    unsigned *pi_ffmpeg_codec, const char **ppsz_name )
+bool GetFfmpegCodec( unsigned cat, vlc_fourcc_t i_fourcc,
+                     unsigned *pi_ffmpeg_codec, const char **ppsz_name )
 {
-    const struct vlc_avcodec_fourcc *mapping;
-    unsigned cat;
+    const struct vlc_avcodec_fourcc *base;
+    size_t count;
 
-    i_fourcc = vlc_fourcc_GetCodec( UNKNOWN_ES, i_fourcc );
+    switch( cat )
+    {
+        case VIDEO_ES:
+            base = video_codecs;
+            count = ARRAY_SIZE(video_codecs);
+            break;
+        case AUDIO_ES:
+            base = audio_codecs;
+            count = ARRAY_SIZE(audio_codecs);
+            break;
+        case SPU_ES:
+            base = spu_codecs;
+            count = ARRAY_SIZE(spu_codecs);
+            break;
+        default:
+            base = NULL;
+            count = 0;
+    }
 
-    for( size_t i = 0; i < ARRAY_SIZE(video_codecs); i++ )
+    i_fourcc = vlc_fourcc_GetCodec( cat, i_fourcc );
+
+    for( size_t i = 0; i < count; i++ )
     {
-        mapping = video_codecs + i;
-        if( mapping->i_fourcc == i_fourcc )
+        if( base[i].i_fourcc == i_fourcc )
         {
-            cat = VIDEO_ES;
-            goto found;
-        }
-    }
-    for( size_t i = 0; i < ARRAY_SIZE(audio_codecs); i++ )
-    {
-        mapping = audio_codecs + i;
-        if( mapping->i_fourcc == i_fourcc )
-        {
-            cat = AUDIO_ES;
-            goto found;
-        }
-    }
-    for( size_t i = 0; i < ARRAY_SIZE(spu_codecs); i++ )
-    {
-        mapping = spu_codecs + i;
-        if( mapping->i_fourcc == i_fourcc )
-        {
-            cat = SPU_ES;
-            goto found;
+            if( pi_ffmpeg_codec != NULL )
+                *pi_ffmpeg_codec = base[i].i_codec;
+            if( ppsz_name )
+                *ppsz_name = vlc_fourcc_GetDescription( cat, i_fourcc );
+            return true;
         }
     }
     return false;
-
-found:
-    if( pi_cat != NULL )
-        *pi_cat = cat;
-    if( pi_ffmpeg_codec != NULL )
-        *pi_ffmpeg_codec = mapping->i_codec;
-    if( ppsz_name )
-        *ppsz_name = vlc_fourcc_GetDescription( cat, i_fourcc );
-    return true;
 }
 
 vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec )

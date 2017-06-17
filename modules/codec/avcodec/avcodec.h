@@ -25,8 +25,8 @@
 #include "avcommon.h"
 
 /* VLC <-> avcodec tables */
-int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
-                    unsigned *pi_ffmpeg_codec, const char **ppsz_name );
+bool GetFfmpegCodec( unsigned cat, vlc_fourcc_t i_fourcc,
+                     unsigned *pi_ffmpeg_codec, const char **ppsz_name );
 vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec );
 vlc_fourcc_t GetVlcAudioFormat( int i_sample_fmt );
 
