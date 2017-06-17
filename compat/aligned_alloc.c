@@ -1,7 +1,7 @@
 /*****************************************************************************
- * posix_memalign.c: POSIX posix_memalign() replacement
+ * aligned_alloc.c: C11 aligned_alloc() replacement
  *****************************************************************************
- * Copyright © 2012 Rémi Denis-Courmont
+ * Copyright © 2012, 2017 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -22,46 +22,44 @@
 # include <config.h>
 #endif
 
+#include <assert.h>
 #include <stdlib.h>
 #include <errno.h>
+#if !defined (HAVE_POSIX_MEMALIGN) && !defined (_WIN32) && !defined (__APPLE__)
+# include <malloc.h>
+#endif
 
-static int check_align (size_t align)
+void *aligned_alloc(size_t align, size_t size)
 {
-    for (size_t i = sizeof (void *); i != 0; i *= 2)
-        if (align == i)
-            return 0;
-    return EINVAL;
-}
-
-#if !defined (_WIN32) && !defined (__APPLE__)
-#include <malloc.h>
-
-int posix_memalign (void **ptr, size_t align, size_t size)
-{
-    if (check_align (align))
-        return EINVAL;
-
-    int saved_errno = errno;
-    void *p = memalign (align, size);
-    if (p == NULL)
+    /* align must be a power of 2 */
+    /* size must be a multiple of align */
+    if ((align & (align - 1)) || (size & (align - 1)))
     {
-        errno = saved_errno;
-        return ENOMEM;
+        errno = EINVAL;
+        return NULL;
     }
 
-    *ptr = p;
-    return 0;
-}
+#ifdef HAVE_POSIX_MEMALIGN
+    if (align < sizeof (void *)) /* POSIX does not allow small alignment */
+        align = sizeof (void *);
+
+    void *ptr;
+    int err = posix_memalign(&ptr, align, size);
+    if (err)
+    {
+        errno = err;
+        ptr = NULL;
+    }
+    return ptr;
+
+#elif !defined (_WIN32) && !defined (__APPLE__)
+
+   return memalign(align, size);
 
 #else
 
-int posix_memalign (void **ptr, size_t align, size_t size)
-{
-    if (check_align (align))
-        return EINVAL;
-
-    *ptr = NULL;
-    return size ? ENOMEM : 0;
-}
-
+   if (size > 0)
+       errno = ENOMEM;
+   return NULL;
 #endif
+}

@@ -88,7 +88,7 @@ typedef struct
 # include <stdio.h> /* FILE */
 #endif
 
-#if !defined (HAVE_POSIX_MEMALIGN) || \
+#if !defined (HAVE_ALIGNED_ALLOC) || \
     !defined (HAVE_MEMRCHR) || \
     !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
@@ -302,8 +302,8 @@ int setenv (const char *, const char *, int);
 int unsetenv (const char *);
 #endif
 
-#ifndef HAVE_POSIX_MEMALIGN
-int posix_memalign (void **, size_t, size_t);
+#ifndef HAVE_ALIGNED_ALLOC
+void *aligned_alloc(size_t, size_t);
 #endif
 
 #if defined(__native_client__) && defined(__cplusplus)

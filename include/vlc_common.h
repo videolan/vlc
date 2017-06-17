@@ -854,13 +854,7 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 # define vlc_memalign(align, size) (_aligned_malloc(size, align))
 # define vlc_free(base)            (_aligned_free(base))
 #else
-static inline void *vlc_memalign(size_t align, size_t size)
-{
-    void *base;
-    if (unlikely(posix_memalign(&base, align, size)))
-        base = NULL;
-    return base;
-}
+# define vlc_memalign(align, size) aligned_alloc(align, size)
 # define vlc_free(base) free(base)
 #endif
 
