@@ -373,7 +373,6 @@ int OpenEncoder( vlc_object_t *p_this )
     AVCodecContext *p_context;
     AVCodec *p_codec = NULL;
     unsigned i_codec_id;
-    int i_cat;
     const char *psz_namecodec;
     float f_val;
     char *psz_val;
@@ -385,51 +384,34 @@ int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
-    if( p_enc->fmt_out.i_codec == VLC_CODEC_MP1V )
+    switch( p_enc->fmt_out.i_cat )
     {
-        i_cat = VIDEO_ES;
-        i_codec_id = AV_CODEC_ID_MPEG1VIDEO;
-        psz_namecodec = "MPEG-1 video";
-    }
-    else if( GetFfmpegCodec( VIDEO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
-                             &psz_namecodec ) )
-        i_cat = VIDEO_ES;
-    else if( GetFfmpegCodec( AUDIO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
-                             &psz_namecodec ) )
-        i_cat = AUDIO_ES;
-    else if( GetFfmpegCodec( SPU_ES, p_enc->fmt_out.i_codec, &i_codec_id,
-                             &psz_namecodec ) )
-        i_cat = SPU_ES;
-    else
-    if( FindFfmpegChroma( p_enc->fmt_out.i_codec ) != AV_PIX_FMT_NONE )
-    {
-        i_cat = VIDEO_ES;
-        i_codec_id = AV_CODEC_ID_RAWVIDEO;
-        psz_namecodec = "Raw video";
-    }
-    else
-        return VLC_EGENERIC; /* handed chroma output */
+        case VIDEO_ES:
+            if( p_enc->fmt_out.i_codec == VLC_CODEC_MP1V )
+            {
+                i_codec_id = AV_CODEC_ID_MPEG1VIDEO;
+                psz_namecodec = "MPEG-1 video";
+                break;
+            }
+            if( GetFfmpegCodec( VIDEO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
+                                &psz_namecodec ) )
+                break;
+            if( FindFfmpegChroma( p_enc->fmt_out.i_codec ) != AV_PIX_FMT_NONE )
+            {
+                i_codec_id = AV_CODEC_ID_RAWVIDEO;
+                psz_namecodec = "Raw video";
+                break;
+            }
+            return VLC_EGENERIC;
 
-    if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
-    {
-        msg_Err( p_enc, "\"%s\" is not a video encoder", psz_namecodec );
-        vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"),
-            _("\"%s\" is no video encoder."), psz_namecodec );
-        return VLC_EGENERIC;
-    }
-
-    if( p_enc->fmt_out.i_cat == AUDIO_ES && i_cat != AUDIO_ES )
-    {
-        msg_Err( p_enc, "\"%s\" is not an audio encoder", psz_namecodec );
-        vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"),
-            _("\"%s\" is no audio encoder."), psz_namecodec );
-        return VLC_EGENERIC;
-    }
-
-    if( p_enc->fmt_out.i_cat == SPU_ES )
-    {
-        /* We don't support subtitle encoding */
-        return VLC_EGENERIC;
+        case AUDIO_ES:
+            if( GetFfmpegCodec( AUDIO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
+                                &psz_namecodec ) )
+                break;
+            /* fall through */
+        default:
+            /* We don't support subtitle encoding */
+            return VLC_EGENERIC;
     }
 
     char *psz_encoder = var_GetString( p_this, ENC_CFG_PREFIX "codec" );
