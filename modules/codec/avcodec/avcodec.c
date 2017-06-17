@@ -252,25 +252,14 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*) p_this;
     unsigned i_codec_id;
-    int i_cat;
     const char *psz_namecodec;
 
     const AVCodec  *p_codec = NULL;
 
     /* *** determine codec type *** */
-    if( GetFfmpegCodec( VIDEO_ES, p_dec->fmt_in.i_codec, &i_codec_id,
-                        &psz_namecodec ) )
-        i_cat = VIDEO_ES;
-    else
-    if( GetFfmpegCodec( AUDIO_ES, p_dec->fmt_in.i_codec, &i_codec_id,
-                        &psz_namecodec ) )
-        i_cat = AUDIO_ES;
-    else
-    if( GetFfmpegCodec( SPU_ES, p_dec->fmt_in.i_codec, &i_codec_id,
-                        &psz_namecodec ) )
-        i_cat = SPU_ES;
-    else
-        return VLC_EGENERIC;
+    if( !GetFfmpegCodec( p_dec->fmt_in.i_cat, p_dec->fmt_in.i_codec,
+                         &i_codec_id, &psz_namecodec ) )
+         return VLC_EGENERIC;
 
     msg_Dbg( p_this, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
 
@@ -310,7 +299,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     int ret;
 
-    switch( i_cat )
+    switch( p_dec->fmt_in.i_cat )
     {
         case VIDEO_ES:
             ret = InitVideoDec( p_dec, avctx, p_codec );
