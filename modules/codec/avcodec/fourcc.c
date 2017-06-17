@@ -47,9 +47,9 @@ struct vlc_avcodec_fourcc
  */
 static const struct vlc_avcodec_fourcc video_codecs[] =
 {
+    { VLC_CODEC_MP1V, AV_CODEC_ID_MPEG1VIDEO },
     { VLC_CODEC_MP2V, AV_CODEC_ID_MPEG2VIDEO }, /* prefer MPEG2 over MPEG1 */
     { VLC_CODEC_MPGV, AV_CODEC_ID_MPEG2VIDEO }, /* prefer MPEG2 over MPEG1 */
-    { VLC_CODEC_MP1V, AV_CODEC_ID_MPEG1VIDEO },
     /* AV_CODEC_ID_MPEG2VIDEO_XVMC */
     { VLC_CODEC_H261, AV_CODEC_ID_H261 },
     { VLC_CODEC_H263, AV_CODEC_ID_H263 },
@@ -226,6 +226,8 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     { VLC_CODEC_ICOD, AV_CODEC_ID_AIC },
     /* AV_CODEC_ID_ESCAPE130 */
     { VLC_CODEC_G2M4, AV_CODEC_ID_G2M },
+    { VLC_CODEC_G2M2, AV_CODEC_ID_G2M },
+    { VLC_CODEC_G2M3, AV_CODEC_ID_G2M },
     /* AV_CODEC_ID_WEBP */
     { VLC_CODEC_HNM4_VIDEO, AV_CODEC_ID_HNM4_VIDEO },
     { VLC_CODEC_HEVC, AV_CODEC_ID_HEVC },
@@ -251,9 +253,6 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* AV_CODEC_ID_DDS */
 
     { VLC_CODEC_DXV, AV_CODEC_ID_DXV },
-
-    { VLC_CODEC_G2M2, AV_CODEC_ID_G2M },
-    { VLC_CODEC_G2M3, AV_CODEC_ID_G2M },
 
     /* ffmpeg only: AV_CODEC_ID_BRENDER_PIX */
     /* ffmpeg only: AV_CODEC_ID_Y41P */
@@ -381,9 +380,9 @@ static const struct vlc_avcodec_fourcc audio_codecs[] =
     /* AV_CODEC_ID_SOL_DPCM */
 
     /* audio codecs */
-    { VLC_CODEC_MP3, AV_CODEC_ID_MP3 },
     { VLC_CODEC_MPGA, AV_CODEC_ID_MP2 },
     { VLC_CODEC_MP2, AV_CODEC_ID_MP2 },
+    { VLC_CODEC_MP3, AV_CODEC_ID_MP3 },
     { VLC_CODEC_MP4A, AV_CODEC_ID_AAC },
     { VLC_CODEC_A52, AV_CODEC_ID_AC3 },
     { VLC_CODEC_DTS, AV_CODEC_ID_DTS },
@@ -432,8 +431,8 @@ static const struct vlc_avcodec_fourcc audio_codecs[] =
     { VLC_CODEC_TRUEHD, AV_CODEC_ID_TRUEHD },
     { VLC_CODEC_ALS, AV_CODEC_ID_MP4ALS },
     { VLC_CODEC_ATRAC1, AV_CODEC_ID_ATRAC1 },
-    { VLC_CODEC_BINKAUDIO_DCT, AV_CODEC_ID_BINKAUDIO_DCT },
     { VLC_CODEC_BINKAUDIO_RDFT, AV_CODEC_ID_BINKAUDIO_RDFT },
+    { VLC_CODEC_BINKAUDIO_DCT, AV_CODEC_ID_BINKAUDIO_DCT },
     { VLC_CODEC_MP4A, AV_CODEC_ID_AAC_LATM },
     /* AV_CODEC_ID_QDMC */
     /* AV_CODEC_ID_CELT */
