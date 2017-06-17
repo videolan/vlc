@@ -59,10 +59,6 @@
 
 @end
 
-@interface VLCResizeControl : NSImageView
-
-@end
-
 @interface VLCColorView : NSView
 
 @end

@@ -26,8 +26,6 @@
 #import "misc.h"
 #import "VLCControlsBarCommon.h"
 
-@class VLCResizeControl;
-
 /*****************************************************************************
  * VLCMainWindowControlsBar
  *

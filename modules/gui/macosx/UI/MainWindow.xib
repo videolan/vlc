@@ -744,16 +744,8 @@
                                             <constraint firstAttribute="right" secondItem="4419" secondAttribute="right" id="teb-w0-7R0"/>
                                         </constraints>
                                     </customView>
-                                    <imageView translatesAutoresizingMaskIntoConstraints="NO" id="4839" customClass="VLCResizeControl">
-                                        <rect key="frame" x="704" y="0.0" width="12" height="14"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="14" id="Wff-4H-UIV"/>
-                                        </constraints>
-                                        <imageCell key="cell" continuous="YES" refusesFirstResponder="YES" alignment="left" image="window-resize" id="4840"/>
-                                    </imageView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="4839" secondAttribute="bottom" id="4QS-9X-8lN"/>
                                     <constraint firstItem="3653" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="5K8-hV-nOQ"/>
                                     <constraint firstItem="mrr-Bw-co0" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="5tM-K0-mjZ"/>
                                     <constraint firstItem="3652" firstAttribute="leading" secondItem="3649" secondAttribute="trailing" constant="3" id="Apb-gM-P9J"/>
@@ -767,7 +759,6 @@
                                     <constraint firstItem="4417" firstAttribute="leading" secondItem="3649" secondAttribute="leading" id="b86-zP-VqN"/>
                                     <constraint firstItem="4417" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="gI8-2E-JGT"/>
                                     <constraint firstItem="dff-fl-Mde" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="gqZ-nc-67e"/>
-                                    <constraint firstAttribute="trailing" secondItem="4839" secondAttribute="trailing" id="jMi-9b-nsp"/>
                                     <constraint firstItem="3649" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="ll4-Gr-Hs6"/>
                                     <constraint firstItem="3652" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="o7m-oP-mfd"/>
                                     <constraint firstItem="jlp-Z2-Qdl" firstAttribute="leading" secondItem="5608" secondAttribute="leading" constant="6" id="odn-Ek-4d1"/>
@@ -858,7 +849,6 @@
                 <outlet property="progressBar" destination="3584" id="d57-az-Grm"/>
                 <outlet property="progressView" destination="5335" id="dBT-U1-rmL"/>
                 <outlet property="repeatButton" destination="2789" id="lRj-JN-Yry"/>
-                <outlet property="resizeView" destination="4839" id="26r-ET-oqH"/>
                 <outlet property="shuffleButton" destination="2208" id="kf1-mU-75T"/>
                 <outlet property="stopButton" destination="3647" id="ddx-Gq-iPV"/>
                 <outlet property="timeField" destination="4423" id="Wvo-az-Lou"/>
@@ -1068,6 +1058,5 @@ Gw
         <image name="volume-high" width="13" height="11"/>
         <image name="volume-low" width="5" height="11"/>
         <image name="volume-slider-track" width="48" height="5"/>
-        <image name="window-resize" width="12" height="12"/>
     </resources>
 </document>

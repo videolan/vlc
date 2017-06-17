@@ -144,13 +144,6 @@
     frame.size.width = 0;
     [_timeSliderGradientView setFrame: frame];
 
-    // hide resize view if necessary
-    [self.resizeView setImage: NULL];
-
-    if ([[self.bottomBarView window] styleMask] & NSResizableWindowMask)
-        [self.resizeView removeFromSuperviewWithoutNeedingDisplay];
-
-
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
         [self.fullscreenButton removeFromSuperview];
