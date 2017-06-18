@@ -1057,23 +1057,12 @@ static const char *const ppsz_prefres[] = {
        "Writes process id into specified file.")
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
-#if defined( _WIN32 ) || defined( __OS2__ )
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
     "for example if you associated VLC with some media types and you " \
     "don't want a new instance of VLC to be opened each time you " \
     "open a file in your file manager. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
-#elif defined( HAVE_DBUS )
-#define ONEINSTANCE_LONGTEXT N_( \
-    "Allowing only one running instance of VLC can sometimes be useful, " \
-    "for example if you associated VLC with some media types and you " \
-    "don't want a new instance of VLC to be opened each time you " \
-    "open a file in your file manager. This option will allow you " \
-    "to play the file with the already running instance or enqueue it. " \
-    "This option requires the D-Bus session daemon to be active " \
-    "and the running instance of VLC to use D-Bus control interface.")
-#endif
 
 #define STARTEDFROMFILE_TEXT N_("VLC is started from file association")
 #define STARTEDFROMFILE_LONGTEXT N_( \
