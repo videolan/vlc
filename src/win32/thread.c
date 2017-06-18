@@ -876,8 +876,9 @@ static BOOL SelectClockSource(void *data)
     if (!strcmp (name, "multimedia"))
     {
         TIMECAPS caps;
+        MMRESULT (WINAPI * timeBeginPeriod)(UINT);
 
-        HMODULE hWinmm = GetModuleHandle(TEXT("winmm.dll"));
+        HMODULE hWinmm = LoadLibrary(TEXT("winmm.dll"));
         if (!hWinmm)
             goto perf;
 
@@ -892,6 +893,10 @@ static BOOL SelectClockSource(void *data)
         msg_Dbg (obj, " min period: %u ms, max period: %u ms",
                  caps.wPeriodMin, caps.wPeriodMax);
         mdate_selected = mdate_multimedia;
+
+        timeBeginPeriod = (void*)GetProcAddress(hWinmm, "timeBeginPeriod");
+        if (timeBeginPeriod != NULL)
+            timeBeginPeriod(5);
     }
 #endif
     else
