@@ -201,11 +201,14 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_t self = pthread_self ();
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
-    const char *argv[i_argc + 2];
+    const char *argv[i_argc + 3];
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
     argv[argc++] = "--media-library";
+#ifdef HAVE_DBUS
+    argv[argc++] = "--dbus";
+#endif
     ppsz_argv++; i_argc--; /* skip executable path */
 
 #ifdef __OS2__
@@ -237,9 +240,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_add_intf (vlc, "hotkeys,none");
 #if !defined (__OS2__)
     libvlc_add_intf (vlc, "globalhotkeys,none");
-#endif
-#ifdef HAVE_DBUS
-    libvlc_add_intf (vlc, "dbus,none");
 #endif
     if (libvlc_add_intf (vlc, NULL))
         goto out;

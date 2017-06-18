@@ -1086,6 +1086,10 @@ static const char *const ppsz_prefres[] = {
     "When using the one instance only option, enqueue items to playlist " \
     "and keep playing current item.")
 
+#define DBUS_TEXT N_("Expose media player via D-Bus")
+#define DBUS_LONGTEXT N_("Allow other applications to control " \
+    "the VLC media player using the D-Bus MPRIS protocol.")
+
 /*****************************************************************************
  * Playlist
  ****************************************************************************/
@@ -2037,6 +2041,9 @@ vlc_module_begin ()
               ONEINSTANCEWHENSTARTEDFROMFILE_TEXT, true )
     add_bool( "playlist-enqueue", 0, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, true )
+#endif
+#ifdef HAVE_DBUS
+    add_bool( "dbus", false, DBUS_TEXT, DBUS_LONGTEXT, true )
 #endif
     add_bool( "media-library", 0, ML_TEXT, ML_LONGTEXT, false )
     add_bool( "playlist-tree", 0, PLTREE_TEXT, PLTREE_LONGTEXT, false )

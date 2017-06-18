@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
+#include "../lib/libvlc_internal.h"
 
 #ifdef HAVE_DBUS
 /* used for one-instance mode */
@@ -157,4 +158,8 @@ void system_Configure(libvlc_int_t *libvlc,
                       int argc, const char *const argv[])
 {
     system_ConfigureDbus(libvlc, argc, argv);
+#ifdef HAVE_DBUS
+    if (var_InheritBool(libvlc, "dbus"))
+        libvlc_InternalAddIntf(libvlc, "dbus,none");
+#endif
 }
