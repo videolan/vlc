@@ -193,14 +193,11 @@ static int Open( vlc_object_t *p_this )
             &dbus_mpris_vtable, p_this );
 
     /* Try to register org.mpris.MediaPlayer2.vlc */
+    const unsigned bus_flags = DBUS_NAME_FLAG_DO_NOT_QUEUE;
     var_Create(p_intf->obj.libvlc, "dbus-mpris-name", VLC_VAR_STRING);
-    dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, 0, &error );
-    if( dbus_error_is_set( &error ) )
+    if( dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, bus_flags, NULL )
+                                     != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER )
     {
-        msg_Dbg( p_this, "Failed to get service name %s: %s",
-                 DBUS_MPRIS_BUS_NAME, error.message );
-        dbus_error_free( &error );
-
         /* Register an instance-specific well known name of the form
          * org.mpris.MediaPlayer2.vlc.instanceXXXX where XXXX is the
          * current Process ID */
@@ -211,14 +208,8 @@ static int Open( vlc_object_t *p_this )
                   DBUS_MPRIS_BUS_NAME"."DBUS_INSTANCE_ID_PREFIX"%"PRIu32,
                   (uint32_t)getpid() );
 
-        dbus_bus_request_name( p_conn, unique_service, 0, &error );
-        if( dbus_error_is_set( &error ) )
-        {
-            msg_Err( p_this, "Failed to get service name %s: %s",
-                     DBUS_MPRIS_BUS_NAME, error.message );
-            dbus_error_free( &error );
-        }
-        else
+        if( dbus_bus_request_name( p_conn, unique_service, bus_flags, NULL )
+                                     == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER )
         {
             msg_Dbg( p_intf, "listening on dbus as: %s", unique_service );
             var_SetString(p_intf->obj.libvlc, "dbus-mpris-name",
