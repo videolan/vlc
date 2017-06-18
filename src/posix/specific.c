@@ -25,12 +25,136 @@
 #include <vlc_common.h>
 #include "../libvlc.h"
 
+#ifdef HAVE_DBUS
+/* used for one-instance mode */
+# include <dbus/dbus.h>
+# include <vlc_url.h>
+#endif
+
 void system_Init (void)
 {
 }
 
-void system_Configure (libvlc_int_t *libvlc,
-                       int argc, const char *const argv[])
+static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
+                                 const char *const argv[])
 {
-    (void)libvlc; (void)argc; (void)argv;
+/* FIXME: could be replaced by using Unix sockets */
+#ifdef HAVE_DBUS
+    if (!var_InheritBool(vlc, "one-instance")
+     && !(var_InheritBool(vlc, "one-instance-when-started-from-file")
+       && var_InheritBool(vlc, "started-from-file")))
+         return;
+
+#define MPRIS_APPEND "/org/mpris/MediaPlayer2/TrackList/Append"
+#define MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
+#define MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
+#define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
+    for (int i = 0; i < argc; i++)
+        if (argv[i][0] == ':')
+        {
+            msg_Err(vlc, "item option %s incompatible with single instance",
+                    argv[i]);
+            return;
+        }
+
+    /* Initialise D-Bus interface, check for other instances */
+    dbus_threads_init_default();
+
+    DBusError err;
+    dbus_error_init(&err);
+
+    /* connect to the session bus */
+    DBusConnection *conn = dbus_bus_get(DBUS_BUS_SESSION, &err);
+    if (conn == NULL)
+    {
+        msg_Err(vlc, "D-Bus session bus connection failure: %s",
+                 err.message);
+        dbus_error_free(&err);
+        return;
+    }
+
+    /* check if VLC is available on the bus
+     * if not: D-Bus control is not enabled on the other
+     * instance and we can't pass MRLs to it */
+    /* FIXME: This check is totally brain-dead and buggy. */
+    if (!dbus_bus_name_has_owner(conn, MPRIS_BUS_NAME, &err))
+    {
+        dbus_connection_unref(conn);
+        if (dbus_error_is_set(&err))
+        {
+            msg_Err(vlc, "D-Bus error: %s", err.message);
+            dbus_error_free(&err);
+        }
+        else
+            msg_Dbg(vlc, "no running VLC instance - continuing normally...");
+        return;
+    }
+    msg_Warn(vlc, "running VLC instance - exiting...");
+
+    const dbus_bool_t play = !var_InheritBool(vlc, "playlist-enqueue");
+
+    for (int i = 0; i < argc; i++)
+    {
+        DBusMessage *req = dbus_message_new_method_call(MPRIS_BUS_NAME,
+            MPRIS_OBJECT_PATH, MPRIS_TRACKLIST_INTERFACE, "AddTrack");
+        if (unlikely(req == NULL))
+            continue;
+
+        /* We need to resolve relative paths in this instance */
+        char *mrlbuf = NULL;
+        const char *mrl;
+
+        if (strstr(argv[i], "://"))
+            mrl = argv[i];
+        else
+        {
+            mrlbuf = vlc_path2uri(argv[i], NULL);
+            if (unlikely(mrlbuf == NULL))
+            {
+                dbus_message_unref(req);
+                continue;
+            }
+            mrl = mrlbuf;
+        }
+
+        /* append MRLs */
+        msg_Dbg(vlc, "adding track %s to running instance", mrl);
+
+        const char *after_track = MPRIS_APPEND;
+        dbus_bool_t ok = dbus_message_append_args(req, DBUS_TYPE_STRING, &mrl,
+                                           DBUS_TYPE_OBJECT_PATH, &after_track,
+                                           DBUS_TYPE_BOOLEAN, &play,
+                                           DBUS_TYPE_INVALID);
+        free(mrlbuf);
+        if (unlikely(!ok))
+        {
+             dbus_message_unref(req);
+             continue;
+        }
+
+        /* send message and get a handle for a reply */
+        DBusMessage *reply = dbus_connection_send_with_reply_and_block(conn,
+                                                                req, -1, &err);
+        dbus_message_unref(req);
+        if (reply == NULL)
+        {
+            msg_Err(vlc, "D-Bus error: %s", err.message);
+            dbus_error_free(&err);
+            continue;
+        }
+        dbus_message_unref(reply);
+    }
+
+    /* we unreference the connection when we've finished with it */
+    dbus_connection_unref(conn);
+    exit(0);
+#else
+    (void) libvlc; (void) argc; (void) argv;
+#endif // HAVE_DBUS
+}
+
+void system_Configure(libvlc_int_t *libvlc,
+                      int argc, const char *const argv[])
+{
+    system_ConfigureDbus(libvlc, argc, argv);
 }
