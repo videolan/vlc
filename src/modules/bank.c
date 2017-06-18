@@ -712,33 +712,28 @@ static int modulecmp (const void *a, const void *b)
  * Builds a sorted list of all VLC modules with a given capability.
  * The list is sorted from the highest module score to the lowest.
  * @param list pointer to the table of modules [OUT]
- * @param cap capability of modules to look for
+ * @param name name of capability of modules to look for
  * @return the number of matching found, or -1 on error (*list is then NULL).
  * @note *list must be freed with module_list_free().
  */
-ssize_t module_list_cap (module_t ***restrict list, const char *cap)
+ssize_t module_list_cap (module_t ***restrict list, const char *name)
 {
-    /* TODO: This is quite inefficient. List should be sorted by capability. */
-    ssize_t n = 0;
+    const vlc_modcap_t **cp = tfind(&name, &modules.caps_tree, vlc_modcap_cmp);
+    if (cp == NULL)
+    {
+        *list = NULL;
+        return 0;
+    }
 
-    assert (list != NULL);
-
-    for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
-         for (module_t *m = lib->module; m != NULL; m = m->next)
-             if (module_provides(m, cap))
-                 n++;
-
+    const vlc_modcap_t *cap = *cp;
+    size_t n = cap->modc;
     module_t **tab = malloc (sizeof (*tab) * n);
     *list = tab;
     if (unlikely(tab == NULL))
         return -1;
 
-    for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
-         for (module_t *m = lib->module; m != NULL; m = m->next)
-             if (module_provides (m, cap))
-                 *(tab++) = m;
-
-    assert (tab == *list + n);
+    /* TODO: Sort the table once. */
+    memcpy(tab, cap->modv, sizeof (*tab) * n);
     qsort (*list, n, sizeof (*tab), modulecmp);
     return n;
 }
