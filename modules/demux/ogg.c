@@ -2226,8 +2226,6 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     p_ogg->skeleton.minor = 0;
     p_ogg->b_preparsing_done = false;
     p_ogg->b_es_created = false;
-    p_ogg->i_nzpcr_offset = (p_ogg->i_pcr >= VLC_TS_INVALID) ?
-                          p_ogg->i_pcr - VLC_TS_0 : 0;
 
     /* */
     if( p_ogg->p_meta )
