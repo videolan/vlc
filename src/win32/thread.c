@@ -793,20 +793,9 @@ static mtime_t mdate_wall (void)
     return s.QuadPart / (10000000 / CLOCK_FREQ);
 }
 
-static CRITICAL_SECTION clock_lock;
-static bool clock_used_early = false;
-
 static mtime_t mdate_default(void)
 {
-    EnterCriticalSection(&clock_lock);
-    if (!clock_used_early)
-    {
-        if (!QueryPerformanceFrequency(&clk.perf.freq))
-            abort();
-        clock_used_early = true;
-    }
-    LeaveCriticalSection(&clock_lock);
-
+    vlc_threads_setup(NULL);
     return mdate_perf();
 }
 
@@ -840,23 +829,18 @@ void (msleep)(mtime_t delay)
 }
 #endif
 
-static void SelectClockSource (vlc_object_t *obj)
+static BOOL SelectClockSource(void *data)
 {
-    EnterCriticalSection (&clock_lock);
-    if (mdate_selected != mdate_default)
-    {
-        LeaveCriticalSection (&clock_lock);
-        return;
-    }
-
-    assert(!clock_used_early);
+    vlc_object_t *obj = data;
 
 #if VLC_WINSTORE_APP
     const char *name = "perf";
 #else
     const char *name = "multimedia";
 #endif
-    char *str = var_InheritString (obj, "clock-source");
+    char *str = NULL;
+    if (obj != NULL)
+        str = var_InheritString(obj, "clock-source");
     if (str != NULL)
         name = str;
     if (!strcmp (name, "interrupt"))
@@ -865,7 +849,7 @@ static void SelectClockSource (vlc_object_t *obj)
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN7)
         HANDLE h = GetModuleHandle (_T("kernel32.dll"));
         if (unlikely(h == NULL))
-            abort ();
+            return FALSE;
         clk.interrupt.query = (void *)GetProcAddress (h,
                                                       "QueryUnbiasedInterruptTime");
         if (unlikely(clk.interrupt.query == NULL))
@@ -880,10 +864,10 @@ static void SelectClockSource (vlc_object_t *obj)
 #if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
         HANDLE h = GetModuleHandle (_T("kernel32.dll"));
         if (unlikely(h == NULL))
-            abort ();
+            return FALSE;
         clk.tick.get = (void *)GetProcAddress (h, "GetTickCount64");
         if (unlikely(clk.tick.get == NULL))
-            abort ();
+            return FALSE;
 #endif
         mdate_selected = mdate_tick;
     }
@@ -931,8 +915,8 @@ static void SelectClockSource (vlc_object_t *obj)
         msg_Err (obj, "invalid clock source \"%s\"", name);
         abort ();
     }
-    LeaveCriticalSection (&clock_lock);
     free (str);
+    return TRUE;
 }
 
 size_t EnumClockSource (vlc_object_t *obj, const char *var,
@@ -998,9 +982,18 @@ unsigned vlc_GetCPUCount (void)
 
 
 /*** Initialization ***/
-void vlc_threads_setup (libvlc_int_t *p_libvlc)
+static CRITICAL_SECTION setup_lock; /* FIXME: use INIT_ONCE */
+
+void vlc_threads_setup(libvlc_int_t *vlc)
 {
-    SelectClockSource (VLC_OBJECT(p_libvlc));
+    EnterCriticalSection(&setup_lock);
+    if (mdate_selected == mdate_default)
+    {
+        if (!SelectClockSource((vlc != NULL) ? VLC_OBJECT(vlc) : NULL))
+            abort();
+        assert(mdate_selected != mdate_default);
+    }
+    LeaveCriticalSection(&setup_lock);
 }
 
 #define LOOKUP(s) (((s##_) = (void *)GetProcAddress(h, #s)) != NULL)
@@ -1044,7 +1037,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             thread_key = TlsAlloc();
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
                 return FALSE;
-            InitializeCriticalSection (&clock_lock);
+            InitializeCriticalSection(&setup_lock);
             InitializeCriticalSection(&super_mutex);
             InitializeConditionVariable(&super_variable);
             vlc_rwlock_init (&config_lock);
@@ -1055,7 +1048,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_DETACH:
             vlc_rwlock_destroy (&config_lock);
             DeleteCriticalSection(&super_mutex);
-            DeleteCriticalSection (&clock_lock);
+            DeleteCriticalSection(&setup_lock);
             TlsFree(thread_key);
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
             if (WaitOnAddress_ == WaitOnAddressFallback)
