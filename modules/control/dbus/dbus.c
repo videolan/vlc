@@ -193,6 +193,7 @@ static int Open( vlc_object_t *p_this )
             &dbus_mpris_vtable, p_this );
 
     /* Try to register org.mpris.MediaPlayer2.vlc */
+    var_Create(p_intf->obj.libvlc, "dbus-mpris-name", VLC_VAR_STRING);
     dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, 0, &error );
     if( dbus_error_is_set( &error ) )
     {
@@ -218,11 +219,18 @@ static int Open( vlc_object_t *p_this )
             dbus_error_free( &error );
         }
         else
+        {
             msg_Dbg( p_intf, "listening on dbus as: %s", unique_service );
+            var_SetString(p_intf->obj.libvlc, "dbus-mpris-name",
+                          unique_service);
+        }
     }
     else
+    {
         msg_Dbg( p_intf, "listening on dbus as: %s", DBUS_MPRIS_BUS_NAME );
-
+        var_SetString(p_intf->obj.libvlc, "dbus-mpris-name",
+                      DBUS_MPRIS_BUS_NAME);
+    }
     dbus_connection_flush( p_conn );
 
     p_intf->p_sys = p_sys;
@@ -265,6 +273,7 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
+    var_Destroy(p_intf->obj.libvlc, "dbus-mpris-name");
     /* The dbus connection is private,
      * so we are responsible for closing it
      * XXX: Does this make sense when OOM ? */
