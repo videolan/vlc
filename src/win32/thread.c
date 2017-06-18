@@ -987,12 +987,30 @@ static CRITICAL_SECTION setup_lock; /* FIXME: use INIT_ONCE */
 void vlc_threads_setup(libvlc_int_t *vlc)
 {
     EnterCriticalSection(&setup_lock);
-    if (mdate_selected == mdate_default)
+    if (mdate_selected != mdate_default)
     {
-        if (!SelectClockSource((vlc != NULL) ? VLC_OBJECT(vlc) : NULL))
-            abort();
-        assert(mdate_selected != mdate_default);
+        LeaveCriticalSection(&setup_lock);
+        return;
     }
+
+    if (!SelectClockSource((vlc != NULL) ? VLC_OBJECT(vlc) : NULL))
+        abort();
+    assert(mdate_selected != mdate_default);
+
+#if !VLC_WINSTORE_APP
+    /* Raise default priority of the current process */
+#ifndef ABOVE_NORMAL_PRIORITY_CLASS
+#   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
+#endif
+    if (var_InheritBool(vlc, "high-priority"))
+    {
+        if (SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS)
+         || SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
+            msg_Dbg(vlc, "raised process priority");
+        else
+            msg_Dbg(vlc, "could not raise process priority");
+    }
+#endif
     LeaveCriticalSection(&setup_lock);
 }
 

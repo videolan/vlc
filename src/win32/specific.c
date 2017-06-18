@@ -97,23 +97,6 @@ typedef struct
 void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_argv[] )
 {
 #if !VLC_WINSTORE_APP
-    /* Raise default priority of the current process */
-#ifndef ABOVE_NORMAL_PRIORITY_CLASS
-#   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
-#endif
-    if( var_InheritBool( p_this, "high-priority" ) )
-    {
-        if( SetPriorityClass( GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS )
-             || SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
-        {
-            msg_Dbg( p_this, "raised process priority" );
-        }
-        else
-        {
-            msg_Dbg( p_this, "could not raise process priority" );
-        }
-    }
-
     if( var_InheritBool( p_this, "one-instance" )
      || ( var_InheritBool( p_this, "one-instance-when-started-from-file" )
        && var_InheritBool( p_this, "started-from-file" ) ) )
