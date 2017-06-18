@@ -41,15 +41,21 @@ static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
 {
 /* FIXME: could be replaced by using Unix sockets */
 #ifdef HAVE_DBUS
+# define MPRIS_APPEND "/org/mpris/MediaPlayer2/TrackList/Append"
+# define MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
+# define MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
+# define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
+
+    dbus_threads_init_default();
+
+    if (var_InheritBool(vlc, "dbus"))
+        libvlc_InternalAddIntf(vlc, "dbus,none");
+
     if (!var_InheritBool(vlc, "one-instance")
      && !(var_InheritBool(vlc, "one-instance-when-started-from-file")
        && var_InheritBool(vlc, "started-from-file")))
          return;
 
-#define MPRIS_APPEND "/org/mpris/MediaPlayer2/TrackList/Append"
-#define MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
-#define MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
-#define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
     for (int i = 0; i < argc; i++)
         if (argv[i][0] == ':')
         {
@@ -58,9 +64,19 @@ static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
             return;
         }
 
-    /* Initialise D-Bus interface, check for other instances */
-    dbus_threads_init_default();
+    char *name = var_GetString(vlc, "dbus-mpris-name");
+    if (name != NULL)
+    {
+        bool singleton = !strcmp(name, MPRIS_BUS_NAME);
+        free(name);
+        if (singleton)
+        {
+            msg_Dbg(vlc, "no running VLC instance - continuing normally...");
+            return; /* This is the single instance */
+        }
+    }
 
+    /* Initialise D-Bus interface, check for other instances */
     DBusError err;
     dbus_error_init(&err);
 
@@ -74,22 +90,6 @@ static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
         return;
     }
 
-    /* check if VLC is available on the bus
-     * if not: D-Bus control is not enabled on the other
-     * instance and we can't pass MRLs to it */
-    /* FIXME: This check is totally brain-dead and buggy. */
-    if (!dbus_bus_name_has_owner(conn, MPRIS_BUS_NAME, &err))
-    {
-        dbus_connection_unref(conn);
-        if (dbus_error_is_set(&err))
-        {
-            msg_Err(vlc, "D-Bus error: %s", err.message);
-            dbus_error_free(&err);
-        }
-        else
-            msg_Dbg(vlc, "no running VLC instance - continuing normally...");
-        return;
-    }
     msg_Warn(vlc, "running VLC instance - exiting...");
 
     const dbus_bool_t play = !var_InheritBool(vlc, "playlist-enqueue");
@@ -158,8 +158,4 @@ void system_Configure(libvlc_int_t *libvlc,
                       int argc, const char *const argv[])
 {
     system_ConfigureDbus(libvlc, argc, argv);
-#ifdef HAVE_DBUS
-    if (var_InheritBool(libvlc, "dbus"))
-        libvlc_InternalAddIntf(libvlc, "dbus,none");
-#endif
 }
