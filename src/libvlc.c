@@ -68,10 +68,6 @@
 
 #include <vlc_vlm.h>
 
-#ifdef __APPLE__
-# include <libkern/OSAtomic.h>
-#endif
-
 #include <assert.h>
 
 /*****************************************************************************
