@@ -36,6 +36,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -46,20 +49,90 @@
 #include "config/configuration.h"
 #include "modules/modules.h"
 
+typedef struct vlc_modcap
+{
+    char *name;
+    module_t **modv;
+    size_t modc;
+} vlc_modcap_t;
+
+static int vlc_modcap_cmp(const void *a, const void *b)
+{
+    const vlc_modcap_t *capa = a, *capb = b;
+    return strcmp(capa->name, capb->name);
+}
+
+static void vlc_modcap_free(void *data)
+{
+    vlc_modcap_t *cap = data;
+
+    free(cap->modv);
+    free(cap->name);
+    free(cap);
+}
+
 static struct
 {
     vlc_mutex_t lock;
     block_t *caches;
+    void *caps_tree;
     unsigned usage;
-} modules = { VLC_STATIC_MUTEX, NULL, 0 };
+} modules = { VLC_STATIC_MUTEX, NULL, NULL, 0 };
 
 vlc_plugin_t *vlc_plugins = NULL;
 
-static void module_StoreBank(vlc_plugin_t *lib)
+/**
+ * Adds a module to the bank
+ */
+static int vlc_module_store(module_t *mod)
+{
+    const char *name = module_get_capability(mod);
+    vlc_modcap_t *cap = malloc(sizeof (*cap));
+    if (unlikely(cap == NULL))
+        return -1;
+
+    cap->name = strdup(name);
+    cap->modv = NULL;
+    cap->modc = 0;
+
+    if (unlikely(cap->name == NULL))
+        goto error;
+
+    vlc_modcap_t **cp = tsearch(cap, &modules.caps_tree, vlc_modcap_cmp);
+    if (unlikely(cp == NULL))
+        goto error;
+
+    if (*cp != cap)
+    {
+        vlc_modcap_free(cap);
+        cap = *cp;
+    }
+
+    module_t **modv = realloc(cap->modv, sizeof (*modv) * (cap->modc + 1));
+    if (unlikely(modv == NULL))
+        return -1;
+
+    cap->modv = modv;
+    cap->modv[cap->modc] = mod;
+    cap->modc++;
+    return 0;
+error:
+    vlc_modcap_free(cap);
+    return -1;
+}
+
+/**
+ * Adds a plugin (and all its modules) to the bank
+ */
+static void vlc_plugin_store(vlc_plugin_t *lib)
 {
     /*vlc_assert_locked (&modules.lock);*/
+
     lib->next = vlc_plugins;
     vlc_plugins = lib;
+
+    for (module_t *m = lib->module; m != NULL; m = m->next)
+        vlc_module_store(m);
 }
 
 /**
@@ -96,7 +169,7 @@ static void module_InitStaticModules(void)
     {
         vlc_plugin_t *lib = module_InitStatic(vlc_static_modules[i]);
         if (likely(lib != NULL))
-            module_StoreBank(lib);
+            vlc_plugin_store(lib);
     }
 }
 #else
@@ -207,7 +280,7 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     if (plugin == NULL)
         return -1;
 
-    module_StoreBank(plugin);
+    vlc_plugin_store(plugin);
 
     if (bank->mode & CACHE_WRITE_FILE) /* Add entry to to-be-saved cache */
     {
@@ -334,7 +407,7 @@ static void AllocatePluginPath(vlc_object_t *obj, const char *path,
         if (mode & CACHE_SCAN_DIR)
             vlc_plugin_destroy(plugin);
         else
-            module_StoreBank(plugin);
+            vlc_plugin_store(plugin);
     }
 
     if (mode & CACHE_WRITE_FILE)
@@ -495,7 +568,7 @@ void module_InitBank (void)
          * as for every other module. */
         vlc_plugin_t *plugin = module_InitStatic(vlc_entry__core);
         if (likely(plugin != NULL))
-            module_StoreBank(plugin);
+            vlc_plugin_store(plugin);
         config_SortConfig ();
     }
     modules.usage++;
@@ -518,6 +591,7 @@ void module_EndBank (bool b_plugins)
 {
     vlc_plugin_t *libs = NULL;
     block_t *caches = NULL;
+    void *caps_tree = NULL;
 
     /* If plugins were _not_ loaded, then the caller still has the bank lock
      * from module_InitBank(). */
@@ -532,10 +606,14 @@ void module_EndBank (bool b_plugins)
         config_UnsortConfig ();
         libs = vlc_plugins;
         caches = modules.caches;
+        caps_tree = modules.caps_tree;
         vlc_plugins = NULL;
         modules.caches = NULL;
+        modules.caps_tree = NULL;
     }
     vlc_mutex_unlock (&modules.lock);
+
+    tdestroy(caps_tree, vlc_modcap_free);
 
     while (libs != NULL)
     {
