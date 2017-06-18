@@ -71,6 +71,26 @@ static void vlc_modcap_free(void *data)
     free(cap);
 }
 
+static int vlc_module_cmp (const void *a, const void *b)
+{
+    const module_t *const *ma = a, *const *mb = b;
+    /* Note that qsort() uses _ascending_ order,
+     * so the smallest module is the one with the biggest score. */
+    return (*mb)->i_score - (*ma)->i_score;
+}
+
+static void vlc_modcap_sort(const void *node, const VISIT which,
+                            const int depth)
+{
+    vlc_modcap_t *const *cp = node, *cap = *cp;
+
+    if (which != postorder && which != leaf)
+        return;
+
+    qsort(cap->modv, cap->modc, sizeof (*cap->modv), vlc_module_cmp);
+    (void) depth;
+}
+
 static struct
 {
     vlc_mutex_t lock;
@@ -648,6 +668,8 @@ size_t module_LoadPlugins (vlc_object_t *obj)
 #endif
         config_UnsortConfig ();
         config_SortConfig ();
+
+        twalk(modules.caps_tree, vlc_modcap_sort);
     }
     vlc_mutex_unlock (&modules.lock);
 
@@ -700,14 +722,6 @@ module_t **module_list_get (size_t *n)
     return tab;
 }
 
-static int modulecmp (const void *a, const void *b)
-{
-    const module_t *const *ma = a, *const *mb = b;
-    /* Note that qsort() uses _ascending_ order,
-     * so the smallest module is the one with the biggest score. */
-    return (*mb)->i_score - (*ma)->i_score;
-}
-
 /**
  * Builds a sorted list of all VLC modules with a given capability.
  * The list is sorted from the highest module score to the lowest.
@@ -732,8 +746,6 @@ ssize_t module_list_cap (module_t ***restrict list, const char *name)
     if (unlikely(tab == NULL))
         return -1;
 
-    /* TODO: Sort the table once. */
     memcpy(tab, cap->modv, sizeof (*tab) * n);
-    qsort (*list, n, sizeof (*tab), modulecmp);
     return n;
 }
