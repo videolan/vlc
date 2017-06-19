@@ -270,14 +270,14 @@ void MissingPATPMTFixup( demux_t *p_demux )
     if( i_num_pes == 0 )
         return;
 
-    ts_stream_t patstream =
+    tsmux_stream_t patstream =
     {
         .i_pid = 0,
         .i_continuity_counter = 0x10,
         .b_discontinuity = false
     };
 
-    ts_stream_t pmtprogramstream =
+    tsmux_stream_t pmtprogramstream =
     {
         .i_pid = i_program_pid,
         .i_continuity_counter = 0x0,
@@ -301,8 +301,8 @@ void MissingPATPMTFixup( demux_t *p_demux )
                                                                          : TS_MUX_STANDARD_DVB;
     struct esstreams_t
     {
-        pes_stream_t pes;
-        ts_stream_t ts;
+        pesmux_stream_t pes;
+        tsmux_stream_t ts;
     };
     es_format_t esfmt = {0};
     struct esstreams_t *esstreams = calloc( i_num_pes, sizeof(struct esstreams_t) );

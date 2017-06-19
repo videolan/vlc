@@ -333,8 +333,8 @@ typedef struct
 
 typedef struct
 {
-    ts_stream_t  ts;
-    pes_stream_t pes;
+    tsmux_stream_t  ts;
+    pesmux_stream_t pes;
     pes_state_t  state;
 } sout_input_sys_t;
 
@@ -354,10 +354,10 @@ struct sout_mux_sys_t
     unsigned        i_num_pmt;
     int             i_pmtslots;
     int             i_pat_version_number;
-    ts_stream_t     pat;
+    tsmux_stream_t  pat;
 
     int             i_pmt_version_number;
-    ts_stream_t     pmt[MAX_PMT];
+    tsmux_stream_t  pmt[MAX_PMT];
     pmt_map_t       pmtmap[MAX_PMT_PID];
     int             i_pmt_program_number[MAX_PMT];
     bool            b_data_alignment;

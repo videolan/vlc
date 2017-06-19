@@ -28,7 +28,7 @@ typedef struct
     uint8_t         i_continuity_counter;
     bool            b_discontinuity;
 
-} ts_stream_t;
+} tsmux_stream_t;
 
 typedef struct
 {
@@ -47,6 +47,6 @@ typedef struct
     /* language is iso639-2T */
     size_t          i_langs;
     uint8_t         *lang;
-} pes_stream_t;
+} pesmux_stream_t;
 
 #endif

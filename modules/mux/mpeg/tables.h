@@ -24,7 +24,7 @@
 
 typedef struct
 {
-    ts_stream_t ts;
+    tsmux_stream_t ts;
     int i_netid;
     struct
     {
@@ -38,13 +38,13 @@ block_t * WritePSISection( dvbpsi_psi_section_t* p_section );
 void BuildPAT( dvbpsi_t *p_dvbpsi,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pat_version_number,
-               ts_stream_t *p_pat,
-               unsigned i_programs, ts_stream_t *p_pmt, const int *pi_programs_number );
+               tsmux_stream_t *p_pat,
+               unsigned i_programs, tsmux_stream_t *p_pmt, const int *pi_programs_number );
 
 typedef struct
 {
-    const pes_stream_t *pes;
-    const ts_stream_t  *ts;
+    const pesmux_stream_t *pes;
+    const tsmux_stream_t  *ts;
     const es_format_t  *fmt;
     int i_mapped_prog;
 } pes_mapped_stream_t;
@@ -61,11 +61,11 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                int i_tsid, int i_pmt_version_number,
                int i_pcr_pid,
                sdt_psi_t *p_sdt,
-               unsigned i_programs, ts_stream_t *p_pmt, const int *pi_programs_number,
+               unsigned i_programs, tsmux_stream_t *p_pmt, const int *pi_programs_number,
                unsigned i_mapped_streams, const pes_mapped_stream_t *p_mapped_streams );
 
 
 int FillPMTESParams( ts_mux_standard, const es_format_t *,
-                   ts_stream_t *, pes_stream_t * );
+                   tsmux_stream_t *, pesmux_stream_t * );
 
 #endif

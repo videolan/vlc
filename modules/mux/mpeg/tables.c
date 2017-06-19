@@ -83,8 +83,8 @@ error:
 void BuildPAT( dvbpsi_t *p_dvbpsi,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pat_version_number,
-               ts_stream_t *p_pat,
-               unsigned i_programs, ts_stream_t *p_pmt, const int *pi_programs_number )
+               tsmux_stream_t *p_pat,
+               unsigned i_programs, tsmux_stream_t *p_pmt, const int *pi_programs_number )
 {
     dvbpsi_pat_t         patpsi;
     dvbpsi_psi_section_t *p_section;
@@ -255,7 +255,7 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
 }
 
 static void UpdateServiceType( uint8_t *pi_service_cat, uint8_t *pi_service_type,
-                               const ts_stream_t *p_ts, const pes_stream_t *p_pes )
+                               const tsmux_stream_t *p_ts, const pesmux_stream_t *p_pes )
 {
     uint8_t i_type = 0x00;
 
@@ -360,7 +360,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                int i_tsid, int i_pmt_version_number,
                int i_pcr_pid,
                sdt_psi_t *p_sdt,
-               unsigned i_programs, ts_stream_t *p_pmt, const int *pi_programs_number,
+               unsigned i_programs, tsmux_stream_t *p_pmt, const int *pi_programs_number,
                unsigned i_mapped_streams, const pes_mapped_stream_t *p_mapped_streams )
 {
     dvbpsi_pmt_t *dvbpmt = malloc( i_programs * sizeof(dvbpsi_pmt_t) );
@@ -635,7 +635,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
 }
 
 int FillPMTESParams( ts_mux_standard standard, const es_format_t *fmt,
-                     ts_stream_t *ts, pes_stream_t *pes )
+                     tsmux_stream_t *ts, pesmux_stream_t *pes )
 {
     switch( fmt->i_codec )
     {
