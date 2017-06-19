@@ -52,8 +52,12 @@ static void Flush(decoder_t *);
 /**
  * Initialize subtitle decoder
  */
-int InitSubtitleDec(decoder_t *dec)
+int InitSubtitleDec(vlc_object_t *obj)
 {
+    decoder_t *dec = (decoder_t *)obj;
+    if (dec->fmt_in.i_cat != SPU_ES)
+        return VLC_EGENERIC;
+
     const AVCodec *codec;
     AVCodecContext *context = ffmpeg_AllocContext(dec, &codec);
     if (context == NULL)
@@ -128,8 +132,9 @@ int InitSubtitleDec(decoder_t *dec)
     return VLC_SUCCESS;
 }
 
-void EndSubtitleDec(decoder_t *dec)
+void EndSubtitleDec(vlc_object_t *obj)
 {
+    decoder_t *dec = (decoder_t *)obj;
     decoder_sys_t *sys = dec->p_sys;
     AVCodecContext *ctx = sys->p_context;
 

@@ -35,16 +35,16 @@ int  OpenEncoder ( vlc_object_t * );
 void CloseEncoder( vlc_object_t * );
 
 /* Video Decoder */
-int InitVideoDec( decoder_t * );
-void EndVideoDec( decoder_t *p_dec );
+int InitVideoDec( vlc_object_t * );
+void EndVideoDec( vlc_object_t * );
 
 /* Audio Decoder */
-int InitAudioDec( decoder_t * );
-void EndAudioDec( decoder_t *p_dec );
+int InitAudioDec( vlc_object_t * );
+void EndAudioDec( vlc_object_t * );
 
 /* Subtitle Decoder */
-int InitSubtitleDec( decoder_t * );
-void EndSubtitleDec( decoder_t * );
+int InitSubtitleDec( vlc_object_t * );
+void EndSubtitleDec( vlc_object_t * );
 
 /* Initialize decoder */
 AVCodecContext *ffmpeg_AllocContext( decoder_t *, const AVCodec ** );

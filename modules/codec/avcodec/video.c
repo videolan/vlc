@@ -434,8 +434,12 @@ static int OpenVideoCodec( decoder_t *p_dec )
  * the ffmpeg codec will be opened, some memory allocated. The vout is not yet
  * opened (done after the first decoded frame).
  *****************************************************************************/
-int InitVideoDec( decoder_t *p_dec )
+int InitVideoDec( vlc_object_t *obj )
 {
+    decoder_t *p_dec = (decoder_t *)obj;
+    if( p_dec->fmt_in.i_cat != VIDEO_ES )
+        return VLC_EGENERIC;
+
     const AVCodec *p_codec;
     AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
     if( p_context == NULL )
@@ -1219,8 +1223,9 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
  * This function is called when the thread ends after a successful
  * initialization.
  *****************************************************************************/
-void EndVideoDec( decoder_t *p_dec )
+void EndVideoDec( vlc_object_t *obj )
 {
+    decoder_t *p_dec = (decoder_t *)obj;
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
     void *hwaccel_context;

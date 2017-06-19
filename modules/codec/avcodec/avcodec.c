@@ -45,9 +45,6 @@
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int OpenDecoder( vlc_object_t * );
-static void CloseDecoder( vlc_object_t * );
-
 static const int  nloopf_list[] = { 0, 1, 2, 3, 4 };
 static const char *const nloopf_list_text[] =
   { N_("None"), N_("Non-ref"), N_("Bidir"), N_("Non-key"), N_("All") };
@@ -73,16 +70,26 @@ static const char *const enc_hq_list_text[] = {
 
 vlc_module_begin ()
     set_shortname( "FFmpeg")
-    add_shortcut( "ffmpeg" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     /* decoder main module */
     set_description( N_("FFmpeg audio/video decoder") )
     set_help( MODULE_DESCRIPTION )
-    set_capability( "decoder", 70 )
     set_section( N_("Decoding") , NULL )
-    set_callbacks( OpenDecoder, CloseDecoder )
 
+    add_shortcut("ffmpeg")
+    set_capability("decoder", 70)
+    set_callbacks(InitVideoDec, EndVideoDec)
+
+    add_submodule()
+    add_shortcut("ffmpeg")
+    set_capability("decoder", 70)
+    set_callbacks(InitAudioDec, EndAudioDec)
+
+    add_submodule()
+    add_shortcut("ffmpeg")
+    set_capability("decoder", 70)
+    set_callbacks(InitSubtitleDec, EndSubtitleDec)
 
     add_obsolete_bool( "ffmpeg-dr" ) /* removed since 2.1.0 */
     add_bool( "avcodec-dr", true, DR_TEXT, DR_TEXT, true )
@@ -286,55 +293,6 @@ AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
     avctx->debug = var_InheritInteger( p_dec, "avcodec-debug" );
     avctx->opaque = p_dec;
     return avctx;
-}
-
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-    int ret;
-
-    switch( p_dec->fmt_in.i_cat )
-    {
-        case VIDEO_ES:
-            ret = InitVideoDec( p_dec );
-            break;
-        case AUDIO_ES:
-            ret = InitAudioDec( p_dec );
-            break;
-        case SPU_ES:
-            ret = InitSubtitleDec( p_dec );
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
-
-    return ret;
-}
-
-/*****************************************************************************
- * CloseDecoder: decoder destruction
- *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-
-    switch( p_dec->fmt_out.i_cat )
-    {
-        case VIDEO_ES:
-            EndVideoDec( p_dec );
-            break;
-        case AUDIO_ES:
-            EndAudioDec( p_dec );
-            break;
-        case SPU_ES:
-            EndSubtitleDec( p_dec );
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
 }
 
 /*****************************************************************************
