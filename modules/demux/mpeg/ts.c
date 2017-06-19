@@ -1505,10 +1505,8 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
         p_pes->i_length = FROM_SCALE_NZ(i_length);
 
-        /* Some codecs might need xform or AU splitting */
-        block_t *p_chain = ConvertPESBlock( p_demux, p_es, i_pes_size, i_stream_id,
-                                            block_ChainGather( p_pes ) );
-
+        /* Can become a chain on next call due to prepcr */
+        block_t *p_chain = block_ChainGather( p_pes );
         while ( p_chain ) {
             block_t *p_block = p_chain;
             p_chain = p_chain->p_next;
@@ -1570,7 +1568,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                     ProcessMetadata( p_demux->out, p_es->metadata.i_format, p_pmt->i_number,
                                      p_block->p_buffer, p_block->i_buffer );
                 }
-
+                else
                 /* SL in PES */
                 if( pid->u.p_pes->i_stream_type == 0x12 &&
                     ((i_stream_id & 0xFE) == 0xFA) /* 0xFA || 0xFB */ )
@@ -1606,6 +1604,11 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                             pid->u.p_pes->sl.pp_last = &pid->u.p_pes->sl.p_data;
                         }
                     }
+                }
+                else
+                /* Some codecs might need xform or AU splitting */
+                {
+                    p_block = ConvertPESBlock( p_demux, p_es, i_pes_size, i_stream_id, p_block );
                 }
 
                 SendDataChain( p_demux, p_es, p_block );
