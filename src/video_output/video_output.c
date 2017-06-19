@@ -857,6 +857,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         if (filter_chain_AppendConverter(vout->p->filter.chain_interactive,
                                          &fmt_current, &fmt_target) != 0) {
             msg_Err(vout, "Failed to compensate for the format changes, removing all filters");
+            ThreadDelAllFilterCallbacks(vout);
             filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, &fmt_target);
             filter_chain_Reset(vout->p->filter.chain_interactive, &fmt_target, &fmt_target);
         }
