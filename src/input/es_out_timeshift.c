@@ -644,6 +644,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_SET_META:
     case ES_OUT_SET_ES:
     case ES_OUT_RESTART_ES:
+    case ES_OUT_RESTART_ALL_ES:
     case ES_OUT_SET_ES_DEFAULT:
     case ES_OUT_SET_ES_STATE:
     case ES_OUT_SET_ES_CAT_POLICY:
@@ -1401,6 +1402,7 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
 
     case ES_OUT_RESET_PCR:           /* no arg */
     case ES_OUT_SET_EOS:
+    case ES_OUT_RESTART_ALL_ES:
         break;
 
     case ES_OUT_SET_META:        /* arg1=const vlc_meta_t* */
@@ -1552,6 +1554,7 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
 
     case ES_OUT_RESET_PCR:           /* no arg */
     case ES_OUT_SET_EOS:
+    case ES_OUT_RESTART_ALL_ES:
         return es_out_Control( p_out, i_query );
 
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=const vlc_meta_t* */

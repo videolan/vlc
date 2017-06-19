@@ -1850,6 +1850,26 @@ static void ControlNav( input_thread_t *p_input, int i_type )
     }
 }
 
+static void ControlUpdateSout( input_thread_t *p_input, const char* psz_chain )
+{
+    var_SetString( p_input, "sout", psz_chain );
+    if( psz_chain && *psz_chain )
+    {
+        if( InitSout( p_input ) != VLC_SUCCESS )
+        {
+            msg_Err( p_input, "Failed to start sout" );
+            return;
+        }
+    }
+    else
+    {
+        input_resource_RequestSout( input_priv(p_input)->p_resource,
+                                    input_priv(p_input)->p_sout, NULL );
+        input_priv(p_input)->p_sout = NULL;
+    }
+    es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESTART_ALL_ES );
+}
+
 static bool Control( input_thread_t *p_input,
                      int i_type, vlc_value_t val )
 {
