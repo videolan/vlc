@@ -49,7 +49,8 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-    AVCODEC_COMMON_MEMBERS
+    AVCodecContext *p_context;
+    const AVCodec  *p_codec;
 
     /*
      * Output properties

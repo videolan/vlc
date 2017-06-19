@@ -39,7 +39,8 @@
 #include "avcodec.h"
 
 struct decoder_sys_t {
-    AVCODEC_COMMON_MEMBERS
+    AVCodecContext *p_context;
+    const AVCodec  *p_codec;
     bool b_need_ephemer; /* Does the format need the ephemer flag (no end time set) */
 };
 
