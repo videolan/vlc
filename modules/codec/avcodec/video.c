@@ -443,7 +443,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
-    p_sys->b_delayed_open = true;
     p_sys->p_va = NULL;
     vlc_sem_init( &p_sys->sem_mt, 0 );
 
@@ -868,7 +867,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
         ffmpeg_InitCodec( p_dec );
-        if( p_sys->b_delayed_open )
+        if( !avcodec_is_open( p_context ) )
             OpenVideoCodec( p_dec );
     }
 
@@ -876,7 +875,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
     if(!p_block && !(p_sys->p_codec->capabilities & AV_CODEC_CAP_DELAY) )
         return NULL;
 
-    if( p_sys->b_delayed_open )
+    if( !avcodec_is_open( p_context ) )
     {
         if( p_block )
             block_Release( p_block );

@@ -219,7 +219,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_context->refcounted_frames = true;
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
-    p_sys->b_delayed_open = true;
 
     // Initialize decoder extradata
     InitDecoderConfig( p_dec, p_context);
@@ -280,13 +279,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block = NULL;
     bool b_error = false;
 
-    if( !ctx->extradata_size && p_dec->fmt_in.i_extra && p_sys->b_delayed_open)
+    if( !ctx->extradata_size && p_dec->fmt_in.i_extra
+     && !avcodec_is_open( ctx ) )
     {
         InitDecoderConfig( p_dec, ctx );
         OpenAudioCodec( p_dec );
     }
 
-    if( p_sys->b_delayed_open )
+    if( !avcodec_is_open( ctx ) )
     {
         if( pp_block )
             p_block = *pp_block;

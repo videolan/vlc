@@ -74,7 +74,6 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
 
     sys->p_context = context;
     sys->p_codec = codec;
-    sys->b_delayed_open = false;
     sys->b_need_ephemer = codec->id == AV_CODEC_ID_HDMV_PGS_SUBTITLE;
 
     /* */

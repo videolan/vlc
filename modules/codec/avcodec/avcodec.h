@@ -235,8 +235,7 @@ void ffmpeg_CloseCodec( decoder_t *p_dec );
 
 #define AVCODEC_COMMON_MEMBERS   \
     AVCodecContext *p_context;  \
-    const AVCodec  *p_codec;    \
-    bool b_delayed_open;
+    const AVCodec  *p_codec;
 
 #ifndef AV_VERSION_INT
 #   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
