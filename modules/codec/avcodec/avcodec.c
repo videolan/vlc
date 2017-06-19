@@ -267,8 +267,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     vlc_init_avcodec(p_this);
 
     /* *** ask ffmpeg for a decoder *** */
-    char *psz_decoder = var_CreateGetString( p_this, "avcodec-codec" );
-    if( psz_decoder && *psz_decoder )
+    char *psz_decoder = var_InheritString( p_this, "avcodec-codec" );
+    if( psz_decoder != NULL )
     {
         p_codec = avcodec_find_decoder_by_name( psz_decoder );
         if( !p_codec )
@@ -279,8 +279,8 @@ static int OpenDecoder( vlc_object_t *p_this )
                     psz_decoder, (char*)&p_dec->fmt_in.i_codec );
             p_codec = NULL;
         }
+        free( psz_decoder );
     }
-    free( psz_decoder );
     if( !p_codec )
         p_codec = avcodec_find_decoder( i_codec_id );
     if( !p_codec )
