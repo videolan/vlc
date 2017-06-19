@@ -76,7 +76,7 @@ vlc_module_begin()
 set_category(CAT_INPUT)
 set_subcategory(SUBCAT_INPUT_VCODEC)
 set_description(N_("VideoToolbox video decoder"))
-set_capability("decoder",800)
+set_capability("video decoder",800)
 set_callbacks(OpenDecoder, CloseDecoder)
 
 add_bool("videotoolbox-temporal-deinterlacing", true, VT_TEMPO_DEINTERLACE, VT_TEMPO_DEINTERLACE_LONG, false)
@@ -829,9 +829,6 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 #endif
-
-    if (p_dec->fmt_in.i_cat != VIDEO_ES)
-        return VLC_EGENERIC;
 
     /* Fail if this module already failed to decode this ES */
     if (var_Type(p_dec, "videotoolbox-failed") != 0)

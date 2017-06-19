@@ -172,7 +172,7 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
     if( !b_packetizer )
     {
         const char caps[ES_CATEGORY_COUNT][16] = {
-            [VIDEO_ES] = "decoder",
+            [VIDEO_ES] = "video decoder",
             [AUDIO_ES] = "audio decoder",
             [SPU_ES] = "decoder",
         };

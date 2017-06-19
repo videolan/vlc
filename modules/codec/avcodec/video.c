@@ -437,9 +437,6 @@ static int OpenVideoCodec( decoder_t *p_dec )
 int InitVideoDec( vlc_object_t *obj )
 {
     decoder_t *p_dec = (decoder_t *)obj;
-    if( p_dec->fmt_in.i_cat != VIDEO_ES )
-        return VLC_EGENERIC;
-
     const AVCodec *p_codec;
     AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
     if( p_context == NULL )

@@ -361,7 +361,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_shortname( "Schroedinger" )
     set_description( N_("Dirac video decoder using libschroedinger") )
-    set_capability( "decoder", 200 )
+    set_capability( "video decoder", 200 )
     set_callbacks( OpenDecoder, CloseDecoder )
     add_shortcut( "schroedinger" )
 

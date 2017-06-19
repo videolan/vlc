@@ -92,7 +92,7 @@ vlc_module_begin( )
     /* decoder main module */
     set_description( N_( "GStreamer Based Decoder" ) )
     set_help( MODULE_DESCRIPTION )
-    set_capability( "decoder", 50 )
+    set_capability( "video decoder", 50 )
     set_section( N_( "Decoding" ) , NULL )
     set_callbacks( OpenDecoder, CloseDecoder )
     add_bool( "use-decodebin", true, USEDECODEBIN_TEXT,

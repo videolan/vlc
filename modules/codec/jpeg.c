@@ -109,7 +109,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_VCODEC)
     /* decoder main module */
     set_description(N_("JPEG image decoder"))
-    set_capability("decoder", 1000)
+    set_capability("video decoder", 1000)
     set_callbacks(OpenDecoder, CloseDecoder)
     add_shortcut("jpeg")
 

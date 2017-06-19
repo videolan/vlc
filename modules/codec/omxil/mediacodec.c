@@ -180,7 +180,7 @@ vlc_module_begin ()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_section(N_("Decoding"), NULL)
-    set_capability("decoder", 0) /* Only enabled via commandline arguments */
+    set_capability("video decoder", 0) /* Only enabled via commandline arguments */
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
     add_bool(CFG_PREFIX "audio", false,
@@ -195,7 +195,7 @@ vlc_module_begin ()
         add_shortcut("mediacodec_ndk")
     add_submodule ()
         set_description("Video decoder using Android MediaCodec via JNI")
-        set_capability("decoder", 0)
+        set_capability("video decoder", 0)
         set_callbacks(OpenDecoderJni, CloseDecoder)
         add_shortcut("mediacodec_jni")
     add_submodule ()

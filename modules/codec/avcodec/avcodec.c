@@ -78,7 +78,7 @@ vlc_module_begin ()
     set_section( N_("Decoding") , NULL )
 
     add_shortcut("ffmpeg")
-    set_capability("decoder", 70)
+    set_capability("video decoder", 70)
     set_callbacks(InitVideoDec, EndVideoDec)
 
     add_submodule()

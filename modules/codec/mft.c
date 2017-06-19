@@ -61,7 +61,7 @@ static void Close(vlc_object_t *);
 vlc_module_begin()
     set_description(N_("Media Foundation Transform decoder"))
     add_shortcut("mft")
-    set_capability("decoder", 1)
+    set_capability("video decoder", 1)
     set_callbacks(Open, Close)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
@@ -1116,9 +1116,6 @@ static int Open(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
-
-    if (p_dec->fmt_in.i_cat != VIDEO_ES && p_dec->fmt_in.i_cat != AUDIO_ES)
-        return VLC_EGENERIC;
 
     p_sys = p_dec->p_sys = calloc(1, sizeof(*p_sys));
     if (!p_sys)

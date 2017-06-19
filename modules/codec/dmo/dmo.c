@@ -90,7 +90,7 @@ static void CopyPicture( picture_t *, uint8_t * );
 vlc_module_begin ()
     set_description( N_("DirectMedia Object decoder") )
     add_shortcut( "dmo" )
-    set_capability( "decoder", 1 )
+    set_capability( "video decoder", 1 )
     set_callbacks( DecoderOpen, DecoderClose )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )

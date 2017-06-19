@@ -84,7 +84,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_shortname("OggSpots")
     set_description(N_("OggSpots video decoder"))
-    set_capability("decoder", 10)
+    set_capability("video decoder", 10)
     set_callbacks(OpenDecoder, CloseDecoder)
     add_shortcut("oggspots")
 

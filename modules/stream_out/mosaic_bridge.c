@@ -307,19 +307,11 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
     //p_sys->p_decoder->p_cfg = p_sys->p_video_cfg;
 
     p_sys->p_decoder->p_module =
-        module_need( p_sys->p_decoder, "decoder", "$codec", false );
+        module_need( p_sys->p_decoder, "video decoder", "$codec", false );
 
-    if( !p_sys->p_decoder->p_module || p_sys->p_decoder->fmt_out.i_cat != VIDEO_ES )
+    if( !p_sys->p_decoder->p_module )
     {
-        if( p_sys->p_decoder->fmt_out.i_cat != VIDEO_ES )
-        {
-            msg_Err( p_stream, "instanciated a non video decoder" );
-            module_unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
-        }
-        else
-        {
-            msg_Err( p_stream, "cannot find decoder" );
-        }
+        msg_Err( p_stream, "cannot find decoder" );
         free( p_sys->p_decoder->p_owner );
         vlc_object_release( p_sys->p_decoder );
         return NULL;

@@ -196,7 +196,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     id->p_decoder->p_owner->id = id;
 
     id->p_decoder->p_module =
-        module_need( id->p_decoder, "decoder", "$codec", false );
+        module_need( id->p_decoder, "video decoder", "$codec", false );
 
     if( !id->p_decoder->p_module )
     {

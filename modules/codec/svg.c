@@ -61,7 +61,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_description( N_("SVG video decoder") )
-    set_capability( "decoder", 100 )
+    set_capability( "video decoder", 100 )
     set_callbacks( OpenDecoder, CloseDecoder )
     add_shortcut( "svg" )
 

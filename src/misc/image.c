@@ -655,7 +655,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     p_dec->pf_vout_buffer_new = video_new_buffer;
 
     /* Find a suitable decoder module */
-    p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
+    p_dec->p_module = module_need( p_dec, "video decoder", "$codec", false );
     if( !p_dec->p_module )
     {
         msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'. "

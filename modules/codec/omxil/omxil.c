@@ -150,11 +150,11 @@ vlc_module_begin ()
     /* For IOMX, don't enable it automatically via priorities,
      * enable it only via the --codec iomx command line parameter when
      * wanted. */
-    set_capability( "decoder", 0 )
+    set_capability( "video decoder", 0 )
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
 #else
-    set_capability( "decoder", 80 )
+    set_capability( "video decoder", 80 )
 #endif
     set_callbacks( OpenDecoder, CloseGeneric )
 #ifndef __ANDROID__
