@@ -148,7 +148,7 @@ static int OpenAudioCodec( decoder_t *p_dec )
         ctx->sample_rate >  0)
         ctx->bits_per_coded_sample = ctx->bit_rate / ctx->sample_rate;
 
-    return ffmpeg_OpenCodec( p_dec );
+    return ffmpeg_OpenCodec( p_dec, ctx, codec );
 }
 
 /**

@@ -400,7 +400,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
     cc_Init( &p_sys->cc );
 
     post_mt( p_sys );
-    ret = ffmpeg_OpenCodec( p_dec );
+    ret = ffmpeg_OpenCodec( p_dec, ctx, codec );
     wait_mt( p_sys );
     if( ret < 0 )
         return ret;

@@ -354,9 +354,9 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * ffmpeg_OpenCodec:
  *****************************************************************************/
-int ffmpeg_OpenCodec( decoder_t *p_dec )
+int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *ctx,
+                      const AVCodec *codec )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     char *psz_opts = var_InheritString( p_dec, "avcodec-options" );
     AVDictionary *options = NULL;
     int ret;
@@ -367,7 +367,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     }
 
     vlc_avcodec_lock();
-    ret = avcodec_open2( p_sys->p_context, p_sys->p_codec, options ? &options : NULL );
+    ret = avcodec_open2( ctx, codec, options ? &options : NULL );
     vlc_avcodec_unlock();
 
     AVDictionaryEntry *t = NULL;
@@ -378,10 +378,10 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     if( ret < 0 )
     {
-        msg_Err( p_dec, "cannot start codec (%s)", p_sys->p_codec->name );
+        msg_Err( p_dec, "cannot start codec (%s)", codec->name );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_dec, "codec (%s) started", p_sys->p_codec->name );
+    msg_Dbg( p_dec, "codec (%s) started", codec->name );
     return VLC_SUCCESS;
 }
