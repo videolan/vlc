@@ -245,7 +245,7 @@ int main (int argc, char *argv[])
     }
     if (uid == 0)
     {
-        fprintf (stderr, "Cannot determine unprivileged user for VLC!\n");
+        fputs("Cannot determine unprivileged user for VLC!\n", stderr);
         exit (1);
     }
     setuid (uid);
