@@ -214,9 +214,6 @@ void EndAudioDec( vlc_object_t *obj )
 int InitAudioDec( vlc_object_t *obj )
 {
     decoder_t *p_dec = (decoder_t *)obj;
-    if( p_dec->fmt_in.i_cat != AUDIO_ES )
-        return VLC_EGENERIC;
-
     const AVCodec *codec;
     AVCodecContext *avctx = ffmpeg_AllocContext( p_dec, &codec );
     if( avctx == NULL )

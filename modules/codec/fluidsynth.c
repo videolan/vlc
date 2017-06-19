@@ -68,7 +68,7 @@ static void Close (vlc_object_t *);
 
 vlc_module_begin ()
     set_description (N_("FluidSynth MIDI synthesizer"))
-    set_capability ("decoder", 100)
+    set_capability ("audio decoder", 100)
     set_shortname (N_("FluidSynth"))
     set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_ACODEC)

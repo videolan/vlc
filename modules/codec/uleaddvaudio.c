@@ -39,7 +39,7 @@ static void Close(vlc_object_t *);
 
 vlc_module_begin()
     set_description(N_("Ulead DV audio decoder"))
-    set_capability("decoder", 50)
+    set_capability("audio decoder", 50)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACODEC)
     set_callbacks(Open, Close)

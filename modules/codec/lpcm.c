@@ -58,7 +58,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_description( N_("Linear PCM audio decoder") )
-    set_capability( "decoder", 100 )
+    set_capability( "audio decoder", 100 )
     set_callbacks( OpenDecoder, CloseCommon )
 
     add_submodule ()

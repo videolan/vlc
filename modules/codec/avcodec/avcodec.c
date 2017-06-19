@@ -83,7 +83,7 @@ vlc_module_begin ()
 
     add_submodule()
     add_shortcut("ffmpeg")
-    set_capability("decoder", 70)
+    set_capability("audio decoder", 70)
     set_callbacks(InitAudioDec, EndAudioDec)
 
     add_submodule()

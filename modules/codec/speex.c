@@ -96,7 +96,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACODEC )
 
     set_description( N_("Speex audio decoder") )
-    set_capability( "decoder", 100 )
+    set_capability( "audio decoder", 100 )
     set_shortname( N_("Speex") )
     set_callbacks( OpenDecoder, CloseDecoder )
 
