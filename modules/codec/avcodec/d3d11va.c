@@ -416,7 +416,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 #if VLC_WINSTORE_APP
     err = directx_va_Open(va, &sys->dx_sys, false);
 #else
-    err = directx_va_Open(va, &sys->dx_sys, dx_sys->d3ddev == NULL || va->sys->d3dctx == NULL);
+    err = directx_va_Open(va, &sys->dx_sys, true);
 #endif
     if (err!=VLC_SUCCESS)
         goto error;
