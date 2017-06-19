@@ -237,7 +237,7 @@ done:
     return pic_ctx;
 }
 
-static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface, ID3D11VideoDecoderOutputView *surface)
+static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, ID3D11VideoDecoderOutputView *surface)
 {
     ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
     ID3D11Resource *p_resource;
@@ -249,7 +249,7 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
         resourceView[i] = va->sys->resourceView[viewDesc.Texture2D.ArraySlice*D3D11_MAX_SHADER_VIEW + i];
 
-    struct va_pic_context *pic_ctx = CreatePicContext(va_surface,
+    struct va_pic_context *pic_ctx = CreatePicContext(NULL,
                                                   surface,
                                                   p_resource,
                                                   va->sys->d3dctx,
@@ -262,7 +262,7 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
      * CreatePicContext(), undo one of them otherwise we need an extra release
      * when the pool is emptied */
     ReleasePictureSys(&pic_ctx->picsys);
-    return &pic_ctx->s;
+    return pic_ctx;
 }
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
@@ -304,7 +304,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     else
 #endif
     {
-        int res = va_pool_Get(va, pic, &va->sys->dx_sys.va_pool);
+        int res = va_pool_Get(&va->sys->dx_sys.va_pool, pic);
         if (unlikely(res != VLC_SUCCESS))
             return res;
     }

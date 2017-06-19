@@ -32,6 +32,13 @@
 #include <libavcodec/avcodec.h>
 #include "va.h"
 
+#include <stdatomic.h>
+
+/* */
+typedef struct vlc_va_surface_t {
+    atomic_uintptr_t     refcount;
+} vlc_va_surface_t;
+
 #define MAX_SURFACE_COUNT (64)
 typedef struct
 {
@@ -40,8 +47,8 @@ typedef struct
     int          surface_width;
     int          surface_height;
 
-    vlc_va_surface_t    *surface[MAX_SURFACE_COUNT];
-    D3D_DecoderSurface  *hw_surface[MAX_SURFACE_COUNT];
+    struct va_pic_context  *surface[MAX_SURFACE_COUNT];
+    D3D_DecoderSurface     *hw_surface[MAX_SURFACE_COUNT];
 
     int (*pf_create_device)(vlc_va_t *);
     void (*pf_destroy_device)(vlc_va_t *);
@@ -70,14 +77,14 @@ typedef struct
     /**
      * Create a new context for the surface being acquired
      */
-    picture_context_t* (*pf_new_surface_context)(vlc_va_t *, vlc_va_surface_t *, D3D_DecoderSurface *);
+    struct va_pic_context* (*pf_new_surface_context)(vlc_va_t *, D3D_DecoderSurface *);
 
 } va_pool_t;
 
 int va_pool_Open(vlc_va_t *, va_pool_t *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
 int va_pool_Setup(vlc_va_t *, va_pool_t *, const AVCodecContext *, unsigned count, int alignment);
-int va_pool_Get(vlc_va_t *, picture_t *, va_pool_t *);
+int va_pool_Get(va_pool_t *, picture_t *);
 void va_surface_AddRef(vlc_va_surface_t *surface);
 void va_surface_Release(vlc_va_surface_t *surface);
 

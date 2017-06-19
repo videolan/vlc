@@ -1,5 +1,5 @@
 /*****************************************************************************
- * directx_va.h: DirectX Generic Video Acceleration helpers
+ * va_surface.h: libavcodec Generic Video Acceleration helpers
  *****************************************************************************
  * Copyright (C) 2009 Geoffroy Couprie
  * Copyright (C) 2009 Laurent Aimar
@@ -27,13 +27,13 @@
 #ifndef AVCODEC_VA_SURFACE_H
 #define AVCODEC_VA_SURFACE_H
 
-#include <vlc_common.h>
+#include <vlc_picture.h>
 
-#include <stdatomic.h>
-
-/* */
-struct vlc_va_surface_t {
-    atomic_uintptr_t     refcount;
+struct va_pic_context
+{
+    picture_context_t         s;
+    struct vlc_va_surface_t *va_surface;
+    struct picture_sys_t      picsys;
 };
 
 #endif /* AVCODEC_VA_SURFACE_H */

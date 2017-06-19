@@ -198,10 +198,7 @@ static struct va_pic_context *CreatePicContext(vlc_va_surface_t *, IDirect3DSurf
 static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
 {
     struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = CreatePicContext(src_ctx->va_surface, src_ctx->picsys.surface);
-    if (unlikely(pic_ctx==NULL))
-        return NULL;
-    return &pic_ctx->s;
+    return (picture_context_t*)CreatePicContext(src_ctx->va_surface, src_ctx->picsys.surface);
 }
 
 static struct va_pic_context *CreatePicContext(vlc_va_surface_t *va_surface, IDirect3DSurface9 *surface)
@@ -218,13 +215,10 @@ static struct va_pic_context *CreatePicContext(vlc_va_surface_t *va_surface, IDi
     return pic_ctx;
 }
 
-static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface, IDirect3DSurface9 *surface)
+static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, IDirect3DSurface9 *surface)
 {
     VLC_UNUSED(va);
-    struct va_pic_context *pic_ctx = CreatePicContext(va_surface, surface);
-    if (unlikely(pic_ctx==NULL))
-        return NULL;
-    return &pic_ctx->s;
+    return CreatePicContext(NULL, surface);
 }
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
@@ -241,7 +235,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_EGENERIC;
     }
 
-    int res = va_pool_Get(va, pic, &sys->dx_sys.va_pool);
+    int res = va_pool_Get(&sys->dx_sys.va_pool, pic);
     if (likely(res==VLC_SUCCESS))
         *data = (uint8_t*)((struct va_pic_context*)pic->context)->picsys.surface;
     return res;

@@ -36,7 +36,9 @@
 
 
 #define D3D_DecoderSurface  void
-typedef struct vlc_va_surface_t vlc_va_surface_t;
+struct picture_sys_t {
+    void *dummy;
+};
 #include "va_surface_internal.h"
 
 #include "avcodec.h"
@@ -93,11 +95,11 @@ int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
         return VLC_EGENERIC;
 
     for (i = 0; i < count; i++) {
-        vlc_va_surface_t *surface = malloc(sizeof(*surface));
-        if (unlikely(surface==NULL))
+        struct va_pic_context *p_ctx = va_pool->pf_new_surface_context(va, va_pool->hw_surface[i]);
+        if (unlikely(p_ctx==NULL))
             goto done;
-        atomic_init(&surface->refcount, 1);
-        va_pool->surface[i] = surface;
+        atomic_init(&p_ctx->va_surface->refcount, 1);
+        va_pool->surface[i] = p_ctx;
     }
 
     va_pool->surface_width  = surface_width;
@@ -111,18 +113,18 @@ done:
     return err;
 }
 
-static picture_context_t *GetSurface(vlc_va_t *va, va_pool_t *va_pool)
+static picture_context_t *GetSurface(va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++) {
-        vlc_va_surface_t *surface = va_pool->surface[i];
+        struct va_pic_context *surface = va_pool->surface[i];
         uintptr_t expected = 1;
 
-        if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
+        if (atomic_compare_exchange_strong(&surface->va_surface->refcount, &expected, 2))
         {
-            picture_context_t *field = va_pool->pf_new_surface_context(va, surface, va_pool->hw_surface[i]);
+            picture_context_t *field = surface->s.copy(&surface->s);
             if (!field)
             {
-                atomic_fetch_sub(&surface->refcount, 1);
+                atomic_fetch_sub(&surface->va_surface->refcount, 1);
                 continue;
             }
             return field;
@@ -131,12 +133,12 @@ static picture_context_t *GetSurface(vlc_va_t *va, va_pool_t *va_pool)
     return NULL;
 }
 
-int va_pool_Get(vlc_va_t *va, picture_t *pic, va_pool_t *va_pool)
+int va_pool_Get(va_pool_t *va_pool, picture_t *pic)
 {
     unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
     picture_context_t *field;
 
-    while ((field = GetSurface(va, va_pool)) == NULL)
+    while ((field = GetSurface(va_pool)) == NULL)
     {
         if (--tries == 0)
             return VLC_ENOITEM;

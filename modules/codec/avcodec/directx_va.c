@@ -40,7 +40,9 @@
 #define D3D_DecoderType     IUnknown
 #define D3D_DecoderDevice   IUnknown
 #define D3D_DecoderSurface  IUnknown
-typedef struct vlc_va_surface_t vlc_va_surface_t;
+struct picture_sys_t {
+    void *dummy;
+};
 #include "directx_va.h"
 
 #include "avcodec.h"
