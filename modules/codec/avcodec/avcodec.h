@@ -48,7 +48,6 @@ void EndSubtitleDec( decoder_t * );
 
 /* Initialize decoder */
 int ffmpeg_OpenCodec( decoder_t *p_dec );
-void ffmpeg_CloseCodec( decoder_t *p_dec );
 
 /*****************************************************************************
  * Module descriptor help strings

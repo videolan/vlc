@@ -123,7 +123,6 @@ void EndSubtitleDec(decoder_t *dec)
     decoder_sys_t *sys = dec->p_sys;
     AVCodecContext *ctx = sys->p_context;
 
-    ffmpeg_CloseCodec(dec);
     avcodec_free_context(&ctx);
     free(sys);
 }

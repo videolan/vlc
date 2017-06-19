@@ -1208,6 +1208,7 @@ void EndVideoDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
+    void *hwaccel_context;
 
     post_mt( p_sys );
 
@@ -1219,13 +1220,13 @@ void EndVideoDec( decoder_t *p_dec )
 
     cc_Flush( &p_sys->cc );
 
-    ffmpeg_CloseCodec( p_dec );
+    hwaccel_context = ctx->hwaccel_context;
+    avcodec_free_context( &ctx );
 
     if( p_sys->p_va )
-        vlc_va_Delete( p_sys->p_va, ctx->hwaccel_context );
+        vlc_va_Delete( p_sys->p_va, hwaccel_context );
 
     vlc_sem_destroy( &p_sys->sem_mt );
-    avcodec_free_context( &ctx );
     free( p_sys );
 }
 

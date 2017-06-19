@@ -385,16 +385,3 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     msg_Dbg( p_dec, "codec (%s) started", p_sys->p_codec->name );
     return VLC_SUCCESS;
 }
-
-void ffmpeg_CloseCodec( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( !avcodec_is_open( p_sys->p_context ) )
-        return;
-
-    vlc_avcodec_lock();
-    avcodec_close( p_sys->p_context );
-    vlc_avcodec_unlock();
-    msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->p_codec->name );
-}
