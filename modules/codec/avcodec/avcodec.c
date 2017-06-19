@@ -236,37 +236,34 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static
+AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
+                                     const AVCodec **restrict codecp )
 {
-    decoder_t *p_dec = (decoder_t*) p_this;
     unsigned i_codec_id;
     const char *psz_namecodec;
-
-    const AVCodec  *p_codec = NULL;
+    const AVCodec *p_codec = NULL;
 
     /* *** determine codec type *** */
     if( !GetFfmpegCodec( p_dec->fmt_in.i_cat, p_dec->fmt_in.i_codec,
                          &i_codec_id, &psz_namecodec ) )
-         return VLC_EGENERIC;
+         return NULL;
 
-    msg_Dbg( p_this, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
+    msg_Dbg( p_dec, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
 
     /* Initialization must be done before avcodec_find_decoder() */
-    vlc_init_avcodec(p_this);
+    vlc_init_avcodec(VLC_OBJECT(p_dec));
 
     /* *** ask ffmpeg for a decoder *** */
-    char *psz_decoder = var_InheritString( p_this, "avcodec-codec" );
+    char *psz_decoder = var_InheritString( p_dec, "avcodec-codec" );
     if( psz_decoder != NULL )
     {
         p_codec = avcodec_find_decoder_by_name( psz_decoder );
         if( !p_codec )
-            msg_Err( p_this, "Decoder `%s' not found", psz_decoder );
+            msg_Err( p_dec, "Decoder `%s' not found", psz_decoder );
         else if( p_codec->id != i_codec_id )
         {
-            msg_Err( p_this, "Decoder `%s' can't handle %4.4s",
+            msg_Err( p_dec, "Decoder `%s' can't handle %4.4s",
                     psz_decoder, (char*)&p_dec->fmt_in.i_codec );
             p_codec = NULL;
         }
@@ -277,16 +274,32 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( !p_codec )
     {
         msg_Dbg( p_dec, "codec not found (%s)", psz_namecodec );
-        return VLC_EGENERIC;
+        return NULL;
     }
+
+    *codecp = p_codec;
 
     /* *** get a p_context *** */
     AVCodecContext *avctx = avcodec_alloc_context3(p_codec);
     if( unlikely(avctx == NULL) )
-        return VLC_ENOMEM;
+        return NULL;
 
     avctx->debug = var_InheritInteger( p_dec, "avcodec-debug" );
     avctx->opaque = p_dec;
+    return avctx;
+}
+
+/*****************************************************************************
+ * OpenDecoder: probe the decoder and return score
+ *****************************************************************************/
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+    const AVCodec *p_codec;
+
+    AVCodecContext *avctx = ffmpeg_AllocContext( p_dec, &p_codec );
+    if( unlikely(avctx == NULL) )
+        return VLC_EGENERIC;
 
     int ret;
 
