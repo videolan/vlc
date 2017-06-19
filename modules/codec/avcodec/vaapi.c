@@ -126,12 +126,6 @@ static int GetVaProfile(AVCodecContext *ctx, VAProfile *va_profile,
     return VLC_SUCCESS;
 }
 
-static int Extract(vlc_va_t *va, picture_t *pic, uint8_t *data)
-{
-    (void) va; (void) pic; (void) data;
-    return VLC_SUCCESS;
-}
-
 #ifdef VLC_VA_BACKEND_DR
 
 static int GetDR(vlc_va_t *va, picture_t *pic, uint8_t **data)
@@ -216,8 +210,6 @@ static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->sys = sys;
     va->description = vaQueryVendorString(sys->hw_ctx.display);
     va->get = GetDR;
-    va->release = NULL;
-    va->extract = Extract;
     return VLC_SUCCESS;
 
 error:
@@ -390,8 +382,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->sys = sys;
     va->description = vaQueryVendorString(sys->hw_ctx.display);
     va->get = Get;
-    va->release = NULL;
-    va->extract = Extract;
     return VLC_SUCCESS;
 
 error:

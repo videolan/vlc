@@ -108,12 +108,6 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static int Copy(vlc_va_t *va, picture_t *pic, uint8_t *data)
-{
-    (void) va; (void) pic; (void) data;
-    return VLC_SUCCESS;
-}
-
 static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -203,8 +197,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
 
     va->description = infos;
     va->get = Lock;
-    va->release = NULL;
-    va->extract = Copy;
     return VLC_SUCCESS;
 
 error:

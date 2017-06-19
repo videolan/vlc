@@ -1158,8 +1158,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         }
         else
         {
-            if( p_sys->p_va != NULL )
-                vlc_va_Extract( p_sys->p_va, p_pic, frame->data[3] );
             picture_Hold( p_pic );
         }
 
@@ -1337,14 +1335,10 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
      * data[3] actually contains the format-specific surface handle. */
     frame->data[3] = frame->data[0];
 
-    void (*release)(void *, uint8_t *) = va->release;
-    if (va->release == NULL)
-        release = lavc_ReleaseFrame;
-
-    frame->buf[0] = av_buffer_create(frame->data[0], 0, release, pic, 0);
+    frame->buf[0] = av_buffer_create(frame->data[0], 0, lavc_ReleaseFrame, pic, 0);
     if (unlikely(frame->buf[0] == NULL))
     {
-        release(pic, frame->data[0]);
+        lavc_ReleaseFrame(pic, frame->data[0]);
         return -1;
     }
 

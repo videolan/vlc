@@ -174,12 +174,6 @@ void SetupAVCodecContext(vlc_va_t *va)
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 }
 
-static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
-{
-    VLC_UNUSED(va); VLC_UNUSED(output); VLC_UNUSED(data);
-    return VLC_SUCCESS;
-}
-
 static void d3d9_pic_context_destroy(struct picture_context_t *opaque)
 {
     struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
@@ -336,8 +330,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->description = DxDescribe(sys);
     va->setup   = Setup;
     va->get     = Get;
-    va->release = NULL;
-    va->extract = Extract;
     return VLC_SUCCESS;
 
 error:
