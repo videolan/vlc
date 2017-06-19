@@ -213,14 +213,14 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_va_t *va, AVCodecContext *avctx)
+static void Close(vlc_va_t *va, void *hwctx)
 {
     vlc_va_sys_t *sys = va->sys;
 
     for (unsigned i = 0; sys->pool[i] != NULL; i++)
         vlc_vdp_video_destroy(sys->pool[i]);
     vdp_release_x11(sys->vdp);
-    av_freep(&avctx->hwaccel_context);
+    av_free(hwctx);
     free(sys);
 }
 

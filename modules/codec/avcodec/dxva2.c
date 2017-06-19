@@ -46,7 +46,7 @@
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
-static void Close(vlc_va_t *, AVCodecContext *);
+static void Close(vlc_va_t *, void *);
 
 vlc_module_begin()
     set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))

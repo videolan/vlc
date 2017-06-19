@@ -1220,7 +1220,7 @@ void EndVideoDec( decoder_t *p_dec )
     ffmpeg_CloseCodec( p_dec );
 
     if( p_sys->p_va )
-        vlc_va_Delete( p_sys->p_va, p_sys->p_context );
+        vlc_va_Delete( p_sys->p_va, p_sys->p_context->hwaccel_context );
 
     vlc_sem_destroy( &p_sys->sem_mt );
 }

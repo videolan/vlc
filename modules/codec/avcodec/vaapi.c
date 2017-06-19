@@ -144,12 +144,12 @@ static int GetDR(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void DeleteDR(vlc_va_t *va, AVCodecContext *avctx)
+static void DeleteDR(vlc_va_t *va, void *hwctx)
 {
     vlc_va_sys_t *sys = va->sys;
     vlc_object_t *o = VLC_OBJECT(va);
 
-    (void) avctx;
+    (void) hwctx;
 
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
@@ -253,12 +253,12 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void Delete(vlc_va_t *va, AVCodecContext *avctx)
+static void Delete(vlc_va_t *va, void *hwctx)
 {
     vlc_va_sys_t *sys = va->sys;
     vlc_object_t *o = VLC_OBJECT(va);
 
-    (void) avctx;
+    (void) hwctx;
     picture_pool_Release(sys->pool);
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
