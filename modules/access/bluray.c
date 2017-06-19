@@ -627,6 +627,9 @@ static int blurayOpen(vlc_object_t *object)
     const char *error_msg = NULL;
 #define BLURAY_ERROR(s) do { error_msg = s; goto error; } while(0)
 
+    if (unlikely(!p_demux->p_input))
+        return VLC_EGENERIC;
+
     forced = !strcasecmp(p_demux->psz_access, "bluray");
 
     if (p_demux->s) {
@@ -802,10 +805,6 @@ static int blurayOpen(vlc_object_t *object)
 
     /* Registering overlay event handler */
     bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
-    if (unlikely(!p_demux->p_input)) {
-        msg_Err(p_demux, "Could not get parent input");
-        goto error;
-    }
 
     if (p_sys->b_menu) {
 
