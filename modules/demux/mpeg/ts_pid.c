@@ -202,10 +202,10 @@ bool PIDSetup( demux_t *p_demux, ts_pid_type_t i_type, ts_pid_t *pid, ts_pid_t *
                 return false;
             break;
 
-        case TYPE_PES:
+        case TYPE_STREAM:
             PIDReset( pid );
-            pid->u.p_pes = ts_pes_New( p_demux, p_parent->u.p_pmt );
-            if( !pid->u.p_pes )
+            pid->u.p_stream = ts_stream_New( p_demux, p_parent->u.p_pmt );
+            if( !pid->u.p_stream )
                 return false;
             break;
 
@@ -284,9 +284,9 @@ void PIDRelease( demux_t *p_demux, ts_pid_t *pid )
             pid->u.p_pmt = NULL;
             break;
 
-        case TYPE_PES:
-            ts_pes_Del( p_demux, pid->u.p_pes );
-            pid->u.p_pes = NULL;
+        case TYPE_STREAM:
+            ts_stream_Del( p_demux, pid->u.p_stream );
+            pid->u.p_stream = NULL;
             break;
 
         case TYPE_SI:

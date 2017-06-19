@@ -32,7 +32,7 @@ typedef enum
     TYPE_CAT,
     TYPE_PAT,
     TYPE_PMT,
-    TYPE_PES,
+    TYPE_STREAM,
     TYPE_SI,
     TYPE_PSIP,
 } ts_pid_type_t;
@@ -64,7 +64,7 @@ struct ts_pid_t
     {
         ts_pat_t    *p_pat;
         ts_pmt_t    *p_pmt;
-        ts_pes_t    *p_pes;
+        ts_stream_t    *p_stream;
         ts_si_t     *p_si;
         ts_psip_t   *p_psip;
     } u;

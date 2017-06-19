@@ -76,15 +76,15 @@ struct ts_pmt_t
 
 };
 
-struct ts_pes_es_t
+struct ts_es_t
 {
     ts_pmt_t *p_program;
     es_format_t  fmt;
     es_out_id_t *id;
     uint16_t i_sl_es_id;
     int         i_next_block_flags;
-    ts_pes_es_t *p_extraes; /* Some private streams encapsulate several ES (eg. DVB subtitles) */
-    ts_pes_es_t *p_next; /* Next es on same pid from different pmt (shared pid) */
+    ts_es_t *p_extraes; /* Some private streams encapsulate several ES (eg. DVB subtitles) */
+    ts_es_t *p_next; /* Next es on same pid from different pmt (shared pid) */
     /* J2K stuff */
     uint8_t  b_interlaced;
     /* Metadata */
@@ -102,9 +102,9 @@ typedef enum
     TS_TRANSPORT_IGNORE
 } ts_transport_type_t;
 
-struct ts_pes_t
+struct ts_stream_t
 {
-    ts_pes_es_t *p_es;
+    ts_es_t *p_es;
 
     uint8_t i_stream_type;
 
@@ -155,7 +155,7 @@ struct ts_psip_t
 {
     dvbpsi_t       *handle;
     int             i_version;
-    ts_pes_es_t    *p_eas_es;
+    ts_es_t    *p_eas_es;
     ts_psip_context_t *p_ctx;
     /* Used to track list of active pid for eit/ett, to call PIDRelease on them.
        VCT table could have been used, but PIDSetup can fail, and we can't alter

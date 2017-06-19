@@ -51,11 +51,11 @@ const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *pmt, uint16_t 
     return NULL;
 }
 
-static ts_pes_es_t * GetPMTESBySLEsId( ts_pmt_t *pmt, uint16_t i_sl_es_id )
+static ts_es_t * GetPMTESBySLEsId( ts_pmt_t *pmt, uint16_t i_sl_es_id )
 {
     for( int i=0; i< pmt->e_streams.i_size; i++ )
     {
-        ts_pes_es_t *p_es = pmt->e_streams.p_elems[i]->u.p_pes->p_es;
+        ts_es_t *p_es = pmt->e_streams.p_elems[i]->u.p_stream->p_es;
         if( p_es->i_sl_es_id == i_sl_es_id )
             return p_es;
     }
@@ -155,7 +155,7 @@ void SLPackets_Section_Handler( demux_t *p_demux,
                                 void *p_pes_cbdata )
 {
     VLC_UNUSED(p_sectiondata); VLC_UNUSED(i_sectiondata);
-    ts_pes_t *p_pes = (ts_pes_t *) p_pes_cbdata;
+    ts_stream_t *p_pes = (ts_stream_t *) p_pes_cbdata;
     ts_pmt_t *p_pmt = p_pes->p_es->p_program;
 
     const es_mpeg4_descriptor_t *p_mpeg4desc = GetMPEG4DescByEsId( p_pmt, p_pes->p_es->i_sl_es_id );
@@ -177,7 +177,7 @@ void SLPackets_Section_Handler( demux_t *p_demux,
             for( int j = 0; j < ES_DESCRIPTOR_COUNT && p_od->es_descr[j].b_ok; j++ )
             {
                 p_mpeg4desc = &p_od->es_descr[j];
-                ts_pes_es_t *p_es = GetPMTESBySLEsId( p_pmt, p_mpeg4desc->i_es_id );
+                ts_es_t *p_es = GetPMTESBySLEsId( p_pmt, p_mpeg4desc->i_es_id );
                 es_format_t fmt;
                 es_format_Init( &fmt, UNKNOWN_ES, 0 );
                 fmt.i_id = p_es->fmt.i_id;
@@ -205,7 +205,7 @@ void SLPackets_Section_Handler( demux_t *p_demux,
     }
 }
 
-block_t * SLProcessPacketized( ts_pes_t *p_pes, ts_pes_es_t *p_es, block_t *p_block )
+block_t * SLProcessPacketized( ts_stream_t *p_pes, ts_es_t *p_es, block_t *p_block )
 {
     ts_pmt_t *p_pmt = p_es->p_program;
     const es_mpeg4_descriptor_t *p_desc = GetMPEG4DescByEsId( p_pmt, p_es->i_sl_es_id );

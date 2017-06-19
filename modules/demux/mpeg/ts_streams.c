@@ -162,9 +162,9 @@ void ts_pmt_Del( demux_t *p_demux, ts_pmt_t *pmt )
     free( pmt );
 }
 
-ts_pes_es_t * ts_pes_es_New( ts_pmt_t *p_program )
+ts_es_t * ts_es_New( ts_pmt_t *p_program )
 {
-    ts_pes_es_t *p_es = malloc( sizeof(*p_es) );
+    ts_es_t *p_es = malloc( sizeof(*p_es) );
     if( p_es )
     {
         p_es->p_program = p_program;
@@ -182,7 +182,7 @@ ts_pes_es_t * ts_pes_es_New( ts_pmt_t *p_program )
     return p_es;
 }
 
-static void ts_pes_es_Clean( demux_t *p_demux, ts_pes_es_t *p_es )
+static void ts_pes_es_Clean( demux_t *p_demux, ts_es_t *p_es )
 {
     if( p_es && p_es->id )
     {
@@ -194,9 +194,9 @@ static void ts_pes_es_Clean( demux_t *p_demux, ts_pes_es_t *p_es )
     es_format_Clean( &p_es->fmt );
 }
 
-void ts_pes_Add_es( ts_pes_t *p_pes, ts_pes_es_t *p_es, bool b_extra )
+void ts_stream_Add_es( ts_stream_t *p_pes, ts_es_t *p_es, bool b_extra )
 {
-    ts_pes_es_t **pp_es = (b_extra && p_pes->p_es) ?  /* Ensure extra has main es */
+    ts_es_t **pp_es = (b_extra && p_pes->p_es) ?  /* Ensure extra has main es */
                            &p_pes->p_es->p_extraes :
                            &p_pes->p_es;
     if( likely(!*pp_es) )
@@ -205,15 +205,15 @@ void ts_pes_Add_es( ts_pes_t *p_pes, ts_pes_es_t *p_es, bool b_extra )
     }
     else
     {
-        ts_pes_es_t *p_next = (*pp_es)->p_next;
+        ts_es_t *p_next = (*pp_es)->p_next;
         (*pp_es)->p_next = p_es;
         p_es->p_next = p_next;
     }
 }
 
-ts_pes_es_t * ts_pes_Find_es( ts_pes_t *p_pes, const ts_pmt_t *p_pmt )
+ts_es_t * ts_stream_Find_es( ts_stream_t *p_pes, const ts_pmt_t *p_pmt )
 {
-    for( ts_pes_es_t *p_es = p_pes->p_es; p_es; p_es = p_es->p_next )
+    for( ts_es_t *p_es = p_pes->p_es; p_es; p_es = p_es->p_next )
     {
         if( p_es->p_program == p_pmt )
             return p_es;
@@ -221,10 +221,10 @@ ts_pes_es_t * ts_pes_Find_es( ts_pes_t *p_pes, const ts_pmt_t *p_pmt )
     return NULL;
 }
 
-ts_pes_es_t * ts_pes_Extract_es( ts_pes_t *p_pes, const ts_pmt_t *p_pmt )
+ts_es_t * ts_stream_Extract_es( ts_stream_t *p_pes, const ts_pmt_t *p_pmt )
 {
-    ts_pes_es_t **pp_prev = &p_pes->p_es;
-    for( ts_pes_es_t *p_es = p_pes->p_es; p_es; p_es = p_es->p_next )
+    ts_es_t **pp_prev = &p_pes->p_es;
+    for( ts_es_t *p_es = p_pes->p_es; p_es; p_es = p_es->p_next )
     {
         if( p_es->p_program == p_pmt )
         {
@@ -237,22 +237,22 @@ ts_pes_es_t * ts_pes_Extract_es( ts_pes_t *p_pes, const ts_pmt_t *p_pmt )
     return NULL;
 }
 
-size_t ts_pes_Count_es( const ts_pes_es_t *p_es, bool b_active, const ts_pmt_t *p_pmt )
+size_t ts_Count_es( const ts_es_t *p_es, bool b_active, const ts_pmt_t *p_pmt )
 {
     size_t i=0;
     for( ; p_es; p_es = p_es->p_next )
     {
         i += ( b_active ) ? !!p_es->id : ( ( !p_pmt || p_pmt == p_es->p_program ) ? 1 : 0 );
-        i += ts_pes_Count_es( p_es->p_extraes, b_active, p_pmt );
+        i += ts_Count_es( p_es->p_extraes, b_active, p_pmt );
     }
     return i;
 }
 
-static void ts_pes_ChainDelete_es( demux_t *p_demux, ts_pes_es_t *p_es )
+static void ts_pes_ChainDelete_es( demux_t *p_demux, ts_es_t *p_es )
 {
     while( p_es )
     {
-        ts_pes_es_t *p_next = p_es->p_next;
+        ts_es_t *p_next = p_es->p_next;
         ts_pes_ChainDelete_es( p_demux, p_es->p_extraes );
         ts_pes_es_Clean( p_demux, p_es );
         free( p_es );
@@ -260,14 +260,14 @@ static void ts_pes_ChainDelete_es( demux_t *p_demux, ts_pes_es_t *p_es )
     }
 }
 
-ts_pes_t *ts_pes_New( demux_t *p_demux, ts_pmt_t *p_program )
+ts_stream_t *ts_stream_New( demux_t *p_demux, ts_pmt_t *p_program )
 {
     VLC_UNUSED(p_demux);
-    ts_pes_t *pes = malloc( sizeof( ts_pes_t ) );
+    ts_stream_t *pes = malloc( sizeof( ts_stream_t ) );
     if( !pes )
         return NULL;
 
-    pes->p_es = ts_pes_es_New( p_program );
+    pes->p_es = ts_es_New( p_program );
     if( !pes->p_es )
     {
         free( pes );
@@ -291,7 +291,7 @@ ts_pes_t *ts_pes_New( demux_t *p_demux, ts_pmt_t *p_program )
     return pes;
 }
 
-void ts_pes_Del( demux_t *p_demux, ts_pes_t *pes )
+void ts_stream_Del( demux_t *p_demux, ts_stream_t *pes )
 {
     ts_pes_ChainDelete_es( p_demux, pes->p_es );
 

@@ -19,10 +19,10 @@
 #ifndef VLC_TS_STREAMS_H
 #define VLC_TS_STREAMS_H
 
-typedef struct ts_pes_es_t ts_pes_es_t;
+typedef struct ts_es_t ts_es_t;
 typedef struct ts_pat_t ts_pat_t;
 typedef struct ts_pmt_t ts_pmt_t;
-typedef struct ts_pes_t ts_pes_t;
+typedef struct ts_stream_t ts_stream_t;
 typedef struct ts_si_t  ts_si_t;
 typedef struct ts_psip_t ts_psip_t;
 
@@ -34,14 +34,14 @@ ts_pmt_t *ts_pat_Get_pmt( ts_pat_t *, uint16_t );
 ts_pmt_t *ts_pmt_New( demux_t * );
 void ts_pmt_Del( demux_t *, ts_pmt_t * );
 
-ts_pes_es_t * ts_pes_es_New( ts_pmt_t * );
-void ts_pes_Add_es( ts_pes_t *, ts_pes_es_t *, bool );
-ts_pes_es_t * ts_pes_Extract_es( ts_pes_t *, const ts_pmt_t * );
-ts_pes_es_t * ts_pes_Find_es( ts_pes_t *, const ts_pmt_t * );
-size_t ts_pes_Count_es( const ts_pes_es_t *, bool, const ts_pmt_t * );
+ts_es_t * ts_es_New( ts_pmt_t * );
+void ts_stream_Add_es( ts_stream_t *, ts_es_t *, bool );
+ts_es_t * ts_stream_Extract_es( ts_stream_t *, const ts_pmt_t * );
+ts_es_t * ts_stream_Find_es( ts_stream_t *, const ts_pmt_t * );
+size_t ts_Count_es( const ts_es_t *, bool, const ts_pmt_t * );
 
-ts_pes_t *ts_pes_New( demux_t *, ts_pmt_t * );
-void ts_pes_Del( demux_t *, ts_pes_t * );
+ts_stream_t *ts_stream_New( demux_t *, ts_pmt_t * );
+void ts_stream_Del( demux_t *, ts_stream_t * );
 
 ts_si_t *ts_si_New( demux_t * );
 void ts_si_Del( demux_t *, ts_si_t * );

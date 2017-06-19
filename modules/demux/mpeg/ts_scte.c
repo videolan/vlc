@@ -55,7 +55,7 @@ void SCTE18_Section_Callback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t* p_
         if( i_priority != EAS_PRIORITY_HIGH && i_priority != EAS_PRIORITY_MAX )
             continue;
 
-        for( ts_pes_es_t *p_es = p_psip->p_eas_es; p_es; p_es = p_es->p_next )
+        for( ts_es_t *p_es = p_psip->p_eas_es; p_es; p_es = p_es->p_next )
         {
             if( !p_es->id && !(p_es->id = es_out_Add( p_demux->out, &p_es->fmt )) )
                 continue;
@@ -78,7 +78,7 @@ void SCTE27_Section_Callback( demux_t *p_demux,
                               void *p_pes_cb_data )
 {
     VLC_UNUSED(p_payloaddata); VLC_UNUSED(i_payloaddata);
-    ts_pes_t *p_pes = (ts_pes_t *) p_pes_cb_data;
+    ts_stream_t *p_pes = (ts_stream_t *) p_pes_cb_data;
     assert( p_pes->p_es->fmt.i_codec == VLC_CODEC_SCTE_27 );
     ts_pmt_t *p_pmt = p_pes->p_es->p_program;
     mtime_t i_date = p_pmt->pcr.i_current;
