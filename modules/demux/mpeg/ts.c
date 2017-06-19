@@ -1315,6 +1315,67 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_pes_es_t *p_es,
 }
 
 /****************************************************************************
+ * fanouts current block to all subdecoders / shared pid es
+ ****************************************************************************/
+static void SendDataChain( demux_t *p_demux, ts_pes_es_t *p_es, block_t *p_chain )
+{
+    while( p_chain )
+    {
+        block_t *p_block = p_chain;
+        p_chain = p_block->p_next;
+        p_block->p_next = NULL;
+
+        ts_pes_es_t *p_es_send = p_es;
+        if( p_es_send->i_next_block_flags )
+        {
+            p_block->i_flags |= p_es_send->i_next_block_flags;
+            p_es_send->i_next_block_flags = 0;
+        }
+
+        while( p_es_send )
+        {
+            if( p_es_send->p_program->b_selected )
+            {
+                /* Send a copy to each extra es */
+                ts_pes_es_t *p_extra_es = p_es_send->p_extraes;
+                while( p_extra_es )
+                {
+                    if( p_extra_es->id )
+                    {
+                        block_t *p_dup = block_Duplicate( p_block );
+                        if( p_dup )
+                            es_out_Send( p_demux->out, p_extra_es->id, p_dup );
+                    }
+                    p_extra_es = p_extra_es->p_next;
+                }
+
+                if( p_es_send->p_next )
+                {
+                    if( p_es_send->id )
+                    {
+                        block_t *p_dup = block_Duplicate( p_block );
+                        if( p_dup )
+                            es_out_Send( p_demux->out, p_es_send->id, p_dup );
+                    }
+                }
+                else
+                {
+                    if( p_es_send->id )
+                    {
+                        es_out_Send( p_demux->out, p_es_send->id, p_block );
+                        p_block = NULL;
+                    }
+                }
+            }
+            p_es_send = p_es_send->p_next;
+        }
+
+        if( p_block )
+            block_Release( p_block );
+    }
+}
+
+/****************************************************************************
  * gathering stuff
  ****************************************************************************/
 static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
@@ -1547,56 +1608,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                     }
                 }
 
-                if ( p_block )
-                {
-                    ts_pes_es_t *p_es_send = p_es;
-                    if( p_es_send->i_next_block_flags )
-                    {
-                        p_block->i_flags |= p_es_send->i_next_block_flags;
-                        p_es_send->i_next_block_flags = 0;
-                    }
-
-                    while( p_es_send )
-                    {
-                        if( p_es_send->p_program->b_selected )
-                        {
-                            /* Send a copy to each extra es */
-                            ts_pes_es_t *p_extra_es = p_es_send->p_extraes;
-                            while( p_extra_es )
-                            {
-                                if( p_extra_es->id )
-                                {
-                                    block_t *p_dup = block_Duplicate( p_block );
-                                    if( p_dup )
-                                        es_out_Send( p_demux->out, p_extra_es->id, p_dup );
-                                }
-                                p_extra_es = p_extra_es->p_next;
-                            }
-
-                            if( p_es_send->p_next )
-                            {
-                                if( p_es_send->id )
-                                {
-                                    block_t *p_dup = block_Duplicate( p_block );
-                                    if( p_dup )
-                                        es_out_Send( p_demux->out, p_es_send->id, p_dup );
-                                }
-                            }
-                            else
-                            {
-                                if( p_es_send->id )
-                                {
-                                    es_out_Send( p_demux->out, p_es_send->id, p_block );
-                                    p_block = NULL;
-                                }
-                            }
-                        }
-                        p_es_send = p_es_send->p_next;
-                    }
-
-                    if( p_block )
-                        block_Release( p_block );
-                }
+                SendDataChain( p_demux, p_es, p_block );
             }
             else
             {
