@@ -48,7 +48,7 @@ static void DecoderClose  ( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("CVD subtitle decoder") )
-    set_capability( "decoder", 50 )
+    set_capability( "spu decoder", 50 )
     set_callbacks( DecoderOpen, DecoderClose )
 
     add_submodule ()

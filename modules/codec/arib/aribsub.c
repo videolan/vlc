@@ -52,7 +52,7 @@ vlc_module_begin ()
 #   define ARIBSUB_CFG_PREFIX "aribsub-"
     set_description( N_("ARIB subtitles decoder") )
     set_shortname( N_("ARIB subtitles") )
-    set_capability( "decoder", 50 )
+    set_capability( "spu decoder", 50 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Open, Close )

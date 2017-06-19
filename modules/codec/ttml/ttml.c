@@ -40,7 +40,7 @@
  *****************************************************************************/
 
 vlc_module_begin ()
-    set_capability( "decoder", 10 )
+    set_capability( "spu decoder", 10 )
     set_shortname( N_("TTML decoder"))
     set_description( N_("TTML subtitles decoder") )
     set_callbacks( OpenDecoder, CloseDecoder )

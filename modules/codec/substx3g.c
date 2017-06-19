@@ -39,7 +39,7 @@ static int Decode( decoder_t *, block_t * );
 vlc_module_begin ()
     set_description( N_("tx3g subtitles decoder") )
     set_shortname( N_("tx3g subtitles") )
-    set_capability( "decoder", 100 )
+    set_capability( "spu decoder", 100 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Open, NULL )

@@ -55,9 +55,6 @@ static void Flush(decoder_t *);
 int InitSubtitleDec(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t *)obj;
-    if (dec->fmt_in.i_cat != SPU_ES)
-        return VLC_EGENERIC;
-
     const AVCodec *codec;
     AVCodecContext *context = ffmpeg_AllocContext(dec, &codec);
     if (context == NULL)

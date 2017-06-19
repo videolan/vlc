@@ -88,7 +88,7 @@ vlc_module_begin ()
 
     add_submodule()
     add_shortcut("ffmpeg")
-    set_capability("decoder", 70)
+    set_capability("spu decoder", 70)
     set_callbacks(InitSubtitleDec, EndSubtitleDec)
 
     add_obsolete_bool( "ffmpeg-dr" ) /* removed since 2.1.0 */
