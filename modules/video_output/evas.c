@@ -1002,7 +1002,7 @@ EvasImageBuffersAlloc( vout_display_t *vd, video_format_t *p_fmt )
     {
         struct buffer *p_buffer = &sys->p_buffers[i];
 
-        p_buffer->p[0] = vlc_memalign( 16, i_bytes );
+        p_buffer->p[0] = aligned_alloc( 16, i_bytes );
 
         if( !p_buffer->p[0] )
         {
