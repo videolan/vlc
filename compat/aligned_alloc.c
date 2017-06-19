@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <errno.h>
-#if !defined (HAVE_POSIX_MEMALIGN) && !defined (_WIN32) && !defined (__APPLE__)
+#if !defined (HAVE_POSIX_MEMALIGN) && !defined (_WIN32)
 # include <malloc.h>
 #endif
 
@@ -52,7 +52,7 @@ void *aligned_alloc(size_t align, size_t size)
     }
     return ptr;
 
-#elif !defined (_WIN32) && !defined (__APPLE__)
+#elif !defined (_WIN32)
 
    return memalign(align, size);
 
