@@ -281,7 +281,7 @@ static void DrawZoomStatus( uint8_t *pb_dst, int i_pitch, int i_width, int i_hei
         " X X  X     X         X   X   X X   X X   X   XXXXX   X   X   X XXXX L"
         " X X  X     X        X    X   X X   X X   X   X   X   X   X   X X    L"
         "  X   XXXXX  XXXX   XXXXX  XXX   XXX  X   X   X   X XXXXX XXXX  XXXXXL";
-    static const char *p_show = 
+    static const char *p_show =
         "X   X X      XXXX   XXXXX  XXX   XXX  XX XX    XXXX X   X  XXX  X   XL"
         "X   X X     X          X  X   X X   X X X X   X     X   X X   X X   XL"
         " X X  X     X         X   X   X X   X X   X    XXX  XXXXX X   X X X XL"
