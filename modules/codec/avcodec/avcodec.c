@@ -236,7 +236,6 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
-static
 AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
                                      const AVCodec **restrict codecp )
 {
@@ -295,41 +294,24 @@ AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    const AVCodec *p_codec;
-
-    AVCodecContext *avctx = ffmpeg_AllocContext( p_dec, &p_codec );
-    if( unlikely(avctx == NULL) )
-        return VLC_EGENERIC;
-
     int ret;
 
     switch( p_dec->fmt_in.i_cat )
     {
         case VIDEO_ES:
-            ret = InitVideoDec( p_dec, avctx, p_codec );
+            ret = InitVideoDec( p_dec );
             break;
         case AUDIO_ES:
-            ret = InitAudioDec( p_dec, avctx, p_codec );
+            ret = InitAudioDec( p_dec );
             break;
         case SPU_ES:
-            ret = InitSubtitleDec( p_dec, avctx, p_codec );
+            ret = InitSubtitleDec( p_dec );
             break;
         default:
             vlc_assert_unreachable();
     }
 
-    if( ret != VLC_SUCCESS )
-    {
-        avcodec_free_context( &avctx );
-        return ret;
-    }
-
-    if( avctx->profile != FF_PROFILE_UNKNOWN)
-        p_dec->fmt_in.i_profile = avctx->profile;
-    if( avctx->level != FF_LEVEL_UNKNOWN)
-        p_dec->fmt_in.i_level = avctx->level;
-
-    return VLC_SUCCESS;
+    return ret;
 }
 
 /*****************************************************************************

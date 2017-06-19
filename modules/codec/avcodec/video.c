@@ -434,16 +434,24 @@ static int OpenVideoCodec( decoder_t *p_dec )
  * the ffmpeg codec will be opened, some memory allocated. The vout is not yet
  * opened (done after the first decoded frame).
  *****************************************************************************/
-int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec )
+int InitVideoDec( decoder_t *p_dec )
 {
-    decoder_sys_t *p_sys;
+    const AVCodec *p_codec;
+    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
+    if( p_context == NULL )
+        return VLC_EGENERIC;
+
     int i_val;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(decoder_sys_t) ) ) == NULL )
+    decoder_sys_t *p_sys = calloc( 1, sizeof(*p_sys) );
+    if( unlikely(p_sys == NULL) )
+    {
+        avcodec_free_context( &p_context );
         return VLC_ENOMEM;
+    }
 
+    p_dec->p_sys = p_sys;
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->p_va = NULL;
@@ -590,12 +598,18 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     {
         vlc_sem_destroy( &p_sys->sem_mt );
         free( p_sys );
+        avcodec_free_context( &p_context );
         return VLC_EGENERIC;
     }
 
     p_dec->pf_decode = DecodeVideo;
     p_dec->pf_flush  = Flush;
 
+    /* XXX: Writing input format makes little sense. */
+    if( p_context->profile != FF_PROFILE_UNKNOWN )
+        p_dec->fmt_in.i_profile = p_context->profile;
+    if( p_context->level != FF_LEVEL_UNKNOWN )
+        p_dec->fmt_in.i_level = p_context->level;
     return VLC_SUCCESS;
 }
 

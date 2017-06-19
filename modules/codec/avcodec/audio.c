@@ -210,28 +210,35 @@ void EndAudioDec( decoder_t *p_dec )
  *****************************************************************************
  * The avcodec codec will be opened, some memory allocated.
  *****************************************************************************/
-int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec )
+int InitAudioDec( decoder_t *p_dec )
 {
-    decoder_sys_t *p_sys;
+    const AVCodec *codec;
+    AVCodecContext *avctx = ffmpeg_AllocContext( p_dec, &codec );
+    if( avctx == NULL )
+        return VLC_EGENERIC;
+
+    avctx->refcounted_frames = true;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
+    decoder_sys_t *p_sys = malloc(sizeof(*p_sys));
+    if( unlikely(p_sys == NULL) )
     {
+        avcodec_free_context( &avctx );
         return VLC_ENOMEM;
     }
 
-    p_context->refcounted_frames = true;
-    p_sys->p_context = p_context;
-    p_sys->p_codec = p_codec;
+    p_dec->p_sys = p_sys;
+    p_sys->p_context = avctx;
+    p_sys->p_codec = codec;
 
     // Initialize decoder extradata
-    InitDecoderConfig( p_dec, p_context);
+    InitDecoderConfig( p_dec, avctx );
 
     /* ***** Open the codec ***** */
     if( OpenAudioCodec( p_dec ) < 0 )
     {
         free( p_sys );
+        avcodec_free_context( &avctx );
         return VLC_EGENERIC;
     }
 
@@ -253,6 +260,13 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_dec->pf_decode = DecodeAudio;
     p_dec->pf_flush  = Flush;
+
+    /* XXX: Writing input format makes little sense. */
+    if( avctx->profile != FF_PROFILE_UNKNOWN )
+        p_dec->fmt_in.i_profile = avctx->profile;
+    if( avctx->level != FF_LEVEL_UNKNOWN )
+        p_dec->fmt_in.i_level = avctx->level;
+
     return VLC_SUCCESS;
 }
 

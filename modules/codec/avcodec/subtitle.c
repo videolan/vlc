@@ -52,9 +52,13 @@ static void Flush(decoder_t *);
 /**
  * Initialize subtitle decoder
  */
-int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
-                    const AVCodec *codec)
+int InitSubtitleDec(decoder_t *dec)
 {
+    const AVCodec *codec;
+    AVCodecContext *context = ffmpeg_AllocContext(dec, &codec);
+    if (context == NULL)
+        return VLC_EGENERIC;
+
     decoder_sys_t *sys;
 
     /* */
@@ -65,13 +69,17 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
         break;
     default:
         msg_Warn(dec, "refusing to decode non validated subtitle codec");
+        avcodec_free_context(&context);
         return VLC_EGENERIC;
     }
 
     /* */
     dec->p_sys = sys = malloc(sizeof(*sys));
-    if (!sys)
+    if (unlikely(sys == NULL))
+    {
+        avcodec_free_context(&context);
         return VLC_ENOMEM;
+    }
 
     sys->p_context = context;
     sys->p_codec = codec;
@@ -107,6 +115,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     if (ret < 0) {
         msg_Err(dec, "cannot open codec (%s)", codec->name);
         free(sys);
+        avcodec_free_context(&context);
         return VLC_EGENERIC;
     }
 
