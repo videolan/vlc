@@ -309,6 +309,7 @@ static int Open(vlc_object_t *obj)
     }
     filter_sys->derive_failed = false;
     filter_sys->image_fallback_failed = false;
+    filter_sys->image_fallback.image_id = VA_INVALID_ID;
 
     if (is_upload)
     {
@@ -359,7 +360,7 @@ Close(vlc_object_t *obj)
 {
     filter_sys_t *const filter_sys = ((filter_t *)obj)->p_sys;
 
-    if (filter_sys->image_fallback.image_id)
+    if (filter_sys->image_fallback.image_id != VA_INVALID_ID)
         vlc_vaapi_DestroyImage(obj, filter_sys->dpy,
                                filter_sys->image_fallback.image_id);
     if (filter_sys->dest_pics)
