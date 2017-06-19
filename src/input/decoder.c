@@ -170,7 +170,15 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
 
     /* Find a suitable decoder/packetizer module */
     if( !b_packetizer )
-        p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
+    {
+        const char caps[ES_CATEGORY_COUNT][16] = {
+            [VIDEO_ES] = "decoder",
+            [AUDIO_ES] = "decoder",
+            [SPU_ES] = "decoder",
+        };
+        p_dec->p_module = module_need( p_dec, caps[p_dec->fmt_in.i_cat],
+                                       "$codec", false );
+    }
     else
         p_dec->p_module = module_need( p_dec, "packetizer", "$packetizer", false );
 
