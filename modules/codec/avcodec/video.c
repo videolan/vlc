@@ -372,26 +372,28 @@ static int lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
 static int OpenVideoCodec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    AVCodecContext *ctx = p_sys->p_context;
+    const AVCodec *codec = p_sys->p_codec;
     int ret;
 
-    if( p_sys->p_context->extradata_size <= 0 )
+    if( ctx->extradata_size <= 0 )
     {
-        if( p_sys->p_codec->id == AV_CODEC_ID_VC1 ||
-            p_sys->p_codec->id == AV_CODEC_ID_THEORA )
+        if( codec->id == AV_CODEC_ID_VC1 ||
+            codec->id == AV_CODEC_ID_THEORA )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
-                      p_sys->p_codec->name );
+                      codec->name );
             return 1;
         }
     }
 
-    p_sys->p_context->width  = p_dec->fmt_in.video.i_visible_width;
-    p_sys->p_context->height = p_dec->fmt_in.video.i_visible_height;
+    ctx->width  = p_dec->fmt_in.video.i_visible_width;
+    ctx->height = p_dec->fmt_in.video.i_visible_height;
 
-    p_sys->p_context->coded_width = p_dec->fmt_in.video.i_width;
-    p_sys->p_context->coded_height = p_dec->fmt_in.video.i_height;
+    ctx->coded_width = p_dec->fmt_in.video.i_width;
+    ctx->coded_height = p_dec->fmt_in.video.i_height;
 
-    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+    ctx->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
     p_sys->pix_fmt = AV_PIX_FMT_NONE;
     p_sys->profile = -1;
     p_sys->level = -1;
@@ -403,23 +405,23 @@ static int OpenVideoCodec( decoder_t *p_dec )
     if( ret < 0 )
         return ret;
 
-    switch( p_sys->p_context->active_thread_type )
+    switch( ctx->active_thread_type )
     {
         case FF_THREAD_FRAME:
             msg_Dbg( p_dec, "using frame thread mode with %d threads",
-                     p_sys->p_context->thread_count );
+                     ctx->thread_count );
             break;
         case FF_THREAD_SLICE:
             msg_Dbg( p_dec, "using slice thread mode with %d threads",
-                     p_sys->p_context->thread_count );
+                     ctx->thread_count );
             break;
         case 0:
-            if( p_sys->p_context->thread_count > 1 )
+            if( ctx->thread_count > 1 )
                 msg_Warn( p_dec, "failed to enable threaded decoding" );
             break;
         default:
             msg_Warn( p_dec, "using unknown thread mode with %d threads",
-                      p_sys->p_context->thread_count );
+                      ctx->thread_count );
             break;
     }
     return 0;
@@ -1205,12 +1207,13 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
 void EndVideoDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    AVCodecContext *ctx = p_sys->p_context;
 
     post_mt( p_sys );
 
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
-    if( avcodec_is_open( p_sys->p_context ) )
-        avcodec_flush_buffers( p_sys->p_context );
+    if( avcodec_is_open( ctx ) )
+        avcodec_flush_buffers( ctx );
 
     wait_mt( p_sys );
 
@@ -1219,7 +1222,7 @@ void EndVideoDec( decoder_t *p_dec )
     ffmpeg_CloseCodec( p_dec );
 
     if( p_sys->p_va )
-        vlc_va_Delete( p_sys->p_va, p_sys->p_context->hwaccel_context );
+        vlc_va_Delete( p_sys->p_va, ctx->hwaccel_context );
 
     vlc_sem_destroy( &p_sys->sem_mt );
 }

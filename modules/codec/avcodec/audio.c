@@ -122,31 +122,31 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 static int OpenAudioCodec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    AVCodecContext *ctx = p_sys->p_context;
+    const AVCodec *codec = p_sys->p_codec;
 
-    if( p_sys->p_context->extradata_size <= 0 )
+    if( ctx->extradata_size <= 0 )
     {
-        if( p_sys->p_codec->id == AV_CODEC_ID_VORBIS ||
-            ( p_sys->p_codec->id == AV_CODEC_ID_AAC &&
+        if( codec->id == AV_CODEC_ID_VORBIS ||
+            ( codec->id == AV_CODEC_ID_AAC &&
               !p_dec->fmt_in.b_packetized ) )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
-                      p_sys->p_codec->name );
+                      codec->name );
             return 1;
         }
     }
 
-    p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
-    p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
-    p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
-    p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
-    p_sys->p_context->bits_per_coded_sample =
-                                           p_dec->fmt_in.audio.i_bitspersample;
+    ctx->sample_rate = p_dec->fmt_in.audio.i_rate;
+    ctx->channels = p_dec->fmt_in.audio.i_channels;
+    ctx->block_align = p_dec->fmt_in.audio.i_blockalign;
+    ctx->bit_rate = p_dec->fmt_in.i_bitrate;
+    ctx->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
 
-    if( p_sys->p_codec->id == AV_CODEC_ID_ADPCM_G726 &&
-        p_sys->p_context->bit_rate > 0 &&
-        p_sys->p_context->sample_rate >  0)
-        p_sys->p_context->bits_per_coded_sample = p_sys->p_context->bit_rate
-                                               / p_sys->p_context->sample_rate;
+    if( codec->id == AV_CODEC_ID_ADPCM_G726 &&
+        ctx->bit_rate > 0 &&
+        ctx->sample_rate >  0)
+        ctx->bits_per_coded_sample = ctx->bit_rate / ctx->sample_rate;
 
     return ffmpeg_OpenCodec( p_dec );
 }
