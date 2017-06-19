@@ -34,8 +34,6 @@
 #include <vlc_codec.h>
 #include <vlc_picture.h>
 
-
-#define D3D_DecoderSurface  void
 struct picture_sys_t {
     void *dummy;
 };
@@ -98,7 +96,7 @@ int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
         struct vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
         if (unlikely(p_surface==NULL))
             goto done;
-        va_pool->surface[i] = va_pool->pf_new_surface_context(va, va_pool->hw_surface[i]);
+        va_pool->surface[i] = va_pool->pf_new_surface_context(va, i);
         if (unlikely(va_pool->surface[i]==NULL))
         {
             free(p_surface);

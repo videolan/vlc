@@ -55,6 +55,9 @@ typedef struct
 {
     va_pool_t             va_pool;
 
+    /* for pre allocation */
+    D3D_DecoderSurface     *hw_surface[MAX_SURFACE_COUNT];
+
     /* DLL */
     HINSTANCE             hdecoder_dll;
     const TCHAR           *psz_decoder_dll;

@@ -48,7 +48,6 @@ typedef struct
     int          surface_height;
 
     struct va_pic_context  *surface[MAX_SURFACE_COUNT];
-    D3D_DecoderSurface     *hw_surface[MAX_SURFACE_COUNT];
 
     int (*pf_create_device)(vlc_va_t *);
     void (*pf_destroy_device)(vlc_va_t *);
@@ -77,7 +76,7 @@ typedef struct
     /**
      * Create a new context for the surface being acquired
      */
-    struct va_pic_context* (*pf_new_surface_context)(vlc_va_t *, D3D_DecoderSurface *);
+    struct va_pic_context* (*pf_new_surface_context)(vlc_va_t *, int surface_index);
 
 } va_pool_t;
 
