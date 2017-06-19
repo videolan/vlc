@@ -126,6 +126,7 @@ static picture_context_t *GetSurface(va_pool_t *va_pool)
         if (atomic_compare_exchange_strong(&surface->va_surface->refcount, &expected, 2))
         {
             picture_context_t *field = surface->s.copy(&surface->s);
+            /* the copy should have added an extra reference */
             atomic_fetch_sub(&surface->va_surface->refcount, 1);
             return field;
         }

@@ -174,11 +174,9 @@ void SetupAVCodecContext(vlc_va_t *va)
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 }
 
-static int Extract(vlc_va_t *va, picture_t *picture, uint8_t *data)
+static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 {
-    VLC_UNUSED(va); VLC_UNUSED(data);
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
-    va_surface_AddRef(pic_ctx->va_surface);
+    VLC_UNUSED(va); VLC_UNUSED(output); VLC_UNUSED(data);
     return VLC_SUCCESS;
 }
 
@@ -273,15 +271,6 @@ static vlc_fourcc_t d3d9va_fourcc(enum PixelFormat swfmt)
     }
 }
 
-static void ReleasePic(void *opaque, uint8_t *data)
-{
-    (void)data;
-    picture_t *pic = opaque;
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)pic->context;
-    va_surface_Release(pic_ctx->va_surface);
-    picture_Release(pic);
-}
-
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -347,7 +336,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->description = DxDescribe(sys);
     va->setup   = Setup;
     va->get     = Get;
-    va->release = ReleasePic;
+    va->release = NULL;
     va->extract = Extract;
     return VLC_SUCCESS;
 

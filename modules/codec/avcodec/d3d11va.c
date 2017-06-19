@@ -175,11 +175,7 @@ void SetupAVCodecContext(vlc_va_t *va)
 
 static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 {
-    VLC_UNUSED(va); VLC_UNUSED(data);
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)output->context;
-    if (pic_ctx->va_surface)
-        va_surface_AddRef(pic_ctx->va_surface);
-    assert(data == (void*)pic_ctx->picsys.decoder);
+    VLC_UNUSED(va); VLC_UNUSED(output); VLC_UNUSED(data);
     return VLC_SUCCESS;
 }
 
@@ -344,15 +340,6 @@ static vlc_fourcc_t d3d11va_fourcc(enum PixelFormat swfmt)
     }
 }
 
-static void ReleasePic(void *opaque, uint8_t *data)
-{
-    (void)data;
-    picture_t *pic = opaque;
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)pic->context;
-    va_surface_Release(pic_ctx->va_surface);
-    picture_Release(pic);
-}
-
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -435,11 +422,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->description = DxDescribe(dx_sys);
     va->setup   = Setup;
     va->get     = Get;
-#if D3D11_DIRECT_DECODE
-    va->release = sys->b_extern_pool ? NULL : ReleasePic;
-#else
-    va->release = ReleasePic;
-#endif
+    va->release = NULL;
     va->extract = Extract;
 
     return VLC_SUCCESS;
