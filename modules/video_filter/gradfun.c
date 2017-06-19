@@ -194,7 +194,7 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
     cfg->thresh = (1 << 15) / strength;
     if (cfg->radius != radius) {
         cfg->radius = radius;
-        cfg->buf    = vlc_memalign(16,
+        cfg->buf    = aligned_alloc(16,
                                    (((fmt->i_width + 15) & ~15) * (cfg->radius + 1) / 2 + 32) * sizeof(*cfg->buf));
     }
 

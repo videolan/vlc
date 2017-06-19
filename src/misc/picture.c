@@ -62,7 +62,7 @@ static int AllocatePicture( picture_t *p_pic )
         i_bytes += p->i_pitch * p->i_lines;
     }
 
-    uint8_t *p_data = vlc_memalign( 16, i_bytes );
+    uint8_t *p_data = aligned_alloc( 16, i_bytes );
     if( i_bytes > 0 && p_data == NULL )
     {
         p_pic->i_planes = 0;
