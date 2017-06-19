@@ -49,7 +49,7 @@ int CopyInitCache(copy_cache_t *cache, unsigned width)
 void CopyCleanCache(copy_cache_t *cache)
 {
 #ifdef CAN_COMPILE_SSE2
-    vlc_free(cache->buffer);
+    free(cache->buffer);
     cache->buffer = NULL;
     cache->size   = 0;
 #else

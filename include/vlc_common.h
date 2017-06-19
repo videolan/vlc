@@ -849,13 +849,10 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 
 #ifdef __MINGW32__
 # define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
-# define vlc_free(base)            (__mingw_aligned_free(base))
 #elif defined(_MSC_VER)
 # define vlc_memalign(align, size) (_aligned_malloc(size, align))
-# define vlc_free(base)            (_aligned_free(base))
 #else
 # define vlc_memalign(align, size) aligned_alloc(align, size)
-# define vlc_free(base) free(base)
 #endif
 
 /*****************************************************************************
