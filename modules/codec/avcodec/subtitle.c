@@ -119,6 +119,11 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     return VLC_SUCCESS;
 }
 
+void EndSubtitleDec(decoder_t *dec)
+{
+    ffmpeg_CloseCodec(dec);
+}
+
 /**
  * Flush
  */

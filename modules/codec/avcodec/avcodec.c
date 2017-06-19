@@ -343,9 +343,11 @@ static void CloseDecoder( vlc_object_t *p_this )
         case AUDIO_ES:
             EndAudioDec( p_dec );
             break;
-        default:
-            ffmpeg_CloseCodec( p_dec );
+        case SPU_ES:
+            EndSubtitleDec( p_dec );
             break;
+        default:
+            vlc_assert_unreachable();
     }
 
     decoder_sys_t *p_sys = p_dec->p_sys;

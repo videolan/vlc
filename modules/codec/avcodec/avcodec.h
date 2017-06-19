@@ -44,6 +44,7 @@ void EndAudioDec( decoder_t *p_dec );
 
 /* Subtitle Decoder */
 int InitSubtitleDec( decoder_t *, AVCodecContext *, const AVCodec * );
+void EndSubtitleDec( decoder_t * );
 
 /* Initialize decoder */
 int ffmpeg_OpenCodec( decoder_t *p_dec );
