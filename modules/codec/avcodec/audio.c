@@ -197,7 +197,12 @@ static block_t *vlc_av_frame_Wrap(AVFrame *frame)
  *****************************************************************************/
 void EndAudioDec( decoder_t *p_dec )
 {
+    decoder_sys_t *sys = p_dec->p_sys;
+    AVCodecContext *ctx = sys->p_context;
+
     ffmpeg_CloseCodec( p_dec );
+    avcodec_free_context( &ctx );
+    free( sys );
 }
 
 /*****************************************************************************

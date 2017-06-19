@@ -349,11 +349,6 @@ static void CloseDecoder( vlc_object_t *p_this )
         default:
             vlc_assert_unreachable();
     }
-
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    avcodec_free_context( &p_sys->p_context );
-    free( p_sys );
 }
 
 /*****************************************************************************

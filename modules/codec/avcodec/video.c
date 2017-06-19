@@ -1225,6 +1225,8 @@ void EndVideoDec( decoder_t *p_dec )
         vlc_va_Delete( p_sys->p_va, ctx->hwaccel_context );
 
     vlc_sem_destroy( &p_sys->sem_mt );
+    avcodec_free_context( &ctx );
+    free( p_sys );
 }
 
 /*****************************************************************************
