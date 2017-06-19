@@ -95,11 +95,17 @@ int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
         return VLC_EGENERIC;
 
     for (i = 0; i < count; i++) {
-        struct va_pic_context *p_ctx = va_pool->pf_new_surface_context(va, va_pool->hw_surface[i]);
-        if (unlikely(p_ctx==NULL))
+        struct vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
+        if (unlikely(p_surface==NULL))
             goto done;
-        atomic_init(&p_ctx->va_surface->refcount, 1);
-        va_pool->surface[i] = p_ctx;
+        va_pool->surface[i] = va_pool->pf_new_surface_context(va, va_pool->hw_surface[i]);
+        if (unlikely(va_pool->surface[i]==NULL))
+        {
+            free(p_surface);
+            goto done;
+        }
+        va_pool->surface[i]->va_surface = p_surface;
+        atomic_init(&va_pool->surface[i]->va_surface->refcount, 1);
     }
 
     va_pool->surface_width  = surface_width;
@@ -122,11 +128,7 @@ static picture_context_t *GetSurface(va_pool_t *va_pool)
         if (atomic_compare_exchange_strong(&surface->va_surface->refcount, &expected, 2))
         {
             picture_context_t *field = surface->s.copy(&surface->s);
-            if (!field)
-            {
-                atomic_fetch_sub(&surface->va_surface->refcount, 1);
-                continue;
-            }
+            atomic_fetch_sub(&surface->va_surface->refcount, 1);
             return field;
         }
     }
