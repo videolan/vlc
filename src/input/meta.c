@@ -212,8 +212,8 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
     {   /* XXX Weird, we should not end up with attachment:// art URL
          * unless there is a race condition */
         msg_Warn( p_input, "art already fetched" );
-        playlist_FindArtInCache( p_item );
-        return;
+        if( likely(playlist_FindArtInCache( p_item ) == VLC_SUCCESS) )
+            return;
     }
 
     /* */
