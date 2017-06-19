@@ -205,3 +205,40 @@ void SLPackets_Section_Handler( demux_t *p_demux,
     }
 }
 
+block_t * SLProcessPacketized( ts_pes_t *p_pes, ts_pes_es_t *p_es, block_t *p_block )
+{
+    ts_pmt_t *p_pmt = p_es->p_program;
+    const es_mpeg4_descriptor_t *p_desc = GetMPEG4DescByEsId( p_pmt, p_es->i_sl_es_id );
+    if(!p_desc)
+    {
+        block_Release( p_block );
+        p_block = NULL;
+    }
+    else
+    {
+        sl_header_data header = DecodeSLHeader( p_block->i_buffer, p_block->p_buffer,
+                                                &p_desc->sl_descr );
+        p_block->i_buffer -= header.i_size;
+        p_block->p_buffer += header.i_size;
+        p_block->i_dts = header.i_dts ? header.i_dts : p_block->i_dts;
+        p_block->i_pts = header.i_pts ? header.i_pts : p_block->i_pts;
+
+        /* Assemble access units */
+        if( header.b_au_start && p_pes->sl.p_data )
+        {
+            block_ChainRelease( p_pes->sl.p_data );
+            p_pes->sl.p_data = NULL;
+            p_pes->sl.pp_last = &p_pes->sl.p_data;
+        }
+        block_ChainLastAppend( &p_pes->sl.pp_last, p_block );
+        p_block = NULL;
+        if( header.b_au_end )
+        {
+            p_block = block_ChainGather( p_pes->sl.p_data );
+            p_pes->sl.p_data = NULL;
+            p_pes->sl.pp_last = &p_pes->sl.p_data;
+        }
+    }
+
+    return p_block;
+}

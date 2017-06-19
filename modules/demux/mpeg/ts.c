@@ -1573,37 +1573,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 if( pid->u.p_pes->i_stream_type == 0x12 &&
                     ((i_stream_id & 0xFE) == 0xFA) /* 0xFA || 0xFB */ )
                 {
-                    const es_mpeg4_descriptor_t *p_desc = GetMPEG4DescByEsId( p_pmt, p_es->i_sl_es_id );
-                    if(!p_desc)
-                    {
-                        block_Release( p_block );
-                        p_block = NULL;
-                    }
-                    else
-                    {
-                        sl_header_data header = DecodeSLHeader( p_block->i_buffer, p_block->p_buffer,
-                                                                &p_mpeg4desc->sl_descr );
-                        p_block->i_buffer -= header.i_size;
-                        p_block->p_buffer += header.i_size;
-                        p_block->i_dts = header.i_dts ? header.i_dts : p_block->i_dts;
-                        p_block->i_pts = header.i_pts ? header.i_pts : p_block->i_pts;
-
-                        /* Assemble access units */
-                        if( header.b_au_start && pid->u.p_pes->sl.p_data )
-                        {
-                            block_ChainRelease( pid->u.p_pes->sl.p_data );
-                            pid->u.p_pes->sl.p_data = NULL;
-                            pid->u.p_pes->sl.pp_last = &pid->u.p_pes->sl.p_data;
-                        }
-                        block_ChainLastAppend( &pid->u.p_pes->sl.pp_last, p_block );
-                        p_block = NULL;
-                        if( header.b_au_end )
-                        {
-                            p_block = block_ChainGather( pid->u.p_pes->sl.p_data );
-                            pid->u.p_pes->sl.p_data = NULL;
-                            pid->u.p_pes->sl.pp_last = &pid->u.p_pes->sl.p_data;
-                        }
-                    }
+                    p_block = SLProcessPacketized( pid->u.p_pes, p_es, p_block );
                 }
                 else
                 /* Some codecs might need xform or AU splitting */
