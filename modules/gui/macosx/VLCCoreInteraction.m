@@ -781,11 +781,13 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     /* Try to set non splitter filters on the fly */
     if (strcmp(psz_filter_type, "video-splitter")) {
-        vout_thread_t *p_vout = getVout();
-        if (p_vout) {
-            var_SetString(p_vout, psz_filter_type, psz_string);
-            vlc_object_release(p_vout);
-        }
+        NSArray<NSValue *> *vouts = getVouts();
+        if (vouts)
+            for (NSValue * val in vouts) {
+                vout_thread_t *p_vout = [val pointerValue];
+                var_SetString(p_vout, psz_filter_type, psz_string);
+                vlc_object_release(p_vout);
+            }
     }
 
     free(psz_string);

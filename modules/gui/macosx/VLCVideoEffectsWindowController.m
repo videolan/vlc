@@ -915,14 +915,16 @@
             [self setCropRightValue: [self cropLeftValue]];
     }
 
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        var_SetInteger(p_vout, "crop-top", [_cropTopTextField intValue]);
-        var_SetInteger(p_vout, "crop-bottom", [_cropBottomTextField intValue]);
-        var_SetInteger(p_vout, "crop-left", [_cropLeftTextField intValue]);
-        var_SetInteger(p_vout, "crop-right", [_cropRightTextField intValue]);
-        vlc_object_release(p_vout);
-    }
+    NSArray<NSValue *> *vouts = getVouts();
+    if (vouts)
+        for (NSValue *ptr in vouts) {
+            vout_thread_t *p_vout = [ptr pointerValue];
+            var_SetInteger(p_vout, "crop-top", [_cropTopTextField intValue]);
+            var_SetInteger(p_vout, "crop-bottom", [_cropBottomTextField intValue]);
+            var_SetInteger(p_vout, "crop-left", [_cropLeftTextField intValue]);
+            var_SetInteger(p_vout, "crop-right", [_cropRightTextField intValue]);
+            vlc_object_release(p_vout);
+        }
 }
 
 #pragma mark -
