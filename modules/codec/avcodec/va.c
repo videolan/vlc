@@ -128,19 +128,6 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
     if (va->module == NULL)
     {
         vlc_object_release(va);
-#ifdef _WIN32
-        return NULL;
-    }
-
-    vlc_fourcc_t chroma;
-    vlc_fourcc_t expected = vlc_va_GetChroma( pix_fmt, avctx->sw_pix_fmt );
-    va->setup(va, &chroma);
-    if (chroma != expected)
-    {   /* Mismatch, cannot work, fail */
-        msg_Dbg( obj, "chroma mismatch %4.4s expected %4.4s",
-                 (const char*)&chroma, (const char*) &expected );
-        vlc_va_Delete(va, &avctx->hwaccel_context);
-#endif
         va = NULL;
     }
     return va;

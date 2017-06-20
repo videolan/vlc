@@ -36,10 +36,6 @@ struct vlc_va_t {
     module_t *module;
     const char *description;
 
-#ifdef _WIN32
-    VLC_DEPRECATED
-    void (*setup)(vlc_va_t *, vlc_fourcc_t *output);
-#endif
     int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **data);
 };
 

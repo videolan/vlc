@@ -111,7 +111,6 @@ static const d3d_format_t *D3dFindFormat(D3DFORMAT format)
 struct vlc_va_sys_t
 {
     directx_sys_t         dx_sys;
-    vlc_fourcc_t          i_chroma;
 
     /* DLL */
     HINSTANCE             hd3d9_dll;
@@ -153,12 +152,6 @@ static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
 static void DxDestroyVideoDecoder(vlc_va_t *);
 static int DxResetVideoDecoder(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
-
-/* */
-static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
-{
-    *chroma = va->sys->i_chroma;
-}
 
 void SetupAVCodecContext(vlc_va_t *va)
 {
@@ -251,20 +244,6 @@ static void Close(vlc_va_t *va, void **ctx)
     free(sys);
 }
 
-static vlc_fourcc_t d3d9va_fourcc(enum PixelFormat swfmt)
-{
-    switch (swfmt)
-    {
-        case AV_PIX_FMT_YUV420P10LE:
-            return VLC_CODEC_D3D9_OPAQUE_10B;
-        case AV_PIX_FMT_YUVJ420P:
-        case AV_PIX_FMT_YUV420P:
-            return VLC_CODEC_D3D9_OPAQUE;
-        default:
-            return VLC_CODEC_D3D9_OPAQUE;
-    }
-}
-
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -314,8 +293,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         IDirect3DSurface9_GetDevice(p_sys->surface, &dx_sys->d3ddev );
     }
 
-    sys->i_chroma = d3d9va_fourcc(ctx->sw_pix_fmt);
-
     err = directx_va_Open(va, &sys->dx_sys, true);
     if (err!=VLC_SUCCESS)
         goto error;
@@ -328,7 +305,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     /* TODO print the hardware name/vendor for debugging purposes */
     va->description = DxDescribe(sys);
-    va->setup   = Setup;
     va->get     = Get;
     return VLC_SUCCESS;
 

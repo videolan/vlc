@@ -109,7 +109,6 @@ DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 
 struct vlc_va_sys_t
 {
     directx_sys_t                dx_sys;
-    vlc_fourcc_t                 i_chroma;
     UINT                         totalTextureSlices;
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
@@ -150,12 +149,6 @@ static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id,
                                    const video_format_t *fmt, unsigned surface_count);
 static void DxDestroySurfaces(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
-
-/* */
-static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
-{
-    *chroma = va->sys->i_chroma;
-}
 
 void SetupAVCodecContext(vlc_va_t *va)
 {
@@ -323,17 +316,6 @@ static void Close(vlc_va_t *va, void **ctx)
     free(sys);
 }
 
-static vlc_fourcc_t d3d11va_fourcc(enum PixelFormat swfmt)
-{
-    switch (swfmt)
-    {
-        case AV_PIX_FMT_YUV420P10LE:
-            return VLC_CODEC_D3D11_OPAQUE_10B;
-        default:
-            return VLC_CODEC_D3D11_OPAQUE;
-    }
-}
-
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -396,8 +378,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         }
     }
 
-    sys->i_chroma = d3d11va_fourcc(ctx->sw_pix_fmt);
-
 #if VLC_WINSTORE_APP
     err = directx_va_Open(va, &sys->dx_sys, false);
 #else
@@ -414,7 +394,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     /* TODO print the hardware name/vendor for debugging purposes */
     va->description = DxDescribe(dx_sys);
-    va->setup   = Setup;
     va->get     = Get;
 
     return VLC_SUCCESS;
