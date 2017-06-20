@@ -92,8 +92,15 @@
         [_disabledStrokeColor setStroke];
     }
 
+    [NSGraphicsContext saveGraphicsState];
+    if ([super showsFirstResponder] && [[[self controlView] window] isKeyWindow] &&
+       ([self focusRingType] == NSFocusRingTypeDefault ||
+        [self focusRingType] == NSFocusRingTypeExterior)) {
+        NSSetFocusRingStyle(NSFocusRingOnly);
+    }
     [backgroundPath setLineWidth:1.0];
     [backgroundPath stroke];
+    [NSGraphicsContext restoreGraphicsState];
 
     // Now drawing tick
     if ([self intValue]) {
