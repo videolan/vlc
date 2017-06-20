@@ -43,6 +43,8 @@ struct picture_sys_t {
 
 static void DestroyVideoDecoder(vlc_va_t *va, va_pool_t *va_pool)
 {
+    for (unsigned i = 0; i < va_pool->surface_count; i++)
+        va_surface_Release(va_pool->surface[i]->va_surface);
     va_pool->pf_destroy_surfaces(va);
     va_pool->surface_count = 0;
 }
