@@ -36,7 +36,7 @@
 
 @implementation VLCHUDCheckboxCell
 
-- (instancetype) initWithCoder:(NSCoder *)coder
+- (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
     if (self) {
@@ -57,7 +57,7 @@
     return self;
 }
 
-- (void) drawImage:(NSImage *)image withFrame:(NSRect)frame inView:(NSView *)controlView
+- (void)drawImage:(NSImage *)image withFrame:(NSRect)frame inView:(NSView *)controlView
 {
     // Set frame size correctly
     NSRect backgroundFrame = frame;

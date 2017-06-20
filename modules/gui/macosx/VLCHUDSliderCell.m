@@ -66,7 +66,7 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-- (void) drawKnob:(NSRect)smallRect
+- (void)drawKnob:(NSRect)smallRect
 {
     NSBezierPath *path = [NSBezierPath bezierPath];
     // Inset rect to have enough room for the stroke

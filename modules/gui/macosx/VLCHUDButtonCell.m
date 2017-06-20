@@ -36,7 +36,7 @@
 
 @implementation VLCHUDButtonCell
 
-- (instancetype) initWithCoder:(NSCoder *)coder
+- (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
     if (self) {
@@ -54,7 +54,7 @@
     return self;
 }
 
-- (void) drawBezelWithFrame:(NSRect)frame inView:(NSView *)controlView
+- (void)drawBezelWithFrame:(NSRect)frame inView:(NSView *)controlView
 {
     // Set frame to the correct size
     frame.size.height = self.cellSize.height;
@@ -85,7 +85,7 @@
     return [super drawTitle:coloredTitle withFrame:frame inView:controlView];
 }
 
-- (void) drawRoundRectButtonBezelInRect:(NSRect)rect
+- (void)drawRoundRectButtonBezelInRect:(NSRect)rect
 {
     NSBezierPath *path;
     if (self.controlSize == NSMiniControlSize) {
