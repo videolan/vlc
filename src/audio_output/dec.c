@@ -81,7 +81,8 @@ int aout_DecNew( audio_output_t *p_aout,
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
 
-    if (i_map_channels == 0)
+    if (p_format->channel_type == AUDIO_CHANNEL_TYPE_BITMAP
+     && i_map_channels == 0)
     {
         /* The output channel map is unknown, use the WAVE one. */
         assert(owner->mixer_format.i_channels > 0);

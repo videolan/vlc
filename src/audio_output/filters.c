@@ -163,7 +163,8 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
 
     /* Remix channels */
     if (infmt->i_physical_channels != outfmt->i_physical_channels
-     || infmt->i_chan_mode != outfmt->i_chan_mode)
+     || infmt->i_chan_mode != outfmt->i_chan_mode
+     || infmt->channel_type != outfmt->channel_type)
     {   /* Remixing currently requires FL32... TODO: S16N */
         if (input.i_format != VLC_CODEC_FL32)
         {
@@ -188,10 +189,16 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         output.i_format = input.i_format;
         output.i_rate = input.i_rate;
         output.i_physical_channels = outfmt->i_physical_channels;
+        output.channel_type = outfmt->channel_type;
         output.i_chan_mode = outfmt->i_chan_mode;
         aout_FormatPrepare (&output);
 
-        filter_t *f = FindConverter (obj, &input, &output);
+        const char *filter_type =
+            infmt->channel_type != outfmt->channel_type ?
+            "audio renderer" : "audio converter";
+
+        filter_t *f = CreateFilter (obj, filter_type, NULL, NULL,
+                                    &input, &output, NULL, true);
         if (f == NULL)
         {
             msg_Err (obj, "cannot find %s for conversion pipeline",
@@ -519,6 +526,26 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         goto error;
     }
 
+    assert(output_format.channel_type == AUDIO_CHANNEL_TYPE_BITMAP);
+    if (input_format.channel_type != output_format.channel_type)
+    {
+        /* Do the channel type conversion before any filters since audio
+         * converters and filters handle only AUDIO_CHANNEL_TYPE_BITMAP */
+
+        /* convert to the output format (minus resampling) if necessary */
+        output_format.i_rate = input_format.i_rate;
+        if (aout_FiltersPipelineCreate (obj, filters->tab, &filters->count,
+                                  AOUT_MAX_FILTERS, &input_format, &output_format))
+        {
+            msg_Warn (obj, "cannot setup audio renderer pipeline");
+            /* Fallback to bitmap without any conversions */
+            input_format.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+            aout_FormatPrepare(&input_format);
+        }
+        else
+            input_format = output_format;
+    }
+
     if (aout_FormatNbChannels(&input_format) == 0)
     {
         /* The input channel map is unknown, use the WAVE one and add a
@@ -540,6 +567,8 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         input_format = input_phys_format;
         filters->tab[filters->count++] = f;
     }
+
+    assert(input_format.channel_type == AUDIO_CHANNEL_TYPE_BITMAP);
 
     /* parse user filter lists */
     if (var_InheritBool (obj, "audio-time-stretch"))
