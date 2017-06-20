@@ -1520,7 +1520,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if (p_sys->p_va != NULL)
     {
         msg_Err(p_dec, "existing hardware acceleration cannot be reused");
-        vlc_va_Delete(p_sys->p_va, p_context);
+        vlc_va_Delete(p_sys->p_va, p_context->hwaccel_context);
         p_sys->p_va = NULL;
     }
 
