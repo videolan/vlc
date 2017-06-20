@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G16b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -113,7 +112,7 @@
                                             <rect key="frame" x="10" y="-1" width="404" height="186"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField verticalHuggingPriority="750" id="90">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="90">
                                                     <rect key="frame" x="32" y="130" width="48" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="+20 dB" id="158" customClass="VLCHUDTextFieldCell">
@@ -122,7 +121,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="91">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="91">
                                                     <rect key="frame" x="32" y="85" width="48" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" continuous="YES" sendsActionOnEndEditing="YES" alignment="right" title="0 dB" id="157" customClass="VLCHUDTextFieldCell">
@@ -131,7 +130,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="92">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="92">
                                                     <rect key="frame" x="32" y="41" width="48" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="-20 dB" id="156" customClass="VLCHUDTextFieldCell">
@@ -140,7 +139,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="93">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="93">
                                                     <rect key="frame" x="17" y="22" width="81" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Preamp" id="155" customClass="VLCHUDTextFieldCell">
@@ -149,7 +148,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="95">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="95">
                                                     <rect key="frame" x="109" y="22" width="22" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="60" id="153" customClass="VLCHUDTextFieldCell">
@@ -158,7 +157,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="96">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="96">
                                                     <rect key="frame" x="135" y="22" width="29" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="170" id="152" customClass="VLCHUDTextFieldCell">
@@ -167,7 +166,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="100">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="100">
                                                     <rect key="frame" x="193" y="22" width="29" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="600" id="148" customClass="VLCHUDTextFieldCell">
@@ -176,7 +175,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="101">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="101">
                                                     <rect key="frame" x="164" y="22" width="29" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="310" id="147" customClass="VLCHUDTextFieldCell">
@@ -185,7 +184,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="102">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="102">
                                                     <rect key="frame" x="225" y="22" width="23" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="1K" id="146" customClass="VLCHUDTextFieldCell">
@@ -194,7 +193,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="104">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="104">
                                                     <rect key="frame" x="308" y="22" width="30" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="12K" id="144" customClass="VLCHUDTextFieldCell">
@@ -203,7 +202,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="107">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="107">
                                                     <rect key="frame" x="254" y="22" width="23" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="3K" id="141" customClass="VLCHUDTextFieldCell">
@@ -212,7 +211,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="109">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="109">
                                                     <rect key="frame" x="283" y="22" width="23" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="6K" id="139" customClass="VLCHUDTextFieldCell">
@@ -221,7 +220,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="110">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="110">
                                                     <rect key="frame" x="337" y="22" width="30" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="14K" id="138" customClass="VLCHUDTextFieldCell">
@@ -230,7 +229,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="111">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="111">
                                                     <rect key="frame" x="366" y="22" width="30" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="16K" id="137" customClass="VLCHUDTextFieldCell">
@@ -432,7 +431,7 @@
                                             <rect key="frame" x="7" y="0.0" width="410" height="170"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <subviews>
-                                                <textField verticalHuggingPriority="750" id="220">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="220">
                                                     <rect key="frame" x="24" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="223" customClass="VLCHUDTextFieldCell">
@@ -449,7 +448,7 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="scd-cx-Z2t"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="224">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="224">
                                                     <rect key="frame" x="76" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="24.9 ms" id="227" customClass="VLCHUDTextFieldCell">
@@ -466,7 +465,7 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="TSd-Vu-uAC"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="228">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="228">
                                                     <rect key="frame" x="128" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="800.0 ms" id="231" customClass="VLCHUDTextFieldCell">
@@ -483,7 +482,7 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="tJL-Vg-pRk"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="232">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="232">
                                                     <rect key="frame" x="180" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="-11.0 dB" id="235" customClass="VLCHUDTextFieldCell">
@@ -500,7 +499,7 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Otq-ED-0CI"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="236">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="236">
                                                     <rect key="frame" x="232" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="8.0:1" id="239" customClass="VLCHUDTextFieldCell">
@@ -517,7 +516,7 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Vee-cn-Xep"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="240">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="240">
                                                     <rect key="frame" x="284" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.5 dB" id="243" customClass="VLCHUDTextFieldCell">
@@ -534,7 +533,7 @@
                                                         <action selector="compressorSliderUpdated:" target="-2" id="gaI-my-uOm"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="244">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="244">
                                                     <rect key="frame" x="336" y="35" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="7.0 dB" id="247" customClass="VLCHUDTextFieldCell">
@@ -543,7 +542,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="248">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="248">
                                                     <rect key="frame" x="25" y="9" width="50" height="22"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="RMS/peak" id="261" customClass="VLCHUDTextFieldCell">
@@ -552,7 +551,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="249">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="249">
                                                     <rect key="frame" x="76" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Attack" id="260" customClass="VLCHUDTextFieldCell">
@@ -561,7 +560,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="250">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="250">
                                                     <rect key="frame" x="128" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Release" id="259" customClass="VLCHUDTextFieldCell">
@@ -570,7 +569,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="251">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="251">
                                                     <rect key="frame" x="180" y="14" width="52" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Threshold" id="258" customClass="VLCHUDTextFieldCell">
@@ -579,7 +578,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="252">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="252">
                                                     <rect key="frame" x="232" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Ratio" id="257" customClass="VLCHUDTextFieldCell">
@@ -588,7 +587,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="253">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="253">
                                                     <rect key="frame" x="284" y="9" width="50" height="22"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Knee radius" id="256" customClass="VLCHUDTextFieldCell">
@@ -597,7 +596,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="254">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="254">
                                                     <rect key="frame" x="336" y="9" width="50" height="22"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Makeup gain" id="255" customClass="VLCHUDTextFieldCell">
@@ -617,7 +616,7 @@
                                                 <button verticalHuggingPriority="750" misplaced="YES" id="621">
                                                     <rect key="frame" x="325" y="151" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="7EAD0153-D2BE-43C6-866E-7448FD3FC4DD" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:622:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -653,7 +652,7 @@
                                                 <button verticalHuggingPriority="750" id="618">
                                                     <rect key="frame" x="317" y="145" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="153C3A5A-B2A3-4D33-BC33-44A5EC4E91B5" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:619:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -661,7 +660,7 @@
                                                         <action selector="resetSpatializerValues:" target="-2" id="LeL-eG-qna"/>
                                                     </connections>
                                                 </button>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" id="265">
+                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="265">
                                                     <rect key="frame" x="76" y="34" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="302" customClass="VLCHUDTextFieldCell">
@@ -678,7 +677,7 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="TzD-ul-6Gx"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" id="267">
+                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="267">
                                                     <rect key="frame" x="128" y="34" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="300" customClass="VLCHUDTextFieldCell">
@@ -695,7 +694,7 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="smf-XD-GHV"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" id="269">
+                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="269">
                                                     <rect key="frame" x="180" y="34" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="298" customClass="VLCHUDTextFieldCell">
@@ -712,7 +711,7 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="bnX-CW-h45"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" id="271">
+                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="271">
                                                     <rect key="frame" x="232" y="34" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="296" customClass="VLCHUDTextFieldCell">
@@ -729,7 +728,7 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="wM1-xe-t5e"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" id="273">
+                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="273">
                                                     <rect key="frame" x="284" y="34" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="294" customClass="VLCHUDTextFieldCell">
@@ -746,7 +745,7 @@
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="CoP-xd-gur"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" id="277">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="277">
                                                     <rect key="frame" x="76" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Size" id="290" customClass="VLCHUDTextFieldCell">
@@ -755,7 +754,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="278">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="278">
                                                     <rect key="frame" x="128" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Width" id="289" customClass="VLCHUDTextFieldCell">
@@ -764,7 +763,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="279">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="279">
                                                     <rect key="frame" x="180" y="14" width="52" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Wet" id="288" customClass="VLCHUDTextFieldCell">
@@ -773,7 +772,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="280">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="280">
                                                     <rect key="frame" x="232" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dry" id="287" customClass="VLCHUDTextFieldCell">
@@ -782,7 +781,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" id="281">
+                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="281">
                                                     <rect key="frame" x="284" y="14" width="50" height="11"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dump" id="286" customClass="VLCHUDTextFieldCell">
@@ -841,7 +840,7 @@
                                                 <rect key="frame" x="1" y="1" width="390" height="41"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" id="341">
+                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="341">
                                                         <rect key="frame" x="15" y="14" width="101" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Maximum level" id="348" customClass="VLCHUDTextFieldCell">
@@ -891,7 +890,7 @@
                     <segmentedControl verticalHuggingPriority="750" misplaced="YES" id="Jb1-f1-iF3">
                         <rect key="frame" x="48" y="228" width="314" height="24"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ZdJ-0F-LWH">
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ZdJ-0F-LWH" customClass="VLCHUDSegmentedCell">
                             <font key="font" metaFont="system"/>
                             <segments>
                                 <segment label="Equalizer" selected="YES"/>
@@ -911,7 +910,7 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="153C3A5A-B2A3-4D33-BC33-44A5EC4E91B5" width="1" height="1">
+        <image name="buttonCell:619:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -952,7 +951,7 @@ B04HVwdcB2QHZwdsB3sHfweGB44HmwegB6IHpAepB7EHtAe5B8EHxAfWB9kH3gAAAAAAAAIBAAAAAAAA
 AEEAAAAAAAAAAAAAAAAAAAfgA
 </mutableData>
         </image>
-        <image name="7EAD0153-D2BE-43C6-866E-7448FD3FC4DD" width="1" height="1">
+        <image name="buttonCell:622:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
