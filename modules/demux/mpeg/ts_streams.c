@@ -286,8 +286,6 @@ ts_stream_t *ts_stream_New( demux_t *p_demux, ts_pmt_t *p_program )
     pes->p_proc = NULL;
     pes->prepcr.p_head = NULL;
     pes->prepcr.pp_last = &pes->prepcr.p_head;
-    pes->sl.p_data = NULL;
-    pes->sl.pp_last = &pes->sl.p_data;
 
     return pes;
 }

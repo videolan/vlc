@@ -30,6 +30,6 @@ void SLPackets_Section_Handler( demux_t *p_demux,
 bool SetupISO14496LogicalStream( demux_t *, const decoder_config_descriptor_t *,
                                   es_format_t * );
 
-block_t * SLProcessPacketized( ts_stream_t *, ts_es_t *, block_t * );
+ts_stream_processor_t *SL_stream_processor_New( ts_stream_t * );
 
 #endif

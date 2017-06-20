@@ -445,9 +445,18 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_stream_t *p_pes,
                 {
                     p_es->i_sl_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
                     msg_Dbg( p_demux, "     - found SL_descriptor mapping es_id=%"PRIu16, p_es->i_sl_es_id );
-                    ts_sections_processor_Add( p_demux,
-                                               &p_pes->p_sections_proc, 0x05, 0x00,
-                                               SLPackets_Section_Handler, p_pes );
+
+                    if( p_dvbpsies->i_type == 0x12 ) /* SL AU pes stream */
+                    {
+                        if( !p_pes->p_proc )
+                            p_pes->p_proc = SL_stream_processor_New( p_pes );
+                    }
+                    else if( p_dvbpsies->i_type == 0x13 ) /* IOD / SL sections */
+                    {
+                        ts_sections_processor_Add( p_demux,
+                                                   &p_pes->p_sections_proc, 0x05, 0x00,
+                                                   SLPackets_Section_Handler, p_pes );
+                    }
                     p_pes->b_always_receive = true;
                 }
                 break;

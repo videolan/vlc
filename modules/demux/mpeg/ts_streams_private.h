@@ -130,13 +130,6 @@ struct ts_stream_t
         block_t *p_head;
         block_t **pp_last;
     } prepcr;
-
-    /* SL AU */
-    struct
-    {
-        block_t     *p_data;
-        block_t     **pp_last;
-    } sl;
 };
 
 typedef struct ts_si_context_t ts_si_context_t;

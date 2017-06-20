@@ -1783,13 +1783,8 @@ static inline void FlushESBuffer( ts_stream_t *p_pes )
         p_pes->gather.pp_last = &p_pes->gather.p_data;
         p_pes->gather.i_saved = 0;
     }
-
-    if( p_pes->sl.p_data )
-    {
-        block_ChainRelease( p_pes->sl.p_data );
-        p_pes->sl.p_data = NULL;
-        p_pes->sl.pp_last = &p_pes->sl.p_data;
-    }
+    if( p_pes->p_proc )
+        ts_stream_processor_Reset( p_pes->p_proc );
 }
 
 static void ReadyQueuesPostSeek( demux_t *p_demux )

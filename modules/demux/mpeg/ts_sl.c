@@ -205,9 +205,42 @@ void SLPackets_Section_Handler( demux_t *p_demux,
     }
 }
 
-block_t * SLProcessPacketized( ts_stream_t *p_pes, ts_es_t *p_es, block_t *p_block )
+typedef struct
 {
+    block_t     *p_au;
+    block_t     **pp_au_last;
+    ts_stream_t *p_stream;
+
+} SL_stream_processor_context_t;
+
+static void SL_stream_processor_Delete( ts_stream_processor_t *h )
+{
+    SL_stream_processor_context_t *ctx = (SL_stream_processor_context_t *) h->priv;
+    block_ChainRelease( ctx->p_au );
+    free( ctx );
+    free( h );
+}
+
+static void SL_stream_processor_Reset( ts_stream_processor_t *h )
+{
+    SL_stream_processor_context_t *ctx = (SL_stream_processor_context_t *) h->priv;
+    block_ChainRelease( ctx->p_au );
+    ctx->p_au = NULL;
+    ctx->pp_au_last = &ctx->p_au;
+}
+
+static block_t * SL_stream_processor_Push( ts_stream_processor_t *h, uint8_t i_stream_id, block_t *p_block )
+{
+    SL_stream_processor_context_t *ctx = (SL_stream_processor_context_t *) h->priv;
+    ts_es_t *p_es = ctx->p_stream->p_es;
     ts_pmt_t *p_pmt = p_es->p_program;
+
+    if( ((i_stream_id & 0xFE) != 0xFA) /* 0xFA || 0xFB */ )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
     const es_mpeg4_descriptor_t *p_desc = GetMPEG4DescByEsId( p_pmt, p_es->i_sl_es_id );
     if(!p_desc)
     {
@@ -224,21 +257,45 @@ block_t * SLProcessPacketized( ts_stream_t *p_pes, ts_es_t *p_es, block_t *p_blo
         p_block->i_pts = header.i_pts ? header.i_pts : p_block->i_pts;
 
         /* Assemble access units */
-        if( header.b_au_start && p_pes->sl.p_data )
+        if( header.b_au_start && ctx->p_au )
         {
-            block_ChainRelease( p_pes->sl.p_data );
-            p_pes->sl.p_data = NULL;
-            p_pes->sl.pp_last = &p_pes->sl.p_data;
+            block_ChainRelease( ctx->p_au );
+            ctx->p_au = NULL;
+            ctx->pp_au_last = &ctx->p_au;
         }
-        block_ChainLastAppend( &p_pes->sl.pp_last, p_block );
+        block_ChainLastAppend( &ctx->pp_au_last, p_block );
         p_block = NULL;
         if( header.b_au_end )
         {
-            p_block = block_ChainGather( p_pes->sl.p_data );
-            p_pes->sl.p_data = NULL;
-            p_pes->sl.pp_last = &p_pes->sl.p_data;
+            p_block = block_ChainGather( ctx->p_au );
+            ctx->p_au = NULL;
+            ctx->pp_au_last = &ctx->p_au;
         }
     }
 
     return p_block;
+}
+
+ts_stream_processor_t *SL_stream_processor_New( ts_stream_t *p_stream )
+{
+    ts_stream_processor_t *h = malloc(sizeof(*h));
+    if(!h)
+        return NULL;
+
+    SL_stream_processor_context_t *ctx = malloc( sizeof(SL_stream_processor_context_t) );
+    if(!ctx)
+    {
+        free(h);
+        return NULL;
+    }
+    ctx->p_au = NULL;
+    ctx->pp_au_last = &ctx->p_au;
+    ctx->p_stream = p_stream;
+
+    h->priv = ctx;
+    h->pf_delete = SL_stream_processor_Delete;
+    h->pf_push = SL_stream_processor_Push;
+    h->pf_reset = SL_stream_processor_Reset;
+
+    return h;
 }
