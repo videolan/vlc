@@ -38,6 +38,7 @@
 @interface NSSegmentedCell (Private)
 
 - (NSRect)rectForSegment:(NSInteger)segment inFrame:(NSRect)frame;
+- (NSInteger)_keySegment;
 
 @end
 
@@ -116,6 +117,15 @@
 
     if (segment > 0 && segment < (self.segmentCount - 1)) {
         // Middle segments
+        [NSGraphicsContext saveGraphicsState];
+        if ([super showsFirstResponder] && [[[self controlView] window] isKeyWindow] &&
+            ([self focusRingType] == NSFocusRingTypeDefault ||
+             [self focusRingType] == NSFocusRingTypeExterior) &&
+            [self respondsToSelector:@selector(_keySegment)] && self._keySegment == segment) {
+            NSSetFocusRingStyle(NSFocusRingOnly);
+            NSRectFill(frame);
+        }
+        [NSGraphicsContext restoreGraphicsState];
         [gradient drawInRect:frame angle:90];
         return;
     }
@@ -137,6 +147,15 @@
         [fillPath lineToPoint: NSMakePoint(NSMinX(frame), NSMaxY(frame))];
     }
     [fillPath closePath];
+    [NSGraphicsContext saveGraphicsState];
+    if ([super showsFirstResponder] && [[[self controlView] window] isKeyWindow] &&
+        ([self focusRingType] == NSFocusRingTypeDefault ||
+         [self focusRingType] == NSFocusRingTypeExterior) &&
+        [self respondsToSelector:@selector(_keySegment)] && self._keySegment == segment) {
+        NSSetFocusRingStyle(NSFocusRingOnly);
+        [fillPath fill];
+    }
+    [NSGraphicsContext restoreGraphicsState];
     [gradient drawInBezierPath:fillPath angle:90];
 }
 
