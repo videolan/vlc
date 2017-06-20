@@ -267,6 +267,7 @@
 - (void)setWidgetValue: (id)widget forOption: (char *)psz_option enabled: (bool)b_state
 {
     intf_thread_t *p_intf = getIntf();
+    playlist_t *p_playlist = pl_Get(p_intf);
 
     vlc_value_t val;
     int i_type = config_GetType(p_intf, psz_option) & VLC_VAR_CLASS;
@@ -274,18 +275,16 @@
     {
     case VLC_VAR_BOOL:
     case VLC_VAR_INTEGER:
-        val.i_int = config_GetInt(p_intf, psz_option);
-        break;
     case VLC_VAR_FLOAT:
-        val.f_float = config_GetFloat(p_intf, psz_option);
-        break;
     case VLC_VAR_STRING:
-        val.psz_string = config_GetPsz(p_intf, psz_option);
         break;
     default:
         msg_Err(p_intf, "%s variable is of an unsupported type (%d)", psz_option, i_type);
         return;
     }
+    if (var_Create(p_playlist, psz_option, i_type | VLC_VAR_DOINHERIT) ||
+        var_GetChecked(p_playlist, psz_option, i_type, &val))
+        return;
 
     if (i_type == VLC_VAR_BOOL || i_type == VLC_VAR_INTEGER)
     {
