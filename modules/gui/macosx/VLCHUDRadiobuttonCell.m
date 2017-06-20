@@ -80,8 +80,16 @@
 
     // Draw border and background
     [NSColor.whiteColor setStroke];
+
+    [NSGraphicsContext saveGraphicsState];
+    if ([super showsFirstResponder] && [[[self controlView] window] isKeyWindow] &&
+        ([self focusRingType] == NSFocusRingTypeDefault ||
+         [self focusRingType] == NSFocusRingTypeExterior)) {
+        NSSetFocusRingStyle(NSFocusRingOnly);
+    }
     [backgroundPath setLineWidth:1.5];
     [backgroundPath stroke];
+    [NSGraphicsContext restoreGraphicsState];
 
     if ([self isEnabled]) {
         if ([self isHighlighted]) {
