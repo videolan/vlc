@@ -91,14 +91,15 @@
     [_focusRing setShadowOffset:NSMakeSize(0, 0)];
 
     _strokeColor = [NSColor colorWithDeviceRed:0.749f green:0.761f blue:0.788f alpha:1.0f];
-    _disabledStrokeColor = [NSColor colorWithDeviceRed:0.749f green:0.761f blue:0.788f alpha:0.2f];
+    _disabledStrokeColor = [NSColor colorWithDeviceRed:1 green:1 blue:1 alpha:0.2f];
+
     _selectionHighlightActiveColor = [NSColor darkGrayColor];
     _selectionTextActiveColor = [NSColor whiteColor];
     _selectionHighlightInActiveColor = [NSColor darkGrayColor];
     _selectionTextInActiveColor = [NSColor whiteColor];
+
     _placeholderTextColor = [NSColor grayColor];
     _cellTextColor = [NSColor whiteColor];
-    _disabledStrokeColor = [NSColor colorWithDeviceRed:1 green:1 blue:1 alpha:0.2f];
     _textFillColor = [NSColor colorWithDeviceRed:.224f green:.224f blue:.224f alpha:.95f];
 
     // Init some properties
