@@ -130,6 +130,24 @@ static char *EITConvertToUTF8( demux_t *p_demux,
     return vlc_from_EIT( psz_instring, i_length );
 }
 
+#define attach_SI_decoders(i_pid, name, member) do {\
+    ts_pid_t *pid = GetPID(p_sys, i_pid);\
+    if ( PIDSetup( p_demux, TYPE_SI, pid, NULL ) )\
+    {\
+        if( !ts_attach_SI_Tables_Decoders( pid ) )\
+        {\
+            msg_Err( p_demux, "Can't attach SI table decoders for pid %d", i_pid );\
+            PIDRelease( p_demux, pid );\
+        }\
+        else\
+        {\
+            sdt->u.p_si->member = pid;\
+            SetPIDFilter( p_demux->p_sys, pid, true );\
+            msg_Dbg( p_demux, "  * pid=%d listening for "name, i_pid );\
+        }\
+    }\
+    } while(0)\
+
 static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 {
     demux_sys_t          *p_sys = p_demux->p_sys;
@@ -149,37 +167,9 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
     /* First callback */
     if( sdt->u.p_si->i_version == -1 )
     {
-        ts_pid_t *eitpid = GetPID(p_sys, TS_SI_EIT_PID);
-        if ( PIDSetup( p_demux, TYPE_SI, eitpid, NULL ) )
-        {
-            if( !ts_attach_SI_Tables_Decoders( eitpid ) )
-            {
-                msg_Err( p_demux, "Can't attach SI table decoders for pid %d", TS_SI_EIT_PID );
-                PIDRelease( p_demux, eitpid );
-            }
-            else
-            {
-                sdt->u.p_si->eitpid = eitpid;
-                SetPIDFilter( p_demux->p_sys, eitpid, true );
-                msg_Dbg( p_demux, "  * pid=%"PRIu16" listening for EIT", eitpid->i_pid );
-            }
-        }
+        attach_SI_decoders( TS_SI_EIT_PID, "EIT", eitpid );
+        attach_SI_decoders( TS_SI_TDT_PID, "TDT", tdtpid );
 
-        ts_pid_t *tdtpid = GetPID(p_sys, TS_SI_TDT_PID);
-        if ( PIDSetup( p_demux, TYPE_SI, tdtpid, NULL ) )
-        {
-            if( !ts_attach_SI_Tables_Decoders( tdtpid ) )
-            {
-                msg_Err( p_demux, "Can't attach SI table decoders for pid %d", TS_SI_TDT_PID );
-                PIDRelease( p_demux, tdtpid );
-            }
-            else
-            {
-                sdt->u.p_si->tdtpid = tdtpid;
-                SetPIDFilter( p_demux->p_sys, tdtpid, true );
-                msg_Dbg( p_demux, "  * pid=%"PRIu16" listening for TDT", tdtpid->i_pid );
-            }
-        }
     }
 
     msg_Dbg( p_demux, "new SDT ts_id=%"PRIu16" version=%"PRIu8" current_next=%d "
