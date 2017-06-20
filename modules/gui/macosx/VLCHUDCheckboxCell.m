@@ -40,6 +40,13 @@
 {
     self = [super initWithCoder:coder];
     if (self) {
+        /* Colors */
+        _cellTextColor         = [NSColor whiteColor];
+        _disabledCellTextColor = [NSColor colorWithCalibratedWhite:1.0f alpha:0.5f];
+        _strokeColor           = [NSColor whiteColor];
+        _disabledStrokeColor   = [NSColor colorWithCalibratedWhite:1.0f alpha:0.5f];
+
+        /* Gradients */
         _normalGradient    = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.251f green:0.251f blue:0.255f alpha:1.0f]
                                                            endingColor:[NSColor colorWithDeviceRed:0.118f green:0.118f blue:0.118f alpha:1.0f]];
         _highlightGradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.451f green:0.451f blue:0.455f alpha:1.0f]
@@ -80,9 +87,9 @@
         } else {
             [_normalGradient drawInBezierPath:backgroundPath angle:90.0];
         }
-        [[NSColor whiteColor] setStroke];
+        [_strokeColor setStroke];
     } else {
-        [[NSColor colorWithCalibratedWhite:0.25 alpha:1.0] setStroke];
+        [_disabledStrokeColor setStroke];
     }
 
     [backgroundPath setLineWidth:1.0];
@@ -97,12 +104,29 @@
         [bezierPath setLineWidth: 1.5];
 
         if([self isEnabled]) {
-            [[NSColor whiteColor] setStroke];
+            [_strokeColor setStroke];
         } else {
-            [[NSColor colorWithCalibratedWhite:0.25 alpha:1.0] setStroke];
+            [_disabledStrokeColor setStroke];
         }
         [bezierPath stroke];
     }
+}
+
+- (NSRect)drawTitle:(NSAttributedString *)title withFrame:(NSRect)frame inView:(NSView *)controlView
+{
+    NSMutableAttributedString *newTitle = [title mutableCopy];
+
+    if([self isEnabled]) {
+        [newTitle addAttribute:NSForegroundColorAttributeName
+                         value:_cellTextColor
+                         range:NSMakeRange(0, [newTitle length])];
+    } else {
+        [newTitle addAttribute:NSForegroundColorAttributeName
+                         value:_disabledCellTextColor
+                         range:NSMakeRange(0, [newTitle length])];
+    }
+
+    return [super drawTitle: newTitle withFrame: frame inView: controlView];
 }
 
 @end

@@ -45,4 +45,10 @@
 @property NSGradient *highlightGradient;
 @property NSGradient *pushedGradient;
 
+@property NSColor *cellTextColor;
+@property NSColor *disabledCellTextColor;
+
+@property NSColor *strokeColor;
+@property NSColor *disabledStrokeColor;
+
 @end
