@@ -74,6 +74,12 @@ struct ts_pmt_t
     mtime_t i_last_dts;
     uint64_t i_last_dts_byte;
 
+    /* ARIB specific */
+    struct
+    {
+        int i_logo_id;
+        int i_download_id;
+    } arib;
 };
 
 struct ts_es_t
@@ -141,6 +147,7 @@ struct ts_si_t
     /* Track successfully set pid */
     ts_pid_t *eitpid;
     ts_pid_t *tdtpid;
+    ts_pid_t *cdtpid;
 };
 
 typedef struct ts_psip_context_t ts_psip_context_t;

@@ -40,6 +40,7 @@
 #include <vlc_demux.h>
 #include <vlc_es.h>
 #include <vlc_es_out.h>
+#include <vlc_input.h>
 
 #include "sections.h"
 #include "ts_pid.h"
@@ -137,6 +138,9 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     pmt->eit.i_event_length = 0;
     pmt->eit.i_event_start = 0;
 
+    pmt->arib.i_download_id = -1;
+    pmt->arib.i_logo_id = -1;
+
     return pmt;
 }
 
@@ -159,6 +163,7 @@ void ts_pmt_Del( demux_t *p_demux, ts_pmt_t *pmt )
     ARRAY_RESET( pmt->od.objects );
     if( pmt->i_number > -1 )
         es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, pmt->i_number );
+
     free( pmt );
 }
 
@@ -324,6 +329,7 @@ ts_si_t *ts_si_New( demux_t *p_demux )
     si->i_version  = -1;
     si->eitpid = NULL;
     si->tdtpid = NULL;
+    si->cdtpid = NULL;
 
     return si;
 }
@@ -337,6 +343,8 @@ void ts_si_Del( demux_t *p_demux, ts_si_t *si )
         PIDRelease( p_demux, si->eitpid );
     if( si->tdtpid )
         PIDRelease( p_demux, si->tdtpid );
+    if( si->cdtpid )
+        PIDRelease( p_demux, si->cdtpid );
     free( si );
 }
 
