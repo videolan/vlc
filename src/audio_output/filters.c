@@ -139,24 +139,6 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
     audio_sample_format_t input = *infmt;
     unsigned n = 0;
 
-    /* Encapsulate or decode non-linear formats */
-    if (!AOUT_FMT_LINEAR(infmt) && infmt->i_format != outfmt->i_format)
-    {
-        if (n == max)
-            goto overflow;
-
-        filter_t *f = TryFormat (obj, VLC_CODEC_S32N, &input);
-        if (f == NULL)
-            f = TryFormat (obj, VLC_CODEC_FL32, &input);
-        if (f == NULL)
-        {
-            msg_Err (obj, "cannot find %s for conversion pipeline",
-                     "decoder");
-            goto error;
-        }
-
-        filters[n++] = f;
-    }
     assert (AOUT_FMT_LINEAR(&input));
 
     /* Remix channels */
