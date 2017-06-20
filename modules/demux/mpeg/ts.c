@@ -1570,12 +1570,6 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                         ts_stream_processor_Reset( pid->u.p_stream->p_proc );
                     p_block = ts_stream_processor_Push( pid->u.p_stream->p_proc, i_stream_id, p_block );
                 }
-                /* METADATA in PES */
-                else if( pid->u.p_stream->i_stream_type == 0x15 && i_stream_id == 0xbd )
-                {
-                    ProcessMetadata( p_demux->out, p_es->metadata.i_format, p_pmt->i_number,
-                                     p_block->p_buffer, p_block->i_buffer );
-                }
                 else
                 /* Some codecs might need xform or AU splitting */
                 {

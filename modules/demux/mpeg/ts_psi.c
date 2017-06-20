@@ -51,6 +51,7 @@
 #include "ts_scte.h"
 #include "ts_psip.h"
 #include "ts_si.h"
+#include "ts_metadata.h"
 
 #include "../access/dtv/en50221_capmt.h"
 
@@ -492,8 +493,9 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_stream_t *p_pes,
     }
 }
 
-static void SetupMetadataDescriptors( demux_t *p_demux, ts_es_t *p_es, const dvbpsi_pmt_es_t *p_dvbpsies )
+static void SetupMetadataDescriptors( demux_t *p_demux, ts_stream_t *p_stream, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
+    ts_es_t *p_es = p_stream->p_es;
     const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x26 );
     if( p_dr && p_dr->i_length >= 13 )
     {
@@ -508,6 +510,8 @@ static void SetupMetadataDescriptors( demux_t *p_demux, ts_es_t *p_es, const dvb
             p_es->metadata.i_service_id = p_dr->p_data[11];
             msg_Dbg( p_demux, "     - found Metadata_descriptor type ID3 with service_id=0x%"PRIx8,
                      p_dr->p_data[11] );
+            if( !p_stream->p_proc )
+                p_stream->p_proc = Metadata_stream_processor_New( p_stream, p_demux->out );
         }
     }
 }
@@ -1463,7 +1467,7 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
             SetupISO14496Descriptors( p_demux, p_pes, p_pmt, p_dvbpsies );
             break;
         case 0x15:
-            SetupMetadataDescriptors( p_demux, p_pes->p_es, p_dvbpsies );
+            SetupMetadataDescriptors( p_demux, p_pes, p_dvbpsies );
             break;
         case 0x1b:
             SetupAVCDescriptors( p_demux, p_pes->p_es, p_dvbpsies );

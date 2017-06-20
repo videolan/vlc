@@ -19,6 +19,6 @@
 #ifndef VLC_TS_METADATA_H
 #define VLC_TS_METADATA_H
 
-void ProcessMetadata( es_out_t *, uint32_t, uint16_t, const uint8_t *, size_t );
+ts_stream_processor_t *Metadata_stream_processor_New( ts_stream_t *, es_out_t * );
 
 #endif
