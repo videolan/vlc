@@ -73,27 +73,17 @@ static inline void AcquirePictureSys(picture_sys_t *p_sys)
 static inline void ReleasePictureSys(picture_sys_t *p_sys)
 {
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-        if (p_sys->resourceView[i]) {
+        if (p_sys->resourceView[i])
             ID3D11ShaderResourceView_Release(p_sys->resourceView[i]);
-            p_sys->resourceView[i] = NULL;
-        }
-        if (p_sys->texture[i]) {
+        if (p_sys->texture[i])
             ID3D11Texture2D_Release(p_sys->texture[i]);
-            p_sys->texture[i] = NULL;
-        }
     }
-    if (p_sys->context) {
+    if (p_sys->context)
         ID3D11DeviceContext_Release(p_sys->context);
-        p_sys->context = NULL;
-    }
-    if (p_sys->decoder) {
+    if (p_sys->decoder)
         ID3D11VideoDecoderOutputView_Release(p_sys->decoder);
-        p_sys->decoder = NULL;
-    }
-    if (p_sys->processorInput) {
+    if (p_sys->processorInput)
         ID3D11VideoProcessorInputView_Release(p_sys->processorInput);
-        p_sys->processorInput = NULL;
-    }
 }
 
 /* map texture planes to resource views */
