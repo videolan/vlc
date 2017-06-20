@@ -283,6 +283,7 @@ ts_stream_t *ts_stream_New( demux_t *p_demux, ts_pmt_t *p_program )
     pes->b_broken_PUSI_conformance = false;
     pes->b_always_receive = false;
     pes->p_sections_proc = NULL;
+    pes->p_proc = NULL;
     pes->prepcr.p_head = NULL;
     pes->prepcr.pp_last = &pes->prepcr.p_head;
     pes->sl.p_data = NULL;
@@ -300,6 +301,9 @@ void ts_stream_Del( demux_t *p_demux, ts_stream_t *pes )
 
     if( pes->p_sections_proc )
         ts_sections_processor_ChainDelete( pes->p_sections_proc );
+
+    if( pes->p_proc )
+        ts_stream_processor_Delete( pes->p_proc );
 
     if( pes->prepcr.p_head )
         block_ChainRelease( pes->prepcr.p_head );

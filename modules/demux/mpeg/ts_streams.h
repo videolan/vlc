@@ -26,6 +26,32 @@ typedef struct ts_stream_t ts_stream_t;
 typedef struct ts_si_t  ts_si_t;
 typedef struct ts_psip_t ts_psip_t;
 
+typedef struct ts_stream_processor_t ts_stream_processor_t;
+struct ts_stream_processor_t
+{
+    void *priv;
+    void (*pf_delete)(ts_stream_processor_t *);
+    void (*pf_reset)  (ts_stream_processor_t *);
+    block_t * (*pf_push) (ts_stream_processor_t *, uint8_t, block_t * );
+};
+
+static inline void ts_stream_processor_Delete( ts_stream_processor_t *sp )
+{
+    if( sp )
+        sp->pf_delete( sp );
+}
+
+static inline void ts_stream_processor_Reset( ts_stream_processor_t *sp )
+{
+    if( sp && sp->pf_reset )
+        sp->pf_reset( sp );
+}
+
+static inline block_t * ts_stream_processor_Push( ts_stream_processor_t *sp, uint8_t i_stream_id, block_t *b )
+{
+    return (sp) ? sp->pf_push( sp, i_stream_id, b ) : b;
+}
+
 /* Structs */
 ts_pat_t *ts_pat_New( demux_t * );
 void ts_pat_Del( demux_t *, ts_pat_t * );

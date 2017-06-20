@@ -1562,18 +1562,19 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                         p_block->i_pts += FROM_SCALE_NZ(p_pmt->pcr.i_pcroffset);
                 }
 
+                /*** From here, block can become a chain again though conversion below ***/
+
+                if( pid->u.p_stream->p_proc )
+                {
+                    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+                        ts_stream_processor_Reset( pid->u.p_stream->p_proc );
+                    p_block = ts_stream_processor_Push( pid->u.p_stream->p_proc, i_stream_id, p_block );
+                }
                 /* METADATA in PES */
-                if( pid->u.p_stream->i_stream_type == 0x15 && i_stream_id == 0xbd )
+                else if( pid->u.p_stream->i_stream_type == 0x15 && i_stream_id == 0xbd )
                 {
                     ProcessMetadata( p_demux->out, p_es->metadata.i_format, p_pmt->i_number,
                                      p_block->p_buffer, p_block->i_buffer );
-                }
-                else
-                /* SL in PES */
-                if( pid->u.p_stream->i_stream_type == 0x12 &&
-                    ((i_stream_id & 0xFE) == 0xFA) /* 0xFA || 0xFB */ )
-                {
-                    p_block = SLProcessPacketized( pid->u.p_stream, p_es, p_block );
                 }
                 else
                 /* Some codecs might need xform or AU splitting */
@@ -1820,6 +1821,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
             }
 
             ts_sections_processor_Reset( pid->u.p_stream->p_sections_proc );
+            ts_stream_processor_Reset( pid->u.p_stream->p_proc );
 
             FlushESBuffer( pid->u.p_stream );
         }
