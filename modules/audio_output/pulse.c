@@ -799,16 +799,14 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     pa_cvolume_init(&sys->cvolume);
     sys->first_pts = VLC_TS_INVALID;
 
-    pa_format_info *formatv[2];
-    unsigned formatc = 0;
+    pa_format_info *formatv;
 
     /* Favor digital pass-through if available*/
     if (encoding != PA_ENCODING_INVALID) {
-        formatv[formatc] = pa_format_info_new();
-        formatv[formatc]->encoding = encoding;
-        pa_format_info_set_rate(formatv[formatc], ss.rate);
-        pa_format_info_set_channels(formatv[formatc], ss.channels);
-        formatc++;
+        formatv = pa_format_info_new();
+        formatv->encoding = encoding;
+        pa_format_info_set_rate(formatv, ss.rate);
+        pa_format_info_set_channels(formatv, ss.channels);
 
         /* FIX flags are only permitted for PCM, and there is no way to pass
          * different flags for different formats... */
@@ -863,13 +861,12 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         }
 
         /* PCM */
-        formatv[formatc] = pa_format_info_new();
-        formatv[formatc]->encoding = PA_ENCODING_PCM;
-        pa_format_info_set_sample_format(formatv[formatc], ss.format);
-        pa_format_info_set_rate(formatv[formatc], ss.rate);
-        pa_format_info_set_channels(formatv[formatc], ss.channels);
-        pa_format_info_set_channel_map(formatv[formatc], &map);
-        formatc++;
+        formatv = pa_format_info_new();
+        formatv->encoding = PA_ENCODING_PCM;
+        pa_format_info_set_sample_format(formatv, ss.format);
+        pa_format_info_set_rate(formatv, ss.rate);
+        pa_format_info_set_channels(formatv, ss.channels);
+        pa_format_info_set_channel_map(formatv, &map);
     }
 
     /* Create a playback stream */
@@ -900,12 +897,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     pa_threaded_mainloop_lock(sys->mainloop);
     pa_stream *s = pa_stream_new_extended(sys->context, "audio stream",
-                                          formatv, formatc, props);
+                                          &formatv, 1, props);
 
     if (likely(props != NULL))
         pa_proplist_free(props);
-    for (unsigned i = 0; i < formatc; i++)
-        pa_format_info_free(formatv[i]);
+    pa_format_info_free(formatv);
 
     if (s == NULL) {
         pa_threaded_mainloop_unlock(sys->mainloop);
