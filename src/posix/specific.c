@@ -150,7 +150,7 @@ static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
     dbus_connection_unref(conn);
     exit(0);
 #else
-    (void) libvlc; (void) argc; (void) argv;
+    (void) vlc; (void) argc; (void) argv;
 #endif // HAVE_DBUS
 }
 
