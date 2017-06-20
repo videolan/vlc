@@ -797,15 +797,29 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                      forFilter: (char const *)psz_filter
                      withValue: (vlc_value_t)value
 {
-    vout_thread_t *p_vout = getVout();
-    vlc_object_t *p_filter;
+    NSArray<NSValue *> *vouts = getVouts();
     intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
+    int i_type;
+    bool b_is_command = false;
+    char const *psz_filter_type = [self getFilterType: psz_filter];
+    if (!psz_filter_type) {
+        msg_Err(p_intf, "Unable to find filter module \"%s\".", psz_filter);
+        return;
+    }
 
-    int i_type = config_GetType(p_intf, psz_property);
+    if (vouts && [vouts count])
+    {
+        i_type = var_Type((vout_thread_t *)[[vouts firstObject] pointerValue], psz_property);
+        b_is_command = i_type & VLC_VAR_ISCOMMAND;
+    }
+    if (!i_type)
+        i_type = config_GetType(p_intf, psz_property);
+
+    i_type &= VLC_VAR_CLASS;
     if (i_type == VLC_VAR_BOOL)
-        config_PutInt(p_intf, psz_property, (int)value.b_bool);
+        config_PutInt(p_intf, psz_property, (int64_t)value.b_bool);
     else if (i_type == VLC_VAR_INTEGER)
         config_PutInt(p_intf, psz_property, value.i_int);
     else if (i_type == VLC_VAR_FLOAT)
@@ -817,23 +831,25 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         msg_Err(p_intf,
                 "Module %s's %s variable is of an unsupported type ( %d )",
                 psz_filter, psz_property, i_type);
-        if (p_vout)
-            vlc_object_release(p_vout);
-        return;
+        b_is_command = false;
     }
 
-    if (p_vout) {
-        p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
+    if (b_is_command)
+        if (vouts)
+            for (NSValue *ptr in vouts)
+            {
+                vout_thread_t *p_vout = [ptr pointerValue];
+                var_SetChecked(p_vout, psz_property, i_type, value);
+#ifndef NDEBUG
+                int i_cur_type = var_Type(p_vout, psz_property);
+                assert((i_cur_type & VLC_VAR_CLASS) == i_type);
+                assert(i_cur_type & VLC_VAR_ISCOMMAND);
+#endif
+            }
 
-        if (!p_filter) {
-            msg_Warn(p_intf, "filter '%s' isn't enabled", psz_filter);
-            vlc_object_release(p_vout);
-            return;
-        }
-        var_SetChecked(p_filter, psz_property, i_type, value);
-        vlc_object_release(p_vout);
-        vlc_object_release(p_filter);
-    }
+    if (vouts)
+        for (NSValue *ptr in vouts)
+            vlc_object_release((vout_thread_t *)[ptr pointerValue]);
 }
 
 #pragma mark -
