@@ -117,6 +117,6 @@ static inline int vlc_va_Extract(vlc_va_t *va, picture_t *pic, uint8_t *data)
  * Destroys a libavcodec hardware acceleration back-end.
  * All allocated surfaces shall have been released beforehand.
  */
-void vlc_va_Delete(vlc_va_t *, void *);
+void vlc_va_Delete(vlc_va_t *, void **);
 
 #endif

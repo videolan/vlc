@@ -58,7 +58,7 @@
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
-static void Close(vlc_va_t *, void *);
+static void Close(vlc_va_t *, void **);
 
 vlc_module_begin()
     set_description(N_("Direct3D11 Video Acceleration"))
@@ -326,7 +326,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_va_t *va, void *ctx)
+static void Close(vlc_va_t *va, void **ctx)
 {
     vlc_va_sys_t *sys = va->sys;
 

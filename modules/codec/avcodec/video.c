@@ -1241,7 +1241,7 @@ void EndVideoDec( vlc_object_t *obj )
     avcodec_free_context( &ctx );
 
     if( p_sys->p_va )
-        vlc_va_Delete( p_sys->p_va, hwaccel_context );
+        vlc_va_Delete( p_sys->p_va, &hwaccel_context );
 
     vlc_sem_destroy( &p_sys->sem_mt );
     free( p_sys );
@@ -1520,7 +1520,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if (p_sys->p_va != NULL)
     {
         msg_Err(p_dec, "existing hardware acceleration cannot be reused");
-        vlc_va_Delete(p_sys->p_va, p_context->hwaccel_context);
+        vlc_va_Delete(p_sys->p_va, &p_context->hwaccel_context);
         p_sys->p_va = NULL;
     }
 
