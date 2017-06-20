@@ -49,7 +49,6 @@
     [self setAttributedTitle:colorTitle];
 
     // Set frame size correctly
-    NSRect backgroundFrame = frame;
     NSRect innerFrame = frame;
     if (self.controlSize == NSSmallControlSize) {
         frame.origin.x += 3.5;
