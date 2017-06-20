@@ -104,8 +104,8 @@
 
 - (NSRect)drawTitle:(NSAttributedString *)title withFrame:(NSRect)frame inView:(NSView *)controlView
 {
-    NSMutableAttributedString *coloredTitle = [[NSMutableAttributedString alloc]
-                                               initWithAttributedString:title];
+    NSMutableAttributedString *coloredTitle = [title mutableCopy];
+
     if (self.isEnabled) {
         [coloredTitle addAttribute:NSForegroundColorAttributeName
                              value:[NSColor whiteColor]
