@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>    /* DVB-specific things */
 #include <vlc_demux.h>
+#include <vlc_input.h>
 
 #include "ts_pid.h"
 #include "ts_streams.h"
@@ -388,6 +389,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
 
+    vlc_dictionary_init( &p_sys->attachments, 0 );
+
     p_sys->patfix.i_first_dts = -1;
     p_sys->patfix.i_timesourcepid = 0;
     p_sys->patfix.status = PAT_WAITING;
@@ -525,6 +528,12 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close
  *****************************************************************************/
+static void FreeDictAttachment( void *p_value, void *p_obj )
+{
+    VLC_UNUSED(p_obj);
+    vlc_input_attachment_Delete( (input_attachment_t *) p_value );
+}
+
 static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
@@ -558,6 +567,9 @@ static void Close( vlc_object_t *p_this )
 
     /* Release all non default pids */
     ts_pid_list_Release( p_demux, &p_sys->pids );
+
+    /* Clear up attachments */
+    vlc_dictionary_clear( &p_sys->attachments, FreeDictAttachment, NULL );
 
     free( p_sys );
 }
@@ -1117,6 +1129,36 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_GET_SIGNAL:
         return vlc_stream_vaControl( p_sys->stream, STREAM_GET_SIGNAL, args );
+
+    case DEMUX_GET_ATTACHMENTS:
+    {
+        input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t *** );
+        int *pi_int = va_arg( args, int * );
+
+        *pi_int = vlc_dictionary_keys_count( &p_sys->attachments );
+        if( *pi_int <= 0 )
+            return VLC_EGENERIC;
+
+        *ppp_attach = malloc( sizeof(input_attachment_t*) * *pi_int );
+        if( !*ppp_attach )
+            return VLC_EGENERIC;
+
+        *pi_int = 0;
+        for( int i = 0; i < p_sys->attachments.i_size; i++ )
+        {
+            for( vlc_dictionary_entry_t *p_entry = p_sys->attachments.p_entries[i];
+                                         p_entry; p_entry = p_entry->p_next )
+            {
+                msg_Err(p_demux, "GET ATTACHMENT %s", p_entry->psz_key);
+                (*ppp_attach)[*pi_int] = vlc_input_attachment_Duplicate(
+                                                (input_attachment_t *) p_entry->p_value );
+                if( (*ppp_attach)[*pi_int] )
+                    (*pi_int)++;
+            }
+        }
+
+        return VLC_SUCCESS;
+    }
 
     default:
         break;

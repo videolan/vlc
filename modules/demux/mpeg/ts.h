@@ -120,6 +120,9 @@ struct demux_sys_t
 
     vdr_info_t  vdr;
 
+    /* downloadable content */
+    vlc_dictionary_t attachments;
+
     /* */
     bool        b_start_record;
 };
