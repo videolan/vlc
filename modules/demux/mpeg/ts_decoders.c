@@ -66,6 +66,7 @@ static void ts_dvbpsi_RawSubDecoderGatherSections( dvbpsi_t *p_dvbpsi,
 
     /* Add to linked list of sections */
     (void) dvbpsi_decoder_psi_section_add( DVBPSI_DECODER(p_decoder), p_section );
+    p_decoder->i_last_section_number = p_section->i_last_number;
 
     /* Check if we have all the sections */
     if ( dvbpsi_decoder_psi_sections_completed( DVBPSI_DECODER(p_decoder) ) )
