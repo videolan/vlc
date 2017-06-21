@@ -278,8 +278,12 @@ tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc, VADisplay *vadpy)
         return 0;
     }
 
-    return opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_NV12,
-                                       fmt->space);
+    GLuint fshader =
+        opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_NV12,
+                                    fmt->space);
+    if (fshader == 0)
+        vlc_vaapi_ReleaseInstance(priv->vadpy);
+    return fshader;
 #undef GETPROC
 }
 
