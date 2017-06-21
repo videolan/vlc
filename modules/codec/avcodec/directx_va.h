@@ -111,7 +111,8 @@ typedef struct
      * Create the DirectX surfaces in hw_surface and the decoder in decoder
      */
     int (*pf_create_decoder_surfaces)(vlc_va_t *, int codec_id,
-                                      const video_format_t *fmt);
+                                      const video_format_t *fmt,
+                                      unsigned surface_count);
     /**
      * Destroy resources allocated with the surfaces and the associated decoder
      */

@@ -282,10 +282,12 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
 {
     int surface_alignment = 16;
     unsigned surface_count = 2;
+    unsigned i = dx_sys->surface_count;
+    int err = VLC_EGENERIC;
 
     if (dx_sys->width == avctx->coded_width && dx_sys->height == avctx->coded_height
      && dx_sys->decoder != NULL)
-        goto ok;
+        goto done;
 
     /* */
     DestroyVideoDecoder(va, dx_sys);
@@ -324,8 +326,6 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
     if (surface_count > MAX_SURFACE_COUNT)
         return VLC_EGENERIC;
 
-    dx_sys->surface_count = surface_count;
-
 #define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
     dx_sys->width  = avctx->coded_width;
     dx_sys->height = avctx->coded_height;
@@ -340,7 +340,7 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
     fmt.i_frame_rate = avctx->framerate.num;
     fmt.i_frame_rate_base = avctx->framerate.den;
 
-    if (dx_sys->pf_create_decoder_surfaces(va, dx_sys->codec_id, &fmt))
+    if (dx_sys->pf_create_decoder_surfaces(va, dx_sys->codec_id, &fmt, surface_count))
         return VLC_EGENERIC;
 
     if (avctx->coded_width != dx_sys->surface_width ||
@@ -349,21 +349,23 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
                   dx_sys->surface_width, dx_sys->surface_height,
                   avctx->coded_width, avctx->coded_height);
 
-    for (unsigned i = 0; i < dx_sys->surface_count; i++) {
+    for (i = 0; i < surface_count; i++) {
         vlc_va_surface_t *surface = malloc(sizeof(*surface));
         if (unlikely(surface==NULL))
         {
-            dx_sys->surface_count = i;
-            return VLC_ENOMEM;
+            err = VLC_ENOMEM;
+            goto done;
         }
         atomic_init(&surface->refcount, 1);
         dx_sys->surface[i] = surface;
     }
 
     dx_sys->pf_setup_avcodec_ctx(va);
+    err = VLC_SUCCESS;
 
-ok:
-    return VLC_SUCCESS;
+done:
+    dx_sys->surface_count = i;
+    return err;
 }
 
 void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
