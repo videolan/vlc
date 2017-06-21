@@ -12,6 +12,6 @@ libvaapi_chroma_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBVA_CFLAGS)
 libvaapi_chroma_plugin_la_LIBADD = $(AM_LIBADD) $(LIBVA_LIBS) libvlc_vaapi_instance.la
 
 if HAVE_VAAPI
-vaapi_LTLIBRARIES = libvlc_vaapi_instance.la	\
-		    libvaapi_chroma_plugin.la
+pkglib_LTLIBRARIES += libvlc_vaapi_instance.la
+vaapi_LTLIBRARIES = libvaapi_chroma_plugin.la
 endif
