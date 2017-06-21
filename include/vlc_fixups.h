@@ -306,6 +306,14 @@ int unsetenv (const char *);
 void *aligned_alloc(size_t, size_t);
 #endif
 
+#if defined (_WIN32) && defined(__MINGW32__)
+#define aligned_free(ptr)  __mingw_aligned_free(ptr)
+#elif defined (_WIN32) && defined(_MSC_VER)
+#define aligned_free(ptr)  _aligned_free(ptr)
+#else
+#define aligned_free(ptr)  free(ptr)
+#endif
+
 #if defined(__native_client__) && defined(__cplusplus)
 # define HAVE_USELOCALE
 #endif

@@ -110,7 +110,7 @@ static void picture_DestroyFromResource( picture_t *p_picture )
  */
 static void picture_Destroy( picture_t *p_picture )
 {
-    free( p_picture->p[0].p_pixels );
+    aligned_free( p_picture->p[0].p_pixels );
     free( p_picture );
 }
 

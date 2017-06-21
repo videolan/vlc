@@ -951,7 +951,7 @@ EvasImageBuffersFree( vout_display_t *vd )
     vout_display_sys_t *sys = vd->sys;
 
     for( unsigned int i = 0; i < sys->i_nb_buffers; i++ )
-        free( sys->p_buffers[i].p[0] );
+        aligned_free( sys->p_buffers[i].p[0] );
     free( sys->p_buffers );
     sys->p_buffers = NULL;
     sys->i_nb_buffers = 0;

@@ -845,16 +845,6 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 #define container_of(ptr, type, member) \
     ((type *)(((char *)(ptr)) - offsetof(type, member)))
 
-/* Aligned memory allocator */
-
-#ifdef __MINGW32__
-# define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
-#elif defined(_MSC_VER)
-# define vlc_memalign(align, size) (_aligned_malloc(size, align))
-#else
-# define vlc_memalign(align, size) aligned_alloc(align, size)
-#endif
-
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/

@@ -58,7 +58,7 @@ static void picture_pool_Destroy(picture_pool_t *pool)
 
     vlc_cond_destroy(&pool->wait);
     vlc_mutex_destroy(&pool->lock);
-    free(pool);
+    aligned_free(pool);
 }
 
 void picture_pool_Release(picture_pool_t *pool)
