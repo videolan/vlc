@@ -448,6 +448,7 @@ static int Open(vlc_object_t *p_this)
     }
     catch (const std::bad_alloc& )
     {
+        p_intf = NULL;
         goto error;
     }
 
