@@ -323,6 +323,13 @@ enum demux_query_e
     DEMUX_NAV_POPUP,
     /** Activate disc Root Menu. Can fail */
     DEMUX_NAV_MENU,            /* res=can fail */
+    /** Enable/Disable a demux filter
+     * \warning This has limited support, and is likely to break if more than
+     * a single demux_filter is present in the chain. This is not guaranteed to
+     * work in future VLC versions, nor with all demux filters
+     */
+    DEMUX_FILTER_ENABLE,
+    DEMUX_FILTER_DISABLE
 };
 
 /*************************************************************************

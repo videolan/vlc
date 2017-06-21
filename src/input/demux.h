@@ -41,5 +41,7 @@ int demux_GetTitle( demux_t * );
 int demux_GetSeekpoint( demux_t * );
 
 demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_name );
+bool demux_FilterEnable( demux_t *p_demux_chain, const char* psz_demux );
+bool demux_FilterDisable( demux_t *p_demux_chain, const char* psz_demux );
 
 #endif

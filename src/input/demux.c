@@ -487,6 +487,8 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_NAV_RIGHT:
         case DEMUX_NAV_POPUP:
         case DEMUX_NAV_MENU:
+        case DEMUX_FILTER_ENABLE:
+        case DEMUX_FILTER_DISABLE:
             return VLC_EGENERIC;
 
         case DEMUX_SET_TITLE:
@@ -628,4 +630,32 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
     }
 
     return p_demux;
+}
+
+static bool demux_filter_enable_disable( demux_t *p_demux_chain,
+                                          const char* psz_demux, bool b_enable )
+{
+    demux_t *p_demux = p_demux_chain;
+    while ( p_demux )
+    {
+        if( strcmp( module_get_name( p_demux->p_module, false ), psz_demux) == 0 ||
+            strcmp( module_get_name( p_demux->p_module, true ), psz_demux ) == 0 )
+        {
+            demux_Control( p_demux,
+                           b_enable ? DEMUX_FILTER_ENABLE : DEMUX_FILTER_DISABLE );
+            return true;
+        }
+        p_demux = p_demux->p_next;
+    }
+    return false;
+}
+
+bool demux_FilterEnable( demux_t *p_demux_chain, const char* psz_demux )
+{
+    return demux_filter_enable_disable( p_demux_chain, psz_demux, true );
+}
+
+bool demux_FilterDisable( demux_t *p_demux_chain, const char* psz_demux )
+{
+    return demux_filter_enable_disable( p_demux_chain, psz_demux, false );
 }

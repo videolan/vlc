@@ -1871,6 +1871,16 @@ static void ControlUpdateSout( input_thread_t *p_input, const char* psz_chain )
     es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESTART_ALL_ES );
 }
 
+static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_demux_chain )
+{
+    input_source_t *p_inputSource = input_priv(p_input)->master;
+    demux_t *p_filtered_demux = demux_FilterChainNew( p_inputSource->p_demux, psz_demux_chain );
+    if ( p_filtered_demux != NULL )
+        p_inputSource->p_demux = p_filtered_demux;
+    else if ( psz_demux_chain != NULL )
+        msg_Dbg(p_input, "Failed to create demux filter %s", psz_demux_chain);
+}
+
 static bool Control( input_thread_t *p_input,
                      int i_type, vlc_value_t val )
 {
