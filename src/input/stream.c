@@ -210,10 +210,13 @@ char *vlc_stream_ReadLine( stream_t *s )
             if( psz_encoding != NULL )
             {
                 msg_Dbg( s, "UTF-16 BOM detected" );
-                priv->text.char_width = 2;
                 priv->text.conv = vlc_iconv_open( "UTF-8", psz_encoding );
-                if( priv->text.conv == (vlc_iconv_t)-1 )
+                if( unlikely(priv->text.conv == (vlc_iconv_t)-1) )
+                {
                     msg_Err( s, "iconv_open failed" );
+                    goto error;
+                }
+                priv->text.char_width = 2;
             }
         }
 
