@@ -453,7 +453,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     return VLC_SUCCESS;
 
 error:
-    Close(va, ctx);
+    Close(va, NULL);
     return err;
 }
 
