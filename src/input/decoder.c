@@ -1871,7 +1871,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 /* */
 static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt )
 {
-    if (fmt->i_codec != VLC_FOURCC('u','n','d','f')) {
+    if (fmt->i_codec != VLC_FOURCC('u','n','d','f') && fmt->i_codec) {
         const char *desc = vlc_fourcc_GetDescription(fmt->i_cat, fmt->i_codec);
         if (!desc || !*desc)
             desc = N_("No description for this codec");
