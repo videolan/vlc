@@ -163,8 +163,7 @@ void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
     va_pool->pf_destroy_device(va);
 }
 
-int va_pool_Open(vlc_va_t *va, va_pool_t *va_pool,
-                    AVCodecContext *ctx, const es_format_t *fmt)
+int va_pool_Open(vlc_va_t *va, va_pool_t *va_pool, AVCodecContext *ctx)
 {
     va_pool->codec_id = ctx->codec_id;
 

@@ -330,7 +330,7 @@ int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
         msg_Dbg(va, "DLLs loaded");
     }
 
-    if (va_pool_Open(va, &dx_sys->va_pool, ctx, fmt) != VLC_SUCCESS)
+    if (va_pool_Open(va, &dx_sys->va_pool, ctx) != VLC_SUCCESS)
         goto error;
 
     /* */
