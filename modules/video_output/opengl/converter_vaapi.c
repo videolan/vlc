@@ -45,13 +45,10 @@ struct priv
 {
     VADisplay vadpy;
     VASurfaceID *va_surface_ids;
-    PFNEGLCREATEIMAGEKHRPROC            eglCreateImageKHR;
-    PFNEGLDESTROYIMAGEKHRPROC           eglDestroyImageKHR;
     PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
 #ifdef HAVE_VA_X11
     Display *x11dpy;
 #endif
-    EGLDisplay egldpy;
 
     video_color_space_t yuv_space;
     unsigned fourcc;
@@ -66,10 +63,13 @@ struct priv
 };
 
 static void
-vaegl_release_last_pic(vlc_object_t *o, struct priv *priv)
+vaegl_release_last_pic(const opengl_tex_converter_t *tc, struct priv *priv)
 {
+    vlc_object_t *o = VLC_OBJECT(tc->gl);
+    vlc_gl_t *gl = tc->gl;
+
     for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
-        priv->eglDestroyImageKHR(priv->egldpy, priv->last.egl_images[i]);
+        gl->egl.destroyImageKHR(gl, priv->last.egl_images[i]);
 
     vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, priv->last.va_image.buf);
 
@@ -130,6 +130,7 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     (void) plane_offset;
     struct priv *priv = tc->priv;
     vlc_object_t *o = VLC_OBJECT(tc->gl);
+    vlc_gl_t *gl = tc->gl;
     VAImage va_image;
     VABufferInfo va_buffer_info;
     EGLImageKHR egl_images[3] = { };
@@ -177,9 +178,8 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
             EGL_NONE
         };
 
-        egl_images[i] = priv->eglCreateImageKHR(priv->egldpy, EGL_NO_CONTEXT,
-                                                EGL_LINUX_DMA_BUF_EXT, NULL,
-                                                attribs);
+        egl_images[i] = gl->egl.createImageKHR(gl, EGL_LINUX_DMA_BUF_EXT, NULL,
+                                               attribs);
         if (egl_images[i] == NULL)
             goto error;
 
@@ -191,7 +191,7 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     if (pic != priv->last.pic)
     {
         if (priv->last.pic != NULL)
-            vaegl_release_last_pic(o, priv);
+            vaegl_release_last_pic(tc, priv);
         priv->last.pic = picture_Hold(pic);
         priv->last.va_image = va_image;
         priv->last.va_buffer_info = va_buffer_info;
@@ -208,7 +208,7 @@ error:
             vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
 
         for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
-            priv->eglDestroyImageKHR(priv->egldpy, egl_images[i]);
+            gl->egl.destroyImageKHR(gl, egl_images[i]);
 
         vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
     }
@@ -221,7 +221,7 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
     struct priv *priv = tc->priv;
 
     if (priv->last.pic != NULL)
-        vaegl_release_last_pic(VLC_OBJECT(tc->gl), priv);
+        vaegl_release_last_pic(tc, priv);
 
     vlc_vaapi_ReleaseInstance(priv->vadpy);
 
@@ -235,10 +235,6 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
 static GLuint
 tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc, VADisplay *vadpy)
 {
-#define GETPROC(x) do { \
-    if ((priv->x = vlc_gl_GetProcAddress(tc->gl, #x)) == NULL) return -1; \
-} while(0)
-
     if (vadpy == NULL)
         return 0;
     struct priv *priv = tc->priv;
@@ -249,22 +245,17 @@ tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc, VADisplay *vadpy)
     if (!HasExtension(tc->glexts, "GL_OES_EGL_image"))
         return 0;
 
-    void *(*func)() = vlc_gl_GetProcAddress(tc->gl, "eglGetCurrentDisplay");
-    priv->egldpy = func ? func() : NULL;
-    if (priv->egldpy == NULL)
-        return 0;
-
-    func = vlc_gl_GetProcAddress(tc->gl, "eglQueryString");
-    const char *eglexts = func ? func(priv->egldpy, EGL_EXTENSIONS) : "";
-    if (!HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
+    const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
+    if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
         return 0;
 
     if (vaegl_init_fourcc(tc, priv, VA_FOURCC_NV12))
         return 0;
 
-    GETPROC(eglCreateImageKHR);
-    GETPROC(eglDestroyImageKHR);
-    GETPROC(glEGLImageTargetTexture2DOES);
+    priv->glEGLImageTargetTexture2DOES =
+        vlc_gl_GetProcAddress(tc->gl, "glEGLImageTargetTexture2DOES");
+    if (priv->glEGLImageTargetTexture2DOES == NULL)
+        return 0;
 
     tc->pf_update  = tc_vaegl_update;
     tc->pf_release = tc_vaegl_release;
@@ -284,7 +275,6 @@ tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc, VADisplay *vadpy)
     if (fshader == 0)
         vlc_vaapi_ReleaseInstance(priv->vadpy);
     return fshader;
-#undef GETPROC
 }
 
 static picture_pool_t *
@@ -306,7 +296,9 @@ tc_va_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
 GLuint
 opengl_tex_converter_vaapi_init(video_format_t *fmt, opengl_tex_converter_t *tc)
 {
-    if (fmt->i_chroma != VLC_CODEC_VAAPI_420)
+    if (fmt->i_chroma != VLC_CODEC_VAAPI_420 || tc->gl->ext != VLC_GL_EXT_EGL
+     || tc->gl->egl.createImageKHR == NULL
+     || tc->gl->egl.destroyImageKHR == NULL)
         return 0;
 
     GLuint fshader = 0;
