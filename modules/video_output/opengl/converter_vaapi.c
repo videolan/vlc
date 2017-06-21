@@ -38,14 +38,7 @@
 
 #ifdef HAVE_VA_X11
 # include <va/va_x11.h>
-/* TODO ugly way to get the X11 Display via EGL. */
-struct vlc_gl_sys_t
-{
-    EGLDisplay display;
-    EGLSurface surface;
-    EGLContext context;
-    Display *x11;
-};
+# include <vlc_xlib.h>
 #endif
 
 struct priv
@@ -55,6 +48,9 @@ struct priv
     PFNEGLCREATEIMAGEKHRPROC            eglCreateImageKHR;
     PFNEGLDESTROYIMAGEKHRPROC           eglDestroyImageKHR;
     PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
+#ifdef HAVE_VA_X11
+    Display *x11dpy;
+#endif
     EGLDisplay egldpy;
 
     video_color_space_t yuv_space;
@@ -229,12 +225,15 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
 
     vlc_vaapi_ReleaseInstance(priv->vadpy);
 
+#ifdef HAVE_VA_X11
+    if (priv->x11dpy != NULL)
+        XCloseDisplay(priv->x11dpy);
+#endif
     free(tc->priv);
 }
 
 static GLuint
-tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc,
-              struct priv *priv, VADisplay *vadpy)
+tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc, VADisplay *vadpy)
 {
 #define GETPROC(x) do { \
     if ((priv->x = vlc_gl_GetProcAddress(tc->gl, #x)) == NULL) return -1; \
@@ -242,6 +241,7 @@ tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc,
 
     if (vadpy == NULL)
         return 0;
+    struct priv *priv = tc->priv;
     priv->vadpy = vadpy;
     priv->fourcc = 0;
     priv->yuv_space = fmt->space;
@@ -305,39 +305,55 @@ opengl_tex_converter_vaapi_init(video_format_t *fmt, opengl_tex_converter_t *tc)
     if (fmt->i_chroma != VLC_CODEC_VAAPI_420)
         return 0;
 
-    struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
-    if (unlikely(priv == NULL))
-        return VLC_ENOMEM;
-
     GLuint fshader = 0;
     switch (tc->gl->surface->type)
     {
 #ifdef HAVE_VA_X11
         case VOUT_WINDOW_TYPE_XID:
         {
-            struct vlc_gl_sys_t *glsys = tc->gl->sys;
-            fshader = tc_vaegl_init(fmt, tc, priv, vaGetDisplay(glsys->x11));
+            if (!vlc_xlib_init(VLC_OBJECT(tc->gl)))
+                return VLC_EGENERIC;
+            Display *x11dpy = XOpenDisplay(tc->gl->surface->display.x11);
+            if (x11dpy == NULL)
+                return VLC_EGENERIC;
+
+            struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
+            if (unlikely(tc->priv == NULL))
+            {
+                XCloseDisplay(x11dpy);
+                return VLC_ENOMEM;
+            }
+
+            fshader = tc_vaegl_init(fmt, tc, vaGetDisplay(x11dpy));
+            if (fshader == 0)
+            {
+                XCloseDisplay(x11dpy);
+                free(tc->priv);
+                return 0;
+            }
+            priv->x11dpy = x11dpy;
             break;
         }
 #endif
 #ifdef HAVE_VA_WL
         case VOUT_WINDOW_TYPE_WAYLAND:
-            fshader = tc_vaegl_init(fmt, tc, priv,
+            tc->priv = calloc(1, sizeof(struct priv));
+            if (unlikely(tc->priv == NULL))
+                return VLC_ENOMEM;
+
+            fshader = tc_vaegl_init(fmt, tc,
                                     vaGetDisplayWl(tc->gl->surface->display.wl));
+            if (fshader == 0)
+            {
+                free(tc->priv);
+                return 0;
+            }
             break;
 #endif
         default:
-            goto error;
+            return VLC_EGENERIC;
     }
-    if (fshader == 0)
-        goto error;
-
-    tc->priv              = priv;
-    tc->pf_get_pool       = tc_va_get_pool;
+    tc->pf_get_pool = tc_va_get_pool;
 
     return fshader;
-
-error:
-    free(priv);
-    return 0;
 }
