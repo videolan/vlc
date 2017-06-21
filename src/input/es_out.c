@@ -193,7 +193,8 @@ static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_da
 static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date );
 static void EsOutProgramsChangeRate( es_out_t *out );
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced );
-static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta );
+static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta );
+static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta, const vlc_meta_t *p_progmeta );
 
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
@@ -1238,7 +1239,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
 
     if( i_group < 0 )
     {
-        EsOutMeta( out, p_meta );
+        EsOutGlobalMeta( out, p_meta );
         return;
     }
 
@@ -1271,7 +1272,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
 
     if( p_sys->p_pgrm == p_pgrm )
     {
-        EsOutMeta( out, p_meta );
+        EsOutMeta( out, NULL, p_meta );
     }
     /* */
     psz_title = vlc_meta_Get( p_meta, vlc_meta_Title);
@@ -1471,27 +1472,35 @@ static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm 
     input_SendEventProgramScrambled( p_input, p_pgrm->i_id, b_scrambled );
 }
 
-static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
+static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta, const vlc_meta_t *p_program_meta )
 {
     es_out_sys_t    *p_sys = p_out->p_sys;
     input_thread_t  *p_input = p_sys->p_input;
     input_item_t *p_item = input_GetItem( p_input );
 
-    if( vlc_meta_Get( p_meta, vlc_meta_Title ) != NULL )
-        input_item_SetName( p_item, vlc_meta_Get( p_meta, vlc_meta_Title ) );
-
-    char *psz_arturl = NULL;
-    if( vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL ) != NULL )
-        psz_arturl = input_item_GetArtURL( p_item ); /* save value */
-
     vlc_mutex_lock( &p_item->lock );
-    vlc_meta_Merge( p_item->p_meta, p_meta );
+    if( p_meta )
+        vlc_meta_Merge( p_item->p_meta, p_meta );
     vlc_mutex_unlock( &p_item->lock );
 
-    if( psz_arturl != NULL ) /* restore/favor previously set item art URL */
+    /* Check program meta to not override GROUP_META values */
+    if( (!p_program_meta || vlc_meta_Get( p_program_meta, vlc_meta_Title ) == NULL) &&
+         vlc_meta_Get( p_meta, vlc_meta_Title ) != NULL )
+        input_item_SetName( p_item, vlc_meta_Get( p_meta, vlc_meta_Title ) );
+
+    const char *psz_arturl = NULL;
+    char *psz_alloc = NULL;
+
+    if( p_program_meta )
+        psz_arturl = vlc_meta_Get( p_program_meta, vlc_meta_ArtworkURL );
+    if( psz_arturl == NULL && p_meta )
+        psz_arturl = vlc_meta_Get( p_meta, vlc_meta_ArtworkURL );
+
+    if( psz_arturl == NULL ) /* restore/favor previously set item art URL */
+        psz_arturl = psz_alloc = input_item_GetArtURL( p_item );
+
+    if( psz_arturl != NULL )
         input_item_SetArtURL( p_item, psz_arturl );
-    else
-        psz_arturl = input_item_GetArtURL( p_item );
 
     if( psz_arturl != NULL && !strncmp( psz_arturl, "attachment://", 13 ) )
     {   /* Clear art cover if streaming out.
@@ -1501,12 +1510,19 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
         else
             input_ExtractAttachmentAndCacheArt( p_input, psz_arturl + 13 );
     }
-    free( psz_arturl );
+    free( psz_alloc );
 
     input_item_SetPreparsed( p_item, true );
 
     input_SendEventMeta( p_input );
     /* TODO handle sout meta ? */
+}
+
+static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
+{
+    es_out_sys_t    *p_sys = p_out->p_sys;
+    EsOutMeta( p_out, p_meta,
+               (p_sys->p_pgrm && p_sys->p_pgrm->p_meta) ? p_sys->p_pgrm->p_meta : NULL );
 }
 
 static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out_id_t *p_master )
@@ -2543,7 +2559,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     {
         const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
-        EsOutMeta( out, p_meta );
+        EsOutGlobalMeta( out, p_meta );
         return VLC_SUCCESS;
     }
 
