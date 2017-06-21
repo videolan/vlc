@@ -19,7 +19,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCAddonsWindowController.h gui/macosx/VLCAddonsWindowController.m \
 	gui/macosx/applescript.h gui/macosx/applescript.m \
 	gui/macosx/AppleRemote.h gui/macosx/AppleRemote.m \
-	gui/macosx/CompatibilityFixes.h \
+	gui/macosx/CompatibilityFixes.h gui/macosx/CompatibilityFixes.m \
 	gui/macosx/VLCControlsBarCommon.m gui/macosx/VLCControlsBarCommon.h \
 	gui/macosx/VLCDocumentController.m gui/macosx/VLCDocumentController.h \
 	gui/macosx/VLCMainWindowControlsBar.m gui/macosx/VLCMainWindowControlsBar.h \

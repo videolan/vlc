@@ -22,37 +22,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "CompatibilityFixes.h"
+#import <objc/runtime.h>
 
-#pragma mark -
-#pragma OS detection code
-#define OSX_LION_AND_HIGHER (NSAppKitVersionNumber >= 1115.2)
-#define OSX_MOUNTAIN_LION_AND_HIGHER (NSAppKitVersionNumber >= 1162)
-#define OSX_MAVERICKS_AND_HIGHER (NSAppKitVersionNumber >= 1244)
-#define OSX_YOSEMITE_AND_HIGHER (NSAppKitVersionNumber >= 1334)
-#define OSX_EL_CAPITAN_AND_HIGHER (NSAppKitVersionNumber >= 1404)
-#define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
+/**
+ Swaps out the implementation of the method at @c selector in Class @c cls
+ with the implementation of that method from the superclass.
+ 
+ @param cls         The class which this selector belongs to
+ @param selector    The selector of whom to swap the implementation
+ 
+ @note  The @c cls must be a subclass of another class and both
+        must implement the @c selector for this function to work as expected!
+ */
+void swapoutOverride(Class cls, SEL selector)
+{
+    Method subclassMeth = class_getInstanceMethod(cls, selector);
+    IMP baseImp = class_getMethodImplementation([cls superclass], selector);
 
-// Sierra only APIs
-#ifndef MAC_OS_X_VERSION_10_12
-
-typedef NS_OPTIONS(NSUInteger, NSStatusItemBehavior) {
-
-    NSStatusItemBehaviorRemovalAllowed = (1 << 1),
-    NSStatusItemBehaviorTerminationOnRemoval = (1 << 2),
-};
-
-@interface NSStatusItem(IntroducedInSierra)
-
-@property (assign) NSStatusItemBehavior behavior;
-@property (assign, getter=isVisible) BOOL visible;
-@property (null_resettable, copy) NSString *autosaveName;
-
-@end
-
-typedef NSUInteger NSWindowStyleMask;
-
-#endif
-
-void swapoutOverride(Class cls, SEL selector);
-
+    if (subclassMeth && baseImp)
+        method_setImplementation(subclassMeth, baseImp);
+}
