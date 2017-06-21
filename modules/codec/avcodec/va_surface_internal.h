@@ -36,8 +36,6 @@
 typedef struct
 {
     int          codec_id;
-    int          width;
-    int          height;
 
     /* */
     unsigned     surface_count;

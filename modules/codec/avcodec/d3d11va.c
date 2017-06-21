@@ -860,8 +860,8 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     {
         D3D11_TEXTURE2D_DESC texDesc;
         ZeroMemory(&texDesc, sizeof(texDesc));
-        texDesc.Width = dx_sys->va_pool.surface_width;
-        texDesc.Height = dx_sys->va_pool.surface_height;
+        texDesc.Width = fmt->i_width;
+        texDesc.Height = fmt->i_height;
         texDesc.MipLevels = 1;
         texDesc.Format = sys->render;
         texDesc.SampleDesc.Count = 1;
@@ -905,7 +905,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         }
     }
     msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d)",
-            surface_count, dx_sys->va_pool.surface_width, dx_sys->va_pool.surface_height);
+            surface_count, fmt->i_width, fmt->i_height);
 
     D3D11_VIDEO_DECODER_DESC decoderDesc;
     ZeroMemory(&decoderDesc, sizeof(decoderDesc));

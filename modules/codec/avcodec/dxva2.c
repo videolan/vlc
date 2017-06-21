@@ -657,8 +657,8 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     HRESULT hr;
 
     hr = IDirectXVideoDecoderService_CreateSurface(sys->d3ddec,
-                                                         sys->va_pool.surface_width,
-                                                         sys->va_pool.surface_height,
+                                                         fmt->i_width,
+                                                         fmt->i_width,
                                                          surface_count - 1,
                                                          p_sys->render,
                                                          D3DPOOL_DEFAULT,
@@ -671,12 +671,12 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
         return VLC_EGENERIC;
     }
     msg_Dbg(va, "IDirectXVideoAccelerationService_CreateSurface succeed with %d surfaces (%dx%d)",
-            surface_count, sys->va_pool.surface_width, sys->va_pool.surface_height);
+            surface_count, fmt->i_width, fmt->i_height);
 
     IDirect3DSurface9 *tstCrash;
     hr = IDirectXVideoDecoderService_CreateSurface(sys->d3ddec,
-                                                         sys->va_pool.surface_width,
-                                                         sys->va_pool.surface_height,
+                                                         fmt->i_width,
+                                                         fmt->i_width,
                                                          0,
                                                          p_sys->render,
                                                          D3DPOOL_DEFAULT,
