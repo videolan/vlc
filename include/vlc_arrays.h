@@ -473,6 +473,16 @@ vlc_dictionary_keys_count( const vlc_dictionary_t * p_dict )
     return count;
 }
 
+static inline bool
+vlc_dictionary_is_empty( const vlc_dictionary_t * p_dict )
+{
+    if( p_dict->p_entries )
+        for( int i = 0; i < p_dict->i_size; i++ )
+            if( p_dict->p_entries[i] )
+                return false;
+    return true;
+}
+
 static inline char **
 vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
 {

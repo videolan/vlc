@@ -74,6 +74,7 @@ int main (void)
     vlc_dictionary_init( &dict, 0 );
 
     assert( vlc_dictionary_keys_count( &dict ) == 0 );
+    assert( vlc_dictionary_is_empty( &dict ) );
 
     keys = vlc_dictionary_all_keys( &dict );
     assert( keys && !keys[0] );
@@ -89,6 +90,7 @@ int main (void)
             assert( !vlc_dictionary_has_key(&dict, our_keys[j]) );
     }
 
+    assert( !vlc_dictionary_is_empty( &dict ) );
     test_dictionary_validity( &dict, our_keys, size );
 
     vlc_dictionary_remove_value_for_key( &dict, our_keys[size-1], NULL, NULL );
@@ -98,5 +100,6 @@ int main (void)
     vlc_dictionary_clear( &dict, NULL, NULL );
 
     assert( vlc_dictionary_keys_count( &dict ) == 0 );
+    assert( vlc_dictionary_is_empty( &dict ) );
     return 0;
 }

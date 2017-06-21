@@ -616,13 +616,13 @@ static void ProcessEvents( intf_thread_t *p_intf,
         free( p_events[i] );
     }
 
-    if( vlc_dictionary_keys_count( &player_properties ) )
+    if( !vlc_dictionary_is_empty( &player_properties ) )
         PlayerPropertiesChangedEmit( p_intf, &player_properties );
 
-    if( vlc_dictionary_keys_count( &tracklist_properties ) )
+    if( !vlc_dictionary_is_empty( &tracklist_properties ) )
         TrackListPropertiesChangedEmit( p_intf, &tracklist_properties );
 
-    if( vlc_dictionary_keys_count( &root_properties ) )
+    if( !vlc_dictionary_is_empty( &root_properties ) )
         RootPropertiesChangedEmit( p_intf, &root_properties );
 
     vlc_dictionary_clear( &player_properties,    NULL, NULL );
