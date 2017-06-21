@@ -893,7 +893,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
             return VLC_EGENERIC;
         }
 
-        int surface_count = dx_sys->surface_count;
+        unsigned surface_count = dx_sys->surface_count;
         for (dx_sys->surface_count = 0; dx_sys->surface_count < surface_count; dx_sys->surface_count++) {
             sys->extern_pics[dx_sys->surface_count] = NULL;
             viewDesc.Texture2D.ArraySlice = dx_sys->surface_count;
@@ -997,7 +997,7 @@ static void DxDestroySurfaces(vlc_va_t *va)
         ID3D11Resource_Release(p_texture);
         ID3D11Resource_Release(p_texture);
     }
-    for (int i = 0; i < dx_sys->surface_count; i++)
+    for (unsigned i = 0; i < dx_sys->surface_count; i++)
     {
         ID3D11VideoDecoderOutputView_Release( dx_sys->hw_surface[i] );
         for (int j = 0; j < D3D11_MAX_SHADER_VIEW; j++)

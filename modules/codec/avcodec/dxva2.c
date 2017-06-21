@@ -677,7 +677,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
                                                          NULL);
     if (FAILED(hr)) {
         msg_Err(va, "extra buffer impossible, avoid a crash (hr=0x%0lx)", hr);
-        for (int i = 0; i < sys->surface_count; i++)
+        for (unsigned i = 0; i < sys->surface_count; i++)
             IDirect3DSurface9_Release( sys->hw_surface[i] );
         sys->surface_count = 0;
         return VLC_EGENERIC;
@@ -721,7 +721,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
                                                                     &cfg_count,
                                                                     &cfg_list))) {
         msg_Err(va, "IDirectXVideoDecoderService_GetDecoderConfigurations failed");
-        for (int i = 0; i < sys->surface_count; i++)
+        for (unsigned i = 0; i < sys->surface_count; i++)
             IDirect3DSurface9_Release( sys->hw_surface[i] );
         sys->surface_count = 0;
         return VLC_EGENERIC;
@@ -769,7 +769,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
                                                               sys->surface_count,
                                                               &decoder))) {
         msg_Err(va, "IDirectXVideoDecoderService_CreateVideoDecoder failed");
-        for (int i = 0; i < sys->surface_count; i++)
+        for (unsigned i = 0; i < sys->surface_count; i++)
             IDirect3DSurface9_Release( sys->hw_surface[i] );
         sys->surface_count = 0;
         return VLC_EGENERIC;

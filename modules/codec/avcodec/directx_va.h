@@ -76,7 +76,7 @@ typedef struct
     D3D_DecoderType        *decoder;
 
     /* */
-    int          surface_count;
+    unsigned     surface_count;
     int          surface_width;
     int          surface_height;
 

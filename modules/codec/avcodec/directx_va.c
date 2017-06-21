@@ -281,7 +281,7 @@ char *directx_va_GetDecoderName(const GUID *guid)
 int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
 {
     int surface_alignment = 16;
-    int surface_count = 2;
+    unsigned surface_count = 2;
 
     if (dx_sys->width == avctx->coded_width && dx_sys->height == avctx->coded_height
      && dx_sys->decoder != NULL)
@@ -349,7 +349,7 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
                   dx_sys->surface_width, dx_sys->surface_height,
                   avctx->coded_width, avctx->coded_height);
 
-    for (int i = 0; i < dx_sys->surface_count; i++) {
+    for (unsigned i = 0; i < dx_sys->surface_count; i++) {
         vlc_va_surface_t *surface = malloc(sizeof(*surface));
         if (unlikely(surface==NULL))
         {
@@ -370,7 +370,7 @@ void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
 {
     dx_sys->pf_destroy_surfaces(va);
 
-    for (int i = 0; i < dx_sys->surface_count; i++)
+    for (unsigned i = 0; i < dx_sys->surface_count; i++)
     {
         IUnknown_Release( dx_sys->hw_surface[i] );
         directx_va_Release(dx_sys->surface[i]);
@@ -381,7 +381,7 @@ void DestroyVideoDecoder(vlc_va_t *va, directx_sys_t *dx_sys)
 
 static vlc_va_surface_t *GetSurface(directx_sys_t *dx_sys)
 {
-    for (int i = 0; i < dx_sys->surface_count; i++) {
+    for (unsigned i = 0; i < dx_sys->surface_count; i++) {
         vlc_va_surface_t *surface = dx_sys->surface[i];
         uintptr_t expected = 1;
 
