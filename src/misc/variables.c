@@ -340,7 +340,7 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         case VLC_VAR_FLOAT:
             p_var->ops = &float_ops;
             p_var->val.f_float = 0.f;
-            p_var->min.f_float = FLT_MIN;
+            p_var->min.f_float = -FLT_MAX;
             p_var->max.f_float = FLT_MAX;
             break;
         case VLC_VAR_COORDS:
