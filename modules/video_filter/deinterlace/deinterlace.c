@@ -279,6 +279,37 @@ static void GetOutputFormat( filter_t *p_filter,
 
 #define DEINTERLACE_DST_SIZE 3
 
+static mtime_t GetFieldDuration( metadata_history_t meta[static METADATA_SIZE],
+                                 picture_t *p_pic )
+{
+    mtime_t i_field_dur = 0;
+
+    /* Calculate one field duration. */
+    int i = 0;
+    int iend = METADATA_SIZE-1;
+    /* Find oldest valid logged date.
+       The current input frame doesn't count. */
+    for( ; i < iend; i++ )
+        if( meta[i].pi_date > VLC_TS_INVALID )
+            break;
+    if( i < iend )
+    {
+        /* Count how many fields the valid history entries
+           (except the new frame) represent. */
+        int i_fields_total = 0;
+        for( int j = i ; j < iend; j++ )
+            i_fields_total += meta[j].pi_nb_fields;
+        /* One field took this long. */
+        i_field_dur = (p_pic->date - meta[i].pi_date) / i_fields_total;
+    }
+    /* Note that we default to field duration 0 if it could not be
+       determined. This behaves the same as the old code - leaving the
+       extra output frame dates the same as p_pic->date if the last cached
+       date was not valid.
+    */
+    return i_field_dur;
+}
+
 /* This is the filter function. See Open(). */
 picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 {
@@ -356,7 +387,6 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 
     /* For framerate doublers, determine field duration and allocate
        output frames. */
-    mtime_t i_field_dur = 0;
     int i_double_rate_alloc_end = 0; /* One past last for allocated output
                                         frames in p_dst[]. Used only for
                                         framerate doublers. Will be inited
@@ -364,30 +394,6 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
                                         PTS logic needs the result. */
     if( p_sys->b_double_rate )
     {
-        /* Calculate one field duration. */
-        int i = 0;
-        int iend = METADATA_SIZE-1;
-        /* Find oldest valid logged date.
-           The current input frame doesn't count. */
-        for( ; i < iend; i++ )
-            if( p_sys->meta[i].pi_date > VLC_TS_INVALID )
-                break;
-        if( i < iend )
-        {
-            /* Count how many fields the valid history entries
-               (except the new frame) represent. */
-            int i_fields_total = 0;
-            for( int j = i ; j < iend; j++ )
-                i_fields_total += p_sys->meta[j].pi_nb_fields;
-            /* One field took this long. */
-            i_field_dur = (p_pic->date - p_sys->meta[i].pi_date) / i_fields_total;
-        }
-        /* Note that we default to field duration 0 if it could not be
-           determined. This behaves the same as the old code - leaving the
-           extra output frame dates the same as p_pic->date if the last cached
-           date was not valid.
-        */
-
         i_double_rate_alloc_end = i_nb_fields;
         if( i_nb_fields > DEINTERLACE_DST_SIZE )
         {
@@ -518,6 +524,7 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 
         if( p_sys->b_double_rate )
         {
+            mtime_t i_field_dur = GetFieldDuration( p_sys->meta, p_pic );
             /* Processing all actually allocated output frames. */
             for( int i = 1; i < i_double_rate_alloc_end; ++i )
             {
