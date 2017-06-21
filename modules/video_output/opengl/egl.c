@@ -55,6 +55,8 @@ typedef struct vlc_gl_sys_t
     struct wl_egl_window *window;
     unsigned width, height;
 #endif
+    PFNEGLCREATEIMAGEKHRPROC    eglCreateImageKHR;
+    PFNEGLDESTROYIMAGEKHRPROC   eglDestroyImageKHR;
 } vlc_gl_sys_t;
 
 static int MakeCurrent (vlc_gl_t *gl)
@@ -101,6 +103,29 @@ static void *GetSymbol(vlc_gl_t *gl, const char *procname)
 {
     (void) gl;
     return (void *)eglGetProcAddress (procname);
+}
+
+static const char *QueryString(vlc_gl_t *gl, int32_t name)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    return eglQueryString(sys->display, name);
+}
+
+static void *CreateImageKHR(vlc_gl_t *gl, unsigned target, void *buffer,
+                            const int32_t *attrib_list)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    return sys->eglCreateImageKHR(sys->display, NULL, target, buffer,
+                                  attrib_list);
+}
+
+static bool DestroyImageKHR(vlc_gl_t *gl, void *image)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    return sys->eglDestroyImageKHR(sys->display, image);
 }
 
 static bool CheckToken(const char *haystack, const char *needle)
@@ -211,6 +236,8 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     gl->sys = sys;
     sys->display = EGL_NO_DISPLAY;
     sys->surface = EGL_NO_SURFACE;
+    sys->eglCreateImageKHR = NULL;
+    sys->eglDestroyImageKHR = NULL;
 
     vout_window_t *wnd = gl->surface;
     EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
@@ -366,11 +393,22 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     sys->context = ctx;
 
     /* Initialize OpenGL callbacks */
+    gl->ext = VLC_GL_EXT_EGL;
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
     gl->resize = Resize;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
+    gl->egl.queryString = QueryString;
+
+    sys->eglCreateImageKHR = (void *)eglGetProcAddress("eglCreateImageKHR");
+    sys->eglDestroyImageKHR = (void *)eglGetProcAddress("eglDestroyImageKHR");
+    if (sys->eglCreateImageKHR != NULL && sys->eglDestroyImageKHR != NULL)
+    {
+        gl->egl.createImageKHR = CreateImageKHR;
+        gl->egl.destroyImageKHR = DestroyImageKHR;
+    }
+
     return VLC_SUCCESS;
 
 error:
