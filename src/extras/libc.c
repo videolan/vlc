@@ -382,17 +382,29 @@ vlc_iconv_t vlc_iconv_open( const char *tocode, const char *fromcode )
 size_t vlc_iconv( vlc_iconv_t cd, const char **inbuf, size_t *inbytesleft,
                   char **outbuf, size_t *outbytesleft )
 {
+    size_t ret;
+
 #ifndef __linux__
     if ( cd == (vlc_iconv_t)(-2) )
-        return ISO6937toUTF8( inbuf, inbytesleft,
-                              (unsigned char **)outbuf, outbytesleft );
+    {
+        unsigned char *out = (unsigned char *)*outbuf;
+
+        ret = ISO6937toUTF8( inbuf, inbytesleft, &out, outbytesleft );
+        *outbuf = (char *)out;
+    }
+    else
 #endif
 #if defined(HAVE_ICONV)
-    return iconv( cd, (ICONV_CONST char **)inbuf, inbytesleft,
-                  outbuf, outbytesleft );
+    {
+        ICONV_CONST char *cin = (ICONV_CONST char *)*inbuf;
+
+        ret = iconv( cd, &cin, inbytesleft, outbuf, outbytesleft );
+        *inbuf = cin;
+    }
 #else
-    abort ();
+        abort ();
 #endif
+    return ret;
 }
 
 int vlc_iconv_close( vlc_iconv_t cd )
