@@ -577,9 +577,12 @@ static void ATSC_ETT_RawCallback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t
                                   void *p_base_pid )
 {
     VLC_UNUSED( p_handle );
-    dvbpsi_atsc_ett_t *p_ett = DVBPlague_ETT_Decode( p_section );
-    if( p_ett ) /* Send to real callback */
-        ATSC_ETT_Callback( p_base_pid, p_ett );
+    for( ; p_section; p_section = p_section->p_next )
+    {
+        dvbpsi_atsc_ett_t *p_ett = DVBPlague_ETT_Decode( p_section );
+        if( p_ett ) /* Send to real callback */
+            ATSC_ETT_Callback( p_base_pid, p_ett );
+    }
 }
 
 static void ATSC_VCT_Callback( void *p_cb_basepid, dvbpsi_atsc_vct_t* p_vct )
@@ -812,9 +815,12 @@ static void ATSC_STT_RawCallback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t
                                   void *p_base_pid )
 {
     VLC_UNUSED( p_handle );
-    dvbpsi_atsc_stt_t *p_stt = DVBPlague_STT_Decode( p_section );
-    if( p_stt ) /* Send to real callback */
-        ATSC_STT_Callback( p_base_pid, p_stt );
+    for( ; p_section ; p_section = p_section->p_next )
+    {
+        dvbpsi_atsc_stt_t *p_stt = DVBPlague_STT_Decode( p_section );
+        if( p_stt ) /* Send to real callback */
+            ATSC_STT_Callback( p_base_pid, p_stt );
+    }
 }
 
 bool ATSC_Attach_Dvbpsi_Base_Decoders( dvbpsi_t *p_handle, void *p_base_pid )
