@@ -89,7 +89,7 @@ block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size )
             if(i_nalcount == i_list)
             {
                 i_list += 16;
-                struct nalmoves_e *p_new = malloc( sizeof(*p_new) * i_list );
+                struct nalmoves_e *p_new = realloc( p_list, sizeof(*p_new) * i_list );
                 if(unlikely(!p_new))
                     goto error;
                 p_list = p_new;
