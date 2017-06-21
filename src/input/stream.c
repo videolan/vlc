@@ -196,6 +196,12 @@ char *vlc_stream_ReadLine( stream_t *s )
         {
             const char *psz_encoding = NULL;
 
+            if( unlikely(priv->text.conv != (vlc_iconv_t)-1) )
+            {   /* seek back to beginning? reset */
+                vlc_iconv_close( priv->text.conv );
+                priv->text.conv = (vlc_iconv_t)-1;
+            }
+
             if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
                 psz_encoding = "UTF-16LE";
