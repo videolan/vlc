@@ -42,7 +42,8 @@ struct picture_sys_t
     };
     ID3D11DeviceContext           *context;
     unsigned                      slice_index;
-    ID3D11VideoProcessorInputView *processorInput; /* when used as processor input */
+    ID3D11VideoProcessorInputView  *processorInput;  /* when used as processor input */
+    ID3D11VideoProcessorOutputView *processorOutput; /* when used as processor output */
     ID3D11ShaderResourceView      *resourceView[D3D11_MAX_SHADER_VIEW];
     DXGI_FORMAT                   decoderFormat;
     DXGI_FORMAT                   formatTexture;
@@ -74,6 +75,8 @@ static inline void AcquirePictureSys(picture_sys_t *p_sys)
         ID3D11VideoDecoderOutputView_AddRef(p_sys->decoder);
     if (p_sys->processorInput)
         ID3D11VideoProcessorInputView_AddRef(p_sys->processorInput);
+    if (p_sys->processorOutput)
+        ID3D11VideoProcessorOutputView_AddRef(p_sys->processorOutput);
 }
 
 static inline void ReleasePictureSys(picture_sys_t *p_sys)
@@ -90,6 +93,8 @@ static inline void ReleasePictureSys(picture_sys_t *p_sys)
         ID3D11VideoDecoderOutputView_Release(p_sys->decoder);
     if (p_sys->processorInput)
         ID3D11VideoProcessorInputView_Release(p_sys->processorInput);
+    if (p_sys->processorOutput)
+        ID3D11VideoProcessorOutputView_Release(p_sys->processorOutput);
 }
 
 /* map texture planes to resource views */
