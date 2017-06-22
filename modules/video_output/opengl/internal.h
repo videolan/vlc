@@ -164,8 +164,7 @@ typedef struct opengl_tex_converter_t opengl_tex_converter_t;
  * \param fc OpenGL tex converter that needs to be filled on success
  * \return VLC_SUCCESS or a VLC error
  */
-typedef GLuint (*opengl_tex_converter_init_cb)(video_format_t *fmt,
-                                               opengl_tex_converter_t *fc);
+typedef GLuint (*opengl_tex_converter_init_cb)(opengl_tex_converter_t *fc);
 
 /*
  * Structure that is filled by an opengl_tex_converter_init_cb function
@@ -178,8 +177,9 @@ struct opengl_tex_converter_t
     const opengl_shaders_api_t *api;
     /* Available gl extensions (from GL_EXTENSIONS) */
     const char *glexts;
-    /* Set it to request a special orientation (by default = fmt.orientation) */
-    video_orientation_t orientation;
+
+    /* Can only be changed from the module open function */
+    video_format_t fmt;
 
     /* Number of textures, cannot be 0 */
     unsigned tex_count;
@@ -240,12 +240,10 @@ struct opengl_tex_converter_t
      * pictures allocated from the video_format_t will be used.
      *
      * \param fc OpenGL tex converter
-     * \param fmt video format
      * \param requested_count number of pictures to allocate
      * \return the picture pool or NULL in case of error
      */
     picture_pool_t *(*pf_get_pool)(const opengl_tex_converter_t *fc,
-                                   const video_format_t *fmt,
                                    unsigned requested_count);
 
     /*
@@ -324,29 +322,24 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space);
 
 GLuint
-opengl_tex_converter_subpictures_init(const video_format_t *,
-                                      opengl_tex_converter_t *);
+opengl_tex_converter_subpictures_init(opengl_tex_converter_t *);
 
 GLuint
-opengl_tex_converter_generic_init(video_format_t *,
-                                  opengl_tex_converter_t *);
+opengl_tex_converter_generic_init(opengl_tex_converter_t *);
 
 #ifdef __ANDROID__
 GLuint
-opengl_tex_converter_anop_init(video_format_t *,
-                               opengl_tex_converter_t *);
+opengl_tex_converter_anop_init(opengl_tex_converter_t *);
 #endif
 
 #ifdef VLCGL_CONV_CVPX
 GLuint
-opengl_tex_converter_cvpx_init(video_format_t *fmt,
-                               opengl_tex_converter_t *tc);
+opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc);
 #endif
 
 #ifdef VLCGL_CONV_VA
 GLuint
-opengl_tex_converter_vaapi_init(video_format_t *fmt,
-                                opengl_tex_converter_t *tc);
+opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc);
 #endif
 
 #endif /* include-guard */

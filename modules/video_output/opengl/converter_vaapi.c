@@ -50,7 +50,6 @@ struct priv
     Display *x11dpy;
 #endif
 
-    video_color_space_t yuv_space;
     unsigned fourcc;
     EGLint drm_fourccs[3];
 
@@ -233,14 +232,13 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
 }
 
 static GLuint
-tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc, VADisplay *vadpy)
+tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
 {
     if (vadpy == NULL)
         return 0;
     struct priv *priv = tc->priv;
     priv->vadpy = vadpy;
     priv->fourcc = 0;
-    priv->yuv_space = fmt->space;
 
     if (!HasExtension(tc->glexts, "GL_OES_EGL_image"))
         return 0;
@@ -271,21 +269,20 @@ tc_vaegl_init(video_format_t *fmt, opengl_tex_converter_t *tc, VADisplay *vadpy)
 
     GLuint fshader =
         opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_NV12,
-                                    fmt->space);
+                                    tc->fmt.space);
     if (fshader == 0)
         vlc_vaapi_ReleaseInstance(priv->vadpy);
     return fshader;
 }
 
 static picture_pool_t *
-tc_va_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-               unsigned requested_count)
+tc_va_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
 {
     struct priv *priv = tc->priv;
 
     picture_pool_t *pool =
         vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), priv->vadpy, requested_count,
-                          &priv->va_surface_ids, fmt, VA_RT_FORMAT_YUV420,
+                          &priv->va_surface_ids, &tc->fmt, VA_RT_FORMAT_YUV420,
                           VA_FOURCC_NV12);
     if (!pool)
         return NULL;
@@ -294,9 +291,9 @@ tc_va_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
 }
 
 GLuint
-opengl_tex_converter_vaapi_init(video_format_t *fmt, opengl_tex_converter_t *tc)
+opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
 {
-    if (fmt->i_chroma != VLC_CODEC_VAAPI_420 || tc->gl->ext != VLC_GL_EXT_EGL
+    if (tc->fmt.i_chroma != VLC_CODEC_VAAPI_420 || tc->gl->ext != VLC_GL_EXT_EGL
      || tc->gl->egl.createImageKHR == NULL
      || tc->gl->egl.destroyImageKHR == NULL)
         return 0;
@@ -320,7 +317,7 @@ opengl_tex_converter_vaapi_init(video_format_t *fmt, opengl_tex_converter_t *tc)
                 return VLC_ENOMEM;
             }
 
-            fshader = tc_vaegl_init(fmt, tc, vaGetDisplay(x11dpy));
+            fshader = tc_vaegl_init(tc, vaGetDisplay(x11dpy));
             if (fshader == 0)
             {
                 XCloseDisplay(x11dpy);
@@ -337,7 +334,7 @@ opengl_tex_converter_vaapi_init(video_format_t *fmt, opengl_tex_converter_t *tc)
             if (unlikely(tc->priv == NULL))
                 return VLC_ENOMEM;
 
-            fshader = tc_vaegl_init(fmt, tc,
+            fshader = tc_vaegl_init(tc,
                                     vaGetDisplayWl(tc->gl->surface->display.wl));
             if (fshader == 0)
             {

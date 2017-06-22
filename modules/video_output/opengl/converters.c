@@ -507,7 +507,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 # endif
 
 static picture_t *
-pbo_picture_create(const opengl_tex_converter_t *tc, const video_format_t *fmt,
+pbo_picture_create(const opengl_tex_converter_t *tc,
                    void (*pf_destroy)(picture_t *))
 {
     picture_sys_t *picsys = calloc(1, sizeof(*picsys));
@@ -519,13 +519,13 @@ pbo_picture_create(const opengl_tex_converter_t *tc, const video_format_t *fmt,
         .pf_destroy = pf_destroy,
     };
 
-    picture_t *pic = picture_NewFromResource(fmt, &rsc);
+    picture_t *pic = picture_NewFromResource(&tc->fmt, &rsc);
     if (pic == NULL)
     {
         free(picsys);
         return NULL;
     }
-    if (picture_Setup(pic, fmt))
+    if (picture_Setup(pic, &tc->fmt))
     {
         picture_Release(pic);
         return NULL;
@@ -583,13 +583,13 @@ picture_pbo_destroy_cb(picture_t *pic)
 }
 
 static int
-pbo_pics_alloc(const opengl_tex_converter_t *tc, const video_format_t *fmt)
+pbo_pics_alloc(const opengl_tex_converter_t *tc)
 {
     struct priv *priv = tc->priv;
     for (size_t i = 0; i < PBO_DISPLAY_COUNT; ++i)
     {
         picture_t *pic = priv->pbo.display_pics[i] =
-            pbo_picture_create(tc, fmt, picture_pbo_destroy_cb);
+            pbo_picture_create(tc, picture_pbo_destroy_cb);
         if (pic == NULL)
             goto error;
 
@@ -816,8 +816,7 @@ picture_persistent_destroy_cb(picture_t *pic)
 }
 
 static picture_pool_t *
-tc_persistent_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                       unsigned requested_count)
+tc_persistent_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
 {
     struct priv *priv = tc->priv;
     picture_t *pictures[VLCGL_PICTURE_MAX];
@@ -829,7 +828,7 @@ tc_persistent_get_pool(const opengl_tex_converter_t *tc, const video_format_t *f
     for (count = 0; count < requested_count; count++)
     {
         picture_t *pic = pictures[count] =
-            pbo_picture_create(tc, fmt, picture_persistent_destroy_cb);
+            pbo_picture_create(tc, picture_persistent_destroy_cb);
         if (pic == NULL)
             break;
 #ifndef NDEBUG
@@ -1041,22 +1040,23 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
 }
 
 static GLuint
-generic_init(video_format_t *fmt, opengl_tex_converter_t *tc, bool allow_dr)
+generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 {
     const vlc_chroma_description_t *desc =
-        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+        vlc_fourcc_GetChromaDescription(tc->fmt.i_chroma);
+    assert(desc);
     if (!desc)
         return 0;
 
     GLuint fragment_shader = 0;
-    if (fmt->i_chroma == VLC_CODEC_XYZ12)
+    if (tc->fmt.i_chroma == VLC_CODEC_XYZ12)
         fragment_shader = xyz12_shader_init(tc);
     else
     {
         video_color_space_t space;
         const vlc_fourcc_t *(*get_fallback)(vlc_fourcc_t i_fourcc);
 
-        if (vlc_fourcc_IsYUV(fmt->i_chroma))
+        if (vlc_fourcc_IsYUV(tc->fmt.i_chroma))
         {
             GLint max_texture_units = 0;
             glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
@@ -1064,7 +1064,7 @@ generic_init(video_format_t *fmt, opengl_tex_converter_t *tc, bool allow_dr)
                 return 0;
 
             get_fallback = vlc_fourcc_GetYUVFallback;
-            space = fmt->space;
+            space = tc->fmt.space;
         }
         else
         {
@@ -1072,27 +1072,27 @@ generic_init(video_format_t *fmt, opengl_tex_converter_t *tc, bool allow_dr)
             space = COLOR_SPACE_UNDEF;
         }
 
-        const vlc_fourcc_t *list = get_fallback(fmt->i_chroma);
+        const vlc_fourcc_t *list = get_fallback(tc->fmt.i_chroma);
         while (*list)
         {
             fragment_shader =
                 opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list, space);
             if (fragment_shader != 0)
             {
-                fmt->i_chroma = *list;
+                tc->fmt.i_chroma = *list;
 
-                if (fmt->i_chroma == VLC_CODEC_RGB32)
+                if (tc->fmt.i_chroma == VLC_CODEC_RGB32)
                 {
 #if defined(WORDS_BIGENDIAN)
-                    fmt->i_rmask  = 0xff000000;
-                    fmt->i_gmask  = 0x00ff0000;
-                    fmt->i_bmask  = 0x0000ff00;
+                    tc->fmt.i_rmask  = 0xff000000;
+                    tc->fmt.i_gmask  = 0x00ff0000;
+                    tc->fmt.i_bmask  = 0x0000ff00;
 #else
-                    fmt->i_rmask  = 0x000000ff;
-                    fmt->i_gmask  = 0x0000ff00;
-                    fmt->i_bmask  = 0x00ff0000;
+                    tc->fmt.i_rmask  = 0x000000ff;
+                    tc->fmt.i_gmask  = 0x0000ff00;
+                    tc->fmt.i_bmask  = 0x00ff0000;
 #endif
-                    video_format_FixRgb(fmt);
+                    video_format_FixRgb(&tc->fmt);
                 }
                 break;
             }
@@ -1139,7 +1139,7 @@ generic_init(video_format_t *fmt, opengl_tex_converter_t *tc, bool allow_dr)
         {
             const bool supports_pbo = has_pbo && tc->api->BufferData
                 && tc->api->BufferSubData;
-            if (supports_pbo && pbo_pics_alloc(tc, fmt) == VLC_SUCCESS)
+            if (supports_pbo && pbo_pics_alloc(tc) == VLC_SUCCESS)
             {
                 tc->pf_update  = tc_pbo_update;
                 tc->pf_release = tc_pbo_release;
@@ -1163,17 +1163,14 @@ error:
 }
 
 GLuint
-opengl_tex_converter_subpictures_init(const video_format_t *fmt,
-                                      opengl_tex_converter_t *tc)
+opengl_tex_converter_subpictures_init(opengl_tex_converter_t *tc)
 {
-    video_format_t sub_fmt = *fmt;
-    sub_fmt.i_chroma = VLC_CODEC_RGB32;
-    return generic_init(&sub_fmt, tc, false);
+    tc->fmt.i_chroma = VLC_CODEC_RGB32;
+    return generic_init(tc, false);
 }
 
 GLuint
-opengl_tex_converter_generic_init(video_format_t *fmt,
-                                  opengl_tex_converter_t *tc)
+opengl_tex_converter_generic_init(opengl_tex_converter_t *tc)
 {
-    return generic_init(fmt, tc, true);
+    return generic_init(tc, true);
 }

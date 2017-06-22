@@ -658,12 +658,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         .gl = vgl->gl,
         .api = &vgl->api,
         .glexts = extensions,
-        .orientation = fmt->orientation,
+        .fmt = *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    GLuint fshader = opengl_tex_converter_subpictures_init(fmt,
-                                                           &vgl->sub_prgm->tc);
+    GLuint fshader = opengl_tex_converter_subpictures_init(&vgl->sub_prgm->tc);
     int ret = opengl_link_program(vgl->sub_prgm, fshader);
     if (ret != VLC_SUCCESS)
     {
@@ -679,9 +678,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             .gl = vgl->gl,
             .api = &vgl->api,
             .glexts = extensions,
-            .orientation = fmt->orientation,
+            .fmt = *fmt,
         };
-        fshader = opengl_tex_converter_init_cbs[j](fmt, &vgl->prgm->tc);
+        fshader = opengl_tex_converter_init_cbs[j](&vgl->prgm->tc);
         ret = opengl_link_program(vgl->prgm, fshader);
         if (ret == VLC_SUCCESS)
         {
@@ -706,7 +705,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    getOrientationTransformMatrix(vgl->prgm->tc.orientation,
+    getOrientationTransformMatrix(vgl->prgm->tc.fmt.orientation,
                                   vgl->prgm->var.OrientationMatrix);
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
 
@@ -901,7 +900,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     /* Allocate with tex converter pool callback if it exists */
     if (tc->pf_get_pool != NULL)
     {
-        vgl->pool = tc->pf_get_pool(tc, &vgl->fmt, requested_count);
+        vgl->pool = tc->pf_get_pool(tc, requested_count);
         if (!vgl->pool)
             goto error;
         return vgl->pool;

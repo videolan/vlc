@@ -79,8 +79,7 @@ tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
 }
 
 static picture_pool_t *
-tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
-                 unsigned requested_count)
+tc_anop_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
 {
     struct priv *priv = tc->priv;
 #define FORCED_COUNT 31
@@ -104,7 +103,7 @@ tc_anop_get_pool(const opengl_tex_converter_t *tc, const video_format_t *fmt,
         p_picsys->hw.i_index = -1;
         vlc_mutex_init(&p_picsys->hw.lock);
 
-        picture[count] = picture_NewFromResource(fmt, &rsc);
+        picture[count] = picture_NewFromResource(&tc->fmt, &rsc);
         if (!picture[count])
         {
             free(p_picsys);
@@ -193,9 +192,9 @@ tc_anop_release(const opengl_tex_converter_t *tc)
 }
 
 GLuint
-opengl_tex_converter_anop_init(video_format_t *fmt, opengl_tex_converter_t *tc)
+opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
 {
-    if (fmt->i_chroma != VLC_CODEC_ANDROID_OPAQUE
+    if (tc->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || !tc->gl->surface->handle.anativewindow)
         return 0;
 
@@ -223,31 +222,31 @@ opengl_tex_converter_anop_init(video_format_t *fmt, opengl_tex_converter_t *tc)
     /* The transform Matrix (uSTMatrix) given by the SurfaceTexture is not
      * using the same origin than us. Ask the caller to rotate textures
      * coordinates, via the vertex shader, by forcing an orientation. */
-    switch (tc->orientation)
+    switch (tc->fmt.orientation)
     {
         case ORIENT_TOP_LEFT:
-            tc->orientation = ORIENT_BOTTOM_LEFT;
+            tc->fmt.orientation = ORIENT_BOTTOM_LEFT;
             break;
         case ORIENT_TOP_RIGHT:
-            tc->orientation = ORIENT_BOTTOM_RIGHT;
+            tc->fmt.orientation = ORIENT_BOTTOM_RIGHT;
             break;
         case ORIENT_BOTTOM_LEFT:
-            tc->orientation = ORIENT_TOP_LEFT;
+            tc->fmt.orientation = ORIENT_TOP_LEFT;
             break;
         case ORIENT_BOTTOM_RIGHT:
-            tc->orientation = ORIENT_TOP_RIGHT;
+            tc->fmt.orientation = ORIENT_TOP_RIGHT;
             break;
         case ORIENT_LEFT_TOP:
-            tc->orientation = ORIENT_RIGHT_TOP;
+            tc->fmt.orientation = ORIENT_RIGHT_TOP;
             break;
         case ORIENT_LEFT_BOTTOM:
-            tc->orientation = ORIENT_RIGHT_BOTTOM;
+            tc->fmt.orientation = ORIENT_RIGHT_BOTTOM;
             break;
         case ORIENT_RIGHT_TOP:
-            tc->orientation = ORIENT_LEFT_TOP;
+            tc->fmt.orientation = ORIENT_LEFT_TOP;
             break;
         case ORIENT_RIGHT_BOTTOM:
-            tc->orientation = ORIENT_LEFT_BOTTOM;
+            tc->fmt.orientation = ORIENT_LEFT_BOTTOM;
             break;
     }
 
