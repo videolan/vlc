@@ -900,11 +900,11 @@ static block_t *OutputPicture( decoder_t *p_dec )
     }
 
 #if 0
-    msg_Err(p_dec, "F/BOC %d/%d POC %d %d rec %d flags %x ref%d fn %d fp %d %d pts %ld",
+    msg_Err(p_dec, "F/BOC %d/%d POC %d %d rec %d flags %x ref%d fn %d fp %d %d pts %ld len %ld",
                     tFOC, bFOC, PictureOrderCount,
                     p_sys->slice.type, p_sys->b_recovered, p_pic->i_flags,
                     p_sys->slice.i_nal_ref_idc, p_sys->slice.i_frame_num, p_sys->slice.i_field_pic_flag,
-                    p_pic->i_pts - p_pic->i_dts, p_pic->i_pts % (100*CLOCK_FREQ));
+                    p_pic->i_pts - p_pic->i_dts, p_pic->i_pts % (100*CLOCK_FREQ), p_pic->i_length);
 #endif
 
     /* save for next pic fixups */
