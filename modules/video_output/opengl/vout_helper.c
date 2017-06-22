@@ -437,8 +437,6 @@ opengl_link_program(struct prgm *prgm)
 {
     opengl_tex_converter_t *tc = &prgm->tc;
 
-    assert(tc->fshader != 0 && tc->tex_target != 0 && tc->tex_count > 0);
-
     GLuint vertex_shader = BuildVertexShader(tc, tc->tex_count);
     GLuint shaders[] = { tc->fshader, vertex_shader };
 
@@ -539,6 +537,69 @@ error:
     tc->api->DeleteProgram(prgm->id);
     prgm->id = 0;
     return VLC_EGENERIC;
+}
+
+static void
+opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
+{
+    if (prgm->tc.pf_release != NULL)
+        prgm->tc.pf_release(&prgm->tc);
+    if (prgm->id != 0)
+        vgl->api.DeleteProgram(prgm->id);
+}
+
+static int
+opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
+                    const char *glexts, const video_format_t *fmt, bool subpics)
+{
+    int ret;
+    prgm->tc = (opengl_tex_converter_t) {
+        .gl = vgl->gl,
+        .api = &vgl->api,
+        .glexts = glexts,
+        .fmt = *fmt,
+    };
+
+    if (subpics)
+    {
+        prgm->tc.fmt.i_chroma = VLC_CODEC_RGB32;
+        /* Normal orientation and no projection for subtitles */
+        prgm->tc.fmt.orientation = ORIENT_NORMAL;
+        prgm->tc.fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
+
+        ret = opengl_tex_converter_subpictures_init(&prgm->tc);
+    }
+    else
+    {
+        for (size_t i = 0; i < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++i)
+        {
+            ret = opengl_tex_converter_init_cbs[i](&prgm->tc);
+            if (ret == VLC_SUCCESS)
+                break;
+        }
+    }
+
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    assert(prgm->tc.fshader != 0 && prgm->tc.tex_target != 0 &&
+           prgm->tc.tex_count > 0 && prgm->tc.pf_update != NULL &&
+           prgm->tc.pf_fetch_locations != NULL &&
+           prgm->tc.pf_prepare_shader != NULL);
+
+    ret = opengl_link_program(prgm);
+    if (ret != VLC_SUCCESS)
+    {
+        if (prgm->tc.pf_release != NULL)
+            prgm->tc.pf_release(&prgm->tc);
+        return VLC_EGENERIC;
+    }
+
+    getOrientationTransformMatrix(prgm->tc.fmt.orientation,
+                                  prgm->var.OrientationMatrix);
+    getViewpointMatrixes(vgl, prgm->tc.fmt.projection_mode, prgm);
+
+    return VLC_SUCCESS;
 }
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
@@ -651,66 +712,29 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->prgm = &vgl->prgms[0];
     vgl->sub_prgm = &vgl->prgms[1];
 
-    vgl->sub_prgm->tc = (opengl_tex_converter_t) {
-        .gl = vgl->gl,
-        .api = &vgl->api,
-        .glexts = extensions,
-        .fmt = *fmt,
-    };
-
-    /* RGBA is needed for subpictures or for non YUV pictures */
-    int ret = opengl_tex_converter_subpictures_init(&vgl->sub_prgm->tc);
-    if (ret == VLC_SUCCESS)
-        ret = opengl_link_program(vgl->sub_prgm);
-    if (ret != VLC_SUCCESS)
-    {
-        msg_Err(gl, "RGBA shader failed");
-        free(vgl);
-        return NULL;
-    }
-    assert(!vgl->sub_prgm->tc.handle_texs_gen);
-
-    for (size_t j = 0; j < ARRAY_SIZE(opengl_tex_converter_init_cbs); ++j)
-    {
-        vgl->prgm->tc = (opengl_tex_converter_t) {
-            .gl = vgl->gl,
-            .api = &vgl->api,
-            .glexts = extensions,
-            .fmt = *fmt,
-        };
-        ret = opengl_tex_converter_init_cbs[j](&vgl->prgm->tc);
-        if (ret == VLC_SUCCESS)
-            ret = opengl_link_program(vgl->prgm);
-        if (ret == VLC_SUCCESS)
-        {
-            assert(vgl->prgm->tc.pf_update != NULL &&
-                   vgl->prgm->tc.pf_fetch_locations != NULL &&
-                   vgl->prgm->tc.pf_prepare_shader != NULL);
-
-            vgl->fmt = *fmt;
-            break;
-        }
-    }
+    int ret;
+    ret = opengl_init_program(vgl, vgl->prgm, extensions, fmt, false);
     if (ret != VLC_SUCCESS)
     {
         msg_Warn(gl, "could not init tex converter for %4.4s",
                  (const char *) &fmt->i_chroma);
-        if (vgl->sub_prgm->tc.pf_release != NULL)
-            vgl->sub_prgm->tc.pf_release(&vgl->sub_prgm->tc);
-        if (vgl->sub_prgm->id != 0)
-            vgl->api.DeleteProgram(vgl->sub_prgm->id);
         free(vgl);
         return NULL;
     }
 
-    getOrientationTransformMatrix(vgl->prgm->tc.fmt.orientation,
-                                  vgl->prgm->var.OrientationMatrix);
-    getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
-
-    /* Normal orientation and no projection for subtitles */
-    getOrientationTransformMatrix(ORIENT_NORMAL,
-                                  vgl->sub_prgm->var.OrientationMatrix);
-    getViewpointMatrixes(vgl, PROJECTION_MODE_RECTANGULAR, vgl->sub_prgm);
+    ret = opengl_init_program(vgl, vgl->sub_prgm, extensions, fmt, true);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Warn(gl, "could not init subpictures tex converter for %4.4s",
+                 (const char *) &fmt->i_chroma);
+        opengl_deinit_program(vgl, vgl->prgm);
+        free(vgl);
+        return NULL;
+    }
+    /* Update the fmt to main program one */
+    vgl->fmt = vgl->prgm->tc.fmt;
+    /* The orientation is handled by the orientation matrix */
+    vgl->fmt.orientation = ORIENT_NORMAL;
 
     /* Texture size */
     const opengl_tex_converter_t *tc = &vgl->prgm->tc;
@@ -729,6 +753,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     /* Allocates our textures */
+    assert(!vgl->sub_prgm->tc.handle_texs_gen);
+
     if (!vgl->prgm->tc.handle_texs_gen)
     {
         ret = GenTextures(&vgl->prgm->tc, vgl->tex_width, vgl->tex_height,
@@ -790,6 +816,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     opengl_tex_converter_t *tc = &vgl->prgm->tc;
     if (!tc->handle_texs_gen)
         DelTextures(tc, vgl->texture);
+    opengl_deinit_program(vgl, vgl->prgm);
 
     tc = &vgl->sub_prgm->tc;
     for (int i = 0; i < vgl->region_count; i++)
@@ -798,14 +825,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
             DelTextures(tc, &vgl->region[i].texture);
     }
     free(vgl->region);
+    opengl_deinit_program(vgl, vgl->sub_prgm);
 
-    for (int i = 0; i < 2 && vgl->prgms[i].id != 0; i++)
-    {
-        vgl->api.DeleteProgram(vgl->prgms[i].id);
-        opengl_tex_converter_t *tc = &vgl->prgms[i].tc;
-        if (tc->pf_release != NULL)
-            tc->pf_release(tc);
-    }
     vgl->api.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->api.DeleteBuffers(1, &vgl->index_buffer_object);
 

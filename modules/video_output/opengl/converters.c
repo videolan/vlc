@@ -1167,7 +1167,6 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 int
 opengl_tex_converter_subpictures_init(opengl_tex_converter_t *tc)
 {
-    tc->fmt.i_chroma = VLC_CODEC_RGB32;
     return generic_init(tc, false);
 }
 
