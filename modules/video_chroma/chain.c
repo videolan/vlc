@@ -79,7 +79,19 @@ static const vlc_fourcc_t pi_allowed_chromas[] = {
 struct filter_sys_t
 {
     filter_chain_t *p_chain;
+    filter_t *p_video_filter;
 };
+
+/* Restart filter callback */
+static int RestartFilterCallback( vlc_object_t *obj, char const *psz_name,
+                                  vlc_value_t oldval, vlc_value_t newval,
+                                  void *p_data )
+{ VLC_UNUSED(obj); VLC_UNUSED(psz_name); VLC_UNUSED(oldval);
+    VLC_UNUSED(newval);
+
+    var_TriggerCallback( (vlc_object_t *)p_data, "video-filter" );
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
  * Buffer management
@@ -140,6 +152,10 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
     if( i_ret )
     {
         /* Hum ... looks like this really isn't going to work. Too bad. */
+        if (p_sys->p_video_filter)
+            filter_DelProxyCallbacks( p_filter->obj.parent,
+                                      p_sys->p_video_filter,
+                                      RestartFilterCallback );
         filter_chain_Delete( p_sys->p_chain );
         free( p_sys );
         return VLC_EGENERIC;
@@ -183,6 +199,10 @@ static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
+    if (p_filter->p_sys->p_video_filter)
+        filter_DelProxyCallbacks( p_filter->obj.parent,
+                                  p_filter->p_sys->p_video_filter,
+                                  RestartFilterCallback );
     filter_chain_Delete( p_filter->p_sys->p_chain );
     free( p_filter->p_sys );
 }
@@ -312,10 +332,15 @@ static int BuildFilterChain( filter_t *p_filter )
         if( filter_chain_AppendConverter( p_filter->p_sys->p_chain,
                                           NULL, &fmt_mid ) )
         {
-            if( filter_chain_AppendFilter( p_filter->p_sys->p_chain,
+            p_filter->p_sys->p_video_filter =
+                filter_chain_AppendFilter( p_filter->p_sys->p_chain,
                                            p_filter->psz_name, p_filter->p_cfg,
-                                           &fmt_mid, &fmt_mid ) )
+                                           &fmt_mid, &fmt_mid );
+            if( p_filter->p_sys->p_video_filter )
             {
+                filter_AddProxyCallbacks( p_filter->obj.parent,
+                                          p_filter->p_sys->p_video_filter,
+                                          RestartFilterCallback );
                 es_format_Clean( &fmt_mid );
                 i_ret = VLC_SUCCESS;
                 break;
