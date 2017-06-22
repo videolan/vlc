@@ -1112,8 +1112,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if( sys->context_lock != INVALID_HANDLE_VALUE )
         WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
 #endif
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
-    picture_sys_t *p_sys = pic_ctx ? &pic_ctx->picsys : picture->p_sys;
+    picture_sys_t *p_sys = ActivePictureSys(picture);
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
         D3D11_TEXTURE2D_DESC texDesc;
         if (!is_d3d11_opaque(picture->format.i_chroma))
@@ -1208,8 +1207,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
         DisplayD3DPicture(sys, &sys->picQuad, sys->stagingSys.resourceView);
     else {
-        struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
-        picture_sys_t *p_sys = pic_ctx ? &pic_ctx->picsys : picture->p_sys;
+        picture_sys_t *p_sys = ActivePictureSys(picture);
         DisplayD3DPicture(sys, &sys->picQuad, p_sys->resourceView);
     }
 
