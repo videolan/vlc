@@ -433,17 +433,14 @@ DelTextures(const opengl_tex_converter_t *tc, GLuint *textures)
 }
 
 static int
-opengl_link_program(struct prgm *prgm, GLuint fragment_shader)
+opengl_link_program(struct prgm *prgm)
 {
-    if (fragment_shader == 0)
-        return VLC_EGENERIC;
-
     opengl_tex_converter_t *tc = &prgm->tc;
 
-    assert(tc->tex_target != 0 && tc->tex_count > 0);
+    assert(tc->fshader != 0 && tc->tex_target != 0 && tc->tex_count > 0);
 
     GLuint vertex_shader = BuildVertexShader(tc, tc->tex_count);
-    GLuint shaders[] = { fragment_shader, vertex_shader };
+    GLuint shaders[] = { tc->fshader, vertex_shader };
 
     /* Check shaders messages */
     for (unsigned i = 0; i < 2; i++) {
@@ -464,12 +461,12 @@ opengl_link_program(struct prgm *prgm, GLuint fragment_shader)
     }
 
     prgm->id = tc->api->CreateProgram();
-    tc->api->AttachShader(prgm->id, fragment_shader);
+    tc->api->AttachShader(prgm->id, tc->fshader);
     tc->api->AttachShader(prgm->id, vertex_shader);
     tc->api->LinkProgram(prgm->id);
 
     tc->api->DeleteShader(vertex_shader);
-    tc->api->DeleteShader(fragment_shader);
+    tc->api->DeleteShader(tc->fshader);
 
     /* Check program messages */
     int infoLength = 0;
@@ -662,8 +659,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     };
 
     /* RGBA is needed for subpictures or for non YUV pictures */
-    GLuint fshader = opengl_tex_converter_subpictures_init(&vgl->sub_prgm->tc);
-    int ret = opengl_link_program(vgl->sub_prgm, fshader);
+    int ret = opengl_tex_converter_subpictures_init(&vgl->sub_prgm->tc);
+    if (ret == VLC_SUCCESS)
+        ret = opengl_link_program(vgl->sub_prgm);
     if (ret != VLC_SUCCESS)
     {
         msg_Err(gl, "RGBA shader failed");
@@ -680,12 +678,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             .glexts = extensions,
             .fmt = *fmt,
         };
-        fshader = opengl_tex_converter_init_cbs[j](&vgl->prgm->tc);
-        ret = opengl_link_program(vgl->prgm, fshader);
+        ret = opengl_tex_converter_init_cbs[j](&vgl->prgm->tc);
+        if (ret == VLC_SUCCESS)
+            ret = opengl_link_program(vgl->prgm);
         if (ret == VLC_SUCCESS)
         {
-            assert(vgl->prgm->tc.tex_target != 0 &&
-                   vgl->prgm->tc.tex_count > 0 &&  vgl->prgm->tc.pf_update != NULL &&
+            assert(vgl->prgm->tc.pf_update != NULL &&
                    vgl->prgm->tc.pf_fetch_locations != NULL &&
                    vgl->prgm->tc.pf_prepare_shader != NULL);
 

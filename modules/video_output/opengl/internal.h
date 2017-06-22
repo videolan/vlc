@@ -164,7 +164,7 @@ typedef struct opengl_tex_converter_t opengl_tex_converter_t;
  * \param fc OpenGL tex converter that needs to be filled on success
  * \return VLC_SUCCESS or a VLC error
  */
-typedef GLuint (*opengl_tex_converter_init_cb)(opengl_tex_converter_t *fc);
+typedef int (*opengl_tex_converter_init_cb)(opengl_tex_converter_t *fc);
 
 /*
  * Structure that is filled by an opengl_tex_converter_init_cb function
@@ -180,6 +180,10 @@ struct opengl_tex_converter_t
 
     /* Can only be changed from the module open function */
     video_format_t fmt;
+
+    /* Fragment shader, must be set from the module open function. It will be
+     * deleted by the caller. */
+    GLuint fshader;
 
     /* Number of textures, cannot be 0 */
     unsigned tex_count;
@@ -321,24 +325,24 @@ GLuint
 opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space);
 
-GLuint
+int
 opengl_tex_converter_subpictures_init(opengl_tex_converter_t *);
 
-GLuint
+int
 opengl_tex_converter_generic_init(opengl_tex_converter_t *);
 
 #ifdef __ANDROID__
-GLuint
+int
 opengl_tex_converter_anop_init(opengl_tex_converter_t *);
 #endif
 
 #ifdef VLCGL_CONV_CVPX
-GLuint
+int
 opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc);
 #endif
 
 #ifdef VLCGL_CONV_VA
-GLuint
+int
 opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc);
 #endif
 

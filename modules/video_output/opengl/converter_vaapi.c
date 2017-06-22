@@ -231,48 +231,58 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
     free(tc->priv);
 }
 
-static GLuint
+static int
 tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
 {
     if (vadpy == NULL)
-        return 0;
-    struct priv *priv = tc->priv;
+        return VLC_EGENERIC;
+
+    struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
+    if (unlikely(tc->priv == NULL))
+        return VLC_ENOMEM;
+
     priv->vadpy = vadpy;
     priv->fourcc = 0;
 
     if (!HasExtension(tc->glexts, "GL_OES_EGL_image"))
-        return 0;
+        goto error;
 
     const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
     if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
-        return 0;
+        goto error;
 
     if (vaegl_init_fourcc(tc, priv, VA_FOURCC_NV12))
-        return 0;
+        goto error;
 
     priv->glEGLImageTargetTexture2DOES =
         vlc_gl_GetProcAddress(tc->gl, "glEGLImageTargetTexture2DOES");
     if (priv->glEGLImageTargetTexture2DOES == NULL)
-        return 0;
+        goto error;
 
     tc->pf_update  = tc_vaegl_update;
     tc->pf_release = tc_vaegl_release;
 
     if (vlc_vaapi_Initialize(VLC_OBJECT(tc->gl), priv->vadpy))
-        return 0;
+        goto error;
 
     if (vlc_vaapi_SetInstance(priv->vadpy))
     {
         msg_Err(tc->gl, "VAAPI instance already in use");
-        return 0;
+        goto error;
     }
 
-    GLuint fshader =
-        opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_NV12,
-                                    tc->fmt.space);
-    if (fshader == 0)
+    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_NV12,
+                                              tc->fmt.space);
+    if (tc->fshader == 0)
+    {
         vlc_vaapi_ReleaseInstance(priv->vadpy);
-    return fshader;
+        goto error;
+    }
+    return VLC_SUCCESS;
+
+error:
+    free(tc->priv);
+    return VLC_EGENERIC;
 }
 
 static picture_pool_t *
@@ -290,15 +300,14 @@ tc_va_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     return pool;
 }
 
-GLuint
+int
 opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
 {
     if (tc->fmt.i_chroma != VLC_CODEC_VAAPI_420 || tc->gl->ext != VLC_GL_EXT_EGL
      || tc->gl->egl.createImageKHR == NULL
      || tc->gl->egl.destroyImageKHR == NULL)
-        return 0;
+        return VLC_EGENERIC;
 
-    GLuint fshader = 0;
     switch (tc->gl->surface->type)
     {
 #ifdef HAVE_VA_X11
@@ -310,37 +319,20 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
             if (x11dpy == NULL)
                 return VLC_EGENERIC;
 
-            struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
-            if (unlikely(tc->priv == NULL))
+            if (tc_vaegl_init(tc, vaGetDisplay(x11dpy)))
             {
                 XCloseDisplay(x11dpy);
-                return VLC_ENOMEM;
+                return VLC_EGENERIC;
             }
-
-            fshader = tc_vaegl_init(tc, vaGetDisplay(x11dpy));
-            if (fshader == 0)
-            {
-                XCloseDisplay(x11dpy);
-                free(tc->priv);
-                return 0;
-            }
+            struct priv *priv = tc->priv;
             priv->x11dpy = x11dpy;
             break;
         }
 #endif
 #ifdef HAVE_VA_WL
         case VOUT_WINDOW_TYPE_WAYLAND:
-            tc->priv = calloc(1, sizeof(struct priv));
-            if (unlikely(tc->priv == NULL))
-                return VLC_ENOMEM;
-
-            fshader = tc_vaegl_init(tc,
-                                    vaGetDisplayWl(tc->gl->surface->display.wl));
-            if (fshader == 0)
-            {
-                free(tc->priv);
-                return 0;
-            }
+            if (tc_vaegl_init(tc, vaGetDisplayWl(tc->gl->surface->display.wl)))
+                return VLC_EGENERIC;
             break;
 #endif
         default:
@@ -348,5 +340,5 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
     }
     tc->pf_get_pool = tc_va_get_pool;
 
-    return fshader;
+    return VLC_SUCCESS;
 }

@@ -157,18 +157,18 @@ tc_cvpx_release(const opengl_tex_converter_t *tc)
     free(tc->priv);
 }
 
-GLuint
+int
 opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc)
 {
     if (tc->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
      && tc->fmt.i_chroma != VLC_CODEC_CVPX_NV12
      && tc->fmt.i_chroma != VLC_CODEC_CVPX_I420
      && tc->fmt.i_chroma != VLC_CODEC_CVPX_BGRA)
-        return 0;
+        return VLC_EGENERIC;
 
     struct priv *priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
-        return 0;
+        return VLC_ENOMEM;
 
 #if TARGET_OS_IPHONE
     const GLenum tex_target = GL_TEXTURE_2D;
@@ -182,7 +182,7 @@ opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc)
         {
             msg_Err(tc->gl, "CVOpenGLESTextureCacheCreate failed: %d", err);
             free(priv);
-            return 0;
+            return VLC_EGENERIC;
         }
     }
     tc->handle_texs_gen = true;
@@ -232,12 +232,13 @@ opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc)
     if (fragment_shader == 0)
     {
         free(priv);
-        return 0;
+        return VLC_EGENERIC;
     }
 
     tc->priv              = priv;
     tc->pf_update         = tc_cvpx_update;
     tc->pf_release        = tc_cvpx_release;
+    tc->fshader           = fragment_shader;
 
-    return fragment_shader;
+    return VLC_SUCCESS;
 }

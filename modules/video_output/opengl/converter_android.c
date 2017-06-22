@@ -191,16 +191,16 @@ tc_anop_release(const opengl_tex_converter_t *tc)
     free(priv);
 }
 
-GLuint
+int
 opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
 {
     if (tc->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || !tc->gl->surface->handle.anativewindow)
-        return 0;
+        return VLC_EGENERIC;
 
     tc->priv = malloc(sizeof(struct priv));
     if (unlikely(tc->priv == NULL))
-        return 0;
+        return VLC_ENOMEM;
 
     struct priv *priv = tc->priv;
     priv->awh = tc->gl->surface->handle.anativewindow;
@@ -264,6 +264,7 @@ opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
     GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
     tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
     tc->api->CompileShader(fragment_shader);
+    tc->fshader = fragment_shader;
 
-    return fragment_shader;
+    return VLC_SUCCESS;
 }

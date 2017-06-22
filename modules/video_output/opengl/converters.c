@@ -1039,14 +1039,14 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
     return fragment_shader;
 }
 
-static GLuint
+static int
 generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 {
     const vlc_chroma_description_t *desc =
         vlc_fourcc_GetChromaDescription(tc->fmt.i_chroma);
     assert(desc);
     if (!desc)
-        return 0;
+        return VLC_EGENERIC;
 
     GLuint fragment_shader = 0;
     if (tc->fmt.i_chroma == VLC_CODEC_XYZ12)
@@ -1061,7 +1061,7 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
             GLint max_texture_units = 0;
             glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
             if (max_texture_units < 3)
-                return 0;
+                return VLC_EGENERIC;
 
             get_fallback = vlc_fourcc_GetYUVFallback;
             space = tc->fmt.space;
@@ -1100,11 +1100,14 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         }
     }
     if (fragment_shader == 0)
-        return 0;
+        return VLC_EGENERIC;
 
     struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
-        goto error;
+    {
+        tc->api->DeleteShader(fragment_shader);
+        return VLC_ENOMEM;
+    }
 
     tc->pf_update            = tc_common_update;
     tc->pf_release           = tc_common_release;
@@ -1156,20 +1159,19 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     priv->has_unpack_subimage = true;
 #endif
 
-    return fragment_shader;
-error:
-    tc->api->DeleteShader(fragment_shader);
-    return 0;
+    tc->fshader = fragment_shader;
+
+    return VLC_SUCCESS;
 }
 
-GLuint
+int
 opengl_tex_converter_subpictures_init(opengl_tex_converter_t *tc)
 {
     tc->fmt.i_chroma = VLC_CODEC_RGB32;
     return generic_init(tc, false);
 }
 
-GLuint
+int
 opengl_tex_converter_generic_init(opengl_tex_converter_t *tc)
 {
     return generic_init(tc, true);
