@@ -145,19 +145,6 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys = p_filter->p_sys;
 
-    /* needed to get options passed in transcode using the
-     * adjust{name=value} syntax */
-    config_ChainParse( p_filter, "", ppsz_filter_options,
-                   p_filter->p_cfg );
-
-    p_sys->f_contrast = var_CreateGetFloatCommand( p_filter, "contrast" );
-    p_sys->f_brightness = var_CreateGetFloatCommand( p_filter, "brightness" );
-    p_sys->f_hue = var_CreateGetFloatCommand( p_filter, "hue" );
-    p_sys->f_saturation = var_CreateGetFloatCommand( p_filter, "saturation" );
-    p_sys->f_gamma = var_CreateGetFloatCommand( p_filter, "gamma" );
-    p_sys->b_brightness_threshold =
-        var_CreateGetBoolCommand( p_filter, "brightness-threshold" );
-
     /* Choose Planar/Packed function and pointer to a Hue/Saturation processing
      * function*/
     switch( p_filter->fmt_in.video.i_chroma )
@@ -192,6 +179,19 @@ static int Create( vlc_object_t *p_this )
     }
 
     vlc_mutex_init( &p_sys->lock );
+
+    /* needed to get options passed in transcode using the
+     * adjust{name=value} syntax */
+    config_ChainParse( p_filter, "", ppsz_filter_options, p_filter->p_cfg );
+
+    p_sys->f_contrast = var_CreateGetFloatCommand( p_filter, "contrast" );
+    p_sys->f_brightness = var_CreateGetFloatCommand( p_filter, "brightness" );
+    p_sys->f_hue = var_CreateGetFloatCommand( p_filter, "hue" );
+    p_sys->f_saturation = var_CreateGetFloatCommand( p_filter, "saturation" );
+    p_sys->f_gamma = var_CreateGetFloatCommand( p_filter, "gamma" );
+    p_sys->b_brightness_threshold =
+        var_CreateGetBoolCommand( p_filter, "brightness-threshold" );
+
     var_AddCallback( p_filter, "contrast",   AdjustCallback, p_sys );
     var_AddCallback( p_filter, "brightness", AdjustCallback, p_sys );
     var_AddCallback( p_filter, "hue",        AdjustCallback, p_sys );
