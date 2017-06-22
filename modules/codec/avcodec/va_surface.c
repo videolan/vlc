@@ -110,12 +110,13 @@ int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
 
     va_pool->surface_width  = surface_width;
     va_pool->surface_height = surface_height;
-
-    va_pool->pf_setup_avcodec_ctx(va);
     err = VLC_SUCCESS;
 
 done:
     va_pool->surface_count = i;
+    if (err == VLC_SUCCESS)
+        va_pool->pf_setup_avcodec_ctx(va);
+
     return err;
 }
 
