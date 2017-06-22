@@ -99,16 +99,21 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     D3D11_VIDEO_FRAME_FORMAT frameFormat = src->b_top_field_first ?
                 D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST :
                 D3D11_VIDEO_FRAME_FORMAT_INTERLACED_BOTTOM_FIELD_FIRST;
+
+    if( sys->context_mutex != INVALID_HANDLE_VALUE )
+        WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
+
     ID3D11VideoContext_VideoProcessorSetStreamFrameFormat(sys->d3dvidctx, sys->videoProcessor, 0, frameFormat);
 
     hr = ID3D11VideoContext_VideoProcessorBlt(sys->d3dvidctx, sys->videoProcessor,
                                               sys->processorOutput,
                                               0, 1, &stream);
     if (FAILED(hr))
+    {
+        if( sys->context_mutex  != INVALID_HANDLE_VALUE )
+            ReleaseMutex( sys->context_mutex );
         goto error;
-
-    if( sys->context_mutex != INVALID_HANDLE_VALUE )
-        WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
+    }
 
     ID3D11DeviceContext_CopySubresourceRegion(dst->p_sys->context,
                                               dst->p_sys->resource[KNOWN_DXGI_INDEX],
