@@ -162,6 +162,11 @@ $Id$
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
  * gl: OpenGL video output using the generic OpenGL provider
+ * glconv_android: Android SurfaceTexture OpenGL hardware converter
+ * glconv_cvpx: Apple CVPX OpenGL hardware converter (for iOS and macOS)
+ * glconv_vaapi_drm: VA-API OpenGL hardware converter for DRM
+ * glconv_vaapi_wl: VA-API OpenGL hardware converter for Wayland
+ * glconv_vaapi_x11: VA-API OpenGL hardware converter for X11
  * gles2: OpenGL ES2 video output using the generic OpenGL provider
  * glspectrum: 3D OpenGL spectrum visualization
  * glwin32: a opengl provider using DirectX OpenGL

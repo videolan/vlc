@@ -181,8 +181,9 @@ tc_anop_prepare_shader(const opengl_tex_converter_t *tc,
 }
 
 static void
-tc_anop_release(const opengl_tex_converter_t *tc)
+Close(vlc_object_t *obj)
 {
+    opengl_tex_converter_t *tc = (void *)obj;
     struct priv *priv = tc->priv;
 
     if (priv->stex_attached)
@@ -191,9 +192,11 @@ tc_anop_release(const opengl_tex_converter_t *tc)
     free(priv);
 }
 
-int
-opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
+static int
+Open(vlc_object_t *obj)
 {
+    opengl_tex_converter_t *tc = (void *) obj;
+
     if (tc->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || !tc->gl->surface->handle.anativewindow)
         return VLC_EGENERIC;
@@ -212,10 +215,9 @@ opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
     tc->pf_update         = tc_anop_update;
     tc->pf_fetch_locations = tc_anop_fetch_locations;
     tc->pf_prepare_shader = tc_anop_prepare_shader;
-    tc->pf_release        = tc_anop_release;
 
     tc->tex_count = 1;
-    tc->texs[0] = (struct opengl_tex_cfg) { { 1, 1 }, { 1, 1 } };
+    tc->texs[0] = (struct opengl_tex_cfg) { { 1, 1 }, { 1, 1 }, 0, 0, 0 };
 
     tc->tex_target   = GL_TEXTURE_EXTERNAL_OES;
 
@@ -273,3 +275,11 @@ opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
 
     return VLC_SUCCESS;
 }
+
+vlc_module_begin ()
+    set_description("Android OpenGL SurfaceTexture converter")
+    set_capability("glconv", 1)
+    set_callbacks(Open, Close)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+vlc_module_end ()

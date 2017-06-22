@@ -143,8 +143,9 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 #endif
 
 static void
-tc_cvpx_release(const opengl_tex_converter_t *tc)
+Close(vlc_object_t *obj)
 {
+    opengl_tex_converter_t *tc = (void *)obj;
     struct priv *priv = tc->priv;
 
     if (priv->last_pic != NULL)
@@ -155,9 +156,10 @@ tc_cvpx_release(const opengl_tex_converter_t *tc)
     free(tc->priv);
 }
 
-int
-opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc)
+static int
+Open(vlc_object_t *obj)
 {
+    opengl_tex_converter_t *tc = (void *) obj;
     if (tc->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
      && tc->fmt.i_chroma != VLC_CODEC_CVPX_NV12
      && tc->fmt.i_chroma != VLC_CODEC_CVPX_I420
@@ -242,8 +244,15 @@ opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc)
 
     tc->priv              = priv;
     tc->pf_update         = tc_cvpx_update;
-    tc->pf_release        = tc_cvpx_release;
     tc->fshader           = fragment_shader;
 
     return VLC_SUCCESS;
 }
+
+vlc_module_begin ()
+    set_description("Apple OpenGL CVPX converter")
+    set_capability("glconv", 1)
+    set_callbacks(Open, Close)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+vlc_module_end ()

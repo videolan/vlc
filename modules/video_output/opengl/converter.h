@@ -22,6 +22,7 @@
 #define VLC_OPENGL_CONVERTER_H
 
 #include "vout_helper.h"
+#include <vlc_plugin.h>
 
 #define VLCGL_PICTURE_MAX 128
 
@@ -163,31 +164,28 @@ typedef struct {
     PFNGLCLIENTWAITSYNCPROC         ClientWaitSync; /* can be NULL */
 } opengl_vtable_t;
 
+/*
+ * Structure that is filled by "glhw converter" module probe function
+ * The implementation should initialize every members of the struct that are
+ * not set by the caller
+ */
 typedef struct opengl_tex_converter_t opengl_tex_converter_t;
-
-/*
- * Callback to initialize an opengl_tex_converter_t struct
- *
- * The implementation should initialize every members of the struct in regards
- * of the video format.
- *
- * \param fmt video format, fmt->i_chroma can be modified in order to match a
- * shader
- * \param fc OpenGL tex converter that needs to be filled on success
- * \return VLC_SUCCESS or a VLC error
- */
-typedef int (*opengl_tex_converter_init_cb)(opengl_tex_converter_t *fc);
-
-/*
- * Structure that is filled by an opengl_tex_converter_init_cb function
- */
 struct opengl_tex_converter_t
 {
-    /* Pointer to object gl, set by the caller of the init cb */
+    VLC_COMMON_MEMBERS
+
+    module_t *p_module;
+
+    /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
 
     /* Function pointers to OpenGL functions, set by the caller */
     const opengl_vtable_t *vt;
+
+    /* Function pointer to the shader init command, set by the caller, see
+     * opengl_fragment_shader_init() documentation. */
+    GLuint (*pf_fragment_shader_init)(opengl_tex_converter_t *, GLenum,
+                                      vlc_fourcc_t, video_color_space_t);
 
     /* Available gl extensions (from GL_EXTENSIONS) */
     const char *glexts;
@@ -317,14 +315,6 @@ struct opengl_tex_converter_t
     void (*pf_prepare_shader)(const opengl_tex_converter_t *fc,
                               const GLsizei *tex_width, const GLsizei *tex_height,
                               float alpha);
-
-    /*
-     * Callback to release the private context
-     *
-     * This function pointer can be NULL.
-     * \param fc OpenGL tex converter
-     */
-    void (*pf_release)(const opengl_tex_converter_t *fc);
 };
 
 /*
@@ -334,38 +324,20 @@ struct opengl_tex_converter_t
  * generic fragment shader. It will compile a fragment shader generated from
  * the chroma and the tex target. This will initialize all elements of the
  * opengl_tex_converter_t struct except for priv, pf_allocate_texture,
- * pf_get_pool, pf_update, and pf_release.
+ * pf_get_pool, pf_update
  *
  * \param tc OpenGL tex converter
  * \param tex_target GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE
  * \param chroma chroma used to generate the fragment shader
- * \param yuv_space if not COLOR_SPACE_UNDEF, YUV planes will be converted to
- * RGB according to the color space
+ * \param if not COLOR_SPACE_UNDEF, YUV planes will be converted to RGB
+ * according to the color space
  * \return the compiled fragment shader or 0 in case of error
  */
-GLuint
+static inline GLuint
 opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
-                            vlc_fourcc_t chroma, video_color_space_t yuv_space);
-
-int
-opengl_tex_converter_subpictures_init(opengl_tex_converter_t *);
-
-int
-opengl_tex_converter_generic_init(opengl_tex_converter_t *);
-
-#ifdef __ANDROID__
-int
-opengl_tex_converter_anop_init(opengl_tex_converter_t *);
-#endif
-
-#ifdef VLCGL_CONV_CVPX
-int
-opengl_tex_converter_cvpx_init(opengl_tex_converter_t *tc);
-#endif
-
-#ifdef VLCGL_CONV_VA
-int
-opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc);
-#endif
+                            vlc_fourcc_t chroma, video_color_space_t yuv_space)
+{
+    return tc->pf_fragment_shader_init(tc, tex_target, chroma, yuv_space);
+}
 
 #endif /* include-guard */

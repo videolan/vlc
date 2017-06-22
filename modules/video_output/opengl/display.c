@@ -42,6 +42,10 @@ static void Close (vlc_object_t *);
 #define PROVIDER_LONGTEXT N_( \
     "Extension through which to use the Open Graphics Library (OpenGL).")
 
+#define GLCONV_TEXT N_("Open GL/GLES hardware converter")
+#define GLCONV_LONGTEXT N_( \
+    "Force a \"glconv\" module.")
+
 vlc_module_begin ()
 #if defined (USE_OPENGL_ES2)
 # define API VLC_OPENGL_ES2
@@ -68,6 +72,8 @@ vlc_module_begin ()
     add_module ("gl", "opengl", NULL,
                 GL_TEXT, PROVIDER_LONGTEXT, true)
 #endif
+    add_module ("glconv", NULL, NULL,
+                GLCONV_TEXT, GLCONV_LONGTEXT, true)
 vlc_module_end ()
 
 struct vout_display_sys_t

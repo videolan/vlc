@@ -49,6 +49,10 @@
 #include <vlc_dialog.h>
 #include "opengl/vout_helper.h"
 
+#define GLHW_TEXT N_("GL/GLES hw converter")
+#define GLHW_LONGTEXT N_( \
+    "Force an \"gl hw converter\" module.")
+
 /**
  * Forward declarations
  */
@@ -77,6 +81,8 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout display", 300)
     set_callbacks (Open, Close)
+    add_module ("glhw", NULL, NULL,
+                GLHW_TEXT, GLHW_LONGTEXT, true)
 
     add_shortcut ("macosx", "vout_macosx")
 vlc_module_end ()
