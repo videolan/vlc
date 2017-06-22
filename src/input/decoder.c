@@ -1869,7 +1869,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 }
 
 /* */
-static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt )
+static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt, bool b_decoding )
 {
     if (fmt->i_codec != VLC_FOURCC('u','n','d','f') && fmt->i_codec) {
         const char *desc = vlc_fourcc_GetDescription(fmt->i_cat, fmt->i_codec);
@@ -1879,7 +1879,7 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt )
         vlc_dialog_display_error( p_dec, _("Codec not supported"),
             _("VLC could not decode the format \"%4.4s\" (%s)"),
             (char*)&fmt->i_codec, desc );
-    } else {
+    } else if( b_decoding ){
         msg_Err( p_dec, "could not identify codec" );
         vlc_dialog_display_error( p_dec, _("Unidentified codec"),
             _("VLC could not identify the audio or video codec" ) );
@@ -1908,7 +1908,7 @@ static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
 
     if( !p_dec->p_module )
     {
-        DecoderUnsupportedCodec( p_dec, fmt );
+        DecoderUnsupportedCodec( p_dec, fmt, !p_sout );
 
         DeleteDecoder( p_dec );
         return NULL;
@@ -2170,7 +2170,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         }
         else if( !p_cc->p_module )
         {
-            DecoderUnsupportedCodec( p_dec, &fmt );
+            DecoderUnsupportedCodec( p_dec, &fmt, true );
             input_DecoderDelete(p_cc);
             return VLC_EGENERIC;
         }
