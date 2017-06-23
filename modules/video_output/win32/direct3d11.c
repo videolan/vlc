@@ -686,19 +686,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
                          true, false))
         goto error;
 
-    if (vd->info.is_slow) {
-        picture_resource_t resource = {
-            .p_sys = &sys->picQuad.picSys,
-            .pf_destroy = DestroyDisplayPoolPicture,
-        };
-
-        picture = picture_NewFromResource(&surface_fmt, &resource);
-        if (likely(picture != NULL)) {
-            pool_cfg.picture       = &picture;
-            pool_cfg.lock          = Direct3D11MapPoolTexture;
-            //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
-        }
-    } else {
+    if (!vd->info.is_slow) {
         HRESULT           hr;
         ID3D10Multithread *pMultithread;
         hr = ID3D11Device_QueryInterface( sys->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
