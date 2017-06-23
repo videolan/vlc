@@ -232,6 +232,35 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
 }
 
 static int
+tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
+{
+    const char *vendor = vaQueryVendorString(vadpy);
+    if (vendor == NULL)
+        return VLC_SUCCESS;
+
+#define BL_SIZE_MAX 19
+    static const char blacklist_prefix[][BL_SIZE_MAX] = {
+        /* XXX: case insensitive and alphabetical order */
+        "mesa gallium vaapi",
+    };
+
+    char vendor_prefix[BL_SIZE_MAX];
+    strncpy(vendor_prefix, vendor, BL_SIZE_MAX);
+    vendor_prefix[BL_SIZE_MAX - 1] = '\0';
+
+    const char *found = bsearch(vendor_prefix, blacklist_prefix,
+                                ARRAY_SIZE(blacklist_prefix),
+                                BL_SIZE_MAX, (void *) strcasecmp);
+    if (found != NULL)
+    {
+        msg_Warn(tc->gl, "The '%s' driver is blacklisted: no interop", found);
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int
 tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
 {
     if (vadpy == NULL)
@@ -264,6 +293,12 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
 
     if (vlc_vaapi_Initialize(VLC_OBJECT(tc->gl), priv->vadpy))
         goto error;
+
+    if (tc_va_check_interop_blacklist(tc, priv->vadpy))
+    {
+        vaTerminate(priv->vadpy);
+        goto error;
+    }
 
     if (vlc_vaapi_SetInstance(priv->vadpy))
     {
