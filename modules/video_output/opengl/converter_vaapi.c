@@ -288,6 +288,7 @@ error:
 static picture_pool_t *
 tc_va_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
 {
+    vlc_object_t *o = VLC_OBJECT(tc->gl);
     struct priv *priv = tc->priv;
 
     picture_pool_t *pool =
@@ -297,6 +298,16 @@ tc_va_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     if (!pool)
         return NULL;
 
+    /* Check if a surface from the pool can be derived */
+    VAImage va_image;
+    if (vlc_vaapi_DeriveImage(o, priv->vadpy, priv->va_surface_ids[0],
+                              &va_image))
+    {
+        picture_pool_Release(pool);
+        return NULL;
+    }
+
+    vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
     return pool;
 }
 
