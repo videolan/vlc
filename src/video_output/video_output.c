@@ -660,6 +660,15 @@ static int FilterProxyCallback(vlc_object_t *p_this, char const *psz_var,
     return 0;
 }
 
+static int FilterRestartCallback(vlc_object_t *p_this, char const *psz_var,
+                                 vlc_value_t oldval, vlc_value_t newval,
+                                 void *p_data)
+{
+    (void) p_this; (void) psz_var; (void) oldval; (void) newval;
+    vout_ControlChangeFilters((vout_thread_t *)p_data, NULL);
+    return 0;
+}
+
 static void ThreadAddFilterCallbacks(vout_thread_t *vout, filter_t *filter)
 {
     /* Duplicate every command variables from the filter, and add a proxy
@@ -673,12 +682,12 @@ static void ThreadAddFilterCallbacks(vout_thread_t *vout, filter_t *filter)
     {
         char *name = *pname;
         int var_type = var_Type(filter, name);
+        assert(var_Type(vout, name) == 0);
+        var_Create(vout, name, var_type | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
         if ((var_type & VLC_VAR_ISCOMMAND))
-        {
-            assert(var_Type(vout, name) == 0);
-            var_Create(vout, name, var_type | VLC_VAR_DOINHERIT);
             var_AddCallback(vout, name, FilterProxyCallback, filter);
-        }
+        else
+            var_AddCallback(vout, name, FilterRestartCallback, vout);
         free(name);
     }
     free(names);
@@ -694,12 +703,15 @@ static int ThreadDelFilterCallbacks(filter_t *filter, void *opaque)
     for (char **pname = names; *pname != NULL; pname++)
     {
         char *name = *pname;
-        int var_type = var_Type(filter, name);
-        if ((var_type & VLC_VAR_ISCOMMAND))
-        {
+        int var_type = var_Type(vout, name);
+        assert(var_type & VLC_VAR_ISCOMMAND);
+        int filter_var_type = var_Type(filter, name);
+
+        if (filter_var_type & VLC_VAR_ISCOMMAND)
             var_DelCallback(vout, name, FilterProxyCallback, filter);
-            var_Destroy(vout, name);
-        }
+        else if (filter_var_type)
+            var_DelCallback(vout, name, FilterRestartCallback, vout);
+        var_Destroy(vout, name);
         free(name);
     }
     free(names);
@@ -1651,7 +1663,10 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadDisplayOsdTitle(vout, cmd.u.string);
         break;
     case VOUT_CONTROL_CHANGE_FILTERS:
-        ThreadChangeFilters(vout, NULL, cmd.u.string, -1, false);
+        ThreadChangeFilters(vout, NULL,
+                            cmd.u.string != NULL ?
+                            cmd.u.string : vout->p->filter.configuration,
+                            -1, false);
         break;
     case VOUT_CONTROL_CHANGE_INTERLACE:
         ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
