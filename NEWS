@@ -166,6 +166,7 @@ Video ouput:
  * New OpenGL provider for Windows
  * Drop OpenGL 1.x and OpenGL ES 1 support
  * Direct rendering with OpenGL (starting OpenGL 4.4)
+ * Direct rendering with VA-API via EGL/OpenGL
 
 Text renderer:
  * CTL support through Harfbuzz in the Freetype module
@@ -176,6 +177,7 @@ Video filter:
  * New video filter to convert between fps rates
  * Added 9-bit and 10-bit support to image adjust filter
  * New edge detection filter uses the Sobel operator to detect edges
+ * Hardware accelerated deinterlacing/adjust/sharpen/chroma with VA-API
 
 Stream Output:
  * Chromecast output module
