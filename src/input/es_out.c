@@ -2282,7 +2282,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     case ES_OUT_SET_ES:
     case ES_OUT_RESTART_ES:
     {
-#define IGNORE_ES NAV_ES
+#define IGNORE_ES DATA_ES
         es_out_id_t *es = va_arg( args, es_out_id_t * );
 
         enum es_format_category_e i_cat;

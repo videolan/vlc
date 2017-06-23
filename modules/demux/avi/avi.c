@@ -100,7 +100,7 @@ static char *FromACP( const char *str )
     return FromCharset(vlc_pgettext("GetACP", "CP1252"), str, strlen(str));
 }
 
-#define IGNORE_ES NAV_ES
+#define IGNORE_ES DATA_ES
 #define READ_LENGTH (25 * 1000) // 25ms
 #define READ_LENGTH_NONINTERLEAVED (CLOCK_FREQ * 3 / 2)
 

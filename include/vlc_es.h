@@ -560,9 +560,9 @@ enum es_format_category_e
     VIDEO_ES,
     AUDIO_ES,
     SPU_ES,
-    NAV_ES,
+    DATA_ES,
 };
-#define ES_CATEGORY_COUNT (NAV_ES + 1)
+#define ES_CATEGORY_COUNT (DATA_ES + 1)
 
 /**
  * ES format definition

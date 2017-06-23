@@ -510,7 +510,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
     mkv_track_t &track = *p_track;
 
-    if( track.fmt.i_cat != NAV_ES && track.p_es == NULL )
+    if( track.fmt.i_cat != DATA_ES && track.p_es == NULL )
     {
         msg_Err( p_demux, "unknown track number" );
         return;
@@ -518,7 +518,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
     i_pts -= track.i_codec_delay;
 
-    if ( track.fmt.i_cat != NAV_ES )
+    if ( track.fmt.i_cat != DATA_ES )
     {
         bool b;
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, track.p_es, &b );
@@ -618,7 +618,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
         if( track.fmt.i_cat != VIDEO_ES )
         {
-            if ( track.fmt.i_cat == NAV_ES )
+            if ( track.fmt.i_cat == DATA_ES )
             {
                 // TODO handle the start/stop times of this packet
                 p_sys->p_ev->SetPci( (const pci_t *)&p_block->p_buffer[1]);

@@ -2038,7 +2038,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             vars.p_fmt->subs.psz_encoding = strdup( "UTF-8");
         }
         S_CASE("B_VOBBTN") {
-            vars.p_fmt->i_cat = NAV_ES;
+            vars.p_fmt->i_cat = DATA_ES;
         }
         S_CASE_DEFAULT(str) {
             msg_Err( vars.p_demuxer, "unknown codec id=`%s'", str );
