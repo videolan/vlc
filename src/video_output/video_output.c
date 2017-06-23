@@ -380,7 +380,7 @@ void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 }
 int vout_RegisterSubpictureChannel( vout_thread_t *vout )
 {
-    int channel = VOUT_SPU_CHANNEL_OSD;
+    int channel = VOUT_SPU_CHANNEL_AVAIL_FIRST;
 
     vlc_mutex_lock(&vout->p->spu_lock);
     if (vout->p->spu)
