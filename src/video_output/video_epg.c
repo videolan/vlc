@@ -394,7 +394,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
         return VLC_EGENERIC;
     }
 
-    subpic->i_channel  = SPU_DEFAULT_CHANNEL;
+    subpic->i_channel  = VOUT_SPU_CHANNEL_OSD;
     subpic->i_start    = now;
     subpic->i_stop     = now + 3000 * INT64_C(1000);
     subpic->b_ephemer  = true;

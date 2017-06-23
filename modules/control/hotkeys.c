@@ -87,10 +87,10 @@ static void ClearChannels  ( vout_thread_t *, int );
 #define DisplayMessage(vout, ...) \
     do { \
         if (vout) \
-            vout_OSDMessage(vout, SPU_DEFAULT_CHANNEL, __VA_ARGS__); \
+            vout_OSDMessage(vout, VOUT_SPU_CHANNEL_OSD, __VA_ARGS__); \
     } while(0)
 #define DisplayIcon(vout, icon) \
-    do { if(vout) vout_OSDIcon(vout, SPU_DEFAULT_CHANNEL, icon); } while(0)
+    do { if(vout) vout_OSDIcon(vout, VOUT_SPU_CHANNEL_OSD, icon); } while(0)
 
 /*****************************************************************************
  * Module descriptor
@@ -1535,7 +1535,7 @@ static void ClearChannels( vout_thread_t *p_vout, int slider_chan )
 {
     if( p_vout )
     {
-        vout_FlushSubpictureChannel( p_vout, SPU_DEFAULT_CHANNEL );
+        vout_FlushSubpictureChannel( p_vout, VOUT_SPU_CHANNEL_OSD );
         vout_FlushSubpictureChannel( p_vout, slider_chan );
     }
 }

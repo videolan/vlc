@@ -38,9 +38,6 @@ extern "C" {
  * Overlay text and widgets
  */
 
-//* Default subpicture channel ID */
-#define SPU_DEFAULT_CHANNEL (1)
-
 /**
  * OSD menu position and picture type defines
  */

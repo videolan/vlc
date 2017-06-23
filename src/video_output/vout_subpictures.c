@@ -1229,7 +1229,7 @@ spu_t *spu_Create(vlc_object_t *object)
     sys->margin = var_InheritInteger(spu, "sub-margin");
 
     /* Register the default subpicture channel */
-    sys->channel = SPU_DEFAULT_CHANNEL + 1;
+    sys->channel = VOUT_SPU_CHANNEL_AVAIL_FIRST;
 
     sys->source_chain_update = NULL;
     sys->filter_chain_update = NULL;
@@ -1402,8 +1402,8 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
         return;
 
     /* SPU_DEFAULT_CHANNEL always reset itself */
-    if (subpic->i_channel == SPU_DEFAULT_CHANNEL)
-        spu_ClearChannel(spu, SPU_DEFAULT_CHANNEL);
+    if (subpic->i_channel == VOUT_SPU_CHANNEL_OSD)
+        spu_ClearChannel(spu, VOUT_SPU_CHANNEL_OSD);
 
     /* p_private is for spu only and cannot be non NULL here */
     for (subpicture_region_t *r = subpic->p_region; r != NULL; r = r->p_next)
@@ -1551,7 +1551,7 @@ void spu_ClearChannel(spu_t *spu, int channel)
 
         if (!subpic)
             continue;
-        if (subpic->i_channel != channel && (channel != -1 || subpic->i_channel == SPU_DEFAULT_CHANNEL))
+        if (subpic->i_channel != channel && (channel != -1 || subpic->i_channel == VOUT_SPU_CHANNEL_OSD))
             continue;
 
         /* You cannot delete subpicture outside of spu_SortSubpictures */

@@ -380,7 +380,7 @@ void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 }
 int vout_RegisterSubpictureChannel( vout_thread_t *vout )
 {
-    int channel = SPU_DEFAULT_CHANNEL;
+    int channel = VOUT_SPU_CHANNEL_OSD;
 
     vlc_mutex_lock(&vout->p->spu_lock);
     if (vout->p->spu)
@@ -1226,7 +1226,7 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
     if (!vout->p->title.show)
         return;
 
-    vout_OSDText(vout, SPU_DEFAULT_CHANNEL,
+    vout_OSDText(vout, VOUT_SPU_CHANNEL_OSD,
                  vout->p->title.position, INT64_C(1000) * vout->p->title.timeout,
                  string);
 }

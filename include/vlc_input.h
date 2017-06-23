@@ -38,6 +38,7 @@
 #include <vlc_epg.h>
 #include <vlc_events.h>
 #include <vlc_input_item.h>
+#include <vlc_vout.h>
 #include <vlc_vout_osd.h>
 
 #include <string.h>
@@ -582,7 +583,7 @@ static inline int input_AddSubtitleOSD( input_thread_t *p_input, const char *psz
     vout_thread_t *p_vout = input_GetVout( p_input );
     if( p_vout )
     {
-        vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, "%s",
+        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s",
                         vlc_gettext("Subtitle track added") );
         vlc_object_release( (vlc_object_t *)p_vout );
     }

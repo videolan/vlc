@@ -413,7 +413,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     var_Set(p_playlist, "random", val);
     if (val.b_bool) {
         if (p_vout) {
-            vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Random On"));
+            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random On"));
             vlc_object_release(p_vout);
         }
         config_PutInt(p_playlist, "random", 1);
@@ -421,7 +421,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     else
     {
         if (p_vout) {
-            vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Random Off"));
+            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random Off"));
             vlc_object_release(p_vout);
         }
         config_PutInt(p_playlist, "random", 0);
@@ -443,7 +443,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
-        vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Repeat All"));
+        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat All"));
         vlc_object_release(p_vout);
     }
 }
@@ -463,7 +463,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
-        vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Repeat One"));
+        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat One"));
         vlc_object_release(p_vout);
     }
 }
@@ -483,7 +483,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
-        vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Repeat Off"));
+        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat Off"));
         vlc_object_release(p_vout);
     }
 }
