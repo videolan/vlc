@@ -330,10 +330,9 @@ VLC_API filter_t *filter_chain_AppendFilter(filter_chain_t *chain,
  * \param chain filter chain to append a filter to
  * \param fmt_in filter input format
  * \param fmt_out filter output format
- * \retval 0 on success
- * \retval -1 on failure
+ * \return a pointer to the filter or NULL on error
  */
-VLC_API int filter_chain_AppendConverter(filter_chain_t *chain,
+VLC_API filter_t *filter_chain_AppendConverter(filter_chain_t *chain,
     const es_format_t *fmt_in, const es_format_t *fmt_out);
 
 /**

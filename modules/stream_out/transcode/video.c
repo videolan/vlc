@@ -69,7 +69,7 @@ static int video_update_format_decoder( decoder_t *p_dec )
     filter_chain_Reset( test_chain, &p_dec->fmt_out, &p_dec->fmt_out );
 
     int chain_works = filter_chain_AppendConverter( test_chain, &p_dec->fmt_out,
-                                  &id->p_encoder->fmt_in );
+                                                    &id->p_encoder->fmt_in ) != NULL ? 0 : -1;
     filter_chain_Delete( test_chain );
     msg_Dbg( stream, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
                      (char *)&p_dec->fmt_out.video.i_chroma,
