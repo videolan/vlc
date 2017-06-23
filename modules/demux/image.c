@@ -637,6 +637,8 @@ static int Open(vlc_object_t *object)
         if (img->detect) {
             if (img->detect(demux->s))
                 break;
+            /* detect callbacks can invalidate the current peek buffer */
+            peek_size = 0;
         } else {
             if ((size_t) peek_size < img->marker_size)
             {
