@@ -35,9 +35,7 @@
 #include <stdatomic.h>
 
 /* */
-typedef struct vlc_va_surface_t {
-    atomic_uintptr_t     refcount;
-} vlc_va_surface_t;
+typedef struct vlc_va_surface_t vlc_va_surface_t;
 
 #define MAX_SURFACE_COUNT (64)
 typedef struct

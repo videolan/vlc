@@ -41,6 +41,10 @@ struct picture_sys_t {
 
 #include "avcodec.h"
 
+struct vlc_va_surface_t {
+    atomic_uintptr_t     refcount;
+};
+
 static void DestroyVideoDecoder(vlc_va_t *va, va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++)
