@@ -651,15 +651,6 @@ int vout_HideWindowMouse(vout_thread_t *vout, bool hide)
 }
 
 /* */
-static int FilterProxyCallback(vlc_object_t *p_this, char const *psz_var,
-                         vlc_value_t oldval, vlc_value_t newval,
-                         void *p_data)
-{
-    (void) p_this; (void) oldval;
-    var_Set((filter_t *)p_data, psz_var, newval);
-    return 0;
-}
-
 static int FilterRestartCallback(vlc_object_t *p_this, char const *psz_var,
                                  vlc_value_t oldval, vlc_value_t newval,
                                  void *p_data)
@@ -669,52 +660,10 @@ static int FilterRestartCallback(vlc_object_t *p_this, char const *psz_var,
     return 0;
 }
 
-static void ThreadAddFilterCallbacks(vout_thread_t *vout, filter_t *filter)
-{
-    /* Duplicate every command variables from the filter, and add a proxy
-     * callback to trigger filters events from the vout. */
-
-    char **names = var_GetAllNames(VLC_OBJECT(filter));
-    if (names == NULL)
-        return;
-
-    for (char **pname = names; *pname != NULL; pname++)
-    {
-        char *name = *pname;
-        int var_type = var_Type(filter, name);
-        assert(var_Type(vout, name) == 0);
-        var_Create(vout, name, var_type | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
-        if ((var_type & VLC_VAR_ISCOMMAND))
-            var_AddCallback(vout, name, FilterProxyCallback, filter);
-        else
-            var_AddCallback(vout, name, FilterRestartCallback, vout);
-        free(name);
-    }
-    free(names);
-}
-
 static int ThreadDelFilterCallbacks(filter_t *filter, void *opaque)
 {
-    vout_thread_t *vout = opaque;
-    char **names = var_GetAllNames(VLC_OBJECT(filter));
-    if (names == NULL)
-        return VLC_SUCCESS;
-
-    for (char **pname = names; *pname != NULL; pname++)
-    {
-        char *name = *pname;
-        int var_type = var_Type(vout, name);
-        assert(var_type & VLC_VAR_ISCOMMAND);
-        int filter_var_type = var_Type(filter, name);
-
-        if (filter_var_type & VLC_VAR_ISCOMMAND)
-            var_DelCallback(vout, name, FilterProxyCallback, filter);
-        else if (filter_var_type)
-            var_DelCallback(vout, name, FilterRestartCallback, vout);
-        var_Destroy(vout, name);
-        free(name);
-    }
-    free(names);
+    filter_DelProxyCallbacks((vlc_object_t *)opaque, filter,
+                             FilterRestartCallback);
     return VLC_SUCCESS;
 }
 
@@ -855,7 +804,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
                 config_ChainDestroy(e->cfg);
             }
             else if (a == 1) /* Add callbacks for interactive filters */
-                ThreadAddFilterCallbacks(vout, filter);
+                filter_AddProxyCallbacks(vout, filter, FilterRestartCallback);
 
             free(e->name);
             free(e);

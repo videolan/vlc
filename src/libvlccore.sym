@@ -98,6 +98,8 @@ es_format_Copy
 es_format_Init
 es_format_InitFromVideo
 es_format_IsSimilar
+filter_AddProxyCallbacks
+filter_DelProxyCallbacks
 filter_Blend
 filter_chain_AppendConverter
 filter_chain_AppendFilter

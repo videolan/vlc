@@ -215,6 +215,29 @@ static inline int filter_GetInputAttachments( filter_t *p_filter,
 }
 
 /**
+ * This function duplicates every variables from the filter, and adds a proxy
+ * callback to trigger filter events from obj.
+ *
+ * \param restart_cb a vlc_callback_t to call if the event means restarting the
+ * filter (i.e. an event on a non-command variable)
+ */
+VLC_API void filter_AddProxyCallbacks( vlc_object_t *obj, filter_t *filter,
+                                       vlc_callback_t restart_cb );
+# define filter_AddProxyCallbacks(a, b, c) \
+    filter_AddProxyCallbacks(VLC_OBJECT(a), b, c)
+
+/**
+ * This function removes the callbacks previously added to every duplicated
+ * variables, and removes them afterward.
+ *
+ * \param restart_cb the same vlc_callback_t passed to filter_AddProxyCallbacks
+ */
+VLC_API void filter_DelProxyCallbacks( vlc_object_t *obj, filter_t *filter,
+                                       vlc_callback_t restart_cb);
+# define filter_DelProxyCallbacks(a, b, c) \
+    filter_DelProxyCallbacks(VLC_OBJECT(a), b, c)
+
+/**
  * It creates a blend filter.
  *
  * Only the chroma properties of the dest format is used (chroma
