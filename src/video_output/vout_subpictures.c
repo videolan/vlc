@@ -84,15 +84,18 @@ struct spu_private_t {
     uint8_t palette[4][4];                             /**< forced palette */
 
     /* Subpiture filters */
+    char           *source_chain_current;
     char           *source_chain_update;
     vlc_mutex_t    source_chain_lock;
     filter_chain_t *source_chain;
+    char           *filter_chain_current;
     char           *filter_chain_update;
     vlc_mutex_t    filter_chain_lock;
     filter_chain_t *filter_chain;
 
     /* */
-    mtime_t last_sort_date;
+    mtime_t             last_sort_date;
+    vout_thread_t       *vout;
 };
 
 /*****************************************************************************
@@ -1197,6 +1200,54 @@ static int SubSourceClean(filter_t *filter, void *data)
 }
 
 /*****************************************************************************
+ * Proxy callbacks
+ *****************************************************************************/
+
+static int RestartSubFilterCallback(vlc_object_t *obj, char const *psz_var,
+                                    vlc_value_t oldval, vlc_value_t newval,
+                                    void *p_data)
+{ VLC_UNUSED(obj); VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    vout_ControlChangeSubFilters((vout_thread_t *)p_data, NULL);
+    return VLC_SUCCESS;
+}
+
+static int SubFilterAddProxyCallbacks(filter_t *filter, void *opaque)
+{
+    filter_AddProxyCallbacks((vlc_object_t *)opaque, filter,
+                             RestartSubFilterCallback);
+    return VLC_SUCCESS;
+}
+
+static int SubFilterDelProxyCallbacks(filter_t *filter, void *opaque)
+{
+    filter_DelProxyCallbacks((vlc_object_t *)opaque, filter,
+                             RestartSubFilterCallback);
+    return VLC_SUCCESS;
+}
+
+static int RestartSubSourceCallback(vlc_object_t *obj, char const *psz_var,
+                                    vlc_value_t oldval, vlc_value_t newval,
+                                    void *p_data)
+{ VLC_UNUSED(obj); VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    vout_ControlChangeSubSources((vout_thread_t *)p_data, NULL);
+    return VLC_SUCCESS;
+}
+
+static int SubSourceAddProxyCallbacks(filter_t *filter, void *opaque)
+{
+    filter_AddProxyCallbacks((vlc_object_t *)opaque, filter,
+                             RestartSubSourceCallback);
+    return VLC_SUCCESS;
+}
+
+static int SubSourceDelProxyCallbacks(filter_t *filter, void *opaque)
+{
+    filter_DelProxyCallbacks((vlc_object_t *)opaque, filter,
+                             RestartSubSourceCallback);
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * Public API
  *****************************************************************************/
 
@@ -1206,7 +1257,7 @@ static int SubSourceClean(filter_t *filter, void *data)
  *
  * \param p_this the parent object which creates the subpicture unit
  */
-spu_t *spu_Create(vlc_object_t *object)
+spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
 {
     spu_t *spu = vlc_custom_create(object,
                                    sizeof(spu_t) + sizeof(spu_private_t),
@@ -1253,6 +1304,7 @@ spu_t *spu_Create(vlc_object_t *object)
 
     /* */
     sys->last_sort_date = -1;
+    sys->vout = vout;
 
     return spu;
 }
@@ -1276,8 +1328,16 @@ void spu_Destroy(spu_t *spu)
         FilterRelease(sys->scale);
 
     filter_chain_ForEach(sys->source_chain, SubSourceClean, spu);
+    if (sys->vout)
+        filter_chain_ForEach(sys->source_chain,
+                             SubSourceDelProxyCallbacks, sys->vout);
     filter_chain_Delete(sys->source_chain);
+    free(sys->source_chain_current);
+    if (sys->vout)
+        filter_chain_ForEach(sys->filter_chain,
+                             SubFilterDelProxyCallbacks, sys->vout);
     filter_chain_Delete(sys->filter_chain);
+    free(sys->filter_chain_current);
     vlc_mutex_destroy(&sys->source_chain_lock);
     vlc_mutex_destroy(&sys->filter_chain_lock);
     free(sys->source_chain_update);
@@ -1362,9 +1422,17 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
     vlc_mutex_lock(&sys->filter_chain_lock);
     if (chain_update) {
         if (*chain_update) {
+            if (sys->vout)
+                filter_chain_ForEach(sys->filter_chain,
+                                     SubFilterDelProxyCallbacks,
+                                     sys->vout);
             filter_chain_Reset(sys->filter_chain, NULL, NULL);
 
             filter_chain_AppendFromString(spu->p->filter_chain, chain_update);
+            if (sys->vout)
+                filter_chain_ForEach(sys->filter_chain,
+                                     SubFilterAddProxyCallbacks,
+                                     sys->vout);
         }
         else if (filter_chain_GetLength(spu->p->filter_chain) > 0)
             filter_chain_Reset(sys->filter_chain, NULL, NULL);
@@ -1386,6 +1454,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
                 if (sys->source_chain_update)
                     free(sys->source_chain_update);
                 sys->source_chain_update = chain_update;
+                sys->source_chain_current = strdup(chain_update);
                 chain_update = NULL;
             }
             vlc_mutex_unlock(&sys->lock);
@@ -1439,9 +1508,16 @@ subpicture_t *spu_Render(spu_t *spu,
     vlc_mutex_lock(&sys->source_chain_lock);
     if (chain_update) {
         filter_chain_ForEach(sys->source_chain, SubSourceClean, spu);
+            if (sys->vout)
+                filter_chain_ForEach(sys->source_chain,
+                                     SubSourceDelProxyCallbacks,
+                                     sys->vout);
         filter_chain_Reset(sys->source_chain, NULL, NULL);
 
         filter_chain_AppendFromString(spu->p->source_chain, chain_update);
+        if (sys->vout)
+            filter_chain_ForEach(sys->source_chain,
+                                 SubSourceAddProxyCallbacks, sys->vout);
         filter_chain_ForEach(sys->source_chain, SubSourceInit, spu);
 
         free(chain_update);
@@ -1568,7 +1644,14 @@ void spu_ChangeSources(spu_t *spu, const char *filters)
     vlc_mutex_lock(&sys->lock);
 
     free(sys->source_chain_update);
-    sys->source_chain_update = strdup(filters);
+    if (filters)
+    {
+        sys->source_chain_update = strdup(filters);
+        free(sys->source_chain_current);
+        sys->source_chain_current = strdup(filters);
+    }
+    else if (sys->source_chain_current)
+        sys->source_chain_update = strdup(sys->source_chain_current);
 
     vlc_mutex_unlock(&sys->lock);
 }
@@ -1580,7 +1663,14 @@ void spu_ChangeFilters(spu_t *spu, const char *filters)
     vlc_mutex_lock(&sys->lock);
 
     free(sys->filter_chain_update);
-    sys->filter_chain_update = strdup(filters);
+    if (filters)
+    {
+        sys->filter_chain_update = strdup(filters);
+        free(sys->filter_chain_current);
+        sys->filter_chain_current = strdup(filters);
+    }
+    else if (sys->filter_chain_current)
+        sys->filter_chain_update = strdup(sys->filter_chain_current);
 
     vlc_mutex_unlock(&sys->lock);
 }

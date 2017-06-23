@@ -421,7 +421,7 @@ static int Open( vlc_object_t *p_this )
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
     if( psz_string && *psz_string )
     {
-        p_sys->p_spu = spu_Create( p_stream );
+        p_sys->p_spu = spu_Create( p_stream, NULL );
         if( p_sys->p_spu )
             spu_ChangeSources( p_sys->p_spu, psz_string );
     }
@@ -447,7 +447,7 @@ static int Open( vlc_object_t *p_this )
 
         if( !p_sys->p_spu )
         {
-            p_sys->p_spu = spu_Create( p_stream );
+            p_sys->p_spu = spu_Create( p_stream, NULL );
             if( p_sys->p_spu )
                 spu_ChangeSources( p_sys->p_spu, "osdmenu" );
         }

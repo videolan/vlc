@@ -51,8 +51,8 @@ struct spu_t
     spu_private_t *p;
 };
 
-VLC_API spu_t * spu_Create( vlc_object_t * );
-#define spu_Create(a) spu_Create(VLC_OBJECT(a))
+    VLC_API spu_t * spu_Create( vlc_object_t *, vout_thread_t * );
+#define spu_Create(a,b) spu_Create(VLC_OBJECT(a),b)
 VLC_API void spu_Destroy( spu_t * );
 
 /**

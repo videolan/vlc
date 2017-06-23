@@ -150,7 +150,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout_IntfInit(vout);
 
     /* Initialize subpicture unit */
-    vout->p->spu = spu_Create(vout);
+    vout->p->spu = spu_Create(vout, vout);
 
     vout->p->title.show     = var_InheritBool(vout, "video-title-show");
     vout->p->title.timeout  = var_InheritInteger(vout, "video-title-timeout");

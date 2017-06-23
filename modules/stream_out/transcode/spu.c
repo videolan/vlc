@@ -113,7 +113,7 @@ int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     }
 
     if( !p_sys->p_spu )
-        p_sys->p_spu = spu_Create( p_stream );
+        p_sys->p_spu = spu_Create( p_stream, NULL );
 
     return VLC_SUCCESS;
 }
