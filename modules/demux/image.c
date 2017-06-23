@@ -423,7 +423,9 @@ static bool IsSpiff(stream_t *s)
 static bool IsExif(stream_t *s)
 {
     const uint8_t *header;
-    int size = vlc_stream_Peek(s, &header, 256);
+    ssize_t size = vlc_stream_Peek(s, &header, 256);
+    if (size == -1)
+        return false;
     int position = 0;
 
     if (FindJpegMarker(&position, header, size) != 0xd8)
@@ -460,7 +462,9 @@ static bool IsSVG(stream_t *s)
     if (!ext) return false;
 
     const uint8_t *header;
-    int size = vlc_stream_Peek(s, &header, 4096);
+    ssize_t size = vlc_stream_Peek(s, &header, 4096);
+    if (size == -1)
+        return false;
     int position = 0;
 
     const char xml[] = "<?xml version=\"";
@@ -535,7 +539,7 @@ static bool IsTarga(stream_t *s)
 
 typedef struct {
     vlc_fourcc_t  codec;
-    int           marker_size;
+    size_t        marker_size;
     const uint8_t marker[14];
     bool          (*detect)(stream_t *s);
 } image_format_t;
@@ -624,7 +628,7 @@ static int Open(vlc_object_t *object)
     const image_format_t *img;
 
     const uint8_t *peek;
-    int peek_size = 0;
+    ssize_t peek_size = 0;
     for (int i = 0; ; i++) {
         img = &formats[i];
         if (!img->codec)
@@ -634,9 +638,13 @@ static int Open(vlc_object_t *object)
             if (img->detect(demux->s))
                 break;
         } else {
-            if (peek_size < img->marker_size)
+            if ((size_t) peek_size < img->marker_size)
+            {
                 peek_size = vlc_stream_Peek(demux->s, &peek, img->marker_size);
-            if (peek_size >= img->marker_size &&
+                if (peek_size == -1)
+                    return VLC_ENOMEM;
+            }
+            if ((size_t) peek_size >= img->marker_size &&
                 !memcmp(peek, img->marker, img->marker_size))
                 break;
         }
