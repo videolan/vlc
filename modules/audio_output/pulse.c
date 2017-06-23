@@ -802,6 +802,16 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (ss.format != PA_SAMPLE_INVALID)
         pa_format_info_set_sample_format(formatv, ss.format);
 
+    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+    {
+        fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+
+        /* Setup low latency in order to quickly react to ambisonics
+         * filters viewpoint changes. */
+        flags |= PA_STREAM_ADJUST_LATENCY;
+        attr.tlength = pa_usec_to_bytes(2 * AOUT_MIN_PREPARE_TIME, &ss);
+    }
+
     if (encoding != PA_ENCODING_PCM)
     {
         pa_format_info_set_channels(formatv, ss.channels);
