@@ -613,7 +613,7 @@ int Open( vlc_object_t *p_this )
     if( chroma == NULL || chroma->pixel_size > 2 )
     {
 notsupp:
-        msg_Err( p_filter, "unsupported chroma %4.4s", (char*)&fourcc );
+        msg_Dbg( p_filter, "unsupported chroma %4.4s", (char*)&fourcc );
         return VLC_EGENERIC;
     }
 
