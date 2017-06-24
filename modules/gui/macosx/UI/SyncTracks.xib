@@ -72,7 +72,7 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="10">
                                     <rect key="frame" x="343" y="11" width="15" height="22"/>
-                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="11">
+                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="11" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
                                     <connections>
@@ -128,7 +128,7 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="19">
                                     <rect key="frame" x="343" y="74" width="15" height="22"/>
-                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="24">
+                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="24" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
                                     <connections>
@@ -163,7 +163,7 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="29">
                                     <rect key="frame" x="343" y="43" width="15" height="22"/>
-                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="100" doubleValue="1" id="34">
+                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="100" doubleValue="1" id="34" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
                                     <connections>
@@ -198,7 +198,7 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="105">
                                     <rect key="frame" x="343" y="13" width="15" height="22"/>
-                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="20" id="106">
+                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="20" id="106" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
                                     <connections>
