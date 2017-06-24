@@ -1,5 +1,5 @@
 //
-//  BGHUDStepperCell.m
+//  VLCHUDStepperCell.h
 //  BGHUDAppKit
 //
 //  Created by BinaryGod on 4/6/09.

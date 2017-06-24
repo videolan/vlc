@@ -1,5 +1,5 @@
 //
-//  VLCHUDButtonCell.m
+//  VLCHUDButtonCell.h
 //  BGHUDAppKit
 //
 //  Created by BinaryGod on 5/25/08.

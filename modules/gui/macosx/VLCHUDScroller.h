@@ -1,3 +1,4 @@
+//
 //  VLCHUDScroller.h
 //  HUDScroller
 //

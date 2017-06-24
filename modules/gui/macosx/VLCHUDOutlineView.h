@@ -2,7 +2,7 @@
 //  VLCHUDOutlineView.h
 //  BGHUDAppKit
 //
-//  Created by BinaryGod on 6/17/08.
+//  Created by BinaryGod on 6/20/08.
 //
 //  Copyright (c) 2008, Tim Davis (BinaryMethod.com, binary.god@gmail.com)
 //  All rights reserved.
