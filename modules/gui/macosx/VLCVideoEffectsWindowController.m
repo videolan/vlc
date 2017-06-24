@@ -683,7 +683,8 @@
     [_textfieldPanel setCancelButtonString:_NS("Cancel")];
     [_textfieldPanel setOkButtonString:_NS("Save")];
 
-    __weak typeof(self) _self = self;
+    // TODO: Change to weak, when dropping 10.7 support
+    __unsafe_unretained typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -750,7 +751,8 @@
     [_popupPanel setCancelButtonString:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoEffectProfileNames"]];
 
-    __weak typeof(self) _self = self;
+    // TODO: Change to weak, when dropping 10.7 support
+    __unsafe_unretained typeof(self) _self = self;
     [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
