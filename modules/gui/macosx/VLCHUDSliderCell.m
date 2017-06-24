@@ -33,6 +33,7 @@
 //	POSSIBILITY OF SUCH DAMAGE.
 
 #import "VLCHUDSliderCell.h"
+#import "CompatibilityFixes.h"
 
 @implementation VLCHUDSliderCell
 
@@ -68,6 +69,9 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 #pragma clang diagnostic ignored "-Wpartial-availability"
 - (void)drawKnob:(NSRect)smallRect
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawKnob:smallRect];
+    }
     NSBezierPath *path = [NSBezierPath bezierPath];
     // Inset rect to have enough room for the stroke
     smallRect = NSInsetRect(smallRect, 1.0, 1.0);
@@ -155,6 +159,9 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 
 - (void)drawBarInside:(NSRect)fullRect flipped:(BOOL)flipped
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawBarInside:fullRect flipped:flipped];
+    }
     if (self.isVertical) {
         return [self drawVerticalBarInFrame:fullRect];
     } else {
@@ -315,6 +322,9 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 
 - (void)drawTickMarks
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawTickMarks];
+    }
     for (int i = 0; i < self.numberOfTickMarks; i++) {
         NSRect tickMarkRect = [self rectOfTickMarkAtIndex:i];
         if (self.isEnabled) {

@@ -33,8 +33,22 @@
 //	POSSIBILITY OF SUCH DAMAGE.
 
 #import "VLCHUDPopUpButtonCell.h"
+#import "CompatibilityFixes.h"
 
 @implementation VLCHUDPopUpButtonCell
+
++ (void)load
+{
+    /* On 10.10+ we do not want custom drawing, therefore we swap out the implementation
+     * of the selectors below with their original implementations.
+     * Just calling super in the overridden methods is not enough, to get the same drawin
+     * a non-subclassed cell would use.
+     */
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        swapoutOverride([VLCHUDPopUpButtonCell class], @selector(initWithCoder:));
+        swapoutOverride([VLCHUDPopUpButtonCell class], @selector(drawWithFrame:inView:));
+    }
+}
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {

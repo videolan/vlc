@@ -35,6 +35,7 @@
 // transparent drawing issues.  Your awesome man!!!
 
 #import "VLCHUDScroller.h"
+#import "CompatibilityFixes.h"
 
 @implementation VLCHUDScroller
 
@@ -58,6 +59,9 @@
 #pragma mark Drawing Functions
 
 - (void)drawRect:(NSRect)rect {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawRect:rect];
+    }
     // See if we should use system default or supplied value
     if ([self arrowsPosition] == NSScrollerArrowsDefaultSetting) {
         arrowPosition = [[[NSUserDefaults standardUserDefaults] persistentDomainForName:NSGlobalDomain] valueForKey: @"AppleScrollBarVariant"];
@@ -91,6 +95,9 @@
 }
 
 - (void)drawKnob {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawKnob];
+    }
 
     if(![self isHoriz]) {
 
@@ -173,6 +180,9 @@
 }
 
 - (void)drawArrow:(NSScrollerArrow)arrow highlightPart:(NSUInteger)part {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawArrow:arrow highlight:part];
+    }
 
     if (arrow == NSScrollerDecrementArrow) {
 
@@ -196,6 +206,9 @@
 }
 
 - (void)drawKnobSlotInRect:(NSRect)rect highlight:(BOOL)highlight {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawKnobSlotInRect:rect highlight:highlight];
+    }
 
     if (![self isHoriz]) {
 
@@ -687,6 +700,9 @@
 #pragma mark -
 #pragma mark Helper Methods
 - (NSUsableScrollerParts)usableParts {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super usableParts];
+    }
 
     if ([self arrowsPosition] != NSScrollerArrowsNone) {
 

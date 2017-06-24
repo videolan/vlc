@@ -54,6 +54,20 @@
 
 @implementation VLCHUDTextFieldCell
 
++ (void)load
+{
+    /* On 10.10+ we do not want custom drawing, therefore we swap out the implementation
+     * of the selectors below with their original implementations.
+     */
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        swapoutOverride([VLCHUDTextFieldCell class], @selector(initTextCell:));
+        swapoutOverride([VLCHUDTextFieldCell class], @selector(initWithCoder:));
+        swapoutOverride([VLCHUDTextFieldCell class], @selector(setUpFieldEditorAttributes:));
+        swapoutOverride([VLCHUDTextFieldCell class], @selector(drawWithFrame:inView:));
+        swapoutOverride([VLCHUDTextFieldCell class], @selector(_drawKeyboardFocusRingWithFrame:inView:));
+    }
+}
+
 #pragma mark Drawing Functions
 
 - (instancetype)initTextCell:(NSString *)aString
@@ -80,10 +94,6 @@
 
 - (void)commonInit
 {
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        return;
-    }
-
     // Init colors
     _focusRing = [[NSShadow alloc] init];
     [_focusRing setShadowColor:NSColor.whiteColor];
@@ -114,10 +124,6 @@
 
 - (NSText *)setUpFieldEditorAttributes:(NSText *)textObj
 {
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        return [super setUpFieldEditorAttributes:textObj];
-    }
-
     NSText *newText = [super setUpFieldEditorAttributes:textObj];
     NSColor *textColor = _cellTextColor;
     [(NSTextView *)newText setInsertionPointColor:textColor];
@@ -126,10 +132,6 @@
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        return [super drawWithFrame:cellFrame inView:controlView];
-    }
-
     // Adjust Rect
     cellFrame = NSInsetRect(cellFrame, 0.5f, 0.5f);
 
@@ -293,12 +295,6 @@
 
 - (void)_drawKeyboardFocusRingWithFrame:(NSRect)rect inView:(NSView*)view
 {
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        if ([super respondsToSelector:@selector(_drawKeyboardFocusRingWithFrame:inView:)]) {
-            [super _drawKeyboardFocusRingWithFrame:rect inView:view];
-        }
-    }
-
     // Do nothing
 }
 

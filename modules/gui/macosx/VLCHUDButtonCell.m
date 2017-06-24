@@ -33,8 +33,24 @@
 //	POSSIBILITY OF SUCH DAMAGE.
 
 #import "VLCHUDButtonCell.h"
+#import "CompatibilityFixes.h"
 
 @implementation VLCHUDButtonCell
+
+
++ (void)load
+{
+    /* On 10.10+ we do not want custom drawing, therefore we swap out the implementation
+     * of the selectors below with their original implementations.
+     * Just calling super is not enough, as it would still result in different drawing
+     * due to lack of vibrancy.
+     */
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        swapoutOverride([VLCHUDButtonCell class], @selector(initWithCoder:));
+        swapoutOverride([VLCHUDButtonCell class], @selector(drawBezelWithFrame:inView:));
+        swapoutOverride([VLCHUDButtonCell class], @selector(drawTitle:withFrame:inView:));
+    }
+}
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {

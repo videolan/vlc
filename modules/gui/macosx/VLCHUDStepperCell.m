@@ -33,6 +33,7 @@
 //	POSSIBILITY OF SUCH DAMAGE.
 
 #import "VLCHUDStepperCell.h"
+#import "CompatibilityFixes.h"
 
 @implementation VLCHUDStepperCell {
     int topButtonFlag;
@@ -69,6 +70,9 @@
 }
 
 -(void)drawWithFrame:(NSRect) frame inView:(NSView *) controlView {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super drawWithFrame:frame inView:controlView];
+    }
     [self drawRoundRectButtonInFrame:frame];
     [self drawArrowsInRect:frame];
 }
@@ -84,6 +88,9 @@
 
 -(BOOL)startTrackingAt:(NSPoint)startPoint inView:(NSView *)controlView
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super startTrackingAt:startPoint inView:controlView];
+    }
     NSRect frame = [controlView bounds];
 
     NSRect bottomRect = NSMakeRect(frame.origin.x,frame.origin.y,frame.size.width,frame.size.height/2);
@@ -103,6 +110,9 @@
 }
 -(BOOL)continueTracking:(NSPoint)lastPoint at:(NSPoint)currentPoint inView:(NSView *)controlView
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super continueTracking:lastPoint at:currentPoint inView:controlView];
+    }
     NSRect frame = [controlView bounds];
 
     NSRect bottomRect = NSMakeRect(frame.origin.x,frame.origin.y,frame.size.width,frame.size.height/2);
@@ -133,6 +143,9 @@
 }
 -(void)stopTracking:(NSPoint)lastPoint at:(NSPoint)stopPoint inView:(NSView *)controlView mouseIsUp:(BOOL)flag
 {
+    if (OSX_YOSEMITE_AND_HIGHER) {
+        return [super stopTracking:lastPoint at:stopPoint inView:controlView mouseIsUp:flag];
+    }
     isTopDown = isBottomDown = topPressed = bottomPressed = NO;
     [[self controlView] setNeedsDisplay:YES];
     [super stopTracking:lastPoint at:stopPoint inView:controlView mouseIsUp:flag];
