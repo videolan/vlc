@@ -93,4 +93,13 @@
     var_SetString(playlist , "sout", sout.UTF8String);
 }
 
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[VLCRendererItem class]]) {
+        return NO;
+    }
+    VLCRendererItem *other = object;
+    return (other.rendererItem == self.rendererItem);
+}
+
 @end
