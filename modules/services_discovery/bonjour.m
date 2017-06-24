@@ -301,9 +301,19 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
     NSString *uri = [NSString stringWithFormat:@"%@://%@:%ld", protocol, netService.hostName, netService.port];
     NSDictionary *txtDict = [NSNetService dictionaryFromTXTRecordData:[netService TXTRecordData]];
+    NSString *displayName = netService.name;
 
+    if ([netService.type isEqualToString:@"_googlecast._tcp."]) {
+        NSData *modelData = [txtDict objectForKey:@"md"];
+        NSData *nameData = [txtDict objectForKey:@"fn"];
+        if (modelData && nameData) {
+            NSString *model = [[NSString alloc] initWithData:modelData encoding:NSUTF8StringEncoding];
+            NSString *name = [[NSString alloc] initWithData:nameData encoding:NSUTF8StringEncoding];
+            displayName = [NSString stringWithFormat:@"%@ (%@)", name, model];
+        }
+    }
     // TODO: Detect rendered capabilities and adapt to work with not just chromecast
-    vlc_renderer_item_t *p_renderer_item = vlc_renderer_item_new( "chromecast", [netService.name UTF8String],
+    vlc_renderer_item_t *p_renderer_item = vlc_renderer_item_new( "chromecast", [displayName UTF8String],
                                                                  [uri UTF8String], NULL, "cc_demux",
                                                                  "", VLC_RENDERER_CAN_VIDEO );
     if (p_renderer_item != NULL) {
