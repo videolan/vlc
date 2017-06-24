@@ -120,13 +120,13 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
     for (VLCRendererItem *item in _rendererItems) {
         if (item.rendererItem == base_item) {
             result_item = item;
-            return;
+            break;
         }
     }
     if (result_item) {
-        [_rendererItems removeObject:result_item];
         if (_delegate)
             [_delegate removedRendererItem:result_item from:self];
+        [_rendererItems removeObject:result_item];
     } else {
         msg_Err(p_intf, "VLCRendererDiscovery could not find item to remove!");
     }
