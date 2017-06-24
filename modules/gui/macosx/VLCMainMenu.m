@@ -49,7 +49,6 @@
 #import "VLCDebugMessageWindowController.h"
 #import "VLCAddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"
-#import "VLCRendererDialog.h"
 #import "NSScreen+VLCAdditions.h"
 
 #ifdef HAVE_SPARKLE
@@ -61,7 +60,6 @@
     VLCAboutWindowController *_aboutWindowController;
     VLCHelpWindowController  *_helpWindowController;
     VLCAddonsWindowController *_addonsController;
-    VLCRendererDialog *_rendererDialog;
 
     NSMenu *_playlistTableColumnsContextMenu;
 
@@ -401,7 +399,6 @@
     [_titleMenu setTitle: _NS("Title")];
     [_chapter setTitle: _NS("Chapter")];
     [_chapterMenu setTitle: _NS("Chapter")];
-    [_renderer setTitle: _NS("Select Renderer…")];
 
     [_audioMenu setTitle: _NS("Audio")];
     [_vol_up setTitle: _NS("Increase Volume")];
@@ -1280,14 +1277,6 @@
         _helpWindowController = [[VLCHelpWindowController alloc] init];
 
     [_helpWindowController showHelp];
-}
-
-- (IBAction)showRenderers:(id)sender
-{
-    if (!_rendererDialog)
-        _rendererDialog = [[VLCRendererDialog alloc] init];
-
-    [_rendererDialog showWindow:self];
 }
 
 - (IBAction)openDocumentation:(id)sender

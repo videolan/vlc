@@ -87,7 +87,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \
 	gui/macosx/VLCRendererItem.h gui/macosx/VLCRendererItem.m \
-	gui/macosx/VLCRendererDialog.h gui/macosx/VLCRendererDialog.m \
+	gui/macosx/VLCRendererMenuController.h gui/macosx/VLCRendererMenuController.m \
 	gui/macosx/VLCResumeDialogController.h gui/macosx/VLCResumeDialogController.m \
 	gui/macosx/VLCTrackSynchronizationWindowController.h gui/macosx/VLCTrackSynchronizationWindowController.m \
 	gui/macosx/VLCVideoEffectsWindowController.h gui/macosx/VLCVideoEffectsWindowController.m \

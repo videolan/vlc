@@ -106,7 +106,6 @@
                 <outlet property="rate_slowerLabel" destination="4600" id="vRN-S8-MSb"/>
                 <outlet property="rate_view" destination="4596" id="MPC-hG-6bj"/>
                 <outlet property="record" destination="5137" id="Ka3-jl-auY"/>
-                <outlet property="renderer" destination="Rf6-Uj-7Ja" id="Nzc-Qb-SnK"/>
                 <outlet property="repeat" destination="5143" id="ulG-wD-gtG"/>
                 <outlet property="revealInFinder" destination="3945" id="z7n-A2-K5o"/>
                 <outlet property="save_playlist" destination="1599" id="spC-pk-6W4"/>
@@ -484,11 +483,31 @@
                             <menuItem isSeparatorItem="YES" id="5154">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Select Renderer…" id="Rf6-Uj-7Ja">
+                            <menuItem title="Renderer" id="wYl-A2-q30">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="showRenderers:" target="-2" id="Y9L-YQ-3RJ"/>
-                                </connections>
+                                <menu key="submenu" title="Renderer" id="ODg-VN-8Tv">
+                                    <items>
+                                        <menuItem title="Renderer discovery off" enabled="NO" id="kZC-S6-b2M">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Enable renderer discovery" id="5gR-ec-KSL">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggleRendererDiscovery:" target="GfD-zq-JqC" id="tGk-pM-MVQ"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="sbF-Ji-lAl"/>
+                                        <menuItem title="No Renderer" state="on" id="eE8-qf-9x9">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="selectRenderer:" target="GfD-zq-JqC" id="JA3-zV-4I0"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                    <connections>
+                                        <outlet property="delegate" destination="GfD-zq-JqC" id="9Fg-VF-zbg"/>
+                                    </connections>
+                                </menu>
                             </menuItem>
                             <menuItem title="Program" id="5150">
                                 <menu key="submenu" title="Program" id="5157"/>
@@ -1060,6 +1079,14 @@
             </constraints>
             <point key="canvasLocation" x="479.5" y="564.5"/>
         </customView>
+        <customObject id="GfD-zq-JqC" customClass="VLCRendererMenuController">
+            <connections>
+                <outlet property="rendererDiscoveryState" destination="kZC-S6-b2M" id="Ur7-YL-R4x"/>
+                <outlet property="rendererDiscoveryToggle" destination="5gR-ec-KSL" id="CEI-18-tX4"/>
+                <outlet property="rendererMenu" destination="ODg-VN-8Tv" id="bMa-lk-ryz"/>
+                <outlet property="rendererNoneItem" destination="eE8-qf-9x9" id="p9J-VU-Dg9"/>
+            </connections>
+        </customObject>
         <userDefaultsController representsSharedInstance="YES" id="uFO-sP-uo6"/>
     </objects>
 </document>

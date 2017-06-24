@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCRendererDialog.h: View controller class for the renderer dialog
+ * VLCRendererDialog.h: Controller class for the renderer menu
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
@@ -26,14 +26,11 @@
 #import "VLCRendererItem.h"
 #import "VLCRendererDiscovery.h"
 
-@interface VLCRendererDialog : NSWindowController <VLCRendererDiscoveryDelegate, NSWindowDelegate>
+@interface VLCRendererMenuController : NSObject <VLCRendererDiscoveryDelegate>
 
-#ifdef MAC_OS_X_VERSION_10_11
-@property NSMutableArray<VLCRendererItem*> *rendererItems;
-#else
-@property NSMutableArray *rendererItems;
-#endif
-
-- (IBAction)selectRenderer:(id)sender;
+@property (readwrite, weak) IBOutlet NSMenu     *rendererMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *rendererDiscoveryState;
+@property (readwrite, weak) IBOutlet NSMenuItem *rendererDiscoveryToggle;
+@property (readwrite, weak) IBOutlet NSMenuItem *rendererNoneItem;
 
 @end
