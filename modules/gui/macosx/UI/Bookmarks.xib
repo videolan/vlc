@@ -37,7 +37,7 @@
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="88">
                         <rect key="frame" x="20" y="268" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89">
+                        <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89" customClass="VLCHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -47,7 +47,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="90">
                         <rect key="frame" x="20" y="243" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91">
+                        <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91" customClass="VLCHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -57,7 +57,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92">
                         <rect key="frame" x="20" y="218" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93">
+                        <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93" customClass="VLCHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -67,7 +67,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94">
                         <rect key="frame" x="20" y="193" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95">
+                        <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95" customClass="VLCHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -77,7 +77,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="96">
                         <rect key="frame" x="20" y="133" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Extract" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="97">
+                        <buttonCell key="cell" type="roundRect" title="Extract" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="97" customClass="VLCHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
@@ -175,20 +175,20 @@
                 <rect key="frame" x="0.0" y="0.0" width="298" height="125"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="135">
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="135">
                         <rect key="frame" x="74" y="83" width="204" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="204" id="bLc-El-nRp"/>
                         </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="136">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="136" customClass="VLCHUDTextFieldCell">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="137">
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="137">
                         <rect key="frame" x="74" y="51" width="204" height="22"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="138">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="138" customClass="VLCHUDTextFieldCell">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -196,7 +196,7 @@
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="141">
                         <rect key="frame" x="246" y="18" width="32" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142">
+                        <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142" customClass="VLCHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -209,7 +209,7 @@ DQ
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="143">
                         <rect key="frame" x="185" y="18" width="53" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144">
+                        <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144" customClass="VLCHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -220,17 +220,17 @@ Gw
                             <action selector="edit_cancel:" target="-2" id="180"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="145">
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="145">
                         <rect key="frame" x="25" y="85" width="44" height="17"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Name:" id="146">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Name:" id="146" customClass="VLCHUDTextFieldCell">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="147">
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="147">
                         <rect key="frame" x="31" y="53" width="38" height="17"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time:" id="148">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time:" id="148" customClass="VLCHUDTextFieldCell">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

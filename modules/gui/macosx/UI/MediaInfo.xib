@@ -108,7 +108,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="369" id="QQR-jU-J5W"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Title" id="430">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Title" id="430" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -128,7 +128,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="510">
                                             <rect key="frame" x="35" y="40" width="475" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Location" id="511">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Location" id="511" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -147,7 +147,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="432">
                                             <rect key="frame" x="35" y="371" width="330" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Artist" id="433">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Artist" id="433" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -169,7 +169,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="89" id="R0Z-z4-bc9"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Date" id="437">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Date" id="437" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -188,7 +188,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="440">
                                             <rect key="frame" x="35" y="328" width="330" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Album" id="445">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Album" id="445" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -207,7 +207,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="442">
                                             <rect key="frame" x="411" y="328" width="93" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Track Number" id="443">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Track Number" id="443" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -226,7 +226,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="462">
                                             <rect key="frame" x="35" y="285" width="307" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Genre" id="467">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Genre" id="467" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -245,7 +245,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="477">
                                             <rect key="frame" x="35" y="242" width="307" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now Playing" id="478">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now Playing" id="478" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -264,7 +264,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="482">
                                             <rect key="frame" x="35" y="113" width="232" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Publisher" id="483">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Publisher" id="483" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -283,7 +283,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="505">
                                             <rect key="frame" x="273" y="108" width="232" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Encoded by" id="506">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Encoded by" id="506" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -302,7 +302,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="487">
                                             <rect key="frame" x="35" y="156" width="307" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Copyright" id="488">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Copyright" id="488" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -324,7 +324,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="498">
                                             <rect key="frame" x="35" y="199" width="307" height="13"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description" id="499">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description" id="499" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -346,7 +346,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="89" id="qse-Y4-EaG"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Language" id="465">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Language" id="465" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -460,17 +460,17 @@
                             </tabViewItem>
                             <tabViewItem label="Codec Details" identifier="2" id="420">
                                 <view key="view" id="421">
-                                    <rect key="frame" x="0.0" y="0.0" width="542" height="444"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="542" height="432"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="516">
-                                            <rect key="frame" x="17" y="0.0" width="510" height="440"/>
+                                            <rect key="frame" x="17" y="0.0" width="510" height="428"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="jDW-Lc-WE4">
-                                                <rect key="frame" x="0.0" y="0.0" width="510" height="440"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="510" height="428"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="521" id="519" customClass="VLCHUDOutlineView">
-                                                        <rect key="frame" x="0.0" y="0.0" width="510" height="440"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="510" height="428"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -526,7 +526,7 @@
                             </tabViewItem>
                             <tabViewItem label="Statistics" identifier="3" id="425">
                                 <view key="view" id="426">
-                                    <rect key="frame" x="0.0" y="0.0" width="542" height="444"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="542" height="432"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" boxType="custom" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="549">
@@ -540,7 +540,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="Fe5-cw-cYX"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Read at media" id="532">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Read at media" id="532" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -551,7 +551,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="jaJ-qV-SHG"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="536">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="536" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -559,7 +559,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="537">
                                                         <rect key="frame" x="12" y="53" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input bitrate" id="540">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input bitrate" id="540" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -567,7 +567,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="538">
                                                         <rect key="frame" x="135" y="53" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="539">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="539" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -575,7 +575,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="541">
                                                         <rect key="frame" x="12" y="34" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Demuxed" id="544">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Demuxed" id="544" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -583,7 +583,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="542">
                                                         <rect key="frame" x="135" y="34" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="543">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="543" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -591,7 +591,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="545">
                                                         <rect key="frame" x="12" y="15" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stream bitrate" id="548">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stream bitrate" id="548" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -599,7 +599,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="546">
                                                         <rect key="frame" x="135" y="15" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="547">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB/s" id="547" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -637,7 +637,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="117" id="9nA-Gr-Hi1"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input" id="551">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input" id="551" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -654,7 +654,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="Htg-L7-ZFh"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="570">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="570" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -665,7 +665,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="NGB-dc-ns6"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="569">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="569" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -673,7 +673,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="557">
                                                         <rect key="frame" x="12" y="53" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Displayed frames" id="568">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Displayed frames" id="568" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -681,7 +681,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="558">
                                                         <rect key="frame" x="135" y="53" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000/s" id="567">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000/s" id="567" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -689,7 +689,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="559">
                                                         <rect key="frame" x="12" y="34" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost frames" id="566">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost frames" id="566" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -697,7 +697,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="560">
                                                         <rect key="frame" x="135" y="34" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="565">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="565" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -729,7 +729,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="117" id="zpS-Zr-N7Z"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Video" id="554">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Video" id="554" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -746,7 +746,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="I4C-Np-0Vf"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sent packets" id="608">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sent packets" id="608" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -757,7 +757,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="Sqd-F6-iuk"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="607">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="607" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -765,7 +765,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="595">
                                                         <rect key="frame" x="12" y="38" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sent bytes" id="606">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sent bytes" id="606" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -773,7 +773,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="596">
                                                         <rect key="frame" x="135" y="38" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="605">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="605" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -781,7 +781,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="597">
                                                         <rect key="frame" x="12" y="19" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Send rate" id="604">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Send rate" id="604" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -789,7 +789,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="598">
                                                         <rect key="frame" x="135" y="19" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="603">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000 kB" id="603" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -818,7 +818,7 @@
                                         </box>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="572">
                                             <rect key="frame" x="27" y="280" width="121" height="14"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Streaming" id="592">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Streaming" id="592" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -835,7 +835,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="117" id="FaO-BP-Myr"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="584">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Decoded blocks" id="584" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -846,7 +846,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="85" id="pgJ-Ad-US6"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="585">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="585" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -854,7 +854,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="581">
                                                         <rect key="frame" x="12" y="38" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Played buffer" id="586">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Played buffer" id="586" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -862,7 +862,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="580">
                                                         <rect key="frame" x="135" y="38" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="587">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="587" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -870,7 +870,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="579">
                                                         <rect key="frame" x="12" y="19" width="121" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost buffers" id="588">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lost buffers" id="588" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -878,7 +878,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="578">
                                                         <rect key="frame" x="135" y="19" width="89" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="589">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1000" id="589" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -907,7 +907,7 @@
                                         </box>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="574">
                                             <rect key="frame" x="275" y="280" width="121" height="14"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio" id="575">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio" id="575" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -946,7 +946,7 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
+                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
                         <rect key="frame" x="124" y="448" width="258" height="24"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="WVH-Tg-9g5"/>
@@ -963,7 +963,7 @@
                             <action selector="takeSelectedTabViewItemFromSender:" target="418" id="Z4V-Lm-ikS"/>
                         </connections>
                     </segmentedControl>
-                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
+                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
                         <rect key="frame" x="0.0" y="440" width="506" height="5"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="1" id="ivG-J4-70G"/>

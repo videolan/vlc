@@ -147,14 +147,14 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="171" id="Qmh-zW-wC1"/>
                                                         </constraints>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="-180" maxValue="180" tickMarkPosition="above" sliderType="linear" id="32"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="-180" maxValue="180" tickMarkPosition="above" sliderType="linear" id="32" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="adjustSliderChanged:" target="-2" id="9Ra-Ux-sYu"/>
                                                         </connections>
                                                     </slider>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="25">
                                                         <rect key="frame" x="15" y="138" width="26" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Hue" id="38">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Hue" id="38" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -162,14 +162,14 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="30">
                                                         <rect key="frame" x="119" y="114" width="171" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="33"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="33" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="adjustSliderChanged:" target="-2" id="ceo-WZ-Y3X"/>
                                                         </connections>
                                                     </slider>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="24">
                                                         <rect key="frame" x="15" y="116" width="50" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Contrast" id="39">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Contrast" id="39" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -177,7 +177,7 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="29">
                                                         <rect key="frame" x="119" y="92" width="171" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="34"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="34" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="adjustSliderChanged:" target="-2" id="oSl-TZ-hTC"/>
                                                         </connections>
@@ -194,7 +194,7 @@
                                                     </button>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="23">
                                                         <rect key="frame" x="15" y="94" width="61" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Brightness" id="40">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Brightness" id="40" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -202,14 +202,14 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
                                                         <rect key="frame" x="119" y="54" width="171" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="3" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="35"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="3" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="35" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="adjustSliderChanged:" target="-2" id="8p1-yp-x16"/>
                                                         </connections>
                                                     </slider>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="22">
                                                         <rect key="frame" x="15" y="56" width="59" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Saturation" id="41">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Saturation" id="41" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -217,7 +217,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="21">
                                                         <rect key="frame" x="15" y="34" width="44" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Gamma" id="42">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Gamma" id="42" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -225,14 +225,14 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="27">
                                                         <rect key="frame" x="119" y="32" width="171" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="36"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="36" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="enableMotionDetect:" target="-2" id="K42-v1-HXL"/>
                                                         </connections>
                                                     </slider>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="704">
                                                         <rect key="frame" x="251" y="10" width="39" height="17"/>
-                                                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="705">
+                                                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="705" customClass="VLCHUDButtonCell">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="miniSystem"/>
                                                         </buttonCell>
@@ -304,7 +304,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="54">
                                                         <rect key="frame" x="15" y="13" width="37" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Sigma" id="55">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Sigma" id="55" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -312,7 +312,7 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="53">
                                                         <rect key="frame" x="125" y="12" width="171" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="0.050000000000000003" tickMarkPosition="above" sliderType="linear" id="56"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="2" doubleValue="0.050000000000000003" tickMarkPosition="above" sliderType="linear" id="56" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="sharpenSliderChanged:" target="-2" id="rDd-ql-8sc"/>
                                                         </connections>
@@ -347,7 +347,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="62">
                                                         <rect key="frame" x="15" y="13" width="40" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Radius" id="65">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Radius" id="65" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -355,7 +355,7 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="63">
                                                         <rect key="frame" x="119" y="10" width="171" height="18"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="4" maxValue="32" doubleValue="16" tickMarkPosition="below" numberOfTickMarks="8" allowsTickMarkValuesOnly="YES" sliderType="linear" id="64"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="4" maxValue="32" doubleValue="16" tickMarkPosition="below" numberOfTickMarks="8" allowsTickMarkValuesOnly="YES" sliderType="linear" id="64" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="bandingSliderChanged:" target="-2" id="HfP-zx-lT4"/>
                                                         </connections>
@@ -390,7 +390,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="70">
                                                         <rect key="frame" x="15" y="13" width="50" height="14"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Variance" id="71">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Variance" id="71" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -398,7 +398,7 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="69">
                                                         <rect key="frame" x="125" y="12" width="171" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="40" doubleValue="2" tickMarkPosition="above" sliderType="linear" id="72"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="40" doubleValue="2" tickMarkPosition="above" sliderType="linear" id="72" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="grainSliderChanged:" target="-2" id="Z7w-sc-MfL"/>
                                                         </connections>
@@ -454,7 +454,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="96" id="xcv-U8-Q2H"/>
                                             </constraints>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="75">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="75" customClass="VLCHUDTextFieldCell">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0 px" negativeFormat="0 px" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="80">
                                                     <real key="roundingIncrement" value="1"/>
                                                     <real key="minimum" value="0.0"/>
@@ -470,7 +470,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="76">
                                             <rect key="frame" x="245" y="172" width="24" height="14"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Top" id="77">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Top" id="77" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -478,7 +478,7 @@
                                         </textField>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="78">
                                             <rect key="frame" x="375" y="167" width="15" height="22"/>
-                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="79">
+                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="79" customClass="VLCHUDStepperCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                             </stepperCell>
                                             <connections>
@@ -488,7 +488,7 @@
                                         </stepper>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="83">
                                             <rect key="frame" x="274" y="92" width="96" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="88">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="88" customClass="VLCHUDTextFieldCell">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0 px" negativeFormat="0 px" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="89">
                                                     <real key="roundingIncrement" value="1"/>
                                                     <real key="minimum" value="0.0"/>
@@ -504,7 +504,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="84">
                                             <rect key="frame" x="226" y="95" width="43" height="14"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Bottom" id="87">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Bottom" id="87" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -512,7 +512,7 @@
                                         </textField>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="85">
                                             <rect key="frame" x="375" y="90" width="15" height="22"/>
-                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="86">
+                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="86" customClass="VLCHUDStepperCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                             </stepperCell>
                                             <connections>
@@ -522,7 +522,7 @@
                                         </stepper>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="92">
                                             <rect key="frame" x="510" y="131" width="96" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="97">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="97" customClass="VLCHUDTextFieldCell">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0 px" negativeFormat="0 px" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="98">
                                                     <real key="roundingIncrement" value="1"/>
                                                     <real key="minimum" value="0.0"/>
@@ -538,7 +538,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="93">
                                             <rect key="frame" x="473" y="134" width="32" height="14"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Right" id="96">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Right" id="96" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -546,7 +546,7 @@
                                         </textField>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94">
                                             <rect key="frame" x="611" y="129" width="15" height="22"/>
-                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="95">
+                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="95" customClass="VLCHUDStepperCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                             </stepperCell>
                                             <connections>
@@ -556,7 +556,7 @@
                                         </stepper>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="101">
                                             <rect key="frame" x="48" y="131" width="96" height="19"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="106">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="106" customClass="VLCHUDTextFieldCell">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0 px" negativeFormat="0 px" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="107">
                                                     <real key="roundingIncrement" value="1"/>
                                                     <real key="minimum" value="0.0"/>
@@ -572,7 +572,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="102">
                                             <rect key="frame" x="18" y="134" width="25" height="14"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Left" id="105">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Left" id="105" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -580,7 +580,7 @@
                                         </textField>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="103">
                                             <rect key="frame" x="149" y="129" width="15" height="22"/>
-                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="104">
+                                            <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1000" id="104" customClass="VLCHUDStepperCell">
                                                 <font key="font" metaFont="smallSystem"/>
                                             </stepperCell>
                                             <connections>
@@ -680,7 +680,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="266" id="P89-PX-ceT"/>
                                                         </constraints>
-                                                        <popUpButtonCell key="cell" type="push" title="Rotate by 90 degrees" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="196" id="194">
+                                                        <popUpButtonCell key="cell" type="push" title="Rotate by 90 degrees" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="196" id="194" customClass="VLCPopUpButtonCell">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="195">
@@ -724,7 +724,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="138">
                                                         <rect key="frame" x="170" y="41" width="96" height="19"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="139">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="139" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="171">
                                                                 <real key="roundingIncrement" value="1"/>
                                                                 <real key="minimum" value="2"/>
@@ -741,7 +741,7 @@
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="140">
                                                         <rect key="frame" x="271" y="39" width="15" height="22"/>
-                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="16" doubleValue="4" id="141">
+                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="16" doubleValue="4" id="141" customClass="VLCHUDStepperCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
                                                         <connections>
@@ -751,7 +751,7 @@
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="142">
                                                         <rect key="frame" x="15" y="44" width="32" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rows" id="143">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rows" id="143" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -759,7 +759,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="144">
                                                         <rect key="frame" x="170" y="14" width="96" height="19"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="149">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="149" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="176">
                                                                 <real key="roundingIncrement" value="1"/>
                                                                 <real key="minimum" value="2"/>
@@ -776,7 +776,7 @@
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="145">
                                                         <rect key="frame" x="271" y="12" width="15" height="22"/>
-                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="16" doubleValue="4" id="148">
+                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="16" doubleValue="4" id="148" customClass="VLCHUDStepperCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
                                                         <connections>
@@ -786,7 +786,7 @@
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="146">
                                                         <rect key="frame" x="15" y="17" width="50" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Columns" id="147">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Columns" id="147" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -835,7 +835,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="96" id="QKd-ku-QNM"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="764">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="764" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="765">
                                                                 <real key="roundingIncrement" value="1"/>
                                                                 <real key="minimum" value="1"/>
@@ -852,7 +852,7 @@
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="760">
                                                         <rect key="frame" x="271" y="39" width="15" height="22"/>
-                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="15" doubleValue="4" id="766">
+                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="15" doubleValue="4" id="766" customClass="VLCHUDStepperCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
                                                         <connections>
@@ -862,7 +862,7 @@
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="759">
                                                         <rect key="frame" x="15" y="44" width="32" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rows" id="767">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rows" id="767" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -870,7 +870,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="758">
                                                         <rect key="frame" x="170" y="14" width="96" height="19"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="2" id="768">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="2" id="768" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="769">
                                                                 <real key="roundingIncrement" value="1"/>
                                                                 <real key="minimum" value="1"/>
@@ -887,7 +887,7 @@
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="757">
                                                         <rect key="frame" x="271" y="12" width="15" height="22"/>
-                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="15" doubleValue="4" id="770">
+                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="15" doubleValue="4" id="770" customClass="VLCHUDStepperCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
                                                         <connections>
@@ -897,7 +897,7 @@
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="756">
                                                         <rect key="frame" x="15" y="17" width="50" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Columns" id="771">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Columns" id="771" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -944,7 +944,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="736">
                                                         <rect key="frame" x="170" y="13" width="96" height="19"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="739">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="739" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="740">
                                                                 <real key="roundingIncrement" value="1"/>
                                                                 <real key="minimum" value="2"/>
@@ -961,7 +961,7 @@
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="735">
                                                         <rect key="frame" x="271" y="11" width="15" height="22"/>
-                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="20" doubleValue="4" id="741">
+                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="20" doubleValue="4" id="741" customClass="VLCHUDStepperCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
                                                         <connections>
@@ -971,7 +971,7 @@
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="734">
                                                         <rect key="frame" x="15" y="16" width="97" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of clones" id="742">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of clones" id="742" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1030,7 +1030,7 @@
                                                 <subviews>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="187">
                                                         <rect key="frame" x="92" y="54" width="80" height="22"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Gradient" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="190" id="188">
+                                                        <popUpButtonCell key="cell" type="push" title="Gradient" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="190" id="188" customClass="VLCPopUpButtonCell">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="189">
@@ -1077,7 +1077,7 @@
                                                     </button>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="185">
                                                         <rect key="frame" x="15" y="59" width="34" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Mode" id="186">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Mode" id="186" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1192,7 +1192,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="Mmc-JB-TlB"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="6" id="236">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="6" id="236" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="237">
                                                                 <real key="roundingIncrement" value="1"/>
                                                                 <real key="minimum" value="2"/>
@@ -1209,7 +1209,7 @@
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="234">
                                                         <rect key="frame" x="181" y="11" width="15" height="22"/>
-                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="256" doubleValue="6" id="235">
+                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="256" doubleValue="6" id="235" customClass="VLCHUDStepperCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
                                                         <connections>
@@ -1219,7 +1219,7 @@
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="240">
                                                         <rect key="frame" x="15" y="15" width="81" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Posterize level" id="241">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Posterize level" id="241" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1261,7 +1261,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="Z1R-tI-76R"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="30" id="247">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="30" id="247" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="255" id="248">
                                                                 <real key="roundingIncrement" value="1"/>
                                                                 <real key="minimum" value="0.0"/>
@@ -1278,7 +1278,7 @@
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="245">
                                                         <rect key="frame" x="181" y="11" width="15" height="22"/>
-                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="255" doubleValue="100" valueWraps="YES" id="249">
+                                                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="255" doubleValue="100" valueWraps="YES" id="249" customClass="VLCHUDStepperCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
                                                         <connections>
@@ -1288,7 +1288,7 @@
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="244">
                                                         <rect key="frame" x="15" y="15" width="49" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Intensity" id="250">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Intensity" id="250" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1327,7 +1327,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="282">
                                                         <rect key="frame" x="15" y="15" width="33" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Color" id="283">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Color" id="283" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1338,7 +1338,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="NhX-q8-iDm"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="FF0000" id="291">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="FF0000" id="291" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1381,14 +1381,14 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="90" id="fiC-8c-fdb"/>
                                                         </constraints>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="1" maxValue="127" doubleValue="80" tickMarkPosition="above" sliderType="linear" id="221"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="1" maxValue="127" doubleValue="80" tickMarkPosition="above" sliderType="linear" id="221" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="blurModifierChanged:" target="-2" id="gLG-Z8-DSC"/>
                                                         </connections>
                                                     </slider>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="219">
                                                         <rect key="frame" x="61" y="15" width="38" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Factor" id="222">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Factor" id="222" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1421,14 +1421,14 @@
                                                 <subviews>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="274">
                                                         <rect key="frame" x="94" y="34" width="100" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" doubleValue="20" tickMarkPosition="above" sliderType="linear" id="275"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" doubleValue="20" tickMarkPosition="above" sliderType="linear" id="275" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="thresholdModifierChanged:" target="-2" id="DA5-ev-OYe"/>
                                                         </connections>
                                                     </slider>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="273">
                                                         <rect key="frame" x="15" y="35" width="59" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Saturation" id="276">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Saturation" id="276" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1436,14 +1436,14 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="296">
                                                         <rect key="frame" x="94" y="13" width="100" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="15" tickMarkPosition="above" sliderType="linear" id="299"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="15" tickMarkPosition="above" sliderType="linear" id="299" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="thresholdModifierChanged:" target="-2" id="B6O-zi-366"/>
                                                         </connections>
                                                     </slider>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="297">
                                                         <rect key="frame" x="15" y="14" width="53" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Similarity" id="298">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Similarity" id="298" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1451,7 +1451,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="292">
                                                         <rect key="frame" x="15" y="59" width="33" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Color" id="295">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Color" id="295" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1462,7 +1462,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="100" id="I8Q-NU-g5N"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" id="294">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" id="294" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1560,7 +1560,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="307">
                                                         <rect key="frame" x="15" y="42" width="27" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Text" id="315">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Text" id="315" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1568,7 +1568,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="304">
                                                         <rect key="frame" x="15" y="15" width="46" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Position" id="319">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Position" id="319" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1576,7 +1576,7 @@
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="325">
                                                         <rect key="frame" x="103" y="10" width="190" height="22"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="328" id="326">
+                                                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="328" id="326" customClass="VLCPopUpButtonCell">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="327">
@@ -1596,7 +1596,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="184" id="fsZ-s4-l8b"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="332">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="332" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1641,7 +1641,7 @@
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="652">
                                                         <rect key="frame" x="15" y="64" width="30" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Logo" id="658">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Logo" id="658" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1649,7 +1649,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="651">
                                                         <rect key="frame" x="16" y="37" width="46" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Position" id="659">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Position" id="659" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1657,7 +1657,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="649">
                                                         <rect key="frame" x="16" y="12" width="76" height="14"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Transparency" id="661">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Transparency" id="661" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1665,7 +1665,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="646">
                                                         <rect key="frame" x="106" y="62" width="184" height="19"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="665">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="665" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1676,14 +1676,14 @@
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="645">
                                                         <rect key="frame" x="106" y="11" width="184" height="15"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="255" doubleValue="255" tickMarkPosition="above" sliderType="linear" id="666"/>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="255" doubleValue="255" tickMarkPosition="above" sliderType="linear" id="666" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="addLogoModifierChanged:" target="-2" id="zDd-CQ-Txa"/>
                                                         </connections>
                                                     </slider>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="692">
                                                         <rect key="frame" x="103" y="32" width="190" height="22"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="697" id="693">
+                                                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="697" id="693" customClass="VLCPopUpButtonCell">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="694">

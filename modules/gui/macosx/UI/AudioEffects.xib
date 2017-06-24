@@ -242,7 +242,7 @@
                                                 <popUpButton verticalHuggingPriority="750" id="168">
                                                     <rect key="frame" x="196" y="156" width="155" height="22"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169">
+                                                    <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169" customClass="VLCPopUpButtonCell">
                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <menu key="menu" title="OtherViews" id="170">
@@ -869,7 +869,7 @@
                     <popUpButton verticalHuggingPriority="750" id="701">
                         <rect key="frame" x="110" y="6" width="190" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="706" id="702">
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="706" id="702" customClass="VLCPopUpButtonCell">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                             <menu key="menu" title="OtherViews" id="703">
