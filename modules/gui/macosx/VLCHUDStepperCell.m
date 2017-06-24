@@ -35,7 +35,7 @@
 #import "VLCHUDStepperCell.h"
 #import "CompatibilityFixes.h"
 
-@implementation VLCHUDStepperCell {
+@interface VLCHUDStepperCell () {
     int topButtonFlag;
     int bottomButtonFlag;
 
@@ -44,6 +44,10 @@
     BOOL isTopDown;
     BOOL isBottomDown;
 }
+
+@end
+
+@implementation VLCHUDStepperCell
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
