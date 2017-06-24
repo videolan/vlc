@@ -78,6 +78,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCHUDTextFieldCell.h gui/macosx/VLCHUDTextFieldCell.m \
 	gui/macosx/VLCHUDScroller.h gui/macosx/VLCHUDScroller.m \
 	gui/macosx/VLCHUDOutlineView.h gui/macosx/VLCHUDOutlineView.m \
+	gui/macosx/VLCHUDTableView.h gui/macosx/VLCHUDTableView.m \
 	gui/macosx/VLCHUDTableCornerView.h gui/macosx/VLCHUDTableCornerView.m \
 	gui/macosx/VLCHUDTableHeaderCell.h gui/macosx/VLCHUDTableHeaderCell.m \
 	gui/macosx/VLCHUDSegmentedCell.h gui/macosx/VLCHUDSegmentedCell.m \
