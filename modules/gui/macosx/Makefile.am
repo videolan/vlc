@@ -75,7 +75,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCHUDSliderCell.h gui/macosx/VLCHUDSliderCell.m \
 	gui/macosx/VLCHUDButtonCell.h gui/macosx/VLCHUDButtonCell.m \
 	gui/macosx/VLCHUDCheckboxCell.h gui/macosx/VLCHUDCheckboxCell.m \
-	gui/macosx/VLCHUDRadiobuttonCell.h gui/macosx/VLCHUDRadiobuttonCell.m \
 	gui/macosx/VLCHUDTextFieldCell.h gui/macosx/VLCHUDTextFieldCell.m \
 	gui/macosx/VLCHUDScroller.h gui/macosx/VLCHUDScroller.m \
 	gui/macosx/VLCHUDOutlineView.h gui/macosx/VLCHUDOutlineView.m \
