@@ -33,7 +33,6 @@
 //	POSSIBILITY OF SUCH DAMAGE.
 
 #import "VLCHUDOutlineView.h"
-#import "VLCHUDTableHeaderCell.h"
 #import "VLCHUDTableCornerView.h"
 
 @interface NSOutlineView (private)
@@ -66,17 +65,6 @@
 
         [self setBackgroundColor:_tableBackgroundColor];
         [self setFocusRingType:NSFocusRingTypeNone];
-
-        // Setup Header Cells
-        for (NSTableColumn* aColumn in [self tableColumns]) {
-
-            // Create new cell and set it's props to that of old cell
-            VLCHUDTableHeaderCell *newHeader = [[VLCHUDTableHeaderCell alloc] init];
-            [newHeader setStringValue: [[aColumn headerCell] stringValue]];
-            [newHeader setFont: [[aColumn headerCell] font]];
-
-            [aColumn setHeaderCell: newHeader];
-        }
     }
 
     return self;

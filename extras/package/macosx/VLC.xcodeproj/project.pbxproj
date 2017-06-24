@@ -82,7 +82,6 @@
 		6B81662C1EBFC38100C26F1B /* VLCUIWidgets.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */; };
 		6B9FD0391EEB5D8A0085151F /* VLCHUDScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B9FD0381EEB5D8A0085151F /* VLCHUDScroller.m */; };
 		6BBB05DA1EEFEA29003A1019 /* VLCHUDOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */; };
-		6BBB05DD1EEFEADF003A1019 /* VLCHUDTableHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05DC1EEFEADF003A1019 /* VLCHUDTableHeaderCell.m */; };
 		6BBB05E01EEFF165003A1019 /* VLCHUDTableCornerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05DF1EEFF165003A1019 /* VLCHUDTableCornerView.m */; };
 		6BBB05E31EF08181003A1019 /* VLCHUDSegmentedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05E21EF08181003A1019 /* VLCHUDSegmentedCell.m */; };
 		6BF093F91EE0182B0049D8B0 /* VLCTimeField.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */; };
@@ -691,8 +690,6 @@
 		6B9FD0381EEB5D8A0085151F /* VLCHUDScroller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCHUDScroller.m; sourceTree = "<group>"; };
 		6BBB05D81EEFEA29003A1019 /* VLCHUDOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDOutlineView.h; sourceTree = "<group>"; };
 		6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDOutlineView.m; sourceTree = "<group>"; };
-		6BBB05DB1EEFEADF003A1019 /* VLCHUDTableHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDTableHeaderCell.h; sourceTree = "<group>"; };
-		6BBB05DC1EEFEADF003A1019 /* VLCHUDTableHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDTableHeaderCell.m; sourceTree = "<group>"; };
 		6BBB05DE1EEFF165003A1019 /* VLCHUDTableCornerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDTableCornerView.h; sourceTree = "<group>"; };
 		6BBB05DF1EEFF165003A1019 /* VLCHUDTableCornerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDTableCornerView.m; sourceTree = "<group>"; };
 		6BBB05E11EF08181003A1019 /* VLCHUDSegmentedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDSegmentedCell.h; sourceTree = "<group>"; };
@@ -1625,8 +1622,6 @@
 				6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */,
 				6BBB05DE1EEFF165003A1019 /* VLCHUDTableCornerView.h */,
 				6BBB05DF1EEFF165003A1019 /* VLCHUDTableCornerView.m */,
-				6BBB05DB1EEFEADF003A1019 /* VLCHUDTableHeaderCell.h */,
-				6BBB05DC1EEFEADF003A1019 /* VLCHUDTableHeaderCell.m */,
 				6BBB05E11EF08181003A1019 /* VLCHUDSegmentedCell.h */,
 				6BBB05E21EF08181003A1019 /* VLCHUDSegmentedCell.m */,
 			);
@@ -1874,7 +1869,6 @@
 				6B8166291EBFC34300C26F1B /* VLCDefaultValueSlider.m in Sources */,
 				6B81662A1EBFC34300C26F1B /* VLCDefaultValueSliderCell.m in Sources */,
 				1C69FDF61EAB30C7007724ED /* Windows.m in Sources */,
-				6BBB05DD1EEFEADF003A1019 /* VLCHUDTableHeaderCell.m in Sources */,
 				6B3BE42C1E6217CB008D098A /* VLCImageButton.m in Sources */,
 				6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */,
 				1C3114031E508C8800D4DD76 /* AppleRemote.m in Sources */,
