@@ -1,5 +1,5 @@
 //
-//  VLCPopUpButtonCell.h
+//  VLCHUDPopUpButtonCell.h
 //  BGHUDAppKit
 //
 //  Created by BinaryGod on 5/31/08.
@@ -34,7 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCPopUpButtonCell : NSPopUpButtonCell
+@interface VLCHUDPopUpButtonCell : NSPopUpButtonCell
 
 @property NSShadow *dropShadow;
 

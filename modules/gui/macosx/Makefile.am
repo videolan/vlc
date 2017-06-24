@@ -83,7 +83,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCHUDTableHeaderCell.h gui/macosx/VLCHUDTableHeaderCell.m \
 	gui/macosx/VLCHUDSegmentedCell.h gui/macosx/VLCHUDSegmentedCell.m \
 	gui/macosx/VLCHUDStepperCell.h gui/macosx/VLCHUDStepperCell.m \
-	gui/macosx/VLCPopUpButtonCell.h gui/macosx/VLCPopUpButtonCell.m \
+	gui/macosx/VLCHUDPopUpButtonCell.h gui/macosx/VLCHUDPopUpButtonCell.m \
 	gui/macosx/VLCInputManager.h gui/macosx/VLCInputManager.m \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \

@@ -1,5 +1,5 @@
 //
-//  VLCPopUpButtonCell.m
+//  VLCHUDPopUpButtonCell.m
 //  BGHUDAppKit
 //
 //  Created by BinaryGod on 5/31/08.
@@ -32,9 +32,9 @@
 //	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //	POSSIBILITY OF SUCH DAMAGE.
 
-#import "VLCPopUpButtonCell.h"
+#import "VLCHUDPopUpButtonCell.h"
 
-@implementation VLCPopUpButtonCell
+@implementation VLCHUDPopUpButtonCell
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
