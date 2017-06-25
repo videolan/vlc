@@ -864,14 +864,13 @@ static inline int RenderAXYZ( filter_t *p_filter,
         for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
         {
             int i_align_left = i_margin;
-            if( p_line->i_width < i_text_width )
+            if( p_line->i_width < i_text_width &&
+               (p_region->i_align & (SUBPICTURE_ALIGN_LEAVETEXT|SUBPICTURE_ALIGN_LEFT)) == 0 )
             {
                 /* Left offset to take into account alignment */
-                if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
+                if( p_region->i_align & SUBPICTURE_ALIGN_RIGHT )
                     i_align_left += ( i_text_width - p_line->i_width );
-                else if( (p_region->i_align & 0x10) == SUBPICTURE_ALIGN_LEAVETEXT)
-                    i_align_left = i_margin; /* Keep it the way it is */
-                else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
+                else /* center */
                     i_align_left += ( i_text_width - p_line->i_width ) / 2;
             }
             int i_align_top = i_margin;
