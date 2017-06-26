@@ -1453,11 +1453,19 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             /* If we created a line up to previous space, we only keep the difference for
                our current width since that split */
             if( i_newline_start == i_last_space )
+            {
                 i_width = i_width - i_last_space_width;
+                if( i_newline_start + 1 < p_paragraph->i_size )
+                    i_line_start = i_newline_start + 1;
+                else
+                    i_line_start = i_newline_start; // == i
+            }
             else
+            {
                 i_width = 0;
+                i_line_start = i_newline_start;
+            }
             i_last_space_width = 0;
-            i_line_start = i_newline_start;
         }
         i_width += i_advance_x;
     }
