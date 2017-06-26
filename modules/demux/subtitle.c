@@ -1260,11 +1260,9 @@ static char *ParseSamiSearch( text_t *txt,
         if( !p )
             return NULL;
 
-        if( strcasestr( p, psz_str ) )
-        {
-            char *s = strcasestr( p, psz_str );
+        char *s = strcasestr( p, psz_str );
+        if( s != NULL )
             return &s[strlen( psz_str )];
-        }
     }
 }
 static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
