@@ -1533,12 +1533,11 @@ void SyncControls::subsdelayClean()
 
 void SyncControls::subsdelaySetFactor( double f_factor )
 {
-    /* Try to find an instance of subsdelay, and set its factor */
-    vlc_object_t *p_obj = ( vlc_object_t * ) vlc_object_find_name( p_intf->obj.libvlc, "subsdelay" );
-    if( p_obj )
+    QVector<vout_thread_t*> p_vouts = THEMIM->getVouts();
+    foreach( vout_thread_t *p_vout, p_vouts )
     {
-        var_SetFloat( p_obj, SUBSDELAY_CFG_FACTOR, f_factor );
-        vlc_object_release( p_obj );
+        var_SetFloat( p_vout, SUBSDELAY_CFG_FACTOR, f_factor );
+        vlc_object_release( p_vout );
     }
 }
 
