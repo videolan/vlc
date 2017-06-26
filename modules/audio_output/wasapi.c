@@ -475,13 +475,13 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE_IEC61937 wf_iec61937;
     WAVEFORMATEXTENSIBLE *pwfe = &wf_iec61937.FormatExt;
-    WAVEFORMATEX *pwf = &pwfe->Format, *pwf_closest;
+    WAVEFORMATEX *pwf = &pwfe->Format, *pwf_closest, *pwf_mix = NULL;
     AUDCLNT_SHAREMODE shared_mode;
     REFERENCE_TIME buffer_duration;
     audio_sample_format_t fmt = *pfmt;
-
     bool b_spdif = AOUT_FMT_SPDIF(&fmt);
     bool b_hdmi = AOUT_FMT_HDMI(&fmt);
+
     if (b_spdif && !b_hdmi && fmt.i_format == VLC_CODEC_DTS && !force_dts_spdif
      && fmt.i_rate >= 48000)
     {
@@ -509,9 +509,28 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     }
     else if (AOUT_FMT_LINEAR(&fmt))
     {
-        vlc_ToWave(pwfe, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_SHARED;
-        buffer_duration = AOUT_MAX_PREPARE_TIME * 10;
+
+        if (fmt.channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+        {
+            fmt.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+
+            /* Render Ambisonics on the native mix format */
+            hr = IAudioClient_GetMixFormat(sys->client, &pwf_mix);
+            if (FAILED(hr) || vlc_FromWave(pwf_mix, &fmt))
+                vlc_ToWave(pwfe, &fmt); /* failed, fallback to default */
+            else
+                pwf = pwf_mix;
+
+            /* Setup low latency in order to quickly react to ambisonics filters
+             * viewpoint changes. */
+            buffer_duration = AOUT_MIN_PREPARE_TIME;
+        }
+        else
+        {
+            vlc_ToWave(pwfe, &fmt);
+            buffer_duration = AOUT_MAX_PREPARE_TIME * 10;
+        }
     }
     else
     {
@@ -588,6 +607,7 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         msg_Dbg(s, "minimum period : %"PRIu64"00 ns", minT);
     }
 
+    CoTaskMemFree(pwf_mix);
     *pfmt = fmt;
     sys->written = 0;
     s->sys = sys;
@@ -597,6 +617,7 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     s->flush = Flush;
     return S_OK;
 error:
+    CoTaskMemFree(pwf_mix);
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
     free(sys);
