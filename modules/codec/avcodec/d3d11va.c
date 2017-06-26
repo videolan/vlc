@@ -711,10 +711,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     /* On the Xbox 1/S, any decoding of H264 with one dimension over 2304
      * crashes totally the device */
     if (codec_id == AV_CODEC_ID_H264 &&
-        (dx_sys->surface_width > 2304 || dx_sys->surface_height > 2304) &&
+        (dx_sys->va_pool.surface_width > 2304 || dx_sys->va_pool.surface_height > 2304) &&
         isXboxHardware(dx_sys->d3ddev))
     {
-        msg_Warn(va, "%dx%d resolution not supported by your hardware", dx_sys->surface_width, dx_sys->surface_height);
+        msg_Warn(va, "%dx%d resolution not supported by your hardware", dx_sys->va_pool.surface_width, dx_sys->va_pool.surface_height);
         return VLC_EGENERIC;
     }
 #endif
