@@ -119,8 +119,10 @@ struct filter_sys_t
     picture_t *pp_history[HISTORY_SIZE];
 
     /* Algorithm-specific substructures */
-    phosphor_sys_t phosphor; /**< Phosphor algorithm state. */
-    ivtc_sys_t ivtc;         /**< IVTC algorithm state. */
+    union {
+        phosphor_sys_t phosphor; /**< Phosphor algorithm state. */
+        ivtc_sys_t ivtc;         /**< IVTC algorithm state. */
+    };
 };
 
 /*****************************************************************************
