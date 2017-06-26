@@ -551,14 +551,6 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
 #endif
         }
     }
-    else if( !p_vouts.isEmpty() )
-    {
-        msg_Warn( p_intf, "Module %s's %s variable isn't a command. Brute-restarting the filter.",
-                 psz_module,
-                 psz_option );
-        changeVFiltersString( psz_module, false );
-        changeVFiltersString( psz_module, true );
-    }
 
     foreach( vout_thread_t *p_vout, p_vouts )
         vlc_object_release( p_vout );
