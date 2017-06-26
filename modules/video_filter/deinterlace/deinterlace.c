@@ -257,15 +257,6 @@ static void GetOutputFormat( filter_t *p_filter,
     {
         p_dst->i_frame_rate *= 2;
     }
-
-    if( p_sys->i_mode == DEINTERLACE_PHOSPHOR  &&
-        2 * p_sys->chroma->p[1].h.num == p_sys->chroma->p[1].h.den &&
-        2 * p_sys->chroma->p[2].h.num == p_sys->chroma->p[2].h.den &&
-        p_sys->phosphor.i_chroma_for_420 == PC_UPCONVERT )
-    {
-        p_dst->i_chroma = p_src->i_chroma == VLC_CODEC_J420 ? VLC_CODEC_J422 :
-                                                              VLC_CODEC_I422;
-    }
     else
     {
         p_dst->i_chroma = p_src->i_chroma;
@@ -717,6 +708,10 @@ notsupp:
     }
 
     /* */
+    video_format_t fmt;
+    GetOutputFormat( p_filter, &fmt, &p_filter->fmt_in.video );
+
+    /* */
     if( p_sys->i_mode == DEINTERLACE_PHOSPHOR )
     {
         int i_c420 = var_GetInteger( p_filter,
@@ -746,6 +741,14 @@ notsupp:
         msg_Dbg( p_filter, "using Phosphor dimmer strength %d", i_dimmer );
         /* The internal value ranges from 0 to 3. */
         p_sys->phosphor.i_dimmer_strength = i_dimmer - 1;
+
+        if( 2 * chroma->p[1].h.num == chroma->p[1].h.den &&
+            2 * chroma->p[2].h.num == chroma->p[2].h.den &&
+            i_c420 == PC_UPCONVERT )
+        {
+            fmt.i_chroma = p_filter->fmt_in.video.i_chroma == VLC_CODEC_J420 ?
+                        VLC_CODEC_J422 : VLC_CODEC_I422;
+        }
     }
     else
     {
@@ -753,9 +756,6 @@ notsupp:
         p_sys->phosphor.i_dimmer_strength = 1;
     }
 
-    /* */
-    video_format_t fmt;
-    GetOutputFormat( p_filter, &fmt, &p_filter->fmt_in.video );
     if( !p_filter->b_allow_fmt_out_change &&
         ( fmt.i_chroma != p_filter->fmt_in.video.i_chroma ||
           fmt.i_height != p_filter->fmt_in.video.i_height ) )
