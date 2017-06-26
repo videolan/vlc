@@ -22,6 +22,7 @@ ifdef HAVE_ANDROID
 endif
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/no-windows-files.patch
+	$(APPLY) $(SRC)/libarchive/winrt.patch
 endif
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)

@@ -1,0 +1,325 @@
+--- libarchive/libarchive/archive_read_support_filter_program.c	2017-02-05 20:28:19.000000000 +0100
++++ libarchive_new/libarchive/archive_read_support_filter_program.c	2017-06-26 14:58:46.300005904 +0200
+@@ -82,6 +82,8 @@
+ 	return (archive_read_support_filter_program_signature(a, cmd, NULL, 0));
+ }
+ 
++ #if !defined(_WIN32) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++
+ /*
+  * The bidder object stores the command and the signature to watch for.
+  * The 'inhibit' entry here is used to ensure that unchecked filters never
+@@ -105,7 +107,7 @@
+  */
+ struct program_filter {
+ 	struct archive_string description;
+-#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	HANDLE		 child;
+ #else
+ 	pid_t		 child;
+@@ -254,7 +256,7 @@
+ 			state->waitpid_return
+ 			    = waitpid(state->child, &state->exit_status, 0);
+ 		} while (state->waitpid_return == -1 && errno == EINTR);
+-#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 		CloseHandle(state->child);
+ #endif
+ 		state->child = 0;
+@@ -309,7 +311,7 @@
+ 	struct program_filter *state = self->data;
+ 	ssize_t ret, requested, avail;
+ 	const char *p;
+-#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	HANDLE handle = (HANDLE)_get_osfhandle(state->child_stdout);
+ #endif
+ 
+@@ -317,7 +319,7 @@
+ 
+ 	for (;;) {
+ 		do {
+-#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 			/* Avoid infinity wait.
+ 			 * Note: If there is no data in the pipe, ReadFile()
+ 			 * called in read() never returns and so we won't
+@@ -437,7 +439,7 @@
+ 		    cmd);
+ 		return (ARCHIVE_FATAL);
+ 	}
+-#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	state->child = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, child);
+ 	if (state->child == NULL) {
+ 		child_stop(self, state);
+@@ -516,3 +518,5 @@
+ 
+ 	return (e);
+ }
++
++#endif
+--- libarchive/libarchive/archive_read_support_filter_bzip2.c	2015-09-05 06:24:18.000000000 +0200
++++ libarchive_new/libarchive/archive_read_support_filter_bzip2.c	2017-06-26 15:19:40.527381263 +0200
+@@ -169,6 +169,7 @@
+ static int
+ bzip2_reader_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "bzip2 -d");
+@@ -178,6 +179,9 @@
+ 	self->code = ARCHIVE_FILTER_BZIP2;
+ 	self->name = "bzip2";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
+ 
+ 
+--- libarchive/libarchive/archive_read_support_filter_grzip.c	2015-09-05 06:24:18.000000000 +0200
++++ libarchive_new/libarchive/archive_read_support_filter_grzip.c	2017-06-26 15:19:33.991379066 +0200
+@@ -109,6 +109,7 @@
+ static int
+ grzip_bidder_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "grzip -d");
+@@ -118,4 +119,7 @@
+ 	self->code = ARCHIVE_FILTER_GRZIP;
+ 	self->name = "grzip";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
+--- libarchive/libarchive/archive_read_support_filter_lz4.c	2017-01-29 06:06:27.000000000 +0100
++++ libarchive_new/libarchive/archive_read_support_filter_lz4.c	2017-06-26 15:20:54.223415399 +0200
+@@ -204,6 +204,7 @@
+ static int
+ lz4_reader_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "lz4 -d -q");
+@@ -213,6 +214,9 @@
+ 	self->code = ARCHIVE_FILTER_LZ4;
+ 	self->name = "lz4";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
+ 
+ 
+--- libarchive/libarchive/archive_read_support_filter_lzop.c	2017-01-29 06:06:27.000000000 +0100
++++ libarchive_new/libarchive/archive_read_support_filter_lzop.c	2017-06-26 15:21:35.567441516 +0200
+@@ -160,6 +160,7 @@
+ static int
+ lzop_bidder_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "lzop -d");
+@@ -169,6 +170,9 @@
+ 	self->code = ARCHIVE_FILTER_LZOP;
+ 	self->name = "lzop";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
+ #else
+ /*
+--- libarchive/libarchive/archive_read_support_filter_xz.c	2017-01-29 06:06:27.000000000 +0100
++++ libarchive_new/libarchive/archive_read_support_filter_xz.c	2017-06-26 15:25:12.335644790 +0200
+@@ -754,6 +754,7 @@
+ static int
+ lzma_bidder_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "lzma -d -qq");
+@@ -763,11 +764,15 @@
+ 	self->code = ARCHIVE_FILTER_LZMA;
+ 	self->name = "lzma";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
+ 
+ static int
+ xz_bidder_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "xz -d -qq");
+@@ -777,11 +782,15 @@
+ 	self->code = ARCHIVE_FILTER_XZ;
+ 	self->name = "xz";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
+ 
+ static int
+ lzip_bidder_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "lzip -d -q");
+@@ -791,6 +800,9 @@
+ 	self->code = ARCHIVE_FILTER_LZIP;
+ 	self->name = "lzip";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
+ 
+ #endif /* HAVE_LZMA_H */
+--- libarchive/libarchive/archive_read_support_format_mtree.c	2017-02-11 21:00:09.000000000 +0100
++++ libarchive_new/libarchive/archive_read_support_format_mtree.c	2017-06-26 16:06:59.219333324 +0200
+@@ -53,6 +53,8 @@
+ #include "archive_string.h"
+ #include "archive_pack_dev.h"
+ 
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++
+ #ifndef O_BINARY
+ #define	O_BINARY 0
+ #endif
+@@ -2038,3 +2040,11 @@
+ 	}
+ 	return h;
+ }
++
++#else
++int
++archive_read_support_format_mtree(struct archive *_a)
++{
++    return ARCHIVE_OK;
++}
++#endif
+--- libarchive/libarchive/archive_string.c	2017-01-29 06:06:27.000000000 +0100
++++ libarchive_new/libarchive/archive_string.c	2017-06-26 16:16:32.864286781 +0200
+@@ -1310,7 +1310,7 @@
+ 	free(sc);
+ }
+ 
+-#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ static unsigned
+ my_atoi(const char *p)
+ {
+--- libarchive/libarchive/archive_windows.h	2017-01-29 06:06:27.000000000 +0100
++++ libarchive_new/libarchive/archive_windows.h	2017-06-26 16:32:56.238016686 +0200
+@@ -106,16 +106,20 @@
+ #define	lseek		__la_lseek
+ #define __LA_LSEEK_NEEDED
+ #endif
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ #define	lstat		__la_stat
+ #define	open		__la_open
+ #define	read		__la_read
++#endif
+ #if !defined(__BORLANDC__) && !defined(__WATCOMC__)
+ #define setmode		_setmode
+ #endif
+ #ifdef stat
+ #undef stat
+ #endif
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ #define	stat(path,stref)		__la_stat(path,stref)
++#endif
+ #if !defined(__WATCOMC__)
+ #if !defined(__BORLANDC__)
+ #define	strdup		_strdup
+@@ -125,8 +129,10 @@
+ #define	umask		_umask
+ #endif
+ #endif
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ #define	waitpid		__la_waitpid
+ #define	write		__la_write
++#endif
+ 
+ #if !defined(__WATCOMC__)
+ 
+@@ -266,7 +272,6 @@
+     #define	F_OK    0       /*  Test for existence of file  */
+ #endif
+ 
+-
+ /* Replacement POSIX function */
+ extern int	 __la_fstat(int fd, struct stat *st);
+ extern int	 __la_lstat(const char *path, struct stat *st);
+@@ -279,8 +284,13 @@
+ extern pid_t	 __la_waitpid(HANDLE child, int *status, int option);
+ extern ssize_t	 __la_write(int fd, const void *buf, size_t nbytes);
+ 
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++
+ #define _stat64i32(path, st)	__la_stat(path, st)
+ #define _stat64(path, st)	__la_stat(path, st)
++
++#endif
++
+ /* for status returned by la_waitpid */
+ #define WIFEXITED(sts)		((sts & 0x100) == 0)
+ #define WEXITSTATUS(sts)	(sts & 0x0FF)
+--- libarchive/libarchive/archive_util.c	2016-12-03 07:52:27.000000000 +0100
++++ libarchive_new/libarchive/archive_util.c	2017-06-26 16:53:20.324214719 +0200
+@@ -291,7 +291,7 @@
+  * Create a temporary file
+  */
+ #if defined(_WIN32) && !defined(__CYGWIN__)
+-
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ /*
+  * Do not use Windows tmpfile() function.
+  * It will make a temporary file under the root directory
+@@ -443,6 +443,13 @@
+ 	archive_wstring_free(&temp_name);
+ 	return (fd);
+ }
++#else
++int
++__archive_mktemp(const char *tmpdir)
++{
++    return -1;
++}
++#endif
+ 
+ #else
+ 
+--- libarchive/libarchive/archive_read_support_filter_lrzip.c	2015-09-05 06:24:18.000000000 +0200
++++ libarchive_new/libarchive/archive_read_support_filter_lrzip.c	2017-06-26 15:19:28.647377378 +0200
+@@ -120,6 +120,7 @@
+ static int
+ lrzip_bidder_init(struct archive_read_filter *self)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	int r;
+ 
+ 	r = __archive_read_program(self, "lrzip -d -q");
+@@ -129,4 +130,7 @@
+ 	self->code = ARCHIVE_FILTER_LRZIP;
+ 	self->name = "lrzip";
+ 	return (r);
++#else
++    return ARCHIVE_FATAL;
++#endif
+ }
