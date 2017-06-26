@@ -67,6 +67,7 @@ struct subpicture_region_t
     text_segment_t  *p_text;         /**< subtitle text, made of a list of segments */
     bool            b_noregionbg;    /**< render background under text only */
     bool            b_gridmode;      /** if the decoder sends row/cols based output */
+    bool            b_balanced_text; /** try to balance wrapped text lines */
     int             i_max_width;     /** horizontal rendering/cropping limit */
     int             i_max_height;    /** vertical rendering/cropping limit */
 

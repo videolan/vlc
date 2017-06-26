@@ -1144,7 +1144,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_max_height -= p_region_in->i_y;
 
     rv = LayoutText( p_filter,
-                     psz_text, pp_styles, pi_k_durations, i_text_length, p_region_in->b_gridmode,
+                     psz_text, pp_styles, pi_k_durations, i_text_length,
+                     p_region_in->b_gridmode, p_region_in->b_balanced_text,
                      i_max_width, i_max_height, &p_lines, &bbox, &i_max_face_height );
 
     p_region_out->i_x = p_region_in->i_x;

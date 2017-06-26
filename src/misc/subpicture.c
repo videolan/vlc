@@ -230,6 +230,7 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     }
 
     p_region->i_alpha = 0xff;
+    p_region->b_balanced_text = true;
 
     if( p_fmt->i_chroma == VLC_CODEC_TEXT )
         return p_region;

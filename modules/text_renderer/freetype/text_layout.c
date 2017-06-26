@@ -1321,7 +1321,7 @@ static inline bool IsWhitespaceAt( paragraph_t *p_paragraph, size_t i )
 
 static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                             unsigned i_max_width, unsigned i_max_advance_x,
-                            line_desc_t **pp_lines, bool b_grid )
+                            line_desc_t **pp_lines, bool b_grid, bool b_balance )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0 )
     {
@@ -1346,7 +1346,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
     int i_line_start = 0;
     FT_Pos i_width = 0;
-    FT_Pos i_preferred_width = 0;
+    FT_Pos i_preferred_width = i_max_width;
     FT_Pos i_total_width = 0;
     FT_Pos i_last_space_width = 0;
     int i_last_space = -1;
@@ -1372,8 +1372,11 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         return VLC_SUCCESS;
     }
 
-    int i_line_count = i_total_width / (i_max_width - i_max_advance_x) + 1;
-    i_preferred_width = i_total_width / i_line_count;
+    if( b_balance )
+    {
+        int i_line_count = i_total_width / (i_max_width - i_max_advance_x) + 1;
+        i_preferred_width = i_total_width / i_line_count;
+    }
 
     for( int i = 0; i <= p_paragraph->i_size; ++i )
     {
@@ -1483,7 +1486,8 @@ error:
 
 int LayoutText( filter_t *p_filter,
                 const uni_char_t *psz_text, text_style_t **pp_styles,
-                uint32_t *pi_k_dates, int i_len, bool b_grid,
+                uint32_t *pi_k_dates, int i_len,
+                bool b_grid, bool b_balance,
                 unsigned i_max_width, unsigned i_max_height,
                 line_desc_t **pp_lines, FT_BBox *p_bbox, int *pi_max_face_height )
 {
@@ -1547,7 +1551,8 @@ int LayoutText( filter_t *p_filter,
 #endif
 
             if( LayoutParagraph( p_filter, p_paragraph,
-                                 i_max_width, i_max_advance_x, pp_line, b_grid ) )
+                                 i_max_width, i_max_advance_x, pp_line,
+                                 b_grid, b_balance ) )
                 goto error;
 
             FreeParagraph( p_paragraph );
