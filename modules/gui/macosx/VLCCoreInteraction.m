@@ -793,60 +793,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     free(psz_string);
 }
 
-- (void)restartFilterIfNeeded: (const char *)psz_filter option: (const char *)psz_name
-{
-    vout_thread_t *p_vout = getVout();
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    if (p_vout == NULL)
-        return;
-    else
-        vlc_object_release(p_vout);
-
-    vlc_object_t *p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
-    if (p_filter) {
-
-        /* we cannot rely on the p_filter existence.
-         This filter might be just
-         disabled, but the object still exists. Therefore, the string
-         is checked, additionally.
-         */
-        const char *psz_filter_type = [self getFilterType:psz_filter];
-        if (!psz_filter_type) {
-            msg_Err(p_intf, "Unable to find filter module \"%s\".", psz_name);
-            goto out;
-        }
-
-        char *psz_string = config_GetPsz(p_intf, psz_filter_type);
-        if (!psz_string) {
-            goto out;
-        }
-        if (strstr(psz_string, psz_filter) == NULL) {
-            free(psz_string);
-            goto out;
-        }
-        free(psz_string);
-
-        int i_type;
-        i_type = var_Type(p_filter, psz_name);
-        if (i_type == 0)
-            i_type = config_GetType(p_intf, psz_name);
-
-        if (!(i_type & VLC_VAR_ISCOMMAND)) {
-            msg_Warn(p_intf, "Brute-restarting filter '%s', because the last changed option isn't a command", psz_name);
-
-            [self setVideoFilter: psz_filter on: NO];
-            [self setVideoFilter: psz_filter on: YES];
-        } else
-            msg_Dbg(p_intf, "restart not needed");
-
-        out:
-        vlc_object_release(p_filter);
-    }
-}
-
 - (void)setVideoFilterProperty: (char const *)psz_property
                      forFilter: (char const *)psz_filter
                      withValue: (vlc_value_t)value
@@ -872,10 +818,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                 "Module %s's %s variable is of an unsupported type ( %d )",
                 psz_filter, psz_property, i_type);
         if (p_vout)
-        {
-            [self restartFilterIfNeeded: psz_filter option: psz_property];
             vlc_object_release(p_vout);
-        }
         return;
     }
 
@@ -890,8 +833,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         var_SetChecked(p_filter, psz_property, i_type, value);
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
-
-        [self restartFilterIfNeeded: psz_filter option: psz_property];
     }
 }
 
