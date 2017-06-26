@@ -28,6 +28,7 @@
 #endif
 
 #include <stdint.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_picture.h>
@@ -44,6 +45,7 @@
 
 void RenderDiscard( picture_t *p_outpic, picture_t *p_pic, int i_field )
 {
+    assert(i_field == 0);
     int i_plane;
 
     /* Copy image and skip lines */
@@ -51,8 +53,7 @@ void RenderDiscard( picture_t *p_outpic, picture_t *p_pic, int i_field )
     {
         uint8_t *p_in, *p_out_end, *p_out;
 
-        p_in = p_pic->p[i_plane].p_pixels
-                   + i_field * p_pic->p[i_plane].i_pitch;
+        p_in = p_pic->p[i_plane].p_pixels;
 
         p_out = p_outpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
