@@ -1,5 +1,5 @@
---- ../tarballs/dxva2api.idl	2017-04-11 14:13:48.105355400 +0200
-+++ dxva2api/dxva2api.idl	2017-04-11 15:00:53.705524600 +0200
+--- ../tarballs/dxva2api.idl	2017-06-13 14:45:14.598269100 +0200
++++ dxva2api/dxva2api.idl	2017-06-26 10:08:58.732675300 +0200
 @@ -6,6 +6,8 @@
  
  import "unknwn.idl";
@@ -9,7 +9,7 @@
  /* Fake widl types */
  cpp_quote("#if 0")
  typedef DWORD IDirect3DDevice9;
-@@ -14,12 +16,15 @@
+@@ -14,12 +16,15 @@ typedef DWORD D3DFORMAT;
  typedef DWORD D3DPOOL;
  cpp_quote("#endif")
  
@@ -29,7 +29,7 @@
  
  cpp_quote("#define DXVA2_ProcAmp_None 0x0000")
  cpp_quote("#define DXVA2_ProcAmp_Brightness 0x0001")
-@@ -142,19 +147,19 @@
+@@ -142,19 +147,19 @@ cpp_quote("  DXVA2_VideoTransferMatrix_B
  cpp_quote("  DXVA2_VideoTransferMatrix_SMPTE240M   = 3 ")
  cpp_quote("} DXVA2_VideoTransferMatrix;")
  cpp_quote("")
@@ -62,7 +62,7 @@
  
  typedef struct _DXVA2_ConfigPictureDecode {
    GUID   guidConfigBitstreamEncryption;
-@@ -219,40 +224,40 @@
+@@ -219,40 +224,40 @@ typedef struct _DXVA2_ExtendedFormat {
    };
  } DXVA2_ExtendedFormat;
  
@@ -131,7 +131,7 @@
  
  typedef struct _DXVA2_VideoDesc {
    UINT                 SampleWidth;
-@@ -317,57 +322,60 @@
+@@ -317,57 +322,93 @@ cpp_quote("DXVA2_DetailFilterTech_Unknow
  cpp_quote("DXVA2_DetailFilterTech_Edge")
  cpp_quote("DXVA2_DetailFilterTech_Sharpening")
  cpp_quote("*/")
@@ -217,6 +217,39 @@
 +} DXVA2_VideoProcessorCaps;
 +#endif
 +
++cpp_quote("/* deinterlacing capabilities */")
++cpp_quote("#define DXVA2_DeinterlaceTech_Unknown                      0x0")
++cpp_quote("#define DXVA2_DeinterlaceTech_BOBLineReplicate             0x1")
++cpp_quote("#define DXVA2_DeinterlaceTech_BOBVerticalStretch           0x2")
++cpp_quote("#define DXVA2_DeinterlaceTech_BOBVerticalStretch4Tap       0x4")
++cpp_quote("#define DXVA2_DeinterlaceTech_MedianFiltering              0x8")
++cpp_quote("#define DXVA2_DeinterlaceTech_EdgeFiltering               0x10")
++cpp_quote("#define DXVA2_DeinterlaceTech_FieldAdaptive               0x20")
++cpp_quote("#define DXVA2_DeinterlaceTech_PixelAdaptive               0x40")
++cpp_quote("#define DXVA2_DeinterlaceTech_MotionVectorSteered         0x80")
++cpp_quote("#define DXVA2_DeinterlaceTech_InverseTelecine            0x100")
++cpp_quote("#define DXVA2_DeinterlaceTech_Mask                       0x1FF")
++
++cpp_quote("/* VideoProcessor capabilities */")
++cpp_quote("#define DXVA2_VideoProcess_None                            0x0")
++cpp_quote("#define DXVA2_VideoProcess_YUV2RGB                         0x1")
++cpp_quote("#define DXVA2_VideoProcess_StretchX                        0x2")
++cpp_quote("#define DXVA2_VideoProcess_StretchY                        0x4")
++cpp_quote("#define DXVA2_VideoProcess_AlphaBlend                      0x8")
++cpp_quote("#define DXVA2_VideoProcess_SubRects                       0x10")
++cpp_quote("#define DXVA2_VideoProcess_SubStreams                     0x20")
++cpp_quote("#define DXVA2_VideoProcess_SubStreamsExtended             0x40")
++cpp_quote("#define DXVA2_VideoProcess_YUV2RGBExtended                0x80")
++cpp_quote("#define DXVA2_VideoProcess_AlphaBlendExtended            0x100")
++cpp_quote("#define DXVA2_VideoProcess_Constriction                  0x200")
++cpp_quote("#define DXVA2_VideoProcess_NoiseFilter                   0x400")
++cpp_quote("#define DXVA2_VideoProcess_DetailFilter                  0x800")
++cpp_quote("#define DXVA2_VideoProcess_PlanarAlpha                  0x1000")
++cpp_quote("#define DXVA2_VideoProcess_LinearScaling                0x2000")
++cpp_quote("#define DXVA2_VideoProcess_GammaCompensated             0x4000")
++cpp_quote("#define DXVA2_VideoProcess_MaintainsOriginalFieldData   0x8000")
++cpp_quote("#define DXVA2_VideoProcess_Mask                         0xFFFF")
++
 +cpp_quote("/* SampleData */")
 +enum
 +{
@@ -243,7 +276,23 @@
  cpp_quote("/* Constants */")
  cpp_quote("")
  cpp_quote("#define DXVA2_VideoDecoderRenderTarget 0")
-@@ -481,4 +489,84 @@
+@@ -385,13 +426,13 @@ cpp_quote("#define DXVA2_BitStreamDateBu
+ cpp_quote("#define DXVA2_MotionVectorBuffer 7")
+ cpp_quote("#define DXVA2_FilmGrainBuffer 8")
+ cpp_quote("")
+-cpp_quote("__forceinline const DXVA2_Fixed32 DXVA2_Fixed32OpaqueAlpha (void) {")
++cpp_quote("__forceinline DXVA2_Fixed32 DXVA2_Fixed32OpaqueAlpha (void) {")
+ cpp_quote("  DXVA2_Fixed32 f32;")
+ cpp_quote("  f32.ll = 0 + (1 << 16);")
+ cpp_quote("  return f32;")
+ cpp_quote("}")
+ cpp_quote("")
+-cpp_quote("__forceinline const DXVA2_Fixed32 DXVA2_Fixed32TransparentAlpha (void) {")
++cpp_quote("__forceinline DXVA2_Fixed32 DXVA2_Fixed32TransparentAlpha (void) {")
+ cpp_quote("  DXVA2_Fixed32 f32;")
+ cpp_quote("  f32.ll = 0;")
+ cpp_quote("  return f32;")
+@@ -481,4 +522,84 @@ interface IDirectXVideoDecoderService :
              [in] UINT NumRenderTargets, [out] IDirectXVideoDecoder **ppDecode);
  }
  
