@@ -212,7 +212,10 @@ end:
 reject:
     p_sys->i_reject_count--;
     if( p_out_buf )
+    {
         block_Release( p_out_buf );
+        p_out_buf = NULL;
+    }
     goto end;
 }
 
