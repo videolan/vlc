@@ -197,7 +197,6 @@
 
     if (p_input) {
         float f_factor = [_sv_durTextField floatValue];
-        config_PutFloat(getIntf(), SUBSDELAY_CFG_FACTOR, f_factor);
 
         /* Try to find an instance of subsdelay, and set its factor */
         vlc_object_t *p_obj = (vlc_object_t *) vlc_object_find_name(getIntf()->obj.libvlc, "subsdelay");
