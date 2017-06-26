@@ -609,24 +609,25 @@
 
     /* filter handling */
     NSString *tempString = B64DecNSStr([items firstObject]);
-    vout_thread_t *p_vout = getVout();
+    NSArray<NSValue *> *vouts = getVouts();
 
     /* enable the new filters */
     var_SetString(p_playlist, "video-filter", [tempString UTF8String]);
-    if (p_vout) {
-        var_SetString(p_vout, "video-filter", [tempString UTF8String]);
-    }
+    if (vouts)
+        for (NSValue *ptr in vouts) {
+            vout_thread_t *p_vout = [ptr pointerValue];
+            var_SetString(p_vout, "video-filter", [tempString UTF8String]);
+        }
 
     tempString = B64DecNSStr([items objectAtIndex:1]);
     /* enable another round of new filters */
     var_SetString(p_playlist, "sub-source", [tempString UTF8String]);
-    if (p_vout) {
-        var_SetString(p_vout, "sub-source", [tempString UTF8String]);
-    }
-
-    if (p_vout) {
-        vlc_object_release(p_vout);
-    }
+    if (vouts)
+        for (NSValue *ptr in vouts) {
+            vout_thread_t *p_vout = [ptr pointerValue];
+            var_SetString(p_vout, "sub-source", [tempString UTF8String]);
+            vlc_object_release(p_vout);
+        }
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
     /* enable another round of new filters */
