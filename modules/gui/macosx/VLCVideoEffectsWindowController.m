@@ -589,6 +589,7 @@
 - (IBAction)profileSelectorAction:(id)sender
 {
     intf_thread_t *p_intf = getIntf();
+    playlist_t *p_playlist = pl_Get(p_intf);
     [self saveCurrentProfile];
     i_old_profile_index = [_profilePopup indexOfSelectedItem];
     VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
@@ -611,14 +612,14 @@
     vout_thread_t *p_vout = getVout();
 
     /* enable the new filters */
-    config_PutPsz(p_intf, "video-filter", [tempString UTF8String]);
+    var_SetString(p_playlist, "video-filter", [tempString UTF8String]);
     if (p_vout) {
         var_SetString(p_vout, "video-filter", [tempString UTF8String]);
     }
 
     tempString = B64DecNSStr([items objectAtIndex:1]);
     /* enable another round of new filters */
-    config_PutPsz(p_intf, "sub-source", [tempString UTF8String]);
+    var_SetString(p_playlist, "sub-source", [tempString UTF8String]);
     if (p_vout) {
         var_SetString(p_vout, "sub-source", [tempString UTF8String]);
     }
@@ -629,14 +630,12 @@
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
     /* enable another round of new filters */
-    char *psz_current_splitter = var_GetString(pl_Get(p_intf), "video-splitter");
+    char *psz_current_splitter = var_GetString(p_playlist, "video-splitter");
     bool b_filter_changed = ![tempString isEqualToString:toNSStr(psz_current_splitter)];
     free(psz_current_splitter);
 
-    if (b_filter_changed) {
-        config_PutPsz(p_intf, "video-splitter", [tempString UTF8String]);
-        var_SetString(pl_Get(p_intf), "video-splitter", [tempString UTF8String]);
-    }
+    if (b_filter_changed)
+        var_SetString(p_playlist, "video-splitter", [tempString UTF8String]);
 
     /* try to set filter values on-the-fly and store them appropriately */
     // index 3 is deprecated
