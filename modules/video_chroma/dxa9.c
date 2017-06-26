@@ -56,7 +56,7 @@ struct filter_sys_t {
 static bool GetLock(filter_t *p_filter, LPDIRECT3DSURFACE9 d3d,
                     D3DLOCKED_RECT *p_lock, D3DSURFACE_DESC *p_desc)
 {
-    if (FAILED( IDirect3DSurface9_GetDesc(d3d, p_desc)))
+    if (unlikely(FAILED( IDirect3DSurface9_GetDesc(d3d, p_desc))))
         return false;
 
     /* */
