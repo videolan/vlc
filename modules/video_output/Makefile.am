@@ -238,6 +238,7 @@ libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libdirect3d9_plugin_la_LIBADD = -lgdi32 $(LIBCOM) -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libdirect3d9_deinterlace_plugin_la_SOURCES = video_output/win32/dxva2_deinterlace.c \
+        video_filter/deinterlace/common.c video_filter/deinterlace/common.h \
         video_chroma/d3d9_fmt.h
 libdirect3d9_deinterlace_plugin_la_LIBADD = $(LIBCOM)
 libdirect3d9_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
