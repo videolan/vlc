@@ -61,15 +61,6 @@ static const char *const mode_list_text[] = {
  * Data structures
  *****************************************************************************/
 
-/**
- * Available deinterlace algorithms.
- * @see SetFilterMethod()
- */
-typedef enum { DEINTERLACE_DISCARD, DEINTERLACE_MEAN,    DEINTERLACE_BLEND,
-               DEINTERLACE_BOB,     DEINTERLACE_LINEAR,  DEINTERLACE_X,
-               DEINTERLACE_YADIF,   DEINTERLACE_YADIF2X, DEINTERLACE_PHOSPHOR,
-               DEINTERLACE_IVTC } deinterlace_mode;
-
 #define METADATA_SIZE (3)
 /**
  * Metadata history structure, used for framerate doublers.
@@ -91,8 +82,6 @@ struct filter_sys_t
 {
     const vlc_chroma_description_t *chroma;
 
-    uint8_t  i_mode;              /**< Deinterlace mode */
-
     /* Algorithm behaviour flags */
     bool b_double_rate;       /**< Shall we double the framerate? */
     bool b_half_height;       /**< Shall be divide the height by 2 */
@@ -104,6 +93,12 @@ struct filter_sys_t
     /** Merge finalization routine for SSE */
     void (*pf_end_merge) ( void );
 #endif
+
+    union {
+        int (*pf_render_ordered)(filter_t *, picture_t *p_dst, picture_t *p_pic,
+                                 int order, int i_field);
+        int (*pf_render_single_pic)(filter_t *, picture_t *p_dst, picture_t *p_pic);
+    };
 
     /**
      * Metadata history (PTS, nb_fields, TFF). Used for framerate doublers.

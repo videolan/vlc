@@ -157,31 +157,31 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
 
     if ( !strcmp( mode, "auto" ) )
     {
-        p_sys->i_mode = DEINTERLACE_X;
+        p_sys->context.pf_render_single_pic = RenderX;
     }
     else if( !strcmp( mode, "discard" ) )
     {
-        p_sys->i_mode = DEINTERLACE_DISCARD;
+        p_sys->pf_render_single_pic = RenderDiscard;
         p_sys->b_half_height = true;
     }
     else if( !strcmp( mode, "bob" ) || !strcmp( mode, "progressive-scan" ) )
     {
-        p_sys->i_mode = DEINTERLACE_BOB;
+        p_sys->pf_render_ordered = RenderBob;
         p_sys->b_double_rate = true;
     }
     else if( !strcmp( mode, "linear" ) )
     {
-        p_sys->i_mode = DEINTERLACE_LINEAR;
+        p_sys->pf_render_ordered = RenderLinear;
         p_sys->b_double_rate = true;
     }
     else if( !strcmp( mode, "mean" ) )
     {
-        p_sys->i_mode = DEINTERLACE_MEAN;
+        p_sys->pf_render_single_pic = RenderMean;
         p_sys->b_half_height = true;
     }
     else if( !strcmp( mode, "blend" ) )
     {
-        p_sys->i_mode = DEINTERLACE_BLEND;
+        p_sys->pf_render_single_pic = RenderBlend;
     }
     else if( pack )
     {
@@ -191,12 +191,12 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
     }
     else if( !strcmp( mode, "yadif" ) )
     {
-        p_sys->i_mode = DEINTERLACE_YADIF;
+        p_sys->pf_render_single_pic = RenderYadifSingle;
         p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( mode, "yadif2x" ) )
     {
-        p_sys->i_mode = DEINTERLACE_YADIF2X;
+        p_sys->pf_render_ordered = RenderYadif;
         p_sys->b_double_rate = true;
         p_sys->b_use_frame_history = true;
     }
@@ -208,17 +208,17 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
     }
     else if( !strcmp( mode, "x" ) )
     {
-        p_sys->i_mode = DEINTERLACE_X;
+        p_sys->pf_render_single_pic = RenderX;
     }
     else if( !strcmp( mode, "phosphor" ) )
     {
-        p_sys->i_mode = DEINTERLACE_PHOSPHOR;
+        p_sys->pf_render_ordered = RenderPhosphor;
         p_sys->b_double_rate = true;
         p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( mode, "ivtc" ) )
     {
-        p_sys->i_mode = DEINTERLACE_IVTC;
+        p_sys->pf_render_single_pic = RenderIVTC;
         p_sys->b_use_frame_history = true;
     }
     else
@@ -427,72 +427,24 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     assert( i_nb_fields > 2  ||  p_dst[2] == NULL );
 
     /* Render */
-    switch( p_sys->i_mode )
+    if ( p_sys->b_double_rate )
     {
-        case DEINTERLACE_DISCARD:
-            RenderDiscard( p_filter, p_dst[0], p_pic );
-            break;
-
-        case DEINTERLACE_BOB:
-            RenderBob( p_filter, p_dst[0], p_pic, 0, !b_top_field_first );
-            if( p_dst[1] )
-                RenderBob( p_filter, p_dst[1], p_pic, 1, b_top_field_first );
-            if( p_dst[2] )
-                RenderBob( p_filter, p_dst[2], p_pic, 2, !b_top_field_first );
-            break;;
-
-        case DEINTERLACE_LINEAR:
-            RenderLinear( p_filter, p_dst[0], p_pic, 0, !b_top_field_first );
-            if( p_dst[1] )
-                RenderLinear( p_filter, p_dst[1], p_pic, 1, b_top_field_first );
-            if( p_dst[2] )
-                RenderLinear( p_filter, p_dst[2], p_pic, 2, !b_top_field_first );
-            break;
-
-        case DEINTERLACE_MEAN:
-            RenderMean( p_filter, p_dst[0], p_pic );
-            break;
-
-        case DEINTERLACE_BLEND:
-            RenderBlend( p_filter, p_dst[0], p_pic );
-            break;
-
-        case DEINTERLACE_X:
-            RenderX( p_filter, p_dst[0], p_pic );
-            break;
-
-        case DEINTERLACE_YADIF:
-            if( RenderYadif( p_filter, p_dst[0], p_pic, 0, 0 ) )
-                goto drop;
-            break;
-
-        case DEINTERLACE_YADIF2X:
-            if( RenderYadif( p_filter, p_dst[0], p_pic, 0, !b_top_field_first ) )
-                goto drop;
-            if( p_dst[1] )
-                RenderYadif( p_filter, p_dst[1], p_pic, 1, b_top_field_first );
-            if( p_dst[2] )
-                RenderYadif( p_filter, p_dst[2], p_pic, 2, !b_top_field_first );
-            break;
-
-        case DEINTERLACE_PHOSPHOR:
-            if( RenderPhosphor( p_filter, p_dst[0], p_pic, 0,
-                                !b_top_field_first ) )
-                goto drop;
-            if( p_dst[1] )
-                RenderPhosphor( p_filter, p_dst[1], p_pic, 1,
-                                b_top_field_first );
-            if( p_dst[2] )
-                RenderPhosphor( p_filter, p_dst[2], p_pic, 2,
-                                !b_top_field_first );
-            break;
-
-        case DEINTERLACE_IVTC:
-            /* Note: RenderIVTC will automatically drop the duplicate frames
-                     produced by IVTC. This is part of normal operation. */
-            if( RenderIVTC( p_filter, p_dst[0], p_pic ) )
-                goto drop;
-            break;
+        if ( p_sys->pf_render_single_pic( p_filter, p_dst[0], p_pic ) )
+            goto drop;
+    }
+    else
+    {
+        /* Note: RenderIVTC will automatically drop the duplicate frames
+                 produced by IVTC. This is part of normal operation. */
+        if ( p_sys->pf_render_ordered( p_filter, p_dst[0], p_pic,
+                                       0, !b_top_field_first ) )
+            goto drop;
+        if ( p_dst[1] )
+            p_sys->pf_render_ordered( p_filter, p_dst[1], p_pic,
+                                      1, b_top_field_first );
+        if ( p_dst[2] )
+            p_sys->pf_render_ordered( p_filter, p_dst[1], p_pic,
+                                      2, !b_top_field_first );
     }
 
     /* Set output timestamps, if the algorithm didn't request CUSTOM_PTS
@@ -638,7 +590,6 @@ notsupp:
                        p_filter->p_cfg );
     char *psz_mode = var_InheritString( p_filter, FILTER_CFG_PREFIX "mode" );
     SetFilterMethod( p_filter, psz_mode, packed );
-    free( psz_mode );
 
     for( int i = 0; i < METADATA_SIZE; i++ )
     {
@@ -707,7 +658,7 @@ notsupp:
     GetOutputFormat( p_filter, &fmt, &p_filter->fmt_in.video );
 
     /* */
-    if( p_sys->i_mode == DEINTERLACE_PHOSPHOR )
+    if( !strcmp( psz_mode, "phosphor" ) )
     {
         int i_c420 = var_GetInteger( p_filter,
                                      FILTER_CFG_PREFIX "phosphor-chroma" );
@@ -745,6 +696,7 @@ notsupp:
                         VLC_CODEC_J422 : VLC_CODEC_I422;
         }
     }
+    free( psz_mode );
 
     if( !p_filter->b_allow_fmt_out_change &&
         ( fmt.i_chroma != p_filter->fmt_in.video.i_chroma ||
