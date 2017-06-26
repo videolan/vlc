@@ -820,25 +820,13 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     i_type &= VLC_VAR_CLASS;
     if (i_type == VLC_VAR_BOOL)
-    {
         var_SetBool(p_playlist, psz_property, value.b_bool);
-        config_PutInt(p_intf, psz_property, (int64_t)value.b_bool);
-    }
     else if (i_type == VLC_VAR_INTEGER)
-    {
         var_SetInteger(p_playlist, psz_property, value.i_int);
-        config_PutInt(p_intf, psz_property, value.i_int);
-    }
     else if (i_type == VLC_VAR_FLOAT)
-    {
-        config_PutFloat(p_intf, psz_property, value.f_float);
         var_SetFloat(p_playlist, psz_property, value.f_float);
-    }
     else if (i_type == VLC_VAR_STRING)
-    {
-        config_PutPsz(p_intf, psz_property, EnsureUTF8(value.psz_string));
         var_SetString(p_playlist, psz_property, EnsureUTF8(value.psz_string));
-    }
     else
     {
         msg_Err(p_intf,
