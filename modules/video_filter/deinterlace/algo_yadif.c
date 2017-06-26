@@ -64,9 +64,9 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
     assert( i_field == 0 || i_field == 1 );
 
     /* As the pitches must match, use ONLY pictures coming from picture_New()! */
-    picture_t *p_prev = p_sys->pp_history[0];
-    picture_t *p_cur  = p_sys->pp_history[1];
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_prev = p_sys->context.pp_history[0];
+    picture_t *p_cur  = p_sys->context.pp_history[1];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     /* Account for soft field repeat.
 
@@ -177,7 +177,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
             }
         }
 
-        p_sys->i_frame_offset = 1; /* p_cur will be rendered at next frame, too */
+        p_sys->context.i_frame_offset = 1; /* p_cur will be rendered at next frame, too */
 
         return VLC_SUCCESS;
     }
@@ -192,7 +192,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
     }
     else
     {
-        p_sys->i_frame_offset = 1; /* p_cur will be rendered at next frame */
+        p_sys->context.i_frame_offset = 1; /* p_cur will be rendered at next frame */
 
         return VLC_EGENERIC;
     }

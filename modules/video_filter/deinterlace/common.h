@@ -1,10 +1,11 @@
 /*****************************************************************************
  * common.h : Common macros for the VLC deinterlacer
  *****************************************************************************
- * Copyright (C) 2000-2011 VLC authors and VideoLAN
+ * Copyright (C) 2000-2017 VLC authors and VideoLAN
  * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
+ *         Steve Lhomme <robux4@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -24,6 +25,11 @@
 #ifndef VLC_DEINTERLACE_COMMON_H
 #define VLC_DEINTERLACE_COMMON_H 1
 
+#include <vlc_common.h>
+#include <vlc_filter.h>
+
+#include <assert.h>
+
 /**
  * \file
  * Common macros for the VLC deinterlacer.
@@ -34,5 +40,81 @@
 #define FFMAX3(a,b,c)   FFMAX(FFMAX(a,b),c)
 #define FFMIN(a,b)      __MIN(a,b)
 #define FFMIN3(a,b,c)   FFMIN(FFMIN(a,b),c)
+
+/**
+ * Metadata history structure, used for framerate doublers.
+ * This is used for computing field duration in Deinterlace().
+ * @see Deinterlace()
+ */
+typedef struct {
+    mtime_t pi_date;
+    int     pi_nb_fields;
+    bool    pb_top_field_first;
+} metadata_history_t;
+
+#define METADATA_SIZE (3)
+#define HISTORY_SIZE (3)
+#define CUSTOM_PTS -1
+
+struct deinterlace_ctx
+{
+    /* Algorithm behaviour flags */
+    bool b_double_rate;       /**< Shall we double the framerate? */
+    bool b_half_height;       /**< Shall be divide the height by 2 */
+    bool b_use_frame_history; /**< Use the input frame history buffer? */
+
+    /**
+     * Metadata history (PTS, nb_fields, TFF). Used for framerate doublers.
+     * @see metadata_history_t
+     */
+    metadata_history_t meta[METADATA_SIZE];
+
+    /** Output frame timing / framerate doubler control
+        (see extra documentation in deinterlace.h) */
+    int i_frame_offset;
+
+    /** Input frame history buffer for algorithms with temporal filtering. */
+    picture_t *pp_history[HISTORY_SIZE];
+
+    union {
+        /**
+         * @param i_order Temporal field number: 0 = first, 1 = second, 2 = repeat first.
+         * @param i_field Keep which field? 0 = top field, 1 = bottom field.
+         */
+        int (*pf_render_ordered)(filter_t *, picture_t *p_dst, picture_t *p_pic,
+                                 int order, int i_field);
+        int (*pf_render_single_pic)(filter_t *, picture_t *p_dst, picture_t *p_pic);
+    };
+};
+
+#define DEINTERLACE_DST_SIZE 3
+
+/**
+ * @brief Get the field duration based on the previous fields
+ * @param p_pic the picture which field we want the duration
+ * @return the duration of the field or 0 if there's no known framerate
+ */
+mtime_t GetFieldDuration( const struct deinterlace_ctx *,
+                          const picture_t *p_pic );
+
+/**
+ * @brief Get the output video_format_t configured for the deinterlacer
+ * @param p_dst video_format_t to fill
+ * @param p_src source video_format_t
+ */
+void GetDeinterlacingOutput( const struct deinterlace_ctx *,
+                             video_format_t *p_dst, const video_format_t *p_src );
+
+/**
+ * @brief Do the deinterlacing of the picture using pf_render_ordered() or pf_render_single_pic() calls.
+ * @return The deinterlaced picture or NULL if it failed
+ */
+picture_t *DoDeinterlacing( filter_t *, struct deinterlace_ctx *, picture_t * );
+
+/**
+ * @brief Flush the deinterlacer context
+ */
+void FlushDeinterlacing( struct deinterlace_ctx * );
+
 
 #endif

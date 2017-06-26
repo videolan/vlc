@@ -408,8 +408,8 @@ static void IVTCLowLevelDetect( filter_t *p_filter )
 
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
-    picture_t *p_curr = p_sys->pp_history[1];
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_curr = p_sys->context.pp_history[1];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     assert( p_next != NULL );
     assert( p_curr != NULL );
@@ -460,7 +460,7 @@ static void IVTCCadenceDetectAlgoScores( filter_t *p_filter )
 
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     assert( p_next != NULL );
 
@@ -634,7 +634,7 @@ static void IVTCCadenceDetectAlgoVektor( filter_t *p_filter )
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
 
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     assert( p_next != NULL );
 
@@ -862,9 +862,9 @@ static void IVTCSoftTelecineDetect( filter_t *p_filter )
 
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
-    picture_t *p_prev = p_sys->pp_history[0];
-    picture_t *p_curr = p_sys->pp_history[1];
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_prev = p_sys->context.pp_history[0];
+    picture_t *p_curr = p_sys->context.pp_history[1];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     assert( p_next != NULL );
     assert( p_curr != NULL );
@@ -979,9 +979,9 @@ static void IVTCCadenceAnalyze( filter_t *p_filter )
 
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
-    picture_t *p_prev = p_sys->pp_history[0];
-    picture_t *p_curr = p_sys->pp_history[1];
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_prev = p_sys->context.pp_history[0];
+    picture_t *p_curr = p_sys->context.pp_history[1];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     assert( p_next != NULL );
     assert( p_curr != NULL );
@@ -1218,8 +1218,8 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
     mtime_t t_final = VLC_TS_INVALID; /* for custom timestamp mangling */
 
-    picture_t *p_curr = p_sys->pp_history[1];
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_curr = p_sys->context.pp_history[1];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     assert( p_next != NULL );
     assert( p_curr != NULL );
@@ -1478,9 +1478,9 @@ int RenderIVTC( filter_t *p_filter, picture_t *p_dst, picture_t *p_pic )
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
 
-    picture_t *p_prev = p_sys->pp_history[0];
-    picture_t *p_curr = p_sys->pp_history[1];
-    picture_t *p_next = p_sys->pp_history[2];
+    picture_t *p_prev = p_sys->context.pp_history[0];
+    picture_t *p_curr = p_sys->context.pp_history[1];
+    picture_t *p_next = p_sys->context.pp_history[2];
 
     /* If the history mechanism has failed, we have nothing to do. */
     if( !p_next )
@@ -1522,7 +1522,7 @@ int RenderIVTC( filter_t *p_filter, picture_t *p_dst, picture_t *p_pic )
         bool b_have_output_frame = IVTCOutputOrDropFrame( p_filter, p_dst );
 
         /* The next frame will get a custom timestamp, too. */
-        p_sys->i_frame_offset = CUSTOM_PTS;
+        p_sys->context.i_frame_offset = CUSTOM_PTS;
 
         if( b_have_output_frame )
             return VLC_SUCCESS;
@@ -1571,7 +1571,7 @@ int RenderIVTC( filter_t *p_filter, picture_t *p_dst, picture_t *p_pic )
 
         /* At the next frame, the filter starts. The next frame will get
            a custom timestamp. */
-        p_sys->i_frame_offset = CUSTOM_PTS;
+        p_sys->context.i_frame_offset = CUSTOM_PTS;
 
         picture_Copy( p_dst, p_next );
         return VLC_SUCCESS;
