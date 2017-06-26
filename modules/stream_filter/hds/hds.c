@@ -1642,6 +1642,12 @@ static int Open( vlc_object_t *p_this )
 
     /* remove the last part of the url */
     char *pos = strrchr( uri_without_query, '/');
+    if ( pos == NULL )
+    {
+        free( uri_without_query );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     *pos = '\0';
     p_sys->base_url = uri_without_query;
 
