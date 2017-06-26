@@ -514,43 +514,44 @@
 - (NSString *)generateProfileString
 {
     intf_thread_t *p_intf = getIntf();
+    playlist_t *p_playlist = pl_Get(p_intf);
     return [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f",
-            B64EncAndFree(config_GetPsz(p_intf, "video-filter")),
-            B64EncAndFree(config_GetPsz(p_intf, "sub-source")),
-            B64EncAndFree(config_GetPsz(p_intf, "video-splitter")),
-            0LL, // former "hue" value, deprecated since 3.0.0
-            config_GetFloat(p_intf, "contrast"),
-            config_GetFloat(p_intf, "brightness"),
-            config_GetFloat(p_intf, "saturation"),
-            config_GetFloat(p_intf, "gamma"),
-            config_GetFloat(p_intf, "sharpen-sigma"),
-            config_GetInt(p_intf, "gradfun-radius"),
-            config_GetFloat(p_intf, "grain-variance"),
-            B64EncAndFree(config_GetPsz(p_intf, "transform-type")),
-            config_GetInt(p_intf, "puzzle-rows"),
-            config_GetInt(p_intf, "puzzle-cols"),
-            config_GetInt(p_intf, "colorthres-color"),
-            config_GetInt(p_intf, "colorthres-saturationthres"),
-            config_GetInt(p_intf, "colorthres-similaritythres"),
-            config_GetInt(p_intf, "sepia-intensity"),
-            B64EncAndFree(config_GetPsz(p_intf, "gradient-mode")),
-            config_GetInt(p_intf, "gradient-cartoon"),
-            config_GetInt(p_intf, "gradient-type"),
-            config_GetInt(p_intf, "extract-component"),
-            config_GetInt(p_intf, "posterize-level"),
-            config_GetInt(p_intf, "blur-factor"),
-            B64EncAndFree(config_GetPsz(p_intf, "marq-marquee")),
-            config_GetInt(p_intf, "marq-position"),
-            B64EncAndFree(config_GetPsz(p_intf, "logo-file")),
-            config_GetInt(p_intf, "logo-position"),
-            config_GetInt(p_intf, "logo-opacity"),
-            config_GetInt(p_intf, "clone-count"),
-            config_GetInt(p_intf, "wall-rows"),
-            config_GetInt(p_intf, "wall-cols"),
-            // version 2 of profile string:
-            config_GetInt(p_intf, "brightness-threshold"), // index: 32
-            // version 3 of profile string: (vlc-3.0.0)
-            config_GetFloat(p_intf, "hue") // index: 33
+                     B64EncAndFree(var_InheritString(p_playlist, "video-filter")),
+                     B64EncAndFree(var_InheritString(p_playlist, "sub-source")),
+                     B64EncAndFree(var_InheritString(p_playlist, "video-splitter")),
+                     0LL, // former "hue" value, deprecated since 3.0.0
+                     var_InheritFloat(p_playlist, "contrast"),
+                     var_InheritFloat(p_playlist, "brightness"),
+                     var_InheritFloat(p_playlist, "saturation"),
+                     var_InheritFloat(p_playlist, "gamma"),
+                     var_InheritFloat(p_playlist, "sharpen-sigma"),
+                     var_InheritInteger(p_playlist, "gradfun-radius"),
+                     var_InheritFloat(p_playlist, "grain-variance"),
+                     B64EncAndFree(var_InheritString(p_playlist, "transform-type")),
+                     var_InheritInteger(p_playlist, "puzzle-rows"),
+                     var_InheritInteger(p_playlist, "puzzle-cols"),
+                     var_InheritInteger(p_playlist, "colorthres-color"),
+                     var_InheritInteger(p_playlist, "colorthres-saturationthres"),
+                     var_InheritInteger(p_playlist, "colorthres-similaritythres"),
+                     var_InheritInteger(p_playlist, "sepia-intensity"),
+                     B64EncAndFree(var_InheritString(p_playlist, "gradient-mode")),
+                     (int64_t)var_InheritBool(p_playlist, "gradient-cartoon"),
+                     var_InheritInteger(p_playlist, "gradient-type"),
+                     var_InheritInteger(p_playlist, "extract-component"),
+                     var_InheritInteger(p_playlist, "posterize-level"),
+                     var_InheritInteger(p_playlist, "blur-factor"),
+                     B64EncAndFree(var_InheritString(p_playlist, "marq-marquee")),
+                     var_InheritInteger(p_playlist, "marq-position"),
+                     B64EncAndFree(var_InheritString(p_playlist, "logo-file")),
+                     var_InheritInteger(p_playlist, "logo-position"),
+                     var_InheritInteger(p_playlist, "logo-opacity"),
+                     var_InheritInteger(p_playlist, "clone-count"),
+                     var_InheritInteger(p_playlist, "wall-rows"),
+                     var_InheritInteger(p_playlist, "wall-cols"),
+                     // version 2 of profile string:
+                     (int64_t)var_InheritBool(p_playlist, "brightness-threshold"), // index: 32
+                     // version 3 of profile string: (vlc-3.0.0)
+                     var_InheritFloat(p_playlist, "hue") // index: 33
             ];
 }
 
