@@ -197,13 +197,15 @@
 
     if (p_input) {
         float f_factor = [_sv_durTextField floatValue];
+        NSArray<NSValue *> *vouts = getVouts();
 
-        /* Try to find an instance of subsdelay, and set its factor */
-        vlc_object_t *p_obj = (vlc_object_t *) vlc_object_find_name(getIntf()->obj.libvlc, "subsdelay");
-        if (p_obj) {
-            var_SetFloat(p_obj, SUBSDELAY_CFG_FACTOR, f_factor);
-            vlc_object_release(p_obj);
-        }
+        if (vouts)
+            for (NSValue *ptr in vouts) {
+                vout_thread_t *p_vout = [ptr pointerValue];
+
+                var_SetFloat(p_vout, SUBSDELAY_CFG_FACTOR, f_factor);
+                vlc_object_release(p_vout);
+            }
         [[VLCCoreInteraction sharedInstance] setVideoFilter: "subsdelay" on: f_factor > 0];
 
         vlc_object_release(p_input);
