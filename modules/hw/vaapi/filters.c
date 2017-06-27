@@ -163,6 +163,7 @@ struct  deint_mode
 static struct deint_mode const  deint_modes[] =
 {
     { "x",     VAProcDeinterlacingMotionAdaptive },
+    { "x",     VAProcDeinterlacingMotionCompensated },
     { "bob",   VAProcDeinterlacingBob },
     { "mean",  VAProcDeinterlacingWeave }
 };
@@ -840,7 +841,6 @@ OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
                             deint_modes[i].name);
                     return VLC_SUCCESS;
                 }
-                break;
             }
         }
         fallback = true;
