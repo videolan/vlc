@@ -448,16 +448,24 @@ static const struct IAudioVolumeDuckNotificationVtbl vlc_AudioVolumeDuckNotifica
 /*** Audio devices ***/
 
 /** Gets the user-readable device name */
-static char *DeviceName(IMMDevice *dev)
+static int DeviceHotplugReport(audio_output_t *aout, LPCWSTR wid,
+                               IMMDevice *dev)
 {
     IPropertyStore *props;
-    char *name = NULL;
+    char *name;
     PROPVARIANT v;
     HRESULT hr;
 
+    char *id = FromWide(wid);
+    if (unlikely(id == NULL))
+        return VLC_ENOMEM;
+
     hr = IMMDevice_OpenPropertyStore(dev, STGM_READ, &props);
     if (FAILED(hr))
-        return NULL;
+    {
+        free(id);
+        return VLC_EGENERIC;
+    }
 
     PropVariantInit(&v);
     hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
@@ -466,8 +474,16 @@ static char *DeviceName(IMMDevice *dev)
         name = FromWide(v.pwszVal);
         PropVariantClear(&v);
     }
+    else
+        name = id;
+
     IPropertyStore_Release(props);
-    return name;
+    aout_HotplugReport(aout, id, name);
+
+    free(id);
+    if (id != name)
+        free(name);
+    return VLC_SUCCESS;
 }
 
 /** Checks that a device is an output device */
@@ -507,19 +523,8 @@ static HRESULT DeviceUpdated(audio_output_t *aout, LPCWSTR wid)
         return S_OK;
     }
 
-    char *id = FromWide(wid);
-    if (unlikely(id == NULL))
-    {
-        IMMDevice_Release(dev);
-        return E_OUTOFMEMORY;
-    }
-
-    char *name = DeviceName(dev);
+    DeviceHotplugReport(aout, wid, dev);
     IMMDevice_Release(dev);
-
-    aout_HotplugReport(aout, id, (name != NULL) ? name : id);
-    free(name);
-    free(id);
     return S_OK;
 }
 
@@ -690,7 +695,6 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
     for (UINT i = 0; i < count; i++)
     {
         IMMDevice *dev;
-        char *id, *name;
 
         hr = IMMDeviceCollection_Item(devs, i, &dev);
         if (FAILED(hr) || !DeviceIsRender(dev))
@@ -704,15 +708,10 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
             IMMDevice_Release(dev);
             continue;
         }
-        id = FromWide(devid);
-        CoTaskMemFree(devid);
 
-        name = DeviceName(dev);
+        DeviceHotplugReport(aout, devid, dev);
         IMMDevice_Release(dev);
-
-        aout_HotplugReport(aout, id, (name != NULL) ? name : id);
-        free(name);
-        free(id);
+        CoTaskMemFree(devid);
         n++;
     }
     IMMDeviceCollection_Release(devs);
