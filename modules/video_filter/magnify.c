@@ -127,7 +127,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_zoom = 2*ZOOM_FACTOR;
     p_sys->b_visible = true;
     p_sys->i_last_activity = mdate();
-    p_sys->i_hide_timeout = 1000 * var_CreateGetInteger( p_filter, "mouse-hide-timeout" ); /* FIXME */
+    p_sys->i_hide_timeout = 1000 * var_InheritInteger( p_filter, "mouse-hide-timeout" );
 
     /* */
     p_filter->pf_video_filter = Filter;
