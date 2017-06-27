@@ -320,6 +320,8 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 - (void)drawTickMarks
 {
     if (OSX_YOSEMITE_AND_HIGHER) {
@@ -335,5 +337,6 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
         NSRectFill(tickMarkRect);
     }
 }
+#pragma clang diagnostic pop
 
 @end
