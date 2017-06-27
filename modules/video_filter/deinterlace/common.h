@@ -90,12 +90,13 @@ struct deinterlace_ctx
 #define DEINTERLACE_DST_SIZE 3
 
 /**
- * @brief Get the field duration based on the previous fields
+ * @brief Get the field duration based on the previous fields or the frame rate
+ * @param fmt output format of the deinterlacer with the frame rate
  * @param p_pic the picture which field we want the duration
  * @return the duration of the field or 0 if there's no known framerate
  */
 mtime_t GetFieldDuration( const struct deinterlace_ctx *,
-                          const picture_t *p_pic );
+                          const video_format_t *fmt, const picture_t *p_pic );
 
 /**
  * @brief Get the output video_format_t configured for the deinterlacer

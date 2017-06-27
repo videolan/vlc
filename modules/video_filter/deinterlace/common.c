@@ -52,7 +52,7 @@ void FlushDeinterlacing(struct deinterlace_ctx *p_context)
 }
 
 mtime_t GetFieldDuration(const struct deinterlace_ctx *p_context,
-                         const picture_t *p_pic )
+                         const video_format_t *fmt, const picture_t *p_pic )
 {
     mtime_t i_field_dur = 0;
 
@@ -74,6 +74,8 @@ mtime_t GetFieldDuration(const struct deinterlace_ctx *p_context,
         /* One field took this long. */
         i_field_dur = (p_pic->date - p_context->meta[i].pi_date) / i_fields_total;
     }
+    else if (fmt->i_frame_rate_base)
+        i_field_dur = CLOCK_FREQ * fmt->i_frame_rate_base / fmt->i_frame_rate;
 
     /* Note that we default to field duration 0 if it could not be
        determined. This behaves the same as the old code - leaving the
@@ -276,7 +278,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
 
         if( p_context->b_double_rate )
         {
-            mtime_t i_field_dur = GetFieldDuration( p_context, p_pic );
+            mtime_t i_field_dur = GetFieldDuration( p_context, &p_filter->fmt_out.video, p_pic );
             /* Processing all actually allocated output frames. */
             for( int i = 1; i < i_double_rate_alloc_end; ++i )
             {
