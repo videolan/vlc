@@ -35,8 +35,6 @@
 #include "libvlc.h"
 #include "aout_internal.h"
 
-static const char unset_str[1] = ""; /* Non-NULL constant string pointer */
-
 struct aout_dev
 {
     aout_dev_t *next;
@@ -189,7 +187,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     vlc_mutex_init (&owner->lock);
     vlc_mutex_init (&owner->req.lock);
     vlc_mutex_init (&owner->dev.lock);
-    owner->req.device = (char *)unset_str;
+    owner->req.device = NULL;
     owner->req.volume = -1.f;
     owner->req.mute = -1;
 
@@ -357,7 +355,7 @@ static void aout_Destructor (vlc_object_t *obj)
         free (dev);
     }
 
-    assert (owner->req.device == unset_str);
+    assert (owner->req.device == NULL);
     vlc_mutex_destroy (&owner->req.lock);
     vlc_mutex_destroy (&owner->lock);
 }
@@ -564,11 +562,11 @@ void aout_OutputUnlock (audio_output_t *aout)
     vlc_assert_locked (&owner->lock);
     vlc_mutex_lock (&owner->req.lock);
 
-    if (owner->req.device != unset_str)
+    if (owner->req.device != NULL)
     {
         aout_OutputDeviceSet (aout, owner->req.device);
         free (owner->req.device);
-        owner->req.device = (char *)unset_str;
+        owner->req.device = NULL;
     }
 
     if (owner->req.volume >= 0.f)
@@ -675,8 +673,7 @@ int aout_DeviceSet (audio_output_t *aout, const char *id)
     }
 
     vlc_mutex_lock (&owner->req.lock);
-    if (owner->req.device != unset_str)
-        free (owner->req.device);
+    free (owner->req.device);
     owner->req.device = dev;
     vlc_mutex_unlock (&owner->req.lock);
 
