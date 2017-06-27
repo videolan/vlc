@@ -257,11 +257,6 @@ static void GetOutputFormat( filter_t *p_filter,
     {
         p_dst->i_frame_rate *= 2;
     }
-    else
-    {
-        p_dst->i_chroma = p_src->i_chroma;
-    }
-
 }
 
 /*****************************************************************************
@@ -749,11 +744,6 @@ notsupp:
             fmt.i_chroma = p_filter->fmt_in.video.i_chroma == VLC_CODEC_J420 ?
                         VLC_CODEC_J422 : VLC_CODEC_I422;
         }
-    }
-    else
-    {
-        p_sys->phosphor.i_chroma_for_420 = PC_ALTLINE;
-        p_sys->phosphor.i_dimmer_strength = 1;
     }
 
     if( !p_filter->b_allow_fmt_out_change &&
