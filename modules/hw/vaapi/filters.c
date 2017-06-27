@@ -752,13 +752,17 @@ Deinterlace_UpdateReferenceFrames(void * p_data)
 
     if (p_deint_data->backward_refs.sz)
         for (unsigned int i = 0; i < p_deint_data->backward_refs.sz; ++i)
+        {
+            unsigned int const  idx = p_deint_data->forward_refs.sz + 1 + i;
+
             p_deint_data->backward_refs.surfaces[i] =
-                vlc_vaapi_PicGetSurface(p_deint_data->history.pp_pics[i]);
+                vlc_vaapi_PicGetSurface(p_deint_data->history.pp_pics[idx]);
+        }
 
     if (p_deint_data->forward_refs.sz)
         for (unsigned int i = 0; i < p_deint_data->forward_refs.sz; ++i)
         {
-            unsigned int const  idx = p_deint_data->backward_refs.sz + 1 + i;
+            unsigned int const  idx = p_deint_data->forward_refs.sz - 1 - i;
 
             p_deint_data->forward_refs.surfaces[i] =
                 vlc_vaapi_PicGetSurface(p_deint_data->history.pp_pics[idx]);
@@ -923,20 +927,20 @@ OpenDeinterlace_InitHistory(void * p_data, VAProcPipelineCaps const * pipeline_c
         return VLC_ENOMEM;
 
     p_deint_data->history.pp_cur_pic =
-        p_deint_data->history.pp_pics + sz_backward_refs;
+        p_deint_data->history.pp_pics + sz_forward_refs;
     p_deint_data->history.num_pics = 0;
     p_deint_data->history.sz = history_sz;
 
     if (history_sz - 1)
     {
-        p_deint_data->backward_refs.surfaces =
+        p_deint_data->forward_refs.surfaces =
             malloc((history_sz - 1) * sizeof(VASurfaceID));
-        if (!p_deint_data->backward_refs.surfaces)
+        if (!p_deint_data->forward_refs.surfaces)
             return VLC_ENOMEM;
     }
 
-    p_deint_data->forward_refs.surfaces =
-        p_deint_data->backward_refs.surfaces + sz_backward_refs;
+    p_deint_data->backward_refs.surfaces =
+        p_deint_data->forward_refs.surfaces + sz_forward_refs;
 
     p_deint_data->backward_refs.sz = sz_backward_refs;
     p_deint_data->forward_refs.sz = sz_forward_refs;
@@ -962,8 +966,8 @@ OpenDeinterlace(vlc_object_t * obj)
     return VLC_SUCCESS;
 
 error:
-    if (p_data->backward_refs.surfaces)
-        free(p_data->backward_refs.surfaces);
+    if (p_data->forward_refs.surfaces)
+        free(p_data->forward_refs.surfaces);
     if (p_data->history.pp_pics)
         free(p_data->history.pp_pics);
     free(p_data);
@@ -977,8 +981,8 @@ CloseDeinterlace(vlc_object_t * obj)
     filter_sys_t *const         filter_sys = filter->p_sys;
     struct deint_data *const    p_data = filter_sys->p_data;
 
-    if (p_data->backward_refs.surfaces)
-        free(p_data->backward_refs.surfaces);
+    if (p_data->forward_refs.surfaces)
+        free(p_data->forward_refs.surfaces);
     if (p_data->history.pp_pics)
     {
         while (p_data->history.num_pics)
