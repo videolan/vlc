@@ -421,7 +421,6 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     /* willing to accept a match against marq-pos */
     {
         p_sys->i_pos = newval.i_int;
-        p_sys->i_xoff = -1;       /* force to relative positioning */
     }
 
     free( p_sys->message );
