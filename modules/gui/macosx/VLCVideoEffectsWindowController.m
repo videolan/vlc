@@ -638,6 +638,8 @@
     if (b_filter_changed)
         var_SetString(p_playlist, "video-splitter", [tempString UTF8String]);
 
+    [self resetValues];
+
     /* try to set filter values on-the-fly and store them appropriately */
     // index 3 is deprecated
     [vci_si setVideoFilterProperty: "contrast" forFilter: "adjust" withValue: getWidgetFloatValue([items objectAtIndex:4])];
@@ -685,8 +687,6 @@
 
     [defaults setInteger:selectedProfile forKey:@"VideoEffectSelectedProfile"];
     [defaults synchronize];
-
-    [self resetValues];
 }
 
 - (void)addProfile:(id)sender
