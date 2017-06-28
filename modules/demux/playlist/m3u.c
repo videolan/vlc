@@ -42,7 +42,7 @@
  *****************************************************************************/
 static int ReadDir( stream_t *, input_item_node_t * );
 static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name, int *pi_duration );
-static bool ContainsURL( stream_t *p_demux, const uint8_t *, ssize_t );
+static bool ContainsURL(const uint8_t *, size_t);
 
 static char *GuessEncoding (const char *str)
 {
@@ -102,7 +102,7 @@ int Import_M3U( vlc_object_t *p_this )
        || !vlc_ascii_strcasecmp(type, "application/x-mpegurl")
        || !vlc_ascii_strcasecmp(type, "audio/mpegurl")
        || !vlc_ascii_strcasecmp(type, "audio/x-mpegurl")))
-     || ContainsURL(p_stream, p_peek, i_peek))
+     || ContainsURL(p_peek, i_peek))
         ;
     else
     {   /* Guess encoding */
@@ -146,7 +146,7 @@ int Import_M3U( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static bool ContainsURL( stream_t *s, const uint8_t *p_peek, ssize_t i_peek )
+static bool ContainsURL(const uint8_t *p_peek, size_t i_peek)
 {
     const uint8_t *p_peek_end = p_peek + i_peek;
     if( i_peek < 7 )
