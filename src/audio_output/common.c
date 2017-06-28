@@ -461,7 +461,6 @@ bool aout_CheckChannelExtraction( int *pi_selection,
     static_assert(AOUT_CHAN_MAX <= (sizeof (*pi_order_dst) * CHAR_BIT),
                   "Missing bits");
 
-    const uint32_t pi_order_dual_mono[] = { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT };
     uint32_t i_layout = 0;
     int i_out = 0;
     int pi_index[AOUT_CHAN_MAX];
@@ -469,14 +468,6 @@ bool aout_CheckChannelExtraction( int *pi_selection,
     /* */
     if( !pi_order_dst )
         pi_order_dst = pi_vlc_chan_order_wg4;
-
-    /* Detect special dual mono case */
-    if( i_channels == 2 &&
-        pi_order_src[0] == AOUT_CHAN_CENTER && pi_order_src[1] == AOUT_CHAN_CENTER )
-    {
-        i_layout |= AOUT_CHAN_DUALMONO;
-        pi_order_src = pi_order_dual_mono;
-    }
 
     /* */
     for( int i = 0; i < i_channels; i++ )

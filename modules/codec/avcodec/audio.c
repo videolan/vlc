@@ -607,6 +607,16 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         if( i_channels_src != p_sys->p_context->channels && b_trust )
             msg_Err( p_dec, "Channel layout not understood" );
 
+        bool dual_mono = false;
+        /* Detect special dual mono case */
+        if( i_channels_src == 2 && pi_order_src[0] == AOUT_CHAN_CENTER
+         && pi_order_src[1] == AOUT_CHAN_CENTER )
+        {
+            dual_mono = true;
+            pi_order_src[0] = AOUT_CHAN_LEFT;
+            pi_order_src[1] = AOUT_CHAN_RIGHT;
+        }
+
         uint32_t i_layout_dst;
         int      i_channels_dst;
         p_sys->b_extract = aout_CheckChannelExtraction( p_sys->pi_extraction,
@@ -617,6 +627,8 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
         p_dec->fmt_out.audio.i_physical_channels =
         p_dec->fmt_out.audio.i_original_channels = i_layout_dst;
+        if (dual_mono)
+            p_dec->fmt_out.audio.i_original_channels |= AOUT_CHAN_DUALMONO;
     }
     else
     {
