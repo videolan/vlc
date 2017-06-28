@@ -35,6 +35,7 @@
 
 #include "item.h"
 #include "info.h"
+#include "input_internal.h"
 
 struct input_item_opaque
 {
