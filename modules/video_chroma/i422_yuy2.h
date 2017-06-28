@@ -79,9 +79,6 @@ punpckhbw %%mm0, %%mm1  #                     y7 v3 y6 u3 y5 v2 y4 u2     \n\
 movq      %%mm1, 8(%0)  # Store high UYVY                                 \n\
 "
 
-#define MMX_YUV422_Y211 "                                                 \n\
-"
-
 #elif defined(HAVE_MMX_INTRINSICS)
 
 /* MMX intrinsics */

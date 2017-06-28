@@ -78,12 +78,6 @@ static void I420_Y211           ( filter_t *, picture_t *, picture_t * );
 static picture_t *I420_Y211_Filter    ( filter_t *, picture_t * );
 #endif
 
-#ifdef MODULE_NAME_IS_i420_yuy2_mmx
-/* Initialize MMX-specific constants */
-static const uint64_t i_00ffw = 0x00ff00ff00ff00ffULL;
-static const uint64_t i_80w   = 0x0000000080808080ULL;
-#endif
-
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/

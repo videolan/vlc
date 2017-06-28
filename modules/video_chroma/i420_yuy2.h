@@ -97,25 +97,6 @@ punpckhbw %%mm3, %%mm1  #                     Y7 v3 Y6 u3 Y5 v2 Y4 u2     \n\
 movq      %%mm1, 8(%1)  # Store high UYVY                                 \n\
 "
 
-/* FIXME: this code does not work ! Chroma seems to be wrong. */
-#define MMX_YUV420_Y211 "                                                 \n\
-movd       (%4), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-movd       (%5), %%mm3  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
-pand    i_00ffw, %%mm0  # get Y even          00 Y6 00 Y4 00 Y2 00 Y0     \n\
-packuswb  %%mm0, %%mm0  # pack Y              y6 y4 y2 y0 y6 y4 y2 y0     \n\
-pand    i_00ffw, %%mm2  # get U even          00 u6 00 u4 00 u2 00 u0     \n\
-packuswb  %%mm2, %%mm2  # pack U              00 00 u2 u0 00 00 u2 u0     \n\
-pand    i_00ffw, %%mm3  # get V even          00 v6 00 v4 00 v2 00 v0     \n\
-packuswb  %%mm3, %%mm3  # pack V              00 00 v2 v0 00 00 v2 v0     \n\
-punpcklbw %%mm3, %%mm2  #                     00 00 00 00 v2 u2 v0 u0     \n\
-psubsw    i_80w, %%mm2  # U,V -= 128                                      \n\
-punpcklbw %%mm2, %%mm0  #                     v2 y6 u2 y4 v0 y2 u0 y0     \n\
-movq      %%mm0, (%0)   # Store YUYV                                      \n\
-pand    i_00ffw, %%mm1  # get Y even          00 Y6 00 Y4 00 Y2 00 Y0     \n\
-packuswb  %%mm1, %%mm1  # pack Y              Y6 Y4 Y2 Y0 Y6 Y4 Y2 Y0     \n\
-punpcklbw %%mm2, %%mm1  #                     v2 Y6 u2 Y4 v0 Y2 u0 Y0     \n\
-movq      %%mm1, (%1)   # Store YUYV                                      \n\
-"
 #elif defined(HAVE_MMX_INTRINSICS)
 
 /* MMX intrinsics */
