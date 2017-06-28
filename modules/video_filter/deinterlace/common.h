@@ -89,6 +89,8 @@ struct deinterlace_ctx
 
 #define DEINTERLACE_DST_SIZE 3
 
+void InitDeinterlacingContext( struct deinterlace_ctx * );
+
 /**
  * @brief Get the field duration based on the previous fields or the frame rate
  * @param fmt output format of the deinterlacer with the frame rate

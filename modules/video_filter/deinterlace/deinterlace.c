@@ -333,16 +333,7 @@ notsupp:
     char *psz_mode = var_InheritString( p_filter, FILTER_CFG_PREFIX "mode" );
     SetFilterMethod( p_filter, psz_mode, packed );
 
-    for( int i = 0; i < METADATA_SIZE; i++ )
-    {
-        p_sys->context.meta[i].pi_date = VLC_TS_INVALID;
-        p_sys->context.meta[i].pi_nb_fields = 2;
-        p_sys->context.meta[i].pb_top_field_first = true;
-    }
-    p_sys->context.i_frame_offset = 0; /* start with default value (first-ever frame
-                                  cannot have offset) */
-    for( int i = 0; i < HISTORY_SIZE; i++ )
-        p_sys->context.pp_history[i] = NULL;
+    InitDeinterlacingContext( &p_sys->context );
 
     IVTCClearState( p_filter );
 

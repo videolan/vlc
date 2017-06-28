@@ -33,6 +33,24 @@
 
 #include "common.h"
 
+void InitDeinterlacingContext( struct deinterlace_ctx *p_context )
+{
+    p_context->b_double_rate = false;
+    p_context->b_half_height = false;
+    p_context->b_use_frame_history = false;
+
+    p_context->meta[0].pi_date = VLC_TS_INVALID;
+    p_context->meta[0].pi_nb_fields = 2;
+    p_context->meta[0].pb_top_field_first = true;
+    for( int i = 1; i < METADATA_SIZE; i++ )
+        p_context->meta[i] = p_context->meta[i-1];
+
+    p_context->i_frame_offset = 0; /* start with default value (first-ever frame
+                                  cannot have offset) */
+    for( int i = 0; i < HISTORY_SIZE; i++ )
+        p_context->pp_history[i] = NULL;
+}
+
 void FlushDeinterlacing(struct deinterlace_ctx *p_context)
 {
     p_context->meta[0].pi_date = VLC_TS_INVALID;
