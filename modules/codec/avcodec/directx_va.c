@@ -315,8 +315,10 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *
     if ( avctx->active_thread_type & FF_THREAD_FRAME )
         surface_count += avctx->thread_count;
 
-    return va_pool_Setup(va, &dx_sys->va_pool, avctx,
-                         surface_count, surface_alignment);
+    int err = va_pool_SetupDecoder(va, &dx_sys->va_pool, avctx, surface_count, surface_alignment);
+    if (err != VLC_SUCCESS)
+        return err;
+    return va_pool_SetupSurfaces(va, &dx_sys->va_pool, surface_count);
 }
 
 void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)

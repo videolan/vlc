@@ -50,7 +50,7 @@ static void DestroyVideoDecoder(vlc_va_t *va, va_pool_t *va_pool)
 }
 
 /* */
-int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned count, int alignment)
+int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned count, int alignment)
 {
     int err = VLC_ENOMEM;
     unsigned i = va_pool->surface_count;
@@ -78,7 +78,7 @@ int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
     DestroyVideoDecoder(va, va_pool);
 
     /* */
-    msg_Dbg(va, "va_pool_Setup id %d %dx%d count: %d", avctx->codec_id, avctx->coded_width, avctx->coded_height, count);
+    msg_Dbg(va, "va_pool_SetupDecoder id %d %dx%d count: %d", avctx->codec_id, avctx->coded_width, avctx->coded_height, count);
 
     if (count > MAX_SURFACE_COUNT)
         return VLC_EGENERIC;
@@ -94,6 +94,23 @@ int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
     if (va_pool->pf_create_decoder_surfaces(va, avctx->codec_id, &fmt, count))
         return VLC_EGENERIC;
 
+    va_pool->surface_width  = surface_width;
+    va_pool->surface_height = surface_height;
+    err = VLC_SUCCESS;
+
+done:
+    va_pool->surface_count = i;
+    if (err == VLC_SUCCESS)
+        va_pool->pf_setup_avcodec_ctx(va);
+
+    return err;
+}
+
+int va_pool_SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool, unsigned count)
+{
+    int err = VLC_ENOMEM;
+    unsigned i = va_pool->surface_count;
+
     for (i = 0; i < count; i++) {
         struct vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
         if (unlikely(p_surface==NULL))
@@ -107,9 +124,6 @@ int va_pool_Setup(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
         va_pool->surface[i]->va_surface = p_surface;
         atomic_init(&va_pool->surface[i]->va_surface->refcount, 1);
     }
-
-    va_pool->surface_width  = surface_width;
-    va_pool->surface_height = surface_height;
     err = VLC_SUCCESS;
 
 done:
@@ -141,6 +155,9 @@ int va_pool_Get(va_pool_t *va_pool, picture_t *pic)
 {
     unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
     picture_context_t *field;
+
+    if (va_pool->surface_count == 0)
+        return VLC_ENOITEM;
 
     while ((field = GetSurface(va_pool)) == NULL)
     {
