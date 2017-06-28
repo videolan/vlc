@@ -105,6 +105,7 @@ $Id$
  * demuxdump: Pseudo-demuxer that dumps the stream
  * diracsys: BBC Dirac demuxer
  * direct3d11: video output module using the Direct3D11 API
+ * direct3d11_adjust: adjust filter for Direct3D11 video decoding
  * direct3d11_deinterlace: deinterlacer for Direct3D11 video decoding
  * direct3d9: video output module using the Direct3D9 API
  * direct3d9_deinterlace: deinterlacer for Direct3D9/DxVA video decoding

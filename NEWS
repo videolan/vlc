@@ -65,7 +65,8 @@ Decoder:
  * Support for experimental AV1 video
  * Important improvements for the MMAL decoder and output for rPI and rPI2
  * Support HEVC hardware decoding on Windows, using DxVA2 and D3D11
- * Support hardware decoding using Direct3D11, including GPU-zerocopy mode
+ * Support hardware decoding using Direct3D11, including GPU-zerocopy mode,
+   and hardware filtering, for deinterlace and adjust
  * DxVA2 GPU-zerocopy for hardware decoding and displaying on Windows
  * Support HEVC hardware decoding using OMX and MediaCodec (Android)
  * Use MediaCodec via NDK native API after Android Lollipop
