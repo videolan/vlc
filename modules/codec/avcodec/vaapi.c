@@ -312,7 +312,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->hw_ctx.display = vaGetDisplay(sys->p_display_x11);
 #endif
 #ifdef VLC_VA_BACKEND_DRM
-    static const char const *drm_device_paths[] = {
+    static const char drm_device_paths[][20] = {
         "/dev/dri/renderD128",
         "/dev/dri/card0"
     };
