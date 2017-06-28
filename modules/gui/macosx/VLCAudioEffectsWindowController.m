@@ -179,17 +179,7 @@
 
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on
 {
-    audio_output_t *p_aout = getAout();
-    intf_thread_t *p_intf = getIntf();
-    playlist_EnableAudioFilter(pl_Get(p_intf), psz_name, b_on);
-
-    if (p_aout) {
-        char *psz_new = var_GetNonEmptyString(p_aout, "audio-filter");
-        config_PutPsz(p_intf, "audio-filter", psz_new);
-        free(psz_new);
-
-        vlc_object_release(p_aout);
-    }
+    playlist_EnableAudioFilter(pl_Get(getIntf()), psz_name, b_on);
 }
 
 - (void)resetProfileSelector
@@ -481,7 +471,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     if (!p_aout)
         return false;
 
-    psz_string = config_GetPsz(p_custom_intf, "audio-filter");
+    psz_string = var_InheritString(pl_Get(p_custom_intf), "audio-filter");
 
     if (!psz_string)
         psz_string = var_GetNonEmptyString(p_aout, "audio-filter");
@@ -626,7 +616,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     /* save changed to config */
     config_PutPsz(getIntf(), "equalizer-bands", [[self generatePresetString] UTF8String]);
-
 }
 
 - (IBAction)equalizerChangePreset:(id)sender
@@ -769,7 +758,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     intf_thread_t *p_intf = getIntf();
     BOOL bEnable_compressor = NO;
     char *psz_afilters;
-    psz_afilters = config_GetPsz(p_intf, "audio-filter");
+    psz_afilters = var_InheritString(pl_Get(p_intf), "audio-filter");
     if (psz_afilters) {
         bEnable_compressor = strstr(psz_afilters, "compressor") != NULL;
         [_compressorEnableCheckbox setState: (NSInteger)strstr(psz_afilters, "compressor") ];
@@ -874,7 +863,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     intf_thread_t *p_intf = getIntf();
     BOOL bEnable_spatializer = NO;
     char *psz_afilters;
-    psz_afilters = config_GetPsz(p_intf, "audio-filter");
+    psz_afilters = var_InheritString(pl_Get(p_intf), "audio-filter");
     if (psz_afilters) {
         bEnable_spatializer = strstr(psz_afilters, "spatializer") != NULL;
         free(psz_afilters);
@@ -964,7 +953,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     intf_thread_t *p_intf = getIntf();
     BOOL bEnable_normvol = NO;
     char *psz_afilters;
-    psz_afilters = config_GetPsz(p_intf, "audio-filter");
+    psz_afilters = var_InheritString(pl_Get(p_intf), "audio-filter");
     if (psz_afilters) {
         [_filterHeadPhoneCheckbox setState: (NSInteger)strstr(psz_afilters, "headphone") ];
         [_filterKaraokeCheckbox setState: (NSInteger)strstr(psz_afilters, "karaoke") ];
