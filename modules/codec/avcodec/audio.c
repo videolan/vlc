@@ -258,6 +258,7 @@ int InitAudioDec( vlc_object_t *obj )
         p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
     if( p_dec->fmt_out.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
+    p_dec->fmt_out.audio.i_chan_mode = p_dec->fmt_in.audio.i_chan_mode;
 
     p_dec->pf_decode = DecodeAudio;
     p_dec->pf_flush  = Flush;
@@ -607,12 +608,11 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         if( i_channels_src != p_sys->p_context->channels && b_trust )
             msg_Err( p_dec, "Channel layout not understood" );
 
-        bool dual_mono = false;
         /* Detect special dual mono case */
         if( i_channels_src == 2 && pi_order_src[0] == AOUT_CHAN_CENTER
          && pi_order_src[1] == AOUT_CHAN_CENTER )
         {
-            dual_mono = true;
+            p_dec->fmt_out.audio.i_chan_mode |= AOUT_CHANMODE_DUALMONO;
             pi_order_src[0] = AOUT_CHAN_LEFT;
             pi_order_src[1] = AOUT_CHAN_RIGHT;
         }
@@ -625,16 +625,12 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         if( i_channels_dst != i_channels_src && b_trust )
             msg_Warn( p_dec, "%d channels are dropped", i_channels_src - i_channels_dst );
 
-        p_dec->fmt_out.audio.i_physical_channels =
-        p_dec->fmt_out.audio.i_original_channels = i_layout_dst;
-        if (dual_mono)
-            p_dec->fmt_out.audio.i_original_channels |= AOUT_CHAN_DUALMONO;
+        p_dec->fmt_out.audio.i_physical_channels = i_layout_dst;
     }
     else
     {
         msg_Warn( p_dec, "no channel layout found");
-        p_dec->fmt_out.audio.i_physical_channels =
-        p_dec->fmt_out.audio.i_original_channels = 0;
+        p_dec->fmt_out.audio.i_physical_channels = 0;
         p_dec->fmt_out.audio.i_channels = p_sys->p_context->channels;
     }
 

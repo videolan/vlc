@@ -31,7 +31,8 @@ typedef struct
     unsigned int    i_bitrate;
     unsigned int    i_frame_size;
     unsigned int    i_frame_length;
-    uint32_t        i_original_channels;
+    uint16_t        i_physical_channels;
+    uint16_t        i_chan_mode;
 } vlc_dts_header_t;
 
 int     vlc_dts_header_Parse( vlc_dts_header_t *p_header,

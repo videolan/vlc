@@ -428,7 +428,6 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     else
         return -1;
 
-    audio->i_original_channels = audio->i_physical_channels;
     aout_FormatPrepare (audio);
 
     if (wf->nChannels != audio->i_channels)

@@ -415,11 +415,6 @@ static int Open(vlc_object_t *p_this)
          */
         audiofmt.audio.i_physical_channels = AOUT_CHAN_RIGHT | AOUT_CHAN_LEFT;
         /*
-         * i_original_channels Describes from which original channels,
-         * before downmixing, the buffer is derived.
-         */
-        audiofmt.audio.i_original_channels = AOUT_CHAN_RIGHT | AOUT_CHAN_LEFT;
-        /*
          * Please note that it may be completely arbitrary - buffers are not
          * obliged to contain a integral number of so-called "frames". It's
          * just here for the division:

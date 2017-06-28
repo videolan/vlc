@@ -433,7 +433,6 @@ static int Open (vlc_object_t *obj)
     assert (param > 0);
     assert (param < (sizeof (channel_maps) / sizeof (channel_maps[0])));
     fmt.audio.i_channels = param;
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = channel_maps[param - 1];
 
     param = var_InheritInteger (demux, "alsa-samplerate");

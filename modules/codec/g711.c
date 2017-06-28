@@ -197,12 +197,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     else
         p_dec->fmt_out.audio.i_physical_channels =
                               pi_channels_maps[p_dec->fmt_in.audio.i_channels];
-    if( p_dec->fmt_in.audio.i_original_channels )
-        p_dec->fmt_out.audio.i_original_channels =
-                                       p_dec->fmt_in.audio.i_original_channels;
-    else
-        p_dec->fmt_out.audio.i_original_channels =
-                                      p_dec->fmt_out.audio.i_physical_channels;
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 
     p_sys->table = table;

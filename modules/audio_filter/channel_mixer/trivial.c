@@ -193,8 +193,7 @@ static int Create( vlc_object_t *p_this )
      || infmt->i_rate != outfmt->i_rate
      || infmt->i_format != VLC_CODEC_FL32 )
         return VLC_EGENERIC;
-    if( infmt->i_physical_channels == outfmt->i_physical_channels
-     && infmt->i_original_channels == outfmt->i_original_channels )
+    if( infmt->i_physical_channels == outfmt->i_physical_channels )
         return VLC_EGENERIC;
 
     p_filter->p_sys = NULL;

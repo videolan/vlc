@@ -347,19 +347,12 @@ static int aout_update_format( decoder_t *p_dec )
 
         const int i_force_dolby = var_InheritInteger( p_dec, "force-dolby-surround" );
         if( i_force_dolby &&
-            (format.i_original_channels&AOUT_CHAN_PHYSMASK) ==
-                (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
+            format.i_physical_channels == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
         {
             if( i_force_dolby == 1 )
-            {
-                format.i_original_channels = format.i_original_channels |
-                                             AOUT_CHAN_DOLBYSTEREO;
-            }
+                format.i_chan_mode |= AOUT_CHANMODE_DOLBYSTEREO;
             else /* i_force_dolby == 2 */
-            {
-                format.i_original_channels = format.i_original_channels &
-                                             ~AOUT_CHAN_DOLBYSTEREO;
-            }
+                format.i_chan_mode &= ~AOUT_CHANMODE_DOLBYSTEREO;
         }
 
         aout_request_vout_t request_vout = {

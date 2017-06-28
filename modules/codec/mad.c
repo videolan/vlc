@@ -249,7 +249,6 @@ static int Open( vlc_object_t *p_this )
      && p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','3') )
      || p_dec->fmt_in.audio.i_rate == 0
      || p_dec->fmt_in.audio.i_physical_channels == 0
-     || p_dec->fmt_in.audio.i_original_channels == 0
      || p_dec->fmt_in.audio.i_bytes_per_frame == 0
      || p_dec->fmt_in.audio.i_frame_length == 0 )
         return VLC_EGENERIC;

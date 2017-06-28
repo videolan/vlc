@@ -171,9 +171,7 @@ static int Open (vlc_object_t *p_this)
         var_InheritInteger (p_this, "synth-sample-rate");;
     fluid_synth_set_sample_rate (p_sys->synth, p_dec->fmt_out.audio.i_rate);
     p_dec->fmt_out.audio.i_channels = 2;
-    p_dec->fmt_out.audio.i_original_channels =
-    p_dec->fmt_out.audio.i_physical_channels =
-        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    p_dec->fmt_out.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
     p_dec->fmt_out.audio.i_bitspersample = 32;
     date_Init (&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);

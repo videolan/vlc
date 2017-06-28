@@ -1512,8 +1512,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                                 i_channel_mask,
                                 p_tk->pi_chan_table );
 
-                            p_tk->fmt.audio.i_physical_channels =
-                            p_tk->fmt.audio.i_original_channels = i_channel_mask;
+                            p_tk->fmt.audio.i_physical_channels = i_channel_mask;
                         }
                     }
                 }

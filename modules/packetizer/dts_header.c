@@ -162,7 +162,8 @@ static unsigned int dca_get_bitrate( uint8_t i_rate )
     return p_dca_bitrates[i_rate];
 }
 
-static uint32_t dca_get_channels( uint8_t i_amode, bool b_lfe )
+static uint16_t dca_get_channels( uint8_t i_amode, bool b_lfe,
+                                  uint16_t *p_chan_mode )
 {
     /* See ETSI TS 102 114, table 5-4
      * 00: A
@@ -183,59 +184,60 @@ static uint32_t dca_get_channels( uint8_t i_amode, bool b_lfe )
      * 0F: CL + C + CR + L + R + SL + S + SR
      * 10-3F: user defined */
 
-    uint32_t i_original_channels;
+    uint16_t i_physical_channels;
 
     switch( i_amode )
     {
         case 0x0:
-            i_original_channels = AOUT_CHAN_CENTER;
+            i_physical_channels = AOUT_CHAN_CENTER;
             break;
         case 0x1:
-            i_original_channels = AOUT_CHANS_FRONT | AOUT_CHAN_DUALMONO;
+            i_physical_channels = AOUT_CHANS_FRONT;
+            *p_chan_mode = AOUT_CHANMODE_DUALMONO;
             break;
         case 0x2:
         case 0x3:
         case 0x4:
-            i_original_channels = AOUT_CHANS_FRONT;
+            i_physical_channels = AOUT_CHANS_FRONT;
             break;
         case 0x5:
-            i_original_channels = AOUT_CHANS_3_0;
+            i_physical_channels = AOUT_CHANS_3_0;
             break;
         case 0x6:
-            i_original_channels = AOUT_CHANS_FRONT | AOUT_CHAN_REARCENTER;
+            i_physical_channels = AOUT_CHANS_FRONT | AOUT_CHAN_REARCENTER;
             break;
         case 0x7:
-            i_original_channels = AOUT_CHANS_4_CENTER_REAR;
+            i_physical_channels = AOUT_CHANS_4_CENTER_REAR;
             break;
         case 0x8:
-            i_original_channels = AOUT_CHANS_4_0;
+            i_physical_channels = AOUT_CHANS_4_0;
             break;
         case 0x9:
-            i_original_channels = AOUT_CHANS_5_0;
+            i_physical_channels = AOUT_CHANS_5_0;
             break;
         case 0xA:
         case 0xB:
-            i_original_channels = AOUT_CHANS_6_0;
+            i_physical_channels = AOUT_CHANS_6_0;
             break;
         case 0xC:
-            i_original_channels = AOUT_CHANS_CENTER | AOUT_CHANS_FRONT
+            i_physical_channels = AOUT_CHANS_CENTER | AOUT_CHANS_FRONT
                                 | AOUT_CHANS_REAR;
             break;
         case 0xD:
-            i_original_channels = AOUT_CHANS_7_0;
+            i_physical_channels = AOUT_CHANS_7_0;
             break;
         case 0xE:
         case 0xF:
             /* FIXME: AOUT_CHANS_8_0 */
-            i_original_channels = AOUT_CHANS_7_0;
+            i_physical_channels = AOUT_CHANS_7_0;
             break;
         default:
             return 0;
     }
     if (b_lfe)
-        i_original_channels |= AOUT_CHAN_LFE;
+        i_physical_channels |= AOUT_CHAN_LFE;
 
-    return i_original_channels;
+    return i_physical_channels;
 }
 
 static int dts_header_ParseSubstream( vlc_dts_header_t *p_header,
@@ -290,10 +292,12 @@ static int dts_header_ParseCore( vlc_dts_header_t *p_header,
                                     : ( i_fsize + 1 ) * 16 / 14;
     /* See ETSI TS 102 114, table 5-2 */
     p_header->i_frame_length = (i_nblks + 1) * 32;
-    p_header->i_original_channels = dca_get_channels( i_amode, b_lfe );
+    p_header->i_chan_mode = 0;
+    p_header->i_physical_channels =
+        dca_get_channels( i_amode, b_lfe, &p_header->i_chan_mode );
 
     if( !p_header->i_rate || !p_header->i_frame_size ||
-        !p_header->i_frame_length || !p_header->i_original_channels )
+        !p_header->i_frame_length || !p_header->i_physical_channels )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;

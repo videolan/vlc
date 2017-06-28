@@ -120,12 +120,10 @@ static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_st
 
     /* Fix input format */
     id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
-    if( !id->p_encoder->fmt_in.audio.i_physical_channels
-     || !id->p_encoder->fmt_in.audio.i_original_channels )
+    if( !id->p_encoder->fmt_in.audio.i_physical_channels )
     {
         if( id->p_encoder->fmt_in.audio.i_channels < (sizeof(pi_channels_maps) / sizeof(*pi_channels_maps)) )
             id->p_encoder->fmt_in.audio.i_physical_channels =
-            id->p_encoder->fmt_in.audio.i_original_channels =
                       pi_channels_maps[id->p_encoder->fmt_in.audio.i_channels];
     }
     aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
@@ -265,10 +263,6 @@ int transcode_audio_process( sout_stream_t *p_stream,
             id->p_encoder->fmt_out.audio.i_channels = p_sys->i_channels > 0 ?
                 p_sys->i_channels : id->p_decoder->fmt_out.audio.i_channels;
 
-            id->p_encoder->fmt_in.audio.i_original_channels =
-            id->p_encoder->fmt_out.audio.i_original_channels =
-                id->p_decoder->fmt_out.audio.i_physical_channels;
-
             id->p_encoder->fmt_in.audio.i_physical_channels =
             id->p_encoder->fmt_out.audio.i_physical_channels =
                 pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
@@ -387,10 +381,6 @@ bool transcode_audio_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
         p_fmt->audio.i_bitspersample;
     id->p_encoder->fmt_out.audio.i_channels = p_sys->i_channels > 0 ?
         p_sys->i_channels : p_fmt->audio.i_channels;
-
-    id->p_encoder->fmt_in.audio.i_original_channels =
-    id->p_encoder->fmt_out.audio.i_original_channels =
-        id->p_decoder->fmt_out.audio.i_physical_channels;
 
     id->p_encoder->fmt_in.audio.i_physical_channels =
     id->p_encoder->fmt_out.audio.i_physical_channels =

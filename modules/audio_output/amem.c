@@ -231,7 +231,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     }
 
     fmt->i_format = VLC_CODEC_S16N;
-    fmt->i_original_channels = fmt->i_physical_channels;
     return VLC_SUCCESS;
 }
 

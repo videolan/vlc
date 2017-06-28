@@ -458,8 +458,7 @@ static int DecOpen( decoder_t *p_dec )
         p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
         p_dec->fmt_out.audio.i_bitspersample = 16;//p_dec->fmt_in.audio.i_bitspersample; We request 16
         p_dec->fmt_out.audio.i_physical_channels =
-            p_dec->fmt_out.audio.i_original_channels =
-                pi_channels_maps[p_dec->fmt_out.audio.i_channels];
+            pi_channels_maps[p_dec->fmt_out.audio.i_channels];
 
         p_wf->wFormatTag = WAVE_FORMAT_PCM;
         p_wf->nSamplesPerSec = p_dec->fmt_out.audio.i_rate;

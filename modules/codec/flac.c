@@ -209,8 +209,7 @@ static int DecoderSetOutputFormat( unsigned i_channels, unsigned i_rate,
 
     fmt->i_channels = i_channels;
     fmt->i_rate = (i_rate > 0 ) ? i_rate : i_streaminfo_rate;
-    fmt->i_physical_channels =
-    fmt->i_original_channels = pi_channels_maps[i_channels];
+    fmt->i_physical_channels = pi_channels_maps[i_channels];
     memcpy( pi_channels_reorder, ppi_reorder[i_channels], i_channels );
     fmt->i_bitspersample = i_bitspersample;
 
@@ -373,8 +372,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
                         for( unsigned i=0; i<i_wfxchannels; i++ )
                             p_sys->rgi_channels_reorder[neworder[i]] = i;
 
-                        p_dec->fmt_out.audio.i_physical_channels =
-                        p_dec->fmt_out.audio.i_original_channels = i_vlcmask;
+                        p_dec->fmt_out.audio.i_physical_channels = i_vlcmask;
                         p_dec->fmt_out.audio.i_channels = i_wfxchannels;
                     }
 

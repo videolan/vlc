@@ -324,7 +324,7 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
 {
     /* Fill VLC physical_channels from output layout */
     fmt->i_physical_channels = 0;
-    uint32_t i_original = fmt->i_original_channels & AOUT_CHAN_PHYSMASK;
+    uint32_t i_original = fmt->i_physical_channels;
     AudioChannelLayout *reslayout = NULL;
 
     if (outlayout == NULL)
@@ -434,7 +434,6 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
 
 end:
     free(reslayout);
-    fmt->i_original_channels = fmt->i_physical_channels;
     aout_FormatPrepare(fmt);
 
     msg_Dbg(p_aout, "selected %d physical channels for device output",

@@ -67,7 +67,7 @@
 #define AOUT_FMTS_SIMILAR( p_first, p_second ) (                            \
     ((p_first)->i_rate == (p_second)->i_rate)                               \
       && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
-      && ((p_first)->i_original_channels == (p_second)->i_original_channels) )
+      && ((p_first)->i_chan_mode == (p_second)->i_chan_mode) )
 
 #define AOUT_FMT_LINEAR( p_format ) \
     (aout_BitsPerSample((p_format)->i_format) != 0)

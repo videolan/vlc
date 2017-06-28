@@ -337,8 +337,7 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     /* Setup the format */
     p_dec->fmt_out.audio.i_physical_channels =
-        p_dec->fmt_out.audio.i_original_channels =
-            pi_channels_maps[p_header->channels];
+        pi_channels_maps[p_header->channels];
     p_dec->fmt_out.audio.i_channels = p_header->channels;
     p_dec->fmt_out.audio.i_rate = 48000;
 

@@ -80,10 +80,10 @@ static int Create( vlc_object_t *p_this )
 
     /* Validate audio filter format */
     if ( p_filter->fmt_in.audio.i_physical_channels != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
-       || ! ( p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-       || aout_FormatNbChannels( &p_filter->fmt_out.audio ) <= 2
-       || ( p_filter->fmt_in.audio.i_original_channels & ~AOUT_CHAN_DOLBYSTEREO )
-          != ( p_filter->fmt_out.audio.i_original_channels & ~AOUT_CHAN_DOLBYSTEREO ) )
+       || ! ( p_filter->fmt_in.audio.i_chan_mode & AOUT_CHANMODE_DOLBYSTEREO )
+       || p_filter->fmt_out.audio.i_channels <= 2
+       || ( p_filter->fmt_in.audio.i_chan_mode & ~AOUT_CHANMODE_DOLBYSTEREO )
+          != ( p_filter->fmt_out.audio.i_chan_mode & ~AOUT_CHANMODE_DOLBYSTEREO ) )
     {
         return VLC_EGENERIC;
     }

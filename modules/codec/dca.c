@@ -198,18 +198,16 @@ static int channels_vlc2dca( const audio_format_t *p_audio, int *p_flags )
     switch ( p_audio->i_physical_channels & ~AOUT_CHAN_LFE )
     {
     case AOUT_CHAN_CENTER:
-        if ( (p_audio->i_original_channels & AOUT_CHAN_CENTER)
-              || (p_audio->i_original_channels
+        if ( (p_audio->i_physical_channels & AOUT_CHAN_CENTER)
+              || (p_audio->i_physical_channels
                    & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
             i_flags = DCA_MONO;
         break;
 
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT:
-        if ( p_audio->i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+        if ( p_audio->i_chan_mode & AOUT_CHANMODE_DOLBYSTEREO )
             i_flags = DCA_DOLBY;
-        else if ( p_audio->i_original_channels == AOUT_CHAN_CENTER )
-            i_flags = DCA_MONO;
-        else if ( p_audio->i_original_channels & AOUT_CHAN_DUALMONO )
+        else if ( p_audio->i_chan_mode & AOUT_CHANMODE_DUALMONO )
             i_flags = DCA_CHANNEL;
         else
             i_flags = DCA_STEREO;
@@ -256,7 +254,6 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec != VLC_CODEC_DTS
      || p_dec->fmt_in.audio.i_rate == 0
      || p_dec->fmt_in.audio.i_physical_channels == 0
-     || p_dec->fmt_in.audio.i_original_channels == 0
      || p_dec->fmt_in.audio.i_bytes_per_frame == 0
      || p_dec->fmt_in.audio.i_frame_length == 0 )
         return VLC_EGENERIC;

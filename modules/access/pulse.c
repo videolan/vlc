@@ -341,8 +341,7 @@ static int Open(vlc_object_t *obj)
     }
 
     es_format_Init(&fmt, AUDIO_ES, format);
-    fmt.audio.i_physical_channels = fmt.audio.i_original_channels =
-        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    fmt.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     fmt.audio.i_channels = ss.channels;
     fmt.audio.i_rate = pss->rate;
     fmt.audio.i_bitspersample = aout_BitsPerSample(format);

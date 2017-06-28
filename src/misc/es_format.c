@@ -583,7 +583,7 @@ bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
         if( a1.i_rate != a2.i_rate ||
             a1.i_channels != a2.i_channels ||
             a1.i_physical_channels != a2.i_physical_channels ||
-            a1.i_original_channels != a2.i_original_channels )
+            a1.i_chan_mode != a2.i_chan_mode )
             return false;
         return true;
     }

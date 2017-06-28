@@ -77,9 +77,10 @@ struct audio_format_t
      * channels which are available in the buffer, and positions). */
     uint16_t     i_physical_channels;
 
-    /* Describes from which original channels, before downmixing, the
-     * buffer is derived. */
-    uint32_t     i_original_channels;
+    /* Describes the chan mode, either set from the input
+     * (demux/codec/packetizer) or overridden by the user, used by audio
+     * filters. */
+    uint16_t     i_chan_mode;
 
     /* Optional - for A/52, SPDIF and DTS types : */
     /* Bytes used by one compressed frame, depends on bitrate. */
@@ -134,16 +135,15 @@ struct audio_format_t
 #define AOUT_CHANS_5_0_MIDDLE (AOUT_CHANS_4_0_MIDDLE | AOUT_CHAN_CENTER)
 #define AOUT_CHANS_6_1_MIDDLE (AOUT_CHANS_5_0_MIDDLE | AOUT_CHAN_REARCENTER | AOUT_CHAN_LFE)
 
-/* Values available for original channels only */
-#define AOUT_CHAN_DOLBYSTEREO       0x10000
-#define AOUT_CHAN_DUALMONO          0x20000
-
-#define AOUT_CHAN_PHYSMASK          0xFFFF
 /* Maximum number of mapped channels (or the maximum of bits set in
  * i_physical_channels) */
 #define AOUT_CHAN_MAX               9
 /* Maximum number of unmapped channels */
 #define INPUT_CHAN_MAX              64
+
+/* Values available for i_chan_mode only */
+#define AOUT_CHANMODE_DUALMONO    0x1
+#define AOUT_CHANMODE_DOLBYSTEREO 0x2
 
 /**
  * Picture orientation.

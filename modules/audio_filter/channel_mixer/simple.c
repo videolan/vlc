@@ -283,9 +283,7 @@ static int OpenFilter( vlc_object_t *p_this )
     uint32_t output = p_filter->fmt_out.audio.i_physical_channels;
 
     /* Short circuit the common case of not remixing */
-    if( input == output
-     && p_filter->fmt_in.audio.i_original_channels
-            == p_filter->fmt_out.audio.i_original_channels )
+    if( input == output )
         return VLC_EGENERIC;
 
     const bool b_input_6_1 = input == AOUT_CHANS_6_1_MIDDLE;

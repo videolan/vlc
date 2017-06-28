@@ -213,7 +213,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     else
     {
         fmt->i_rate = rate;
-        fmt->i_original_channels =
         fmt->i_physical_channels = channels;
     }
     aout_FormatPrepare (fmt);

@@ -990,7 +990,6 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
                 return VLC_EGENERIC;
         }
         p_sys->fmt.i_frame_length = 1;
-        p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
         p_sys->fmt.i_channels = aout_FormatNbChannels( &p_sys->fmt );
         p_sys->fmt.i_format = VLC_CODEC_SPDIFL;
     }
@@ -1013,8 +1012,7 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
         }
         p_sys->fmt.i_bytes_per_frame = 4;
         p_sys->fmt.i_frame_length = 1;
-        p_sys->fmt.i_physical_channels =
-        p_sys->fmt.i_original_channels = AOUT_CHANS_STEREO;
+        p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
         p_sys->fmt.i_channels = 2;
         p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
     }
@@ -1094,7 +1092,6 @@ StartPCM( JNIEnv *env, audio_output_t *p_aout, unsigned i_max_channels )
             else
                 p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
         }
-        p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
 
         /* Try to create an AudioTrack with the most advanced channel and
          * format configuration. If AudioTrack_Create fails, try again with a
@@ -1161,8 +1158,6 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     p_sys->fmt = *p_fmt;
 
     aout_FormatPrint( p_aout, "VLC is looking for:", &p_sys->fmt );
-
-    p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
 
     if( AOUT_FMT_LINEAR( &p_sys->fmt ) )
         i_ret = StartPCM( env, p_aout, i_max_channels );

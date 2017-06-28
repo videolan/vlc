@@ -427,7 +427,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
         txt.psz_string = _("Original");
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
     }
-    if (fmt->i_original_channels & AOUT_CHAN_DOLBYSTEREO)
+    if (fmt->i_chan_mode & AOUT_CHANMODE_DOLBYSTEREO)
     {
         val.i_int = AOUT_VAR_CHAN_DOLBYS;
         txt.psz_string = _("Dolby Surround");
@@ -469,10 +469,10 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
             remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_DISABLE;
             break;
         case AOUT_VAR_CHAN_DOLBYS:
-            fmt->i_original_channels = AOUT_CHANS_STEREO|AOUT_CHAN_DOLBYSTEREO;
+            fmt->i_chan_mode = AOUT_CHANMODE_DOLBYSTEREO;
             break;
         default:
-            if (fmt->i_original_channels == (AOUT_CHANS_STEREO | AOUT_CHAN_DUALMONO))
+            if (b_stereo_original && fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
             {   /* Go directly to the left channel. */
                 remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
                 val.i_int = AOUT_VAR_CHAN_LEFT;

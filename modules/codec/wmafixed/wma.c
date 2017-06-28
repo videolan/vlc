@@ -148,9 +148,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     assert( p_dec->fmt_out.audio.i_channels <
         ( sizeof( pi_channels_maps ) / sizeof( pi_channels_maps[0] ) ) );
 
-    p_dec->fmt_out.audio.i_original_channels =
-        p_dec->fmt_out.audio.i_physical_channels =
-            pi_channels_maps[p_dec->fmt_out.audio.i_channels];
+    p_dec->fmt_out.audio.i_physical_channels =
+        pi_channels_maps[p_dec->fmt_out.audio.i_channels];
 
     /* aout core assumes this number is not 0 and uses it in divisions */
     assert( p_dec->fmt_out.audio.i_physical_channels != 0 );

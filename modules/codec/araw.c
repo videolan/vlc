@@ -284,19 +284,12 @@ static int DecoderOpen( vlc_object_t *p_this )
         else
             p_dec->fmt_out.audio.i_physical_channels =
                                   pi_channels_maps[p_dec->fmt_in.audio.i_channels];
-        if( p_dec->fmt_in.audio.i_original_channels )
-            p_dec->fmt_out.audio.i_original_channels =
-                                           p_dec->fmt_in.audio.i_original_channels;
-        else
-            p_dec->fmt_out.audio.i_original_channels =
-                                          p_dec->fmt_out.audio.i_physical_channels;
     }
     else
     {
         /* Unknown channel map, let the aout/filters decide what to do */
         p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
-        p_dec->fmt_out.audio.i_physical_channels =
-        p_dec->fmt_out.audio.i_original_channels = 0;
+        p_dec->fmt_out.audio.i_physical_channels = 0;
     }
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 

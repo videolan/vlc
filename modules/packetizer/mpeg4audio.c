@@ -978,7 +978,6 @@ static void SetupOutput(decoder_t *p_dec, block_t *p_block)
     p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
 
 #if 0
-    p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
     p_dec->fmt_out.audio.i_physical_channels = p_sys->i_channels_conf;
 #endif
 

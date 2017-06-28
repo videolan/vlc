@@ -500,7 +500,6 @@ static void *pcmu_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MULAW);
     fmt.audio.i_rate = 8000;
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
@@ -514,7 +513,6 @@ static void *gsm_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_GSM);
     fmt.audio.i_rate = 8000;
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
@@ -528,7 +526,6 @@ static void *pcma_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_ALAW);
     fmt.audio.i_rate = 8000;
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
@@ -542,7 +539,6 @@ static void *l16s_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
     fmt.audio.i_rate = 44100;
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
     return codec_init (demux, &fmt);
 }
@@ -553,7 +549,6 @@ static void *l16m_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
     fmt.audio.i_rate = 44100;
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
@@ -567,7 +562,6 @@ static void *qcelp_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_QCELP);
     fmt.audio.i_rate = 8000;
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
@@ -580,7 +574,6 @@ static void *mpa_init (demux_t *demux)
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MPGA);
-    fmt.audio.i_original_channels =
     fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
     fmt.b_packetized = false;
     return codec_init (demux, &fmt);

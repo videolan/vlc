@@ -189,8 +189,7 @@ static void fill_channels_info(audio_format_t *audio)
 
     unsigned chans = audio->i_channels;
     if (chans < sizeof(pi_channels_map) / sizeof(pi_channels_map[0]))
-        audio->i_physical_channels =
-        audio->i_original_channels = pi_channels_map[chans];
+        audio->i_physical_channels = pi_channels_map[chans];
 }
 
 /* Special TS value: don't send or derive any pts/pcr from it.

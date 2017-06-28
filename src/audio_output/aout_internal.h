@@ -163,7 +163,6 @@ static inline void aout_SetWavePhysicalChannels(audio_sample_format_t *fmt)
     fmt->i_physical_channels = 0;
     for (int i = 0; i < fmt->i_channels && i < AOUT_CHAN_MAX; ++i)
         fmt->i_physical_channels |= wave_channels[i];
-    fmt->i_original_channels = fmt->i_physical_channels;
     aout_FormatPrepare(fmt);
 }
 

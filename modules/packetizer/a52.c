@@ -103,9 +103,8 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
         p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->frame.i_size;
     p_dec->fmt_out.audio.i_frame_length = p_sys->frame.i_samples;
 
-    p_dec->fmt_out.audio.i_original_channels = p_sys->frame.i_channels_conf;
-    p_dec->fmt_out.audio.i_physical_channels =
-        p_sys->frame.i_channels_conf & AOUT_CHAN_PHYSMASK;
+    p_dec->fmt_out.audio.i_chan_mode = p_sys->frame.i_chan_mode;
+    p_dec->fmt_out.audio.i_physical_channels = p_sys->frame.i_channels_conf;
 
     p_dec->fmt_out.i_bitrate = p_sys->frame.i_bitrate;
 

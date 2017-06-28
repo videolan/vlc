@@ -719,7 +719,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_format = VLC_CODEC_SPDIFL;
             fmt->i_bytes_per_frame = 4;
             fmt->i_frame_length = 1;
-            fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_2_0;
+            fmt->i_physical_channels = AOUT_CHANS_2_0;
             fmt->i_channels = 2;
             encoding = PA_ENCODING_AC3_IEC61937;
             ss.format = PA_SAMPLE_S16NE;
@@ -728,7 +728,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_format = VLC_CODEC_SPDIFL;
             fmt->i_bytes_per_frame = 4;
             fmt->i_frame_length = 1;
-            fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_2_0;
+            fmt->i_physical_channels = AOUT_CHANS_2_0;
             fmt->i_channels = 2;
             encoding = PA_ENCODING_EAC3_IEC61937;
             ss.format = PA_SAMPLE_S16NE;
@@ -742,7 +742,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_format = VLC_CODEC_SPDIFL;
             fmt->i_bytes_per_frame = 4;
             fmt->i_frame_length = 1;
-            fmt->i_physical_channels = fmt->i_original_channels = AOUT_CHANS_2_0;
+            fmt->i_physical_channels = AOUT_CHANS_2_0;
             fmt->i_channels = 2;
             encoding = PA_ENCODING_DTS_IEC61937;
             ss.format = PA_SAMPLE_S16NE;
@@ -844,7 +844,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         }
         if (fmt->i_physical_channels & AOUT_CHAN_LFE)
             map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
-        fmt->i_original_channels = fmt->i_physical_channels;
 
         static_assert(AOUT_CHAN_MAX == 9, "Missing channels");
 

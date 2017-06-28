@@ -167,8 +167,7 @@ static int Open(vlc_object_t *object)
     dec->fmt_out.i_codec = VLC_CODEC_S16N;
     dec->fmt_out.audio.i_rate = dec->fmt_in.audio.i_rate;
     dec->fmt_out.audio.i_channels = 2;
-    dec->fmt_out.audio.i_physical_channels =
-    dec->fmt_out.audio.i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    dec->fmt_out.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
 
     dec->pf_decode = DecodeAudio;
     dec->pf_flush  = Flush;

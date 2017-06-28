@@ -1077,7 +1077,6 @@ static int Audio_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             msg_Warn(p_dec, "need channel extraction: %d -> %d",
                      p_sys->audio.i_channels, i_channels_dst);
 
-        p_dec->fmt_out.audio.i_original_channels =
         p_dec->fmt_out.audio.i_physical_channels = i_layout_dst;
         aout_FormatPrepare(&p_dec->fmt_out.audio);
 

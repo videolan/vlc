@@ -310,8 +310,7 @@ static int Open( vlc_object_t * p_this )
                  p_sys->i_channel_mask, p_sys->i_chans_to_reorder );
     }
 
-    p_sys->fmt.audio.i_physical_channels =
-    p_sys->fmt.audio.i_original_channels = p_sys->i_channel_mask;
+    p_sys->fmt.audio.i_physical_channels = p_sys->i_channel_mask;
 
     if( p_sys->fmt.i_extra > 0 )
     {

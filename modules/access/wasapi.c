@@ -143,7 +143,6 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     if (wfe->dwChannelMask & SPEAKER_LOW_FREQUENCY)
         fmt->i_physical_channels |= AOUT_CHAN_LFE;
 
-    fmt->i_original_channels = fmt->i_physical_channels;
     assert(popcount(wfe->dwChannelMask) == wf->nChannels);
 
     if (IsEqualIID(&wfe->SubFormat, &KSDATAFORMAT_SUBTYPE_PCM))

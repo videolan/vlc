@@ -278,8 +278,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
     p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
     p_dec->fmt_out.audio.i_channels = i_channels;
-    p_dec->fmt_out.audio.i_physical_channels =
-        p_dec->fmt_out.audio.i_original_channels = pi_channels_maps[i_channels];
+    p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[i_channels];
 
     date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
     date_Set( &p_sys->end_date, 0 );

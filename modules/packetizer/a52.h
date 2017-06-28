@@ -44,6 +44,7 @@ typedef struct
 
     unsigned int i_channels;
     unsigned int i_channels_conf;
+    unsigned int i_chan_mode;
     unsigned int i_rate;
     unsigned int i_bitrate;
 
@@ -153,13 +154,16 @@ static inline int vlc_a52_header_ParseAc3( vlc_a52_header_t *p_header,
     const uint8_t i_lfeon = bs_read( &s, 1 );
 
     p_header->i_channels_conf = p_acmod[i_acmod];
+    p_header->i_chan_mode = 0;
     if( i_dsurmod == 2 )
-        p_header->i_channels_conf |= AOUT_CHAN_DOLBYSTEREO;
+        p_header->i_chan_mode |= AOUT_CHANMODE_DOLBYSTEREO;
+    if( i_acmod == 0 )
+        p_header->i_chan_mode |= AOUT_CHANMODE_DUALMONO;
+
     if( i_lfeon )
         p_header->i_channels_conf |= AOUT_CHAN_LFE;
 
-    p_header->i_channels = popcount(p_header->i_channels_conf
-                                    & AOUT_CHAN_PHYSMASK);
+    p_header->i_channels = popcount(p_header->i_channels_conf);
 
     const unsigned i_rate_shift = VLC_CLIP(i_bsid, 8, 11) - 8;
     p_header->i_bitrate = (pi_frmsizcod_bitrates[i_frmsizcod >> 1] * 1000)
@@ -214,10 +218,12 @@ static inline int vlc_a52_header_ParseEac3( vlc_a52_header_t *p_header,
     const unsigned i_lfeon = bs_read1( &s );
 
     p_header->i_channels_conf = p_acmod[i_acmod];
+    p_header->i_chan_mode = 0;
+    if( i_acmod == 0 )
+        p_header->i_chan_mode |= AOUT_CHANMODE_DUALMONO;
     if( i_lfeon )
         p_header->i_channels_conf |= AOUT_CHAN_LFE;
-    p_header->i_channels = popcount( p_header->i_channels_conf
-                                     & AOUT_CHAN_PHYSMASK );
+    p_header->i_channels = popcount( p_header->i_channels_conf );
     p_header->i_bitrate = 8 * p_header->i_size * p_header->i_rate
                         / (p_header->i_blocks_per_sync_frame * 256);
     p_header->i_samples = p_header->i_blocks_per_sync_frame * 256;
@@ -236,7 +242,7 @@ static inline int vlc_a52_header_Parse( vlc_a52_header_t *p_header,
                                         const uint8_t *p_buffer, int i_buffer )
 {
     static const uint32_t p_acmod[8] = {
-        AOUT_CHANS_2_0 | AOUT_CHAN_DUALMONO,
+        AOUT_CHANS_2_0,
         AOUT_CHAN_CENTER,
         AOUT_CHANS_2_0,
         AOUT_CHANS_3_0,

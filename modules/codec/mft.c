@@ -445,7 +445,6 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **resul
         p_dec->fmt_out.i_codec = vlc_fourcc_GetCodecAudio(fourcc, p_dec->fmt_out.audio.i_bitspersample);
 
         p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_dec->fmt_out.audio.i_channels];
-        p_dec->fmt_out.audio.i_original_channels = p_dec->fmt_out.audio.i_physical_channels;
     }
 
     *result = output_media_type;

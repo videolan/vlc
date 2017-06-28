@@ -717,8 +717,7 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                 | AOUT_CHAN_LFE
             };
             p_fmt->audio.i_physical_channels =
-                p_fmt->audio.i_original_channels =
-                    pi_channels_maps[p_fmt->audio.i_channels];
+                pi_channels_maps[p_fmt->audio.i_channels];
         }
 
         date_Init( &p_dec->p_sys->end_date, p_fmt->audio.i_rate, 1 );
