@@ -123,7 +123,6 @@ struct vlc_va_sys_t
     HANDLE                       context_mutex;
 
     /* pool */
-    bool                         b_extern_pool;
     picture_t                    *extern_pics[MAX_SURFACE_COUNT];
 
     /* Video decoder */
@@ -255,7 +254,7 @@ static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_ind
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
 #if D3D11_DIRECT_DECODE
-    if (va->sys->b_extern_pool)
+    if (va->sys->dx_sys.can_extern_pool)
     {
         /* copy the original picture_sys_t in the va_pic_context */
         if (!pic->context)
@@ -675,7 +674,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
             /* NVIDIA cards crash when calling CreateVideoDecoderOutputView
              * on more than 30 slices */
             if (va->sys->totalTextureSlices <= 30 || !isNvidiaHardware(dx_sys->d3ddev))
-                va->sys->b_extern_pool = true;
+                dx_sys->can_extern_pool = true;
             else
                 msg_Warn( va, "NVIDIA GPU with too many slices (%d) detected, use internal pool",
                           va->sys->totalTextureSlices );
@@ -741,7 +740,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         return VLC_EGENERIC;
     }
 
-    if (sys->b_extern_pool)
+    if (dx_sys->can_extern_pool)
     {
 #if !D3D11_DIRECT_DECODE
         size_t surface_idx;
@@ -752,7 +751,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             if (pic==NULL)
             {
                 msg_Warn(va, "not enough decoder pictures %d out of %d", surface_idx, surface_count);
-                sys->b_extern_pool = false;
+                dx_sys->can_extern_pool = false;
                 break;
             }
 
@@ -762,7 +761,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             {
                 msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
                          texDesc.ArraySize, surface_count);
-                sys->b_extern_pool = false;
+                dx_sys->can_extern_pool = false;
                 break;
             }
             assert(texDesc.Format == sys->render);
@@ -773,7 +772,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             {
                 msg_Warn(va, "d3d11va requires decoding slices to be the first in the texture (%d/%d)",
                          pic->p_sys->slice_index, surface_idx);
-                sys->b_extern_pool = false;
+                dx_sys->can_extern_pool = false;
                 break;
             }
 #endif
@@ -785,7 +784,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                                                                  &pic->p_sys->decoder );
             if (FAILED(hr)) {
                 msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%0lx)", surface_idx, hr);
-                sys->b_extern_pool = false;
+                dx_sys->can_extern_pool = false;
                 break;
             }
 
@@ -794,7 +793,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             dx_sys->hw_surface[surface_idx] = pic->p_sys->decoder;
         }
 
-        if (!sys->b_extern_pool)
+        if (!dx_sys->can_extern_pool)
         {
             for (size_t i = 0; i < surface_idx; ++i)
             {
@@ -816,7 +815,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             msg_Dbg(va, "using external surface pool");
     }
 
-    if (!sys->b_extern_pool)
+    if (!dx_sys->can_extern_pool)
     {
         D3D11_TEXTURE2D_DESC texDesc;
         ZeroMemory(&texDesc, sizeof(texDesc));
@@ -940,7 +939,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 static void DxDestroySurfaces(vlc_va_t *va)
 {
     directx_sys_t *dx_sys = &va->sys->dx_sys;
-    if (dx_sys->va_pool.surface_count && !va->sys->b_extern_pool) {
+    if (dx_sys->va_pool.surface_count && !dx_sys->can_extern_pool) {
         ID3D11Resource *p_texture;
         ID3D11VideoDecoderOutputView_GetResource( dx_sys->hw_surface[0], &p_texture );
         ID3D11Resource_Release(p_texture);
