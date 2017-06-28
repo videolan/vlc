@@ -135,7 +135,7 @@ Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, c
         if(resAttr)
         {
             std::pair<int, int> res = resAttr->getResolution();
-            if(res.first * res.second)
+            if(res.first && res.second)
             {
                 rep->setWidth(res.first);
                 rep->setHeight(res.second);
