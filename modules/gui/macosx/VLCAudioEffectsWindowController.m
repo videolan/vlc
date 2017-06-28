@@ -225,31 +225,24 @@
 
 - (NSString *)generateProfileString
 {
-    intf_thread_t *p_intf = getIntf();
-    vlc_object_t *p_object = VLC_OBJECT(getAout());
-    if (p_object == NULL)
-        p_object = vlc_object_hold(pl_Get(p_intf));
-
-    NSString *o_str = [NSString stringWithFormat:@"%@;%@;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%lli",
-                       B64EncAndFree(var_GetNonEmptyString(p_object, "equalizer-preset")),
-                       B64EncAndFree(config_GetPsz(p_intf, "audio-filter")),
-                       config_GetFloat(p_intf, "compressor-rms-peak"),
-                       config_GetFloat(p_intf, "compressor-attack"),
-                       config_GetFloat(p_intf, "compressor-release"),
-                       config_GetFloat(p_intf, "compressor-threshold"),
-                       config_GetFloat(p_intf, "compressor-ratio"),
-                       config_GetFloat(p_intf, "compressor-knee"),
-                       config_GetFloat(p_intf, "compressor-makeup-gain"),
-                       config_GetFloat(p_intf, "spatializer-roomsize"),
-                       config_GetFloat(p_intf, "spatializer-width"),
-                       config_GetFloat(p_intf, "spatializer-wet"),
-                       config_GetFloat(p_intf, "spatializer-dry"),
-                       config_GetFloat(p_intf, "spatializer-damp"),
-                       config_GetFloat(p_intf, "norm-max-level"),
-                       config_GetInt(p_intf,"equalizer-2pass")];
-
-    vlc_object_release(p_object);
-    return o_str;
+    playlist_t *p_playlist = pl_Get(getIntf());
+    return [NSString stringWithFormat:@"%@;%@;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
+                     B64EncAndFree(var_GetNonEmptyString(p_playlist, "equalizer-preset")),
+                     B64EncAndFree(var_InheritString(p_playlist, "audio-filter")),
+                     var_InheritFloat(p_playlist, "compressor-rms-peak"),
+                     var_InheritFloat(p_playlist, "compressor-attack"),
+                     var_InheritFloat(p_playlist, "compressor-release"),
+                     var_InheritFloat(p_playlist, "compressor-threshold"),
+                     var_InheritFloat(p_playlist, "compressor-ratio"),
+                     var_InheritFloat(p_playlist, "compressor-knee"),
+                     var_InheritFloat(p_playlist, "compressor-makeup-gain"),
+                     var_InheritFloat(p_playlist, "spatializer-roomsize"),
+                     var_InheritFloat(p_playlist, "spatializer-width"),
+                     var_InheritFloat(p_playlist, "spatializer-wet"),
+                     var_InheritFloat(p_playlist, "spatializer-dry"),
+                     var_InheritFloat(p_playlist, "spatializer-damp"),
+                     var_InheritFloat(p_playlist, "norm-max-level"),
+                     var_InheritBool(p_playlist,"equalizer-2pass")];
 }
 
 - (void)saveCurrentProfile
