@@ -176,6 +176,7 @@ static const ivtc_field_pair pi_best_field_pairs[NUM_CADENCE_POS][3] = {
  * best or worst, the resulting detected cadence positions are identical
  * (neither strategy performs any different from the other).
  */
+#if 0
 static const ivtc_field_pair pi_worst_field_pairs[NUM_CADENCE_POS][4] = {
     {FIELD_PAIR_TPBC, FIELD_PAIR_TCBP,
         FIELD_PAIR_TCBN, FIELD_PAIR_TNBC}, /* prog. */
@@ -198,6 +199,7 @@ static const ivtc_field_pair pi_worst_field_pairs[NUM_CADENCE_POS][4] = {
     {FIELD_PAIR_TCBP, FIELD_PAIR_TPBC,
         FIELD_PAIR_TNBC, FIELD_PAIR_TNBN}, /* BFF EAB */
 };
+#endif
 
 /**
  * Table for extracting the i_cadence_pos part of detected cadence position
