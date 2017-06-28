@@ -308,20 +308,20 @@
     }
 
     /* values */
-    config_PutFloat(p_intf, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
-    config_PutFloat(p_intf, "compressor-attack",[[items objectAtIndex:3] floatValue]);
-    config_PutFloat(p_intf, "compressor-release",[[items objectAtIndex:4] floatValue]);
-    config_PutFloat(p_intf, "compressor-threshold",[[items objectAtIndex:5] floatValue]);
-    config_PutFloat(p_intf, "compressor-ratio",[[items objectAtIndex:6] floatValue]);
-    config_PutFloat(p_intf, "compressor-knee",[[items objectAtIndex:7] floatValue]);
-    config_PutFloat(p_intf, "compressor-makeup-gain",[[items objectAtIndex:8] floatValue]);
-    config_PutFloat(p_intf, "spatializer-roomsize",[[items objectAtIndex:9] floatValue]);
-    config_PutFloat(p_intf, "spatializer-width",[[items objectAtIndex:10] floatValue]);
-    config_PutFloat(p_intf, "spatializer-wet",[[items objectAtIndex:11] floatValue]);
-    config_PutFloat(p_intf, "spatializer-dry",[[items objectAtIndex:12] floatValue]);
-    config_PutFloat(p_intf, "spatializer-damp",[[items objectAtIndex:13] floatValue]);
-    config_PutFloat(p_intf, "norm-max-level",[[items objectAtIndex:14] floatValue]);
-    config_PutInt(p_intf, "equalizer-2pass",[[items objectAtIndex:15] intValue]);
+    var_SetFloat(p_playlist, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
+    var_SetFloat(p_playlist, "compressor-attack",[[items objectAtIndex:3] floatValue]);
+    var_SetFloat(p_playlist, "compressor-release",[[items objectAtIndex:4] floatValue]);
+    var_SetFloat(p_playlist, "compressor-threshold",[[items objectAtIndex:5] floatValue]);
+    var_SetFloat(p_playlist, "compressor-ratio",[[items objectAtIndex:6] floatValue]);
+    var_SetFloat(p_playlist, "compressor-knee",[[items objectAtIndex:7] floatValue]);
+    var_SetFloat(p_playlist, "compressor-makeup-gain",[[items objectAtIndex:8] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-roomsize",[[items objectAtIndex:9] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-width",[[items objectAtIndex:10] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-wet",[[items objectAtIndex:11] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-dry",[[items objectAtIndex:12] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-damp",[[items objectAtIndex:13] floatValue]);
+    var_SetFloat(p_playlist, "norm-max-level",[[items objectAtIndex:14] floatValue]);
+    var_SetBool(p_playlist, "equalizer-2pass",(BOOL)[[items objectAtIndex:15] intValue]);
 
     /* set values on-the-fly if we have an aout */
     if (p_aout) {
