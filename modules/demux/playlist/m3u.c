@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_charset.h>
+#include <vlc_strings.h>
 
 #include "playlist.h"
 
@@ -78,6 +79,14 @@ int Import_M3U( vlc_object_t *p_this )
     }
 
     char *type = stream_MimeType(p_stream->p_source);
+    if (type != NULL
+     && (!vlc_ascii_strcasecmp(type, "application/vnd.apple.mpegurl")
+      || !vlc_ascii_strcasecmp(type, "audio/mpegurl")))
+    {
+        free(type);
+        return VLC_EGENERIC;
+    }
+
     bool b_check_hls = true;
 
     if( (type != NULL && !strcasecmp(type, "application/x-mpegurl") ) )
@@ -86,8 +95,7 @@ int Import_M3U( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( stream_HasExtension( p_stream, ".m3u8" )
-     || (type != NULL && !strcasecmp(type, "application/vnd.apple.mpegurl")))
+    if( stream_HasExtension( p_stream, ".m3u8" ) )
     {
         pf_dup = CheckUnicode; /* UTF-8 file type */
     }
