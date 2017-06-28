@@ -36,7 +36,6 @@
 #include <vlc_charset.h>
 
 static int OpenDemux( vlc_object_t * );
-static void CloseDemux( vlc_object_t * );
 
 vlc_module_begin ()
     set_shortname( N_("Dummy") )
