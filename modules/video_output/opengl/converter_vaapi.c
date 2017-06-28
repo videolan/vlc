@@ -41,6 +41,10 @@
 # include <vlc_xlib.h>
 #endif
 
+#if defined(USE_OPENGL_ES2)
+#   include <GLES2/gl2ext.h>
+#endif
+
 struct priv
 {
     VADisplay vadpy;
