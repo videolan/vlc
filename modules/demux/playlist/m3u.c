@@ -89,26 +89,23 @@ int Import_M3U( vlc_object_t *p_this )
 
     bool b_check_hls = true;
 
-    if( (type != NULL && !strcasecmp(type, "application/x-mpegurl") ) )
-    {
-        free( type );
-        return VLC_EGENERIC;
-    }
-
     if( stream_HasExtension( p_stream, ".m3u8" ) )
-    {
         pf_dup = CheckUnicode; /* UTF-8 file type */
-    }
-    else if( stream_HasExtension( p_stream, ".vlc" ) )
-    {
+    else
+    if (stream_HasExtension(p_stream, ".vlc"))
         b_check_hls = false;
-    }
-    else if( !stream_HasExtension( p_stream, ".m3u" ) &&
-             !ContainsURL( p_stream, p_peek, i_peek ) &&
-             (type == NULL || strcasecmp(type, "audio/x-mpegurl") ) &&
-             !p_stream->obj.force )
-    {
-        /* Guess encoding */
+    else
+    if (stream_HasExtension(p_stream, ".m3u")
+     || p_stream->obj.force
+     || (type != NULL
+      && (!vlc_ascii_strcasecmp(type, "application/mpegurl")
+       || !vlc_ascii_strcasecmp(type, "application/x-mpegurl")
+       || !vlc_ascii_strcasecmp(type, "audio/mpegurl")
+       || !vlc_ascii_strcasecmp(type, "audio/x-mpegurl")))
+     || ContainsURL(p_stream, p_peek, i_peek))
+        ;
+    else
+    {   /* Guess encoding */
         p_peek += offset;
 
         if( !strncasecmp( (const char *)p_peek, "RTSPtext", 8 ) ) /* QuickTime */
