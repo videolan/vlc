@@ -2543,7 +2543,7 @@ static uint8_t *FindNextPESHeader( uint8_t *p_buf, size_t i_buffer )
     return NULL;
 }
 
-const uint8_t const pes_sync[] = { 0, 0, 1 };
+static const uint8_t pes_sync[] = { 0, 0, 1 };
 
 static bool MayHaveStartCodeOnEnd( const uint8_t *p_buf, size_t i_buf )
 {
