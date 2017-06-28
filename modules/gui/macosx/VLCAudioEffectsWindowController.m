@@ -274,19 +274,16 @@
     if (selectedProfile < 0)
         return;
 
-    audio_output_t *p_aout = getAout();
     playlist_t *p_playlist = pl_Get(p_intf);
 
-    if (p_aout) {
-        /* disable existing filters */
-        playlist_EnableAudioFilter(p_playlist, "equalizer", false);
-        playlist_EnableAudioFilter(p_playlist, "compressor", false);
-        playlist_EnableAudioFilter(p_playlist, "spatializer", false);
-        playlist_EnableAudioFilter(p_playlist, "compressor", false);
-        playlist_EnableAudioFilter(p_playlist, "headphone", false);
-        playlist_EnableAudioFilter(p_playlist, "normvol", false);
-        playlist_EnableAudioFilter(p_playlist, "karaoke", false);
-    }
+    /* disable existing filters */
+    playlist_EnableAudioFilter(p_playlist, "equalizer", false);
+    playlist_EnableAudioFilter(p_playlist, "compressor", false);
+    playlist_EnableAudioFilter(p_playlist, "spatializer", false);
+    playlist_EnableAudioFilter(p_playlist, "compressor", false);
+    playlist_EnableAudioFilter(p_playlist, "headphone", false);
+    playlist_EnableAudioFilter(p_playlist, "normvol", false);
+    playlist_EnableAudioFilter(p_playlist, "karaoke", false);
 
     /* fetch preset */
     NSArray *items = [[[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:(NSUInteger) selectedProfile] componentsSeparatedByString:@";"];
@@ -302,16 +299,13 @@
     NSString *tempString = B64DecNSStr([items objectAtIndex:1]);
     NSArray *tempArray;
     NSUInteger count;
-    /* enable the new filters, if we have an aout */
-    if (p_aout) {
-        if ([tempString length] > 0) {
-            tempArray = [tempString componentsSeparatedByString:@":"];
-            count = [tempArray count];
-            for (NSUInteger x = 0; x < count; x++)
-                playlist_EnableAudioFilter(p_playlist, [[tempArray objectAtIndex:x] UTF8String], true);
-        }
+    /* enable the new filters */
+    if ([tempString length] > 0) {
+        tempArray = [tempString componentsSeparatedByString:@":"];
+        count = [tempArray count];
+        for (NSUInteger x = 0; x < count; x++)
+            playlist_EnableAudioFilter(p_playlist, [[tempArray objectAtIndex:x] UTF8String], true);
     }
-    config_PutPsz(p_intf,"audio-filter",[tempString UTF8String]);
 
     /* values */
     config_PutFloat(p_intf, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
@@ -330,6 +324,7 @@
     config_PutInt(p_intf, "equalizer-2pass",[[items objectAtIndex:15] intValue]);
 
     /* set values on-the-fly if we have an aout */
+    audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetFloat(p_aout, "compressor-rms-peak", [[items objectAtIndex:2] floatValue]);
         var_SetFloat(p_aout, "compressor-attack", [[items objectAtIndex:3] floatValue]);
