@@ -30,6 +30,7 @@
  *****************************************************************************/
 
 #import "VLCDefaultValueSliderCell.h"
+#import "CompatibilityFixes.h"
 
 @interface VLCDefaultValueSliderCell (){
     BOOL _isRTL;
@@ -175,14 +176,29 @@
             tickFrame.size.height = tickThickness;
         } else {
             CGFloat mid = NSMidX(tickFrame);
-            tickFrame.origin.x = mid - tickThickness/2.0;
-            tickFrame.origin.y = cellFrame.origin.y;
-            tickFrame.size.width = tickThickness;
+            // Ugly workaround
+            // Corrects minor alignment issue on non-retina
+            CGFloat scale = [[[self controlView] window] backingScaleFactor];
             tickFrame.size.height = cellFrame.size.height;
+            tickFrame.origin.y = cellFrame.origin.y;
+            if (scale > 1.0) {
+                tickFrame.origin.x = mid;
+            } else {
+                tickFrame.origin.x = mid - tickThickness;
+                if (OSX_YOSEMITE_AND_HIGHER) {
+                    tickFrame.size.height = cellFrame.size.height - 1;
+                    tickFrame.origin.y = cellFrame.origin.y - 1;
+                }
+            }
+            tickFrame.size.width = tickThickness;
         }
 
+        NSAlignmentOptions alignOpts = NSAlignMinXOutward | NSAlignMinYOutward |
+                                       NSAlignWidthOutward | NSAlignMaxYOutward;
+        NSRect alignedRect = [[self controlView] backingAlignedRect:tickFrame options:alignOpts];
+
         // Draw default tick mark
-        [self drawDefaultTickMarkWithFrame:tickFrame];
+        [self drawDefaultTickMarkWithFrame:alignedRect];
     }
 
     // Redraw knob
