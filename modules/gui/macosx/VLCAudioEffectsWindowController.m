@@ -289,11 +289,11 @@
     NSArray *items = [[[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:(NSUInteger) selectedProfile] componentsSeparatedByString:@";"];
 
     /* eq preset */
-    vlc_object_t *p_object = VLC_OBJECT(getAout());
-    if (p_object == NULL)
-        p_object = vlc_object_hold(pl_Get(p_intf));
-    var_SetString(p_object, "equalizer-preset", [B64DecNSStr([items firstObject]) UTF8String]);
-    vlc_object_release(p_object);
+    char const *psz_eq_preset = [B64DecNSStr([items firstObject]) UTF8String];
+    audio_output_t *p_aout = getAout();
+    if (p_aout)
+        var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
+    var_SetString(p_playlist, "equalizer-preset", psz_eq_preset);
 
     /* filter handling */
     NSString *tempString = B64DecNSStr([items objectAtIndex:1]);
@@ -324,7 +324,6 @@
     config_PutInt(p_intf, "equalizer-2pass",[[items objectAtIndex:15] intValue]);
 
     /* set values on-the-fly if we have an aout */
-    audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetFloat(p_aout, "compressor-rms-peak", [[items objectAtIndex:2] floatValue]);
         var_SetFloat(p_aout, "compressor-attack", [[items objectAtIndex:3] floatValue]);
