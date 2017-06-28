@@ -530,7 +530,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_equalizerPresetsPopup selectItemAtIndex:currentPresetIndex];
     [self equalizerChangePreset:_equalizerPresetsPopup];
 
-    
     [_equalizerPreampSlider setFloatValue:[[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:currentPresetIndex] floatValue]];
     [self setBandSliderValuesForPreset:currentPresetIndex];
 }
@@ -538,7 +537,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (void)equalizerUpdated
 {
     intf_thread_t *p_intf = getIntf();
-    float fPreamp = config_GetFloat(p_intf, "equalizer-preamp");
     bool b_2p = (BOOL)config_GetInt(p_intf, "equalizer-2pass");
     bool bEnabled = GetEqualizerStatus(p_intf, (char *)"equalizer");
 
