@@ -602,14 +602,10 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetString(p_aout, "equalizer-bands", psz_preset_values);
         vlc_object_release(p_aout);
     }
-
-    /* save changed to config */
-    config_PutPsz(getIntf(), "equalizer-bands", psz_preset_values);
 }
 
 - (IBAction)equalizerChangePreset:(id)sender
 {
-    intf_thread_t *p_intf = getIntf();
     NSInteger numberOfChosenPreset = [sender indexOfSelectedItem];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -628,11 +624,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_equalizerPreampSlider setFloatValue: f_eq_preamp];
     [self setBandSliderValuesForPreset:numberOfChosenPreset];
 
-    /* save changed to config */
-    config_PutPsz(p_intf, "equalizer-bands", psz_eq_bands);
-    config_PutFloat(p_intf, "equalizer-preamp", f_eq_preamp);
-    config_PutPsz(p_intf, "equalizer-preset", psz_eq_preset);
-    var_SetString(pl_Get(p_intf), "equalizer-preset", psz_eq_preset);
+    var_SetString(pl_Get(getIntf()), "equalizer-preset", psz_eq_preset);
 }
 
 - (IBAction)equalizerPreAmpSliderUpdated:(id)sender
@@ -644,25 +636,19 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, "equalizer-preamp", fPreamp);
         vlc_object_release(p_aout);
     }
-
-    /* save changed to config */
-    config_PutFloat(getIntf(), "equalizer-preamp", fPreamp);
 }
 
 - (IBAction)equalizerTwoPass:(id)sender
 {
     bool b_2p = [sender state] ? true : false;
 
-    intf_thread_t *p_intf = getIntf();
     audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetBool(p_aout, "equalizer-2pass", b_2p);
         vlc_object_release(p_aout);
     }
 
-    /* save changed to config */
-    config_PutInt(p_intf, "equalizer-2pass", (int)b_2p);
-    var_SetBool(pl_Get(p_intf), "equalizer-2pass", b_2p);
+    var_SetBool(pl_Get(getIntf()), "equalizer-2pass", b_2p);
 }
 
 - (IBAction)addPresetAction:(id)sender
@@ -698,15 +684,13 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
         /* update VLC internals */
         char const *psz_eq_preset = [decomposedStringWithCanonicalMapping UTF8String];
-        intf_thread_t *p_intf = getIntf();
         audio_output_t *p_aout = getAout();
         if (p_aout) {
             var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
             vlc_object_release(p_aout);
         }
 
-        config_PutPsz(p_intf, "equalizer-preset", psz_eq_preset);
-        var_SetString(pl_Get(p_intf), "equalizer-preset", psz_eq_preset);
+        var_SetString(pl_Get(getIntf()), "equalizer-preset", psz_eq_preset);
 
         /* update UI */
         [_self updatePresetSelector];
@@ -784,17 +768,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)resetCompressorValues:(id)sender
 {
-    intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
-
-    config_PutFloat(p_intf, "compressor-rms-peak", 0.000000);
-    config_PutFloat(p_intf, "compressor-attack", 25.000000);
-    config_PutFloat(p_intf, "compressor-release", 100.000000);
-    config_PutFloat(p_intf, "compressor-threshold", -11.000000);
-    config_PutFloat(p_intf, "compressor-ratio", 8.000000);
-    config_PutFloat(p_intf, "compressor-knee", 2.500000);
-    config_PutFloat(p_intf, "compressor-makeup-gain", 7.000000);
-
+    playlist_t *p_playlist = pl_Get(getIntf());
     var_SetFloat(p_playlist, "compressor-rms-peak", 0.000000);
     var_SetFloat(p_playlist, "compressor-attack", 25.000000);
     var_SetFloat(p_playlist, "compressor-release", 100.000000);
@@ -825,7 +799,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)compressorSliderUpdated:(id)sender
 {
-    intf_thread_t *p_intf = getIntf();
     audio_output_t *p_aout = getAout();
     char *psz_property;
     float f_value = [sender floatValue];
@@ -849,8 +822,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, psz_property, f_value);
         vlc_object_release(p_aout);
     }
-    config_PutFloat(p_intf, psz_property, f_value);
-    var_SetFloat(pl_Get(p_intf), psz_property, f_value);
+    var_SetFloat(pl_Get(getIntf()), psz_property, f_value);
 
     if (sender == _compressorBand1Slider)
         [_compressorBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", f_value]];
@@ -900,15 +872,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)resetSpatializerValues:(id)sender
 {
-    intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
-
-    config_PutFloat(p_intf, "spatializer-roomsize", .85);
-    config_PutFloat(p_intf, "spatializer-width", 1.);
-    config_PutFloat(p_intf, "spatializer-wet", .4);
-    config_PutFloat(p_intf, "spatializer-dry", .5);
-    config_PutFloat(p_intf, "spatializer-damp", .5);
-
+    playlist_t *p_playlist = pl_Get(getIntf());
     var_SetFloat(p_playlist, "spatializer-roomsize", .85);
     var_SetFloat(p_playlist, "spatializer-width", 1.);
     var_SetFloat(p_playlist, "spatializer-wet", .4);
@@ -935,7 +899,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)spatializerSliderUpdated:(id)sender
 {
-    intf_thread_t *p_intf = getIntf();
     audio_output_t *p_aout = getAout();
     char *psz_property = NULL;
     float f_value = [sender floatValue];
@@ -955,8 +918,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, psz_property, f_value / 10.f);
         vlc_object_release(p_aout);
     }
-    config_PutFloat(p_intf, psz_property, f_value / 10.f);
-    var_SetFloat(pl_Get(p_intf), psz_property, f_value / 10.f);
+    var_SetFloat(pl_Get(getIntf()), psz_property, f_value / 10.f);
 
     if (sender == _spatializerBand1Slider)
         [_spatializerBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", f_value]];
@@ -1013,7 +975,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)filterVolumeNormSliderUpdated:(id)sender
 {
-    intf_thread_t *p_intf = getIntf();
     audio_output_t *p_aout = getAout();
     float f_value = [_filterNormLevelSlider floatValue];
 
@@ -1022,8 +983,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         vlc_object_release(p_aout);
     }
 
-    config_PutFloat(p_intf, "norm-max-level", f_value);
-    var_SetFloat(pl_Get(p_intf), "norm-max-level", f_value);
+    var_SetFloat(pl_Get(getIntf()), "norm-max-level", f_value);
 }
 
 - (IBAction)filterEnableKaraoke:(id)sender
