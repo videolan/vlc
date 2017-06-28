@@ -85,9 +85,8 @@
                                 </connections>
                             </button>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ihl-7x-5mN" customClass="VLCDefaultValueSlider">
-                                <rect key="frame" x="50" y="13" width="80" height="16"/>
+                                <rect key="frame" x="50" y="14" width="80" height="13"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="15" id="2ZX-Ma-yc0"/>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="80" id="qcW-zc-UJI"/>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="zHK-AF-Ru9"/>
                                 </constraints>
