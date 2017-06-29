@@ -702,6 +702,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     {
         case VLC_CODEC_FL64:
             fmt->i_format = VLC_CODEC_FL32;
+            /* fall through */
         case VLC_CODEC_FL32:
             ss.format = PA_SAMPLE_FLOAT32NE;
             break;
