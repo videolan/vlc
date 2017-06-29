@@ -1063,7 +1063,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             /* Intentional fall-through on x-playNow option in RTSP request */
             if( !psz_playnow )
                 break;
-        }
+        }   /* fall through */
 
         case HTTPD_MSG_PLAY:
         {
@@ -1401,6 +1401,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             /* Intentional fall-through on x-playNow option in RTSP request */
             if( !psz_playnow )
                 break;
+            /* fall through */
 
         case HTTPD_MSG_PLAY:
             /* This is kind of a kludge. Should we only support Aggregate
