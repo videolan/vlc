@@ -1240,7 +1240,6 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 break;
 
             case 'O':
-            {
                 expect = 'S';
                 if (cat != 'o')
                 {
@@ -1261,10 +1260,8 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 }
                 EnsureUTF8 (p_sdp->orig_host);
                 break;
-            }
 
             case 'S':
-            {
                 expect = 'I';
                 if ((cat != 's') || !*data)
                 {
@@ -1278,10 +1275,8 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     goto error;
                 EnsureUTF8 (p_sdp->psz_sessionname);
                 break;
-            }
 
             case 'I':
-            {
                 expect = 'U';
                 /* optional (and may be empty) */
                 if (cat == 'i')
@@ -1293,20 +1288,23 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     EnsureUTF8 (p_sdp->psz_sessioninfo);
                     break;
                 }
-            }
+                /* fall through */
 
             case 'U':
                 expect = 'E';
                 if (cat == 'u')
                     break;
+                /* fall through */
             case 'E':
                 expect = 'E';
                 if (cat == 'e')
                     break;
+                /* fall through */
             case 'P':
                 expect = 'P';
                 if (cat == 'p')
                     break;
+                /* fall through */
             case 'C':
                 expect = 'B';
                 if (cat == 'c')
@@ -1320,10 +1318,12 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     }
                     break;
                 }
+                /* fall through */
             case 'B':
                 assert (expect == 'B');
                 if (cat == 'b')
                     break;
+                /* fall through */
             case 'T':
                 expect = 'R';
                 if (cat != 't')
@@ -1336,15 +1336,17 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
             case 'R':
                 if ((cat == 't') || (cat == 'r'))
                     break;
-
+                /* fall through */
             case 'Z':
                 expect = 'K';
                 if (cat == 'z')
                     break;
+                /* fall through */
             case 'K':
                 expect = 'A';
                 if (cat == 'k')
                     break;
+                /* fall through */
             case 'A':
                 //expect = 'A';
                 if (cat == 'a')
@@ -1353,6 +1355,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     TAB_APPEND( p_sdp->i_attributes, p_sdp->pp_attributes, p_attr );
                     break;
                 }
+                /* fall through */
 
             /* Media description */
             case 'm':
@@ -1404,10 +1407,12 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
 
                 break;
             }
+
             case 'i':
                 expect = 'c';
                 if (cat == 'i')
                     break;
+                /* fall through */
             case 'c':
                 expect = 'b';
                 if (cat == 'c')
@@ -1423,14 +1428,17 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     net_SetPort ((struct sockaddr *)&m->addr, htons (port));
                     break;
                 }
+                /* fall through */
             case 'b':
                 expect = 'b';
                 if (cat == 'b')
                     break;
+                /* fall through */
             case 'k':
                 expect = 'a';
                 if (cat == 'k')
                     break;
+                /* fall through */
             case 'a':
                 assert (expect == 'a');
                 if (cat == 'a')
