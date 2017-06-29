@@ -546,8 +546,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pb_bool = false;
             return VLC_SUCCESS;
         }
-        // ft
-
+        /* fall through */
     default:
         return demux_vaControlHelper( p_demux->s,
                                       __MIN( INT64_MAX, p_sys->i_data_begin ),
