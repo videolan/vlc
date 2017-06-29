@@ -494,7 +494,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
                     return false;
                 bs_read( p_bs, 4 );
                 bs_read( p_bs, 4 );
-                for( uint32_t i=0; i<count; i++ )
+                for( uint32_t j = 0; j < count; j++ )
                 {
                     if( bs_remain( p_bs ) < 23 )
                         return false;
