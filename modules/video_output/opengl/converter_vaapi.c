@@ -218,6 +218,32 @@ error:
     return VLC_EGENERIC;
 }
 
+static picture_pool_t *
+tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
+{
+    vlc_object_t *o = VLC_OBJECT(tc->gl);
+    struct priv *priv = tc->priv;
+
+    picture_pool_t *pool =
+        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), priv->vadpy, requested_count,
+                          &priv->va_surface_ids, &tc->fmt, VA_RT_FORMAT_YUV420,
+                          VA_FOURCC_NV12);
+    if (!pool)
+        return NULL;
+
+    /* Check if a surface from the pool can be derived */
+    VAImage va_image;
+    if (vlc_vaapi_DeriveImage(o, priv->vadpy, priv->va_surface_ids[0],
+                              &va_image))
+    {
+        picture_pool_Release(pool);
+        return NULL;
+    }
+
+    vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
+    return pool;
+}
+
 static void
 tc_vaegl_release(const opengl_tex_converter_t *tc)
 {
@@ -294,6 +320,7 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
 
     tc->pf_update  = tc_vaegl_update;
     tc->pf_release = tc_vaegl_release;
+    tc->pf_get_pool = tc_vaegl_get_pool;
 
     if (vlc_vaapi_Initialize(VLC_OBJECT(tc->gl), priv->vadpy))
         goto error;
@@ -322,32 +349,6 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
 error:
     free(tc->priv);
     return VLC_EGENERIC;
-}
-
-static picture_pool_t *
-tc_va_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
-{
-    vlc_object_t *o = VLC_OBJECT(tc->gl);
-    struct priv *priv = tc->priv;
-
-    picture_pool_t *pool =
-        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), priv->vadpy, requested_count,
-                          &priv->va_surface_ids, &tc->fmt, VA_RT_FORMAT_YUV420,
-                          VA_FOURCC_NV12);
-    if (!pool)
-        return NULL;
-
-    /* Check if a surface from the pool can be derived */
-    VAImage va_image;
-    if (vlc_vaapi_DeriveImage(o, priv->vadpy, priv->va_surface_ids[0],
-                              &va_image))
-    {
-        picture_pool_Release(pool);
-        return NULL;
-    }
-
-    vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
-    return pool;
 }
 
 int
@@ -388,7 +389,6 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
         default:
             return VLC_EGENERIC;
     }
-    tc->pf_get_pool = tc_va_get_pool;
 
     return VLC_SUCCESS;
 }
