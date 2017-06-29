@@ -975,15 +975,15 @@ static int DrawPlaylist(intf_thread_t *intf, input_thread_t *input)
     for (int i = 0; i < sys->plist_entries; i++) {
         char c;
         playlist_item_t *current;
-        input_item_t *input = sys->plist[i]->item;
+        input_item_t *item = sys->plist[i]->item;
 
         PL_LOCK;
         current = playlist_CurrentPlayingItem(p_playlist);
 
-        if ((sys->node != NULL && input == sys->node) ||
-            (sys->node == NULL && current != NULL && input == current->p_input))
+        if ((sys->node != NULL && item == sys->node) ||
+            (sys->node == NULL && current != NULL && item == current->p_input))
             c = '*';
-        else if (current != NULL && current->p_input == input)
+        else if (current != NULL && current->p_input == item)
             c = '>';
         else
             c = ' ';
