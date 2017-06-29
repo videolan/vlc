@@ -200,7 +200,7 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
     {
         case VLC_MODULE_CREATE:
         {
-            module_t *module = plugin->module;
+            module_t *super = plugin->module;
             module_t *submodule = vlc_module_create(plugin);
             if (unlikely(submodule == NULL))
             {
@@ -214,12 +214,12 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 
             /* Inheritance. Ugly!! */
             submodule->pp_shortcuts = xmalloc (sizeof ( *submodule->pp_shortcuts ));
-            submodule->pp_shortcuts[0] = module->pp_shortcuts[0];
+            submodule->pp_shortcuts[0] = super->pp_shortcuts[0];
             submodule->i_shortcuts = 1; /* object name */
 
-            submodule->psz_shortname = module->psz_shortname;
-            submodule->psz_longname = module->psz_longname;
-            submodule->psz_capability = module->psz_capability;
+            submodule->psz_shortname = super->psz_shortname;
+            submodule->psz_longname = super->psz_longname;
+            submodule->psz_capability = super->psz_capability;
             break;
         }
 
