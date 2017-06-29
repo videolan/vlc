@@ -271,7 +271,7 @@ static int Open( vlc_object_t * p_this )
     avi_chunk_avih_t    *p_avih;
 
     unsigned int i_track;
-    unsigned int i, i_peeker;
+    unsigned int i_peeker;
 
     const uint8_t *p_peek;
 
@@ -328,7 +328,7 @@ static int Open( vlc_object_t * p_this )
             AVI_ChunkCount( &p_sys->ck_root, AVIFOURCC_RIFF );
 
         msg_Warn( p_demux, "multiple riff -> OpenDML ?" );
-        for( i = 1; i < i_count; i++ )
+        for( unsigned i = 1; i < i_count; i++ )
         {
             avi_chunk_list_t *p_sysx;
 
@@ -392,7 +392,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_avih_flags = p_avih->i_flags;
 
     /* now read info on each stream and create ES */
-    for( i = 0 ; i < i_track; i++ )
+    for( unsigned i = 0 ; i < i_track; i++ )
     {
         avi_track_t           *tk     = calloc( 1, sizeof( avi_track_t ) );
         if( unlikely( !tk ) )
@@ -580,13 +580,13 @@ static int Open( vlc_object_t * p_this )
                         if ( fmt.video.p_palette )
                         {
                             uint32_t entry;
-                            for ( uint32_t i=0; i<p_vids->p_bih->biClrUsed; i++ )
+                            for( uint32_t j = 0; j < p_vids->p_bih->biClrUsed; j++ )
                             {
-                                 entry = GetDWBE( &p_bi->bmiColors[i] );
-                                 fmt.video.p_palette->palette[i][0] = entry >> 24;
-                                 fmt.video.p_palette->palette[i][1] = (entry >> 16) & 0xFF;
-                                 fmt.video.p_palette->palette[i][2] = (entry >> 8) & 0xFF;
-                                 fmt.video.p_palette->palette[i][3] = entry & 0xFF;
+                                 entry = GetDWBE( &p_bi->bmiColors[j] );
+                                 fmt.video.p_palette->palette[j][0] = entry >> 24;
+                                 fmt.video.p_palette->palette[j][1] = (entry >> 16) & 0xFF;
+                                 fmt.video.p_palette->palette[j][2] = (entry >> 8) & 0xFF;
+                                 fmt.video.p_palette->palette[j][3] = entry & 0xFF;
                             }
                             fmt.video.p_palette->i_entries = p_vids->p_bih->biClrUsed;
                         }
@@ -807,7 +807,7 @@ aviindex:
     }
 
     /* fix some BeOS MediaKit generated file */
-    for( i = 0 ; i < p_sys->i_track; i++ )
+    for( unsigned i = 0 ; i < p_sys->i_track; i++ )
     {
         avi_track_t         *tk = p_sys->track[i];
         avi_chunk_list_t    *p_strl;
@@ -1646,7 +1646,6 @@ static double ControlGetPosition( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i;
     double   f, *pf;
     int64_t i64, *pi64;
     vlc_meta_t *p_meta;
@@ -1706,7 +1705,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_FPS:
             pf = va_arg( args, double * );
             *pf = 0.0;
-            for( i = 0; i < (int)p_sys->i_track; i++ )
+            for( unsigned i = 0; i < p_sys->i_track; i++ )
             {
                 avi_track_t *tk = p_sys->track[i];
                 if( tk->i_cat == VIDEO_ES && tk->i_scale > 0)
