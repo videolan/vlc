@@ -490,7 +490,6 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     uint32_t     i_tool_version;
     uint32_t     i_update_player_url;
     uint32_t     i_encryption_type;
-    int          i;
     int          i_streams;
     int          i_first;
     char         *mediapath;
@@ -843,7 +842,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     i_first = -1;
     var_buffer_reinitwrite( &buffer, 0 );
     /* for now, select first audio and video stream */
-    for( i = 1; i < 128; i++ )
+    for( int i = 1; i < 128; i++ )
     {
 
         if( p_sys->asfh.stream[i].i_cat != ASF_CODEC_TYPE_UNKNOWN )
