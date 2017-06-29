@@ -458,7 +458,6 @@ static void *Run( void *data )
 {
     services_discovery_t *p_sd = data;
     char *psz_addr;
-    int i;
     int timeout = -1;
     int canc = vlc_savecancel ();
 
@@ -576,7 +575,7 @@ static void *Run( void *data )
         timeout = 1000 * 60 * 60;
 
         /* Check for items that need deletion */
-        for( i = 0; i < p_sd->p_sys->i_announces; i++ )
+        for( int i = 0; i < p_sd->p_sys->i_announces; i++ )
         {
             mtime_t i_timeout = ( mtime_t ) 1000000 * p_sd->p_sys->i_timeout;
             sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
@@ -662,7 +661,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                      size_t len )
 {
-    int i;
     const char          *psz_sdp;
     const uint8_t *end = buf + len;
     sdp_t               *p_sdp;
@@ -787,7 +785,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         goto error;
     }
 
-    for( i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
+    for( int i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
     {
         sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
         /* FIXME: slow */
