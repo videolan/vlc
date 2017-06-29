@@ -79,7 +79,6 @@ int Import_M3U( vlc_object_t *p_this )
     stream_t *p_stream = (stream_t *)p_this;
     const uint8_t *p_peek;
     ssize_t i_peek;
-    char *(*pf_dup) (const char *) = GuessEncoding;
     int offset = 0;
 
     CHECK_FILE(p_stream);
@@ -87,14 +86,24 @@ int Import_M3U( vlc_object_t *p_this )
     if( i_peek < 8 )
         return VLC_EGENERIC;
 
-    if( !memcmp( p_peek, "\xef\xbb\xbf", 3) )
+    /* Encoding: UTF-8 or unspecified */
+    char *(*pf_dup) (const char *) = GuessEncoding;
+
+    if (stream_HasExtension(p_stream, ".m3u8")
+     || strncasecmp((const char *)p_peek, "RTSPtext", 8) == 0) /* QuickTime */
+        pf_dup = CheckUnicode;
+    else
+    if (memcmp( p_peek, "\xef\xbb\xbf", 3) == 0) /* UTF-8 Byte Order Mark */
     {
         if( i_peek < 12 )
             return VLC_EGENERIC;
-        pf_dup = CheckUnicode; /* UTF-8 Byte Order Mark */
+        pf_dup = CheckUnicode;
         offset = 3;
+        p_peek += offset;
+        i_peek -= offset;
     }
 
+    /* File type: playlist, or not (HLS manifest or whatever else) */
     char *type = stream_MimeType(p_stream->p_source);
     if (type != NULL
      && (!vlc_ascii_strcasecmp(type, "application/vnd.apple.mpegurl")
@@ -107,7 +116,7 @@ int Import_M3U( vlc_object_t *p_this )
     bool b_check_hls = true;
 
     if( stream_HasExtension( p_stream, ".m3u8" ) )
-        pf_dup = CheckUnicode; /* UTF-8 file type */
+        ;
     else
     if (stream_HasExtension(p_stream, ".vlc"))
         b_check_hls = false;
@@ -123,11 +132,8 @@ int Import_M3U( vlc_object_t *p_this )
         ;
     else
     {   /* Guess encoding */
-        p_peek += offset;
-
         if( !strncasecmp( (const char *)p_peek, "RTSPtext", 8 ) ) /* QuickTime */
         {
-            pf_dup = CheckUnicode; /* UTF-8 */
             b_check_hls = false;
         }
         else if( memcmp( p_peek, "#EXTM3U", 7 ) )
@@ -139,7 +145,7 @@ int Import_M3U( vlc_object_t *p_this )
 
     free(type);
 
-    if (b_check_hls && IsHLS(p_peek, i_peek - offset))
+    if (b_check_hls && IsHLS(p_peek, i_peek))
         return VLC_EGENERIC;
 
     if (offset != 0 && vlc_stream_Seek(p_stream->p_source, offset))
