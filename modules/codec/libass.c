@@ -622,9 +622,9 @@ static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_i
             {
                 for( int j = i+1; j < i_region; j++ )
                 {
-                    rectangle_t n = region[i];
-                    r_add( &n, &region[j] );
-                    int ds = r_surface( &n ) - r_surface( &region[i] ) - r_surface( &region[j] );
+                    rectangle_t rect = region[i];
+                    r_add( &rect, &region[j] );
+                    int ds = r_surface( &rect ) - r_surface( &region[i] ) - r_surface( &region[j] );
 
                     if( ds < i_best_ds )
                     {
