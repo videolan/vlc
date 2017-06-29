@@ -142,7 +142,8 @@ int Import_M3U( vlc_object_t *p_this )
     if (b_check_hls && IsHLS(p_peek, i_peek - offset))
         return VLC_EGENERIC;
 
-    vlc_stream_Seek( p_stream->p_source, offset );
+    if (offset != 0 && vlc_stream_Seek(p_stream->p_source, offset))
+        return VLC_EGENERIC;
 
     msg_Dbg( p_stream, "found valid M3U playlist" );
     p_stream->p_sys = pf_dup;
