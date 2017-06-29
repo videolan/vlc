@@ -585,21 +585,21 @@ static char *disc_get_name (struct udev_device *dev)
     const char *cat = NULL;
     udev_list_entry_foreach (entry, list)
     {
-        const char *name = udev_list_entry_get_name (entry);
+        const char *propname = udev_list_entry_get_name(entry);
 
-        if (strncmp (name, "ID_CDROM_MEDIA_", 15))
+        if (strncmp(propname, "ID_CDROM_MEDIA_", 15))
             continue;
         if (!atoi (udev_list_entry_get_value (entry)))
             continue;
-        name += 15;
+        propname += 15;
 
-        if (!strncmp (name, "CD", 2))
+        if (!strncmp(propname, "CD", 2))
             cat = N_("CD");
-        else if (!strncmp (name, "DVD", 3))
+        else if (!strncmp(propname, "DVD", 3))
             cat = N_("DVD");
-        else if (!strncmp (name, "BD", 2))
+        else if (!strncmp(propname, "BD", 2))
             cat = N_("Blu-ray");
-        else if (!strncmp (name, "HDDVD", 5))
+        else if (!strncmp(propname, "HDDVD", 5))
             cat = N_("HD DVD");
 
         if (cat != NULL)
