@@ -254,7 +254,6 @@ static int Open ( vlc_object_t *p_this )
     float          f_fps;
     char           *psz_type;
     int  (*pf_read)( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t*, size_t );
-    int            i;
 
     if( !p_demux->obj.force )
     {
@@ -301,9 +300,7 @@ static int Open ( vlc_object_t *p_this )
     psz_type = var_CreateGetString( p_demux, "sub-type" );
     if( psz_type && *psz_type )
     {
-        int i;
-
-        for( i = 0; ; i++ )
+        for( int i = 0; ; i++ )
         {
             if( sub_read_subtitle_function[i].psz_type_name == NULL )
                 break;
@@ -512,7 +509,7 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    for( i = 0; ; i++ )
+    for( int i = 0; ; i++ )
     {
         if( sub_read_subtitle_function[i].i_type == p_sys->props.i_type )
         {
@@ -1689,7 +1686,6 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
     VLC_UNUSED( i_idx );
     char         *psz_text, *psz_orig;
     char         *psz_text2, *psz_orig2;
-    int h1, h2, m1, m2, s1, s2, f1, f2;
 
     if( !p_props->jss.b_inited )
     {
@@ -1714,6 +1710,7 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
         psz_text = psz_orig;
 
         /* Complete time lines */
+        int h1, h2, m1, m2, s1, s2, f1, f2;
         if( sscanf( s, "%d:%d:%d.%d %d:%d:%d.%d %[^\n\r]",
                     &h1, &m1, &s1, &f1, &h2, &m2, &s2, &f2, psz_text ) == 9 )
         {
@@ -2109,7 +2106,7 @@ static int ParseDKS( vlc_object_t *p_obj, subs_properties_t *p_props,
                                     (int64_t)m1 * 60*1000 +
                                     (int64_t)s1 * 1000 ) * 1000;
 
-            char *s = TextGetLine( txt );
+            s = TextGetLine( txt );
             if( !s )
             {
                 free( psz_text );
@@ -2162,7 +2159,7 @@ static int ParseSubViewer1( vlc_object_t *p_obj, subs_properties_t *p_props,
                                     (int64_t)m1 * 60*1000 +
                                     (int64_t)s1 * 1000 ) * 1000;
 
-            char *s = TextGetLine( txt );
+            s = TextGetLine( txt );
             if( !s )
                 return VLC_EGENERIC;
 
