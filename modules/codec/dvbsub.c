@@ -706,11 +706,8 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
     while( i_processed_length < i_segment_length )
     {
         uint8_t y, cb, cr, t;
-        uint8_t i_id;
-        uint8_t i_type;
-
-        i_id = bs_read( s, 8 );
-        i_type = bs_read( s, 3 );
+        uint_fast8_t cid = bs_read( s, 8 );
+        uint_fast8_t type = bs_read( s, 3 );
 
         bs_skip( s, 4 );
 
@@ -743,26 +740,26 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
         /* According to EN 300-743 section 7.2.3 note 1, type should
          * not have more than 1 bit set to one, but some streams don't
          * respect this note. */
-        if( ( i_type & 0x04 ) && ( i_id < 4 ) )
+        if( ( type & 0x04 ) && ( cid < 4 ) )
         {
-            p_clut->c_2b[i_id].Y = y;
-            p_clut->c_2b[i_id].Cr = cr;
-            p_clut->c_2b[i_id].Cb = cb;
-            p_clut->c_2b[i_id].T = t;
+            p_clut->c_2b[cid].Y = y;
+            p_clut->c_2b[cid].Cr = cr;
+            p_clut->c_2b[cid].Cb = cb;
+            p_clut->c_2b[cid].T = t;
         }
-        if( ( i_type & 0x02 ) && ( i_id < 16 ) )
+        if( ( type & 0x02 ) && ( cid < 16 ) )
         {
-            p_clut->c_4b[i_id].Y = y;
-            p_clut->c_4b[i_id].Cr = cr;
-            p_clut->c_4b[i_id].Cb = cb;
-            p_clut->c_4b[i_id].T = t;
+            p_clut->c_4b[cid].Y = y;
+            p_clut->c_4b[cid].Cr = cr;
+            p_clut->c_4b[cid].Cb = cb;
+            p_clut->c_4b[cid].T = t;
         }
-        if( i_type & 0x01 )
+        if( type & 0x01 )
         {
-            p_clut->c_8b[i_id].Y = y;
-            p_clut->c_8b[i_id].Cr = cr;
-            p_clut->c_8b[i_id].Cb = cb;
-            p_clut->c_8b[i_id].T = t;
+            p_clut->c_8b[cid].Y = y;
+            p_clut->c_8b[cid].Cr = cr;
+            p_clut->c_8b[cid].Cb = cb;
+            p_clut->c_8b[cid].T = t;
         }
     }
 }
