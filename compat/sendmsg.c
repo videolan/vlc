@@ -73,7 +73,7 @@ ssize_t sendmsg(int fd, const struct msghdr *msg, int flags)
     return -1;
 }
 
-#elif __native_client__
+#elif defined __native_client__
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
