@@ -1069,7 +1069,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else // All ES Mode
             {
                 p_sys->b_es_all = true;
-                ts_pat_t *p_pat = GetPID(p_sys, 0)->u.p_pat;
+                p_pat = GetPID(p_sys, 0)->u.p_pat;
                 for( int i = 0; i < p_pat->programs.i_size; i++ )
                    ARRAY_APPEND( p_sys->programs, p_pat->programs.p_elems[i]->i_pid );
                 UpdatePESFilters( p_demux, true );
@@ -2140,10 +2140,10 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
         ts_pat_t *p_pat = GetPID(p_sys, 0)->u.p_pat;
         for( int i=0; i< p_pat->programs.i_size; i++ )
         {
-            ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
-            for( int j=0; j<p_pmt->e_streams.i_size; j++ )
+            ts_pmt_t *p_opmt = p_pat->programs.p_elems[i]->u.p_pmt;
+            for( int j=0; j<p_opmt->e_streams.i_size; j++ )
             {
-                ts_pid_t *p_pid = p_pmt->e_streams.p_elems[j];
+                ts_pid_t *p_pid = p_opmt->e_streams.p_elems[j];
                 block_t *p_block = p_pid->u.p_stream->prepcr.p_head;
                 while( p_block && p_block->i_dts == VLC_TS_INVALID )
                     p_block = p_block->p_next;

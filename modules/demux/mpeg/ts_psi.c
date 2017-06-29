@@ -829,7 +829,7 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
         csc = p_csc[channels - 1];
         stream_count = channels - csc;
 
-        static const uint8_t map[6][7] = {
+        static const uint8_t maps[6][7] = {
             { 2,1 },
             { 1,2,3 },
             { 4,1,2,3 },
@@ -838,7 +838,7 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
             { 6,1,2,3,4,5,7 },
         };
         if (channels > 2)
-            memcpy(&h.stream_map[1], map[channels-3], channels - 1);
+            memcpy(&h.stream_map[1], maps[channels-3], channels - 1);
     } else if (ccc == 0x81) {
         if (len < 4)
             goto explicit_config_too_short;
