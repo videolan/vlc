@@ -1919,14 +1919,13 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
     demux_sys_t *p_sys = p_demux->p_sys;
     char *psz_dup = strdup( psz_fmt );
     char *psz = psz_dup;
-    int  i_pid;
     int  i_number;
 
     if( !psz_dup )
         return VLC_ENOMEM;
 
     /* Parse PID */
-    i_pid = strtol( psz, &psz, 0 );
+    unsigned long i_pid = strtoul( psz, &psz, 0 );
     if( i_pid < 2 || i_pid >= 8192 )
         goto error;
 
@@ -1938,7 +1937,7 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
     /* */
     ts_pid_t *pmtpid = GetPID(p_sys, i_pid);
 
-    msg_Dbg( p_demux, "user pmt specified (pid=%d,number=%d)", i_pid, i_number );
+    msg_Dbg( p_demux, "user pmt specified (pid=%lu,number=%d)", i_pid, i_number );
     if ( !PIDSetup( p_demux, TYPE_PMT, pmtpid, GetPID(p_sys, 0) ) )
         goto error;
 
@@ -1961,12 +1960,11 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
     while( psz && *psz )
     {
         char *psz_next = strchr( psz, ',' );
-        int i_pid;
 
         if( psz_next )
             *psz_next++ = '\0';
 
-        i_pid = strtol( psz, &psz, 0 );
+        i_pid = strtoul( psz, &psz, 0 );
         if( *psz != ':' || i_pid < 2 || i_pid >= 8192 )
             goto next;
 
@@ -2021,7 +2019,7 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
 
             if( fmt->i_cat != UNKNOWN_ES )
             {
-                msg_Dbg( p_demux, "  * es pid=%d fcc=%4.4s", i_pid,
+                msg_Dbg( p_demux, "  * es pid=%lu fcc=%4.4s", i_pid,
                          (char*)&fmt->i_codec );
                 pid->u.p_stream->p_es->id = es_out_Add( p_demux->out, fmt );
                 p_sys->i_pmt_es++;
