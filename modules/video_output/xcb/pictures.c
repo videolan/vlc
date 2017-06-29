@@ -126,8 +126,7 @@ int XCB_picture_Alloc (vout_display_t *vd, picture_resource_t *res,
                 if (vlc_xcb_error_Check(vd, conn, "same error on retry",
                                         ck) == 0)
                     break;
-                /* fall through */
-            }
+            }   /* fall through */
 
             default:
                 msg_Info (vd, "using buggy X11 server - SSH proxying?");
