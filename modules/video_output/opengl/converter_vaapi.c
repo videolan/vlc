@@ -296,10 +296,12 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
     if (vadpy == NULL)
         return VLC_EGENERIC;
 
+    int ret = VLC_ENOMEM;
     struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
     if (unlikely(tc->priv == NULL))
-        return VLC_ENOMEM;
+        goto error;
 
+    ret = VLC_EGENERIC;
     priv->vadpy = vadpy;
     priv->fourcc = 0;
 
@@ -326,14 +328,12 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
         goto error;
 
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
-    {
-        vaTerminate(priv->vadpy);
         goto error;
-    }
 
     if (vlc_vaapi_SetInstance(priv->vadpy))
     {
         msg_Err(tc->gl, "VAAPI instance already in use");
+        vadpy = NULL;
         goto error;
     }
 
@@ -342,13 +342,16 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
     if (tc->fshader == 0)
     {
         vlc_vaapi_ReleaseInstance(priv->vadpy);
+        vadpy = NULL;
         goto error;
     }
     return VLC_SUCCESS;
 
 error:
+    if (vadpy != NULL)
+        vaTerminate(vadpy);
     free(tc->priv);
-    return VLC_EGENERIC;
+    return ret;
 }
 
 int
