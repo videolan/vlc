@@ -41,6 +41,12 @@
 # include <vlc_xlib.h>
 #endif
 
+#ifdef HAVE_VA_DRM
+# include <va/va_drm.h>
+# include <vlc_fs.h>
+# include <fcntl.h>
+#endif
+
 #if defined(USE_OPENGL_ES2)
 #   include <GLES2/gl2ext.h>
 #endif
@@ -354,6 +360,13 @@ x11_native_destroy_cb(VANativeDisplay native)
     XCloseDisplay(native);
 }
 #endif
+#ifdef HAVE_VA_DRM
+static void
+drm_native_destroy_cb(VANativeDisplay native)
+{
+    vlc_close((intptr_t) native);
+}
+#endif
 
 int
 opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
@@ -369,6 +382,28 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
     const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
     if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
         return VLC_EGENERIC;
+
+#ifdef HAVE_VA_DRM
+    static const char const *drm_device_paths[] = {
+        "/dev/dri/renderD128",
+        "/dev/dri/card0"
+    };
+
+    for (int i = 0; ARRAY_SIZE(drm_device_paths); i++)
+    {
+        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
+        if (drm_fd == -1)
+            continue;
+
+        VADisplay dpy = vaGetDisplayDRM(drm_fd);
+        if (dpy)
+            return tc_vaegl_init(tc, dpy, (VANativeDisplay) (intptr_t) drm_fd,
+                                 drm_native_destroy_cb);
+
+        vlc_close(drm_fd);
+    }
+    /* Fallback to X11 or WAYLAND */
+#endif
 
     switch (tc->gl->surface->type)
     {
