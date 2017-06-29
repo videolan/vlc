@@ -626,12 +626,12 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
                 {
                     unsigned long long iv_hi = segment->aes_ivs[0];
                     unsigned long long iv_lo = segment->aes_ivs[8];
-                    for( unsigned short i = 1; i < 8; i++ )
+                    for( unsigned short j = 1; j < 8; j++ )
                     {
                         iv_hi <<= 8;
-                        iv_hi |= segment->aes_ivs[i] & 0xff;
+                        iv_hi |= segment->aes_ivs[j] & 0xff;
                         iv_lo <<= 8;
-                        iv_lo |= segment->aes_ivs[8+i] & 0xff;
+                        iv_lo |= segment->aes_ivs[8+j] & 0xff;
                     }
                     ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\",IV=0X%16.16llx%16.16llx\n",
                                    segment->psz_key_uri, iv_hi, iv_lo );
