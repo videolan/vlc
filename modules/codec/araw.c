@@ -175,6 +175,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_S32I:
         format = VLC_CODEC_S32N;
         decode = S32IDecode;
+        /* fall through */
     case VLC_CODEC_S32N:
         bits = 32;
         break;
@@ -226,6 +227,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_S16I:
         format = VLC_CODEC_S16N;
         decode = S16IDecode;
+        /* fall through */
     case VLC_CODEC_S16N:
         bits = 16;
         break;
@@ -237,6 +239,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_S8:
         decode = S8Decode;
         format = VLC_CODEC_U8;
+        /* fall through */
     case VLC_CODEC_U8:
         bits = 8;
         break;
@@ -817,6 +820,7 @@ static int EncoderOpen( vlc_object_t *p_this )
     {
     case VLC_CODEC_S8:
         encode = S8Decode;
+        /* fall through */
     case VLC_CODEC_U8:
         p_enc->fmt_in.i_codec = VLC_CODEC_U8;
         p_enc->fmt_out.audio.i_bitspersample = 8;
@@ -833,6 +837,7 @@ static int EncoderOpen( vlc_object_t *p_this )
         break;
     case VLC_CODEC_S16I:
         encode = S16IDecode;
+        /* fall through */
     case VLC_CODEC_S16N:
         p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
         p_enc->fmt_out.audio.i_bitspersample = 16;
@@ -869,6 +874,7 @@ static int EncoderOpen( vlc_object_t *p_this )
         break;
     case VLC_CODEC_S32I:
         encode = S32IEncode;
+        /* fall through */
     case VLC_CODEC_S32N:
         p_enc->fmt_in.i_codec = VLC_CODEC_S32N;
         p_enc->fmt_out.audio.i_bitspersample = 32;
@@ -879,6 +885,7 @@ static int EncoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_F32B:
 #endif
         encode = F32IEncode;
+        /* fall through */
     case VLC_CODEC_FL32:
         p_enc->fmt_in.i_codec = VLC_CODEC_FL32;
         p_enc->fmt_out.audio.i_bitspersample = 32;
@@ -889,6 +896,7 @@ static int EncoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_F64B:
 #endif
         encode = F64IEncode;
+        /* fall through */
     case VLC_CODEC_FL64:
         p_enc->fmt_in.i_codec = VLC_CODEC_FL64;
         p_enc->fmt_out.audio.i_bitspersample = 64;
