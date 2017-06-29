@@ -500,7 +500,7 @@ static int Open( vlc_object_t * p_this )
                 }
 
                 msg_Dbg( p_demux,
-                    "stream[%d] audio(0x%x - %s) %d channels %dHz %dbits",
+                    "stream[%u] audio(0x%x - %s) %d channels %dHz %dbits",
                     i, p_auds->p_wf->wFormatTag,vlc_fourcc_GetDescription(AUDIO_ES,tk->i_codec),
                     p_auds->p_wf->nChannels,
                     p_auds->p_wf->nSamplesPerSec,
@@ -529,7 +529,7 @@ static int Open( vlc_object_t * p_this )
                                                   p_vids->p_bih->biCompression );
                 if( p_vids->p_bih->biCompression == VLC_FOURCC( 'D', 'X', 'S', 'B' ) )
                 {
-                   msg_Dbg( p_demux, "stream[%d] subtitles", i );
+                   msg_Dbg( p_demux, "stream[%u] subtitles", i );
                    es_format_Init( &fmt, SPU_ES, p_vids->p_bih->biCompression );
                    tk->i_cat = SPU_ES;
                    break;
@@ -653,7 +653,7 @@ static int Open( vlc_object_t * p_this )
                     }
                 }
 
-                msg_Dbg( p_demux, "stream[%d] video(%4.4s) %"PRIu32"x%"PRIu32" %dbpp %ffps",
+                msg_Dbg( p_demux, "stream[%u] video(%4.4s) %"PRIu32"x%"PRIu32" %dbpp %ffps",
                          i, (char*)&p_vids->p_bih->biCompression,
                          (uint32_t)p_vids->p_bih->biWidth,
                          (uint32_t)p_vids->p_bih->biHeight,
@@ -684,14 +684,14 @@ static int Open( vlc_object_t * p_this )
             }
 
             case( AVIFOURCC_txts):
-                msg_Dbg( p_demux, "stream[%d] subtitle attachment", i );
+                msg_Dbg( p_demux, "stream[%u] subtitle attachment", i );
                 AVI_ExtractSubtitle( p_demux, i, p_strl, p_strn );
                 free( tk );
                 continue;
 
             case( AVIFOURCC_iavs):
             case( AVIFOURCC_ivas):
-                msg_Dbg( p_demux, "stream[%d] iavs with handler %4.4s", i, (char *)&p_strh->i_handler );
+                msg_Dbg( p_demux, "stream[%u] iavs with handler %4.4s", i, (char *)&p_strh->i_handler );
                 tk->i_cat   = VIDEO_ES;
                 tk->i_codec = AVI_FourccGetCodec( VIDEO_ES, p_strh->i_handler );
                 tk->i_samplesize = 0;
@@ -705,10 +705,10 @@ static int Open( vlc_object_t * p_this )
                 break;
 
             case( AVIFOURCC_mids):
-                msg_Dbg( p_demux, "stream[%d] midi is UNSUPPORTED", i );
+                msg_Dbg( p_demux, "stream[%u] midi is UNSUPPORTED", i );
 
             default:
-                msg_Warn( p_demux, "stream[%d] unknown type %4.4s", i, (char *)&p_strh->i_type );
+                msg_Warn( p_demux, "stream[%u] unknown type %4.4s", i, (char *)&p_strh->i_type );
                 free( tk );
                 continue;
         }
