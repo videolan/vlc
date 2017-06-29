@@ -54,6 +54,23 @@ static char *CheckUnicode (const char *str)
     return IsUTF8 (str) ? strdup (str): NULL;
 }
 
+static bool IsHLS(const unsigned char *buf, size_t length)
+{
+    static const char *const hlsexts[] =
+    {
+        "#EXT-X-MEDIA:",
+        "#EXT-X-VERSION:",
+        "#EXT-X-TARGETDURATION:",
+        "#EXT-X-MEDIA-SEQUENCE:",
+    };
+
+    for (size_t i = 0; i < ARRAY_SIZE(hlsexts); i++)
+        if (strnstr((const char *)buf, hlsexts[i], length) != NULL)
+            return true;
+
+    return false;
+}
+
 /*****************************************************************************
  * Import_M3U: main import function
  *****************************************************************************/
@@ -122,19 +139,8 @@ int Import_M3U( vlc_object_t *p_this )
 
     free(type);
 
-    if( b_check_hls )
-    {
-        const char * ppsz_hlsexts[] =
-        {
-            "#EXT-X-MEDIA:",
-            "#EXT-X-VERSION:",
-            "#EXT-X-TARGETDURATION:",
-            "#EXT-X-MEDIA-SEQUENCE:",
-        };
-        for( size_t i=0; i<ARRAY_SIZE(ppsz_hlsexts); i++ )
-            if( strnstr( (const char *) p_peek, ppsz_hlsexts[i], i_peek - offset ) )
-                return VLC_EGENERIC;
-    }
+    if (b_check_hls && IsHLS(p_peek, i_peek - offset))
+        return VLC_EGENERIC;
 
     vlc_stream_Seek( p_stream->p_source, offset );
 
