@@ -660,11 +660,9 @@ static int Open( vlc_object_t * p_this )
 
     MP4_Box_t       *p_ftyp;
     MP4_Box_t       *p_rmra;
-    MP4_Box_t       *p_trak;
     const MP4_Box_t *p_mvhd = NULL;
     const MP4_Box_t *p_mvex = NULL;
 
-    unsigned int    i;
     bool      b_enabled_es;
 
     /* A little test to see if it could be a mp4 */
@@ -915,7 +913,7 @@ static int Open( vlc_object_t * p_this )
      * check that at least 1 stream is enabled */
     p_sys->p_tref_chap = NULL;
     b_enabled_es = false;
-    for( i = 0; i < p_sys->i_tracks; i++ )
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
 
@@ -935,9 +933,9 @@ static int Open( vlc_object_t * p_this )
         MP4_LoadMeta( p_sys, p_sys->p_meta );
 
     /* now process each track and extract all useful information */
-    for( i = 0; i < p_sys->i_tracks; i++ )
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
-        p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
+        MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%u]", i );
         MP4_TrackSetup( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
 
         if( p_sys->track[i].b_ok && !p_sys->track[i].b_chapters_source )
