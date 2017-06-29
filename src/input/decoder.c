@@ -424,7 +424,9 @@ static int vout_update_format( decoder_t *p_dec )
         vout_thread_t *p_vout;
 
         if( !p_dec->fmt_out.video.i_width ||
-            !p_dec->fmt_out.video.i_height )
+            !p_dec->fmt_out.video.i_height ||
+            p_dec->fmt_out.video.i_width < p_dec->fmt_out.video.i_visible_width ||
+            p_dec->fmt_out.video.i_height < p_dec->fmt_out.video.i_visible_height )
         {
             /* Can't create a new vout without display size */
             return -1;
