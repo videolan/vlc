@@ -105,47 +105,35 @@ int Import_M3U( vlc_object_t *p_this )
 
     /* File type: playlist, or not (HLS manifest or whatever else) */
     char *type = stream_MimeType(p_stream->p_source);
+    bool match;
+
+    if (p_stream->obj.force)
+        match = true;
+    else
     if (type != NULL
-     && (!vlc_ascii_strcasecmp(type, "application/vnd.apple.mpegurl")
-      || !vlc_ascii_strcasecmp(type, "audio/mpegurl")))
-    {
-        free(type);
-        return VLC_EGENERIC;
-    }
-
-    bool b_check_hls = true;
-
-    if( stream_HasExtension( p_stream, ".m3u8" ) )
-        ;
+     && !vlc_ascii_strcasecmp(type, "application/vnd.apple.mpegurl")) /* HLS */
+        match = false;
     else
-    if (stream_HasExtension(p_stream, ".vlc"))
-        b_check_hls = false;
+    if (stream_HasExtension(p_stream, ".m3u8")
+     || stream_HasExtension(p_stream, ".m3u")
+     || (type != NULL && vlc_ascii_strcasecmp(type, "audio/mpegurl") == 0))
+        match = !IsHLS(p_peek, i_peek);
     else
-    if (stream_HasExtension(p_stream, ".m3u")
-     || p_stream->obj.force
+    if (memcmp(p_peek, "#EXTM3U", 7 ) == 0
+     || stream_HasExtension(p_stream, ".vlc")
      || (type != NULL
-      && (!vlc_ascii_strcasecmp(type, "application/mpegurl")
-       || !vlc_ascii_strcasecmp(type, "application/x-mpegurl")
-       || !vlc_ascii_strcasecmp(type, "audio/mpegurl")
-       || !vlc_ascii_strcasecmp(type, "audio/x-mpegurl")))
+      && (vlc_ascii_strcasecmp(type, "application/mpegurl") == 0
+       || vlc_ascii_strcasecmp(type, "application/x-mpegurl") == 0
+       || vlc_ascii_strcasecmp(type, "audio/x-mpegurl") == 0))
+     || strncasecmp((const char *)p_peek, "RTSPtext", 8) == 0
      || ContainsURL(p_peek, i_peek))
-        ;
+        match = true;
     else
-    {   /* Guess encoding */
-        if( !strncasecmp( (const char *)p_peek, "RTSPtext", 8 ) ) /* QuickTime */
-        {
-            b_check_hls = false;
-        }
-        else if( memcmp( p_peek, "#EXTM3U", 7 ) )
-        {
-            free( type );
-            return VLC_EGENERIC;
-        }
-    }
+        match = false;
 
     free(type);
 
-    if (b_check_hls && IsHLS(p_peek, i_peek))
+    if (!match)
         return VLC_EGENERIC;
 
     if (offset != 0 && vlc_stream_Seek(p_stream->p_source, offset))
