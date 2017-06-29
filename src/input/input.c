@@ -2862,24 +2862,24 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
         if( asprintf( &psz_probe, psz_format, psz_base, i ) < 0 )
             break;
 
-        char *psz_path = get_path( psz_probe );
+        char *filepath = get_path( psz_probe );
 
         struct stat st;
-        if( psz_path == NULL ||
-            vlc_stat( psz_path, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
+        if( filepath == NULL ||
+            vlc_stat( filepath, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
         {
-            free( psz_path );
+            free( filepath );
             free( psz_probe );
             break;
         }
 
-        msg_Dbg( p_input, "Detected extra file `%s'", psz_path );
+        msg_Dbg( p_input, "Detected extra file `%s'", filepath );
 
-        char* psz_uri = vlc_path2uri( psz_path, NULL );
+        char* psz_uri = vlc_path2uri( filepath, NULL );
         if( psz_uri )
             TAB_APPEND( i_list, ppsz_list, psz_uri );
 
-        free( psz_path );
+        free( filepath );
         free( psz_probe );
     }
     free( psz_base );
