@@ -464,9 +464,9 @@ static void OutputStart( sout_stream_t *p_stream )
             }
 
             /* */
-            for( int i = 0; i < p_sys->i_id; i++ )
+            for( int j = 0; j < p_sys->i_id; j++ )
             {
-                sout_stream_id_sys_t *id = p_sys->id[i];
+                sout_stream_id_sys_t *id = p_sys->id[j];
 
                 if( id->id )
                     sout_StreamIdDel( p_sys->p_out, id->id );
