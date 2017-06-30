@@ -38,6 +38,7 @@ void InitDeinterlacingContext( struct deinterlace_ctx *p_context )
     p_context->settings.b_double_rate = false;
     p_context->settings.b_half_height = false;
     p_context->settings.b_use_frame_history = false;
+    p_context->settings.b_custom_pts = false;
 
     p_context->meta[0].pi_date = VLC_TS_INVALID;
     p_context->meta[0].pi_nb_fields = 2;
@@ -121,6 +122,8 @@ void GetDeinterlacingOutput( const struct deinterlace_ctx *p_context,
         p_dst->i_frame_rate *= 2;
     }
 }
+
+#define CUSTOM_PTS -1
 
 picture_t *DoDeinterlacing( filter_t *p_filter,
                             struct deinterlace_ctx *p_context, picture_t *p_pic )
@@ -278,6 +281,25 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
         if ( p_dst[2] )
             p_context->pf_render_ordered( p_filter, p_dst[1], p_pic,
                                           2, !b_top_field_first );
+    }
+
+    if ( p_context->settings.b_custom_pts )
+    {
+        assert(p_context->settings.b_use_frame_history);
+        if( p_context->pp_history[0] && p_context->pp_history[1] )
+        {
+            /* The next frame will get a custom timestamp, too. */
+            p_context->i_frame_offset = CUSTOM_PTS;
+        }
+        else if( !p_context->pp_history[0] && !p_context->pp_history[1] ) /* first frame */
+        {
+        }
+        else /* second frame */
+        {
+            /* At the next frame, the filter starts. The next frame will get
+               a custom timestamp. */
+            p_context->i_frame_offset = CUSTOM_PTS;
+        }
     }
 
     /* Set output timestamps, if the algorithm didn't request CUSTOM_PTS

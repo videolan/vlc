@@ -1521,9 +1521,6 @@ int RenderIVTC( filter_t *p_filter, picture_t *p_dst, picture_t *p_pic )
         /* Now we can... */
         bool b_have_output_frame = IVTCOutputOrDropFrame( p_filter, p_dst );
 
-        /* The next frame will get a custom timestamp, too. */
-        p_sys->context.i_frame_offset = CUSTOM_PTS;
-
         if( b_have_output_frame )
             return VLC_SUCCESS;
         else
@@ -1568,10 +1565,6 @@ int RenderIVTC( filter_t *p_filter, picture_t *p_dst, picture_t *p_pic )
            when the actual filter does.
         */
         p_ivtc->pi_final_scores[1] = p_ivtc->pi_scores[FIELD_PAIR_TNBN];
-
-        /* At the next frame, the filter starts. The next frame will get
-           a custom timestamp. */
-        p_sys->context.i_frame_offset = CUSTOM_PTS;
 
         picture_Copy( p_dst, p_next );
         return VLC_SUCCESS;
