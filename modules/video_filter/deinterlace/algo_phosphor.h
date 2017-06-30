@@ -101,7 +101,7 @@ typedef struct
  * @see Deinterlace()
  */
 int RenderPhosphor( filter_t *p_filter,
-                    picture_t *p_dst,
+                    picture_t *p_dst, picture_t *p_pic,
                     int i_order, int i_field );
 
 /*****************************************************************************

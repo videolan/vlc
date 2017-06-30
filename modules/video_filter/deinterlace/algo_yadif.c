@@ -47,6 +47,11 @@
    Necessary preprocessor macros are defined in common.h. */
 #include "yadif.h"
 
+int RenderYadifSingle( filter_t *p_filter, picture_t *p_dst, picture_t *p_src )
+{
+    return RenderYadif( p_filter, p_dst, p_src, 0, 0 );
+}
+
 int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
                  int i_order, int i_field )
 {
@@ -182,7 +187,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
                  as set by Open() or SetFilterMethod(). It is always 0. */
 
         /* FIXME not good as it does not use i_order/i_field */
-        RenderX( p_dst, p_next );
+        RenderX( p_filter, p_dst, p_next );
         return VLC_SUCCESS;
     }
     else

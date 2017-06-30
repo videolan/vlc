@@ -512,8 +512,9 @@ static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
  * Public functions
  *****************************************************************************/
 
-void RenderX( picture_t *p_outpic, picture_t *p_pic )
+int RenderX( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
 {
+    VLC_UNUSED(p_filter);
     int i_plane;
 #if defined (CAN_COMPILE_MMXEXT)
     const bool mmxext = vlc_CPU_MMXEXT();
@@ -569,4 +570,5 @@ void RenderX( picture_t *p_outpic, picture_t *p_pic )
     if( mmxext )
         emms();
 #endif
+    return VLC_SUCCESS;
 }

@@ -86,4 +86,9 @@ struct picture_t;
 int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
                  int i_order, int i_field );
 
+/**
+ * Same as RenderYadif() but with no temporal references
+ */
+int RenderYadifSingle( filter_t *p_filter, picture_t *p_dst, picture_t *p_src );
+
 #endif

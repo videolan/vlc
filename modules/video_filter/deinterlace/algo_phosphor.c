@@ -278,9 +278,10 @@ static void DarkenFieldMMX( picture_t *p_dst,
 
 /* See header for function doc. */
 int RenderPhosphor( filter_t *p_filter,
-                    picture_t *p_dst,
+                    picture_t *p_dst, picture_t *p_pic,
                     int i_order, int i_field )
 {
+    VLC_UNUSED(p_pic);
     assert( p_filter != NULL );
     assert( p_dst != NULL );
     assert( i_order >= 0 && i_order <= 2 ); /* 2 = soft field repeat */

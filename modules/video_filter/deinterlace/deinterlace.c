@@ -430,23 +430,23 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     switch( p_sys->i_mode )
     {
         case DEINTERLACE_DISCARD:
-            RenderDiscard( p_dst[0], p_pic, 0 );
+            RenderDiscard( p_filter, p_dst[0], p_pic );
             break;
 
         case DEINTERLACE_BOB:
-            RenderBob( p_dst[0], p_pic, !b_top_field_first );
+            RenderBob( p_filter, p_dst[0], p_pic, 0, !b_top_field_first );
             if( p_dst[1] )
-                RenderBob( p_dst[1], p_pic, b_top_field_first );
+                RenderBob( p_filter, p_dst[1], p_pic, 1, b_top_field_first );
             if( p_dst[2] )
-                RenderBob( p_dst[2], p_pic, !b_top_field_first );
+                RenderBob( p_filter, p_dst[2], p_pic, 2, !b_top_field_first );
             break;;
 
         case DEINTERLACE_LINEAR:
-            RenderLinear( p_filter, p_dst[0], p_pic, !b_top_field_first );
+            RenderLinear( p_filter, p_dst[0], p_pic, 0, !b_top_field_first );
             if( p_dst[1] )
-                RenderLinear( p_filter, p_dst[1], p_pic, b_top_field_first );
+                RenderLinear( p_filter, p_dst[1], p_pic, 1, b_top_field_first );
             if( p_dst[2] )
-                RenderLinear( p_filter, p_dst[2], p_pic, !b_top_field_first );
+                RenderLinear( p_filter, p_dst[2], p_pic, 2, !b_top_field_first );
             break;
 
         case DEINTERLACE_MEAN:
@@ -458,7 +458,7 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_X:
-            RenderX( p_dst[0], p_pic );
+            RenderX( p_filter, p_dst[0], p_pic );
             break;
 
         case DEINTERLACE_YADIF:
@@ -476,21 +476,21 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_PHOSPHOR:
-            if( RenderPhosphor( p_filter, p_dst[0], 0,
+            if( RenderPhosphor( p_filter, p_dst[0], p_pic, 0,
                                 !b_top_field_first ) )
                 goto drop;
             if( p_dst[1] )
-                RenderPhosphor( p_filter, p_dst[1], 1,
+                RenderPhosphor( p_filter, p_dst[1], p_pic, 1,
                                 b_top_field_first );
             if( p_dst[2] )
-                RenderPhosphor( p_filter, p_dst[2], 2,
+                RenderPhosphor( p_filter, p_dst[2], p_pic, 2,
                                 !b_top_field_first );
             break;
 
         case DEINTERLACE_IVTC:
             /* Note: RenderIVTC will automatically drop the duplicate frames
                      produced by IVTC. This is part of normal operation. */
-            if( RenderIVTC( p_filter, p_dst[0] ) )
+            if( RenderIVTC( p_filter, p_dst[0], p_pic ) )
                 goto drop;
             break;
     }

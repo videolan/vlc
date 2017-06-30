@@ -141,7 +141,7 @@ typedef struct
  * @see CalculateInterlaceScore()
  * @see EstimateNumBlocksWithMotion()
  */
-int RenderIVTC( filter_t *p_filter, picture_t *p_dst );
+int RenderIVTC( filter_t *p_filter, picture_t *p_dst, picture_t *p_pic );
 
 /**
  * Clears the inverse telecine subsystem state.

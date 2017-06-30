@@ -46,11 +46,10 @@ struct picture_t;
  *
  * @param p_outpic Output frame. Must be allocated by caller.
  * @param p_pic Input frame. Must exist.
- * @param i_field Keep which field? 0 = top field, 1 = bottom field.
  * @see RenderBob()
  * @see Deinterlace()
  */
-void RenderDiscard( picture_t *p_outpic, picture_t *p_pic, int i_field );
+int RenderDiscard( filter_t *, picture_t *p_outpic, picture_t *p_pic );
 
 /**
  * RenderBob: basic framerate doubler.
@@ -65,7 +64,8 @@ void RenderDiscard( picture_t *p_outpic, picture_t *p_pic, int i_field );
  * @see RenderLinear()
  * @see Deinterlace()
  */
-void RenderBob( picture_t *p_outpic, picture_t *p_pic, int i_field );
+int RenderBob( filter_t *,
+               picture_t *p_outpic, picture_t *p_pic, int order, int i_field );
 
 /**
  * RenderLinear: Bob with linear interpolation.
@@ -79,8 +79,8 @@ void RenderBob( picture_t *p_outpic, picture_t *p_pic, int i_field );
  * @see RenderBob()
  * @see Deinterlace()
  */
-void RenderLinear( filter_t *p_filter,
-                   picture_t *p_outpic, picture_t *p_pic, int i_field );
+int RenderLinear( filter_t *p_filter,
+                  picture_t *p_outpic, picture_t *p_pic, int order, int i_field );
 
 /**
  * RenderMean: half-resolution blender.
@@ -94,8 +94,7 @@ void RenderLinear( filter_t *p_filter,
  * @param p_pic Input frame. Must exist.
  * @see Deinterlace()
  */
-void RenderMean( filter_t *p_filter,
-                 picture_t *p_outpic, picture_t *p_pic );
+int RenderMean( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic );
 
 /**
  * RenderBlend: full-resolution blender.
@@ -110,7 +109,6 @@ void RenderMean( filter_t *p_filter,
  * @param p_pic Input frame. Must exist.
  * @see Deinterlace()
  */
-void RenderBlend( filter_t *p_filter,
-                  picture_t *p_outpic, picture_t *p_pic );
+int RenderBlend( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic );
 
 #endif

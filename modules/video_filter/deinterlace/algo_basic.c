@@ -43,9 +43,9 @@
  * RenderDiscard: only keep TOP or BOTTOM field, discard the other.
  *****************************************************************************/
 
-void RenderDiscard( picture_t *p_outpic, picture_t *p_pic, int i_field )
+int RenderDiscard( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
 {
-    assert(i_field == 0);
+    VLC_UNUSED(p_filter);
     int i_plane;
 
     /* Copy image and skip lines */
@@ -67,14 +67,18 @@ void RenderDiscard( picture_t *p_outpic, picture_t *p_pic, int i_field )
             p_in += 2 * p_pic->p[i_plane].i_pitch;
         }
     }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * RenderBob: renders a BOB picture - simple copy
  *****************************************************************************/
 
-void RenderBob( picture_t *p_outpic, picture_t *p_pic, int i_field )
+int RenderBob( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
+               int order, int i_field )
 {
+    VLC_UNUSED(p_filter);
+    VLC_UNUSED(order);
     int i_plane;
 
     /* Copy image and skip lines */
@@ -119,15 +123,18 @@ void RenderBob( picture_t *p_outpic, picture_t *p_pic, int i_field )
             memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
         }
     }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * RenderLinear: BOB with linear interpolation
  *****************************************************************************/
 
-void RenderLinear( filter_t *p_filter,
-                   picture_t *p_outpic, picture_t *p_pic, int i_field )
+int RenderLinear( filter_t *p_filter,
+                  picture_t *p_outpic, picture_t *p_pic, int order, int i_field )
 {
+    VLC_UNUSED(p_filter);
+    VLC_UNUSED(order);
     int i_plane;
 
     /* Copy image and skip lines */
@@ -174,15 +181,16 @@ void RenderLinear( filter_t *p_filter,
         }
     }
     EndMerge();
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * RenderMean: Half-resolution blender
  *****************************************************************************/
 
-void RenderMean( filter_t *p_filter,
-                 picture_t *p_outpic, picture_t *p_pic )
+int RenderMean( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
 {
+    VLC_UNUSED(p_filter);
     int i_plane;
 
     /* Copy image and skip lines */
@@ -207,15 +215,16 @@ void RenderMean( filter_t *p_filter,
         }
     }
     EndMerge();
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * RenderBlend: Full-resolution blender
  *****************************************************************************/
 
-void RenderBlend( filter_t *p_filter,
-                  picture_t *p_outpic, picture_t *p_pic )
+int RenderBlend( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
 {
+    VLC_UNUSED(p_filter);
     int i_plane;
 
     /* Copy image and skip lines */
@@ -244,4 +253,5 @@ void RenderBlend( filter_t *p_filter,
         }
     }
     EndMerge();
+    return VLC_SUCCESS;
 }
