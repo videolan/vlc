@@ -35,9 +35,9 @@
 
 void InitDeinterlacingContext( struct deinterlace_ctx *p_context )
 {
-    p_context->b_double_rate = false;
-    p_context->b_half_height = false;
-    p_context->b_use_frame_history = false;
+    p_context->settings.b_double_rate = false;
+    p_context->settings.b_half_height = false;
+    p_context->settings.b_use_frame_history = false;
 
     p_context->meta[0].pi_date = VLC_TS_INVALID;
     p_context->meta[0].pi_nb_fields = 2;
@@ -108,7 +108,7 @@ void GetDeinterlacingOutput( const struct deinterlace_ctx *p_context,
 {
     *p_dst = *p_src;
 
-    if( p_context->b_half_height )
+    if( p_context->settings.b_half_height )
     {
         p_dst->i_height /= 2;
         p_dst->i_visible_height /= 2;
@@ -116,7 +116,7 @@ void GetDeinterlacingOutput( const struct deinterlace_ctx *p_context,
         p_dst->i_sar_den *= 2;
     }
 
-    if( p_context->b_double_rate )
+    if( p_context->settings.b_double_rate )
     {
         p_dst->i_frame_rate *= 2;
     }
@@ -151,7 +151,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
 
     /* Update the input frame history, if the currently active algorithm
        needs it. */
-    if( p_context->b_use_frame_history )
+    if( p_context->settings.b_use_frame_history )
     {
         /* Keep reference for the picture */
         picture_t *p_dup = picture_Hold( p_pic );
@@ -192,7 +192,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
         /* Framerate doublers must not request CUSTOM_PTS, as they need the
            original field timings, and need Deinterlace() to allocate the
            correct number of output frames. */
-        assert( !p_context->b_double_rate );
+        assert( !p_context->settings.b_double_rate );
 
         /* NOTE: i_nb_fields is only used for framerate doublers, so it is
                  unused in this case. b_top_field_first is only passed to the
@@ -211,7 +211,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
                                         framerate doublers. Will be inited
                                         below. Declared here because the
                                         PTS logic needs the result. */
-    if( p_context->b_double_rate )
+    if( p_context->settings.b_double_rate )
     {
         i_double_rate_alloc_end = i_nb_fields;
         if( i_nb_fields > DEINTERLACE_DST_SIZE )
@@ -256,11 +256,11 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
            Note that now p_dst[i] != NULL
            for 0 <= i < i_double_rate_alloc_end. */
     }
-    assert( p_context->b_double_rate  ||  p_dst[1] == NULL );
+    assert( p_context->settings.b_double_rate  ||  p_dst[1] == NULL );
     assert( i_nb_fields > 2  ||  p_dst[2] == NULL );
 
     /* Render */
-    if ( !p_context->b_double_rate )
+    if ( !p_context->settings.b_double_rate )
     {
         if ( p_context->pf_render_single_pic( p_filter, p_dst[0], p_pic ) )
             goto drop;
@@ -294,7 +294,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
                  when i_frame_offset > 0. */
         p_dst[0]->date = i_base_pts;
 
-        if( p_context->b_double_rate )
+        if( p_context->settings.b_double_rate )
         {
             mtime_t i_field_dur = GetFieldDuration( p_context, &p_filter->fmt_out.video, p_pic );
             /* Processing all actually allocated output frames. */

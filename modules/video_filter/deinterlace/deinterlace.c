@@ -151,9 +151,9 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
     if ( mode == NULL )
         mode = "auto";
 
-    p_sys->context.b_double_rate = false;
-    p_sys->context.b_half_height = false;
-    p_sys->context.b_use_frame_history = false;
+    p_sys->context.settings.b_double_rate = false;
+    p_sys->context.settings.b_half_height = false;
+    p_sys->context.settings.b_use_frame_history = false;
 
     if ( !strcmp( mode, "auto" ) )
     {
@@ -162,22 +162,22 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
     else if( !strcmp( mode, "discard" ) )
     {
         p_sys->context.pf_render_single_pic = RenderDiscard;
-        p_sys->context.b_half_height = true;
+        p_sys->context.settings.b_half_height = true;
     }
     else if( !strcmp( mode, "bob" ) || !strcmp( mode, "progressive-scan" ) )
     {
         p_sys->context.pf_render_ordered = RenderBob;
-        p_sys->context.b_double_rate = true;
+        p_sys->context.settings.b_double_rate = true;
     }
     else if( !strcmp( mode, "linear" ) )
     {
         p_sys->context.pf_render_ordered = RenderLinear;
-        p_sys->context.b_double_rate = true;
+        p_sys->context.settings.b_double_rate = true;
     }
     else if( !strcmp( mode, "mean" ) )
     {
         p_sys->context.pf_render_single_pic = RenderMean;
-        p_sys->context.b_half_height = true;
+        p_sys->context.settings.b_half_height = true;
     }
     else if( !strcmp( mode, "blend" ) )
     {
@@ -192,13 +192,13 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
     else if( !strcmp( mode, "yadif" ) )
     {
         p_sys->context.pf_render_ordered = RenderYadif;
-        p_sys->context.b_use_frame_history = true;
+        p_sys->context.settings.b_use_frame_history = true;
     }
     else if( !strcmp( mode, "yadif2x" ) )
     {
         p_sys->context.pf_render_ordered = RenderYadif;
-        p_sys->context.b_double_rate = true;
-        p_sys->context.b_use_frame_history = true;
+        p_sys->context.settings.b_double_rate = true;
+        p_sys->context.settings.b_use_frame_history = true;
     }
     else if( p_sys->chroma->pixel_size > 1 )
     {
@@ -213,13 +213,13 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
     else if( !strcmp( mode, "phosphor" ) )
     {
         p_sys->context.pf_render_ordered = RenderPhosphor;
-        p_sys->context.b_double_rate = true;
-        p_sys->context.b_use_frame_history = true;
+        p_sys->context.settings.b_double_rate = true;
+        p_sys->context.settings.b_use_frame_history = true;
     }
     else if( !strcmp( mode, "ivtc" ) )
     {
         p_sys->context.pf_render_single_pic = RenderIVTC;
-        p_sys->context.b_use_frame_history = true;
+        p_sys->context.settings.b_use_frame_history = true;
     }
     else
         msg_Err( p_filter, "unknown deinterlace mode \"%s\"", mode );
@@ -276,7 +276,7 @@ int Mouse( filter_t *p_filter,
 {
     VLC_UNUSED(p_old);
     *p_mouse = *p_new;
-    if( p_filter->p_sys->context.b_half_height )
+    if( p_filter->p_sys->context.settings.b_half_height )
         p_mouse->i_y *= 2;
     return VLC_SUCCESS;
 }

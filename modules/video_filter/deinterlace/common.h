@@ -56,12 +56,16 @@ typedef struct {
 #define HISTORY_SIZE (3)
 #define CUSTOM_PTS -1
 
+typedef struct  {
+    bool b_double_rate;       /**< Shall we double the framerate? */
+    bool b_use_frame_history; /**< Use the input frame history buffer? */
+    bool b_half_height;       /**< Shall be divide the height by 2 */
+} deinterlace_algo;
+
 struct deinterlace_ctx
 {
     /* Algorithm behaviour flags */
-    bool b_double_rate;       /**< Shall we double the framerate? */
-    bool b_half_height;       /**< Shall be divide the height by 2 */
-    bool b_use_frame_history; /**< Use the input frame history buffer? */
+    deinterlace_algo   settings;
 
     /**
      * Metadata history (PTS, nb_fields, TFF). Used for framerate doublers.
