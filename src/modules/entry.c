@@ -209,7 +209,7 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             }
 
             *(va_arg (ap, module_t **)) = submodule;
-            if (module == NULL)
+            if (super == NULL)
                 break;
 
             /* Inheritance. Ugly!! */
