@@ -206,7 +206,14 @@ static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface)
 static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_index)
 {
     directx_sys_t *dx_sys = &va->sys->dx_sys;
-    return CreatePicContext(dx_sys->hw_surface[surface_index]);
+    struct va_pic_context *pic_ctx = CreatePicContext(dx_sys->hw_surface[surface_index]);
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    /* all the resources are acquired during surfaces init, and a second time in
+     * CreatePicContext(), undo one of them otherwise we need an extra release
+     * when the pool is emptied */
+    ReleasePictureSys(&pic_ctx->picsys);
+    return pic_ctx;
 }
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
@@ -749,6 +756,8 @@ static void DxDestroyVideoDecoder(vlc_va_t *va)
     {
         IDirectXVideoDecoder_Release(dx_sys->decoder);
         dx_sys->decoder = NULL;
+        for (unsigned i = 0; i < dx_sys->va_pool.surface_count; i++)
+            IDirect3DSurface9_Release(dx_sys->hw_surface[i]);
     }
 }
 
