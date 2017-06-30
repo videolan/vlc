@@ -135,6 +135,43 @@ static const char *const ppsz_filter_options[] = {
  * SetFilterMethod: setup the deinterlace method to use.
  *****************************************************************************/
 
+struct filter_mode_t
+{
+    const char           *psz_mode;
+    union {
+    int (*pf_render_ordered)(filter_t *, picture_t *p_dst, picture_t *p_pic,
+                             int order, int i_field);
+    int (*pf_render_single_pic)(filter_t *, picture_t *p_dst, picture_t *p_pic);
+    };
+    deinterlace_algo     settings;
+    bool                 can_pack;         /**< can handle packed pixel */
+    bool                 b_high_bit_depth; /**< can handle high bit depth */
+};
+static struct filter_mode_t filter_mode [] = {
+    { "discard", .pf_render_single_pic = RenderDiscard,
+                 { false, false, false, true }, true, true },
+    { "bob", .pf_render_ordered = RenderBob,
+                 { true, false, false }, true, true },
+    { "progressive-scan", .pf_render_ordered = RenderBob,
+                 { true, false, false }, true, true },
+    { "linear", .pf_render_ordered = RenderLinear,
+                 { true, false, false }, true, true },
+    { "mean", .pf_render_single_pic = RenderMean,
+                 { false, false, true }, true, true },
+    { "blend", .pf_render_single_pic = RenderBlend,
+                 { false, false, false }, true, true },
+    { "yadif", .pf_render_single_pic = RenderYadifSingle,
+                 { false, true, false }, false, true },
+    { "yadif2x", .pf_render_ordered = RenderYadif,
+                 { true, true, false }, false, true },
+    { "x", .pf_render_single_pic = RenderX,
+                 { false, false, false }, false, false },
+    { "phosphor", .pf_render_ordered = RenderPhosphor,
+                 { true, true, false }, false, false },
+    { "ivtc", .pf_render_single_pic = RenderIVTC,
+                 { false, true, false }, false, false },
+};
+
 /**
  * Setup the deinterlace method to use.
  *
@@ -148,83 +185,36 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if ( mode == NULL )
-        mode = "auto";
+    if ( mode == NULL || !strcmp( mode, "auto" ) )
+        mode = "x";
 
-    p_sys->context.settings.b_double_rate = false;
-    p_sys->context.settings.b_half_height = false;
-    p_sys->context.settings.b_use_frame_history = false;
+    for ( size_t i = 0; i < ARRAY_SIZE(filter_mode); i++ )
+    {
+        if( !strcmp( mode, filter_mode[i].psz_mode ) )
+        {
+            if ( pack && !filter_mode[i].can_pack )
+            {
+                msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
+                        " for packed format", mode );
+                SetFilterMethod( p_filter, "blend", pack );
+                return;
+            }
+            if( p_sys->chroma->pixel_size > 1 && !filter_mode[i].b_high_bit_depth )
+            {
+                msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
+                        " for high depth format", mode );
+                SetFilterMethod( p_filter, "blend", pack );
+                return;
+            }
 
-    if ( !strcmp( mode, "auto" ) )
-    {
-        p_sys->context.pf_render_single_pic = RenderX;
+            msg_Dbg( p_filter, "using %s deinterlace method", mode );
+            p_filter->p_sys->context.settings = filter_mode[i].settings;
+            p_filter->p_sys->context.pf_render_ordered = filter_mode[i].pf_render_ordered;
+            return;
+        }
     }
-    else if( !strcmp( mode, "discard" ) )
-    {
-        p_sys->context.pf_render_single_pic = RenderDiscard;
-        p_sys->context.settings.b_half_height = true;
-    }
-    else if( !strcmp( mode, "bob" ) || !strcmp( mode, "progressive-scan" ) )
-    {
-        p_sys->context.pf_render_ordered = RenderBob;
-        p_sys->context.settings.b_double_rate = true;
-    }
-    else if( !strcmp( mode, "linear" ) )
-    {
-        p_sys->context.pf_render_ordered = RenderLinear;
-        p_sys->context.settings.b_double_rate = true;
-    }
-    else if( !strcmp( mode, "mean" ) )
-    {
-        p_sys->context.pf_render_single_pic = RenderMean;
-        p_sys->context.settings.b_half_height = true;
-    }
-    else if( !strcmp( mode, "blend" ) )
-    {
-        p_sys->context.pf_render_single_pic = RenderBlend;
-    }
-    else if( pack )
-    {
-        msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
-                 " for packed format", mode );
-        return SetFilterMethod( p_filter, "auto", pack );
-    }
-    else if( !strcmp( mode, "yadif" ) )
-    {
-        p_sys->context.pf_render_ordered = RenderYadif;
-        p_sys->context.settings.b_use_frame_history = true;
-    }
-    else if( !strcmp( mode, "yadif2x" ) )
-    {
-        p_sys->context.pf_render_ordered = RenderYadif;
-        p_sys->context.settings.b_double_rate = true;
-        p_sys->context.settings.b_use_frame_history = true;
-    }
-    else if( p_sys->chroma->pixel_size > 1 )
-    {
-        msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
-                 " for high depth format", mode );
-        return SetFilterMethod(p_filter, "auto", pack);
-    }
-    else if( !strcmp( mode, "x" ) )
-    {
-        p_sys->context.pf_render_single_pic = RenderX;
-    }
-    else if( !strcmp( mode, "phosphor" ) )
-    {
-        p_sys->context.pf_render_ordered = RenderPhosphor;
-        p_sys->context.settings.b_double_rate = true;
-        p_sys->context.settings.b_use_frame_history = true;
-    }
-    else if( !strcmp( mode, "ivtc" ) )
-    {
-        p_sys->context.pf_render_single_pic = RenderIVTC;
-        p_sys->context.settings.b_use_frame_history = true;
-    }
-    else
-        msg_Err( p_filter, "unknown deinterlace mode \"%s\"", mode );
 
-    msg_Dbg( p_filter, "using %s deinterlace method", mode );
+    msg_Err( p_filter, "unknown deinterlace mode \"%s\"", mode );
 }
 
 /**
