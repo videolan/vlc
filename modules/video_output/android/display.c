@@ -67,6 +67,7 @@ vlc_module_begin()
     add_submodule ()
         set_description("Android opaque video output")
         set_capability("vout display", 280)
+        add_shortcut("android-opaque")
         set_callbacks(OpenOpaque, Close)
 vlc_module_end()
 
