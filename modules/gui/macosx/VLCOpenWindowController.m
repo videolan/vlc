@@ -217,6 +217,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_fileStartTimeTextField setFormatter:[[PositionFormatter alloc] init]];
     [_fileStopTimeTextField setFormatter:[[PositionFormatter alloc] init]];
 
+    // Auto collapse MRL field
+    self.mrlViewHeightConstraint.constant = 0;
+
     [self updateQTKVideoDevices];
     [_qtkVideoDevicePopup removeAllItems];
     msg_Dbg(getIntf(), "Found %lu video capture devices", _avvideoDevices.count);
@@ -570,33 +573,11 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (IBAction)expandMRLfieldAction:(id)sender
 {
-    NSRect windowRect = [self.window frame];
-    NSRect viewRect = [_mrlView frame];
-
     if ([_mrlButton state] == NSOffState) {
-        /* we need to collaps, restore the panel size */
-        windowRect.size.height = windowRect.size.height - viewRect.size.height;
-        windowRect.origin.y = (windowRect.origin.y + viewRect.size.height) - viewRect.size.height;
-
-        /* remove the MRL view */
-        [_mrlView removeFromSuperview];
+        self.mrlViewHeightConstraint.animator.constant = 0;
     } else {
-        /* we need to expand */
-        [_mrlView setFrame: NSMakeRect(0,
-                                       [_mrlButton frame].origin.y,
-                                       viewRect.size.width,
-                                       viewRect.size.height)];
-        [_mrlView setNeedsDisplay: NO];
-        [_mrlView setAutoresizesSubviews: YES];
-
-        /* enlarge panel size for MRL view */
-        windowRect.size.height = windowRect.size.height + viewRect.size.height;
+        self.mrlViewHeightConstraint.animator.constant = 39;
     }
-
-    [[self.window animator] setFrame: windowRect display:YES];
-
-    if ([_mrlButton state] == NSOnState)
-        [[self.window contentView] addSubview: _mrlView];
 }
 
 - (void)openFileGeneric

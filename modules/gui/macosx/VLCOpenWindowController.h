@@ -33,6 +33,7 @@
 @property (readwrite, weak) IBOutlet NSView *mrlView;
 @property (readwrite, weak) IBOutlet NSButton *mrlButton;
 @property (readwrite, weak) IBOutlet NSTabView *tabView;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *mrlViewHeightConstraint;
 
 @property (readwrite, weak) IBOutlet NSButton *okButton;
 @property (readwrite, weak) IBOutlet NSButton *cancelButton;
