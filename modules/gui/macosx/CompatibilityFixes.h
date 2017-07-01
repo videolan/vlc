@@ -54,5 +54,5 @@ typedef NSUInteger NSWindowStyleMask;
 
 #endif
 
-void swapoutOverride(Class cls, SEL selector);
+void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);
 
