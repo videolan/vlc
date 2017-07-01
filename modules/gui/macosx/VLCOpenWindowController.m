@@ -134,6 +134,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_okButton setTitle: _NS("Open")];
     [_cancelButton setTitle: _NS("Cancel")];
 
+    [_outputCheckbox setTitle:_NS("Stream output:")];
+    [_outputSettingsButton setTitle:_NS("Settings...")];
+
     [[_tabView tabViewItemAtIndex: 0] setLabel: _NS("File")];
     [_tabView accessibilitySetOverrideValue:_NS("4 Tabs to choose between media input. Select 'File' for files, 'Disc' for optical media such as DVDs, Audio CDs or BRs, 'Network' for network streams or 'Capture' for Input Devices such as microphones or cameras.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[_tabView tabViewItemAtIndex: 1] setLabel: _NS("Disc")];
