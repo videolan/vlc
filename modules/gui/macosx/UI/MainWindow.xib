@@ -445,7 +445,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="716" height="36"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="jlp-Z2-Qdl" userLabel="Playback Buttons">
-                                        <rect key="frame" x="6" y="7" width="141" height="23"/>
+                                        <rect key="frame" x="8" y="7" width="141" height="23"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="qfh-30-nky" userLabel="Previous Button">
                                                 <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
@@ -531,7 +531,7 @@
                                         </constraints>
                                     </customView>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="3647">
-                                        <rect key="frame" x="149" y="6" width="29" height="23"/>
+                                        <rect key="frame" x="153" y="6" width="29" height="23"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="23" id="m6O-Hj-xpC"/>
                                         </constraints>
@@ -544,7 +544,7 @@
                                         </connections>
                                     </button>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="mrr-Bw-co0" userLabel="Left Control Buttons">
-                                        <rect key="frame" x="180" y="6" width="85" height="23"/>
+                                        <rect key="frame" x="186" y="6" width="85" height="23"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="4671">
                                                 <rect key="frame" x="0.0" y="0.0" width="28" height="23"/>
@@ -600,19 +600,19 @@
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="5335" customClass="VLCProgressView">
-                                        <rect key="frame" x="271" y="11" width="247" height="14"/>
+                                        <rect key="frame" x="279" y="11" width="223" height="14"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="4919" customClass="VLCThreePartImageView">
-                                                <rect key="frame" x="0.0" y="0.0" width="247" height="14"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="223" height="14"/>
                                             </customView>
                                             <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4701" customClass="VLCThreePartImageView">
                                                 <rect key="frame" x="1" y="1" width="70" height="12"/>
                                             </customView>
                                             <progressIndicator hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="3584" userLabel="Buffering Bar">
-                                                <rect key="frame" x="0.0" y="1" width="247" height="12"/>
+                                                <rect key="frame" x="0.0" y="1" width="223" height="12"/>
                                             </progressIndicator>
-                                            <slider hidden="YES" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4422" customClass="TimeLineSlider">
-                                                <rect key="frame" x="0.0" y="0.0" width="247" height="15"/>
+                                            <slider hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4422" customClass="TimeLineSlider">
+                                                <rect key="frame" x="0.0" y="1" width="223" height="15"/>
                                                 <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" doubleValue="3204.0777439024391" tickMarkPosition="above" sliderType="linear" id="4425">
                                                     <font key="font" size="12" name="Helvetica"/>
                                                 </sliderCell>
@@ -636,7 +636,7 @@
                                         </constraints>
                                     </customView>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4423" customClass="VLCTimeField">
-                                        <rect key="frame" x="520" y="11" width="56" height="13"/>
+                                        <rect key="frame" x="508" y="11" width="56" height="13"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="52" id="oTA-8E-R2c"/>
                                         </constraints>
@@ -647,7 +647,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="3653">
-                                        <rect key="frame" x="577" y="13" width="5" height="11"/>
+                                        <rect key="frame" x="570" y="13" width="5" height="11"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="11" id="fR7-Fz-iWX"/>
                                         </constraints>
@@ -659,8 +659,8 @@
                                             <action selector="volumeAction:" target="5339" id="5361"/>
                                         </connections>
                                     </button>
-                                    <slider verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3649" customClass="ITSlider">
-                                        <rect key="frame" x="585" y="9" width="48" height="15"/>
+                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3649" customClass="ITSlider">
+                                        <rect key="frame" x="578" y="11" width="48" height="15"/>
                                         <ciFilter key="compositingFilter" name="CISourceOverCompositing">
                                             <configuration>
                                                 <null key="inputBackgroundImage"/>
@@ -675,7 +675,7 @@
                                         </connections>
                                     </slider>
                                     <imageView translatesAutoresizingMaskIntoConstraints="NO" id="4417">
-                                        <rect key="frame" x="585" y="16" width="48" height="5"/>
+                                        <rect key="frame" x="578" y="16" width="48" height="5"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="5" id="Xxv-t7-alW"/>
                                         </constraints>
@@ -688,7 +688,7 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="volume-slider-track" id="4418"/>
                                     </imageView>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="3652">
-                                        <rect key="frame" x="636" y="12" width="13" height="11"/>
+                                        <rect key="frame" x="629" y="12" width="13" height="11"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="11" id="2hO-Uc-UqJ"/>
                                         </constraints>
@@ -701,7 +701,7 @@
                                         </connections>
                                     </button>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="dff-fl-Mde" userLabel="Right control Buttons">
-                                        <rect key="frame" x="651" y="6" width="58" height="23"/>
+                                        <rect key="frame" x="650" y="6" width="58" height="23"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="3654">
                                                 <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
@@ -757,9 +757,9 @@
                                     <constraint firstItem="3652" firstAttribute="leading" secondItem="3649" secondAttribute="trailing" constant="3" id="Apb-gM-P9J"/>
                                     <constraint firstItem="4423" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="HUU-wF-duH"/>
                                     <constraint firstItem="jlp-Z2-Qdl" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="Hnv-b4-wWi"/>
-                                    <constraint firstItem="5335" firstAttribute="leading" secondItem="mrr-Bw-co0" secondAttribute="trailing" constant="6" id="I5r-X9-Qdm"/>
+                                    <constraint firstItem="5335" firstAttribute="leading" secondItem="mrr-Bw-co0" secondAttribute="trailing" constant="8" symbolic="YES" id="I5r-X9-Qdm"/>
                                     <constraint firstItem="5335" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="MpQ-gv-fno"/>
-                                    <constraint firstItem="dff-fl-Mde" firstAttribute="leading" secondItem="3652" secondAttribute="trailing" constant="2" id="TVP-Cr-bfO"/>
+                                    <constraint firstItem="dff-fl-Mde" firstAttribute="leading" secondItem="3652" secondAttribute="trailing" constant="8" symbolic="YES" id="TVP-Cr-bfO"/>
                                     <constraint firstItem="4417" firstAttribute="trailing" secondItem="3649" secondAttribute="trailing" id="WUo-ur-GGy"/>
                                     <constraint firstItem="3647" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="WdH-6H-Xhc"/>
                                     <constraint firstItem="4417" firstAttribute="leading" secondItem="3649" secondAttribute="leading" id="b86-zP-VqN"/>
@@ -767,13 +767,13 @@
                                     <constraint firstItem="dff-fl-Mde" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="gqZ-nc-67e"/>
                                     <constraint firstItem="3649" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="ll4-Gr-Hs6"/>
                                     <constraint firstItem="3652" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="o7m-oP-mfd"/>
-                                    <constraint firstItem="jlp-Z2-Qdl" firstAttribute="leading" secondItem="5608" secondAttribute="leading" constant="6" id="odn-Ek-4d1"/>
-                                    <constraint firstItem="3653" firstAttribute="leading" secondItem="4423" secondAttribute="trailing" constant="3" id="tn5-dP-NYa"/>
-                                    <constraint firstItem="4423" firstAttribute="leading" secondItem="5335" secondAttribute="trailing" constant="4" id="tvk-Cf-6uD"/>
-                                    <constraint firstItem="3647" firstAttribute="leading" secondItem="jlp-Z2-Qdl" secondAttribute="trailing" constant="2" id="ucM-uq-yJA"/>
-                                    <constraint firstItem="mrr-Bw-co0" firstAttribute="leading" secondItem="3647" secondAttribute="trailing" constant="2" id="vZh-zx-o9s"/>
+                                    <constraint firstItem="jlp-Z2-Qdl" firstAttribute="leading" secondItem="5608" secondAttribute="leading" constant="8" id="odn-Ek-4d1"/>
+                                    <constraint firstItem="3653" firstAttribute="leading" secondItem="4423" secondAttribute="trailing" constant="8" symbolic="YES" id="tn5-dP-NYa"/>
+                                    <constraint firstItem="4423" firstAttribute="leading" secondItem="5335" secondAttribute="trailing" constant="8" symbolic="YES" id="tvk-Cf-6uD"/>
+                                    <constraint firstItem="3647" firstAttribute="leading" secondItem="jlp-Z2-Qdl" secondAttribute="trailing" constant="4" id="ucM-uq-yJA"/>
+                                    <constraint firstItem="mrr-Bw-co0" firstAttribute="leading" secondItem="3647" secondAttribute="trailing" constant="4" id="vZh-zx-o9s"/>
                                     <constraint firstItem="3649" firstAttribute="leading" secondItem="3653" secondAttribute="trailing" constant="3" id="wz6-Z8-Pow"/>
-                                    <constraint firstAttribute="trailing" secondItem="dff-fl-Mde" secondAttribute="trailing" constant="7" id="yih-A2-DNj"/>
+                                    <constraint firstAttribute="trailing" secondItem="dff-fl-Mde" secondAttribute="trailing" constant="8" id="yih-A2-DNj"/>
                                 </constraints>
                             </customView>
                         </subviews>

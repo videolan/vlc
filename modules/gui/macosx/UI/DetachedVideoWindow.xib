@@ -116,7 +116,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="363" height="36"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Vae-cT-EEI" userLabel="Play controls group">
-                                        <rect key="frame" x="6" y="6" width="85" height="23"/>
+                                        <rect key="frame" x="8" y="6" width="85" height="23"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="11">
                                                 <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
@@ -164,19 +164,19 @@
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="6" customClass="VLCProgressView">
-                                        <rect key="frame" x="96" y="10" width="170" height="14"/>
+                                        <rect key="frame" x="101" y="10" width="157" height="14"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="22" customClass="VLCThreePartImageView">
-                                                <rect key="frame" x="0.0" y="0.0" width="170" height="14"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="157" height="14"/>
                                             </customView>
                                             <progressIndicator hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="21" userLabel="Buffering bar">
-                                                <rect key="frame" x="0.0" y="1" width="170" height="12"/>
+                                                <rect key="frame" x="0.0" y="1" width="157" height="12"/>
                                             </progressIndicator>
                                             <customView hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="VLCThreePartImageView">
                                                 <rect key="frame" x="1" y="1" width="60" height="12"/>
                                             </customView>
-                                            <slider hidden="YES" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="TimeLineSlider">
-                                                <rect key="frame" x="0.0" y="0.0" width="170" height="15"/>
+                                            <slider hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="TimeLineSlider">
+                                                <rect key="frame" x="0.0" y="1" width="157" height="15"/>
                                                 <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" doubleValue="3260.3068524096384" tickMarkPosition="above" sliderType="linear" id="23">
                                                     <font key="font" size="12" name="Helvetica"/>
                                                 </sliderCell>
@@ -200,7 +200,7 @@
                                         </constraints>
                                     </customView>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
-                                        <rect key="frame" x="268" y="11" width="56" height="13"/>
+                                        <rect key="frame" x="264" y="11" width="56" height="13"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="52" id="EvZ-Sy-m25"/>
                                             <constraint firstAttribute="height" constant="13" id="LYT-Sd-Gf6"/>
@@ -212,7 +212,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="8">
-                                        <rect key="frame" x="327" y="6" width="29" height="23"/>
+                                        <rect key="frame" x="326" y="6" width="29" height="23"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="23" id="fNg-pN-oQw"/>
                                         </constraints>
@@ -227,11 +227,11 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="9" firstAttribute="centerY" secondItem="6" secondAttribute="centerY" id="7ZU-On-ZZb"/>
-                                    <constraint firstItem="6" firstAttribute="leading" secondItem="Vae-cT-EEI" secondAttribute="trailing" constant="5" id="GU7-gS-983"/>
+                                    <constraint firstItem="6" firstAttribute="leading" secondItem="Vae-cT-EEI" secondAttribute="trailing" constant="8" symbolic="YES" id="GU7-gS-983"/>
                                     <constraint firstItem="8" firstAttribute="centerY" secondItem="9" secondAttribute="centerY" id="IBe-RR-daQ"/>
-                                    <constraint firstAttribute="trailing" secondItem="8" secondAttribute="trailing" constant="7" id="Kfi-X6-dCb"/>
+                                    <constraint firstAttribute="trailing" secondItem="8" secondAttribute="trailing" constant="8" id="Kfi-X6-dCb"/>
                                     <constraint firstItem="Vae-cT-EEI" firstAttribute="centerY" secondItem="65" secondAttribute="centerY" id="L8J-t8-eZg"/>
-                                    <constraint firstItem="9" firstAttribute="leading" secondItem="6" secondAttribute="trailing" constant="4" id="P5c-gH-8J6"/>
+                                    <constraint firstItem="9" firstAttribute="leading" secondItem="6" secondAttribute="trailing" constant="8" symbolic="YES" id="P5c-gH-8J6"/>
                                     <constraint firstItem="6" firstAttribute="centerY" secondItem="Vae-cT-EEI" secondAttribute="centerY" id="cvI-P6-Eda"/>
                                     <constraint firstAttribute="trailing" secondItem="9" secondAttribute="trailing" priority="250" constant="7" id="fzk-WE-wjs">
                                         <attributedString key="userComments">
@@ -243,8 +243,8 @@
                                             </fragment>
                                         </attributedString>
                                     </constraint>
-                                    <constraint firstItem="Vae-cT-EEI" firstAttribute="leading" secondItem="65" secondAttribute="leading" constant="6" id="ju1-w7-CzH"/>
-                                    <constraint firstItem="8" firstAttribute="leading" secondItem="9" secondAttribute="trailing" constant="5" id="qs6-O2-pGr"/>
+                                    <constraint firstItem="Vae-cT-EEI" firstAttribute="leading" secondItem="65" secondAttribute="leading" constant="8" id="ju1-w7-CzH"/>
+                                    <constraint firstItem="8" firstAttribute="leading" secondItem="9" secondAttribute="trailing" constant="8" symbolic="YES" id="qs6-O2-pGr"/>
                                 </constraints>
                             </customView>
                         </subviews>
