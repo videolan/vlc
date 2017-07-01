@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G16b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -83,24 +85,22 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="254" width="409" height="255"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="409" height="255"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView misplaced="YES" drawsBackground="NO" type="noTabsNoBorder" initialItem="81" id="80">
-                        <rect key="frame" x="-7" y="35" width="424" height="189"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <tabView drawsBackground="NO" type="noTabsNoBorder" initialItem="81" translatesAutoresizingMaskIntoConstraints="NO" id="80">
+                        <rect key="frame" x="-8" y="35" width="425" height="189"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Graphic Equalizer" identifier="equalizer" id="81">
                                 <view key="view" id="84">
-                                    <rect key="frame" x="0.0" y="0.0" width="424" height="189"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="425" height="189"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="192">
-                                            <rect key="frame" x="14" y="168" width="80" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="192">
+                                            <rect key="frame" x="14" y="166" width="58" height="18"/>
                                             <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="193" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -109,139 +109,133 @@
                                                 <action selector="equalizerEnable:" target="-2" id="dyP-pG-TZF"/>
                                             </connections>
                                         </button>
-                                        <customView misplaced="YES" id="721">
+                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="721">
                                             <rect key="frame" x="10" y="-1" width="404" height="186"/>
-                                            <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="90">
-                                                    <rect key="frame" x="32" y="130" width="48" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="196">
+                                                    <rect key="frame" x="19" y="39" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="Hzi-gJ-sao"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="197" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="equalizerPreAmpSliderUpdated:" target="-2" id="7Xa-Z8-5gG"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="60" translatesAutoresizingMaskIntoConstraints="NO" id="90">
+                                                    <rect key="frame" x="43" y="129" width="36" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="+20 dB" id="158" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="91">
-                                                    <rect key="frame" x="32" y="85" width="48" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="60" translatesAutoresizingMaskIntoConstraints="NO" id="91">
+                                                    <rect key="frame" x="43" y="85" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" continuous="YES" sendsActionOnEndEditing="YES" alignment="right" title="0 dB" id="157" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="92">
-                                                    <rect key="frame" x="32" y="41" width="48" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="60" translatesAutoresizingMaskIntoConstraints="NO" id="92">
+                                                    <rect key="frame" x="43" y="40" width="35" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="-20 dB" id="156" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="93">
-                                                    <rect key="frame" x="17" y="22" width="81" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="60" translatesAutoresizingMaskIntoConstraints="NO" id="93">
+                                                    <rect key="frame" x="35" y="22" width="42" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Preamp" id="155" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="95">
-                                                    <rect key="frame" x="109" y="22" width="22" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="95">
+                                                    <rect key="frame" x="110" y="22" width="20" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="60" id="153" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="96">
-                                                    <rect key="frame" x="135" y="22" width="29" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="96">
+                                                    <rect key="frame" x="137" y="22" width="24" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="170" id="152" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="100">
-                                                    <rect key="frame" x="193" y="22" width="29" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="100">
+                                                    <rect key="frame" x="194" y="22" width="26" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="600" id="148" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="101">
-                                                    <rect key="frame" x="164" y="22" width="29" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="101">
+                                                    <rect key="frame" x="166" y="22" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="310" id="147" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="102">
-                                                    <rect key="frame" x="225" y="22" width="23" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="102">
+                                                    <rect key="frame" x="227" y="22" width="19" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="1K" id="146" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="104">
-                                                    <rect key="frame" x="308" y="22" width="30" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="104">
+                                                    <rect key="frame" x="311" y="22" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="12K" id="144" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="107">
-                                                    <rect key="frame" x="254" y="22" width="23" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="107">
+                                                    <rect key="frame" x="255" y="22" width="20" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="3K" id="141" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="109">
-                                                    <rect key="frame" x="283" y="22" width="23" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="109">
+                                                    <rect key="frame" x="284" y="22" width="20" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="6K" id="139" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="110">
-                                                    <rect key="frame" x="337" y="22" width="30" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="110">
+                                                    <rect key="frame" x="340" y="22" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="14K" id="138" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="111">
-                                                    <rect key="frame" x="366" y="22" width="30" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="111">
+                                                    <rect key="frame" x="369" y="22" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="16K" id="137" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <popUpButton verticalHuggingPriority="750" id="168">
-                                                    <rect key="frame" x="196" y="156" width="155" height="22"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="168">
+                                                    <rect key="frame" x="151" y="150" width="106" height="22"/>
                                                     <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169" customClass="VLCHUDPopUpButtonCell">
                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
@@ -308,9 +302,8 @@
                                                         <action selector="equalizerChangePreset:" target="-2" id="Io0-Eg-HA8"/>
                                                     </connections>
                                                 </popUpButton>
-                                                <button id="194">
-                                                    <rect key="frame" x="109" y="159" width="88" height="18"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="194">
+                                                    <rect key="frame" x="91" y="153" width="57" height="18"/>
                                                     <buttonCell key="cell" type="check" title="2 Pass" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="195" customClass="VLCHUDCheckboxCell">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
@@ -319,107 +312,166 @@
                                                         <action selector="equalizerTwoPass:" target="-2" id="3IO-c8-m0p"/>
                                                     </connections>
                                                 </button>
-                                                <slider horizontalHuggingPriority="750" id="196">
-                                                    <rect key="frame" x="19" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="197" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="equalizerPreAmpSliderUpdated:" target="-2" id="7Xa-Z8-5gG"/>
-                                                    </connections>
-                                                </slider>
-                                                <slider horizontalHuggingPriority="750" id="198">
-                                                    <rect key="frame" x="111" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="198">
+                                                    <rect key="frame" x="111" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="199" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="Pq9-mK-6gi"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="200">
-                                                    <rect key="frame" x="140" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="200">
+                                                    <rect key="frame" x="140" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="201" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="V5y-cd-ebf"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="202">
-                                                    <rect key="frame" x="169" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="202">
+                                                    <rect key="frame" x="169" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="203" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="KN9-Ll-nEK"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="204">
-                                                    <rect key="frame" x="198" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="204">
+                                                    <rect key="frame" x="198" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="205" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="35G-ln-i5e"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="206">
-                                                    <rect key="frame" x="227" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="206">
+                                                    <rect key="frame" x="227" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="207" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="LEn-my-NvY"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="208">
-                                                    <rect key="frame" x="256" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="208">
+                                                    <rect key="frame" x="256" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="209" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="h2x-ra-iQ3"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="210">
-                                                    <rect key="frame" x="285" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="210">
+                                                    <rect key="frame" x="285" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="211" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="m57-Q8-ZCE"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="212">
-                                                    <rect key="frame" x="314" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="212">
+                                                    <rect key="frame" x="314" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="213" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="wbc-hi-c1U"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="214">
-                                                    <rect key="frame" x="343" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="214">
+                                                    <rect key="frame" x="343" y="39" width="18" height="101"/>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="215" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="LPs-jK-YbG"/>
                                                     </connections>
                                                 </slider>
-                                                <slider horizontalHuggingPriority="750" id="216">
-                                                    <rect key="frame" x="372" y="39" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="216">
+                                                    <rect key="frame" x="372" y="39" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="9Z8-kV-kfV"/>
+                                                    </constraints>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="217" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="ATa-AV-o2U"/>
                                                     </connections>
                                                 </slider>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstItem="92" firstAttribute="leading" secondItem="196" secondAttribute="trailing" constant="8" id="29p-ah-3vM"/>
+                                                <constraint firstItem="168" firstAttribute="leading" secondItem="194" secondAttribute="trailing" constant="8" id="2Rh-6y-aZu"/>
+                                                <constraint firstItem="91" firstAttribute="leading" secondItem="196" secondAttribute="trailing" constant="8" id="5bl-le-Orx"/>
+                                                <constraint firstItem="194" firstAttribute="top" secondItem="721" secondAttribute="top" constant="18" id="7CK-oU-fL6"/>
+                                                <constraint firstItem="208" firstAttribute="leading" secondItem="206" secondAttribute="trailing" constant="11" id="7Vq-yV-DVh"/>
+                                                <constraint firstItem="101" firstAttribute="top" secondItem="202" secondAttribute="bottom" constant="7" id="7Yy-xC-wEh"/>
+                                                <constraint firstItem="93" firstAttribute="centerX" secondItem="91" secondAttribute="centerX" id="7fP-ST-JVC"/>
+                                                <constraint firstItem="196" firstAttribute="top" secondItem="721" secondAttribute="top" constant="46" id="7uP-Cw-18k"/>
+                                                <constraint firstItem="101" firstAttribute="centerX" secondItem="202" secondAttribute="centerX" id="92O-de-vab"/>
+                                                <constraint firstItem="102" firstAttribute="baseline" secondItem="107" secondAttribute="baseline" id="AmK-t4-y2r"/>
+                                                <constraint firstItem="198" firstAttribute="centerY" secondItem="196" secondAttribute="centerY" id="BSH-h9-zub"/>
+                                                <constraint firstItem="196" firstAttribute="leading" secondItem="721" secondAttribute="leading" constant="19" id="BaX-Jq-pGN"/>
+                                                <constraint firstItem="202" firstAttribute="centerY" secondItem="200" secondAttribute="centerY" id="D3N-Qf-gau"/>
+                                                <constraint firstItem="210" firstAttribute="leading" secondItem="208" secondAttribute="trailing" constant="11" id="DrH-Q8-S4c"/>
+                                                <constraint firstItem="109" firstAttribute="centerX" secondItem="210" secondAttribute="centerX" id="Ee3-KC-CS4"/>
+                                                <constraint firstItem="206" firstAttribute="centerY" secondItem="204" secondAttribute="centerY" id="F7r-a9-no8"/>
+                                                <constraint firstItem="96" firstAttribute="centerX" secondItem="200" secondAttribute="centerX" id="FrP-OA-de5"/>
+                                                <constraint firstItem="216" firstAttribute="leading" secondItem="214" secondAttribute="trailing" constant="11" id="GRY-t0-SwT"/>
+                                                <constraint firstItem="93" firstAttribute="top" secondItem="196" secondAttribute="bottom" constant="7" id="GeL-8N-DXv"/>
+                                                <constraint firstItem="102" firstAttribute="centerX" secondItem="206" secondAttribute="centerX" id="GkX-Fr-BFQ"/>
+                                                <constraint firstItem="212" firstAttribute="centerY" secondItem="210" secondAttribute="centerY" id="IjB-eH-M8P"/>
+                                                <constraint firstItem="107" firstAttribute="centerX" secondItem="208" secondAttribute="centerX" id="JGI-cY-8mU"/>
+                                                <constraint firstItem="104" firstAttribute="baseline" secondItem="110" secondAttribute="baseline" id="JMw-Kn-zkf"/>
+                                                <constraint firstAttribute="trailing" secondItem="216" secondAttribute="trailing" constant="14" id="KAX-VC-FfD"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="168" secondAttribute="trailing" constant="17" id="LUf-1z-umL"/>
+                                                <constraint firstItem="95" firstAttribute="centerX" secondItem="198" secondAttribute="centerX" id="LbW-qJ-BVx"/>
+                                                <constraint firstItem="214" firstAttribute="leading" secondItem="212" secondAttribute="trailing" constant="11" id="NEv-Jd-jdb"/>
+                                                <constraint firstItem="216" firstAttribute="centerY" secondItem="214" secondAttribute="centerY" id="NUA-Hm-yw3"/>
+                                                <constraint firstItem="107" firstAttribute="top" secondItem="208" secondAttribute="bottom" constant="7" id="Nlb-kY-i2o"/>
+                                                <constraint firstItem="104" firstAttribute="centerX" secondItem="212" secondAttribute="centerX" id="Nsd-K0-zbR"/>
+                                                <constraint firstItem="90" firstAttribute="leading" secondItem="196" secondAttribute="trailing" constant="8" id="OEX-jQ-whN"/>
+                                                <constraint firstItem="100" firstAttribute="centerX" secondItem="204" secondAttribute="centerX" id="PXq-Ld-s2V"/>
+                                                <constraint firstItem="104" firstAttribute="top" secondItem="212" secondAttribute="bottom" constant="7" id="Pwt-5U-zy4"/>
+                                                <constraint firstItem="110" firstAttribute="top" secondItem="214" secondAttribute="bottom" constant="7" id="S4Q-Mo-DNS"/>
+                                                <constraint firstItem="200" firstAttribute="leading" secondItem="198" secondAttribute="trailing" constant="11" id="SHV-uz-yRZ"/>
+                                                <constraint firstItem="204" firstAttribute="leading" secondItem="202" secondAttribute="trailing" constant="11" id="Tz4-Ca-r8K"/>
+                                                <constraint firstItem="100" firstAttribute="baseline" secondItem="102" secondAttribute="baseline" id="U2Y-m6-ErK"/>
+                                                <constraint firstItem="212" firstAttribute="leading" secondItem="210" secondAttribute="trailing" constant="11" id="V3a-cp-l4m"/>
+                                                <constraint firstItem="214" firstAttribute="centerY" secondItem="212" secondAttribute="centerY" id="VRb-GI-d6s"/>
+                                                <constraint firstItem="200" firstAttribute="centerY" secondItem="198" secondAttribute="centerY" id="Wgb-R2-wwX"/>
+                                                <constraint firstItem="100" firstAttribute="top" secondItem="204" secondAttribute="bottom" constant="7" id="XHW-jO-qRW"/>
+                                                <constraint firstItem="208" firstAttribute="centerY" secondItem="206" secondAttribute="centerY" id="Y3e-3n-Oqw"/>
+                                                <constraint firstItem="109" firstAttribute="baseline" secondItem="104" secondAttribute="baseline" id="an0-vg-XfA"/>
+                                                <constraint firstItem="204" firstAttribute="centerY" secondItem="202" secondAttribute="centerY" id="bbM-hX-Oiz"/>
+                                                <constraint firstItem="168" firstAttribute="centerY" secondItem="194" secondAttribute="centerY" id="eUW-Jt-Y61"/>
+                                                <constraint firstItem="102" firstAttribute="top" secondItem="206" secondAttribute="bottom" constant="7" id="eV2-fg-nOd"/>
+                                                <constraint firstItem="91" firstAttribute="centerY" secondItem="196" secondAttribute="centerY" id="eVL-FE-kQm"/>
+                                                <constraint firstItem="210" firstAttribute="centerY" secondItem="208" secondAttribute="centerY" id="eXl-mk-dzL"/>
+                                                <constraint firstItem="110" firstAttribute="centerX" secondItem="214" secondAttribute="centerX" id="ep7-YO-bZn"/>
+                                                <constraint firstItem="198" firstAttribute="centerX" secondItem="194" secondAttribute="centerX" id="htG-4I-VrI"/>
+                                                <constraint firstItem="107" firstAttribute="baseline" secondItem="109" secondAttribute="baseline" id="jOw-G6-qF1"/>
+                                                <constraint firstItem="96" firstAttribute="top" secondItem="200" secondAttribute="bottom" constant="7" id="klW-cF-UXV"/>
+                                                <constraint firstItem="96" firstAttribute="baseline" secondItem="101" secondAttribute="baseline" id="kmK-no-pee"/>
+                                                <constraint firstItem="110" firstAttribute="baseline" secondItem="111" secondAttribute="baseline" id="ldV-zy-ZLR"/>
+                                                <constraint firstItem="90" firstAttribute="top" secondItem="196" secondAttribute="top" id="nPi-tQ-g91"/>
+                                                <constraint firstItem="101" firstAttribute="baseline" secondItem="100" secondAttribute="baseline" id="nwO-7m-upz"/>
+                                                <constraint firstItem="92" firstAttribute="bottom" secondItem="196" secondAttribute="bottom" id="oBD-Jb-gKN"/>
+                                                <constraint firstItem="95" firstAttribute="top" secondItem="198" secondAttribute="bottom" constant="7" id="t8h-El-K96"/>
+                                                <constraint firstItem="109" firstAttribute="top" secondItem="210" secondAttribute="bottom" constant="7" id="uA9-4F-76a"/>
+                                                <constraint firstItem="206" firstAttribute="leading" secondItem="204" secondAttribute="trailing" constant="11" id="vb1-AW-YiY"/>
+                                                <constraint firstItem="95" firstAttribute="baseline" secondItem="96" secondAttribute="baseline" id="wgA-Vr-ls8"/>
+                                                <constraint firstItem="111" firstAttribute="centerX" secondItem="216" secondAttribute="centerX" id="ycf-YN-zGJ"/>
+                                                <constraint firstAttribute="bottom" secondItem="196" secondAttribute="bottom" constant="40" id="yeu-lI-wc9"/>
+                                                <constraint firstItem="111" firstAttribute="top" secondItem="216" secondAttribute="bottom" constant="7" id="z3D-IG-nU3"/>
+                                                <constraint firstItem="202" firstAttribute="leading" secondItem="200" secondAttribute="trailing" constant="11" id="zrY-JU-iz1"/>
+                                            </constraints>
                                         </customView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="721" firstAttribute="top" secondItem="84" secondAttribute="top" constant="4" id="1hX-Aa-yf1"/>
+                                        <constraint firstAttribute="bottom" secondItem="721" secondAttribute="bottom" constant="-1" id="Dyn-tm-aYa"/>
+                                        <constraint firstAttribute="trailing" secondItem="721" secondAttribute="trailing" constant="11" id="ab4-Fg-lEf"/>
+                                        <constraint firstItem="721" firstAttribute="leading" secondItem="84" secondAttribute="leading" constant="10" id="gFD-rg-SdD"/>
+                                        <constraint firstItem="192" firstAttribute="leading" secondItem="84" secondAttribute="leading" constant="17" id="hM5-cv-AmJ"/>
+                                        <constraint firstItem="192" firstAttribute="top" secondItem="84" secondAttribute="top" constant="8" id="rY2-Xn-vSr"/>
+                                    </constraints>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Compressor" identifier="compressor" id="82">
                                 <view key="view" id="83">
-                                    <rect key="frame" x="0.0" y="0.0" width="424" height="189"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="425" height="189"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="218">
-                                            <rect key="frame" x="14" y="168" width="375" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="218">
+                                            <rect key="frame" x="14" y="168" width="203" height="18"/>
                                             <buttonCell key="cell" type="check" title="Enable dynamic range compressor" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="219" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -428,195 +480,196 @@
                                                 <action selector="compressorEnable:" target="-2" id="uHx-ux-eWT"/>
                                             </connections>
                                         </button>
-                                        <customView misplaced="YES" id="723">
+                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="723">
                                             <rect key="frame" x="7" y="0.0" width="410" height="170"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <subviews>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="220">
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="220">
                                                     <rect key="frame" x="24" y="35" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="223" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="221">
-                                                    <rect key="frame" x="40" y="49" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="222" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="compressorSliderUpdated:" target="-2" id="scd-cx-Z2t"/>
-                                                    </connections>
-                                                </slider>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="224">
-                                                    <rect key="frame" x="76" y="35" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="24.9 ms" id="227" customClass="VLCHUDTextFieldCell">
-                                                        <font key="font" metaFont="miniSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="225">
-                                                    <rect key="frame" x="92" y="49" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1.5" maxValue="400" doubleValue="25" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="226" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="compressorSliderUpdated:" target="-2" id="TSd-Vu-uAC"/>
-                                                    </connections>
-                                                </slider>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="228">
-                                                    <rect key="frame" x="128" y="35" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="800.0 ms" id="231" customClass="VLCHUDTextFieldCell">
-                                                        <font key="font" metaFont="miniSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="229">
-                                                    <rect key="frame" x="143" y="49" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="800" doubleValue="100" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="230" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="compressorSliderUpdated:" target="-2" id="tJL-Vg-pRk"/>
-                                                    </connections>
-                                                </slider>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="232">
-                                                    <rect key="frame" x="180" y="35" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="-11.0 dB" id="235" customClass="VLCHUDTextFieldCell">
-                                                        <font key="font" metaFont="miniSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="233">
-                                                    <rect key="frame" x="196" y="49" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-30" doubleValue="-11" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="234" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="compressorSliderUpdated:" target="-2" id="Otq-ED-0CI"/>
-                                                    </connections>
-                                                </slider>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="236">
-                                                    <rect key="frame" x="232" y="35" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="8.0:1" id="239" customClass="VLCHUDTextFieldCell">
-                                                        <font key="font" metaFont="miniSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="237">
-                                                    <rect key="frame" x="248" y="49" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="20" doubleValue="8" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="238" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="compressorSliderUpdated:" target="-2" id="Vee-cn-Xep"/>
-                                                    </connections>
-                                                </slider>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="240">
-                                                    <rect key="frame" x="284" y="35" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.5 dB" id="243" customClass="VLCHUDTextFieldCell">
-                                                        <font key="font" metaFont="miniSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="241">
-                                                    <rect key="frame" x="300" y="49" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="10" doubleValue="2.5" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="242" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="compressorSliderUpdated:" target="-2" id="gaI-my-uOm"/>
-                                                    </connections>
-                                                </slider>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="244">
-                                                    <rect key="frame" x="336" y="35" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="7.0 dB" id="247" customClass="VLCHUDTextFieldCell">
-                                                        <font key="font" metaFont="miniSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="248">
-                                                    <rect key="frame" x="25" y="9" width="50" height="22"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="248">
+                                                    <rect key="frame" x="25" y="20" width="48" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="RMS/peak" id="261" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="249">
-                                                    <rect key="frame" x="76" y="14" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="221">
+                                                    <rect key="frame" x="40" y="49" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="bKT-9X-pKE"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="222" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="compressorSliderUpdated:" target="-2" id="scd-cx-Z2t"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="224">
+                                                    <rect key="frame" x="76" y="35" width="50" height="11"/>
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="24.9 ms" id="227" customClass="VLCHUDTextFieldCell">
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="249">
+                                                    <rect key="frame" x="74" y="14" width="54" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Attack" id="260" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="250">
-                                                    <rect key="frame" x="128" y="14" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="225">
+                                                    <rect key="frame" x="92" y="49" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="f5l-te-ARJ"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1.5" maxValue="400" doubleValue="25" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="226" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="compressorSliderUpdated:" target="-2" id="TSd-Vu-uAC"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="228">
+                                                    <rect key="frame" x="127" y="35" width="50" height="11"/>
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="800.0 ms" id="231" customClass="VLCHUDTextFieldCell">
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="250">
+                                                    <rect key="frame" x="126" y="14" width="52" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Release" id="259" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="251">
-                                                    <rect key="frame" x="180" y="14" width="52" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="229">
+                                                    <rect key="frame" x="143" y="49" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="6ic-hx-c7h"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="800" doubleValue="100" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="230" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="compressorSliderUpdated:" target="-2" id="tJL-Vg-pRk"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="232">
+                                                    <rect key="frame" x="180" y="35" width="50" height="11"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="46" id="wzW-8x-1e0"/>
+                                                    </constraints>
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="-11.0 dB" id="235" customClass="VLCHUDTextFieldCell">
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="251">
+                                                    <rect key="frame" x="180" y="14" width="50" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Threshold" id="258" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="252">
-                                                    <rect key="frame" x="232" y="14" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="233">
+                                                    <rect key="frame" x="196" y="49" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="5gA-jD-bRT"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-30" doubleValue="-11" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="234" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="compressorSliderUpdated:" target="-2" id="Otq-ED-0CI"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="236">
+                                                    <rect key="frame" x="232" y="35" width="50" height="11"/>
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="8.0:1" id="239" customClass="VLCHUDTextFieldCell">
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="252">
+                                                    <rect key="frame" x="230" y="14" width="54" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Ratio" id="257" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="253">
-                                                    <rect key="frame" x="284" y="9" width="50" height="22"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="237">
+                                                    <rect key="frame" x="248" y="49" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="ekK-DU-1wv"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="20" doubleValue="8" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="238" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="compressorSliderUpdated:" target="-2" id="Vee-cn-Xep"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="240">
+                                                    <rect key="frame" x="284" y="35" width="50" height="11"/>
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.5 dB" id="243" customClass="VLCHUDTextFieldCell">
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="253">
+                                                    <rect key="frame" x="284" y="20" width="50" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Knee radius" id="256" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="254">
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="241">
+                                                    <rect key="frame" x="300" y="49" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="fLv-wu-TJU"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="10" doubleValue="2.5" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="242" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="compressorSliderUpdated:" target="-2" id="gaI-my-uOm"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="244">
+                                                    <rect key="frame" x="336" y="35" width="50" height="11"/>
+                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="7.0 dB" id="247" customClass="VLCHUDTextFieldCell">
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="245">
+                                                    <rect key="frame" x="352" y="49" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="FUw-B6-Oe4"/>
+                                                    </constraints>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="24" doubleValue="7" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="246" customClass="VLCHUDSliderCell"/>
+                                                    <connections>
+                                                        <action selector="compressorSliderUpdated:" target="-2" id="iSY-Me-sMB"/>
+                                                    </connections>
+                                                </slider>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="254">
                                                     <rect key="frame" x="336" y="9" width="50" height="22"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Makeup gain" id="255" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="245">
-                                                    <rect key="frame" x="352" y="49" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="24" doubleValue="7" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="246" customClass="VLCHUDSliderCell"/>
-                                                    <connections>
-                                                        <action selector="compressorSliderUpdated:" target="-2" id="iSY-Me-sMB"/>
-                                                    </connections>
-                                                </slider>
-                                                <button verticalHuggingPriority="750" misplaced="YES" id="621">
-                                                    <rect key="frame" x="325" y="151" width="73" height="17"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="621">
+                                                    <rect key="frame" x="359" y="151" width="39" height="17"/>
                                                     <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:622:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
@@ -626,18 +679,90 @@
                                                     </connections>
                                                 </button>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstItem="254" firstAttribute="top" secondItem="245" secondAttribute="bottom" constant="19" id="513-BD-4ve"/>
+                                                <constraint firstItem="241" firstAttribute="top" secondItem="723" secondAttribute="top" constant="20" id="56P-QP-HCH"/>
+                                                <constraint firstItem="232" firstAttribute="leading" secondItem="251" secondAttribute="leading" id="6rc-cn-R9R"/>
+                                                <constraint firstItem="248" firstAttribute="leading" secondItem="723" secondAttribute="leading" constant="27" id="7pi-8k-m4D"/>
+                                                <constraint firstItem="254" firstAttribute="leading" secondItem="253" secondAttribute="trailing" constant="6" id="8AS-so-K0G"/>
+                                                <constraint firstItem="229" firstAttribute="centerX" secondItem="250" secondAttribute="centerX" id="9M6-bD-HIG"/>
+                                                <constraint firstItem="221" firstAttribute="top" secondItem="723" secondAttribute="top" constant="20" id="9g8-so-J1E"/>
+                                                <constraint firstItem="221" firstAttribute="centerX" secondItem="248" secondAttribute="centerX" id="A9G-3t-1Eq"/>
+                                                <constraint firstItem="245" firstAttribute="centerX" secondItem="254" secondAttribute="centerX" id="AUY-V3-wbI"/>
+                                                <constraint firstItem="249" firstAttribute="leading" secondItem="248" secondAttribute="trailing" constant="5" id="AZc-5L-J3Y"/>
+                                                <constraint firstItem="248" firstAttribute="top" secondItem="221" secondAttribute="bottom" constant="19" id="BD3-b2-JHZ"/>
+                                                <constraint firstItem="237" firstAttribute="top" secondItem="723" secondAttribute="top" constant="20" id="Cp3-4w-W5G"/>
+                                                <constraint firstItem="229" firstAttribute="centerX" secondItem="228" secondAttribute="centerX" id="DbZ-66-PZJ"/>
+                                                <constraint firstItem="251" firstAttribute="baseline" secondItem="252" secondAttribute="baseline" id="Dnm-lq-dHs"/>
+                                                <constraint firstItem="237" firstAttribute="leading" secondItem="233" secondAttribute="trailing" constant="34" id="FFl-za-aa9"/>
+                                                <constraint firstItem="248" firstAttribute="baseline" secondItem="253" secondAttribute="firstBaseline" id="Hbm-CG-Sd9"/>
+                                                <constraint firstItem="233" firstAttribute="centerX" secondItem="723" secondAttribute="centerX" id="IQQ-eg-z7W"/>
+                                                <constraint firstItem="229" firstAttribute="leading" secondItem="225" secondAttribute="trailing" constant="33" id="KQL-pU-8Sx"/>
+                                                <constraint firstItem="244" firstAttribute="top" secondItem="245" secondAttribute="bottom" constant="4" id="LsW-86-RIh"/>
+                                                <constraint firstItem="621" firstAttribute="top" secondItem="723" secondAttribute="top" constant="3" id="MX3-tE-CV0"/>
+                                                <constraint firstItem="254" firstAttribute="firstBaseline" secondItem="253" secondAttribute="baseline" id="MZD-za-gAM"/>
+                                                <constraint firstItem="252" firstAttribute="top" secondItem="237" secondAttribute="bottom" constant="25" id="Mhl-Qv-6de"/>
+                                                <constraint firstItem="251" firstAttribute="centerY" secondItem="254" secondAttribute="centerY" id="N4X-QM-wNo"/>
+                                                <constraint firstItem="236" firstAttribute="leading" secondItem="232" secondAttribute="trailing" constant="6" id="NRc-Gi-g8z"/>
+                                                <constraint firstItem="232" firstAttribute="top" secondItem="233" secondAttribute="bottom" constant="4" id="NWX-Bm-N6B"/>
+                                                <constraint firstItem="221" firstAttribute="leading" secondItem="723" secondAttribute="leading" constant="40" id="Oa5-V9-eW6"/>
+                                                <constraint firstItem="245" firstAttribute="centerX" secondItem="244" secondAttribute="centerX" id="PHb-wh-OGO"/>
+                                                <constraint firstItem="253" firstAttribute="top" secondItem="241" secondAttribute="bottom" constant="19" id="Q5I-a9-StU"/>
+                                                <constraint firstItem="233" firstAttribute="centerX" secondItem="232" secondAttribute="centerX" id="Q7Y-1n-dMp"/>
+                                                <constraint firstItem="241" firstAttribute="centerX" secondItem="240" secondAttribute="centerX" id="SJf-9F-EKR"/>
+                                                <constraint firstItem="252" firstAttribute="leading" secondItem="251" secondAttribute="trailing" constant="4" id="TV2-r6-kIZ"/>
+                                                <constraint firstItem="250" firstAttribute="top" secondItem="229" secondAttribute="bottom" constant="25" id="Uf3-Qx-edc"/>
+                                                <constraint firstItem="240" firstAttribute="top" secondItem="241" secondAttribute="bottom" constant="4" id="VYE-bx-H5u"/>
+                                                <constraint firstItem="233" firstAttribute="leading" secondItem="229" secondAttribute="trailing" constant="35" id="WeT-YD-F6S"/>
+                                                <constraint firstItem="224" firstAttribute="top" secondItem="225" secondAttribute="bottom" constant="4" id="Wmm-hZ-W8d"/>
+                                                <constraint firstItem="245" firstAttribute="leading" secondItem="241" secondAttribute="trailing" constant="34" id="Xwk-1y-M4v"/>
+                                                <constraint firstItem="224" firstAttribute="leading" secondItem="220" secondAttribute="trailing" constant="6" id="YBt-FI-8A4"/>
+                                                <constraint firstItem="221" firstAttribute="centerX" secondItem="220" secondAttribute="centerX" id="YEL-LS-aNZ"/>
+                                                <constraint firstItem="233" firstAttribute="centerX" secondItem="251" secondAttribute="centerX" id="YqX-af-qBX"/>
+                                                <constraint firstAttribute="trailing" secondItem="621" secondAttribute="trailing" constant="12" id="ad3-PG-I53"/>
+                                                <constraint firstItem="233" firstAttribute="top" secondItem="723" secondAttribute="top" constant="20" id="bYr-XH-rO0"/>
+                                                <constraint firstItem="228" firstAttribute="top" secondItem="229" secondAttribute="bottom" constant="4" id="cOH-YT-4Kr"/>
+                                                <constraint firstItem="220" firstAttribute="top" secondItem="221" secondAttribute="bottom" constant="4" id="dyA-im-S45"/>
+                                                <constraint firstItem="225" firstAttribute="centerX" secondItem="249" secondAttribute="centerX" id="e6p-1T-m7D"/>
+                                                <constraint firstItem="225" firstAttribute="leading" secondItem="221" secondAttribute="trailing" constant="34" id="ftV-ri-674"/>
+                                                <constraint firstAttribute="trailing" secondItem="244" secondAttribute="trailing" constant="26" id="gBC-qU-Xdb"/>
+                                                <constraint firstItem="225" firstAttribute="centerX" secondItem="224" secondAttribute="centerX" id="gTe-B3-hoT"/>
+                                                <constraint firstItem="236" firstAttribute="top" secondItem="237" secondAttribute="bottom" constant="4" id="hDH-bq-Oa2"/>
+                                                <constraint firstItem="241" firstAttribute="leading" secondItem="237" secondAttribute="trailing" constant="34" id="ive-Nw-GyD"/>
+                                                <constraint firstAttribute="trailing" secondItem="245" secondAttribute="trailing" constant="40" id="mF3-RC-4BA"/>
+                                                <constraint firstItem="244" firstAttribute="leading" secondItem="254" secondAttribute="leading" id="miX-s4-REJ"/>
+                                                <constraint firstItem="237" firstAttribute="centerX" secondItem="252" secondAttribute="centerX" id="o5H-B7-re0"/>
+                                                <constraint firstItem="241" firstAttribute="centerX" secondItem="253" secondAttribute="centerX" id="pUn-ly-XYo"/>
+                                                <constraint firstItem="245" firstAttribute="top" secondItem="723" secondAttribute="top" constant="20" id="pgv-pf-z9Y"/>
+                                                <constraint firstItem="220" firstAttribute="leading" secondItem="723" secondAttribute="leading" constant="26" id="rVV-RY-DSz"/>
+                                                <constraint firstItem="225" firstAttribute="top" secondItem="723" secondAttribute="top" constant="20" id="rho-5c-9f4"/>
+                                                <constraint firstItem="244" firstAttribute="leading" secondItem="240" secondAttribute="trailing" constant="6" id="rtr-HN-1gD"/>
+                                                <constraint firstItem="251" firstAttribute="top" secondItem="233" secondAttribute="bottom" constant="25" id="vE1-Hz-WcV"/>
+                                                <constraint firstItem="249" firstAttribute="top" secondItem="225" secondAttribute="bottom" constant="25" id="wW0-T5-RnG"/>
+                                                <constraint firstItem="237" firstAttribute="centerX" secondItem="236" secondAttribute="centerX" id="wYG-e6-aiN"/>
+                                                <constraint firstItem="229" firstAttribute="top" secondItem="723" secondAttribute="top" constant="20" id="xmU-cX-jtq"/>
+                                                <constraint firstItem="251" firstAttribute="leading" secondItem="250" secondAttribute="trailing" constant="6" id="yED-Gw-iSj"/>
+                                            </constraints>
                                         </customView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="723" secondAttribute="trailing" constant="8" id="G4Q-T9-rJI"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="218" secondAttribute="trailing" constant="17" id="M8U-RE-rBt"/>
+                                        <constraint firstAttribute="bottom" secondItem="723" secondAttribute="bottom" id="VIW-Fi-Syq"/>
+                                        <constraint firstItem="218" firstAttribute="leading" secondItem="83" secondAttribute="leading" constant="17" id="bxC-3H-MSO"/>
+                                        <constraint firstItem="723" firstAttribute="leading" secondItem="83" secondAttribute="leading" constant="7" id="nms-Ir-z0a"/>
+                                        <constraint firstItem="723" firstAttribute="top" secondItem="83" secondAttribute="top" constant="19" id="quO-m5-14E"/>
+                                        <constraint firstItem="218" firstAttribute="top" secondItem="83" secondAttribute="top" constant="6" id="zLo-N7-jek"/>
+                                    </constraints>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Spatializer" identifier="spatializer" id="85">
                                 <view key="view" id="86">
-                                    <rect key="frame" x="0.0" y="0.0" width="424" height="189"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="425" height="189"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="262">
-                                            <rect key="frame" x="14" y="168" width="375" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="262">
+                                            <rect key="frame" x="14" y="168" width="116" height="18"/>
                                             <buttonCell key="cell" type="check" title="Enable Spatializer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="305" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -646,13 +771,11 @@
                                                 <action selector="spatializerEnable:" target="-2" id="bpE-Et-UJk"/>
                                             </connections>
                                         </button>
-                                        <customView misplaced="YES" id="725">
+                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="725">
                                             <rect key="frame" x="7" y="0.0" width="410" height="169"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <subviews>
-                                                <button verticalHuggingPriority="750" id="618">
-                                                    <rect key="frame" x="317" y="145" width="73" height="17"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="618">
+                                                    <rect key="frame" x="351" y="145" width="39" height="17"/>
                                                     <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:619:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
@@ -661,130 +784,130 @@
                                                         <action selector="resetSpatializerValues:" target="-2" id="LeL-eG-qna"/>
                                                     </connections>
                                                 </button>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="265">
-                                                    <rect key="frame" x="76" y="34" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="265">
+                                                    <rect key="frame" x="90" y="34" width="22" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="302" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="266">
-                                                    <rect key="frame" x="92" y="48" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="266">
+                                                    <rect key="frame" x="92" y="48" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="4TQ-oR-B0e"/>
+                                                    </constraints>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="301" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="TzD-ul-6Gx"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="267">
-                                                    <rect key="frame" x="128" y="34" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="267">
+                                                    <rect key="frame" x="141" y="34" width="22" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="2.0" id="300" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="268">
-                                                    <rect key="frame" x="143" y="48" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="268">
+                                                    <rect key="frame" x="143" y="48" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="wd6-fd-9vT"/>
+                                                    </constraints>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="299" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="smf-XD-GHV"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="269">
-                                                    <rect key="frame" x="180" y="34" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="269">
+                                                    <rect key="frame" x="194" y="34" width="22" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="298" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="270">
-                                                    <rect key="frame" x="196" y="48" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="270">
+                                                    <rect key="frame" x="196" y="48" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="xpL-AJ-rLa"/>
+                                                    </constraints>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="297" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="bnX-CW-h45"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="271">
-                                                    <rect key="frame" x="232" y="34" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="271">
+                                                    <rect key="frame" x="246" y="34" width="22" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="296" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="272">
-                                                    <rect key="frame" x="248" y="48" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="272">
+                                                    <rect key="frame" x="248" y="48" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="mor-eb-LT5"/>
+                                                    </constraints>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="295" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="wM1-xe-t5e"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="273">
-                                                    <rect key="frame" x="284" y="34" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="273">
+                                                    <rect key="frame" x="298" y="34" width="22" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="0.0" id="294" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <slider horizontalHuggingPriority="750" misplaced="YES" id="274">
-                                                    <rect key="frame" x="300" y="48" width="19" height="101"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <slider horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="274">
+                                                    <rect key="frame" x="300" y="48" width="18" height="101"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="100" id="eBE-HK-RFa"/>
+                                                    </constraints>
                                                     <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="293" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="CoP-xd-gur"/>
                                                     </connections>
                                                 </slider>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="277">
-                                                    <rect key="frame" x="76" y="14" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="277">
+                                                    <rect key="frame" x="88" y="14" width="27" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Size" id="290" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="278">
-                                                    <rect key="frame" x="128" y="14" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="278">
+                                                    <rect key="frame" x="135" y="14" width="34" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Width" id="289" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="279">
-                                                    <rect key="frame" x="180" y="14" width="52" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="279">
+                                                    <rect key="frame" x="192" y="14" width="26" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Wet" id="288" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="280">
-                                                    <rect key="frame" x="232" y="14" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="280">
+                                                    <rect key="frame" x="245" y="14" width="24" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dry" id="287" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="281">
-                                                    <rect key="frame" x="284" y="14" width="50" height="11"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="40" translatesAutoresizingMaskIntoConstraints="NO" id="281">
+                                                    <rect key="frame" x="292" y="14" width="34" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Dump" id="286" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -792,18 +915,60 @@
                                                     </textFieldCell>
                                                 </textField>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstItem="274" firstAttribute="leading" secondItem="272" secondAttribute="trailing" constant="34" id="0fA-6m-LKO"/>
+                                                <constraint firstItem="272" firstAttribute="top" secondItem="725" secondAttribute="top" constant="20" id="1yQ-vb-yn6"/>
+                                                <constraint firstItem="274" firstAttribute="centerX" secondItem="273" secondAttribute="centerX" id="6t5-Ht-mvk"/>
+                                                <constraint firstItem="267" firstAttribute="top" secondItem="268" secondAttribute="bottom" constant="4" id="8aQ-oH-YVX"/>
+                                                <constraint firstItem="265" firstAttribute="top" secondItem="266" secondAttribute="bottom" constant="4" id="96n-yE-cdB"/>
+                                                <constraint firstItem="272" firstAttribute="centerX" secondItem="280" secondAttribute="centerX" id="AeU-JO-7sZ"/>
+                                                <constraint firstItem="278" firstAttribute="top" secondItem="268" secondAttribute="bottom" constant="24" id="BF5-aJ-ffa"/>
+                                                <constraint firstItem="268" firstAttribute="leading" secondItem="266" secondAttribute="trailing" constant="33" id="CVb-t3-BIV"/>
+                                                <constraint firstItem="268" firstAttribute="centerX" secondItem="278" secondAttribute="centerX" id="GlU-8r-UpJ"/>
+                                                <constraint firstItem="270" firstAttribute="top" secondItem="725" secondAttribute="top" constant="20" id="LFR-Wf-AyR"/>
+                                                <constraint firstItem="266" firstAttribute="centerX" secondItem="265" secondAttribute="centerX" id="LQS-Wd-1hC"/>
+                                                <constraint firstItem="277" firstAttribute="top" secondItem="266" secondAttribute="bottom" constant="24" id="Ld3-Ko-wX0"/>
+                                                <constraint firstItem="266" firstAttribute="centerX" secondItem="277" secondAttribute="centerX" id="Qlu-3c-cMJ"/>
+                                                <constraint firstItem="268" firstAttribute="centerX" secondItem="267" secondAttribute="centerX" id="TdE-Q1-sNo"/>
+                                                <constraint firstItem="281" firstAttribute="top" secondItem="274" secondAttribute="bottom" constant="24" id="Vjn-zk-R3e"/>
+                                                <constraint firstItem="618" firstAttribute="top" secondItem="725" secondAttribute="top" constant="8" id="YZt-Cd-AP6"/>
+                                                <constraint firstItem="274" firstAttribute="top" secondItem="725" secondAttribute="top" constant="20" id="ZbI-RC-FkJ"/>
+                                                <constraint firstItem="274" firstAttribute="centerX" secondItem="281" secondAttribute="centerX" id="bnc-nm-EIK"/>
+                                                <constraint firstItem="273" firstAttribute="top" secondItem="274" secondAttribute="bottom" constant="4" id="efN-HC-PEB"/>
+                                                <constraint firstItem="266" firstAttribute="top" secondItem="725" secondAttribute="top" constant="20" id="fzt-3b-mFd"/>
+                                                <constraint firstItem="268" firstAttribute="top" secondItem="725" secondAttribute="top" constant="20" id="imh-b6-KYp"/>
+                                                <constraint firstAttribute="trailing" secondItem="618" secondAttribute="trailing" constant="20" id="lzc-AR-INn"/>
+                                                <constraint firstItem="270" firstAttribute="centerX" secondItem="279" secondAttribute="centerX" id="mvN-Gp-d1Y"/>
+                                                <constraint firstItem="270" firstAttribute="centerX" secondItem="725" secondAttribute="centerX" id="n9I-iK-qJv"/>
+                                                <constraint firstItem="272" firstAttribute="leading" secondItem="270" secondAttribute="trailing" constant="34" id="nTL-ks-FOm"/>
+                                                <constraint firstItem="272" firstAttribute="centerX" secondItem="271" secondAttribute="centerX" id="pfj-fj-Brd"/>
+                                                <constraint firstItem="269" firstAttribute="top" secondItem="270" secondAttribute="bottom" constant="4" id="pm9-AD-aWR"/>
+                                                <constraint firstItem="270" firstAttribute="centerX" secondItem="269" secondAttribute="centerX" id="pqv-dL-KDN"/>
+                                                <constraint firstItem="270" firstAttribute="leading" secondItem="268" secondAttribute="trailing" constant="35" id="tEh-kA-gmB"/>
+                                                <constraint firstItem="271" firstAttribute="top" secondItem="272" secondAttribute="bottom" constant="4" id="x8H-hj-6pv"/>
+                                                <constraint firstItem="279" firstAttribute="top" secondItem="270" secondAttribute="bottom" constant="24" id="zZq-ku-XzM"/>
+                                                <constraint firstItem="280" firstAttribute="top" secondItem="272" secondAttribute="bottom" constant="24" id="zvw-C7-EsK"/>
+                                            </constraints>
                                         </customView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottom" secondItem="725" secondAttribute="bottom" id="7QL-pb-bC2"/>
+                                        <constraint firstItem="262" firstAttribute="leading" secondItem="86" secondAttribute="leading" constant="17" id="FP2-lC-BR5"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="262" secondAttribute="trailing" constant="17" id="WGX-e8-Ryy"/>
+                                        <constraint firstItem="262" firstAttribute="top" secondItem="86" secondAttribute="top" constant="6" id="YN5-5A-rqZ"/>
+                                        <constraint firstItem="725" firstAttribute="leading" secondItem="86" secondAttribute="leading" constant="7" id="ZvP-vu-IZK"/>
+                                        <constraint firstItem="725" firstAttribute="top" secondItem="86" secondAttribute="top" constant="20" id="fVW-Ye-5Cf"/>
+                                        <constraint firstAttribute="trailing" secondItem="725" secondAttribute="trailing" constant="8" id="lzh-l4-n7a"/>
+                                    </constraints>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Filter" identifier="filter" id="339">
                                 <view key="view" id="340">
-                                    <rect key="frame" x="0.0" y="0.0" width="424" height="189"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="425" height="189"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="343">
-                                            <rect key="frame" x="14" y="168" width="335" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="343">
+                                            <rect key="frame" x="14" y="157" width="135" height="18"/>
                                             <buttonCell key="cell" type="check" title="Volume normalization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="346" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -812,9 +977,8 @@
                                                 <action selector="filterEnableVolumeNorm:" target="-2" id="TN6-b4-Vnj"/>
                                             </connections>
                                         </button>
-                                        <button id="344">
-                                            <rect key="frame" x="14" y="88" width="335" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="344">
+                                            <rect key="frame" x="14" y="77" width="154" height="18"/>
                                             <buttonCell key="cell" type="check" title="Headphone virtualization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="345" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -823,9 +987,8 @@
                                                 <action selector="filterEnableHeadPhoneVirt:" target="-2" id="PHU-zj-xvf"/>
                                             </connections>
                                         </button>
-                                        <button id="709">
-                                            <rect key="frame" x="14" y="108" width="335" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="709">
+                                            <rect key="frame" x="14" y="97" width="65" height="18"/>
                                             <buttonCell key="cell" type="check" title="Karaoke" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="710" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -834,41 +997,61 @@
                                                 <action selector="filterEnableKaraoke:" target="-2" id="xdG-5Z-pQZ"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Box" titlePosition="noTitle" id="727">
-                                            <rect key="frame" x="16" y="128" width="392" height="43"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="727">
+                                            <rect key="frame" x="16" y="117" width="392" height="43"/>
                                             <view key="contentView" id="eB4-KX-Qdy">
                                                 <rect key="frame" x="1" y="1" width="390" height="41"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="341">
-                                                        <rect key="frame" x="15" y="14" width="101" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="341">
+                                                        <rect key="frame" x="15" y="14" width="82" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Maximum level" id="348" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <slider verticalHuggingPriority="750" id="342">
-                                                        <rect key="frame" x="129" y="13" width="243" height="15"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="342">
+                                                        <rect key="frame" x="110" y="13" width="262" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="0.10000000000000001" maxValue="10" doubleValue="5" tickMarkPosition="above" sliderType="linear" id="347" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="filterVolumeNormSliderUpdated:" target="-2" id="YLf-gK-UkJ"/>
                                                         </connections>
                                                     </slider>
                                                 </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="341" firstAttribute="leading" secondItem="eB4-KX-Qdy" secondAttribute="leading" constant="17" id="1od-0k-Uc1"/>
+                                                    <constraint firstItem="342" firstAttribute="leading" secondItem="341" secondAttribute="trailing" constant="15" id="5a5-Js-Jdc"/>
+                                                    <constraint firstAttribute="trailing" secondItem="342" secondAttribute="trailing" constant="18" id="VrV-To-HZD"/>
+                                                    <constraint firstItem="342" firstAttribute="centerY" secondItem="eB4-KX-Qdy" secondAttribute="centerY" id="XlU-Yz-8BZ"/>
+                                                    <constraint firstItem="341" firstAttribute="centerY" secondItem="342" secondAttribute="centerY" id="hR6-pB-76R"/>
+                                                </constraints>
                                             </view>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="37" id="wQm-1q-xOZ"/>
+                                            </constraints>
                                         </box>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="343" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="807-K7-OVI"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="344" secondAttribute="trailing" constant="17" id="Bt0-CZ-zNA"/>
+                                        <constraint firstItem="727" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="19" id="CP6-RB-2oD"/>
+                                        <constraint firstItem="709" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="KH7-bt-QAy"/>
+                                        <constraint firstItem="344" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="TT3-Ns-bah"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="343" secondAttribute="trailing" constant="17" id="U6r-dx-G3F"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="709" secondAttribute="trailing" constant="17" id="XNI-EE-bK7"/>
+                                        <constraint firstAttribute="trailing" secondItem="727" secondAttribute="trailing" constant="20" id="fMH-4J-f1L"/>
+                                        <constraint firstItem="344" firstAttribute="top" secondItem="709" secondAttribute="bottom" constant="8" id="hm2-YQ-yW3"/>
+                                        <constraint firstItem="343" firstAttribute="top" secondItem="340" secondAttribute="top" constant="17" id="io6-vx-Ttr"/>
+                                        <constraint firstItem="eB4-KX-Qdy" firstAttribute="top" secondItem="343" secondAttribute="bottom" constant="1" id="lSW-6i-4TX"/>
+                                        <constraint firstItem="709" firstAttribute="top" secondItem="727" secondAttribute="bottom" constant="9" id="yUQ-aD-K7C"/>
+                                    </constraints>
                                 </view>
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <popUpButton verticalHuggingPriority="750" id="701">
-                        <rect key="frame" x="110" y="6" width="190" height="22"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="701">
+                        <rect key="frame" x="171" y="6" width="68" height="22"/>
                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="706" id="702" customClass="VLCHUDPopUpButtonCell">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -884,13 +1067,12 @@
                             <action selector="profileSelectorAction:" target="-2" id="uTq-Bz-2S2"/>
                         </connections>
                     </popUpButton>
-                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="EuA-vb-mSS">
+                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="EuA-vb-mSS">
                         <rect key="frame" x="0.0" y="221" width="409" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
-                    <segmentedControl verticalHuggingPriority="750" misplaced="YES" id="Jb1-f1-iF3">
+                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jb1-f1-iF3">
                         <rect key="frame" x="48" y="228" width="314" height="24"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ZdJ-0F-LWH" customClass="VLCHUDSegmentedCell">
                             <font key="font" metaFont="system"/>
                             <segments>
@@ -905,6 +1087,16 @@
                         </connections>
                     </segmentedControl>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="80" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="-8" id="IMR-wz-4Ly"/>
+                    <constraint firstAttribute="bottom" secondItem="701" secondAttribute="bottom" constant="9" id="J0K-xv-xsb"/>
+                    <constraint firstAttribute="trailing" secondItem="80" secondAttribute="trailing" constant="-8" id="KUJ-ZT-T77"/>
+                    <constraint firstAttribute="bottom" secondItem="80" secondAttribute="bottom" constant="35" id="OVV-Za-fCZ"/>
+                    <constraint firstItem="701" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="RcE-hb-fne"/>
+                    <constraint firstItem="Jb1-f1-iF3" firstAttribute="top" secondItem="2" secondAttribute="top" constant="4" id="ZTA-69-Rbc"/>
+                    <constraint firstItem="80" firstAttribute="top" secondItem="2" secondAttribute="top" constant="31" id="cgf-qG-2Pl"/>
+                    <constraint firstItem="Jb1-f1-iF3" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="iYo-cU-P4u"/>
+                </constraints>
             </view>
             <point key="canvasLocation" x="138.5" y="162.5"/>
         </window>
