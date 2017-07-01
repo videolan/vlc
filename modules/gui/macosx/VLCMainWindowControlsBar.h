@@ -37,7 +37,9 @@
 @property (readwrite, strong) IBOutlet NSButton *stopButton;
 
 @property (readwrite, strong) IBOutlet NSButton *prevButton;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *prevButtonWidthConstraint;
 @property (readwrite, strong) IBOutlet NSButton *nextButton;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *nextButtonWidthConstraint;
 
 @property (readwrite, strong) IBOutlet NSButton *playlistButton;
 @property (readwrite, strong) IBOutlet NSButton *repeatButton;

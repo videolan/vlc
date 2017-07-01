@@ -450,6 +450,7 @@
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="qfh-30-nky" userLabel="Previous Button">
                                                 <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
                                                 <constraints>
+                                                    <constraint firstAttribute="width" constant="29" id="bP7-Ec-OLG"/>
                                                     <constraint firstAttribute="height" constant="23" id="bsS-LC-mxp"/>
                                                 </constraints>
                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="previous-6btns" imagePosition="only" alignment="center" alternateImage="previous-6btns-pressed" continuous="YES" enabled="NO" id="KXm-ys-zEA">
@@ -503,6 +504,7 @@
                                                 <rect key="frame" x="112" y="0.0" width="29" height="23"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="23" id="Icc-CC-PIU"/>
+                                                    <constraint firstAttribute="width" constant="29" id="uPv-u5-I21"/>
                                                 </constraints>
                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="next-6btns" imagePosition="only" alignment="center" alternateImage="next-6btns-pressed" continuous="YES" enabled="NO" id="tLR-jN-43M">
                                                     <behavior key="behavior" lightByContents="YES"/>
@@ -848,9 +850,11 @@
                 <outlet property="forwardButton" destination="3648" id="0bA-YS-tkr"/>
                 <outlet property="fullscreenButton" destination="4419" id="hgS-Tk-jle"/>
                 <outlet property="nextButton" destination="HBS-xq-EkN" id="MIO-Ba-jDH"/>
+                <outlet property="nextButtonWidthConstraint" destination="uPv-u5-I21" id="Lsk-Nu-vmn"/>
                 <outlet property="playButton" destination="3571" id="5Mf-48-Ga9"/>
                 <outlet property="playlistButton" destination="4671" id="AZd-5b-MrA"/>
                 <outlet property="prevButton" destination="qfh-30-nky" id="uN2-nC-7Mt"/>
+                <outlet property="prevButtonWidthConstraint" destination="bP7-Ec-OLG" id="qs4-ok-Ual"/>
                 <outlet property="progressBar" destination="3584" id="d57-az-Grm"/>
                 <outlet property="progressView" destination="5335" id="dBT-U1-rmL"/>
                 <outlet property="repeatButton" destination="2789" id="lRj-JN-Yry"/>

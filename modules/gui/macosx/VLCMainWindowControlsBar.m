@@ -56,8 +56,6 @@
     NSLayoutConstraint *_hideNextButtonConstraint;
 }
 
-- (void)addJumpButtons:(BOOL)b_fast;
-- (void)removeJumpButtons:(BOOL)b_fast;
 - (void)addPlaymodeButtons:(BOOL)withAnimation;
 - (void)removePlaymodeButtons:(BOOL)withAnimation;
 
@@ -200,23 +198,9 @@
     if (!b_show_playmode_buttons)
         [self removePlaymodeButtons:NO];
 
-    _hidePrevButtonConstraint = [NSLayoutConstraint constraintWithItem:self.prevButton
-                                                               attribute:NSLayoutAttributeWidth
-                                                               relatedBy:NSLayoutRelationEqual
-                                                                  toItem:nil
-                                                               attribute:NSLayoutAttributeNotAnAttribute
-                                                              multiplier:1
-                                                                constant:0];
-    _hideNextButtonConstraint = [NSLayoutConstraint constraintWithItem:self.nextButton
-                                                             attribute:NSLayoutAttributeWidth
-                                                             relatedBy:NSLayoutRelationEqual
-                                                                toItem:nil
-                                                             attribute:NSLayoutAttributeNotAnAttribute
-                                                            multiplier:1
-                                                              constant:0];
     b_show_jump_buttons = var_InheritBool(getIntf(), "macosx-show-playback-buttons");
     if (!b_show_jump_buttons)
-        [self removeJumpButtons:YES];
+        [self removeJumpButtons:NO];
 
     [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
 
@@ -291,50 +275,55 @@
     b_show_jump_buttons = config_GetInt(getIntf(), "macosx-show-playback-buttons");
 
     if (b_show_jump_buttons)
-        [self addJumpButtons:NO];
+        [self addJumpButtons:YES];
     else
-        [self removeJumpButtons:NO];
+        [self removeJumpButtons:YES];
 }
 
-- (void)addJumpButtons:(BOOL)b_fast
+- (void)addJumpButtons:(BOOL)withAnimation
 {
-    [self.prevButton removeConstraint:_hidePrevButtonConstraint];
-    [self.nextButton removeConstraint:_hideNextButtonConstraint];
+    [NSAnimationContext beginGrouping];
+    [self showButtonWithConstraint:self.prevButtonWidthConstraint animation:withAnimation];
+    [self showButtonWithConstraint:self.nextButtonWidthConstraint animation:withAnimation];
 
+    id backwardButton = withAnimation ? self.backwardButton.animator : self.backwardButton;
+    id forwardButton = withAnimation ? self.forwardButton.animator : self.forwardButton;
     if (self.darkInterface) {
-        [[self.forwardButton animator] setImage:imageFromRes(@"forward-6btns-dark")];
-        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-6btns-dark-pressed")];
-        [[self.backwardButton animator] setImage:imageFromRes(@"backward-6btns-dark")];
-        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-6btns-dark-pressed")];
+        [forwardButton setImage:imageFromRes(@"forward-6btns-dark")];
+        [forwardButton setAlternateImage:imageFromRes(@"forward-6btns-dark-pressed")];
+        [backwardButton setImage:imageFromRes(@"backward-6btns-dark")];
+        [backwardButton setAlternateImage:imageFromRes(@"backward-6btns-dark-pressed")];
     } else {
-        [[self.forwardButton animator] setImage:imageFromRes(@"forward-6btns")];
-        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-6btns-pressed")];
-        [[self.backwardButton animator] setImage:imageFromRes(@"backward-6btns")];
-        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-6btns-pressed")];
+        [forwardButton setImage:imageFromRes(@"forward-6btns")];
+        [forwardButton setAlternateImage:imageFromRes(@"forward-6btns-pressed")];
+        [backwardButton setImage:imageFromRes(@"backward-6btns")];
+        [backwardButton setAlternateImage:imageFromRes(@"backward-6btns-pressed")];
     }
+    [NSAnimationContext endGrouping];
 
     [self toggleForwardBackwardMode: YES];
 }
 
-- (void)removeJumpButtons:(BOOL)b_fast
+- (void)removeJumpButtons:(BOOL)withAnimation
 {
-    if (!self.prevButton || !self.nextButton)
-        return;
+    [NSAnimationContext beginGrouping];
+    [self hideButtonWithConstraint:self.prevButtonWidthConstraint animation:withAnimation];
+    [self hideButtonWithConstraint:self.nextButtonWidthConstraint animation:withAnimation];
 
-    [self.prevButton addConstraint:_hidePrevButtonConstraint];
-    [self.nextButton addConstraint:_hideNextButtonConstraint];
-
+    id backwardButton = withAnimation ? self.backwardButton.animator : self.backwardButton;
+    id forwardButton = withAnimation ? self.forwardButton.animator : self.forwardButton;
     if (self.darkInterface) {
-        [[self.forwardButton animator] setImage:imageFromRes(@"forward-3btns-dark")];
-        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-3btns-dark-pressed")];
-        [[self.backwardButton animator] setImage:imageFromRes(@"backward-3btns-dark")];
-        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-3btns-dark-pressed")];
+        [forwardButton setImage:imageFromRes(@"forward-3btns-dark")];
+        [forwardButton setAlternateImage:imageFromRes(@"forward-3btns-dark-pressed")];
+        [backwardButton setImage:imageFromRes(@"backward-3btns-dark")];
+        [backwardButton setAlternateImage:imageFromRes(@"backward-3btns-dark-pressed")];
     } else {
-        [[self.forwardButton animator] setImage:imageFromRes(@"forward-3btns")];
-        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-3btns-pressed")];
-        [[self.backwardButton animator] setImage:imageFromRes(@"backward-3btns")];
-        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-3btns-pressed")];
+        [forwardButton setImage:imageFromRes(@"forward-3btns")];
+        [forwardButton setAlternateImage:imageFromRes(@"forward-3btns-pressed")];
+        [backwardButton setImage:imageFromRes(@"backward-3btns")];
+        [backwardButton setAlternateImage:imageFromRes(@"backward-3btns-pressed")];
     }
+    [NSAnimationContext endGrouping];
 
     [self toggleForwardBackwardMode: NO];
 }
