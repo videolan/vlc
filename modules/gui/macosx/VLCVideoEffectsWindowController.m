@@ -788,21 +788,41 @@
 #pragma mark basic
 - (IBAction)enableAdjust:(id)sender
 {
-    BOOL b_state = [_adjustCheckbox state];
+    if (sender == _adjustResetButton) {
+        [_adjustBrightnessSlider setFloatValue: 1.0];
+        [_adjustContrastSlider setFloatValue: 1.0];
+        [_adjustGammaSlider setFloatValue: 1.0];
+        [_adjustHueSlider setFloatValue: 0];
+        [_adjustSaturationSlider setFloatValue: 1.0];
+        [_adjustBrightnessSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [_adjustContrastSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [_adjustGammaSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", 0.0]];
+        [_adjustSaturationSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
 
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "adjust" on: b_state];
-    [_adjustBrightnessSlider setEnabled: b_state];
-    [_adjustBrightnessCheckbox setEnabled: b_state];
-    [_adjustBrightnessLabel setEnabled: b_state];
-    [_adjustContrastSlider setEnabled: b_state];
-    [_adjustContrastLabel setEnabled: b_state];
-    [_adjustGammaSlider setEnabled: b_state];
-    [_adjustGammaLabel setEnabled: b_state];
-    [_adjustHueSlider setEnabled: b_state];
-    [_adjustHueLabel setEnabled: b_state];
-    [_adjustSaturationSlider setEnabled: b_state];
-    [_adjustSaturationLabel setEnabled: b_state];
-    [_adjustResetButton setEnabled: b_state];
+        VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
+        [vci_si setVideoFilterProperty: "brightness" forFilter: "adjust" float: 1.0];
+        [vci_si setVideoFilterProperty: "contrast" forFilter: "adjust" float: 1.0];
+        [vci_si setVideoFilterProperty: "gamma" forFilter: "adjust" float: 1.0];
+        [vci_si setVideoFilterProperty: "hue" forFilter: "adjust" float: 0.0];
+        [vci_si setVideoFilterProperty: "saturation" forFilter: "adjust" float: 1.0];
+    } else {
+        BOOL b_state = [_adjustCheckbox state];
+
+        [[VLCCoreInteraction sharedInstance] setVideoFilter: "adjust" on: b_state];
+        [_adjustBrightnessSlider setEnabled: b_state];
+        [_adjustBrightnessCheckbox setEnabled: b_state];
+        [_adjustBrightnessLabel setEnabled: b_state];
+        [_adjustContrastSlider setEnabled: b_state];
+        [_adjustContrastLabel setEnabled: b_state];
+        [_adjustGammaSlider setEnabled: b_state];
+        [_adjustGammaLabel setEnabled: b_state];
+        [_adjustHueSlider setEnabled: b_state];
+        [_adjustHueLabel setEnabled: b_state];
+        [_adjustSaturationSlider setEnabled: b_state];
+        [_adjustSaturationLabel setEnabled: b_state];
+        [_adjustResetButton setEnabled: b_state];
+    }
 }
 
 - (IBAction)adjustSliderChanged:(id)sender
@@ -827,26 +847,7 @@
 - (IBAction)enableAdjustBrightnessThreshold:(id)sender
 {
     VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
-
-    if (sender == _adjustResetButton) {
-        [_adjustBrightnessSlider setFloatValue: 1.0];
-        [_adjustContrastSlider setFloatValue: 1.0];
-        [_adjustGammaSlider setFloatValue: 1.0];
-        [_adjustHueSlider setFloatValue: 0];
-        [_adjustSaturationSlider setFloatValue: 1.0];
-        [_adjustBrightnessSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [_adjustContrastSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [_adjustGammaSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", 0.0]];
-        [_adjustSaturationSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [vci_si setVideoFilterProperty: "brightness" forFilter: "adjust" float: 1.0];
-        [vci_si setVideoFilterProperty: "contrast" forFilter: "adjust" float: 1.0];
-        [vci_si setVideoFilterProperty: "gamma" forFilter: "adjust" float: 1.0];
-        [vci_si setVideoFilterProperty: "hue" forFilter: "adjust" float: 0.0];
-        [vci_si setVideoFilterProperty: "saturation" forFilter: "adjust" float: 1.0];
-    } else
-        [vci_si setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" boolean: [_adjustBrightnessCheckbox state]];
-
+    [vci_si setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" boolean: [_adjustBrightnessCheckbox state]];
 }
 
 - (IBAction)enableSharpen:(id)sender
