@@ -129,7 +129,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self.window setTitle: _NS("Open Source")];
-    [_mrlLabel setStringValue: _NS("Media Resource Locator (MRL)")];
+    [_mrlButtonLabel setTitle: _NS("Media Resource Locator (MRL)")];
 
     [_okButton setTitle: _NS("Open")];
     [_cancelButton setTitle: _NS("Cancel")];

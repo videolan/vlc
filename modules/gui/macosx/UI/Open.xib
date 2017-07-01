@@ -84,9 +84,8 @@
                 <outlet property="fileSubtitlesIconWell" destination="3335" id="Ewo-mh-0b9"/>
                 <outlet property="fileTreatAsPipeButton" destination="834" id="qZ9-Ma-hdL"/>
                 <outlet property="mrlButton" destination="2836" id="BTX-dY-2pe"/>
-                <outlet property="mrlLabel" destination="2835" id="dYM-KV-nw8"/>
+                <outlet property="mrlButtonLabel" destination="kwb-cv-hMZ" id="RqG-TM-bZ0"/>
                 <outlet property="mrlTextField" destination="2840" id="YtE-PL-EEV"/>
-                <outlet property="mrlView" destination="2837" id="4C3-kA-e1R"/>
                 <outlet property="mrlViewHeightConstraint" destination="M1Q-TC-tLd" id="ctk-fz-NgD"/>
                 <outlet property="netHTTPURLLabel" destination="725" id="V9O-ut-b26"/>
                 <outlet property="netHTTPURLTextField" destination="730" id="L9w-sd-gAb"/>
@@ -524,7 +523,7 @@
                     </tabView>
                     <button identifier="mrl button" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2836">
                         <rect key="frame" x="20" y="131" width="13" height="13"/>
-                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="1F3D5BE8-1854-49AC-9658-089829738770" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
+                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="7662E04A-C488-4889-8A64-F0271C8DCE46" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -532,14 +531,6 @@
                             <action selector="expandMRLfieldAction:" target="-2" id="xIA-tD-1dw"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2835">
-                        <rect key="frame" x="38" y="131" width="166" height="14"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Media Resource Locator (MRL)" id="2892">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <customView identifier="mrl view" translatesAutoresizingMaskIntoConstraints="NO" id="2837">
                         <rect key="frame" x="35" y="90" width="504" height="39"/>
                         <subviews>
@@ -622,19 +613,29 @@ Gw
                             <action selector="panelCancel:" target="-2" id="9aG-gu-Abl"/>
                         </connections>
                     </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kwb-cv-hMZ">
+                        <rect key="frame" x="33" y="131" width="166" height="14"/>
+                        <buttonCell key="cell" type="square" title="Media Resource Locator (MRL)" bezelStyle="shadowlessSquare" alignment="left" imageScaling="proportionallyDown" inset="2" id="VXw-Fk-qfp">
+                            <behavior key="behavior" lightByContents="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="performClick:" target="2836" id="VaF-KC-MIR"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="2837" firstAttribute="top" secondItem="2836" secondAttribute="bottom" constant="2" id="1Zn-W0-Q4C"/>
                     <constraint firstItem="2836" firstAttribute="leading" secondItem="678" secondAttribute="leading" id="23O-ir-xvo"/>
                     <constraint firstItem="640" firstAttribute="top" secondItem="1256" secondAttribute="bottom" constant="16" id="4qd-10-LcF"/>
-                    <constraint firstItem="2835" firstAttribute="leading" secondItem="2836" secondAttribute="trailing" constant="7" id="D4Y-0l-5IH"/>
-                    <constraint firstItem="2835" firstAttribute="baseline" secondItem="2836" secondAttribute="baseline" constant="5" id="IIG-7j-y4U"/>
                     <constraint firstItem="678" firstAttribute="leading" secondItem="637" secondAttribute="leading" constant="20" symbolic="YES" id="M6M-zD-ejl"/>
                     <constraint firstItem="2836" firstAttribute="top" secondItem="678" secondAttribute="bottom" constant="8" symbolic="YES" id="MKs-LN-9kf"/>
                     <constraint firstItem="2837" firstAttribute="leading" secondItem="678" secondAttribute="leading" constant="15" id="Qo9-5e-hpg"/>
                     <constraint firstItem="641" firstAttribute="centerY" secondItem="640" secondAttribute="centerY" id="UVS-ZX-oI1"/>
                     <constraint firstAttribute="trailing" secondItem="678" secondAttribute="trailing" constant="20" symbolic="YES" id="VQr-tH-iXh"/>
+                    <constraint firstItem="kwb-cv-hMZ" firstAttribute="bottom" secondItem="2836" secondAttribute="bottom" id="bmp-eJ-RfD"/>
                     <constraint firstItem="929" firstAttribute="top" secondItem="2837" secondAttribute="bottom" constant="16" id="bnV-jE-1yz"/>
+                    <constraint firstItem="kwb-cv-hMZ" firstAttribute="leading" secondItem="2836" secondAttribute="trailing" id="cPm-q3-EwE"/>
                     <constraint firstAttribute="trailing" secondItem="1256" secondAttribute="trailing" constant="20" id="cUM-b1-5Ge"/>
                     <constraint firstItem="2837" firstAttribute="trailing" secondItem="678" secondAttribute="trailing" constant="-15" id="erI-Pi-xqK"/>
                     <constraint firstAttribute="trailing" secondItem="640" secondAttribute="trailing" constant="20" id="fwB-4h-Xua"/>
@@ -1891,7 +1892,7 @@ To open a stream using a different protocol, just press Cancel to close this she
         <userDefaultsController representsSharedInstance="YES" id="3521"/>
     </objects>
     <resources>
-        <image name="1F3D5BE8-1854-49AC-9658-089829738770" width="1" height="1">
+        <image name="7662E04A-C488-4889-8A64-F0271C8DCE46" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
