@@ -334,7 +334,12 @@
 
 - (BOOL)mouseDownCanMoveWindow
 {
-    return NO;
+    if (p_vout) {
+        bool b_vrnav_can_change = var_GetBool(p_vout, "viewpoint-changeable");
+        return !b_vrnav_can_change;
+    }
+
+    return YES;
 }
 
 - (BOOL)acceptsFirstResponder
