@@ -704,6 +704,7 @@
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="3654">
                                                 <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
                                                 <constraints>
+                                                    <constraint firstAttribute="width" constant="29" id="cE9-ym-9VP"/>
                                                     <constraint firstAttribute="height" constant="23" id="eNr-1j-DKO"/>
                                                 </constraints>
                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="effects-double-buttons" imagePosition="only" alignment="center" alternateImage="effects-double-buttons-pressed" id="4281">
@@ -843,6 +844,7 @@
                 <outlet property="bottomBarView" destination="4756" id="5621"/>
                 <outlet property="dropView" destination="5608" id="zUe-aW-9EY"/>
                 <outlet property="effectsButton" destination="3654" id="VfE-Hs-5Ni"/>
+                <outlet property="effectsButtonWidthConstraint" destination="cE9-ym-9VP" id="ZQQ-m6-t7W"/>
                 <outlet property="forwardButton" destination="3648" id="0bA-YS-tkr"/>
                 <outlet property="fullscreenButton" destination="4419" id="hgS-Tk-jle"/>
                 <outlet property="nextButton" destination="HBS-xq-EkN" id="MIO-Ba-jDH"/>

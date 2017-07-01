@@ -52,6 +52,7 @@
 @property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
 
 @property (readwrite, strong) IBOutlet NSButton *effectsButton;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *effectsButtonWidthConstraint;
 
 - (IBAction)stop:(id)sender;
 

@@ -54,8 +54,6 @@
 
     NSLayoutConstraint *_hidePrevButtonConstraint;
     NSLayoutConstraint *_hideNextButtonConstraint;
-
-    NSLayoutConstraint *_hideEffectsButtonConstraint;
 }
 
 - (void)addJumpButtons:(BOOL)b_fast;
@@ -195,15 +193,8 @@
     [self.volumeUpButton setEnabled: b_mute];
 
     // configure optional buttons
-    _hideEffectsButtonConstraint = [NSLayoutConstraint constraintWithItem:self.effectsButton
-                                                      attribute:NSLayoutAttributeWidth
-                                                      relatedBy:NSLayoutRelationEqual
-                                                         toItem:nil
-                                                      attribute:NSLayoutAttributeNotAnAttribute
-                                                     multiplier:1
-                                                       constant:0];
     if (!var_InheritBool(getIntf(), "macosx-show-effects-button"))
-        [self removeEffectsButton:YES];
+        [self removeEffectsButton:NO];
 
     b_show_playmode_buttons = var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
     if (!b_show_playmode_buttons)
@@ -254,47 +245,45 @@
 - (void)toggleEffectsButton
 {
     if (config_GetInt(getIntf(), "macosx-show-effects-button"))
-        [self addEffectsButton:NO];
+        [self addEffectsButton:YES];
     else
-        [self removeEffectsButton:NO];
+        [self removeEffectsButton:YES];
 }
 
-- (void)addEffectsButton:(BOOL)b_fast
+- (void)addEffectsButton:(BOOL)withAnimation
 {
-    if (!self.effectsButton)
-        return;
+    [NSAnimationContext beginGrouping];
+    [self showButtonWithConstraint:self.effectsButtonWidthConstraint animation:withAnimation];
 
-    [self.effectsButton removeConstraint:_hideEffectsButtonConstraint];
-
+    id button = withAnimation ? self.fullscreenButton.animator : self.fullscreenButton;
     if (!self.nativeFullscreenMode) {
         if (self.darkInterface) {
-            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
-            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
+            [button setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
+            [button setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
         } else {
-            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-double-buttons")];
-            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
+            [button setImage: imageFromRes(@"fullscreen-double-buttons")];
+            [button setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
         }
     }
-
-    [self.bottomBarView setNeedsDisplay:YES];
+    [NSAnimationContext endGrouping];
 }
 
-- (void)removeEffectsButton:(BOOL)b_fast
+- (void)removeEffectsButton:(BOOL)withAnimation
 {
-    if (!self.effectsButton)
-        return;
+    [NSAnimationContext beginGrouping];
+    [self hideButtonWithConstraint:self.effectsButtonWidthConstraint animation:withAnimation];
 
-    [self.effectsButton addConstraint:_hideEffectsButtonConstraint];
-
+    id button = withAnimation ? self.fullscreenButton.animator : self.fullscreenButton;
     if (!self.nativeFullscreenMode) {
         if (self.darkInterface) {
-            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-one-button_dark")];
-            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
+            [button setImage: imageFromRes(@"fullscreen-one-button_dark")];
+            [button setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
         } else {
-            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-one-button")];
-            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
+            [button setImage: imageFromRes(@"fullscreen-one-button")];
+            [button setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
         }
     }
+    [NSAnimationContext endGrouping];
 }
 
 - (void)toggleJumpButtons
