@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -33,7 +33,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="286" width="399" height="224"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="399" height="224"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -44,7 +44,7 @@
                             <rect key="frame" x="1" y="1" width="372" height="45"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6">
+                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="240" translatesAutoresizingMaskIntoConstraints="NO" id="6">
                                     <rect key="frame" x="15" y="16" width="154" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio track synchronization:" id="7" customClass="VLCHUDTextFieldCell">
                                         <font key="font" metaFont="smallSystem"/>
@@ -72,6 +72,9 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="10">
                                     <rect key="frame" x="343" y="11" width="15" height="22"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="11" id="o6E-3c-2GM"/>
+                                    </constraints>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="11" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
@@ -83,6 +86,7 @@
                             <constraints>
                                 <constraint firstItem="6" firstAttribute="centerY" secondItem="cSz-hU-mVM" secondAttribute="centerY" id="5Vp-9w-oUr"/>
                                 <constraint firstItem="6" firstAttribute="leading" secondItem="cSz-hU-mVM" secondAttribute="leading" constant="17" id="aVd-9P-n8Q"/>
+                                <constraint firstItem="8" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6" secondAttribute="trailing" constant="17" id="k8E-KO-bnf"/>
                                 <constraint firstItem="10" firstAttribute="leading" secondItem="8" secondAttribute="trailing" constant="8" id="s7s-bB-pDz"/>
                                 <constraint firstItem="10" firstAttribute="centerY" secondItem="cSz-hU-mVM" secondAttribute="centerY" id="vZl-MW-Ozf"/>
                                 <constraint firstItem="8" firstAttribute="centerY" secondItem="10" secondAttribute="centerY" id="zRC-FF-830"/>
@@ -100,7 +104,7 @@
                             <rect key="frame" x="1" y="1" width="374" height="107"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="21">
+                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="250" translatesAutoresizingMaskIntoConstraints="NO" id="21">
                                     <rect key="frame" x="15" y="79" width="164" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Subtitle track synchronization:" id="22" customClass="VLCHUDTextFieldCell">
                                         <font key="font" metaFont="smallSystem"/>
@@ -128,6 +132,9 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="19">
                                     <rect key="frame" x="343" y="74" width="15" height="22"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="11" id="zn7-Ia-vuR"/>
+                                    </constraints>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="24" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
@@ -163,6 +170,9 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="29">
                                     <rect key="frame" x="343" y="43" width="15" height="22"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="11" id="g4V-Ed-ddS"/>
+                                    </constraints>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="100" doubleValue="1" id="34" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
@@ -198,6 +208,9 @@
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="105">
                                     <rect key="frame" x="343" y="13" width="15" height="22"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="11" id="gz3-ya-eot"/>
+                                    </constraints>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="20" id="106" customClass="VLCHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
@@ -210,9 +223,11 @@
                                 <constraint firstItem="98" firstAttribute="leading" secondItem="27" secondAttribute="leading" id="46x-ee-a5b"/>
                                 <constraint firstItem="20" firstAttribute="centerY" secondItem="19" secondAttribute="centerY" id="4HX-er-iB1"/>
                                 <constraint firstItem="21" firstAttribute="centerY" secondItem="20" secondAttribute="centerY" id="6VJ-D5-VQ6"/>
+                                <constraint firstItem="28" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="27" secondAttribute="trailing" constant="17" id="83a-ba-qYv"/>
                                 <constraint firstItem="19" firstAttribute="leading" secondItem="20" secondAttribute="trailing" constant="8" id="9qQ-wN-2RZ"/>
                                 <constraint firstItem="27" firstAttribute="centerY" secondItem="28" secondAttribute="centerY" id="EHm-VK-wRd"/>
                                 <constraint firstItem="21" firstAttribute="leading" secondItem="KDu-mg-vUb" secondAttribute="leading" constant="17" id="FaN-bF-8S3"/>
+                                <constraint firstItem="20" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="21" secondAttribute="trailing" constant="17" id="Fgg-CT-Jcw"/>
                                 <constraint firstItem="29" firstAttribute="centerX" secondItem="19" secondAttribute="centerX" id="Lcf-SW-6Mj"/>
                                 <constraint firstItem="105" firstAttribute="leading" secondItem="99" secondAttribute="trailing" constant="8" id="N3A-1H-ZYe"/>
                                 <constraint firstItem="28" firstAttribute="centerY" secondItem="29" secondAttribute="centerY" id="Sd6-fF-Yg3"/>
@@ -222,6 +237,7 @@
                                 <constraint firstItem="29" firstAttribute="top" secondItem="19" secondAttribute="bottom" constant="12" id="Zg5-eS-SFV"/>
                                 <constraint firstItem="27" firstAttribute="leading" secondItem="21" secondAttribute="leading" id="onN-xA-vC9"/>
                                 <constraint firstAttribute="trailing" secondItem="19" secondAttribute="trailing" constant="18" id="peZ-90-9eH"/>
+                                <constraint firstItem="99" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="98" secondAttribute="trailing" constant="17" id="t9z-lx-udQ"/>
                                 <constraint firstItem="19" firstAttribute="top" secondItem="KDu-mg-vUb" secondAttribute="top" constant="12" id="tFi-50-Rg5"/>
                                 <constraint firstItem="29" firstAttribute="leading" secondItem="28" secondAttribute="trailing" constant="8" id="upi-Mf-NNY"/>
                                 <constraint firstItem="105" firstAttribute="centerY" secondItem="99" secondAttribute="centerY" id="yuz-V3-h8W"/>
