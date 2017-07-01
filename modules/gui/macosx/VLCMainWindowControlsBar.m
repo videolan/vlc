@@ -48,16 +48,7 @@
     NSImage * _pressedShuffleImage;
     NSImage * _shuffleOnImage;
     NSImage * _pressedShuffleOnImage;
-
-    BOOL b_show_jump_buttons;
-    BOOL b_show_playmode_buttons;
-
-    NSLayoutConstraint *_hidePrevButtonConstraint;
-    NSLayoutConstraint *_hideNextButtonConstraint;
 }
-
-- (void)addPlaymodeButtons:(BOOL)withAnimation;
-- (void)removePlaymodeButtons:(BOOL)withAnimation;
 
 @end
 
@@ -194,12 +185,10 @@
     if (!var_InheritBool(getIntf(), "macosx-show-effects-button"))
         [self removeEffectsButton:NO];
 
-    b_show_playmode_buttons = var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
-    if (!b_show_playmode_buttons)
+    if (!var_InheritBool(getIntf(), "macosx-show-playmode-buttons"))
         [self removePlaymodeButtons:NO];
 
-    b_show_jump_buttons = var_InheritBool(getIntf(), "macosx-show-playback-buttons");
-    if (!b_show_jump_buttons)
+    if (!var_InheritBool(getIntf(), "macosx-show-playback-buttons"))
         [self removeJumpButtons:NO];
 
     [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
@@ -228,7 +217,7 @@
 
 - (void)toggleEffectsButton
 {
-    if (config_GetInt(getIntf(), "macosx-show-effects-button"))
+    if (var_InheritBool(getIntf(), "macosx-show-effects-button"))
         [self addEffectsButton:YES];
     else
         [self removeEffectsButton:YES];
@@ -272,9 +261,7 @@
 
 - (void)toggleJumpButtons
 {
-    b_show_jump_buttons = config_GetInt(getIntf(), "macosx-show-playback-buttons");
-
-    if (b_show_jump_buttons)
+    if (var_InheritBool(getIntf(), "macosx-show-playback-buttons"))
         [self addJumpButtons:YES];
     else
         [self removeJumpButtons:YES];
@@ -330,9 +317,7 @@
 
 - (void)togglePlaymodeButtons
 {
-    b_show_playmode_buttons = config_GetInt(getIntf(), "macosx-show-playmode-buttons");
-
-    if (b_show_playmode_buttons)
+    if (var_InheritBool(getIntf(), "macosx-show-playmode-buttons"))
         [self addPlaymodeButtons:YES];
     else
         [self removePlaymodeButtons:YES];
@@ -528,11 +513,8 @@
     }
 
     [self.stopButton setEnabled: b_input];
-
-    if (b_show_jump_buttons) {
-        [self.prevButton setEnabled: (b_seekable || b_plmul || b_chapters)];
-        [self.nextButton setEnabled: (b_seekable || b_plmul || b_chapters)];
-    }
+    [self.prevButton setEnabled: (b_seekable || b_plmul || b_chapters)];
+    [self.nextButton setEnabled: (b_seekable || b_plmul || b_chapters)];
 
     [[[VLCMain sharedInstance] mainMenu] setRateControlsEnabled: b_control];
 }

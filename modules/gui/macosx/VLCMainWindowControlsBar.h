@@ -68,7 +68,6 @@
 - (IBAction)repeat:(id)sender;
 
 - (void)setShuffle;
-- (IBAction)shuffle:(id)sender;
 
 - (IBAction)togglePlaylist:(id)sender;
 

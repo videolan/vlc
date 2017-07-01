@@ -366,13 +366,13 @@
 
     [_viewMenu setTitle: _NS("View")];
     [_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];
-    [_toggleJumpButtons setState: config_GetInt(getIntf(), "macosx-show-playback-buttons")];
+    [_toggleJumpButtons setState: var_InheritBool(getIntf(), "macosx-show-playback-buttons")];
     [_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
-    [_togglePlaymodeButtons setState: config_GetInt(getIntf(), "macosx-show-playmode-buttons")];
+    [_togglePlaymodeButtons setState: var_InheritBool(getIntf(), "macosx-show-playmode-buttons")];
     [_toggleEffectsButton setTitle: _NS("Show Audio Effects Button")];
-    [_toggleEffectsButton setState: config_GetInt(getIntf(), "macosx-show-effects-button")];
+    [_toggleEffectsButton setState: var_InheritBool(getIntf(), "macosx-show-effects-button")];
     [_toggleSidebar setTitle: _NS("Show Sidebar")];
-    [_toggleSidebar setState: config_GetInt(getIntf(), "macosx-show-sidebar")];
+    [_toggleSidebar setState: var_InheritBool(getIntf(), "macosx-show-sidebar")];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
@@ -659,7 +659,7 @@
 
 - (IBAction)toggleEffectsButton:(id)sender
 {
-    BOOL b_value = !config_GetInt(getIntf(), "macosx-show-effects-button");
+    BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-effects-button");
     config_PutInt(getIntf(), "macosx-show-effects-button", b_value);
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleEffectsButton];
     [_toggleEffectsButton setState: b_value];
@@ -667,7 +667,7 @@
 
 - (IBAction)toggleJumpButtons:(id)sender
 {
-    BOOL b_value = !config_GetInt(getIntf(), "macosx-show-playback-buttons");
+    BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playback-buttons");
     config_PutInt(getIntf(), "macosx-show-playback-buttons", b_value);
 
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
@@ -680,7 +680,7 @@
 
 - (IBAction)togglePlaymodeButtons:(id)sender
 {
-    BOOL b_value = !config_GetInt(getIntf(), "macosx-show-playmode-buttons");
+    BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
     config_PutInt(getIntf(), "macosx-show-playmode-buttons", b_value);
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
     [_togglePlaymodeButtons setState: b_value];
@@ -693,7 +693,7 @@
 
 - (void)updateSidebarMenuItem
 {
-    [_toggleSidebar setState: config_GetInt(getIntf(), "macosx-show-sidebar")];
+    [_toggleSidebar setState: var_InheritBool(getIntf(), "macosx-show-sidebar")];
 }
 
 #pragma mark - Playback

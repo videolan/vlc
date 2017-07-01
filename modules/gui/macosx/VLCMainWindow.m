@@ -284,7 +284,7 @@ static const float f_min_window_height = 307.;
     /* restore split view */
     f_lastLeftSplitViewWidth = 200;
     /* trick NSSplitView implementation, which pretends to know better than us */
-    if (!config_GetInt(getIntf(), "macosx-show-sidebar"))
+    if (!var_InheritBool(getIntf(), "macosx-show-sidebar"))
         [self performSelector:@selector(toggleLeftSubSplitView) withObject:nil afterDelay:0.05];
 }
 
