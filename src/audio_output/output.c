@@ -445,6 +445,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     aout_FormatPrepare (fmt);
+    assert (aout_FormatNbChannels(fmt) > 0);
     assert (fmt->i_bytes_per_frame > 0 && fmt->i_frame_length > 0);
     aout_FormatPrint (aout, "output", fmt);
     return 0;
