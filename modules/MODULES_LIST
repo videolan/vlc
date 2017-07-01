@@ -108,6 +108,7 @@ $Id$
  * direct3d11_adjust: adjust filter for Direct3D11 video decoding
  * direct3d11_deinterlace: deinterlacer for Direct3D11 video decoding
  * direct3d9: video output module using the Direct3D9 API
+ * direct3d9_adjust: adjust filter for Direct3D9 video decoding
  * direct3d9_deinterlace: deinterlacer for Direct3D9/DxVA video decoding
  * directdraw: video output module using the DirectDraw API
  * directfb: Direct Framebuffer video output
