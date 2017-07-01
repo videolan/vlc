@@ -56,15 +56,12 @@
     NSLayoutConstraint *_hideNextButtonConstraint;
 
     NSLayoutConstraint *_hideEffectsButtonConstraint;
-
-    NSLayoutConstraint *_hideRepeatButtonConstraint;
-    NSLayoutConstraint *_hideShuffleButtonConstraint;
 }
 
 - (void)addJumpButtons:(BOOL)b_fast;
 - (void)removeJumpButtons:(BOOL)b_fast;
-- (void)addPlaymodeButtons:(BOOL)b_fast;
-- (void)removePlaymodeButtons:(BOOL)b_fast;
+- (void)addPlaymodeButtons:(BOOL)withAnimation;
+- (void)removePlaymodeButtons:(BOOL)withAnimation;
 
 @end
 
@@ -208,23 +205,9 @@
     if (!var_InheritBool(getIntf(), "macosx-show-effects-button"))
         [self removeEffectsButton:YES];
 
-    _hideRepeatButtonConstraint = [NSLayoutConstraint constraintWithItem:self.repeatButton
-                                                                attribute:NSLayoutAttributeWidth
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:nil
-                                                                attribute:NSLayoutAttributeNotAnAttribute
-                                                               multiplier:1
-                                                                 constant:0];
-    _hideShuffleButtonConstraint = [NSLayoutConstraint constraintWithItem:self.shuffleButton
-                                                               attribute:NSLayoutAttributeWidth
-                                                               relatedBy:NSLayoutRelationEqual
-                                                                  toItem:nil
-                                                               attribute:NSLayoutAttributeNotAnAttribute
-                                                              multiplier:1
-                                                                constant:0];
     b_show_playmode_buttons = var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
     if (!b_show_playmode_buttons)
-        [self removePlaymodeButtons:YES];
+        [self removePlaymodeButtons:NO];
 
     _hidePrevButtonConstraint = [NSLayoutConstraint constraintWithItem:self.prevButton
                                                                attribute:NSLayoutAttributeWidth
@@ -251,6 +234,22 @@
 #pragma mark -
 #pragma mark interface customization
 
+
+- (void)hideButtonWithConstraint:(NSLayoutConstraint *)constraint animation:(BOOL)animation
+{
+    NSAssert([constraint.firstItem isKindOfClass:[NSButton class]], @"Constraint must be for NSButton object");
+
+    NSLayoutConstraint *animatedConstraint = animation ? constraint.animator : constraint;
+    animatedConstraint.constant = 0;
+}
+
+- (void)showButtonWithConstraint:(NSLayoutConstraint *)constraint animation:(BOOL)animation
+{
+    NSAssert([constraint.firstItem isKindOfClass:[NSButton class]], @"Constraint must be for NSButton object");
+
+    NSLayoutConstraint *animatedConstraint = animation ? constraint.animator : constraint;
+    animatedConstraint.constant = ((NSButton *)constraint.firstItem).image.size.width;
+}
 
 - (void)toggleEffectsButton
 {
@@ -356,37 +355,44 @@
     b_show_playmode_buttons = config_GetInt(getIntf(), "macosx-show-playmode-buttons");
 
     if (b_show_playmode_buttons)
-        [self addPlaymodeButtons:NO];
+        [self addPlaymodeButtons:YES];
     else
-        [self removePlaymodeButtons:NO];
+        [self removePlaymodeButtons:YES];
 }
 
-- (void)addPlaymodeButtons:(BOOL)b_fast
+- (void)addPlaymodeButtons:(BOOL)withAnimation
 {
-    [self.repeatButton removeConstraint:_hideRepeatButtonConstraint];
-    [self.shuffleButton removeConstraint:_hideShuffleButtonConstraint];
+    [NSAnimationContext beginGrouping];
+    [self showButtonWithConstraint:self.repeatButtonWidthConstraint animation:withAnimation];
+    [self showButtonWithConstraint:self.shuffleButtonWidthConstraint animation:withAnimation];
 
+    id button = withAnimation ? self.playlistButton.animator : self.playlistButton;
     if (self.darkInterface) {
-        [[self.playlistButton animator] setImage:imageFromRes(@"playlist_dark")];
-        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-pressed_dark")];
+        [button setImage:imageFromRes(@"playlist_dark")];
+        [button setAlternateImage:imageFromRes(@"playlist-pressed_dark")];
     } else {
-        [[self.playlistButton animator] setImage:imageFromRes(@"playlist-btn")];
-        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-btn-pressed")];
+        [button setImage:imageFromRes(@"playlist-btn")];
+        [button setAlternateImage:imageFromRes(@"playlist-btn-pressed")];
     }
+    [NSAnimationContext endGrouping];
 }
 
-- (void)removePlaymodeButtons:(BOOL)b_fast
+- (void)removePlaymodeButtons:(BOOL)withAnimation
 {
-    [self.repeatButton addConstraint:_hideRepeatButtonConstraint];
-    [self.shuffleButton addConstraint:_hideShuffleButtonConstraint];
+    [NSAnimationContext beginGrouping];
 
+    [self hideButtonWithConstraint:self.repeatButtonWidthConstraint animation:withAnimation];
+    [self hideButtonWithConstraint:self.shuffleButtonWidthConstraint animation:withAnimation];
+
+    id button = withAnimation ? self.playlistButton.animator : self.playlistButton;
     if (self.darkInterface) {
-        [[self.playlistButton animator] setImage:imageFromRes(@"playlist-1btn-dark")];
-        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-1btn-dark-pressed")];
+        [button setImage:imageFromRes(@"playlist-1btn-dark")];
+        [button setAlternateImage:imageFromRes(@"playlist-1btn-dark-pressed")];
     } else {
-        [[self.playlistButton animator] setImage:imageFromRes(@"playlist-1btn")];
-        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-1btn-pressed")];
+        [button setImage:imageFromRes(@"playlist-1btn")];
+        [button setAlternateImage:imageFromRes(@"playlist-1btn-pressed")];
     }
+    [NSAnimationContext endGrouping];
 }
 
 #pragma mark -

@@ -14,7 +14,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="VLC media player" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Main Window" customClass="VLCMainWindow">
+        <window title="VLC media player" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="21" userLabel="Main Window" customClass="VLCMainWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="53" y="419" width="716" height="333"/>
@@ -560,6 +560,7 @@
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="2789">
                                                 <rect key="frame" x="28" y="0.0" width="28" height="23"/>
                                                 <constraints>
+                                                    <constraint firstAttribute="width" constant="28" id="3Ww-8A-Fh7"/>
                                                     <constraint firstAttribute="height" constant="23" id="JJL-a1-CWG"/>
                                                 </constraints>
                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="repeat" imagePosition="only" alignment="center" alternateImage="repeat-pressed" inset="2" id="4316">
@@ -573,6 +574,7 @@
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="2208">
                                                 <rect key="frame" x="56" y="0.0" width="29" height="23"/>
                                                 <constraints>
+                                                    <constraint firstAttribute="width" constant="29" id="6Z4-L0-Wzo"/>
                                                     <constraint firstAttribute="height" constant="23" id="7YJ-zp-9if"/>
                                                 </constraints>
                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="shuffle" imagePosition="only" alignment="center" alternateImage="shuffle-pressed" inset="2" id="4313">
@@ -850,7 +852,9 @@
                 <outlet property="progressBar" destination="3584" id="d57-az-Grm"/>
                 <outlet property="progressView" destination="5335" id="dBT-U1-rmL"/>
                 <outlet property="repeatButton" destination="2789" id="lRj-JN-Yry"/>
+                <outlet property="repeatButtonWidthConstraint" destination="3Ww-8A-Fh7" id="i89-fY-S9w"/>
                 <outlet property="shuffleButton" destination="2208" id="kf1-mU-75T"/>
+                <outlet property="shuffleButtonWidthConstraint" destination="6Z4-L0-Wzo" id="xFz-7x-Vlz"/>
                 <outlet property="stopButton" destination="3647" id="ddx-Gq-iPV"/>
                 <outlet property="timeField" destination="4423" id="Wvo-az-Lou"/>
                 <outlet property="timeSlider" destination="4422" id="I3H-rQ-4GH"/>

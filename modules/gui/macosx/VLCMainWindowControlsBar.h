@@ -41,7 +41,10 @@
 
 @property (readwrite, strong) IBOutlet NSButton *playlistButton;
 @property (readwrite, strong) IBOutlet NSButton *repeatButton;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *repeatButtonWidthConstraint;
+
 @property (readwrite, strong) IBOutlet NSButton *shuffleButton;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *shuffleButtonWidthConstraint;
 
 @property (readwrite, strong) IBOutlet VLCVolumeSliderCommon * volumeSlider;
 @property (readwrite, strong) IBOutlet NSImageView *volumeTrackImageView;
