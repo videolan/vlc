@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -27,7 +28,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="194" width="568" height="316"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <value key="minSize" type="size" width="568" height="316"/>
             <value key="maxSize" type="size" width="568" height="316"/>
             <view key="contentView" id="2">
@@ -79,7 +80,6 @@
                                     </connections>
                                 </tableView>
                             </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <constraints>
                             <constraint firstAttribute="width" constant="260" id="16S-p9-eac"/>
@@ -127,13 +127,13 @@
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="7">
                         <rect key="frame" x="134" y="142" width="32" height="32"/>
                     </progressIndicator>
-                    <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3">
+                    <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3">
                         <rect key="frame" x="285" y="16" width="265" height="289"/>
                         <view key="contentView" id="iYv-xr-08Y">
                             <rect key="frame" x="1" y="1" width="263" height="287"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="31">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="31">
                                     <rect key="frame" x="15" y="259" width="126" height="17"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="My Über Extension" id="32">
                                         <font key="font" metaFont="systemBold"/>
@@ -141,7 +141,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="30">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="30">
                                     <rect key="frame" x="15" y="237" width="56" height="14"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="That's me" id="33">
                                         <font key="font" metaFont="smallSystem"/>
@@ -149,7 +149,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="29">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="29">
                                     <rect key="frame" x="15" y="215" width="73" height="14"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Version 2.0.0" id="34">
                                         <font key="font" metaFont="smallSystem"/>
@@ -163,7 +163,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="228" height="163"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
-                                            <textView editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" findStyle="panel" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="35">
+                                            <textView editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" usesFontPanel="YES" findStyle="panel" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="35">
                                                 <rect key="frame" x="0.0" y="0.0" width="228" height="163"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -182,8 +182,6 @@ I've never been this far away from home</string>
                                                     </fragment>
                                                 </attributedString>
                                                 <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <size key="minSize" width="228" height="163"/>
-                                                <size key="maxSize" width="228" height="10000000"/>
                                             </textView>
                                         </subviews>
                                         <color key="backgroundColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -223,8 +221,6 @@ I've never been this far away from home</string>
                                 <constraint firstItem="99" firstAttribute="top" secondItem="28" secondAttribute="bottom" constant="10" id="unV-XY-3c6"/>
                             </constraints>
                         </view>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="101">
                         <rect key="frame" x="14" y="13" width="272" height="32"/>
@@ -250,6 +246,7 @@ I've never been this far away from home</string>
                     <constraint firstItem="7" firstAttribute="centerY" secondItem="10" secondAttribute="centerY" id="eq7-Jt-kvh"/>
                     <constraint firstItem="9" firstAttribute="top" secondItem="2" secondAttribute="top" constant="13" id="fE2-lZ-mct"/>
                     <constraint firstItem="7" firstAttribute="centerX" secondItem="10" secondAttribute="centerX" id="frM-NA-uJj"/>
+                    <constraint firstItem="iYv-xr-08Y" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="8" secondAttribute="trailing" constant="17" id="gVv-Kc-DdM"/>
                     <constraint firstItem="101" firstAttribute="top" secondItem="10" secondAttribute="bottom" constant="5" id="ieT-LN-pgb"/>
                     <constraint firstAttribute="trailing" secondItem="3" secondAttribute="trailing" constant="21" id="jnc-uA-zqU"/>
                     <constraint firstItem="101" firstAttribute="leading" secondItem="10" secondAttribute="leading" id="mfy-OE-EfI"/>
