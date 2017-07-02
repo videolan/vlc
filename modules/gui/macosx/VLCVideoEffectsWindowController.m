@@ -365,7 +365,8 @@
     }
 
     [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
-    [self profileSelectorAction:self];
+    if (i_old_profile_index || [defaults integerForKey:@"VideoEffectSelectedProfile"])
+        [self profileSelectorAction:self];
 }
 
 - (void)setWidgetValue: (id)widget forOption: (char *)psz_option enabled: (bool)b_state
