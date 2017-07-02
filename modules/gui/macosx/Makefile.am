@@ -142,7 +142,6 @@ EXTRA_DIST += \
 	gui/macosx/UI/CoreDialogs.xib \
 	gui/macosx/UI/DetachedVideoWindow.xib \
 	gui/macosx/UI/ErrorPanel.xib \
-	gui/macosx/UI/FSPanel.xib \
 	gui/macosx/UI/Help.xib \
 	gui/macosx/UI/LogMessageWindow.xib \
 	gui/macosx/UI/MainMenu.xib \
