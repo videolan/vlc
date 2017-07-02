@@ -56,6 +56,8 @@
                 <outlet property="filterNormLevelCheckbox" destination="343" id="Hjr-wL-zji"/>
                 <outlet property="filterNormLevelLabel" destination="341" id="xqp-hZ-4Kx"/>
                 <outlet property="filterNormLevelSlider" destination="342" id="hKR-wL-WGK"/>
+                <outlet property="filterScaleTempoCheckbox" destination="wYr-HG-zA2" id="Io2-dE-xoC"/>
+                <outlet property="filterStereoEnhancerCheckbox" destination="NUi-0U-gqN" id="aym-ex-fgv"/>
                 <outlet property="profilePopup" destination="701" id="fL3-Nz-1t7"/>
                 <outlet property="spatializerBand1Label" destination="277" id="pg6-1P-KW1"/>
                 <outlet property="spatializerBand1Slider" destination="266" id="Cdn-mQ-kxW"/>
@@ -987,6 +989,16 @@
                                                 <action selector="filterEnableHeadPhoneVirt:" target="-2" id="PHU-zj-xvf"/>
                                             </connections>
                                         </button>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="wYr-HG-zA2">
+                                            <rect key="frame" x="14" y="57" width="84" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Scaletempo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="9yB-r8-GZB" customClass="VLCHUDCheckboxCell">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="filterEnableScaleTempo:" target="-2" id="RyL-Bj-fSg"/>
+                                            </connections>
+                                        </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="709">
                                             <rect key="frame" x="14" y="97" width="65" height="18"/>
                                             <buttonCell key="cell" type="check" title="Karaoke" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="710" customClass="VLCHUDCheckboxCell">
@@ -1031,12 +1043,26 @@
                                                 <constraint firstAttribute="height" constant="37" id="wQm-1q-xOZ"/>
                                             </constraints>
                                         </box>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="NUi-0U-gqN">
+                                            <rect key="frame" x="14" y="37" width="109" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Stereo Enhancer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="kvM-H1-VS8" customClass="VLCHUDCheckboxCell">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="filterEnableStereoEnhancer:" target="-2" id="nQn-vb-PhK"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="343" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="807-K7-OVI"/>
+                                        <constraint firstItem="wYr-HG-zA2" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="AAR-fI-Drg"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="344" secondAttribute="trailing" constant="17" id="Bt0-CZ-zNA"/>
                                         <constraint firstItem="727" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="19" id="CP6-RB-2oD"/>
+                                        <constraint firstItem="NUi-0U-gqN" firstAttribute="top" secondItem="wYr-HG-zA2" secondAttribute="bottom" constant="8" id="ERP-Pe-oQ9"/>
                                         <constraint firstItem="709" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="KH7-bt-QAy"/>
+                                        <constraint firstItem="NUi-0U-gqN" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="N7H-Mp-U0I"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="NUi-0U-gqN" secondAttribute="trailing" constant="17" id="N91-oo-QEw"/>
                                         <constraint firstItem="344" firstAttribute="leading" secondItem="340" secondAttribute="leading" constant="17" id="TT3-Ns-bah"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="343" secondAttribute="trailing" constant="17" id="U6r-dx-G3F"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="709" secondAttribute="trailing" constant="17" id="XNI-EE-bK7"/>
@@ -1044,6 +1070,8 @@
                                         <constraint firstItem="344" firstAttribute="top" secondItem="709" secondAttribute="bottom" constant="8" id="hm2-YQ-yW3"/>
                                         <constraint firstItem="343" firstAttribute="top" secondItem="340" secondAttribute="top" constant="17" id="io6-vx-Ttr"/>
                                         <constraint firstItem="eB4-KX-Qdy" firstAttribute="top" secondItem="343" secondAttribute="bottom" constant="1" id="lSW-6i-4TX"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wYr-HG-zA2" secondAttribute="trailing" constant="17" id="qCX-pR-3fB"/>
+                                        <constraint firstItem="wYr-HG-zA2" firstAttribute="top" secondItem="344" secondAttribute="bottom" constant="8" id="s4V-di-NZX"/>
                                         <constraint firstItem="709" firstAttribute="top" secondItem="727" secondAttribute="bottom" constant="9" id="yUQ-aD-K7C"/>
                                     </constraints>
                                 </view>

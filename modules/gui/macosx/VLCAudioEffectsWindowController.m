@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCAudioEffectsWindowController.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2004-2015 VLC authors and VideoLAN
+ * Copyright (C) 2004-2017 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -118,7 +118,6 @@
     [_compressorBand6Label setStringValue:_NS("Knee radius")];
     [_compressorBand7Label setStringValue:_NS("Makeup gain")];
 
-
     /* Spatializer */
     [_spatializerEnableCheckbox setTitle:_NS("Enable Spatializer")];
     [_spatializerResetButton setTitle:_NS("Reset")];
@@ -133,6 +132,8 @@
     [_filterNormLevelCheckbox setTitle:_NS("Volume normalization")];
     [_filterNormLevelLabel setStringValue:_NS("Maximum level")];
     [_filterKaraokeCheckbox setTitle:_NS("Karaoke")];
+    [_filterScaleTempoCheckbox setTitle:_NS("Scaletempo")];
+    [_filterStereoEnhancerCheckbox setTitle:_NS("Stereo Enhancer")];
 
     /* generic */
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"equalizer"]] setLabel:_NS("Equalizer")];
@@ -944,11 +945,15 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     if (psz_afilters) {
         [_filterHeadPhoneCheckbox setState: (NSInteger)strstr(psz_afilters, "headphone") ];
         [_filterKaraokeCheckbox setState: (NSInteger)strstr(psz_afilters, "karaoke") ];
+        [_filterScaleTempoCheckbox setState: (NSInteger)strstr(psz_afilters, "scaletempo") ];
+        [_filterStereoEnhancerCheckbox setState: (NSInteger)strstr(psz_afilters, "stereo_widen") ];
         bEnable_normvol = strstr(psz_afilters, "normvol") != NULL;
         free(psz_afilters);
     } else {
         [_filterHeadPhoneCheckbox setState: NSOffState];
         [_filterKaraokeCheckbox setState: NSOffState];
+        [_filterScaleTempoCheckbox setState: NSOffState];
+        [_filterStereoEnhancerCheckbox setState: NSOffState];
     }
 
     [_filterNormLevelSlider setEnabled:bEnable_normvol];
@@ -960,14 +965,14 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)filterEnableHeadPhoneVirt:(id)sender
 {
-    [self setAudioFilter: "headphone" on:[sender state]];
+    [self setAudioFilter:"headphone" on:[sender state]];
 }
 
 - (IBAction)filterEnableVolumeNorm:(id)sender
 {
     [_filterNormLevelSlider setEnabled:[sender state]];
     [_filterNormLevelLabel setEnabled:[sender state]];
-    [self setAudioFilter: "normvol" on:[sender state]];
+    [self setAudioFilter:"normvol" on:[sender state]];
 }
 
 - (IBAction)filterVolumeNormSliderUpdated:(id)sender
@@ -984,7 +989,17 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)filterEnableKaraoke:(id)sender
 {
-    [self setAudioFilter: "karaoke" on:[sender state]];
+    [self setAudioFilter:"karaoke" on:[sender state]];
+}
+
+- (IBAction)filterEnableScaleTempo:(id)sender
+{
+    [self setAudioFilter:"scaletempo" on:[sender state]];
+}
+
+- (IBAction)filterEnableStereoEnhancer:(id)sender
+{
+    [self setAudioFilter:"stereo_widen" on:[sender state]];
 }
 
 @end
