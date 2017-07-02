@@ -115,6 +115,8 @@ fi
 make > $out
 spopd
 
+core_count=`sysctl -n machdep.cpu.core_count`
+let jobs=$core_count+1
 
 #
 # vlc/contribs
@@ -129,7 +131,7 @@ if [ "$REBUILD" = "yes" ]; then
 fi
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     make fetch
-    make
+    make -j$jobs
 else
 if [ ! -e "../$TRIPLET" ]; then
     make prebuilt > $out
@@ -168,8 +170,6 @@ fi
 # make
 #
 
-core_count=`sysctl -n machdep.cpu.core_count`
-let jobs=$core_count+1
 
 if [ "$REBUILD" = "yes" ]; then
     info "Running make clean"
