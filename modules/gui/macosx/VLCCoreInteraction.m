@@ -744,7 +744,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
     }
 
-    msg_Dbg(p_intf, "will set filter '%s'", psz_name);
+    msg_Dbg(p_intf, "will turn filter '%s' %s", psz_name, b_on ? "on" : "off");
 
     psz_string = var_InheritString(p_playlist, psz_filter_type);
 
