@@ -159,7 +159,6 @@ parts:
       - libfribidi0
       - libgcc1
       - libgl1-mesa-glx
-      - libgles1-mesa
       - libgles2-mesa
       - libglib2.0-0
       - libpulse0
