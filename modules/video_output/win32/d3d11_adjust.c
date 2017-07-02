@@ -178,23 +178,30 @@ static void SetLevel(struct filter_level *range, float val)
 
 static void InitLevel(filter_t *filter, struct filter_level *range, const char *p_name, float def)
 {
-    int level;
+    int level = 0;
 
     module_config_t *cfg = config_FindConfig( VLC_OBJECT(filter), p_name);
-    range->min = cfg->min.f;
-    range->max = cfg->max.f;
-    range->default_val = def;
-
-    float val = var_CreateGetFloatCommand( filter, p_name );
-
-    if (val > range->default_val)
-        level = (range->Range.Maximum - range->Range.Default) * (val - range->default_val) /
-                (range->max - range->default_val);
-    else if (val < range->default_val)
-        level = (range->Range.Minimum - range->Range.Default) * (val - range->default_val) /
-                (range->min - range->default_val);
+    if (unlikely(cfg == NULL))
+    {
+        range->min         = 0.;
+        range->max         = 2.;
+        range->default_val = 1.;
+    }
     else
-        level = 0;
+    {
+        range->min         = cfg->min.f;
+        range->max         = cfg->max.f;
+        range->default_val = def;
+
+        float val = var_CreateGetFloatCommand( filter, p_name );
+
+        if (val > range->default_val)
+            level = (range->Range.Maximum - range->Range.Default) * (val - range->default_val) /
+                    (range->max - range->default_val);
+        else if (val < range->default_val)
+            level = (range->Range.Minimum - range->Range.Default) * (val - range->default_val) /
+                    (range->min - range->default_val);
+    }
 
     atomic_init( &range->level, range->Range.Default + level );
 }
