@@ -301,8 +301,6 @@
             [widget setIntValue: val.i_int];
         else if ([widget isKindOfClass: [NSPopUpButton class]])
             [widget selectItemWithTag: val.i_int];
-        else
-            msg_Warn(p_intf, "Could not find the correct Integer widget");
     }
     else if (i_type == VLC_VAR_FLOAT)
     {
@@ -311,8 +309,6 @@
             [widget setFloatValue: val.f_float];
             [widget setToolTip: [NSString stringWithFormat:@"%0.3f", val.f_float]];
         }
-        else
-            msg_Warn(p_intf, "Could not find the correct Float widget");
     }
     else if (i_type == VLC_VAR_STRING)
     {
@@ -328,8 +324,6 @@
         }
         else if ([widget isKindOfClass: [NSTextField class]])
             [widget setStringValue: toNSStr(val.psz_string)];
-        else
-            msg_Warn(p_intf, "Could not find the correct String widget");
         free(val.psz_string);
     }
 
