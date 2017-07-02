@@ -77,6 +77,8 @@
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"color"]] setLabel:_NS("Color")];
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"misc"]] setLabel:_NS("Miscellaneous")];
 
+    [_applyProfileCheckbox setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"VideoEffectApplyProfileOnStartup"]];
+
     [self resetProfileSelector];
 
     [_adjustCheckbox setTitle:_NS("Image Adjust")];
@@ -798,6 +800,11 @@
         /* refresh UI */
         [_self resetProfileSelector];
     }];
+}
+
+- (IBAction)applyProfileCheckboxChanged:(id)sender
+{
+    [[NSUserDefaults standardUserDefaults] setBool:[sender state] forKey:@"VideoEffectApplyProfileOnStartup"];
 }
 
 #pragma mark -

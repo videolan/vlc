@@ -35,6 +35,7 @@
                 <outlet property="adjustSaturationLabel" destination="22" id="5Aa-ns-JxL"/>
                 <outlet property="adjustSaturationSlider" destination="28" id="rqd-2B-4Iq"/>
                 <outlet property="anaglyphCheckbox" destination="708" id="Ko7-7F-UFt"/>
+                <outlet property="applyProfileCheckbox" destination="ABI-av-fGB" id="I7F-KX-vAa"/>
                 <outlet property="bandingCheckbox" destination="60" id="tjM-u7-Fdm"/>
                 <outlet property="bandingLabel" destination="62" id="cfP-PI-7a7"/>
                 <outlet property="bandingSlider" destination="63" id="MjZ-RS-yOC"/>
@@ -122,7 +123,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="236" width="642" height="274"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="642" height="274"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1791,6 +1792,17 @@
                             <constraint firstAttribute="height" constant="1" id="La9-tY-5he"/>
                         </constraints>
                     </box>
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-av-fGB">
+                        <rect key="frame" x="466" y="9" width="158" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="8uO-gi-iv5">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="applyProfileCheckboxChanged:" target="-1" id="9PJ-xF-qBh"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="3" secondAttribute="bottom" constant="35" id="0Mc-wz-dcA"/>
