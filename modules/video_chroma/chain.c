@@ -330,7 +330,7 @@ static int BuildFilterChain( filter_t *p_filter )
         video_format_FixRgb(&fmt_mid.video);
 
         if( filter_chain_AppendConverter( p_filter->p_sys->p_chain,
-                                          NULL, &fmt_mid ) )
+                                          NULL, &fmt_mid ) == VLC_SUCCESS )
         {
             p_filter->p_sys->p_video_filter =
                 filter_chain_AppendFilter( p_filter->p_sys->p_chain,
@@ -380,8 +380,8 @@ static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid )
     }
     else
     {
-        if( !filter_chain_AppendConverter( p_parent->p_sys->p_chain,
-                                           NULL, p_fmt_mid ) )
+        if( filter_chain_AppendConverter( p_parent->p_sys->p_chain,
+                                          NULL, p_fmt_mid ) )
             return VLC_EGENERIC;
     }
 
@@ -393,8 +393,8 @@ static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid )
     }
     else
     {
-        if( !filter_chain_AppendConverter( p_parent->p_sys->p_chain,
-                                           p_fmt_mid, NULL ) )
+        if( filter_chain_AppendConverter( p_parent->p_sys->p_chain,
+                                          p_fmt_mid, NULL ) )
             goto error;
     }
     return VLC_SUCCESS;
