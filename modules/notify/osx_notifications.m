@@ -272,6 +272,8 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
 
 - (void)dealloc
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
     // Clear the remaining lastNotification in Notification Center, if any
     @autoreleasepool {
@@ -283,6 +285,7 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
 #endif
+#pragma clang diagnostic pop
 
     // Release everything
     [applicationName release];
@@ -306,12 +309,15 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
 
         [GrowlApplicationBridge setGrowlDelegate:self];
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
         if (hasNativeNotifications) {
             [[NSUserNotificationCenter defaultUserNotificationCenter]
              setDelegate:(id<NSUserNotificationCenterDelegate>)self];
         }
 #endif
+#pragma clang diagnostic pop
     }
 }
 
@@ -375,6 +381,8 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
                                        clickContext:nil
                                          identifier:@"VLCNowPlayingNotification"];
         } else if (hasNativeNotifications) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
             // Make the OS X notification and string
             NSUserNotification *notification = [NSUserNotification new];
@@ -398,6 +406,7 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
             [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
             [notification release];
 #endif
+#pragma clang diagnostic pop
         }
 
         // Release stuff
@@ -425,6 +434,8 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
         isInForeground = NO;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center
        didActivateNotification:(NSUserNotification *)notification
@@ -447,4 +458,5 @@ static int InputCurrent( vlc_object_t *p_this, const char *psz_var,
     lastNotification = notification;
 }
 #endif
+#pragma clang diagnostic pop
 @end
