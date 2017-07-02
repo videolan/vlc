@@ -62,6 +62,7 @@ endif
 
 
 package-macosx: VLC.app
+	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
 if HAVE_DMGBUILD
 	@echo "Packaging fancy DMG using dmgbuild"
 	cd "$(top_srcdir)/extras/package/macosx/dmg" && dmgbuild -s "dmg_settings.py" \
@@ -82,6 +83,7 @@ else !HAVE_DMGBUILD
 endif
 
 package-macosx-zip: VLC.app
+	rm -f "$(top_builddir)/vlc-$(VERSION).zip"
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
 	cp -R $(top_builddir)/VLC.app $(top_builddir)/vlc-$(VERSION)/VLC.app
 	cd $(srcdir); cp -R AUTHORS COPYING README THANKS NEWS $(abs_top_builddir)/vlc-$(VERSION)/Goodies/
