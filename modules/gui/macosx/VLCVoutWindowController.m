@@ -169,7 +169,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             }
             default:
             {
-                msg_Warn(p_wnd, "unsupported control query");
+                msg_Warn(p_wnd, "unsupported control query: %i", i_query );
                 [voutController.lock unlock];
                 return VLC_EGENERIC;
             }
