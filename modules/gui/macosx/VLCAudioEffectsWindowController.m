@@ -346,7 +346,7 @@
 
 - (void)saveCurrentProfile
 {
-    if (i_old_profile_index == -1)
+    if (!i_old_profile_index || i_old_profile_index == -1)
         return;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
