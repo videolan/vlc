@@ -419,6 +419,8 @@ static int Open(vlc_object_t *obj)
 
     sys->procEnumerator  = processorEnumerator;
 
+    InitDeinterlacingContext( &sys->context );
+
     sys->context.settings = p_mode->settings;
     if (sys->context.settings.b_double_rate)
         sys->context.pf_render_ordered = RenderPic;
@@ -432,8 +434,6 @@ static int Open(vlc_object_t *obj)
     {
        goto error;
     }
-
-    InitDeinterlacingContext( &sys->context );
 
     filter->fmt_out.video   = out_fmt;
     filter->pf_video_filter = Deinterlace;

@@ -318,12 +318,12 @@ notsupp:
 
     p_sys->chroma = chroma;
 
+    InitDeinterlacingContext( &p_sys->context );
+
     config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
     char *psz_mode = var_InheritString( p_filter, FILTER_CFG_PREFIX "mode" );
     SetFilterMethod( p_filter, psz_mode, packed );
-
-    InitDeinterlacingContext( &p_sys->context );
 
     IVTCClearState( p_filter );
 

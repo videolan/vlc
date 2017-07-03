@@ -357,6 +357,8 @@ static int Open(vlc_object_t *obj)
     sys->d3d9_dll     = d3d9_dll;
     sys->decoder_caps = best_caps;
 
+    InitDeinterlacingContext( &sys->context );
+
     sys->context.settings = p_mode->settings;
     sys->context.settings.b_use_frame_history = best_caps.NumBackwardRefSamples != 0 ||
                                        best_caps.NumForwardRefSamples  != 0;
@@ -373,8 +375,6 @@ static int Open(vlc_object_t *obj)
     {
        goto error;
     }
-
-    InitDeinterlacingContext( &sys->context );
 
     filter->fmt_out.video   = out_fmt;
     filter->pf_video_filter = Deinterlace;
