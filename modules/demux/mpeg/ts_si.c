@@ -53,6 +53,7 @@
 
 #include <time.h>
 #include <assert.h>
+#include <limits.h>
 
 #ifndef SI_DEBUG_EIT
  #define SI_DEBUG_TIMESHIFT(t)
@@ -66,16 +67,6 @@
     } while(0);
 #endif
 
-static inline char *grab_notempty( char **ppsz )
-{
-    char *psz_ret = NULL;
-    if( *ppsz && **ppsz )
-    {
-        psz_ret = *ppsz;
-        *ppsz = NULL;
-    }
-    return psz_ret;
-}
 
 static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
                                 uint16_t i_extension, void *p_pid_cbdata );
@@ -408,6 +399,86 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
     es_out_Control( p_demux->out, ES_OUT_SET_EPG_TIME, (int64_t) p_sys->i_network_time );
 }
 
+static void EITExtractDrDescItems( demux_t *p_demux, const dvbpsi_extended_event_dr_t *pE,
+                                   vlc_epg_event_t *p_evt )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( pE->i_entry_count )
+    {
+        char **ppsz_prev = NULL;
+        /* Continued items from previous descriptor (ARIB) */
+        if( p_evt->i_description_items > 0 )
+            ppsz_prev = &p_evt->description_items[p_evt->i_description_items - 1].psz_value;
+
+        for( int i = 0; i < pE->i_entry_count; i++ )
+        {
+            char *psz_key = NULL;
+            /* Continued items have NULL key */
+            const bool b_appending = ( pE->i_item_description_length[i] == 0 );
+            if( !b_appending )
+            {
+                void *p_realloc = NULL;
+                if( (size_t)p_evt->i_description_items < SIZE_MAX / sizeof(*p_evt->description_items) )
+                {
+                    p_realloc = realloc( p_evt->description_items,
+                                        (p_evt->i_description_items + 1) *
+                                         sizeof(*p_evt->description_items) );
+                }
+                if( !p_realloc )
+                {
+                    free( psz_key );
+                    break;
+                }
+                p_evt->description_items = p_realloc;
+
+                psz_key = EITConvertToUTF8( p_demux,
+                                            pE->i_item_description[i],
+                                            pE->i_item_description_length[i],
+                                            p_sys->b_broken_charset );
+                if( !psz_key )
+                {
+                    ppsz_prev = NULL;
+                    continue;
+                }
+            }
+            else if( ppsz_prev == NULL )
+                continue;
+
+            char *psz_itm = EITConvertToUTF8( p_demux,
+                                              pE->i_item[i], pE->i_item_length[i],
+                                              p_sys->b_broken_charset );
+            if( !psz_itm )
+            {
+                free( psz_key );
+                ppsz_prev = NULL;
+                continue;
+            }
+
+            msg_Dbg( p_demux, "       - desc='%s' item='%s'", psz_key, psz_itm );
+            if( b_appending )
+            {
+                /* Continued items */
+                size_t i_total = strlen(*ppsz_prev) + strlen(psz_itm) + 1;
+                char *psz_realloc = realloc( *ppsz_prev, i_total );
+                if( psz_realloc )
+                {
+                    *ppsz_prev = psz_realloc;
+                    strcat( *ppsz_prev, psz_itm );
+                }
+                free( psz_itm );
+            }
+            else
+            {
+                p_evt->description_items[p_evt->i_description_items].psz_key = psz_key;
+                p_evt->description_items[p_evt->i_description_items].psz_value = psz_itm;
+                ppsz_prev = &p_evt->description_items[p_evt->i_description_items].psz_value;
+                p_evt->i_description_items++;
+            }
+        }
+    }
+}
+
 static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
@@ -445,12 +516,8 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
     for( p_evt = p_eit->p_first_event; p_evt; p_evt = p_evt->p_next )
     {
         dvbpsi_descriptor_t *p_dr;
-        char                *psz_name = NULL;
-        char                *psz_text = NULL;
-        char                *psz_extra = NULL;
         int64_t i_start;
         int i_duration;
-        int i_min_age = 0;
 
         i_start = EITConvertStartTime( p_evt->i_start_time );
         SI_DEBUG_TIMESHIFT(i_start);
@@ -468,6 +535,21 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                  p_evt->i_event_id, i_start, i_duration,
                  p_evt->i_running_status, p_evt->b_free_ca );
 
+        /* */
+        if( i_start <= 0 )
+            continue;
+
+        vlc_epg_event_t *p_epgevt = vlc_epg_event_New( p_evt->i_event_id,
+                                                       i_start, i_duration );
+        if( !p_epgevt )
+            continue;
+
+        if( !vlc_epg_AddEvent( p_epg, p_epgevt ) )
+        {
+            vlc_epg_event_Delete( p_epgevt );
+            continue;
+        }
+
         for( p_dr = p_evt->p_first_descriptor; p_dr; p_dr = p_dr->p_next )
         {
             switch(p_dr->i_tag)
@@ -478,17 +560,20 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 
                 /* Only take first description, as we don't handle language-info
                    for epg atm*/
-                if( pE && psz_name == NULL )
+                if( pE )
                 {
-                    psz_name = EITConvertToUTF8( p_demux,
-                                                 pE->i_event_name, pE->i_event_name_length,
-                                                 p_sys->b_broken_charset );
-                    free( psz_text );
-                    psz_text = EITConvertToUTF8( p_demux,
-                                                 pE->i_text, pE->i_text_length,
-                                                 p_sys->b_broken_charset );
+                    char **ppsz = &p_epgevt->psz_name;
+                    free( *ppsz );
+                    *ppsz = EITConvertToUTF8( p_demux,
+                                              pE->i_event_name, pE->i_event_name_length,
+                                              p_sys->b_broken_charset );
+                    ppsz = &p_epgevt->psz_short_description;
+                    free( *ppsz );
+                    *ppsz = EITConvertToUTF8( p_demux,
+                                              pE->i_text, pE->i_text_length,
+                                              p_sys->b_broken_charset );
                     msg_Dbg( p_demux, "    - short event lang=%3.3s '%s' : '%s'",
-                             pE->i_iso_639_code, psz_name, psz_text );
+                             pE->i_iso_639_code, p_epgevt->psz_name, *ppsz );
                 }
             }
                 break;
@@ -511,51 +596,25 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                         {
                             msg_Dbg( p_demux, "       - text='%s'", psz_text );
 
-                            if( psz_extra )
+                            if( p_epgevt->psz_description )
                             {
-                                size_t i_extra = strlen( psz_extra ) + strlen( psz_text ) + 1;
-                                char *psz_realloc = realloc( psz_extra, i_extra );
+                                size_t i_total = strlen( p_epgevt->psz_description ) + strlen( psz_text ) + 1;
+                                char *psz_realloc = realloc( p_epgevt->psz_description, i_total );
                                 if( psz_realloc )
                                 {
-                                    psz_extra = psz_realloc;
-                                    strcat( psz_extra, psz_text );
+                                    p_epgevt->psz_description = psz_realloc;
+                                    strcat( psz_realloc, psz_text );
                                 }
                                 free( psz_text );
                             }
                             else
                             {
-                                psz_extra = psz_text;
+                                p_epgevt->psz_description = psz_text;
                             }
                         }
                     }
 
-                    for( int i = 0; i < pE->i_entry_count; i++ )
-                    {
-                        char *psz_dsc = EITConvertToUTF8( p_demux,
-                                                          pE->i_item_description[i],
-                                                          pE->i_item_description_length[i],
-                                                          p_sys->b_broken_charset );
-                        char *psz_itm = EITConvertToUTF8( p_demux,
-                                                          pE->i_item[i], pE->i_item_length[i],
-                                                          p_sys->b_broken_charset );
-
-                        if( psz_dsc && psz_itm )
-                        {
-                            msg_Dbg( p_demux, "       - desc='%s' item='%s'", psz_dsc, psz_itm );
-#if 0
-                            psz_extra = xrealloc( psz_extra,
-                                         strlen(psz_extra) + strlen(psz_dsc) +
-                                         strlen(psz_itm) + 3 + 1 );
-                            strcat( psz_extra, "(" );
-                            strcat( psz_extra, psz_dsc );
-                            strcat( psz_extra, " " );
-                            strcat( psz_extra, psz_itm );
-                            strcat( psz_extra, ")" );
-#endif
-                        }
-                        free( psz_dsc );
-                        free( psz_itm );
-                    }
+                    EITExtractDrDescItems( p_demux, pE, p_epgevt );
                 }
             }
                 break;
@@ -565,6 +624,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                 dvbpsi_parental_rating_dr_t *pR = dvbpsi_DecodeParentalRatingDr( p_dr );
                 if ( pR )
                 {
+                    int i_min_age = 0;
                     for ( int i = 0; i < pR->i_ratings_number; i++ )
                     {
                         const dvbpsi_parental_rating_t *p_rating = & pR->p_parental_rating[ i ];
@@ -576,6 +636,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                                      i_min_age );
                         }
                     }
+                    p_epgevt->i_rating = i_min_age;
                 }
             }
                 break;
@@ -603,27 +664,6 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
             default:
                 break;
         }
-
-        /* */
-        if( i_start > 0 )
-        {
-            vlc_epg_event_t *p_epgevt = vlc_epg_event_New( p_evt->i_event_id,
-                                                           i_start, i_duration );
-            if( p_epgevt )
-            {
-                p_epgevt->psz_name = grab_notempty( &psz_name );
-                p_epgevt->psz_short_description = grab_notempty( &psz_text );
-                p_epgevt->psz_description = grab_notempty( &psz_extra );
-                p_epgevt->i_rating = i_min_age;
-                if( !vlc_epg_AddEvent( p_epg, p_epgevt ) )
-                    vlc_epg_event_Delete( p_epgevt );
-            }
-        }
-
-        free( psz_name );
-        free( psz_text );
-
-        free( psz_extra );
     }
 
     /* Update "now playing" field */
