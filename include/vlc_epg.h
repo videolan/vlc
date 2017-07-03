@@ -38,6 +38,12 @@ typedef struct
     char    *psz_name;
     char    *psz_short_description;
     char    *psz_description;
+    struct               /* Description items in tranmission order */
+    {
+        char *psz_key;
+        char *psz_value;
+    } * description_items;
+    int i_description_items;
 
     uint8_t i_rating;   /* Parental control, set to 0 when undefined */
 } vlc_epg_event_t;
