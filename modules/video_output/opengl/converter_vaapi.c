@@ -47,6 +47,7 @@
 
 struct priv
 {
+    struct vlc_vaapi_instance *vainst;
     VADisplay vadpy;
     VASurfaceID *va_surface_ids;
     PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
@@ -225,9 +226,9 @@ tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     struct priv *priv = tc->priv;
 
     picture_pool_t *pool =
-        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), priv->vadpy, requested_count,
-                          &priv->va_surface_ids, &tc->fmt, VA_RT_FORMAT_YUV420,
-                          VA_FOURCC_NV12);
+        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), priv->vainst, priv->vadpy,
+                          requested_count, &priv->va_surface_ids, &tc->fmt,
+                          VA_RT_FORMAT_YUV420, VA_FOURCC_NV12);
     if (!pool)
         return NULL;
 
@@ -252,12 +253,13 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
     if (priv->last.pic != NULL)
         vaegl_release_last_pic(tc, priv);
 
-    vlc_vaapi_ReleaseInstance(priv->vadpy);
+    vlc_vaapi_ReleaseInstance(priv->vainst);
 
 #ifdef HAVE_VA_X11
     if (priv->x11dpy != NULL)
         XCloseDisplay(priv->x11dpy);
 #endif
+
     free(tc->priv);
 }
 
@@ -324,31 +326,24 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
     tc->pf_release = tc_vaegl_release;
     tc->pf_get_pool = tc_vaegl_get_pool;
 
-    if (vlc_vaapi_Initialize(VLC_OBJECT(tc->gl), priv->vadpy))
+    priv->vainst = vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy);
+    if (priv->vainst == NULL)
         goto error;
 
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
         goto error;
 
-    if (vlc_vaapi_SetInstance(priv->vadpy))
-    {
-        msg_Err(tc->gl, "VAAPI instance already in use");
-        vadpy = NULL;
-        goto error;
-    }
-
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_NV12,
                                               tc->fmt.space);
     if (tc->fshader == 0)
-    {
-        vlc_vaapi_ReleaseInstance(priv->vadpy);
-        vadpy = NULL;
         goto error;
-    }
+
     return VLC_SUCCESS;
 
 error:
-    if (vadpy != NULL)
+    if (priv->vainst)
+        vlc_vaapi_ReleaseInstance(priv->vainst);
+    else
         vaTerminate(vadpy);
     free(tc->priv);
     return ret;

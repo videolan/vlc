@@ -24,7 +24,7 @@ OPENGL_COMMONCFLAGS += -DVLCGL_CONV_CVPX
 endif
 if HAVE_EGL
 if HAVE_VAAPI
-OPENGL_COMMONLIBS += $(LIBVA_LIBS) $(LIBVA_EGL_LIBS) libvlc_vaapi_instance.la
+OPENGL_COMMONLIBS += $(LIBVA_LIBS) $(LIBVA_EGL_LIBS)
 OPENGL_COMMONSOURCES += video_output/opengl/converter_vaapi.c \
 	hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
 OPENGL_COMMONCFLAGS += -DVLCGL_CONV_VA

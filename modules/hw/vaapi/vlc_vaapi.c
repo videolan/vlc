@@ -38,6 +38,7 @@
 #include <vlc_common.h>
 #include <vlc_atomic.h>
 #include <vlc_fourcc.h>
+#include <vlc_filter.h>
 #include <vlc_picture_pool.h>
 
 /* This macro is designed to wrap any VA call, and in case of failure,
@@ -54,19 +55,47 @@
         }                                               \
     } while (0)
 
-/*****************
- * VAAPI display *
- *****************/
+/**************************
+ * VA instance management *
+ **************************/
 
-int
-vlc_vaapi_Initialize(vlc_object_t *o, VADisplay dpy)
+struct vlc_vaapi_instance {
+    VADisplay dpy;
+    atomic_uint pic_refcount;
+};
+
+struct vlc_vaapi_instance *
+vlc_vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy)
 {
     int major = 0, minor = 0;
     VA_CALL(o, vaInitialize, dpy, &major, &minor);
-    return VLC_SUCCESS;
+    struct vlc_vaapi_instance *inst = malloc(sizeof(*inst));
+
+    if (unlikely(inst == NULL))
+        return NULL;
+    inst->dpy = dpy;
+    atomic_init(&inst->pic_refcount, 1);
+
+    return inst;
 error:
-    vaTerminate(dpy);
-    return VLC_EGENERIC;
+    return NULL;
+}
+
+VADisplay
+vlc_vaapi_HoldInstance(struct vlc_vaapi_instance *inst)
+{
+    atomic_fetch_add(&inst->pic_refcount, 1);
+    return inst->dpy;
+}
+
+void
+vlc_vaapi_ReleaseInstance(struct vlc_vaapi_instance *inst)
+{
+    if (atomic_fetch_sub(&inst->pic_refcount, 1) == 1)
+    {
+        vaTerminate(inst->dpy);
+        free(inst);
+    }
 }
 
 /**************************
@@ -412,8 +441,9 @@ struct vaapi_pic_ctx
 
 struct pic_sys_vaapi_instance
 {
-    atomic_int refcount;
-    VADisplay dpy;
+    atomic_int pic_refcount;
+    VADisplay va_dpy;
+    struct vlc_vaapi_instance *va_inst;
     unsigned num_render_targets;
     VASurfaceID render_targets[];
 };
@@ -430,11 +460,11 @@ pool_pic_destroy_cb(picture_t *pic)
     picture_sys_t *p_sys = pic->p_sys;
     struct pic_sys_vaapi_instance *instance = p_sys->instance;
 
-    if (atomic_fetch_sub(&instance->refcount, 1) == 1)
+    if (atomic_fetch_sub(&instance->pic_refcount, 1) == 1)
     {
-        vaDestroySurfaces(instance->dpy, instance->render_targets,
+        vaDestroySurfaces(instance->va_dpy, instance->render_targets,
                           instance->num_render_targets);
-        vlc_vaapi_ReleaseInstance(instance->dpy);
+        vlc_vaapi_ReleaseInstance(instance->va_inst);
         free(instance);
     }
     free(pic->p_sys);
@@ -471,8 +501,8 @@ pic_sys_ctx_destroy_cb(struct picture_context_t *opaque)
 }
 
 picture_pool_t *
-vlc_vaapi_PoolNew(vlc_object_t *o, VADisplay dpy, unsigned count,
-                  VASurfaceID **render_targets,
+vlc_vaapi_PoolNew(vlc_object_t *o, struct vlc_vaapi_instance *va_inst,
+                  VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt,
                   unsigned va_rt_format, int va_force_fourcc)
 {
@@ -481,7 +511,7 @@ vlc_vaapi_PoolNew(vlc_object_t *o, VADisplay dpy, unsigned count,
     if (!instance)
         return NULL;
     instance->num_render_targets = count;
-    atomic_init(&instance->refcount, 0);
+    atomic_init(&instance->pic_refcount, 0);
 
     VASurfaceAttrib *attribs = NULL;
     unsigned num_attribs = 0;
@@ -536,9 +566,9 @@ vlc_vaapi_PoolNew(vlc_object_t *o, VADisplay dpy, unsigned count,
     if (!pool)
         goto error_pic;
 
-    atomic_store(&instance->refcount, count);
-    instance->dpy = vlc_vaapi_GetInstance(); /* Hold a reference on VADisplay */
-    assert(instance->dpy == dpy);
+    atomic_store(&instance->pic_refcount, count);
+    instance->va_dpy = vlc_vaapi_HoldInstance(va_inst);
+    instance->va_inst = va_inst;
 
     *render_targets = instance->render_targets;
     return pool;
@@ -547,7 +577,7 @@ error_pic:
     while (count > 0)
         picture_Release(pics[--count]);
 
-    VA_CALL(o, vaDestroySurfaces, instance->dpy, instance->render_targets,
+    VA_CALL(o, vaDestroySurfaces, instance->va_dpy, instance->render_targets,
             instance->num_render_targets);
 
 error:
@@ -564,9 +594,37 @@ vlc_vaapi_PicSysGetRenderTargets(picture_sys_t *sys,
     return sys->instance->num_render_targets;
 }
 
+struct vlc_vaapi_instance *
+vlc_vaapi_PicSysHoldInstance(picture_sys_t *sys, VADisplay *dpy)
+{
+    assert(sys->instance != NULL);
+    *dpy = vlc_vaapi_HoldInstance(sys->instance->va_inst);
+    return sys->instance->va_inst;
+}
+
+struct vlc_vaapi_instance *
+vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy)
+{
+    picture_t *pic = filter_NewPicture(filter);
+    if (!pic)
+        return NULL;
+
+    struct vlc_vaapi_instance *va_inst =
+        pic->format.i_chroma == VLC_CODEC_VAAPI_420 && pic->p_sys ?
+        vlc_vaapi_PicSysHoldInstance(pic->p_sys, dpy) : NULL;
+    picture_Release(pic);
+
+    return va_inst;
+}
+
+#define ASSERT_VAAPI_CHROMA(pic) do { \
+    assert(pic->format.i_chroma == VLC_CODEC_VAAPI_420); \
+} while(0)
+
 void
 vlc_vaapi_PicAttachContext(picture_t *pic)
 {
+    ASSERT_VAAPI_CHROMA(pic);
     assert(pic->p_sys != NULL);
     assert(pic->context == NULL);
 
@@ -577,7 +635,17 @@ vlc_vaapi_PicAttachContext(picture_t *pic)
 VASurfaceID
 vlc_vaapi_PicGetSurface(picture_t *pic)
 {
+    ASSERT_VAAPI_CHROMA(pic);
     assert(pic->context);
 
     return ((struct vaapi_pic_ctx *)pic->context)->surface;
+}
+
+VADisplay
+vlc_vaapi_PicGetDisplay(picture_t *pic)
+{
+    ASSERT_VAAPI_CHROMA(pic);
+    assert(pic->context);
+
+    return ((struct vaapi_pic_ctx *)pic->context)->picref->p_sys->instance->va_dpy;
 }

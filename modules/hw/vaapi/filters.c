@@ -38,6 +38,7 @@
 
 struct  va_filter_desc
 {
+    struct vlc_vaapi_instance *inst;
     VADisplay           dpy;
     VAConfigID          conf;
     VAContextID         ctx;
@@ -298,14 +299,15 @@ Open(filter_t * filter,
     filter_sys->va.conf = VA_INVALID_ID;
     filter_sys->va.ctx = VA_INVALID_ID;
     filter_sys->va.buf = VA_INVALID_ID;
-    filter_sys->va.dpy = vlc_vaapi_GetInstance();
-    if (!filter_sys->va.dpy)
+    filter_sys->va.inst =
+        vlc_vaapi_FilterHoldInstance(filter, &filter_sys->va.dpy);
+    if (!filter_sys->va.inst)
         goto error;
 
     filter_sys->dest_pics =
-        vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter_sys->va.dpy,
-                          DEST_PICS_POOL_SZ, &filter_sys->va.surface_ids,
-                          &filter->fmt_out.video,
+        vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter_sys->va.inst,
+                          filter_sys->va.dpy, DEST_PICS_POOL_SZ,
+                          &filter_sys->va.surface_ids, &filter->fmt_out.video,
                           VA_RT_FORMAT_YUV420, VA_FOURCC_NV12);
     if (!filter_sys->dest_pics)
         goto error;
@@ -376,8 +378,8 @@ error:
     if (filter_sys->va.conf != VA_INVALID_ID)
         vlc_vaapi_DestroyConfig(VLC_OBJECT(filter),
                                 filter_sys->va.dpy, filter_sys->va.conf);
-    if (filter_sys->va.dpy)
-        vlc_vaapi_ReleaseInstance(filter_sys->va.dpy);
+    if (filter_sys->va.inst)
+        vlc_vaapi_ReleaseInstance(filter_sys->va.inst);
     free(filter_sys);
     return VLC_EGENERIC;
 }
@@ -389,7 +391,7 @@ Close(vlc_object_t * obj, filter_sys_t * filter_sys)
     vlc_vaapi_DestroyBuffer(obj, filter_sys->va.dpy, filter_sys->va.buf);
     vlc_vaapi_DestroyContext(obj, filter_sys->va.dpy, filter_sys->va.ctx);
     vlc_vaapi_DestroyConfig(obj, filter_sys->va.dpy, filter_sys->va.conf);
-    vlc_vaapi_ReleaseInstance(filter_sys->va.dpy);
+    vlc_vaapi_ReleaseInstance(filter_sys->va.inst);
     free(filter_sys);
 }
 

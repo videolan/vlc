@@ -35,25 +35,20 @@
  * VA instance management *
  **************************/
 
-/* Allocates the VA instance and sets the reference counter to 1. */
-int
-vlc_vaapi_SetInstance(VADisplay dpy);
+struct vlc_vaapi_instance;
 
-/* Retrieve the VA instance and increases the reference counter by 1. */
+/* Initializes the VADisplay and sets the reference counter to 1. */
+struct vlc_vaapi_instance *
+vlc_vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy);
+
+/* Increments the VAAPI instance refcount */
 VADisplay
-vlc_vaapi_GetInstance(void);
+vlc_vaapi_HoldInstance(struct vlc_vaapi_instance *inst);
 
-/* Decreases the reference counter by 1 and frees the instance if that counter
-   reaches 0. */
+/* Decrements the VAAPI instance refcount, and call vaTerminate if that counter
+ * reaches 0 */
 void
-vlc_vaapi_ReleaseInstance(VADisplay *);
-
-/*****************
- * VAAPI display *
- *****************/
-
-int
-vlc_vaapi_Initialize(vlc_object_t *o, VADisplay va_dpy);
+vlc_vaapi_ReleaseInstance(struct vlc_vaapi_instance *inst);
 
 /**************************
  * VAAPI create & destroy *
@@ -177,8 +172,8 @@ vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
 /* Create a pool backed by VASurfaceID. render_targets will destroyed once
  * the pool and every pictures are released. */
 picture_pool_t *
-vlc_vaapi_PoolNew(vlc_object_t *o, VADisplay va_dpy,
-                  unsigned count, VASurfaceID **render_targets,
+vlc_vaapi_PoolNew(vlc_object_t *o, struct vlc_vaapi_instance *vainst,
+                  VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt,
                   unsigned va_rt_format, int va_force_fourcc);
 
@@ -188,6 +183,14 @@ unsigned
 vlc_vaapi_PicSysGetRenderTargets(picture_sys_t *sys,
                                  VASurfaceID **render_targets);
 
+/* Get and hold the VADisplay instance attached to the picture sys */
+struct vlc_vaapi_instance *
+vlc_vaapi_PicSysHoldInstance(picture_sys_t *sys, VADisplay *dpy);
+
+/* Get and hold the VADisplay instance from a filter */
+struct vlc_vaapi_instance *
+vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy);
+
 /* Attachs the VASurface to the picture context, the picture must be allocated
  * by a vaapi pool (see vlc_vaapi_PoolNew()) */
 void
@@ -196,5 +199,9 @@ vlc_vaapi_PicAttachContext(picture_t *pic);
 /* Get the VASurfaceID attached to the pic */
 VASurfaceID
 vlc_vaapi_PicGetSurface(picture_t *pic);
+
+/* Get the VADisplay attached to the pic (valid while the pic is alive) */
+VADisplay
+vlc_vaapi_PicGetDisplay(picture_t *pic);
 
 #endif /* VLC_VAAPI_H */

@@ -39,6 +39,7 @@
 
 struct filter_sys_t
 {
+    struct vlc_vaapi_instance *va_inst;
     VADisplay           dpy;
     picture_pool_t *    dest_pics;
     VASurfaceID *       va_surface_ids;
@@ -126,19 +127,9 @@ static picture_t *
 DownloadSurface(filter_t *filter, picture_t *src_pic)
 {
     filter_sys_t *const filter_sys = filter->p_sys;
-    VADisplay           va_dpy;
+    VADisplay           va_dpy = vlc_vaapi_PicGetDisplay(src_pic);
     VAImage             src_img;
     void *              src_buf;
-
-    if (filter_sys->dpy == NULL)
-    {
-        /* Get the instance here since the instance may be not created by the
-         * decoder from Open() */
-        va_dpy = filter_sys->dpy = vlc_vaapi_GetInstance();
-        assert(filter_sys->dpy);
-    }
-    else
-        va_dpy = filter->p_sys->dpy;
 
     picture_t *dest = filter_NewPicture(filter);
     if (!dest)
@@ -310,24 +301,26 @@ static int Open(vlc_object_t *obj)
     filter_sys->derive_failed = false;
     filter_sys->image_fallback_failed = false;
     filter_sys->image_fallback.image_id = VA_INVALID_ID;
+    filter_sys->va_inst = vlc_vaapi_FilterHoldInstance(filter,
+                                                       &filter_sys->dpy);
 
     if (is_upload)
     {
-        filter_sys->dpy = vlc_vaapi_GetInstance();
-        if (filter_sys->dpy == NULL)
+        /* Only upload can't work without a VAAPI instance */
+        if (filter_sys->va_inst == NULL)
         {
             free(filter_sys);
             return VLC_EGENERIC;
         }
 
         filter_sys->dest_pics =
-            vlc_vaapi_PoolNew(obj, filter_sys->dpy, DEST_PICS_POOL_SZ,
-                              &filter_sys->va_surface_ids,
+            vlc_vaapi_PoolNew(obj, filter_sys->va_inst, filter_sys->dpy,
+                              DEST_PICS_POOL_SZ, &filter_sys->va_surface_ids,
                               &filter->fmt_out.video, VA_RT_FORMAT_YUV420,
                               VA_FOURCC_NV12);
         if (!filter_sys->dest_pics)
         {
-            vlc_vaapi_ReleaseInstance(filter_sys->dpy);
+            vlc_vaapi_ReleaseInstance(filter_sys->va_inst);
             free(filter_sys);
             return VLC_EGENERIC;
         }
@@ -344,7 +337,7 @@ static int Open(vlc_object_t *obj)
         if (is_upload)
         {
             picture_pool_Release(filter_sys->dest_pics);
-            vlc_vaapi_ReleaseInstance(filter_sys->dpy);
+            vlc_vaapi_ReleaseInstance(filter_sys->va_inst);
         }
         free(filter_sys);
         return VLC_EGENERIC;
@@ -365,8 +358,8 @@ Close(vlc_object_t *obj)
                                filter_sys->image_fallback.image_id);
     if (filter_sys->dest_pics)
         picture_pool_Release(filter_sys->dest_pics);
-    if (filter_sys->dpy != NULL)
-        vlc_vaapi_ReleaseInstance(filter_sys->dpy);
+    if (filter_sys->va_inst != NULL)
+        vlc_vaapi_ReleaseInstance(filter_sys->va_inst);
     CopyCleanCache(&filter_sys->cache);
 
     free(filter_sys);

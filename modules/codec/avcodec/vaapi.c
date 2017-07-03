@@ -54,6 +54,7 @@
 
 struct vlc_va_sys_t
 {
+    struct vlc_vaapi_instance *va_inst;
 #ifdef VLC_VA_BACKEND_XLIB
     Display  *p_display_x11;
 #endif
@@ -147,14 +148,14 @@ static void DeleteDR(vlc_va_t *va, void *hwctx)
 
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
-    vlc_vaapi_ReleaseInstance(sys->hw_ctx.display);
+    vlc_vaapi_ReleaseInstance(sys->va_inst);
     free(sys);
 }
 
 static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                     const es_format_t *fmt, picture_sys_t *p_sys)
 {
-    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD)
+    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys == NULL)
         return VLC_EGENERIC;
 
     (void) fmt;
@@ -164,9 +165,9 @@ static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     vlc_va_sys_t *sys = NULL;
 
     /* The picture must be allocated by the vout */
-    VADisplay *va_dpy = vlc_vaapi_GetInstance();
-    if (va_dpy == NULL)
-        return VLC_EGENERIC;
+    VADisplay va_dpy;
+    struct vlc_vaapi_instance *va_inst =
+        vlc_vaapi_PicSysHoldInstance(p_sys, &va_dpy);
 
     VASurfaceID *render_targets;
     unsigned num_render_targets =
@@ -188,6 +189,7 @@ static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     memset(sys, 0, sizeof (*sys));
 
     /* */
+    sys->va_inst = va_inst;
     sys->hw_ctx.display = va_dpy;
     sys->hw_ctx.config_id = VA_INVALID_ID;
     sys->hw_ctx.context_id = VA_INVALID_ID;
@@ -221,7 +223,7 @@ error:
             vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
         free(sys);
     }
-    vlc_vaapi_ReleaseInstance(va_dpy);
+    vlc_vaapi_ReleaseInstance(va_inst);
     return ret;
 }
 
@@ -254,7 +256,7 @@ static void Delete(vlc_va_t *va, void **hwctx)
     picture_pool_Release(sys->pool);
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
-    vlc_vaapi_ReleaseInstance(sys->hw_ctx.display);
+    vlc_vaapi_ReleaseInstance(sys->va_inst);
 #ifdef VLC_VA_BACKEND_XLIB
     XCloseDisplay(sys->p_display_x11);
 #endif
@@ -267,7 +269,7 @@ static void Delete(vlc_va_t *va, void **hwctx)
 static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                   const es_format_t *fmt, picture_sys_t *p_sys)
 {
-    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD)
+    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys)
         return VLC_EGENERIC;
 
     (void) fmt;
@@ -299,6 +301,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->hw_ctx.config_id = VA_INVALID_ID;
     sys->hw_ctx.context_id = VA_INVALID_ID;
     sys->pool = NULL;
+    sys->va_inst = NULL;
 
     /* Create a VA display */
 #ifdef VLC_VA_BACKEND_XLIB
@@ -337,18 +340,9 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
     }
 
-    if (vlc_vaapi_Initialize(o, sys->hw_ctx.display))
-    {
-        sys->hw_ctx.display = NULL;
+    sys->va_inst = vlc_vaapi_InitializeInstance(o, sys->hw_ctx.display);
+    if (!sys->va_inst)
         goto error;
-    }
-
-    if (vlc_vaapi_SetInstance(sys->hw_ctx.display))
-    {
-        msg_Err(va, "VAAPI instance already in use");
-        sys->hw_ctx.display = NULL;
-        goto error;
-    }
 
     sys->hw_ctx.config_id =
         vlc_vaapi_CreateConfigChecked(o, sys->hw_ctx.display, i_profile,
@@ -364,7 +358,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         .i_visible_height = ctx->coded_height
     };
     VASurfaceID *surfaces;
-    sys->pool = vlc_vaapi_PoolNew(o, sys->hw_ctx.display, count,
+    sys->pool = vlc_vaapi_PoolNew(o, sys->va_inst, sys->hw_ctx.display, count,
                                   &surfaces, &vfmt, VA_RT_FORMAT_YUV420, 0);
 
     if (!sys->pool)
@@ -391,8 +385,10 @@ error:
         picture_pool_Release(sys->pool);
     if (sys->hw_ctx.config_id != VA_INVALID_ID)
         vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
-    if (sys->hw_ctx.display != NULL)
-        vlc_vaapi_ReleaseInstance(sys->hw_ctx.display);
+    if (sys->va_inst != NULL)
+        vlc_vaapi_ReleaseInstance(sys->va_inst);
+    else if (sys->hw_ctx.display != NULL)
+        vaTerminate(sys->hw_ctx.display);
 #ifdef VLC_VA_BACKEND_XLIB
     if( sys->p_display_x11 != NULL)
         XCloseDisplay(sys->p_display_x11);
