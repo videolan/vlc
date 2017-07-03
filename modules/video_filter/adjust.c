@@ -34,6 +34,7 @@
 #include <math.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
@@ -113,12 +114,12 @@ static const char *const ppsz_filter_options[] = {
 struct filter_sys_t
 {
     vlc_mutex_t lock;
-    float f_contrast;
-    float f_brightness;
-    float f_hue;
-    float f_saturation;
-    float f_gamma;
-    bool  b_brightness_threshold;
+    vlc_atomic_float f_contrast;
+    vlc_atomic_float f_brightness;
+    vlc_atomic_float f_hue;
+    vlc_atomic_float f_saturation;
+    vlc_atomic_float f_gamma;
+    atomic_bool  b_brightness_threshold;
     int (*pf_process_sat_hue)( picture_t *, picture_t *, int, int, int,
                                int, int );
     int (*pf_process_sat_hue_clip)( picture_t *, picture_t *, int, int,
@@ -184,13 +185,18 @@ static int Create( vlc_object_t *p_this )
      * adjust{name=value} syntax */
     config_ChainParse( p_filter, "", ppsz_filter_options, p_filter->p_cfg );
 
-    p_sys->f_contrast = var_CreateGetFloatCommand( p_filter, "contrast" );
-    p_sys->f_brightness = var_CreateGetFloatCommand( p_filter, "brightness" );
-    p_sys->f_hue = var_CreateGetFloatCommand( p_filter, "hue" );
-    p_sys->f_saturation = var_CreateGetFloatCommand( p_filter, "saturation" );
-    p_sys->f_gamma = var_CreateGetFloatCommand( p_filter, "gamma" );
-    p_sys->b_brightness_threshold =
-        var_CreateGetBoolCommand( p_filter, "brightness-threshold" );
+    vlc_atomic_init_float( &p_sys->f_contrast,
+                           var_CreateGetFloatCommand( p_filter, "contrast" ) );
+    vlc_atomic_init_float( &p_sys->f_brightness,
+                           var_CreateGetFloatCommand( p_filter, "brightness" ) );
+    vlc_atomic_init_float( &p_sys->f_hue,
+                           var_CreateGetFloatCommand( p_filter, "hue" ) );
+    vlc_atomic_init_float( &p_sys->f_saturation,
+                           var_CreateGetFloatCommand( p_filter, "saturation" ) );
+    vlc_atomic_init_float( &p_sys->f_gamma,
+                           var_CreateGetFloatCommand( p_filter, "gamma" ) );
+    atomic_init( &p_sys->b_brightness_threshold,
+                 var_CreateGetBoolCommand( p_filter, "brightness-threshold" ) );
 
     var_AddCallback( p_filter, "contrast",   AdjustCallback, p_sys );
     var_AddCallback( p_filter, "brightness", AdjustCallback, p_sys );
@@ -270,18 +276,17 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
 
     /* Get variables */
     vlc_mutex_lock( &p_sys->lock );
-    int32_t i_cont = lroundf( p_sys->f_contrast * f_max );
-    int32_t i_lum = lroundf( (p_sys->f_brightness - 1.f) * f_max );
-    float f_hue = p_sys->f_hue * (float)(M_PI / 180.);
-    int i_sat = (int)( p_sys->f_saturation * f_range );
-    float f_gamma = 1.f / p_sys->f_gamma;
-    bool b_thres = p_sys->b_brightness_threshold;
+    int32_t i_cont = lroundf( vlc_atomic_load_float( &p_sys->f_contrast ) * f_max );
+    int32_t i_lum = lroundf( (vlc_atomic_load_float( &p_sys->f_brightness ) - 1.f) * f_max );
+    float f_hue = vlc_atomic_load_float( &p_sys->f_hue ) * (float)(M_PI / 180.);
+    int i_sat = (int)( vlc_atomic_load_float( &p_sys->f_saturation ) * f_range );
+    float f_gamma = 1.f / vlc_atomic_load_float( &p_sys->f_gamma );
     vlc_mutex_unlock( &p_sys->lock );
 
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
      */
-    if( !b_thres )
+    if( !atomic_load( &p_sys->b_brightness_threshold ) )
     {
 
         /* Contrast is a fast but kludged function, so I put this gap to be
@@ -437,7 +442,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 
     int i_pitch, i_visible_pitch;
 
-    bool b_thres;
     double  f_hue;
     double  f_gamma;
     int32_t i_cont, i_lum;
@@ -471,18 +475,17 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 
     /* Get variables */
     vlc_mutex_lock( &p_sys->lock );
-    i_cont = (int)( p_sys->f_contrast * 255 );
-    i_lum = (int)( (p_sys->f_brightness - 1.0)*255 );
-    f_hue = p_sys->f_hue * (float)(M_PI / 180.);
-    i_sat = (int)( p_sys->f_saturation * 256 );
-    f_gamma = 1.0 / p_sys->f_gamma;
-    b_thres = p_sys->b_brightness_threshold;
+    i_cont = (int)( vlc_atomic_load_float( &p_sys->f_contrast ) * 255 );
+    i_lum = (int)( (vlc_atomic_load_float( &p_sys->f_brightness ) - 1.0)*255 );
+    f_hue = vlc_atomic_load_float( &p_sys->f_hue ) * (float)(M_PI / 180.);
+    i_sat = (int)( vlc_atomic_load_float( &p_sys->f_saturation ) * 256 );
+    f_gamma = 1.0 / vlc_atomic_load_float( &p_sys->f_gamma );
     vlc_mutex_unlock( &p_sys->lock );
 
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
      */
-    if( !b_thres )
+    if( !atomic_load( &p_sys->b_brightness_threshold ) )
     {
 
         /* Contrast is a fast but kludged function, so I put this gap to be
@@ -604,17 +607,17 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
 
     vlc_mutex_lock( &p_sys->lock );
     if( !strcmp( psz_var, "contrast" ) )
-        p_sys->f_contrast = newval.f_float;
+        vlc_atomic_store_float( &p_sys->f_contrast, newval.f_float );
     else if( !strcmp( psz_var, "brightness" ) )
-        p_sys->f_brightness = newval.f_float;
+        vlc_atomic_store_float( &p_sys->f_brightness, newval.f_float );
     else if( !strcmp( psz_var, "hue" ) )
-        p_sys->f_hue = newval.f_float;
+        vlc_atomic_store_float( &p_sys->f_hue, newval.f_float );
     else if( !strcmp( psz_var, "saturation" ) )
-        p_sys->f_saturation = newval.f_float;
+        vlc_atomic_store_float( &p_sys->f_saturation, newval.f_float );
     else if( !strcmp( psz_var, "gamma" ) )
-        p_sys->f_gamma = newval.f_float;
+        vlc_atomic_store_float( &p_sys->f_gamma, newval.f_float );
     else if( !strcmp( psz_var, "brightness-threshold" ) )
-        p_sys->b_brightness_threshold = newval.b_bool;
+        atomic_store( &p_sys->b_brightness_threshold, newval.b_bool );
     vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
