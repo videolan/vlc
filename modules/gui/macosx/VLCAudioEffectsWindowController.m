@@ -94,9 +94,105 @@
 
         self.popupPanel = [[VLCPopupPanelController alloc] init];
         self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
+
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"AudioEffectApplyProfileOnStartup"])
+        {
+            [self equalizerUpdated];
+            [self resetCompressor];
+            [self resetSpatializer];
+            [self resetAudioFilters];
+            [self loadProfile];
+        }
     }
 
     return self;
+}
+
+- (void)loadProfile
+{
+    intf_thread_t *p_intf = getIntf();
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSInteger selectedProfile = [defaults integerForKey:@"AudioEffectSelectedProfile"];
+    playlist_t *p_playlist = pl_Get(p_intf);
+
+    /* disable existing filters */
+    playlist_EnableAudioFilter(p_playlist, "equalizer", false);
+    playlist_EnableAudioFilter(p_playlist, "compressor", false);
+    playlist_EnableAudioFilter(p_playlist, "spatializer", false);
+    playlist_EnableAudioFilter(p_playlist, "compressor", false);
+    playlist_EnableAudioFilter(p_playlist, "headphone", false);
+    playlist_EnableAudioFilter(p_playlist, "normvol", false);
+    playlist_EnableAudioFilter(p_playlist, "karaoke", false);
+
+    /* fetch preset */
+    NSArray *items = [[[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:(NSUInteger) selectedProfile] componentsSeparatedByString:@";"];
+
+    /* eq preset */
+    char const *psz_eq_preset = [B64DecNSStr([items firstObject]) UTF8String];
+    audio_output_t *p_aout = getAout();
+    if (p_aout)
+        var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
+    var_SetString(p_playlist, "equalizer-preset", psz_eq_preset);
+
+    /* filter handling */
+    NSString *tempString = B64DecNSStr([items objectAtIndex:1]);
+    NSArray *tempArray;
+    NSUInteger count;
+    /* enable the new filters */
+    if ([tempString length] > 0) {
+        tempArray = [tempString componentsSeparatedByString:@":"];
+        count = [tempArray count];
+        for (NSUInteger x = 0; x < count; x++)
+            playlist_EnableAudioFilter(p_playlist, [[tempArray objectAtIndex:x] UTF8String], true);
+    }
+
+    /* values */
+    var_SetFloat(p_playlist, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
+    var_SetFloat(p_playlist, "compressor-attack",[[items objectAtIndex:3] floatValue]);
+    var_SetFloat(p_playlist, "compressor-release",[[items objectAtIndex:4] floatValue]);
+    var_SetFloat(p_playlist, "compressor-threshold",[[items objectAtIndex:5] floatValue]);
+    var_SetFloat(p_playlist, "compressor-ratio",[[items objectAtIndex:6] floatValue]);
+    var_SetFloat(p_playlist, "compressor-knee",[[items objectAtIndex:7] floatValue]);
+    var_SetFloat(p_playlist, "compressor-makeup-gain",[[items objectAtIndex:8] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-roomsize",[[items objectAtIndex:9] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-width",[[items objectAtIndex:10] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-wet",[[items objectAtIndex:11] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-dry",[[items objectAtIndex:12] floatValue]);
+    var_SetFloat(p_playlist, "spatializer-damp",[[items objectAtIndex:13] floatValue]);
+    var_SetFloat(p_playlist, "norm-max-level",[[items objectAtIndex:14] floatValue]);
+    var_SetBool(p_playlist, "equalizer-2pass",(BOOL)[[items objectAtIndex:15] intValue]);
+
+    /* set values on-the-fly if we have an aout */
+    if (p_aout) {
+        var_SetFloat(p_aout, "compressor-rms-peak", [[items objectAtIndex:2] floatValue]);
+        var_SetFloat(p_aout, "compressor-attack", [[items objectAtIndex:3] floatValue]);
+        var_SetFloat(p_aout, "compressor-release", [[items objectAtIndex:4] floatValue]);
+        var_SetFloat(p_aout, "compressor-threshold", [[items objectAtIndex:5] floatValue]);
+        var_SetFloat(p_aout, "compressor-ratio", [[items objectAtIndex:6] floatValue]);
+        var_SetFloat(p_aout, "compressor-knee", [[items objectAtIndex:7] floatValue]);
+        var_SetFloat(p_aout, "compressor-makeup-gain", [[items objectAtIndex:8] floatValue]);
+        var_SetFloat(p_aout, "spatializer-roomsize", [[items objectAtIndex:9] floatValue]);
+        var_SetFloat(p_aout, "spatializer-width", [[items objectAtIndex:10] floatValue]);
+        var_SetFloat(p_aout, "spatializer-wet", [[items objectAtIndex:11] floatValue]);
+        var_SetFloat(p_aout, "spatializer-dry", [[items objectAtIndex:12] floatValue]);
+        var_SetFloat(p_aout, "spatializer-damp", [[items objectAtIndex:13] floatValue]);
+        var_SetFloat(p_aout, "norm-max-level", [[items objectAtIndex:14] floatValue]);
+        var_SetBool(p_aout, "equalizer-2pass", (BOOL)[[items objectAtIndex:15] intValue]);
+    }
+
+    /* update UI */
+    BOOL b_equalizerEnabled = [tempString rangeOfString:@"equalizer"].location != NSNotFound;
+    [_equalizerView enableSubviews:b_equalizerEnabled];
+    [_equalizerEnableCheckbox setState:(b_equalizerEnabled ? NSOnState : NSOffState)];
+
+    [_equalizerTwoPassCheckbox setState:[[items objectAtIndex:15] intValue]];
+
+    /* store current profile selection */
+    [defaults setInteger:selectedProfile forKey:@"AudioEffectSelectedProfile"];
+    [defaults synchronize];
+
+    if (p_aout)
+        vlc_object_release(p_aout);
 }
 
 - (void)windowDidLoad
@@ -267,99 +363,16 @@
 
 - (IBAction)profileSelectorAction:(id)sender
 {
-    intf_thread_t *p_intf = getIntf();
     [self saveCurrentProfile];
     i_old_profile_index = [_profilePopup indexOfSelectedItem];
-
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSInteger selectedProfile = [_profilePopup indexOfSelectedItem];
-    if (selectedProfile < 0)
-        return;
-
-    playlist_t *p_playlist = pl_Get(p_intf);
-
-    /* disable existing filters */
-    playlist_EnableAudioFilter(p_playlist, "equalizer", false);
-    playlist_EnableAudioFilter(p_playlist, "compressor", false);
-    playlist_EnableAudioFilter(p_playlist, "spatializer", false);
-    playlist_EnableAudioFilter(p_playlist, "compressor", false);
-    playlist_EnableAudioFilter(p_playlist, "headphone", false);
-    playlist_EnableAudioFilter(p_playlist, "normvol", false);
-    playlist_EnableAudioFilter(p_playlist, "karaoke", false);
-
-    /* fetch preset */
-    NSArray *items = [[[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:(NSUInteger) selectedProfile] componentsSeparatedByString:@";"];
-
-    /* eq preset */
-    char const *psz_eq_preset = [B64DecNSStr([items firstObject]) UTF8String];
-    audio_output_t *p_aout = getAout();
-    if (p_aout)
-        var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
-    var_SetString(p_playlist, "equalizer-preset", psz_eq_preset);
-
-    /* filter handling */
-    NSString *tempString = B64DecNSStr([items objectAtIndex:1]);
-    NSArray *tempArray;
-    NSUInteger count;
-    /* enable the new filters */
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            playlist_EnableAudioFilter(p_playlist, [[tempArray objectAtIndex:x] UTF8String], true);
-    }
-
-    /* values */
-    var_SetFloat(p_playlist, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
-    var_SetFloat(p_playlist, "compressor-attack",[[items objectAtIndex:3] floatValue]);
-    var_SetFloat(p_playlist, "compressor-release",[[items objectAtIndex:4] floatValue]);
-    var_SetFloat(p_playlist, "compressor-threshold",[[items objectAtIndex:5] floatValue]);
-    var_SetFloat(p_playlist, "compressor-ratio",[[items objectAtIndex:6] floatValue]);
-    var_SetFloat(p_playlist, "compressor-knee",[[items objectAtIndex:7] floatValue]);
-    var_SetFloat(p_playlist, "compressor-makeup-gain",[[items objectAtIndex:8] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-roomsize",[[items objectAtIndex:9] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-width",[[items objectAtIndex:10] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-wet",[[items objectAtIndex:11] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-dry",[[items objectAtIndex:12] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-damp",[[items objectAtIndex:13] floatValue]);
-    var_SetFloat(p_playlist, "norm-max-level",[[items objectAtIndex:14] floatValue]);
-    var_SetBool(p_playlist, "equalizer-2pass",(BOOL)[[items objectAtIndex:15] intValue]);
-
-    /* set values on-the-fly if we have an aout */
-    if (p_aout) {
-        var_SetFloat(p_aout, "compressor-rms-peak", [[items objectAtIndex:2] floatValue]);
-        var_SetFloat(p_aout, "compressor-attack", [[items objectAtIndex:3] floatValue]);
-        var_SetFloat(p_aout, "compressor-release", [[items objectAtIndex:4] floatValue]);
-        var_SetFloat(p_aout, "compressor-threshold", [[items objectAtIndex:5] floatValue]);
-        var_SetFloat(p_aout, "compressor-ratio", [[items objectAtIndex:6] floatValue]);
-        var_SetFloat(p_aout, "compressor-knee", [[items objectAtIndex:7] floatValue]);
-        var_SetFloat(p_aout, "compressor-makeup-gain", [[items objectAtIndex:8] floatValue]);
-        var_SetFloat(p_aout, "spatializer-roomsize", [[items objectAtIndex:9] floatValue]);
-        var_SetFloat(p_aout, "spatializer-width", [[items objectAtIndex:10] floatValue]);
-        var_SetFloat(p_aout, "spatializer-wet", [[items objectAtIndex:11] floatValue]);
-        var_SetFloat(p_aout, "spatializer-dry", [[items objectAtIndex:12] floatValue]);
-        var_SetFloat(p_aout, "spatializer-damp", [[items objectAtIndex:13] floatValue]);
-        var_SetFloat(p_aout, "norm-max-level", [[items objectAtIndex:14] floatValue]);
-        var_SetBool(p_aout, "equalizer-2pass", (BOOL)[[items objectAtIndex:15] intValue]);
-    }
+    [[NSUserDefaults standardUserDefaults] setInteger:i_old_profile_index forKey:@"AudioEffectSelectedProfile"];
+    [self loadProfile];
 
     /* update UI */
-    BOOL b_equalizerEnabled = [tempString rangeOfString:@"equalizer"].location != NSNotFound;
-    [_equalizerView enableSubviews:b_equalizerEnabled];
-    [_equalizerEnableCheckbox setState:(b_equalizerEnabled ? NSOnState : NSOffState)];
-
-    [_equalizerTwoPassCheckbox setState:[[items objectAtIndex:15] intValue]];
     [self resetCompressor];
     [self resetSpatializer];
     [self resetAudioFilters];
     [self updatePresetSelector];
-
-    /* store current profile selection */
-    [defaults setInteger:selectedProfile forKey:@"AudioEffectSelectedProfile"];
-    [defaults synchronize];
-
-    if (p_aout)
-        vlc_object_release(p_aout);
 }
 
 - (void)addAudioEffectsProfile:(id)sender
