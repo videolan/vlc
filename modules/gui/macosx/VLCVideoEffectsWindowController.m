@@ -62,10 +62,13 @@
         self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
     }
 
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"VideoEffectApplyProfileOnStartup"]) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults boolForKey:@"VideoEffectApplyProfileOnStartup"]) {
         [self resetValues];
         [self loadProfile];
     }
+    else
+        [defaults setInteger:0 forKey:@"VideoEffectSelectedProfile"];
 
     return self;
 }
