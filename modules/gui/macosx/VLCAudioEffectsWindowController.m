@@ -447,6 +447,11 @@
             return;
         }
 
+        if (!selectedIndex) { // TODO: add popup to notify user
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+            return;
+        }
+
         /* remove selected profile from settings */
         NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
         [workArray removeObjectAtIndex:selectedIndex];
