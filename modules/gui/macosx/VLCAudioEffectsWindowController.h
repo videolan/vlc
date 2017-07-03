@@ -32,6 +32,7 @@
 /* generic */
 @property (readwrite, weak) IBOutlet NSTabView *tabView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *profilePopup;
+@property (readwrite, weak) IBOutlet NSButton *applyProfileCheckbox;
 
 /* Equalizer */
 @property (readwrite, weak) IBOutlet NSView *equalizerView;
@@ -111,6 +112,7 @@
 
 /* generic */
 - (IBAction)profileSelectorAction:(id)sender;
+- (IBAction)applyProfileCheckboxChanged:(id)sender;
 
 - (void)toggleWindow:(id)sender;
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;

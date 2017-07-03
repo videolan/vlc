@@ -101,6 +101,8 @@
 
 - (void)windowDidLoad
 {
+    [_applyProfileCheckbox setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"AudioEffectApplyProfileOnStartup"]];
+
     /* setup the user's language */
     /* Equalizer */
     [_equalizerEnableCheckbox setTitle:_NS("Enable")];
@@ -446,6 +448,11 @@
         [defaults synchronize];
         [_self resetProfileSelector];
     }];
+}
+
+- (IBAction)applyProfileCheckboxChanged:(id)sender
+{
+    [[NSUserDefaults standardUserDefaults] setBool:[sender state] forKey:@"AudioEffectApplyProfileOnStartup"];
 }
 
 #pragma mark -

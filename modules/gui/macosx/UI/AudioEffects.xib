@@ -11,6 +11,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCAudioEffectsWindowController">
             <connections>
+                <outlet property="applyProfileCheckbox" destination="Dqv-cc-ZvK" id="DXd-0m-de4"/>
                 <outlet property="compressorBand1Label" destination="248" id="qCX-jv-cwZ"/>
                 <outlet property="compressorBand1Slider" destination="221" id="mTW-zO-vyb"/>
                 <outlet property="compressorBand1TextField" destination="220" id="AuC-eV-R0U"/>
@@ -87,7 +88,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="254" width="409" height="255"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="409" height="255"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1078,23 +1079,6 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="701">
-                        <rect key="frame" x="171" y="6" width="68" height="22"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="706" id="702" customClass="VLCHUDPopUpButtonCell">
-                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
-                            <menu key="menu" title="OtherViews" id="703">
-                                <items>
-                                    <menuItem title="Item 1" state="on" id="706"/>
-                                    <menuItem title="Item 2" id="705"/>
-                                    <menuItem title="Item 3" id="704"/>
-                                </items>
-                            </menu>
-                        </popUpButtonCell>
-                        <connections>
-                            <action selector="profileSelectorAction:" target="-2" id="uTq-Bz-2S2"/>
-                        </connections>
-                    </popUpButton>
                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="EuA-vb-mSS">
                         <rect key="frame" x="0.0" y="221" width="409" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1114,21 +1098,58 @@
                             <action selector="takeSelectedTabViewItemFromSender:" target="80" id="NRc-hG-ZR6"/>
                         </connections>
                     </segmentedControl>
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dqv-cc-ZvK">
+                        <rect key="frame" x="233" y="9" width="158" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fiO-IL-qum">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="applyProfileCheckboxChanged:" target="-1" id="i9T-ah-Bfc"/>
+                        </connections>
+                    </button>
+                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="701">
+                        <rect key="frame" x="47" y="6" width="68" height="22"/>
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="706" id="702" customClass="VLCHUDPopUpButtonCell">
+                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                            <menu key="menu" title="OtherViews" id="703">
+                                <items>
+                                    <menuItem title="Item 1" state="on" id="706"/>
+                                    <menuItem title="Item 2" id="705"/>
+                                    <menuItem title="Item 3" id="704"/>
+                                </items>
+                            </menu>
+                        </popUpButtonCell>
+                        <connections>
+                            <action selector="profileSelectorAction:" target="-2" id="uTq-Bz-2S2"/>
+                        </connections>
+                    </popUpButton>
                 </subviews>
                 <constraints>
                     <constraint firstItem="80" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="-8" id="IMR-wz-4Ly"/>
                     <constraint firstAttribute="bottom" secondItem="701" secondAttribute="bottom" constant="9" id="J0K-xv-xsb"/>
                     <constraint firstAttribute="trailing" secondItem="80" secondAttribute="trailing" constant="-8" id="KUJ-ZT-T77"/>
                     <constraint firstAttribute="bottom" secondItem="80" secondAttribute="bottom" constant="35" id="OVV-Za-fCZ"/>
-                    <constraint firstItem="701" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="RcE-hb-fne"/>
                     <constraint firstItem="Jb1-f1-iF3" firstAttribute="top" secondItem="2" secondAttribute="top" constant="4" id="ZTA-69-Rbc"/>
                     <constraint firstItem="80" firstAttribute="top" secondItem="2" secondAttribute="top" constant="31" id="cgf-qG-2Pl"/>
+                    <constraint firstItem="701" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="50" id="d4T-xa-vp3"/>
                     <constraint firstItem="Jb1-f1-iF3" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="iYo-cU-P4u"/>
                 </constraints>
             </view>
             <point key="canvasLocation" x="138.5" y="162.5"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="350"/>
+        <button id="fcU-Hc-rUX">
+            <rect key="frame" x="0.0" y="0.0" width="61" height="18"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <buttonCell key="cell" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Bf3-XK-VMa">
+                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                <font key="font" metaFont="system"/>
+            </buttonCell>
+            <point key="canvasLocation" x="288.5" y="277"/>
+        </button>
     </objects>
     <resources>
         <image name="buttonCell:619:image" width="1" height="1">
