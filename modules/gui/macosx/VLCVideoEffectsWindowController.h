@@ -169,7 +169,7 @@
 
 /* generic */
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
-- (void)saveCurrentProfile;
+- (void)saveCurrentProfileAtTerminate;
 
 - (void)toggleWindow:(id)sender;
 - (IBAction)profileSelectorAction:(id)sender;

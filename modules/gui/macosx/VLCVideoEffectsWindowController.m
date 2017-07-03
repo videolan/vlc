@@ -675,6 +675,35 @@
     [defaults synchronize];
 }
 
+- (void)saveCurrentProfileAtTerminate
+{
+    if (i_old_profile_index)
+        return [self saveCurrentProfile];
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *newProfile = [self generateProfileString];
+    if ([newProfile compare:[[defaults objectForKey:@"VideoEffectProfiles"] firstObject]] == NSOrderedSame)
+        return;
+
+    NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfiles"]];
+    [workArray addObject:newProfile];
+    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+
+    NSArray<NSString *> *profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
+    NSString *newProfileName;
+
+    unsigned int num_custom = 0;
+    do
+        newProfileName = [@"Custom" stringByAppendingString:[NSString stringWithFormat:@"%03i",num_custom++]];
+    while ([profileNames containsObject:newProfileName]);
+
+    workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
+    [workArray addObject:newProfileName];
+    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+
+    [defaults synchronize];
+}
+
 - (IBAction)toggleWindow:(id)sender
 {
     if ([self.window isKeyWindow])
