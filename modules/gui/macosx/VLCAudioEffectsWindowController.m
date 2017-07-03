@@ -300,7 +300,8 @@
     }
 
     [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
-    [self profileSelectorAction:self];
+    if (i_old_profile_index || [[NSUserDefaults standardUserDefaults] integerForKey:@"AudioEffectSelectedProfile"])
+        [self profileSelectorAction:self];
 }
 
 #pragma mark -
