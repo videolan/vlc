@@ -32,6 +32,69 @@
 #include <vlc_plugin.h>
 #include "filters.h"
 
+/*******************
+ * Instance holder *
+ *******************/
+
+/* XXX: Static filters (like deinterlace) may not have access to a picture
+ * allocated by the vout if it's not the first filter in the chain. That vout
+ * picture is needed to get the VADisplay instance. Therefore, we store the
+ * fist vaapi instance set by a filter so that it can be re-usable by others
+ * filters. The instance is ref-counted, so there is no problem if the main
+ * filter is destroyed before the other ones. */
+static struct {
+    vlc_mutex_t lock;
+    struct vlc_vaapi_instance *inst;
+    filter_t *owner;
+} holder = { VLC_STATIC_MUTEX, NULL, NULL };
+
+struct vlc_vaapi_instance *
+vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy)
+{
+
+    picture_t *pic = filter_NewPicture(filter);
+    if (!pic)
+        return NULL;
+
+    if (pic->format.i_chroma != VLC_CODEC_VAAPI_420)
+    {
+        picture_Release(pic);
+        return NULL;
+    }
+
+    struct vlc_vaapi_instance *va_inst = NULL;
+
+    vlc_mutex_lock(&holder.lock);
+    if (holder.inst != NULL)
+    {
+        va_inst = holder.inst;
+        *dpy = vlc_vaapi_HoldInstance(holder.inst);
+    }
+    else
+    {
+        holder.owner = filter;
+        holder.inst = va_inst = pic->p_sys ?
+            vlc_vaapi_PicSysHoldInstance(pic->p_sys, dpy) : NULL;
+    }
+    vlc_mutex_unlock(&holder.lock);
+    picture_Release(pic);
+
+    return va_inst;
+}
+
+void
+vlc_vaapi_FilterReleaseInstance(filter_t *filter,
+                                struct vlc_vaapi_instance *va_inst)
+{
+    vlc_vaapi_ReleaseInstance(va_inst);
+    vlc_mutex_lock(&holder.lock);
+    if (filter == holder.owner)
+    {
+        holder.inst = NULL;
+        holder.owner = NULL;
+    }
+    vlc_mutex_unlock(&holder.lock);
+}
 /********************************
  * Common structures and macros *
  ********************************/
@@ -379,19 +442,20 @@ error:
         vlc_vaapi_DestroyConfig(VLC_OBJECT(filter),
                                 filter_sys->va.dpy, filter_sys->va.conf);
     if (filter_sys->va.inst)
-        vlc_vaapi_ReleaseInstance(filter_sys->va.inst);
+        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.inst);
     free(filter_sys);
     return VLC_EGENERIC;
 }
 
 static void
-Close(vlc_object_t * obj, filter_sys_t * filter_sys)
+Close(filter_t *filter, filter_sys_t * filter_sys)
 {
+    vlc_object_t * obj = VLC_OBJECT(filter);
     picture_pool_Release(filter_sys->dest_pics);
     vlc_vaapi_DestroyBuffer(obj, filter_sys->va.dpy, filter_sys->va.buf);
     vlc_vaapi_DestroyContext(obj, filter_sys->va.dpy, filter_sys->va.ctx);
     vlc_vaapi_DestroyConfig(obj, filter_sys->va.dpy, filter_sys->va.conf);
-    vlc_vaapi_ReleaseInstance(filter_sys->va.inst);
+    vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.inst);
     free(filter_sys);
 }
 
@@ -593,7 +657,7 @@ CloseAdjust(vlc_object_t * obj)
         var_Destroy(obj, adjust_params_names[i]);
     }
     free(filter_sys->p_data);
-    Close(obj, filter_sys);
+    Close(filter, filter_sys);
 }
 
 /***************************
@@ -727,7 +791,7 @@ CloseBasicFilter(vlc_object_t * obj)
     var_Destroy(obj, p_data->sigma.psz_name);
     free(p_data->sigma.psz_name);
     free(p_data);
-    Close(obj, filter_sys);
+    Close(filter, filter_sys);
 }
 
 /*************************
@@ -992,7 +1056,7 @@ CloseDeinterlace(vlc_object_t * obj)
         free(p_data->history.pp_pics);
     }
     free(p_data);
-    Close(obj, filter_sys);
+    Close(filter, filter_sys);
 }
 
 /*********************

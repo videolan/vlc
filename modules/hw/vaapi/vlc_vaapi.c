@@ -602,21 +602,6 @@ vlc_vaapi_PicSysHoldInstance(picture_sys_t *sys, VADisplay *dpy)
     return sys->instance->va_inst;
 }
 
-struct vlc_vaapi_instance *
-vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy)
-{
-    picture_t *pic = filter_NewPicture(filter);
-    if (!pic)
-        return NULL;
-
-    struct vlc_vaapi_instance *va_inst =
-        pic->format.i_chroma == VLC_CODEC_VAAPI_420 && pic->p_sys ?
-        vlc_vaapi_PicSysHoldInstance(pic->p_sys, dpy) : NULL;
-    picture_Release(pic);
-
-    return va_inst;
-}
-
 #define ASSERT_VAAPI_CHROMA(pic) do { \
     assert(pic->format.i_chroma == VLC_CODEC_VAAPI_420); \
 } while(0)

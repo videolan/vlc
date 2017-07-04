@@ -309,7 +309,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
                               VA_FOURCC_NV12);
         if (!filter_sys->dest_pics)
         {
-            vlc_vaapi_ReleaseInstance(filter_sys->va_inst);
+            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va_inst);
             free(filter_sys);
             return VLC_EGENERIC;
         }
@@ -326,7 +326,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
         if (is_upload)
         {
             picture_pool_Release(filter_sys->dest_pics);
-            vlc_vaapi_ReleaseInstance(filter_sys->va_inst);
+            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va_inst);
         }
         free(filter_sys);
         return VLC_EGENERIC;
@@ -340,7 +340,8 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
 void
 vlc_vaapi_CloseChroma(vlc_object_t *obj)
 {
-    filter_sys_t *const filter_sys = ((filter_t *)obj)->p_sys;
+    filter_t *filter = (filter_t *)obj;
+    filter_sys_t *const filter_sys = filter->p_sys;
 
     if (filter_sys->image_fallback.image_id != VA_INVALID_ID)
         vlc_vaapi_DestroyImage(obj, filter_sys->dpy,
@@ -348,7 +349,7 @@ vlc_vaapi_CloseChroma(vlc_object_t *obj)
     if (filter_sys->dest_pics)
         picture_pool_Release(filter_sys->dest_pics);
     if (filter_sys->va_inst != NULL)
-        vlc_vaapi_ReleaseInstance(filter_sys->va_inst);
+        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va_inst);
     CopyCleanCache(&filter_sys->cache);
 
     free(filter_sys);

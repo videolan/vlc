@@ -187,10 +187,6 @@ vlc_vaapi_PicSysGetRenderTargets(picture_sys_t *sys,
 struct vlc_vaapi_instance *
 vlc_vaapi_PicSysHoldInstance(picture_sys_t *sys, VADisplay *dpy);
 
-/* Get and hold the VADisplay instance from a filter */
-struct vlc_vaapi_instance *
-vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy);
-
 /* Attachs the VASurface to the picture context, the picture must be allocated
  * by a vaapi pool (see vlc_vaapi_PoolNew()) */
 void
