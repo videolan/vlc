@@ -242,6 +242,8 @@ static int Open(vlc_object_t *object)
     const int cct = ParseInteger(&header[12], 2);
     const mtime_t program_start = ParseTextTimeCode(&header[256], fps);
     const size_t tti_count = ParseInteger(&header[238], 5);
+    if (!tti_count)
+        return VLC_EGENERIC;
     msg_Dbg(demux, "Detected EBU STL : CCT=%d TTI=%zu start=%8.8s %"PRId64, cct, tti_count, &header[256], program_start);
 
     demux_sys_t *sys = malloc(sizeof(*sys));
