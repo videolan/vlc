@@ -32,6 +32,7 @@
 
 #include <QVBoxLayout>
 #include <QSplitter>
+#include <QScrollBar>
 #include <QLabel>
 #include <QGroupBox>
 #include <QPushButton>
@@ -161,6 +162,7 @@ void EpgDialog::displayEvent( EPGItem *epgItem )
                              QString() )
                    );
     description->setText( epgItem->description() );
+    description->verticalScrollBar()->setValue(0);
 }
 
 void EpgDialog::updateInfos()
