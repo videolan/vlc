@@ -512,7 +512,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
         if (currentPresetIndex == NSNotFound)
             currentPresetIndex = [presets count] - 1;
-    }    
+    }
 
     [_equalizerPresetsPopup selectItemAtIndex:currentPresetIndex];
     [self equalizerChangePreset:_equalizerPresetsPopup];
