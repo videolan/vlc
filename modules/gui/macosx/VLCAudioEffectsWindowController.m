@@ -95,7 +95,8 @@
         self.popupPanel = [[VLCPopupPanelController alloc] init];
         self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
 
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"AudioEffectApplyProfileOnStartup"])
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        if ([defaults boolForKey:@"AudioEffectApplyProfileOnStartup"])
         {
             [self equalizerUpdated];
             [self resetCompressor];
@@ -103,6 +104,8 @@
             [self resetAudioFilters];
             [self loadProfile];
         }
+        else
+            [defaults setInteger:0 forKey:@"AudioEffectSelectedProfile"];
     }
 
     return self;
