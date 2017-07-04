@@ -170,6 +170,13 @@ bool EPGItem::setData( const vlc_epg_event_t *data )
         m_shortDescription = newshortdesc;
         setDuration( data->i_duration );
         setRating( data->i_rating );
+        m_descitems.clear();
+        for( int i=0; i<data->i_description_items; i++ )
+        {
+            m_descitems.append(QPair<QString, QString>(
+                                  QString(data->description_items[i].psz_key),
+                                  QString(data->description_items[i].psz_value)));
+        }
         updatePos();
         prepareGeometryChange();
         return true;
@@ -185,6 +192,11 @@ bool EPGItem::endsBefore( const QDateTime &ref ) const
 bool EPGItem::playsAt( const QDateTime & ref ) const
 {
     return (m_start <= ref) && !endsBefore( ref );
+}
+
+const QList<QPair<QString, QString>> & EPGItem::descriptionItems() const
+{
+    return m_descitems;
 }
 
 void EPGItem::setDuration( uint32_t duration )

@@ -57,6 +57,7 @@ public:
     void updatePos();
     bool endsBefore( const QDateTime & ) const;
     bool playsAt( const QDateTime & ) const;
+    const QList<QPair<QString, QString>> &descriptionItems() const;
 
 protected:
     void focusInEvent( QFocusEvent * event ) Q_DECL_OVERRIDE;
@@ -75,6 +76,7 @@ private:
     QString     m_name;
     QString     m_description;
     QString     m_shortDescription;
+    QList<QPair<QString, QString>> m_descitems;
     uint8_t     m_rating;
 };
 
