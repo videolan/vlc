@@ -307,13 +307,6 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
     priv->vadpy = vadpy;
     priv->fourcc = 0;
 
-    if (!HasExtension(tc->glexts, "GL_OES_EGL_image"))
-        goto error;
-
-    const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
-    if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
-        goto error;
-
     if (vaegl_init_fourcc(tc, priv, VA_FOURCC_NV12))
         goto error;
 
@@ -355,6 +348,13 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
     if (tc->fmt.i_chroma != VLC_CODEC_VAAPI_420 || tc->gl->ext != VLC_GL_EXT_EGL
      || tc->gl->egl.createImageKHR == NULL
      || tc->gl->egl.destroyImageKHR == NULL)
+        return VLC_EGENERIC;
+
+    if (!HasExtension(tc->glexts, "GL_OES_EGL_image"))
+        return VLC_EGENERIC;
+
+    const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
+    if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
         return VLC_EGENERIC;
 
     switch (tc->gl->surface->type)
