@@ -33,7 +33,7 @@
 #include <vlc_plugin.h>
 
 #include "../../video_chroma/copy.h"
-#include "vlc_vaapi.h"
+#include "filters.h"
 
 # define DEST_PICS_POOL_SZ 3
 
@@ -49,18 +49,6 @@ struct filter_sys_t
     bool                image_fallback_failed;
     VAImage             image_fallback;
 };
-
-static int              Open(vlc_object_t *obj);
-static void             Close(vlc_object_t *obj);
-
-vlc_module_begin()
-    set_shortname(N_("VAAPI"))
-    set_description(N_("VAAPI surface conversions"))
-    set_capability("video converter", 10)
-    set_category(CAT_VIDEO)
-    set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(Open, Close)
-vlc_module_end()
 
 static int CreateFallbackImage(filter_t *filter, picture_t *src_pic)
 {
@@ -265,7 +253,8 @@ error:
     goto ret;
 }
 
-static int Open(vlc_object_t *obj)
+int
+vlc_vaapi_OpenChroma(vlc_object_t *obj)
 {
     filter_t *const     filter = (filter_t *)obj;
     filter_sys_t *      filter_sys;
@@ -348,8 +337,8 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static void
-Close(vlc_object_t *obj)
+void
+vlc_vaapi_CloseChroma(vlc_object_t *obj)
 {
     filter_sys_t *const filter_sys = ((filter_t *)obj)->p_sys;
 

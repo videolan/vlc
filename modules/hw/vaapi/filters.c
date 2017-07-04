@@ -30,7 +30,7 @@
 #include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include <vlc_plugin.h>
-#include "vlc_vaapi.h"
+#include "filters.h"
 
 /********************************
  * Common structures and macros *
@@ -1021,9 +1021,9 @@ vlc_module_begin()
                          "Set the Denoise strength, between 0 and 2. "
                             "Defaults to 1.",
                          false)
-    add_shortcut("denoise")
+    add_shortcut("denoise", "sharpen")
 
     add_submodule()
-    set_callbacks(OpenBasicFilter, CloseBasicFilter)
-    add_shortcut("sharpen")
+    set_capability("video converter", 10)
+    set_callbacks(vlc_vaapi_OpenChroma, vlc_vaapi_CloseChroma)
 vlc_module_end()

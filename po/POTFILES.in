@@ -912,7 +912,6 @@ modules/hw/vdpau/chroma.c
 modules/hw/vdpau/deinterlace.c
 modules/hw/vdpau/display.c
 modules/hw/vdpau/sharpen.c
-modules/hw/vaapi/chroma.c
 modules/hw/vaapi/filters.c
 modules/keystore/keychain.m
 modules/lua/demux.c
