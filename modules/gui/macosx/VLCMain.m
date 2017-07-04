@@ -336,7 +336,7 @@ static VLCMain *sharedInstance = nil;
 
     /* save current video and audio profiles */
     [[self videoEffectsPanel] saveCurrentProfileAtTerminate];
-    [[self audioEffectsPanel] saveCurrentProfile];
+    [[self audioEffectsPanel] saveCurrentProfileAtTerminate];
 
     /* Save some interface state in configuration, at module quit */
     config_PutInt(p_intf, "random", var_GetBool(p_playlist, "random"));

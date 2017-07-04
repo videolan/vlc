@@ -116,7 +116,7 @@
 
 - (void)toggleWindow:(id)sender;
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
-- (void)saveCurrentProfile;
+- (void)saveCurrentProfileAtTerminate;
 
 /* Equalizer */
 - (IBAction)equalizerBandSliderUpdated:(id)sender;
