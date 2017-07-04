@@ -2049,7 +2049,9 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
     {
         bool b_audio = !strcmp( psz_name, CFG_PREFIX "adev" );
 
-        ComContext ctx( COINIT_MULTITHREADED );
+        // Use STA as this most likely comes from a Qt thread, which is
+        // initialized as STA.
+        ComContext ctx( COINIT_APARTMENTTHREADED );
 
         FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
 
