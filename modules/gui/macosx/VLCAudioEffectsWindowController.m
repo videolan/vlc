@@ -108,6 +108,14 @@
     return self;
 }
 
+- (NSInteger)getPresetIndexForProfile:(NSInteger)profileIndex
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *profile = [[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:profileIndex];
+    NSString *presetName = B64DecNSStr([[profile componentsSeparatedByString:@";"] firstObject]);
+    return [[defaults objectForKey:@"EQNames"] indexOfObject:presetName];
+}
+
 - (void)loadProfile
 {
     intf_thread_t *p_intf = getIntf();
@@ -146,6 +154,8 @@
             playlist_EnableAudioFilter(p_playlist, [[tempArray objectAtIndex:x] UTF8String], true);
     }
 
+    NSInteger presetIndex = [self getPresetIndexForProfile:selectedProfile];
+
     /* values */
     var_SetFloat(p_playlist, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
     var_SetFloat(p_playlist, "compressor-attack",[[items objectAtIndex:3] floatValue]);
@@ -161,6 +171,9 @@
     var_SetFloat(p_playlist, "spatializer-damp",[[items objectAtIndex:13] floatValue]);
     var_SetFloat(p_playlist, "norm-max-level",[[items objectAtIndex:14] floatValue]);
     var_SetBool(p_playlist, "equalizer-2pass",(BOOL)[[items objectAtIndex:15] intValue]);
+    var_SetString(p_playlist, "equalizer-bands", [[[defaults objectForKey:@"EQValues"] objectAtIndex:presetIndex] UTF8String]);
+    var_SetFloat(p_playlist, "equalizer-preamp", [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:presetIndex] floatValue]);
+    var_SetString(p_playlist, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:presetIndex] UTF8String]);
 
     /* set values on-the-fly if we have an aout */
     if (p_aout) {
@@ -178,6 +191,9 @@
         var_SetFloat(p_aout, "spatializer-damp", [[items objectAtIndex:13] floatValue]);
         var_SetFloat(p_aout, "norm-max-level", [[items objectAtIndex:14] floatValue]);
         var_SetBool(p_aout, "equalizer-2pass", (BOOL)[[items objectAtIndex:15] intValue]);
+        var_SetString(p_aout, "equalizer-bands", [[[defaults objectForKey:@"EQValues"] objectAtIndex:presetIndex] UTF8String]);
+        var_SetFloat(p_aout, "equalizer-preamp", [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:presetIndex] floatValue]);
+        var_SetString(p_aout, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:presetIndex] UTF8String]);
     }
 
     /* update UI */
@@ -557,6 +573,10 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     /* Setup sliders */
     var_Create(p_playlist, "equalizer-preset",
                VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create(p_playlist, "equalizer-bands",
+               VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create(p_playlist, "equalizer-preamp",
+               VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     [self updatePresetSelector];
 
     /* Set the the checkboxes */
@@ -628,6 +648,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetString(p_aout, "equalizer-bands", psz_preset_values);
         vlc_object_release(p_aout);
     }
+    var_SetString(pl_Get(getIntf()), "equalizer-bands", psz_preset_values);
 }
 
 - (IBAction)equalizerChangePreset:(id)sender
@@ -650,6 +671,8 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_equalizerPreampSlider setFloatValue: f_eq_preamp];
     [self setBandSliderValuesForPreset:numberOfChosenPreset];
 
+    var_SetString(pl_Get(getIntf()), "equalizer-bands", psz_eq_bands);
+    var_SetFloat(pl_Get(getIntf()), "equalizer-preamp", f_eq_preamp);
     var_SetString(pl_Get(getIntf()), "equalizer-preset", psz_eq_preset);
 }
 
@@ -662,6 +685,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, "equalizer-preamp", fPreamp);
         vlc_object_release(p_aout);
     }
+    var_SetFloat(pl_Get(getIntf()), "equalizer-preamp", fPreamp);
 }
 
 - (IBAction)equalizerTwoPass:(id)sender
