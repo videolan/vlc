@@ -494,8 +494,10 @@ enum input_query_e
  * Prototypes
  *****************************************************************************/
 
-VLC_API input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) VLC_USED;
-#define input_Create(a,b,c,d) input_Create(VLC_OBJECT(a),b,c,d)
+VLC_API input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *,
+                                       const char *psz_log, input_resource_t *,
+                                       vlc_renderer_item_t* p_renderer ) VLC_USED;
+#define input_Create(a,b,c,d,e) input_Create(VLC_OBJECT(a),b,c,d,e)
 
 VLC_API int input_Start( input_thread_t * );
 
@@ -521,7 +523,7 @@ static inline
 input_thread_t *input_CreateAndStart( vlc_object_t *parent,
                                       input_item_t *item, const char *log )
 {
-    input_thread_t *input = input_Create( parent, item, log, NULL );
+    input_thread_t *input = input_Create( parent, item, log, NULL, NULL );
     if( input != NULL && input_Start( input ) )
     {
         vlc_object_release( input );

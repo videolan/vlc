@@ -183,7 +183,7 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
     }
     input_item_SetURI( p_item, psz_uri ) ;
 
-    input_thread_t *p_input = input_Create( p_fingerprinter, p_item, "fingerprinter", NULL );
+    input_thread_t *p_input = input_Create( p_fingerprinter, p_item, "fingerprinter", NULL, NULL );
     input_item_Release( p_item );
 
     if( p_input == NULL )

@@ -33,6 +33,7 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_rand.h>
+#include <vlc_renderer_discovery.h>
 #include "playlist_internal.h"
 
 /*****************************************************************************
@@ -195,6 +196,7 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     input_item_t *p_input = p_item->p_input;
+    vlc_renderer_item_t *p_renderer;
 
     PL_ASSERT_LOCKED;
 
@@ -202,13 +204,20 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     p_item->i_nb_played++;
     set_current_status_item( p_playlist, p_item );
+    p_renderer = p_sys->p_renderer;
+    /* Retain the renderer now to avoid it to be released by
+     * playlist_SetRenderer when we exit the locked scope. If the last reference
+     * was to be released, we would use a dangling pointer */
+    if( p_renderer )
+        vlc_renderer_item_hold( p_renderer );
     assert( p_sys->p_input == NULL );
     PL_UNLOCK;
 
     libvlc_MetadataCancel( p_playlist->obj.libvlc, p_item );
 
     input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL,
-                                                   p_sys->p_input_resource );
+                                                   p_sys->p_input_resource,
+                                                   p_renderer );
     if( likely(p_input_thread != NULL) )
     {
         var_AddCallback( p_input_thread, "intf-event",

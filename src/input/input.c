@@ -63,7 +63,8 @@ static  void *Run( void * );
 static  void *Preparse( void * );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
-                                  const char *, bool, input_resource_t * );
+                                  const char *, bool, input_resource_t *,
+                                  vlc_renderer_item_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
@@ -126,9 +127,10 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
  */
 input_thread_t *input_Create( vlc_object_t *p_parent,
                               input_item_t *p_item,
-                              const char *psz_log, input_resource_t *p_resource )
+                              const char *psz_log, input_resource_t *p_resource,
+                              vlc_renderer_item_t *p_renderer )
 {
-    return Create( p_parent, p_item, psz_log, false, p_resource );
+    return Create( p_parent, p_item, psz_log, false, p_resource, p_renderer );
 }
 
 #undef input_Read
@@ -141,7 +143,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
  */
 int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 {
-    input_thread_t *p_input = Create( p_parent, p_item, NULL, false, NULL );
+    input_thread_t *p_input = Create( p_parent, p_item, NULL, false, NULL, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 
@@ -158,7 +160,7 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 input_thread_t *input_CreatePreparser( vlc_object_t *parent,
                                        input_item_t *item )
 {
-    return Create( parent, item, NULL, true, NULL );
+    return Create( parent, item, NULL, true, NULL, NULL );
 }
 
 /**
@@ -282,7 +284,8 @@ input_item_t *input_GetItem( input_thread_t *p_input )
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                                const char *psz_header, bool b_preparsing,
-                               input_resource_t *p_resource )
+                               input_resource_t *p_resource,
+                               vlc_renderer_item_t *p_renderer )
 {
     /* Allocate descriptor */
     input_thread_private_t *priv;
@@ -323,6 +326,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->attachment_demux = NULL;
     priv->p_sout   = NULL;
     priv->b_out_pace_control = false;
+    /* The renderer is passed after its refcount was incremented.
+     * The input thread is now responsible for releasing it */
+    priv->p_renderer = p_renderer;
 
     priv->viewpoint_changed = false;
     /* Fetch the viewpoint from the mediaplayer or the playlist if any */
@@ -840,7 +846,15 @@ static int InitSout( input_thread_t * p_input )
         return VLC_SUCCESS;
 
     /* Find a usable sout and attach it to p_input */
-    char *psz = var_GetNonEmptyString( p_input, "sout" );
+    char *psz = NULL;
+    if( priv->p_renderer )
+    {
+        const char *psz_renderer_sout = vlc_renderer_item_sout( priv->p_renderer );
+        if( asprintf( &psz, "#%s", psz_renderer_sout ) < 0 )
+            return VLC_ENOMEM;
+    }
+    if( !psz )
+        psz = var_GetNonEmptyString( p_input, "sout" );
     if( psz && strncasecmp( priv->p_item->psz_uri, "vlc:", 4 ) )
     {
         priv->p_sout  = input_resource_RequestSout( priv->p_resource, NULL, psz );
