@@ -494,7 +494,7 @@ fourcc_gen$(BUILDEXEEXT): misc/fourcc_gen.c misc/fourcc_list.h ../include/vlc_fo
 
 fourcc_tables.h: fourcc_gen$(BUILDEXEEXT)
 	$(AM_V_at)rm -f -- $@.tmp
-	$(AM_V_GEN)$(builddir)/fourcc_gen > $@.tmp
+	$(AM_V_GEN)$(builddir)/fourcc_gen$(BUILDEXEEXT) > $@.tmp
 	$(AM_V_at)mv -f -- $@.tmp $@
 
 # Unit/regression tests
