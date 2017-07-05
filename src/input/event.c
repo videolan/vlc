@@ -228,7 +228,7 @@ void input_SendEventProgramScrambled( input_thread_t *p_input, int i_group, bool
     Trigger( p_input, INPUT_EVENT_PROGRAM );
 }
 
-static const char *GetEsVarName( int i_cat )
+static const char *GetEsVarName( enum es_format_category_e i_cat )
 {
     switch( i_cat )
     {
@@ -242,20 +242,20 @@ static const char *GetEsVarName( int i_cat )
         return NULL;
     }
 }
-void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const char *psz_text )
+void input_SendEventEsAdd( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id, const char *psz_text )
 {
     const char *psz_varname = GetEsVarName( i_cat );
     if( psz_varname )
         VarListAdd( p_input, psz_varname, INPUT_EVENT_ES, i_id, psz_text );
 }
-void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id )
+void input_SendEventEsDel( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id )
 {
     const char *psz_varname = GetEsVarName( i_cat );
     if( psz_varname )
         VarListDel( p_input, psz_varname, INPUT_EVENT_ES, i_id );
 }
 /* i_id == -1 will unselect */
-void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
+void input_SendEventEsSelect( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id )
 {
     const char *psz_varname = GetEsVarName( i_cat );
     if( psz_varname )
