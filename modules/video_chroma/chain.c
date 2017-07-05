@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_mouse.h>
 #include <vlc_picture.h>
 
 /*****************************************************************************
@@ -303,6 +304,13 @@ static int BuildChromaChain( filter_t *p_filter )
     return i_ret;
 }
 
+static int ChainMouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
+                       const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+{
+    (void) p_old;
+    return filter_chain_MouseFilter( p_filter->p_sys->p_chain, p_mouse, p_new );
+}
+
 static int BuildFilterChain( filter_t *p_filter )
 {
     es_format_t fmt_mid;
@@ -341,6 +349,8 @@ static int BuildFilterChain( filter_t *p_filter )
                 filter_AddProxyCallbacks( p_filter->obj.parent,
                                           p_filter->p_sys->p_video_filter,
                                           RestartFilterCallback );
+                if (p_filter->p_sys->p_video_filter->pf_video_mouse != NULL)
+                    p_filter->pf_video_mouse = ChainMouse;
                 es_format_Clean( &fmt_mid );
                 i_ret = VLC_SUCCESS;
                 break;
