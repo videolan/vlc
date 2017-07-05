@@ -529,8 +529,7 @@ static int Demux( demux_t *p_demux )
 #if 0
                         if( i_stream_id == PS_STREAM_ID_PRIVATE_STREAM1 )
                         {
-                            tk->fmt.i_codec = VLC_CODEC_ATRAC3P;
-                            tk->fmt.i_cat = AUDIO_ES;
+                            es_format_Change( &tk->fmt, AUDIO_ES, VLC_CODEC_ATRAC3P );
                             tk->fmt.audio.i_blockalign = 376;
                             tk->fmt.audio.i_channels = 2;
                             tk->fmt.audio.i_rate = 44100;
