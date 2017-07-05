@@ -51,9 +51,6 @@ struct priv
     VADisplay vadpy;
     VASurfaceID *va_surface_ids;
     PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
-#ifdef HAVE_VA_X11
-    Display *x11dpy;
-#endif
 
     unsigned fourcc;
     EGLint drm_fourccs[3];
@@ -255,11 +252,6 @@ tc_vaegl_release(const opengl_tex_converter_t *tc)
 
     vlc_vaapi_ReleaseInstance(priv->vainst);
 
-#ifdef HAVE_VA_X11
-    if (priv->x11dpy != NULL)
-        XCloseDisplay(priv->x11dpy);
-#endif
-
     free(tc->priv);
 }
 
@@ -293,10 +285,12 @@ tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
 }
 
 static int
-tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
+tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
+              VANativeDisplay native,
+              vlc_vaapi_native_destroy_cb native_destroy_cb)
 {
     if (vadpy == NULL)
-        return VLC_EGENERIC;
+        goto error;
 
     int ret = VLC_ENOMEM;
     struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
@@ -319,9 +313,15 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy)
     tc->pf_release = tc_vaegl_release;
     tc->pf_get_pool = tc_vaegl_get_pool;
 
-    priv->vainst = vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy);
+    priv->vainst = vlc_vaapi_InitializeInstance(VLC_OBJECT(tc->gl), priv->vadpy,
+                                                native, native_destroy_cb);
     if (priv->vainst == NULL)
+    {
+        /* Already released by vlc_vaapi_InitializeInstance */
+        vadpy = NULL;
+        native_destroy_cb = NULL;
         goto error;
+    }
 
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
         goto error;
@@ -337,10 +337,23 @@ error:
     if (priv->vainst)
         vlc_vaapi_ReleaseInstance(priv->vainst);
     else
-        vaTerminate(vadpy);
-    free(tc->priv);
+    {
+        if (vadpy != NULL)
+            vaTerminate(vadpy);
+        if (native != NULL && native_destroy_cb != NULL)
+            native_destroy_cb(native);
+    }
+    if (tc->priv)
+        free(tc->priv);
     return ret;
 }
+#ifdef HAVE_VA_X11
+static void
+x11_native_destroy_cb(VANativeDisplay native)
+{
+    XCloseDisplay(native);
+}
+#endif
 
 int
 opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
@@ -368,25 +381,16 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
             if (x11dpy == NULL)
                 return VLC_EGENERIC;
 
-            if (tc_vaegl_init(tc, vaGetDisplay(x11dpy)))
-            {
-                XCloseDisplay(x11dpy);
-                return VLC_EGENERIC;
-            }
-            struct priv *priv = tc->priv;
-            priv->x11dpy = x11dpy;
-            break;
+            return tc_vaegl_init(tc, vaGetDisplay(x11dpy), x11dpy,
+                                 x11_native_destroy_cb);
         }
 #endif
 #ifdef HAVE_VA_WL
         case VOUT_WINDOW_TYPE_WAYLAND:
-            if (tc_vaegl_init(tc, vaGetDisplayWl(tc->gl->surface->display.wl)))
-                return VLC_EGENERIC;
-            break;
+            return tc_vaegl_init(tc, vaGetDisplayWl(tc->gl->surface->display.wl),
+                                 NULL, NULL);
 #endif
         default:
             return VLC_EGENERIC;
     }
-
-    return VLC_SUCCESS;
 }

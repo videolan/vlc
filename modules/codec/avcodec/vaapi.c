@@ -55,12 +55,6 @@
 struct vlc_va_sys_t
 {
     struct vlc_vaapi_instance *va_inst;
-#ifdef VLC_VA_BACKEND_XLIB
-    Display  *p_display_x11;
-#endif
-#ifdef VLC_VA_BACKEND_DRM
-    int       drm_fd;
-#endif
     struct vaapi_context hw_ctx;
 
 #ifndef VLC_VA_BACKEND_DR /* XLIB or DRM */
@@ -257,14 +251,21 @@ static void Delete(vlc_va_t *va, void **hwctx)
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
     vlc_vaapi_ReleaseInstance(sys->va_inst);
-#ifdef VLC_VA_BACKEND_XLIB
-    XCloseDisplay(sys->p_display_x11);
-#endif
-#ifdef VLC_VA_BACKEND_DRM
-    vlc_close(sys->drm_fd);
-#endif
     free(sys);
 }
+
+#ifdef VLC_VA_BACKEND_XLIB
+static void X11NativeDestroy(VANativeDisplay native)
+{
+    XCloseDisplay(native);
+}
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+static void DRMNativeDestroy(VANativeDisplay native)
+{
+    vlc_close((intptr_t) native);
+}
+#endif
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                   const es_format_t *fmt, picture_sys_t *p_sys)
@@ -304,17 +305,22 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->va_inst = NULL;
 
     /* Create a VA display */
+    VANativeDisplay native = NULL;
+    vlc_vaapi_native_destroy_cb native_destroy_cb = NULL;
 #ifdef VLC_VA_BACKEND_XLIB
-    sys->p_display_x11 = XOpenDisplay(NULL);
-    if (!sys->p_display_x11)
+    Display *p_display_x11 = XOpenDisplay(NULL);
+    if (!p_display_x11)
     {
         msg_Err(va, "Could not connect to X server");
         goto error;
     }
 
-    sys->hw_ctx.display = vaGetDisplay(sys->p_display_x11);
+    native = p_display_x11;
+    native_destroy_cb = X11NativeDestroy;
+    sys->hw_ctx.display = vaGetDisplay(p_display_x11);
 #endif
 #ifdef VLC_VA_BACKEND_DRM
+    int drm_fd = -1;
     static const char drm_device_paths[][20] = {
         "/dev/dri/renderD128",
         "/dev/dri/card0"
@@ -322,16 +328,20 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     for (int i = 0; ARRAY_SIZE(drm_device_paths); i++)
     {
-        sys->drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
-        if (sys->drm_fd < 0)
+        drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
+        if (drm_fd < 0)
             continue;
 
-        sys->hw_ctx.display = vaGetDisplayDRM(sys->drm_fd);
+        sys->hw_ctx.display = vaGetDisplayDRM(drm_fd);
         if (sys->hw_ctx.display)
+        {
+            native_destroy_cb = DRMNativeDestroy;
+            native = (VANativeDisplay *)(intptr_t) drm_fd;
             break;
+        }
 
-        vlc_close(sys->drm_fd);
-        sys->drm_fd = -1;
+        vlc_close(drm_fd);
+        drm_fd = -1;
     }
 #endif
     if (sys->hw_ctx.display == NULL)
@@ -340,7 +350,8 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
     }
 
-    sys->va_inst = vlc_vaapi_InitializeInstance(o, sys->hw_ctx.display);
+    sys->va_inst = vlc_vaapi_InitializeInstance(o, sys->hw_ctx.display, native,
+                                                native_destroy_cb);
     if (!sys->va_inst)
         goto error;
 
@@ -387,16 +398,6 @@ error:
         vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
     if (sys->va_inst != NULL)
         vlc_vaapi_ReleaseInstance(sys->va_inst);
-    else if (sys->hw_ctx.display != NULL)
-        vaTerminate(sys->hw_ctx.display);
-#ifdef VLC_VA_BACKEND_XLIB
-    if( sys->p_display_x11 != NULL)
-        XCloseDisplay(sys->p_display_x11);
-#endif
-#ifdef VLC_VA_BACKEND_DRM
-    if( sys->drm_fd != -1 )
-        vlc_close(sys->drm_fd);
-#endif
     free(sys);
     return VLC_EGENERIC;
 }

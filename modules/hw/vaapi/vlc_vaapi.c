@@ -61,23 +61,32 @@
 
 struct vlc_vaapi_instance {
     VADisplay dpy;
+    VANativeDisplay native;
+    vlc_vaapi_native_destroy_cb native_destroy_cb;
     atomic_uint pic_refcount;
 };
 
 struct vlc_vaapi_instance *
-vlc_vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy)
+vlc_vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy,
+                             VANativeDisplay native,
+                             vlc_vaapi_native_destroy_cb native_destroy_cb)
 {
     int major = 0, minor = 0;
     VA_CALL(o, vaInitialize, dpy, &major, &minor);
     struct vlc_vaapi_instance *inst = malloc(sizeof(*inst));
 
     if (unlikely(inst == NULL))
-        return NULL;
+        goto error;
     inst->dpy = dpy;
+    inst->native = native;
+    inst->native_destroy_cb = native_destroy_cb;
     atomic_init(&inst->pic_refcount, 1);
 
     return inst;
 error:
+    vaTerminate(dpy);
+    if (native != NULL && native_destroy_cb != NULL)
+        native_destroy_cb(native);
     return NULL;
 }
 
@@ -94,6 +103,8 @@ vlc_vaapi_ReleaseInstance(struct vlc_vaapi_instance *inst)
     if (atomic_fetch_sub(&inst->pic_refcount, 1) == 1)
     {
         vaTerminate(inst->dpy);
+        if (inst->native != NULL && inst->native_destroy_cb != NULL)
+            inst->native_destroy_cb(inst->native);
         free(inst);
     }
 }
