@@ -71,7 +71,7 @@ static void FilterDeletePictures( picture_t * );
 
 static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     const char *cap, const char *conv_cap, bool fmt_out_change,
-    const filter_owner_t *owner )
+    const filter_owner_t *owner, enum es_format_category_e cat )
 {
     assert( callbacks != NULL && callbacks->sys != NULL );
     assert( cap != NULL );
@@ -85,8 +85,8 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
         chain->owner = *owner;
     chain->first = NULL;
     chain->last = NULL;
-    es_format_Init( &chain->fmt_in, UNKNOWN_ES, 0 );
-    es_format_Init( &chain->fmt_out, UNKNOWN_ES, 0 );
+    es_format_Init( &chain->fmt_in, cat, 0 );
+    es_format_Init( &chain->fmt_out, cat, 0 );
     chain->length = 0;
     chain->b_allow_fmt_out_change = fmt_out_change;
     chain->filter_cap = cap;
@@ -98,13 +98,14 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
 /**
  * Filter chain initialisation
  */
-filter_chain_t *filter_chain_New( vlc_object_t *obj, const char *cap )
+filter_chain_t *filter_chain_New( vlc_object_t *obj, const char *cap,
+                                  enum es_format_category_e cat )
 {
     filter_owner_t callbacks = {
         .sys = obj,
     };
 
-    return filter_chain_NewInner( &callbacks, cap, NULL, false, NULL );
+    return filter_chain_NewInner( &callbacks, cap, NULL, false, NULL, cat );
 }
 
 /** Chained filter picture allocator function */
@@ -141,7 +142,7 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
     };
 
     return filter_chain_NewInner( &callbacks, "video filter",
-                                  "video converter", allow_change, owner );
+                                  "video converter", allow_change, owner, VIDEO_ES );
 }
 
 /**

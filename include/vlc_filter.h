@@ -298,9 +298,9 @@ typedef struct filter_chain_t filter_chain_t;
  * \param psz_capability vlc capability of filters in filter chain
  * \return pointer to a filter chain
  */
-filter_chain_t * filter_chain_New( vlc_object_t *, const char * )
+filter_chain_t * filter_chain_New( vlc_object_t *, const char *, enum es_format_category_e )
 VLC_USED;
-#define filter_chain_New( a, b ) filter_chain_New( VLC_OBJECT( a ), b )
+#define filter_chain_New( a, b, c ) filter_chain_New( VLC_OBJECT( a ), b, c )
 
 /**
  * Creates a new video filter chain.
