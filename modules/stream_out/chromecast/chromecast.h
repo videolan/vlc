@@ -221,9 +221,6 @@ private:
     mtime_t           m_ts_local_start;
     mtime_t           m_length;
 
-    /* playback time reported by the receiver, used to wait for seeking point */
-    mtime_t           m_chromecast_start_time;
-
     /* shared structure with the demux-filter */
     chromecast_common      m_common;
 

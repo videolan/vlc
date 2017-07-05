@@ -86,7 +86,6 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_time_playback_started( VLC_TS_INVALID )
  , m_ts_local_start( VLC_TS_INVALID )
  , m_length( VLC_TS_INVALID )
- , m_chromecast_start_time( VLC_TS_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
 {
     vlc_mutex_init(&m_lock);
@@ -406,15 +405,11 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
 
             if (newPlayerState == "PLAYING")
             {
-                msg_Dbg( m_module, "Playback started with an offset of %" PRId64 " now:%" PRId64 " i_ts_local_start:%" PRId64,
-                         m_chromecast_start_time, m_time_playback_started, m_ts_local_start);
+                msg_Dbg( m_module, "Playback started now:%" PRId64 " i_ts_local_start:%" PRId64,
+                         m_time_playback_started, m_ts_local_start);
                 if ( m_state != Playing )
                 {
                     /* TODO reset demux PCR ? */
-                    if (unlikely(m_chromecast_start_time == VLC_TS_INVALID)) {
-                        msg_Warn( m_module, "start playing without buffering" );
-                        m_chromecast_start_time = (1 + mtime_t( double( status[0]["currentTime"] ) ) ) * 1000000L;
-                    }
                     m_time_playback_started = mdate();
                     setState( Playing );
                 }
@@ -423,8 +418,6 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
             {
                 if ( m_state != Buffering )
                 {
-                    m_chromecast_start_time = (1 + mtime_t( double( status[0]["currentTime"] ) ) ) * 1000000L;
-                    msg_Dbg( m_module, "Playback pending with an offset of %" PRId64, m_chromecast_start_time);
                     m_time_playback_started = VLC_TS_INVALID;
                     setState( Buffering );
                 }
@@ -433,9 +426,8 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
             {
                 if ( m_state != Paused )
                 {
-                    m_chromecast_start_time = (1 + mtime_t( double( status[0]["currentTime"] ) ) ) * 1000000L;
     #ifndef NDEBUG
-                    msg_Dbg( m_module, "Playback paused with an offset of %" PRId64 " date_play_start:%" PRId64, m_chromecast_start_time, m_time_playback_started);
+                    msg_Dbg( m_module, "Playback paused: date_play_start: %" PRId64, m_time_playback_started);
     #endif
 
                     if ( m_time_playback_started != VLC_TS_INVALID && m_state == Playing )
