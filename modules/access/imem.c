@@ -416,7 +416,7 @@ static int OpenDemux(vlc_object_t *object)
     const int cat = var_InheritInteger(object, "imem-cat");
     switch (cat) {
     case 1: {
-        fmt.i_cat = AUDIO_ES;
+        es_format_Change( &fmt, AUDIO_ES, 0 );
         fmt.audio.i_channels = var_InheritInteger(object, "imem-channels");
         fmt.audio.i_rate = var_InheritInteger(object, "imem-samplerate");
 
@@ -426,7 +426,7 @@ static int OpenDemux(vlc_object_t *object)
         break;
     }
     case 2: {
-        fmt.i_cat = VIDEO_ES;
+        es_format_Change( &fmt, VIDEO_ES, 0 );
         fmt.video.i_width  = var_InheritInteger(object, "imem-width");
         fmt.video.i_height = var_InheritInteger(object, "imem-height");
         unsigned num, den;
@@ -449,7 +449,7 @@ static int OpenDemux(vlc_object_t *object)
         break;
     }
     case 3: {
-        fmt.i_cat = SPU_ES;
+        es_format_Change( &fmt, SPU_ES, 0 );
         fmt.subs.spu.i_original_frame_width =
             var_InheritInteger(object, "imem-width");
         fmt.subs.spu.i_original_frame_height =
