@@ -817,7 +817,7 @@ static int Open( vlc_object_t *p_this )
     /* From this point on, we have to free p_sys if we return an error (e.g. "goto caf_open_end") */
 
     p_sys = p_demux->p_sys;
-    es_format_Init( &p_sys->fmt, UNKNOWN_ES, 0 );
+    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
 
     vlc_fourcc_t i_fcc;
     uint64_t i_size;
