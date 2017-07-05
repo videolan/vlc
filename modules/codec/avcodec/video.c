@@ -318,7 +318,6 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
                                     __MAX(ctx->ticks_per_frame, 1),
                                     fmt_out.i_frame_rate_base);
 
-    const int i_cc_reorder = dec->fmt_out.subs.cc.i_reorder_depth;
     fmt_out.p_palette = dec->fmt_out.video.p_palette;
     dec->fmt_out.video.p_palette = NULL;
 
@@ -331,8 +330,6 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     if ( dec->fmt_in.video.mastering.max_luminance )
         dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
     dec->fmt_out.video.lighting = dec->fmt_in.video.lighting;
-
-    dec->fmt_out.subs.cc.i_reorder_depth = i_cc_reorder;
 
     return decoder_UpdateVideoFormat(dec);
 }
