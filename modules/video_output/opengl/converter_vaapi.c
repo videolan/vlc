@@ -340,7 +340,7 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
     return VLC_SUCCESS;
 
 error:
-    if (priv->vainst)
+    if (priv && priv->vainst)
         vlc_vaapi_ReleaseInstance(priv->vainst);
     else
     {
@@ -349,10 +349,11 @@ error:
         if (native != NULL && native_destroy_cb != NULL)
             native_destroy_cb(native);
     }
-    if (tc->priv)
-        free(tc->priv);
+    if (priv)
+        free(priv);
     return ret;
 }
+
 #ifdef HAVE_VA_X11
 static void
 x11_native_destroy_cb(VANativeDisplay native)
