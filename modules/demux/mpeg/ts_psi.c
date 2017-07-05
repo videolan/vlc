@@ -948,15 +948,13 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
         PMTEsFindDescriptor( p_dvbpsies, 0x7a ) )
     {
         /* DVB with stream_type 0x06 (ETS EN 300 468) */
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_EAC3;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_EAC3 );
     }
     else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "AC-3" ) ||
              PMTEsFindDescriptor( p_dvbpsies, 0x6a ) ||
              PMTEsFindDescriptor( p_dvbpsies, 0x81 ) ) /* AC-3 channel (also in EAC3) */
     {
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_A52;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_A52 );
     }
     else if( (desc = PMTEsFindDescriptor( p_dvbpsies, 0x7f ) ) &&
              desc->i_length >= 2 && desc->p_data[0] == 0x80 &&
@@ -970,21 +968,18 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
              PMTEsFindDescriptor( p_dvbpsies, 0x73 ) )
     {
         /*registration descriptor(ETSI TS 101 154 Annex F)*/
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_DTS;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_DTS );
     }
     else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "BSSD" ) && !p_subs_dr )
     {
         /* BSSD is AES3 DATA, but could also be subtitles
          * we need to check for secondary descriptor then s*/
-        p_fmt->i_cat = AUDIO_ES;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_302M );
         p_fmt->b_packetized = true;
-        p_fmt->i_codec = VLC_CODEC_302M;
     }
     else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "HEVC" ) )
     {
-        p_fmt->i_cat = VIDEO_ES;
-        p_fmt->i_codec = VLC_CODEC_HEVC;
+        es_format_Change( p_fmt, VIDEO_ES, VLC_CODEC_HEVC );
     }
     else if ( p_demux->p_sys->standard == TS_STANDARD_ARIB )
     {
@@ -998,14 +993,14 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
             if( i_data_component_id == 0x0008 &&
                 PMTEsHasComponentTagBetween( p_dvbpsies, 0x30, 0x37 ) )
             {
-                es_format_Init( p_fmt, SPU_ES, VLC_CODEC_ARIB_A );
+                es_format_Change( p_fmt, SPU_ES, VLC_CODEC_ARIB_A );
                 p_fmt->psz_language = strndup ( "jpn", 3 );
                 p_fmt->psz_description = strdup( _("ARIB subtitles") );
             }
             else if( i_data_component_id == 0x0012 &&
                      PMTEsHasComponentTagBetween( p_dvbpsies, 0x87, 0x88 ) )
             {
-                es_format_Init( p_fmt, SPU_ES, VLC_CODEC_ARIB_C );
+                es_format_Change( p_fmt, SPU_ES, VLC_CODEC_ARIB_C );
                 p_fmt->psz_language = strndup ( "jpn", 3 );
                 p_fmt->psz_description = strdup( _("ARIB subtitles") );
             }
@@ -1079,11 +1074,8 @@ static void PMTSetupEs0xEA( demux_t *p_demux, ts_es_t *p_es,
         return;
     }
 
-    es_format_t *p_fmt = &p_es->fmt;
-
     /* registration descriptor for VC-1 (SMPTE rp227) */
-    p_fmt->i_cat = VIDEO_ES;
-    p_fmt->i_codec = VLC_CODEC_VC1;
+    es_format_Change( &p_es->fmt, VIDEO_ES, VLC_CODEC_VC1 );
 
     /* XXX With Simple and Main profile the SEQUENCE
      * header is modified: video width and height are
@@ -1101,12 +1093,9 @@ static void PMTSetupEs0xD1( demux_t *p_demux, ts_es_t *p_es,
         return;
     }
 
-    es_format_t *p_fmt = &p_es->fmt;
-
     /* registration descriptor for Dirac
      * (backwards compatable with VC-2 (SMPTE Sxxxx:2008)) */
-    p_fmt->i_cat = VIDEO_ES;
-    p_fmt->i_codec = VLC_CODEC_DIRAC;
+    es_format_Change( &p_es->fmt, VIDEO_ES, VLC_CODEC_DIRAC );
 }
 
 static void PMTSetupEs0xA0( demux_t *p_demux, ts_es_t *p_es,
@@ -1122,9 +1111,9 @@ static void PMTSetupEs0xA0( demux_t *p_demux, ts_es_t *p_es,
     }
 
     es_format_t *p_fmt = &p_es->fmt;
-    p_fmt->i_cat = VIDEO_ES;
-    p_fmt->i_codec = VLC_FOURCC( p_dr->p_data[0], p_dr->p_data[1],
-                                 p_dr->p_data[2], p_dr->p_data[3] );
+    es_format_Change( &p_es->fmt, VIDEO_ES,
+                      VLC_FOURCC( p_dr->p_data[0], p_dr->p_data[1],
+                                 p_dr->p_data[2], p_dr->p_data[3] ) );
     p_fmt->video.i_width = GetWBE( &p_dr->p_data[4] );
     p_fmt->video.i_height = GetWBE( &p_dr->p_data[6] );
     p_fmt->video.i_visible_width = p_fmt->video.i_width;
@@ -1155,10 +1144,10 @@ static void PMTSetupEs0x83( const dvbpsi_pmt_t *p_pmt, ts_es_t *p_es, int i_pid 
         ( i_pid >> 8 ) == 0x11 )
     {
         /* Not enough ? might contain 0x83 private descriptor, 2 bytes 0x473F */
-        es_format_Init( &p_es->fmt, AUDIO_ES, VLC_CODEC_WIDI_LPCM );
+        es_format_Change( &p_es->fmt, AUDIO_ES, VLC_CODEC_WIDI_LPCM );
     }
     else
-        es_format_Init( &p_es->fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
+        es_format_Change( &p_es->fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
 }
 
 static bool PMTSetupEsHDMV( demux_t *p_demux, ts_es_t *p_es,
@@ -1170,44 +1159,36 @@ static bool PMTSetupEsHDMV( demux_t *p_demux, ts_es_t *p_es,
     switch( p_dvbpsies->i_type )
     {
     case 0x80:
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_BD_LPCM;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_BD_LPCM );
         break;
     case 0x81:
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_A52;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_A52 );
         break;
     case 0x82:
     case 0x85: /* DTS-HD High resolution audio */
     case 0x86: /* DTS-HD Master audio */
     case 0xA2: /* Secondary DTS audio */
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_DTS;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_DTS );
         break;
 
     case 0x83: /* TrueHD AC3 */
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_TRUEHD;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_TRUEHD );
         break;
 
     case 0x84: /* E-AC3 */
     case 0xA1: /* Secondary E-AC3 */
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_EAC3;
+        es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_EAC3 );
         break;
     case 0x90: /* Presentation graphics */
-        p_fmt->i_cat = SPU_ES;
-        p_fmt->i_codec = VLC_CODEC_BD_PG;
+        es_format_Change( p_fmt, SPU_ES, VLC_CODEC_BD_PG );
         break;
     case 0x91: /* Interactive graphics */
         return false;
     case 0x92: /* Subtitle */
-        p_fmt->i_cat = SPU_ES;
-        p_fmt->i_codec = VLC_CODEC_BD_TEXT;
+        es_format_Change( p_fmt, SPU_ES, VLC_CODEC_BD_TEXT );
         break;
     case 0xEA:
-        p_fmt->i_cat = VIDEO_ES;
-        p_fmt->i_codec = VLC_CODEC_VC1;
+        es_format_Change( p_fmt, VIDEO_ES, VLC_CODEC_VC1 );
         break;
     default:
         msg_Info( p_demux, "HDMV registration not implemented for pid 0x%x type 0x%x",
@@ -1242,8 +1223,7 @@ static bool PMTSetupEsRegistration( demux_t *p_demux, ts_es_t *p_es,
     {
         if( PMTEsHasRegistration( p_demux, p_dvbpsies, p_regs[i].psz_tag ) )
         {
-            p_fmt->i_cat   = p_regs[i].i_cat;
-            p_fmt->i_codec = p_regs[i].i_codec;
+            es_format_Change( p_fmt, p_regs[i].i_cat, p_regs[i].i_codec );
 
             /* System A AC3 extension, see ATSC A/52 Annex G.2 */
             if ( p_regs[i].i_codec == VLC_CODEC_A52 && p_dvbpsies->i_type == 0x87 )
@@ -1326,83 +1306,83 @@ static void PIDFillFormat( demux_t *p_demux, ts_stream_t *p_pes,
     switch( i_stream_type )
     {
     case 0x01:  /* MPEG-1 video */
-        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MPGV );
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_MPGV );
         fmt->i_original_fourcc = VLC_CODEC_MP1V;
         break;
     case 0x02:  /* MPEG-2 video */
     case 0x80:  /* MPEG-2 MOTO video */
-        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MPGV );
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_MPGV );
         break;
     case 0x03:  /* MPEG-1 audio */
     case 0x04:  /* MPEG-2 audio */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MPGA );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_MPGA );
         break;
     case 0x0f:  /* ISO/IEC 13818-7 Audio with ADTS transport syntax */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_MP4A );
         fmt->i_original_fourcc = VLC_FOURCC('A','D','T','S');
         break;
     case 0x10:  /* MPEG4 (video) */
-        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MP4V );
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_MP4V );
         break;
     case 0x11:  /* MPEG4 (audio) LATM */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_MP4A );
         fmt->i_original_fourcc = VLC_FOURCC('L','A','T','M');
         break;
     case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
-        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_H264 );
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_H264 );
         break;
     case 0x1C:  /* ISO/IEC 14496-3 Audio, without using any additional
                    transport syntax, such as DST, ALS and SLS */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_MP4A );
         break;
     case 0x24:  /* HEVC */
-        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_HEVC );
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_HEVC );
         break;
     case 0x42:  /* CAVS (Chinese AVS) */
-        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_CAVS );
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_CAVS );
         break;
 
     case 0x81:  /* A52 (audio) */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_A52 );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_A52 );
         break;
     case 0x82:  /* SCTE-27 (sub) */
-        es_format_Init( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
+        es_format_Change( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
         *p_datatype = TS_TRANSPORT_SECTIONS;
         ts_sections_processor_Add( p_demux, &p_pes->p_sections_proc, 0xC6, 0x00,
                                    SCTE27_Section_Callback, p_pes );
         break;
     case 0x84:  /* SDDS (audio) */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_SDDS );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_SDDS );
         break;
     case 0x85:  /* DTS (audio) FIXME: HDMV Only ? */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DTS );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_DTS );
         break;
     case 0x87: /* E-AC3, ATSC */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_EAC3 );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_EAC3 );
         break;
     case 0x8a: /* DTS (audio) */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DTS );
+        es_format_Change( fmt, AUDIO_ES, VLC_CODEC_DTS );
         break;
     case 0x91:  /* A52 vls (audio) */
-        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', 'b' ) );
+        es_format_Change( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', 'b' ) );
         break;
     case 0x92:  /* DVD_SPU vls (sub) */
-        es_format_Init( fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', 'b' ) );
+        es_format_Change( fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', 'b' ) );
         break;
 
     case 0x94:  /* SDDS (audio) */
-        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 'b' ) );
+        es_format_Change( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 'b' ) );
         break;
 
     case 0xa0:  /* MSCODEC vlc (video) (fixed later) */
-        es_format_Init( fmt, UNKNOWN_ES, 0 );
+        es_format_Change( fmt, UNKNOWN_ES, 0 );
         break;
 
     case 0x06:  /* PES_PRIVATE  (fixed later) */
     case 0x12:  /* MPEG-4 generic (sub/scene/...) (fixed later) */
     case 0xEA:  /* Privately managed ES (VC-1) (fixed later */
     default:
-        es_format_Init( fmt, UNKNOWN_ES, 0 );
+        es_format_Change( fmt, UNKNOWN_ES, 0 );
         break;
     }
 
@@ -1839,8 +1819,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                     ts_es_t *p_eas_es = ts_es_New( p_pmt );
                     if( likely(p_eas_es) )
                     {
-                        p_eas_es->fmt.i_codec = VLC_CODEC_SCTE_18;
-                        p_eas_es->fmt.i_cat = SPU_ES;
+                        es_format_Change( &p_eas_es->fmt, SPU_ES, VLC_CODEC_SCTE_18 );
                         p_eas_es->fmt.i_id = ATSC_BASE_PID;
                         p_eas_es->fmt.i_group = p_pmt->i_number;
                         p_eas_es->fmt.psz_description = strdup(SCTE18_DESCRIPTION);
