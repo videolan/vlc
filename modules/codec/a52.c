@@ -365,7 +365,7 @@ static int Open( vlc_object_t *p_this )
 
     if( decoder_UpdateAudioFormat( p_dec ) )
     {
-        es_format_Init( &p_dec->fmt_out, UNKNOWN_ES, 0 );
+        es_format_Init( &p_dec->fmt_out, AUDIO_ES, 0 );
         Close( p_this );
         return VLC_EGENERIC;
     }
