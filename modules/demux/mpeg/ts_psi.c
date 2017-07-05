@@ -899,10 +899,13 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
     h.channel_mapping = mapping;
 
     if (h.channels) {
-        opus_write_header((uint8_t**)&p_fmt->p_extra, &p_fmt->i_extra, &h, NULL /* FIXME */);
-        if (p_fmt->p_extra) {
-            p_fmt->i_cat = AUDIO_ES;
-            p_fmt->i_codec = VLC_CODEC_OPUS;
+        uint8_t *p_extra = NULL;
+        int i_extra = 0;
+        opus_write_header(&p_extra, &i_extra, &h, NULL /* FIXME */);
+        if (p_extra) {
+            es_format_Change(p_fmt, AUDIO_ES, VLC_CODEC_OPUS);
+            p_fmt->p_extra = p_extra;
+            p_fmt->i_extra = i_extra;
             p_fmt->audio.i_channels = h.channels;
             p_fmt->audio.i_rate = 48000;
         }
