@@ -3260,7 +3260,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
             {
                 return;
             }
-            p_track->fmt.i_cat = AUDIO_ES;
+            es_format_Clean( &p_track->fmt );
+            es_format_Init( &p_track->fmt, AUDIO_ES, 0 );
             break;
 
         case( ATOM_vide ):
@@ -3268,7 +3269,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
             {
                 return;
             }
-            p_track->fmt.i_cat = VIDEO_ES;
+            es_format_Clean( &p_track->fmt );
+            es_format_Init( &p_track->fmt, VIDEO_ES, 0 );
             break;
 
         case( ATOM_hint ):
@@ -3291,12 +3293,14 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
             if( !strcmp(sdp_media_type, "m=audio") )
             {
                 msg_Dbg( p_demux, "Found audio Rtp: %s", sdp_media_type );
-                p_track->fmt.i_cat = AUDIO_ES;
+                es_format_Clean( &p_track->fmt );
+                es_format_Init( &p_track->fmt, AUDIO_ES, 0 );
             }
             else if( !strcmp(sdp_media_type, "m=video") )
             {
                 msg_Dbg( p_demux, "Found video Rtp: %s", sdp_media_type );
-                p_track->fmt.i_cat = VIDEO_ES;
+                es_format_Clean( &p_track->fmt );
+                es_format_Init( &p_track->fmt, VIDEO_ES, 0 );
             }
             else
             {
@@ -3312,7 +3316,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
         case( ATOM_subt ): /* ttml */
         case( ATOM_sbtl ):
         case( ATOM_clcp ): /* closed captions */
-            p_track->fmt.i_cat = SPU_ES;
+            es_format_Clean( &p_track->fmt );
+            es_format_Init( &p_track->fmt, SPU_ES, 0 );
             break;
 
         default:
@@ -3516,7 +3521,7 @@ static void MP4_TrackClean( es_out_t *out, mp4_track_t *p_track )
 static void MP4_TrackInit( mp4_track_t *p_track )
 {
     memset( p_track, 0, sizeof(mp4_track_t) );
-    es_format_Init( &p_track->fmt, 0, 0 );
+    es_format_Init( &p_track->fmt, UNKNOWN_ES, 0 );
     p_track->i_timescale = 1;
 }
 
