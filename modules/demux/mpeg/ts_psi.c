@@ -1203,9 +1203,9 @@ static bool PMTSetupEsRegistration( demux_t *p_demux, ts_es_t *p_es,
 {
     static const struct
     {
-        char         psz_tag[5];
-        int          i_cat;
-        vlc_fourcc_t i_codec;
+        char                      psz_tag[5];
+        enum es_format_category_e i_cat;
+        vlc_fourcc_t              i_codec;
     } p_regs[] = {
         { "AC-3", AUDIO_ES, VLC_CODEC_A52   },
         { "EAC3", AUDIO_ES, VLC_CODEC_EAC3  },
