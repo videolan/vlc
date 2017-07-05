@@ -489,7 +489,7 @@ static const struct vlc_avcodec_fourcc spu_codecs[] =
     /* ffmpeg only: AV_CODEC_ID_ASS */
 };
 
-bool GetFfmpegCodec( unsigned cat, vlc_fourcc_t i_fourcc,
+bool GetFfmpegCodec( enum es_format_category_e cat, vlc_fourcc_t i_fourcc,
                      unsigned *pi_ffmpeg_codec, const char **ppsz_name )
 {
     const struct vlc_avcodec_fourcc *base;
