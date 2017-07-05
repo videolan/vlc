@@ -215,9 +215,8 @@ block_t * ForgedInitSegment::buildMoovBox()
     trackinfo.i_trex_default_length = 1;
     trackinfo.i_trex_default_size = 1;
 
-    trackinfo.fmt.i_cat = es_type;
+    es_format_Change(&trackinfo.fmt, es_type, vlc_fourcc_GetCodec(es_type, fourcc));
     trackinfo.fmt.i_original_fourcc = fourcc;
-    trackinfo.fmt.i_codec = vlc_fourcc_GetCodec(es_type, fourcc);
     switch(es_type)
     {
         case VIDEO_ES:

@@ -50,7 +50,7 @@ bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream, unsigned i_id,
     if(!p_stream->entry)
         return false;
 
-    es_format_Init(&p_stream->fmt, 0, 0);
+    es_format_Init(&p_stream->fmt, UNKNOWN_ES, 0);
 
     return true;
 }
