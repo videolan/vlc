@@ -55,16 +55,16 @@ typedef struct {
     mtime_t start;
     mtime_t stop;
     size_t  blocknumber;
-    int     count;
+    size_t  count;
 } stl_entry_t;
 
 struct demux_sys_t {
-    int         count;
+    size_t      count;
     stl_entry_t *index;
 
     es_out_id_t *es;
 
-    int         current;
+    size_t      current;
     int64_t     next_date;
     bool        b_slave;
     bool        b_first_time;
