@@ -118,7 +118,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
-    es_format_Init( &p_sys->fmt, UNKNOWN_ES, 0 );
+    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
     p_sys->i_time = 0;
     p_sys->i_ssnd_pos = -1;
 
