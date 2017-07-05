@@ -639,4 +639,14 @@ VLC_API void es_format_Clean( es_format_t *fmt );
  */
 VLC_API bool es_format_IsSimilar( const es_format_t *, const es_format_t * );
 
+/**
+ * Changes ES format to another category
+ * Format must have been properly initialized
+ */
+static inline void es_format_Change( es_format_t *fmt, int i_cat, vlc_fourcc_t i_codec )
+{
+    es_format_Clean( fmt );
+    es_format_Init( fmt, i_cat, i_codec );
+}
+
 #endif
