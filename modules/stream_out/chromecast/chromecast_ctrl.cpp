@@ -423,17 +423,10 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
             {
                 if ( m_state != Buffering )
                 {
-                    if ( double(status[0]["currentTime"]) == 0.0 )
-                    {
-                        msg_Dbg( m_module, "Invalid buffering time, keep current state");
-                    }
-                    else
-                    {
-                        m_chromecast_start_time = (1 + mtime_t( double( status[0]["currentTime"] ) ) ) * 1000000L;
-                        msg_Dbg( m_module, "Playback pending with an offset of %" PRId64, m_chromecast_start_time);
-                        m_time_playback_started = VLC_TS_INVALID;
-                        setState( Buffering );
-                    }
+                    m_chromecast_start_time = (1 + mtime_t( double( status[0]["currentTime"] ) ) ) * 1000000L;
+                    msg_Dbg( m_module, "Playback pending with an offset of %" PRId64, m_chromecast_start_time);
+                    m_time_playback_started = VLC_TS_INVALID;
+                    setState( Buffering );
                 }
             }
             else if (newPlayerState == "PAUSED")
