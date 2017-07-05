@@ -209,24 +209,22 @@ void ActionsManager::skipBackward()
         THEMIM->getIM()->jumpBwd();
 }
 
-bool ActionsManager::isItemSout( QVariant & m_obj, const char *psz_sout, bool as_output )
+bool ActionsManager::compareRenderers( const QVariant &obj, vlc_renderer_item_t* p_item )
 {
-    if ( psz_sout == NULL )
+    if (!obj.canConvert<QVariantHash>())
         return false;
-    if (!m_obj.canConvert<QVariantHash>())
+    QVariantHash qvh = obj.value<QVariantHash>();
+    if (!qvh.contains( "sout" ))
         return false;
-
-    QVariantHash hash = m_obj.value<QVariantHash>();
-    QString renderer(psz_sout);
-    if ( as_output && renderer.at(0) == '#' )
-        renderer = renderer.right( renderer.length() - 1 );
-    return QString::compare( hash["sout"].toString(), renderer, Qt::CaseInsensitive) == 0;
+    vlc_renderer_item_t* p_existing =
+            reinterpret_cast<vlc_renderer_item_t*>( qvh["sout"].value<void*>() );
+    return !strcasecmp(vlc_renderer_item_sout( p_existing ),
+                    vlc_renderer_item_sout( p_item ) );
 }
 
-void ActionsManager::renderer_event_item_added(
-    vlc_renderer_discovery_t *rd, vlc_renderer_item_t *p_item )
+void ActionsManager::renderer_event_item_added( vlc_renderer_discovery_t*,
+                                                vlc_renderer_item_t *p_item )
 {
-    intf_thread_t *p_intf = static_cast<intf_thread_t*>(rd->owner.sys);
     QAction *firstSeparator = NULL;
 
     foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
@@ -237,38 +235,45 @@ void ActionsManager::renderer_event_item_added(
             break;
         }
         QVariant v = action->data();
-        if ( isItemSout( v, vlc_renderer_item_sout( p_item ), false ) )
+        if (compareRenderers( action->data(), p_item ))
             return; /* we already have this item */
     }
-
-    QHash<QString,QVariant> itemData;
-    itemData.insert("sout", vlc_renderer_item_sout( p_item ));
-    itemData.insert("filter", vlc_renderer_item_demux_filter( p_item ));
-    QVariant data(itemData);
 
     QAction *action = new QAction( vlc_renderer_item_flags(p_item) & VLC_RENDERER_CAN_VIDEO ? QIcon( ":/sidebar/movie" ) : QIcon( ":/sidebar/music" ),
                                    vlc_renderer_item_name(p_item), VLCMenuBar::rendererMenu );
     action->setCheckable(true);
-    action->setData(data);
+
+    vlc_renderer_item_hold( p_item );
+    QVariantHash data;
+    data.insert( "sout", QVariant::fromValue( reinterpret_cast<void*>( p_item ) ) );
+    action->setData( data );
     if (firstSeparator != NULL)
     {
         VLCMenuBar::rendererMenu->insertAction( firstSeparator, action );
         VLCMenuBar::rendererGroup->addAction(action);
     }
-
-    char *psz_renderer = var_InheritString( THEPL, "sout" );
-    if ( psz_renderer != NULL )
-    {
-        if ( isItemSout( data, psz_renderer, true ) )
-            action->setChecked( true );
-        free( psz_renderer );
-    }
 }
 
 void ActionsManager::renderer_event_item_removed(
-    vlc_renderer_discovery_t *rd, vlc_renderer_item_t *p_item )
+    vlc_renderer_discovery_t *p_rd, vlc_renderer_item_t *p_item )
 {
-    (void) rd; (void) p_item;
+    foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
+    {
+        if (action->isSeparator())
+            continue;
+        if (compareRenderers( action->data(), p_item ))
+        {
+            if( action->isChecked() )
+            {
+                intf_thread_t* p_intf = reinterpret_cast<intf_thread_t*>( p_rd->owner.sys );
+                playlist_SetRenderer( THEPL, NULL );
+            }
+            VLCMenuBar::rendererMenu->removeAction( action );
+            VLCMenuBar::rendererGroup->removeAction( action );
+            vlc_renderer_item_release( p_item );
+            return;
+        }
+    }
 }
 
 void ActionsManager::ScanRendererAction(bool checked)
@@ -287,19 +292,6 @@ void ActionsManager::ScanRendererAction(bool checked)
             VLCMenuBar::rendererMenu->removeAction(action);
             VLCMenuBar::rendererGroup->removeAction(action);
         }
-        char *psz_renderer = var_InheritString( THEPL, "sout" );
-        if ( psz_renderer == NULL || *psz_renderer == '\0' )
-        {
-            foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
-            {
-                if (!action->data().canConvert<QVariantHash>())
-                    continue;
-                if (!action->isSeparator())
-                    action->setChecked(true);
-                break;
-            }
-        }
-        free( psz_renderer );
 
         /* SD subnodes */
         char **ppsz_longnames;
@@ -337,17 +329,17 @@ void ActionsManager::ScanRendererAction(bool checked)
 
 void ActionsManager::RendererSelected( QAction *selected )
 {
-    QString s_sout, s_demux_filter;
     QVariant data = selected->data();
+    vlc_renderer_item_t *p_item = NULL;
     if (data.canConvert<QVariantHash>())
     {
         QVariantHash hash = data.value<QVariantHash>();
-        s_sout.append('#');
-        s_sout.append(hash["sout"].toString());
-        s_demux_filter.append(hash["filter"].toString());
+        if ( hash.contains( "sout" ) )
+            p_item = reinterpret_cast<vlc_renderer_item_t*>(
+                        hash["sout"].value<void*>() );
     }
-    msg_Dbg( p_intf, "using sout: '%s'", s_sout.toUtf8().constData() );
-    var_SetString( THEPL, "sout", s_sout.toUtf8().constData() );
-    var_SetString( THEPL, "demux-filter", s_demux_filter.toUtf8().constData() );
+    // If we failed to convert the action data to a vlc_renderer_item_t,
+    // assume the selected item was invalid, or most likely that "Local" was selected
+    playlist_SetRenderer( THEPL, p_item );
 }
 
