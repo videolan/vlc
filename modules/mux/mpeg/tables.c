@@ -23,7 +23,6 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
-#include <vlc_fourcc.h>
 #include <vlc_es.h>
 
 # include <dvbpsi/dvbpsi.h>
