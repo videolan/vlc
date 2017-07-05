@@ -143,7 +143,7 @@ typedef struct
  *****************************************************************************/
 typedef struct
 {
-    int i_cat;
+    enum es_format_category_e i_cat;
     vlc_fourcc_t i_fourcc;
 
     int b_new;
