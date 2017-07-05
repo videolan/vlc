@@ -347,7 +347,7 @@ struct str2quirks {
     int i_quirks;
 };
 
-int OMXCodec_GetQuirks( int i_cat, vlc_fourcc_t i_codec,
+int OMXCodec_GetQuirks( enum es_format_category_e i_cat, vlc_fourcc_t i_codec,
                         const char *p_name, unsigned int i_name_len )
 {
     static const struct str2quirks quirks_prefix[] = {
@@ -720,7 +720,8 @@ static const char *GetOmxAudioEncRole( vlc_fourcc_t i_fourcc )
     return audio_enc_format_table[i].psz_role;
 }
 
-const char *GetOmxRole( vlc_fourcc_t i_fourcc, int i_cat, bool b_enc )
+const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,
+                        bool b_enc )
 {
     if(b_enc)
         return i_cat == VIDEO_ES ?
