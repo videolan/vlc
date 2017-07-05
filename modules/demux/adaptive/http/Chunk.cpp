@@ -95,7 +95,7 @@ block_t * AbstractChunk::doRead(size_t size, bool b_block)
             block->i_flags |= BLOCK_FLAG_HEADER;
         bytesRead += block->i_buffer;
         onDownload(&block);
-        block->i_flags ^= BLOCK_FLAG_HEADER;
+        block->i_flags &= ~BLOCK_FLAG_HEADER;
     }
 
     return block;
