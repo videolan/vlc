@@ -1329,7 +1329,11 @@ static int Demux_Seekable( demux_t *p_demux )
 
         if( tk->i_dv_audio_rate )
             AVI_DvHandleAudio( p_demux, tk, p_frame );
-        es_out_Send( p_demux->out, tk->p_es, p_frame );
+
+        if( tk->p_es )
+            es_out_Send( p_demux->out, tk->p_es, p_frame );
+        else
+            block_Release( p_frame );
     }
 }
 
@@ -1458,7 +1462,11 @@ static int Demux_UnSeekable( demux_t *p_demux )
 
                 if( p_stream->i_dv_audio_rate )
                     AVI_DvHandleAudio( p_demux, p_stream, p_frame );
-                es_out_Send( p_demux->out, p_stream->p_es, p_frame );
+
+                if( p_stream->p_es )
+                    es_out_Send( p_demux->out, p_stream->p_es, p_frame );
+                else
+                    block_Release( p_frame );
             }
             else
             {
@@ -2845,7 +2853,12 @@ static void AVI_DvHandleAudio( demux_t *p_demux, avi_track_t *tk, block_t *p_fra
 
     block_t *p_frame_audio = dv_extract_audio( p_frame );
     if( p_frame_audio )
-        es_out_Send( p_demux->out, tk->p_es_dv_audio, p_frame_audio );
+    {
+        if( tk->p_es_dv_audio )
+            es_out_Send( p_demux->out, tk->p_es_dv_audio, p_frame_audio );
+        else
+            block_Release( p_frame_audio );
+    }
 }
 
 /*****************************************************************************
