@@ -50,10 +50,10 @@ struct filter_sys_t
     VAImage             image_fallback;
 };
 
-static int CreateFallbackImage(filter_t *filter, picture_t *src_pic)
+static int CreateFallbackImage(filter_t *filter, picture_t *src_pic,
+                               VADisplay va_dpy)
 {
     filter_sys_t *const filter_sys = filter->p_sys;
-    VADisplay va_dpy = filter_sys->dpy;
     int count = vaMaxNumImageFormats(va_dpy);
 
     VAImageFormat *fmts = malloc(count * sizeof (*fmts));
@@ -138,7 +138,7 @@ DownloadSurface(filter_t *filter, picture_t *src_pic)
         if (!filter_sys->derive_failed)
         {
             filter_sys->derive_failed = true;
-            if (CreateFallbackImage(filter, src_pic))
+            if (CreateFallbackImage(filter, src_pic, va_dpy))
             {
                 filter_sys->image_fallback_failed = true;
                 goto error;
@@ -290,12 +290,11 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     filter_sys->derive_failed = false;
     filter_sys->image_fallback_failed = false;
     filter_sys->image_fallback.image_id = VA_INVALID_ID;
-    filter_sys->va_inst = vlc_vaapi_FilterHoldInstance(filter,
-                                                       &filter_sys->dpy);
-
     if (is_upload)
     {
-        /* Only upload can't work without a VAAPI instance */
+        filter_sys->va_inst = vlc_vaapi_FilterHoldInstance(filter,
+                                                           &filter_sys->dpy);
+
         if (filter_sys->va_inst == NULL)
         {
             free(filter_sys);
@@ -318,6 +317,8 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     {
         /* Don't fetch the vaapi instance since it may be not created yet at
          * this point (in case of cpu rendering) */
+        filter_sys->va_inst = NULL;
+        filter_sys->dpy = NULL;
         filter_sys->dest_pics = NULL;
     }
 
