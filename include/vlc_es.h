@@ -543,6 +543,17 @@ typedef struct extra_languages_t
         char *psz_description;
 } extra_languages_t;
 
+/** ES Categories */
+enum es_format_category_e
+{
+    UNKNOWN_ES = 0x00,
+    VIDEO_ES,
+    AUDIO_ES,
+    SPU_ES,
+    NAV_ES,
+};
+#define ES_CATEGORY_COUNT (NAV_ES + 1)
+
 /**
  * ES format definition
  */
@@ -552,7 +563,7 @@ typedef struct extra_languages_t
 #define ES_PRIORITY_MIN ES_PRIORITY_NOT_SELECTABLE
 struct es_format_t
 {
-    int             i_cat;              /**< ES category @see es_format_category_e */
+    enum es_format_category_e i_cat;    /**< ES category */
     vlc_fourcc_t    i_codec;            /**< FOURCC value as used in vlc */
     vlc_fourcc_t    i_original_fourcc;  /**< original FOURCC from the container */
 
@@ -592,17 +603,6 @@ struct es_format_t
     void    *p_extra;       /**< extra data needed by some decoders or muxers */
 
 };
-
-/** ES Categories */
-enum es_format_category_e
-{
-    UNKNOWN_ES = 0x00,
-    VIDEO_ES,
-    AUDIO_ES,
-    SPU_ES,
-    NAV_ES,
-};
-#define ES_CATEGORY_COUNT (NAV_ES + 1)
 
 /**
  * This function will fill all RGB shift from RGB masks.
