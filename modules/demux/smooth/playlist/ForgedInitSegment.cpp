@@ -59,7 +59,7 @@ ForgedInitSegment::ForgedInitSegment(ICanonicalUrl *parent,
     formatex.wFormatTag = 0;
     width = height = 0;
     fourcc = 0;
-    es_type = 0;
+    es_type = UNKNOWN_ES;
     track_id = 1;
 }
 
