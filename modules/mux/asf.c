@@ -111,7 +111,7 @@ static int Mux      ( sout_mux_t * );
 typedef struct
 {
     int          i_id;
-    int          i_cat;
+    enum es_format_category_e i_cat;
 
     /* codec information */
     uint16_t     i_tag;     /* for audio */
