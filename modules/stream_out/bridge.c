@@ -448,7 +448,7 @@ static void CloseIn( vlc_object_t * p_this )
 struct sout_stream_id_sys_t
 {
     sout_stream_id_sys_t *id;
-    int i_cat; /* es category. Used for placeholder option */
+    enum es_format_category_e i_cat; /* es category. Used for placeholder option */
 };
 
 static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, const es_format_t *p_fmt )
