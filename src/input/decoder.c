@@ -166,7 +166,7 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
     p_dec->pf_flush = NULL;
 
     es_format_Copy( &p_dec->fmt_in, p_fmt );
-    es_format_Init( &p_dec->fmt_out, UNKNOWN_ES, 0 );
+    es_format_Init( &p_dec->fmt_out, p_fmt->i_cat, 0 );
 
     /* Find a suitable decoder/packetizer module */
     if( !b_packetizer )
@@ -217,7 +217,7 @@ static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
 {
     /* Copy p_fmt since it can be destroyed by UnloadDecoder */
     es_format_t fmt_in;
-    es_format_Init( &fmt_in, UNKNOWN_ES, 0 );
+    es_format_Init( &fmt_in, p_fmt->i_cat, 0 );
     if( es_format_Copy( &fmt_in, p_fmt ) != VLC_SUCCESS )
     {
         p_dec->p_owner->error = true;
@@ -1688,7 +1688,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
 
-    es_format_Init( &p_owner->fmt, UNKNOWN_ES, 0 );
+    es_format_Init( &p_owner->fmt, fmt->i_cat, 0 );
 
     /* decoder fifo */
     p_owner->p_fifo = block_FifoNew();
