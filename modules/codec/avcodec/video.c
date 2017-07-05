@@ -321,8 +321,7 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     fmt_out.p_palette = dec->fmt_out.video.p_palette;
     dec->fmt_out.video.p_palette = NULL;
 
-    es_format_Clean(&dec->fmt_out);
-    es_format_Init(&dec->fmt_out, VIDEO_ES, fmt_out.i_chroma);
+    es_format_Change(&dec->fmt_out, VIDEO_ES, fmt_out.i_chroma);
     dec->fmt_out.video = fmt_out;
     dec->fmt_out.video.orientation = dec->fmt_in.video.orientation;
     dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
