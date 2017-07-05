@@ -93,9 +93,9 @@ struct aout_sys_t
     unsigned ducks;
     float gain; /**< Current software gain volume */
 
-    wchar_t *device; /**< Requested device identifier, NULL if none */
-    float volume; /**< Requested volume, negative if none */
-    signed char mute; /**< Requested mute, negative if none */
+    wchar_t *requested_device; /**< Requested device identifier, NULL if none */
+    float requested_volume; /**< Requested volume, negative if none */
+    signed char requested_mute; /**< Requested mute, negative if none */
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
@@ -191,7 +191,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
     EnterCriticalSection(&sys->lock);
     sys->gain = gain;
-    sys->volume = vol;
+    sys->requested_volume = vol;
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
     return 0;
@@ -202,7 +202,7 @@ static int MuteSet(audio_output_t *aout, bool mute)
     aout_sys_t *sys = aout->sys;
 
     EnterCriticalSection(&sys->lock);
-    sys->mute = mute;
+    sys->requested_mute = mute;
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
     return 0;
@@ -732,11 +732,11 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
     else
         device = default_device;
 
-    assert(sys->device == NULL);
-    sys->device = device;
+    assert(sys->requested_device == NULL);
+    sys->requested_device = device;
 
     WakeConditionVariable(&sys->work);
-    while (sys->device != NULL)
+    while (sys->requested_device != NULL)
         SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
 
     if (sys->stream != NULL && sys->dev != NULL)
@@ -787,17 +787,17 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     void *pv;
     HRESULT hr;
 
-    assert(sys->device != NULL);
+    assert(sys->requested_device != NULL);
     assert(sys->dev == NULL);
 
-    if (sys->device != default_device) /* Device selected explicitly */
+    if (sys->requested_device != default_device) /* Device selected explicitly */
     {
-        msg_Dbg(aout, "using selected device %ls", sys->device);
-        hr = IMMDeviceEnumerator_GetDevice(it, sys->device, &sys->dev);
+        msg_Dbg(aout, "using selected device %ls", sys->requested_device);
+        hr = IMMDeviceEnumerator_GetDevice(it, sys->requested_device, &sys->dev);
         if (FAILED(hr))
             msg_Err(aout, "cannot get selected device %ls (error 0x%lx)",
-                    sys->device, hr);
-        free(sys->device);
+                    sys->requested_device, hr);
+        free(sys->requested_device);
     }
     else
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
@@ -812,7 +812,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             msg_Err(aout, "cannot get default device (error 0x%lx)", hr);
     }
 
-    sys->device = NULL;
+    sys->requested_device = NULL;
     WakeConditionVariable(&sys->ready);
 
     if (SUCCEEDED(hr))
@@ -923,7 +923,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         msg_Err(aout, "cannot activate endpoint volume (error %lx)", hr);
 
     /* Main loop (adjust volume as long as device is unchanged) */
-    while (sys->device == NULL)
+    while (sys->requested_device == NULL)
     {
         if (volume != NULL)
         {
@@ -935,7 +935,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             else
                 msg_Err(aout, "cannot get master volume (error 0x%lx)", hr);
 
-            level = sys->volume;
+            level = sys->requested_volume;
             if (level >= 0.f)
             {
                 hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
@@ -943,7 +943,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                     msg_Err(aout, "cannot set master volume (error 0x%lx)",
                             hr);
             }
-            sys->volume = -1.f;
+            sys->requested_volume = -1.f;
 
             BOOL mute;
 
@@ -953,15 +953,15 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             else
                 msg_Err(aout, "cannot get mute (error 0x%lx)", hr);
 
-            if (sys->mute >= 0)
+            if (sys->requested_mute >= 0)
             {
-                mute = sys->mute ? TRUE : FALSE;
+                mute = sys->requested_mute ? TRUE : FALSE;
 
                 hr = ISimpleAudioVolume_SetMute(volume, mute, NULL);
                 if (FAILED(hr))
                     msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
             }
-            sys->mute = -1;
+            sys->requested_mute = -1;
         }
 
         SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
@@ -1134,10 +1134,10 @@ static int Open(vlc_object_t *obj)
     sys->refs = 1;
     sys->ducks = 0;
 
-    sys->device = default_device;
     sys->gain = 1.f;
-    sys->volume = -1.f;
-    sys->mute = -1;
+    sys->requested_device = default_device;
+    sys->requested_volume = -1.f;
+    sys->requested_mute = -1;
     InitializeCriticalSection(&sys->lock);
     InitializeConditionVariable(&sys->work);
     InitializeConditionVariable(&sys->ready);
@@ -1165,7 +1165,7 @@ static int Open(vlc_object_t *obj)
     }
 
     EnterCriticalSection(&sys->lock);
-    while (sys->device != NULL)
+    while (sys->requested_device != NULL)
         SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
     LeaveCriticalSection(&sys->lock);
     LeaveMTA(); /* Leave MTA after thread has entered MTA */
@@ -1193,7 +1193,7 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     EnterCriticalSection(&sys->lock);
-    sys->device = default_device; /* break out of MMSession() loop */
+    sys->requested_device = default_device; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
