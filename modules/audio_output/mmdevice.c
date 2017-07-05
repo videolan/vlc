@@ -96,6 +96,7 @@ struct aout_sys_t
     wchar_t *requested_device; /**< Requested device identifier, NULL if none */
     float requested_volume; /**< Requested volume, negative if none */
     signed char requested_mute; /**< Requested mute, negative if none */
+    wchar_t *acquired_device; /**< Acquired device identifier, NULL if none */
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
@@ -718,22 +719,10 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
     return n;
 }
 
-static int DeviceSelectLocked(audio_output_t *aout, const char *id)
+static int DeviceRequestLocked(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
-    wchar_t *device;
-
-    if (id != NULL)
-    {
-        device = ToWide(id);
-        if (unlikely(device == NULL))
-            return -1;
-    }
-    else
-        device = default_device;
-
-    assert(sys->requested_device == NULL);
-    sys->requested_device = device;
+    assert(sys->requested_device);
 
     WakeConditionVariable(&sys->work);
     while (sys->requested_device != NULL)
@@ -743,6 +732,32 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
         /* Request restart of stream with the new device */
         aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     return (sys->dev != NULL) ? 0 : -1;
+}
+
+static int DeviceSelectLocked(audio_output_t *aout, const char *id)
+{
+    aout_sys_t *sys = aout->sys;
+    assert(sys->requested_device == NULL);
+
+    if (id != NULL)
+    {
+        sys->requested_device = ToWide(id);
+        if (unlikely(sys->requested_device == NULL))
+            return -1;
+    }
+    else
+        sys->requested_device = default_device;
+
+    return DeviceRequestLocked(aout);
+}
+
+static int DeviceRestartLocked(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    assert(sys->requested_device == NULL);
+    assert(sys->acquired_device != NULL);
+    sys->requested_device = sys->acquired_device;
+    return DeviceRequestLocked(aout);
 }
 
 static int DeviceSelect(audio_output_t *aout, const char *id)
@@ -790,6 +805,11 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     assert(sys->requested_device != NULL);
     assert(sys->dev == NULL);
 
+    /* Yes, it's perfectly valid to request the same device, see Start()
+     * comments. */
+    if (sys->acquired_device != sys->requested_device
+     && sys->acquired_device != default_device)
+        free(sys->acquired_device);
     if (sys->requested_device != default_device) /* Device selected explicitly */
     {
         msg_Dbg(aout, "using selected device %ls", sys->requested_device);
@@ -797,7 +817,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         if (FAILED(hr))
             msg_Err(aout, "cannot get selected device %ls (error 0x%lx)",
                     sys->requested_device, hr);
-        free(sys->requested_device);
+        sys->acquired_device = sys->requested_device;
     }
     else
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
@@ -810,6 +830,8 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                                                          eConsole, &sys->dev);
         if (FAILED(hr))
             msg_Err(aout, "cannot get default device (error 0x%lx)", hr);
+        else
+            sys->acquired_device = default_device;
     }
 
     sys->requested_device = NULL;
@@ -1083,7 +1105,29 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
         sys->module = vlc_module_load(s, "aout stream", "$mmdevice-backend",
                                       false, aout_stream_Start, s, fmt, &hr);
-        if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelectLocked(aout, NULL))
+
+        int ret = -1;
+        if (hr == AUDCLNT_E_ALREADY_INITIALIZED)
+        {
+            /* From MSDN: "If the initial call to Initialize fails, subsequent
+             * Initialize calls might fail and return error code
+             * E_ALREADY_INITIALIZED, even though the interface has not been
+             * initialized. If this occurs, release the IAudioClient interface
+             * and obtain a new IAudioClient interface from the MMDevice API
+             * before calling Initialize again."
+             *
+             * Therefore, request to MMThread the same device and try again. */
+
+            ret = DeviceRestartLocked(aout);
+        }
+        else if (hr == AUDCLNT_E_DEVICE_INVALIDATED)
+        {
+            /* The audio endpoint device has been unplugged, request to
+             * MMThread the default device and try again. */
+
+            ret = DeviceSelectLocked(aout, NULL);
+        }
+        if (ret != 0)
             break;
     }
     LeaveCriticalSection(&sys->lock);
@@ -1138,6 +1182,7 @@ static int Open(vlc_object_t *obj)
     sys->requested_device = default_device;
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
+    sys->acquired_device = NULL;
     InitializeCriticalSection(&sys->lock);
     InitializeConditionVariable(&sys->work);
     InitializeConditionVariable(&sys->ready);
