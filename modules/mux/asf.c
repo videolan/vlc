@@ -996,13 +996,14 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
             if( tk->i_cat == VIDEO_ES &&
                 tk->fmt.video.i_sar_num != 0 &&
                 tk->fmt.video.i_sar_den != 0 )
+            {
+                vlc_ureduce( &i_dst_num, &i_dst_den,
+                             tk->fmt.video.i_sar_num,
+                             tk->fmt.video.i_sar_den, 0 );
                 break;
+            }
         }
         assert( tk != NULL );
-
-        vlc_ureduce( &i_dst_num, &i_dst_den,
-                     tk->fmt.video.i_sar_num,
-                     tk->fmt.video.i_sar_den, 0 );
 
         msg_Dbg( p_mux, "pixel aspect-ratio: %i/%i", i_dst_num, i_dst_den );
 
