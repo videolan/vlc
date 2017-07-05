@@ -77,7 +77,7 @@ typedef struct rtp_format_t
     uint8_t      payload_type;
     unsigned     clock_rate;
     unsigned     channels;
-    int          cat;
+    enum es_format_category_e cat;
     /* Used in SDP only */
     unsigned     bitrate;
     const char  *ptname;
