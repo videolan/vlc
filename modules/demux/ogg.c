@@ -1547,8 +1547,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 
                 TAB_APPEND( p_ogg->i_streams, p_ogg->pp_stream, p_stream );
 
-                es_format_Init( &p_stream->fmt, 0, 0 );
-                es_format_Init( &p_stream->fmt_old, 0, 0 );
+                es_format_Init( &p_stream->fmt, UNKNOWN_ES, 0 );
+                es_format_Init( &p_stream->fmt_old, UNKNOWN_ES, 0 );
                 p_stream->b_initializing = true;
 
                 /* Setup the logical stream */
@@ -1624,8 +1624,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     p_stream->b_force_backup = true;
                     p_stream->i_extra_headers_packets = 1;
                     p_stream->special.flac.b_old = true;
-                    p_stream->fmt.i_cat = AUDIO_ES;
-                    p_stream->fmt.i_codec = VLC_CODEC_FLAC;
+                    es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_FLAC );
                 }
                 /* Check for Flac header (>= version 1.0.0) */
                 else if( oggpacket.bytes >= 13 && oggpacket.packet[0] ==0x7F &&
@@ -1644,8 +1643,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     p_stream->i_extra_headers_packets = i_packets;
                     p_stream->special.flac.b_old = false;
 
-                    p_stream->fmt.i_cat = AUDIO_ES;
-                    p_stream->fmt.i_codec = VLC_CODEC_FLAC;
+                    es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_FLAC );
                     oggpacket.packet += 13; oggpacket.bytes -= 13; /* Point to the streaminfo */
                     if ( !Ogg_ReadFlacStreamInfo( p_demux, p_stream, &oggpacket ) )
                     {
@@ -1710,8 +1708,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     oggpack_buffer opb;
 
                     msg_Dbg( p_demux, "found tarkin header" );
-                    p_stream->fmt.i_cat = VIDEO_ES;
-                    p_stream->fmt.i_codec = VLC_CODEC_TARKIN;
+                    es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_TARKIN );
 
                     /* Cheat and get additionnal info ;) */
                     oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
@@ -1781,12 +1778,11 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     if( GetDWLE((oggpacket.packet+96)) == 0x05589f80 &&
                         oggpacket.bytes >= 184 )
                     {
-                        p_stream->fmt.i_cat = VIDEO_ES;
-                        p_stream->fmt.i_codec =
-                            VLC_FOURCC( oggpacket.packet[68],
-                                        oggpacket.packet[69],
-                                        oggpacket.packet[70],
-                                        oggpacket.packet[71] );
+                        es_format_Change( &p_stream->fmt, VIDEO_ES,
+                                          VLC_FOURCC( oggpacket.packet[68],
+                                                      oggpacket.packet[69],
+                                                      oggpacket.packet[70],
+                                                      oggpacket.packet[71] ) );
                         msg_Dbg( p_demux, "found video header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
 
@@ -1825,7 +1821,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         int i_extra_size;
                         unsigned int i_format_tag;
 
-                        p_stream->fmt.i_cat = AUDIO_ES;
+                        es_format_Change( &p_stream->fmt, AUDIO_ES, 0 );
 
                         i_extra_size = GetWLE((oggpacket.packet+140));
                         if( i_extra_size > 0 && i_extra_size < oggpacket.bytes - 142 )
@@ -1913,7 +1909,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         st->sh.video.width = GetDWLE( &oggpacket.packet[1+44] );
                         st->sh.video.height = GetDWLE( &oggpacket.packet[1+48] );
 
-                        p_stream->fmt.i_cat = VIDEO_ES;
+                        es_format_Change( &p_stream->fmt, VIDEO_ES, 0 );
 
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
@@ -1956,7 +1952,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         st->sh.audio.blockalign = GetWLE( &oggpacket.packet[1+48] );
                         st->sh.audio.avgbytespersec = GetDWLE( &oggpacket.packet[1+52] );
 
-                        p_stream->fmt.i_cat = AUDIO_ES;
+                        es_format_Change( &p_stream->fmt, AUDIO_ES, 0 );
 
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
@@ -2022,8 +2018,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
                         msg_Dbg( p_demux, "found text subtitle header" );
-                        p_stream->fmt.i_cat = SPU_ES;
-                        p_stream->fmt.i_codec = VLC_CODEC_SUBT;
+                        es_format_Change( &p_stream->fmt, SPU_ES, VLC_CODEC_SUBT );
                         p_stream->f_rate = 1000; /* granulepos is in millisec */
                     }
                     else
@@ -2125,6 +2120,8 @@ static void Ogg_CreateES( demux_t *p_demux )
                 p_stream->b_reinit = false;
                 p_stream->b_initializing = false;
                 p_stream->i_pre_skip = 0;
+                es_format_Change( &p_stream->fmt_old, p_old_stream->fmt.i_cat,
+                                                      p_old_stream->fmt.i_codec );
                 es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
                 bool b_resetdecoder = Ogg_LogicalStreamResetEsFormat( p_demux, p_stream );
 
@@ -2571,8 +2568,7 @@ static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     int i_subminor;
     int i_version;
 
-    p_stream->fmt.i_cat = VIDEO_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_THEORA;
+    es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_THEORA );
 
     /* Signal that we want to keep a backup of the theora
      * stream headers. They will be used when switching between
@@ -2642,8 +2638,7 @@ static bool Ogg_ReadDaalaHeader( logical_stream_t *p_stream,
     uint8_t i_subminor;
     int i_version;
 
-    p_stream->fmt.i_cat = VIDEO_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_DAALA;
+    es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_DAALA );
 
     /* Signal that we want to keep a backup of the daala
      * stream headers. They will be used when switching between
@@ -2698,8 +2693,7 @@ static bool Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
 {
     oggpack_buffer opb;
 
-    p_stream->fmt.i_cat = AUDIO_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_VORBIS;
+    es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_VORBIS );
 
     /* Signal that we want to keep a backup of the vorbis
      * stream headers. They will be used when switching between
@@ -2760,8 +2754,7 @@ static bool Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
 {
     oggpack_buffer opb;
 
-    p_stream->fmt.i_cat = AUDIO_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_SPEEX;
+    es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_SPEEX );
 
     /* Signal that we want to keep a backup of the speex
      * stream headers. They will be used when switching between
@@ -2794,8 +2787,7 @@ static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
 {
     oggpack_buffer opb;
 
-    p_stream->fmt.i_cat = AUDIO_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_OPUS;
+    es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_OPUS );
 
     /* Signal that we want to keep a backup of the opus
      * stream headers. They will be used when switching between
@@ -2867,8 +2859,7 @@ static bool Ogg_ReadKateHeader( logical_stream_t *p_stream,
     int n;
     char *psz_desc;
 
-    p_stream->fmt.i_cat = SPU_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_KATE;
+    es_format_Change( &p_stream->fmt, SPU_ES, VLC_CODEC_KATE );
 
     /* Signal that we want to keep a backup of the kate
      * stream headers. They will be used when switching between
@@ -2934,8 +2925,7 @@ static bool Ogg_ReadVP8Header( demux_t *p_demux, logical_stream_t *p_stream,
         /* Mapping version */
         if ( p_oggpacket->packet[6] != 0x01 || p_oggpacket->packet[7] != 0x00 )
             return false;
-        p_stream->fmt.i_cat = VIDEO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_VP8;
+        es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_VP8 );
         p_stream->i_granule_shift = 32;
         p_stream->fmt.video.i_width = GetWBE( &p_oggpacket->packet[8] );
         p_stream->fmt.video.i_height = GetWBE( &p_oggpacket->packet[10] );
@@ -2966,80 +2956,70 @@ static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_va
     if( !strncmp(psz_value, "audio/x-wav", 11) )
     {
         /* n.b. WAVs are unsupported right now */
-        p_stream->fmt.i_cat = UNKNOWN_ES;
+        es_format_Change( &p_stream->fmt, UNKNOWN_ES, 0 );
         free( p_stream->fmt.psz_description );
         p_stream->fmt.psz_description = strdup("WAV Audio (Unsupported)");
     }
     else if( !strncmp(psz_value, "audio/x-vorbis", 14) ||
              !strncmp(psz_value, "audio/vorbis", 12) )
     {
-        p_stream->fmt.i_cat = AUDIO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_VORBIS;
+        es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_VORBIS );
 
         *b_force_backup = true;
     }
     else if( !strncmp(psz_value, "audio/x-speex", 13) ||
              !strncmp(psz_value, "audio/speex", 11) )
     {
-        p_stream->fmt.i_cat = AUDIO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_SPEEX;
+        es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_SPEEX );
 
         *b_force_backup = true;
     }
     else if( !strncmp(psz_value, "audio/flac", 10) )
     {
-        p_stream->fmt.i_cat = AUDIO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_FLAC;
+        es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_FLAC );
 
         *b_force_backup = true;
     }
     else if( !strncmp(psz_value, "video/x-theora", 14) ||
              !strncmp(psz_value, "video/theora", 12) )
     {
-        p_stream->fmt.i_cat = VIDEO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_THEORA;
+        es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_THEORA );
 
         *b_force_backup = true;
     }
     else if( !strncmp(psz_value, "video/x-daala", 13) ||
              !strncmp(psz_value, "video/daala", 11) )
     {
-        p_stream->fmt.i_cat = VIDEO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_DAALA;
+        es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_DAALA );
 
         *b_force_backup = true;
     }
     else if( !strncmp(psz_value, "video/x-xvid", 12) )
     {
-        p_stream->fmt.i_cat = VIDEO_ES;
-        p_stream->fmt.i_codec = VLC_FOURCC( 'x','v','i','d' );
+        es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_FOURCC( 'x','v','i','d' ) );
 
         *b_force_backup = true;
     }
     else if( !strncmp(psz_value, "video/mpeg", 10) )
     {
         /* n.b. MPEG streams are unsupported right now */
-        p_stream->fmt.i_cat = VIDEO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_MPGV;
+        es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_MPGV );
     }
     else if( !strncmp(psz_value, "text/x-cmml", 11) ||
              !strncmp(psz_value, "text/cmml", 9) )
     {
-        p_stream->fmt.i_cat = SPU_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_CMML;
+        es_format_Change( &p_stream->fmt, SPU_ES, VLC_CODEC_CMML );
         *b_packet_out = true;
     }
     else if( !strncmp(psz_value, "application/kate", 16) )
     {
         /* ??? */
-        p_stream->fmt.i_cat = UNKNOWN_ES;
-        free( p_stream->fmt.psz_description );
+        es_format_Change( &p_stream->fmt, UNKNOWN_ES, 0 );
         p_stream->fmt.psz_description = strdup("OGG Kate Overlay (Unsupported)");
     }
     else if( !strncmp(psz_value, "video/x-vp8", 11) )
     {
-        p_stream->fmt.i_cat = VIDEO_ES;
-        p_stream->fmt.i_codec = VLC_CODEC_VP8;
+        es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_VP8 );
     }
 }
 
@@ -3429,8 +3409,7 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     if ( p_stream->f_rate == 0 ) return false;
 
     /* probably is an ogg dirac es */
-    p_stream->fmt.i_cat = VIDEO_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_DIRAC;
+    es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_DIRAC );
 
     return true;
 }
@@ -3443,8 +3422,7 @@ static bool Ogg_ReadOggSpotsHeader( logical_stream_t *p_stream,
     int i_major;
     int i_minor;
 
-    p_stream->fmt.i_cat = VIDEO_ES;
-    p_stream->fmt.i_codec = VLC_CODEC_OGGSPOTS;
+    es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_OGGSPOTS );
 
     /* Signal that we want to keep a backup of the OggSpots
      * stream headers. They will be used when switching between
