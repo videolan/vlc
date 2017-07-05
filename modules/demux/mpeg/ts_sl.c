@@ -70,19 +70,17 @@ bool SetupISO14496LogicalStream( demux_t *p_demux, const decoder_config_descript
 
     if( dcd->i_streamType == 0x04 )    /* VisualStream */
     {
-        p_fmt->i_cat = VIDEO_ES;
         switch( dcd->i_objectTypeIndication )
         {
         case 0x0B: /* mpeg4 sub */
-            p_fmt->i_cat = SPU_ES;
-            p_fmt->i_codec = VLC_CODEC_SUBT;
+            es_format_Change( p_fmt, SPU_ES, VLC_CODEC_SUBT );
             break;
 
         case 0x20: /* mpeg4 */
-            p_fmt->i_codec = VLC_CODEC_MP4V;
+            es_format_Change( p_fmt, VIDEO_ES, VLC_CODEC_MP4V );
             break;
         case 0x21: /* h264 */
-            p_fmt->i_codec = VLC_CODEC_H264;
+            es_format_Change( p_fmt, VIDEO_ES, VLC_CODEC_H264 );
             break;
         case 0x60:
         case 0x61:
@@ -90,46 +88,33 @@ bool SetupISO14496LogicalStream( demux_t *p_demux, const decoder_config_descript
         case 0x63:
         case 0x64:
         case 0x65: /* mpeg2 */
-            p_fmt->i_codec = VLC_CODEC_MPGV;
-            break;
         case 0x6a: /* mpeg1 */
-            p_fmt->i_codec = VLC_CODEC_MPGV;
+            es_format_Change( p_fmt, VIDEO_ES, VLC_CODEC_MPGV );
             break;
         case 0x6c: /* mpeg1 */
-            p_fmt->i_codec = VLC_CODEC_JPEG;
+            es_format_Change( p_fmt, VIDEO_ES, VLC_CODEC_JPEG );
             break;
         default:
-            p_fmt->i_cat = UNKNOWN_ES;
             break;
         }
     }
     else if( dcd->i_streamType == 0x05 )    /* AudioStream */
     {
-        p_fmt->i_cat = AUDIO_ES;
         switch( dcd->i_objectTypeIndication )
         {
         case 0x40: /* mpeg4 */
-            p_fmt->i_codec = VLC_CODEC_MP4A;
-            break;
         case 0x66:
         case 0x67:
         case 0x68: /* mpeg2 aac */
-            p_fmt->i_codec = VLC_CODEC_MP4A;
+            es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_MP4A );
             break;
         case 0x69: /* mpeg2 */
-            p_fmt->i_codec = VLC_CODEC_MPGA;
-            break;
         case 0x6b: /* mpeg1 */
-            p_fmt->i_codec = VLC_CODEC_MPGA;
+            es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_MPGA );
             break;
         default:
-            p_fmt->i_cat = UNKNOWN_ES;
             break;
         }
-    }
-    else
-    {
-        p_fmt->i_cat = UNKNOWN_ES;
     }
 
     if( p_fmt->i_cat != UNKNOWN_ES )
@@ -180,13 +165,13 @@ void SLPackets_Section_Handler( demux_t *p_demux,
                 ts_es_t *p_es = GetPMTESBySLEsId( p_pmt, p_mpeg4desc->i_es_id );
                 es_format_t fmt;
                 es_format_Init( &fmt, UNKNOWN_ES, 0 );
-                fmt.i_id = p_es->fmt.i_id;
-                fmt.i_group = p_es->fmt.i_group;
 
                 if ( p_mpeg4desc && p_mpeg4desc->b_ok && p_es &&
                      SetupISO14496LogicalStream( p_demux, &p_mpeg4desc->dec_descr, &fmt ) &&
                      !es_format_IsSimilar( &fmt, &p_es->fmt ) )
                 {
+                    fmt.i_id = p_es->fmt.i_id;
+                    fmt.i_group = p_es->fmt.i_group;
                     es_format_Clean( &p_es->fmt );
                     p_es->fmt = fmt;
 
