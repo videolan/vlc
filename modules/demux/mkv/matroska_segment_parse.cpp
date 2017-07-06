@@ -225,7 +225,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     track.i_last_dts             = 0;
     track.i_skip_until_fpos      = -1;
 
-    std::memset(    &track.fmt, 0, sizeof( track.fmt ) );
     es_format_Init( &track.fmt, UNKNOWN_ES, 0 );
 
     track.fmt.psz_language       = strdup("English");
