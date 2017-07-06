@@ -1516,6 +1516,7 @@ static void ESNew( demux_t *p_demux, int i_id )
         }
     }
 
+    tk->fmt.i_id = i_id;
     tk->es = es_out_Add( p_demux->out, &tk->fmt );
     if( b_select && tk->es )
     {
