@@ -1297,6 +1297,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
     if( i_title > 0 ) return;
 
+    /* dvdnav_get_active_spu_stream sets (in)visibility flag as 0xF0 */
     if( i_spu >= 0 && i_spu <= 0x1f )
     {
         ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(0xbd20 + i_spu)];
