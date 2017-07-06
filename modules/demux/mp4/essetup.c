@@ -1249,6 +1249,7 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     p_style->i_features |= (STYLE_HAS_BACKGROUND_ALPHA | STYLE_HAS_BACKGROUND_COLOR);
                 }
             }
+            assert(p_track->fmt.i_cat == SPU_ES);
             p_track->fmt.subs.p_style = p_style;
 
             /* FIXME UTF-8 doesn't work here ? */
