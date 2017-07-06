@@ -249,7 +249,8 @@ struct encoder_t
  */
 static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 {
-    if( dec->pf_vout_format_update != NULL )
+    assert( dec->fmt_in.i_cat == VIDEO_ES );
+    if( dec->fmt_in.i_cat == VIDEO_ES && dec->pf_vout_format_update != NULL )
         return dec->pf_vout_format_update( dec );
     else
         return -1;
@@ -365,7 +366,8 @@ static inline int decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
  * @return 0 if the audio output is working, -1 if not. */
 static inline int decoder_UpdateAudioFormat( decoder_t *dec )
 {
-    if( dec->pf_aout_format_update != NULL )
+    assert(dec->fmt_in.i_cat == AUDIO_ES);
+    if( dec->fmt_in.i_cat == AUDIO_ES && dec->pf_aout_format_update != NULL )
         return dec->pf_aout_format_update( dec );
     else
         return -1;
