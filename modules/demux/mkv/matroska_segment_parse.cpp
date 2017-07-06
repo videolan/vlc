@@ -671,9 +671,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             }
         }
         E_CASE( KaxTrackAudio, tka ) {
-            vars.tk->fmt.audio.i_channels = 1;
-            vars.tk->fmt.audio.i_rate = 8000;
-
             debug( vars, "Track Audio");
 
             vars.level += 1;
