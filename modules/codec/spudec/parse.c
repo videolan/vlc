@@ -238,6 +238,10 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
         case SPU_CMD_FORCE_DISPLAY: /* 00 (force displaying) */
             p_spu->i_start = i_pts + date;
             p_spu->b_ephemer = true;
+            /* ignores picture date as display start time
+             * works around non displayable (offset by few ms)
+             * spu menu over still frame in SPU_Select */
+            p_spu->b_subtitle = false;
             i_index += 1;
             break;
 
