@@ -167,7 +167,7 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
             p_track->fmt.subs.spu.palette[1 + i] =
                     GetDWBE((char*)p_track->fmt.p_extra + i * 4);
         }
-        p_track->fmt.subs.spu.palette[0] = 0xBeef;
+        p_track->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
     }
 }
 

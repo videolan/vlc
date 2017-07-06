@@ -558,7 +558,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             fmt.psz_language = language;
             if( p_sys->b_palette )
             {
-                fmt.subs.spu.palette[0] = 0xBeef;
+                fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
                 memcpy( &fmt.subs.spu.palette[1], p_sys->palette, 16 * sizeof( uint32_t ) );
             }
 

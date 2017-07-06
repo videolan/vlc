@@ -264,7 +264,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 return VLC_EGENERIC;
             }
 
-            if( p_dec->fmt_in.subs.spu.palette[0] == 0xBeeF )
+            if( p_dec->fmt_in.subs.spu.palette[0] == SPU_PALETTE_DEFINED )
             {
                 unsigned int idx[4];
                 int i;

@@ -1890,7 +1890,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     if( psz_start &&
                         vobsub_palette_parse( psz_start, &p_tk->fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
                     {
-                        p_tk->fmt.subs.spu.palette[0] =  0xBeef;
+                        p_tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
                         msg_Dbg( vars.p_demuxer, "vobsub palette read" );
                     }
                     else

@@ -706,7 +706,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
     else if( tk->fmt.i_cat == SPU_ES )
     {
         /* Palette */
-        tk->fmt.subs.spu.palette[0] = 0xBeef;
+        tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
         memcpy( &tk->fmt.subs.spu.palette[1], p_sys->clut,
                 16 * sizeof( uint32_t ) );
 

@@ -534,6 +534,8 @@ struct subs_format_t
     text_style_t *p_style; /* Default styles to use */
 };
 
+#define SPU_PALETTE_DEFINED  0xbeefbeef
+
 /**
  * ES language definition
  */

@@ -486,7 +486,7 @@ int OpenDemux( vlc_object_t *p_this )
                     if( psz_start &&
                         vobsub_palette_parse( psz_start, &es_fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
                     {
-                        es_fmt.subs.spu.palette[0] =  0xBeef;
+                        es_fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
                         msg_Dbg( p_demux, "vobsub palette read" );
                     }
                     else
