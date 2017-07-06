@@ -476,7 +476,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     /* Chroma */
     psz_val = var_CreateGetString( p_this, CFG_PREFIX "chroma" );
-    i_chroma = vlc_fourcc_GetCodecFromString( UNKNOWN_ES, psz_val );
+    i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_val );
     p_sys->b_chroma = i_chroma != 0;
     free( psz_val );
 
