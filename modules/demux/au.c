@@ -180,28 +180,28 @@ static int Open( vlc_object_t *p_this )
             break;
 
         case AU_LINEAR_8:      /* 8-bit linear PCM */
-            p_sys->fmt.i_codec               = VLC_FOURCC( 't','w','o','s' );
+            p_sys->fmt.i_codec               = VLC_CODEC_S8;
             p_sys->fmt.audio.i_bitspersample = 8;
             p_sys->fmt.audio.i_blockalign    = 1 * p_sys->fmt.audio.i_channels;
             i_cat                    = AU_CAT_PCM;
             break;
 
         case AU_LINEAR_16:     /* 16-bit linear PCM */
-            p_sys->fmt.i_codec               = VLC_FOURCC( 't','w','o','s' );
+            p_sys->fmt.i_codec               = VLC_CODEC_S16B;
             p_sys->fmt.audio.i_bitspersample = 16;
             p_sys->fmt.audio.i_blockalign    = 2 * p_sys->fmt.audio.i_channels;
             i_cat                    = AU_CAT_PCM;
             break;
 
         case AU_LINEAR_24:     /* 24-bit linear PCM */
-            p_sys->fmt.i_codec               = VLC_FOURCC( 't','w','o','s' );
+            p_sys->fmt.i_codec               = VLC_CODEC_S24B;
             p_sys->fmt.audio.i_bitspersample = 24;
             p_sys->fmt.audio.i_blockalign    = 3 * p_sys->fmt.audio.i_channels;
             i_cat                    = AU_CAT_PCM;
             break;
 
         case AU_LINEAR_32:     /* 32-bit linear PCM */
-            p_sys->fmt.i_codec               = VLC_FOURCC( 't','w','o','s' );
+            p_sys->fmt.i_codec               = VLC_CODEC_S32B;
             p_sys->fmt.audio.i_bitspersample = 32;
             p_sys->fmt.audio.i_blockalign    = 4 * p_sys->fmt.audio.i_channels;
             i_cat                    = AU_CAT_PCM;
