@@ -75,7 +75,6 @@ struct access_sys_t
     int            i_width;
     int            i_height;
     int            i_chroma;
-    bool           b_chroma; /* Force a specific chroma on the dshow input */
     mtime_t        i_start;
 };
 
