@@ -514,6 +514,9 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 
             mkv_track_t *tk = vars.tk;
 
+            if (tk->fmt.i_cat != VIDEO_ES ) {
+                msg_Err( vars.p_demuxer, "Video elements not allowed for this track" );
+            } else {
             tk->f_fps = 0.0;
 
             if( tk->i_default_duration > 1000 ) /* Broken ffmpeg mux info when non set fps */
@@ -553,6 +556,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             }
             /* FIXME: i_display_* allows you to not only set DAR, but also a zoom factor.
                we do not support this atm */
+            }
         }
 #if LIBMATROSKA_VERSION >= 0x010406
         E_CASE( KaxVideoProjection, proj )
@@ -672,10 +676,13 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxTrackAudio, tka ) {
             debug( vars, "Track Audio");
-
+            if (vars.tk->fmt.i_cat != AUDIO_ES ) {
+                msg_Err( vars.p_demuxer, "Audio elements not allowed for this track" );
+            } else {
             vars.level += 1;
             dispatcher.iterate( tka.begin(), tka.end(), Payload( vars ));
             vars.level -= 1;
+            }
         }
         E_CASE( KaxAudioSamplingFreq, afreq )
         {
