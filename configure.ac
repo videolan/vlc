@@ -378,6 +378,12 @@ case "${host_os}" in
     AC_LIBOBJ([recvmsg])
     AC_LIBOBJ([sendmsg])
     ;;
+  *emscripten*)
+    SYS=emscripten
+    # tdestroy() is a GNU extension
+    CFLAGS="${CFLAGS} -pthread -D_GNU_SOURCE"
+    CXXFLAGS="${CXXFLAGS} -pthread"
+    ;;
   *)
     SYS="${host_os}"
     ;;
@@ -450,6 +456,8 @@ AS_IF([test x$with_pic = xyes], [X86ASMDEFS="${X86ASMDEFS} -DPIC"])
 
 AC_SUBST([X86ASMFLAGS])
 AC_SUBST([X86ASMDEFS])
+
+AM_CONDITIONAL([HAVE_EMSCRIPTEN], [test "${SYS}" = "emscripten"])
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
