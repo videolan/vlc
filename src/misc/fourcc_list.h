@@ -1308,6 +1308,9 @@ static const staticentry_t p_list_audio[] = {
 
     B(VLC_CODEC_ADPCM_THP, "GameCube THP ADPCM"),
 
+    B(VLC_CODEC_ADPCM_XA_EA, "EA-XA ADPCM"),
+        A("XAJ\x00"),
+
     /* AMR */
     B(VLC_CODEC_AMR_NB, "AMR narrow band"),
         A("samr"),

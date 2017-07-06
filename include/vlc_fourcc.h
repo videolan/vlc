@@ -440,6 +440,7 @@
 #define VLC_CODEC_ADPCM_SBPRO_3              VLC_FOURCC('m','s',0x00,0xC3)
 #define VLC_CODEC_ADPCM_SBPRO_4              VLC_FOURCC('m','s',0x00,0xC4)
 #define VLC_CODEC_ADPCM_THP                  VLC_FOURCC('T','H','P','A')
+#define VLC_CODEC_ADPCM_XA_EA                VLC_FOURCC('X','A','J', 0)
 #define VLC_CODEC_G723_1                     VLC_FOURCC('g','7','2', 0x31)
 #define VLC_CODEC_G729                       VLC_FOURCC('g','7','2','9')
 #define VLC_CODEC_VMDAUDIO                   VLC_FOURCC('v','m','d','a')
