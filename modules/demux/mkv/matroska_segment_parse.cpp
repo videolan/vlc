@@ -1541,7 +1541,13 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     }
                 }
                 else
+                {
                     wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
+                    if( p_wf->wFormatTag == WAVE_FORMAT_AAC_LATM )
+                    {
+                        p_tk->fmt.i_original_fourcc = VLC_FOURCC('L','A','T','M');
+                    }
+                }
 
                 if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
                     msg_Err( vars.p_demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
