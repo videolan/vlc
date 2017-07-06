@@ -49,7 +49,7 @@ static int   OpenDesignated ( vlc_object_t * );
 static int   FindDesignated ( addons_finder_t *p_finder );
 
 #define ADDONS_MODULE_SHORTCUT "addons.vo"
-#define ADDONS_REPO_SCHEMEHOST "http://api.addons.videolan.org"
+#define ADDONS_REPO_SCHEMEHOST "https://api-addons.videolan.org"
 /*****************************************************************************
  * Module descriptor
  ****************************************************************************/
