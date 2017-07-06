@@ -1728,7 +1728,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("A_PCM/INT/BIG")    { A_PCM__helper ( vars, VLC_FOURCC( 't','w','o','s' ) ); }
         S_CASE("A_PCM/INT/LIT")    { A_PCM__helper ( vars, VLC_FOURCC( 'a','r','a','w' ) ); }
-        S_CASE("A_PCM/FLOAT/IEEE") { A_PCM__helper ( vars, VLC_FOURCC( 'a','r','a','w' ) ) ;}
+        S_CASE("A_PCM/FLOAT/IEEE") { A_PCM__helper ( vars, VLC_FOURCC( 'a','f','l','t' ) ) ;}
         S_CASE("A_REAL/14_4") {
             vars.p_fmt->i_codec = VLC_CODEC_RA_144;
             vars.p_fmt->audio.i_channels = 1;
