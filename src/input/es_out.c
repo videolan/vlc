@@ -2272,9 +2272,10 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     case ES_OUT_SET_ES:
     case ES_OUT_RESTART_ES:
     {
+#define IGNORE_ES NAV_ES
         es_out_id_t *es = va_arg( args, es_out_id_t * );
 
-        int i_cat;
+        enum es_format_category_e i_cat;
         if( es == NULL )
             i_cat = UNKNOWN_ES;
         else if( es == (es_out_id_t*)((uint8_t*)NULL+AUDIO_ES) )
@@ -2284,11 +2285,11 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         else if( es == (es_out_id_t*)((uint8_t*)NULL+SPU_ES) )
             i_cat = SPU_ES;
         else
-            i_cat = -1;
+            i_cat = IGNORE_ES;
 
         for( int i = 0; i < p_sys->i_es; i++ )
         {
-            if( i_cat == -1 )
+            if( i_cat == IGNORE_ES )
             {
                 if( es == p_sys->es[i] )
                 {
