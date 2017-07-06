@@ -2151,7 +2151,6 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
 static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
                                    unsigned int *pi_number, unsigned int *pi_type )
 {
-#define SET_PTR( p, v ) if( p ) *(p) = (v);
     int c1, c2;
 
     c1 = ((uint8_t *)&i_id)[0];
@@ -2159,35 +2158,34 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
 
     if( c1 < '0' || c1 > '9' || c2 < '0' || c2 > '9' )
     {
-        SET_PTR( pi_number, 100 ); /* > max stream number */
-        SET_PTR( pi_type, UNKNOWN_ES );
+        *pi_number =  100; /* > max stream number */
+        *pi_type = UNKNOWN_ES;
     }
     else
     {
-        SET_PTR( pi_number, (c1 - '0') * 10 + (c2 - '0' ) );
+        *pi_number = (c1 - '0') * 10 + (c2 - '0' );
         switch( VLC_TWOCC( ((uint8_t *)&i_id)[2], ((uint8_t *)&i_id)[3] ) )
         {
             case AVITWOCC_wb:
-                SET_PTR( pi_type, AUDIO_ES );
+                *pi_type = AUDIO_ES;
                 break;
             case AVITWOCC_dc:
             case AVITWOCC_db:
             case AVITWOCC_AC:
-                SET_PTR( pi_type, VIDEO_ES );
+                *pi_type = VIDEO_ES;
                 break;
             case AVITWOCC_tx:
             case AVITWOCC_sb:
-                SET_PTR( pi_type, SPU_ES );
+                *pi_type = SPU_ES;
                 break;
             case AVITWOCC_pc:
-                SET_PTR( pi_type, IGNORE_ES );
+                *pi_type = IGNORE_ES;
                 break;
             default:
-                SET_PTR( pi_type, UNKNOWN_ES );
+                *pi_type = UNKNOWN_ES;
                 break;
         }
     }
-#undef SET_PTR
 }
 
 /****************************************************************************
