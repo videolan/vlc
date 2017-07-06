@@ -358,6 +358,9 @@ case "${OS}" in
 	*nacl*)
 		add_make_enabled "HAVE_NACL"
 		;;
+	*emscripten*)
+	       add_make_enabled "HAVE_EMSCRIPTEN"
+	       ;;
 esac
 
 #

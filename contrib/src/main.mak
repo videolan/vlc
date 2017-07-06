@@ -565,6 +565,9 @@ endif
 ifdef HAVE_DARWIN_OS
 CMAKE_SYSTEM_NAME = Darwin
 endif
+ifdef HAVE_EMSCRIPTEN
+CMAKE_SYSTEM_NAME = Emscripten
+endif
 
 ifdef HAVE_ANDROID
 CFLAGS += -DANDROID_NATIVE_API_LEVEL=$(ANDROID_API)
@@ -620,6 +623,10 @@ ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 endif
+ifdef HAVE_EMSCRIPTEN
+	# https://github.com/emscripten-core/emscripten/blob/main/cmake/Modules/Platform/Emscripten.cmake#L268
+	echo "set(EMSCRIPTEN 1)" >> $@
+endif
 
 MESON_SYSTEM_NAME =
 ifdef HAVE_WIN32
@@ -635,7 +642,11 @@ ifdef HAVE_LINUX
 	# android has also system = linux and defines HAVE_LINUX
 	MESON_SYSTEM_NAME = linux
 else
+ifdef HAVE_EMSCRIPTEN
+	MESON_SYSTEM_NAME = emscripten
+else
 	$(error "No meson system name known for this target")
+endif
 endif
 endif
 endif
