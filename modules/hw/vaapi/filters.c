@@ -873,6 +873,19 @@ Deinterlace(filter_t * filter, picture_t * src)
     return dest;
 }
 
+static void
+Deinterlace_Flush(filter_t *filter)
+{
+    struct deint_data *const    p_deint_data = filter->p_sys->p_data;
+
+    while (p_deint_data->history.num_pics)
+    {
+        picture_t *     pic =
+            p_deint_data->history.pp_pics[--p_deint_data->history.num_pics];
+        picture_Release(pic);
+    }
+}
+
 static inline bool
 OpenDeinterlace_IsValidType(filter_t * filter,
                             VAProcDeinterlacingType const caps[],
@@ -1028,6 +1041,7 @@ OpenDeinterlace(vlc_object_t * obj)
         goto error;
 
     filter->pf_video_filter = Deinterlace;
+    filter->pf_flush = Deinterlace_Flush;
 
     return VLC_SUCCESS;
 
