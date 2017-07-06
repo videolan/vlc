@@ -222,15 +222,18 @@ struct  deint_mode
 {
     char const                  name[5];
     VAProcDeinterlacingType     type;
+    bool                        b_double_rate;
 };
 
 static struct deint_mode const  deint_modes[] =
 {
-    { "x",     VAProcDeinterlacingMotionAdaptive },
-    { "x",     VAProcDeinterlacingMotionCompensated },
-    { "bob",   VAProcDeinterlacingBob },
-    { "mean",  VAProcDeinterlacingWeave }
+    { "x",     VAProcDeinterlacingMotionAdaptive,     true },
+    { "x",     VAProcDeinterlacingMotionCompensated,  true },
+    { "bob",   VAProcDeinterlacingBob,                true },
+    { "mean",  VAProcDeinterlacingWeave,              false }
 };
+
+#define METADATA_SIZE 3
 
 struct  deint_data
 {
@@ -247,6 +250,15 @@ struct  deint_data
         VASurfaceID *   surfaces;
         unsigned int    sz;
     } backward_refs, forward_refs;
+
+    struct
+    {
+        mtime_t date;
+        int     i_nb_fields;
+    } meta[METADATA_SIZE];
+
+    bool                b_double_rate;
+    unsigned int        cur_frame;
 };
 
 /********************
@@ -813,6 +825,20 @@ Deinterlace_UpdateHistory(struct deint_data * p_deint_data, picture_t * src)
 }
 
 static void
+Deinterlace_UpdateFilterParams(void * p_data, void * va_params)
+{
+    struct deint_data *const    p_deint_data = p_data;
+    VAProcFilterParameterBufferDeinterlacing *const      p_va_params = va_params;
+
+    p_va_params->flags =
+        p_deint_data->history.pp_cur_pic[0]->b_top_field_first ?
+        0 : VA_DEINTERLACING_BOTTOM_FIELD_FIRST;
+    if (p_deint_data->cur_frame ==
+        (p_deint_data->history.pp_cur_pic[0]->b_top_field_first ? 1 : 0))
+        p_va_params->flags |= VA_DEINTERLACING_BOTTOM_FIELD;
+}
+
+static void
 Deinterlace_UpdateReferenceFrames(void * p_data)
 {
     struct deint_data *const    p_deint_data = p_data;
@@ -842,10 +868,6 @@ Deinterlace_UpdatePipelineParams
 {
     struct deint_data *const    p_deint_data = p_data;
 
-    pipeline_param->filter_flags =
-        p_deint_data->history.pp_cur_pic[0]->b_top_field_first ?
-        0 : VA_DEINTERLACING_BOTTOM_FIELD_FIRST;
-
     pipeline_param->backward_references = p_deint_data->backward_refs.surfaces;
     pipeline_param->forward_references = p_deint_data->forward_refs.surfaces;
     pipeline_param->num_backward_references = p_deint_data->backward_refs.sz;
@@ -863,7 +885,8 @@ Deinterlace(filter_t * filter, picture_t * src)
         return NULL;
 
     picture_t *const    dest =
-        Filter(filter, src, NULL,
+        Filter(filter, src,
+               Deinterlace_UpdateFilterParams,
                Deinterlace_UpdateReferenceFrames,
                Deinterlace_UpdatePipelineParams);
 
@@ -871,6 +894,71 @@ Deinterlace(filter_t * filter, picture_t * src)
         dest->b_progressive = true;
 
     return dest;
+}
+
+static picture_t *
+DeinterlaceX2(filter_t * filter, picture_t * src)
+{
+    filter_sys_t *const         filter_sys = filter->p_sys;
+    struct deint_data *const    p_deint_data = filter_sys->p_data;
+    const video_format_t *      fmt = &filter->fmt_out.video;
+
+    /* TODO: could use the meta array and calculation from deinterlace/common
+       but then it would also be appropriate to use the picture history array
+       too and the callback system...so a rewrite of this module basically.*/
+    for (unsigned int i = 1; i < METADATA_SIZE; ++i)
+        p_deint_data->meta[i-1] = p_deint_data->meta[i];
+    p_deint_data->meta[METADATA_SIZE-1].date        = src->date;
+    p_deint_data->meta[METADATA_SIZE-1].i_nb_fields = src->i_nb_fields;
+
+    picture_t * cur = Deinterlace_UpdateHistory(p_deint_data, src);
+    if (p_deint_data->history.num_pics < p_deint_data->history.sz)
+        return NULL;
+
+    mtime_t i_field_dur = 0;
+    unsigned int i = 0;
+    for ( ; i < METADATA_SIZE-1; i ++)
+        if (p_deint_data->meta[i].date > VLC_TS_INVALID)
+            break;
+    if (i < METADATA_SIZE-1) {
+        unsigned int i_fields_total = 0;
+        for (unsigned int j = i; j < METADATA_SIZE-1; ++j)
+            i_fields_total += p_deint_data->meta[j].i_nb_fields;
+        i_field_dur = (src->date - p_deint_data->meta[i].date) / i_fields_total;
+    }
+    else if (fmt->i_frame_rate_base)
+        i_field_dur = CLOCK_FREQ * fmt->i_frame_rate_base / fmt->i_frame_rate;
+
+    picture_t *dest[2] = {NULL, NULL};
+    for (i = 0; i < 2; ++i)
+    {
+        p_deint_data->cur_frame = i;
+        dest[i] = Filter(filter, cur,
+                         Deinterlace_UpdateFilterParams,
+                         Deinterlace_UpdateReferenceFrames,
+                         Deinterlace_UpdatePipelineParams);
+        if (!dest[i])
+           goto error;
+
+        dest[i]->b_progressive = true;
+        dest[i]->i_nb_fields = 1;
+    }
+
+    dest[0]->p_next = dest[1];
+    dest[0]->date = cur->date;
+    if (dest[0]->date > VLC_TS_INVALID)
+        dest[1]->date = dest[0]->date + i_field_dur;
+    else
+        dest[1]->date = VLC_TS_INVALID;
+
+    return dest[0];
+
+error:
+    for (i = 0; i < 2; ++i)
+        if (dest[i])
+            picture_Release(dest[i]);
+
+    return NULL;
 }
 
 static void
@@ -883,6 +971,12 @@ Deinterlace_Flush(filter_t *filter)
         picture_t *     pic =
             p_deint_data->history.pp_pics[--p_deint_data->history.num_pics];
         picture_Release(pic);
+    }
+
+    for (unsigned int i = 0; i < METADATA_SIZE; ++i)
+    {
+        p_deint_data->meta[i].date = VLC_TS_INVALID;
+        p_deint_data->meta[i].i_nb_fields = 2;
     }
 }
 
@@ -901,7 +995,7 @@ OpenDeinterlace_IsValidType(filter_t * filter,
 
 static inline int
 OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
-                        VAProcDeinterlacingType * p_deint_mode,
+                        struct  deint_mode * p_deint_mode,
                         VAProcDeinterlacingType const caps[],
                         unsigned int num_caps)
 {
@@ -915,7 +1009,7 @@ OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
                 if (OpenDeinterlace_IsValidType(filter, caps, num_caps,
                                                 deint_modes + i))
                 {
-                    *p_deint_mode = deint_modes[i].type;
+                    memcpy(p_deint_mode, &deint_modes[i], sizeof(*p_deint_mode));
                     msg_Dbg(filter, "using %s deinterlace method",
                             deint_modes[i].name);
                     return VLC_SUCCESS;
@@ -929,7 +1023,7 @@ OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
         if (OpenDeinterlace_IsValidType(filter, caps, num_caps,
                                         deint_modes + i))
         {
-            *p_deint_mode = deint_modes[i].type;
+            memcpy(p_deint_mode, &deint_modes[i], sizeof(*p_deint_mode));
             if (fallback)
                 msg_Info(filter, "%s algorithm not available, falling back to "
                          "%s algorithm", deint_mode, deint_modes[i].name);
@@ -952,7 +1046,8 @@ OpenDeinterlace_InitFilterParams(filter_t * filter, void * p_data,
                                  void ** pp_va_params,
                                  uint32_t * p_va_param_sz,
                                  uint32_t * p_num_va_params)
-{ VLC_UNUSED(p_data);
+{
+    struct deint_data *const    p_deint_data = p_data;
     filter_sys_t *const         filter_sys = filter->p_sys;
     VAProcDeinterlacingType     caps[VAProcDeinterlacingCount];
     unsigned int                num_caps = VAProcDeinterlacingCount;
@@ -964,12 +1059,12 @@ OpenDeinterlace_InitFilterParams(filter_t * filter, void * p_data,
                                            &caps, &num_caps))
         return VLC_EGENERIC;
 
-    VAProcDeinterlacingType     va_mode;
-    char *const                 psz_deint_mode =
+    struct deint_mode   deint_mode;
+    char *const         psz_deint_mode =
         var_InheritString(filter, "deinterlace-mode");
 
     int ret = OpenDeinterlace_GetMode(filter, psz_deint_mode,
-                                      &va_mode, caps, num_caps);
+                                      &deint_mode, caps, num_caps);
     free(psz_deint_mode);
     if (ret)
         return VLC_EGENERIC;
@@ -984,8 +1079,10 @@ OpenDeinterlace_InitFilterParams(filter_t * filter, void * p_data,
         return VLC_ENOMEM;
 
     p_va_param->type = VAProcFilterDeinterlacing;
-    p_va_param->algorithm = va_mode;
+    p_va_param->algorithm = deint_mode.type;
     *pp_va_params = p_va_param;
+
+    p_deint_data->b_double_rate = deint_mode.b_double_rate;
 
     return VLC_SUCCESS;
 }
@@ -1040,8 +1137,17 @@ OpenDeinterlace(vlc_object_t * obj)
              OpenDeinterlace_InitFilterParams, OpenDeinterlace_InitHistory))
         goto error;
 
-    filter->pf_video_filter = Deinterlace;
+    if (p_data->b_double_rate)
+        filter->pf_video_filter = DeinterlaceX2;
+    else
+        filter->pf_video_filter = Deinterlace;
     filter->pf_flush = Deinterlace_Flush;
+
+    for (unsigned int i = 0; i < METADATA_SIZE; ++i)
+    {
+        p_data->meta[i].date = VLC_TS_INVALID;
+        p_data->meta[i].i_nb_fields = 2;
+    }
 
     return VLC_SUCCESS;
 
