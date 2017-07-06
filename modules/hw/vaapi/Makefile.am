@@ -1,6 +1,6 @@
 vaapidir = $(pluginsdir)/vaapi
 
-libvaapi_filters_plugin_la_SOURCES = hw/vaapi/filters.c \
+libvaapi_filters_plugin_la_SOURCES = hw/vaapi/filters.c hw/vaapi/filters.h \
 	hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h \
 	hw/vaapi/chroma.c video_chroma/copy.c video_chroma/copy.h
 
