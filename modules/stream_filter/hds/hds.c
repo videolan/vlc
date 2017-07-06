@@ -30,7 +30,6 @@
 #include <vlc_strings.h>            /* b64_decode */
 #include <vlc_xml.h>
 #include <vlc_charset.h>            /* FromCharset */
-#include <vlc_es.h>                 /* UNKNOWN_ES */
 
 typedef struct chunk_s
 {
@@ -1297,7 +1296,7 @@ static void initialize_header_and_metadata( stream_sys_t* p_sys, hds_stream_t *s
 
 static int parse_Manifest( stream_t *s, manifest_t *m )
 {
-    int type = UNKNOWN_ES;
+    int type = 0;
 
     msg_Dbg( s, "Manifest parsing\n" );
 
