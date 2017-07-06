@@ -234,6 +234,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_ON2_AVC             0x0500 /* VP7 */
 #define WAVE_FORMAT_ON2_AVC_2           0x0501 /* VP6 */
 
+#define WAVE_FORMAT_AAC_ADTS            0x1600 /* AAC/ADTS */
 #define WAVE_FORMAT_AAC_2               0x1601 /* Other AAC */
 #define WAVE_FORMAT_AAC_LATM            0x1602 /* AAC/LATM */
 
@@ -353,9 +354,10 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_DTS_MS,           VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DIVIO_AAC,        VLC_CODEC_MP4A,                   "MPEG-4 Audio (Divio)" },
     { WAVE_FORMAT_AAC,              VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
+    { WAVE_FORMAT_AAC_ADTS,         VLC_CODEC_MP4A,                   "MPEG-4 ADTS Audio" },
     { WAVE_FORMAT_AAC_2,            VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_3,            VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
-    { WAVE_FORMAT_AAC_LATM,         VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
+    { WAVE_FORMAT_AAC_LATM,         VLC_CODEC_MP4A,                   "MPEG-4 LATM Audio" },
     { WAVE_FORMAT_AVCODEC_AAC,      VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_MS,           VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_VORBIS,           VLC_CODEC_VORBIS,                 "Vorbis Audio" },
