@@ -1547,6 +1547,10 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     {
                         p_tk->fmt.i_original_fourcc = VLC_FOURCC('L','A','T','M');
                     }
+                    else if( p_wf->wFormatTag == WAVE_FORMAT_AAC_ADTS )
+                    {
+                        p_tk->fmt.i_original_fourcc = VLC_FOURCC('A','D','T','S');
+                    }
                 }
 
                 if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
