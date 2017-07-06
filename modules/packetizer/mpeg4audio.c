@@ -837,7 +837,15 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 
     /* Wait for the configuration */
     if (!p_sys->b_latm_cfg)
-        return 0;
+    {
+        /* WAVE_FORMAT_MPEG_LOAS, configuration provided as AAC header :/ */
+        if( p_dec->fmt_in.i_extra > 0 &&
+            p_sys->i_channels && p_sys->i_rate && p_sys->i_frame_length )
+        {
+            p_sys->b_latm_cfg = true;
+        }
+        else return 0;
+    }
 
     /* FIXME do we need to split the subframe into independent packet ? */
     if (p_sys->latm.i_sub_frames > 1)
