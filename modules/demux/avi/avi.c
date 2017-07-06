@@ -116,7 +116,7 @@ typedef struct
     uint8_t      i_peek[8];  /* first 8 bytes */
 
     unsigned int i_stream;
-    unsigned int i_cat;
+    enum es_format_category_e i_cat;
 } avi_packet_t;
 
 
@@ -2149,7 +2149,8 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
  *
  ****************************************************************************/
 static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
-                                   unsigned int *pi_number, unsigned int *pi_type )
+                                   unsigned int *pi_number,
+                                   enum es_format_category_e *pi_type )
 {
     int c1, c2;
 
@@ -2417,7 +2418,7 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
 
     for( unsigned i_index = 0; i_index < p_idx1->i_entry_count; i_index++ )
     {
-        unsigned i_cat;
+        enum es_format_category_e i_cat;
         unsigned i_stream;
 
         AVI_ParseStreamHeader( p_idx1->entry[i_index].i_fourcc,
@@ -2913,7 +2914,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
         for( unsigned i = 0; i < p_idx1->i_entry_count; i++ )
         {
             const idx1_entry_t *e = &p_idx1->entry[i];
-            unsigned i_cat;
+            enum es_format_category_e i_cat;
             unsigned i_stream_idx;
 
             AVI_ParseStreamHeader( e->i_fourcc, &i_stream_idx, &i_cat );
