@@ -1875,31 +1875,34 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     memcpy( psz_buf, p_tk->p_extra_data , p_tk->i_extra_data );
                     psz_buf[p_tk->i_extra_data] = '\0';
 
-                    psz_start = strstr( psz_buf, "size:" );
-                    if( psz_start &&
-                        vobsub_size_parse( psz_start,
-                                           &p_tk->fmt.subs.spu.i_original_frame_width,
-                                           &p_tk->fmt.subs.spu.i_original_frame_height ) == VLC_SUCCESS )
+                    if (p_tk->fmt.i_cat == SPU_ES)
                     {
-                        msg_Dbg( vars.p_demuxer, "original frame size vobsubs: %dx%d",
-                                 p_tk->fmt.subs.spu.i_original_frame_width,
-                                 p_tk->fmt.subs.spu.i_original_frame_height );
-                    }
-                    else
-                    {
-                        msg_Warn( vars.p_demuxer, "reading original frame size for vobsub failed" );
-                    }
+                        psz_start = strstr( psz_buf, "size:" );
+                        if( psz_start &&
+                            vobsub_size_parse( psz_start,
+                                               &p_tk->fmt.subs.spu.i_original_frame_width,
+                                               &p_tk->fmt.subs.spu.i_original_frame_height ) == VLC_SUCCESS )
+                        {
+                            msg_Dbg( vars.p_demuxer, "original frame size vobsubs: %dx%d",
+                                     p_tk->fmt.subs.spu.i_original_frame_width,
+                                     p_tk->fmt.subs.spu.i_original_frame_height );
+                        }
+                        else
+                        {
+                            msg_Warn( vars.p_demuxer, "reading original frame size for vobsub failed" );
+                        }
 
-                    psz_start = strstr( psz_buf, "palette:" );
-                    if( psz_start &&
-                        vobsub_palette_parse( psz_start, &p_tk->fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
-                    {
-                        p_tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
-                        msg_Dbg( vars.p_demuxer, "vobsub palette read" );
-                    }
-                    else
-                    {
-                        msg_Warn( vars.p_demuxer, "reading original palette failed" );
+                        psz_start = strstr( psz_buf, "palette:" );
+                        if( psz_start &&
+                            vobsub_palette_parse( psz_start, &p_tk->fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
+                        {
+                            p_tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
+                            msg_Dbg( vars.p_demuxer, "vobsub palette read" );
+                        }
+                        else
+                        {
+                            msg_Warn( vars.p_demuxer, "reading original palette failed" );
+                        }
                     }
                     free( psz_buf );
                 }
