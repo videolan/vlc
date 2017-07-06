@@ -533,7 +533,7 @@ static void SetupJ2KDescriptors( demux_t *p_demux, ts_es_t *p_es, const dvbpsi_p
     const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x32 );
     if( p_dr && p_dr->i_length >= 24 )
     {
-        es_format_Init( &p_es->fmt, VIDEO_ES, VLC_CODEC_JPEG2000 );
+        es_format_Change( &p_es->fmt, VIDEO_ES, VLC_CODEC_JPEG2000 );
         p_es->fmt.i_profile = p_dr->p_data[0];
         p_es->fmt.i_level = p_dr->p_data[1];
         p_es->fmt.video.i_width = GetDWBE(&p_dr->p_data[2]);
@@ -640,7 +640,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
     }
 
     /* */
-    es_format_Init( p_fmt, SPU_ES, VLC_CODEC_TELETEXT );
+    es_format_Change(p_fmt, SPU_ES, VLC_CODEC_TELETEXT );
 
     if( !p_demux->p_sys->b_split_es || i_page <= 0 )
     {
@@ -711,7 +711,7 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_stream_t *p_pes,
 {
     es_format_t *p_fmt = &p_pes->p_es->fmt;
 
-    es_format_Init( p_fmt, SPU_ES, VLC_CODEC_DVBS );
+    es_format_Change( p_fmt, SPU_ES, VLC_CODEC_DVBS );
 
     dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x59 );
     int i_page = 0;
@@ -1986,7 +1986,7 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
                 else if( !strcmp( psz_opt, "spu" ) )
                     i_cat = SPU_ES;
 
-                es_format_Init( fmt, i_cat, i_codec );
+                es_format_Change( fmt, i_cat, i_codec );
                 fmt->b_packetized = false;
             }
             else
