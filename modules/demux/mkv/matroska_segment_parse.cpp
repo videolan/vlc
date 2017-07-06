@@ -225,7 +225,33 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     track.i_last_dts             = 0;
     track.i_skip_until_fpos      = -1;
 
-    es_format_Init( &track.fmt, UNKNOWN_ES, 0 );
+    EbmlUInteger *pTrackType = static_cast<EbmlUInteger*>(m->FindElt(EBML_INFO(KaxTrackType)));
+    uint8 ttype;
+    if (likely(pTrackType != NULL))
+        ttype = (uint8) *pTrackType;
+    else
+        ttype = 0;
+
+    switch( ttype )
+    {
+        case track_audio:
+            es_format_Init( &track.fmt, AUDIO_ES, 0);
+            track.fmt.audio.i_channels = 1;
+            track.fmt.audio.i_rate = 8000;
+            break;
+        case track_video:
+            es_format_Init( &track.fmt, VIDEO_ES, 0);
+            break;
+        case track_subtitle:
+            es_format_Init( &track.fmt, SPU_ES, 0);
+            break;
+        case track_buttons:
+            es_format_Init( &track.fmt, SPU_ES, 0);
+            break;
+        default:
+            es_format_Init( &track.fmt, UNKNOWN_ES, 0);
+            break;
+    }
 
     track.fmt.psz_language       = strdup("English");
     track.fmt.psz_description    = NULL;
@@ -303,25 +329,18 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             {
                 case track_audio:
                     psz_type = "audio";
-                    vars.tk->fmt.i_cat = AUDIO_ES;
-                    vars.tk->fmt.audio.i_channels = 1;
-                    vars.tk->fmt.audio.i_rate = 8000;
                     break;
                 case track_video:
                     psz_type = "video";
-                    vars.tk->fmt.i_cat = VIDEO_ES;
                     break;
                 case track_subtitle:
                     psz_type = "subtitle";
-                    vars.tk->fmt.i_cat = SPU_ES;
                     break;
                 case track_buttons:
                     psz_type = "buttons";
-                    vars.tk->fmt.i_cat = SPU_ES;
                     break;
                 default:
                     psz_type = "unknown";
-                    vars.tk->fmt.i_cat = UNKNOWN_ES;
                     break;
             }
 
