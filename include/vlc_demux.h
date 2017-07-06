@@ -208,7 +208,7 @@ enum demux_query_e
     /** Check which INPUT_UPDATE_XXX flag is set and reset the ones set.
      *
      * The unsigned* argument is set with the flags needed to be checked,
-     * on return it contains the values that were reset during the call 
+     * on return it contains the values that were reset during the call
      *
      * This can can fail, in which case flags from demux_t.info.i_update
      * are read/reset
