@@ -311,11 +311,17 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
             .buffer_new = transcode_video_filter_buffer_new,
         },
     };
-    es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
+    const es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
 
     id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
     id->p_f_chain = filter_chain_NewVideo( p_stream, false, &owner );
     filter_chain_Reset( id->p_f_chain, p_fmt_out, p_fmt_out );
+
+    /* Check that we have visible_width/height*/
+    if( !id->p_decoder->fmt_out.video.i_visible_height )
+        id->p_decoder->fmt_out.video.i_visible_height = id->p_decoder->fmt_out.video.i_height;
+    if( !id->p_decoder->fmt_out.video.i_visible_width )
+        id->p_decoder->fmt_out.video.i_visible_width = id->p_decoder->fmt_out.video.i_width;
 
     /* Deinterlace */
     if( p_stream->p_sys->psz_deinterlace != NULL )
@@ -338,12 +344,6 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 
         p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
     }
-
-    /* Check that we have visible_width/height*/
-    if( !p_fmt_out->video.i_visible_height )
-        p_fmt_out->video.i_visible_height = p_fmt_out->video.i_height;
-    if( !p_fmt_out->video.i_visible_width )
-        p_fmt_out->video.i_visible_width = p_fmt_out->video.i_width;
 
     if( p_stream->p_sys->psz_vf2 )
     {
