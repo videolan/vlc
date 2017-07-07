@@ -385,7 +385,7 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
         return VLC_EGENERIC;
 
 #ifdef HAVE_VA_DRM
-    static const char const *drm_device_paths[] = {
+    static const char *const drm_device_paths[] = {
         "/dev/dri/renderD128",
         "/dev/dri/card0"
     };
