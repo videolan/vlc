@@ -62,12 +62,6 @@ struct sout_stream_sys_t
     spu_t           *p_spu;
     filter_t        *p_spu_blend;
 
-    /* OSD Menu */
-    vlc_fourcc_t    i_osdcodec; /* codec osd menu (0 if not transcode) */
-    char            *psz_osdenc;
-    config_chain_t  *p_osd_cfg;
-    bool            b_osd;   /* true when osd es is registered */
-
     /* Sync */
     bool            b_master_sync;
     /* i_master drift is how much audio buffer is ahead of calculated pts */

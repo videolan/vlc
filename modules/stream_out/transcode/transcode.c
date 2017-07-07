@@ -120,10 +120,6 @@
     "be overlayed directly onto the video. You can specify a colon-separated "\
     "list of subpicture modules" )
 
-#define OSD_TEXT N_("OSD menu")
-#define OSD_LONGTEXT N_(\
-    "Stream the On Screen Display menu (using the osdmenu subpicture module)." )
-
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \
     "Number of threads used for the transcoding." )
@@ -212,10 +208,6 @@ vlc_module_begin ()
     add_module_list( SOUT_CFG_PREFIX "sfilter", "spu source",
                      NULL, SFILTER_TEXT, SFILTER_LONGTEXT, false )
 
-    set_section( N_("On Screen Display"), NULL )
-    add_bool( SOUT_CFG_PREFIX "osd", false, OSD_TEXT,
-              OSD_LONGTEXT, false )
-
     set_section( N_("Miscellaneous"), NULL )
     add_integer( SOUT_CFG_PREFIX "threads", 0, THREADS_TEXT,
                  THREADS_LONGTEXT, true )
@@ -231,7 +223,7 @@ static const char *const ppsz_sout_options[] = {
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "aenc", "acodec", "ab", "alang",
     "afilter", "samplerate", "channels", "senc", "scodec", "soverlay",
-    "sfilter", "osd", "high-priority", "maxwidth", "maxheight", "pool-size",
+    "sfilter", "high-priority", "maxwidth", "maxheight", "pool-size",
     NULL
 };
 
@@ -427,36 +419,6 @@ static int Open( vlc_object_t *p_this )
     }
     free( psz_string );
 
-    /* OSD menu transcoding parameters */
-    p_sys->psz_osdenc = NULL;
-    p_sys->p_osd_cfg  = NULL;
-    p_sys->i_osdcodec = 0;
-    p_sys->b_osd   = var_GetBool( p_stream, SOUT_CFG_PREFIX "osd" );
-
-    if( p_sys->b_osd )
-    {
-        char *psz_next;
-
-        psz_next = config_ChainCreate( &p_sys->psz_osdenc,
-                                   &p_sys->p_osd_cfg, "dvbsub" );
-        free( psz_next );
-
-        p_sys->i_osdcodec = VLC_CODEC_YUVP;
-
-        msg_Dbg( p_stream, "codec osd=%4.4s", (char *)&p_sys->i_osdcodec );
-
-        if( !p_sys->p_spu )
-        {
-            p_sys->p_spu = spu_Create( p_stream, NULL );
-            if( p_sys->p_spu )
-                spu_ChangeSources( p_sys->p_spu, "osdmenu" );
-        }
-        else
-        {
-            spu_ChangeSources( p_sys->p_spu, "osdmenu" );
-        }
-    }
-
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
@@ -492,9 +454,6 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
     if( p_sys->p_spu_blend ) filter_DeleteBlend( p_sys->p_spu_blend );
-
-    config_ChainDestroy( p_sys->p_osd_cfg );
-    free( p_sys->psz_osdenc );
 
     free( p_sys );
 }
@@ -547,8 +506,6 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
     else if( ( p_fmt->i_cat == SPU_ES ) &&
              ( p_sys->i_scodec || p_sys->b_soverlay ) )
         success = transcode_spu_add(p_stream, p_fmt, id);
-    else if( !p_sys->b_osd && (p_sys->i_osdcodec != 0 || p_sys->psz_osdenc) )
-        success = transcode_osd_add(p_stream, p_fmt, id);
     else
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
@@ -588,8 +545,6 @@ error:
 
 static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     if( id->b_transcode )
     {
         switch( id->p_decoder->fmt_in.i_cat )
@@ -603,10 +558,7 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
             transcode_video_close( p_stream, id );
             break;
         case SPU_ES:
-            if( p_sys->b_osd )
-                transcode_osd_close( p_stream, id );
-            else
-                transcode_spu_close( p_stream, id );
+            transcode_spu_close( p_stream, id );
             break;
         }
     }
@@ -632,7 +584,6 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
     block_t *p_out = NULL;
 
     if( !id->b_transcode )
@@ -663,16 +614,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         break;
 
     case SPU_ES:
-        /* Transcode OSD menu pictures. */
-        if( p_sys->b_osd )
-        {
-            if( transcode_osd_process( p_stream, id, p_buffer, &p_out ) !=
-                VLC_SUCCESS )
-            {
-                return VLC_EGENERIC;
-            }
-        }
-        else if ( transcode_spu_process( p_stream, id, p_buffer, &p_out ) !=
+        if ( transcode_spu_process( p_stream, id, p_buffer, &p_out ) !=
             VLC_SUCCESS )
         {
             return VLC_EGENERIC;

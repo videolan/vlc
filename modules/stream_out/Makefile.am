@@ -19,7 +19,7 @@ libstream_out_smem_plugin_la_SOURCES = stream_out/smem.c
 libstream_out_setid_plugin_la_SOURCES = stream_out/setid.c
 libstream_out_transcode_plugin_la_SOURCES = \
 	stream_out/transcode/transcode.c stream_out/transcode/transcode.h \
-	stream_out/transcode/osd.c stream_out/transcode/spu.c \
+	stream_out/transcode/spu.c \
 	stream_out/transcode/audio.c stream_out/transcode/video.c
 libstream_out_transcode_plugin_la_CFLAGS = $(AM_CFLAGS)
 libstream_out_transcode_plugin_la_LIBADD = $(LIBM)
