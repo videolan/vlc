@@ -526,7 +526,7 @@ static int Open( vlc_object_t *p_this )
      * then actual PTS will catch up using offsets. */
     p_sys->i_npt_zero = VLC_TS_INVALID;
     p_sys->i_pts_zero = rtp_init_ts(p_sys->p_vod_media,
-                                    p_sys->psz_vod_session); 
+                                    p_sys->psz_vod_session);
     p_sys->i_es = 0;
     p_sys->es   = NULL;
     p_sys->rtsp = NULL;
@@ -1103,8 +1103,9 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
                 }
                 var_SetString (p_stream, "dccp-service", code);
                 type = SOCK_DCCP;
-            }   /* fall through */
+            }
 #endif
+            /* fall through */
             case IPPROTO_TCP:
                 id->listen.fd = net_Listen( VLC_OBJECT(p_stream),
                                             p_sys->psz_destination, i_port,
@@ -1607,7 +1608,7 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
     if (p_npt != NULL)
         *p_npt = npt;
 
-    return p_sys->i_pts_zero + npt; 
+    return p_sys->i_pts_zero + npt;
 }
 
 void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
