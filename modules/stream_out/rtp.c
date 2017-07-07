@@ -394,7 +394,6 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys = NULL;
-    config_chain_t      *p_cfg = NULL;
     char                *psz;
     bool          b_rtsp = false;
 
@@ -420,7 +419,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
+    for( config_chain_t *p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
         if( !strcmp( p_cfg->psz_name, "sdp" )
          && ( p_cfg->psz_value != NULL )
