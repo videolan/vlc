@@ -46,14 +46,7 @@
 #include "../vobsub.h"
 
 #include <libavformat/avformat.h>
-
-#if ( (LIBAVUTIL_VERSION_MICRO <  100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 53, 15, 0) ) || \
-      (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 52, 85, 100 ) )  )
-# if LIBAVFORMAT_VERSION_CHECK( 55, 18, 0, 40, 100)
-#  include <libavutil/display.h>
-#  define HAVE_AV_STREAM_GET_SIDE_DATA
-# endif
-#endif
+#include <libavutil/display.h>
 
 //#define AVFORMAT_DEBUG 1
 
@@ -132,7 +125,6 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
         else
             fmt->video.orientation = ORIENT_NORMAL;
     }
-#ifdef HAVE_AV_STREAM_GET_SIDE_DATA
     int32_t *matrix = (int32_t *)av_stream_get_side_data(s, AV_PKT_DATA_DISPLAYMATRIX, NULL);
     if( matrix ) {
         angle = lround(av_display_rotation_get(matrix));
@@ -149,7 +141,6 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
         else
             fmt->video.orientation = ORIENT_NORMAL;
     }
-#endif
 }
 
 int OpenDemux( vlc_object_t *p_this )
@@ -328,7 +319,6 @@ int OpenDemux( vlc_object_t *p_this )
     }
     free( psz_url );
 
-#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
     AVDictionary *options[p_sys->ic->nb_streams ? p_sys->ic->nb_streams : 1];
     options[0] = NULL;
@@ -354,11 +344,6 @@ int OpenDemux( vlc_object_t *p_this )
     for (unsigned i = 1; i < nb_streams; i++) {
         av_dict_free(&options[i]);
     }
-#else
-    vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
-    error = av_find_stream_info( p_sys->ic );
-    vlc_avcodec_unlock();
-#endif
 
     if( error < 0 )
     {
@@ -377,12 +362,8 @@ int OpenDemux( vlc_object_t *p_this )
         if( !fcc )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
-#if LIBAVFORMAT_VERSION_INT >= ((54<<16)+(2<<8)+0)
         /* Do not use the cover art as a stream */
         if( s->disposition == AV_DISPOSITION_ATTACHED_PIC )
-            fcc = 0;
-#endif
-        if( fcc == 0 )
         {
             TAB_APPEND( p_sys->i_tk, p_sys->tk, NULL );
             continue;
@@ -701,11 +682,7 @@ void CloseDemux( vlc_object_t *p_this )
             av_free( p_sys->ic->pb->buffer );
             av_free( p_sys->ic->pb );
         }
-#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
         avformat_close_input( &p_sys->ic );
-#else
-        av_close_input_stream( p_sys->ic );
-#endif
     }
 
     for( int i = 0; i < p_sys->i_attachments; i++ )

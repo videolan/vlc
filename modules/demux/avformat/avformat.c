@@ -45,9 +45,7 @@ vlc_module_begin ()
     set_section( N_("Demuxer"), NULL )
     add_string( "avformat-format", NULL, FORMAT_TEXT, FORMAT_LONGTEXT, true )
     add_obsolete_string("ffmpeg-format") /* removed since 2.1.0 */
-#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
     add_string( "avformat-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
-#endif
 
 #ifdef ENABLE_SOUT
     /* mux submodule */
