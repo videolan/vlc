@@ -56,6 +56,16 @@ static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
     filter->fmt_in.i_codec = infmt->i_format;
     filter->fmt_out.audio = *outfmt;
     filter->fmt_out.i_codec = outfmt->i_format;
+
+#ifndef NDEBUG
+    /* Assure that infmt/oufmt are well prepared and that channels
+     * configurations are valid*/
+    if( infmt->i_physical_channels != 0 )
+        assert( aout_FormatNbChannels( infmt ) == infmt->i_channels );
+    if( outfmt->i_physical_channels != 0 )
+        assert( aout_FormatNbChannels( outfmt ) == outfmt->i_channels );
+#endif
+
     filter->p_module = module_need (filter, type, name, false);
     if (filter->p_module == NULL)
     {
@@ -442,10 +452,32 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         }
         return filters;
     }
-    if (aout_FormatNbChannels(infmt) == 0 || aout_FormatNbChannels(outfmt) == 0)
+    if (aout_FormatNbChannels(outfmt) == 0)
     {
-        msg_Warn (obj, "No channel mask, cannot setup filters");
+        msg_Warn (obj, "No ouput channel mask, cannot setup filters");
         goto error;
+    }
+
+    if (aout_FormatNbChannels(&input_format) == 0)
+    {
+        /* The input channel map is unknown, use the WAVE one and add a
+         * converter that will drop extra channels that are not handled by VLC
+         * */
+        msg_Info(obj, "unknown channel map, using the WAVE channel layout.");
+
+        assert(input_format.i_channels > 0);
+        audio_sample_format_t input_phys_format = input_format;
+        aout_SetWavePhysicalChannels(&input_phys_format);
+
+        filter_t *f = FindConverter (obj, &input_format, &input_phys_format);
+        if (f == NULL)
+        {
+            msg_Err (obj, "cannot find channel converter");
+            goto error;
+        }
+
+        input_format = input_phys_format;
+        filters->tab[filters->count++] = f;
     }
 
     /* parse user filter lists */

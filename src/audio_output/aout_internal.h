@@ -152,6 +152,20 @@ static inline void aout_InputRequestRestart(audio_output_t *aout)
     aout_RequestRestart(aout, AOUT_RESTART_FILTERS);
 }
 
+static inline void aout_SetWavePhysicalChannels(audio_sample_format_t *fmt)
+{
+    static const uint32_t wave_channels[] = {
+        AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+        AOUT_CHAN_LFE, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+        AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, AOUT_CHAN_REARCENTER };
+
+    fmt->i_physical_channels = 0;
+    for (int i = 0; i < fmt->i_channels && i < AOUT_CHAN_MAX; ++i)
+        fmt->i_physical_channels |= wave_channels[i];
+    fmt->i_original_channels = fmt->i_physical_channels;
+    aout_FormatPrepare(fmt);
+}
+
 /* From filters.c */
 bool aout_FiltersCanResample (aout_filters_t *filters);
 

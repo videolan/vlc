@@ -45,11 +45,14 @@ int aout_DecNew( audio_output_t *p_aout,
                  const audio_replay_gain_t *p_replay_gain,
                  const aout_request_vout_t *p_request_vout )
 {
-    /* Sanitize audio format */
-    unsigned i_channels = aout_FormatNbChannels( p_format );
-    if( i_channels != p_format->i_channels && AOUT_FMT_LINEAR( p_format ) )
+
+    /* Sanitize audio format, input need to have a valid physical channels
+     * layout or a valid number of channels. */
+    int i_map_channels = aout_FormatNbChannels( p_format );
+    if( ( i_map_channels == 0 && p_format->i_channels == 0 )
+       || i_map_channels > AOUT_CHAN_MAX || p_format->i_channels > INPUT_CHAN_MAX )
     {
-        msg_Err( p_aout, "incompatible audio channels count with layout mask" );
+        msg_Err( p_aout, "invalid audio channels count" );
         return -1;
     }
 
@@ -82,6 +85,13 @@ int aout_DecNew( audio_output_t *p_aout,
     atomic_store (&owner->restart, 0);
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
+
+    if (i_map_channels == 0)
+    {
+        /* The output channel map is unknown, use the WAVE one. */
+        assert(owner->mixer_format.i_channels > 0);
+        aout_SetWavePhysicalChannels(&owner->mixer_format);
+    }
     owner->request_vout = *p_request_vout;
 
     if (aout_OutputNew (p_aout, &owner->mixer_format))
