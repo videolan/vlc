@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -36,6 +38,9 @@
 #include <vlc_codecs.h>
 
 #include "windows_audio_commons.h"
+
+#define WAV_CHAN_MAX 32
+static_assert( INPUT_CHAN_MAX >= WAV_CHAN_MAX, "channel count mismatch" );
 
 /*****************************************************************************
  * Module descriptor
@@ -271,7 +276,8 @@ static int Open( vlc_object_t * p_this )
             }
         }
     }
-    if( p_sys->i_channel_mask == 0 && p_sys->fmt.audio.i_channels > 2 )
+    if( p_sys->i_channel_mask == 0 && p_sys->fmt.audio.i_channels > 2
+     && p_sys->fmt.audio.i_channels <= AOUT_CHAN_MAX )
     {
         /* A dwChannelMask of 0 tells the audio device to render the first
          * channel to the first port on the device, the second channel to the
@@ -555,7 +561,7 @@ static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
 
     if( p_fmt->audio.i_rate > 352800
      || p_fmt->audio.i_bitspersample > 64
-     || p_fmt->audio.i_channels > AOUT_CHAN_MAX )
+     || p_fmt->audio.i_channels > WAV_CHAN_MAX )
         return VLC_EGENERIC;
 
     /* read samples for 50ms of */
