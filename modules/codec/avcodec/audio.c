@@ -575,6 +575,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_dec->fmt_out.i_codec = GetVlcAudioFormat( p_sys->p_context->sample_fmt );
+    p_dec->fmt_out.audio.channel_type = p_dec->fmt_in.audio.channel_type;
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     p_dec->fmt_out.audio.i_rate = p_sys->p_context->sample_rate;
 
