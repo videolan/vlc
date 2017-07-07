@@ -1851,8 +1851,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         wf_tag_to_fourcc( i_format_tag,
                                           &p_stream->fmt.i_codec, 0 );
 
-                        if( p_stream->fmt.i_codec ==
-                            VLC_FOURCC('u','n','d','f') )
+                        if( p_stream->fmt.i_codec == VLC_CODEC_UNKNOWN )
                         {
                             p_stream->fmt.i_codec = VLC_FOURCC( 'm', 's',
                                 ( i_format_tag >> 8 ) & 0xff,
@@ -1986,8 +1985,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         wf_tag_to_fourcc( i_format_tag,
                                           &p_stream->fmt.i_codec, 0 );
 
-                        if( p_stream->fmt.i_codec ==
-                            VLC_FOURCC('u','n','d','f') )
+                        if( p_stream->fmt.i_codec == VLC_CODEC_UNKNOWN )
                         {
                             p_stream->fmt.i_codec = VLC_FOURCC( 'm', 's',
                                 ( i_format_tag >> 8 ) & 0xff,

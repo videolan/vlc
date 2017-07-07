@@ -360,7 +360,7 @@ int OpenDemux( vlc_object_t *p_this )
         const char *psz_type = "unknown";
         vlc_fourcc_t fcc = GetVlcFourcc( cp->codec_id );
         if( !fcc )
-            fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+            fcc = VLC_CODEC_UNKNOWN;
 
         /* Do not use the cover art as a stream */
         if( s->disposition == AV_DISPOSITION_ATTACHED_PIC )

@@ -1335,7 +1335,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     if( p_tk->codec.empty() )
     {
         msg_Err( &sys.demuxer, "Empty codec id" );
-        p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+        p_tk->fmt.i_codec = VLC_CODEC_UNKNOWN;
         return 0;
     }
 
@@ -1356,7 +1356,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if( vars.p_tk->i_extra_data < (int)sizeof( VLC_BITMAPINFOHEADER ) )
             {
                 msg_Err(vars.p_demuxer, "missing/invalid VLC_BITMAPINFOHEADER" );
-                vars.p_fmt->i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+                vars.p_fmt->i_codec = VLC_CODEC_UNKNOWN;
             }
             else
             {
@@ -1511,7 +1511,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if( p_tk->i_extra_data < (int)sizeof( WAVEFORMATEX ) )
             {
                 msg_Err( vars.p_demuxer, "missing/invalid WAVEFORMATEX" );
-                p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+                p_tk->fmt.i_codec = VLC_CODEC_UNKNOWN;
             }
             else
             {
@@ -1541,7 +1541,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     /* FIXME should we use Samples */
 
                     if( p_tk->fmt.audio.i_channels > 2 &&
-                        ( p_tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) ) )
+                        ( p_tk->fmt.i_codec != VLC_CODEC_UNKNOWN ) )
                     {
                         uint32_t wfextcm = GetDWLE( &p_wext->dwChannelMask );
                         int match;
@@ -1575,7 +1575,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     }
                 }
 
-                if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
+                if( p_tk->fmt.i_codec == VLC_CODEC_UNKNOWN )
                     msg_Err( vars.p_demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
             }
             p_fmt->b_packetized = !p_fmt->audio.i_blockalign;
@@ -1743,7 +1743,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 
             if( memcmp( p, ".ra", 3 ) ) {
                 msg_Err( vars.p_demuxer, "Invalid Real ExtraData 0x%4.4s", (char *)p );
-                vars.p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+                vars.p_tk->fmt.i_codec = VLC_CODEC_UNKNOWN;
                 return false;
             }
 
@@ -1923,7 +1923,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE_DEFAULT(str) {
             msg_Err( vars.p_demuxer, "unknown codec id=`%s'", str );
-            vars.p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+            vars.p_tk->fmt.i_codec = VLC_CODEC_UNKNOWN;
         }
     };
 

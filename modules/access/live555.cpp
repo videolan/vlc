@@ -854,7 +854,7 @@ static int SessionsSetup( demux_t *p_demux )
             /* Value taken from mplayer */
             if( !strcmp( sub->mediumName(), "audio" ) )
             {
-                es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('u','n','d','f') );
+                es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_UNKNOWN );
                 tk->fmt.audio.i_channels = sub->numChannels();
                 tk->fmt.audio.i_rate = sub->rtpTimestampFrequency();
 
@@ -1001,7 +1001,7 @@ static int SessionsSetup( demux_t *p_demux )
             }
             else if( !strcmp( sub->mediumName(), "video" ) )
             {
-                es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('u','n','d','f') );
+                es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_UNKNOWN );
                 if( !strcmp( sub->codecName(), "MPV" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_MPGV;
@@ -1149,7 +1149,7 @@ static int SessionsSetup( demux_t *p_demux )
             }
             else if( !strcmp( sub->mediumName(), "text" ) )
             {
-                es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('u','n','d','f') );
+                es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_UNKNOWN );
 
                 if( !strcmp( sub->codecName(), "T140" ) )
                 {

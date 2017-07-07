@@ -381,7 +381,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_ON2_AVC,          VLC_CODEC_ON2AVC,                 "On2 Audio for Video Codec (VP7)" },
     { WAVE_FORMAT_ON2_AVC_2,        VLC_CODEC_ON2AVC,                 "On2 Audio for Video Codec (VP6)" },
 
-    { WAVE_FORMAT_UNKNOWN,          VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
+    { WAVE_FORMAT_UNKNOWN,          VLC_CODEC_UNKNOWN,                "Unknown" }
 };
 
 static inline void wf_tag_to_fourcc( uint16_t i_tag, vlc_fourcc_t *fcc,
@@ -421,7 +421,7 @@ sub_format_tag_to_fourcc[] =
     { VLC_AMBISONIC_SUBTYPE_PCM,        VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Ambisonic B format (PCM)" },
     { VLC_AMBISONIC_SUBTYPE_IEEE_FLOAT, VLC_FOURCC( 'a', 'f', 'l', 't' ), "Ambisonic B format (IEEE float)" },
     { VLC_KSDATAFORMAT_SUBTYPE_ATRAC3P, VLC_CODEC_ATRAC3P,                "Sony Atrac3+" },
-    { VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN, VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
+    { VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN, VLC_CODEC_UNKNOWN,      "Unknown" }
 };
 
 static inline int guidcmpbase( const GUID *s1, const GUID *s2 )

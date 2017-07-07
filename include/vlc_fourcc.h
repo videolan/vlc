@@ -24,6 +24,8 @@
 #ifndef VLC_FOURCC_H
 #define VLC_FOURCC_H 1
 
+#define VLC_CODEC_UNKNOWN         VLC_FOURCC('u','n','d','f')
+
 /* Video codec */
 #define VLC_CODEC_MPGV            VLC_FOURCC('m','p','g','v')
 #define VLC_CODEC_MP4V            VLC_FOURCC('m','p','4','v')
