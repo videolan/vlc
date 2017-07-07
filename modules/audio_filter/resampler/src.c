@@ -90,17 +90,13 @@ static int OpenResampler (vlc_object_t *obj)
     if (filter->fmt_in.audio.i_format != VLC_CODEC_FL32
      || filter->fmt_out.audio.i_format != VLC_CODEC_FL32
     /* No channels remapping */
-     || filter->fmt_in.audio.i_physical_channels
-                                  != filter->fmt_out.audio.i_physical_channels
-     || filter->fmt_in.audio.i_original_channels
-                                  != filter->fmt_out.audio.i_original_channels)
+     || filter->fmt_in.audio.i_channels != filter->fmt_out.audio.i_channels )
         return VLC_EGENERIC;
 
     int type = var_InheritInteger (obj, "src-converter-type");
-    int channels = aout_FormatNbChannels (&filter->fmt_in.audio);
     int err;
 
-    SRC_STATE *s = src_new (type, channels, &err);
+    SRC_STATE *s = src_new (type, filter->fmt_in.audio.i_channels, &err);
     if (s == NULL)
     {
         msg_Err (obj, "cannot initialize resampler: %s", src_strerror (err));
