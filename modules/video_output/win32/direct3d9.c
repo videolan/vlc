@@ -1048,7 +1048,8 @@ static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
 static void Direct3D9DestroyResources(vout_display_t *vd)
 {
     Direct3D9DestroyScene(vd);
-    picture_pool_Release(vd->sys->sys.pool);
+    if (vd->sys->sys.pool)
+        picture_pool_Release(vd->sys->sys.pool);
     Direct3D9DestroyShaders(vd);
 }
 
