@@ -114,7 +114,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* skip aiff header */
-    vlc_stream_Read( p_demux->s, NULL, 12 );
+    if( vlc_stream_Read( p_demux->s, NULL, 12 ) < 12 )
+        return VLC_EGENERIC;
 
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
