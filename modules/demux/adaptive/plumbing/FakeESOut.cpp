@@ -377,6 +377,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
             else
                 i_group = 0;
             int64_t  pcr = va_arg( args, int64_t );
+            me->checkTimestampsStart( pcr );
             pcr += me->getTimestampOffset();
             AbstractCommand *command = me->commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );
             if( likely(command) )
