@@ -274,7 +274,8 @@ static int Demux( demux_t *p_demux )
 
         default:
             msg_Warn( p_demux, "unknown id=0x%x", p_peek[2] );
-            vlc_stream_Read( p_demux->s, NULL, i_size + 8 );
+            if( vlc_stream_Read( p_demux->s, NULL, i_size + 8 ) < i_size + 8 )
+                return 0;
             break;
     }
     return 1;
