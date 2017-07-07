@@ -527,7 +527,6 @@ static int MimeDemux( demux_t *p_demux )
     if( !b_match )
     {
         msg_Err( p_demux, "discard non-JPEG part" );
-        vlc_stream_Read( p_demux->s, NULL, i );
         return 0;
     }
 
