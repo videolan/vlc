@@ -602,6 +602,35 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
     return VLC_SUCCESS;
 }
 
+static void
+ResizeFormatToGLMaxTexSize(video_format_t *fmt, unsigned int max_tex_size)
+{
+    if (fmt->i_width > fmt->i_height)
+    {
+        unsigned int const  vis_w = fmt->i_visible_width;
+        unsigned int const  vis_h = fmt->i_visible_height;
+        unsigned int const  nw_w = max_tex_size;
+        unsigned int const  nw_vis_w = nw_w * vis_w / fmt->i_width;
+
+        fmt->i_height = nw_w * fmt->i_height / fmt->i_width;
+        fmt->i_width = nw_w;
+        fmt->i_visible_height = nw_vis_w * vis_h / vis_w;
+        fmt->i_visible_width = nw_vis_w;
+    }
+    else
+    {
+        unsigned int const  vis_w = fmt->i_visible_width;
+        unsigned int const  vis_h = fmt->i_visible_height;
+        unsigned int const  nw_h = max_tex_size;
+        unsigned int const  nw_vis_h = nw_h * vis_h / fmt->i_height;
+
+        fmt->i_width = nw_h * fmt->i_width / fmt->i_height;
+        fmt->i_height = nw_h;
+        fmt->i_visible_width = nw_vis_h * vis_w / vis_h;
+        fmt->i_visible_height = nw_vis_h;
+    }
+}
+
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl,
@@ -699,6 +728,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #   define glClientActiveTexture vgl->api.ClientActiveTexture
 #endif
 #undef GET_PROC_ADDR
+
+    /* Resize the format if it is greater than the maximum texture size
+     * supported by the hardware */
+    GLint       max_tex_size;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_size);
+
+    if ((GLint)fmt->i_width > max_tex_size ||
+        (GLint)fmt->i_height > max_tex_size)
+        ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
 
 #if defined(USE_OPENGL_ES2)
     /* OpenGL ES 2 includes support for non-power of 2 textures by specification
