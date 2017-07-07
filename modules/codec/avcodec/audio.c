@@ -395,7 +395,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( ret == 0 )
         {
             /* checks and init from first decoded frame */
-            if( ctx->channels <= 0 || ctx->channels > 8 || ctx->sample_rate <= 0 )
+            if( ctx->channels <= 0 || ctx->channels > INPUT_CHAN_MAX
+             || ctx->sample_rate <= 0 )
             {
                 msg_Warn( p_dec, "invalid audio properties channels count %d, sample rate %d",
                           ctx->channels, ctx->sample_rate );
@@ -605,20 +606,26 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
         if( i_channels_src != p_sys->p_context->channels && b_trust )
             msg_Err( p_dec, "Channel layout not understood" );
+
+        uint32_t i_layout_dst;
+        int      i_channels_dst;
+        p_sys->b_extract = aout_CheckChannelExtraction( p_sys->pi_extraction,
+                                                        &i_layout_dst, &i_channels_dst,
+                                                        NULL, pi_order_src, i_channels_src );
+        if( i_channels_dst != i_channels_src && b_trust )
+            msg_Warn( p_dec, "%d channels are dropped", i_channels_src - i_channels_dst );
+
+        p_dec->fmt_out.audio.i_physical_channels =
+        p_dec->fmt_out.audio.i_original_channels = i_layout_dst;
     }
     else
+    {
         msg_Warn( p_dec, "no channel layout found");
+        p_dec->fmt_out.audio.i_physical_channels =
+        p_dec->fmt_out.audio.i_original_channels = 0;
+        p_dec->fmt_out.audio.i_channels = p_sys->p_context->channels;
+    }
 
-    uint32_t i_layout_dst;
-    int      i_channels_dst;
-    p_sys->b_extract = aout_CheckChannelExtraction( p_sys->pi_extraction,
-                                                    &i_layout_dst, &i_channels_dst,
-                                                    NULL, pi_order_src, i_channels_src );
-    if( i_channels_dst != i_channels_src && b_trust )
-        msg_Warn( p_dec, "%d channels are dropped", i_channels_src - i_channels_dst );
-
-    p_dec->fmt_out.audio.i_physical_channels =
-    p_dec->fmt_out.audio.i_original_channels = i_layout_dst;
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 }
 
