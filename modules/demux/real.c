@@ -346,7 +346,7 @@ static int Demux( demux_t *p_demux )
     mtime_t i_pcr = VLC_TS_INVALID;
     for( int i = 0; i < p_sys->i_track; i++ )
     {
-        real_track_t *tk = p_sys->track[i];
+        tk = p_sys->track[i];
 
         if( i_pcr <= VLC_TS_INVALID || ( tk->i_last_dts > VLC_TS_INVALID && tk->i_last_dts < i_pcr ) )
             i_pcr = tk->i_last_dts;
