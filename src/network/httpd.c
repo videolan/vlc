@@ -1955,21 +1955,14 @@ static void httpdLoop(httpd_host_t *host)
     vlc_restorecancel(canc);
 
     /* we will wait 20ms (not too big) if HTTPD_CLIENT_WAITING */
-    int ret = poll(ufd, nfd, b_low_delay ? 20 : -1);
+    while (poll(ufd, nfd, b_low_delay ? 20 : -1) < 0)
+    {
+        if (errno != EINTR)
+            msg_Err(host, "polling error: %s", vlc_strerror_c(errno));
+    }
 
     canc = vlc_savecancel();
     vlc_mutex_lock(&host->lock);
-    switch(ret) {
-        case -1:
-            if (errno != EINTR) {
-                /* Kernel on low memory or a bug: pace */
-                msg_Err(host, "polling error: %s", vlc_strerror_c(errno));
-                msleep(100000);
-            }
-        case 0:
-            vlc_restorecancel(canc);
-            return;
-    }
 
     /* Handle client sockets */
     now = mdate();
