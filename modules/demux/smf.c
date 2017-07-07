@@ -665,8 +665,11 @@ static int Open (vlc_object_t *obj)
             if (memcmp (head, "MTrk", 4) == 0)
                 break;
 
-            msg_Dbg (demux, "skipping unknown SMF chunk");
-            vlc_stream_Read (stream, NULL, GetDWBE (head + 4));
+            uint_fast32_t chunk_len = GetDWBE(head + 4);
+            msg_Dbg(demux, "skipping unknown SMF chunk (%"PRIuFAST32" bytes)",
+                    chunk_len);
+            if (vlc_stream_Seek(stream, vlc_stream_Tell(stream) + chunk_len))
+                goto error;
         }
 
         tr->start = vlc_stream_Tell (stream);
