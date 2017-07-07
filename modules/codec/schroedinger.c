@@ -584,7 +584,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_frame_pts_delta = 0;
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_I420;
 
     /* Set callbacks */

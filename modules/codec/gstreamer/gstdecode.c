@@ -600,8 +600,6 @@ static int OpenDecoder( vlc_object_t *p_this )
                 VLC_EGENERIC );
     }
 
-    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
-
     /* set the pipeline to playing */
     i_ret = gst_element_set_state( p_sys->p_decoder, GST_STATE_PLAYING );
     VLC_GST_CHECK( i_ret, GST_STATE_CHANGE_FAILURE,

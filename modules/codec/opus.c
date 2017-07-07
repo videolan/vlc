@@ -182,7 +182,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     date_Set( &p_sys->end_date, 0 );
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
 
     p_dec->pf_decode    = DecodeAudio;

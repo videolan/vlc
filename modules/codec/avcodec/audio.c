@@ -250,7 +250,6 @@ int InitAudioDec( vlc_object_t *obj )
     p_sys->i_previous_layout = 0;
 
     /* */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     /* Try to set as much information as possible but do not trust it */
     SetupOutputFormat( p_dec, false );
 

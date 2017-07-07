@@ -122,7 +122,6 @@ int InitSubtitleDec(vlc_object_t *obj)
 
     /* */
     msg_Dbg(dec, "libavcodec codec (%s) started", codec->name);
-    dec->fmt_out.i_cat = SPU_ES;
     dec->pf_decode = DecodeSubtitle;
     dec->pf_flush  = Flush;
 

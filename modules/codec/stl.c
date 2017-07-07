@@ -480,7 +480,6 @@ static int Open(vlc_object_t *object)
 
     dec->p_sys = sys;
     dec->pf_decode = Decode;
-    dec->fmt_out.i_cat = SPU_ES;
     dec->fmt_out.i_codec = 0;
     return VLC_SUCCESS;
 }

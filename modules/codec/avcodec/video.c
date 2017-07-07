@@ -571,7 +571,6 @@ int InitVideoDec( vlc_object_t *obj )
     p_sys->b_from_preroll = false;
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = VIDEO_ES;
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
     {
         /* we are doomed. but not really, because most codecs set their pix_fmt later on */

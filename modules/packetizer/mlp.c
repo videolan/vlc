@@ -488,7 +488,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_discontinuity = false;
 
     /* Set output properties (Passthrough only) */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
     p_dec->fmt_out.audio.i_rate = 0;
 

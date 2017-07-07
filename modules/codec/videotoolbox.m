@@ -868,7 +868,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     vlc_mutex_init(&p_sys->lock);
 
     /* return our proper VLC internal state */
-    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
     {

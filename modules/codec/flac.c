@@ -488,7 +488,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 #endif
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
 
     /* Set callbacks */

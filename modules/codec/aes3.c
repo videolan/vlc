@@ -282,7 +282,6 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
     date_Set( &p_sys->end_date, 0 );
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.audio.i_rate = 48000;
 
     /* Set callback */

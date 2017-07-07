@@ -278,7 +278,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_opaque = var_InheritBool( p_dec, "cc-opaque" );
     p_sys->i_reorder_depth = p_dec->fmt_in.subs.cc.i_reorder_depth;
 
-    p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
 
     return VLC_SUCCESS;

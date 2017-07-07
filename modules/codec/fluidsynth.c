@@ -167,7 +167,6 @@ static int Open (vlc_object_t *p_this)
     fluid_synth_set_reverb_on (p_sys->synth,
                                var_InheritBool (p_this, "synth-reverb"));
 
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.audio.i_rate =
         var_InheritInteger (p_this, "synth-sample-rate");;
     fluid_synth_set_sample_rate (p_sys->synth, p_dec->fmt_out.audio.i_rate);

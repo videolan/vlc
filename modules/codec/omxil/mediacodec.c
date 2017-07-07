@@ -614,7 +614,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     p_dec->p_sys = p_sys;
 
-    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;

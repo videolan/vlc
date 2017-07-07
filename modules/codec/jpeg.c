@@ -174,9 +174,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->err.error_exit = user_error_exit;
     p_sys->err.output_message = user_error_message;
 
-    /* Set output properties */
-    p_dec->fmt_out.i_cat = VIDEO_ES;
-
     /* Set callbacks */
     p_dec->pf_decode = DecodeBlock;
 

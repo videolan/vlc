@@ -113,7 +113,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Set output properties
      * TODO maybe it would be better to use RV16 or RV24 ? */
-    p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
     p_dec->fmt_out.video.i_width = CDG_DISPLAY_WIDTH;
     p_dec->fmt_out.video.i_height = CDG_DISPLAY_HEIGHT;

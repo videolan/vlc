@@ -259,8 +259,6 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_sys->i_chans_to_reorder = 0;
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
-
     if( b_packetizer )
     {
         switch( i_type )

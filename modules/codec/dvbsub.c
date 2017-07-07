@@ -367,7 +367,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_spu_y = i_posy;
     }
 
-    p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
 
     default_clut_init( p_dec );

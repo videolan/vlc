@@ -232,7 +232,6 @@ static int OpenDecoder(decoder_t *dec)
         dec->fmt_out.video.i_chroma = VLC_CODEC_I420;
     }
 
-    dec->fmt_out.i_cat = VIDEO_ES;
     dec->pf_decode = decode;
     dec->pf_flush  = flush_decoder;
 

@@ -234,7 +234,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     p_dec->pf_decode = DecodeBlock;
-    p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
 
     /* Allocate the memory needed to store the decoder's structure */

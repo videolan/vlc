@@ -1141,7 +1141,6 @@ static int Open(vlc_object_t *p_this)
         goto error;
 
     p_dec->pf_decode = p_sys->is_async ? DecodeAsync : DecodeSync;
-    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
 
     return VLC_SUCCESS;
 

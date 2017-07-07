@@ -139,7 +139,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
     p_dec->fmt_out.audio.i_bitspersample = p_dec->fmt_in.audio.i_bitspersample;
     p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;

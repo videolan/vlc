@@ -73,7 +73,6 @@ OpenDecoder(vlc_object_t *p_this)
     }
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;

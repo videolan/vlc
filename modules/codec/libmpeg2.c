@@ -242,7 +242,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_dec->pf_decode = DecodeVideo;
     p_dec->pf_flush  = Reset;
-    p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = 0;
 
     return VLC_SUCCESS;

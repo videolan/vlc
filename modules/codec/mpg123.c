@@ -372,7 +372,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->fmt_in.i_codec != VLC_CODEC_MP3 )
         return VLC_EGENERIC;
 
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
 
     /* Initialize libmpg123 */

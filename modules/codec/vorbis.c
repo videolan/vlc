@@ -254,7 +254,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     vorbis_comment_init( &p_sys->vc );
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
 #ifdef MODULE_NAME_IS_tremor
     p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
 #else

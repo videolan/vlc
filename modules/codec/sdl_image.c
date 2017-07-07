@@ -112,7 +112,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->psz_sdl_type = p_supported_fmt[i].psz_sdl_type;
 
     /* Set output properties - this is a decoy and isn't used anywhere */
-    p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
 
     /* Set callbacks */

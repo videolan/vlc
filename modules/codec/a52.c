@@ -352,7 +352,6 @@ static int Open( vlc_object_t *p_this )
                               p_dec->fmt_in.audio.i_physical_channels,
                               p_sys->pi_chan_table );
 
-    p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
 #ifdef LIBA52_FIXED
     p_dec->fmt_out.audio.i_format = VLC_CODEC_S32N;

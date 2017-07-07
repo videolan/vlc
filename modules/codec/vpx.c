@@ -323,7 +323,6 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     dec->pf_decode = Decode;
 
-    dec->fmt_out.i_cat = VIDEO_ES;
     dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
     dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
 

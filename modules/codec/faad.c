@@ -129,7 +129,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     date_Set( &p_sys->date, 0 );
-    p_dec->fmt_out.i_cat = AUDIO_ES;
 
     p_dec->fmt_out.i_codec = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
 

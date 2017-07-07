@@ -976,7 +976,6 @@ int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_dec->pf_decode = DecodeBlock;
-    p_dec->fmt_out.i_cat = SPU_ES;
     p_sys->i_align = var_InheritInteger( p_dec, "ttml-align" );
 
     return VLC_SUCCESS;
