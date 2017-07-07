@@ -172,6 +172,10 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
     if ( p_stream == NULL )
         return VLC_EGENERIC;
 
+    stream_t *p_chain = vlc_stream_FilterNew( p_stream, "inflate" );
+    if( p_chain )
+        p_stream = p_chain;
+
     /* read answer */
     char *p_buffer = NULL;
     int i_ret = 0;
