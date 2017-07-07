@@ -290,6 +290,10 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
+    if( i_peeker > 0
+     && vlc_stream_Read( p_demux->s, NULL, i_peeker ) < i_peeker )
+        return VLC_EGENERIC;
+
     /* Initialize input structures. */
     p_sys = p_demux->p_sys = calloc( 1, sizeof(demux_sys_t) );
     if( unlikely(!p_sys) )
@@ -307,11 +311,6 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux = (p_sys->b_seekable) ? Demux_Seekable : Demux_UnSeekable;
 
     p_sys->b_interleaved = var_InheritBool( p_demux, "avi-interleaved" );
-
-    if( i_peeker > 0 )
-    {
-        vlc_stream_Read( p_demux->s, NULL, i_peeker );
-    }
 
     if( AVI_ChunkReadRoot( p_demux->s, &p_sys->ck_root ) )
     {
@@ -844,10 +843,12 @@ aviindex:
     if( p_sys->b_seekable )
     {
         /* we have read all chunk so go back to movi */
-        vlc_stream_Seek( p_demux->s, p_movi->i_chunk_pos );
+        if( vlc_stream_Seek( p_demux->s, p_movi->i_chunk_pos ) )
+            goto error;
     }
     /* Skip movi header */
-    vlc_stream_Read( p_demux->s, NULL, 12 );
+    if( vlc_stream_Read( p_demux->s, NULL, 12 ) < 12 )
+        goto error;
 
     p_sys->i_movi_begin = p_movi->i_chunk_pos;
     return VLC_SUCCESS;
