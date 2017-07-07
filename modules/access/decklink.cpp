@@ -313,7 +313,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
                     if (!sys->cc_es) {
                         es_format_t fmt;
 
-                        es_format_Init( &fmt, SPU_ES, VLC_FOURCC('c', 'c', '1' , ' ') );
+                        es_format_Init( &fmt, SPU_ES, VLC_CODEC_EIA608_1 );
                         fmt.psz_description = strdup(N_("Closed captions 1"));
                         if (fmt.psz_description) {
                             sys->cc_es = es_out_Add(demux_->out, &fmt);
