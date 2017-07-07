@@ -535,7 +535,7 @@ static int InitAudio( demux_t *p_demux )
                  1 + p_audio->i_channel / 2, 1 + (p_audio->i_channel % 2),
                  p_sys->i_sample_rate, p_audio->i_delay );
 
-        es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('a','r','a','w') );
+        es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_S16L );
         fmt.i_id = p_audio->i_id;
         fmt.audio.i_channels          = 2;
         fmt.audio.i_original_channels =
