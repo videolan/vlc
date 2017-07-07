@@ -28,7 +28,7 @@
                 <outlet property="adjustContrastLabel" destination="24" id="dsy-YF-4Xb"/>
                 <outlet property="adjustContrastSlider" destination="30" id="HK3-EC-qLd"/>
                 <outlet property="adjustGammaLabel" destination="21" id="7dj-r2-Ne4"/>
-                <outlet property="adjustGammaSlider" destination="27" id="wC9-ez-RCn"/>
+                <outlet property="adjustGammaSlider" destination="27" id="IkC-FT-foM"/>
                 <outlet property="adjustHueLabel" destination="25" id="uKX-SY-DIJ"/>
                 <outlet property="adjustHueSlider" destination="31" id="uWx-9j-B57"/>
                 <outlet property="adjustResetButton" destination="704" id="Zyq-fN-9Ak"/>
@@ -228,7 +228,7 @@
                                                         <rect key="frame" x="119" y="32" width="171" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10" doubleValue="1" tickMarkPosition="above" sliderType="linear" id="36" customClass="VLCHUDSliderCell"/>
                                                         <connections>
-                                                            <action selector="enableMotionDetect:" target="-2" id="K42-v1-HXL"/>
+                                                            <action selector="adjustSliderChanged:" target="-1" id="FKI-i0-k9R"/>
                                                         </connections>
                                                     </slider>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="704">
