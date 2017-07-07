@@ -65,10 +65,8 @@ static int OpenResampler (vlc_object_t *obj)
     /* Cannot convert format */
     if (filter->fmt_in.audio.i_format != filter->fmt_out.audio.i_format
     /* Cannot remix */
-     || filter->fmt_in.audio.i_physical_channels
-                                  != filter->fmt_out.audio.i_physical_channels
-     || filter->fmt_in.audio.i_original_channels
-                                  != filter->fmt_out.audio.i_original_channels)
+     || filter->fmt_in.audio.i_channels != filter->fmt_out.audio.i_channels
+     || filter->fmt_in.audio.i_physical_channels == 0 )
         return VLC_EGENERIC;
 
     switch (filter->fmt_in.audio.i_format)
@@ -80,13 +78,13 @@ static int OpenResampler (vlc_object_t *obj)
 
     SpeexResamplerState *st;
 
-    unsigned channels = aout_FormatNbChannels (&filter->fmt_in.audio);
     unsigned q = var_InheritInteger (obj, "speex-resampler-quality");
     if (unlikely(q > 10))
         q = 3;
 
     int err;
-    st = speex_resampler_init(channels, filter->fmt_in.audio.i_rate,
+    st = speex_resampler_init(filter->fmt_in.audio.i_channels,
+                              filter->fmt_in.audio.i_rate,
                               filter->fmt_out.audio.i_rate, q, &err);
     if (unlikely(st == NULL))
     {
