@@ -506,7 +506,7 @@ static int InitVideo( demux_t *p_demux )
                             + sizeof(struct block_extension_t);
 
     /* Video ES */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC('I','4','2','0') );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_I420 );
     fmt.i_id                    = p_sys->i_id_video;
     fmt.video.i_frame_rate      = p_sys->i_frame_rate;
     fmt.video.i_frame_rate_base = p_sys->i_frame_rate_base;
