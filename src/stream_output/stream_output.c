@@ -154,7 +154,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
  * Packetizer/Input
  *****************************************************************************/
 sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
-                                        es_format_t *p_fmt )
+                                        const es_format_t *p_fmt )
 {
     sout_packetizer_input_t *p_input;
 
