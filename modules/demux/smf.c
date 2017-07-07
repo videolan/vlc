@@ -59,7 +59,7 @@ static int32_t ReadVarInt (stream_t *s)
 typedef struct smf_track_t
 {
     uint64_t next;   /*< Time of next message (in term of pulses) */
-    int64_t  start;  /*< Start offset in the file */
+    uint64_t start;  /*< Start offset in the file */
     uint32_t length; /*< Bytes length */
     uint32_t offset; /*< Read offset relative to the start offset */
     uint8_t  running_event; /*< Running (previous) event */
