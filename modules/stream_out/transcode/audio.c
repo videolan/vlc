@@ -58,7 +58,7 @@ static const int pi_channels_maps[9] =
 static int audio_update_format( decoder_t *p_dec )
 {
     aout_FormatPrepare( &p_dec->fmt_out.audio );
-    return 0;
+    return ( p_dec->fmt_out.audio.i_bitspersample > 0 ) ? 0 : -1;
 }
 
 static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
