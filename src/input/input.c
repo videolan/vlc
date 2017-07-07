@@ -45,6 +45,7 @@
 #include "resource.h"
 #include "stream.h"
 
+#include <vlc_aout.h>
 #include <vlc_sout.h>
 #include <vlc_dialog.h>
 #include <vlc_url.h>
@@ -1976,6 +1977,14 @@ static bool Control( input_thread_t *p_input,
                 vlc_object_release( pp_vout[i] );
             }
             free( pp_vout );
+
+            audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
+            if( p_aout )
+            {
+
+                var_SetAddress( p_aout, "viewpoint", &priv->viewpoint );
+                vlc_object_release( p_aout );
+            }
             break;
         }
 
