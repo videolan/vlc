@@ -1616,6 +1616,7 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         // can be selected.
         fmt.i_bitrate = fmt.audio.i_rate;
         msg_Dbg( p_demux, "    - sipr flavor=%i", i_flavor );
+        /* fall through */
 
     case VLC_CODEC_COOK:
     case VLC_CODEC_ATRAC3:
