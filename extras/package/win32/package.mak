@@ -58,6 +58,9 @@ if BUILD_SKINS
 	cp -r $(prefix)/share/vlc/skins2 $(win32_destdir)/skins
 endif
 
+# HRTF
+	cp -r $(srcdir)/share/hrtfs $(win32_destdir)/
+
 # SDK
 	mkdir -p "$(win32_destdir)/sdk/lib/"
 	cp -r $(prefix)/include "$(win32_destdir)/sdk"
