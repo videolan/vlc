@@ -185,7 +185,7 @@ static es_format_t GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m)
     }
 
     es_format_t video_fmt;
-    vlc_fourcc_t chroma; chroma = sys->tenbits ? VLC_CODEC_I422_10L : VLC_CODEC_UYVY;
+    vlc_fourcc_t chroma = sys->tenbits ? VLC_CODEC_I422_10L : VLC_CODEC_UYVY;
     es_format_Init(&video_fmt, VIDEO_ES, chroma);
 
     video_fmt.video.i_width = m->GetWidth();
