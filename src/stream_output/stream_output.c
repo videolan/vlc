@@ -163,7 +163,6 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
         return NULL;
 
     p_input->p_sout = p_sout;
-    p_input->p_fmt  = p_fmt;
 
     msg_Dbg( p_sout, "adding a new sout input for `%4.4s` (sout_input: %p)",
              (char*) &p_fmt->i_codec, (void *)p_input );

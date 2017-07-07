@@ -37,8 +37,6 @@ struct sout_packetizer_input_t
 {
     sout_instance_t     *p_sout;
 
-    es_format_t         *p_fmt;
-
     sout_stream_id_sys_t    *id;
 };
 
