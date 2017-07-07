@@ -358,9 +358,6 @@ int OpenDemux( vlc_object_t *p_this )
         es_out_id_t  *es = NULL;
         es_format_t es_fmt;
         const char *psz_type = "unknown";
-        vlc_fourcc_t fcc = GetVlcFourcc( cp->codec_id );
-        if( !fcc )
-            fcc = VLC_CODEC_UNKNOWN;
 
         /* Do not use the cover art as a stream */
         if( s->disposition == AV_DISPOSITION_ATTACHED_PIC )
@@ -369,6 +366,7 @@ int OpenDemux( vlc_object_t *p_this )
             continue;
         }
 
+        vlc_fourcc_t fcc = GetVlcFourcc( cp->codec_id );
         switch( cp->codec_type )
         {
         case AVMEDIA_TYPE_AUDIO:

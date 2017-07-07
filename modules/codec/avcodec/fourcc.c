@@ -547,5 +547,5 @@ vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec )
         if( spu_codecs[i].i_codec == i_ffmpeg_codec )
             return spu_codecs[i].i_fourcc;
     }
-    return 0;
+    return VLC_CODEC_UNKNOWN;
 }
