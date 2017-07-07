@@ -121,10 +121,7 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
     filter_t *p_filter = (filter_t *)p_obj;
 
     /* Cannot remix */
-    if( p_filter->fmt_in.audio.i_physical_channels
-            != p_filter->fmt_out.audio.i_physical_channels
-     || p_filter->fmt_in.audio.i_original_channels
-            != p_filter->fmt_out.audio.i_original_channels )
+    if( p_filter->fmt_in.audio.i_channels != p_filter->fmt_out.audio.i_channels )
         return VLC_EGENERIC;
 
     /* Get SoXR input/output format */
@@ -144,7 +141,7 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
     else if( i_vlc_q > MAX_SOXR_QUALITY )
         i_vlc_q = MAX_SOXR_QUALITY;
     const unsigned long i_recipe = soxr_resampler_quality_list[i_vlc_q];
-    const unsigned i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    const unsigned i_channels = p_filter->fmt_in.audio.i_channels;
     const double f_ratio = p_filter->fmt_out.audio.i_rate
                            / (double) p_filter->fmt_in.audio.i_rate;
 
