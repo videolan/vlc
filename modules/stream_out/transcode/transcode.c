@@ -458,6 +458,29 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
+static void DeleteSoutStreamID( sout_stream_id_sys_t *id )
+{
+    if( id )
+    {
+        if( id->p_decoder )
+        {
+            es_format_Clean( &id->p_encoder->fmt_in );
+            es_format_Clean( &id->p_encoder->fmt_out );
+            vlc_object_release( id->p_decoder );
+        }
+
+        if( id->p_encoder )
+        {
+            es_format_Clean( &id->p_encoder->fmt_in );
+            es_format_Clean( &id->p_encoder->fmt_out );
+            vlc_object_release( id->p_encoder );
+        }
+
+        vlc_mutex_destroy(&id->fifo.lock);
+        free( id );
+    }
+}
+
 static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
                                   const es_format_t *p_fmt )
 {
@@ -478,7 +501,9 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
     if( !id->p_decoder )
         goto error;
     id->p_decoder->p_module = NULL;
-    id->p_decoder->fmt_in = *p_fmt;
+    es_format_Init( &id->p_decoder->fmt_out, p_fmt->i_cat, 0 );
+    es_format_Init( &id->p_decoder->fmt_in, p_fmt->i_cat, 0 );
+    es_format_Copy( &id->p_decoder->fmt_in, p_fmt );
     id->p_decoder->b_frame_drop_allowed = false;
 
     /* Create encoder object */
@@ -488,6 +513,7 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
     id->p_encoder->p_module = NULL;
 
     /* Create destination format */
+    es_format_Init( &id->p_encoder->fmt_in, p_fmt->i_cat, 0 );
     es_format_Init( &id->p_encoder->fmt_out, p_fmt->i_cat, 0 );
     id->p_encoder->fmt_out.i_id    = p_fmt->i_id;
     id->p_encoder->fmt_out.i_group = p_fmt->i_group;
@@ -522,24 +548,7 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
     return id;
 
 error:
-    if( id )
-    {
-        if( id->p_decoder )
-        {
-            vlc_object_release( id->p_decoder );
-            id->p_decoder = NULL;
-        }
-
-        if( id->p_encoder )
-        {
-            es_format_Clean( &id->p_encoder->fmt_out );
-            vlc_object_release( id->p_encoder );
-            id->p_encoder = NULL;
-        }
-
-        vlc_mutex_destroy(&id->fifo.lock);
-        free( id );
-    }
+    DeleteSoutStreamID( id );
     return NULL;
 }
 
@@ -565,20 +574,7 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 
     if( id->id ) sout_StreamIdDel( p_stream->p_next, id->id );
 
-    if( id->p_decoder )
-    {
-        vlc_object_release( id->p_decoder );
-        id->p_decoder = NULL;
-    }
-
-    if( id->p_encoder )
-    {
-        es_format_Clean( &id->p_encoder->fmt_out );
-        vlc_object_release( id->p_encoder );
-        id->p_encoder = NULL;
-    }
-    vlc_mutex_destroy(&id->fifo.lock);
-    free( id );
+    DeleteSoutStreamID( id );
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
