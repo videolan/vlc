@@ -196,6 +196,39 @@ static block_t *Equals( filter_t *p_filter, block_t *p_buf )
     return p_buf;
 }
 
+static block_t *Extract( filter_t *p_filter, block_t *p_in_buf )
+{
+    size_t i_out_channels = aout_FormatNbChannels( &p_filter->fmt_out.audio );
+    size_t i_out_size = p_in_buf->i_nb_samples
+                      * p_filter->fmt_out.audio.i_bitspersample
+                      * i_out_channels / 8;
+
+    block_t *p_out_buf = block_Alloc( i_out_size );
+    if( unlikely(p_out_buf == NULL) )
+    {
+        block_Release( p_in_buf );
+        return NULL;
+    }
+
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_dts        = p_in_buf->i_dts;
+    p_out_buf->i_pts        = p_in_buf->i_pts;
+    p_out_buf->i_length     = p_in_buf->i_length;
+
+    static const int pi_selections[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8,
+    };
+    static_assert(sizeof(pi_selections)/sizeof(int) == AOUT_CHAN_MAX,
+                  "channel max size mismatch!");
+
+    aout_ChannelExtract( p_out_buf->p_buffer, i_out_channels,
+                         p_in_buf->p_buffer, p_filter->fmt_in.audio.i_channels,
+                         p_in_buf->i_nb_samples, pi_selections,
+                         p_filter->fmt_out.audio.i_bitspersample );
+
+    return p_out_buf;
+}
+
 /**
  * Probes the trivial channel mixer
  */
@@ -204,6 +237,26 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     const audio_format_t *infmt = &p_filter->fmt_in.audio;
     const audio_format_t *outfmt = &p_filter->fmt_out.audio;
+
+    if( infmt->i_physical_channels == 0 )
+    {
+        assert( infmt->i_channels > 0 );
+        if( outfmt->i_physical_channels == 0 )
+            return VLC_EGENERIC;
+        if( aout_FormatNbChannels( outfmt ) == infmt->i_channels )
+        {
+            p_filter->pf_audio_filter = Equals;
+            return VLC_SUCCESS;
+        }
+        else
+        {
+            if( infmt->i_channels > AOUT_CHAN_MAX )
+                msg_Info(p_filter, "%d channels will be dropped.",
+                         infmt->i_channels - AOUT_CHAN_MAX);
+            p_filter->pf_audio_filter = Extract;
+            return VLC_SUCCESS;
+        }
+    }
 
     if( infmt->i_format != outfmt->i_format
      || infmt->i_rate != outfmt->i_rate
