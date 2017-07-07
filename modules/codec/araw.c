@@ -83,6 +83,8 @@ static const uint16_t pi_channels_maps[] =
     AOUT_CHANS_4_0,   AOUT_CHANS_5_0, AOUT_CHANS_5_1,
     AOUT_CHANS_7_0,   AOUT_CHANS_7_1, AOUT_CHANS_8_1,
 };
+static_assert( ARRAY_SIZE( pi_channels_maps ) - 1 <= AOUT_CHAN_MAX,
+               "channel count mismatch" );
 
 static void S8Decode( void *, const uint8_t *, unsigned );
 static void U16BDecode( void *, const uint8_t *, unsigned );
@@ -248,7 +250,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     }
 
     if( p_dec->fmt_in.audio.i_channels == 0 ||
-        p_dec->fmt_in.audio.i_channels > AOUT_CHAN_MAX )
+        p_dec->fmt_in.audio.i_channels > INPUT_CHAN_MAX )
     {
         msg_Err( p_dec, "bad channels count (1-%i): %i",
                  AOUT_CHAN_MAX, p_dec->fmt_in.audio.i_channels );
@@ -274,18 +276,28 @@ static int DecoderOpen( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = format;
     p_dec->fmt_out.audio.i_format = format;
     p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
-    if( p_dec->fmt_in.audio.i_physical_channels )
-        p_dec->fmt_out.audio.i_physical_channels =
-                                       p_dec->fmt_in.audio.i_physical_channels;
+    if( p_dec->fmt_in.audio.i_channels <= ARRAY_SIZE( pi_channels_maps ) - 1 )
+    {
+        if( p_dec->fmt_in.audio.i_physical_channels )
+            p_dec->fmt_out.audio.i_physical_channels =
+                                           p_dec->fmt_in.audio.i_physical_channels;
+        else
+            p_dec->fmt_out.audio.i_physical_channels =
+                                  pi_channels_maps[p_dec->fmt_in.audio.i_channels];
+        if( p_dec->fmt_in.audio.i_original_channels )
+            p_dec->fmt_out.audio.i_original_channels =
+                                           p_dec->fmt_in.audio.i_original_channels;
+        else
+            p_dec->fmt_out.audio.i_original_channels =
+                                          p_dec->fmt_out.audio.i_physical_channels;
+    }
     else
+    {
+        /* Unknown channel map, let the aout/filters decide what to do */
+        p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
         p_dec->fmt_out.audio.i_physical_channels =
-                              pi_channels_maps[p_dec->fmt_in.audio.i_channels];
-    if( p_dec->fmt_in.audio.i_original_channels )
-        p_dec->fmt_out.audio.i_original_channels =
-                                       p_dec->fmt_in.audio.i_original_channels;
-    else
-        p_dec->fmt_out.audio.i_original_channels =
-                                      p_dec->fmt_out.audio.i_physical_channels;
+        p_dec->fmt_out.audio.i_original_channels = 0;
+    }
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 
     p_sys->decode = decode;
