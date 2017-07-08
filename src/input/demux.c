@@ -691,9 +691,12 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
     size_t i = vlc_array_count(&name);
     while(i--)
     {
-        const char *p_name = vlc_array_item_at_index(&name, i);
+        char *p_name = vlc_array_item_at_index(&name, i);
         demux_t *p_next = demux_FilterNew( p_demux, p_name );
-        if(!p_next)
+
+        free( p_name );
+
+        if( p_next == NULL )
             goto error;
 
         p_demux = p_next;
@@ -703,8 +706,6 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
 
     return p_demux;
  error:
-    i++;    /* last module couldn't be created */
-
     demux_Delete(p_demux);
 
     while(i--)
