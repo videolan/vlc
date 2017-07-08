@@ -36,9 +36,6 @@
 #include <vlc_modules.h>
 #include <vlc_strings.h>
 
-static bool SkipID3Tag( demux_t * );
-static bool SkipAPETag( demux_t *p_demux );
-
 typedef const struct
 {
     char const key[20];
@@ -247,13 +244,6 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
         if( psz_module == NULL )
             psz_module = p_demux->psz_demux;
-
-        /* ID3/APE tags will mess-up demuxer probing so we skip it here.
-         * ID3/APE parsers will called later on in the demuxer to access the
-         * skipped info. */
-        while (SkipID3Tag( p_demux ))
-          ;
-        SkipAPETag( p_demux );
 
         p_demux->p_module =
             module_need( p_demux, "demux", psz_module,
@@ -537,73 +527,6 @@ void demux_PacketizerDestroy( decoder_t *p_packetizer )
     if( p_packetizer->p_description )
         vlc_meta_Delete( p_packetizer->p_description );
     vlc_object_release( p_packetizer );
-}
-
-static bool SkipID3Tag( demux_t *p_demux )
-{
-    const uint8_t *p_peek;
-    uint8_t version, revision;
-    int i_size;
-    int b_footer;
-
-    if( !p_demux->s )
-        return false;
-
-    /* Get 10 byte id3 header */
-    if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-        return false;
-
-    if( memcmp( p_peek, "ID3", 3 ) )
-        return false;
-
-    version = p_peek[3];
-    revision = p_peek[4];
-    b_footer = p_peek[5] & 0x10;
-    i_size = (p_peek[6]<<21) + (p_peek[7]<<14) + (p_peek[8]<<7) + p_peek[9];
-
-    if( b_footer ) i_size += 10;
-    i_size += 10;
-
-    /* Skip the entire tag */
-    if( vlc_stream_Read( p_demux->s, NULL, i_size ) < i_size )
-        return false;
-
-    msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skipping %d bytes",
-             version, revision, i_size );
-    return true;
-}
-static bool SkipAPETag( demux_t *p_demux )
-{
-    const uint8_t *p_peek;
-
-    if( !p_demux->s )
-        return false;
-
-    /* Get 32 byte ape header */
-    if( vlc_stream_Peek( p_demux->s, &p_peek, 32 ) < 32 )
-        return false;
-
-    if( memcmp( p_peek, "APETAGEX", 8 ) )
-        return false;
-
-    uint_fast32_t version = GetDWLE( &p_peek[8] );
-    uint_fast32_t size = GetDWLE( &p_peek[8+4] );
-    uint_fast32_t flags = GetDWLE( &p_peek[8+4+4] );
-
-    if( (version != 1000 && version != 2000) || !(flags & (1u << 29))
-     || (size > SSIZE_MAX - 32u) )
-        return false;
-
-    if( flags & (1u << 30) )
-        size += 32;
-
-    /* Skip the entire tag */
-    if( vlc_stream_Read( p_demux->s, NULL, size ) < (ssize_t)size )
-        return false;
-
-    msg_Dbg( p_demux, "AP2 v%"PRIuFAST32" tag found, "
-             "skipping %"PRIuFAST32" bytes", version / 1000, size );
-    return true;
 }
 
 unsigned demux_TestAndClearFlags( demux_t *p_demux, unsigned flags )
