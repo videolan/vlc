@@ -464,3 +464,5 @@ libadaptive_plugin_la_LIBADD += $(GCRYPT_LIBS)
 endif
 demux_LTLIBRARIES += libadaptive_plugin.la
 
+libnoseek_plugin_la_SOURCES = demux/filter/noseek.c
+demux_LTLIBRARIES += libnoseek_plugin.la

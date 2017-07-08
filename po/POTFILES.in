@@ -444,6 +444,7 @@ modules/demux/caf.c
 modules/demux/cdg.c
 modules/demux/demuxdump.c
 modules/demux/dirac.c
+modules/demux/filter/noseek.c
 modules/demux/flac.c
 modules/demux/gme.c
 modules/demux/image.c

@@ -140,6 +140,7 @@ Stream filter:
 
 Demux filter:
  * Added a demuxer filter chain to filter or intercept control commands and demuxing
+ * Added a demuxer filter to block seeking (--demux-filter noseek)
 
 Audio output:
  * Complete rewrite of the AudioTrack Android module, it is now the default

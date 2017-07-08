@@ -262,6 +262,7 @@ $Id$
  * nfs: NFS access module using libnfs
  * normvol: a audio filter for volume normalization
  * notify: notifications using libnotify
+ * noseek: seek prevention demuxing filter
  * nsc: decoder for Microsoft proprietary NSC descriptors
  * nsspeechsynthesizer: Text to speech subtitles renderer
  * nsv: NullSoft Video demuxer
