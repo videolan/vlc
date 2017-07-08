@@ -175,7 +175,7 @@ static void demux_DestroyAccessDemux(demux_t *demux)
 static void demux_DestroyDemuxFilter(demux_t *demux)
 {
     assert(demux->p_next != NULL);
-    (void) demux;
+    demux_Delete(demux->p_next);
 }
 
 /*****************************************************************************
