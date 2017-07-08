@@ -1019,6 +1019,7 @@ modules/stream_filter/hds/hds.c
 modules/stream_filter/inflate.c
 modules/stream_filter/prefetch.c
 modules/stream_filter/record.c
+modules/stream_filter/skiptags.c
 modules/stream_out/autodel.c
 modules/stream_out/bridge.c
 modules/stream_out/cycle.c

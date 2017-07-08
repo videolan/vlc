@@ -352,6 +352,7 @@ $Id$
  * sid: Sidplay demuxer
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
+ * skiptags: APE & ID3 tags-skipping stream filter
  * smb: SMB shares access module
  * smf: Standard MIDI file demuxer
  * sndio: OpenBSD sndio audio output

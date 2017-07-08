@@ -52,3 +52,6 @@ EXTRA_LTLIBRARIES += libaccesstweaks_plugin.la
 
 libadf_plugin_la_SOURCES = stream_filter/adf.c
 stream_filter_LTLIBRARIES += libadf_plugin.la
+
+libskiptags_plugin_la_SOURCES = stream_filter/skiptags.c
+stream_filter_LTLIBRARIES += libskiptags_plugin.la
