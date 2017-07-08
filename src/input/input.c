@@ -2466,13 +2466,18 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     }
 
     char *psz_demux_chain = var_GetNonEmptyString(p_input, "demux-filter");
-    /* add the chain of demux filters */
-    demux_t *p_filtered_demux = demux_FilterChainNew( in->p_demux, psz_demux_chain );
-    if ( p_filtered_demux != NULL )
-        in->p_demux = p_filtered_demux;
-    else if ( psz_demux_chain != NULL )
-        msg_Dbg(p_input, "Failed to create demux filter %s", psz_demux_chain);
-    free( psz_demux_chain );
+    if( psz_demux_chain != NULL ) /* add the chain of demux filters */
+    {
+        in->p_demux = demux_FilterChainNew( in->p_demux, psz_demux_chain );
+        free( psz_demux_chain );
+
+        if( in->p_demux == NULL )
+        {
+            msg_Err(p_input, "Failed to create demux filter");
+            vlc_object_release( in );
+            return NULL;
+        }
+    }
 
     /* Get infos from (access_)demux */
     bool b_can_seek;
