@@ -2332,8 +2332,6 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, input_source_t *p_source
     if( p_stream == NULL )
         goto error;
 
-    p_stream = stream_FilterAutoNew( p_stream );
-
     /* attach explicit stream filters to stream */
     if( psz_filters )
         p_stream = stream_FilterChainNew( p_stream, psz_filters );

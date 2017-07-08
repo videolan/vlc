@@ -319,7 +319,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
 
     if (cachename != NULL)
         s = stream_FilterChainNew(s, cachename);
-    return s;
+    return stream_FilterAutoNew(s);
 }
 
 static int compar_type(input_item_t *p1, input_item_t *p2)
