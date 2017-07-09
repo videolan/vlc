@@ -58,7 +58,6 @@ struct demux_sys_t
 {
     es_out_id_t     *p_es;
 
-    int64_t         i_data_offset;
     unsigned int    i_data_size;
     unsigned int    i_block_frames;
     unsigned int    i_frame_size;
@@ -79,6 +78,8 @@ typedef struct xa_header_t
     uint16_t nBlockAlign;
     uint16_t wBitsPerSample;
 } xa_header_t;
+
+#define HEADER_LENGTH 24
 
 static_assert(offsetof(xa_header_t, wBitsPerSample) == 22, "Bad padding");
 
@@ -107,7 +108,7 @@ static int Open( vlc_object_t * p_this )
     /* read XA header*/
     xa_header_t xa;
 
-    if( vlc_stream_Read( p_demux->s, &xa, 24 ) < 24 )
+    if( vlc_stream_Read( p_demux->s, &xa, HEADER_LENGTH ) < HEADER_LENGTH )
     {
         free( p_sys );
         return VLC_EGENERIC;
@@ -127,7 +128,6 @@ static int Open( vlc_object_t * p_this )
     fmt.i_bitrate = (fmt.audio.i_rate * fmt.audio.i_bytes_per_frame * 8)
                     / fmt.audio.i_frame_length;
 
-    p_sys->i_data_offset = vlc_stream_Tell( p_demux->s );
     /* FIXME: better computation */
     p_sys->i_data_size = xa.iSize * 15 / 56;
     /* How many frames per block (1:1 is too CPU intensive) */
@@ -167,13 +167,11 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;
-    int64_t     i_offset;
+    int64_t     i_offset = vlc_stream_Tell( p_demux->s );
     unsigned    i_frames = p_sys->i_block_frames;
 
-    i_offset = vlc_stream_Tell( p_demux->s );
-
     if( p_sys->i_data_size > 0 &&
-        i_offset >= p_sys->i_data_offset + p_sys->i_data_size )
+        (i_offset - HEADER_LENGTH) >= p_sys->i_data_size )
     {
         /* EOF */
         return 0;
@@ -213,9 +211,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 
-    return demux_vaControlHelper( p_demux->s, p_sys->i_data_offset,
-                                   p_sys->i_data_size ? p_sys->i_data_offset
-                                   + p_sys->i_data_size : -1,
-                                   p_sys->i_bitrate, p_sys->i_frame_size,
-                                   i_query, args );
+    return demux_vaControlHelper( p_demux->s, HEADER_LENGTH,
+                                  p_sys->i_data_size
+                                  ? HEADER_LENGTH + p_sys->i_data_size : -1,
+                                  p_sys->i_bitrate, p_sys->i_frame_size,
+                                  i_query, args );
 }
