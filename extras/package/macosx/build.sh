@@ -103,6 +103,9 @@ export OSX_VERSION
 export SDKROOT
 export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:${PATH}"
 
+# Select avcodec flavor to compile contribs with
+export USE_FFMPEG=1
+
 #
 # vlc/extras/tools
 #
