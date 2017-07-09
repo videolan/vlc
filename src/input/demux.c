@@ -175,6 +175,22 @@ static void demux_DestroyDemuxFilter(demux_t *demux)
     demux_Delete(demux->p_next);
 }
 
+static int demux_Probe(void *func, va_list ap)
+{
+    int (*probe)(vlc_object_t *) = func;
+    demux_t *demux = va_arg(ap, demux_t *);
+
+    /* Restore input stream offset (in case previous probed demux failed to
+     * to do so). */
+    if (vlc_stream_Tell(demux->s) != 0 && vlc_stream_Seek(demux->s, 0))
+    {
+        msg_Err(demux, "seek failure before probing");
+        return VLC_EGENERIC;
+    }
+
+    return probe(VLC_OBJECT(demux));
+}
+
 /*****************************************************************************
  * demux_NewAdvanced:
  *  if s is NULL then load a access_demux
@@ -245,9 +261,8 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         if( psz_module == NULL )
             psz_module = p_demux->psz_demux;
 
-        p_demux->p_module =
-            module_need( p_demux, "demux", psz_module,
-                         !strcmp( psz_module, p_demux->psz_demux ) );
+        p_demux->p_module = vlc_module_load(p_demux, "demux", psz_module,
+             !strcmp(psz_module, p_demux->psz_demux), demux_Probe, p_demux);
     }
     else
     {
