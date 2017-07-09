@@ -502,7 +502,6 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
         goto error;
     id->p_decoder->p_module = NULL;
     es_format_Init( &id->p_decoder->fmt_out, p_fmt->i_cat, 0 );
-    es_format_Init( &id->p_decoder->fmt_in, p_fmt->i_cat, 0 );
     es_format_Copy( &id->p_decoder->fmt_in, p_fmt );
     id->p_decoder->b_frame_drop_allowed = false;
 
