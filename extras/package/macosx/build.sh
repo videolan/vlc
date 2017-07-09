@@ -95,9 +95,9 @@ info "Building in \"$builddir\""
 
 TRIPLET=$ARCH-apple-darwin15
 
-export CC="xcrun clang"
-export CXX="xcrun clang++"
-export OBJC="xcrun clang"
+export CC="`xcrun --find clang`"
+export CXX="`xcrun --find clang++`"
+export OBJC="`xcrun --find clang`"
 export OSX_VERSION
 export SDKROOT
 export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:${PATH}"
