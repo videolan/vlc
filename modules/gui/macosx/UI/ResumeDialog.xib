@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCResumeDialogController">
@@ -21,14 +22,14 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="446" height="160"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="446" height="133"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="446" height="160"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="560" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                        <rect key="frame" x="102" y="83" width="326" height="32"/>
+                        <rect key="frame" x="102" y="83" width="185" height="32"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Do you want to resume this file? This-is-a-file" id="4">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -51,9 +52,8 @@
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="VLC" id="56"/>
                     </imageView>
-                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="85X-TN-2Hu">
-                        <rect key="frame" x="102" y="59" width="326" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <button translatesAutoresizingMaskIntoConstraints="NO" id="85X-TN-2Hu">
+                        <rect key="frame" x="102" y="59" width="219" height="18"/>
                         <buttonCell key="cell" type="check" title="Always continue media playback" bezelStyle="regularSquare" imagePosition="left" inset="2" id="xHm-jn-IdY">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -91,8 +91,9 @@ DQ
                     <constraint firstAttribute="trailing" secondItem="21" secondAttribute="trailing" constant="20" id="32S-YZ-Fpf"/>
                     <constraint firstItem="3" firstAttribute="top" secondItem="42" secondAttribute="bottom" constant="8" id="3VQ-Ea-6y3"/>
                     <constraint firstItem="55" firstAttribute="top" secondItem="42" secondAttribute="top" id="CcT-8r-bRm"/>
+                    <constraint firstItem="85X-TN-2Hu" firstAttribute="leading" secondItem="3" secondAttribute="leading" id="CfM-1U-Mbv"/>
+                    <constraint firstItem="85X-TN-2Hu" firstAttribute="top" secondItem="3" secondAttribute="bottom" constant="8" id="Det-Ih-YSU"/>
                     <constraint firstItem="55" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" id="Iav-mD-8iG"/>
-                    <constraint firstItem="3" firstAttribute="trailing" secondItem="21" secondAttribute="trailing" id="PtC-fY-fIN"/>
                     <constraint firstAttribute="bottom" secondItem="9" secondAttribute="bottom" constant="20" id="SZk-pu-Lgd"/>
                     <constraint firstAttribute="bottom" secondItem="21" secondAttribute="bottom" constant="20" id="fiW-7M-G63"/>
                     <constraint firstItem="55" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="lQU-ef-GZw"/>
