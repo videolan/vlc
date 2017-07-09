@@ -217,7 +217,6 @@ static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
 {
     /* Copy p_fmt since it can be destroyed by UnloadDecoder */
     es_format_t fmt_in;
-    es_format_Init( &fmt_in, p_fmt->i_cat, 0 );
     if( es_format_Copy( &fmt_in, p_fmt ) != VLC_SUCCESS )
     {
         p_dec->p_owner->error = true;
