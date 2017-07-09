@@ -111,7 +111,6 @@ nodist_libmacosx_plugin_la_SOURCES = \
 	gui/macosx/UI/CoreDialogs.nib \
 	gui/macosx/UI/DetachedVideoWindow.nib \
 	gui/macosx/UI/ErrorPanel.nib \
-	gui/macosx/UI/FSPanel.nib \
 	gui/macosx/UI/Help.nib \
 	gui/macosx/UI/LogMessageWindow.nib \
 	gui/macosx/UI/MainMenu.nib \

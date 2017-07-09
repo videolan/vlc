@@ -150,7 +150,6 @@
 		6B8224031E4D2A9000833BE1 /* ConvertAndSave.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConvertAndSave.xib; sourceTree = "<group>"; };
 		6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoreDialogs.xib; sourceTree = "<group>"; };
 		6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetachedVideoWindow.xib; sourceTree = "<group>"; };
-		6B8224061E4D2A9000833BE1 /* FSPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSPanel.xib; sourceTree = "<group>"; };
 		6B8224071E4D2A9000833BE1 /* Help.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Help.xib; sourceTree = "<group>"; };
 		6B8224081E4D2A9000833BE1 /* LogMessageWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogMessageWindow.xib; sourceTree = "<group>"; };
 		6B8224091E4D2A9000833BE1 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
@@ -1794,7 +1793,6 @@
 				6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */,
 				6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */,
 				1CFE8D561EA0D3D300E94451 /* ErrorPanel.xib */,
-				6B8224061E4D2A9000833BE1 /* FSPanel.xib */,
 				6B8224071E4D2A9000833BE1 /* Help.xib */,
 				6B8224081E4D2A9000833BE1 /* LogMessageWindow.xib */,
 				6B8224091E4D2A9000833BE1 /* MainMenu.xib */,
