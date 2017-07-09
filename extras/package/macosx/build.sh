@@ -12,6 +12,7 @@ info()
 ARCH="x86_64"
 MINIMAL_OSX_VERSION="10.7"
 OSX_VERSION=`xcrun --show-sdk-version`
+OSX_KERNELVERSION=`uname -r | cut -d. -f1`
 SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
 
 usage()
@@ -93,7 +94,7 @@ builddir=`pwd`
 
 info "Building in \"$builddir\""
 
-TRIPLET=$ARCH-apple-darwin15
+TRIPLET=$ARCH-apple-darwin$OSX_KERNELVERSION
 
 export CC="`xcrun --find clang`"
 export CXX="`xcrun --find clang++`"
