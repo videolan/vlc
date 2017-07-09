@@ -3150,7 +3150,6 @@ static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
     es_format_t fmtbackup;
     es_out_id_t *p_es_backup = p_track->p_es;
     p_track->p_es = NULL;
-    es_format_Init( &fmtbackup, UNKNOWN_ES, 0 );
     es_format_Copy( &fmtbackup, &p_track->fmt );
     es_format_Clean( &p_track->fmt );
 
