@@ -299,7 +299,7 @@ static int Probe( demux_t *p_demux, bool b_end )
     i_id = ps_pkt_id( p_pkt );
     if( i_id >= 0xc0 )
     {
-        ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
+        ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];
         if( !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) &&
              p_pkt->i_pts > VLC_TS_INVALID )
         {
@@ -515,7 +515,7 @@ static int Demux( demux_t *p_demux )
             }
 
             bool b_new = false;
-            ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
+            ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];
 
             if( !tk->b_configured )
             {

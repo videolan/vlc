@@ -617,7 +617,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
             int i_id = ps_pkt_id( p_pkt );
             if( i_id >= 0xc0 )
             {
-                ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
+                ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];
 
                 if( !tk->b_configured )
                 {
@@ -654,7 +654,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 static void ESNew( demux_t *p_demux, int i_id, int i_lang )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    ps_track_t  *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
+    ps_track_t  *tk = &p_sys->tk[ps_id_to_tk(i_id)];
     char psz_language[3];
 
     if( tk->b_configured ) return;

@@ -37,10 +37,6 @@
 
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
-#if 0
-#define PS_ID_TO_TK( id ) ((id) <= 0xff ? (id) - 0xc0 : \
-            ((id)&0xff) + (((id)&0xff00) == 0xbd00 ? 256-0xC0 : 512-0xc0) )
-#else
 static inline int ps_id_to_tk( unsigned i_id )
 {
     if( i_id <= 0xff )
@@ -52,8 +48,6 @@ static inline int ps_id_to_tk( unsigned i_id )
     else
         return 768-0xc0 + (i_id & 0x07);
 }
-#define PS_ID_TO_TK( id ) ps_id_to_tk( id )
-#endif
 
 typedef struct ps_psm_t ps_psm_t;
 static inline int ps_id_to_type( const ps_psm_t *, int );
@@ -485,7 +479,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
         if( i_id < 0xc0 )
             continue;
 
-        int i_tk = PS_ID_TO_TK( i_id );
+        int i_tk = ps_id_to_tk( i_id );
         if( !tk[i_tk].b_configured )
             ps_track_fill( &tk[i_tk], p_psm, i_id, NULL, false );
     }
