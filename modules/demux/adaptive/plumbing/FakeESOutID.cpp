@@ -32,7 +32,6 @@ FakeESOutID::FakeESOutID( FakeESOut *fakeesout, const es_format_t *p_fmt )
     , p_real_es_id( NULL )
     , pending_delete( false )
 {
-    es_format_Init( &fmt, 0, 0 );
     es_format_Copy( &fmt, p_fmt );
 }
 

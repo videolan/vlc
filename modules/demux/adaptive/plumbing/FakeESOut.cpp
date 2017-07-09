@@ -91,7 +91,6 @@ void FakeESOut::setExtraInfoProvider( ExtraFMTInfoInterface *extra )
 FakeESOutID * FakeESOut::createNewID( const es_format_t *p_fmt )
 {
     es_format_t fmtcopy;
-    es_format_Init( &fmtcopy, 0, 0 );
     es_format_Copy( &fmtcopy, p_fmt );
     fmtcopy.i_group = 0; /* Always ignore group for adaptive */
     fmtcopy.i_id = -1;
