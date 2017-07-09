@@ -686,9 +686,10 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
     /* Check/Modify our existing tracks */
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
-        ps_track_t tk_tmp;
-
         if( !tk[i].b_configured || !tk[i].es ) continue;
+
+        ps_track_t tk_tmp;
+        es_format_Init( &tk_tmp.fmt, UNKNOWN_ES, 0 );
 
         if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id, p_pkt, false ) != VLC_SUCCESS )
             continue;
