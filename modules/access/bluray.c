@@ -993,7 +993,6 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     es_format_t fmt;
     bool b_select = false;
 
-    es_format_Init(&fmt, p_fmt->i_cat, p_fmt->i_codec);
     es_format_Copy(&fmt, p_fmt);
 
     switch (fmt.i_cat) {
