@@ -186,7 +186,7 @@ void CloseMux( vlc_object_t *p_this )
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    es_format_t *fmt = &p_input->fmt;
+    const es_format_t *fmt = p_input->p_fmt;
     AVCodecContext *codec;
     AVStream *stream;
     unsigned i_codec_id;
@@ -240,6 +240,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     codec->opaque = p_mux;
 
+    unsigned int i_bitrate = fmt->i_bitrate;
+    unsigned int i_frame_rate = fmt->video.i_frame_rate;
+    unsigned int i_frame_rate_base = fmt->video.i_frame_rate_base;
     switch( fmt->i_cat )
     {
     case AUDIO_ES:
@@ -250,15 +253,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         codec->frame_size = fmt->audio.i_frame_length;
         if (fmt->i_bitrate == 0) {
             msg_Warn( p_mux, "Missing audio bitrate, assuming 64k" );
-            fmt->i_bitrate = 64000;
+            i_bitrate = 64000;
         }
         break;
 
     case VIDEO_ES:
         if( !fmt->video.i_frame_rate || !fmt->video.i_frame_rate_base ) {
             msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
-            fmt->video.i_frame_rate = 25;
-            fmt->video.i_frame_rate_base = 1;
+            i_frame_rate = 25;
+            i_frame_rate_base = 1;
         } else
             msg_Dbg( p_mux, "Muxing framerate will be %d/%d = %.2f fps",
                     fmt->video.i_frame_rate,
@@ -276,18 +279,18 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 fmt->video.i_sar_num, fmt->video.i_sar_den);
         stream->sample_aspect_ratio.den = codec->sample_aspect_ratio.den;
         stream->sample_aspect_ratio.num = codec->sample_aspect_ratio.num;
-        stream->time_base.den = fmt->video.i_frame_rate;
-        stream->time_base.num = fmt->video.i_frame_rate_base;
+        stream->time_base.den = i_frame_rate;
+        stream->time_base.num = i_frame_rate_base;
         if (fmt->i_bitrate == 0) {
             msg_Warn( p_mux, "Missing video bitrate, assuming 512k" );
-            fmt->i_bitrate = 512000;
+            i_bitrate = 512000;
         } else
             msg_Dbg( p_mux, "Muxing video bitrate will be %d", fmt->i_bitrate );
         break;
 
     }
 
-    codec->bit_rate = fmt->i_bitrate;
+    codec->bit_rate = i_bitrate;
     codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );
     if( !codec->codec_tag && i_codec_id == AV_CODEC_ID_MP2 )
     {
