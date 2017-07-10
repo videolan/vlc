@@ -106,6 +106,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
+
     p_sys->p_block    = NULL;
     switch( p_dec->fmt_in.i_codec )
     {
