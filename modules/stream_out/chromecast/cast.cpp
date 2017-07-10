@@ -44,7 +44,7 @@ struct sout_stream_sys_t
         , default_muxer(psz_default_muxer)
         , default_mime(psz_default_mime)
         , p_intf(intf)
-        , b_has_video(has_video)
+        , b_supports_video(has_video)
         , i_port(port)
         , es_changed( true )
     {
@@ -66,7 +66,7 @@ struct sout_stream_sys_t
     const std::string  default_mime;
 
     intf_sys_t * const p_intf;
-    const bool b_has_video;
+    const bool b_supports_video;
     const int i_port;
 
     sout_stream_id_sys_t *GetSubId( sout_stream_t*, sout_stream_id_sys_t* );
@@ -147,7 +147,7 @@ static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_f
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if (!p_sys->b_has_video)
+    if (!p_sys->b_supports_video)
     {
         if (p_fmt->i_cat != AUDIO_ES)
             return NULL;
@@ -237,7 +237,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 else if (i_codec_audio == 0)
                     i_codec_audio = p_es->i_codec;
             }
-            else if (b_has_video && p_es->i_cat == VIDEO_ES)
+            else if (b_supports_video && p_es->i_cat == VIDEO_ES)
             {
                 if (!canDecodeVideo( p_es->i_codec ))
                 {
@@ -264,7 +264,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 s_fourcc[4] = '\0';
                 ssout << s_fourcc << ',';
             }
-            if ( b_has_video && i_codec_video == 0 )
+            if ( b_supports_video && i_codec_video == 0 )
             {
                 i_codec_video = DEFAULT_TRANSCODE_VIDEO;
                 msg_Dbg( p_stream, "Converting video to %.4s", (const char*)&i_codec_video );
@@ -277,7 +277,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             ssout << "}:";
         }
         std::string mime;
-        if ( !b_has_video && default_muxer == DEFAULT_MUXER )
+        if ( !b_supports_video && default_muxer == DEFAULT_MUXER )
             mime = "audio/x-matroska";
         else if ( i_codec_audio == VLC_CODEC_VORBIS &&
                   i_codec_video == VLC_CODEC_VP8 &&
@@ -416,7 +416,7 @@ static int Open(vlc_object_t *p_this)
     char *psz_mux = NULL;
     char *psz_var_mime = NULL;
     sout_stream_t *p_sout = NULL;
-    bool b_has_video = true;
+    bool b_supports_video = true;
     int i_local_server_port;
     int i_device_port;
     std::stringstream ss;
@@ -475,9 +475,9 @@ static int Open(vlc_object_t *p_this)
     }
     sout_StreamChainDelete( p_sout, NULL );
 
-    b_has_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
+    b_supports_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
 
-    p_sys = new(std::nothrow) sout_stream_sys_t( p_intf, b_has_video, i_local_server_port,
+    p_sys = new(std::nothrow) sout_stream_sys_t( p_intf, b_supports_video, i_local_server_port,
                                                  psz_mux, psz_var_mime );
     if (unlikely(p_sys == NULL))
         goto error;
