@@ -372,8 +372,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->fmt_in.i_codec != VLC_CODEC_MP3 )
         return VLC_EGENERIC;
 
-    p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
-
     /* Initialize libmpg123 */
     if( InitMPG123() != MPG123_OK )
         return VLC_EGENERIC;
@@ -389,6 +387,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( MPG123Open( p_dec ) )
         goto error;
 
+    p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     p_dec->pf_decode = DecodeBlock;

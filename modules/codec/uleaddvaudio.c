@@ -164,7 +164,7 @@ static int Open(vlc_object_t *object)
                           (2 + sys->is_12bit) * (i / b) + 8;
     }
 
-    es_format_Init(&dec->fmt_out, AUDIO_ES, VLC_CODEC_S16N);
+    dec->fmt_out.i_codec = VLC_CODEC_S16N;
     dec->fmt_out.audio.i_rate = dec->fmt_in.audio.i_rate;
     dec->fmt_out.audio.i_channels = 2;
     dec->fmt_out.audio.i_physical_channels =

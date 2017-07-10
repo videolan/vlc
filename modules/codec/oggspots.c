@@ -117,15 +117,15 @@ static int OpenDecoder(vlc_object_t* p_this)
     p_sys->b_has_headers = false;
     p_sys->i_pts = VLC_TS_INVALID;
 
-    /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
-
     /* Initialize image handler */
     p_sys->p_image = image_HandlerCreate(p_dec);
     if (p_sys->p_image == NULL) {
         free(p_sys);
         return VLC_ENOMEM;
     }
+
+    /* Set output properties */
+    p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
 
     /* Set callbacks */
     p_dec->pf_decode    = DecodeVideo;
