@@ -119,7 +119,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
-    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
+    es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
     p_sys->i_time = 0;
     p_sys->i_ssnd_pos = -1;
 
@@ -139,7 +139,6 @@ static int Open( vlc_object_t *p_this )
             if( vlc_stream_Peek( p_demux->s, &p_peek, 18+8 ) < 18+8 )
                 goto error;
 
-            es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
             p_sys->fmt.audio.i_channels = GetWBE( &p_peek[8] );
             p_sys->fmt.audio.i_bitspersample = GetWBE( &p_peek[14] );
             p_sys->fmt.audio.i_rate     = GetF80BE( &p_peek[16] );
@@ -161,7 +160,7 @@ static int Open( vlc_object_t *p_this )
             msg_Dbg( p_demux, "SSND: (offset=%d blocksize=%d)",
                      p_sys->i_ssnd_offset, p_sys->i_ssnd_blocksize );
         }
-        if( p_sys->i_ssnd_pos >= 12 && p_sys->fmt.i_cat == AUDIO_ES )
+        if( p_sys->i_ssnd_pos >= 12 && p_sys->fmt.audio.i_channels != 0 )
         {
             /* We have found the 2 needed chunks */
             break;
