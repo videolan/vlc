@@ -140,7 +140,11 @@ struct audio_format_t
 #define AOUT_CHAN_REVERSESTEREO     0x40000
 
 #define AOUT_CHAN_PHYSMASK          0xFFFF
+/* Maximum number of mapped channels (or the maximum of bits set in
+ * i_physical_channels) */
 #define AOUT_CHAN_MAX               9
+/* Maximum number of unmapped channels */
+#define INPUT_CHAN_MAX              64
 
 /**
  * Picture orientation.
