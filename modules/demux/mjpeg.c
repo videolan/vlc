@@ -383,8 +383,7 @@ static int Open( vlc_object_t * p_this )
         p_sys->b_still = false;
     p_sys->i_frame_length = f_fps ? (CLOCK_FREQ / f_fps) : 0;
 
-    es_format_Init( &p_sys->fmt, VIDEO_ES, 0 );
-    p_sys->fmt.i_codec = VLC_CODEC_MJPG;
+    es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_CODEC_MJPG );
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
     return VLC_SUCCESS;
