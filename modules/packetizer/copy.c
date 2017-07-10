@@ -93,18 +93,6 @@ static int Open( vlc_object_t *p_this )
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
-    /* Fix the value of the fourcc for audio */
-    if( p_dec->fmt_in.i_cat == AUDIO_ES )
-    {
-        p_dec->fmt_out.i_codec = vlc_fourcc_GetCodecAudio( p_dec->fmt_in.i_codec,
-                                                           p_dec->fmt_in.audio.i_bitspersample );
-        if( !p_dec->fmt_out.i_codec )
-        {
-            msg_Err( p_dec, "unknown raw audio sample size" );
-            return VLC_EGENERIC;
-        }
-    }
-
     p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
@@ -118,6 +106,19 @@ static int Open( vlc_object_t *p_this )
     default:
         p_sys->pf_parse = NULL;
         break;
+    }
+
+    /* Fix the value of the fourcc for audio */
+    if( p_dec->fmt_in.i_cat == AUDIO_ES )
+    {
+        vlc_fourcc_t fcc = vlc_fourcc_GetCodecAudio( p_dec->fmt_in.i_codec,
+                                                     p_dec->fmt_in.audio.i_bitspersample );
+        if( !fcc )
+        {
+            msg_Err( p_dec, "unknown raw audio sample size" );
+            return VLC_EGENERIC;
+        }
+        p_dec->fmt_out.i_codec = fcc;
     }
 
     return VLC_SUCCESS;
