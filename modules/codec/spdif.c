@@ -78,10 +78,7 @@ OpenDecoder(vlc_object_t *p_this)
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
 
     if (decoder_UpdateAudioFormat(p_dec))
-    {
-        es_format_Init(&p_dec->fmt_out, UNKNOWN_ES, 0);
         return VLC_EGENERIC;
-    }
 
     p_dec->pf_decode = DecodeBlock;
     p_dec->pf_flush  = NULL;
