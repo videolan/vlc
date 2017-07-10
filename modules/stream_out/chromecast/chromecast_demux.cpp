@@ -140,6 +140,103 @@ struct demux_sys_t
         return demux_Demux( p_demux->p_next );
     }
 
+    int Control( demux_t *p_demux_filter, int i_query, va_list args )
+    {
+        switch (i_query)
+        {
+        case DEMUX_GET_POSITION:
+            *va_arg( args, double * ) = getPlaybackPosition();
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_TIME:
+            *va_arg(args, int64_t *) = getPlaybackTime();
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_LENGTH:
+        {
+            int ret;
+            va_list ap;
+
+            va_copy( ap, args );
+            ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
+            if( ret == VLC_SUCCESS )
+                setLength( *va_arg( ap, int64_t * ) );
+            va_end( ap );
+            return ret;
+        }
+
+        case DEMUX_CAN_SEEK:
+        {
+            int ret;
+            va_list ap;
+
+            va_copy( ap, args );
+            ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
+            if( ret == VLC_SUCCESS )
+                setCanSeek( *va_arg( ap, bool* ) );
+            va_end( ap );
+            return ret;
+        }
+
+        case DEMUX_SET_POSITION:
+        {
+            va_list ap;
+
+            va_copy( ap, args );
+            double pos = va_arg( ap, double );
+            va_end( ap );
+
+            if ( getPlaybackTime() == VLC_TS_INVALID )
+            {
+                msg_Dbg( p_demux_filter, "internal seek to %f when the playback didn't start", pos );
+                break; // seek before device started, likely on-the-fly restart
+            }
+
+            if ( !seekTo( pos ) )
+            {
+                msg_Err( p_demux_filter, "failed to seek to %f", pos );
+                return VLC_EGENERIC;
+            }
+            break;
+        }
+
+        case DEMUX_SET_TIME:
+        {
+            va_list ap;
+
+            va_copy( ap, args );
+            mtime_t pos = va_arg( ap, mtime_t );
+            va_end( ap );
+
+            if ( getPlaybackTime() == VLC_TS_INVALID )
+            {
+                msg_Dbg( p_demux_filter, "internal seek to %" PRId64 " when the playback didn't start", pos );
+                break; // seek before device started, likely on-the-fly restart
+            }
+
+            if ( !seekTo( pos ) )
+            {
+                msg_Err( p_demux_filter, "failed to seek to time %" PRId64, pos );
+                return VLC_EGENERIC;
+            }
+            break;
+        }
+        case DEMUX_SET_PAUSE_STATE:
+        {
+            va_list ap;
+
+            va_copy( ap, args );
+            int paused = va_arg( ap, int );
+            va_end( ap );
+
+            setPauseState( paused != 0 );
+            break;
+        }
+        }
+
+        return demux_vaControl( p_demux_filter->p_next, i_query, args );
+    }
+
 protected:
     demux_t     * const p_demux;
     chromecast_common  * const p_renderer;
@@ -161,99 +258,7 @@ static int Control( demux_t *p_demux_filter, int i_query, va_list args)
 {
     demux_sys_t *p_sys = p_demux_filter->p_sys;
 
-    switch (i_query)
-    {
-    case DEMUX_GET_POSITION:
-        *va_arg( args, double * ) = p_sys->getPlaybackPosition();
-        return VLC_SUCCESS;
-
-    case DEMUX_GET_TIME:
-        *va_arg(args, int64_t *) = p_sys->getPlaybackTime();
-        return VLC_SUCCESS;
-
-    case DEMUX_GET_LENGTH:
-    {
-        int ret;
-        va_list ap;
-
-        va_copy( ap, args );
-        ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
-        if( ret == VLC_SUCCESS )
-            p_sys->setLength( *va_arg( ap, int64_t * ) );
-        va_end( ap );
-        return ret;
-    }
-
-    case DEMUX_CAN_SEEK:
-    {
-        int ret;
-        va_list ap;
-
-        va_copy( ap, args );
-        ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
-        if( ret == VLC_SUCCESS )
-            p_sys->setCanSeek( *va_arg( ap, bool* ) );
-        va_end( ap );
-        return ret;
-    }
-
-    case DEMUX_SET_POSITION:
-    {
-        va_list ap;
-
-        va_copy( ap, args );
-        double pos = va_arg( ap, double );
-        va_end( ap );
-
-        if ( p_sys->getPlaybackTime() == VLC_TS_INVALID )
-        {
-            msg_Dbg( p_demux_filter, "internal seek to %f when the playback didn't start", pos );
-            break; // seek before device started, likely on-the-fly restart
-        }
-
-        if ( !p_sys->seekTo( pos ) )
-        {
-            msg_Err( p_demux_filter, "failed to seek to %f", pos );
-            return VLC_EGENERIC;
-        }
-        break;
-    }
-
-    case DEMUX_SET_TIME:
-    {
-        va_list ap;
-
-        va_copy( ap, args );
-        mtime_t pos = va_arg( ap, mtime_t );
-        va_end( ap );
-
-        if ( p_sys->getPlaybackTime() == VLC_TS_INVALID )
-        {
-            msg_Dbg( p_demux_filter, "internal seek to %" PRId64 " when the playback didn't start", pos );
-            break; // seek before device started, likely on-the-fly restart
-        }
-
-        if ( !p_sys->seekTo( pos ) )
-        {
-            msg_Err( p_demux_filter, "failed to seek to time %" PRId64, pos );
-            return VLC_EGENERIC;
-        }
-        break;
-    }
-    case DEMUX_SET_PAUSE_STATE:
-    {
-        va_list ap;
-
-        va_copy( ap, args );
-        int paused = va_arg( ap, int );
-        va_end( ap );
-
-        p_sys->setPauseState( paused != 0 );
-        break;
-    }
-    }
-
-    return demux_vaControl( p_demux_filter->p_next, i_query, args );
+    return p_sys->Control( p_demux_filter, i_query, args );
 }
 
 int Open(vlc_object_t *p_this)
