@@ -377,13 +377,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     switch( p_input->p_fmt->i_cat )
     {
     case VIDEO_ES:
+    {
+        unsigned int i_frame_rate = p_input->p_fmt->video.i_frame_rate;
+        unsigned int i_frame_rate_base = p_input->p_fmt->video.i_frame_rate_base;
         if( !p_input->p_fmt->video.i_frame_rate ||
             !p_input->p_fmt->video.i_frame_rate_base )
         {
             msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
-            assert(p_input->p_fmt == &p_input->fmt);
-            p_input->fmt.video.i_frame_rate = 25;
-            p_input->fmt.video.i_frame_rate_base = 1;
+            i_frame_rate = 25;
+            i_frame_rate_base = 1;
         }
 
         switch( p_stream->i_fourcc )
@@ -421,8 +423,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             p_stream->p_oggds_header->i_size = 0 ;
             p_stream->p_oggds_header->i_time_unit =
-                     INT64_C(10000000) * p_input->p_fmt->video.i_frame_rate_base /
-                     (int64_t)p_input->p_fmt->video.i_frame_rate;
+                     INT64_C(10000000) * i_frame_rate_base /
+                     (int64_t)i_frame_rate;
             p_stream->p_oggds_header->i_samples_per_unit = 1;
             p_stream->p_oggds_header->i_default_len = 1 ; /* ??? */
             p_stream->p_oggds_header->i_buffer_size = 1024*1024;
@@ -452,6 +454,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             FREENULL( p_input->p_sys );
             return VLC_EGENERIC;
         }
+    }
         break;
 
     case AUDIO_ES:
