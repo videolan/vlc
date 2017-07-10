@@ -895,7 +895,7 @@ static void SelectPCRStream( sout_mux_t *p_mux, sout_input_t *p_removed_pcr_inpu
 
         if( p_input->p_fmt->i_cat == VIDEO_ES &&
            (p_sys->p_pcr_input == NULL ||
-            p_sys->p_pcr_input->fmt.i_cat != VIDEO_ES) )
+            p_sys->p_pcr_input->p_fmt->i_cat != VIDEO_ES) )
         {
             p_sys->p_pcr_input = p_input;
             break;
@@ -938,15 +938,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                         &p_stream->ts, &p_stream->pes ) != VLC_SUCCESS )
     {
         msg_Warn( p_mux, "rejecting stream with unsupported codec %4.4s",
-                  (char*)&p_input->fmt.i_codec );
+                  (char*)&p_input->p_fmt->i_codec );
         free( p_stream );
         return VLC_EGENERIC;
     }
 
     if( p_input->p_fmt->i_cat == VIDEO_ES )
     {
-        p_stream->pes.i_width = p_input->fmt.video.i_width;
-        p_stream->pes.i_height = p_input->fmt.video.i_height;
+        p_stream->pes.i_width = p_input->p_fmt->video.i_width;
+        p_stream->pes.i_height = p_input->p_fmt->video.i_height;
     }
 
     p_stream->pes.i_langs = 1 + p_input->p_fmt->i_extra_languages;
