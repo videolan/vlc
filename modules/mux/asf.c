@@ -346,6 +346,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     tk = p_input->p_sys = malloc( sizeof( asf_track_t ) );
+    if( unlikely(p_input->p_sys == NULL) )
+        return VLC_ENOMEM;
     memset( tk, 0, sizeof( *tk ) );
     tk->i_cat = p_input->p_fmt->i_cat;
     tk->i_sequence = 0;
