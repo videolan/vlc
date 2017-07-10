@@ -418,7 +418,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **resul
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        p_dec->fmt_out.video = p_dec->fmt_in.video;
+        video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in.video );
         p_dec->fmt_out.i_codec = vlc_fourcc_GetCodec(p_dec->fmt_in.i_cat, subtype.Data1);
     }
     else
