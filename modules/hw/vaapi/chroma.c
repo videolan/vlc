@@ -47,13 +47,11 @@ struct filter_sys_t
 
     bool                derive_failed;
     bool                image_fallback_failed;
-    VAImage             image_fallback;
 };
 
 static int CreateFallbackImage(filter_t *filter, picture_t *src_pic,
-                               VADisplay va_dpy)
+                               VADisplay va_dpy, VAImage *image_fallback)
 {
-    filter_sys_t *const filter_sys = filter->p_sys;
     int count = vaMaxNumImageFormats(va_dpy);
 
     VAImageFormat *fmts = malloc(count * sizeof (*fmts));
@@ -75,7 +73,7 @@ static int CreateFallbackImage(filter_t *filter, picture_t *src_pic,
     if (fmts[i].fourcc == VA_FOURCC_NV12
      && !vlc_vaapi_CreateImage(VLC_OBJECT(filter), va_dpy, &fmts[i],
                                src_pic->format.i_width, src_pic->format.i_height,
-                               &filter_sys->image_fallback))
+                               image_fallback))
         ret = VLC_SUCCESS;
     else
         ret = VLC_EGENERIC;
@@ -126,6 +124,7 @@ DownloadSurface(filter_t *filter, picture_t *src_pic)
         goto ret;
     }
 
+    VAImageID image_fallback_id = VA_INVALID_ID;
     VASurfaceID surface = vlc_vaapi_PicGetSurface(src_pic);
     if (vaSyncSurface(va_dpy, surface))
         goto error;
@@ -135,24 +134,24 @@ DownloadSurface(filter_t *filter, picture_t *src_pic)
     {
         if (filter_sys->image_fallback_failed)
             goto error;
-        if (!filter_sys->derive_failed)
-        {
-            filter_sys->derive_failed = true;
-            if (CreateFallbackImage(filter, src_pic, va_dpy))
-            {
-                filter_sys->image_fallback_failed = true;
-                goto error;
-            }
-        }
 
-        if (vaGetImage(va_dpy, surface, 0, 0, src_pic->format.i_width,
-                       src_pic->format.i_height,
-                       filter_sys->image_fallback.image_id))
+        filter_sys->derive_failed = true;
+
+        VAImage image_fallback;
+        if (CreateFallbackImage(filter, src_pic, va_dpy, &image_fallback))
         {
             filter_sys->image_fallback_failed = true;
             goto error;
         }
-        src_img = filter_sys->image_fallback;
+        image_fallback_id = image_fallback.image_id;
+
+        if (vaGetImage(va_dpy, surface, 0, 0, src_pic->format.i_width,
+                       src_pic->format.i_height, image_fallback_id))
+        {
+            filter_sys->image_fallback_failed = true;
+            goto error;
+        }
+        src_img = image_fallback;
     }
 
     if (vlc_vaapi_MapBuffer(VLC_OBJECT(filter), va_dpy, src_img.buf, &src_buf))
@@ -161,8 +160,7 @@ DownloadSurface(filter_t *filter, picture_t *src_pic)
     FillPictureFromVAImage(dest, &src_img, src_buf, &filter->p_sys->cache);
 
     vlc_vaapi_UnmapBuffer(VLC_OBJECT(filter), va_dpy, src_img.buf);
-    if (src_img.image_id != filter_sys->image_fallback.image_id)
-        vlc_vaapi_DestroyImage(VLC_OBJECT(filter), va_dpy, src_img.image_id);
+    vlc_vaapi_DestroyImage(VLC_OBJECT(filter), va_dpy, src_img.image_id);
 
     picture_CopyProperties(dest, src_pic);
 ret:
@@ -170,6 +168,9 @@ ret:
     return dest;
 
 error:
+    if (image_fallback_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyImage(VLC_OBJECT(filter), va_dpy, image_fallback_id);
+
     picture_Release(dest);
     dest = NULL;
     goto ret;
@@ -289,7 +290,6 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     }
     filter_sys->derive_failed = false;
     filter_sys->image_fallback_failed = false;
-    filter_sys->image_fallback.image_id = VA_INVALID_ID;
     if (is_upload)
     {
         filter_sys->va_inst = vlc_vaapi_FilterHoldInstance(filter,
@@ -344,9 +344,6 @@ vlc_vaapi_CloseChroma(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *const filter_sys = filter->p_sys;
 
-    if (filter_sys->image_fallback.image_id != VA_INVALID_ID)
-        vlc_vaapi_DestroyImage(obj, filter_sys->dpy,
-                               filter_sys->image_fallback.image_id);
     if (filter_sys->dest_pics)
         picture_pool_Release(filter_sys->dest_pics);
     if (filter_sys->va_inst != NULL)
