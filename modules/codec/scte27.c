@@ -503,7 +503,7 @@ static int Open(vlc_object_t *object)
     sys->segment_buffer = NULL;
 
     dec->pf_decode = Decode;
-    es_format_Init(&dec->fmt_out, SPU_ES, VLC_CODEC_YUVP);
+    dec->fmt_out.i_codec = VLC_CODEC_YUVP;
 
     return VLC_SUCCESS;
 }

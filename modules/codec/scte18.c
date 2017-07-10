@@ -236,7 +236,7 @@ static int Open( vlc_object_t *object )
 
     dec->p_sys = p_sys;
     dec->pf_decode = Decode;
-    es_format_Init( &dec->fmt_out, SPU_ES, 0 );
+    dec->fmt_out.i_codec = 0;
 
     return VLC_SUCCESS;
 }

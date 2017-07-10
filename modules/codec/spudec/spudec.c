@@ -91,7 +91,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     p_sys->i_spu      = 0;
     p_sys->p_block    = NULL;
 
-    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_CODEC_SPU );
+    p_dec->fmt_out.i_codec = VLC_CODEC_SPU;
 
     p_dec->pf_decode    = Decode;
     p_dec->pf_packetize = NULL;

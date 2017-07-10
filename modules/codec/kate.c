@@ -417,7 +417,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
 #endif
 
-    es_format_Init( &p_dec->fmt_out, SPU_ES, 0 );
+    p_dec->fmt_out.i_codec = 0; // may vary during the stream
 
     /* add the decoder to the global list */
     decoder_t **list = realloc( kate_decoder_list, (kate_decoder_list_size+1) * sizeof( *list ));
