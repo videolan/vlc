@@ -267,6 +267,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
              (char*)&p_input->p_fmt->i_codec );
 
     p_input->p_sys = p_stream = malloc( sizeof( ps_stream_t ) );
+    if( unlikely(p_input->p_sys == NULL) )
+        return VLC_ENOMEM;
     p_stream->i_stream_type = 0x81;
 
     /* Init this new stream */
