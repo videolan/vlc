@@ -1257,7 +1257,11 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             return VLCDEC_SUCCESS;
     }
 
-    if (b_config_changed)
+    frame_info_t *p_info = CreateReorderInfo(p_dec, p_block);
+    if(unlikely(!p_info))
+        goto skip;
+
+    if (b_config_changed && p_info->b_flush)
     {
         /* decoding didn't start yet, which is ok for H264, let's see
          * if we can use this block to get going */
@@ -1277,12 +1281,11 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             StartVideoToolbox(p_dec);
         }
         if (!p_sys->session)
+        {
+            free(p_info);
             goto skip;
+        }
     }
-
-    frame_info_t *p_info = CreateReorderInfo(p_dec, p_block);
-    if(unlikely(!p_info))
-        goto skip;
 
     CMSampleBufferRef sampleBuffer =
         VTSampleBufferCreate(p_dec, p_sys->videoFormatDescription, p_block);
