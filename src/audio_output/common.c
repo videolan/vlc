@@ -220,7 +220,7 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
         return "3F2M3R/LFE";
     }
 
-    return AOUT_FMT_LINEAR( p_format ) ? "ERROR" : "Unknown-chan-mask";
+    return "Unknown-chan-mask";
 }
 
 #undef aout_FormatPrint
