@@ -220,7 +220,7 @@ struct  basic_filter_data
 
 struct  deint_mode
 {
-    char const                  name[5];
+    char                        name[5];
     VAProcDeinterlacingType     type;
     bool                        b_double_rate;
 };
@@ -995,7 +995,7 @@ OpenDeinterlace_IsValidType(filter_t * filter,
 
 static inline int
 OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
-                        struct  deint_mode * p_deint_mode,
+                        struct deint_mode * p_deint_mode,
                         VAProcDeinterlacingType const caps[],
                         unsigned int num_caps)
 {
@@ -1009,7 +1009,7 @@ OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
                 if (OpenDeinterlace_IsValidType(filter, caps, num_caps,
                                                 deint_modes + i))
                 {
-                    memcpy(p_deint_mode, &deint_modes[i], sizeof(*p_deint_mode));
+                    *p_deint_mode = deint_modes[i];
                     msg_Dbg(filter, "using %s deinterlace method",
                             deint_modes[i].name);
                     return VLC_SUCCESS;
@@ -1023,7 +1023,7 @@ OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
         if (OpenDeinterlace_IsValidType(filter, caps, num_caps,
                                         deint_modes + i))
         {
-            memcpy(p_deint_mode, &deint_modes[i], sizeof(*p_deint_mode));
+            *p_deint_mode = deint_modes[i];
             if (fallback)
                 msg_Info(filter, "%s algorithm not available, falling back to "
                          "%s algorithm", deint_mode, deint_modes[i].name);
