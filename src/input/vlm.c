@@ -654,6 +654,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
             /* XXX: Don't do it that way, but properly use a new input item ref. */
             input_item_t item = *p_media->vod.p_item;;
+            es_format_t es, *p_es = &es;
             if( p_cfg->vod.psz_mux )
             {
                 const char *psz_mux;
@@ -664,7 +665,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 else
                     psz_mux = p_cfg->vod.psz_mux;
 
-                es_format_t es, *p_es = &es;
                 union {
                     char text[5];
                     unsigned char utext[5];
