@@ -178,7 +178,6 @@ void SLPackets_Section_Handler( demux_t *p_demux,
                     if( p_es->id )
                         es_out_Del( p_demux->out, p_es->id );
                     p_es->fmt.b_packetized = true; /* Split by access unit, no sync code */
-                    FREENULL( p_es->fmt.psz_description );
                     p_es->id = es_out_Add( p_demux->out, &p_es->fmt );
                     b_changed = true;
                 }
