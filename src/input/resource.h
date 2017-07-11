@@ -39,7 +39,8 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t
 /**
  * This function handles vout request.
  */
-vout_thread_t *input_resource_RequestVout( input_resource_t *, vout_thread_t *, video_format_t *, unsigned dpb_size, bool b_recycle );
+vout_thread_t *input_resource_RequestVout( input_resource_t *, vout_thread_t *,
+                                           const video_format_t *, unsigned dpb_size, bool b_recycle );
 
 /**
  * This function returns one of the current vout if any.

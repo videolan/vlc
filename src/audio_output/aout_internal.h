@@ -38,7 +38,7 @@ enum {
 struct aout_request_vout
 {
     struct vout_thread_t  *(*pf_request_vout)( void *, struct vout_thread_t *,
-                                               video_format_t *, bool );
+                                               const video_format_t *, bool );
     void *p_private;
 };
 

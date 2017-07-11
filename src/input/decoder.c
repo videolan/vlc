@@ -278,7 +278,8 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
  * Buffers allocation callbacks for the decoders
  *****************************************************************************/
 static vout_thread_t *aout_request_vout( void *p_private,
-                                         vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recyle )
+                                         vout_thread_t *p_vout,
+                                         const video_format_t *p_fmt, bool b_recyle )
 {
     decoder_t *p_dec = p_private;
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
