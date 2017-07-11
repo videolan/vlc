@@ -94,7 +94,6 @@ struct filter_sys_t
 static int Open( vlc_object_t *p_this )
 {
     int i_ret;
-    es_format_t fmt;
     filter_t *p_filter = (filter_t *)p_this;
     filter_owner_t owner = {
         .sys = p_filter,
@@ -111,9 +110,8 @@ static int Open( vlc_object_t *p_this )
         free( p_filter->p_sys );
         return VLC_EGENERIC;
     }
-    es_format_Copy( &fmt, &p_filter->fmt_in );
     /* Clear filter chain */
-    filter_chain_Reset( (filter_chain_t *)p_filter->p_sys, &p_filter->fmt_in, &fmt);
+    filter_chain_Reset( (filter_chain_t *)p_filter->p_sys, &p_filter->fmt_in, &p_filter->fmt_in);
     /* Add adjust filter to turn frame black-and-white */
     i_ret = filter_chain_AppendFromString( (filter_chain_t *)p_filter->p_sys,
                                            "adjust{saturation=0}" );
