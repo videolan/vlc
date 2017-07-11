@@ -481,14 +481,13 @@ static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     sout_stream_t *p_stream = p_dec->p_queue_ctx;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     picture_t *p_new_pic;
+    const video_format_t *p_fmt_in = &p_sys->p_decoder->fmt_out.video;
 
     if( p_sys->i_height || p_sys->i_width )
     {
-        video_format_t fmt_out, fmt_in;
+        video_format_t fmt_out;
 
-        memset( &fmt_in, 0, sizeof(video_format_t) );
         memset( &fmt_out, 0, sizeof(video_format_t) );
-        fmt_in = p_sys->p_decoder->fmt_out.video;
 
 
         if( p_sys->i_chroma )
@@ -498,8 +497,8 @@ static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
         const unsigned i_fmt_in_aspect =
             (int64_t)VOUT_ASPECT_FACTOR *
-            fmt_in.i_sar_num * fmt_in.i_width /
-            (fmt_in.i_sar_den * fmt_in.i_height);
+            p_fmt_in->i_sar_num * p_fmt_in->i_width /
+            (p_fmt_in->i_sar_den * p_fmt_in->i_height);
         if ( !p_sys->i_height )
         {
             fmt_out.i_width = p_sys->i_width;
@@ -523,7 +522,7 @@ static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
         fmt_out.i_visible_height = fmt_out.i_height;
 
         p_new_pic = image_Convert( p_sys->p_image,
-                                   p_pic, &fmt_in, &fmt_out );
+                                   p_pic, p_fmt_in, &fmt_out );
         if( p_new_pic == NULL )
         {
             msg_Err( p_stream, "image conversion failed" );
@@ -537,8 +536,8 @@ static int decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
         p_new_pic = picture_New( p_pic->format.i_chroma,
                                  p_pic->format.i_width, p_pic->format.i_height,
-                                 p_sys->p_decoder->fmt_out.video.i_sar_num,
-                                 p_sys->p_decoder->fmt_out.video.i_sar_den );
+                                 p_fmt_in->i_sar_num,
+                                 p_fmt_in->i_sar_den );
         if( !p_new_pic )
         {
             picture_Release( p_pic );
