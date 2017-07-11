@@ -30,14 +30,36 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
+#include <vlc_block.h>
+
+#define MAX_TAGS 16
+#define MAX_TAG_SIZE (1<<17)
 
 struct skiptags_sys_t
 {
     uint64_t header_skip;
     /* TODO? also discard trailer tags? */
+    block_t *p_tags;
 };
 
-static int SkipID3Tag(stream_t *s)
+static struct skiptags_sys_t * skiptags_sys_New(void)
+{
+    struct skiptags_sys_t *sys = malloc(sizeof (*sys));
+    if(sys)
+    {
+        sys->header_skip = 0;
+        sys->p_tags = NULL;
+    }
+    return sys;
+}
+
+static void skiptags_sys_Delete(struct skiptags_sys_t *sys)
+{
+    block_ChainRelease(sys->p_tags);
+    free(sys);
+}
+
+static uint_fast32_t SkipID3Tag(stream_t *s)
 {
     const uint8_t *peek;
 
@@ -56,13 +78,11 @@ static int SkipID3Tag(stream_t *s)
     /* Skip the entire tag */
     msg_Dbg(s, "ID3v2.%"PRIuFAST8" revision %"PRIuFAST8" tag found, "
             "skipping %"PRIuFAST32" bytes", version, revision, size);
-    if (vlc_stream_Read(s, NULL, size) < (ssize_t)size)
-        return -1;
 
-    return 1;
+    return size;
 }
 
-static int SkipAPETag(stream_t *s)
+static uint_fast32_t SkipAPETag(stream_t *s)
 {
     const uint8_t *peek;
 
@@ -87,26 +107,44 @@ static int SkipAPETag(stream_t *s)
     if (flags & (1u << 30))
         size += 32;
 
-    /* Skip the entire tag */
-    if (vlc_stream_Read(s, NULL, size) < (ssize_t)size)
-        return -1;
-
     msg_Dbg(s, "AP2 v%"PRIuFAST32" tag found, "
             "skipping %"PRIuFAST32" bytes", version / 1000, size);
-    return 1;
+    return size;
 }
 
-static bool SkipTag(stream_t *s, int (*skipper)(stream_t *))
+static bool SkipTag(stream_t *s, uint_fast32_t (*skipper)(stream_t *),
+                    block_t **pp_block, unsigned *pi_tags_count)
 {
     uint_fast64_t offset = vlc_stream_Tell(s);
-    int val = skipper(s);
-    if (unlikely(val < 0))
-    {   /* I/O error, try to restore offset. If it fails, screwed. */
-        if (vlc_stream_Seek(s, offset))
-            msg_Err(s, "seek failure");
-        return false;
+    uint_fast32_t size = skipper(s);
+    if(size> 0)
+    {
+        /* Skip the entire tag */
+        ssize_t read;
+        if(*pi_tags_count < MAX_TAGS && size <= MAX_TAG_SIZE)
+        {
+            *pp_block = vlc_stream_Block(s, size);
+            read = *pp_block ? (ssize_t)(*pp_block)->i_buffer : -1;
+        }
+        else
+        {
+            read = vlc_stream_Read(s, NULL, size);
+        }
+
+        if(read < (ssize_t)size)
+        {
+            block_ChainRelease(*pp_block);
+            *pp_block = NULL;
+            if (unlikely(read < 0))
+            {   /* I/O error, try to restore offset. If it fails, screwed. */
+                if (vlc_stream_Seek(s, offset))
+                    msg_Err(s, "seek failure");
+                return false;
+            }
+        }
+        else (*pi_tags_count)++;
     }
-    return val != 0;
+    return size != 0;
 }
 
 static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
@@ -131,9 +169,16 @@ static int Seek(stream_t *stream, uint64_t offset)
 
 static int Control(stream_t *stream, int query, va_list args)
 {
+    const struct skiptags_sys_t *sys = stream->p_sys;
     /* In principles, we should return the meta-data embedded in the skipped
      * tags in STREAM_GET_META. But the meta engine is devoted to that already.
      */
+    if( query == STREAM_GET_TAGS && sys->p_tags )
+    {
+        *va_arg( args, const block_t ** ) = sys->p_tags;
+        return VLC_SUCCESS;
+    }
+
     return vlc_stream_vaControl(stream->p_source, query, args);
 }
 
@@ -141,19 +186,31 @@ static int Open(vlc_object_t *obj)
 {
     stream_t *stream = (stream_t *)obj;
     stream_t *s = stream->p_source;
+    struct skiptags_sys_t *sys;
 
-    while (SkipTag(s, SkipID3Tag)||
-           SkipTag(s, SkipAPETag));
+    block_t *p_tags = NULL, *p_tag = NULL;
+    unsigned i_tagscount = 0;
+
+    while (SkipTag(s, SkipID3Tag, &p_tag, &i_tagscount)||
+           SkipTag(s, SkipAPETag, &p_tag, &i_tagscount))
+    {
+        if(p_tag)
+        {
+            p_tag->p_next = p_tags;
+            p_tags = p_tag;
+            p_tag = NULL;
+        }
+    }
 
     uint_fast64_t offset = vlc_stream_Tell(s);
-    if (offset == 0)
+    if (offset == 0 || !(sys = skiptags_sys_New()))
+    {
+        block_ChainRelease( p_tags );
         return VLC_EGENERIC; /* nothing to do */
-
-    struct skiptags_sys_t *sys = malloc(sizeof (*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
+    }
 
     sys->header_skip = offset;
+    sys->p_tags = p_tags;
     stream->p_sys = sys;
     stream->pf_read = Read;
     stream->pf_readdir = ReadDir;
@@ -165,9 +222,9 @@ static int Open(vlc_object_t *obj)
 static void Close(vlc_object_t *obj)
 {
     stream_t *stream = (stream_t *)obj;
-    stream_sys_t *sys = stream->p_sys;
+    struct skiptags_sys_t *sys = (struct skiptags_sys_t *) stream->p_sys;
 
-    free(sys);
+    skiptags_sys_Delete(sys);
 }
 
 vlc_module_begin()
