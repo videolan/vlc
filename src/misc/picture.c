@@ -272,7 +272,7 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
 {
     video_format_t fmt;
 
-    memset( &fmt, 0, sizeof(fmt) );
+    video_format_Init( &fmt, 0 );
     video_format_Setup( &fmt, i_chroma, i_width, i_height,
                         i_width, i_height, i_sar_num, i_sar_den );
 
