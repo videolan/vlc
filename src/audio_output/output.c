@@ -389,6 +389,11 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_OutputAssertLocked (aout);
 
+    int i_forced_stereo_mode = var_GetInteger (aout, "stereo-mode");
+    bool b_stereo_original = fmt->i_physical_channels == AOUT_CHANS_STEREO;
+    if (i_forced_stereo_mode != AOUT_VAR_CHAN_UNSET)
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+
     /* Ideally, the audio filters would be created before the audio output,
      * and the ideal audio format would be the output of the filters chain.
      * But that scheme would not really play well with digital pass-through. */
@@ -409,32 +414,40 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     var_Change (aout, "stereo-mode", VLC_VAR_CLEARCHOICES, NULL, NULL);
     vlc_value_t val, txt, default_val;
     val.i_int = 0;
-    if (fmt->i_physical_channels == AOUT_CHANS_STEREO)
+    if (!b_stereo_original)
     {
-        if (fmt->i_original_channels & AOUT_CHAN_DOLBYSTEREO)
-        {
-            default_val.i_int = val.i_int = AOUT_VAR_CHAN_DOLBYS;
-            txt.psz_string = _("Dolby Surround");
-        }
-        else
-        {
-            default_val.i_int = val.i_int = AOUT_VAR_CHAN_STEREO;
-            txt.psz_string = _("Stereo");
-        }
+        val.i_int = AOUT_VAR_CHAN_UNSET;
+        txt.psz_string = _("Original");
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+    }
+    if (fmt->i_original_channels & AOUT_CHAN_DOLBYSTEREO)
+    {
+        val.i_int = AOUT_VAR_CHAN_DOLBYS;
+        txt.psz_string = _("Dolby Surround");
+    }
+    else
+    {
+        val.i_int = AOUT_VAR_CHAN_STEREO;
+        txt.psz_string = _("Stereo");
+    }
+    var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+    default_val.i_int = b_stereo_original ? val.i_int : AOUT_VAR_CHAN_UNSET;
+
+    if (b_stereo_original)
+    {
         val.i_int = AOUT_VAR_CHAN_LEFT;
         txt.psz_string = _("Left");
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
         val.i_int = AOUT_VAR_CHAN_RIGHT;
         txt.psz_string = _("Right");
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
-        val.i_int = AOUT_VAR_CHAN_RSTEREO;
-        txt.psz_string = _("Reverse stereo");
-        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
     }
+    val.i_int = AOUT_VAR_CHAN_RSTEREO;
+    txt.psz_string = _("Reverse stereo");
+    var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
 
     /* The user may have selected a different channels configuration. */
-    switch (var_GetInteger (aout, "stereo-mode"))
+    switch (i_forced_stereo_mode)
     {
         case AOUT_VAR_CHAN_RSTEREO:
             fmt->i_original_channels |= AOUT_CHAN_REVERSESTEREO;
@@ -452,7 +465,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_original_channels = AOUT_CHANS_STEREO|AOUT_CHAN_DOLBYSTEREO;
             break;
         default:
-            if (fmt->i_original_channels & AOUT_CHAN_DUALMONO)
+            if (fmt->i_original_channels == (AOUT_CHANS_STEREO | AOUT_CHAN_DUALMONO))
             {   /* Go directly to the left channel. */
                 fmt->i_original_channels = AOUT_CHAN_LEFT;
                 val.i_int = AOUT_VAR_CHAN_LEFT;
