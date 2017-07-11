@@ -675,6 +675,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         surface_fmt.i_width  = (surface_fmt.i_width  + 0x7F) & ~0x7F;
         surface_fmt.i_height = (surface_fmt.i_height + 0x7F) & ~0x7F;
     }
+    else if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+              sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    {
+        surface_fmt.i_width  = (surface_fmt.i_width  + 0x01) & ~0x01;
+        surface_fmt.i_height = (surface_fmt.i_height + 0x01) & ~0x01;
+    }
 
     if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, pool_size, textures,
                          true))
@@ -732,6 +738,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         video_format_Copy(&staging_fmt, &surface_fmt);
         staging_fmt.i_width = staging_fmt.i_visible_width;
         staging_fmt.i_height = staging_fmt.i_visible_height;
+        if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+             sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+        {
+            staging_fmt.i_width  = (staging_fmt.i_width  + 0x01) & ~0x01;
+            staging_fmt.i_height = (staging_fmt.i_height + 0x01) & ~0x01;
+        }
         if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures, true))
             goto error;
 
