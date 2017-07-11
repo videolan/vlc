@@ -952,33 +952,18 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
     return VLC_SUCCESS;
 }
 
-static int ID3Parse( demux_t *p_demux, uint64_t i_stream_offset,
+static int ID3Parse( demux_t *p_demux,
                      int (*pf_callback)(uint32_t, const uint8_t *, size_t, void *) )
 {
-    const uint8_t *p_peek;
+    const block_t *p_tags = NULL;
 
-    bool b_canseek;
-    if( i_stream_offset < 10 ||
-        vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek ) != VLC_SUCCESS ||
-        !b_canseek ||
-        vlc_stream_Seek( p_demux->s, 0 ) != VLC_SUCCESS )
+    if( vlc_stream_Control( p_demux->s, STREAM_GET_TAGS, &p_tags ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
-    int64_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_stream_offset );
-    if( i_peek > 0 && (uint64_t) i_peek == i_stream_offset )
-    {
-        while( i_peek > 0 )
-        {
-            size_t i_forward =  ID3TAG_Parse( p_peek, i_peek,
-                                              pf_callback, (void *) p_demux );
-            if(i_forward == 0)
-                break;
-            p_peek += i_forward;
-            i_peek -= i_forward;
-        }
-    }
+    for( ; p_tags; p_tags = p_tags->p_next )
+        ID3TAG_Parse( p_tags->p_buffer, p_tags->i_buffer, pf_callback, (void *) p_demux );
 
-    return vlc_stream_Seek( p_demux->s, i_stream_offset );
+    return VLC_SUCCESS;
 }
 
 static int MpgaInit( demux_t *p_demux )
@@ -991,7 +976,7 @@ static int MpgaInit( demux_t *p_demux )
     /* */
     p_sys->i_packet_size = 1024;
 
-    ID3Parse( p_demux, p_sys->i_stream_offset, ID3TAG_Parse_Handler );
+    ID3Parse( p_demux, ID3TAG_Parse_Handler );
 
     /* Load a potential xing header */
     i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4 + 1024 );
