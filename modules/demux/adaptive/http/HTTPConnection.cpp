@@ -427,6 +427,10 @@ int StreamUrlConnection::request(const std::string &path, const BytesRange &rang
     if(!p_streamurl)
         return VLC_EGENERIC;
 
+    stream_t *p_chain = vlc_stream_FilterNew( p_streamurl, "inflate" );
+    if( p_chain )
+        p_streamurl = p_chain;
+
     if(range.isValid() && range.getEndByte() > 0)
     {
         if(vlc_stream_Seek(p_streamurl, range.getStartByte()) != VLC_SUCCESS)
