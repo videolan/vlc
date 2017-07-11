@@ -76,7 +76,7 @@ vlc_module_end ()
 /**
  * Common initialization for decoder and packetizer
  */
-static int OpenCommon( decoder_t *p_dec )
+static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
 {
     const vlc_chroma_description_t *dsc =
         vlc_fourcc_GetChromaDescription( p_dec->fmt_in.i_codec );
@@ -100,7 +100,8 @@ static int OpenCommon( decoder_t *p_dec )
     if( !p_dec->fmt_in.video.i_visible_height )
         p_dec->fmt_in.video.i_visible_height = p_dec->fmt_in.video.i_height;
 
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    if ( !b_packetizer )
+        es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
     date_Init( &p_sys->pts, p_dec->fmt_out.video.i_frame_rate,
                p_dec->fmt_out.video.i_frame_rate_base );
@@ -267,7 +268,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
 
-    int ret = OpenCommon( p_dec );
+    int ret = OpenCommon( p_dec, false );
     if( ret == VLC_SUCCESS )
     {
         p_dec->pf_decode = DecodeFrame;
@@ -305,7 +306,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
 
-    int ret = OpenCommon( p_dec );
+    int ret = OpenCommon( p_dec, true );
     if( ret == VLC_SUCCESS )
         p_dec->pf_packetize = SendFrame;
     return ret;
