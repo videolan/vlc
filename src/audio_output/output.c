@@ -171,6 +171,16 @@ static int FilterCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
+static int StereoModeCallback (vlc_object_t *obj, const char *varname,
+                               vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    (void)varname; (void)oldval; (void)newval; (void)data;
+
+    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    return 0;
+}
+
 #undef aout_New
 /**
  * Creates an audio output object and initializes an output module.
@@ -388,7 +398,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* The user may have selected a different channels configuration. */
-    var_AddCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
+    var_AddCallback (aout, "stereo-mode", StereoModeCallback, NULL);
     switch (var_GetInteger (aout, "stereo-mode"))
     {
         case AOUT_VAR_CHAN_RSTEREO:
@@ -460,7 +470,7 @@ void aout_OutputDelete (audio_output_t *aout)
 {
     aout_OutputAssertLocked (aout);
 
-    var_DelCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
+    var_DelCallback (aout, "stereo-mode", StereoModeCallback, NULL);
     if (aout->stop != NULL)
         aout->stop (aout);
 }

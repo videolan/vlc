@@ -316,16 +316,6 @@ static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
     aout->event.restart_request(aout, mode);
 }
 
-static inline int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
-                            vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    audio_output_t *aout = (audio_output_t *)obj;
-    (void)varname; (void)oldval; (void)newval; (void)data;
-
-    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
-    return 0;
-}
-
 /* Audio output filters */
 typedef struct aout_filters aout_filters_t;
 typedef struct aout_request_vout aout_request_vout_t;
