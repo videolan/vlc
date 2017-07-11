@@ -228,7 +228,8 @@ static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
 static int SetupQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
-                     const d3d_format_t *, ID3D11PixelShader *, video_projection_mode_t);
+                     const d3d_format_t *, ID3D11PixelShader *, video_projection_mode_t,
+                     video_orientation_t);
 static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 
@@ -775,7 +776,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
     if (SetupQuad( vd, &surface_fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
-                   surface_fmt.projection_mode) != VLC_SUCCESS) {
+                   surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
     }
@@ -2234,7 +2235,78 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
     sys->sys.pool = NULL;
 }
 
-static void SetupQuadFlat(d3d_vertex_t *dst_data, const video_format_t *fmt, d3d_quad_t *quad, WORD *triangle_pos)
+/**
+ * Compute the vertex ordering needed to rotate the video. Without
+ * rotation, the vertices of the rectangle are defined in a clockwise
+ * order. This function computes a remapping of the coordinates to
+ * implement the rotation, given fixed texture coordinates.
+ * The unrotated order is the following:
+ * 0--1
+ * |  |
+ * 3--2
+ * For a 180 degrees rotation it should like this:
+ * 2--3
+ * |  |
+ * 1--0
+ * Vertex 0 should be assigned coordinates at index 2 from the
+ * unrotated order and so on, thus yielding order: 2 3 0 1.
+ */
+static void orientationVertexOrder(video_orientation_t orientation, int vertex_order[static 4])
+{
+    switch (orientation) {
+        case ORIENT_ROTATED_90:
+            vertex_order[0] = 3;
+            vertex_order[1] = 0;
+            vertex_order[2] = 1;
+            vertex_order[3] = 2;
+            break;
+        case ORIENT_ROTATED_270:
+            vertex_order[0] = 1;
+            vertex_order[1] = 2;
+            vertex_order[2] = 3;
+            vertex_order[3] = 0;
+            break;
+        case ORIENT_ROTATED_180:
+            vertex_order[0] = 2;
+            vertex_order[1] = 3;
+            vertex_order[2] = 0;
+            vertex_order[3] = 1;
+            break;
+        case ORIENT_TRANSPOSED:
+            vertex_order[0] = 2;
+            vertex_order[1] = 1;
+            vertex_order[2] = 0;
+            vertex_order[3] = 3;
+            break;
+        case ORIENT_HFLIPPED:
+            vertex_order[0] = 3;
+            vertex_order[1] = 2;
+            vertex_order[2] = 1;
+            vertex_order[3] = 0;
+            break;
+        case ORIENT_VFLIPPED:
+            vertex_order[0] = 1;
+            vertex_order[1] = 0;
+            vertex_order[2] = 3;
+            vertex_order[3] = 2;
+            break;
+        case ORIENT_ANTI_TRANSPOSED: /* transpose + vflip */
+            vertex_order[0] = 1;
+            vertex_order[1] = 2;
+            vertex_order[2] = 3;
+            vertex_order[3] = 0;
+            break;
+       default:
+            vertex_order[0] = 0;
+            vertex_order[1] = 1;
+            vertex_order[2] = 2;
+            vertex_order[3] = 3;
+            break;
+    }
+}
+
+static void SetupQuadFlat(d3d_vertex_t *dst_data, const video_format_t *fmt,
+                          d3d_quad_t *quad, WORD *triangle_pos, video_orientation_t orientation)
 {
     unsigned int dst_width = fmt->i_visible_width;
     unsigned int dst_height = fmt->i_visible_height;
@@ -2256,30 +2328,38 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const video_format_t *fmt, d3d
     float top    =  (float) (2*src_x + dst_height) / (float) dst_height;
     float bottom = -(float) (2*src_height - dst_height - 2*src_y) / (float) dst_height;
 
+    const float vertices_coords[4][2] = {
+        { left,  bottom },
+        { right, bottom },
+        { right, top    },
+        { left,  top    },
+    };
+
+    /* Compute index remapping necessary to implement the rotation. */
+    int vertex_order[4];
+    orientationVertexOrder(orientation, vertex_order);
+
+    for (int i = 0; i < 4; ++i) {
+        dst_data[i].position.x  = vertices_coords[vertex_order[i]][0];
+        dst_data[i].position.y  = vertices_coords[vertex_order[i]][1];
+    }
+
     // bottom left
-    dst_data[0].position.x = left;
-    dst_data[0].position.y = bottom;
     dst_data[0].position.z = 0.0f;
     dst_data[0].texture.x = 0.0f;
     dst_data[0].texture.y = 1.0f;
 
     // bottom right
-    dst_data[1].position.x = right;
-    dst_data[1].position.y = bottom;
     dst_data[1].position.z = 0.0f;
     dst_data[1].texture.x = 1.0f;
     dst_data[1].texture.y = 1.0f;
 
     // top right
-    dst_data[2].position.x = right;
-    dst_data[2].position.y = top;
     dst_data[2].position.z = 0.0f;
     dst_data[2].texture.x = 1.0f;
     dst_data[2].texture.y = 0.0f;
 
     // top left
-    dst_data[3].position.x = left;
-    dst_data[3].position.y = top;
     dst_data[3].position.z = 0.0f;
     dst_data[3].texture.x = 0.0f;
     dst_data[3].texture.y = 0.0f;
@@ -2343,7 +2423,8 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, WORD *triangle_pos)
     }
 }
 
-static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_format_t *fmt, video_projection_mode_t projection)
+static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_format_t *fmt,
+                              video_projection_mode_t projection, video_orientation_t orientation)
 {
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -2410,7 +2491,7 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_
     WORD *triangle_pos = mappedResource.pData;
 
     if ( projection == PROJECTION_MODE_RECTANGULAR )
-        SetupQuadFlat(dst_data, fmt, quad, triangle_pos);
+        SetupQuadFlat(dst_data, fmt, quad, triangle_pos, orientation);
     else
         SetupQuadSphere(dst_data, triangle_pos);
 
@@ -2422,7 +2503,7 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_
 
 static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
                      const d3d_format_t *cfg, ID3D11PixelShader *d3dpixelShader,
-                     video_projection_mode_t projection)
+                     video_projection_mode_t projection, video_orientation_t orientation)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
@@ -2568,7 +2649,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     quad->picSys.context = sys->d3dcontext;
     ID3D11DeviceContext_AddRef(quad->picSys.context);
 
-    if (!AllocQuadVertices(vd, quad, fmt, projection))
+    if (!AllocQuadVertices(vd, quad, fmt, projection, orientation))
         goto error;
 
     quad->d3dpixelShader = d3dpixelShader;
@@ -2773,7 +2854,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             d3dquad->i_width    = r->fmt.i_width;
             d3dquad->i_height   = r->fmt.i_height;
             err = SetupQuad( vd, &r->fmt, d3dquad, sys->d3dregion_format, sys->pSPUPixelShader,
-                             PROJECTION_MODE_RECTANGULAR );
+                             PROJECTION_MODE_RECTANGULAR, ORIENT_NORMAL );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to create %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
