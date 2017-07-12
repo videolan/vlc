@@ -93,6 +93,16 @@
     var_SetString(playlist , "sout", sout.UTF8String);
 }
 
+- (void)setDemuxFilterForPlaylist:(playlist_t*)playlist
+{
+    const char *item_demux_filter = vlc_renderer_item_demux_filter(_rendererItem);
+
+    if (!playlist || !item_demux_filter)
+        return;
+
+    var_SetString(playlist, "demux-filter", item_demux_filter);
+}
+
 - (BOOL)isEqual:(id)object
 {
     if (![object isKindOfClass:[VLCRendererItem class]]) {

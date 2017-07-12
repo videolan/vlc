@@ -82,4 +82,11 @@
  */
 - (void)setSoutForPlaylist:(playlist_t*)playlist;
 
+/**
+ Sets the passed playlist’s demux filter to the demux filter of the \c VLCRendererItem.
+
+ \param playlist The playlist for which to set the demux filter
+ */
+- (void)setDemuxFilterForPlaylist:(playlist_t*)playlist;
+
 @end
