@@ -304,14 +304,13 @@ static int OpenFilter( vlc_object_t *p_this )
     }
     i_output_physical = CanonicaliseChannels( i_output_physical );
 
-    audio_out->i_physical_channels = i_output_physical;
-    aout_FormatPrepare( audio_out );
+    unsigned i_channels = popcount(i_output_physical);
 
     /* condense out_channels */
     uint8_t out_ch_sorted[ AOUT_CHAN_MAX ];
-    for( uint8_t i = 0, wg4_i = 0; i < audio_out->i_channels; i++, wg4_i++ )
+    for( uint8_t i = 0, wg4_i = 0; i < i_channels; i++, wg4_i++ )
     {
-        while( ( audio_out->i_physical_channels & pi_vlc_chan_order_wg4[ wg4_i ] ) == 0 )
+        while( ( i_output_physical & pi_vlc_chan_order_wg4[ wg4_i ] ) == 0 )
         {
             wg4_i++;
             assert( wg4_i < sizeof( pi_vlc_chan_order_wg4 )/sizeof( pi_vlc_chan_order_wg4[0] ) );
@@ -323,19 +322,12 @@ static int OpenFilter( vlc_object_t *p_this )
     for( uint8_t i = 0; i < audio_in->i_channels; i++ )
     {
         uint8_t wg4_out_ch = pi_map_ch[i];
-        uint8_t *pi_out_ch = memchr( out_ch_sorted, wg4_out_ch, audio_out->i_channels );
+        uint8_t *pi_out_ch = memchr( out_ch_sorted, wg4_out_ch, i_channels );
         assert( pi_out_ch != NULL );
         p_sys->map_ch[i] = pi_out_ch - out_ch_sorted;
         if( ++p_sys->nb_in_ch[ p_sys->map_ch[i] ] > 1 )
             b_multiple = true;
     }
-
-    msg_Dbg( p_filter, "%s '%4.4s'->'%4.4s' %d Hz->%d Hz %s->%s",
-             "Remap filter",
-             (char *)&audio_in->i_format, (char *)&audio_out->i_format,
-             audio_in->i_rate, audio_out->i_rate,
-             aout_FormatPrintChannels( audio_in ),
-             aout_FormatPrintChannels( audio_out ) );
 
     p_sys->pf_remap = GetRemapFun( audio_in, b_multiple );
     if( !p_sys->pf_remap )
@@ -344,6 +336,16 @@ static int OpenFilter( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
+
+    audio_out->i_physical_channels = i_output_physical;
+    aout_FormatPrepare( audio_out );
+
+    msg_Dbg( p_filter, "%s '%4.4s'->'%4.4s' %d Hz->%d Hz %s->%s",
+             "Remap filter",
+             (char *)&audio_in->i_format, (char *)&audio_out->i_format,
+             audio_in->i_rate, audio_out->i_rate,
+             aout_FormatPrintChannels( audio_in ),
+             aout_FormatPrintChannels( audio_out ) );
 
     p_filter->pf_audio_filter = Remap;
     return VLC_SUCCESS;
