@@ -381,11 +381,10 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
     /* */
     picture_t *p_picture;
     block_t *p_image;
-    video_format_t fmt;
 
     /* 500ms timeout
      * XXX it will cause trouble with low fps video (< 2fps) */
-    if( vout_GetSnapshot( p_vout, &p_image, &p_picture, &fmt, psz_format, 500*1000 ) )
+    if( vout_GetSnapshot( p_vout, &p_image, &p_picture, NULL, psz_format, 500*1000 ) )
     {
         p_picture = NULL;
         p_image = NULL;
