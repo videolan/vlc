@@ -43,6 +43,7 @@ int vout_SetDisplayFormat(vout_display_t *, const video_format_t *fmt,
  * profile and always updating the display state to a consistent value */
 void vout_SetDisplayIccProfile(vout_display_t *, const vlc_icc_profile_t *);
 void vout_SetDisplayProjection(vout_display_t *, video_projection_mode_t);
+void vout_SetDisplayStereo(vout_display_t *, vlc_stereoscopic_mode_t);
 
 #endif /* LIBVLC_VOUT_WRAPPER_H */
 

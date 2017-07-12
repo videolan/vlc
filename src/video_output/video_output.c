@@ -722,6 +722,18 @@ void vout_ChangeProjection(vout_thread_t *vout,
     vlc_queuedmutex_unlock(&sys->display_lock);
 }
 
+void vout_ControlChangeStereo(vout_thread_t *vout, vlc_stereoscopic_mode_t mode)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    vlc_queuedmutex_lock(&sys->display_lock);
+    sys->display_cfg.stereo_mode = mode;
+    if (sys->display != NULL)
+        vout_SetDisplayStereo(sys->display, mode);
+    vlc_queuedmutex_unlock(&sys->display_lock);
+}
+
 /* */
 static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *fmt, vout_display_cfg_t *cfg)
 {
@@ -760,6 +772,7 @@ static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *f
         cfg->display.align.vertical = VLC_VIDEO_ALIGN_TOP;
     else if (align_mask & VOUT_ALIGN_BOTTOM)
         cfg->display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+    cfg->stereo_mode = var_GetInteger(vout, "video-stereo-mode");
 }
 
 /* */

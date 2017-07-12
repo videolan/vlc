@@ -770,6 +770,24 @@ void vout_SetDisplayProjection(vout_display_t *vd,
     vout_display_ChangeProjection(vd, projection);
 }
 
+void vout_SetDisplayStereo(vout_display_t *vd, vlc_stereoscopic_mode_t mode)
+{
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    if (osys->cfg.stereo_mode != mode) {
+        osys->cfg.stereo_mode = mode;
+        int err;
+        if (vd->ops->set_stereo)
+            err = vd->ops->set_stereo(vd, mode);
+        else
+            err = VLC_ENOTSUP; // not handled, we need to do it in the core
+        if (err != VLC_SUCCESS)
+        {
+            msg_Err(vd, "Failed to change multiview display mode");
+        }
+    }
+}
+
 vout_display_t *vout_display_New(vlc_object_t *parent,
                                  const video_format_t *source,
                                  vlc_video_context *vctx,
@@ -798,6 +816,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     osys->crop.mode = VOUT_CROP_NONE;
 
     osys->src_vctx = vctx ? vlc_video_context_Hold( vctx ) : NULL;
+
+    osys->cfg.stereo_mode = cfg->stereo_mode;
 
     /* */
     vout_display_t *vd = &osys->display;

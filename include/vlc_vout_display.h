@@ -124,6 +124,7 @@ typedef struct vout_display_cfg {
 
     /** Initial viewpoint when projection != PROJECTION_MODE_RECTANGULAR */
     vlc_viewpoint_t viewpoint;
+    vlc_stereoscopic_mode_t stereo_mode; /**< Stereoscopic/3D mode used by the display */
 } vout_display_cfg_t;
 
 /**
@@ -315,6 +316,16 @@ struct vlc_display_operations
      * \param prof new ICC profile associated with display, or NULL for none
      */
     void       (*set_icc_profile)(vout_display_t *, const vlc_icc_profile_t *prof);
+
+    /**
+     * Notifies the new Stereoscopic 3D mode in \ref vout_display_cfg_t changed.
+     *
+     * May be NULL.
+     *
+     * \retval VLC_SUCCESS if the display handled the change
+     * \retval VLC_EGENERIC if the display handled the change was not handled
+     */
+    int        (*set_stereo)(vout_display_t *, vlc_stereoscopic_mode_t);
 
     /**
      * Notifies a change in the input format.
