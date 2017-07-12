@@ -180,6 +180,11 @@
     var_SetString(playlist, "sout", "");
 }
 
+- (void)unsetDemuxFilterForPlaylist:(playlist_t*)playlist
+{
+    var_SetString(playlist, "demux-filter", "");
+}
+
 #pragma mark VLCRendererDiscovery delegate methods
 - (void)addedRendererItem:(VLCRendererItem *)item from:(VLCRendererDiscovery *)sender
 {
