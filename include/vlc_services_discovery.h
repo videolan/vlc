@@ -157,7 +157,7 @@ VLC_API void vlc_sd_Destroy( services_discovery_t * );
 static inline void services_discovery_AddItem(services_discovery_t *sd,
                                               input_item_t *item)
 {
-    return sd->owner.item_added(sd, NULL, item, NULL);
+    sd->owner.item_added(sd, NULL, item, NULL);
 }
 
 /**
@@ -181,7 +181,7 @@ static inline void services_discovery_AddSubItem(services_discovery_t *sd,
                                                  input_item_t *parent,
                                                  input_item_t *item)
 {
-    return sd->owner.item_added(sd, parent, item, NULL);
+    sd->owner.item_added(sd, parent, item, NULL);
 }
 
 /**
@@ -195,7 +195,7 @@ static inline void services_discovery_AddItemCat(services_discovery_t *sd,
                                                  input_item_t *item,
                                                  const char *category)
 {
-    return sd->owner.item_added(sd, NULL, item, category);
+    sd->owner.item_added(sd, NULL, item, category);
 }
 
 /**
@@ -207,7 +207,7 @@ static inline void services_discovery_AddItemCat(services_discovery_t *sd,
 static inline void services_discovery_RemoveItem(services_discovery_t *sd,
                                                  input_item_t *item)
 {
-    return sd->owner.item_removed(sd, item);
+    sd->owner.item_removed(sd, item);
 }
 
 /* SD probing */
