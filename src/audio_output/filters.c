@@ -45,7 +45,8 @@
 static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
                                const char *name, filter_owner_sys_t *owner,
                                const audio_sample_format_t *infmt,
-                               const audio_sample_format_t *outfmt)
+                               const audio_sample_format_t *outfmt,
+                               bool const_fmt)
 {
     filter_t *filter = vlc_custom_create (obj, sizeof (*filter), type);
     if (unlikely(filter == NULL))
@@ -67,11 +68,18 @@ static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
 #endif
 
     filter->p_module = module_need (filter, type, name, false);
-    if (filter->p_module == NULL)
+
+#ifndef NDEBUG
+    if (filter->p_module == NULL || const_fmt)
     {
         /* If probing failed, formats shall not have been modified. */
         assert (AOUT_FMTS_IDENTICAL(&filter->fmt_in.audio, infmt));
         assert (AOUT_FMTS_IDENTICAL(&filter->fmt_out.audio, outfmt));
+    }
+#endif
+
+    if (filter->p_module == NULL)
+    {
         vlc_object_release (filter);
         filter = NULL;
     }
@@ -84,7 +92,7 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter (obj, "audio converter", NULL, NULL, infmt, outfmt);
+    return CreateFilter (obj, "audio converter", NULL, NULL, infmt, outfmt, true);
 }
 
 static filter_t *FindResampler (vlc_object_t *obj,
@@ -92,7 +100,7 @@ static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *outfmt)
 {
     return CreateFilter (obj, "audio resampler", "$audio-resampler", NULL,
-                         infmt, outfmt);
+                         infmt, outfmt, true);
 }
 
 /**
@@ -375,7 +383,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     }
 
     filter_t *filter = CreateFilter (obj, type, name,
-                                     (void *)owner, infmt, outfmt);
+                                     (void *)owner, infmt, outfmt, false);
     if (filter == NULL)
     {
         msg_Err (obj, "cannot add user %s \"%s\" (skipped)", type, name);
