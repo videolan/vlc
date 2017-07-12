@@ -170,8 +170,10 @@
 
     if (item) {
         [item setSoutForPlaylist:playlist];
+        [item setDemuxFilterForPlaylist:playlist];
     } else {
         [self unsetSoutForPlaylist:playlist];
+        [self unsetDemuxFilterForPlaylist:playlist];
     }
 }
 
