@@ -482,6 +482,9 @@ static int OpenFilter( vlc_object_t *p_this )
     }
     p_filter->pf_audio_filter = Convert;
 
+    aout_FormatPrepare(&p_filter->fmt_in.audio);
+    aout_FormatPrepare(&p_filter->fmt_out.audio);
+
     return VLC_SUCCESS;
 }
 
