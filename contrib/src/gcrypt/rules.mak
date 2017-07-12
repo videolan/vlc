@@ -1,5 +1,5 @@
 # GCRYPT
-GCRYPT_VERSION := 1.7.6
+GCRYPT_VERSION := 1.7.8
 GCRYPT_URL := ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 PKGS += gcrypt
@@ -9,7 +9,7 @@ $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 
 .sum-gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
-libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
+gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(UNPACK)
 	$(APPLY) $(SRC)/gcrypt/disable-tests-compilation.patch
 	$(APPLY) $(SRC)/gcrypt/fix-pthread-detection.patch
@@ -66,7 +66,7 @@ GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
 endif
 endif
 
-.gcrypt: libgcrypt
+.gcrypt: gcrypt
 	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" ./configure $(HOSTCONF) $(GCRYPT_CONF)
 	cd $< && $(MAKE) install
