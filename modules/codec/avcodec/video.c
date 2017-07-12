@@ -47,6 +47,10 @@
 #include "avcodec.h"
 #include "va.h"
 
+#if LIBAVUTIL_VERSION_CHECK( 52, 20, 0, 58, 100 )
+#include <libavutil/stereo3d.h>
+#endif
+
 #include "../codec/cc.h"
 #define FRAME_INFO_DEPTH 64
 
@@ -862,6 +866,49 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
             format_changed = true;
         }
     }
+#endif
+
+#if LIBAVUTIL_VERSION_CHECK( 52, 20, 0, 58, 100 )
+    const AVFrameSideData *p_stereo3d_data =
+            av_frame_get_side_data( frame,
+                                    AV_FRAME_DATA_STEREO3D );
+    if( p_stereo3d_data )
+    {
+        const struct AVStereo3D *stereo_data =
+                (const AVStereo3D *) p_stereo3d_data->data;
+        switch (stereo_data->type)
+        {
+        case AV_STEREO3D_SIDEBYSIDE:
+            p_pic->format.multiview_mode = MULTIVIEW_STEREO_SBS;
+            break;
+        case AV_STEREO3D_TOPBOTTOM:
+            p_pic->format.multiview_mode = MULTIVIEW_STEREO_TB;
+            break;
+        case AV_STEREO3D_FRAMESEQUENCE:
+            p_pic->format.multiview_mode = MULTIVIEW_STEREO_FRAME;
+            break;
+        case AV_STEREO3D_COLUMNS:
+            p_pic->format.multiview_mode = MULTIVIEW_STEREO_ROW;
+            break;
+        case AV_STEREO3D_LINES:
+            p_pic->format.multiview_mode = MULTIVIEW_STEREO_COL;
+            break;
+        case AV_STEREO3D_CHECKERBOARD:
+            p_pic->format.multiview_mode = MULTIVIEW_STEREO_CHECKERBOARD;
+            break;
+        default:
+        case AV_STEREO3D_2D:
+            p_pic->format.multiview_mode = MULTIVIEW_2D;
+            break;
+        }
+        if (p_dec->fmt_out.video.multiview_mode != p_pic->format.multiview_mode)
+        {
+            p_dec->fmt_out.video.multiview_mode = p_pic->format.multiview_mode;
+            format_changed = true;
+        }
+    }
+    else
+        p_pic->format.multiview_mode = p_dec->fmt_out.video.multiview_mode;
 #endif
 
     if (format_changed && decoder_UpdateVideoFormat( p_dec ))
