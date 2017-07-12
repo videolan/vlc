@@ -172,6 +172,7 @@ namespace adaptive
             CommandsFactory *commandsFactory;
             vlc_mutex_t lock;
             void LockedCommit();
+            void LockedSetDraining();
             std::list<AbstractCommand *> incoming;
             std::list<AbstractCommand *> commands;
             mtime_t bufferinglevel;

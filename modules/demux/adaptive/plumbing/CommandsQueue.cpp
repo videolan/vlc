@@ -360,8 +360,7 @@ void CommandsQueue::setDrop( bool b )
 void CommandsQueue::setDraining()
 {
     vlc_mutex_lock(&lock);
-    LockedCommit();
-    b_draining = !commands.empty();
+    LockedSetDraining();
     vlc_mutex_unlock(&lock);
 }
 
@@ -377,8 +376,7 @@ void CommandsQueue::setEOF()
 {
     vlc_mutex_lock(&lock);
     b_eof = true;
-    LockedCommit();
-    b_draining = !commands.empty();
+    LockedSetDraining();
     vlc_mutex_unlock(&lock);
 }
 
@@ -421,6 +419,12 @@ mtime_t CommandsQueue::getFirstDTS() const
     }
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return i_firstdts;
+}
+
+void CommandsQueue::LockedSetDraining()
+{
+    LockedCommit();
+    b_draining = !commands.empty();
 }
 
 mtime_t CommandsQueue::getPCR() const
