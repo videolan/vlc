@@ -842,16 +842,14 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 
     for( SegmentSeeker::tracks_seekpoint_t::const_iterator it = seekpoints.begin(); it != seekpoints.end(); ++it )
     {
-        mkv_track_t& track = tracks[ it->first ];
-
         if( i_seek_position > it->second.fpos )
         {
             i_seek_position = it->second.fpos;
             i_mk_seek_time  = it->second.pts;
         }
 
-        track.i_skip_until_fpos = it->second.fpos;
-        track.i_last_dts        = it->second.pts;
+        tracks.at( it->first ).i_skip_until_fpos = it->second.fpos;
+        tracks.at( it->first ).i_last_dts        = it->second.pts;
 
         msg_Dbg( &sys.demuxer, "seek: preroll{ track: %u, pts: %" PRId64 ", fpos: %" PRIu64 " } ",
           it->first, it->second.pts, it->second.fpos );
@@ -1230,7 +1228,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             vars.block->ReadData( vars.obj->es.I_O() );
             vars.block->SetParent( *vars.obj->cluster );
 
-            if( vars.obj->tracks[ kblock.TrackNum() ].fmt.i_cat == SPU_ES )
+            if( vars.obj->tracks.at( kblock.TrackNum() ).fmt.i_cat == SPU_ES )
             {
                 vars.obj->_seeker.add_seekpoint( kblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 );
             }
