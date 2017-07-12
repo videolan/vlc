@@ -58,13 +58,13 @@
 - (NSImage *)image:(NSImage*)image tintedWithColor:(NSColor *)tint
 {
     image = [image copy];
+    [image setTemplate:NO];
     if (tint) {
         [image lockFocus];
-        [tint set];
         NSRect imageRect = {NSZeroPoint, [image size]};
+        [tint setFill];
         NSRectFillUsingOperation(imageRect, NSCompositeSourceAtop);
         [image unlockFocus];
-        [image setTemplate:NO];
     }
     return image;
 }
@@ -81,6 +81,7 @@
 
 - (void)drawImage:(NSImage *)image withFrame:(NSRect)frame inView:(NSView *)controlView
 {
+    image = [self tintedImage:image];
     [super drawImage:image withFrame:frame inView:controlView];
 }
 
