@@ -207,24 +207,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     /* Init the track */
     mkv_track_t track;
 
-    track.b_default              = true;
-    track.b_enabled              = true;
-    track.b_forced               = false;
-    track.i_number               = 0;
-
-    track.i_extra_data           = 0;
-    track.p_extra_data           = NULL;
-
-    track.codec                  = "";
-    track.b_dts_only             = false;
-    track.b_pts_only             = false;
-
-    track.b_no_duration          = false;
-    track.i_default_duration     = 0;
-    track.f_timecodescale        = 1.0;
-    track.i_last_dts             = 0;
-    track.i_skip_until_fpos      = -1;
-
     EbmlUInteger *pTrackType = static_cast<EbmlUInteger*>(m->FindElt(EBML_INFO(KaxTrackType)));
     uint8 ttype;
     if (likely(pTrackType != NULL))
@@ -252,33 +234,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             es_format_Init( &track.fmt, UNKNOWN_ES, 0);
             break;
     }
-
-    track.fmt.psz_language       = strdup("English");
-    track.fmt.psz_description    = NULL;
-
-    track.f_fps = 0;
-    track.p_es = NULL;
-
-    track.i_original_rate        = 0;
-    track.i_chans_to_reorder     = 0;
-    std::memset( &track.pi_chan_table, 0, sizeof( track.pi_chan_table ) );
-
-    track.p_sys                  = NULL;
-
-    track.b_inited               = false;
-    track.b_discontinuity        = false;
-
-    track.i_data_init            = 0;
-    track.p_data_init            = NULL;
-
-    track.str_codec_name         = "";
-
-    track.i_compression_type     = MATROSKA_COMPRESSION_NONE;
-    track.i_encoding_scope       = MATROSKA_ENCODING_SCOPE_ALL_FRAMES;
-    track.p_compression_data     = NULL;
-
-    track.i_seek_preroll          = 0;
-    track.i_codec_delay           = 0;
 
     MkvTree( sys.demuxer, 2, "Track Entry" );
 

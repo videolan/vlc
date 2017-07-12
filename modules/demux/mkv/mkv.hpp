@@ -183,6 +183,40 @@ public:
 class mkv_track_t
 {
     public:
+        mkv_track_t() :
+            b_default(true)
+          ,b_enabled(true)
+          ,b_forced(false)
+          ,i_number(0)
+          ,i_extra_data(0)
+          ,p_extra_data(NULL)
+          ,b_dts_only(false)
+          ,b_pts_only(false)
+          ,b_no_duration(false)
+          ,i_default_duration(0)
+          ,f_timecodescale(1.0)
+          ,i_last_dts(0)
+          ,i_skip_until_fpos(-1)
+          ,f_fps(0)
+          ,p_es(NULL)
+          ,i_original_rate(0)
+          ,i_chans_to_reorder(0)
+          ,p_sys(NULL)
+          ,b_inited(false)
+          ,b_discontinuity(false)
+          ,i_data_init(0)
+          ,p_data_init(NULL)
+          ,i_compression_type(MATROSKA_COMPRESSION_NONE)
+          ,i_encoding_scope(MATROSKA_ENCODING_SCOPE_ALL_FRAMES)
+          ,p_compression_data(NULL)
+          ,i_seek_preroll(0)
+          ,i_codec_delay(0)
+        {
+            std::memset( &fmt, 0, sizeof( fmt ) );
+            std::memset( &pi_chan_table, 0, sizeof( pi_chan_table ) );
+            fmt.psz_language = strdup("English");
+        }
+
         typedef unsigned int track_id_t;
 
         bool         b_default;
