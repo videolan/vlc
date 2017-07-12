@@ -243,6 +243,7 @@ static int VideoAutoMenuBuilder( playlist_t *pl, input_thread_t *p_input,
     PUSH_VAR( "crop" );
     PUSH_VAR( "deinterlace" );
     PUSH_VAR( "deinterlace-mode" );
+    PUSH_VAR( "hmd" );
 
     if( p_object )
         vlc_object_release( p_object );
@@ -677,6 +678,10 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
+
+        current->addSeparator();
+        current->addMenu( rendererMenu );
+        addActionWithCheckbox( current, "hmd", qtr( "&Use an HMD" ) );
 
         current->addSeparator();
         /* Surface modifiers */
