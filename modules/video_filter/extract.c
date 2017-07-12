@@ -48,7 +48,7 @@ static int ExtractCallback( vlc_object_t *, char const *,
                             vlc_value_t, vlc_value_t, void * );
 
 static void make_projection_matrix( filter_t *, int color, int *matrix );
-static void get_custom_from_yuv( picture_t *, picture_t *, int, int, int, int const * );
+static void get_custom_from_yuv( picture_t *, picture_t *, int const, int const, int const, int const * );
 static void get_custom_from_packedyuv422( picture_t *, picture_t *, int * );
 
 
