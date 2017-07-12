@@ -168,6 +168,7 @@ public:
 
     //vout properties
     Q_PROPERTY(bool hasVideoOutput READ hasVideoOutput NOTIFY hasVideoOutputChanged FINAL)
+    Q_PROPERTY(VLCVarChoiceModel* videoStereoMode READ getVideoStereoMode CONSTANT FINAL)
     Q_PROPERTY(VLCVarChoiceModel* zoom READ getZoom CONSTANT FINAL)
     Q_PROPERTY(VLCVarChoiceModel* aspectRatio READ getAspectRatio CONSTANT FINAL)
     Q_PROPERTY(VLCVarChoiceModel* crop READ getCrop CONSTANT FINAL)
@@ -350,6 +351,7 @@ public slots:
 
     //vout properties
     bool hasVideoOutput() const;
+    VLCVarChoiceModel* getVideoStereoMode();
     VLCVarChoiceModel* getZoom();
     VLCVarChoiceModel* getAspectRatio();
     VLCVarChoiceModel* getCrop();

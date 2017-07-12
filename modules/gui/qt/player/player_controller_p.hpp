@@ -144,6 +144,7 @@ public:
     bool m_teletextTransparent = false;
 
     //vout properties
+    VLCVarChoiceModel m_videoStereoMode;
     VLCVarChoiceModel m_zoom;
     VLCVarChoiceModel m_aspectRatio;
     VLCVarChoiceModel m_crop;

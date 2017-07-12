@@ -221,6 +221,7 @@ void PlayerControllerPrivate::UpdateVouts(vout_thread_t **vouts, size_t i_vouts,
     if (m_hasVideo)
         main_vout = vouts[0];
 
+    m_videoStereoMode.resetObject( main_vout );
     m_zoom.resetObject( main_vout );
     m_aspectRatio.resetObject( main_vout );
     m_crop.resetObject(  main_vout );
@@ -1114,6 +1115,7 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
     , m_titleList(m_player)
     , m_chapterList(m_player)
     , m_programList(m_player)
+    , m_videoStereoMode((vout_thread_t*)nullptr, "video-stereo-mode")
     , m_zoom((vout_thread_t*)nullptr, "zoom")
     , m_aspectRatio((vout_thread_t*)nullptr, "aspect-ratio")
     , m_crop((vout_thread_t*)nullptr, "crop")
@@ -2070,6 +2072,7 @@ QABSTRACTLIST_GETTER( TitleListModel, getTitles, m_titleList)
 QABSTRACTLIST_GETTER( ChapterListModel,getChapters, m_chapterList)
 QABSTRACTLIST_GETTER( AudioDeviceModel, getAudioDevices, m_audioDeviceList)
 QABSTRACTLIST_GETTER( ProgramListModel, getPrograms, m_programList)
+QABSTRACTLIST_GETTER( VLCVarChoiceModel, getVideoStereoMode, m_videoStereoMode)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getZoom, m_zoom)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAspectRatio, m_aspectRatio)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getCrop, m_crop)
