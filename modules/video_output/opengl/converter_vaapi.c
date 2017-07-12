@@ -295,11 +295,14 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
               VANativeDisplay native,
               vlc_vaapi_native_destroy_cb native_destroy_cb)
 {
+    int ret = VLC_EGENERIC;
+    struct priv *priv = NULL;
+
     if (vadpy == NULL)
         goto error;
 
-    int ret = VLC_ENOMEM;
-    struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
+    ret = VLC_ENOMEM;
+    priv = tc->priv = calloc(1, sizeof(struct priv));
     if (unlikely(tc->priv == NULL))
         goto error;
 
@@ -349,8 +352,7 @@ error:
         if (native != NULL && native_destroy_cb != NULL)
             native_destroy_cb(native);
     }
-    if (priv)
-        free(priv);
+    free(priv);
     return ret;
 }
 
@@ -384,13 +386,39 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
     if (eglexts == NULL || !HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
         return VLC_EGENERIC;
 
+    int ret = VLC_EGENERIC;
+    switch (tc->gl->surface->type)
+    {
+#ifdef HAVE_VA_X11
+        case VOUT_WINDOW_TYPE_XID:
+        {
+            if (!vlc_xlib_init(VLC_OBJECT(tc->gl)))
+                break;
+            Display *x11dpy = XOpenDisplay(tc->gl->surface->display.x11);
+            if (x11dpy == NULL)
+                break;
+
+            ret = tc_vaegl_init(tc, vaGetDisplay(x11dpy), x11dpy,
+                                x11_native_destroy_cb);
+        }
+#endif
+#ifdef HAVE_VA_WL
+        case VOUT_WINDOW_TYPE_WAYLAND:
+            ret = tc_vaegl_init(tc, vaGetDisplayWl(tc->gl->surface->display.wl),
+                                NULL, NULL);
+#endif
+    }
+
+    if (ret == VLC_SUCCESS)
+        return VLC_SUCCESS;
+
 #ifdef HAVE_VA_DRM
     static const char *const drm_device_paths[] = {
         "/dev/dri/renderD128",
         "/dev/dri/card0"
     };
 
-    for (int i = 0; ARRAY_SIZE(drm_device_paths); i++)
+    for (size_t i = 0; i < ARRAY_SIZE(drm_device_paths); i++)
     {
         int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
         if (drm_fd == -1)
@@ -398,35 +426,16 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
 
         VADisplay dpy = vaGetDisplayDRM(drm_fd);
         if (dpy)
-            return tc_vaegl_init(tc, dpy, (VANativeDisplay) (intptr_t) drm_fd,
-                                 drm_native_destroy_cb);
-
+        {
+            ret = tc_vaegl_init(tc, dpy, (VANativeDisplay) (intptr_t) drm_fd,
+                                drm_native_destroy_cb);
+            if (ret == VLC_SUCCESS)
+                return ret;
+        }
         vlc_close(drm_fd);
     }
     /* Fallback to X11 or WAYLAND */
 #endif
 
-    switch (tc->gl->surface->type)
-    {
-#ifdef HAVE_VA_X11
-        case VOUT_WINDOW_TYPE_XID:
-        {
-            if (!vlc_xlib_init(VLC_OBJECT(tc->gl)))
-                return VLC_EGENERIC;
-            Display *x11dpy = XOpenDisplay(tc->gl->surface->display.x11);
-            if (x11dpy == NULL)
-                return VLC_EGENERIC;
-
-            return tc_vaegl_init(tc, vaGetDisplay(x11dpy), x11dpy,
-                                 x11_native_destroy_cb);
-        }
-#endif
-#ifdef HAVE_VA_WL
-        case VOUT_WINDOW_TYPE_WAYLAND:
-            return tc_vaegl_init(tc, vaGetDisplayWl(tc->gl->surface->display.wl),
-                                 NULL, NULL);
-#endif
-        default:
-            return VLC_EGENERIC;
-    }
+    return VLC_EGENERIC;
 }
