@@ -473,6 +473,16 @@ static void stream_destroy (demux_t *demux, void *data)
     }
 }
 
+static void stream_header (demux_t *demux, void *data, block_t *block)
+{
+    VLC_UNUSED(demux);
+    VLC_UNUSED(data);
+    if(block->p_buffer[1] & 0x80) /* TS M-bit == discontinuity (RFC 2250, 2.1) */
+    {
+        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
+}
+
 /* Send a packet to a chained demuxer */
 static bool stream_decode (demux_t *demux, void *data, block_t *block)
 {
@@ -652,6 +662,7 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
     rtp_pt_t pt = {
         .init = NULL,
         .destroy = codec_destroy,
+        .header = NULL,
         .decode = codec_decode,
         .frequency = 0,
         .number = ptype,
@@ -714,6 +725,7 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
         msg_Dbg (demux, "detected MPEG2 TS");
         pt.init = ts_init;
         pt.destroy = stream_destroy;
+        pt.header = stream_header;
         pt.decode = stream_decode;
         pt.frequency = 90000;
         break;
