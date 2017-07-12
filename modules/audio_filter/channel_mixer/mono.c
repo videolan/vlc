@@ -397,7 +397,10 @@ static int OpenFilter( vlc_object_t *p_this )
              p_filter->fmt_out.audio.i_bitspersample );
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_S16N;
+    aout_FormatPrepare(&p_filter->fmt_in.audio);
     p_filter->fmt_out.audio.i_format = VLC_CODEC_S16N;
+    aout_FormatPrepare(&p_filter->fmt_out.audio);
+
     return VLC_SUCCESS;
 }
 
