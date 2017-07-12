@@ -348,9 +348,6 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_filter->fmt_in.audio.i_format = VLC_CODEC_S16N;
-    p_filter->fmt_out.audio.i_format = VLC_CODEC_S16N;
-
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
     if( p_sys == NULL )
@@ -399,6 +396,8 @@ static int OpenFilter( vlc_object_t *p_this )
              p_filter->fmt_in.audio.i_bitspersample,
              p_filter->fmt_out.audio.i_bitspersample );
 
+    p_filter->fmt_in.audio.i_format = VLC_CODEC_S16N;
+    p_filter->fmt_out.audio.i_format = VLC_CODEC_S16N;
     return VLC_SUCCESS;
 }
 
