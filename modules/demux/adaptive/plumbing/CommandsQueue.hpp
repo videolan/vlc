@@ -159,9 +159,9 @@ namespace adaptive
             void Commit();
             bool isEmpty() const;
             void setDrop( bool );
-            void setFlush();
+            void setDraining();
             void setEOF();
-            bool isFlushing() const;
+            bool isDraining() const;
             bool isEOF() const;
             mtime_t getDemuxedAmount() const;
             mtime_t getBufferingLevel() const;
@@ -176,7 +176,7 @@ namespace adaptive
             std::list<AbstractCommand *> commands;
             mtime_t bufferinglevel;
             mtime_t pcr;
-            bool b_flushing;
+            bool b_draining;
             bool b_drop;
             bool b_eof;
     };

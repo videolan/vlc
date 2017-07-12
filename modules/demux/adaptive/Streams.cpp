@@ -187,7 +187,7 @@ bool AbstractStream::seekAble() const
     return (demuxer &&
             !fakeesout->restarting() &&
             !discontinuity &&
-            !commandsqueue->isFlushing() );
+            !commandsqueue->isDraining() );
 }
 
 bool AbstractStream::isSelected() const
@@ -311,7 +311,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
         return AbstractStream::buffering_end;
     }
 
-    if(commandsqueue->isFlushing())
+    if(commandsqueue->isDraining())
     {
         vlc_mutex_unlock(&lock);
         return AbstractStream::buffering_suspended;
@@ -325,10 +325,10 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
             /* If demux fails because of probing failure / wrong format*/
             if(discontinuity)
             {
-                msg_Dbg( p_realdemux, "Flushing on format change" );
+                msg_Dbg( p_realdemux, "Draining on format change" );
                 prepareRestart();
                 discontinuity = false;
-                commandsqueue->setFlush();
+                commandsqueue->setDraining();
                 vlc_mutex_unlock(&lock);
                 return AbstractStream::buffering_ongoing;
             }
@@ -367,8 +367,8 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
                 prepareRestart(discontinuity);
                 if(discontinuity)
                 {
-                    msg_Dbg(p_realdemux, "Flushing on discontinuity");
-                    commandsqueue->setFlush();
+                    msg_Dbg(p_realdemux, "Draining on discontinuity");
+                    commandsqueue->setDraining();
                     discontinuity = false;
                 }
                 needrestart = false;
@@ -399,7 +399,7 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     *pi_pcr = nz_deadline;
 
-    if(commandsqueue->isFlushing())
+    if(commandsqueue->isDraining())
     {
         *pi_pcr = commandsqueue->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
         if(!commandsqueue->isEmpty())
