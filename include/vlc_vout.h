@@ -84,6 +84,18 @@ enum vlc_vout_order
     VLC_VOUT_ORDER_SECONDARY,
 };
 
+/**
+  * Stereoscopic display mode.
+  */
+typedef enum vlc_stereoscopic_mode_t
+{
+    VIDEO_STEREO_OUTPUT_AUTO = 0,
+    VIDEO_STEREO_OUTPUT_STEREO,
+    VIDEO_STEREO_OUTPUT_LEFT_ONLY,
+    VIDEO_STEREO_OUTPUT_RIGHT_ONLY,
+    VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE,
+} vlc_stereoscopic_mode_t;
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/

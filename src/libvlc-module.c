@@ -390,6 +390,19 @@ static const char * const ppsz_deinterlace_mode_text[] = {
 #define DEINTERLACE_FILTER_TEXT N_("Deinterlace filter")
 #define DEINTERLACE_FILTER_LONGTEXT N_("Deinterlace module to use.")
 
+#define VIDEO_STEREO_FORMAT_TEXT N_("Video Stereo 3D mode")
+#define VIDEO_STEREO_FORMAT_TEXT_LONGTEXT  N_("Set the Video Stereo 3D mode.")
+
+static const int video_stereo_formats[] = {
+    VIDEO_STEREO_OUTPUT_AUTO, VIDEO_STEREO_OUTPUT_STEREO,
+    VIDEO_STEREO_OUTPUT_LEFT_ONLY, VIDEO_STEREO_OUTPUT_RIGHT_ONLY,
+    VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE,
+};
+static const char *const video_stereo_formats_text[] = {
+    N_("Auto"), N_("Stereo"), N_("Left Only"), N_("Right Only"),
+    N_("Side-by-Side"),
+};
+
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -1678,6 +1691,10 @@ vlc_module_begin ()
     add_bool( "video-title-show", true, VIDEO_TITLE_SHOW_TEXT,
               VIDEO_TITLE_SHOW_LONGTEXT )
         change_safe()
+    add_integer ("video-stereo-mode", VIDEO_STEREO_OUTPUT_AUTO, VIDEO_STEREO_FORMAT_TEXT,
+                 VIDEO_STEREO_FORMAT_TEXT_LONGTEXT)
+        change_safe()
+        change_integer_list (video_stereo_formats, video_stereo_formats_text)
     add_integer( "video-title-timeout", 5000, VIDEO_TITLE_TIMEOUT_TEXT,
                  VIDEO_TITLE_TIMEOUT_LONGTEXT )
         change_safe()

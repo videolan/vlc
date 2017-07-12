@@ -149,6 +149,18 @@ static const struct
     { VLC_VIDEO_FIT_HEIGHT,  N_("Window Height") },
 };
 
+static const struct
+{
+    int i_value;
+    char psz_label[13];
+} p_3D_output_format_values[] = {
+    { VIDEO_STEREO_OUTPUT_AUTO, N_("Auto") },
+    { VIDEO_STEREO_OUTPUT_STEREO, N_("Stereo") },
+    { VIDEO_STEREO_OUTPUT_LEFT_ONLY, N_("Left Only") },
+    { VIDEO_STEREO_OUTPUT_RIGHT_ONLY, N_("Right Only") },
+    { VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE, N_("Side-by-Side") },
+};
+
 static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
                              char *psz_list )
 {
@@ -215,6 +227,16 @@ void vout_CreateVars( vout_thread_t *p_vout )
         val.f_float = p_zoom_values[i].f_value;
         var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, val,
                     vlc_gettext( p_zoom_values[i].psz_label ) );
+    }
+
+    var_Create( p_vout, "video-stereo-mode", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Change( p_vout, "video-stereo-mode", VLC_VAR_SETTEXT, _("video-stereo-output"), NULL );
+
+    for( size_t i = 0; i < ARRAY_SIZE(p_3D_output_format_values); i++ )
+    {
+        val.i_int = p_3D_output_format_values[i].i_value;
+        var_Change( p_vout, "video-stereo-mode", VLC_VAR_ADDCHOICE, val,
+                    vlc_gettext( p_3D_output_format_values[i].psz_label ) );
     }
 
     /* Crop offset vars */
