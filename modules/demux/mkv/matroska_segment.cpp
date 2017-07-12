@@ -912,6 +912,7 @@ void matroska_segment_c::ComputeTrackPriority()
         {
             case VIDEO_ES: b_has_default_video |= flag; break;
             case AUDIO_ES: b_has_default_audio |= flag; break;
+            default: break; // ignore
         }
     }
 
