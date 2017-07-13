@@ -23,6 +23,8 @@
 #ifndef VLC_AOUT_H
 #define VLC_AOUT_H 1
 
+#include <assert.h>
+
 /**
  * \defgroup audio_output Audio output
  * \ingroup output
@@ -175,6 +177,35 @@ struct audio_output
     } event;
 };
 
+typedef enum
+{
+    AOUT_CHANIDX_DISABLE = -1,
+    AOUT_CHANIDX_LEFT,
+    AOUT_CHANIDX_RIGHT,
+    AOUT_CHANIDX_MIDDLELEFT,
+    AOUT_CHANIDX_MIDDLERIGHT,
+    AOUT_CHANIDX_REARLEFT,
+    AOUT_CHANIDX_REARRIGHT,
+    AOUT_CHANIDX_REARCENTER,
+    AOUT_CHANIDX_CENTER,
+    AOUT_CHANIDX_LFE,
+    AOUT_CHANIDX_MAX
+} vlc_chan_order_idx_t;
+
+static_assert(AOUT_CHANIDX_MAX == AOUT_CHAN_MAX, "channel count mismatch");
+
+#define AOUT_CHAN_REMAP_INIT { \
+    AOUT_CHANIDX_LEFT,  \
+    AOUT_CHANIDX_RIGHT, \
+    AOUT_CHANIDX_MIDDLELEFT, \
+    AOUT_CHANIDX_MIDDLERIGHT, \
+    AOUT_CHANIDX_REARLEFT, \
+    AOUT_CHANIDX_REARRIGHT, \
+    AOUT_CHANIDX_REARCENTER, \
+    AOUT_CHANIDX_CENTER, \
+    AOUT_CHANIDX_LFE, \
+}
+
 /**
  * It describes the audio channel order VLC expect.
  */
@@ -323,9 +354,10 @@ typedef struct aout_request_vout aout_request_vout_t;
 VLC_API aout_filters_t *aout_FiltersNew(vlc_object_t *,
                                         const audio_sample_format_t *,
                                         const audio_sample_format_t *,
-                                        const aout_request_vout_t *) VLC_USED;
-#define aout_FiltersNew(o,inf,outf,rv) \
-        aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv)
+                                        const aout_request_vout_t *,
+                                        const int *remap) VLC_USED;
+#define aout_FiltersNew(o,inf,outf,rv,remap) \
+        aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv,remap)
 VLC_API void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);
 #define aout_FiltersDelete(o,f) \
         aout_FiltersDelete(VLC_OBJECT(o),f)

@@ -71,7 +71,7 @@ static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_str
     if( p_sys->psz_af )
         var_SetString( p_stream, "audio-filter", p_sys->psz_af );
     id->p_af_chain = aout_FiltersNew( p_stream, fmt_last,
-                                      &id->p_encoder->fmt_in.audio, NULL );
+                                      &id->p_encoder->fmt_in.audio, NULL, NULL );
     var_Destroy( p_stream, "audio-filter" );
     var_Destroy( p_stream, "audio-time-stretch" );
     if( id->p_af_chain == NULL )

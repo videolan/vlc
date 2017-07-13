@@ -46,13 +46,14 @@ static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
                                const char *name, filter_owner_sys_t *owner,
                                const audio_sample_format_t *infmt,
                                const audio_sample_format_t *outfmt,
-                               bool const_fmt)
+                               config_chain_t *cfg, bool const_fmt)
 {
     filter_t *filter = vlc_custom_create (obj, sizeof (*filter), type);
     if (unlikely(filter == NULL))
         return NULL;
 
     filter->owner.sys = owner;
+    filter->p_cfg = cfg;
     filter->fmt_in.audio = *infmt;
     filter->fmt_in.i_codec = infmt->i_format;
     filter->fmt_out.audio = *outfmt;
@@ -92,7 +93,8 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter (obj, "audio converter", NULL, NULL, infmt, outfmt, true);
+    return CreateFilter (obj, "audio converter", NULL, NULL, infmt, outfmt,
+                         NULL, true);
 }
 
 static filter_t *FindResampler (vlc_object_t *obj,
@@ -100,7 +102,7 @@ static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *outfmt)
 {
     return CreateFilter (obj, "audio resampler", "$audio-resampler", NULL,
-                         infmt, outfmt, true);
+                         infmt, outfmt, NULL, true);
 }
 
 /**
@@ -373,7 +375,8 @@ vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
                         aout_filters_t *restrict filters, const void *owner,
                         audio_sample_format_t *restrict infmt,
-                        const audio_sample_format_t *restrict outfmt)
+                        const audio_sample_format_t *restrict outfmt,
+                        config_chain_t *cfg)
 {
     const unsigned max = sizeof (filters->tab) / sizeof (filters->tab[0]);
     if (filters->count >= max)
@@ -383,7 +386,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     }
 
     filter_t *filter = CreateFilter (obj, type, name,
-                                     (void *)owner, infmt, outfmt, false);
+                                     (void *)owner, infmt, outfmt, cfg, false);
     if (filter == NULL)
     {
         msg_Err (obj, "cannot add user %s \"%s\" (skipped)", type, name);
@@ -407,6 +410,52 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     return 0;
 }
 
+static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters,
+                             audio_sample_format_t *restrict infmt,
+                             const audio_sample_format_t *restrict outfmt,
+                             const int *wg4_remap)
+{
+    char *name;
+    config_chain_t *cfg;
+
+    /* The remap audio filter use a different order than wg4 */
+    static const uint8_t wg4_to_remap[] = { 0, 2, 6, 7, 3, 5, 4, 1, 8 };
+    int remap[AOUT_CHAN_MAX];
+    bool needed = false;
+    for (int i = 0; i < AOUT_CHAN_MAX; ++i)
+    {
+        if (wg4_remap[i] != i)
+            needed = true;
+        remap[i] = wg4_remap[i] >= 0 ? wg4_to_remap[wg4_remap[i]] : -1;
+    }
+    if (!needed)
+        return 0;
+
+    char *str;
+    int ret = asprintf(&str, "remap{channel-left=%d,channel-right=%d,"
+                       "channel-middleleft=%d,channel-middleright=%d,"
+                       "channel-rearleft=%d,channel-rearright=%d,"
+                       "channel-rearcenter=%d,channel-center=%d,"
+                       "channel-lfe=%d,normalize=false}",
+                       remap[0], remap[1], remap[2], remap[3], remap[4],
+                       remap[5], remap[6], remap[7], remap[8]);
+    if (ret == -1)
+        return -1;
+
+    free(config_ChainCreate(&name, &cfg, str));
+    if (name != NULL && cfg != NULL)
+        ret = AppendFilter(obj, "audio filter", name, filters,
+                           NULL, infmt, outfmt, cfg);
+    else
+        ret = -1;
+
+    free(str);
+    free(name);
+    if (cfg)
+        config_ChainDestroy(cfg);
+    return ret;
+}
+
 #undef aout_FiltersNew
 /**
  * Sets a chain of audio filters up.
@@ -414,6 +463,9 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
  * \param infmt chain input format [IN]
  * \param outfmt chain output format [IN]
  * \param request_vout visualization video output request callback
+ * \param remap a const array of size AOUT_CHAN_MAX or NULL. If not NULL, a
+ * remap audio filter will be inserted to remap channels according to the
+ * array. The array is in the WG4 order.
  * \return a filters chain or NULL on failure
  *
  * \note
@@ -425,7 +477,8 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
 aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
                                  const audio_sample_format_t *restrict infmt,
                                  const audio_sample_format_t *restrict outfmt,
-                                 const aout_request_vout_t *request_vout)
+                                 const aout_request_vout_t *request_vout,
+                                 const int *remap)
 {
     aout_filters_t *filters = malloc (sizeof (*filters));
     if (unlikely(filters == NULL))
@@ -492,9 +545,12 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     if (var_InheritBool (obj, "audio-time-stretch"))
     {
         if (AppendFilter(obj, "audio filter", "scaletempo",
-                         filters, NULL, &input_format, &output_format) == 0)
+                         filters, NULL, &input_format, &output_format, NULL) == 0)
             filters->rate_filter = filters->tab[filters->count - 1];
     }
+
+    if (remap != NULL)
+        AppendRemapFilter(obj, filters, &input_format, &output_format, remap);
 
     /* Now add user filters */
     char *str = var_InheritString (obj, "audio-filter");
@@ -504,7 +560,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         while ((name = strsep (&p, " :")) != NULL)
         {
             AppendFilter(obj, "audio filter", name, filters,
-                         NULL, &input_format, &output_format);
+                         NULL, &input_format, &output_format, NULL);
         }
         free (str);
     }
@@ -514,7 +570,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         char *visual = var_InheritString (obj, "audio-visual");
         if (visual != NULL && strcasecmp (visual, "none"))
             AppendFilter(obj, "visualization", visual, filters,
-                         request_vout, &input_format, &output_format);
+                         request_vout, &input_format, &output_format, NULL);
         free (visual);
     }
 
