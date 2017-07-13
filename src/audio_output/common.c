@@ -118,26 +118,17 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
             return "Left";
         return "Right";
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT:
-        if ( p_format->i_original_channels & AOUT_CHAN_REVERSESTEREO )
-        {
-            if ( p_format->i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-                return "Dolby/Reverse";
-            return "Stereo/Reverse";
-        }
-        else
-        {
-            if ( p_format->i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-                return "Dolby";
-            else if ( p_format->i_original_channels & AOUT_CHAN_DUALMONO )
-                return "Dual-mono";
-            else if ( p_format->i_original_channels == AOUT_CHAN_CENTER )
-                return "Stereo/Mono";
-            else if ( !(p_format->i_original_channels & AOUT_CHAN_RIGHT) )
-                return "Stereo/Left";
-            else if ( !(p_format->i_original_channels & AOUT_CHAN_LEFT) )
-                return "Stereo/Right";
-            return "Stereo";
-        }
+        if ( p_format->i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+            return "Dolby";
+        else if ( p_format->i_original_channels & AOUT_CHAN_DUALMONO )
+            return "Dual-mono";
+        else if ( p_format->i_original_channels == AOUT_CHAN_CENTER )
+            return "Stereo/Mono";
+        else if ( !(p_format->i_original_channels & AOUT_CHAN_RIGHT) )
+            return "Stereo/Left";
+        else if ( !(p_format->i_original_channels & AOUT_CHAN_LEFT) )
+            return "Stereo/Right";
+        return "Stereo";
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER:
         return "3F";
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER:
