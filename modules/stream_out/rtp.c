@@ -1612,7 +1612,7 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
 }
 
 void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
-                           int b_marker, int64_t i_pts )
+                           bool b_m_bit, int64_t i_pts )
 {
     if( !id->b_ts_init )
     {
@@ -1639,7 +1639,7 @@ void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
                            + id->i_ts_offset;
 
     out->p_buffer[0] = 0x80;
-    out->p_buffer[1] = (b_marker?0x80:0x00)|id->rtp_fmt.payload_type;
+    out->p_buffer[1] = (b_m_bit?0x80:0x00)|id->rtp_fmt.payload_type;
     out->p_buffer[2] = ( id->i_sequence >> 8)&0xff;
     out->p_buffer[3] = ( id->i_sequence     )&0xff;
     out->p_buffer[4] = ( i_timestamp >> 24 )&0xff;
