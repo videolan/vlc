@@ -434,7 +434,8 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
             if (ret == VLC_SUCCESS)
                 return ret;
         }
-        vlc_close(drm_fd);
+        else
+            vlc_close(drm_fd);
     }
     /* Fallback to X11 or WAYLAND */
 #endif
