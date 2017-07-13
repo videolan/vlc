@@ -208,6 +208,7 @@ bool sout_stream_sys_t::canDecodeAudio( int i_codec ) const
         i_codec == VLC_FOURCC('h', 'a', 'a', 'c') ||
         i_codec == VLC_FOURCC('l', 'a', 'a', 'c') ||
         i_codec == VLC_FOURCC('s', 'a', 'a', 'c') ||
+        i_codec == VLC_CODEC_OPUS ||
         i_codec == VLC_CODEC_MP3 ||
         i_codec == VLC_CODEC_A52 ||
         i_codec == VLC_CODEC_EAC3;
