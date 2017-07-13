@@ -153,7 +153,7 @@ static block_t *transcode_dequeue_all_audios( sout_stream_id_sys_t *id )
     return p_audio_bufs;
 }
 
-int transcode_audio_new( sout_stream_t *p_stream,
+static int transcode_audio_new( sout_stream_t *p_stream,
                                 sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;

@@ -162,7 +162,7 @@ static picture_t *transcode_dequeue_all_pics( sout_stream_id_sys_t *id )
     return p_pics;
 }
 
-int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 

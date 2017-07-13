@@ -67,7 +67,7 @@ static subpicture_t *transcode_dequeue_all_subs( sout_stream_id_sys_t *id )
     return p_subpics;
 }
 
-int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
