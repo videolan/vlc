@@ -4,6 +4,8 @@
  * Copyright (C) 2015-2017 VLC authors, VideoLAN and VideoLabs
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
+ *          Thomas Guillem <thomas@gllm.fr>
+ *          Victorien Le Couviour--Tuffet <victorien.lecouiour.tuffet@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -36,17 +38,36 @@
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
+static int Open_CVPX_to_CVPX(vlc_object_t *);
+static void Close_CVPX_to_CVPX(vlc_object_t *);
+
 vlc_module_begin ()
     set_description("Conversions from/to CoreVideo buffers")
     set_capability("video converter", 10)
     set_callbacks(Open, Close)
+
+    add_submodule()
+    set_description("Conversions between CoreVideo buffers")
+    set_callbacks(Open_CVPX_to_CVPX, Close_CVPX_to_CVPX)
 vlc_module_end ()
 
 struct filter_sys_t
 {
-    filter_t *p_sw_filter;
-    CVPixelBufferPoolRef pool;
+    union
+    {
+        struct
+        {
+            filter_t *p_sw_filter;
+            CVPixelBufferPoolRef pool;
+        };
+
+        VTPixelTransferSessionRef vttransfer;
+    };
 };
+
+/********************************
+ * CVPX to/from I420 conversion *
+ ********************************/
 
 static picture_t *CVPX_TO_I420_Filter(filter_t *p_filter, picture_t *src)
 {
@@ -210,4 +231,86 @@ error:
     return VLC_EGENERIC;
 #undef CASE_CVPX_INPUT
 #undef CASE_CVPX_OUTPUT
+}
+
+/***************************
+ * CVPX to CVPX conversion *
+ ***************************/
+
+static picture_t *
+Filter(filter_t *filter, picture_t *src)
+{
+    CVPixelBufferRef src_cvpx = cvpxpic_get_ref(src);
+    assert(src_cvpx);
+
+    picture_t *dst = filter_NewPicture(filter);
+    if (!dst)
+    {
+        picture_Release(src);
+        return NULL;
+    }
+
+    CVPixelBufferRef dst_cvpx = cvpxpic_get_ref(dst);
+    assert(dst_cvpx);
+
+    if (VTPixelTransferSessionTransferImage(filter->p_sys->vttransfer,
+                                            src_cvpx, dst_cvpx) != noErr)
+    {
+        picture_Release(dst);
+        picture_Release(src);
+        return NULL;
+    }
+
+    picture_CopyProperties(dst, src);
+    picture_Release(src);
+    return dst;
+}
+
+static vlc_fourcc_t const supported_chromas[] = { VLC_CODEC_CVPX_BGRA,
+                                                  VLC_CODEC_CVPX_I420,
+                                                  VLC_CODEC_CVPX_NV12,
+                                                  VLC_CODEC_CVPX_UYVY };
+
+static int
+Open_CVPX_to_CVPX(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t *)obj;
+
+    unsigned int i;
+#define CHECK_CHROMA(fourcc) \
+    i = 0; \
+    while (i < ARRAY_SIZE(supported_chromas) && \
+           fourcc != supported_chromas[i]) \
+        ++i; \
+    if (i == ARRAY_SIZE(supported_chromas)) \
+        return VLC_EGENERIC; \
+
+    CHECK_CHROMA(filter->fmt_in.video.i_chroma)
+    CHECK_CHROMA(filter->fmt_out.video.i_chroma)
+#undef CHECK_CHROMA
+
+    filter->p_sys = calloc(1, sizeof(filter_sys_t));
+    if (!filter->p_sys)
+        return VLC_ENOMEM;
+
+    if (VTPixelTransferSessionCreate(NULL, &filter->p_sys->vttransfer)
+        != noErr)
+    {
+        free(filter->p_sys);
+        return VLC_EGENERIC;
+    }
+
+    filter->pf_video_filter = Filter;
+
+    return VLC_SUCCESS;
+}
+
+static void
+Close_CVPX_to_CVPX(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t *)obj;
+
+    VTPixelTransferSessionInvalidate(filter->p_sys->vttransfer);
+    CFRelease(filter->p_sys->vttransfer);
+    free(filter->p_sys);
 }
