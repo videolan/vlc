@@ -116,6 +116,7 @@ static block_t *Downmix( filter_t *p_filter, block_t *p_buf )
         p_src += i_input_nb;
         p_dest += i_output_nb;
     }
+    p_buf->i_buffer = p_buf->i_buffer * i_output_nb / i_input_nb;
 
     return p_buf;
 }
