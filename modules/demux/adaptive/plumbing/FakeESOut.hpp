@@ -44,7 +44,7 @@ namespace adaptive
             void setExpectedTimestampOffset(mtime_t);
             size_t esCount() const;
             bool hasSelectedEs() const;
-            bool drain();
+            bool decodersDrained();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
             void checkTimestampsStart(mtime_t);

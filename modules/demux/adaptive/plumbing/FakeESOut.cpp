@@ -247,7 +247,7 @@ bool FakeESOut::hasSelectedEs() const
     return b_selected;
 }
 
-bool FakeESOut::drain()
+bool FakeESOut::decodersDrained()
 {
     bool b_drained = true;
     std::list<FakeESOutID *>::const_iterator it;

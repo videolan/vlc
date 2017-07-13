@@ -266,9 +266,9 @@ bool AbstractStream::canActivate() const
     return !dead;
 }
 
-bool AbstractStream::drain()
+bool AbstractStream::decodersDrained()
 {
-    return fakeesout->drain();
+    return fakeesout->decodersDrained();
 }
 
 AbstractStream::buffering_status AbstractStream::getLastBufferStatus() const

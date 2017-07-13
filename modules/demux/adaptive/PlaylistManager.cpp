@@ -287,7 +287,7 @@ void PlaylistManager::drain()
             if (st->isDisabled())
                 continue;
 
-            b_drained &= st->drain();
+            b_drained &= st->decodersDrained();
         }
 
         if(b_drained)

@@ -86,7 +86,7 @@ namespace adaptive
         buffering_status getLastBufferStatus() const;
         mtime_t getDemuxedAmount() const;
         status dequeue(mtime_t, mtime_t *);
-        bool drain();
+        bool decodersDrained();
         virtual bool setPosition(mtime_t, bool);
         mtime_t getPlaybackTime() const;
         void runUpdates();
