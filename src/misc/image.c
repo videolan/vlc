@@ -646,9 +646,8 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, const video_format_t *fmt
         return NULL;
 
     p_dec->p_module = NULL;
-    es_format_Init( &p_dec->fmt_in, VIDEO_ES, fmt->i_chroma );
+    es_format_InitFromVideo( &p_dec->fmt_in, fmt );
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, 0 );
-    p_dec->fmt_in.video = *fmt;
     p_dec->b_frame_drop_allowed = false;
 
     p_dec->pf_vout_format_update = video_update_format;
@@ -693,8 +692,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
         return NULL;
 
     p_enc->p_module = NULL;
-    es_format_Init( &p_enc->fmt_in, VIDEO_ES, fmt_in->i_chroma );
-    p_enc->fmt_in.video = *fmt_in;
+    es_format_InitFromVideo( &p_enc->fmt_in, fmt_in );
 
     if( p_enc->fmt_in.video.i_visible_width == 0 ||
         p_enc->fmt_in.video.i_visible_height == 0 ||
@@ -733,8 +731,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
     p_enc->fmt_in.video.i_frame_rate = 25;
     p_enc->fmt_in.video.i_frame_rate_base = 1;
 
-    es_format_Init( &p_enc->fmt_out, VIDEO_ES, fmt_out->i_chroma );
-    p_enc->fmt_out.video = *fmt_out;
+    es_format_InitFromVideo( &p_enc->fmt_out, fmt_out );
     p_enc->fmt_out.video.i_width = p_enc->fmt_in.video.i_width;
     p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
 
