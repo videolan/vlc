@@ -137,7 +137,6 @@ struct audio_format_t
 /* Values available for original channels only */
 #define AOUT_CHAN_DOLBYSTEREO       0x10000
 #define AOUT_CHAN_DUALMONO          0x20000
-#define AOUT_CHAN_REVERSESTEREO     0x40000
 
 #define AOUT_CHAN_PHYSMASK          0xFFFF
 /* Maximum number of mapped channels (or the maximum of bits set in
