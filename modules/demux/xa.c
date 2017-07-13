@@ -115,7 +115,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     es_format_t fmt;
-    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_ADPCM_EA );
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_ADPCM_XA_EA );
 
     msg_Dbg( p_demux, "assuming EA ADPCM audio codec" );
     fmt.audio.i_rate = GetDWLE( &xa.nSamplesPerSec );
