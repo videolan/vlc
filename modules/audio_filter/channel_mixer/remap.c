@@ -108,7 +108,7 @@ struct filter_sys_t
 {
     remap_fun_t pf_remap;
     int nb_in_ch[AOUT_CHAN_MAX];
-    uint8_t map_ch[AOUT_CHAN_MAX];
+    int8_t map_ch[AOUT_CHAN_MAX];
     bool b_normalize;
 };
 
@@ -179,7 +179,8 @@ static void RemapCopy##name( filter_t *p_filter, \
     { \
         for( uint8_t in_ch = 0; in_ch < i_nb_in_channels; in_ch++ ) \
         { \
-            uint8_t out_ch = p_sys->map_ch[ in_ch ]; \
+            int8_t out_ch = p_sys->map_ch[ in_ch ]; \
+            if (out_ch < 0) continue; \
             memcpy( p_dest + out_ch, \
                     p_src  + in_ch, \
                     sizeof( type ) ); \
@@ -202,7 +203,8 @@ static void RemapAdd##name( filter_t *p_filter, \
     { \
         for( uint8_t in_ch = 0; in_ch < i_nb_in_channels; in_ch++ ) \
         { \
-            uint8_t out_ch = p_sys->map_ch[ in_ch ]; \
+            int8_t out_ch = p_sys->map_ch[ in_ch ]; \
+            if (out_ch < 0) continue; \
             if( p_sys->b_normalize ) \
                 p_dest[ out_ch ] += p_src[ in_ch ] / p_sys->nb_in_ch[ out_ch ]; \
             else \
@@ -278,7 +280,7 @@ static int OpenFilter( vlc_object_t *p_this )
 
     /* get number of and layout of input channels */
     uint32_t i_output_physical = 0;
-    uint8_t pi_map_ch[ AOUT_CHAN_MAX ] = { 0 }; /* which out channel each in channel is mapped to */
+    int8_t pi_map_ch[ AOUT_CHAN_MAX ] = { 0 }; /* which out channel each in channel is mapped to */
     p_sys->b_normalize = var_InheritBool( p_this, REMAP_CFG "normalize" );
 
     for( uint8_t in_ch = 0, wg4_i = 0; in_ch < audio_in->i_channels; in_ch++, wg4_i++ )
@@ -293,7 +295,19 @@ static int OpenFilter( vlc_object_t *p_this )
         uint8_t *pi_chnidx = memchr( channel_wg4idx, wg4_i, channel_wg4idx_len );
         assert( pi_chnidx != NULL );
         uint8_t chnidx = pi_chnidx - channel_wg4idx;
-        uint8_t out_idx = var_InheritInteger( p_this, channel_name[chnidx] );
+        int64_t val = var_InheritInteger( p_this, channel_name[chnidx] );
+        if (val >= AOUT_CHAN_MAX)
+        {
+            msg_Err( p_filter, "invalid channel index" );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+        if (val < 0)
+        {
+            pi_map_ch[in_ch] = -1;
+            continue;
+        }
+        uint8_t out_idx = val;
         pi_map_ch[in_ch] = channel_wg4idx[ out_idx ];
 
         i_output_physical |= channel_flag[ out_idx ];
@@ -317,7 +331,12 @@ static int OpenFilter( vlc_object_t *p_this )
     memset( p_sys->nb_in_ch, 0, sizeof( p_sys->nb_in_ch ) );
     for( uint8_t i = 0; i < audio_in->i_channels; i++ )
     {
-        uint8_t wg4_out_ch = pi_map_ch[i];
+        int8_t wg4_out_ch = pi_map_ch[i];
+        if (wg4_out_ch < 0)
+        {
+            p_sys->map_ch[i] = -1;
+            continue;
+        }
         uint8_t *pi_out_ch = memchr( out_ch_sorted, wg4_out_ch, i_channels );
         assert( pi_out_ch != NULL );
         p_sys->map_ch[i] = pi_out_ch - out_ch_sorted;
