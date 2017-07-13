@@ -1725,6 +1725,7 @@ static ssize_t AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
     uint8_t         *p_data = p_buffer->p_buffer;
     size_t          i_data  = p_buffer->i_buffer;
     size_t          i_max   = id->i_mtu - 12;
+    bool            b_dis   = (p_buffer->i_flags & BLOCK_FLAG_DISCONTINUITY);
 
     size_t i_packet = ( p_buffer->i_buffer + i_max - 1 ) / i_max;
 
@@ -1744,11 +1745,13 @@ static ssize_t AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
         {
             /* allocate a new packet */
             p_sys->packet = block_Alloc( id->i_mtu );
-            rtp_packetize_common( id, p_sys->packet, 1, i_dts );
+            /* m-bit is discontinuity for MPEG1/2 PS and TS, RFC2250 2.1 */
+            rtp_packetize_common( id, p_sys->packet, b_dis, i_dts );
             p_sys->packet->i_buffer = 12;
             p_sys->packet->i_dts = i_dts;
             p_sys->packet->i_length = p_buffer->i_length / i_packet;
             i_dts += p_sys->packet->i_length;
+            b_dis = false;
         }
 
         i_size = __MIN( i_data,
