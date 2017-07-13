@@ -278,6 +278,13 @@ static int OpenFilter( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
+    static const char *const options[] = {
+        "channel-left", "channel-center", "channel-right", "channel-rearleft",
+        "channel-rearcenter", "channel-rearright", "channel-middleleft",
+        "channel-middleright", "channel-lfe", "normalize",
+    };
+    config_ChainParse(p_filter, REMAP_CFG, options, p_filter->p_cfg);
+
     /* get number of and layout of input channels */
     uint32_t i_output_physical = 0;
     int8_t pi_map_ch[ AOUT_CHAN_MAX ] = { 0 }; /* which out channel each in channel is mapped to */
