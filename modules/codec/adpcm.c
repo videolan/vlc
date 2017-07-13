@@ -140,11 +140,11 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     switch( p_dec->fmt_in.i_codec )
     {
-        case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
-        case VLC_FOURCC('m','s',0x00,0x02): /* MS ADPCM */
-        case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
-        case VLC_CODEC_ADPCM_DK3:
+        case VLC_CODEC_ADPCM_IMA_QT:
+        case VLC_CODEC_ADPCM_IMA_WAV:
+        case VLC_CODEC_ADPCM_MS:
         case VLC_CODEC_ADPCM_DK4:
+        case VLC_CODEC_ADPCM_DK3:
         case VLC_CODEC_ADPCM_XA_EA:
             break;
         default:
@@ -169,7 +169,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     uint8_t i_max_channels = 5;
     switch( p_dec->fmt_in.i_codec )
     {
-        case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
+        case VLC_CODEC_ADPCM_IMA_QT: /* IMA ADPCM */
             p_sys->codec = ADPCM_IMA_QT;
             i_max_channels = 2;
             break;
