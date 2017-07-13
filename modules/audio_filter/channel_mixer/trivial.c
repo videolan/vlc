@@ -121,76 +121,6 @@ static block_t *Downmix( filter_t *p_filter, block_t *p_buf )
     return p_buf;
 }
 
-static block_t *CopyLeft( filter_t *p_filter, block_t *p_buf )
-{
-    float *p = (float *)p_buf->p_buffer;
-
-    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
-    {
-        p[1] = p[0];
-        p += 2;
-    }
-    (void) p_filter;
-    return p_buf;
-}
-
-static block_t *CopyRight( filter_t *p_filter, block_t *p_buf )
-{
-    float *p = (float *)p_buf->p_buffer;
-
-    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
-    {
-        p[0] = p[1];
-        p += 2;
-    }
-    (void) p_filter;
-    return p_buf;
-}
-
-static block_t *ExtractLeft( filter_t *p_filter, block_t *p_buf )
-{
-    float *p_dest = (float *)p_buf->p_buffer;
-    const float *p_src = p_dest;
-
-    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
-    {
-        *(p_dest++) = *p_src;
-        p_src += 2;
-    }
-    (void) p_filter;
-    return p_buf;
-}
-
-static block_t *ExtractRight( filter_t *p_filter, block_t *p_buf )
-{
-    float *p_dest = (float *)p_buf->p_buffer;
-    const float *p_src = p_dest;
-
-    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
-    {
-        p_src++;
-        *(p_dest++) = *(p_src++);
-    }
-    (void) p_filter;
-    return p_buf;
-}
-
-static block_t *ReverseStereo( filter_t *p_filter, block_t *p_buf )
-{
-    float *p = (float *)p_buf->p_buffer;
-
-    /* Reverse-stereo mode */
-    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
-    {
-        float f = p[0];
-        p[0] = p[1];
-        p[1] = f;
-        p += 2;
-    }
-    (void) p_filter;
-    return p_buf;
-}
-
 static block_t *Equals( filter_t *p_filter, block_t *p_buf )
 {
     (void) p_filter;
@@ -268,52 +198,12 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_filter->p_sys = NULL;
-    if( outfmt->i_physical_channels == AOUT_CHANS_STEREO )
+
+    if ( aout_FormatNbChannels( outfmt ) == 1
+      && aout_FormatNbChannels( infmt ) == 1 )
     {
-        bool swap = (outfmt->i_original_channels & AOUT_CHAN_REVERSESTEREO)
-                  != (infmt->i_original_channels & AOUT_CHAN_REVERSESTEREO);
-
-        if( (outfmt->i_original_channels & AOUT_CHAN_PHYSMASK)
-                                                            == AOUT_CHAN_LEFT )
-        {
-            p_filter->pf_audio_filter = swap ? CopyRight : CopyLeft;
-            return VLC_SUCCESS;
-        }
-
-        if( (outfmt->i_original_channels & AOUT_CHAN_PHYSMASK)
-                                                           == AOUT_CHAN_RIGHT )
-        {
-            p_filter->pf_audio_filter = swap ? CopyLeft : CopyRight;
-            return VLC_SUCCESS;
-        }
-
-        if( swap )
-        {
-            p_filter->pf_audio_filter = ReverseStereo;
-            return VLC_SUCCESS;
-        }
-    }
-
-    if ( aout_FormatNbChannels( outfmt ) == 1 )
-    {
-        bool mono = !!(infmt->i_original_channels & AOUT_CHAN_DUALMONO);
-
-        if( mono && (infmt->i_original_channels & AOUT_CHAN_LEFT) )
-        {
-            p_filter->pf_audio_filter = ExtractLeft;
-            return VLC_SUCCESS;
-        }
-
-        if( mono && (infmt->i_original_channels & AOUT_CHAN_RIGHT) )
-        {
-            p_filter->pf_audio_filter = ExtractRight;
-            return VLC_SUCCESS;
-        }
-        if( aout_FormatNbChannels( infmt ) == 1 )
-        {
-            p_filter->pf_audio_filter = Equals;
-            return VLC_SUCCESS;
-        }
+        p_filter->pf_audio_filter = Equals;
+        return VLC_SUCCESS;
     }
 
     /* Setup channel order */
