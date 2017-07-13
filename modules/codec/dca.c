@@ -107,21 +107,6 @@ static void Duplicate( float * p_out, const float * p_in )
     }
 }
 
-/*
- * helper function to exchange left & right channels
- */
-static void Exchange( float * p_out, const float * p_in )
-{
-    const float * p_first = p_in + 256;
-    const float * p_second = p_in;
-
-    for ( int i = 0; i < 256; i++ )
-    {
-        *p_out++ = *p_first++;
-        *p_out++ = *p_second++;
-    }
-}
-
 static int Decode( decoder_t *p_dec, block_t *p_in_buf )
 {
     decoder_sys_t  *p_sys = p_dec->p_sys;
@@ -185,12 +170,6 @@ static int Decode( decoder_t *p_dec, block_t *p_in_buf )
         {
             Duplicate( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                        p_samples );
-        }
-        else if ( p_dec->fmt_out.audio.i_original_channels
-                    & AOUT_CHAN_REVERSESTEREO )
-        {
-            Exchange( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
-                      p_samples );
         }
         else
         {
