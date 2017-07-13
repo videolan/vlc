@@ -133,6 +133,9 @@ static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
  *
  * pp_image will hold an encoded picture in psz_format format.
  *
+ * p_fmt can be NULL otherwise it will be set with the format used for the
+ * picture before encoding.
+ *
  * i_timeout specifies the time the function will wait for a snapshot to be
  * available.
  *
