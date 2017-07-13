@@ -63,6 +63,7 @@ Downloader::~Downloader()
 void Downloader::schedule(HTTPChunkBufferedSource *source)
 {
     vlc_mutex_lock(&lock);
+    source->hold();
     chunks.push_back(source);
     vlc_cond_signal(&waitcond);
     vlc_mutex_unlock(&lock);
@@ -71,6 +72,7 @@ void Downloader::schedule(HTTPChunkBufferedSource *source)
 void Downloader::cancel(HTTPChunkBufferedSource *source)
 {
     vlc_mutex_lock(&lock);
+    source->release();
     chunks.remove(source);
     vlc_mutex_unlock(&lock);
 }
@@ -106,7 +108,10 @@ void Downloader::Run()
             HTTPChunkBufferedSource *source = chunks.front();
             DownloadSource(source);
             if(source->isDone())
+            {
                 chunks.pop_front();
+                source->release();
+            }
         }
     }
     vlc_mutex_unlock(&lock);

@@ -118,6 +118,8 @@ namespace adaptive
                 virtual block_t *  readBlock       (); /* reimpl */
                 virtual block_t *  read            (size_t); /* reimpl */
                 virtual bool       hasMoreData     () const; /* impl */
+                void               hold();
+                void               release();
 
             protected:
                 virtual bool       prepare(); /* reimpl */
@@ -133,6 +135,7 @@ namespace adaptive
                 mtime_t             downloadstart;
                 vlc_mutex_t         lock;
                 vlc_cond_t          avail;
+                bool                held;
         };
 
         class HTTPChunk : public AbstractChunk

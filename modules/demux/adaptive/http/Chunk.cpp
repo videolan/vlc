@@ -249,23 +249,28 @@ HTTPChunkBufferedSource::HTTPChunkBufferedSource(const std::string& url, Abstrac
     vlc_cond_init(&avail);
     done = false;
     eof = false;
+    held = false;
     downloadstart = 0;
 }
 
 HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
 {
+    /* cancel ourself if in queue */
+    connManager->cancel(this);
+
     vlc_mutex_lock(&lock);
+    done = true;
+    if(held) /* wait release if not in queue but currently downloaded */
+        vlc_cond_wait(&avail, &lock);
+
     if(p_head)
     {
         block_ChainRelease(p_head);
         p_head = NULL;
         pp_tail = &p_head;
     }
-    done = true;
     buffered = 0;
     vlc_mutex_unlock(&lock);
-
-    connManager->cancel(this);
 
     vlc_cond_destroy(&avail);
     vlc_mutex_destroy(&lock);
@@ -278,6 +283,21 @@ bool HTTPChunkBufferedSource::isDone() const
     b_done = done;
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b_done;
+}
+
+void HTTPChunkBufferedSource::hold()
+{
+    vlc_mutex_lock(&lock);
+    held = true;
+    vlc_mutex_unlock(&lock);
+}
+
+void HTTPChunkBufferedSource::release()
+{
+    vlc_mutex_lock(&lock);
+    held = false;
+    vlc_cond_signal(&avail);
+    vlc_mutex_unlock(&lock);
 }
 
 void HTTPChunkBufferedSource::bufferize(size_t readsize)
@@ -317,6 +337,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     if(ret <= 0)
     {
         block_Release(p_block);
+        p_block = NULL;
         vlc_mutex_lock(&lock);
         done = true;
         rate.size = buffered + consumed;
