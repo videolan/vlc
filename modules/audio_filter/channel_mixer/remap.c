@@ -271,10 +271,6 @@ static int OpenFilter( vlc_object_t *p_this )
     audio_format_t *audio_in  = &p_filter->fmt_in.audio;
     audio_format_t *audio_out = &p_filter->fmt_out.audio;
 
-    if( ( audio_in->i_format != audio_out->i_format ) ||
-        ( audio_in->i_rate != audio_out->i_rate ) )
-        return VLC_EGENERIC;
-
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
     if( unlikely( p_sys == NULL ) )
@@ -337,6 +333,7 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    audio_out->i_format = audio_in->i_format;
     audio_out->i_physical_channels = i_output_physical;
     aout_FormatPrepare( audio_out );
 
