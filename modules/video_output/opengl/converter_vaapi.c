@@ -400,12 +400,14 @@ opengl_tex_converter_vaapi_init(opengl_tex_converter_t *tc)
 
             ret = tc_vaegl_init(tc, vaGetDisplay(x11dpy), x11dpy,
                                 x11_native_destroy_cb);
+            break;
         }
 #endif
 #ifdef HAVE_VA_WL
         case VOUT_WINDOW_TYPE_WAYLAND:
             ret = tc_vaegl_init(tc, vaGetDisplayWl(tc->gl->surface->display.wl),
                                 NULL, NULL);
+            break;
 #endif
     }
 
