@@ -130,30 +130,6 @@ static void Duplicate( sample_t *restrict p_out, const sample_t *restrict p_in )
     }
 }
 
-/*
- * Helper function to exchange left & right channels
- */
-static void Exchange( sample_t *restrict p_out, const sample_t *restrict p_in )
-{
-    const sample_t *p_first = p_in + 256;
-    const sample_t *p_second = p_in;
-
-    for( unsigned i = 0; i < 256; i++ )
-    {
-#ifdef LIBA52_FIXED
-        uint32_t spl[2];
-
-        spl[0] = ((uint32_t)*p_first++) << 4;
-        spl[1] = ((uint32_t)*p_second++) << 4;
-        memcpy( p_out, spl, sizeof(spl) );
-        p_out += 2;
-#else
-        *p_out++ = *p_first++;
-        *p_out++ = *p_second++;
-#endif
-    }
-}
-
 static int Decode( decoder_t *p_dec, block_t *p_in_buf )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -214,12 +190,6 @@ static int Decode( decoder_t *p_dec, block_t *p_in_buf )
         {
             Duplicate( (sample_t *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                        p_samples );
-        }
-        else if ( p_dec->fmt_out.audio.i_original_channels
-                    & AOUT_CHAN_REVERSESTEREO )
-        {
-            Exchange( (sample_t *)(p_out_buf->p_buffer + i * i_bytes_per_block),
-                      p_samples );
         }
         else
         {
