@@ -401,6 +401,10 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     if(commandsqueue->isDraining())
     {
+        AdvDebug(msg_Dbg(p_realdemux, "Stream %s pcr %ld dts %ld deadline %ld [DRAINING]",
+                         description.c_str(), commandsqueue->getPCR(), commandsqueue->getFirstDTS(),
+                         nz_deadline));
+
         *pi_pcr = commandsqueue->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
         if(!commandsqueue->isEmpty())
             return AbstractStream::status_demuxed;
