@@ -89,13 +89,15 @@ int aout_DecNew( audio_output_t *p_aout,
     }
     owner->request_vout = *p_request_vout;
 
-    if (aout_OutputNew (p_aout, &owner->mixer_format))
+    int remap[] = AOUT_CHAN_REMAP_INIT;
+    if (aout_OutputNew (p_aout, &owner->mixer_format, remap))
         goto error;
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
+    memcpy(owner->remap, remap, sizeof(remap));
     owner->filters = aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
-                                      &owner->request_vout, NULL);
+                                      &owner->request_vout, owner->remap);
     if (owner->filters == NULL)
     {
         aout_OutputDelete (p_aout);
@@ -105,6 +107,7 @@ error:
         aout_OutputUnlock (p_aout);
         return -1;
     }
+
 
     owner->sync.end = VLC_TS_INVALID;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
@@ -151,8 +154,10 @@ static int aout_CheckReady (audio_output_t *aout)
             if (owner->mixer_format.i_format)
                 aout_OutputDelete (aout);
             owner->mixer_format = owner->input_format;
-            if (aout_OutputNew (aout, &owner->mixer_format))
+            int remap[] = AOUT_CHAN_REMAP_INIT;
+            if (aout_OutputNew (aout, &owner->mixer_format, remap))
                 owner->mixer_format.i_format = 0;
+            memcpy(owner->remap, remap, sizeof(remap));
             aout_volume_SetFormat (owner->volume,
                                    owner->mixer_format.i_format);
             status = AOUT_DEC_CHANGED;
@@ -166,7 +171,8 @@ static int aout_CheckReady (audio_output_t *aout)
         {
             owner->filters = aout_FiltersNew (aout, &owner->input_format,
                                               &owner->mixer_format,
-                                              &owner->request_vout, NULL);
+                                              &owner->request_vout,
+                                              owner->remap);
             if (owner->filters == NULL)
             {
                 aout_OutputDelete (aout);

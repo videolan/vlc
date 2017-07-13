@@ -385,14 +385,21 @@ static void aout_Destructor (vlc_object_t *obj)
  * \param fmt audio output stream format [IN/OUT]
  * \warning The caller must hold the audio output lock.
  */
-int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
+int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
+                    int *remap)
 {
     aout_OutputAssertLocked (aout);
 
     int i_forced_stereo_mode = var_GetInteger (aout, "stereo-mode");
     bool b_stereo_original = fmt->i_physical_channels == AOUT_CHANS_STEREO;
     if (i_forced_stereo_mode != AOUT_VAR_CHAN_UNSET)
-        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+    {
+        if (i_forced_stereo_mode == AOUT_VAR_CHAN_LEFT
+         || i_forced_stereo_mode == AOUT_VAR_CHAN_RIGHT)
+            fmt->i_physical_channels = AOUT_CHAN_CENTER;
+        else
+            fmt->i_physical_channels = AOUT_CHANS_STEREO;
+    }
 
     /* Ideally, the audio filters would be created before the audio output,
      * and the ideal audio format would be the output of the filters chain.
@@ -450,16 +457,16 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     switch (i_forced_stereo_mode)
     {
         case AOUT_VAR_CHAN_RSTEREO:
-            fmt->i_original_channels |= AOUT_CHAN_REVERSESTEREO;
+            remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_RIGHT;
+            remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_LEFT;
             break;
         case AOUT_VAR_CHAN_STEREO:
-            fmt->i_original_channels = AOUT_CHANS_STEREO;
             break;
         case AOUT_VAR_CHAN_LEFT:
-            fmt->i_original_channels = AOUT_CHAN_LEFT;
+            remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
             break;
         case AOUT_VAR_CHAN_RIGHT:
-            fmt->i_original_channels = AOUT_CHAN_RIGHT;
+            remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_DISABLE;
             break;
         case AOUT_VAR_CHAN_DOLBYS:
             fmt->i_original_channels = AOUT_CHANS_STEREO|AOUT_CHAN_DOLBYSTEREO;
@@ -467,7 +474,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         default:
             if (fmt->i_original_channels == (AOUT_CHANS_STEREO | AOUT_CHAN_DUALMONO))
             {   /* Go directly to the left channel. */
-                fmt->i_original_channels = AOUT_CHAN_LEFT;
+                remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
                 val.i_int = AOUT_VAR_CHAN_LEFT;
                 var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &val, NULL);
             }
