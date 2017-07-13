@@ -189,7 +189,7 @@ static int OpenDecoder( vlc_object_t *p_this )
             p_sys->codec = ADPCM_DK3;
             i_max_channels = 2;
             break;
-        case VLC_CODEC_ADPCM_EA: /* EA ADPCM */
+        case VLC_CODEC_ADPCM_XA_EA: /* EA ADPCM */
             p_sys->codec = ADPCM_EA;
             p_sys->prev = calloc( 2 * p_dec->fmt_in.audio.i_channels,
                                   sizeof( int16_t ) );
