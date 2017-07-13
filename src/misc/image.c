@@ -50,24 +50,24 @@
 #include <vlc_modules.h>
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
-                             video_format_t *, video_format_t * );
+                             const video_format_t *, video_format_t * );
 static picture_t *ImageReadUrl( image_handler_t *, const char *,
                                 video_format_t *, video_format_t * );
 static block_t *ImageWrite( image_handler_t *, picture_t *,
-                            video_format_t *, video_format_t * );
+                            const video_format_t *, const video_format_t * );
 static int ImageWriteUrl( image_handler_t *, picture_t *,
-                          video_format_t *, video_format_t *, const char * );
+                          const video_format_t *, video_format_t *, const char * );
 
 static picture_t *ImageConvert( image_handler_t *, picture_t *,
-                                video_format_t *, video_format_t * );
+                                const video_format_t *, video_format_t * );
 
-static decoder_t *CreateDecoder( vlc_object_t *, video_format_t * );
+static decoder_t *CreateDecoder( vlc_object_t *, const video_format_t * );
 static void DeleteDecoder( decoder_t * );
-static encoder_t *CreateEncoder( vlc_object_t *, video_format_t *,
-                                 video_format_t * );
+static encoder_t *CreateEncoder( vlc_object_t *, const video_format_t *,
+                                 const video_format_t * );
 static void DeleteEncoder( encoder_t * );
-static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
-                               video_format_t * );
+static filter_t *CreateFilter( vlc_object_t *, const es_format_t *,
+                               const video_format_t * );
 static void DeleteFilter( filter_t * );
 
 vlc_fourcc_t image_Type2Fourcc( const char * );
@@ -129,7 +129,7 @@ static int ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 }
 
 static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
-                             video_format_t *p_fmt_in,
+                             const video_format_t *p_fmt_in,
                              video_format_t *p_fmt_out )
 {
     picture_t *p_pic = NULL;
@@ -323,8 +323,8 @@ error:
  */
 
 static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
-                            video_format_t *p_fmt_in,
-                            video_format_t *p_fmt_out )
+                            const video_format_t *p_fmt_in,
+                            const video_format_t *p_fmt_out )
 {
     block_t *p_block;
 
@@ -417,7 +417,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 }
 
 static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
-                          video_format_t *p_fmt_in, video_format_t *p_fmt_out,
+                          const video_format_t *p_fmt_in, video_format_t *p_fmt_out,
                           const char *psz_url )
 {
     block_t *p_block;
@@ -464,7 +464,7 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
  */
 
 static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
-                                video_format_t *p_fmt_in,
+                                const video_format_t *p_fmt_in,
                                 video_format_t *p_fmt_out )
 {
     picture_t *p_pif;
@@ -637,7 +637,7 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
-static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
+static decoder_t *CreateDecoder( vlc_object_t *p_this, const video_format_t *fmt )
 {
     decoder_t *p_dec;
 
@@ -683,8 +683,8 @@ static void DeleteDecoder( decoder_t * p_dec )
     p_dec = NULL;
 }
 
-static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
-                                 video_format_t *fmt_out )
+static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt_in,
+                                 const video_format_t *fmt_out )
 {
     encoder_t *p_enc;
 
@@ -765,8 +765,8 @@ static void DeleteEncoder( encoder_t * p_enc )
     p_enc = NULL;
 }
 
-static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
-                               video_format_t *p_fmt_out )
+static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
+                               const video_format_t *p_fmt_out )
 {
     filter_t *p_filter;
 
