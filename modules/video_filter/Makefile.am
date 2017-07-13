@@ -107,6 +107,17 @@ video_filter_LTLIBRARIES = \
 	libpuzzle_plugin.la \
 	librotate_plugin.la
 
+if HAVE_OSX
+# MacOSX hardware video filters
+libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
+libci_filters_plugin_la_CFLAGS = $(AM_CFLAGS)
+libci_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)' \
+	-Wl,-framework,Foundation -Wl,-framework,CoreGraphics -Wl,-framework,CoreImage -Wl,-framework,CoreVideo
+
+video_filter_LTLIBRARIES += \
+	libci_filters_plugin.la
+endif
+
 libdeinterlace_plugin_la_SOURCES = \
 	video_filter/deinterlace/deinterlace.c video_filter/deinterlace/deinterlace.h \
         video_filter/deinterlace/mmx.h \

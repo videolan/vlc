@@ -181,6 +181,7 @@ Video filter:
  * Added 9-bit and 10-bit support to image adjust filter
  * New edge detection filter uses the Sobel operator to detect edges
  * Hardware accelerated deinterlacing/adjust/sharpen/chroma with VA-API
+ * Hardware accelerated adjust/invert/posterize/sepia/sharpen with CoreImage
 
 Stream Output:
  * Chromecast output module

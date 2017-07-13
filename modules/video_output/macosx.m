@@ -277,6 +277,9 @@ static int Open (vlc_object_t *this)
         sys->gl->swap = OpenglSwap;
         sys->gl->getProcAddress = OurGetProcAddress;
 
+        var_Create(vd->obj.parent, "macosx-ns-opengl-context", VLC_VAR_ADDRESS);
+        var_SetAddress(vd->obj.parent, "macosx-ns-opengl-context", [sys->glView openGLContext]);
+
         const vlc_fourcc_t *subpicture_chromas;
 
         if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
@@ -340,6 +343,7 @@ void Close (vlc_object_t *this)
                                       withObject:nil
                                    waitUntilDone:NO];
 
+        var_Destroy(vd->obj.parent, "macosx-ns-opengl-context");
         if (sys->vgl != NULL)
         {
             vlc_gl_MakeCurrent(sys->gl);
