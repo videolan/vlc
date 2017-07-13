@@ -255,7 +255,7 @@ bool FakeESOut::decodersDrained()
     for( it=fakeesidlist.begin(); it!=fakeesidlist.end(); ++it )
     {
         FakeESOutID *esID = *it;
-        if( esID->realESID() )
+        if( esID->realESID() && esID->getFmt()->i_cat != AUDIO_ES ) /* Broken GET_EMPTY */
         {
             bool b_empty;
             es_out_Control( real_es_out, ES_OUT_GET_EMPTY, &b_empty );
