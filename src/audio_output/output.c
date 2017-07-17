@@ -475,12 +475,10 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
             if (b_stereo_original && fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
             {   /* Go directly to the left channel. */
                 remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
-                val.i_int = AOUT_VAR_CHAN_LEFT;
-                var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &val, NULL);
+                default_val.i_int = val.i_int = AOUT_VAR_CHAN_LEFT;
             }
-            else
-                var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &default_val,
-                            NULL);
+            var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &default_val,
+                        NULL);
             break;
     }
 
