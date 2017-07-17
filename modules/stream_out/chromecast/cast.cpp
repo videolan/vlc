@@ -321,26 +321,21 @@ void sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
           << ",mux=" << default_muxer
           << ",access=http{mime=" << mime << "}}";
 
-    if ( sout != ssout.str() )
+    sout = ssout.str();
+
+    if ( startSoutChain( p_stream ) )
     {
-        sout = ssout.str();
-
-        if ( startSoutChain( p_stream ) )
-        {
-            /* tell the chromecast to load the content */
-            p_intf->setHasInput( mime );
-        }
-        else
-        {
-            p_intf->requestPlayerStop();
-
-            sout_StreamChainDelete( p_out, NULL );
-            p_out = NULL;
-            sout = "";
-        }
+        /* tell the chromecast to load the content */
+        p_intf->setHasInput( mime );
     }
     else
-        msg_Dbg( p_stream, "Stream change doesn't require a new sout chain" );
+    {
+        p_intf->requestPlayerStop();
+
+        sout_StreamChainDelete( p_out, NULL );
+        p_out = NULL;
+        sout = "";
+    }
 }
 
 sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
