@@ -106,6 +106,28 @@ export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin
 # Select avcodec flavor to compile contribs with
 export USE_FFMPEG=1
 
+# The following symbols do not exist on the minimal macOS version (10.7), so they are disabled
+# here. This allows compilation also with newer macOS SDKs.
+# Added symbols between 10.11 and 10.12
+export ac_cv_func_basename_r=no
+export ac_cv_func_clock_getres=no
+export ac_cv_func_clock_gettime=no
+export ac_cv_func_clock_settime=no
+export ac_cv_func_dirname_r=no
+export ac_cv_func_getentropy=no
+export ac_cv_func_mkostemp=no
+export ac_cv_func_mkostemps=no
+
+# Added symbols between 10.7 and 10.11
+export ac_cv_func_ffsll=no
+export ac_cv_func_flsll=no
+export ac_cv_func_fdopendir=no
+export ac_cv_func_openat=no # Disables fstatat as well
+
+
+# libnetwork does not exist yet on 10.7 (used by libcddb)
+export ac_cv_lib_network_connect=no
+
 #
 # vlc/extras/tools
 #
