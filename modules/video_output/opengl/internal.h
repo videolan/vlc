@@ -317,8 +317,8 @@ struct opengl_tex_converter_t
  * \param tc OpenGL tex converter
  * \param tex_target GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE
  * \param chroma chroma used to generate the fragment shader
- * \param if not COLOR_SPACE_UNDEF, YUV planes will be converted to RGB
- * according to the color space
+ * \param yuv_space if not COLOR_SPACE_UNDEF, YUV planes will be converted to
+ * RGB according to the color space
  * \return the compiled fragment shader or 0 in case of error
  */
 GLuint
