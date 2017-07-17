@@ -217,8 +217,8 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
     AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0
 };
 
-#define AOUT_RESTART_FILTERS 1
-#define AOUT_RESTART_OUTPUT  2
+#define AOUT_RESTART_FILTERS        0x1
+#define AOUT_RESTART_OUTPUT         (AOUT_RESTART_FILTERS|0x2)
 
 /*****************************************************************************
  * Prototypes
