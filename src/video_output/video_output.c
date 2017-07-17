@@ -784,7 +784,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     es_format_t fmt_target;
     es_format_InitFromVideo(&fmt_target, source ? source : &vout->p->filter.format);
 
-    es_format_t fmt_current = fmt_target;
+    const es_format_t *p_fmt_current = &fmt_target;
 
     for (int a = 0; a < 2; a++) {
         vlc_array_t    *array = a == 0 ? &array_static :
@@ -792,7 +792,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         filter_chain_t *chain = a == 0 ? vout->p->filter.chain_static :
                                          vout->p->filter.chain_interactive;
 
-        filter_chain_Reset(chain, &fmt_current, &fmt_current);
+        filter_chain_Reset(chain, p_fmt_current, p_fmt_current);
         for (size_t i = 0; i < vlc_array_count(array); i++) {
             vout_filter_t *e = vlc_array_item_at_index(array, i);
             msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
@@ -809,14 +809,14 @@ static void ThreadChangeFilters(vout_thread_t *vout,
             free(e->name);
             free(e);
         }
-        fmt_current = *filter_chain_GetFmtOut(chain);
+        p_fmt_current = filter_chain_GetFmtOut(chain);
         vlc_array_clear(array);
     }
 
-    if (!es_format_IsSimilar(&fmt_current, &fmt_target)) {
+    if (!es_format_IsSimilar(p_fmt_current, &fmt_target)) {
         msg_Dbg(vout, "Adding a filter to compensate for format changes");
         if (filter_chain_AppendConverter(vout->p->filter.chain_interactive,
-                                         &fmt_current, &fmt_target) != 0) {
+                                         p_fmt_current, &fmt_target) != 0) {
             msg_Err(vout, "Failed to compensate for the format changes, removing all filters");
             ThreadDelAllFilterCallbacks(vout);
             filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, &fmt_target);
