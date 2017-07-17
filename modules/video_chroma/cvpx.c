@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <TargetConditionals.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
@@ -38,14 +40,26 @@
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
+#if !TARGET_OS_IPHONE
 static int Open_CVPX_to_CVPX(vlc_object_t *);
 static void Close_CVPX_to_CVPX(vlc_object_t *);
+#endif
 
 vlc_module_begin ()
     set_description("Conversions from/to CoreVideo buffers")
     set_capability("video converter", 10)
     set_callbacks(Open, Close)
 
+#if TARGET_OS_IPHONE
+vlc_module_end ()
+
+struct filter_sys_t
+{
+    filter_t *p_sw_filter;
+    CVPixelBufferPoolRef pool;
+};
+
+#else
     add_submodule()
     set_description("Conversions between CoreVideo buffers")
     set_callbacks(Open_CVPX_to_CVPX, Close_CVPX_to_CVPX)
@@ -64,6 +78,7 @@ struct filter_sys_t
         VTPixelTransferSessionRef vttransfer;
     };
 };
+#endif
 
 /********************************
  * CVPX to/from I420 conversion *
@@ -237,6 +252,8 @@ error:
  * CVPX to CVPX conversion *
  ***************************/
 
+#if !TARGET_OS_IPHONE
+
 static picture_t *
 Filter(filter_t *filter, picture_t *src)
 {
@@ -314,3 +331,5 @@ Close_CVPX_to_CVPX(vlc_object_t *obj)
     CFRelease(filter->p_sys->vttransfer);
     free(filter->p_sys);
 }
+
+#endif
