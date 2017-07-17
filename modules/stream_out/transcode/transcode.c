@@ -464,8 +464,8 @@ static void DeleteSoutStreamID( sout_stream_id_sys_t *id )
     {
         if( id->p_decoder )
         {
-            es_format_Clean( &id->p_encoder->fmt_in );
-            es_format_Clean( &id->p_encoder->fmt_out );
+            es_format_Clean( &id->p_decoder->fmt_in );
+            es_format_Clean( &id->p_decoder->fmt_out );
             vlc_object_release( id->p_decoder );
         }
 
