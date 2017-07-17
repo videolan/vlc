@@ -132,8 +132,16 @@ chroma_LTLIBRARIES += \
 	libd3d11_surface_plugin.la
 endif
 
-libcvpx_plugin_la_SOURCES = video_chroma/cvpx.c \
-	codec/vt_utils.c codec/vt_utils.h
+libcvpx_plugin_la_SOURCES = codec/vt_utils.c codec/vt_utils.h video_chroma/cvpx.c
+if HAVE_OSX
+libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -mmacosx-version-min=10.8
+endif
+if HAVE_IOS
+libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -miphoneos-version-min=8.0
+endif
+if HAVE_TVOS
+libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -mtvos-version-min=10.2
+endif
 libcvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libcvpx_plugin.la
 chroma_LTLIBRARIES += $(LTLIBcvpx)
