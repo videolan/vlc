@@ -1385,9 +1385,6 @@ static void PIDFillFormat( demux_t *p_demux, ts_stream_t *p_pes,
         es_format_Change( fmt, UNKNOWN_ES, 0 );
         break;
     }
-
-    /* PES packets usually contain truncated frames */
-    fmt->b_packetized = false;
 }
 
 static void FillPESFromDvbpsiES( demux_t *p_demux,
@@ -1487,6 +1484,9 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
     {
         SetupAudioExtendedDescriptors( p_demux, p_pes->p_es, p_dvbpsies );
     }
+
+    /* PES packets usually contain truncated frames */
+    p_pes->p_es->fmt.b_packetized = false;
 
     /* Set Groups / ID */
     p_pes->p_es->fmt.i_group = p_dvbpsipmt->i_program_number;
