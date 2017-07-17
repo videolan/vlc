@@ -160,6 +160,9 @@ static int aout_CheckReady (audio_output_t *aout)
             memcpy(owner->remap, remap, sizeof(remap));
             aout_volume_SetFormat (owner->volume,
                                    owner->mixer_format.i_format);
+
+            /* Notify the decoder that the aout changed in order to try a new
+             * suitable codec (like an HDMI audio format). */
             status = AOUT_DEC_CHANGED;
         }
 
