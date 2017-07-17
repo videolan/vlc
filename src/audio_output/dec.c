@@ -89,6 +89,9 @@ int aout_DecNew( audio_output_t *p_aout,
     }
     owner->request_vout = *p_request_vout;
 
+    var_Change (p_aout, "stereo-mode", VLC_VAR_SETVALUE,
+                &(vlc_value_t) { .i_int = AOUT_VAR_CHAN_UNSET }, NULL);
+
     int remap[] = AOUT_CHAN_REMAP_INIT;
     if (aout_OutputNew (p_aout, &owner->mixer_format, remap))
         goto error;
