@@ -26,7 +26,11 @@
 #include <vlc_common.h>
 #include <vlc_sort.h>
 
+#ifdef I_CAN_HAZ_TSD
 static thread_local struct
+#else
+static struct
+#endif
 {
     int (*compar)(const void *, const void *, void *);
     void *arg;
