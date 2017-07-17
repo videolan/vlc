@@ -21,6 +21,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef VLC_MODULES_H
+#define VLC_MODULES_H 1
+
 /**
  * \file
  * This file defines functions for modules in vlc
@@ -78,3 +81,5 @@ VLC_USED static inline bool module_is_main( const module_t * p_module )
 {
     return !strcmp( module_get_object( p_module ), "core" );
 }
+
+#endif /* VLC_MODULES_H */
