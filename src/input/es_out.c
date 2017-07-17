@@ -2158,7 +2158,16 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
         for( i = 0; i < p_sys->i_es; i++ )
         {
             if( es->fmt.i_cat == p_sys->es[i]->fmt.i_cat )
-                EsOutSelect( out, p_sys->es[i], false );
+            {
+                if( EsIsSelected(p_sys->es[i]) )
+                {
+                    input_SendEventEsSelect( p_sys->p_input, es->fmt.i_cat, p_sys->es[i]->i_id );
+                    if( p_esprops->p_main_es == NULL )
+                        p_esprops->p_main_es = p_sys->es[i];
+                }
+                else
+                    EsOutSelect( out, p_sys->es[i], false );
+            }
         }
     }
 
