@@ -43,7 +43,6 @@ struct demux_sys_t
         ,p_renderer(renderer)
         ,i_length(-1)
         ,demuxReady(false)
-        ,canSeek(false)
         ,m_seektime( VLC_TS_INVALID )
         ,m_enabled( true )
     {
@@ -60,6 +59,8 @@ struct demux_sys_t
                     p_renderer->pf_set_artwork( p_renderer->p_opaque, meta );
             }
             vlc_meta_Delete(p_meta);
+            if (demux_Control( demux->p_next, DEMUX_CAN_SEEK, &canSeek ) != VLC_SUCCESS)
+                canSeek = false;
         }
     }
 
