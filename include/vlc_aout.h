@@ -358,10 +358,16 @@ typedef struct
      * be inserted to remap channels according to this array.
      */
     int remap[AOUT_CHANIDX_MAX];
+    /**
+     * If true, a filter will be inserted to add a headphones effect (like a
+     * binauralizer audio filter).
+     */
+    bool headphones;
 } aout_filters_cfg_t;
 
 #define AOUT_FILTERS_CFG_INIT (aout_filters_cfg_t) \
     { .remap = AOUT_CHAN_REMAP_INIT, \
+      .headphones = false, \
     };
 
 typedef struct aout_filters aout_filters_t;
