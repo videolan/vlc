@@ -386,7 +386,7 @@ static void aout_Destructor (vlc_object_t *obj)
  * \warning The caller must hold the audio output lock.
  */
 int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
-                    int *remap)
+                    aout_filters_cfg_t *filters_cfg)
 {
     aout_OutputAssertLocked (aout);
 
@@ -457,16 +457,16 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
     switch (i_forced_stereo_mode)
     {
         case AOUT_VAR_CHAN_RSTEREO:
-            remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_RIGHT;
-            remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_LEFT;
+            filters_cfg->remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_RIGHT;
+            filters_cfg->remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_LEFT;
             break;
         case AOUT_VAR_CHAN_STEREO:
             break;
         case AOUT_VAR_CHAN_LEFT:
-            remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
+            filters_cfg->remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
             break;
         case AOUT_VAR_CHAN_RIGHT:
-            remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_DISABLE;
+            filters_cfg->remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_DISABLE;
             break;
         case AOUT_VAR_CHAN_DOLBYS:
             fmt->i_chan_mode = AOUT_CHANMODE_DOLBYSTEREO;
@@ -474,7 +474,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
         default:
             if (b_stereo_original && fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
             {   /* Go directly to the left channel. */
-                remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
+                filters_cfg->remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
                 default_val.i_int = val.i_int = AOUT_VAR_CHAN_LEFT;
             }
             var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &default_val,

@@ -79,7 +79,7 @@ typedef struct
     audio_sample_format_t mixer_format;
 
     aout_request_vout_t request_vout;
-    int remap[AOUT_CHANIDX_MAX];
+    aout_filters_cfg_t filters_cfg;
 
     atomic_uint buffers_lost;
     atomic_uint buffers_played;
@@ -115,7 +115,8 @@ audio_output_t *aout_New (vlc_object_t *);
 #define aout_New(a) aout_New(VLC_OBJECT(a))
 void aout_Destroy (audio_output_t *);
 
-int aout_OutputNew(audio_output_t *, audio_sample_format_t *, int *wg4_remap);
+int aout_OutputNew(audio_output_t *, audio_sample_format_t *,
+                   aout_filters_cfg_t *filters_cfg);
 int aout_OutputTimeGet(audio_output_t *, mtime_t *);
 void aout_OutputPlay(audio_output_t *, block_t *);
 void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );

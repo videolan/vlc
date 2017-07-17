@@ -93,15 +93,15 @@ int aout_DecNew( audio_output_t *p_aout,
     var_Change (p_aout, "stereo-mode", VLC_VAR_SETVALUE,
                 &(vlc_value_t) { .i_int = AOUT_VAR_CHAN_UNSET }, NULL);
 
-    int remap[] = AOUT_CHAN_REMAP_INIT;
-    if (aout_OutputNew (p_aout, &owner->mixer_format, remap))
+    owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
+    if (aout_OutputNew (p_aout, &owner->mixer_format, &owner->filters_cfg))
         goto error;
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
-    memcpy(owner->remap, remap, sizeof(remap));
     owner->filters = aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
-                                      &owner->request_vout, owner->remap);
+                                      &owner->request_vout,
+                                      &owner->filters_cfg);
     if (owner->filters == NULL)
     {
         aout_OutputDelete (p_aout);
@@ -158,10 +158,9 @@ static int aout_CheckReady (audio_output_t *aout)
             if (owner->mixer_format.i_format)
                 aout_OutputDelete (aout);
             owner->mixer_format = owner->input_format;
-            int remap[] = AOUT_CHAN_REMAP_INIT;
-            if (aout_OutputNew (aout, &owner->mixer_format, remap))
+            owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
+            if (aout_OutputNew (aout, &owner->mixer_format, &owner->filters_cfg))
                 owner->mixer_format.i_format = 0;
-            memcpy(owner->remap, remap, sizeof(remap));
             aout_volume_SetFormat (owner->volume,
                                    owner->mixer_format.i_format);
 
@@ -182,7 +181,7 @@ static int aout_CheckReady (audio_output_t *aout)
             owner->filters = aout_FiltersNew (aout, &owner->input_format,
                                               &owner->mixer_format,
                                               &owner->request_vout,
-                                              owner->remap);
+                                              &owner->filters_cfg);
             if (owner->filters == NULL)
             {
                 aout_OutputDelete (aout);

@@ -350,6 +350,20 @@ static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
 }
 
 /* Audio output filters */
+
+typedef struct
+{
+    /**
+     * If the remap order differs from the WG4 order, a remap audio filter will
+     * be inserted to remap channels according to this array.
+     */
+    int remap[AOUT_CHANIDX_MAX];
+} aout_filters_cfg_t;
+
+#define AOUT_FILTERS_CFG_INIT (aout_filters_cfg_t) \
+    { .remap = AOUT_CHAN_REMAP_INIT, \
+    };
+
 typedef struct aout_filters aout_filters_t;
 typedef struct aout_request_vout aout_request_vout_t;
 
@@ -357,7 +371,7 @@ VLC_API aout_filters_t *aout_FiltersNew(vlc_object_t *,
                                         const audio_sample_format_t *,
                                         const audio_sample_format_t *,
                                         const aout_request_vout_t *,
-                                        const int *remap) VLC_USED;
+                                        const aout_filters_cfg_t *cfg) VLC_USED;
 #define aout_FiltersNew(o,inf,outf,rv,remap) \
         aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv,remap)
 VLC_API void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);

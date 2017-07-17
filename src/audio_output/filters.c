@@ -470,9 +470,7 @@ static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters
  * \param infmt chain input format [IN]
  * \param outfmt chain output format [IN]
  * \param request_vout visualization video output request callback
- * \param remap a const array of size AOUT_CHAN_MAX or NULL. If not NULL, a
- * remap audio filter will be inserted to remap channels according to the
- * array. The array is in the WG4 order.
+ * \param cfg a valid aout_filters_cfg_t struct or NULL.
  * \return a filters chain or NULL on failure
  *
  * \note
@@ -485,7 +483,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
                                  const audio_sample_format_t *restrict infmt,
                                  const audio_sample_format_t *restrict outfmt,
                                  const aout_request_vout_t *request_vout,
-                                 const int *remap)
+                                 const aout_filters_cfg_t *cfg)
 {
     aout_filters_t *filters = malloc (sizeof (*filters));
     if (unlikely(filters == NULL))
@@ -578,8 +576,9 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
             filters->rate_filter = filters->tab[filters->count - 1];
     }
 
-    if (remap != NULL)
-        AppendRemapFilter(obj, filters, &input_format, &output_format, remap);
+    if (cfg != NULL)
+        AppendRemapFilter(obj, filters, &input_format, &output_format,
+                          cfg->remap);
 
     /* Now add user filters */
     char *str = var_InheritString (obj, "audio-filter");
