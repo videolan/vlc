@@ -181,6 +181,8 @@ void SLPackets_Section_Handler( demux_t *p_demux,
                     p_es->id = es_out_Add( p_demux->out, &p_es->fmt );
                     b_changed = true;
                 }
+                else
+                    es_format_Clean( &fmt );
             }
         }
 
