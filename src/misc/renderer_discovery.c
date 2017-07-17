@@ -168,7 +168,9 @@ vlc_renderer_item_release(vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
-    if (atomic_fetch_sub(&p_item->refs, 1) != 1)
+    int refs = atomic_fetch_sub(&p_item->refs, 1);
+    assert(refs != 0 );
+    if( refs != 1 )
         return;
     item_free(p_item);
 }
