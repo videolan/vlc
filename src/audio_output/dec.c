@@ -162,8 +162,11 @@ static int aout_CheckReady (audio_output_t *aout)
                                    owner->mixer_format.i_format);
 
             /* Notify the decoder that the aout changed in order to try a new
-             * suitable codec (like an HDMI audio format). */
-            status = AOUT_DEC_CHANGED;
+             * suitable codec (like an HDMI audio format). However, keep the
+             * same codec if the aout was restarted because of a stereo-mode
+             * change from the user. */
+            if (!(restart & AOUT_RESTART_STEREOMODE))
+                status = AOUT_DEC_CHANGED;
         }
 
         msg_Dbg (aout, "restarting filters...");

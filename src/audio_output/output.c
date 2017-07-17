@@ -177,7 +177,7 @@ static int StereoModeCallback (vlc_object_t *obj, const char *varname,
     audio_output_t *aout = (audio_output_t *)obj;
     (void)varname; (void)oldval; (void)newval; (void)data;
 
-    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    aout_RestartRequest (aout, AOUT_RESTART_STEREOMODE);
     return 0;
 }
 
