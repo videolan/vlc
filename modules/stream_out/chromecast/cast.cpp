@@ -218,7 +218,14 @@ bool sout_stream_sys_t::canDecodeAudio( int i_codec ) const
 bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
 {
     if ( unlikely( p_out != NULL ) )
+    {
+        for ( size_t i = 0; i < streams.size(); i++ )
+        {
+            if ( streams[i]->p_sub_id != NULL )
+                sout_StreamIdDel( p_out, streams[i]->p_sub_id );
+        }
         sout_StreamChainDelete( p_out, NULL );
+    }
 
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
     p_out = sout_StreamChainNew( p_stream->p_sout, sout.c_str(), NULL, NULL);
