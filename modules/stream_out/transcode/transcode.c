@@ -568,6 +568,9 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         case SPU_ES:
             transcode_spu_close( p_stream, id );
             break;
+        case UNKNOWN_ES:
+        case NAV_ES:
+            break;
         }
     }
 
