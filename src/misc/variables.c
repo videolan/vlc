@@ -1137,7 +1137,17 @@ error:
     return VLC_EGENERIC;
 }
 
+#ifdef I_CAN_HAZ_TSD
 static thread_local void *twalk_ctx;
+#else
+#include <pthread.h>
+static pthread_key_t twalk_ctx_key;
+static pthread_once_t twalk_ctx_key_once = PTHREAD_ONCE_INIT;
+static void twalk_ctx_key_create()
+{
+    pthread_key_create(&twalk_ctx_key, NULL);
+}
+#endif
 
 static void TwalkGetNames(const void *data, const VISIT which, const int depth)
 {
@@ -1146,7 +1156,11 @@ static void TwalkGetNames(const void *data, const VISIT which, const int depth)
     (void) depth;
 
     const variable_t *var = *(const variable_t **)data;
+#ifdef I_CAN_HAZ_TSD
     DECL_ARRAY(char *) *names = twalk_ctx;
+#else
+    DECL_ARRAY(char *) *names = pthread_getspecific(twalk_ctx_key);
+#endif
     char *dup = strdup(var->psz_name);
     if (dup != NULL)
         ARRAY_APPEND(*names, dup);
@@ -1159,7 +1173,12 @@ char **var_GetAllNames(vlc_object_t *obj)
     DECL_ARRAY(char *) names;
     ARRAY_INIT(names);
 
+#ifdef I_CAN_HAZ_TSD
     twalk_ctx = &names;
+#else
+    pthread_once(&twalk_ctx_key_once, twalk_ctx_key_create);
+    pthread_setspecific(twalk_ctx_key, &names);
+#endif
     vlc_mutex_lock(&priv->var_lock);
     twalk(priv->var_root, TwalkGetNames);
     vlc_mutex_unlock(&priv->var_lock);
