@@ -418,10 +418,11 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
         val.i_int = AOUT_VAR_CHAN_RIGHT;
         txt.psz_string = _("Right");
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+
+        val.i_int = AOUT_VAR_CHAN_RSTEREO;
+        txt.psz_string = _("Reverse stereo");
+        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
     }
-    val.i_int = AOUT_VAR_CHAN_RSTEREO;
-    txt.psz_string = _("Reverse stereo");
-    var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
 
     if (fmt->i_channels >= 2)
     {
