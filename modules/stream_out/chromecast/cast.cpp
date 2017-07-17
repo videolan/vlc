@@ -59,6 +59,7 @@ struct sout_stream_sys_t
 
     bool canDecodeVideo( int i_codec ) const;
     bool canDecodeAudio( int i_codec ) const;
+    bool startSoutChain(sout_stream_t* p_stream);
 
     sout_stream_t     *p_out;
     std::string        sout;
@@ -75,7 +76,7 @@ struct sout_stream_sys_t
     std::vector<sout_stream_id_sys_t*> streams;
 
 private:
-    int UpdateOutput( sout_stream_t * );
+    void UpdateOutput( sout_stream_t * );
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -214,7 +215,35 @@ bool sout_stream_sys_t::canDecodeAudio( int i_codec ) const
         i_codec == VLC_CODEC_EAC3;
 }
 
-int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
+bool sout_stream_sys_t::startSoutChain( sout_stream_t *p_stream )
+{
+    if ( unlikely( p_out != NULL ) )
+        sout_StreamChainDelete( p_out, NULL );
+
+    msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
+    p_out = sout_StreamChainNew( p_stream->p_sout, sout.c_str(), NULL, NULL);
+    if (p_out == NULL) {
+        msg_Dbg(p_stream, "could not create sout chain:%s", sout.c_str());
+        return false;
+    }
+
+    /* check the streams we can actually add */
+    for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); )
+    {
+        sout_stream_id_sys_t *p_sys_id = *it;
+        p_sys_id->p_sub_id = sout_StreamIdAdd( p_out, &p_sys_id->fmt );
+        if ( p_sys_id->p_sub_id == NULL )
+        {
+            msg_Err( p_stream, "can't handle %4.4s stream", (char *)&p_sys_id->fmt.i_codec );
+            it = streams.erase( it );
+        }
+        else
+            ++it;
+    }
+    return streams.empty() == false;
+}
+
+void sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
 {
     assert( p_stream->p_sys == this );
 
@@ -293,52 +322,25 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
 
         if ( sout != ssout.str() )
         {
-            if ( unlikely( p_out != NULL ) )
-            {
-                sout_StreamChainDelete( p_out, NULL );
-                sout = "";
-            }
-
-            const std::string chain = ssout.str();
-            msg_Dbg( p_stream, "Creating chain %s", chain.c_str() );
-            p_out = sout_StreamChainNew( p_stream->p_sout, chain.c_str(), NULL, NULL);
-            if (p_out == NULL) {
-                msg_Dbg(p_stream, "could not create sout chain:%s", chain.c_str());
-                return VLC_EGENERIC;
-            }
             sout = ssout.str();
-        }
 
-        /* check the streams we can actually add */
-        for (std::vector<sout_stream_id_sys_t*>::iterator it = streams.begin(); it != streams.end(); )
-        {
-            sout_stream_id_sys_t *p_sys_id = *it;
-            p_sys_id->p_sub_id = sout_StreamIdAdd( p_out, &p_sys_id->fmt );
-            if ( p_sys_id->p_sub_id == NULL )
+            if ( startSoutChain( p_stream ) )
             {
-                msg_Err( p_stream, "can't handle %4.4s stream", (char *)&p_sys_id->fmt.i_codec );
-                it = streams.erase( it );
+                /* tell the chromecast to load the content */
+                p_intf->setHasInput( mime );
             }
             else
-                ++it;
-        }
+            {
+                p_intf->requestPlayerStop();
 
-        if ( !streams.empty() )
-        {
-            /* tell the chromecast to load the content */
-            p_intf->setHasInput( mime );
+                sout_StreamChainDelete( p_out, NULL );
+                p_out = NULL;
+                sout = "";
+            }
         }
         else
-        {
-            p_intf->requestPlayerStop();
-
-            sout_StreamChainDelete( p_out, NULL );
-            p_out = NULL;
-            sout = "";
-        }
+            msg_Dbg( p_stream, "Stream change doesn't require a new sout chain" );
     }
-
-    return VLC_SUCCESS;
 }
 
 sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
@@ -348,8 +350,7 @@ sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
 
     assert( p_stream->p_sys == this );
 
-    if ( UpdateOutput( p_stream ) != VLC_SUCCESS )
-        return NULL;
+    UpdateOutput( p_stream );
 
     for (i = 0; i < streams.size(); ++i)
     {
