@@ -380,47 +380,17 @@ static void aout_Destructor (vlc_object_t *obj)
     vlc_mutex_destroy (&owner->lock);
 }
 
-/**
- * Starts an audio output stream.
- * \param fmt audio output stream format [IN/OUT]
- * \warning The caller must hold the audio output lock.
- */
-int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
-                    aout_filters_cfg_t *filters_cfg)
+static void aout_PrepareStereoMode (audio_output_t *aout,
+                                    audio_sample_format_t *restrict fmt,
+                                    aout_filters_cfg_t *filters_cfg,
+                                    int i_forced_stereo_mode,
+                                    bool b_stereo_original)
 {
-    aout_OutputAssertLocked (aout);
-
-    int i_forced_stereo_mode = var_GetInteger (aout, "stereo-mode");
-    bool b_stereo_original = fmt->i_physical_channels == AOUT_CHANS_STEREO;
-    if (i_forced_stereo_mode != AOUT_VAR_CHAN_UNSET)
-    {
-        if (i_forced_stereo_mode == AOUT_VAR_CHAN_LEFT
-         || i_forced_stereo_mode == AOUT_VAR_CHAN_RIGHT)
-            fmt->i_physical_channels = AOUT_CHAN_CENTER;
-        else
-            fmt->i_physical_channels = AOUT_CHANS_STEREO;
-    }
-
-    /* Ideally, the audio filters would be created before the audio output,
-     * and the ideal audio format would be the output of the filters chain.
-     * But that scheme would not really play well with digital pass-through. */
-    if (AOUT_FMT_LINEAR(fmt))
-    {   /* Try to stay in integer domain if possible for no/slow FPU. */
-        fmt->i_format = (fmt->i_bitspersample > 16) ? VLC_CODEC_FL32
-                                                    : VLC_CODEC_S16N;
-        aout_FormatPrepare (fmt);
-    }
-
-    if (aout->start (aout, fmt))
-    {
-        msg_Err (aout, "module not functional");
-        return -1;
-    }
-
     /* Fill Stereo mode choices */
     var_Change (aout, "stereo-mode", VLC_VAR_CLEARCHOICES, NULL, NULL);
     vlc_value_t val, txt, default_val;
     val.i_int = 0;
+
     if (!b_stereo_original)
     {
         val.i_int = AOUT_VAR_CHAN_UNSET;
@@ -491,6 +461,48 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
                         NULL);
             break;
     }
+}
+
+/**
+ * Starts an audio output stream.
+ * \param fmt audio output stream format [IN/OUT]
+ * \warning The caller must hold the audio output lock.
+ */
+int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
+                    aout_filters_cfg_t *filters_cfg)
+{
+    aout_OutputAssertLocked (aout);
+
+    int i_forced_stereo_mode = var_GetInteger (aout, "stereo-mode");
+    bool b_stereo_original = fmt->i_physical_channels == AOUT_CHANS_STEREO;
+    if (i_forced_stereo_mode != AOUT_VAR_CHAN_UNSET)
+    {
+        if (i_forced_stereo_mode == AOUT_VAR_CHAN_LEFT
+         || i_forced_stereo_mode == AOUT_VAR_CHAN_RIGHT)
+            fmt->i_physical_channels = AOUT_CHAN_CENTER;
+        else
+            fmt->i_physical_channels = AOUT_CHANS_STEREO;
+    }
+
+    /* Ideally, the audio filters would be created before the audio output,
+     * and the ideal audio format would be the output of the filters chain.
+     * But that scheme would not really play well with digital pass-through. */
+    if (AOUT_FMT_LINEAR(fmt))
+    {   /* Try to stay in integer domain if possible for no/slow FPU. */
+        fmt->i_format = (fmt->i_bitspersample > 16) ? VLC_CODEC_FL32
+                                                    : VLC_CODEC_S16N;
+
+        aout_FormatPrepare (fmt);
+    }
+
+    if (aout->start (aout, fmt))
+    {
+        msg_Err (aout, "module not functional");
+        return -1;
+    }
+
+    aout_PrepareStereoMode (aout, fmt, filters_cfg, i_forced_stereo_mode,
+                            b_stereo_original);
 
     aout_FormatPrepare (fmt);
     assert (aout_FormatNbChannels(fmt) > 0);
