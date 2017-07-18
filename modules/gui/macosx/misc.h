@@ -68,20 +68,6 @@
 
 @end
 
-
-/*****************************************************************************
- * TimeLineSlider
- *****************************************************************************/
-
-@interface TimeLineSlider : NSSlider
-
-@property (readonly) CGFloat knobPosition;
-
-- (void)drawRect:(NSRect)rect;
-- (void)drawKnobInRect:(NSRect)knobRect;
-
-@end
-
 /*****************************************************************************
  * VLCVolumeSliderCommon
  *****************************************************************************/

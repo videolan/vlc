@@ -258,66 +258,6 @@ void _drawFrameInRect(NSRect frameRect)
 @end
 
 /*****************************************************************************
- * TimeLineSlider
- *****************************************************************************/
-
-@interface TimeLineSlider()
-{
-    NSImage *o_knob_img;
-    NSRect img_rect;
-    BOOL b_dark;
-}
-@end
-
-@implementation TimeLineSlider
-
-- (void)awakeFromNib
-{
-    if (config_GetInt( getIntf(), "macosx-interfacestyle" )) {
-        o_knob_img = imageFromRes(@"progression-knob_dark");
-        b_dark = YES;
-    } else {
-        o_knob_img = imageFromRes(@"progression-knob");
-        b_dark = NO;
-    }
-    img_rect.size = [o_knob_img size];
-    img_rect.origin.x = img_rect.origin.y = 0;
-}
-
-- (CGFloat)knobPosition
-{
-    NSRect knobRect = [[self cell] knobRectFlipped:NO];
-    knobRect.origin.x += knobRect.size.width / 2;
-    return knobRect.origin.x;
-}
-
-- (void)drawKnobInRect:(NSRect)knobRect
-{
-    knobRect.origin.x += (knobRect.size.width - img_rect.size.width) / 2;
-    knobRect.size.width = img_rect.size.width;
-    knobRect.size.height = img_rect.size.height;
-    [o_knob_img drawInRect:knobRect fromRect:img_rect operation:NSCompositeSourceOver fraction:1];
-}
-
-- (void)drawRect:(NSRect)rect
-{
-    [[(VLCVideoWindowCommon *)[self window] controlsBar] drawFancyGradientEffectForTimeSlider];
-    msleep(10000); //wait for the gradient to draw completely
-
-    /* Draw default to make sure the slider behaves correctly */
-    [[NSGraphicsContext currentContext] saveGraphicsState];
-    NSRectClip(NSZeroRect);
-    [super drawRect:rect];
-    [[NSGraphicsContext currentContext] restoreGraphicsState];
-
-    NSRect knobRect = [[self cell] knobRectFlipped:NO];
-    knobRect.origin.y+=1;
-    [self drawKnobInRect: knobRect];
-}
-
-@end
-
-/*****************************************************************************
  * VLCVolumeSliderCommon
  *****************************************************************************/
 
