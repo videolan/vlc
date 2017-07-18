@@ -484,7 +484,16 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
      * and the ideal audio format would be the output of the filters chain.
      * But that scheme would not really play well with digital pass-through. */
     if (AOUT_FMT_LINEAR(fmt))
-    {   /* Try to stay in integer domain if possible for no/slow FPU. */
+    {
+        if (fmt->channel_type == AUDIO_CHANNEL_TYPE_BITMAP
+         && aout_FormatNbChannels(fmt) == 0)
+        {
+            /* The output channel map is unknown, use the WAVE one. */
+            assert(fmt->i_channels > 0);
+            aout_SetWavePhysicalChannels(fmt);
+        }
+
+        /* Try to stay in integer domain if possible for no/slow FPU. */
         fmt->i_format = (fmt->i_bitspersample > 16) ? VLC_CODEC_FL32
                                                     : VLC_CODEC_S16N;
 
