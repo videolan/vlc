@@ -168,6 +168,13 @@ struct audio_output
       * \return 0 on success, non-zero on failure.
       * \warning A stream may or may not have been started when called.
       */
+
+    struct {
+        bool headphones; /**< Default to false, set it to true if the current
+                              sink is using headphones */
+    } current_sink_info;
+    /**< Current sink informations set by the module from the start() function */
+
     struct {
         void (*volume_report)(audio_output_t *, float);
         void (*mute_report)(audio_output_t *, bool);

@@ -537,6 +537,8 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
         aout_FormatPrepare (fmt);
     }
 
+    aout->current_sink_info.headphones = false;
+
     if (aout->start (aout, fmt))
     {
         msg_Err (aout, "module not functional");
