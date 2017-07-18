@@ -91,9 +91,6 @@
         [self.forwardButton setImage: imageFromRes(@"forward-3btns")];
         [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-pressed")];
 
-        [self.timeSliderBackgroundView setImagesLeft: imageFromRes(@"progression-track-wrapper-left") middle: imageFromRes(@"progression-track-wrapper-middle") right: imageFromRes(@"progression-track-wrapper-right")];
-        [self.timeSliderGradientView setImagesLeft:imageFromRes(@"progression-fill-left") middle:imageFromRes(@"progression-fill-middle") right:imageFromRes(@"progression-fill-right")];
-
         [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button")];
         [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
     } else {
@@ -107,9 +104,6 @@
         _pressedPauseImage = imageFromRes(@"pause-pressed_dark");
         [self.forwardButton setImage: imageFromRes(@"forward-3btns-dark")];
         [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-dark-pressed")];
-
-        [self.timeSliderBackgroundView setImagesLeft: imageFromRes(@"progression-track-wrapper-left_dark") middle: imageFromRes(@"progression-track-wrapper-middle_dark") right: imageFromRes(@"progression-track-wrapper-right_dark")];
-        [self.timeSliderGradientView setImagesLeft:imageFromRes(@"progressbar-fill-left_dark") middle:imageFromRes(@"progressbar-fill-middle_dark") right:imageFromRes(@"progressbar-fill-right_dark")];
 
         [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
         [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
@@ -128,21 +122,6 @@
     [self.timeField setAlignment: NSCenterTextAlignment];
     [self.timeField setNeedsDisplay:YES];
     [self.timeField setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
-
-    // prepare time slider fance gradient view
-    self.timeSliderGradientView.translatesAutoresizingMaskIntoConstraints = YES;
-    if (!_darkInterface) {
-        NSRect frame;
-        frame = [self.timeSliderGradientView frame];
-        frame.size.height = frame.size.height - 1;
-        frame.origin.y = frame.origin.y + 1;
-        [self.timeSliderGradientView setFrame: frame];
-    }
-
-    NSRect frame;
-    frame = [_timeSliderGradientView frame];
-    frame.size.width = 0;
-    [_timeSliderGradientView setFrame: frame];
 
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {

@@ -43,11 +43,7 @@
 @property (readwrite, strong) IBOutlet NSButton *backwardButton;
 @property (readwrite, strong) IBOutlet NSButton *forwardButton;
 
-@property (readwrite, strong) IBOutlet VLCProgressView *progressView;
 @property (readwrite, strong) IBOutlet VLCSlider *timeSlider;
-@property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderGradientView;
-@property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderBackgroundView;
-@property (readwrite, strong) IBOutlet NSProgressIndicator *progressBar;
 
 @property (readwrite, strong) IBOutlet VLCTimeField *timeField;
 @property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
