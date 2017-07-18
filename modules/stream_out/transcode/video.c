@@ -38,19 +38,11 @@
 #define ENC_FRAMERATE (25 * 1000)
 #define ENC_FRAMERATE_BASE 1000
 
-struct decoder_owner_sys_t
-{
-    sout_stream_sys_t *p_sys;
-    sout_stream_t *p_stream;
-    sout_stream_id_sys_t *id;
-};
-
 static int video_update_format_decoder( decoder_t *p_dec )
 {
-    decoder_owner_sys_t  *owner  = p_dec->p_owner;
-    sout_stream_sys_t    *sys    = owner->p_sys;
-    sout_stream_t        *stream = owner->p_stream;
-    sout_stream_id_sys_t *id     = owner->id;
+    sout_stream_t        *stream = (sout_stream_t*) p_dec->p_owner;
+    sout_stream_sys_t    *sys    = stream->p_sys;
+    sout_stream_id_sys_t *id     = p_dec->p_queue_ctx;
     filter_chain_t       *test_chain;
 
     filter_owner_t filter_owner = {
@@ -187,13 +179,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     id->p_decoder->pf_get_cc = NULL;
     id->p_decoder->pf_vout_format_update = video_update_format_decoder;
     id->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
-    id->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
-    if( !id->p_decoder->p_owner )
-        return VLC_EGENERIC;
-
-    id->p_decoder->p_owner->p_sys = p_sys;
-    id->p_decoder->p_owner->p_stream = p_stream;
-    id->p_decoder->p_owner->id = id;
+    id->p_decoder->p_owner = (decoder_owner_sys_t*) p_stream;
 
     id->p_decoder->p_module =
         module_need( id->p_decoder, "video decoder", "$codec", false );
@@ -201,7 +187,6 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     if( !id->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find video decoder" );
-        free( id->p_decoder->p_owner );
         return VLC_EGENERIC;
     }
 
@@ -252,7 +237,6 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
                  (char *)&p_sys->i_vcodec );
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = 0;
-        free( id->p_decoder->p_owner );
         return VLC_EGENERIC;
     }
 
@@ -279,7 +263,6 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         msg_Err( p_stream, "cannot create picture fifo" );
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
-        free( id->p_decoder->p_owner );
         return VLC_ENOMEM;
     }
 
@@ -296,7 +279,6 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         picture_fifo_Delete( p_sys->pp_pics );
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
-        free( id->p_decoder->p_owner );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -684,8 +666,6 @@ void transcode_video_close( sout_stream_t *p_stream,
         module_unneed( id->p_decoder, id->p_decoder->p_module );
     if( id->p_decoder->p_description )
         vlc_meta_Delete( id->p_decoder->p_description );
-
-    free( id->p_decoder->p_owner );
 
     /* Close encoder */
     if( id->p_encoder->p_module )
