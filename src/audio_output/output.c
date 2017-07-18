@@ -391,6 +391,9 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
     vlc_value_t val, txt, default_val;
     val.i_int = 0;
 
+    if (!AOUT_FMT_LINEAR(fmt))
+        return;
+
     if (!b_stereo_original)
     {
         val.i_int = AOUT_VAR_CHAN_UNSET;
@@ -474,16 +477,8 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
 {
     aout_OutputAssertLocked (aout);
 
-    int i_forced_stereo_mode = var_GetInteger (aout, "stereo-mode");
-    bool b_stereo_original = fmt->i_physical_channels == AOUT_CHANS_STEREO;
-    if (i_forced_stereo_mode != AOUT_VAR_CHAN_UNSET)
-    {
-        if (i_forced_stereo_mode == AOUT_VAR_CHAN_LEFT
-         || i_forced_stereo_mode == AOUT_VAR_CHAN_RIGHT)
-            fmt->i_physical_channels = AOUT_CHAN_CENTER;
-        else
-            fmt->i_physical_channels = AOUT_CHANS_STEREO;
-    }
+    int i_forced_stereo_mode = AOUT_VAR_CHAN_UNSET;
+    bool b_stereo_original = false;
 
     /* Ideally, the audio filters would be created before the audio output,
      * and the ideal audio format would be the output of the filters chain.
@@ -492,6 +487,17 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
     {   /* Try to stay in integer domain if possible for no/slow FPU. */
         fmt->i_format = (fmt->i_bitspersample > 16) ? VLC_CODEC_FL32
                                                     : VLC_CODEC_S16N;
+
+        i_forced_stereo_mode = var_GetInteger (aout, "stereo-mode");
+        b_stereo_original = fmt->i_physical_channels == AOUT_CHANS_STEREO;
+        if (i_forced_stereo_mode != AOUT_VAR_CHAN_UNSET)
+        {
+            if (i_forced_stereo_mode == AOUT_VAR_CHAN_LEFT
+             || i_forced_stereo_mode == AOUT_VAR_CHAN_RIGHT)
+                fmt->i_physical_channels = AOUT_CHAN_CENTER;
+            else
+                fmt->i_physical_channels = AOUT_CHANS_STEREO;
+        }
 
         aout_FormatPrepare (fmt);
     }
