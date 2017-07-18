@@ -97,7 +97,7 @@
         [dc setDelegate:self];
         [_rendererDiscoveries addObject:dc];
         free(*ppsz_name);
-        free(*ppsz_longnames);
+        free(*ppsz_longname);
     }
     free(ppsz_names);
     free(ppsz_longnames);
