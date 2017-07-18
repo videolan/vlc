@@ -287,7 +287,8 @@ static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
     {
         if (cmarker->marker == EXIF_JPEG_MARKER)
         {
-            if (!memcmp(cmarker->data, EXIF_XMP_STRING, 29))
+            if(cmarker->data_length >= 32 &&
+               !memcmp(cmarker->data, EXIF_XMP_STRING, 29))
             {
                 xmp_marker = cmarker;
                 break;
@@ -296,7 +297,7 @@ static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
         cmarker = cmarker->next;
     }
 
-    if (xmp_marker == NULL || xmp_marker->data_length < 32)
+    if (xmp_marker == NULL)
         return;
     char *psz_rdf = malloc(xmp_marker->data_length - 29 + 1);
     if (unlikely(psz_rdf == NULL))
@@ -375,7 +376,8 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
 
     while ( cmarker )
     {
-        if ( cmarker->marker == EXIF_JPEG_MARKER )
+        if ( cmarker->data_length >= 32 &&
+             cmarker->marker == EXIF_JPEG_MARKER )
         {
             /* The Exif APP1 marker should contain a unique
                identification string ("Exif\0\0"). Check for it. */
@@ -389,10 +391,6 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
 
     /* Did we find the Exif APP1 marker? */
     if ( exif_marker == NULL )
-        return 0;
-
-    /* Do we have enough data? */
-    if ( exif_marker->data_length < 32 )
         return 0;
 
     /* Check for TIFF header and catch endianess */
