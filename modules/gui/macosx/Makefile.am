@@ -98,7 +98,9 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCImageButton.h gui/macosx/VLCImageButton.m \
 	gui/macosx/VLCTintedImageButtonCell.h gui/macosx/VLCTintedImageButtonCell.m \
 	gui/macosx/VLCTimeField.h gui/macosx/VLCTimeField.m \
-	gui/macosx/VLCHexNumberFormatter.h gui/macosx/VLCHexNumberFormatter.m
+	gui/macosx/VLCHexNumberFormatter.h gui/macosx/VLCHexNumberFormatter.m \
+	gui/macosx/VLCSlider.h gui/macosx/VLCSlider.m \
+	gui/macosx/VLCSliderCell.h gui/macosx/VLCSliderCell.m
 
 # User interface compilation
 
