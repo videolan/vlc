@@ -453,6 +453,13 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
     txt.psz_string = _("Reverse stereo");
     var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
 
+    if (fmt->i_channels >= 2)
+    {
+        val.i_int = AOUT_VAR_CHAN_HEADPHONES;
+        txt.psz_string = _("Headphones");
+        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+    }
+
     /* The user may have selected a different channels configuration. */
     switch (i_forced_stereo_mode)
     {
@@ -470,6 +477,9 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
             break;
         case AOUT_VAR_CHAN_DOLBYS:
             fmt->i_chan_mode = AOUT_CHANMODE_DOLBYSTEREO;
+            break;
+        case AOUT_VAR_CHAN_HEADPHONES:
+            filters_cfg->headphones = true;
             break;
         default:
             if (b_stereo_original && fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
