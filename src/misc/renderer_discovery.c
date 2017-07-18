@@ -88,7 +88,7 @@ vlc_renderer_item_new(const char *psz_type, const char *psz_name,
                  psz_extra_sout != NULL ? psz_extra_sout : "") == -1)
         goto error;
 
-    if ((p_item->psz_icon_uri = strdup(psz_icon_uri)) == NULL)
+    if (psz_icon_uri && (p_item->psz_icon_uri = strdup(psz_icon_uri)) == NULL)
         goto error;
 
     if ((p_item->psz_demux_filter = strdup(psz_demux_filter)) == NULL)
