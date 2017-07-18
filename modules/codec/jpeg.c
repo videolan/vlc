@@ -445,7 +445,7 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
 
     /* Check that we still are within the buffer and can read the tag count */
 
-    if ( ( i + 2 ) > exif_marker->data_length )
+    if ( i > exif_marker->data_length - 2 )
         return 0;
 
     /* Find out how many tags we have in IFD0. As per the TIFF spec, the first
@@ -456,7 +456,7 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
     /* Check that we still have enough data for all tags to check. The tags
        are listed in consecutive 12-byte blocks. The tag ID, type, size, and
        a pointer to the actual value, are packed into these 12 byte entries. */
-    if ( ( i + tags * 12 ) > exif_marker->data_length )
+    if ( tags * 12U > exif_marker->data_length - i )
         return 0;
 
     /* Check through IFD0 for tags of interest */
