@@ -28,7 +28,6 @@
     NSInteger _animationPosition;
     double _lastTime;
     double _deltaToLastFrame;
-    NSRect _lastKnobRect;
     CVDisplayLinkRef _displayLink;
 }
 @end
@@ -112,16 +111,41 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     CVDisplayLinkSetOutputCallback(_displayLink, DisplayLinkCallback, (__bridge void*) self);
 }
 
+- (double)myNormalizedDouble
+{
+    double min;
+    double max;
+    double current;
+
+    min = [self minValue];
+    max = [self maxValue];
+    current = [self doubleValue];
+
+    max -= min;
+    current -= min;
+
+    return current / max;
+}
+
+- (NSRect)knobRectFlipped:(BOOL)flipped
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+    // This is our own implementation, so no need to guard it on < 10.9
+    NSRect barRect = [self barRectFlipped:NO];
+#pragma clang diagnostic pop
+    CGFloat knobThickness = barRect.size.height;
+    double val = [self myNormalizedDouble];
+
+    NSRect rect = NSMakeRect((NSWidth(barRect) - knobThickness) * val, 0, knobThickness, knobThickness);
+    return [[self controlView] backingAlignedRect:rect options:NSAlignAllEdgesNearest];
+}
+
 #pragma mark -
 #pragma mark Normal slider drawing
 
 - (void)drawKnob:(NSRect)knobRect
 {
-    _lastKnobRect = knobRect;
-    // 10.7 - 10.10 hack
-    if (!OSX_YOSEMITE_AND_HIGHER)
-        knobRect.size.height += 1.5;
-
     // Draw knob
     NSBezierPath* knobPath = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 2.0, 2.0)];
     if (self.isHighlighted) {
