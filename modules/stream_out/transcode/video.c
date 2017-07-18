@@ -870,11 +870,14 @@ end:
     {
         if( p_sys->i_threads == 0 )
         {
-            block_t *p_block;
-            do {
-                p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
-                block_ChainAppend( out, p_block );
-            } while( p_block );
+            if( id->p_encoder->p_module )
+            {
+                block_t *p_block;
+                do {
+                    p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
+                    block_ChainAppend( out, p_block );
+                } while( p_block );
+            }
         }
         else
         {
