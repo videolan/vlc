@@ -142,8 +142,8 @@ static int Open(vlc_object_t *obj)
     stream_t *stream = (stream_t *)obj;
     stream_t *s = stream->p_source;
 
-    while (SkipTag(s, SkipID3Tag));
-    SkipTag(s, SkipAPETag);
+    while (SkipTag(s, SkipID3Tag)||
+           SkipTag(s, SkipAPETag));
 
     uint_fast64_t offset = vlc_stream_Tell(s);
     if (offset == 0)
