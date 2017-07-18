@@ -26,6 +26,7 @@
 #import "misc.h"
 
 #import "VLCTimeField.h"
+#import "VLCSlider.h"
 
 /*****************************************************************************
  * VLCControlsBarCommon
@@ -43,7 +44,7 @@
 @property (readwrite, strong) IBOutlet NSButton *forwardButton;
 
 @property (readwrite, strong) IBOutlet VLCProgressView *progressView;
-@property (readwrite, strong) IBOutlet TimeLineSlider *timeSlider;
+@property (readwrite, strong) IBOutlet VLCSlider *timeSlider;
 @property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderGradientView;
 @property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderBackgroundView;
 @property (readwrite, strong) IBOutlet NSProgressIndicator *progressBar;
@@ -67,7 +68,6 @@
 - (IBAction)fullscreen:(id)sender;
 
 - (void)updateTimeSlider;
-- (void)drawFancyGradientEffectForTimeSlider;
 - (void)updateControls;
 - (void)setPause;
 - (void)setPlay;

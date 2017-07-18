@@ -318,63 +318,38 @@
 {
     input_thread_t * p_input;
     p_input = pl_CurrentInput(getIntf());
-    if (p_input) {
-        NSString * o_time;
-        vlc_value_t pos;
-        float f_updated;
 
-        var_Get(p_input, "position", &pos);
-        f_updated = 10000. * pos.f_float;
-        [self.timeSlider setFloatValue: f_updated];
+    [self.timeSlider setHidden:NO];
 
-        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[self.timeField timeRemaining]];
-
-        mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
-        if (dur == -1) {
-            [self.timeSlider setHidden: YES];
-            [self.timeSliderGradientView setHidden: YES];
-        } else {
-            if ([self.timeSlider isHidden] == YES) {
-                bool b_buffering = false;
-                input_state_e inputState = input_GetState(p_input);
-                if (inputState == INIT_S || inputState == OPENING_S)
-                    b_buffering = YES;
-
-                [self.timeSlider setHidden: b_buffering];
-                [self.timeSliderGradientView setHidden: b_buffering];
-            }
-        }
-        [self.timeField setStringValue: o_time];
-        [self.timeField setNeedsDisplay:YES];
-
-        vlc_object_release(p_input);
-    } else {
+    if (!p_input) {
+        // Nothing playing
         [self.timeSlider setFloatValue: 0.0];
         [self.timeField setStringValue: @"00:00"];
-        [self.timeSlider setHidden: YES];
-        [self.timeSliderGradientView setHidden: YES];
+        [self.timeSlider setIndefinite:NO];
+        [self.timeSlider setEnabled:NO];
+        return;
     }
-}
 
-- (void)drawFancyGradientEffectForTimeSlider
-{
-    CGFloat f_value = [self.timeSlider knobPosition];
-    if (f_value > 7.5) {
-        NSRect oldFrame = [self.timeSliderGradientView frame];
-        if (f_value != oldFrame.size.width) {
-            if ([self.timeSliderGradientView isHidden])
-                [self.timeSliderGradientView setHidden: NO];
-            [self.timeSliderGradientView setFrame: NSMakeRect(oldFrame.origin.x, oldFrame.origin.y, f_value, oldFrame.size.height)];
-        }
+    vlc_value_t pos;
+    var_Get(p_input, "position", &pos);
+    [self.timeSlider setFloatValue:(10000. * pos.f_float)];
+
+    mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
+    if (dur == -1) {
+        // No duration, disable slider
+        [self.timeSlider setEnabled:NO];
     } else {
-        NSRect frame;
-        frame = [self.timeSliderGradientView frame];
-        if (frame.size.width > 0) {
-            frame.size.width = 0;
-            [self.timeSliderGradientView setFrame: frame];
-        }
-        [self.timeSliderGradientView setHidden: YES];
+        input_state_e inputState = input_GetState(p_input);
+        bool buffering = (inputState == INIT_S || inputState == OPENING_S);
+        [self.timeSlider setIndefinite:buffering];
     }
+
+    NSString *time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:p_input
+                                                                      negative:[self.timeField timeRemaining]];
+    [self.timeField setStringValue:time];
+    [self.timeField setNeedsDisplay:YES];
+
+    vlc_object_release(p_input);
 }
 
 - (void)updateControls
@@ -404,15 +379,6 @@
         //FIXME! b_chapters = p_input->stream.i_area_nb > 1;
 
         vlc_object_release(p_input);
-    }
-
-    if (b_buffering) {
-        [self.progressBar startAnimation:self];
-        [self.progressBar setIndeterminate:YES];
-        [self.progressBar setHidden:NO];
-    } else {
-        [self.progressBar stopAnimation:self];
-        [self.progressBar setHidden:YES];
     }
 
     [self.timeSlider setEnabled: b_seekable];
