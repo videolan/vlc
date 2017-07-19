@@ -233,6 +233,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     if( AudioIO_Start( p_aout ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
+    p_fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+
     aout_FormatPrepare( p_fmt );
     aout_SoftVolumeStart( p_aout );
 
