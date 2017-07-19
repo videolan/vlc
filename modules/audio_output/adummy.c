@@ -67,6 +67,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     else
         fmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
 
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     return VLC_SUCCESS;
 }
 
