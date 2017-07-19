@@ -24,6 +24,7 @@ ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/no-windows-files.patch
 	$(APPLY) $(SRC)/libarchive/winrt.patch
 endif
+	$(APPLY) $(SRC)/libarchive/fix-types.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 

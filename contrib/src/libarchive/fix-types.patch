@@ -1,0 +1,29 @@
+--- libarchive/libarchive/archive_entry.c	2017-07-18 15:27:58.259298500 +0200
++++ libarchive/libarchive/archive_entry.c.types	2017-07-18 15:21:43.800236200 +0200
+@@ -348,7 +348,7 @@ archive_entry_devminor(struct archive_en
+ 		return minor(entry->ae_stat.aest_dev);
+ }
+ 
+-mode_t
++__LA_MODE_T
+ archive_entry_filetype(struct archive_entry *entry)
+ {
+ 	return (AE_IFMT & entry->acl.mode);
+@@ -520,7 +520,7 @@ archive_entry_ino64(struct archive_entry
+ 	return (entry->ae_stat.aest_ino);
+ }
+ 
+-mode_t
++__LA_MODE_T
+ archive_entry_mode(struct archive_entry *entry)
+ {
+ 	return (entry->acl.mode);
+@@ -593,7 +593,7 @@ _archive_entry_pathname_l(struct archive
+ 	return (archive_mstring_get_mbs_l(&entry->ae_pathname, p, len, sc));
+ }
+ 
+-mode_t
++__LA_MODE_T
+ archive_entry_perm(struct archive_entry *entry)
+ {
+ 	return (~AE_IFMT & entry->acl.mode);
