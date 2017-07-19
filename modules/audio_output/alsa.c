@@ -584,6 +584,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
         fmt->i_frame_length = A52_FRAME_NB;
     }
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     sys->format = fmt->i_format;
 
     aout->time_get = TimeGet;
