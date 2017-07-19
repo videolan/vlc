@@ -1204,7 +1204,7 @@ bool MediaServer::fetchContents()
                                       "BrowseDirectChildren",
                                       "*",
                                       // Some servers don't understand "0" as "no-limit"
-                                      "1000", /* RequestedCount */
+                                      "5000", /* RequestedCount */
                                       "" /* SortCriteria */
                                       );
     if ( !p_response )
