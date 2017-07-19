@@ -43,6 +43,8 @@
 #include "hxxx_sei.h"
 #include "hxxx_common.h"
 
+#include <limits.h>
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -190,7 +192,8 @@ static int Open(vlc_object_t *p_this)
 
     /* Init timings */
     if( p_dec->fmt_in.video.i_frame_rate_base &&
-        p_dec->fmt_in.video.i_frame_rate )
+        p_dec->fmt_in.video.i_frame_rate &&
+        p_dec->fmt_in.video.i_frame_rate <= UINT_MAX / 2 )
         date_Init( &p_sys->dts, p_dec->fmt_in.video.i_frame_rate * 2,
                                 p_dec->fmt_in.video.i_frame_rate_base );
     else
@@ -465,7 +468,9 @@ static void ActivateSets(decoder_t *p_dec,
             {
                 p_dec->fmt_out.video.i_frame_rate = num;
                 p_dec->fmt_out.video.i_frame_rate_base = den;
-                if(p_sys->dts.i_divider_den != den && p_sys->dts.i_divider_num != 2 * num)
+                if(p_sys->dts.i_divider_den != den &&
+                   p_sys->dts.i_divider_num != 2 * num &&
+                   num <= UINT_MAX / 2)
                     date_Change(&p_sys->dts, 2 * num, den);
             }
         }
