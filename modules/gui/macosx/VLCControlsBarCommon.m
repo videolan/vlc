@@ -74,6 +74,8 @@
     [self.timeSlider setToolTip: _NS("Position")];
     [[self.timeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.timeSlider cell] accessibilitySetOverrideValue:[self.timeSlider toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    if (_darkInterface)
+        [self.timeSlider setSliderStyleDark];
 
     [self.fullscreenButton setToolTip: _NS("Toggle Fullscreen mode")];
     [[self.fullscreenButton cell] accessibilitySetOverrideValue:_NS("Click to enable fullscreen video playback.") forAttribute:NSAccessibilityDescriptionAttribute];
