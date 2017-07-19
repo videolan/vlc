@@ -174,6 +174,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             goto error;
     }
 
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     fmt->i_physical_channels = chans;
     aout_FormatPrepare (fmt);
 
