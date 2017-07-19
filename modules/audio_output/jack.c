@@ -262,6 +262,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
     msg_Dbg( p_aout, "JACK audio output initialized (%d channels, rate=%d)",
              p_sys->i_channels, fmt->i_rate );
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
 
 error_out:
     /* Clean up, if an error occurred */
