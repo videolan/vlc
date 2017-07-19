@@ -231,6 +231,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     }
 
     fmt->i_format = VLC_CODEC_S16N;
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     return VLC_SUCCESS;
 }
 
