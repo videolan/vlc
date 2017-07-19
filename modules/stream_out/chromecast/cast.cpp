@@ -57,8 +57,8 @@ struct sout_stream_sys_t
         delete p_intf;
     }
 
-    bool canDecodeVideo( int i_codec ) const;
-    bool canDecodeAudio( int i_codec ) const;
+    bool canDecodeVideo( vlc_fourcc_t i_codec ) const;
+    bool canDecodeAudio( vlc_fourcc_t i_codec ) const;
     bool startSoutChain(sout_stream_t* p_stream);
 
     sout_stream_t     *p_out;
@@ -197,12 +197,12 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 }
 
 
-bool sout_stream_sys_t::canDecodeVideo( int i_codec ) const
+bool sout_stream_sys_t::canDecodeVideo( vlc_fourcc_t i_codec ) const
 {
     return i_codec == VLC_CODEC_H264 || i_codec == VLC_CODEC_VP8;
 }
 
-bool sout_stream_sys_t::canDecodeAudio( int i_codec ) const
+bool sout_stream_sys_t::canDecodeAudio( vlc_fourcc_t i_codec ) const
 {
     return i_codec == VLC_CODEC_VORBIS ||
         i_codec == VLC_CODEC_MP4A ||
