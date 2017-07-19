@@ -190,8 +190,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     // Filled Track Drawing
     CGFloat filledTrackCornerRadius = 2;
-    NSRect filledTrackInnerRect = NSInsetRect(filledTrackRect, filledTrackCornerRadius, filledTrackCornerRadius);
-    NSBezierPath* filledTrackPath = [NSBezierPath bezierPathWithRoundedRect:filledTrackInnerRect
+    NSBezierPath* filledTrackPath = [NSBezierPath bezierPathWithRoundedRect:filledTrackRect
                                                                     xRadius:filledTrackCornerRadius
                                                                     yRadius:filledTrackCornerRadius];
 
