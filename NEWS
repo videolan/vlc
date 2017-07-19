@@ -149,11 +149,16 @@ Audio output:
  * Added Tizen audio module
  * HDMI/SPDIF pass-through support for WASAPI (AC3/DTS/DTSHD/EAC3/TRUEHD)
  * Support EAC3 and TRUEHD pass-through for PulseAudio
+ * Support Ambisonics audio with viewpoint changes
 
 Audio filters:
  * Add SoX Resampler library audio filter module (converter and resampler)
  * a52tospdif and dtstospdif audio converters are merged into tospdif,
    this new converter can convert AC3, DTS, EAC3 and TRUEHD to a IEC61937 frame
+ * Added the Spatialaudio module with 2 submodules: one Ambisonics audio
+ * renderer and one Binauralizer audio filter
+ * Add Headphones option in Stereo Mode: use the spatialaudio module for
+ * headphones effects
 
 Video ouput:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
