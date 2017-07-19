@@ -1159,6 +1159,17 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     aout_FormatPrint( p_aout, "VLC is looking for:", &p_sys->fmt );
 
+    bool low_latency = false;
+    if (p_sys->fmt.channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+    {
+        p_sys->fmt.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+
+        /* TODO: detect sink channel layout */
+        p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
+        aout_FormatPrepare(&p_sys->fmt);
+        low_latency = true;
+    }
+
     if( AOUT_FMT_LINEAR( &p_sys->fmt ) )
         i_ret = StartPCM( env, p_aout, i_max_channels );
     else if( b_try_passthrough )
@@ -1217,11 +1228,20 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     }
 
     p_sys->circular.i_read = p_sys->circular.i_write = 0;
-    /* 2 seconds of buffering */
-    p_sys->circular.i_size = (int)p_sys->fmt.i_rate * AOUT_MAX_PREPARE_TIME
+    p_sys->circular.i_size = (int)p_sys->fmt.i_rate
                            * p_sys->fmt.i_bytes_per_frame
-                           / p_sys->fmt.i_frame_length
-                           / CLOCK_FREQ;
+                           / p_sys->fmt.i_frame_length;
+    if (low_latency)
+    {
+        /* 40 ms of buffering */
+        p_sys->circular.i_size = p_sys->circular.i_size / 25;
+    }
+    else
+    {
+        /* 2 seconds of buffering */
+        p_sys->circular.i_size = p_sys->circular.i_size * AOUT_MAX_PREPARE_TIME
+                               / CLOCK_FREQ;
+    }
 
     /* Allocate circular buffer */
     switch( p_sys->i_write_type )
