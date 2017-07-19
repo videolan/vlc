@@ -1455,7 +1455,7 @@ static void MP4_UpdateSeekpoint( demux_t *p_demux, int64_t i_time )
 /*****************************************************************************
  * Seek: Go to i_date
 ******************************************************************************/
-static int Seek( demux_t *p_demux, mtime_t i_date )
+static int Seek( demux_t *p_demux, mtime_t i_date, bool b_accurate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_track;
@@ -1473,7 +1473,8 @@ static int Seek( demux_t *p_demux, mtime_t i_date )
     MP4_UpdateSeekpoint( p_demux, i_date );
 
     MP4ASF_ResetFrames( p_sys );
-    es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
+    if( b_accurate )
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
     return VLC_SUCCESS;
 }
@@ -1633,7 +1634,7 @@ static void FragTrunSeekToTime( mp4_track_t *p_track, stime_t i_target_time )
     p_track->context.runs.i_current = i_run;
 }
 
-static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime )
+static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime, bool b_accurate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint64_t i64 = UINT64_MAX;
@@ -1768,12 +1769,12 @@ static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime )
 
     MP4ASF_ResetFrames( p_sys );
     /* And set next display time in that trun/fragment */
-    if( b_iframesync )
+    if( b_iframesync && b_accurate )
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_nztime );
     return VLC_SUCCESS;
 }
 
-static int FragSeekToPos( demux_t *p_demux, double f )
+static int FragSeekToPos( demux_t *p_demux, double f, bool b_accurate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint64_t i_duration = __MAX(p_sys->i_duration, p_sys->i_cumulated_duration);
@@ -1782,7 +1783,7 @@ static int FragSeekToPos( demux_t *p_demux, double f )
         return VLC_EGENERIC;
 
     return FragSeekToTime( p_demux, (mtime_t)( f *
-                           MP4_rescale( i_duration, p_sys->i_timescale, CLOCK_FREQ ) ) );
+                           MP4_rescale( i_duration, p_sys->i_timescale, CLOCK_FREQ ) ), b_accurate );
 }
 
 static bool imageTypeCompatible( const MP4_Box_data_data_t *p_data )
@@ -1857,6 +1858,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     double f, *pf;
     int64_t i64, *pi64;
+    bool b;
 
     const uint64_t i_duration = __MAX(p_sys->i_duration, p_sys->i_cumulated_duration);
 
@@ -1880,13 +1882,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = va_arg( args, double );
+            b = va_arg( args, int );
             if ( p_demux->pf_demux == DemuxFrag )
-                return FragSeekToPos( p_demux, f );
+                return FragSeekToPos( p_demux, f, b );
             else if( p_sys->i_timescale > 0 )
             {
                 i64 = (int64_t)( f * MP4_rescale( p_sys->i_duration,
                                                   p_sys->i_timescale, CLOCK_FREQ ) );
-                return Seek( p_demux, i64 );
+                return Seek( p_demux, i64, b );
             }
             else return VLC_EGENERIC;
 
@@ -1902,10 +1905,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
+            b = va_arg( args, int );
             if ( p_demux->pf_demux == DemuxFrag )
-                return FragSeekToTime( p_demux, i64 );
+                return FragSeekToTime( p_demux, i64, b );
             else
-                return Seek( p_demux, i64 );
+                return Seek( p_demux, i64, b );
 
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
@@ -2077,7 +2081,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             const int i_seekpoint = va_arg( args, int );
             if( !p_sys->p_title )
                 return VLC_EGENERIC;
-            return Seek( p_demux, p_sys->p_title->seekpoint[i_seekpoint]->i_time_offset );
+            return Seek( p_demux, p_sys->p_title->seekpoint[i_seekpoint]->i_time_offset, true );
         }
         case DEMUX_GET_PTS_DELAY:
         {
