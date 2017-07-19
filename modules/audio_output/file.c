@@ -212,6 +212,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     {
         fmt->i_physical_channels = pi_channels_maps[i_channels];
     }
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
 
     /* WAV header */
     p_aout->sys->b_add_wav_header = var_InheritBool( p_aout, "audiofile-wav" );
