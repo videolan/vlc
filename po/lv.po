@@ -64,7 +64,7 @@ msgstr "Galvenā saskarne"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "Galvenās saskarnes Iestatījumi"
+msgstr "Galvenās saskarnes iestatījumi"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:79
 msgid "Control interfaces"
