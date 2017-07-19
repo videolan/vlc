@@ -107,8 +107,7 @@ ca_Flush(audio_output_t *p_aout, bool wait)
             const mtime_t i_frame_us =
                 FramesToUs(p_sys, BytesToFrames(p_sys, i_bytes)) + 10000;
 
-            /* Don't sleep less than 10ms */
-            msleep(__MAX(i_frame_us, 10000));
+            msleep(i_frame_us / 2);
         }
     }
     else
@@ -166,8 +165,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
         /* Wait for the render buffer to play the remaining data */
         const mtime_t i_frame_us =
             FramesToUs(p_sys, BytesToFrames(p_sys, p_block->i_buffer));
-        /* Don't sleep less than 10ms */
-        msleep(__MAX(i_frame_us, 10000));
+        msleep(i_frame_us / 2);
     }
 
     unsigned i_underrun_size = atomic_exchange(&p_sys->i_underrun_size, 0);
