@@ -250,21 +250,9 @@ bool FakeESOut::hasSelectedEs() const
 
 bool FakeESOut::decodersDrained()
 {
-    bool b_drained = true;
-    std::list<FakeESOutID *>::const_iterator it;
-    vlc_mutex_lock(&lock);
-    for( it=fakeesidlist.begin(); it!=fakeesidlist.end(); ++it )
-    {
-        FakeESOutID *esID = *it;
-        if( esID->realESID() && esID->getFmt()->i_cat != AUDIO_ES ) /* Broken GET_EMPTY */
-        {
-            bool b_empty;
-            es_out_Control( real_es_out, ES_OUT_GET_EMPTY, &b_empty );
-            b_drained &= b_empty;
-        }
-    }
-    vlc_mutex_unlock(&lock);
-    return b_drained;
+    bool b_empty = true;
+    es_out_Control( real_es_out, ES_OUT_GET_EMPTY, &b_empty );
+    return b_empty;
 }
 
 bool FakeESOut::restarting() const
