@@ -475,6 +475,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     // we want 16bit signed data native endian.
     fmt->i_format              = VLC_CODEC_S16N;
     fmt->i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
 
     SetPositionUpdatePeriod(sys->playerPlay, AOUT_MIN_PREPARE_TIME * 1000 / CLOCK_FREQ);
 
