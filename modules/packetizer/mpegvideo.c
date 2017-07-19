@@ -168,14 +168,13 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV )
         return VLC_EGENERIC;
 
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_MPGV );
-    p_dec->fmt_out.i_original_fourcc = p_dec->fmt_in.i_original_fourcc;
-
-
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_dec->p_sys )
         return VLC_ENOMEM;
     memset( p_dec->p_sys, 0, sizeof( decoder_sys_t ) );
+
+    p_dec->fmt_out.i_codec = VLC_CODEC_MPGV;
+    p_dec->fmt_out.i_original_fourcc = p_dec->fmt_in.i_original_fourcc;
 
     /* Misc init */
     packetizer_Init( &p_sys->packetizer,
