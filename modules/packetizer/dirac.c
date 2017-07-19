@@ -913,7 +913,8 @@ static int dirac_InspectDataUnit( decoder_t *p_dec, block_t **pp_block, block_t 
         {
             u_pics_per_sec *= 2;
         }
-        date_Change( &p_sys->dts, u_pics_per_sec, p_sys->seq_hdr.u_fps_den );
+        if( u_pics_per_sec &&  p_sys->seq_hdr.u_fps_den )
+            date_Change( &p_sys->dts, u_pics_per_sec, p_sys->seq_hdr.u_fps_den );
 
         /* TODO: set p_sys->reorder_buf.u_size_max */
         p_sys->i_pts_offset = p_sys->reorder_buf.u_size_max
