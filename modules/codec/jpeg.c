@@ -177,6 +177,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     /* Set callbacks */
     p_dec->pf_decode = DecodeBlock;
 
+    p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
+
     return VLC_SUCCESS;
 }
 
@@ -521,7 +523,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     jpeg_start_decompress(&p_sys->p_jpeg);
 
     /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
     p_dec->fmt_out.video.i_visible_width  = p_dec->fmt_out.video.i_width  = p_sys->p_jpeg.output_width;
     p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height = p_sys->p_jpeg.output_height;
     p_dec->fmt_out.video.i_sar_num = 1;
