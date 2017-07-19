@@ -328,6 +328,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->sys->i_played_length = 0;
     p_aout->sys->p_free_list = NULL;
 
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+
     return VLC_SUCCESS;
 }
 
