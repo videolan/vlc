@@ -49,4 +49,7 @@
 
 @property (nonatomic, setter=setIndefinite:) BOOL indefinite;
 
+- (void)setSliderStyleLight;
+- (void)setSliderStyleDark;
+
 @end

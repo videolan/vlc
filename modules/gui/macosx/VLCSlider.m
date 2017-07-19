@@ -55,4 +55,14 @@
     return NO;
 }
 
+- (void)setSliderStyleLight
+{
+    [(VLCSliderCell*)[self cell] setSliderStyleLight];
+}
+
+- (void)setSliderStyleDark
+{
+    [(VLCSliderCell*)[self cell] setSliderStyleDark];
+}
+
 @end

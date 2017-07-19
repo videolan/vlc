@@ -38,40 +38,78 @@
 {
     self = [super initWithCoder:coder];
     if (self) {
-        // Color Declarations
-        _gradientColor = [NSColor colorWithCalibratedRed: 0.663 green: 0.663 blue: 0.663 alpha: 1];
-        _gradientColor2 = [NSColor colorWithCalibratedRed: 0.749 green: 0.749 blue: 0.753 alpha: 1];
-        _trackStrokeColor = [NSColor colorWithCalibratedRed: 0.619 green: 0.624 blue: 0.623 alpha: 1];
-        _filledTrackColor = [NSColor colorWithCalibratedRed: 0.55 green: 0.55 blue: 0.55 alpha: 1];
-        _knobFillColor = [NSColor colorWithCalibratedRed: 1 green: 1 blue: 1 alpha: 1];
-        _activeKnobFillColor = [NSColor colorWithCalibratedRed: 0.95 green: 0.95 blue: 0.95 alpha: 1];
-        _shadowColor = [NSColor colorWithCalibratedRed: 0.32 green: 0.32 blue: 0.32 alpha: 1];
-        _knobStrokeColor = [NSColor colorWithCalibratedRed: 0.592 green: 0.596 blue: 0.596 alpha: 1];
-
-        // Gradient Declarations
-        _trackGradient = [[NSGradient alloc] initWithColorsAndLocations:
-                          _gradientColor, 0.0,
-                          [_gradientColor blendedColorWithFraction:0.5 ofColor:_gradientColor2], 0.60,
-                          _gradientColor2, 1.0, nil];
-
-        // Shadow Declarations
-        _knobShadow = [[NSShadow alloc] init];
-        _knobShadow.shadowColor = _shadowColor;
-        _knobShadow.shadowOffset = NSMakeSize(0, 0);
-        _knobShadow.shadowBlurRadius = 2;
-
-        _highlightBackground = [NSColor colorWithCalibratedRed:0.20 green:0.55 blue:0.91 alpha:1.0];
-        NSColor *highlightAccent = [NSColor colorWithCalibratedRed:0.4588235294 green:0.7254901961 blue:0.9882352941 alpha:1.0];
-        _highlightGradient = [[NSGradient alloc] initWithColors:@[
-                                                                  _highlightBackground,
-                                                                  highlightAccent,
-                                                                  _highlightBackground
-                                                                  ]];
+        [self setSliderStyleLight];
         _animationWidth = [[self controlView] bounds].size.width;
 
         [self initDisplayLink];
     }
     return self;
+}
+
+- (void)setSliderStyleLight
+{
+    // Color Declarations
+    _gradientColor = [NSColor colorWithCalibratedRed: 0.663 green: 0.663 blue: 0.663 alpha: 1];
+    _gradientColor2 = [NSColor colorWithCalibratedRed: 0.749 green: 0.749 blue: 0.753 alpha: 1];
+    _trackStrokeColor = [NSColor colorWithCalibratedRed: 0.619 green: 0.624 blue: 0.623 alpha: 1];
+    _filledTrackColor = [NSColor colorWithCalibratedRed: 0.55 green: 0.55 blue: 0.55 alpha: 1];
+    _knobFillColor = [NSColor colorWithCalibratedRed: 1 green: 1 blue: 1 alpha: 1];
+    _activeKnobFillColor = [NSColor colorWithCalibratedRed: 0.95 green: 0.95 blue: 0.95 alpha: 1];
+    _shadowColor = [NSColor colorWithCalibratedRed: 0.32 green: 0.32 blue: 0.32 alpha: 1];
+    _knobStrokeColor = [NSColor colorWithCalibratedRed: 0.592 green: 0.596 blue: 0.596 alpha: 1];
+
+    // Gradient Declarations
+    _trackGradient = [[NSGradient alloc] initWithColorsAndLocations:
+                      _gradientColor, 0.0,
+                      [_gradientColor blendedColorWithFraction:0.5 ofColor:_gradientColor2], 0.60,
+                      _gradientColor2, 1.0, nil];
+
+    // Shadow Declarations
+    _knobShadow = [[NSShadow alloc] init];
+    _knobShadow.shadowColor = _shadowColor;
+    _knobShadow.shadowOffset = NSMakeSize(0, 0);
+    _knobShadow.shadowBlurRadius = 2;
+
+    _highlightBackground = [NSColor colorWithCalibratedRed:0.20 green:0.55 blue:0.91 alpha:1.0];
+    NSColor *highlightAccent = [NSColor colorWithCalibratedRed:0.4588235294 green:0.7254901961 blue:0.9882352941 alpha:1.0];
+    _highlightGradient = [[NSGradient alloc] initWithColors:@[
+                                                              _highlightBackground,
+                                                              highlightAccent,
+                                                              _highlightBackground
+                                                              ]];
+}
+
+- (void)setSliderStyleDark
+{
+    // Color Declarations
+    _gradientColor = [NSColor colorWithCalibratedRed: 0.24 green: 0.24 blue: 0.24 alpha: 1];
+    _gradientColor2 = [NSColor colorWithCalibratedRed: 0.15 green: 0.15 blue: 0.15 alpha: 1];
+    _trackStrokeColor = [NSColor colorWithCalibratedRed: 0.23 green: 0.23 blue: 0.23 alpha: 1];
+    _filledTrackColor = [NSColor colorWithCalibratedRed: 0.15 green: 0.15 blue: 0.15 alpha: 1];
+    _knobFillColor = [NSColor colorWithCalibratedRed: 1 green: 1 blue: 1 alpha: 1];
+    _activeKnobFillColor = [NSColor colorWithCalibratedRed: 0.95 green: 0.95 blue: 0.95 alpha: 1];
+    _shadowColor = [NSColor colorWithCalibratedRed: 0.32 green: 0.32 blue: 0.32 alpha: 1];
+    _knobStrokeColor = [NSColor colorWithCalibratedRed: 0.592 green: 0.596 blue: 0.596 alpha: 1];
+
+    // Gradient Declarations
+    _trackGradient = [[NSGradient alloc] initWithColorsAndLocations:
+                      _gradientColor, 0.0,
+                      [_gradientColor blendedColorWithFraction:0.5 ofColor:_gradientColor2], 0.60,
+                      _gradientColor2, 1.0, nil];
+
+    // Shadow Declarations
+    _knobShadow = [[NSShadow alloc] init];
+    _knobShadow.shadowColor = _shadowColor;
+    _knobShadow.shadowOffset = NSMakeSize(0, 0);
+    _knobShadow.shadowBlurRadius = 2;
+
+    _highlightBackground = [NSColor colorWithCalibratedRed:0.20 green:0.55 blue:0.91 alpha:1.0];
+    NSColor *highlightAccent = [NSColor colorWithCalibratedRed:0.4588235294 green:0.7254901961 blue:0.9882352941 alpha:1.0];
+    _highlightGradient = [[NSGradient alloc] initWithColors:@[
+                                                              _highlightBackground,
+                                                              highlightAccent,
+                                                              _highlightBackground
+                                                              ]];
 }
 
 - (void)dealloc
@@ -179,9 +217,6 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     // Empty Track Drawing
     NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:3 yRadius:3];
     [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
-    [_trackStrokeColor setStroke];
-    emptyTrackPath.lineWidth = 1;
-    [emptyTrackPath stroke];
 
     // Calculate filled track
     NSRect filledTrackRect = rect;
@@ -196,6 +231,10 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     [_filledTrackColor setFill];
     [filledTrackPath fill];
+
+    [_trackStrokeColor setStroke];
+    emptyTrackPath.lineWidth = 1;
+    [emptyTrackPath stroke];
 }
 
 #pragma mark -
