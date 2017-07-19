@@ -438,6 +438,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
            name:AVAudioSessionRouteChangeNotification object:nil];
 
     free(layout);
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
     msg_Dbg(p_aout, "analog AudioUnit output successfully opened for %4.4s %s",

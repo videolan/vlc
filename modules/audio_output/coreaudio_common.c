@@ -202,8 +202,20 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_dev_latency_us = i_dev_latency_us;
 
     /* setup circular buffer */
-    const size_t i_audiobuffer_size = AOUT_MAX_ADVANCE_TIME * fmt->i_rate *
-        fmt->i_bytes_per_frame / p_sys->i_frame_length / CLOCK_FREQ;
+    size_t i_audiobuffer_size = fmt->i_rate * fmt->i_bytes_per_frame
+                              / p_sys->i_frame_length;
+    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+    {
+        /* low latency: 40 ms of buffering */
+        i_audiobuffer_size = i_audiobuffer_size / 25;
+    }
+    else
+    {
+        /* 2 seconds of buffering */
+        i_audiobuffer_size = i_audiobuffer_size * AOUT_MAX_ADVANCE_TIME
+                           / CLOCK_FREQ;
+    }
+    fprintf(stderr, "i_audiobuffer_size: %zu\n", i_audiobuffer_size);
     if (!TPCircularBufferInit(&p_sys->circular_buffer, i_audiobuffer_size))
         return VLC_EGENERIC;
 

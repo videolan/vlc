@@ -1488,6 +1488,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         if (StartAnalog(p_aout, fmt, i_latency_us) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "analog output successfully opened");
+            fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
             return VLC_SUCCESS;
         }
     }
