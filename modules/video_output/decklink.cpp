@@ -1118,6 +1118,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     fmt->i_format = VLC_CODEC_S16N;
     fmt->i_channels = 2; //decklink_sys->i_channels;
     fmt->i_physical_channels = AOUT_CHANS_STEREO; //pi_channels_maps[fmt->i_channels];
+    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     fmt->i_rate = sys->i_rate;
     fmt->i_bitspersample = 16;
     fmt->i_blockalign = fmt->i_channels * fmt->i_bitspersample /8 ;
