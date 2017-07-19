@@ -116,6 +116,7 @@ static int Open( vlc_object_t *p_this )
         if( !fcc )
         {
             msg_Err( p_dec, "unknown raw audio sample size" );
+            free( p_sys );
             return VLC_EGENERIC;
         }
         p_dec->fmt_out.i_codec = fcc;
