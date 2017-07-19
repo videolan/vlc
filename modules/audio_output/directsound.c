@@ -810,6 +810,8 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         return ret;
     }
 
+    fmt.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+
     *pfmt = fmt;
     sys->b_playing = false;
     sys->i_write = 0;
