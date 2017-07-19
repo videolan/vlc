@@ -214,9 +214,8 @@ static int WidiHeader( unsigned *pi_rate,
 /*****************************************************************************
  * OpenCommon:
  *****************************************************************************/
-static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
+static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
     int i_type;
     int i_header_size;
@@ -304,11 +303,11 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 }
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    return OpenCommon( p_this, false );
+    return OpenCommon( (decoder_t*) p_this, false );
 }
 static int OpenPacketizer( vlc_object_t *p_this )
 {
-    return OpenCommon( p_this, true );
+    return OpenCommon( (decoder_t*) p_this, true );
 }
 
 /*****************************************************************************
