@@ -427,8 +427,17 @@ static int D3dCreateDevice(vlc_va_t *va)
 #endif
 
     UINT creationFlags = D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
-#if !defined(NDEBUG) //&& defined(_MSC_VER)
-    creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#if !defined(NDEBUG)
+#if !VLC_WINSTORE_APP
+    if (IsDebuggerPresent())
+#endif
+    {
+        HINSTANCE sdklayer_dll = LoadLibrary(TEXT("d3d11_1sdklayers.dll"));
+        if (sdklayer_dll) {
+            creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+            FreeLibrary(sdklayer_dll);
+        }
+    }
 #endif
 
     /* */
