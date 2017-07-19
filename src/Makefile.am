@@ -225,6 +225,7 @@ libvlccore_la_SOURCES = \
 	playlist/item.c \
 	playlist/search.c \
 	playlist/services_discovery.c \
+	playlist/renderer.c \
 	input/item.c \
 	input/access.c \
 	input/clock.c \

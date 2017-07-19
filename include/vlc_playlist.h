@@ -358,6 +358,14 @@ VLC_API bool playlist_IsServicesDiscoveryLoaded( playlist_t *,const char *) VLC_
 /** Query a services discovery */
 VLC_API int playlist_ServicesDiscoveryControl( playlist_t *, const char *, int, ... );
 
+/********************** Renderer ***********************/
+/**
+ * Sets a renderer or remove the current one
+ * @param p_item    The renderer item to be used, or NULL to disable the current
+ *                  one. If a renderer is provided, its reference count will be
+ *                  incremented.
+ */
+VLC_API int playlist_SetRenderer( playlist_t* p_pl, vlc_renderer_item_t* p_item );
 
 
 /********************************************************

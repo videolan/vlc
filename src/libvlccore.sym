@@ -362,6 +362,7 @@ playlist_VolumeSet
 playlist_VolumeUp
 playlist_MuteSet
 playlist_MuteGet
+playlist_SetRenderer
 sdp_AddAttribute
 sdp_AddMedia
 secstotimestr

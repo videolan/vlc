@@ -34,6 +34,7 @@
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 #include <vlc_http.h>
+#include <vlc_renderer_discovery.h>
 #include "playlist_internal.h"
 #include "input/resource.h"
 
@@ -310,6 +311,8 @@ void playlist_Destroy( playlist_t *p_playlist )
     /* Release input resources */
     assert( p_sys->p_input == NULL );
     input_resource_Release( p_sys->p_input_resource );
+    if( p_sys->p_renderer )
+        vlc_renderer_item_release( p_sys->p_renderer );
 
     if( p_playlist->p_media_library != NULL )
         playlist_MLDump( p_playlist );
