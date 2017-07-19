@@ -1484,10 +1484,15 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     HRESULT hr = S_OK;
 
 # if !defined(NDEBUG)
-    HINSTANCE sdklayer_dll = LoadLibrary(TEXT("d3d11_1sdklayers.dll"));
-    if (sdklayer_dll) {
-        creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-        FreeLibrary(sdklayer_dll);
+#  if !VLC_WINSTORE_APP
+    if (IsDebuggerPresent())
+#  endif
+    {
+        HINSTANCE sdklayer_dll = LoadLibrary(TEXT("d3d11_1sdklayers.dll"));
+        if (sdklayer_dll) {
+            creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+            FreeLibrary(sdklayer_dll);
+        }
     }
 # endif
 
