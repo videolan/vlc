@@ -388,13 +388,16 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
         };
 
         p_sys->p_vf2 = filter_chain_NewVideo( p_stream, false, &owner );
-        es_format_t fmt;
-        es_format_Copy( &fmt, &p_sys->p_decoder->fmt_out );
-        if( p_sys->i_chroma )
-            fmt.video.i_chroma = p_sys->i_chroma;
-        filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
-        es_format_Clean( &fmt );
-        filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
+        if (p_sys->p_vf2 != NULL)
+        {
+            es_format_t fmt;
+            es_format_Copy( &fmt, &p_sys->p_decoder->fmt_out );
+            if( p_sys->i_chroma )
+                fmt.video.i_chroma = p_sys->i_chroma;
+            filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
+            es_format_Clean( &fmt );
+            filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
+        }
         free( psz_chain );
     }
     else
