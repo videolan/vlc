@@ -562,6 +562,14 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return es_out_ControlModifyPcrSystem( priv->p_es_out_display, b_absolute, i_system );
         }
 
+        case INPUT_SET_RENDERER:
+        {
+            vlc_renderer_item_t* p_item = va_arg( args, vlc_renderer_item_t* );
+            val.p_address = p_item;
+            input_ControlPush( p_input, INPUT_CONTROL_SET_RENDERER, &val );
+            break;
+        }
+
         default:
             msg_Err( p_input, "unknown query 0x%x in %s", i_query, __func__ );
             return VLC_EGENERIC;

@@ -54,6 +54,7 @@
 #include <vlc_modules.h>
 #include <vlc_stream.h>
 #include <vlc_stream_extractor.h>
+#include <vlc_renderer_discovery.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -237,6 +238,8 @@ static void input_Destructor( vlc_object_t *obj )
     free( psz_name );
 #endif
 
+    if( priv->p_renderer )
+        vlc_renderer_item_release( priv->p_renderer );
     if( priv->p_es_out_display )
         es_out_Delete( priv->p_es_out_display );
 
@@ -2300,6 +2303,36 @@ static bool Control( input_thread_t *p_input,
             b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, val );
             break;
         }
+        case INPUT_CONTROL_SET_RENDERER:
+        {
+            vlc_renderer_item_t *p_item = val.p_address;
+            input_thread_private_t *p_priv = input_priv( p_input );
+            // We do not support switching from a renderer to another for now
+            if ( p_item == NULL && p_priv->p_renderer == NULL )
+                break;
+
+            if ( p_priv->p_renderer )
+            {
+                ControlUpdateSout( p_input, NULL );
+                demux_FilterDisable( p_priv->master->p_demux,
+                        vlc_renderer_item_demux_filter( p_priv->p_renderer ) );
+                vlc_renderer_item_release( p_priv->p_renderer );
+                p_priv->p_renderer = NULL;
+            }
+            if( p_item != NULL )
+            {
+                p_priv->p_renderer = vlc_renderer_item_hold( p_item );
+                ControlUpdateSout( p_input, vlc_renderer_item_sout( p_item ) );
+                if( !demux_FilterEnable( p_priv->master->p_demux,
+                                vlc_renderer_item_demux_filter( p_priv->p_renderer ) ) )
+                {
+                    ControlInsertDemuxFilter( p_input,
+                                        vlc_renderer_item_demux_filter( p_item ) );
+                }
+                input_resource_TerminateVout( p_priv->p_resource );
+            }
+            break;
+        }
 
         case INPUT_CONTROL_NAV_ACTIVATE:
         case INPUT_CONTROL_NAV_UP:
@@ -2511,6 +2544,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
                                        const char *psz_forced_demux,
                                        bool b_in_can_fail )
 {
+    input_thread_private_t *priv = input_priv(p_input);
     input_source_t *in = vlc_custom_create( p_input, sizeof( *in ),
                                             "input source" );
     if( unlikely(in == NULL) )
@@ -2611,7 +2645,16 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         return NULL;
     }
 
-    char *psz_demux_chain = var_GetNonEmptyString(p_input, "demux-filter");
+    char *psz_demux_chain = NULL;
+    if( priv->p_renderer )
+    {
+        const char* psz_renderer_demux = vlc_renderer_item_demux_filter(
+                    priv->p_renderer );
+        if( psz_renderer_demux )
+            psz_demux_chain = strdup( psz_renderer_demux );
+    }
+    if( !psz_demux_chain )
+        psz_demux_chain = var_GetNonEmptyString(p_input, "demux-filter");
     if( psz_demux_chain != NULL ) /* add the chain of demux filters */
     {
         in->p_demux = demux_FilterChainNew( in->p_demux, psz_demux_chain );

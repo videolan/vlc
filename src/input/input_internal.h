@@ -112,6 +112,7 @@ typedef struct input_thread_private_t
     es_out_t        *p_es_out_display;
     vlc_viewpoint_t viewpoint;
     bool            viewpoint_changed;
+    vlc_renderer_item_t *p_renderer;
 
     /* Title infos FIXME multi-input (not easy) ? */
     int          i_title;
@@ -232,6 +233,8 @@ enum input_control_e
     INPUT_CONTROL_SET_RECORD_STATE,
 
     INPUT_CONTROL_SET_FRAME_NEXT,
+
+    INPUT_CONTROL_SET_RENDERER,
 };
 
 /* Internal helpers */
