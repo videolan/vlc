@@ -44,18 +44,30 @@
 typedef void (*PFNGLACTIVETEXTUREPROC) (GLenum texture);
 #endif
 typedef void (APIENTRY *PFNGLBINDTEXTUREPROC) (GLenum target, GLuint texture);
+typedef void (APIENTRY *PFNGLBLENDFUNCPROC) (GLenum sfactor, GLenum dfactor);
 typedef void (APIENTRY *PFNGLBUFFERSTORAGEPROC) (GLenum target, GLsizeiptr size, const void *data, GLbitfield flags);
+typedef void (APIENTRY *PFNGLCLEARCOLORPROC) (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+typedef void (APIENTRY *PFNGLCLEARPROC) (GLbitfield mask);
 typedef void (APIENTRY *PFNGLDELETETEXTURESPROC) (GLsizei n, const GLuint *textures);
+typedef void (APIENTRY *PFNGLDEPTHMASKPROC) (GLboolean flag);
+typedef void (APIENTRY *PFNGLDISABLEPROC) (GLenum cap);
+typedef void (APIENTRY *PFNGLDRAWARRAYSPROC) (GLenum mode, GLint first, GLsizei count);
+typedef void (APIENTRY *PFNGLDRAWELEMENTSPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices);
+typedef void (APIENTRY *PFNGLENABLEPROC) (GLenum cap);
+typedef void (APIENTRY *PFNGLFINISHPROC)(void);
+typedef void (APIENTRY *PFNGLFLUSHPROC)(void);
 typedef void (APIENTRY *PFNGLGENTEXTURESPROC) (GLsizei n, GLuint *textures);
 typedef GLenum (APIENTRY *PFNGLGETERRORPROC) (void);
 typedef void (APIENTRY *PFNGLGETINTEGERVPROC) (GLenum pname, GLint *data);
 typedef const GLubyte *(APIENTRY *PFNGLGETSTRINGPROC) (GLenum name);
 typedef void (APIENTRY *PFNGLGETTEXLEVELPARAMETERIVPROC) (GLenum target, GLint level, GLenum pname, GLint *params);
 typedef void (APIENTRY *PFNGLPIXELSTOREIPROC) (GLenum pname, GLint param);
+typedef void (APIENTRY *PFNGLTEXENVFPROC)(GLenum target, GLenum pname, GLfloat param);
 typedef void (APIENTRY *PFNGLTEXIMAGE2DPROC) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
 typedef void (APIENTRY *PFNGLTEXPARAMETERFPROC) (GLenum target, GLenum pname, GLfloat param);
 typedef void (APIENTRY *PFNGLTEXPARAMETERIPROC) (GLenum target, GLenum pname, GLint param);
 typedef void (APIENTRY *PFNGLTEXSUBIMAGE2DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
+typedef void (APIENTRY *PFNGLVIEWPORTPROC) (GLint x, GLint y, GLsizei width, GLsizei height);
 
 /* The following are defined in glext.h but not for GLES2 or on Apple systems */
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
@@ -115,7 +127,17 @@ typedef struct {
      * GL / GLES core functions
      */
     PFNGLBINDTEXTUREPROC    BindTexture;
+    PFNGLBLENDFUNCPROC      BlendFunc;
+    PFNGLCLEARCOLORPROC     ClearColor;
+    PFNGLCLEARPROC          Clear;
     PFNGLDELETETEXTURESPROC DeleteTextures;
+    PFNGLDEPTHMASKPROC      DepthMask;
+    PFNGLDISABLEPROC        Disable;
+    PFNGLDRAWARRAYSPROC     DrawArrays;
+    PFNGLDRAWELEMENTSPROC   DrawElements;
+    PFNGLENABLEPROC         Enable;
+    PFNGLFINISHPROC         Finish;
+    PFNGLFLUSHPROC          Flush;
     PFNGLGENTEXTURESPROC    GenTextures;
     PFNGLGETERRORPROC       GetError;
     PFNGLGETINTEGERVPROC    GetIntegerv;
@@ -125,9 +147,11 @@ typedef struct {
     PFNGLTEXPARAMETERFPROC  TexParameterf;
     PFNGLTEXPARAMETERIPROC  TexParameteri;
     PFNGLTEXSUBIMAGE2DPROC  TexSubImage2D;
+    PFNGLVIEWPORTPROC       Viewport;
 
     /* GL only core functions: NULL for GLES2 */
     PFNGLGETTEXLEVELPARAMETERIVPROC GetTexLevelParameteriv; /* Can be NULL */
+    PFNGLTEXENVFPROC                TexEnvf; /* Can be NULL */
 
     /*
      * GL / GLES extensions
