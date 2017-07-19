@@ -206,6 +206,7 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     msg_Dbg( p_aout, "obtained i_bytes_per_frame = %d",
              format.i_bytes_per_frame );
 
+    format.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_sys->format = *fmt = format;
 
     p_aout->time_get = TimeGet;
