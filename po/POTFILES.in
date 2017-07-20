@@ -1135,6 +1135,7 @@ modules/video_output/macosx.m
 modules/video_output/opengl/converter_android.c
 modules/video_output/opengl/converter_cvpx.c
 modules/video_output/opengl/converter_vaapi.c
+modules/video_output/opengl/converter_vdpau.c
 modules/video_output/opengl/display.c
 modules/video_output/opengl/egl.c
 modules/video_output/win32/direct3d9.c

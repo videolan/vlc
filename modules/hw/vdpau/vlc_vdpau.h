@@ -261,6 +261,7 @@ struct picture_sys_t
     VdpOutputSurface surface;
     VdpDevice device;
     vdp_t *vdp;
+    void *gl_nv_surface;
 };
 
 typedef struct vlc_vdp_video_frame
