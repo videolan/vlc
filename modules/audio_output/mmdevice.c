@@ -1129,6 +1129,28 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         if (ret != 0)
             break;
     }
+
+    IPropertyStore *props;
+    HRESULT hr = IMMDevice_OpenPropertyStore(sys->dev, STGM_READ, &props);
+    if (SUCCEEDED(hr))
+    {
+        PROPVARIANT v;
+        PropVariantInit(&v);
+        hr = IPropertyStore_GetValue(props, &PKEY_AudioEndpoint_FormFactor, &v);
+        if (SUCCEEDED(hr))
+        {
+            switch (v.uintVal)
+            {
+                case Headphones:
+                case Headset:
+                    aout->current_sink_info.headphones = true;
+                    break;
+            }
+            PropVariantClear(&v);
+        }
+        IPropertyStore_Release(props);
+    }
+
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
