@@ -1,6 +1,6 @@
 # breakpad
 
-BREAKPAD_HASH := bbebd8d5e7d61666c3a2dae82867bb7b5aeda639
+BREAKPAD_HASH := 94b6309aecaddfcf11672f6cfad9575d68ad3b40
 BREAKPAD_URL := https://chromium.googlesource.com/breakpad/breakpad/+archive/$(BREAKPAD_HASH).tar.gz
 
 ifdef HAVE_MACOSX
