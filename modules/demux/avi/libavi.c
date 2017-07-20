@@ -31,6 +31,8 @@
 
 #include "libavi.h"
 
+#include <limits.h>
+
 #ifndef NDEBUG
 # define AVI_DEBUG 1
 #endif
@@ -59,6 +61,9 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
     p_chk->common.i_chunk_fourcc = GetFOURCC( p_peek );
     p_chk->common.i_chunk_size   = GetDWLE( p_peek + 4 );
     p_chk->common.i_chunk_pos    = vlc_stream_Tell( s );
+
+    if( UINT64_MAX - p_chk->common.i_chunk_pos < p_chk->common.i_chunk_size )
+        return VLC_EGENERIC;
 
     p_chk->common.p_father = NULL;
     p_chk->common.p_next = NULL;
