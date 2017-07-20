@@ -390,7 +390,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
     if( !( p_strh = AVI_ChunkFind( p_chk->common.p_father, AVIFOURCC_strh, 0 ) ) )
     {
         msg_Err( (vlc_object_t*)s, "malformed avi file" );
-        AVI_READCHUNK_EXIT( VLC_EGENERIC );
+        AVI_READCHUNK_EXIT( p_chk->common.i_chunk_size > 0  ? VLC_EGENERIC : AVI_ZEROSIZED_CHUNK );
     }
 
     switch( p_strh->strh.i_type )
