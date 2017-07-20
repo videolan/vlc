@@ -397,18 +397,19 @@ static void aout_Destructor (vlc_object_t *obj)
 static void aout_PrepareStereoMode (audio_output_t *aout,
                                     audio_sample_format_t *restrict fmt,
                                     aout_filters_cfg_t *filters_cfg,
-                                    int i_forced_stereo_mode,
-                                    bool b_stereo_original)
+                                    audio_channel_type_t input_chan_type,
+                                    unsigned i_nb_input_channels,
+                                    int i_forced_stereo_mode)
 {
     /* Fill Stereo mode choices */
     var_Change (aout, "stereo-mode", VLC_VAR_CLEARCHOICES, NULL, NULL);
-    vlc_value_t val, txt, default_val;
+    vlc_value_t val, txt, default_val = { .i_int = AOUT_VAR_CHAN_UNSET };
     val.i_int = 0;
 
     if (!AOUT_FMT_LINEAR(fmt))
         return;
 
-    if (!b_stereo_original)
+    if (i_nb_input_channels != 2)
     {
         val.i_int = AOUT_VAR_CHAN_UNSET;
         txt.psz_string = _("Original");
@@ -425,10 +426,11 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
         txt.psz_string = _("Stereo");
     }
     var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
-    default_val.i_int = b_stereo_original ? val.i_int : AOUT_VAR_CHAN_UNSET;
 
-    if (b_stereo_original)
+    if (i_nb_input_channels == 2)
     {
+        default_val.i_int = val.i_int; /* Stereo or Dolby Surround */
+
         val.i_int = AOUT_VAR_CHAN_LEFT;
         txt.psz_string = _("Left");
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
@@ -441,7 +443,8 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
     }
 
-    if (fmt->i_channels >= 2)
+    if (input_chan_type == AUDIO_CHANNEL_TYPE_AMBISONICS
+     || i_nb_input_channels > 2)
     {
         val.i_int = AOUT_VAR_CHAN_HEADPHONES;
         txt.psz_string = _("Headphones");
@@ -470,7 +473,8 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
             filters_cfg->headphones = true;
             break;
         default:
-            if (b_stereo_original && fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
+            if (i_nb_input_channels == 2
+             && fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
             {   /* Go directly to the left channel. */
                 filters_cfg->remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
                 default_val.i_int = val.i_int = AOUT_VAR_CHAN_LEFT;
@@ -491,8 +495,9 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
 {
     aout_OutputAssertLocked (aout);
 
+    audio_channel_type_t input_chan_type = fmt->channel_type;
     int i_forced_stereo_mode = AOUT_VAR_CHAN_UNSET;
-    bool b_stereo_original = false;
+    unsigned i_nb_input_channels = fmt->i_channels;
 
     /* Ideally, the audio filters would be created before the audio output,
      * and the ideal audio format would be the output of the filters chain.
@@ -520,7 +525,6 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
                                                     : VLC_CODEC_S16N;
 
         i_forced_stereo_mode = var_GetInteger (aout, "stereo-mode");
-        b_stereo_original = fmt->i_physical_channels == AOUT_CHANS_STEREO;
         if (i_forced_stereo_mode != AOUT_VAR_CHAN_UNSET)
         {
             if (i_forced_stereo_mode == AOUT_VAR_CHAN_LEFT
@@ -539,8 +543,8 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
         return -1;
     }
 
-    aout_PrepareStereoMode (aout, fmt, filters_cfg, i_forced_stereo_mode,
-                            b_stereo_original);
+    aout_PrepareStereoMode (aout, fmt, filters_cfg, input_chan_type,
+                            i_nb_input_channels, i_forced_stereo_mode);
 
     aout_FormatPrepare (fmt);
     assert (aout_FormatNbChannels(fmt) > 0);
