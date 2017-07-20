@@ -36,7 +36,7 @@ if BUILD_LUA
 	cp -r "$(prefix)/lib/vlc/lua" "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
 endif
 	## HRTFs
-	cp -r $(srcdir)/share/hrtfs @/Contents/MacOS/share/
+	cp -r $(srcdir)/share/hrtfs $@/Contents/MacOS/share/
 	## Copy some other stuff (?)
 	mkdir -p $@/Contents/MacOS/include/
 	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
