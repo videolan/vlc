@@ -36,6 +36,7 @@
 
 #include <atomic>
 #include <sstream>
+#include <queue>
 
 #ifndef PROTOBUF_INLINE_NOT_IN_HEADERS
 # define PROTOBUF_INLINE_NOT_IN_HEADERS 0
@@ -139,6 +140,11 @@ private:
  *****************************************************************************/
 struct intf_sys_t
 {
+    enum QueueableMessages
+    {
+        Stop,
+        Seek
+    };
     intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr, int device_port, vlc_interrupt_t *);
     ~intf_sys_t();
 
@@ -156,6 +162,7 @@ private:
     void waitSeekDone();
 
     void processMessage(const castchannel::CastMessage &msg);
+    void queueMessage( QueueableMessages msg );
 
     void setPauseState(bool paused);
 
@@ -208,6 +215,7 @@ private:
     vlc_thread_t m_chromecastThread;
 
     ChromecastCommunication m_communication;
+    std::queue<QueueableMessages> m_msgQueue;
     States m_state;
 
     std::string m_artwork;

@@ -198,6 +198,13 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
     }
 }
 
+void intf_sys_t::queueMessage( QueueableMessages msg )
+{
+    // Assume lock is held by the called
+    m_msgQueue.push( msg );
+    vlc_interrupt_raise( m_ctl_thread_interrupt );
+}
+
 
 
 /*****************************************************************************
@@ -218,8 +225,38 @@ void intf_sys_t::mainLoop()
     // State was already initialized as Authenticating
     m_communication.msgAuth();
 
-    while ( !vlc_killed() && handleMessages() )
-        ;
+    while ( !vlc_killed() )
+    {
+        if ( !handleMessages() )
+            break;
+        vlc_mutex_locker lock( &m_lock );
+        while ( m_msgQueue.empty() == false )
+        {
+            QueueableMessages msg = m_msgQueue.front();
+            switch ( msg )
+            {
+                case Stop:
+                    m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
+                    break;
+                case Seek:
+                {
+                    char current_time[32];
+                    mtime_t seek_request_time = mdate() + SEEK_FORWARD_OFFSET;
+                    if( snprintf( current_time, sizeof(current_time), "%.3f",
+                                  double( seek_request_time ) / 1000000.0 ) >= (int)sizeof(current_time) )
+                    {
+                        msg_Err( m_module, "snprintf() truncated string for mediaSessionId" );
+                        current_time[sizeof(current_time) - 1] = '\0';
+                    }
+                    /* send a fake time to seek to, to make sure the device flushes its buffers */
+                    m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
+                    setState( Seeking );
+                    break;
+                }
+            }
+            m_msgQueue.pop();
+        }
+    }
 }
 
 void intf_sys_t::processAuthMessage( const castchannel::CastMessage& msg )
@@ -578,7 +615,7 @@ void intf_sys_t::requestPlayerStop()
     vlc_mutex_locker locker(&m_lock);
     if ( m_mediaSessionId.empty() == true )
         return;
-    m_communication.msgPlayerStop( m_appTransportId, m_mediaSessionId );
+    queueMessage( Stop );
 }
 
 void intf_sys_t::requestPlayerSeek(mtime_t pos)
@@ -588,16 +625,7 @@ void intf_sys_t::requestPlayerSeek(mtime_t pos)
         return;
     if ( pos != VLC_TS_INVALID )
         m_ts_local_start = pos;
-    char current_time[32];
-    mtime_t seek_request_time = mdate() + SEEK_FORWARD_OFFSET;
-    if( snprintf( current_time, sizeof(current_time), "%.3f", double( seek_request_time ) / 1000000.0 ) >= (int)sizeof(current_time) )
-    {
-        msg_Err( m_module, "snprintf() truncated string for mediaSessionId" );
-        current_time[sizeof(current_time) - 1] = '\0';
-    }
-    /* send a fake time to seek to, to make sure the device flushes its buffers */
-    m_communication.msgPlayerSeek( m_appTransportId, m_mediaSessionId, current_time );
-    setState( Seeking );
+    queueMessage( Seek );
 }
 
 void intf_sys_t::setPauseState(bool paused)
