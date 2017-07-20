@@ -973,7 +973,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     return AVI_NextChunk( s, p_chk );
 }
 
-void AVI_ChunkFree( stream_t *s,
+void AVI_ChunkClean( stream_t *s,
                      avi_chunk_t *p_chk )
 {
     int i_index;
@@ -989,7 +989,7 @@ void AVI_ChunkFree( stream_t *s,
     while( p_child )
     {
         p_next = p_child->common.p_next;
-        AVI_ChunkFree( s, p_child );
+        AVI_ChunkClean( s, p_child );
         free( p_child );
         p_child = p_next;
     }
@@ -1112,7 +1112,7 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
 void AVI_ChunkFreeRoot( stream_t *s,
                         avi_chunk_t  *p_chk )
 {
-    AVI_ChunkFree( s, p_chk );
+    AVI_ChunkClean( s, p_chk );
 }
 
 

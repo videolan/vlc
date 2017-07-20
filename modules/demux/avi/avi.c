@@ -2548,7 +2548,7 @@ static void AVI_IndexLoad_indx( demux_t *p_demux,
                 }
                 if( ck_sub.indx.i_indextype == AVI_INDEX_OF_CHUNKS )
                     __Parse_indx( p_demux, &p_index[i_stream], pi_last_offset, &ck_sub.indx );
-                AVI_ChunkFree( p_demux->s, &ck_sub );
+                AVI_ChunkClean( p_demux->s, &ck_sub );
             }
         }
         else
@@ -2993,7 +2993,7 @@ exit:
         msg_Warn( p_demux, "Failed to load an embedded subtitle" );
 
     if( p_indx == &ck.indx )
-        AVI_ChunkFree( p_demux->s, &ck );
+        AVI_ChunkClean( p_demux->s, &ck );
 }
 /*****************************************************************************
  * Stream management
