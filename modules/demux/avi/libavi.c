@@ -540,7 +540,7 @@ static int AVI_ChunkRead_strd( stream_t *s, avi_chunk_t *p_chk )
     if ( p_chk->common.i_chunk_size == 0 )
     {
         msg_Dbg( (vlc_object_t*)s, "Zero sized pre-JUNK section met" );
-        return AVI_STRD_ZERO_CHUNK;
+        return AVI_ZEROSIZED_CHUNK;
     }
 
     AVI_READCHUNK_ENTER;
@@ -950,10 +950,11 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     if( AVI_Chunk_Function[i_index].AVI_ChunkRead_function )
     {
         int i_return = AVI_Chunk_Function[i_index].AVI_ChunkRead_function( s, p_chk );
-        if ( i_return == AVI_STRD_ZERO_CHUNK || i_return == AVI_ZERO_FOURCC )
+        if ( i_return == AVI_ZEROSIZED_CHUNK || i_return == AVI_ZERO_FOURCC )
         {
-            if ( !p_father ) return VLC_EGENERIC;
-            return AVI_NextChunk( s, p_father );
+            if ( !p_father )
+                return VLC_EGENERIC;
+            return AVI_NextChunk( s, ( i_return == AVI_ZEROSIZED_CHUNK ) ? p_chk : p_father );
         }
         return i_return;
     }
