@@ -592,12 +592,14 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     }
 
     if (cfg != NULL)
+    {
         AppendRemapFilter(obj, filters, &input_format, &output_format,
                           cfg->remap);
 
-    if (input_format.i_channels > 2 && cfg->headphones)
-        AppendFilter(obj, "audio filter", "binauralizer", filters, NULL,
-                     &input_format, &output_format, NULL);
+        if (input_format.i_channels > 2 && cfg->headphones)
+            AppendFilter(obj, "audio filter", "binauralizer", filters, NULL,
+                    &input_format, &output_format, NULL);
+    }
 
     /* Now add user filters */
     char *str = var_InheritString (obj, "audio-filter");
