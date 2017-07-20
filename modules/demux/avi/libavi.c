@@ -191,8 +191,8 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         }
         if( p_chk->common.p_father->common.i_chunk_size > 0 &&
            ( vlc_stream_Tell( s ) >
-              (off_t)p_chk->common.p_father->common.i_chunk_pos +
-               (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+             p_chk->common.p_father->common.i_chunk_pos +
+             __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;
         }
@@ -244,8 +244,8 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
 
         if( p_chk->common.p_father->common.i_chunk_size > 0 &&
            ( vlc_stream_Tell( s ) >
-              (off_t)p_chk->common.p_father->common.i_chunk_pos +
-               (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+             p_chk->common.p_father->common.i_chunk_pos +
+             __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;
         }
@@ -599,6 +599,7 @@ static int AVI_ChunkRead_indx( stream_t *s, avi_chunk_t *p_chk )
 {
     unsigned int i_count, i;
     int32_t      i_dummy;
+    VLC_UNUSED(i_dummy);
     avi_chunk_indx_t *p_indx = (avi_chunk_indx_t*)p_chk;
 
     AVI_READCHUNK_ENTER;
@@ -1092,8 +1093,8 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
 
         if( AVI_ChunkRead( s, p_chk, p_root ) ||
            ( vlc_stream_Tell( s ) >=
-              (off_t)p_chk->common.p_father->common.i_chunk_pos +
-               (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+             p_chk->common.p_father->common.i_chunk_pos +
+             __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;
         }
