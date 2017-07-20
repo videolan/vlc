@@ -230,6 +230,10 @@ static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpi
 static int SetupQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
                      const d3d_format_t *, ID3D11PixelShader *, video_projection_mode_t,
                      video_orientation_t);
+static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
+                                const video_format_t *fmt,
+                                video_projection_mode_t projection,
+                                video_orientation_t orientation );
 static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 
@@ -1146,6 +1150,17 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             /* for performance reason we don't want to allocate this during
              * display, do it preferrably when creating the texture */
             assert(p_sys->resourceView[0]!=NULL);
+        }
+
+        if ( sys->picQuad.i_height != texDesc.Height ||
+             sys->picQuad.i_width != texDesc.Width )
+        {
+            /* the decoder produced different sizes than the vout, we need to
+             * adjust the vertex */
+            sys->picQuad.i_height = texDesc.Height;
+            sys->picQuad.i_width = texDesc.Width;
+            UpdateQuadPosition( vd, &sys->picQuad, &vd->fmt,
+                                vd->fmt.projection_mode, vd->fmt.orientation );
         }
     }
 
@@ -2423,11 +2438,10 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, WORD *triangle_pos)
     }
 }
 
-static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_format_t *fmt,
-                              video_projection_mode_t projection, video_orientation_t orientation)
+static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad,
+                              video_projection_mode_t projection)
 {
     HRESULT hr;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
     vout_display_sys_t *sys = vd->sys;
 
     if (projection == PROJECTION_MODE_RECTANGULAR)
@@ -2472,6 +2486,18 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad, const video_
         msg_Err(vd, "Could not create the quad indices. (hr=0x%lX)", hr);
         return false;
     }
+
+    return true;
+}
+
+static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
+                                const video_format_t *fmt,
+                                video_projection_mode_t projection,
+                                video_orientation_t orientation )
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
 
     /* create the vertices */
     hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -2649,7 +2675,9 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     quad->picSys.context = sys->d3dcontext;
     ID3D11DeviceContext_AddRef(quad->picSys.context);
 
-    if (!AllocQuadVertices(vd, quad, fmt, projection, orientation))
+    if (!AllocQuadVertices(vd, quad, projection))
+        goto error;
+    if (!UpdateQuadPosition(vd, quad, fmt, projection, orientation))
         goto error;
 
     quad->d3dpixelShader = d3dpixelShader;
