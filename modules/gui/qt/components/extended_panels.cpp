@@ -29,6 +29,8 @@
 
 #include <math.h>
 
+#include <algorithm>
+
 #include <QLabel>
 #include <QVariant>
 #include <QString>
