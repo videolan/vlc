@@ -72,7 +72,7 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
 
 #ifdef AVI_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "found chunk, fourcc: %4.4s size:%"PRId64" pos:%"PRId64,
+             "found chunk, fourcc: %4.4s size:%"PRIu64" pos:%"PRIu64,
              (char*)&p_chk->common.i_chunk_fourcc,
              p_chk->common.i_chunk_size,
              p_chk->common.i_chunk_pos );
