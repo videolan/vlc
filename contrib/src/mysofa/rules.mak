@@ -9,6 +9,8 @@ ifeq ($(call need_pkg,"mysofa"),)
 PKGS_FOUND += mysofa
 endif
 
+DEPS_mysofa += pthreads zlib $(DEPS_pthreads) $(DEPS_zlib)
+
 $(TARBALLS)/mysofa-git.tar.xz:
 	$(call download_git,$(MYSOFA_GITURL),,$(MYSOFA_VERSION))
 
