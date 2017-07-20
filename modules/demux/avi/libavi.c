@@ -954,6 +954,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
         {
             if ( !p_father )
                 return VLC_EGENERIC;
+            p_chk->common.i_chunk_fourcc = 0;
             return AVI_NextChunk( s, ( i_return == AVI_ZEROSIZED_CHUNK ) ? p_chk : p_father );
         }
         return i_return;
