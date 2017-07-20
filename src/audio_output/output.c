@@ -449,6 +449,15 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
         val.i_int = AOUT_VAR_CHAN_HEADPHONES;
         txt.psz_string = _("Headphones");
         var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+
+        if (i_forced_stereo_mode == AOUT_VAR_CHAN_UNSET
+         && aout->current_sink_info.headphones)
+        {
+            i_forced_stereo_mode = AOUT_VAR_CHAN_HEADPHONES;
+            default_val.i_int = val.i_int;
+            var_Change (aout, "stereo-mode", VLC_VAR_SETVALUE, &default_val,
+                        NULL);
+        }
     }
 
     /* The user may have selected a different channels configuration. */
