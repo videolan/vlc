@@ -1,0 +1,13 @@
+--- qt/src/widgets/util/qsystemtrayicon_win.cpp.old
++++ qt/src/widgets/util/qsystemtrayicon_win.cpp
+@@ -258,6 +258,10 @@ bool QSystemTrayIconSys::showMessage(con
+     }
+     if (QSysInfo::windowsVersion() >= QSysInfo::WV_VISTA)
+         tnd.dwInfoFlags |= NIIF_LARGE_ICON;
++
++    // Never play audio on notifications.
++    tnd.dwInfoFlags |= NIIF_NOSOUND;
++
+     tnd.cbSize = notifyIconSize;
+     tnd.hWnd = m_hwnd;
+     tnd.uTimeout = uSecs;
