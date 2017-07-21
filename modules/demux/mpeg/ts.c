@@ -2452,37 +2452,48 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
         * diff == 0 and duplicate packet (playload != 0) <- should we
         *   test the content ?
      */
-    const int i_diff = ( i_cc - pid->i_cc )&0x0f;
-    if( b_payload && i_diff == 1 )
+    if( b_payload )
     {
-        pid->i_cc = ( pid->i_cc + 1 ) & 0xf;
-        pid->i_dup = 0;
-    }
-    else
-    {
-        if( pid->i_cc == 0xff )
+        const int i_diff = ( i_cc - pid->i_cc )&0x0f;
+        if( i_diff == 1 )
         {
-            msg_Dbg( p_demux, "first packet for pid=%d cc=0x%x",
-                      pid->i_pid, i_cc );
-            pid->i_cc = i_cc;
-        }
-        else if( i_diff == 0 && pid->i_dup == 0 && b_payload )
-        {
-            /* Discard duplicated payload 2.4.3.3 */
-            pid->i_dup++;
-            block_Release( p_pkt );
-            return NULL;
-        }
-        else if( i_diff != 0 && !b_discontinuity )
-        {
-            msg_Warn( p_demux, "discontinuity received 0x%x instead of 0x%x (pid=%d)",
-                      i_cc, ( pid->i_cc + 1 )&0x0f, pid->i_pid );
-
-            pid->i_cc = i_cc;
+            pid->i_cc = ( pid->i_cc + 1 ) & 0xf;
             pid->i_dup = 0;
-            p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
-        else pid->i_cc = i_cc;
+        else
+        {
+            if( pid->i_cc == 0xff )
+            {
+                msg_Dbg( p_demux, "first packet for pid=%d cc=0x%x",
+                         pid->i_pid, i_cc );
+                pid->i_cc = i_cc;
+            }
+            else if( i_diff == 0 && pid->i_dup == 0 )
+            {
+                /* Discard duplicated payload 2.4.3.3 */
+                pid->i_dup++;
+                block_Release( p_pkt );
+                return NULL;
+            }
+            else if( i_diff != 0 && !b_discontinuity )
+            {
+                msg_Warn( p_demux, "discontinuity received 0x%x instead of 0x%x (pid=%d)",
+                          i_cc, ( pid->i_cc + 1 )&0x0f, pid->i_pid );
+
+                pid->i_cc = i_cc;
+                pid->i_dup = 0;
+                p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+            }
+            else pid->i_cc = i_cc;
+        }
+    }
+    else /* Ignore all 00 or 10 as in 2.4.3.3 CC counter must not be
+            incremented in those cases, but there is humax inserting
+            empty/10 packets always set with cc = 0 between 2 payload pkts
+            see stream_main_pcr_1280x720p50_5mbps.ts */
+    {
+        if( b_discontinuity )
+            pid->i_cc = i_cc;
     }
 
     if( unlikely(!(b_payload || b_adaptation)) ) /* Invalid, ignore */
