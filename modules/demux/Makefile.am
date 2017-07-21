@@ -56,7 +56,7 @@ demux_LTLIBRARIES += libaiff_plugin.la
 libmjpeg_plugin_la_SOURCES = demux/mjpeg.c demux/mxpeg_helper.h
 demux_LTLIBRARIES += libmjpeg_plugin.la
 
-libsubtitle_plugin_la_SOURCES = demux/subtitle.c demux/subtitle_helper.h
+libsubtitle_plugin_la_SOURCES = demux/subtitle.c
 libsubtitle_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libsubtitle_plugin.la
 

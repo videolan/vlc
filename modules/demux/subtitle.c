@@ -43,8 +43,6 @@
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 
-#include "subtitle_helper.h"
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -318,18 +316,87 @@ static int Open ( vlc_object_t *p_this )
 #ifndef NDEBUG
     const uint64_t i_start_pos = vlc_stream_Tell( p_demux->s );
 #endif
-    uint64_t i_read_offset = 0;
 
-    /* Detect Unicode while skipping the UTF-8 Byte Order Mark */
-    bool unicode = false;
-    const uint8_t *p_data;
-    if( vlc_stream_Peek( p_demux->s, &p_data, 3 ) >= 3
-     && !memcmp( p_data, "\xEF\xBB\xBF", 3 ) )
+    size_t i_peek;
+    const uint8_t *p_peek;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
+        return VLC_EGENERIC;
+
+    enum
     {
-        unicode = true;
-        i_read_offset = 3; /* skip BOM */
-        msg_Dbg( p_demux, "detected Unicode Byte Order Mark" );
+        UTF8BOM,
+        UTF16LE,
+        UTF16BE,
+        NOBOM,
+    } e_bom = NOBOM;
+    const char *psz_bom = NULL;
+
+    i_peek = 4096;
+    /* Detect Unicode while skipping the UTF-8 Byte Order Mark */
+    if( !memcmp( p_peek, "\xEF\xBB\xBF", 3 ) )
+    {
+        e_bom = UTF8BOM;
+        psz_bom = "UTF-8";
     }
+    else if( !memcmp( p_peek, "\xFF\xFE", 2 ) )
+    {
+        e_bom = UTF16LE;
+        psz_bom = "UTF-16LE";
+        i_peek *= 2;
+    }
+    else if( !memcmp( p_peek, "\xFE\xFF", 2 ) )
+    {
+        e_bom = UTF16BE;
+        psz_bom = "UTF-16BE";
+        i_peek *= 2;
+    }
+
+    if( e_bom != NOBOM )
+        msg_Dbg( p_demux, "detected %s Byte Order Mark", psz_bom );
+
+    i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_peek );
+    if( unlikely(i_peek < 16) )
+        return VLC_EGENERIC;
+
+    stream_t *p_probestream = NULL;
+    if( e_bom != UTF8BOM && e_bom != NOBOM )
+    {
+        if( i_peek > 16 )
+        {
+            vlc_iconv_t handle = vlc_iconv_open( "UTF-8", psz_bom );
+            if( handle )
+            {
+                char *p_outbuf = malloc( i_peek );
+                if( p_outbuf )
+                {
+                    const char *p_inbuf = (const char *) p_peek;
+                    char *psz_converted = p_outbuf;
+                    const size_t i_outbuf_size = i_peek;
+                    size_t i_inbuf_remain = i_peek;
+                    size_t i_outbuf_remain = i_peek;
+                    if ( VLC_ICONV_ERR != vlc_iconv( handle,
+                                                     &p_inbuf, &i_inbuf_remain,
+                                                     &p_outbuf, &i_outbuf_remain ) )
+                    {
+                        p_probestream = vlc_stream_MemoryNew( p_demux, (uint8_t *) psz_converted,
+                                                            i_outbuf_size - i_outbuf_remain,
+                                                            false ); /* free p_outbuf on release */
+                    }
+                    else free( p_outbuf );
+                }
+                vlc_iconv_close( handle );
+            }
+        }
+    }
+    else
+    {
+        const size_t i_skip = (e_bom == UTF8BOM) ? 3 : 0;
+        p_probestream = vlc_stream_MemoryNew( p_demux, (uint8_t *) &p_peek[i_skip],
+                                              i_peek - i_skip, true );
+    }
+
+    if( p_probestream == NULL )
+        return VLC_EGENERIC;
 
     /* Probe if unknown type */
     if( p_sys->props.i_type == SUB_TYPE_UNKNOWN )
@@ -343,7 +410,7 @@ static int Open ( vlc_object_t *p_this )
             int i_dummy;
             char p_dummy;
 
-            if( (s = peek_Readline( p_demux->s, &i_read_offset )) == NULL )
+            if( (s = vlc_stream_ReadLine( p_probestream ) ) == NULL )
                 break;
 
             if( strcasestr( s, "<SAMI>" ) )
@@ -497,6 +564,8 @@ static int Open ( vlc_object_t *p_this )
         free( s );
     }
 
+    vlc_stream_Delete( p_probestream );
+
     /* Quit on unknown subtitles */
     if( p_sys->props.i_type == SUB_TYPE_UNKNOWN )
     {
@@ -522,8 +591,8 @@ static int Open ( vlc_object_t *p_this )
 
     msg_Dbg( p_demux, "loading all subtitles..." );
 
-    if( unicode && /* skip BOM */
-        vlc_stream_Seek( p_demux->s, 3 ) != VLC_SUCCESS )
+    if( e_bom == UTF8BOM && /* skip BOM */
+        vlc_stream_Read( p_demux->s, NULL, 3 ) != 3 )
     {
         Close( p_this );
         return VLC_EGENERIC;
@@ -588,8 +657,8 @@ static int Open ( vlc_object_t *p_this )
                  p_demux->psz_location );
     }
 
-    if( unicode )
-        fmt.subs.psz_encoding = strdup( "UTF-8" );
+    if( psz_bom )
+        fmt.subs.psz_encoding = strdup( psz_bom );
     char *psz_description = var_InheritString( p_demux, "sub-description" );
     if( psz_description && *psz_description )
         fmt.psz_description = psz_description;
