@@ -231,13 +231,9 @@ static inline int block_SkipByte( block_bytestream_t *p_bytestream )
 static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
     size_t i_peek_offset, uint8_t *p_data, size_t i_data )
 {
-    /* Check we have that much data, ignoring read offset */
-    if( p_bytestream->i_total < i_peek_offset ||
-        p_bytestream->i_total - i_peek_offset < i_data )
-    {
-        /* Not enough data, bail out */
+    const size_t i_remain = block_BytestreamRemaining( p_bytestream );
+    if( i_remain < i_data + i_peek_offset )
         return VLC_EGENERIC;
-    }
 
     /* Find the right place */
     size_t i_offset = p_bytestream->i_block_offset;
