@@ -346,7 +346,10 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
                 {
                     PLItem *item = getItem( index );
                     /* Used to segfault here because i_type wasn't always initialized */
-                    return QVariant( icons[item->inputItem()->i_type] );
+                    int idx = item->inputItem()->i_type;
+                    if( item->inputItem()->b_net && item->inputItem()->i_type == ITEM_TYPE_FILE )
+                        idx = ITEM_TYPE_STREAM;
+                    return QVariant( icons[idx] );
                 }
                 case COLUMN_COVER:
                     /* !warn: changes tree item line height. Otherwise, override
