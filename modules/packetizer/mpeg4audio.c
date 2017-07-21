@@ -1126,10 +1126,24 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
         if ( (p_sys->i_type == TYPE_ADTS && !HasADTSHeader( p_header )) ||
              (p_sys->i_type == TYPE_LOAS && !HasLoasHeader( p_header )) )
         {
-            msg_Dbg(p_dec, "emulated sync word "
-                    "(no sync on following frame)");
-            p_sys->i_state = STATE_NOSYNC;
-            block_SkipByte(&p_sys->bytestream);
+            /* Check spacial padding case. Failing if need more bytes is ok since
+               that should have been sent as a whole block */
+            if( block_PeekOffsetBytes(&p_sys->bytestream,
+                                      p_sys->i_frame_size + p_sys->i_header_size,
+                                      p_header, 3) == VLC_SUCCESS &&
+                p_header[0] == 0x00 &&
+               ((p_sys->i_type == TYPE_ADTS && HasADTSHeader( &p_header[1] )) ||
+                (p_sys->i_type == TYPE_LOAS && !HasLoasHeader( &p_header[1] ))))
+            {
+                p_sys->i_state = STATE_SEND_DATA;
+            }
+            else
+            {
+                msg_Dbg(p_dec, "emulated sync word (no sync on following frame)"
+                               " 0x%"PRIx8" 0x%"PRIx8, p_header[0], p_header[1] );
+                p_sys->i_state = STATE_NOSYNC;
+                block_SkipByte(&p_sys->bytestream);
+            }
             break;
         }
 
