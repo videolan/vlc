@@ -212,9 +212,7 @@ class mkv_track_t
           ,i_seek_preroll(0)
           ,i_codec_delay(0)
         {
-            std::memset( &fmt, 0, sizeof( fmt ) );
             std::memset( &pi_chan_table, 0, sizeof( pi_chan_table ) );
-            fmt.psz_language = strdup("English");
         }
 
         typedef unsigned int track_id_t;

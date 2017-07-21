@@ -220,15 +220,16 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             es_format_Init( &track.fmt, AUDIO_ES, 0);
             track.fmt.audio.i_channels = 1;
             track.fmt.audio.i_rate = 8000;
+            track.fmt.psz_language = strdup("English");
             break;
         case track_video:
             es_format_Init( &track.fmt, VIDEO_ES, 0);
+            track.fmt.psz_language = strdup("English");
             break;
         case track_subtitle:
-            es_format_Init( &track.fmt, SPU_ES, 0);
-            break;
         case track_buttons:
             es_format_Init( &track.fmt, SPU_ES, 0);
+            track.fmt.psz_language = strdup("English");
             break;
         default:
             es_format_Init( &track.fmt, UNKNOWN_ES, 0);
