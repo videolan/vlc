@@ -2393,6 +2393,13 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
              b_payload, i_cc );
 #endif
 
+    /* Drop null packets */
+    if( unlikely(pid->i_pid == 0x1FFF) )
+    {
+        block_Release( p_pkt );
+        return NULL;
+    }
+
     /* For now, ignore additional error correction
      * TODO: handle Reed-Solomon 204,188 error correction */
     p_pkt->i_buffer = TS_PACKET_SIZE_188;
