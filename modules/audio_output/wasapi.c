@@ -463,15 +463,6 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         return E_OUTOFMEMORY;
     sys->client = NULL;
 
-    void *pv;
-    HRESULT hr = aout_stream_Activate(s, &IID_IAudioClient, NULL, &pv);
-    if (FAILED(hr))
-    {
-        msg_Err(s, "cannot activate client (error 0x%lx)", hr);
-        goto error;
-    }
-    sys->client = pv;
-
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE_IEC61937 wf_iec61937;
     WAVEFORMATEXTENSIBLE *pwfe = &wf_iec61937.FormatExt;
@@ -481,6 +472,15 @@ static HRESULT Restart(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     audio_sample_format_t fmt = *pfmt;
     bool b_spdif = AOUT_FMT_SPDIF(&fmt);
     bool b_hdmi = AOUT_FMT_HDMI(&fmt);
+
+    void *pv;
+    HRESULT hr = aout_stream_Activate(s, &IID_IAudioClient, NULL, &pv);
+    if (FAILED(hr))
+    {
+        msg_Err(s, "cannot activate client (error 0x%lx)", hr);
+        goto error;
+    }
+    sys->client = pv;
 
     if (b_spdif && !b_hdmi && fmt.i_format == VLC_CODEC_DTS && !force_dts_spdif
      && fmt.i_rate >= 48000)
