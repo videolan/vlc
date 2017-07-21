@@ -109,7 +109,33 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    sys->gl = vlc_gl_Create (surface, API, "$" MODULE_VARNAME);
+    const char *gl_name = "$" MODULE_VARNAME;
+
+    /* VDPAU GL interop works only with GLX. Override the "gl" option to force
+     * it. */
+#ifndef USE_OPENGL_ES2
+    if (surface->type == VOUT_WINDOW_TYPE_XID)
+    {
+        switch (vd->fmt.i_chroma)
+        {
+            case VLC_CODEC_VDPAU_VIDEO_444:
+            case VLC_CODEC_VDPAU_VIDEO_422:
+            case VLC_CODEC_VDPAU_VIDEO_420:
+            {
+                /* Force the option only if it was not previously set */
+                char *str = var_InheritString(surface, MODULE_VARNAME);
+                if (str == NULL)
+                    gl_name = "glx";
+                free(str);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+#endif
+
+    sys->gl = vlc_gl_Create (surface, API, gl_name);
     if (sys->gl == NULL)
         goto error;
 
