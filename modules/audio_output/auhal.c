@@ -401,6 +401,42 @@ ReportDevice(audio_output_t *p_aout, UInt32 i_id, char *name)
 }
 
 /*
+ * AudioDeviceIsAHeadphone: Checks if device is a headphone
+ */
+
+static bool
+AudioDeviceIsAHeadphone(audio_output_t *p_aout, AudioDeviceID i_dev_id)
+{
+    UInt32 defaultSize = sizeof(AudioDeviceID);
+
+    const AudioObjectPropertyAddress defaultAddr = {
+        kAudioHardwarePropertyDefaultOutputDevice,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
+    };
+
+    AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultAddr, 0, NULL, &defaultSize, &i_dev_id);
+
+    AudioObjectPropertyAddress property;
+    property.mSelector = kAudioDevicePropertyDataSource;
+    property.mScope = kAudioDevicePropertyScopeOutput;
+    property.mElement = kAudioObjectPropertyElementMaster;
+
+    UInt32 data;
+    UInt32 size = sizeof(UInt32);
+    AudioObjectGetPropertyData(i_dev_id, &property, 0, NULL, &size, &data);
+
+    /*
+     'hdpn' == headphone
+     'ispk' == internal speaker
+     '61pd' == HDMI
+     '    ' == Bluetooth accessory or AirPlay
+    */
+
+    return data == 'hdpn';
+}
+
+/*
  * AudioDeviceHasOutput: Checks if the device is actually an output device
  */
 static int
@@ -961,6 +997,8 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_HALOutput);
     if (p_sys->au_unit == NULL)
         return VLC_EGENERIC;
+
+    p_aout->current_sink_info.headphones = AudioDeviceIsAHeadphone(p_aout, p_sys->i_selected_dev);
 
     /* Set the device we will use for this output unit */
     err = AudioUnitSetProperty(p_sys->au_unit,
