@@ -121,16 +121,6 @@ package-win32-crx: package-win32-webplugin-common
 		--extension-output "$(win32_destdir)/$(WINVERSION).crx" --ignore-file install.rdf
 
 
-# nsis is a 32-bits installer, we need to build a 32bits DLL
-$(win32_destdir)/NSIS/UAC.dll: extras/package/win32/NSIS/UAC/runas.cpp extras/package/win32/NSIS/UAC/uac.cpp
-	mkdir -p "$(win32_destdir)/NSIS/"
-if HAVE_WIN64
-	i686-w64-mingw32-g++ $^ -shared -o $@ -lole32 -static-libstdc++ -static-libgcc
-	i686-w64-mingw32-strip $@
-else
-	$(CXX) $^ -D_WIN32_IE=0x0601 -D__forceinline=inline -shared -o $@ -lole32 -static-libstdc++ -static-libgcc
-	$(STRIP) $@
-endif
 $(win32_destdir)/NSIS/nsProcess.dll: extras/package/win32/NSIS/nsProcess/nsProcess.c extras/package/win32/NSIS/nsProcess/pluginapi.c
 	mkdir -p "$(win32_destdir)/NSIS/"
 if HAVE_WIN64
@@ -142,14 +132,13 @@ else
 endif
 
 
-package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll $(win32_destdir)/NSIS/nsProcess.dll extras/package/win32/NSIS/vlc.win32.nsi
+package-win32-exe: package-win-strip $(win32_destdir)/NSIS/nsProcess.dll extras/package/win32/NSIS/vlc.win32.nsi
 # Script installer
 	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
 	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/NSIS/languages    "$(win32_destdir)/"
 	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      "$(win32_destdir)/"
 	mkdir -p "$(win32_destdir)/NSIS/"
-	cp "$(top_srcdir)/extras/package/win32/NSIS/UAC.nsh" "$(win32_destdir)/NSIS/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
 
 # Create package
@@ -211,23 +200,6 @@ EXTRA_DIST += \
 	extras/package/win32/configure.sh \
 	extras/package/win32/NSIS/vlc.win32.nsi.in \
 	extras/package/win32/NSIS/spad.nsi.in \
-	extras/package/win32/NSIS/UAC/examples \
-	extras/package/win32/NSIS/UAC/examples/UAC_AllowLUA.nsi \
-	extras/package/win32/NSIS/UAC/examples/UAC_AdminOnly.nsi \
-	extras/package/win32/NSIS/UAC/examples/UAC_Uninstaller.nsi \
-	extras/package/win32/NSIS/UAC/examples/UAC.nsh \
-	extras/package/win32/NSIS/UAC/examples/UAC_GetUserShellFolderPath.nsi \
-	extras/package/win32/NSIS/UAC/examples/UAC_RealWorldFullyLoadedDualModeExample.nsi \
-	extras/package/win32/NSIS/UAC/History.txt \
-	extras/package/win32/NSIS/UAC/License.txt \
-	extras/package/win32/NSIS/UAC/nsisutil.h \
-	extras/package/win32/NSIS/UAC/resource.h \
-	extras/package/win32/NSIS/UAC/resource.rc \
-	extras/package/win32/NSIS/UAC/runas.cpp \
-	extras/package/win32/NSIS/UAC/uac.cpp \
-	extras/package/win32/NSIS/UAC/uac.h \
-	extras/package/win32/NSIS/UAC/Readme.html \
-	extras/package/win32/NSIS/UAC.nsh \
 	extras/package/win32/NSIS/languages/declaration.nsh \
 	extras/package/win32/NSIS/languages/bengali.nsh \
 	extras/package/win32/NSIS/languages/basque.nsh \
