@@ -304,12 +304,15 @@
 
     if (!p_input) {
         // Nothing playing
+        [self.timeSlider setKnobHidden:YES];
         [self.timeSlider setFloatValue: 0.0];
         [self.timeField setStringValue: @"00:00"];
         [self.timeSlider setIndefinite:NO];
         [self.timeSlider setEnabled:NO];
         return;
     }
+
+    [self.timeSlider setKnobHidden:NO];
 
     vlc_value_t pos;
     var_Get(p_input, "position", &pos);
