@@ -217,7 +217,7 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
     int i_fuzzy = var_GetInteger( p_this, "sub-autodetect-fuzzy" );
     if ( i_fuzzy == 0 )
         return VLC_EGENERIC;
-    int j, i_fname_len;
+    int i_fname_len;
     input_item_slave_t **pp_slaves = *ppp_slaves;
     int i_slaves = *p_slaves;
     char *f_fname_noext = NULL, *f_fname_trim = NULL;
@@ -265,7 +265,7 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
     strcpy_trim( f_fname_trim, f_fname_noext );
 
     subdirs = paths_to_list( f_dir, psz_path );
-    for( j = -1; (j == -1) || ( j >= 0 && subdirs != NULL && subdirs[j] != NULL ); j++ )
+    for( int j = -1; (j == -1) || ( j >= 0 && subdirs != NULL && subdirs[j] != NULL ); j++ )
     {
         const char *psz_dir = (j < 0) ? f_dir : subdirs[j];
         if( psz_dir == NULL || ( j >= 0 && !strcmp( psz_dir, f_dir ) ) )
@@ -363,7 +363,7 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
     }
     if( subdirs )
     {
-        for( j = 0; subdirs[j]; j++ )
+        for( size_t j = 0; subdirs[j] != NULL; j++ )
             free( subdirs[j] );
         free( subdirs );
     }
