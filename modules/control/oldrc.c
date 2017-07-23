@@ -1335,7 +1335,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "status" ) )
     {
-        input_thread_t * p_input = playlist_CurrentInput( p_playlist );
+        p_input = playlist_CurrentInput( p_playlist );
         if( p_input )
         {
             /* Replay the current state of the system. */
