@@ -62,8 +62,8 @@ struct vlc_va_sys_t
 #endif
 };
 
-static int GetVaProfile(AVCodecContext *ctx, VAProfile *va_profile,
-                        unsigned *pic_count)
+static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
+                        VAProfile *va_profile, unsigned *pic_count)
 {
     VAProfile i_profile;
     unsigned count = 3;
@@ -89,9 +89,9 @@ static int GetVaProfile(AVCodecContext *ctx, VAProfile *va_profile,
         count = 18;
         break;
     case AV_CODEC_ID_HEVC:
-        if (ctx->profile == FF_PROFILE_HEVC_MAIN)
+        if (fmt->i_profile == FF_PROFILE_HEVC_MAIN)
             i_profile = VAProfileHEVCMain;
-        else if (ctx->profile == FF_PROFILE_HEVC_MAIN_10)
+        else if (fmt->i_profile == FF_PROFILE_HEVC_MAIN_10)
             i_profile = VAProfileHEVCMain10;
         else
             return VLC_EGENERIC;
@@ -102,10 +102,10 @@ static int GetVaProfile(AVCodecContext *ctx, VAProfile *va_profile,
         count = 5;
         break;
     case AV_CODEC_ID_VP9:
-        if (ctx->profile == FF_PROFILE_VP9_0)
+        if (fmt->i_profile == FF_PROFILE_VP9_0)
             i_profile = VAProfileVP9Profile0;
 #if VA_CHECK_VERSION( 0, 39, 0 )
-        else if (ctx->profile == FF_PROFILE_VP9_2)
+        else if (fmt->i_profile == FF_PROFILE_VP9_2)
             i_profile = VAProfileVP9Profile2;
 #endif
         else
@@ -171,7 +171,7 @@ static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     VAProfile i_profile;
     unsigned count;
-    if (GetVaProfile(ctx, &i_profile, &count) != VLC_SUCCESS)
+    if (GetVaProfile(ctx, fmt, &i_profile, &count) != VLC_SUCCESS)
         goto error;
 
     sys = malloc(sizeof *sys);
@@ -287,7 +287,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     VAProfile i_profile;
     unsigned count;
-    if (GetVaProfile(ctx, &i_profile, &count) != VLC_SUCCESS)
+    if (GetVaProfile(ctx, fmt, &i_profile, &count) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     vlc_va_sys_t *sys;
