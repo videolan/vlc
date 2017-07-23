@@ -114,6 +114,8 @@ public:
     VLMWrapper( vlm_t * );
     virtual ~VLMWrapper();
 
+    static int GetMedias( vlm_media_t **& );
+
     static void AddBroadcast( const QString&, const QString&,
                               const QString&, const QString&,
                               bool b_enabled = true, bool b_loop = false );
@@ -142,11 +144,6 @@ public:
 
     static void SaveConfig( const QString& );
     static bool LoadConfig( const QString& );
-
-    /* We don't have yet the accessors in the core, so the following is commented */
-    //unsigned int NbMedia() { if( p_vlm ) return p_vlm->i_media; return 0; }
-   /* vlm_media_t *GetMedia( int i )
-    { if( p_vlm ) return p_vlm->media[i]; return NULL; }*/
 
 private:
     static vlm_t *p_vlm;

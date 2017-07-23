@@ -284,13 +284,12 @@ void VLMDialog::mediasPopulator()
 {
     if( p_vlm )
     {
-        int i_nMedias;
         QString typeShortName;
         int vlmItemCount;
         vlm_media_t **pp_dsc;
 
         /* Get medias information and numbers */
-        vlm_Control( p_vlm, VLM_GET_MEDIAS, &pp_dsc, &i_nMedias );
+        int i_nMedias = VLMWrapper::GetMedias( pp_dsc );
 
         /* Loop on all of them */
         for( int i = 0; i < i_nMedias; i++ )
@@ -658,6 +657,14 @@ VLMWrapper::VLMWrapper( vlm_t *_p_vlm )
 VLMWrapper::~VLMWrapper()
 {
     p_vlm = NULL;
+}
+
+int VLMWrapper::GetMedias( vlm_media_t **& array )
+{
+    int count;
+
+    vlm_Control( p_vlm, VLM_GET_MEDIAS, &array, &count );
+    return count;
 }
 
 void VLMWrapper::AddBroadcast( const QString& name, const QString& input,
