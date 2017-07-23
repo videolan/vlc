@@ -277,8 +277,11 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->b_metacube )
     {
-        httpd_header headers[] = {{ "Content-encoding", "metacube" }};
-        int err = httpd_StreamSetHTTPHeaders( p_sys->p_httpd_stream, headers, sizeof( headers ) / sizeof( httpd_header ) );
+        const httpd_header headers[] = {
+            { (char *)"Content-encoding", (char *)"metacube" }
+        };
+        int err = httpd_StreamSetHTTPHeaders( p_sys->p_httpd_stream, headers,
+                                              ARRAY_SIZE(headers) );
         if( err != VLC_SUCCESS )
         {
             free( p_sys );
