@@ -693,7 +693,7 @@ static int Scan_Next_DVBT( const scan_parameter_t *p_params, scan_enumeration_t 
             p_cfg->i_bandwidth = i_bandwidth;
 
             int i_current = 0, i_total = 0;
-            for( int i = 0; i < i_band_count; i++ )
+            for( i = 0; i < i_band_count; i++ )
             {
                 const int i_frag = band[i].i_max-band[i].i_min;
 
