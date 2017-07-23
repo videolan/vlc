@@ -1333,7 +1333,6 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
         case ACTIONID_SUBTITLE_TEXT_SCALE_DOWN:
         case ACTIONID_SUBTITLE_TEXT_SCALE_UP:
         case ACTIONID_SUBTITLE_TEXT_SCALE_NORMAL:
-        {
             if( p_vout )
             {
                 int i_scale;
@@ -1350,7 +1349,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 var_SetInteger( p_playlist, "sub-text-scale", i_scale );
                 DisplayMessage( p_vout, _( "Subtitle text scale %d%%" ), i_scale );
             }
-        }
+            break;
 
         /* Input + video output */
         case ACTIONID_POSITION:
