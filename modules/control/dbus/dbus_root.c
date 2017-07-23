@@ -272,9 +272,9 @@ DBUS_METHOD( Raise )
     REPLY_SEND;
 }
 
-#define PROPERTY_MAPPING_BEGIN if( 0 ) {}
+#define PROPERTY_MAPPING_BEGIN
 #define PROPERTY_GET_FUNC( prop, signature ) \
-    else if( !strcmp( psz_property_name,  #prop ) ) { \
+    if( !strcmp( psz_property_name,  #prop ) ) { \
         if( !dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, signature, &v ) ) \
             return DBUS_HANDLER_RESULT_NEED_MEMORY; \
         if( VLC_SUCCESS != Marshal##prop( p_this, &v ) ) { \
@@ -283,12 +283,12 @@ DBUS_METHOD( Raise )
         } \
         if( !dbus_message_iter_close_container( &args, &v ) ) \
             return DBUS_HANDLER_RESULT_NEED_MEMORY; \
-    }
+    } else
 #define PROPERTY_SET_FUNC( prop ) \
-    else if( !strcmp( psz_property_name,  #prop ) ) { \
+    if( !strcmp( psz_property_name,  #prop ) ) \
         return prop##Set( p_conn, p_from, p_this ); \
-    }
-#define PROPERTY_MAPPING_END else { return DBUS_HANDLER_RESULT_NOT_YET_HANDLED; }
+    else
+#define PROPERTY_MAPPING_END return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
 DBUS_METHOD( GetProperty )
 {
