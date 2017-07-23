@@ -150,50 +150,6 @@
 
 
 /*****************************************************************************
- * ProgressView
- *****************************************************************************/
-
-@implementation VLCProgressView : NSView
-
-- (void)scrollWheel:(NSEvent *)o_event
-{
-    BOOL b_forward = NO;
-    CGFloat f_deltaY = [o_event deltaY];
-    CGFloat f_deltaX = [o_event deltaX];
-
-    if ([o_event isDirectionInvertedFromDevice])
-        f_deltaX = -f_deltaX; // optimisation, actually double invertion of f_deltaY here
-    else
-        f_deltaY = -f_deltaY;
-
-    // positive for left / down, negative otherwise
-    CGFloat f_delta = f_deltaX + f_deltaY;
-    CGFloat f_abs;
-    int i_vlckey;
-
-    if (f_delta > 0.0f)
-        f_abs = f_delta;
-    else {
-        b_forward = YES;
-        f_abs = -f_delta;
-    }
-
-    for (NSUInteger i = 0; i < (int)(f_abs/4.+1.) && f_abs > 0.05 ; i++) {
-        if (b_forward)
-            [[VLCCoreInteraction sharedInstance] forwardExtraShort];
-        else
-            [[VLCCoreInteraction sharedInstance] backwardExtraShort];
-    }
-}
-
-- (BOOL)acceptsFirstResponder
-{
-    return YES;
-}
-
-@end
-
-/*****************************************************************************
  * VLCVolumeSliderCommon
  *****************************************************************************/
 
