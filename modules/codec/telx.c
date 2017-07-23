@@ -442,7 +442,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     bool b_update = false;
     char psz_text[512], *pt = psz_text;
     char psz_line[256];
-    int i, total;
+    int total;
 
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
@@ -647,7 +647,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         goto error;
 
     total = 0;
-    for ( i = 1; i < 24; i++ )
+    for ( int i = 1; i < 24; i++ )
     {
         size_t l = strlen( p_sys->ppsz_lines[i] );
 
