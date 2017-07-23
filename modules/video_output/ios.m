@@ -101,8 +101,6 @@ vlc_module_end ()
 @property (readonly) BOOL isAppActive;
 @property GLuint shaderProgram;
 
-- (id)initWithFrame:(CGRect)frame voutDisplay:(vout_display_t *)vd;
-
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (void)resetBuffers;
@@ -110,6 +108,8 @@ vlc_module_end ()
 - (void)unlock;
 
 - (void)reshape;
+- (void)propagateDimensionsToVoutCore;
+- (CGSize)viewSize;
 @end
 
 struct vout_display_sys_t
@@ -157,8 +157,10 @@ static int Open(vlc_object_t *this)
 
     @autoreleasepool {
         /* setup the actual OpenGL ES view */
-        sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) voutDisplay:vd];
-        sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [VLCOpenGLES2VideoView performSelectorOnMainThread:@selector(getNewView:)
+                                             withObject:[NSValue valueWithPointer:&sys->glESView]
+                                          waitUntilDone:YES];
+        [sys->glESView setVoutDisplay:vd];
 
         if (!sys->glESView) {
             msg_Err(vd, "Creating OpenGL ES 2 view failed");
@@ -213,13 +215,7 @@ static int Open(vlc_object_t *this)
         vd->manage = NULL;
 
         /* forward our dimensions to the vout core */
-        CGFloat scaleFactor;
-        CGSize viewSize;
-        @synchronized(sys->viewContainer) {
-            scaleFactor = sys->viewContainer.contentScaleFactor;
-            viewSize = sys->viewContainer.bounds.size;
-        }
-        vout_display_SendEventDisplaySize(vd, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
+        [sys->glESView performSelectorOnMainThread:@selector(propagateDimensionsToVoutCore) withObject:nil waitUntilDone:YES];
 
         /* */
         [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
@@ -320,7 +316,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
                 vout_display_cfg_t cfg_tmp = *cfg;
                 CGSize viewSize;
-                viewSize = [sys->glESView bounds].size;
+                viewSize = [sys->glESView viewSize];
 
                 /* on HiDPI displays, the point bounds don't equal the actual pixels */
                 CGFloat scaleFactor = sys->glESView.contentScaleFactor;
@@ -439,7 +435,13 @@ static void OpenglESSwap(vlc_gl_t *gl)
     return [CAEAGLLayer class];
 }
 
-- (id)initWithFrame:(CGRect)frame voutDisplay:(vout_display_t *)vd
++ (void)getNewView:(NSValue *)value
+{
+    id *ret = [value pointerValue];
+    *ret = [[self alloc] initWithFrame:CGRectMake(0.,0.,320.,240.)];
+}
+
+- (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
 
@@ -461,14 +463,23 @@ static void OpenglESSwap(vlc_gl_t *gl)
     layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
     layer.opaque = YES;
 
+    self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+    return self;
+}
+
+- (void)setVoutDisplay:(vout_display_t *)vd
+{
     _voutDisplay = vd;
 
     [self createBuffers];
 
     [self reshape];
-    [self setAutoresizingMask: UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+}
 
-    return self;
+- (vout_display_t *)voutDisplay
+{
+    return _voutDisplay;
 }
 
 - (void)fetchViewContainer
@@ -541,6 +552,14 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)createBuffers
 {
+    if (![NSThread isMainThread])
+    {
+        [self performSelectorOnMainThread:@selector(createBuffers)
+                                                 withObject:nil
+                                              waitUntilDone:YES];
+        return;
+    }
+
     glDisable(GL_DEPTH_TEST);
 
     glGenFramebuffers(1, &_frameBuffer);
@@ -560,6 +579,14 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)destroyBuffers
 {
+    if (![NSThread isMainThread])
+    {
+        [self performSelectorOnMainThread:@selector(destroyBuffers)
+                                                 withObject:nil
+                                              waitUntilDone:YES];
+        return;
+    }
+
     /* re-set current context */
     EAGLContext *previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
@@ -603,6 +630,14 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)reshape
 {
+    if (![NSThread isMainThread])
+    {
+        [self performSelectorOnMainThread:@selector(reshape)
+                                                 withObject:nil
+                                              waitUntilDone:YES];
+        return;
+    }
+
     EAGLContext *previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
 
@@ -669,6 +704,59 @@ static void OpenglESSwap(vlc_gl_t *gl)
 - (BOOL)acceptsFirstResponder
 {
     return YES;
+}
+
+- (void)propagateDimensionsToVoutCore
+{
+    CGFloat scaleFactor;
+    CGSize viewSize;
+    @synchronized(_voutDisplay->sys->viewContainer) {
+        scaleFactor = _voutDisplay->sys->viewContainer.contentScaleFactor;
+        viewSize = _voutDisplay->sys->viewContainer.bounds.size;
+    }
+    vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
+}
+
+- (void)mainThreadContentScaleFactor:(NSNumber *)scaleFactor
+{
+    id *ret = [scaleFactor pointerValue];
+    *ret = [[NSNumber alloc] initWithFloat:[super contentScaleFactor]];
+}
+
+- (CGFloat)contentScaleFactor
+{
+    if ([NSThread isMainThread]) {
+        return [super contentScaleFactor];
+    }
+
+    NSNumber *scaleFactor;
+    [self performSelectorOnMainThread:@selector(mainThreadContentScaleFactor:)
+                                         withObject:[NSValue valueWithPointer:&scaleFactor]
+                                      waitUntilDone:YES];
+    CGFloat ret = [scaleFactor floatValue];
+    [scaleFactor release];
+    return ret;
+}
+
+- (void)mainThreadViewBounds:(NSValue *)viewBoundsString
+{
+    id *ret = [viewBoundsString pointerValue];
+    *ret = [NSStringFromCGRect([super bounds]) retain];
+}
+
+- (CGSize)viewSize
+{
+    if ([NSThread isMainThread]) {
+        return self.bounds.size;
+    }
+
+    NSString *viewBoundsString;
+    [self performSelectorOnMainThread:@selector(mainThreadViewBounds:)
+                                         withObject:[NSValue valueWithPointer:&viewBoundsString]
+                                      waitUntilDone:YES];
+    CGRect bounds = CGRectFromString(viewBoundsString);
+    [viewBoundsString release];
+    return bounds.size;
 }
 
 @end
