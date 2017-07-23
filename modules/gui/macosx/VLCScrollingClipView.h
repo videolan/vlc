@@ -21,20 +21,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ A Clip view subclass that offers automatic scrolling of its contents.
+ */
+
 #import <Cocoa/Cocoa.h>
 
 @interface VLCScrollingClipView : NSClipView
 
-/* Start scrolling. Does nothing if already scrolling. */
+/**
+ \brief Start automatic scrolling
+
+ \note  Does nothing if already scrolling
+ */
 - (void)startScrolling;
 
-/* Stop scrolling. Does not reset the position! */
+/**
+ Stop automatic scrolling.
+
+ \note  Does not reset the position */
 - (void)stopScrolling;
 
-/* Resets scrolling position to the top */
+/**
+ Reset scrolling position to the top
+ */
 - (void)resetScrolling;
 
-/* Outlet to the parent NSScrollView */
+/**
+ Outlet to the parent NSScrollView
+ */
 @property IBOutlet NSScrollView *parentScrollView;
 
 @end
