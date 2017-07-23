@@ -29,14 +29,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#ifndef HAVE_STRCOLL
-# define strcoll strcasecmp
-#endif
 
 #include <vlc_common.h>
 #include <vlc_url.h>
 #include <vlc_modules.h>
 #include <vlc_interrupt.h>
+#include <vlc_strings.h>
 
 #include <libvlc.h>
 #include "stream.h"
@@ -343,37 +341,7 @@ static int compar_filename(const void *a, const void *b)
     if (i_ret != 0)
         return i_ret;
 
-    size_t i;
-    char ca, cb;
-
-    /* Attempt to guess if the sorting algorithm should be alphabetic
-     * (i.e. collation) or numeric:
-     * - If the first mismatching characters are not both digits,
-     *   then collation is the only option.
-     * - If one of the first mismatching characters is 0 and the other is also
-     *   a digit, the comparands are probably left-padded numerical values.
-     *   It does not matter which algorithm is used: the zero will be smaller
-     *   than non-zero either way.
-     * - Otherwise, the comparands are numerical values, and might not be
-     *   aligned (i.e. not same order of magnitude). If so, collation would
-     *   fail. So numerical comparison is performed. */
-    for (i = 0; (ca = ia->psz_name[i]) == (cb = ib->psz_name[i]); i++)
-        if (ca == '\0')
-            return 0; /* strings are exactly identical */
-
-    if ((unsigned)(ca - '0') > 9 || (unsigned)(cb - '0') > 9)
-        return strcoll(ia->psz_name, ib->psz_name);
-
-    unsigned long long ua = strtoull(ia->psz_name + i, NULL, 10);
-    unsigned long long ub = strtoull(ib->psz_name + i, NULL, 10);
-
-    /* The number may be identical in two cases:
-     * - leading zero (e.g. "012" and "12")
-     * - overflow on both sides (#ULLONG_MAX) */
-    if (ua == ub)
-        return strcoll(ia->psz_name, ib->psz_name);
-
-    return (ua > ub) ? +1 : -1;
+    return vlc_filenamecmp(ia->psz_name, ib->psz_name);
 }
 
 static void fsdir_sort(input_item_node_t *p_node)

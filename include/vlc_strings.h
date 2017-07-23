@@ -148,6 +148,8 @@ static inline char *str_format( input_thread_t *input, const char *fmt )
     return s2;
 }
 
+VLC_API int vlc_filenamecmp(const char *, const char *);
+
 void filename_sanitize(char *);
 
 /**

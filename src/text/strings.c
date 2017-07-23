@@ -38,6 +38,10 @@
 #include <time.h>
 #include <limits.h>
 #include <math.h>
+#include <string.h>
+#ifndef HAVE_STRCOLL
+# define strcoll strcasecmp
+#endif
 
 /* Needed by vlc_strfinput */
 #include <vlc_input.h>
@@ -815,6 +819,41 @@ char *vlc_strfinput(input_thread_t *input, const char *s)
     if (vlc_memstream_close(stream))
         return NULL;
     return stream->ptr;
+}
+
+int vlc_filenamecmp(const char *a, const char *b)
+{
+    size_t i;
+    char ca, cb;
+
+    /* Attempt to guess if the sorting algorithm should be alphabetic
+     * (i.e. collation) or numeric:
+     * - If the first mismatching characters are not both digits,
+     *   then collation is the only option.
+     * - If one of the first mismatching characters is 0 and the other is also
+     *   a digit, the comparands are probably left-padded numerical values.
+     *   It does not matter which algorithm is used: the zero will be smaller
+     *   than non-zero either way.
+     * - Otherwise, the comparands are numerical values, and might not be
+     *   aligned (i.e. not same order of magnitude). If so, collation would
+     *   fail. So numerical comparison is performed. */
+    for (i = 0; (ca = a[i]) == (cb = b[i]); i++)
+        if (ca == '\0')
+            return 0; /* strings are exactly identical */
+
+    if ((unsigned)(ca - '0') > 9 || (unsigned)(cb - '0') > 9)
+        return strcoll(a, b);
+
+    unsigned long long ua = strtoull(a + i, NULL, 10);
+    unsigned long long ub = strtoull(b + i, NULL, 10);
+
+    /* The number may be identical in two cases:
+     * - leading zero (e.g. "012" and "12")
+     * - overflow on both sides (#ULLONG_MAX) */
+    if (ua == ub)
+        return strcoll(a, b);
+
+    return (ua > ub) ? +1 : -1;
 }
 
 /**

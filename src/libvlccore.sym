@@ -563,6 +563,7 @@ vlc_CPU
 vlc_error
 vlc_event_attach
 vlc_event_detach
+vlc_filenamecmp
 vlc_fourcc_GetCodec
 vlc_fourcc_GetCodecAudio
 vlc_fourcc_GetCodecFromString
