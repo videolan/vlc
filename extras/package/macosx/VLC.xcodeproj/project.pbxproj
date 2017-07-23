@@ -1764,6 +1764,10 @@
 		DCF358BC077F1236007DB450 /* XIBs */ = {
 			isa = PBXGroup;
 			children = (
+				6B8224091E4D2A9000833BE1 /* MainMenu.xib */,
+				6B82240A1E4D2A9000833BE1 /* MainWindow.xib */,
+				6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */,
+				6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */,
 				6B8223FE1E4D2A8F00833BE1 /* About.xib */,
 				6B8223FF1E4D2A9000833BE1 /* AddonManager.xib */,
 				6B8224001E4D2A9000833BE1 /* AudioEffects.xib */,
@@ -1777,8 +1781,6 @@
 				1CFE8D561EA0D3D300E94451 /* ErrorPanel.xib */,
 				6B8224071E4D2A9000833BE1 /* Help.xib */,
 				6B8224081E4D2A9000833BE1 /* LogMessageWindow.xib */,
-				6B8224091E4D2A9000833BE1 /* MainMenu.xib */,
-				6B82240A1E4D2A9000833BE1 /* MainWindow.xib */,
 				6B82240C1E4D2A9000833BE1 /* Open.xib */,
 				6B82240D1E4D2A9000833BE1 /* PlaylistAccessoryView.xib */,
 				6B82240E1E4D2A9000833BE1 /* PlaylistMenu.xib */,
@@ -1789,9 +1791,7 @@
 				6B8224131E4D2A9000833BE1 /* StreamOutput.xib */,
 				6B8224151E4D2A9000833BE1 /* TextfieldPanel.xib */,
 				6B8224161E4D2A9000833BE1 /* TimeSelectionPanel.xib */,
-				6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */,
 				6B8224191E4D2A9000833BE1 /* VLCRendererDialog.xib */,
-				6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */,
 			);
 			name = XIBs;
 			path = ../../../modules/gui/macosx/UI;
