@@ -504,12 +504,12 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
                          fse.stepwise.step_width, fse.stepwise.step_height);
 
             /* FIXME: slow and dumb */
-            for (uint32_t width =  fse.stepwise.min_width;
-                          width <= fse.stepwise.max_width;
-                          width += fse.stepwise.step_width)
-                for (uint32_t height =  fse.stepwise.min_height;
-                              height <= fse.stepwise.max_height;
-                              height += fse.stepwise.step_height)
+            for (width =  fse.stepwise.min_width;
+                 width <= fse.stepwise.max_width;
+                 width += fse.stepwise.step_width)
+                for (height =  fse.stepwise.min_height;
+                     height <= fse.stepwise.max_height;
+                     height += fse.stepwise.step_height)
                 {
                     struct v4l2_fract cur_it;
 
