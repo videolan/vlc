@@ -95,7 +95,8 @@ enum port_type
 {
     PORT_TYPE_DEFAULT,
     PORT_TYPE_USB,
-    PORT_TYPE_HDMI
+    PORT_TYPE_HDMI,
+    PORT_TYPE_HEADPHONES
 };
 
 #pragma mark -
@@ -189,6 +190,8 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
             port_type = PORT_TYPE_USB;
         else if ([out.portType isEqualToString: AVAudioSessionPortHDMI])
             port_type = PORT_TYPE_HDMI;
+        else if ([out.portType isEqualToString: AVAudioSessionPortHeadphones])
+            port_type = PORT_TYPE_HEADPHONES;
         else
             port_type = PORT_TYPE_DEFAULT;
 
@@ -245,7 +248,8 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
 
     msg_Dbg(p_aout, "Output on %s, channel count: %u",
             *pport_type == PORT_TYPE_HDMI ? "HDMI" :
-            *pport_type == PORT_TYPE_USB ? "USB" : "Default",
+            *pport_type == PORT_TYPE_USB ? "USB" :
+            *pport_type == PORT_TYPE_HEADPHONES ? "Headphones" : "Default",
             layout ? (unsigned) layout->mNumberChannelDescriptions : 2);
 
     *playout = layout;
@@ -403,6 +407,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
          || (port_type != PORT_TYPE_USB && port_type != PORT_TYPE_HDMI))
             goto error;
     }
+
+    p_aout->current_sink_info.headphones = port_type == PORT_TYPE_HEADPHONES;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
     if (p_sys->au_unit == NULL)
