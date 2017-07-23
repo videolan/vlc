@@ -174,7 +174,6 @@
 		6B8224161E4D2A9000833BE1 /* TimeSelectionPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TimeSelectionPanel.xib; sourceTree = "<group>"; };
 		6B8224171E4D2A9000833BE1 /* VideoEffects.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VideoEffects.xib; sourceTree = "<group>"; };
 		6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCFullScreenPanel.xib; sourceTree = "<group>"; };
-		6B8224191E4D2A9000833BE1 /* VLCRendererDialog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCRendererDialog.xib; sourceTree = "<group>"; };
 		6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCStatusBarIconMainMenu.xib; sourceTree = "<group>"; };
 		6B8224381E4D2AFD00833BE1 /* VLCBackwardTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCBackwardTemplate.pdf; path = "Button-Icons/VLCBackwardTemplate.pdf"; sourceTree = "<group>"; };
 		6B8224391E4D2AFD00833BE1 /* VLCClearLogTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCClearLogTemplate.pdf; path = "Button-Icons/VLCClearLogTemplate.pdf"; sourceTree = "<group>"; };
@@ -1791,7 +1790,6 @@
 				6B8224131E4D2A9000833BE1 /* StreamOutput.xib */,
 				6B8224151E4D2A9000833BE1 /* TextfieldPanel.xib */,
 				6B8224161E4D2A9000833BE1 /* TimeSelectionPanel.xib */,
-				6B8224191E4D2A9000833BE1 /* VLCRendererDialog.xib */,
 			);
 			name = XIBs;
 			path = ../../../modules/gui/macosx/UI;

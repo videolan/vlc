@@ -131,7 +131,6 @@ nodist_libmacosx_plugin_la_SOURCES = \
 	gui/macosx/UI/TimeSelectionPanel.nib \
 	gui/macosx/UI/VideoEffects.nib \
 	gui/macosx/UI/VLCFullScreenPanel.nib \
-	gui/macosx/UI/VLCRendererDialog.nib \
 	gui/macosx/UI/VLCStatusBarIconMainMenu.nib
 
 EXTRA_DIST += \
@@ -161,7 +160,6 @@ EXTRA_DIST += \
 	gui/macosx/UI/TimeSelectionPanel.xib \
 	gui/macosx/UI/VideoEffects.xib \
 	gui/macosx/UI/VLCFullScreenPanel.xib \
-	gui/macosx/UI/VLCRendererDialog.xib \
 	gui/macosx/UI/VLCStatusBarIconMainMenu.xib
 
 xib_verbose = $(xib_verbose_$(V))
