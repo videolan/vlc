@@ -506,6 +506,7 @@ check_PROGRAMS = \
 	test_interrupt \
 	test_md5 \
 	test_picture_pool \
+	test_sort \
 	test_timer \
 	test_url \
 	test_utf8 \
@@ -525,6 +526,7 @@ test_interrupt_SOURCES = test/interrupt.c
 test_interrupt_LDADD = $(LDADD) $(LIBS_libvlccore) $(LIBPTHREAD)
 test_md5_SOURCES = test/md5.c
 test_picture_pool_SOURCES = test/picture_pool.c
+test_sort_SOURCES = test/sort.c
 test_timer_SOURCES = test/timer.c
 test_url_SOURCES = test/url.c
 test_utf8_SOURCES = test/utf8.c
