@@ -448,11 +448,8 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             SetBookmark( p_intf, i_action - ACTIONID_SET_BOOKMARK1 + 1 );
             break;
         case ACTIONID_PLAY_CLEAR:
-        {
-            playlist_t *p_playlist = pl_Get( p_intf );
             playlist_Clear( p_playlist, pl_Unlocked );
             break;
-        }
         case ACTIONID_VOL_UP:
         {
             float vol;
