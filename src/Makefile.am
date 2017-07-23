@@ -296,6 +296,7 @@ libvlccore_la_SOURCES = \
 	video_output/vout_wrapper.c \
 	network/getaddrinfo.c \
 	network/http_auth.c \
+	network/httpd.c \
 	network/io.c \
 	network/tcp.c \
 	network/udp.c \
@@ -437,10 +438,6 @@ endif
 endif
 endif
 endif
-endif
-
-if BUILD_HTTPD
-libvlccore_la_SOURCES += network/httpd.c
 endif
 
 if ENABLE_SOUT

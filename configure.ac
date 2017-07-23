@@ -1619,19 +1619,6 @@ AM_CONDITIONAL(BUILD_LUA, [test "${have_lua}" = "yes"])
 
 
 dnl
-dnl HTTP daemon
-dnl
-AC_ARG_ENABLE(httpd,
-  [AS_HELP_STRING([--disable-httpd],
-    [disable the built-in HTTP server (default enabled)])])
-if test "${enable_httpd}" != "no"
-then
-  AC_DEFINE(ENABLE_HTTPD, 1, Define if you want the HTTP daemon support)
-fi
-AM_CONDITIONAL(BUILD_HTTPD, [test "${enable_httpd}" != "no"])
-
-
-dnl
 dnl VideoLAN manager
 dnl
 AC_ARG_ENABLE(vlm,

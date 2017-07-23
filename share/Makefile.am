@@ -122,7 +122,9 @@ nobase_vlclib_DATA = \
 	lua/intf/dummy.luac \
 	lua/intf/dumpmeta.luac \
 	lua/intf/luac.luac \
+	lua/intf/http.luac \
 	lua/intf/modules/host.luac \
+	lua/intf/modules/httprequests.luac \
 	lua/intf/telnet.luac \
 	lua/meta/art/02_frenchtv.luac \
 	lua/meta/art/03_lastfm.luac \
@@ -157,6 +159,7 @@ nobase_vlclib_DATA = \
 nobase_doc_DATA = \
 	lua/README.txt \
 	lua/extensions/README.txt \
+	lua/http/requests/README.txt \
 	lua/intf/README.txt \
 	lua/intf/dumpmeta.lua \
 	lua/meta/README.txt \
@@ -173,14 +176,66 @@ nobase_doc_DATA = \
 	lua/sd/icast.lua \
 	$(NULL)
 
-if BUILD_HTTPD
-nobase_vlclib_DATA += \
-	lua/intf/http.luac \
-	lua/intf/modules/httprequests.luac \
-	$(NULL)
-nobase_vlcdata_DATA += $(DIST_http_lua)
-nobase_doc_DATA += lua/http/requests/README.txt
-endif
+nobase_vlcdata_DATA += \
+	lua/http/view.html \
+	lua/http/mobile.html \
+	lua/http/dialogs/create_stream.html \
+	lua/http/dialogs/equalizer_window.html \
+	lua/http/dialogs/mosaic_window.html \
+	lua/http/dialogs/batch_window.html \
+	lua/http/dialogs/error_window.html \
+	lua/http/dialogs/browse_window.html \
+	lua/http/dialogs/stream_window.html \
+	lua/http/dialogs/offset_window.html \
+	lua/http/dialogs/stream_config_window.html \
+	lua/http/custom.lua \
+	lua/http/vlm.html \
+	lua/http/images/buttons.png \
+	lua/http/images/speaker-32.png \
+	lua/http/images/vlc-48.png \
+	lua/http/images/Audio-48.png \
+	lua/http/images/Folder-48.png \
+	lua/http/images/Other-48.png \
+	lua/http/images/Back-48.png \
+	lua/http/images/Video-48.png \
+	lua/http/images/vlc16x16.png \
+	lua/http/mobile_equalizer.html \
+	lua/http/vlm_export.html \
+	lua/http/mobile_browse.html \
+	lua/http/favicon.ico \
+	lua/http/mobile_view.html \
+	lua/http/requests/playlist.xml \
+	lua/http/requests/playlist.json \
+	lua/http/requests/README.txt \
+	lua/http/requests/playlist_jstree.xml \
+	lua/http/requests/browse.xml \
+	lua/http/requests/browse.json \
+	lua/http/requests/vlm_cmd.xml \
+	lua/http/requests/status.xml \
+	lua/http/requests/status.json \
+	lua/http/requests/vlm.xml \
+	lua/http/index.html \
+	lua/http/css/ui-lightness/jquery-ui-1.8.13.custom.css \
+	lua/http/css/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png \
+	lua/http/css/ui-lightness/images/ui-bg_flat_10_000000_40x100.png \
+	lua/http/css/ui-lightness/images/ui-icons_ffffff_256x240.png \
+	lua/http/css/ui-lightness/images/ui-bg_gloss-wave_35_f6a828_500x100.png \
+	lua/http/css/ui-lightness/images/ui-bg_glass_65_ffffff_1x400.png \
+	lua/http/css/ui-lightness/images/ui-icons_222222_256x240.png \
+	lua/http/css/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png \
+	lua/http/css/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png \
+	lua/http/css/ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png \
+	lua/http/css/ui-lightness/images/ui-bg_diagonals-thick_18_b81900_40x40.png \
+	lua/http/css/ui-lightness/images/ui-icons_ffd27a_256x240.png \
+	lua/http/css/ui-lightness/images/ui-icons_228ef1_256x240.png \
+	lua/http/css/ui-lightness/images/ui-icons_ef8c08_256x240.png \
+	lua/http/css/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png \
+	lua/http/css/main.css \
+	lua/http/css/mobile.css \
+	lua/http/js/ui.js \
+	lua/http/js/common.js \
+	lua/http/js/jquery.jstree.js \
+	lua/http/js/controllers.js
 endif
 MOSTLYCLEANFILES += $(nobase_vlclib_DATA)
 
@@ -242,68 +297,6 @@ EXTRA_DIST += \
 	lua/sd/icecast.lua \
 	lua/sd/icast.lua \
 	lua/sd/jamendo.lua
-
-DIST_http_lua = \
-	lua/http/view.html \
-	lua/http/mobile.html \
-	lua/http/dialogs/create_stream.html \
-	lua/http/dialogs/equalizer_window.html \
-	lua/http/dialogs/mosaic_window.html \
-	lua/http/dialogs/batch_window.html \
-	lua/http/dialogs/error_window.html \
-	lua/http/dialogs/browse_window.html \
-	lua/http/dialogs/stream_window.html \
-	lua/http/dialogs/offset_window.html \
-	lua/http/dialogs/stream_config_window.html \
-	lua/http/custom.lua \
-	lua/http/vlm.html \
-	lua/http/images/buttons.png \
-	lua/http/images/speaker-32.png \
-	lua/http/images/vlc-48.png \
-	lua/http/images/Audio-48.png \
-	lua/http/images/Folder-48.png \
-	lua/http/images/Other-48.png \
-	lua/http/images/Back-48.png \
-	lua/http/images/Video-48.png \
-	lua/http/images/vlc16x16.png \
-	lua/http/mobile_equalizer.html \
-	lua/http/vlm_export.html \
-	lua/http/mobile_browse.html \
-	lua/http/favicon.ico \
-	lua/http/mobile_view.html \
-	lua/http/requests/playlist.xml \
-	lua/http/requests/playlist.json \
-	lua/http/requests/README.txt \
-	lua/http/requests/playlist_jstree.xml \
-	lua/http/requests/browse.xml \
-	lua/http/requests/browse.json \
-	lua/http/requests/vlm_cmd.xml \
-	lua/http/requests/status.xml \
-	lua/http/requests/status.json \
-	lua/http/requests/vlm.xml \
-	lua/http/index.html \
-	lua/http/css/ui-lightness/jquery-ui-1.8.13.custom.css \
-	lua/http/css/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png \
-	lua/http/css/ui-lightness/images/ui-bg_flat_10_000000_40x100.png \
-	lua/http/css/ui-lightness/images/ui-icons_ffffff_256x240.png \
-	lua/http/css/ui-lightness/images/ui-bg_gloss-wave_35_f6a828_500x100.png \
-	lua/http/css/ui-lightness/images/ui-bg_glass_65_ffffff_1x400.png \
-	lua/http/css/ui-lightness/images/ui-icons_222222_256x240.png \
-	lua/http/css/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png \
-	lua/http/css/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png \
-	lua/http/css/ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png \
-	lua/http/css/ui-lightness/images/ui-bg_diagonals-thick_18_b81900_40x40.png \
-	lua/http/css/ui-lightness/images/ui-icons_ffd27a_256x240.png \
-	lua/http/css/ui-lightness/images/ui-icons_228ef1_256x240.png \
-	lua/http/css/ui-lightness/images/ui-icons_ef8c08_256x240.png \
-	lua/http/css/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png \
-	lua/http/css/main.css \
-	lua/http/css/mobile.css \
-	lua/http/js/ui.js \
-	lua/http/js/common.js \
-	lua/http/js/jquery.jstree.js \
-	lua/http/js/controllers.js
-
 DIST_solid = \
 	solid/vlc-openbd.desktop \
 	solid/vlc-opencda.desktop \
