@@ -192,16 +192,14 @@ static unsigned GetModifier( xcb_connection_t *p_connection, xcb_key_symbols_t *
     if( !p_keys )
         goto end;
 
-    int i = 0;
     bool no_modifier = true;
-    while( p_keys[i] != XCB_NO_SYMBOL )
+    for( int i = 0; p_keys[i] != XCB_NO_SYMBOL; i++ )
     {
         if( p_keys[i] != 0 )
         {
             no_modifier = false;
             break;
         }
-        i++;
     }
 
     if( no_modifier )
