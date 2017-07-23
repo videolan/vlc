@@ -184,6 +184,9 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
 - (void)drawKnob:(NSRect)knobRect
 {
+    if (_isKnobHidden)
+        return;
+
     // Draw knob
     NSBezierPath* knobPath = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 2.0, 2.0)];
     if (self.isHighlighted) {
@@ -217,6 +220,13 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     // Empty Track Drawing
     NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:3 yRadius:3];
     [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
+
+    if (_isKnobHidden) {
+        [_trackStrokeColor setStroke];
+        emptyTrackPath.lineWidth = 1;
+        [emptyTrackPath stroke];
+        return;
+    }
 
     // Calculate filled track
     NSRect filledTrackRect = rect;
@@ -322,6 +332,12 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     else
         [self endAnimating];
     _indefinite = indefinite;
+}
+
+- (void)setKnobHidden:(BOOL)isKnobHidden
+{
+    _isKnobHidden = isKnobHidden;
+    [self.controlView setNeedsDisplay:YES];
 }
 
 

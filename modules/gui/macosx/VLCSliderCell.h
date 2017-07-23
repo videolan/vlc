@@ -48,6 +48,7 @@
 @property NSInteger animationWidth;
 
 @property (nonatomic, setter=setIndefinite:) BOOL indefinite;
+@property (nonatomic, setter=setKnobHidden:) BOOL isKnobHidden;
 
 - (void)setSliderStyleLight;
 - (void)setSliderStyleDark;

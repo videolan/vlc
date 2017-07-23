@@ -26,6 +26,7 @@
 @interface VLCSlider : NSSlider
 
 @property (nonatomic, getter=getIndefinite,setter=setIndefinite:) BOOL indefinite;
+@property (nonatomic, getter=getKnobHidden,setter=setKnobHidden:) BOOL isKnobHidden;
 
 - (void)setSliderStyleLight;
 - (void)setSliderStyleDark;

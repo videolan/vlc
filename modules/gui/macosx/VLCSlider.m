@@ -50,6 +50,16 @@
     [(VLCSliderCell*)[self cell] setIndefinite:indefinite];
 }
 
+- (BOOL)getKnobHidden
+{
+    return [(VLCSliderCell*)[self cell] isKnobHidden];
+}
+
+- (void)setKnobHidden:(BOOL)isKnobHidden
+{
+    [(VLCSliderCell*)[self cell] setKnobHidden:isKnobHidden];
+}
+
 - (BOOL)isFlipped
 {
     return NO;
