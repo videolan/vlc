@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCRendererDialog.m: Controller class for the renderer menu
+ * VLCRendererMenuController.m: Controller class for the renderer menu
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
