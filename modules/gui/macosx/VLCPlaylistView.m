@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistView.m: MacOS X interface module
+ * VLCPlaylistView.m: OutlineView subclass for the playlist
  *****************************************************************************
 * Copyright (C) 2003-2015 VLC authors and VideoLAN
  * $Id$

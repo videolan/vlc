@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistInfo.m: MacOS X interface module
+ * VLCPlaylistInfo.m: Controller for the codec info panel
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
