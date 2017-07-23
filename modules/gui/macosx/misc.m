@@ -298,22 +298,21 @@
 
 /*****************************************************************************
  * VLCMainWindowSplitView implementation
- * comment 1 + 2 taken from NSSplitView.h (10.7 SDK)
  *****************************************************************************/
 @implementation VLCMainWindowSplitView : NSSplitView
-/* Return the color of the dividers that the split view is drawing between subviews. The default implementation of this method returns [NSColor clearColor] for the thick divider style. It will also return [NSColor clearColor] for the thin divider style when the split view is in a textured window. All other thin dividers are drawn with a color that looks good between two white panes. You can override this method to change the color of dividers.
- */
+
+// Custom color for the dividers
 - (NSColor *)dividerColor
 {
     return [NSColor colorWithCalibratedRed:.60 green:.60 blue:.60 alpha:1.];
 }
 
-/* Return the thickness of the dividers that the split view is drawing between subviews. The default implementation returns a value that depends on the divider style. You can override this method to change the size of dividers.
- */
+// Custom thickness for the divider
 - (CGFloat)dividerThickness
 {
     return 1.0;
 }
+
 @end
 
 /*****************************************************************************
