@@ -359,8 +359,6 @@ valid:
     return VLC_SUCCESS;
 
 error:
-    /* workaround, but y4m uses vlc_stream_ReadLine */
-    vlc_stream_Seek( p_demux->s, 0 );
     free( p_sys );
     return VLC_EGENERIC;
 }
