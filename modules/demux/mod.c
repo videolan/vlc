@@ -576,7 +576,7 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
             const uint8_t *p_sample = &p_peek[20 + i*30];
 
             /* Check correct null padding */
-            const uint8_t *p = memchr( &p_sample[0], '\0', 22 );
+            p = memchr( &p_sample[0], '\0', 22 );
             if( p )
             {
                 for( ; p < &p_sample[22]; p++ )
