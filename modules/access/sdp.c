@@ -39,9 +39,9 @@ vlc_module_begin ()
     add_shortcut ("sdp")
 vlc_module_end()
 
-static ssize_t Read (access_t *, void *, size_t);
-static int Seek (access_t *, uint64_t);
-static int Control (access_t *, int, va_list);
+static ssize_t Read (stream_t *, void *, size_t);
+static int Seek (stream_t *, uint64_t);
+static int Control (stream_t *, int, va_list);
 
 struct access_sys_t
 {
@@ -52,7 +52,7 @@ struct access_sys_t
 
 static int Open (vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     size_t len = strlen (access->psz_location);
 
     access_sys_t *sys = vlc_malloc(obj, sizeof(*sys) + len);
@@ -73,7 +73,7 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static ssize_t Read (access_t *access, void *buf, size_t len)
+static ssize_t Read (stream_t *access, void *buf, size_t len)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -86,7 +86,7 @@ static ssize_t Read (access_t *access, void *buf, size_t len)
     return len;
 }
 
-static int Seek (access_t *access, uint64_t position)
+static int Seek (stream_t *access, uint64_t position)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -97,7 +97,7 @@ static int Seek (access_t *access, uint64_t position)
     return VLC_SUCCESS;
 }
 
-static int Control (access_t *access, int query, va_list args)
+static int Control (stream_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
 

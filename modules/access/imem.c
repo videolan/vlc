@@ -200,8 +200,8 @@ typedef void (*imem_release_t)(void *data, const char *cookie, size_t, void *);
  *****************************************************************************/
 
 /* */
-static block_t *Block(access_t *, bool *);
-static int ControlAccess(access_t *, int, va_list);
+static block_t *Block(stream_t *, bool *);
+static int ControlAccess(stream_t *, int, va_list);
 
 static int Demux(demux_t *);
 static int ControlDemux(demux_t *, int, va_list);
@@ -291,7 +291,7 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
  */
 static int OpenAccess(vlc_object_t *object)
 {
-    access_t   *access = (access_t *)object;
+    stream_t   *access = (stream_t *)object;
     imem_sys_t *sys;
 
     if (OpenCommon(object, &sys, access->psz_location))
@@ -317,7 +317,7 @@ static int OpenAccess(vlc_object_t *object)
  */
 static void CloseAccess(vlc_object_t *object)
 {
-    access_t *access = (access_t *)object;
+    stream_t *access = (stream_t *)object;
 
     CloseCommon((imem_sys_t*)access->p_sys);
 }
@@ -325,7 +325,7 @@ static void CloseAccess(vlc_object_t *object)
 /**
  * It controls an imem access
  */
-static int ControlAccess(access_t *access, int i_query, va_list args)
+static int ControlAccess(stream_t *access, int i_query, va_list args)
 {
     (void) access;
     switch (i_query)
@@ -364,7 +364,7 @@ static int ControlAccess(access_t *access, int i_query, va_list args)
  * It retreives data using the get() callback, copies them,
  * and then release them using the release() callback.
  */
-static block_t *Block(access_t *access, bool *restrict eof)
+static block_t *Block(stream_t *access, bool *restrict eof)
 {
     imem_sys_t *sys = (imem_sys_t*)access->p_sys;
 

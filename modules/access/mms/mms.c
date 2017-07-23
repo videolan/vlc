@@ -90,7 +90,7 @@ struct access_sys_t
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    access_t *p_access = (access_t*)p_this;
+    stream_t *p_access = (stream_t*)p_this;
 
     /* use specified method */
     if( !strncmp( p_access->psz_name, "mmsu", 4 ) )
@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
+    stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
     if( ( p_sys->i_proto == MMS_PROTO_TCP ) ||

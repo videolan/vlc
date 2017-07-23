@@ -44,7 +44,7 @@ struct access_sys_t
     struct vlc_http_resource *resource;
 };
 
-static block_t *FileRead(access_t *access, bool *restrict eof)
+static block_t *FileRead(stream_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -54,7 +54,7 @@ static block_t *FileRead(access_t *access, bool *restrict eof)
     return b;
 }
 
-static int FileSeek(access_t *access, uint64_t pos)
+static int FileSeek(stream_t *access, uint64_t pos)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -63,7 +63,7 @@ static int FileSeek(access_t *access, uint64_t pos)
     return VLC_SUCCESS;
 }
 
-static int FileControl(access_t *access, int query, va_list args)
+static int FileControl(stream_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -110,7 +110,7 @@ static int FileControl(access_t *access, int query, va_list args)
     return VLC_SUCCESS;
 }
 
-static block_t *LiveRead(access_t *access, bool *restrict eof)
+static block_t *LiveRead(stream_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -120,14 +120,14 @@ static block_t *LiveRead(access_t *access, bool *restrict eof)
     return b;
 }
 
-static int NoSeek(access_t *access, uint64_t pos)
+static int NoSeek(stream_t *access, uint64_t pos)
 {
     (void) access;
     (void) pos;
     return VLC_EGENERIC;
 }
 
-static int LiveControl(access_t *access, int query, va_list args)
+static int LiveControl(stream_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -157,7 +157,7 @@ static int LiveControl(access_t *access, int query, va_list args)
 
 static int Open(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     access_sys_t *sys = malloc(sizeof (*sys));
     int ret = VLC_ENOMEM;
 
@@ -276,7 +276,7 @@ error:
 
 static void Close(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     access_sys_t *sys = access->p_sys;
 
     vlc_http_res_destroy(sys->resource);

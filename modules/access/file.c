@@ -128,17 +128,17 @@ static bool IsRemote (const char *path)
 # define posix_fadvise(fd, off, len, adv)
 #endif
 
-static ssize_t Read (access_t *, void *, size_t);
-static int FileSeek (access_t *, uint64_t);
-static int NoSeek (access_t *, uint64_t);
-static int FileControl (access_t *, int, va_list);
+static ssize_t Read (stream_t *, void *, size_t);
+static int FileSeek (stream_t *, uint64_t);
+static int NoSeek (stream_t *, uint64_t);
+static int FileControl (stream_t *, int, va_list);
 
 /*****************************************************************************
  * FileOpen: open the file
  *****************************************************************************/
 int FileOpen( vlc_object_t *p_this )
 {
-    access_t *p_access = (access_t*)p_this;
+    stream_t *p_access = (stream_t*)p_this;
 
     /* Open file */
     int fd = -1;
@@ -257,7 +257,7 @@ error:
  *****************************************************************************/
 void FileClose (vlc_object_t * p_this)
 {
-    access_t     *p_access = (access_t*)p_this;
+    stream_t     *p_access = (stream_t*)p_this;
 
     if (p_access->pf_read == NULL)
     {
@@ -271,7 +271,7 @@ void FileClose (vlc_object_t * p_this)
 }
 
 
-static ssize_t Read (access_t *p_access, void *p_buffer, size_t i_len)
+static ssize_t Read (stream_t *p_access, void *p_buffer, size_t i_len)
 {
     access_sys_t *p_sys = p_access->p_sys;
     int fd = p_sys->fd;
@@ -299,7 +299,7 @@ static ssize_t Read (access_t *p_access, void *p_buffer, size_t i_len)
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int FileSeek (access_t *p_access, uint64_t i_pos)
+static int FileSeek (stream_t *p_access, uint64_t i_pos)
 {
     access_sys_t *sys = p_access->p_sys;
 
@@ -308,7 +308,7 @@ static int FileSeek (access_t *p_access, uint64_t i_pos)
     return VLC_SUCCESS;
 }
 
-static int NoSeek (access_t *p_access, uint64_t i_pos)
+static int NoSeek (stream_t *p_access, uint64_t i_pos)
 {
     /* vlc_assert_unreachable(); ?? */
     (void) p_access; (void) i_pos;
@@ -318,7 +318,7 @@ static int NoSeek (access_t *p_access, uint64_t i_pos)
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int FileControl( access_t *p_access, int i_query, va_list args )
+static int FileControl( stream_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool    *pb_bool;

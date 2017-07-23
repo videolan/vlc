@@ -80,11 +80,11 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t Read( access_t *, void *, size_t );
-static int Seek( access_t *, uint64_t );
-static int Control( access_t *, int, va_list );
+static ssize_t Read( stream_t *, void *, size_t );
+static int Seek( stream_t *, uint64_t );
+static int Control( stream_t *, int, va_list );
 #ifndef _WIN32
-static int DirRead( access_t *, input_item_node_t * );
+static int DirRead( stream_t *, input_item_node_t * );
 #endif
 
 struct access_sys_t
@@ -95,7 +95,7 @@ struct access_sys_t
 };
 
 #ifdef _WIN32
-static void Win32AddConnection( access_t *, const char *, const char *, const char *, const char *, const char * );
+static void Win32AddConnection( stream_t *, const char *, const char *, const char *, const char *, const char * );
 #else
 static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
                       char *un, int unlen, char *pw, int pwlen )
@@ -114,7 +114,7 @@ static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
 
 /* Build an SMB URI
  * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
-static int smb_get_uri( access_t *p_access, char **ppsz_uri,
+static int smb_get_uri( stream_t *p_access, char **ppsz_uri,
                         const char *psz_domain,
                         const char *psz_user, const char *psz_pwd,
                         const char *psz_server, const char *psz_share_path,
@@ -148,7 +148,7 @@ static int smb_get_uri( access_t *p_access, char **ppsz_uri,
  ****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
+    stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *p_sys;
     struct stat  filestat;
     vlc_url_t    url;
@@ -276,7 +276,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
+    stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
     vlc_UrlClean( &p_sys->url );
@@ -292,7 +292,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static int Seek( access_t *p_access, uint64_t i_pos )
+static int Seek( stream_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int64_t      i_ret;
@@ -315,7 +315,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
+static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;
@@ -334,7 +334,7 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
-static int DirRead (access_t *p_access, input_item_node_t *p_node )
+static int DirRead (stream_t *p_access, input_item_node_t *p_node )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct smbc_dirent *p_entry;
@@ -402,7 +402,7 @@ static int DirRead (access_t *p_access, input_item_node_t *p_node )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control( stream_t *p_access, int i_query, va_list args )
 {
     access_sys_t *sys = p_access->p_sys;
 
@@ -441,7 +441,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 }
 
 #ifdef _WIN32
-static void Win32AddConnection( access_t *p_access, const char *psz_server,
+static void Win32AddConnection( stream_t *p_access, const char *psz_server,
                                 const char *psz_share, const char *psz_user,
                                 const char *psz_pwd, const char *psz_domain )
 {

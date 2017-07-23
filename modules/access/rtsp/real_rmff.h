@@ -231,7 +231,7 @@ void rmff_print_header(rmff_header_t *h);
 /*
  * does some checks and fixes header if possible
  */
-void rmff_fix_header(access_t *p_access, rmff_header_t *h);
+void rmff_fix_header(stream_t *p_access, rmff_header_t *h);
 
 /*
  * returns the size of the header (incl. first data-header)

@@ -76,11 +76,11 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t  Read( access_t *, void *, size_t );
-static int      Seek( access_t *, uint64_t );
-static int      Control( access_t *, int, va_list );
+static ssize_t  Read( stream_t *, void *, size_t );
+static int      Seek( stream_t *, uint64_t );
+static int      Control( stream_t *, int, va_list );
 
-static int DirRead( access_t *, input_item_node_t * );
+static int DirRead( stream_t *, input_item_node_t * );
 
 struct access_sys_t
 {
@@ -92,7 +92,7 @@ struct access_sys_t
     char *psz_base_url;
 };
 
-static int AuthKeyAgent( access_t *p_access, const char *psz_username )
+static int AuthKeyAgent( stream_t *p_access, const char *psz_username )
 {
     access_sys_t* p_sys = p_access->p_sys;
     int i_result = VLC_EGENERIC;
@@ -144,7 +144,7 @@ bailout:
 }
 
 
-static int AuthPublicKey( access_t *p_access, const char *psz_home, const char *psz_username )
+static int AuthPublicKey( stream_t *p_access, const char *psz_home, const char *psz_username )
 {
     access_sys_t* p_sys = p_access->p_sys;
     int i_result = VLC_EGENERIC;
@@ -180,7 +180,7 @@ static int AuthPublicKey( access_t *p_access, const char *psz_home, const char *
  */
 static int Open( vlc_object_t* p_this )
 {
-    access_t*   p_access = (access_t*)p_this;
+    stream_t*   p_access = (stream_t*)p_this;
     access_sys_t* p_sys;
     vlc_url_t credential_url;
     vlc_credential credential;
@@ -439,7 +439,7 @@ error:
 /* Close: quit the module */
 static void Close( vlc_object_t* p_this )
 {
-    access_t*   p_access = (access_t*)p_this;
+    stream_t*   p_access = (stream_t*)p_this;
     access_sys_t* p_sys = p_access->p_sys;
 
     if( p_sys->file )
@@ -455,7 +455,7 @@ static void Close( vlc_object_t* p_this )
 }
 
 
-static ssize_t Read( access_t *p_access, void *buf, size_t len )
+static ssize_t Read( stream_t *p_access, void *buf, size_t len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -470,7 +470,7 @@ static ssize_t Read( access_t *p_access, void *buf, size_t len )
 }
 
 
-static int Seek( access_t* p_access, uint64_t i_pos )
+static int Seek( stream_t* p_access, uint64_t i_pos )
 {
     access_sys_t *sys = p_access->p_sys;
 
@@ -479,7 +479,7 @@ static int Seek( access_t* p_access, uint64_t i_pos )
 }
 
 
-static int Control( access_t* p_access, int i_query, va_list args )
+static int Control( stream_t* p_access, int i_query, va_list args )
 {
     access_sys_t *sys = p_access->p_sys;
     bool*       pb_bool;
@@ -530,7 +530,7 @@ static int Control( access_t* p_access, int i_query, va_list args )
  * Directory access
  *****************************************************************************/
 
-static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
+static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
 {
     access_sys_t *p_sys = p_access->p_sys;
     LIBSSH2_SFTP_ATTRIBUTES attrs;

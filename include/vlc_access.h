@@ -40,7 +40,7 @@
  *
  * In case of redirection, the access open function should clean up (as in
  * normal failure case), store the heap-allocated redirection URL in
- * access_t.psz_url, and return this value.
+ * stream_t.psz_url, and return this value.
  */
 #define VLC_ACCESS_REDIRECT VLC_ETIMEOUT
 
@@ -54,7 +54,7 @@
  * \param mrl media resource location to read
  * \return a new access object on success, NULL on failure
  */
-VLC_API access_t *vlc_access_NewMRL(vlc_object_t *obj, const char *mrl);
+VLC_API stream_t *vlc_access_NewMRL(vlc_object_t *obj, const char *mrl);
 
 /**
  * \defgroup access_helper Access Helpers
@@ -64,7 +64,7 @@ VLC_API access_t *vlc_access_NewMRL(vlc_object_t *obj, const char *mrl);
 /**
  * Default pf_control callback for directory accesses.
  */
-VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list args );
+VLC_API int access_vaDirectoryControlHelper( stream_t *p_access, int i_query, va_list args );
 
 #define ACCESS_SET_CALLBACKS( read, block, control, seek ) \
     do { \
@@ -97,7 +97,7 @@ struct access_fsdir
  * \param p_node node that will be used to add items
  */
 VLC_API void access_fsdir_init(struct access_fsdir *p_fsdir,
-                               access_t *p_access, input_item_node_t *p_node);
+                               stream_t *p_access, input_item_node_t *p_node);
 
 /**
  * Finish adding items to the node

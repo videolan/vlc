@@ -33,12 +33,12 @@
 #include <vlc_url.h>
 #include <vlc_tls.h>
 
-static ssize_t Read(access_t *access, void *buf, size_t len)
+static ssize_t Read(stream_t *access, void *buf, size_t len)
 {
     return vlc_tls_Read(access->p_sys, buf, len, false);
 }
 
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control( stream_t *p_access, int i_query, va_list args )
 {
     bool    *pb_bool;
     int64_t *pi_64;
@@ -77,7 +77,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
 static int Open(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     vlc_tls_t *sock;
     vlc_url_t url;
 
@@ -104,7 +104,7 @@ static int Open(vlc_object_t *obj)
 
 static void Close( vlc_object_t *p_this )
 {
-    access_t *access = (access_t *)p_this;
+    stream_t *access = (stream_t *)p_this;
 
     vlc_tls_SessionDelete(access->p_sys);
 }

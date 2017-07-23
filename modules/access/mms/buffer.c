@@ -107,7 +107,7 @@ void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
     p_buf->i_data += i_mem;
 }
 
-void var_buffer_addUTF16( access_t  *p_access, var_buffer_t *p_buf, const char *p_str )
+void var_buffer_addUTF16( stream_t  *p_access, var_buffer_t *p_buf, const char *p_str )
 {
     uint16_t *p_out;
     size_t i_out;

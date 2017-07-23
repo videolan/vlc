@@ -32,7 +32,7 @@
 void stream_CommonDelete( stream_t *s );
 
 /**
- * This function creates a stream_t with an access_t back-end.
+ * This function creates a raw stream_t from an URL.
  */
 stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, bool, const char *);
 

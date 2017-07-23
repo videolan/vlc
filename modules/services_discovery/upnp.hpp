@@ -139,7 +139,7 @@ private:
 class MediaServer
 {
 public:
-    MediaServer( access_t* p_access, input_item_node_t* node );
+    MediaServer( stream_t* p_access, input_item_node_t* node );
     ~MediaServer();
     bool fetchContents();
 
@@ -157,7 +157,7 @@ private:
 private:
     char* m_psz_root;
     char* m_psz_objectId;
-    access_t* m_access;
+    stream_t* m_access;
     input_item_node_t* m_node;
 };
 

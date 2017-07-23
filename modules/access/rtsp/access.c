@@ -58,9 +58,9 @@ vlc_module_end ()
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static block_t *BlockRead( access_t *, bool * );
-static int     Seek( access_t *, uint64_t );
-static int     Control( access_t *, int, va_list );
+static block_t *BlockRead( stream_t *, bool * );
+static int     Seek( stream_t *, uint64_t );
+static int     Control( stream_t *, int, va_list );
 
 struct access_sys_t
 {
@@ -76,7 +76,7 @@ struct access_sys_t
  *****************************************************************************/
 static int RtspConnect( void *p_userdata, char *psz_server, int i_port )
 {
-    access_t *p_access = (access_t *)p_userdata;
+    stream_t *p_access = (stream_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
     /* Open connection */
@@ -94,7 +94,7 @@ static int RtspConnect( void *p_userdata, char *psz_server, int i_port )
 
 static int RtspDisconnect( void *p_userdata )
 {
-    access_t *p_access = (access_t *)p_userdata;
+    stream_t *p_access = (stream_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
     net_Close( p_sys->fd );
@@ -103,7 +103,7 @@ static int RtspDisconnect( void *p_userdata )
 
 static int RtspRead( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 {
-    access_t *p_access = (access_t *)p_userdata;
+    stream_t *p_access = (stream_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
     return net_Read( p_access, p_sys->fd, p_buffer, i_buffer );
@@ -111,7 +111,7 @@ static int RtspRead( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 
 static int RtspReadLine( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 {
-    access_t *p_access = (access_t *)p_userdata;
+    stream_t *p_access = (stream_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
     char *psz = net_Gets( p_access, p_sys->fd );
@@ -128,7 +128,7 @@ static int RtspReadLine( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 static int RtspWrite( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 {
     VLC_UNUSED(i_buffer);
-    access_t *p_access = (access_t *)p_userdata;
+    stream_t *p_access = (stream_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
     //fprintf(stderr, "Write: %s", p_buffer);
@@ -143,7 +143,7 @@ static int RtspWrite( void *p_userdata, uint8_t *p_buffer, int i_buffer )
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    access_t *p_access = (access_t *)p_this;
+    stream_t *p_access = (stream_t *)p_this;
     access_sys_t *p_sys;
     char* psz_server = NULL;
     int i_result;
@@ -252,7 +252,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
+    stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_sys->p_rtsp ) rtsp_close( p_sys->p_rtsp );
@@ -263,7 +263,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static block_t *BlockRead( access_t *p_access, bool *restrict eof )
+static block_t *BlockRead( stream_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t *p_block;
@@ -291,7 +291,7 @@ static block_t *BlockRead( access_t *p_access, bool *restrict eof )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( access_t *p_access, uint64_t i_pos )
+static int Seek( stream_t *p_access, uint64_t i_pos )
 {
     VLC_UNUSED(p_access);
     VLC_UNUSED(i_pos);
@@ -301,7 +301,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control( stream_t *p_access, int i_query, va_list args )
 {
     switch( i_query )
     {

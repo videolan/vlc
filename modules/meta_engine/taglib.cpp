@@ -252,7 +252,7 @@ public:
     }
 
 private:
-    access_t* m_stream;
+    stream_t* m_stream;
     int64_t m_previousPos;
 };
 #endif /* TAGLIB_VERSION_1_11 */

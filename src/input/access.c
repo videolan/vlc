@@ -70,7 +70,7 @@ static void vlc_access_Destroy(stream_t *access)
 /*****************************************************************************
  * access_New:
  *****************************************************************************/
-static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
+static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
                             bool preparsing, const char *mrl)
 {
     char *redirv[MAX_REDIR];
@@ -147,7 +147,7 @@ error:
     return NULL;
 }
 
-access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
+stream_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
 {
     return access_New(parent, NULL, false, mrl);
 }
@@ -155,7 +155,7 @@ access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
 /*****************************************************************************
  * access_vaDirectoryControlHelper:
  *****************************************************************************/
-int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list args )
+int access_vaDirectoryControlHelper( stream_t *p_access, int i_query, va_list args )
 {
     VLC_UNUSED( p_access );
 
@@ -187,7 +187,7 @@ static int AStreamNoReadDir(stream_t *s, input_item_node_t *p_node)
 /* Block access */
 static block_t *AStreamReadBlock(stream_t *s, bool *restrict eof)
 {
-    access_t *access = s->p_sys;
+    stream_t *access = s->p_sys;
     input_thread_t *input = s->p_input;
     block_t * block;
 
@@ -219,7 +219,7 @@ static block_t *AStreamReadBlock(stream_t *s, bool *restrict eof)
 /* Read access */
 static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 {
-    access_t *access = s->p_sys;
+    stream_t *access = s->p_sys;
     input_thread_t *input = s->p_input;
 
     if (vlc_stream_Eof(access))
@@ -246,7 +246,7 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 /* Directory */
 static int AStreamReadDir(stream_t *s, input_item_node_t *p_node)
 {
-    access_t *access = s->p_sys;
+    stream_t *access = s->p_sys;
 
     return access->pf_readdir(access, p_node);
 }
@@ -254,21 +254,21 @@ static int AStreamReadDir(stream_t *s, input_item_node_t *p_node)
 /* Common */
 static int AStreamSeek(stream_t *s, uint64_t offset)
 {
-    access_t *access = s->p_sys;
+    stream_t *access = s->p_sys;
 
     return vlc_stream_Seek(access, offset);
 }
 
 static int AStreamControl(stream_t *s, int cmd, va_list args)
 {
-    access_t *access = s->p_sys;
+    stream_t *access = s->p_sys;
 
     return vlc_stream_vaControl(access, cmd, args);
 }
 
 static void AStreamDestroy(stream_t *s)
 {
-    access_t *access = s->p_sys;
+    stream_t *access = s->p_sys;
 
     vlc_stream_Delete(access);
 }
@@ -280,7 +280,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     if (unlikely(s == NULL))
         return NULL;
 
-    access_t *access = access_New(VLC_OBJECT(s), input, preparsing, url);
+    stream_t *access = access_New(VLC_OBJECT(s), input, preparsing, url);
     if (access == NULL)
     {
         stream_CommonDelete(s);
@@ -629,7 +629,7 @@ static void fsdir_attach_slaves(struct access_fsdir *p_fsdir)
 }
 
 void access_fsdir_init(struct access_fsdir *p_fsdir,
-                       access_t *p_access, input_item_node_t *p_node)
+                       stream_t *p_access, input_item_node_t *p_node)
 {
     p_fsdir->p_node = p_node;
     p_fsdir->b_show_hiddenfiles = var_InheritBool(p_access, "show-hiddenfiles");

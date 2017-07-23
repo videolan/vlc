@@ -51,22 +51,22 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int  MMSHOpen  ( access_t * );
-void MMSHClose ( access_t * );
+int  MMSHOpen  ( stream_t * );
+void MMSHClose ( stream_t * );
 
-static block_t *Block( access_t *p_access, bool * );
-static int  Seek( access_t *, uint64_t );
-static int  Control( access_t *, int, va_list );
+static block_t *Block( stream_t *p_access, bool * );
+static int  Seek( stream_t *, uint64_t );
+static int  Control( stream_t *, int, va_list );
 
-static int  Describe( access_t  *, char **ppsz_location );
-static int  Start( access_t *, uint64_t );
-static void Stop( access_t * );
+static int  Describe( stream_t  *, char **ppsz_location );
+static int  Start( stream_t *, uint64_t );
+static void Stop( stream_t * );
 
-static int  GetPacket( access_t *, chunk_t * );
-static void GetHeader( access_t *p_access, int i_content_length );
+static int  GetPacket( stream_t *, chunk_t * );
+static void GetHeader( stream_t *p_access, int i_content_length );
 
-static int Restart( access_t * );
-static int Reset( access_t * );
+static int Restart( stream_t * );
+static int Reset( stream_t * );
 
 //#define MMSH_USER_AGENT "NSPlayer/4.1.0.3856"
 #define MMSH_USER_AGENT "NSPlayer/7.10.0.3059"
@@ -74,7 +74,7 @@ static int Reset( access_t * );
 /****************************************************************************
  * Open: connect to ftp server and ask for file
  ****************************************************************************/
-int MMSHOpen( access_t *p_access )
+int MMSHOpen( stream_t *p_access )
 {
     access_sys_t    *p_sys = calloc( 1, sizeof( *p_sys ) );
     char            *psz_location = NULL;
@@ -161,7 +161,7 @@ error:
 /*****************************************************************************
  * Close: free unused data structures
  *****************************************************************************/
-void  MMSHClose ( access_t *p_access )
+void  MMSHClose ( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -178,7 +178,7 @@ void  MMSHClose ( access_t *p_access )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control( stream_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool   *pb_bool;
@@ -282,7 +282,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static int Seek( access_t *p_access, uint64_t i_pos )
+static int Seek( stream_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     chunk_t      ck;
@@ -318,7 +318,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 /*****************************************************************************
  * Block:
  *****************************************************************************/
-static block_t *Block( access_t *p_access, bool *restrict eof )
+static block_t *Block( stream_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     const unsigned i_packet_min = p_sys->asfh.i_min_data_packet_size;
@@ -389,7 +389,7 @@ static block_t *Block( access_t *p_access, bool *restrict eof )
 }
 
 /* */
-static int Restart( access_t *p_access )
+static int Restart( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char *psz_location = NULL;
@@ -418,7 +418,7 @@ static int Restart( access_t *p_access )
     }
     return VLC_SUCCESS;
 }
-static int Reset( access_t *p_access )
+static int Reset( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     asf_header_t old_asfh = p_sys->asfh;
@@ -516,7 +516,7 @@ static void WriteRequestLine( const access_sys_t *sys,
     vlc_memstream_printf( stream, "User-Agent: %s\r\n", MMSH_USER_AGENT );
 }
 
-static int OpenConnection( access_t *p_access,
+static int OpenConnection( stream_t *p_access,
                            struct vlc_memstream *restrict stream )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -555,7 +555,7 @@ static int OpenConnection( access_t *p_access,
 /*****************************************************************************
  * Describe:
  *****************************************************************************/
-static int Describe( access_t  *p_access, char **ppsz_location )
+static int Describe( stream_t  *p_access, char **ppsz_location )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char         *psz_location = NULL;
@@ -739,7 +739,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void GetHeader( access_t *p_access, int i_content_length )
+static void GetHeader( stream_t *p_access, int i_content_length )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_read_content = 0;
@@ -771,7 +771,7 @@ static void GetHeader( access_t *p_access, int i_content_length )
 /*****************************************************************************
  * Start stream
  ****************************************************************************/
-static int Start( access_t *p_access, uint64_t i_pos )
+static int Start( stream_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int  i_streams = 0;
@@ -871,7 +871,7 @@ static int Start( access_t *p_access, uint64_t i_pos )
 /*****************************************************************************
  * closing stream
  *****************************************************************************/
-static void Stop( access_t *p_access )
+static void Stop( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -886,7 +886,7 @@ static void Stop( access_t *p_access )
 /*****************************************************************************
  * get packet
  *****************************************************************************/
-static int GetPacket( access_t * p_access, chunk_t *p_ck )
+static int GetPacket( stream_t * p_access, chunk_t *p_ck )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int restsize;

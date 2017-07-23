@@ -971,7 +971,7 @@ int Upnp_i11e_cb::run( Upnp_EventType eventType, void *p_event, void *p_cookie )
     return 0;
 }
 
-MediaServer::MediaServer( access_t *p_access, input_item_node_t *node )
+MediaServer::MediaServer( stream_t *p_access, input_item_node_t *node )
     : m_psz_objectId( NULL )
     , m_access( p_access )
     , m_node( node )
@@ -1250,7 +1250,7 @@ bool MediaServer::fetchContents()
     return true;
 }
 
-static int ReadDirectory( access_t *p_access, input_item_node_t* p_node )
+static int ReadDirectory( stream_t *p_access, input_item_node_t* p_node )
 {
     MediaServer server( p_access, p_node );
 
@@ -1261,7 +1261,7 @@ static int ReadDirectory( access_t *p_access, input_item_node_t* p_node )
 
 static int Open( vlc_object_t *p_this )
 {
-    access_t* p_access = (access_t*)p_this;
+    stream_t* p_access = (stream_t*)p_this;
     access_sys_t* p_sys = new(std::nothrow) access_sys_t;
     if ( unlikely( !p_sys ) )
         return VLC_ENOMEM;
@@ -1282,7 +1282,7 @@ static int Open( vlc_object_t *p_this )
 
 static void Close( vlc_object_t* p_this )
 {
-    access_t* p_access = (access_t*)p_this;
+    stream_t* p_access = (stream_t*)p_this;
     access_sys_t *sys = (access_sys_t *)p_access->p_sys;
 
     sys->p_upnp->release( false );

@@ -401,7 +401,7 @@ error:
 }
 #endif /* HAVE_LIBCDDB */
 
-static void AccessGetMeta(access_t *access, vlc_meta_t *meta)
+static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
 {
     access_sys_t *sys = access->p_sys;
     const char *str;
@@ -466,7 +466,7 @@ static void AccessGetMeta(access_t *access, vlc_meta_t *meta)
 #endif
 }
 
-static int ReadDir(access_t *access, input_item_node_t *node)
+static int ReadDir(stream_t *access, input_item_node_t *node)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -594,7 +594,7 @@ static int ReadDir(access_t *access, input_item_node_t *node)
     return VLC_SUCCESS;
 }
 
-static int AccessControl(access_t *access, int query, va_list args)
+static int AccessControl(stream_t *access, int query, va_list args)
 {
     if (query == STREAM_GET_META)
     {
@@ -606,7 +606,7 @@ static int AccessControl(access_t *access, int query, va_list args)
 
 static int AccessOpen(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     unsigned track;
 
     vcddev_t *dev = DiscOpen(obj, access->psz_location, access->psz_filepath,
@@ -676,7 +676,7 @@ error:
 
 static void AccessClose(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     access_sys_t *sys = access->p_sys;
 
     for (int i = 0; i < sys->cdtextc; i++)

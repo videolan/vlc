@@ -48,9 +48,9 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t Read   (access_t *, void *, size_t);
-static int     Seek   (access_t *, uint64_t);
-static int     Control(access_t *, int, va_list);
+static ssize_t Read   (stream_t *, void *, size_t);
+static int     Seek   (stream_t *, uint64_t);
+static int     Control(stream_t *, int, va_list);
 static ssize_t Write(sout_access_out_t *, block_t *);
 static int     OutControl(sout_access_out_t *, int, va_list);
 static int     OutSeek (sout_access_out_t *, off_t);
@@ -82,7 +82,7 @@ struct sout_access_out_sys_t {
 
 int OpenAvio(vlc_object_t *object)
 {
-    access_t *access = (access_t*)object;
+    stream_t *access = (stream_t*)object;
     access_sys_t *sys = vlc_malloc(object, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
@@ -197,7 +197,7 @@ int OutOpenAvio(vlc_object_t *object)
 
 void CloseAvio(vlc_object_t *object)
 {
-    access_t *access = (access_t*)object;
+    stream_t *access = (stream_t*)object;
     access_sys_t *sys = access->p_sys;
 
     avio_close(sys->context);
@@ -211,7 +211,7 @@ void OutCloseAvio(vlc_object_t *object)
     avio_close(sys->context);
 }
 
-static ssize_t Read(access_t *access, void *data, size_t size)
+static ssize_t Read(stream_t *access, void *data, size_t size)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -255,7 +255,7 @@ error:
     return i_write;
 }
 
-static int Seek(access_t *access, uint64_t position)
+static int Seek(stream_t *access, uint64_t position)
 {
     access_sys_t *sys = access->p_sys;
     int ret;
@@ -305,7 +305,7 @@ static int OutControl(sout_access_out_t *p_access, int i_query, va_list args)
     return VLC_SUCCESS;
 }
 
-static int Control(access_t *access, int query, va_list args)
+static int Control(stream_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
     bool *b;

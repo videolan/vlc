@@ -52,7 +52,7 @@ static const unsigned char xor_table[] = {
 #define LE_32C(x,y) do {uint32_t in=y; *(uint32_t *)(x)=GetDWLE(&in);} while(0)
 #define MAX(x,y) ((x>y) ? x : y)
 
-static void hash(access_t *p_access, char *field, char *param)
+static void hash(stream_t *p_access, char *field, char *param)
 {
   uint32_t a, b, c, d;
 
@@ -209,7 +209,7 @@ static void hash(access_t *p_access, char *field, char *param)
   LE_32C(field+12, d);
 }
 
-static void call_hash (access_t * p_access, char *key, char *challenge, unsigned int len) {
+static void call_hash (stream_t * p_access, char *key, char *challenge, unsigned int len) {
   uint8_t *ptr1, *ptr2;
   uint32_t a, b, c, d, tmp;
 
@@ -250,7 +250,7 @@ static void call_hash (access_t * p_access, char *key, char *challenge, unsigned
   memcpy(key+b+24, challenge+c, len-c);
 }
 
-static void calc_response (access_t *p_access, char *result, char *field) {
+static void calc_response (stream_t *p_access, char *result, char *field) {
   char buf1[128];
   char buf2[128];
   int i;
@@ -275,7 +275,7 @@ static void calc_response (access_t *p_access, char *result, char *field) {
   memcpy (result, field, 16);
 }
 
-static void calc_response_string (access_t *p_access, char *result, char *challenge) {
+static void calc_response_string (stream_t *p_access, char *result, char *challenge) {
 
   char field[128] = {
     0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
@@ -302,7 +302,7 @@ static void calc_response_string (access_t *p_access, char *result, char *challe
   }
 }
 
-static void real_calc_response_and_checksum (access_t *p_access, char *response, char *chksum, char *challenge) {
+static void real_calc_response_and_checksum (stream_t *p_access, char *response, char *chksum, char *challenge) {
 
   int   ch_len, resp_len;
   int   i;
@@ -358,7 +358,7 @@ static void real_calc_response_and_checksum (access_t *p_access, char *response,
  * takes a MLTI-Chunk and a rule number got from match_asm_rule,
  * returns a pointer to selected data and number of bytes in that.
  */
-static int select_mlti_data(access_t *p_access, const char *mlti_chunk, int mlti_size, int selection, char **out) {
+static int select_mlti_data(stream_t *p_access, const char *mlti_chunk, int mlti_size, int selection, char **out) {
 
   int numrules, codec, size;
 
@@ -415,7 +415,7 @@ static int select_mlti_data(access_t *p_access, const char *mlti_chunk, int mlti
  * looking at stream description.
  */
 
-static rmff_header_t *real_parse_sdp(access_t *p_access, char *data, char **stream_rules, uint32_t bandwidth) {
+static rmff_header_t *real_parse_sdp(stream_t *p_access, char *data, char **stream_rules, uint32_t bandwidth) {
 
   sdpplin_t *desc = NULL;
   rmff_header_t *header = NULL;
@@ -534,7 +534,7 @@ error:
 
 int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph) {
 
-  access_t *p_access = (access_t*)rtsp_session->p_userdata;
+  stream_t *p_access = (stream_t*)rtsp_session->p_userdata;
   int n=1;
   uint8_t header[8];
   int size;
@@ -607,7 +607,7 @@ int real_get_rdt_chunk(rtsp_client_t *rtsp_session, rmff_pheader_t *ph,
 //! maximum size of the rtsp description, must be < INT_MAX
 #define MAX_DESC_BUF (20 * 1024 * 1024)
 rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandwidth) {
-  access_t *p_access = (access_t *) rtsp_session->p_userdata;
+  stream_t *p_access = (stream_t *) rtsp_session->p_userdata;
 
   char *description=NULL;
   char *session_id=NULL;

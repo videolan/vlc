@@ -54,9 +54,9 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t Read(access_t *, void *, size_t);
-static int     Seek(access_t *, uint64_t);
-static int     Control(access_t *, int, va_list);
+static ssize_t Read(stream_t *, void *, size_t);
+static int     Seek(stream_t *, uint64_t);
+static int     Control(stream_t *, int, va_list);
 
 struct access_sys_t
 {
@@ -67,7 +67,7 @@ struct access_sys_t
 /* */
 static int Open(vlc_object_t *object)
 {
-    access_t     *access = (access_t *)object;
+    stream_t     *access = (stream_t *)object;
 
     input_thread_t *input = access->p_input;
     if (!input)
@@ -101,14 +101,14 @@ static int Open(vlc_object_t *object)
 /* */
 static void Close(vlc_object_t *object)
 {
-    access_t     *access = (access_t *)object;
+    stream_t     *access = (stream_t *)object;
     access_sys_t *sys = access->p_sys;
 
     vlc_input_attachment_Delete(sys->attachment);
 }
 
 /* */
-static ssize_t Read(access_t *access, void *buffer, size_t size)
+static ssize_t Read(stream_t *access, void *buffer, size_t size)
 {
     access_sys_t *sys = access->p_sys;
     input_attachment_t *a = sys->attachment;
@@ -123,7 +123,7 @@ static ssize_t Read(access_t *access, void *buffer, size_t size)
 }
 
 /* */
-static int Seek(access_t *access, uint64_t position)
+static int Seek(stream_t *access, uint64_t position)
 {
     access_sys_t *sys = access->p_sys;
     input_attachment_t *a = sys->attachment;
@@ -136,7 +136,7 @@ static int Seek(access_t *access, uint64_t position)
 }
 
 /* */
-static int Control(access_t *access, int query, va_list args)
+static int Control(stream_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
 

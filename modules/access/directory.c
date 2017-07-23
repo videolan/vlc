@@ -51,7 +51,7 @@ struct access_sys_t
 /*****************************************************************************
  * DirInit: Init the directory access with a directory stream
  *****************************************************************************/
-int DirInit (access_t *access, DIR *dir)
+int DirInit (stream_t *access, DIR *dir)
 {
     access_sys_t *sys = vlc_malloc(VLC_OBJECT(access), sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -85,7 +85,7 @@ error:
  *****************************************************************************/
 int DirOpen (vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
 
     if (access->psz_filepath == NULL)
         return VLC_EGENERIC;
@@ -102,14 +102,14 @@ int DirOpen (vlc_object_t *obj)
  *****************************************************************************/
 void DirClose(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     access_sys_t *sys = access->p_sys;
 
     free(sys->base_uri);
     closedir(sys->dir);
 }
 
-int DirRead (access_t *access, input_item_node_t *node)
+int DirRead (stream_t *access, input_item_node_t *node)
 {
     access_sys_t *sys = access->p_sys;
     const char *entry;

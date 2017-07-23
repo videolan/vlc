@@ -214,7 +214,7 @@ static void rtsp_schedule_standard( rtsp_client_t *rtsp )
 
 static int rtsp_get_answers( rtsp_client_t *rtsp )
 {
-    access_t *p_access = (access_t*)rtsp->p_userdata;
+    stream_t *p_access = (stream_t*)rtsp->p_userdata;
     char *answer = NULL;
     unsigned int answer_seq;
     char **answer_ptr = rtsp->p_private->answers;
@@ -649,7 +649,7 @@ char *rtsp_get_mrl( rtsp_client_t *rtsp )
 
 void rtsp_schedule_field( rtsp_client_t *rtsp, const char *data )
 {
-    access_t * p_access = (access_t*)rtsp->p_userdata;
+    stream_t * p_access = (stream_t*)rtsp->p_userdata;
     char **pptr;
     int i = 0;
 

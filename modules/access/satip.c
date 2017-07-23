@@ -148,7 +148,7 @@ static int parse_port(char *str, uint16_t *port)
     return 0;
 }
 
-static int parse_transport(access_t *access, char *request_line) {
+static int parse_transport(stream_t *access, char *request_line) {
     access_sys_t *sys = access->p_sys;
     char *state;
     char *tok;
@@ -262,7 +262,7 @@ error:
 }
 
 #define skip_whitespace(x) while(*x == ' ') x++
-static enum rtsp_result rtsp_handle(access_t *access, bool *interrupted) {
+static enum rtsp_result rtsp_handle(stream_t *access, bool *interrupted) {
     access_sys_t *sys = access->p_sys;
     uint8_t buffer[512];
     int rtsp_result = 0;
@@ -336,7 +336,7 @@ static void satip_cleanup_blocks(void *data)
 }
 #endif
 
-static int check_rtp_seq(access_t *access, block_t *block)
+static int check_rtp_seq(stream_t *access, block_t *block)
 {
     access_sys_t *sys = access->p_sys;
     uint16_t seq_nr = block->p_buffer[2] << 8 | block->p_buffer[3];
@@ -358,7 +358,7 @@ static int check_rtp_seq(access_t *access, block_t *block)
 }
 
 static void satip_teardown(void *data) {
-    access_t *access = data;
+    stream_t *access = data;
     access_sys_t *sys = access->p_sys;
     int ret;
 
@@ -422,7 +422,7 @@ static void satip_teardown(void *data) {
 
 #define RECV_TIMEOUT 2 * 1000 * 1000
 static void *satip_thread(void *data) {
-    access_t *access = data;
+    stream_t *access = data;
     access_sys_t *sys = access->p_sys;
     int sock = sys->udp_sock;
     mtime_t last_recv = mdate();
@@ -535,7 +535,7 @@ static void *satip_thread(void *data) {
     return NULL;
 }
 
-static block_t* satip_block(access_t *access, bool *restrict eof) {
+static block_t* satip_block(stream_t *access, bool *restrict eof) {
     access_sys_t *sys = access->p_sys;
     block_t *block;
 
@@ -555,7 +555,7 @@ static block_t* satip_block(access_t *access, bool *restrict eof) {
     return block;
 }
 
-static int satip_control(access_t *access, int i_query, va_list args) {
+static int satip_control(stream_t *access, int i_query, va_list args) {
     bool *pb_bool;
     int64_t *pi_64;
 
@@ -583,7 +583,7 @@ static int satip_control(access_t *access, int i_query, va_list args) {
 /* Bind two adjacent free ports, of which the first one is even (for RTP data)
  * and the second is odd (RTCP). This is a requirement of the satip
  * specification */
-static int satip_bind_ports(access_t *access)
+static int satip_bind_ports(stream_t *access)
 {
     access_sys_t *sys = access->p_sys;
     uint8_t rnd;
@@ -620,7 +620,7 @@ static int satip_bind_ports(access_t *access)
 
 static int satip_open(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     access_sys_t *sys;
     vlc_url_t url;
 
@@ -809,7 +809,7 @@ error:
 
 static void satip_close(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     access_sys_t *sys = access->p_sys;
 
     vlc_cancel(sys->thread);

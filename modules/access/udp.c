@@ -86,15 +86,15 @@ struct access_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *BlockUDP( access_t *, bool * );
-static int Control( access_t *, int, va_list );
+static block_t *BlockUDP( stream_t *, bool * );
+static int Control( stream_t *, int, va_list );
 
 /*****************************************************************************
  * Open: open the socket
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
+    stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *sys;
 
     if( p_access->b_preparsing )
@@ -182,7 +182,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
+    stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *sys = p_access->p_sys;
 
     net_Close( sys->fd );
@@ -191,7 +191,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control( stream_t *p_access, int i_query, va_list args )
 {
     bool    *pb_bool;
     int64_t *pi_64;
@@ -221,7 +221,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * BlockUDP:
  *****************************************************************************/
-static block_t *BlockUDP(access_t *access, bool *restrict eof)
+static block_t *BlockUDP(stream_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 

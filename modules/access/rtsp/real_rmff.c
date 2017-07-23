@@ -511,7 +511,7 @@ void rmff_print_header(rmff_header_t *h) {
   }
 }
 
-void rmff_fix_header(access_t *p_access, rmff_header_t *h) {
+void rmff_fix_header(stream_t *p_access, rmff_header_t *h) {
 
   unsigned int num_headers=0;
   unsigned int header_size=0;

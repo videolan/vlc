@@ -134,20 +134,20 @@ struct access_sys_t
 #define FILE_SIZE(pos)    ARRAY_VAL(p_sys->file_sizes, pos)
 #define FILE_COUNT        (unsigned)p_sys->file_sizes.i_size
 
-static int Control( access_t *, int, va_list );
-static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len );
-static int Seek( access_t *p_access, uint64_t i_pos);
-static void FindSeekpoint( access_t *p_access );
-static bool ScanDirectory( access_t *p_access );
-static char *GetFilePath( access_t *p_access, unsigned i_file );
-static bool ImportNextFile( access_t *p_access );
-static bool SwitchFile( access_t *p_access, unsigned i_file );
+static int Control( stream_t *, int, va_list );
+static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len );
+static int Seek( stream_t *p_access, uint64_t i_pos);
+static void FindSeekpoint( stream_t *p_access );
+static bool ScanDirectory( stream_t *p_access );
+static char *GetFilePath( stream_t *p_access, unsigned i_file );
+static bool ImportNextFile( stream_t *p_access );
+static bool SwitchFile( stream_t *p_access, unsigned i_file );
 static void OptimizeForRead( int fd );
-static void UpdateFileSize( access_t *p_access );
-static FILE *OpenRelativeFile( access_t *p_access, const char *psz_file );
+static void UpdateFileSize( stream_t *p_access );
+static FILE *OpenRelativeFile( stream_t *p_access, const char *psz_file );
 static bool ReadLine( char **ppsz_line, size_t *pi_size, FILE *p_file );
-static void ImportMeta( access_t *p_access );
-static void ImportMarks( access_t *p_access );
+static void ImportMeta( stream_t *p_access );
+static void ImportMarks( stream_t *p_access );
 static bool ReadIndexRecord( FILE *p_file, bool b_ts, int64_t i_frame,
                             uint64_t *pi_offset, uint16_t *pi_file_num );
 static int64_t ParseFrameNumber( const char *psz_line, float fps );
@@ -158,7 +158,7 @@ static const char *BaseName( const char *psz_path );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    access_t *p_access = (access_t*)p_this;
+    stream_t *p_access = (stream_t*)p_this;
 
     if( !p_access->psz_filepath )
         return VLC_EGENERIC;
@@ -216,7 +216,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    access_t *p_access = (access_t*)p_this;
+    stream_t *p_access = (stream_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_sys->fd != -1 )
@@ -234,7 +234,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Determine format and import files
  *****************************************************************************/
-static bool ScanDirectory( access_t *p_access )
+static bool ScanDirectory( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -263,7 +263,7 @@ static bool ScanDirectory( access_t *p_access )
 /*****************************************************************************
  * Control input stream
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control( stream_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     input_title_t ***ppp_title;
@@ -341,7 +341,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * Read and concatenate files
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
+static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -388,7 +388,7 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
 /*****************************************************************************
  * Seek to a specific location in a file
  *****************************************************************************/
-static int Seek( access_t *p_access, uint64_t i_pos )
+static int Seek( stream_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -419,7 +419,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 /*****************************************************************************
  * Change the chapter index to match the current position
  *****************************************************************************/
-static void FindSeekpoint( access_t *p_access )
+static void FindSeekpoint( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     if( !p_sys->p_marks )
@@ -445,7 +445,7 @@ static void FindSeekpoint( access_t *p_access )
 /*****************************************************************************
  * Returns the path of a certain part
  *****************************************************************************/
-static char *GetFilePath( access_t *p_access, unsigned i_file )
+static char *GetFilePath( stream_t *p_access, unsigned i_file )
 {
     access_sys_t *sys = p_access->p_sys;
     char *psz_path;
@@ -461,7 +461,7 @@ static char *GetFilePath( access_t *p_access, unsigned i_file )
 /*****************************************************************************
  * Check if another part exists and import it
  *****************************************************************************/
-static bool ImportNextFile( access_t *p_access )
+static bool ImportNextFile( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -495,7 +495,7 @@ static bool ImportNextFile( access_t *p_access )
 /*****************************************************************************
  * Close the current file and open another
  *****************************************************************************/
-static bool SwitchFile( access_t *p_access, unsigned i_file )
+static bool SwitchFile( stream_t *p_access, unsigned i_file )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -576,7 +576,7 @@ static void OptimizeForRead( int fd )
 /*****************************************************************************
  * Fix size if the (last) part is still growing
  *****************************************************************************/
-static void UpdateFileSize( access_t *p_access )
+static void UpdateFileSize( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct stat st;
@@ -598,7 +598,7 @@ static void UpdateFileSize( access_t *p_access )
 /*****************************************************************************
  * Open file relative to base directory for reading.
  *****************************************************************************/
-static FILE *OpenRelativeFile( access_t *p_access, const char *psz_file )
+static FILE *OpenRelativeFile( stream_t *p_access, const char *psz_file )
 {
     access_sys_t *sys = p_access->p_sys;
 
@@ -642,7 +642,7 @@ static bool ReadLine( char **ppsz_line, size_t *pi_size, FILE *p_file )
 /*****************************************************************************
  * Import meta data
  *****************************************************************************/
-static void ImportMeta( access_t *p_access )
+static void ImportMeta( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -785,7 +785,7 @@ static void ImportMeta( access_t *p_access )
 /*****************************************************************************
  * Import cut marks and convert them to seekpoints (chapters).
  *****************************************************************************/
-static void ImportMarks( access_t *p_access )
+static void ImportMarks( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 

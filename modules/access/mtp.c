@@ -67,16 +67,16 @@ vlc_module_end()
  * Exported prototypes
  *****************************************************************************/
 
-static int  Seek( access_t *, uint64_t );
-static ssize_t Read( access_t *, void *, size_t );
-static int  Control( access_t *, int, va_list );
+static int  Seek( stream_t *, uint64_t );
+static ssize_t Read( stream_t *, void *, size_t );
+static int  Control( stream_t *, int, va_list );
 
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    access_t     *p_access = ( access_t* )p_this;
+    stream_t     *p_access = ( stream_t* )p_this;
     uint32_t i_bus;
     uint8_t i_dev;
     uint16_t i_product_id;
@@ -140,7 +140,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    access_t *p_access = ( access_t* )p_this;
+    stream_t *p_access = ( stream_t* )p_this;
     int fd = (intptr_t)p_access->p_sys;
 
     vlc_close ( fd );
@@ -149,7 +149,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
+static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
     int fd = (intptr_t)p_access->p_sys;
     ssize_t i_ret = read( fd, p_buffer, i_len );
@@ -178,7 +178,7 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( access_t *p_access, uint64_t i_pos )
+static int Seek( stream_t *p_access, uint64_t i_pos )
 {
     int fd = (intptr_t)p_access->p_sys;
 
@@ -190,7 +190,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+static int Control( stream_t *p_access, int i_query, va_list args )
 {
     int fd = (intptr_t)p_access->p_sys;
     bool   *pb_bool;

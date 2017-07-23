@@ -37,7 +37,7 @@ struct access_entry
 
 struct access_sys_t
 {
-    access_t *access;
+    stream_t *access;
     struct access_entry *next;
     struct access_entry *first;
     bool can_seek;
@@ -48,10 +48,10 @@ struct access_sys_t
     int64_t caching;
 };
 
-static access_t *GetAccess(access_t *access)
+static stream_t *GetAccess(stream_t *access)
 {
     access_sys_t *sys = access->p_sys;
-    access_t *a = sys->access;
+    stream_t *a = sys->access;
 
     if (a != NULL)
     {
@@ -74,9 +74,9 @@ static access_t *GetAccess(access_t *access)
     return a;
 }
 
-static ssize_t Read(access_t *access, void *buf, size_t len)
+static ssize_t Read(stream_t *access, void *buf, size_t len)
 {
-    access_t *a = GetAccess(access);
+    stream_t *a = GetAccess(access);
     if (a == NULL)
         return 0;
 
@@ -89,9 +89,9 @@ static ssize_t Read(access_t *access, void *buf, size_t len)
     return vlc_stream_ReadPartial(a, buf, len);
 }
 
-static block_t *Block(access_t *access, bool *restrict eof)
+static block_t *Block(stream_t *access, bool *restrict eof)
 {
-    access_t *a = GetAccess(access);
+    stream_t *a = GetAccess(access);
     if (a == NULL)
     {
         *eof = true;
@@ -101,7 +101,7 @@ static block_t *Block(access_t *access, bool *restrict eof)
     return vlc_stream_ReadBlock(a);
 }
 
-static int Seek(access_t *access, uint64_t position)
+static int Seek(stream_t *access, uint64_t position)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -115,7 +115,7 @@ static int Seek(access_t *access, uint64_t position)
 
     for (uint64_t offset = 0;;)
     {
-        access_t *a = GetAccess(access);
+        stream_t *a = GetAccess(access);
         if (a == NULL)
             break;
 
@@ -143,7 +143,7 @@ static int Seek(access_t *access, uint64_t position)
     return VLC_EGENERIC;
 }
 
-static int Control(access_t *access, int query, va_list args)
+static int Control(stream_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -182,7 +182,7 @@ static int Control(access_t *access, int query, va_list args)
 
 static int Open(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
 
     char *list = var_CreateGetNonEmptyString(access, "concat-list");
     if (list == NULL)
@@ -218,7 +218,7 @@ static int Open(vlc_object_t *obj)
         if (unlikely(e == NULL))
             break;
 
-        access_t *a = vlc_access_NewMRL(obj, mrl);
+        stream_t *a = vlc_access_NewMRL(obj, mrl);
         if (a == NULL)
         {
             msg_Err(access, "cannot concatenate location %s", mrl);
@@ -285,7 +285,7 @@ static int Open(vlc_object_t *obj)
 
 static void Close(vlc_object_t *obj)
 {
-    access_t *access = (access_t *)obj;
+    stream_t *access = (stream_t *)obj;
     access_sys_t *sys = access->p_sys;
 
     if (sys->access != NULL)

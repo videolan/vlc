@@ -40,7 +40,7 @@ static inline int line_length(char * data) {
   return strlen(data);
 }
 
-static int filter(access_t *p_access, const char *in, const char *filter, char **out, size_t outlen) {
+static int filter(stream_t *p_access, const char *in, const char *filter, char **out, size_t outlen) {
 
   int flen=strlen(filter);
   size_t len;
@@ -64,7 +64,7 @@ static int filter(access_t *p_access, const char *in, const char *filter, char *
   return 0;
 }
 
-static sdpplin_stream_t *sdpplin_parse_stream(access_t *p_access, char **data) {
+static sdpplin_stream_t *sdpplin_parse_stream(stream_t *p_access, char **data) {
 
   sdpplin_stream_t *desc;
   char* buf = NULL;
@@ -187,7 +187,7 @@ error:
 }
 
 
-sdpplin_t *sdpplin_parse(access_t *p_access, char *data)
+sdpplin_t *sdpplin_parse(stream_t *p_access, char *data)
 {
   sdpplin_t*        desc;
   sdpplin_stream_t* stream;
