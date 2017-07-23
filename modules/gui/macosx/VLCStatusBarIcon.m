@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCStatusBarIcon.m: Mac OS X module for vlc
+ * VLCStatusBarIcon.m: Status bar icon controller/delegate
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
