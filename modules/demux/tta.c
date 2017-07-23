@@ -256,7 +256,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     tmp += p_sys->pi_seektable[i];
                 }
-                vlc_stream_Seek( p_demux->s, tmp+p_sys->i_start );
+                if( vlc_stream_Seek( p_demux->s, tmp+p_sys->i_start ) )
+                    return VLC_EGENERIC;
                 p_sys->i_currentframe = i;
                 return VLC_SUCCESS;
             }
