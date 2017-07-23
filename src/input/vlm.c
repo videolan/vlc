@@ -378,7 +378,6 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
 static void* Manage( void* p_object )
 {
     vlm_t *vlm = (vlm_t*)p_object;
-    int j;
     time_t lastcheck, now, nextschedule = 0;
 
     time(&lastcheck);
@@ -409,7 +408,7 @@ static void* Manage( void* p_object )
         {
             vlm_media_sys_t *p_media = vlm->media[i];
 
-            for( j = 0; j < p_media->i_instance; )
+            for( int j = 0; j < p_media->i_instance; )
             {
                 vlm_media_instance_sys_t *p_instance = p_media->instance[j];
                 int state = INIT_S;
@@ -474,7 +473,7 @@ static void* Manage( void* p_object )
                 {
                     if( real_date > lastcheck )
                     {
-                        for( j = 0; j < vlm->schedule[i]->i_command; j++ )
+                        for( int j = 0; j < vlm->schedule[i]->i_command; j++ )
                         {
                             TAB_APPEND( i_scheduled_commands,
                                         ppsz_scheduled_commands,
