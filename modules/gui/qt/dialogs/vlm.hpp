@@ -140,6 +140,9 @@ public:
     static void ControlBroadcast( const QString&, int, unsigned int seek = 0 );
     static void EnableItem( const QString&, bool );
 
+    static void SaveConfig( const QString& );
+    static bool LoadConfig( const QString& );
+
     /* We don't have yet the accessors in the core, so the following is commented */
     //unsigned int NbMedia() { if( p_vlm ) return p_vlm->i_media; return 0; }
    /* vlm_media_t *GetMedia( int i )

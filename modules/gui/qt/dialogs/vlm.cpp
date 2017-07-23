@@ -273,10 +273,7 @@ bool VLMDialog::exportVLMConf()
 
     if( !saveVLMConfFileName.isEmpty() )
     {
-        vlm_message_t *message;
-        QString command = "save \"" + saveVLMConfFileName + "\"";
-        vlm_ExecuteCommand( p_vlm , qtu( command ) , &message );
-        vlm_MessageDelete( message );
+        VLMWrapper::SaveConfig( saveVLMConfFileName );
         return true;
     }
 
@@ -347,18 +344,13 @@ bool VLMDialog::importVLMConf()
 
     if( !openVLMConfFileName.isEmpty() )
     {
-        vlm_message_t *message;
-        int status;
-        QString command = "load \"" + openVLMConfFileName + "\"";
-        status = vlm_ExecuteCommand( p_vlm, qtu( command ) , &message );
-        vlm_MessageDelete( message );
-        if( status == 0 )
+        if( VLMWrapper::LoadConfig( openVLMConfFileName ) )
         {
             mediasPopulator();
         }
         else
         {
-            msg_Warn( p_intf, "Failed to import vlm configuration file : %s", qtu( command ) );
+            msg_Warn( p_intf, "Failed to import vlm configuration file : %s", qtu( openVLMConfFileName ) );
             return false;
         }
         return true;
@@ -892,6 +884,26 @@ void VLMWrapper::EditSchedule( const QString& name, const QString& input,
        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
        vlm_MessageDelete( message );
     }
+}
+
+void VLMWrapper::SaveConfig( const QString& filename )
+{
+    /* FIXME: escaping */
+    QString command = "save \"" + filename + "\"";
+    vlm_message_t *message;
+
+    vlm_ExecuteCommand( p_vlm , qtu( command ), &message );
+    vlm_MessageDelete( message );
+}
+
+bool VLMWrapper::LoadConfig( const QString& filename )
+{
+    /* FIXME: escaping */
+    QString command = "load \"" + filename + "\"";
+    vlm_message_t *message;
+    int status = vlm_ExecuteCommand( p_vlm, qtu( command ) , &message );
+    vlm_MessageDelete( message );
+    return status == 0;
 }
 
 void VLMDialog::toggleVisible()
