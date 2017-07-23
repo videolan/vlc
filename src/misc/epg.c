@@ -32,12 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_epg.h>
 
-static void dictionnary_free_value(void *val, void *obj)
-{
-    VLC_UNUSED(obj);
-    free((char *)val);
-}
-
 static void vlc_epg_event_Clean(vlc_epg_event_t *p_event)
 {
     for(int i=0; i<p_event->i_description_items; i++)
