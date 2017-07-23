@@ -437,15 +437,15 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 
     if( p_sys->i_icy_meta > 0 && p_sys->offset - p_sys->i_icy_offset > 0 )
     {
-        int64_t i_next = p_sys->i_icy_meta -
-                                    (p_sys->offset - p_sys->i_icy_offset ) % p_sys->i_icy_meta;
+        int i_next = p_sys->i_icy_meta -
+                   (p_sys->offset - p_sys->i_icy_offset) % p_sys->i_icy_meta;
 
         if( i_next == p_sys->i_icy_meta )
         {
             if( ReadICYMeta( p_access ) )
                 return 0;
         }
-        if( i_len > i_next )
+        if( i_len > (size_t)i_next )
             i_len = i_next;
     }
 
