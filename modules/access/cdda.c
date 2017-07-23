@@ -404,7 +404,6 @@ error:
 static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
 {
     access_sys_t *sys = access->p_sys;
-    const char *str;
 
     vlc_meta_SetTitle(meta, "Audio CD");
 
@@ -421,7 +420,7 @@ static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
 #ifdef HAVE_LIBCDDB
     if (sys->cddb != NULL)
     {
-        str = cddb_disc_get_title(sys->cddb);
+        char *str = cddb_disc_get_title(sys->cddb);
         if (NONEMPTY(str))
             vlc_meta_SetTitle(meta, str);
 
