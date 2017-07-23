@@ -95,6 +95,9 @@ DialogsProvider::~DialogsProvider()
     MediaInfoDialog::killInstance();
     MessagesDialog::killInstance();
     BookmarksDialog::killInstance();
+#ifdef ENABLE_VLM
+    VLMDialog::killInstance();
+#endif
     HelpDialog::killInstance();
 #ifdef UPDATE_CHECK
     UpdateDialog::killInstance();
