@@ -1248,7 +1248,7 @@ void EndVideoDec( vlc_object_t *obj )
 static void ffmpeg_InitCodec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_size = p_dec->fmt_in.i_extra;
+    size_t i_size = p_dec->fmt_in.i_extra;
 
     if( !i_size ) return;
 
@@ -1275,8 +1275,8 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
 
             while( psz < &p[p_sys->p_context->extradata_size - 8] )
             {
-                int i_size = GetDWBE( psz );
-                if( i_size <= 1 )
+                uint_fast32_t atom_size = GetDWBE( psz );
+                if( atom_size <= 1 )
                 {
                     /* FIXME handle 1 as long size */
                     break;
@@ -1288,7 +1288,7 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
                     break;
                 }
 
-                psz += i_size;
+                psz += atom_size;
             }
         }
     }
