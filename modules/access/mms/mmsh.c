@@ -561,7 +561,6 @@ static int Describe( stream_t  *p_access, char **ppsz_location )
     char         *psz_location = NULL;
     int          i_content_length = -1;
     bool         b_keepalive = false;
-    char         *psz;
     int          i_code;
     struct vlc_memstream stream;
 
@@ -588,7 +587,8 @@ static int Describe( stream_t  *p_access, char **ppsz_location )
         return VLC_EGENERIC;
 
     /* Receive the http header */
-    if( ( psz = net_Gets( p_access, p_sys->fd ) ) == NULL )
+    char *psz = net_Gets( p_access, p_sys->fd );
+    if( psz == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -612,8 +612,7 @@ static int Describe( stream_t  *p_access, char **ppsz_location )
     free( psz );
     for( ;; )
     {
-        char *psz = net_Gets( p_access, p_sys->fd );
-        char *p;
+        psz = net_Gets( p_access, p_sys->fd );
 
         if( psz == NULL )
         {
@@ -628,7 +627,8 @@ static int Describe( stream_t  *p_access, char **ppsz_location )
             break;
         }
 
-        if( ( p = strchr( psz, ':' ) ) == NULL )
+        char *p = strchr( psz, ':' );
+        if( p == NULL )
         {
             msg_Err( p_access, "malformed header line: %s", psz );
             free( psz );
@@ -776,7 +776,6 @@ static int Start( stream_t *p_access, uint64_t i_pos )
     access_sys_t *p_sys = p_access->p_sys;
     int  i_streams = 0;
     int  i_streams_selected = 0;
-    char *psz = NULL;
     struct vlc_memstream stream;
 
     msg_Dbg( p_access, "starting stream" );
@@ -828,7 +827,7 @@ static int Start( stream_t *p_access, uint64_t i_pos )
     if( OpenConnection( p_access, &stream ) )
         return VLC_EGENERIC;
 
-    psz = net_Gets( p_access, p_sys->fd );
+    char *psz = net_Gets( p_access, p_sys->fd );
     if( psz == NULL )
     {
         msg_Err( p_access, "cannot read data 0" );
@@ -847,7 +846,7 @@ static int Start( stream_t *p_access, uint64_t i_pos )
     /* FIXME check HTTP code */
     for( ;; )
     {
-        char *psz = net_Gets( p_access, p_sys->fd );
+        psz = net_Gets( p_access, p_sys->fd );
         if( psz == NULL )
         {
             msg_Err( p_access, "cannot read data 1" );
