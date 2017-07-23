@@ -786,7 +786,7 @@ static int Connect( stream_t *p_access )
     {
         char *p, *p_trailing;
 
-        char *psz = net_Gets( p_access, p_sys->fd );
+        psz = net_Gets( p_access, p_sys->fd );
         if( psz == NULL )
         {
             msg_Err( p_access, "failed to read answer" );
