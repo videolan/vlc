@@ -390,8 +390,7 @@ static void Push( decoder_t *p_dec, block_t *p_block )
 
     if( p_sys->i_queue >= CC_MAX_REORDER_SIZE )
     {
-        block_t *p_block = Pop( p_dec, true );
-        block_Release( p_block );
+        block_Release( Pop( p_dec, true ) );
         msg_Warn( p_dec, "Trashing a CC entry" );
     }
 
