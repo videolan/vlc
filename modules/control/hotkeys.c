@@ -902,21 +902,25 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             {
                 case ACTIONID_JUMP_BACKWARD_EXTRASHORT:
                     sign = -1;
+                    /* fall through */
                 case ACTIONID_JUMP_FORWARD_EXTRASHORT:
                     varname = "extrashort-jump-size";
                     break;
                 case ACTIONID_JUMP_BACKWARD_SHORT:
                     sign = -1;
+                    /* fall through */
                 case ACTIONID_JUMP_FORWARD_SHORT:
                     varname = "short-jump-size";
                     break;
                 case ACTIONID_JUMP_BACKWARD_MEDIUM:
                     sign = -1;
+                    /* fall through */
                 case ACTIONID_JUMP_FORWARD_MEDIUM:
                     varname = "medium-jump-size";
                     break;
                 case ACTIONID_JUMP_BACKWARD_LONG:
                     sign = -1;
+                    /* fall through */
                 case ACTIONID_JUMP_FORWARD_LONG:
                     varname = "long-jump-size";
                     break;
