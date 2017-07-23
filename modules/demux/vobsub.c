@@ -482,7 +482,6 @@ static int ParseVobSubIDX( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
     char        *line;
-    vobsub_track_t *current_tk = NULL;
 
     for( ;; )
     {
@@ -544,7 +543,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                     sizeof( vobsub_track_t ) * (p_sys->i_tracks + 1 ) );
 
             /* Init the track */
-            current_tk = &p_sys->track[p_sys->i_tracks - 1];
+            vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
             memset( current_tk, 0, sizeof( vobsub_track_t ) );
             current_tk->i_current_subtitle = 0;
             current_tk->i_subtitles = 0;
