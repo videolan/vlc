@@ -2052,7 +2052,8 @@ static void* httpd_HostThread(void *data)
     return NULL;
 }
 
-int httpd_StreamSetHTTPHeaders(httpd_stream_t * p_stream, httpd_header * p_headers, size_t i_headers)
+int httpd_StreamSetHTTPHeaders(httpd_stream_t * p_stream,
+                               const httpd_header *p_headers, size_t i_headers)
 {
     if (!p_stream)
         return VLC_EGENERIC;

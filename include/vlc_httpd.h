@@ -142,7 +142,7 @@ VLC_API httpd_stream_t * httpd_StreamNew( httpd_host_t *, const char *psz_url, c
 VLC_API void httpd_StreamDelete( httpd_stream_t * );
 VLC_API int httpd_StreamHeader( httpd_stream_t *, uint8_t *p_data, int i_data );
 VLC_API int httpd_StreamSend( httpd_stream_t *, const block_t *p_block );
-VLC_API int httpd_StreamSetHTTPHeaders(httpd_stream_t *, httpd_header *, size_t);
+VLC_API int httpd_StreamSetHTTPHeaders(httpd_stream_t *, const httpd_header *, size_t);
 
 /* Msg functions facilities */
 VLC_API void httpd_MsgAdd( httpd_message_t *, const char *psz_name, const char *psz_value, ... ) VLC_FORMAT( 3, 4 );
