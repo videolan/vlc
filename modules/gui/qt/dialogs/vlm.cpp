@@ -287,10 +287,10 @@ void VLMDialog::mediasPopulator()
         int i_nMedias;
         QString typeShortName;
         int vlmItemCount;
-        vlm_media_t ***ppp_dsc = (vlm_media_t ***)malloc( sizeof( vlm_media_t** ) );
+        vlm_media_t **pp_dsc;
 
         /* Get medias information and numbers */
-        vlm_Control( p_vlm, VLM_GET_MEDIAS, ppp_dsc, &i_nMedias );
+        vlm_Control( p_vlm, VLM_GET_MEDIAS, &pp_dsc, &i_nMedias );
 
         /* Loop on all of them */
         for( int i = 0; i < i_nMedias; i++ )
@@ -298,28 +298,28 @@ void VLMDialog::mediasPopulator()
             VLMAWidget * vlmAwidget;
             vlmItemCount = vlmItems.count();
 
-            QString mediaName = qfu( (*ppp_dsc)[i]->psz_name );
+            QString mediaName = qfu( pp_dsc[i]->psz_name );
             /* It may have several inputs, we take the first one by default
                  - an evolution will be to manage these inputs in the gui */
-            QString inputText = qfu( (*ppp_dsc)[i]->ppsz_input[0] );
+            QString inputText = qfu( pp_dsc[i]->ppsz_input[0] );
 
-            QString outputText = qfu( (*ppp_dsc)[i]->psz_output );
+            QString outputText = qfu( pp_dsc[i]->psz_output );
 
             /* Schedule media is a quite especial, maybe there is another way to grab information */
-            if( (*ppp_dsc)[i]->b_vod )
+            if( pp_dsc[i]->b_vod )
             {
                 typeShortName = "VOD";
-                QString mux = qfu( (*ppp_dsc)[i]->vod.psz_mux );
+                QString mux = qfu( pp_dsc[i]->vod.psz_mux );
                 vlmAwidget = new VLMVod( mediaName, inputText, inputOptions,
-                                         outputText, (*ppp_dsc)[i]->b_enabled,
+                                         outputText, pp_dsc[i]->b_enabled,
                                          mux, this );
             }
             else
             {
                 typeShortName = "Bcast";
                 vlmAwidget = new VLMBroadcast( mediaName, inputText, inputOptions,
-                                               outputText, (*ppp_dsc)[i]->b_enabled,
-                                               (*ppp_dsc)[i]->broadcast.b_loop, this );
+                                               outputText, pp_dsc[i]->b_enabled,
+                                               pp_dsc[i]->broadcast.b_loop, this );
             }
             /* Add an Item of the Side List */
             ui.vlmListItem->addItem( typeShortName + " : " + mediaName );
@@ -330,7 +330,6 @@ void VLMDialog::mediasPopulator()
             vlmItems.append( vlmAwidget );
             clearWidgets();
         }
-        free( ppp_dsc );
     }
 }
 
