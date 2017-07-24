@@ -1003,12 +1003,12 @@ static int Demux_Seekable( demux_t *p_demux )
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
         avi_track_t *tk = p_sys->track[i_track];
-        bool  b;
+        bool  b = false;
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
         if( tk->p_es_dv_audio )
         {
-            bool b_extra;
+            bool b_extra = false;
             es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es_dv_audio, &b_extra );
             b |= b_extra;
         }
