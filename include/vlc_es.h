@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 #include <vlc_text_style.h>
+#include <vlc_viewpoint.h>
 
 /**
  * \file
@@ -313,10 +314,6 @@ typedef enum video_chroma_location_t
     CHROMA_LOCATION_BOTTOM_LEFT,
     CHROMA_LOCATION_BOTTOM_CENTER,
 } video_chroma_location_t;
-
-#define FIELD_OF_VIEW_DEGREES_DEFAULT  80.f
-#define FIELD_OF_VIEW_DEGREES_MAX 150.f
-#define FIELD_OF_VIEW_DEGREES_MIN 20.f
 
 /**
  * video format description

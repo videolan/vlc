@@ -25,6 +25,7 @@
 #define LIBVLC_VOUT_INTERNAL_CONTROL_H
 
 #include <vlc_vout_window.h>
+#include <vlc_viewpoint.h>
 
 /* */
 enum {

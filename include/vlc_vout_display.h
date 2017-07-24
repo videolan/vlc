@@ -32,6 +32,7 @@
 #include <vlc_mouse.h>
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
+#include <vlc_viewpoint.h>
 
 /**
  * \defgroup video_display Video output display

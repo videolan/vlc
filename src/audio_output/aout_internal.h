@@ -25,7 +25,7 @@
 # define LIBVLC_AOUT_INTERNAL_H 1
 
 # include <vlc_atomic.h>
-# include <vlc_vout.h> /* for vlc_viewpoint_t */
+# include <vlc_viewpoint.h>
 
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)

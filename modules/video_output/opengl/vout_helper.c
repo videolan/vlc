@@ -38,6 +38,7 @@
 #include <vlc_opengl.h>
 #include <vlc_memory.h>
 #include <vlc_vout.h>
+#include <vlc_viewpoint.h>
 
 #include "vout_helper.h"
 #include "internal.h"
