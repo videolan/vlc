@@ -328,6 +328,8 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
     else
         p_mi->viewpoint = update;
 
+    vlc_viewpoint_clip( &p_mi->viewpoint );
+
     return 0;
 }
 
