@@ -263,7 +263,7 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
         mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
         access/dtv/en50221_capmt.h \
-        codec/scte18.h \
+        codec/jpeg2000.h codec/scte18.h \
         codec/atsc_a65.c codec/atsc_a65.h \
 	codec/opus_header.c
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)

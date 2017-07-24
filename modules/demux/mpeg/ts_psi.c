@@ -44,6 +44,7 @@
 
 #include "timestamps.h"
 
+#include "../../codec/jpeg2000.h"
 #include "../../codec/opus_header.h"
 
 #include "sections.h"
@@ -540,6 +541,10 @@ static void SetupJ2KDescriptors( demux_t *p_demux, ts_es_t *p_es, const dvbpsi_p
         p_es->fmt.video.i_height = GetDWBE(&p_dr->p_data[6]);
         p_es->fmt.video.i_frame_rate_base = GetWBE(&p_dr->p_data[18]);
         p_es->fmt.video.i_frame_rate = GetWBE(&p_dr->p_data[20]);
+        j2k_fill_color_profile( p_dr->p_data[21],
+                               &p_es->fmt.video.primaries,
+                               &p_es->fmt.video.transfer,
+                               &p_es->fmt.video.space );
         p_es->b_interlaced = p_dr->p_data[23] & 0x40;
         if( p_dr->i_length > 24 )
         {
