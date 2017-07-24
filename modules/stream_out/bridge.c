@@ -480,6 +480,8 @@ static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, const es_format_t 
                     msg_Err( p_stream, "We already had an audio es!" );
                 p_sys->id_audio = id->id;
                 break;
+            default:
+                break;
         }
     }
 
@@ -628,6 +630,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                         if( !newid )
                             break;
                         p_sys->i_last_audio = i_date;
+                        /* fall through */
                     default:
                         p_stream->p_next->pf_send( p_stream->p_next,
                                    newid?newid:p_bridge->pp_es[i]->id,
