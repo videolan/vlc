@@ -974,66 +974,16 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         }
     }
 
-    /* Create decoder specific info for subt */
-    if( p_stream->pes.i_codec == VLC_CODEC_SUBT )
+    /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
+    const es_format_t *fmt = p_input->p_fmt;
+    if( fmt->i_extra > 0 )
     {
-        p_stream->pes.i_extra = 55;
-        p_stream->pes.p_extra = malloc( p_stream->pes.i_extra );
-        if (!p_stream->pes.p_extra)
+        p_stream->pes.i_extra = fmt->i_extra;
+        p_stream->pes.p_extra = malloc( fmt->i_extra );
+        if( !p_stream->pes.p_extra )
             goto oom;
 
-        uint8_t *p = p_stream->pes.p_extra;
-        p[0] = 0x10;    /* textFormat, 0x10 for 3GPP TS 26.245 */
-        p[1] = 0x00;    /* flags: 1b: associated video info flag
-                                3b: reserved
-                                1b: duration flag
-                                3b: reserved */
-        p[2] = 52;      /* remaining size */
-
-        p += 3;
-
-        p[0] = p[1] = p[2] = p[3] = 0; p+=4;    /* display flags */
-        *p++ = 0;  /* horizontal justification (-1: left, 0 center, 1 right) */
-        *p++ = 1;  /* vertical   justification (-1: top, 0 center, 1 bottom) */
-
-        p[0] = p[1] = p[2] = 0x00; p+=3;/* background rgb */
-        *p++ = 0xff;                    /* background a */
-
-        p[0] = p[1] = 0; p += 2;        /* text box top */
-        p[0] = p[1] = 0; p += 2;        /* text box left */
-        p[0] = p[1] = 0; p += 2;        /* text box bottom */
-        p[0] = p[1] = 0; p += 2;        /* text box right */
-
-        p[0] = p[1] = 0; p += 2;        /* start char */
-        p[0] = p[1] = 0; p += 2;        /* end char */
-        p[0] = p[1] = 0; p += 2;        /* default font id */
-
-        *p++ = 0;                       /* font style flags */
-        *p++ = 12;                      /* font size */
-
-        p[0] = p[1] = p[2] = 0x00; p+=3;/* foreground rgb */
-        *p++ = 0x00;                    /* foreground a */
-
-        p[0] = p[1] = p[2] = 0; p[3] = 22; p += 4;
-        memcpy( p, "ftab", 4 ); p += 4;
-        *p++ = 0; *p++ = 1;             /* entry count */
-        p[0] = p[1] = 0; p += 2;        /* font id */
-        *p++ = 9;                       /* font name length */
-        memcpy( p, "Helvetica", 9 );    /* font name */
-    }
-    else
-    {
-        /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
-        const es_format_t *fmt = p_input->p_fmt;
-        if( fmt->i_extra > 0 )
-        {
-            p_stream->pes.i_extra = fmt->i_extra;
-            p_stream->pes.p_extra = malloc( fmt->i_extra );
-            if( !p_stream->pes.p_extra )
-                goto oom;
-
-            memcpy( p_stream->pes.p_extra, fmt->p_extra, fmt->i_extra );
-        }
+        memcpy( p_stream->pes.p_extra, fmt->p_extra, fmt->i_extra );
     }
 
     /* Init pes chain */

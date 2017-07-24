@@ -119,6 +119,57 @@ static uint32_t GetDescriptorLength24b( int i_length )
     return( 0x808000 | ( i_l3 << 16 ) | ( i_l2 << 8 ) | i_l1 );
 }
 
+static void Mpeg4SUBTDecoderSpecific_55( bits_buffer_t *b )
+{
+    bits_write( b, 8, 0x10 ); /* textFormat, 0x10 for 3GPP TS 26.245 */
+    bits_write( b, 8, 0x00 ); /* flags: 1b: associated video info flag
+                                        3b: reserved
+                                        1b: duration flag
+                                        3b: reserved */
+    bits_write( b, 8, 52 );   /* remaining size */
+
+    bits_write( b, 32, 0x00 ); /* display flags */
+
+    bits_write( b, 8, 0x00 ); /* horizontal justification (-1: left, 0 center, 1 right) */
+    bits_write( b, 8, 0x01 );  /* vertical   justification (-1: top, 0 center, 1 bottom) */
+
+    bits_write( b, 24, 0x00 ); /* background rgb */
+    bits_write( b, 8,  0xff ); /* background a */
+
+    bits_write( b, 16,  0x00 ); /* text box top */
+    bits_write( b, 16,  0x00 ); /* text box left */
+    bits_write( b, 16,  0x00 ); /* text box bottom */
+    bits_write( b, 16,  0x00 ); /* text box right */
+
+    bits_write( b, 16,  0x00 ); /* start char */
+    bits_write( b, 16,  0x00 ); /* end char */
+    bits_write( b, 16,  0x00 ); /* default font id */
+
+
+    bits_write( b, 8, 0x00 );   /* font style flags */
+    bits_write( b, 8,   12 );   /* font size */
+
+    bits_write( b, 24, 0x00 );  /* foreground rgb */
+    bits_write( b,  8, 0x00 );  /* foreground a */
+
+    bits_write( b, 24, 0x00 );
+    bits_write( b,  8,   22 );  /* atom size */
+
+    bits_write( b,  8,   'f' ); /* atom id */
+    bits_write( b,  8,   't' );
+    bits_write( b,  8,   'a' );
+    bits_write( b,  8,   'b' );
+
+    bits_write( b,  8,  0x00 );
+    bits_write( b,  8,  0x01 ); /* entry count */
+
+    bits_write( b, 16,  0x00 ); /* font id */
+    bits_write( b,  8,     9 ); /* font name length */
+    const char fontname[] = "Helvetica";
+    for(int i=0; i<9; i++)
+        bits_write( b,  8, fontname[i] ); /* font name */
+}
+
 static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
                          unsigned i_mapped_streams, const pes_mapped_stream_t *p_mapped_streams )
 {
@@ -211,7 +262,16 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
         bits_write( &bits, 32,  0x7fffffff );   /* maxBitrate */
         bits_write( &bits, 32,  0 );            /* avgBitrate */
 
-        if( p_stream->pes->i_extra > 0 )
+        /* DecoderSpecificInfo */
+        if( p_stream->pes->i_codec == VLC_CODEC_SUBT )
+        {
+            bits_align( &bits );
+            bits_write( &bits, 8,   0x05 ); /* tag */
+            bits_write( &bits, 24,  55 );
+            /* Create decoder specific info for subt */
+            Mpeg4SUBTDecoderSpecific_55( &bits );
+        }
+        else if( p_stream->pes->i_extra > 0 )
         {
             /* DecoderSpecificInfo */
             bits_align( &bits );
@@ -224,6 +284,7 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
                     ((uint8_t*)p_stream->pes->p_extra)[j] );
             }
         }
+
         /* fix Decoder length */
         bits_write( &bits_fix_Decoder, 24,
                     GetDescriptorLength24b( bits.i_data -
