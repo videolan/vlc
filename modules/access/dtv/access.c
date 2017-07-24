@@ -713,6 +713,7 @@ static unsigned var_InheritGuardInterval (vlc_object_t *obj)
                            "Use \"guard=1/%"PRIu16" instead.", a, a);
             b = a;
             a = 1;
+            /* fall through */
         case 2:
             return VLC_GUARD(a, b);
     }
