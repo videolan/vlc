@@ -33,7 +33,6 @@
 
 #include <limits.h>
 #include <assert.h>
-#include <math.h>
 #include <sys/stat.h>
 
 #include "input_internal.h"
@@ -1960,12 +1959,7 @@ static bool Control( input_thread_t *p_input,
                 priv->viewpoint.fov   += p_vp->fov;
             }
 
-            priv->viewpoint.yaw = fmodf( priv->viewpoint.yaw, 360.f );
-            priv->viewpoint.pitch = fmodf( priv->viewpoint.pitch, 360.f );
-            priv->viewpoint.roll = fmodf( priv->viewpoint.roll, 360.f );
-            priv->viewpoint.fov = VLC_CLIP( priv->viewpoint.fov,
-                                            FIELD_OF_VIEW_DEGREES_MIN,
-                                            FIELD_OF_VIEW_DEGREES_MAX );
+            vlc_viewpoint_clip( &priv->viewpoint );
 
             vout_thread_t **pp_vout;
             size_t i_vout;
