@@ -215,7 +215,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
         i_audiobuffer_size = i_audiobuffer_size * AOUT_MAX_ADVANCE_TIME
                            / CLOCK_FREQ;
     }
-    fprintf(stderr, "i_audiobuffer_size: %zu\n", i_audiobuffer_size);
     if (!TPCircularBufferInit(&p_sys->circular_buffer, i_audiobuffer_size))
         return VLC_EGENERIC;
 
