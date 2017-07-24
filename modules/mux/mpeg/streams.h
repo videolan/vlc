@@ -32,17 +32,10 @@ typedef struct
 
 typedef struct
 {
-    vlc_fourcc_t    i_codec;
-
     int             i_stream_id; /* keep as int for drac */
-
-    int             i_width, i_height;
 
     /* Specific to mpeg4 in mpeg2ts */
     int             i_es_id;
-
-    size_t          i_extra;
-    uint8_t         *p_extra;
 
     /* language is iso639-2T */
     size_t          i_langs;

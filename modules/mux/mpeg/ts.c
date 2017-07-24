@@ -930,7 +930,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         goto oom;
 
     if ( p_sys->b_es_id_pid )
-        p_stream->ts.i_pid = p_input->p_fmt->i_id & 0x1fff;
+        p_stream->ts.i_pid = p_input->fmt.i_id & 0x1fff;
     else
         p_stream->ts.i_pid = AllocatePID( p_mux, p_input->p_fmt->i_cat );
 
@@ -943,21 +943,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         return VLC_EGENERIC;
     }
 
-    if( p_input->p_fmt->i_cat == VIDEO_ES )
-    {
-        p_stream->pes.i_width = p_input->p_fmt->video.i_width;
-        p_stream->pes.i_height = p_input->p_fmt->video.i_height;
-    }
-
     p_stream->pes.i_langs = 1 + p_input->p_fmt->i_extra_languages;
     p_stream->pes.lang = calloc(1, p_stream->pes.i_langs * 4);
     if( !p_stream->pes.lang )
         goto oom;
 
     msg_Dbg( p_mux, "adding input codec=%4.4s pid=%d",
-             (char*)&p_stream->pes.i_codec, p_stream->ts.i_pid );
+             (char*)&p_input->fmt.i_codec, p_stream->ts.i_pid );
 
-    for (int i = 0; i < p_stream->pes.i_langs; i++) {
+    for (size_t i = 0; i < p_stream->pes.i_langs; i++) {
         char *lang = (i == 0)
             ? p_input->p_fmt->psz_language
             : p_input->p_fmt->p_extra_languages[i-1].psz_language;
@@ -972,18 +966,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->pes.lang[i*4+3] = 0x00; /* audio type: 0x00 undefined */
             msg_Dbg( p_mux, "    - lang=%3.3s", &p_stream->pes.lang[i*4] );
         }
-    }
-
-    /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
-    const es_format_t *fmt = p_input->p_fmt;
-    if( fmt->i_extra > 0 )
-    {
-        p_stream->pes.i_extra = fmt->i_extra;
-        p_stream->pes.p_extra = malloc( fmt->i_extra );
-        if( !p_stream->pes.p_extra )
-            goto oom;
-
-        memcpy( p_stream->pes.p_extra, fmt->p_extra, fmt->i_extra );
     }
 
     /* Init pes chain */
@@ -1026,9 +1008,6 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* Empty all data in chain_pes */
     BufferChainClean( &p_stream->state.chain_pes );
 
-    free(p_stream->pes.lang);
-    free( p_stream->pes.p_extra );
-
     pid = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-video" );
     if ( pid > 0 && pid == p_stream->ts.i_pid )
     {
@@ -1048,6 +1027,7 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
         msg_Dbg( p_mux, "freeing spu PID %d", pid);
     }
 
+    free(p_stream->pes.lang);
     free( p_stream );
 
     /* We only change PMT version (PAT isn't changed) */
@@ -1255,7 +1235,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
         {
             msg_Warn( p_mux, "packet with too strange dts on pid %d (%4.4s)"
                       "(dts=%"PRId64",old=%"PRId64",pcr=%"PRId64")",
-                      p_stream->ts.i_pid, (char *) &p_stream->pes.i_codec,
+                      p_stream->ts.i_pid, (char *) &p_input->fmt.i_codec,
                       p_data->i_dts, p_stream->state.i_pes_dts,
                       p_pcr_stream->state.i_pes_dts );
             block_Release( p_data );
