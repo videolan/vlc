@@ -403,6 +403,7 @@ static inline int GetCategory(vlc_object_t *object)
         return SPU_ES;
     default:
         msg_Err(object, "Invalid ES category");
+        /* fall through */
     case 4:
         return UNKNOWN_ES;
     }
