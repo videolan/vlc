@@ -1244,6 +1244,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->is_display_filled = cfg->is_display_filled;
     osys->width_saved    = cfg->display.width;
     osys->height_saved   = cfg->display.height;
+    osys->viewpoint      = cfg->viewpoint;
     if (osys->is_fullscreen) {
         vout_display_cfg_t cfg_windowed = *cfg;
         cfg_windowed.is_fullscreen  = false;
