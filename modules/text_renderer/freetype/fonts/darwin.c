@@ -195,6 +195,7 @@ end:
 
     CFRelease(coreTextFontDescriptorsArray);
     CFRelease(familyName);
+    free(psz_lc);
 
     return p_family;
 }
