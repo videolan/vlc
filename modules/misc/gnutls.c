@@ -524,6 +524,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
         case 1:
             time (&expiry);
             expiry += 24 * 60 * 60;
+            /* fall through */
         case 2:
             val = gnutls_store_pubkey (NULL, NULL, host, service,
                                        GNUTLS_CRT_X509, datum, expiry, 0);
