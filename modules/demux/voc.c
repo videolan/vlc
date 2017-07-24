@@ -415,6 +415,7 @@ static int ReadBlockHeader( demux_t *p_demux )
         default:
             msg_Dbg( p_demux, "unknown block type %u - skipping block",
                      (unsigned)*buf);
+            /* fall through */
         case 4: /* blocks of non-audio types can be skipped */
         case 5:
             if( vlc_stream_Read( p_demux->s, NULL,
