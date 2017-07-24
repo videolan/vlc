@@ -472,6 +472,7 @@ enum input_query_e
 
     /* Viewpoint */
     INPUT_UPDATE_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*), arg2=bool b_absolute */
+    INPUT_SET_INITIAL_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*) */
 
     /* Input ressources
      * XXX You must call vlc_object_release as soon as possible */

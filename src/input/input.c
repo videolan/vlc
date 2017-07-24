@@ -321,8 +321,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->p_sout   = NULL;
     priv->b_out_pace_control = false;
 
+    priv->viewpoint_changed = false;
+    /* Fetch the viewpoint from the mediaplayer or the playlist if any */
     vlc_viewpoint_t *p_viewpoint = var_InheritAddress( p_input, "viewpoint" );
-    if (likely(p_viewpoint != NULL))
+    if (p_viewpoint != NULL)
         priv->viewpoint = *p_viewpoint;
     else
         vlc_viewpoint_init( &priv->viewpoint );
@@ -1678,6 +1680,7 @@ static void ControlRelease( int i_type, vlc_value_t val )
             input_item_slave_Delete( val.p_address );
         break;
     case INPUT_CONTROL_SET_VIEWPOINT:
+    case INPUT_CONTROL_SET_INITIAL_VIEWPOINT:
     case INPUT_CONTROL_UPDATE_VIEWPOINT:
         free( val.p_address );
         break;
@@ -1945,14 +1948,29 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_VIEWPOINT:
+        case INPUT_CONTROL_SET_INITIAL_VIEWPOINT:
         case INPUT_CONTROL_UPDATE_VIEWPOINT:
         {
             input_thread_private_t *priv = input_priv(p_input);
             const vlc_viewpoint_t *p_vp = val.p_address;
-            if ( i_type == INPUT_CONTROL_SET_VIEWPOINT)
+
+            if ( i_type == INPUT_CONTROL_SET_INITIAL_VIEWPOINT )
+            {
+
+                /* Set the initial viewpoint if it had not been changed by the
+                 * user. */
+                if( !priv->viewpoint_changed )
+                    priv->viewpoint = *p_vp;
+                /* Update viewpoints of aout and every vouts in all cases. */
+            }
+            else if ( i_type == INPUT_CONTROL_SET_VIEWPOINT)
+            {
+                priv->viewpoint_changed = true;
                 priv->viewpoint = *p_vp;
+            }
             else
             {
+                priv->viewpoint_changed = true;
                 priv->viewpoint.yaw   += p_vp->yaw;
                 priv->viewpoint.pitch += p_vp->pitch;
                 priv->viewpoint.roll  += p_vp->roll;

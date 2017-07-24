@@ -497,13 +497,17 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case INPUT_UPDATE_VIEWPOINT:
+        case INPUT_SET_INITIAL_VIEWPOINT:
         {
             vlc_viewpoint_t *p_viewpoint = malloc( sizeof(*p_viewpoint) );
             if( unlikely(p_viewpoint == NULL) )
                 return VLC_ENOMEM;
             val.p_address = p_viewpoint;
             *p_viewpoint = *va_arg( args, const vlc_viewpoint_t* );
-            if ( va_arg( args, int ) )
+            if ( i_query == INPUT_SET_INITIAL_VIEWPOINT )
+                input_ControlPush( p_input, INPUT_CONTROL_SET_INITIAL_VIEWPOINT,
+                                   &val );
+            else if ( va_arg( args, int ) )
                 input_ControlPush( p_input, INPUT_CONTROL_SET_VIEWPOINT, &val );
             else
                 input_ControlPush( p_input, INPUT_CONTROL_UPDATE_VIEWPOINT, &val );
