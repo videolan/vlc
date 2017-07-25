@@ -101,11 +101,7 @@ int64_t config_GetInt( vlc_object_t *p_this, const char *psz_name )
         return -1;
     }
 
-    if (!IsConfigIntegerType (p_config->i_type))
-    {
-        msg_Err( p_this, "option %s does not refer to an int", psz_name );
-        return -1;
-    }
+    assert(IsConfigIntegerType(p_config->i_type));
 
     int64_t val;
 
@@ -135,11 +131,7 @@ float config_GetFloat( vlc_object_t *p_this, const char *psz_name )
         return -1;
     }
 
-    if (!IsConfigFloatType (p_config->i_type))
-    {
-        msg_Err( p_this, "option %s does not refer to a float", psz_name );
-        return -1;
-    }
+    assert(IsConfigFloatType(p_config->i_type));
 
     float val;
 
@@ -174,11 +166,7 @@ char * config_GetPsz( vlc_object_t *p_this, const char *psz_name )
         return NULL;
     }
 
-    if (!IsConfigStringType (p_config->i_type))
-    {
-        msg_Err( p_this, "option %s does not refer to a string", psz_name );
-        return NULL;
-    }
+    assert(IsConfigStringType (p_config->i_type));
 
     /* return a copy of the string */
     vlc_rwlock_rdlock (&config_lock);
@@ -209,11 +197,7 @@ void config_PutPsz( vlc_object_t *p_this,
         return;
     }
 
-    if (!IsConfigStringType (p_config->i_type))
-    {
-        msg_Err( p_this, "option %s does not refer to a string", psz_name );
-        return;
-    }
+    assert(IsConfigStringType(p_config->i_type));
 
     char *str, *oldstr;
     if ((psz_value != NULL) && *psz_value)
@@ -250,11 +234,7 @@ void config_PutInt( vlc_object_t *p_this, const char *psz_name,
         return;
     }
 
-    if (!IsConfigIntegerType (p_config->i_type))
-    {
-        msg_Err( p_this, "option %s does not refer to an int", psz_name );
-        return;
-    }
+    assert(IsConfigIntegerType(p_config->i_type));
 
     if (i_value < p_config->min.i)
         i_value = p_config->min.i;
@@ -286,14 +266,10 @@ void config_PutFloat( vlc_object_t *p_this,
         return;
     }
 
-    if (!IsConfigFloatType (p_config->i_type))
-    {
-        msg_Err( p_this, "option %s does not refer to a float", psz_name );
-        return;
-    }
+    assert(IsConfigFloatType(p_config->i_type));
 
     /* if f_min == f_max == 0, then do not use them */
-    if ((p_config->min.f == 0) && (p_config->max.f == 0))
+    if ((p_config->min.f == 0.f) && (p_config->max.f == 0.f))
         ;
     else if (f_value < p_config->min.f)
         f_value = p_config->min.f;
