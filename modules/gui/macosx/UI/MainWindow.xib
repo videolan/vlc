@@ -117,12 +117,6 @@
                         <subviews>
                             <customView hidden="YES" focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="4665" customClass="VLCVoutView">
                                 <rect key="frame" x="0.0" y="0.0" width="716" height="275"/>
-                                <ciFilter key="compositingFilter" name="CIAdditionCompositing">
-                                    <configuration>
-                                        <null key="inputBackgroundImage"/>
-                                        <null key="inputImage"/>
-                                    </configuration>
-                                </ciFilter>
                             </customView>
                             <splitView dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4680" customClass="VLCMainWindowSplitView">
                                 <rect key="frame" x="0.0" y="0.0" width="716" height="275"/>
@@ -303,12 +297,6 @@
                                                             <constraint firstItem="5605" firstAttribute="leading" secondItem="4722" secondAttribute="leading" id="d47-SK-C7A"/>
                                                             <constraint firstAttribute="bottom" secondItem="5605" secondAttribute="bottom" id="fdA-1r-rKk"/>
                                                         </constraints>
-                                                        <ciFilter key="compositingFilter" name="CIDarkenBlendMode">
-                                                            <configuration>
-                                                                <null key="inputBackgroundImage"/>
-                                                                <null key="inputImage"/>
-                                                            </configuration>
-                                                        </ciFilter>
                                                     </customView>
                                                     <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4372">
                                                         <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
@@ -628,12 +616,6 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="48" id="XRa-UG-wuM"/>
                                         </constraints>
-                                        <ciFilter key="compositingFilter" name="CISourceOverCompositing">
-                                            <configuration>
-                                                <null key="inputBackgroundImage"/>
-                                                <null key="inputImage"/>
-                                            </configuration>
-                                        </ciFilter>
                                         <sliderCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="4276"/>
                                         <connections>
                                             <action selector="volumeAction:" target="5339" id="5358"/>
