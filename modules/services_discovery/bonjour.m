@@ -177,23 +177,21 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
     msg_Info(_p_this, "starting discovery");
     for (NSDictionary *protocol in VLCSupportedProtocols) {
-        msg_Info(_p_this, "looking up %s", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
-
         /* Only discover services if we actually have a module that can handle those */
         if (!module_exists([[protocol objectForKey: VLCBonjourProtocolName] UTF8String]) && !_isRendererDiscovery) {
-            msg_Info(_p_this, "no module for %s, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
+            msg_Dbg(_p_this, "no module for %s, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
             continue;
         }
 
         /* Only discover hosts it they match the current mode (renderer or service) */
         if ([[protocol objectForKey: VLCBonjourIsRenderer] boolValue] != _isRendererDiscovery) {
-            msg_Info(_p_this, "%s does not match current discovery mode, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
+            msg_Dbg(_p_this, "%s does not match current discovery mode, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
             continue;
         }
 
         NSNetServiceBrowser *serviceBrowser = [[NSNetServiceBrowser alloc] init];
         [serviceBrowser setDelegate:self];
-        msg_Info(_p_this, "starting discovery for type %s", [[protocol objectForKey: VLCBonjourProtocolServiceName] UTF8String]);
+        msg_Dbg(_p_this, "starting discovery for type %s", [[protocol objectForKey: VLCBonjourProtocolServiceName] UTF8String]);
         [serviceBrowser searchForServicesOfType:[protocol objectForKey: VLCBonjourProtocolServiceName] inDomain:@"local."];
         [discoverers addObject:serviceBrowser];
         [protocols addObject:protocol];
@@ -229,8 +227,7 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didFindService:(NSNetService *)aNetService moreComing:(BOOL)moreComing
 {
-    msg_Info(_p_this, "found something, looking up");
-    msg_Dbg(self.p_this, "found bonjour service: %s (%s)", [aNetService.name UTF8String], [aNetService.type UTF8String]);
+    msg_Dbg(_p_this, "service found: %s (%s), resolving", [aNetService.name UTF8String], [aNetService.type UTF8String]);
     [_rawNetServices addObject:aNetService];
     aNetService.delegate = self;
     [aNetService resolveWithTimeout:5.];
@@ -238,7 +235,7 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveService:(NSNetService *)aNetService moreComing:(BOOL)moreComing
 {
-    msg_Dbg(self.p_this, "bonjour service disappeared: %s", [aNetService.name UTF8String]);
+    msg_Dbg(self.p_this, "service disappeared: %s (%s), removing", [aNetService.name UTF8String], [aNetService.type UTF8String]);
 
     /* If the item was not looked-up yet, just remove it */
     if ([_rawNetServices containsObject:aNetService])
@@ -266,7 +263,7 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
 - (void)netServiceDidResolveAddress:(NSNetService *)aNetService
 {
-    msg_Info(_p_this, "resolved something");
+    msg_Dbg(_p_this, "service resolved: %s", [aNetService.name UTF8String]);
     if (![_resolvedNetServices containsObject:aNetService]) {
         NSString *serviceType = aNetService.type;
         NSString *protocol = nil;
@@ -288,7 +285,7 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
 - (void)netService:(NSNetService *)aNetService didNotResolve:(NSDictionary *)errorDict
 {
-    msg_Dbg(_p_this, "failed to resolve: %s", [aNetService.name UTF8String]);
+    msg_Warn(_p_this, "service resolution failed: %s, removing", [aNetService.name UTF8String]);
     [_rawNetServices removeObject:aNetService];
 }
 
