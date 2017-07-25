@@ -50,7 +50,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
     playlist_item_t *node;
     const char *longname = (sd->description != NULL) ? sd->description : "?";
 
-    msg_Dbg(sd, "adding %s", p_input->psz_name ? p_input->psz_name : "(null)");
+    msg_Dbg(sd, "adding: %s", p_input->psz_name ? p_input->psz_name : "(null)");
 
     playlist_Lock(playlist);
     if (sds->node == NULL)
@@ -82,6 +82,8 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
     vlc_sd_internal_t *sds = sd->owner.sys;
     playlist_t *p_playlist = (playlist_t *)sd->obj.parent;
     playlist_item_t *node, *item;
+
+    msg_Dbg(sd, "removing: %s", p_input->psz_name ? p_input->psz_name : "(null)");
 
     PL_LOCK;
     item = playlist_ItemGetByInput(p_playlist, p_input);
