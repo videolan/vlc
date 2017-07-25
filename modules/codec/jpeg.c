@@ -316,26 +316,26 @@ static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
     /* pose handling */
     float value;
     if (getRDFFloat(psz_rdf, &value, "PoseHeadingDegrees"))
-        fmt->pose.f_yaw_degrees = value;
+        fmt->pose.yaw = value;
 
     if (getRDFFloat(psz_rdf, &value, "PosePitchDegrees"))
-        fmt->pose.f_pitch_degrees = value;
+        fmt->pose.pitch = value;
 
     if (getRDFFloat(psz_rdf, &value, "PoseRollDegrees"))
-        fmt->pose.f_roll_degrees = value;
+        fmt->pose.roll = value;
 
     /* initial view */
     if (getRDFFloat(psz_rdf, &value, "InitialViewHeadingDegrees"))
-        fmt->pose.f_yaw_degrees = value;
+        fmt->pose.yaw = value;
 
     if (getRDFFloat(psz_rdf, &value, "InitialViewPitchDegrees"))
-        fmt->pose.f_pitch_degrees = value;
+        fmt->pose.pitch = value;
 
     if (getRDFFloat(psz_rdf, &value, "InitialViewRollDegrees"))
-        fmt->pose.f_roll_degrees = value;
+        fmt->pose.roll = value;
 
     if (getRDFFloat(psz_rdf, &value, "InitialHorizontalFOVDegrees"))
-        fmt->pose.f_fov_degrees = value;
+        fmt->pose.fov = value;
 
     free(psz_rdf);
 }

@@ -352,12 +352,7 @@ struct video_format_t
     video_multiview_mode_t multiview_mode;        /** Multiview mode, 2D, 3D */
 
     video_projection_mode_t projection_mode;            /**< projection mode */
-    struct {
-        float f_yaw_degrees;       /**< view point yaw in degrees ]-180;180] */
-        float f_pitch_degrees;     /**< view point pitch in degrees ]-90;90] */
-        float f_roll_degrees;     /**< view point roll in degrees ]-180;180] */
-        float f_fov_degrees;          /**< view point fov in degrees ]0;180[ */
-    } pose;
+    vlc_viewpoint_t pose;
     struct {
         /* similar to SMPTE ST 2086 mastering display color volume */
         uint16_t primaries[3*2]; /* G,B,R / x,y */
@@ -382,7 +377,7 @@ static inline void video_format_Init( video_format_t *p_src, vlc_fourcc_t i_chro
 {
     memset( p_src, 0, sizeof( video_format_t ) );
     p_src->i_chroma = i_chroma;
-    p_src->pose.f_fov_degrees = FIELD_OF_VIEW_DEGREES_DEFAULT;
+    vlc_viewpoint_init( &p_src->pose );
 }
 
 /**

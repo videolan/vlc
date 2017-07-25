@@ -543,15 +543,15 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoProjectionPoseYaw, pose )
         {
-            vars.tk->fmt.video.pose.f_yaw_degrees = static_cast<float>( pose );
+            vars.tk->fmt.video.pose.yaw = static_cast<float>( pose );
         }
         E_CASE( KaxVideoProjectionPosePitch, pose )
         {
-            vars.tk->fmt.video.pose.f_pitch_degrees = static_cast<float>( pose );
+            vars.tk->fmt.video.pose.pitch = static_cast<float>( pose );
         }
         E_CASE( KaxVideoProjectionPoseRoll, pose )
         {
-            vars.tk->fmt.video.pose.f_roll_degrees = static_cast<float>( pose );
+            vars.tk->fmt.video.pose.roll = static_cast<float>( pose );
         }
 #endif
         E_CASE( KaxVideoFlagInterlaced, fint ) // UNUSED

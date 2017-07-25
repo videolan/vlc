@@ -1025,10 +1025,10 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
                     ( p_es->video.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD ) );
             p_mes->video->i_projection = (int) p_es->video.projection_mode;
 
-            p_mes->video->pose.f_yaw_degrees = p_es->video.pose.f_yaw_degrees;
-            p_mes->video->pose.f_pitch_degrees = p_es->video.pose.f_pitch_degrees;
-            p_mes->video->pose.f_roll_degrees = p_es->video.pose.f_roll_degrees;
-            p_mes->video->pose.f_fov_degrees = p_es->video.pose.f_fov_degrees;
+            p_mes->video->pose.f_yaw_degrees = p_es->video.pose.yaw;
+            p_mes->video->pose.f_pitch_degrees = p_es->video.pose.pitch;
+            p_mes->video->pose.f_roll_degrees = p_es->video.pose.roll;
+            p_mes->video->pose.f_fov_degrees = p_es->video.pose.fov;
             break;
         case AUDIO_ES:
             p_mes->i_type = libvlc_track_audio;

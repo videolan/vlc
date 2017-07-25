@@ -3217,13 +3217,13 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            info_category_AddInfo( p_cat, _("Projection"), "%s", _(psz_loc_name) );
 
            info_category_AddInfo( p_cat, _("Yaw"), "%.2f",
-                                  fmt->video.pose.f_yaw_degrees );
+                                  fmt->video.pose.yaw );
            info_category_AddInfo( p_cat, _("Pitch"), "%.2f",
-                                  fmt->video.pose.f_pitch_degrees );
+                                  fmt->video.pose.pitch );
            info_category_AddInfo( p_cat, _("Roll"), "%.2f",
-                                  fmt->video.pose.f_roll_degrees );
+                                  fmt->video.pose.roll );
            info_category_AddInfo( p_cat, _("Field of view"), "%.2f",
-                                  fmt->video.pose.f_fov_degrees );
+                                  fmt->video.pose.fov );
        }
        if ( fmt->video.mastering.max_luminance )
        {

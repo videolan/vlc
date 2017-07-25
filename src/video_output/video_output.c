@@ -566,12 +566,7 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     if (p_viewpoint != NULL)
         cfg->viewpoint = *p_viewpoint;
     else
-    {
-        cfg->viewpoint.yaw   = vout->p->original.pose.f_yaw_degrees;
-        cfg->viewpoint.pitch = vout->p->original.pose.f_pitch_degrees;
-        cfg->viewpoint.roll  = vout->p->original.pose.f_roll_degrees;
-        cfg->viewpoint.fov   = vout->p->original.pose.f_fov_degrees;
-    }
+        cfg->viewpoint   = vout->p->original.pose;
     cfg->display.title = title;
     const int display_width = var_GetInteger(vout, "width");
     const int display_height = var_GetInteger(vout, "height");
