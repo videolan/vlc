@@ -1178,19 +1178,6 @@ LIBVLC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi );
 LIBVLC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi, const char *psz_aspect );
 
 /**
- * Viewpoint for video outputs
- *
- * \warning allocate using libvlc_video_new_viewpoint()
- */
-typedef struct libvlc_video_viewpoint_t
-{
-    float f_yaw;           /**< view point yaw in degrees  ]-180;180] */
-    float f_pitch;         /**< view point pitch in degrees  ]-90;90] */
-    float f_roll;          /**< view point roll in degrees ]-180;180] */
-    float f_field_of_view; /**< field of view in degrees ]0;180[ (default 80.)*/
-} libvlc_video_viewpoint_t;
-
-/**
  * Create a video viewpoint structure.
  *
  * \version LibVLC 3.0.0 and later

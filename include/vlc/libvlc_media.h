@@ -192,6 +192,19 @@ typedef enum libvlc_video_projection_t
     libvlc_video_projection_cubemap_layout_standard = 0x100,
 } libvlc_video_projection_t;
 
+/**
+ * Viewpoint
+ *
+ * \warning allocate using libvlc_video_new_viewpoint()
+ */
+typedef struct libvlc_video_viewpoint_t
+{
+    float f_yaw;           /**< view point yaw in degrees  ]-180;180] */
+    float f_pitch;         /**< view point pitch in degrees  ]-90;90] */
+    float f_roll;          /**< view point roll in degrees ]-180;180] */
+    float f_field_of_view; /**< field of view in degrees ]0;180[ (default 80.)*/
+} libvlc_video_viewpoint_t;
+
 typedef struct libvlc_video_track_t
 {
     unsigned    i_height;
@@ -203,12 +216,7 @@ typedef struct libvlc_video_track_t
 
     libvlc_video_orient_t       i_orientation;
     libvlc_video_projection_t   i_projection;
-    struct {
-        float f_yaw_degrees;    /**< View point yaw in degrees ]-180;180] */
-        float f_pitch_degrees;  /**< View point pitch in degrees ]-90;90] */
-        float f_roll_degrees;   /**< View point roll in degrees ]-180;180] */
-        float f_fov_degrees;    /**< View point fov in degrees ]0;180[ */
-    } pose; /**< Initial view point */
+    libvlc_video_viewpoint_t    pose; /**< Initial view point */
 } libvlc_video_track_t;
 
 typedef struct libvlc_subtitle_track_t
