@@ -438,9 +438,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 #define config_GetLabel(a,b) __config_GetLabel(VLC_OBJECT(a),b)
 static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *psz_name)
 {
-    module_config_t *p_config;
-
-    p_config = config_FindConfig(p_this, psz_name);
+    module_config_t *p_config = config_FindConfig(psz_name);
 
     /* sanity checks */
     if (!p_config) {
@@ -466,7 +464,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     module_config_t *p_item;
 
     [object removeAllItems];
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
+    p_item = config_FindConfig(name);
     /* serious problem, if no item found */
     assert(p_item);
 
@@ -514,7 +512,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     module_config_t *p_item;
 
     [object removeAllItems];
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
+    p_item = config_FindConfig(name);
 
     /* serious problem, if no item found */
     assert(p_item);

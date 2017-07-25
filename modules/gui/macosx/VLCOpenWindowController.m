@@ -341,7 +341,6 @@ static NSString *kCaptureTabViewId  = @"capture";
 {
     int i_index;
     module_config_t * p_item;
-    intf_thread_t * p_intf = getIntf();
 
     [_fileSubCheckbox setTitle: _NS("Add Subtitle File:")];
     [_fileSubPathLabel setStringValue: _NS("Choose a file")];
@@ -367,7 +366,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_fileSubFontBox setTitle: _NS("Font Properties")];
     [_fileSubFileBox setTitle: _NS("Subtitle File")];
 
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), "subsdec-encoding");
+    p_item = config_FindConfig("subsdec-encoding");
 
     if (p_item) {
         for (int i = 0; i < p_item->list_count; i++) {
@@ -381,7 +380,7 @@ static NSString *kCaptureTabViewId  = @"capture";
             [_fileSubEncodingPopup selectItemAtIndex:0];
     }
 
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), "subsdec-align");
+    p_item = config_FindConfig("subsdec-align");
 
     if (p_item) {
         for (i_index = 0; i_index < p_item->list_count; i_index++)
@@ -390,7 +389,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         [_fileSubAlignPopup selectItemAtIndex: p_item->value.i];
     }
 
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), "freetype-rel-fontsize");
+    p_item = config_FindConfig("freetype-rel-fontsize");
 
     if (p_item) {
         for (i_index = 0; i_index < p_item->list_count; i_index++) {
@@ -439,8 +438,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         [options addObject: [NSString stringWithFormat:
                              @"subsdec-align=%li", [_fileSubAlignPopup indexOfSelectedItem]]];
 
-        p_item = config_FindConfig(VLC_OBJECT(getIntf()),
-                                   "freetype-rel-fontsize");
+        p_item = config_FindConfig("freetype-rel-fontsize");
 
         if (p_item) {
             [options addObject: [NSString stringWithFormat:

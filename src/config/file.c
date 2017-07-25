@@ -204,7 +204,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
             continue; /* syntax error */
         *ptr = '\0';
 
-        module_config_t *item = config_FindConfig (p_this, psz_option_name);
+        module_config_t *item = config_FindConfig(psz_option_name);
         if (item == NULL)
             continue;
 

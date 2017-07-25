@@ -198,7 +198,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             if( flag ) psz_name += psz_name[2] == '-' ? 3 : 2;
 
             /* Store the configuration option */
-            p_conf = config_FindConfig( p_this, psz_name );
+            p_conf = config_FindConfig( psz_name );
             if( p_conf )
             {
                 /* Check if the option is deprecated */

@@ -178,7 +178,7 @@ static void InitLevel(filter_t *filter, struct filter_level *range, const char *
 {
     int level;
 
-    module_config_t *cfg = config_FindConfig( VLC_OBJECT(filter), p_name);
+    module_config_t *cfg = config_FindConfig(p_name);
     range->min = cfg->min.f;
     range->max = cfg->max.f;
     range->default_val = def;

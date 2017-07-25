@@ -377,8 +377,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
     if( !combobox ) return;
 
     QString option = OptionFromWidgetName( widget );
-    module_config_t *p_item = config_FindConfig( VLC_OBJECT( p_intf ),
-                                                 qtu( option ) );
+    module_config_t *p_item = config_FindConfig( qtu( option ) );
     if( p_item == NULL )
     {
         msg_Err( p_intf, "Couldn't find option \"%s\".", qtu( option ) );
@@ -874,7 +873,7 @@ float FilterSliderData::initialValue()
         }
     }
 
-    if ( ! config_FindConfig( VLC_OBJECT(p_intf), qtu(p_data->name) ) )
+    if ( ! config_FindConfig( qtu(p_data->name) ) )
         return f;
 
     f = config_GetFloat( p_intf, qtu(p_data->name) );
@@ -1014,7 +1013,7 @@ QStringList EqualizerSliderData::getBandsFromAout() const
     if ( bands.count() ) return bands;
     /* Or try config then */
 
-    if ( ! config_FindConfig( VLC_OBJECT(p_intf), qtu(p_data->name) ) )
+    if ( ! config_FindConfig( qtu(p_data->name) ) )
         return bands;
 
     char *psz_bands = config_GetPsz( p_intf, qtu(p_data->name) );

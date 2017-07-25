@@ -113,7 +113,7 @@ VLC_API int config_SaveConfigFile( vlc_object_t * );
 VLC_API void config_ResetAll( vlc_object_t * );
 #define config_ResetAll(a) config_ResetAll(VLC_OBJECT(a))
 
-VLC_API module_config_t * config_FindConfig( vlc_object_t *, const char * ) VLC_USED;
+VLC_API module_config_t * config_FindConfig(const char *) VLC_USED;
 VLC_API char * config_GetDataDir(void) VLC_USED VLC_MALLOC;
 VLC_API char *config_GetLibDir(void) VLC_USED;
 

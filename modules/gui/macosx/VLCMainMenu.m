@@ -296,7 +296,7 @@
     module_config_t *p_item;
 
     [menu removeAllItems];
-    p_item = config_FindConfig(VLC_OBJECT(getIntf()), psz_name);
+    p_item = config_FindConfig(psz_name);
 
     if (!p_item) {
         msg_Err(getIntf(), "couldn't create menu int list for item '%s' as it does not exist", psz_name);

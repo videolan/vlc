@@ -287,7 +287,7 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                         config_GetType( p_this, name ) | VLC_VAR_DOINHERIT ) )
             return /* VLC_xxx */;
 
-        module_config_t* p_conf = config_FindConfig( p_this, name );
+        module_config_t* p_conf = config_FindConfig( name );
         if( p_conf )
         {
             switch( CONFIG_CLASS( p_conf->i_type ) )
@@ -356,7 +356,7 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                   b_once ? (ppsz_options[i] + 1) : ppsz_options[i] );
 
         /* Check if the option is deprecated */
-        p_conf = config_FindConfig( p_this, name );
+        p_conf = config_FindConfig( name );
 
         /* This is basically cut and paste from src/misc/configuration.c
          * with slight changes */
