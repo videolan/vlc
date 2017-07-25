@@ -142,8 +142,8 @@ static void resolve_callback(
         AvahiStringList *asl = NULL;
         input_item_t *p_input = NULL;
 
-        msg_Err( p_sd, "service '%s' of type '%s' in domain '%s' port %i",
-                 name, type, domain, port );
+        msg_Info( p_sd, "service '%s' of type '%s' in domain '%s' port %i",
+                  name, type, domain, port );
 
         avahi_address_snprint(a, (sizeof(a)/sizeof(a[0]))-1, address);
         if( protocol == AVAHI_PROTO_INET6 )
