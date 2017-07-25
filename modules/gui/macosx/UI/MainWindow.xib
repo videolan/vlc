@@ -815,13 +815,13 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="265" y="520" width="612" height="157"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
-            <value key="minSize" type="size" width="612" height="159"/>
+            <value key="minSize" type="size" width="612" height="157"/>
             <value key="maxSize" type="size" width="612" height="159"/>
             <view key="contentView" id="5266">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="157"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5275">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" preferredMaxLayoutWidth="572" translatesAutoresizingMaskIntoConstraints="NO" id="5275">
                         <rect key="frame" x="18" y="120" width="576" height="17"/>
                         <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Subscribe to a podcast" id="5276">
                             <font key="font" metaFont="systemBold"/>
@@ -829,7 +829,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5274">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" preferredMaxLayoutWidth="572" translatesAutoresizingMaskIntoConstraints="NO" id="5274">
                         <rect key="frame" x="18" y="98" width="576" height="14"/>
                         <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Enter URL of the podcast to subscribe to:" usesSingleLineMode="YES" id="5277">
                             <font key="font" metaFont="smallSystem"/>
@@ -895,13 +895,13 @@ Gw
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="265" y="520" width="612" height="156"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
-            <value key="minSize" type="size" width="612" height="159"/>
+            <value key="minSize" type="size" width="612" height="156"/>
             <value key="maxSize" type="size" width="612" height="159"/>
             <view key="contentView" id="5306">
                 <rect key="frame" x="0.0" y="0.0" width="612" height="156"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5311">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" preferredMaxLayoutWidth="572" translatesAutoresizingMaskIntoConstraints="NO" id="5311">
                         <rect key="frame" x="18" y="119" width="576" height="17"/>
                         <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Unsubscribe from a podcast" id="5312">
                             <font key="font" metaFont="systemBold"/>
@@ -909,7 +909,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5310">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" preferredMaxLayoutWidth="572" translatesAutoresizingMaskIntoConstraints="NO" id="5310">
                         <rect key="frame" x="18" y="97" width="576" height="14"/>
                         <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" title="Select the podcast you would like to unsubscribe from:" usesSingleLineMode="YES" id="5313">
                             <font key="font" metaFont="smallSystem"/>
