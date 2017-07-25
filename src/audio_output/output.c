@@ -209,6 +209,8 @@ audio_output_t *aout_New (vlc_object_t *parent)
     vlc_mutex_init (&owner->req.lock);
     vlc_mutex_init (&owner->dev.lock);
     vlc_mutex_init (&owner->vp.lock);
+    vlc_viewpoint_init (&owner->vp.value);
+    atomic_init (&owner->vp.update, false);
     owner->req.device = (char *)unset_str;
     owner->req.volume = -1.f;
     owner->req.mute = -1;
@@ -310,7 +312,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     text.psz_string = _("Audio filters");
     var_Change (aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL);
 
-    var_Create (aout, "viewpoint", VLC_VAR_ADDRESS  | VLC_VAR_DOINHERIT);
+    var_Create (aout, "viewpoint", VLC_VAR_ADDRESS );
     var_AddCallback (aout, "viewpoint", ViewpointCallback, NULL);
 
     var_Create (aout, "audio-visual", VLC_VAR_STRING | VLC_VAR_DOINHERIT);

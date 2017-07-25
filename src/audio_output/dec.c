@@ -112,7 +112,7 @@ error:
 
     atomic_init (&owner->buffers_lost, 0);
     atomic_init (&owner->buffers_played, 0);
-    atomic_init (&owner->vp.update, false);
+    atomic_store (&owner->vp.update, true);
     return 0;
 }
 
