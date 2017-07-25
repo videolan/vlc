@@ -49,31 +49,6 @@
 
 @end
 
-/*****************************************************************************
- * VLCVolumeSliderCommon
- *****************************************************************************/
-
-@interface VLCVolumeSliderCommon : NSSlider
-
-@property (readwrite, nonatomic) BOOL usesBrightArtwork;
-
-- (void)scrollWheel:(NSEvent *)o_event;
-- (void)drawFullVolumeMarker;
-
-- (CGFloat)fullVolumePos;
-
-@end
-
-@interface VolumeSliderCell : NSSliderCell
-@end
-
-/*****************************************************************************
- * ITSlider
- *****************************************************************************/
-
-@interface ITSlider : VLCVolumeSliderCommon
-
-@end
 
 /*****************************************************************************
  * VLCMainWindowSplitView interface
