@@ -301,7 +301,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-clicked", VLC_VAR_COORDS );
 
     /* Viewpoint */
-    var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  );
     var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
     var_Create( p_vout, "viewpoint-changeable", VLC_VAR_BOOL );
 
@@ -321,7 +321,6 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "sub-source" );
     var_TriggerCallback( p_vout, "sub-filter" );
     var_TriggerCallback( p_vout, "sub-margin" );
-    var_TriggerCallback( p_vout, "viewpoint" );
 }
 
 /*****************************************************************************

@@ -562,11 +562,9 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     /* Load configuration */
     cfg->is_fullscreen = var_GetBool(vout, "fullscreen")
                          || var_GetBool(vout, "video-wallpaper");
-    const vlc_viewpoint_t *p_viewpoint = var_GetAddress(vout, "viewpoint");
-    if (p_viewpoint != NULL)
-        cfg->viewpoint = *p_viewpoint;
-    else
-        cfg->viewpoint   = vout->p->original.pose;
+
+    cfg->viewpoint = vout->p->original.pose;
+
     cfg->display.title = title;
     const int display_width = var_GetInteger(vout, "width");
     const int display_height = var_GetInteger(vout, "height");
