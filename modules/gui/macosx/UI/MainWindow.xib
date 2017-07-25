@@ -611,7 +611,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="3653">
-                                        <rect key="frame" x="570" y="13" width="5" height="11"/>
+                                        <rect key="frame" x="570" y="12" width="5" height="11"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="11" id="fR7-Fz-iWX"/>
                                         </constraints>
@@ -623,25 +623,10 @@
                                             <action selector="volumeAction:" target="5339" id="5361"/>
                                         </connections>
                                     </button>
-                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3649" customClass="ITSlider">
-                                        <rect key="frame" x="578" y="11" width="48" height="15"/>
-                                        <ciFilter key="compositingFilter" name="CISourceOverCompositing">
-                                            <configuration>
-                                                <null key="inputBackgroundImage"/>
-                                                <null key="inputImage"/>
-                                            </configuration>
-                                        </ciFilter>
-                                        <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="4276" customClass="VolumeSliderCell">
-                                            <font key="font" size="12" name="Helvetica"/>
-                                        </sliderCell>
-                                        <connections>
-                                            <action selector="volumeAction:" target="5339" id="5358"/>
-                                        </connections>
-                                    </slider>
-                                    <imageView translatesAutoresizingMaskIntoConstraints="NO" id="4417">
-                                        <rect key="frame" x="578" y="16" width="48" height="5"/>
+                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3649" customClass="VLCDefaultValueSlider">
+                                        <rect key="frame" x="578" y="11" width="48" height="13"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="5" id="Xxv-t7-alW"/>
+                                            <constraint firstAttribute="width" constant="48" id="XRa-UG-wuM"/>
                                         </constraints>
                                         <ciFilter key="compositingFilter" name="CISourceOverCompositing">
                                             <configuration>
@@ -649,8 +634,11 @@
                                                 <null key="inputImage"/>
                                             </configuration>
                                         </ciFilter>
-                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="volume-slider-track" id="4418"/>
-                                    </imageView>
+                                        <sliderCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="4276"/>
+                                        <connections>
+                                            <action selector="volumeAction:" target="5339" id="5358"/>
+                                        </connections>
+                                    </slider>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="3652">
                                         <rect key="frame" x="629" y="12" width="13" height="11"/>
                                         <constraints>
@@ -728,21 +716,18 @@
                                     </slider>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="3653" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="5K8-hV-nOQ"/>
                                     <constraint firstItem="mrr-Bw-co0" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="5tM-K0-mjZ"/>
                                     <constraint firstItem="3652" firstAttribute="leading" secondItem="3649" secondAttribute="trailing" constant="3" id="Apb-gM-P9J"/>
                                     <constraint firstItem="4423" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="HUU-wF-duH"/>
                                     <constraint firstItem="jlp-Z2-Qdl" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="Hnv-b4-wWi"/>
                                     <constraint firstItem="dff-fl-Mde" firstAttribute="leading" secondItem="3652" secondAttribute="trailing" constant="8" symbolic="YES" id="TVP-Cr-bfO"/>
-                                    <constraint firstItem="4417" firstAttribute="trailing" secondItem="3649" secondAttribute="trailing" id="WUo-ur-GGy"/>
                                     <constraint firstItem="3647" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="WdH-6H-Xhc"/>
+                                    <constraint firstItem="3653" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="WjR-sa-lQq"/>
                                     <constraint firstItem="4423" firstAttribute="leading" secondItem="4422" secondAttribute="trailing" constant="8" id="YpP-Vj-f9b"/>
                                     <constraint firstItem="4422" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="Zit-b0-8jR"/>
-                                    <constraint firstItem="4417" firstAttribute="leading" secondItem="3649" secondAttribute="leading" id="b86-zP-VqN"/>
-                                    <constraint firstItem="4417" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="gI8-2E-JGT"/>
+                                    <constraint firstItem="3652" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="cci-dm-60V"/>
                                     <constraint firstItem="dff-fl-Mde" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="gqZ-nc-67e"/>
                                     <constraint firstItem="3649" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="ll4-Gr-Hs6"/>
-                                    <constraint firstItem="3652" firstAttribute="centerY" secondItem="5608" secondAttribute="centerY" id="o7m-oP-mfd"/>
                                     <constraint firstItem="jlp-Z2-Qdl" firstAttribute="leading" secondItem="5608" secondAttribute="leading" constant="8" id="odn-Ek-4d1"/>
                                     <constraint firstItem="4422" firstAttribute="leading" secondItem="mrr-Bw-co0" secondAttribute="trailing" constant="8" id="tg9-ZJ-h8u"/>
                                     <constraint firstItem="3653" firstAttribute="leading" secondItem="4423" secondAttribute="trailing" constant="8" symbolic="YES" id="tn5-dP-NYa"/>
@@ -840,7 +825,6 @@
                 <outlet property="timeSlider" destination="4422" id="I3H-rQ-4GH"/>
                 <outlet property="volumeDownButton" destination="3653" id="brO-P5-sUM"/>
                 <outlet property="volumeSlider" destination="3649" id="NDW-el-poL"/>
-                <outlet property="volumeTrackImageView" destination="4417" id="xH3-Dg-2Ok"/>
                 <outlet property="volumeUpButton" destination="3652" id="vXR-KC-L2N"/>
             </connections>
         </customObject>
@@ -1040,6 +1024,5 @@ Gw
         <image name="topbar_background" width="1" height="27"/>
         <image name="volume-high" width="13" height="11"/>
         <image name="volume-low" width="5" height="10"/>
-        <image name="volume-slider-track" width="48" height="5"/>
     </resources>
 </document>

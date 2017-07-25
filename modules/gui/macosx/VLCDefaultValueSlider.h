@@ -53,4 +53,6 @@
  */
 - (double)defaultValue;
 
+- (void)setUsesBrightArtwork:(BOOL)brightArtwork;
+
 @end

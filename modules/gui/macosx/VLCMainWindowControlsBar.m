@@ -114,7 +114,6 @@
         _pressedShuffleOnImage = imageFromRes(@"shuffle-blue-pressed");
 
         [self.volumeDownButton setImage: imageFromRes(@"volume-low")];
-        [self.volumeTrackImageView setImage: imageFromRes(@"volume-slider-track")];
         [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
         [self.volumeSlider setUsesBrightArtwork: YES];
 
@@ -151,7 +150,6 @@
         _pressedShuffleOnImage = imageFromRes(@"shuffle-blue-pressed_dark");
 
         [self.volumeDownButton setImage: imageFromRes(@"volume-low_dark")];
-        [self.volumeTrackImageView setImage: imageFromRes(@"volume-slider-track_dark")];
         [self.volumeUpButton setImage: imageFromRes(@"volume-high_dark")];
         [self.volumeSlider setUsesBrightArtwork: NO];
 
@@ -179,6 +177,7 @@
     BOOL b_mute = ![[VLCCoreInteraction sharedInstance] mute];
     [self.volumeSlider setEnabled: b_mute];
     [self.volumeSlider setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
+    [self.volumeSlider setDefaultValue: AOUT_VOLUME_DEFAULT];
     [self.volumeUpButton setEnabled: b_mute];
 
     // configure optional buttons
