@@ -244,6 +244,11 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
 
         DisplayVoutTitle( p_resource, p_vout );
 
+        /* Send original viewpoint to the input in order to update other ESes */
+        if( p_resource->p_input != NULL )
+            input_Control( p_resource->p_input, INPUT_SET_INITIAL_VIEWPOINT,
+                           &p_fmt->pose );
+
         vlc_mutex_lock( &p_resource->lock_hold );
         TAB_APPEND( p_resource->i_vout, p_resource->pp_vout, p_vout );
         vlc_mutex_unlock( &p_resource->lock_hold );
