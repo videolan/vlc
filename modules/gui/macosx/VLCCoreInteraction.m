@@ -816,7 +816,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         b_is_command = i_type & VLC_VAR_ISCOMMAND;
     }
     if (!i_type)
-        i_type = config_GetType(p_intf, psz_property);
+        i_type = config_GetType(psz_property);
 
     i_type &= VLC_VAR_CLASS;
     if (i_type == VLC_VAR_BOOL)

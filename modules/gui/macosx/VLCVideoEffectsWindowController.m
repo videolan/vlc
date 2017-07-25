@@ -378,7 +378,7 @@
     playlist_t *p_playlist = pl_Get(p_intf);
 
     vlc_value_t val;
-    int i_type = config_GetType(p_intf, psz_option) & VLC_VAR_CLASS;
+    int i_type = config_GetType(psz_option) & VLC_VAR_CLASS;
     switch (i_type)
     {
     case VLC_VAR_BOOL:

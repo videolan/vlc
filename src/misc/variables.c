@@ -1054,7 +1054,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
     if( psz_value != NULL )
         *psz_value++ = '\0';
 
-    i_type = config_GetType( p_obj, psz_name );
+    i_type = config_GetType( psz_name );
     if( !i_type && !psz_value )
     {
         /* check for "no-foo" or "nofoo" */
@@ -1069,7 +1069,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         else goto cleanup;           /* Option doesn't exist */
 
         b_isno = true;
-        i_type = config_GetType( p_obj, psz_name );
+        i_type = config_GetType( psz_name );
     }
     if( !i_type ) goto cleanup; /* Option doesn't exist */
 

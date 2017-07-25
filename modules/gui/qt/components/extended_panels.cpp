@@ -424,7 +424,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     //std::cout << "Option name: " << option.toStdString() << std::endl;
 
     vlc_value_t val;
-    int i_type = config_GetType( p_intf, qtu( option ) ) & VLC_VAR_CLASS;
+    int i_type = config_GetType( qtu( option ) ) & VLC_VAR_CLASS;
     switch( i_type )
     {
         case VLC_VAR_INTEGER:
@@ -500,7 +500,7 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
         b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     }
     if( i_type == 0 )
-        i_type = config_GetType( p_intf, psz_option );
+        i_type = config_GetType( psz_option );
 
     vlc_value_t val;
     i_type &= VLC_VAR_CLASS;

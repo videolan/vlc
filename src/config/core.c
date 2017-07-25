@@ -46,19 +46,14 @@ static inline char *strdupnull (const char *src)
     return src ? strdup (src) : NULL;
 }
 
-#undef config_GetType
 /*****************************************************************************
  * config_GetType: get the type of a variable (bool, int, float, string)
  *****************************************************************************
  * This function is used to get the type of a variable from its name.
- * Beware, this is quite slow.
  *****************************************************************************/
-int config_GetType( vlc_object_t *p_this, const char *psz_name )
+int config_GetType(const char *psz_name)
 {
-    module_config_t *p_config;
-    int i_type;
-
-    p_config = config_FindConfig( psz_name );
+    module_config_t *p_config = config_FindConfig(psz_name);
 
     /* sanity checks */
     if( !p_config )
@@ -68,28 +63,17 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
 
     switch( CONFIG_CLASS(p_config->i_type) )
     {
-    case CONFIG_ITEM_FLOAT:
-        i_type = VLC_VAR_FLOAT;
-        break;
-
-    case CONFIG_ITEM_INTEGER:
-        i_type = VLC_VAR_INTEGER;
-        break;
-
-    case CONFIG_ITEM_BOOL:
-        i_type = VLC_VAR_BOOL;
-        break;
-
-    case CONFIG_ITEM_STRING:
-        i_type = VLC_VAR_STRING;
-        break;
-
-    default:
-        i_type = 0;
-        break;
+        case CONFIG_ITEM_FLOAT:
+            return VLC_VAR_FLOAT;
+        case CONFIG_ITEM_INTEGER:
+            return VLC_VAR_INTEGER;
+        case CONFIG_ITEM_BOOL:
+            return VLC_VAR_BOOL;
+        case CONFIG_ITEM_STRING:
+            return VLC_VAR_STRING;
+        default:
+            return 0;
     }
-
-    return i_type;
 }
 
 bool config_IsSafe( const char *name )
