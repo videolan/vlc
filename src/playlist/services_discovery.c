@@ -80,17 +80,17 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
                                      input_item_t *p_input)
 {
     vlc_sd_internal_t *sds = sd->owner.sys;
-    playlist_t *p_playlist = (playlist_t *)sd->obj.parent;
+    playlist_t *playlist = (playlist_t *)sd->obj.parent;
     playlist_item_t *node, *item;
 
     msg_Dbg(sd, "removing: %s", p_input->psz_name ? p_input->psz_name : "(null)");
 
-    PL_LOCK;
-    item = playlist_ItemGetByInput(p_playlist, p_input);
+    playlist_Lock(playlist);
+    item = playlist_ItemGetByInput(playlist, p_input);
     if (unlikely(item == NULL))
     {
         msg_Err(sd, "removing item not added"); /* SD plugin bug */
-        PL_UNLOCK;
+        playlist_Unlock(playlist);
         return;
     }
 
@@ -105,9 +105,9 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
        becomes empty, delete that node as well */
     if (node != sds->node && node->i_children == 1)
         item = node;
-    playlist_NodeDeleteExplicit(p_playlist, item,
+    playlist_NodeDeleteExplicit(playlist, item,
         PLAYLIST_DELETE_FORCE | PLAYLIST_DELETE_STOP_IF_CURRENT );
-    PL_UNLOCK;
+    playlist_Unlock(playlist);
 }
 
 int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
@@ -193,12 +193,12 @@ int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
     return VLC_SUCCESS;
 }
 
-bool playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
+bool playlist_IsServicesDiscoveryLoaded( playlist_t * playlist,
                                          const char *psz_name )
 {
-    playlist_private_t *priv = pl_priv( p_playlist );
+    playlist_private_t *priv = pl_priv( playlist );
     bool found = false;
-    PL_LOCK;
+    playlist_Lock(playlist);
 
     for( int i = 0; i < priv->i_sds; i++ )
     {
@@ -210,17 +210,17 @@ bool playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
             break;
         }
     }
-    PL_UNLOCK;
+    playlist_Unlock(playlist);
     return found;
 }
 
-int playlist_ServicesDiscoveryControl( playlist_t *p_playlist, const char *psz_name, int i_control, ... )
+int playlist_ServicesDiscoveryControl( playlist_t *playlist, const char *psz_name, int i_control, ... )
 {
-    playlist_private_t *priv = pl_priv( p_playlist );
+    playlist_private_t *priv = pl_priv( playlist );
     int i_ret = VLC_EGENERIC;
     int i;
 
-    PL_LOCK;
+    playlist_Lock(playlist);
     for( i = 0; i < priv->i_sds; i++ )
     {
         vlc_sd_internal_t *sds = priv->pp_sds[i];
@@ -235,7 +235,7 @@ int playlist_ServicesDiscoveryControl( playlist_t *p_playlist, const char *psz_n
     }
 
     assert( i != priv->i_sds );
-    PL_UNLOCK;
+    playlist_Unlock(playlist);
 
     return i_ret;
 }
