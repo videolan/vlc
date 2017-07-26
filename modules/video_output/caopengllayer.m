@@ -84,6 +84,7 @@ static void OpenglSwap         (vlc_gl_t *gl);
 @interface VLCCAOpenGLLayer : CAOpenGLLayer
 
 @property (nonatomic, readwrite) vout_display_t* voutDisplay;
+@property (nonatomic, readwrite) CGLContextObj glContext;
 
 @end
 
@@ -99,14 +100,18 @@ struct vout_display_sys_t {
 
     CGColorSpaceRef cgColorSpace;
 
-    CGLContextObj glContext;
-
     vlc_gl_t *gl;
     vout_display_opengl_t *vgl;
 
     vout_display_place_t place;
 
     bool  b_frame_available;
+};
+
+struct gl_sys
+{
+    CGLContextObj locked_ctx;
+    VLCCAOpenGLLayer *cgLayer;
 };
 
 /*****************************************************************************
@@ -167,7 +172,7 @@ static int Open (vlc_object_t *p_this)
         if (!sys->cgLayer)
             goto bailout;
 
-        if (!sys->glContext)
+        if (![sys->cgLayer glContext])
             msg_Warn(vd, "we might not have an OpenGL context yet");
 
         /* Initialize common OpenGL video display */
@@ -178,7 +183,12 @@ static int Open (vlc_object_t *p_this)
         sys->gl->releaseCurrent = OpenglUnlock;
         sys->gl->swap = OpenglSwap;
         sys->gl->getProcAddress = OurGetProcAddress;
-        sys->gl->sys = sys;
+
+        struct gl_sys *glsys = sys->gl->sys = malloc(sizeof(*glsys));
+        if (!sys->gl->sys)
+            goto bailout;
+        glsys->locked_ctx = NULL;
+        glsys->cgLayer = sys->cgLayer;
 
         const vlc_fourcc_t *subpicture_chromas;
         video_format_t fmt = vd->fmt;
@@ -308,10 +318,17 @@ static void Close (vlc_object_t *p_this)
     }
 
     if (sys->gl != NULL)
+    {
+        if (sys->gl->sys != NULL)
+        {
+            assert(((struct gl_sys *)sys->gl->sys)->locked_ctx == NULL);
+            free(sys->gl->sys);
+        }
         vlc_object_release(sys->gl);
+    }
 
-    if (sys->glContext)
-        CGLReleaseContext(sys->glContext);
+    if ([sys->cgLayer glContext])
+        CGLReleaseContext([sys->cgLayer glContext]);
 
     if (sys->cgColorSpace != nil)
         CGColorSpaceRelease(sys->cgColorSpace);
@@ -450,15 +467,18 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
 static int OpenglLock (vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
+    struct gl_sys *sys = gl->sys;
+    assert(sys->locked_ctx == NULL);
 
-    if(!sys->glContext) {
+    CGLContextObj ctx = [sys->cgLayer glContext];
+    if(!ctx) {
         return 1;
     }
 
-    CGLError err = CGLLockContext(sys->glContext);
+    CGLError err = CGLLockContext(ctx);
     if (kCGLNoError == err) {
-        CGLSetCurrentContext(sys->glContext);
+        sys->locked_ctx = ctx;
+        CGLSetCurrentContext(ctx);
         return 0;
     }
     return 1;
@@ -466,13 +486,9 @@ static int OpenglLock (vlc_gl_t *gl)
 
 static void OpenglUnlock (vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
-
-    if (!sys->glContext) {
-        return;
-    }
-
-    CGLUnlockContext(sys->glContext);
+    struct gl_sys *sys = gl->sys;
+    CGLUnlockContext(sys->locked_ctx);
+    sys->locked_ctx = NULL;
 }
 
 static void OpenglSwap (vlc_gl_t *gl)
@@ -561,9 +577,9 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat
 {
     // Only one opengl context is allowed for the module lifetime
-    if(_voutDisplay->sys->glContext) {
-        msg_Dbg(_voutDisplay, "Return existing context: %p", _voutDisplay->sys->glContext);
-        return _voutDisplay->sys->glContext;
+    if(_glContext) {
+        msg_Dbg(_voutDisplay, "Return existing context: %p", _glContext);
+        return _glContext;
     }
 
     CGLContextObj context = [super copyCGLContextForPixelFormat:pixelFormat];
@@ -577,7 +593,7 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
                      &params );
 
     @synchronized (self) {
-        _voutDisplay->sys->glContext = context;
+        _glContext = context;
     }
 
     return context;
