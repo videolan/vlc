@@ -292,6 +292,7 @@ static int Open(vlc_object_t *object)
             s->count = 0;
     }
 
+    demux->p_sys = sys;
     if (sys->count == 0 ||
         vlc_stream_Seek(demux->s, 1024 + 128LL * sys->index[0].blocknumber) != VLC_SUCCESS)
     {
