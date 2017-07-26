@@ -56,7 +56,7 @@ static inline bool j2k_is_valid_framerate( unsigned num, unsigned den )
 static inline enum j2k_profiles_e j2k_get_profile( unsigned w, unsigned h,
                                                    unsigned num, unsigned den, bool p )
 {
-    const uint64_t s = w * h;
+    const uint64_t s = w *(uint64_t)h;
     const uint64_t f = num / den;
     if( s <= 720*576 && f < 50 )
         return J2K_PROFILE_SD; /* VSF_TR-01_2013-04-15 */
