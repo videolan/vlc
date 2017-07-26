@@ -122,8 +122,9 @@ export ac_cv_func_mkostemps=no
 export ac_cv_func_ffsll=no
 export ac_cv_func_flsll=no
 export ac_cv_func_fdopendir=no
-export ac_cv_func_openat=no # Disables fstatat as well
-
+export ac_cv_func_openat=no
+export ac_cv_func_fstatat=no
+export ac_cv_func_readlinkat=no
 
 # libnetwork does not exist yet on 10.7 (used by libcddb)
 export ac_cv_lib_network_connect=no
@@ -148,6 +149,17 @@ let jobs=$core_count+1
 # vlc/contribs
 #
 
+# Usually, VLCs contrib libraries do not support partial availability at runtime.
+# Forcing those errors has two reasons:
+# - Some custom configure scripts include the right header for testing availability.
+#   Those configure checks fail (correctly) with those errors, and replacements are
+#   enabled. (e.g. ffmpeg)
+# - This will fail the build if a partially available symbol is added later on
+#   in contribs and not mentioned in the list of symbols above.
+export CFLAGS="-Werror=partial-availability"
+export CXXFLAGS="-Werror=partial-availability"
+export OBJCFLAGS="-Werror=partial-availability"
+
 info "Building contribs"
 spushd "${vlcroot}/contrib"
 mkdir -p contrib-$TRIPLET && cd contrib-$TRIPLET
@@ -165,6 +177,10 @@ if [ ! -e "../$TRIPLET" ]; then
 fi
 fi
 spopd
+
+unset CFLAGS
+unset CXXFLAGS
+unset OBJCFLAGS
 
 
 #
