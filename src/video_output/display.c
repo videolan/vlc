@@ -1092,11 +1092,14 @@ picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    assert(osys->filters);
+    if (osys->filters == NULL)
+        return picture;
+
     if (filter_chain_IsEmpty(osys->filters)) {
         picture_Release(picture);
         return NULL;
     }
+
     return filter_chain_VideoFilter(osys->filters, picture);
 }
 
@@ -1451,8 +1454,7 @@ static void SplitterPrepare(vout_display_t *vd,
     }
 
     for (int i = 0; i < sys->count; i++) {
-        if (vout_IsDisplayFiltered(sys->display[i]))
-            sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
+        sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
         if (sys->picture[i])
             vout_display_Prepare(sys->display[i], sys->picture[i], NULL);
     }

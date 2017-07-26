@@ -1045,17 +1045,17 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     /* Render the direct buffer */
     vout_UpdateDisplaySourceProperties(vd, &todisplay->format);
+
+    todisplay = vout_FilterDisplay(vd, todisplay);
+    if (todisplay == NULL) {
+        if (subpic != NULL)
+            subpicture_Delete(subpic);
+        return VLC_EGENERIC;
+    }
+
     if (sys->display.use_dr) {
         vout_display_Prepare(vd, todisplay, subpic);
     } else {
-        todisplay = vout_FilterDisplay(vd, todisplay);
-        if (todisplay == NULL)
-        {
-            if (subpic != NULL)
-                subpicture_Delete(subpic);
-            return VLC_EGENERIC;
-        }
-
         if (!do_dr_spu && !do_early_spu && vout->p->spu_blend && subpic)
             picture_BlendSubpicture(todisplay, vout->p->spu_blend, subpic);
         vout_display_Prepare(vd, todisplay, do_dr_spu ? subpic : NULL);
