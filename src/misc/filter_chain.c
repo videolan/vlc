@@ -43,9 +43,9 @@ typedef struct chained_filter_t
 } chained_filter_t;
 
 /* Only use this with filter objects from _this_ C module */
-static inline chained_filter_t *chained (filter_t *filter)
+static inline chained_filter_t *chained(filter_t *filter)
 {
-    return (chained_filter_t *)filter;
+    return container_of(filter, chained_filter_t, filter);
 }
 
 /* */
