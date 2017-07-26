@@ -1579,6 +1579,11 @@ typedef struct
 typedef struct
 {
     uint32_t i_projection_mode;
+    enum {
+        XML360_MONOSCOPIC = 0,
+        XML360_STEREOSCOPIC_TOP_BOTTOM = 1,
+        XML360_STEREOSCOPIC_LEFT_RIGHT = 2,
+    } e_stereo_mode;
 } MP4_Box_data_360_t;
 
 

@@ -356,7 +356,21 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         if( p_uuid->i_type == ATOM_uuid
             && !CmpUUID( &p_uuid->i_uuid, &XML360BoxUUID )
             && p_uuid->data.p_360 )
+        {
             p_track->fmt.video.projection_mode = p_uuid->data.p_360->i_projection_mode;
+            switch (p_uuid->data.p_360->e_stereo_mode)
+            {
+            case XML360_STEREOSCOPIC_TOP_BOTTOM:
+                p_track->fmt.video.multiview_mode = MULTIVIEW_STEREO_TB;
+                break;
+            case XML360_STEREOSCOPIC_LEFT_RIGHT:
+                p_track->fmt.video.multiview_mode = MULTIVIEW_STEREO_SBS;
+                break;
+            default:
+                p_track->fmt.video.multiview_mode = MULTIVIEW_2D;
+                break;
+            }
+        }
     }
 
     const MP4_Box_t *p_st3d = MP4_BoxGet( p_sample, "st3d" );

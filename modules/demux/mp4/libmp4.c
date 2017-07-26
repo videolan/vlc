@@ -742,10 +742,16 @@ static int MP4_ReadBox_XML360( stream_t *p_stream, MP4_Box_t *p_box )
 
     /* Try to find the stero mode. */
     if ( strcasestr( psz_rdf, "left-right" ) )
+    {
         msg_Dbg( p_stream, "Left-right stereo mode" );
+        p_360_data->e_stereo_mode = XML360_STEREOSCOPIC_LEFT_RIGHT;
+    }
 
     if ( strcasestr( psz_rdf, "top-bottom" ) )
+    {
         msg_Dbg( p_stream, "Top-bottom stereo mode" );
+        p_360_data->e_stereo_mode = XML360_STEREOSCOPIC_TOP_BOTTOM;
+    }
 
     free( psz_rdf );
 
