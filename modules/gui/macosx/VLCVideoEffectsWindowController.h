@@ -108,7 +108,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *sepiaLabel;
 @property (readwrite, weak) IBOutlet NSTextField *sepiaTextField;
 @property (readwrite, weak) IBOutlet NSStepper *sepiaStepper;
-@property (readwrite, weak) IBOutlet NSButton *noiseCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *gradientCheckbox;
 @property (readwrite, weak) IBOutlet NSTextField *gradientModeLabel;
 @property (readwrite, weak) IBOutlet NSPopUpButton *gradientModePopup;
@@ -205,7 +204,6 @@
 - (IBAction)thresholdModifierChanged:(id)sender;
 - (IBAction)enableSepia:(id)sender;
 - (IBAction)sepiaModifierChanged:(id)sender;
-- (IBAction)enableNoise:(id)sender;
 - (IBAction)enableGradient:(id)sender;
 - (IBAction)gradientModifierChanged:(id)sender;
 - (IBAction)enableExtract:(id)sender;

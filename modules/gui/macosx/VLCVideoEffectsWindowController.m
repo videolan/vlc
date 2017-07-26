@@ -241,7 +241,6 @@
     [_thresholdSimilarityLabel setStringValue:_NS("Similarity")];
     [_sepiaCheckbox setTitle:_NS("Sepia")];
     [_sepiaLabel setStringValue:_NS("Intensity")];
-    [_noiseCheckbox setTitle:_NS("Noise")];
     [_gradientCheckbox setTitle:_NS("Gradient")];
     [_gradientModeLabel setStringValue:_NS("Mode")];
     [_gradientModePopup removeAllItems];
@@ -459,7 +458,6 @@
         [_puzzleCheckbox setState: (NSInteger)strstr(psz_vfilters, "puzzle")];
         [_thresholdCheckbox setState: (NSInteger)strstr(psz_vfilters, "colorthres")];
         [_sepiaCheckbox setState: (NSInteger)strstr(psz_vfilters, "sepia")];
-        [_noiseCheckbox setState: (NSInteger)strstr(psz_vfilters, "noise")];
         [_gradientCheckbox setState: (NSInteger)strstr(psz_vfilters, "gradient")];
         [_extractCheckbox setState: (NSInteger)strstr(psz_vfilters, "extract")];
         [_invertCheckbox setState: (NSInteger)strstr(psz_vfilters, "invert")];
@@ -481,7 +479,6 @@
         [_puzzleCheckbox setState: NSOffState];
         [_thresholdCheckbox setState: NSOffState];
         [_sepiaCheckbox setState: NSOffState];
-        [_noiseCheckbox setState: NSOffState];
         [_gradientCheckbox setState: NSOffState];
         [_extractCheckbox setState: NSOffState];
         [_invertCheckbox setState: NSOffState];
@@ -1129,11 +1126,6 @@
 - (IBAction)sepiaModifierChanged:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "sepia-intensity" forFilter: "sepia" withValue: getWidgetIntValue(sender)];
-}
-
-- (IBAction)enableNoise:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "noise" on: [_noiseCheckbox state]];
 }
 
 - (IBAction)enableGradient:(id)sender

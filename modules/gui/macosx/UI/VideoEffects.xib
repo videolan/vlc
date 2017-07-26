@@ -73,7 +73,6 @@
                 <outlet property="grainSlider" destination="69" id="2P8-j4-XXS"/>
                 <outlet property="invertCheckbox" destination="300" id="5a9-qz-qdw"/>
                 <outlet property="motiondetectCheckbox" destination="254" id="Yh5-OT-vbA"/>
-                <outlet property="noiseCheckbox" destination="262" id="jaY-lZ-bhE"/>
                 <outlet property="posterizeCheckbox" destination="213" id="JeQ-gc-dJ5"/>
                 <outlet property="posterizeLabel" destination="240" id="L5o-pL-E90"/>
                 <outlet property="posterizeStepper" destination="234" id="Xbv-jQ-dtJ"/>
@@ -1162,16 +1161,6 @@
                                                 <action selector="enablePsychedelic:" target="-2" id="0oR-yp-Qnb"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="262">
-                                            <rect key="frame" x="6" y="10" width="52" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Noise" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="263" customClass="VLCHUDCheckboxCell">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="enableNoise:" target="-2" id="KKk-f4-K9A"/>
-                                            </connections>
-                                        </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="300">
                                             <rect key="frame" x="222" y="10" width="88" height="18"/>
                                             <buttonCell key="cell" type="check" title="Invert colors" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="301" customClass="VLCHUDCheckboxCell">
@@ -1502,7 +1491,6 @@
                                         <constraint firstItem="203" firstAttribute="leading" secondItem="204" secondAttribute="leading" id="4mQ-2f-Qic"/>
                                         <constraint firstItem="279" firstAttribute="leading" secondItem="243" secondAttribute="trailing" constant="8" id="BDq-qY-w9m"/>
                                         <constraint firstItem="256" firstAttribute="leading" secondItem="254" secondAttribute="leading" id="ITR-7T-avj"/>
-                                        <constraint firstItem="243" firstAttribute="leading" secondItem="262" secondAttribute="leading" id="MSk-KY-Ehw"/>
                                         <constraint firstItem="279" firstAttribute="leading" secondItem="300" secondAttribute="leading" id="O8e-w0-Yw7"/>
                                         <constraint firstItem="278" firstAttribute="leading" secondItem="279" secondAttribute="leading" id="OzU-Vi-ao3"/>
                                         <constraint firstItem="207" firstAttribute="top" secondItem="203" secondAttribute="top" id="QKr-fj-vSY"/>
@@ -1515,7 +1503,6 @@
                                         <constraint firstItem="254" firstAttribute="top" secondItem="218" secondAttribute="bottom" constant="6" id="X4R-Jg-fee"/>
                                         <constraint firstItem="256" firstAttribute="top" secondItem="254" secondAttribute="bottom" constant="3" id="ZfS-bV-nS5"/>
                                         <constraint firstItem="271" firstAttribute="leading" secondItem="272" secondAttribute="leading" id="bL3-Wr-Y0U"/>
-                                        <constraint firstItem="262" firstAttribute="top" secondItem="243" secondAttribute="bottom" constant="5" id="chw-Qb-hFM"/>
                                         <constraint firstItem="272" firstAttribute="leading" secondItem="11" secondAttribute="leading" constant="11" id="dCG-fm-mE8"/>
                                         <constraint firstItem="218" firstAttribute="height" secondItem="207" secondAttribute="height" id="gKW-QH-gTo"/>
                                         <constraint firstItem="213" firstAttribute="leading" secondItem="207" secondAttribute="leading" id="gLR-0l-e9q"/>
