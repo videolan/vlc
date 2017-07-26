@@ -414,8 +414,16 @@ typedef struct {
 static int VoutDisplayCreateRender(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
+    filter_owner_t owner = {
+        .sys = vd,
+        .video = {
+            .buffer_new = VideoBufferNew,
+        },
+    };
 
-    osys->filters = NULL;
+    osys->filters = filter_chain_NewVideo(vd, false, &owner);
+    if (unlikely(osys->filters == NULL))
+        return -1;
 
     video_format_t v_src = vd->source;
     v_src.i_sar_num = 0;
@@ -438,17 +446,6 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
     msg_Dbg(vd, "A filter to adapt decoder %4.4s to display %4.4s is needed",
             (const char *)&v_src.i_chroma, (const char *)&v_dst.i_chroma);
-
-    filter_owner_t owner = {
-        .sys = vd,
-        .video = {
-            .buffer_new = VideoBufferNew,
-        },
-    };
-
-    osys->filters = filter_chain_NewVideo(vd, false, &owner);
-    if (unlikely(osys->filters == NULL))
-        abort(); /* TODO critical */
 
     /* */
     es_format_t src;
@@ -1085,17 +1082,14 @@ bool vout_IsDisplayFiltered(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    return osys->filters != NULL;
+    return osys->filters == NULL || !filter_chain_IsEmpty(osys->filters);
 }
 
 picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (osys->filters == NULL)
-        return picture;
-
-    if (filter_chain_IsEmpty(osys->filters)) {
+    if (osys->filters == NULL) {
         picture_Release(picture);
         return NULL;
     }
