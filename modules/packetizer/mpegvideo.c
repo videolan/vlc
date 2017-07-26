@@ -817,8 +817,27 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         }
     }
-    else if( p_frag->p_buffer[3] == 0xb2 && p_frag->i_buffer > 4 )
+    else if( p_frag->p_buffer[3] == 0xb2 && p_frag->i_buffer > 8 )
     {
+        /* Frame Packing extension identifier as H262 2012 Amd4 Annex L */
+        if( !memcmp( &p_frag->p_buffer[4], "JP3D", 4 ) &&
+            p_frag->i_buffer > 11 && p_frag->p_buffer[8] == 0x03 &&
+            p_dec->fmt_in.video.multiview_mode == MULTIVIEW_2D )
+        {
+            video_multiview_mode_t mode;
+            switch( p_frag->p_buffer[9] & 0x7F )
+            {
+                case 0x03:
+                    mode = MULTIVIEW_STEREO_SBS; break;
+                case 0x04:
+                    mode = MULTIVIEW_STEREO_TB; break;
+                case 0x08:
+                default:
+                    mode = MULTIVIEW_2D; break;
+            }
+            p_dec->fmt_out.video.multiview_mode = mode;
+        }
+        else
         cc_ProbeAndExtract( &p_sys->cc, p_sys->i_top_field_first,
                     &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
     }
