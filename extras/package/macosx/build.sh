@@ -157,6 +157,7 @@ if [ "$REBUILD" = "yes" ]; then
 fi
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     make fetch
+    make -j$jobs .gettext
     make -j$jobs
 else
 if [ ! -e "../$TRIPLET" ]; then
