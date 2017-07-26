@@ -93,25 +93,25 @@ static void renderer_discovery_item_removed( vlc_renderer_discovery_t *rd,
 const char *
 libvlc_renderer_item_name( const libvlc_renderer_item_t *p_item )
 {
-    return vlc_renderer_item_name( (vlc_renderer_item_t *) p_item );
+    return vlc_renderer_item_name( (const vlc_renderer_item_t *) p_item );
 }
 
 const char *
 libvlc_renderer_item_type( const libvlc_renderer_item_t *p_item )
 {
-    return vlc_renderer_item_type( (vlc_renderer_item_t *) p_item );
+    return vlc_renderer_item_type( (const vlc_renderer_item_t *) p_item );
 }
 
 const char *
 libvlc_renderer_item_icon_uri( const libvlc_renderer_item_t *p_item )
 {
-    return vlc_renderer_item_icon_uri( (vlc_renderer_item_t *) p_item );
+    return vlc_renderer_item_icon_uri( (const vlc_renderer_item_t *) p_item );
 }
 
 int
 libvlc_renderer_item_flags( const libvlc_renderer_item_t *p_item )
 {
-    return vlc_renderer_item_flags( (vlc_renderer_item_t *) p_item );
+    return vlc_renderer_item_flags( (const vlc_renderer_item_t *) p_item );
 }
 
 libvlc_renderer_discoverer_t *
