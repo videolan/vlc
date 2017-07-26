@@ -1,7 +1,7 @@
 /*****************************************************************************
  * caopengllayer.m: CAOpenGLLayer (Mac OS X) video output
  *****************************************************************************
- * Copyright (C) 2014-2016 VLC authors and VideoLAN
+ * Copyright (C) 2014-2017 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: David Fuhrmann <david dot fuhrmann at googlemail dot com>
@@ -43,7 +43,8 @@
 
 #include "opengl/vout_helper.h"
 
-#define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
+#define OSX_EL_CAPITAN_AND_HIGHER (NSAppKitVersionNumber >= 1404)
+#define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
 
 #if MAC_OS_X_VERSION_MIN_ALLOWED <= MAC_OS_X_VERSION_10_11
 const CFStringRef kCGColorSpaceDCIP3 = CFSTR("kCGColorSpaceDCIP3");
@@ -219,7 +220,7 @@ static int Open (vlc_object_t *p_this)
 
             /* support for BT.709 and BT.2020 color spaces was introduced with OS X 10.11
              * on older OS versions, we can't show correct colors, so we fallback on linear RGB */
-            if (OSX_EL_CAPITAN) {
+            if (OSX_EL_CAPITAN_AND_HIGHER) {
                 switch (fmt.primaries) {
                     case COLOR_PRIMARIES_BT601_525:
                     case COLOR_PRIMARIES_BT601_625:
@@ -272,9 +273,11 @@ static int Open (vlc_object_t *p_this)
             msg_Dbg(vd, "OS does not support custom color spaces, output may be undefined");
         }
 
-        /* request our screen's HDR mode (introduced in OS X 10.11) */
-        if ([sys->cgLayer respondsToSelector:@selector(setWantsExtendedDynamicRangeContent:)]) {
-            [sys->cgLayer setWantsExtendedDynamicRangeContent:YES];
+        if (OSX_SIERRA_AND_HIGHER) {
+            /* request our screen's HDR mode (introduced in OS X 10.11, but correctly supported in 10.12 only) */
+            if ([sys->cgLayer respondsToSelector:@selector(setWantsExtendedDynamicRangeContent:)]) {
+                [sys->cgLayer setWantsExtendedDynamicRangeContent:YES];
+            }
         }
 
         /* setup initial state */
