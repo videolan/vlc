@@ -684,7 +684,7 @@ static picture_t *VoutVideoFilterStaticNewPicture(filter_t *filter)
     vout_thread_t *vout = filter->owner.sys;
 
     vlc_assert_locked(&vout->p->filter.lock);
-    if (filter_chain_GetLength(vout->p->filter.chain_interactive) == 0)
+    if (filter_chain_IsEmpty(vout->p->filter.chain_interactive))
         return VoutVideoFilterInteractiveNewPicture(filter);
 
     return picture_NewFromFormat(&filter->fmt_out.video);

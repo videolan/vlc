@@ -1093,7 +1093,7 @@ picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
     assert(osys->filters);
-    if (filter_chain_GetLength(osys->filters) <= 0) {
+    if (filter_chain_IsEmpty(osys->filters)) {
         picture_Release(picture);
         return NULL;
     }

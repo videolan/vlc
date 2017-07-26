@@ -379,9 +379,9 @@ int filter_chain_ForEach( filter_chain_t *chain,
     return VLC_SUCCESS;
 }
 
-int filter_chain_GetLength( filter_chain_t *p_chain )
+bool filter_chain_IsEmpty(const filter_chain_t *chain)
 {
-    return p_chain->length;
+    return chain->length == 0;
 }
 
 const es_format_t *filter_chain_GetFmtOut( filter_chain_t *p_chain )

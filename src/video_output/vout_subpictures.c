@@ -1440,7 +1440,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
         /* "sub-source"  was formerly "sub-filter", so now the "sub-filter"
         configuration may contain sub-filters or sub-sources configurations.
         if the filters chain was left empty it may indicate that it's a sub-source configuration */
-        is_left_empty = (filter_chain_GetLength(spu->p->filter_chain) == 0);
+        is_left_empty = filter_chain_IsEmpty(spu->p->filter_chain);
     }
     vlc_mutex_unlock(&sys->filter_chain_lock);
 

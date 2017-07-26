@@ -395,12 +395,12 @@ VLC_API void filter_chain_DeleteFilter(filter_chain_t *chain,
                                        filter_t *filter);
 
 /**
- * Get the number of filters in the filter chain.
+ * Checks if the filter chain is empty.
  *
  * \param chain pointer to filter chain
- * \return number of filters in this filter chain
+ * \return true if and only if there are no filters in this filter chain
  */
-VLC_API int filter_chain_GetLength(filter_chain_t *chain);
+VLC_API bool filter_chain_IsEmpty(const filter_chain_t *chain);
 
 /**
  * Get last output format of the last element in the filter chain.
