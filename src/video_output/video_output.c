@@ -940,7 +940,6 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
                               (vd->info.is_slow ||
                                sys->display.use_dr ||
                                do_snapshot ||
-                               !vout_IsDisplayFiltered(vd) ||
                                vd->fmt.i_width * vd->fmt.i_height <= vd->source.i_width * vd->source.i_height);
 
     const vlc_fourcc_t *subpicture_chromas;
