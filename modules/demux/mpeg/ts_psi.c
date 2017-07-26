@@ -1623,8 +1623,15 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                 TsChangeStandard( p_sys, TS_STANDARD_ATSC );
                 break;
             default:
-                /* Probe using ES */
-                p_sys->standard = ProbePMTStandard( p_dvbpsipmt );
+                if(SEEN(GetPID(p_sys, ATSC_BASE_PID)))
+                {
+                    TsChangeStandard( p_sys, TS_STANDARD_ATSC );
+                }
+                else
+                {
+                    /* Probe using ES */
+                    p_sys->standard = ProbePMTStandard( p_dvbpsipmt );
+                }
                 break;
         }
     }
