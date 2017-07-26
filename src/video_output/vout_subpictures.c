@@ -1434,7 +1434,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
                                      SubFilterAddProxyCallbacks,
                                      sys->vout);
         }
-        else if (filter_chain_GetLength(spu->p->filter_chain) > 0)
+        else
             filter_chain_Reset(sys->filter_chain, NULL, NULL);
 
         /* "sub-source"  was formerly "sub-filter", so now the "sub-filter"
