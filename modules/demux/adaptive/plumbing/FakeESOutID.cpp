@@ -72,12 +72,15 @@ const es_format_t *FakeESOutID::getFmt() const
 
 bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
 {
+    if( p_other->fmt.i_cat != fmt.i_cat )
+        return false;
+
     switch(fmt.i_codec)
     {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
         case VLC_CODEC_VC1:
-            return true;
+                return true;
 
         default:
             if(fmt.i_cat == AUDIO_ES)
