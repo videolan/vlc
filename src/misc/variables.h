@@ -23,6 +23,7 @@
 #ifndef LIBVLC_VARIABLES_H
 # define LIBVLC_VARIABLES_H 1
 
+# include <stdalign.h>
 # include <vlc_atomic.h>
 
 struct vlc_res;
@@ -34,6 +35,7 @@ typedef struct vlc_object_internals vlc_object_internals_t;
 
 struct vlc_object_internals
 {
+    alignas (max_align_t) /* ensure vlc_externals() is maximally aligned */
     char           *psz_name; /* given name */
 
     /* Object variables */
