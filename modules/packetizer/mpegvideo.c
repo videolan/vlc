@@ -807,6 +807,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
                         break;
                     case 5: /* BT.470BG */
                     case 6: /* SMPTE 170 M */
+                    case 7: /* SMPTE 240 M */
                         p_dec->fmt_out.video.space = COLOR_SPACE_BT601;
                         break;
                     default:
