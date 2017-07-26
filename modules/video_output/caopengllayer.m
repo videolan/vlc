@@ -287,9 +287,9 @@ static int Open (vlc_object_t *p_this)
         else
             outputSize = [sys->container visibleRect].size;
         vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height);
-        
+
         return VLC_SUCCESS;
-        
+
     bailout:
         Close(p_this);
         return VLC_EGENERIC;
