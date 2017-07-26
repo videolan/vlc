@@ -58,7 +58,6 @@ struct filter_chain_t
 
     es_format_t fmt_in; /**< Chain input format (constant) */
     es_format_t fmt_out; /**< Chain current output format */
-    unsigned length; /**< Number of filters */
     bool b_allow_fmt_out_change; /**< Can the output format be changed? */
     const char *filter_cap; /**< Filter modules capability */
     const char *conv_cap; /**< Converter modules capability */
@@ -87,7 +86,6 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     chain->last = NULL;
     es_format_Init( &chain->fmt_in, cat, 0 );
     es_format_Init( &chain->fmt_out, cat, 0 );
-    chain->length = 0;
     chain->b_allow_fmt_out_change = fmt_out_change;
     chain->filter_cap = cap;
     chain->conv_cap = conv_cap;
@@ -243,7 +241,6 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     chained->prev = chain->last;
     chain->last = chained;
     chained->next = NULL;
-    chain->length++;
 
     vlc_mouse_t *mouse = malloc( sizeof(*mouse) );
     if( likely(mouse != NULL) )
@@ -303,9 +300,6 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
         assert( chained == chain->last );
         chain->last = chained->prev;
     }
-
-    assert( chain->length > 0 );
-    chain->length--;
 
     module_unneed( filter, filter->p_module );
 
@@ -381,7 +375,7 @@ int filter_chain_ForEach( filter_chain_t *chain,
 
 bool filter_chain_IsEmpty(const filter_chain_t *chain)
 {
-    return chain->length == 0;
+    return chain->first == NULL;
 }
 
 const es_format_t *filter_chain_GetFmtOut( filter_chain_t *p_chain )
