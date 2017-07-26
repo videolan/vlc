@@ -1101,6 +1101,33 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
             }
         } break;
 
+        case HXXX_SEI_FRAME_PACKING_ARRANGEMENT:
+        {
+            if( p_dec->fmt_in.video.multiview_mode == MULTIVIEW_2D )
+            {
+                video_multiview_mode_t mode;
+                switch( p_sei_data->frame_packing.type )
+                {
+                    case FRAME_PACKING_INTERLEAVED_CHECKERBOARD:
+                        mode = MULTIVIEW_STEREO_CHECKERBOARD; break;
+                    case FRAME_PACKING_INTERLEAVED_COLUMN:
+                        mode = MULTIVIEW_STEREO_COL; break;
+                    case FRAME_PACKING_INTERLEAVED_ROW:
+                        mode = MULTIVIEW_STEREO_ROW; break;
+                    case FRAME_PACKING_SIDE_BY_SIDE:
+                        mode = MULTIVIEW_STEREO_SBS; break;
+                    case FRAME_PACKING_TOP_BOTTOM:
+                        mode = MULTIVIEW_STEREO_TB; break;
+                    case FRAME_PACKING_TEMPORAL:
+                        mode = MULTIVIEW_STEREO_FRAME; break;
+                    case FRAME_PACKING_TILED:
+                    default:
+                        mode = MULTIVIEW_2D; break;
+                }
+                p_dec->fmt_out.video.multiview_mode = mode;
+            }
+        } break;
+
             /* Look for SEI recovery point */
         case HXXX_SEI_RECOVERY_POINT:
         {
