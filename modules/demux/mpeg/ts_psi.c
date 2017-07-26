@@ -1621,6 +1621,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                 break;
             case TS_PMT_REGISTRATION_ATSC:
                 TsChangeStandard( p_sys, TS_STANDARD_ATSC );
+                break;
             default:
                 /* Probe using ES */
                 p_sys->standard = ProbePMTStandard( p_dvbpsipmt );
