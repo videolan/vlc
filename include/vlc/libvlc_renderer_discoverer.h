@@ -66,6 +66,29 @@ typedef struct libvlc_rd_description_t
  */
 typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
 
+
+/**
+ * Hold a renderer item, i.e. creates a new reference
+ *
+ * This functions need to called from the libvlc_RendererDiscovererItemAdded
+ * callback if the libvlc user wants to use this item after. (for display or
+ * for passing it to the mediaplayer for example).
+ *
+ * \version LibVLC 3.0.0 or later
+ *
+ * \return the current item
+ */
+LIBVLC_API libvlc_renderer_item_t *
+libvlc_renderer_item_hold(libvlc_renderer_item_t *p_item);
+
+/**
+ * Releases a renderer item, i.e. decrements its reference counter
+ *
+ * \version LibVLC 3.0.0 or later
+ */
+LIBVLC_API void
+libvlc_renderer_item_release(libvlc_renderer_item_t *p_item);
+
 /**
  * Get the human readable name of a renderer item
  *
@@ -178,7 +201,8 @@ libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_rd );
  * and @ref libvlc_RendererDiscovererItemDeleted.
  *
  * The @ref libvlc_renderer_item_t struct passed to event callbacks is owned by
- * VLC, users should take care of copying this struct for their internal usage.
+ * VLC, users should take care of holding/releasing this struct for their
+ * internal usage.
  *
  * \see libvlc_event_t.u.renderer_discoverer_item_added.item
  * \see libvlc_event_t.u.renderer_discoverer_item_removed.item

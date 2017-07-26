@@ -277,11 +277,11 @@ typedef struct libvlc_event_t
 
         struct
         {
-            const libvlc_renderer_item_t *item;
+            libvlc_renderer_item_t *item;
         } renderer_discoverer_item_added;
         struct
         {
-            const libvlc_renderer_item_t *item;
+            libvlc_renderer_item_t *item;
         } renderer_discoverer_item_deleted;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;

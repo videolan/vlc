@@ -90,6 +90,19 @@ static void renderer_discovery_item_removed( vlc_renderer_discovery_t *rd,
     vlc_renderer_item_release( p_item );
 }
 
+libvlc_renderer_item_t *
+libvlc_renderer_item_hold(libvlc_renderer_item_t *p_item)
+{
+    vlc_renderer_item_hold( (vlc_renderer_item_t *) p_item );
+    return p_item;
+}
+
+void
+libvlc_renderer_item_release(libvlc_renderer_item_t *p_item)
+{
+    vlc_renderer_item_release( (vlc_renderer_item_t *) p_item );
+}
+
 const char *
 libvlc_renderer_item_name( const libvlc_renderer_item_t *p_item )
 {
