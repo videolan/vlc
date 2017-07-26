@@ -4174,6 +4174,8 @@ static int MP4_ReadBox_uuid( stream_t *p_stream, MP4_Box_t *p_box )
         return MP4_ReadBox_tfxd( p_stream, p_box );
     if( !CmpUUID( &p_box->i_uuid, &XML360BoxUUID ) )
         return MP4_ReadBox_XML360( p_stream, p_box );
+    if( !CmpUUID( &p_box->i_uuid, &PS3DDSBoxUUID ) && p_box->i_size == 28 )
+        return MP4_ReadBox_Binary( p_stream, p_box );
 
 #ifdef MP4_VERBOSE
     msg_Warn( p_stream, "Unknown uuid type box: "
