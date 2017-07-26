@@ -378,6 +378,22 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         }
     }
+    else
+    {
+        for( p_uuid = MP4_BoxGet( p_sample, "uuid" ); p_uuid;
+             p_uuid = p_uuid->p_next )
+        {
+            if( p_uuid->i_type == ATOM_uuid &&
+               !CmpUUID( &p_uuid->i_uuid, &PS3DDSBoxUUID ) &&
+                p_uuid->data.p_binary &&
+                p_uuid->data.p_binary->i_blob == 4 &&
+                !memcmp( p_uuid->data.p_binary->p_blob, "\x82\x81\x10\x02", 4 ) )
+            {
+                p_track->fmt.video.multiview_mode = MULTIVIEW_STEREO_FRAME;
+                break;
+            }
+        }
+    }
 
     const MP4_Box_t *p_prhd = MP4_BoxGet( p_sample, "sv3d/proj/prhd" );
     if (p_prhd && BOXDATA(p_prhd))
