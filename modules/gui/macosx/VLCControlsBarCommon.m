@@ -54,6 +54,8 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+    
     _darkInterface = var_InheritBool(getIntf(), "macosx-interfacestyle");
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
