@@ -439,7 +439,7 @@ static void Close(vlc_object_t *obj)
 }
 
 vlc_module_begin()
-    set_description(N_("Direct3D9 deinterlacing filter"))
+    set_description(N_("Direct3D9 adjust filter"))
     set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
