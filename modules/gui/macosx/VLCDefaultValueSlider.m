@@ -28,16 +28,19 @@
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
-    if ([coder isKindOfClass: [NSKeyedUnarchiver class]]) {
-        NSKeyedUnarchiver *keyedUnarchiver = (id)coder;
-        NSString *oldClass = NSStringFromClass([self.superclass cellClass]);
-        [keyedUnarchiver setClass:[VLCDefaultValueSliderCell class] forClassName:oldClass];
-    }
     self = [super initWithCoder:coder];
     if (self) {
+        if (![self.cell isKindOfClass:[VLCDefaultValueSliderCell class]]) {
+            self.cell = [[VLCDefaultValueSliderCell alloc] init];
+        }
         _isScrollable = YES;
     }
     return self;
+}
+
++ (Class)cellClass
+{
+    return [VLCDefaultValueSliderCell class];
 }
 
 - (void)scrollWheel:(NSEvent *)event

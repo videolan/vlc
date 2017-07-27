@@ -26,6 +26,23 @@
 
 @implementation VLCSlider
 
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+
+    if (self) {
+        if (![self.cell isKindOfClass:[VLCSliderCell class]]) {
+            self.cell = [[VLCSliderCell alloc] init];
+        }
+    }
+    return self;
+}
+
++ (Class)cellClass
+{
+    return [VLCSliderCell class];
+}
+
 // Workaround for 10.7
 // http://stackoverflow.com/questions/3985816/custom-nsslidercell
 - (void)setNeedsDisplayInRect:(NSRect)invalidRect {
