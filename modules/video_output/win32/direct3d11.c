@@ -739,10 +739,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (!is_d3d11_opaque(surface_fmt.i_chroma) || sys->legacy_shader)
     {
         /* we need a staging texture */
-        video_format_t staging_fmt;
-        video_format_Copy(&staging_fmt, &surface_fmt);
-        staging_fmt.i_width = staging_fmt.i_width;
-        staging_fmt.i_height = staging_fmt.i_height;
+        video_format_t staging_fmt = surface_fmt;
         if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
              sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
         {
@@ -752,8 +749,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures, true))
             goto error;
 
-        sys->picQuad.i_x_offset = 0;
-        sys->picQuad.i_y_offset = 0;
+        sys->picQuad.i_x_offset = staging_fmt.i_x_offset;
+        sys->picQuad.i_y_offset = staging_fmt.i_y_offset;
         sys->picQuad.i_width    = staging_fmt.i_width;
         sys->picQuad.i_height   = staging_fmt.i_height;
 
