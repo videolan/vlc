@@ -532,13 +532,14 @@ static int Open(vlc_object_t *object)
 #endif
 
     video_format_t fmt;
+    video_format_Copy(&fmt, &vd->source);
     if (Direct3D11Open(vd, &fmt)) {
         msg_Err(vd, "Direct3D11 could not be opened");
         goto error;
     }
 
     video_format_Clean(&vd->fmt);
-    video_format_Copy(&vd->fmt, &fmt);
+    vd->fmt = fmt;
 
     vd->info.has_double_click     = true;
     vd->info.has_hide_mouse       = false;
@@ -1483,8 +1484,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     IDXGIFactory2 *dxgifactory;
-
-    *fmt = vd->source;
 
 #if !VLC_WINSTORE_APP
 
