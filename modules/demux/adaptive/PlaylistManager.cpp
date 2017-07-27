@@ -629,6 +629,7 @@ void PlaylistManager::Run()
         mutex_cleanup_push(&lock);
         while(!b_buffering)
             vlc_cond_wait(&waitcond, &lock);
+        vlc_testcancel();
         vlc_cleanup_pop();
 
         if(needsUpdate())
