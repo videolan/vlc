@@ -1154,15 +1154,15 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             assert(p_sys->resourceView[0]!=NULL);
         }
 
-        if ( sys->picQuad.i_height != texDesc.Height ||
-             sys->picQuad.i_width != texDesc.Width )
+        if ( vd->fmt.i_height != texDesc.Height ||
+             vd->fmt.i_width != texDesc.Width )
         {
             /* the decoder produced different sizes than the vout, we need to
              * adjust the vertex */
-            sys->picQuad.i_height = texDesc.Height;
-            sys->picQuad.i_width = texDesc.Width;
-            UpdateQuadPosition( vd, &sys->picQuad, &vd->fmt,
-                                vd->fmt.projection_mode, vd->fmt.orientation );
+            vd->fmt.i_height = texDesc.Height;
+            vd->fmt.i_width = texDesc.Width;
+            UpdateRects(vd, NULL, NULL, true);
+            UpdateSize(vd);
         }
     }
 
