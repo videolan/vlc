@@ -741,8 +741,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         /* we need a staging texture */
         video_format_t staging_fmt;
         video_format_Copy(&staging_fmt, &surface_fmt);
-        staging_fmt.i_width = staging_fmt.i_visible_width;
-        staging_fmt.i_height = staging_fmt.i_visible_height;
+        staging_fmt.i_width = staging_fmt.i_width;
+        staging_fmt.i_height = staging_fmt.i_height;
         if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
              sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
         {
@@ -1128,11 +1128,13 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         if (!is_d3d11_opaque(picture->format.i_chroma))
             Direct3D11UnmapPoolTexture(picture);
         ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
+        assert(picture->format.i_x_offset + picture->format.i_visible_width <= texDesc.Width);
+        assert(picture->format.i_y_offset + picture->format.i_visible_height <= texDesc.Height);
         D3D11_BOX box = {
-            .top = picture->format.i_y_offset,
-            .bottom = picture->format.i_y_offset + texDesc.Height,
-            .left = picture->format.i_x_offset,
-            .right = picture->format.i_x_offset + texDesc.Width,
+            .top = 0,
+            .bottom = picture->format.i_y_offset + picture->format.i_visible_height,
+            .left = 0,
+            .right = picture->format.i_x_offset + picture->format.i_visible_width,
             .back = 1,
         };
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
