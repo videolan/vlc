@@ -1067,6 +1067,14 @@ static void UpdateSize(vout_display_t *vd)
     UpdateBackBuffer(vd);
 
     UpdatePicQuadPosition(vd);
+
+    sys->picQuad.i_x_offset = sys->sys.rect_src.left;
+    sys->picQuad.i_y_offset = sys->sys.rect_src.top;
+    sys->picQuad.i_width = RECTWidth(sys->sys.rect_src);
+    sys->picQuad.i_height = RECTHeight(sys->sys.rect_src);
+    UpdateQuadPosition(vd, &sys->picQuad, &sys->sys.rect_src_clipped,
+                       vd->fmt.projection_mode, vd->fmt.orientation);
+
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->context_lock != INVALID_HANDLE_VALUE )
     {
