@@ -227,11 +227,11 @@ static void DestroyDisplayPoolPicture(picture_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
-static int SetupQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
+static int SetupQuad(vout_display_t *, const video_format_t *, d3d_quad_t *, const RECT *,
                      const d3d_format_t *, ID3D11PixelShader *, video_projection_mode_t,
                      video_orientation_t);
 static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
-                                const video_format_t *fmt,
+                                const RECT *output,
                                 video_projection_mode_t projection,
                                 video_orientation_t orientation );
 static void ReleaseQuad(d3d_quad_t *);
@@ -779,7 +779,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         }
     }
 
-    if (SetupQuad( vd, &surface_fmt, &sys->picQuad, sys->picQuadConfig, sys->picQuadPixelShader,
+    if (SetupQuad( vd, &surface_fmt, &sys->picQuad, &sys->sys.rect_src_clipped,
+                   sys->picQuadConfig, sys->picQuadPixelShader,
                    surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
@@ -2327,15 +2328,18 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
     }
 }
 
-static void SetupQuadFlat(d3d_vertex_t *dst_data, const video_format_t *fmt,
-                          d3d_quad_t *quad, WORD *triangle_pos, video_orientation_t orientation)
+static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
+                          const d3d_quad_t *quad,
+                          WORD *triangle_pos, video_orientation_t orientation)
 {
-    unsigned int dst_width = fmt->i_visible_width;
-    unsigned int dst_height = fmt->i_visible_height;
-    unsigned int src_x = quad->i_x_offset;
-    unsigned int src_y = quad->i_y_offset;
+    unsigned int dst_x = output->left;
+    unsigned int dst_y = output->top;
+    unsigned int dst_width = RECTWidth(*output);
+    unsigned int dst_height = RECTHeight(*output);
     unsigned int src_width = quad->i_width;
     unsigned int src_height = quad->i_height;
+    LONG MidY = output->top + output->bottom; // /2
+    LONG MidX = output->left + output->right; // /2
 
     /* the clamping will not work properly on the side of the texture as it
      * will have decoder pixels not mean to be displayed but used for interpolation
@@ -2345,10 +2349,11 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const video_format_t *fmt,
     if (src_height != dst_height)
         dst_height -= 1;
 
-    float right  =  (float) (2*src_width - dst_width - 2*src_x) / (float) dst_width;
-    float left   = -(float) (2*src_x + dst_width) / (float) dst_width;
-    float top    =  (float) (2*src_x + dst_height) / (float) dst_height;
-    float bottom = -(float) (2*src_height - dst_height - 2*src_y) / (float) dst_height;
+    float top, bottom, left, right;
+    top    =  (float)MidY / (float)(MidY - 2*dst_y);
+    bottom = -(2.f*src_height - MidY) / (float)(MidY - 2*dst_y);
+    right  =  (2.f*src_width  - MidX) / (float)(MidX - 2*dst_x);
+    left   = -(float)MidX / (float)(MidX - 2*dst_x);
 
     const float vertices_coords[4][2] = {
         { left,  bottom },
@@ -2498,7 +2503,7 @@ static bool AllocQuadVertices(vout_display_t *vd, d3d_quad_t *quad,
 }
 
 static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
-                                const video_format_t *fmt,
+                                const RECT *output,
                                 video_projection_mode_t projection,
                                 video_orientation_t orientation )
 {
@@ -2524,7 +2529,7 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
     WORD *triangle_pos = mappedResource.pData;
 
     if ( projection == PROJECTION_MODE_RECTANGULAR )
-        SetupQuadFlat(dst_data, fmt, quad, triangle_pos, orientation);
+        SetupQuadFlat(dst_data, output, quad, triangle_pos, orientation);
     else
         SetupQuadSphere(dst_data, triangle_pos);
 
@@ -2535,6 +2540,7 @@ static bool UpdateQuadPosition( vout_display_t *vd, d3d_quad_t *quad,
 }
 
 static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
+                     const RECT *output,
                      const d3d_format_t *cfg, ID3D11PixelShader *d3dpixelShader,
                      video_projection_mode_t projection, video_orientation_t orientation)
 {
@@ -2684,7 +2690,7 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     if (!AllocQuadVertices(vd, quad, projection))
         goto error;
-    if (!UpdateQuadPosition(vd, quad, fmt, projection, orientation))
+    if (!UpdateQuadPosition(vd, quad, output, projection, orientation))
         goto error;
 
     quad->d3dpixelShader = d3dpixelShader;
@@ -2888,7 +2894,14 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             d3dquad->i_y_offset = r->fmt.i_y_offset;
             d3dquad->i_width    = r->fmt.i_width;
             d3dquad->i_height   = r->fmt.i_height;
-            err = SetupQuad( vd, &r->fmt, d3dquad, sys->d3dregion_format, sys->pSPUPixelShader,
+            RECT output;
+            output.left   = r->fmt.i_x_offset;
+            output.right  = r->fmt.i_x_offset + r->fmt.i_width;
+            output.top    = r->fmt.i_y_offset;
+            output.bottom = r->fmt.i_y_offset + r->fmt.i_height;
+
+            err = SetupQuad( vd, &r->fmt, d3dquad, &output,
+                             sys->d3dregion_format, sys->pSPUPixelShader,
                              PROJECTION_MODE_RECTANGULAR, ORIENT_NORMAL );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to create %dx%d quad for OSD",
