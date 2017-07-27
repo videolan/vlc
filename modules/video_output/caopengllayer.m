@@ -43,14 +43,7 @@
 
 #include "opengl/vout_helper.h"
 
-#define OSX_EL_CAPITAN_AND_HIGHER (NSAppKitVersionNumber >= 1404)
 #define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
-
-#if MAC_OS_X_VERSION_MIN_ALLOWED <= MAC_OS_X_VERSION_10_11
-const CFStringRef kCGColorSpaceDCIP3 = CFSTR("kCGColorSpaceDCIP3");
-const CFStringRef kCGColorSpaceITUR_709 = CFSTR("kCGColorSpaceITUR_709");
-const CFStringRef kCGColorSpaceITUR_2020 = CFSTR("kCGColorSpaceITUR_2020");
-#endif
 
 /*****************************************************************************
  * Vout interface
@@ -98,8 +91,6 @@ struct vout_display_sys_t {
     CALayer <VLCCoreAnimationVideoLayerEmbedding> *container;
     vout_window_t *embed;
     VLCCAOpenGLLayer *cgLayer;
-
-    CGColorSpaceRef cgColorSpace;
 
     vlc_gl_t *gl;
     vout_display_opengl_t *vgl;
@@ -215,64 +206,6 @@ static int Open (vlc_object_t *p_this)
         vd->display = PictureDisplay;
         vd->control = Control;
 
-        /* handle color space if supported by the OS */
-        if ([sys->cgLayer respondsToSelector:@selector(setColorspace:)]) {
-
-            /* support for BT.709 and BT.2020 color spaces was introduced with OS X 10.11
-             * on older OS versions, we can't show correct colors, so we fallback on linear RGB */
-            if (OSX_EL_CAPITAN_AND_HIGHER) {
-                switch (fmt.primaries) {
-                    case COLOR_PRIMARIES_BT601_525:
-                    case COLOR_PRIMARIES_BT601_625:
-                    {
-                        msg_Dbg(vd, "Using BT.601 color space");
-                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
-                        break;
-                    }
-                    case COLOR_PRIMARIES_BT709:
-                    {
-                        msg_Dbg(vd, "Using BT.709 color space");
-                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
-                        break;
-                    }
-                    case COLOR_PRIMARIES_BT2020:
-                    {
-                        msg_Dbg(vd, "Using BT.2020 color space");
-                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_2020);
-                        break;
-                    }
-                    case COLOR_PRIMARIES_DCI_P3:
-                    {
-                        msg_Dbg(vd, "Using DCI P3 color space");
-                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceDCIP3);
-                        break;
-                    }
-                    default:
-                    {
-                        msg_Dbg(vd, "Guessing color space based on video dimensions (%ix%i)", fmt.i_visible_width, fmt.i_visible_height);
-                        if (fmt.i_visible_height >= 2000 || fmt.i_visible_width >= 3800) {
-                            msg_Dbg(vd, "Using BT.2020 color space");
-                            sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_2020);
-                        } else if (fmt.i_height > 576) {
-                            msg_Dbg(vd, "Using BT.709 color space");
-                            sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
-                        } else {
-                            msg_Dbg(vd, "SD content, using linear RGB color space");
-                            sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
-                        }
-                        break;
-                    }
-                }
-            } else {
-                msg_Dbg(vd, "OS does not support BT.709 or BT.2020 color spaces, output may vary");
-                sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGBLinear);
-            }
-
-            [sys->cgLayer setColorspace: sys->cgColorSpace];
-        } else {
-            msg_Dbg(vd, "OS does not support custom color spaces, output may be undefined");
-        }
-
         if (OSX_SIERRA_AND_HIGHER) {
             /* request our screen's HDR mode (introduced in OS X 10.11, but correctly supported in 10.12 only) */
             if ([sys->cgLayer respondsToSelector:@selector(setWantsExtendedDynamicRangeContent:)]) {
@@ -332,9 +265,6 @@ static void Close (vlc_object_t *p_this)
 
     if ([sys->cgLayer glContext])
         CGLReleaseContext([sys->cgLayer glContext]);
-
-    if (sys->cgColorSpace != nil)
-        CGColorSpaceRelease(sys->cgColorSpace);
 
     free(sys);
 }
