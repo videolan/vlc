@@ -62,7 +62,9 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
     p_chk->common.i_chunk_size   = GetDWLE( p_peek + 4 );
     p_chk->common.i_chunk_pos    = vlc_stream_Tell( s );
 
-    if( UINT64_MAX - p_chk->common.i_chunk_pos < p_chk->common.i_chunk_size )
+    if( p_chk->common.i_chunk_size >= UINT64_MAX - 8 ||
+        p_chk->common.i_chunk_pos > UINT64_MAX - 8 ||
+        UINT64_MAX - p_chk->common.i_chunk_pos - 8 < __EVEN(p_chk->common.i_chunk_size) )
         return VLC_EGENERIC;
 
     p_chk->common.p_father = NULL;
