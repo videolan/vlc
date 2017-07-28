@@ -2114,6 +2114,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     {   /* FIXME: This might hold the ES output caller (i.e. the demux), and
          * the corresponding thread (typically the input thread), for a little
          * bit too long if the ES is deleted in the middle of a stream. */
+        input_DecoderDrain( es->p_dec );
         while( !input_Stopped(p_sys->p_input) && !p_sys->b_buffering )
         {
             if( input_DecoderIsEmpty( es->p_dec ) &&
