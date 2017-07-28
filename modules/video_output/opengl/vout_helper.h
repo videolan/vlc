@@ -97,8 +97,4 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 void vout_display_opengl_UpdateHMD(vout_display_opengl_t *vgl,
                                    vlc_hmd_device_t *device);
 
-int vout_display_opengl_UpdateViewport(vout_display_opengl_t *vgl,
-                                       vout_display_place_t place,
-                                       unsigned displayWidth, unsigned displayHeight);
-
 #endif

@@ -463,6 +463,8 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
         "#version %u\n"
         "%s"
         "uniform sampler2D Texture0;"
+        "uniform vec2 SbSCoefs;"
+        "uniform vec2 SbSOffsets;"
         "uniform vec4 xyz_gamma = vec4(2.6);"
         "uniform vec4 rgb_gamma = vec4(1.0/2.2);"
         /* WARN: matrix Is filled column by column (not row !) */
@@ -477,7 +479,7 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
         "void main()"
         "{ "
         " vec4 v_in, v_out;"
-        " v_in  = texture2D(Texture0, TexCoord0);"
+        " v_in  = texture2D(Texture0, TexCoord0 * SbSCoefs + SbSOffsets);"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
         " v_out = pow(v_out, rgb_gamma) ;"
@@ -546,6 +548,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
     ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
+    ADD("uniform vec2 SbSCoefs;");
+    ADD("uniform vec2 SbSOffsets;");
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
@@ -652,7 +656,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         if (swizzle)
         {
             size_t swizzle_count = strlen(swizzle);
-            ADDF(" colors = %s(Texture%u, %s%u);\n", lookup, i, coord_name, i);
+            ADDF("colors = %s(Texture%u, %s%u * SbSCoefs + SbSOffsets);", lookup, i, coord_name, i);
             for (unsigned j = 0; j < swizzle_count; ++j)
             {
                 ADDF(" val = colors.%c;\n"
@@ -664,7 +668,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         }
         else
         {
-            ADDF(" vec4 color%u = %s(Texture%u, %s%u);\n",
+            ADDF("vec4 color%u = %s(Texture%u, %s%u * SbSCoefs + SbSOffsets);",
                  color_idx, lookup, i, coord_name, i);
             color_idx++;
             assert(color_idx <= PICTURE_PLANE_MAX);

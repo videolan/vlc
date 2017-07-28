@@ -254,11 +254,13 @@ Open(vlc_object_t *obj)
         "#extension GL_OES_EGL_image_external : require\n"
         "%s" /* precision */
         "varying vec2 TexCoord0;"
+        "uniform vec2 SbSCoefs;"
+        "uniform vec2 SbSOffsets;"
         "uniform samplerExternalOES sTexture;"
         "uniform mat4 uSTMatrix;"
         "void main()"
         "{ "
-        "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy).rgba;"
+        "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy * SbSCoefs + SbSOffsets);"
         "}";
 
     char *code;

@@ -106,6 +106,8 @@ struct prgm
         GLfloat YRotMatrix[16];
         GLfloat XRotMatrix[16];
         GLfloat ZoomMatrix[16];
+        GLfloat SbSCoefs[2];
+        GLfloat SbSOffsets[2];
     } var;
 
     struct { /* UniformLocation */
@@ -116,6 +118,8 @@ struct prgm
         GLint YRotMatrix;
         GLint XRotMatrix;
         GLint ZoomMatrix;
+        GLint SbSCoefs;
+        GLint SbSOffsets;
     } uloc;
     struct { /* AttribLocation */
         GLint MultiTexCoord[3];
@@ -184,9 +188,10 @@ struct vout_display_opengl_t {
     bool b_sideBySide;
     bool b_lastSideBySide;
 
+    unsigned i_displayX;
+    unsigned i_displayY;
     unsigned i_displayWidth;
     unsigned i_displayHeight;
-    vout_display_place_t displayPlace;
 
     /* FBO */
     GLuint leftColorTex, leftDepthTex, leftFBO;
@@ -327,6 +332,63 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         memcpy(prgm->var.ZoomMatrix, identity, sizeof(identity));
     }
 }
+
+
+static void getSbSParams(vout_display_opengl_t *vgl, struct prgm *prgm,
+                         side_by_side_eye eye)
+{
+    float *SbSCoefs = prgm->var.SbSCoefs;
+    float *SbSOffsets = prgm->var.SbSOffsets;
+
+    if (vgl->b_sideBySide)
+    {
+        switch (vgl->fmt.multiview_mode)
+        {
+        case MULTIVIEW_STEREO_TB:
+            switch (eye)
+            {
+            case LEFT_EYE:
+                SbSCoefs[0] = 1; SbSCoefs[1] = 0.5;
+                SbSOffsets[0] = 0; SbSOffsets[1] = 0;
+                break;
+            case RIGHT_EYE:
+                SbSCoefs[0] = 1; SbSCoefs[1] = 0.5;
+                SbSOffsets[0] = 0; SbSOffsets[1] = 0.5;
+                break;
+            default:
+                vlc_assert_unreachable();
+                break;
+            }
+            break;
+        case MULTIVIEW_STEREO_SBS:
+            switch (eye)
+            {
+            case LEFT_EYE:
+                SbSCoefs[0] = 0.5; SbSCoefs[1] = 1;
+                SbSOffsets[0] = 0; SbSOffsets[1] = 0;
+                break;
+            case RIGHT_EYE:
+                SbSCoefs[0] = 0.5; SbSCoefs[1] = 1;
+                SbSOffsets[0] = 0.5; SbSOffsets[1] = 0;
+                break;
+            default:
+                vlc_assert_unreachable();
+                break;
+            }
+            break;
+        default:
+            SbSCoefs[0] = 1; SbSCoefs[1] = 1;
+            SbSOffsets[0] = 0; SbSOffsets[1] = 0;
+            break;
+        }
+    }
+    else
+    {
+        SbSCoefs[0] = 1; SbSCoefs[1] = 1;
+        SbSOffsets[0] = 0; SbSOffsets[1] = 0;
+    }
+}
+
 
 static void getOrientationTransformMatrix(video_orientation_t orientation,
                                           GLfloat matrix[static 16])
@@ -585,6 +647,8 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(YRotMatrix, "YRotMatrix");
     GET_ULOC(XRotMatrix, "XRotMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
+    GET_ULOC(SbSCoefs, "SbSCoefs");
+    GET_ULOC(SbSOffsets, "SbSOffsets");
 
     GET_ALOC(VertexPosition, "VertexPosition");
     GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
@@ -771,14 +835,21 @@ ResizeFormatToGLMaxTexSize(video_format_t *fmt, unsigned int max_tex_size)
     }
 }
 
-#define GLSL_VERSION "120" // Temporary hack.
+// Temporary hack.
+#if defined(USE_OPENGL_ES2)
+#define GLSL_VERSION "100"
+#define GLSL_PRECISION "precision highp float;\n"
+#else
+#define GLSL_VERSION "120"
+#define GLSL_PRECISION ""
+#endif
 
 static void BuildStereoVertexShader(vout_display_opengl_t *vgl,
                                     GLuint *shader)
 {
     const char *fragmentShader =
         "#version " GLSL_VERSION "\n"
-        //PRECISION // Temporary hack
+        GLSL_PRECISION
         "attribute vec4 MultiTexCoord0;"
         "attribute vec3 VertexPosition;"
         "varying vec2 TexCoord0;"
@@ -802,7 +873,7 @@ static void BuildStereoFragmentShader(vout_display_opengl_t *vgl,
     // Fragment shader from OpenHMD.
     const char *fragmentShader =
         "#version " GLSL_VERSION "\n"
-        "\n"
+        GLSL_PRECISION
         "//per eye texture to warp for lens distortion\n"
         "uniform sampler2D warpTexture;\n"
         "\n"
@@ -1361,12 +1432,10 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
                                   unsigned width, unsigned height)
 {
+    vgl->i_displayX = x;
+    vgl->i_displayY = y;
     vgl->i_displayWidth = width;
     vgl->i_displayHeight = height;
-    vgl->displayPlace = (const vout_display_place_t){
-        .x = x, .y = y,
-        .width = width,
-        .height = height };
 
     if (vgl->b_sideBySide)
     {
@@ -1975,6 +2044,10 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                               prgm->var.ZoomMatrix);
 
+    getSbSParams(vgl, prgm, eye);
+    vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
+    vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, prgm->var.SbSOffsets);
+
     vgl->vt.DrawElements(GL_TRIANGLES, vgl->nb_indices, GL_UNSIGNED_SHORT, 0);
 }
 
@@ -2179,6 +2252,10 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                   prgm->var.ZoomMatrix);
 
+        getSbSParams(vgl, prgm, eye);
+        vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
+        vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, prgm->var.SbSOffsets);
+
         vgl->vt.DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
@@ -2317,10 +2394,8 @@ static void HmdStateChanged(vlc_hmd_interface_t *hmd,
     else
         vgl->b_sideBySide = false;
 
-    vout_display_opengl_Viewport(vgl, vgl->displayPlace.x,
-                                      vgl->displayPlace.y,
-                                      vgl->i_displayWidth,
-                                      vgl->i_displayHeight);
+    vout_display_opengl_Viewport(vgl, vgl->i_displayX, vgl->i_displayY,
+                                 vgl->i_displayWidth, vgl->i_displayHeight);
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
 
     return VLC_SUCCESS;

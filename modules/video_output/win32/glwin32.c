@@ -73,14 +73,12 @@ static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc
 static void           Display(vout_display_t *, picture_t *);
 static void           Manage (vout_display_t *);
 
-static int Control(vout_display_t *vd, int query, va_list args)
+static int Control(vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
 
     switch (query)
     {
-      case VOUT_DISPLAY_HIDE_MOUSE: /* FIXME TODO */
-        break;
 #ifndef NDEBUG
       case VOUT_DISPLAY_RESET_PICTURES: // not needed
         vlc_assert_unreachable();
@@ -90,17 +88,23 @@ static int Control(vout_display_t *vd, int query, va_list args)
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
       case VOUT_DISPLAY_CHANGE_ZOOM:
       {
-        const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
+        vout_display_cfg_t c = *va_arg (ap, const vout_display_cfg_t *);
         const video_format_t *src = &vd->source;
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, src, c, false);
-        vlc_gl_Resize (sys->gl, place.width, place.height);
-        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
-        if (vout_display_opengl_UpdateViewport(sys->vgl, place,
-                c->display.width, c->display.height) != VLC_SUCCESS)
-            return VLC_EGENERIC;
+        /* Reverse vertical alignment as the GL tex are Y inverted */
+        if (c.align.vertical == VOUT_DISPLAY_ALIGN_TOP)
+            c.align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
+        else if (c.align.vertical == VOUT_DISPLAY_ALIGN_BOTTOM)
+            c.align.vertical = VOUT_DISPLAY_ALIGN_TOP;
 
+        vout_display_PlacePicture (&place, src, &c, false);
+        vlc_gl_Resize (sys->gl, place.width, place.height);
+        if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
+            return VLC_EGENERIC;
+        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+        vout_display_opengl_Viewport(sys->vgl, place.x, place.y, c.display.width, c.display.height);
+        vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;
       }
 
@@ -108,14 +112,14 @@ static int Control(vout_display_t *vd, int query, va_list args)
       case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
       {
         const vout_display_cfg_t *cfg = vd->cfg;
-        const video_format_t *src = va_arg (ap, const video_format_t *);
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, src, cfg, false);
-        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
-        if (vout_display_opengl_UpdateViewport(sys->vgl, place,
-                cfg->display.width, cfg->display.height) != VLC_SUCCESS)
+        vout_display_PlacePicture (&place, &vd->source, cfg, false);
+        if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
             return VLC_EGENERIC;
+        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+        vout_display_opengl_Viewport(sys->vgl, place.x, place.y, cfg->display.width, cfg->display.height);
+        vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;
       }
       case VOUT_DISPLAY_CHANGE_VIEWPOINT:
@@ -123,9 +127,12 @@ static int Control(vout_display_t *vd, int query, va_list args)
             &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
       case VOUT_DISPLAY_CHANGE_HMD_CONFIGURATION:
       {
+        if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
+            return VLC_EGENERIC;
         if (vout_display_opengl_ChangeHMDConfiguration(sys->vgl,
             va_arg(ap, const vout_hmd_cfg_t*)) != VLC_SUCCESS)
             return VLC_EGENERIC;
+        vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;
       }
       default:
