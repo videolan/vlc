@@ -62,7 +62,7 @@ static void Close(vlc_va_t *, void **);
 
 vlc_module_begin()
     set_description(N_("Direct3D11 Video Acceleration"))
-    set_capability("hw decoder", 0)
+    set_capability("hw decoder", 110)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_callbacks(Open, Close)
