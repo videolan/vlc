@@ -1592,7 +1592,6 @@ static void *DecoderThread( void *p_data )
             }
             /* We have emptied the FIFO and there is a pending request to
              * drain. Pass p_block = NULL to decoder just once. */
-            p_owner->b_draining = false;
         }
 
         vlc_fifo_Unlock( p_owner->p_fifo );
@@ -1608,11 +1607,13 @@ static void *DecoderThread( void *p_data )
         }
         vlc_restorecancel( canc );
 
-        /* Given that the drained flag is only polled, an atomic variable is
-         * sufficient. TODO? Wait for draining instead of polling. */
-        atomic_store( &p_owner->drained, (p_block == NULL) );
-
+        /* TODO? Wait for draining instead of polling. */
         vlc_mutex_lock( &p_owner->lock );
+        if( p_owner->b_draining && (p_block == NULL) )
+        {
+            p_owner->b_draining = false;
+            p_owner->drained = true;
+        }
         vlc_fifo_Lock( p_owner->p_fifo );
         vlc_cond_signal( &p_owner->wait_acknowledge );
         vlc_mutex_unlock( &p_owner->lock );
@@ -1677,7 +1678,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
 
     p_owner->flushing = false;
     p_owner->b_draining = false;
-    atomic_init( &p_owner->drained, false );
+    p_owner->drained = false;
     atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
 
@@ -2064,7 +2065,7 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
     if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         b_empty = vout_IsEmpty( p_owner->p_vout );
     else if( p_owner->fmt.i_cat == AUDIO_ES )
-        b_empty = atomic_load( &p_owner->drained );
+        b_empty = !p_owner->b_draining || p_owner->drained;
     else
         b_empty = true; /* TODO subtitles support */
     vlc_mutex_unlock( &p_owner->lock );
