@@ -614,8 +614,7 @@ void PlaylistManager::setBufferingRunState(bool b)
 {
     vlc_mutex_lock(&lock);
     b_buffering = b;
-    if(b_buffering)
-        vlc_cond_signal(&waitcond);
+    vlc_cond_signal(&waitcond);
     vlc_mutex_unlock(&lock);
 }
 
@@ -665,8 +664,9 @@ void PlaylistManager::Run()
             vlc_mutex_unlock(&demux.lock);
 
             mutex_cleanup_push(&lock);
-            while(vlc_cond_timedwait(&waitcond, &lock, i_deadline) == 0
-                 && i_deadline < mdate());
+            while(b_buffering &&
+                    vlc_cond_timedwait(&waitcond, &lock, i_deadline) == 0 &&
+                    i_deadline > mdate());
             vlc_cleanup_pop();
         }
     }
