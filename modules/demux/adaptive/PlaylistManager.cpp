@@ -651,9 +651,9 @@ void PlaylistManager::Run()
         if(i_return != AbstractStream::buffering_lessthanmin)
         {
             mtime_t i_deadline = mdate();
-            if (i_return == AbstractStream::buffering_ongoing)
+            if(i_return == AbstractStream::buffering_ongoing)
                 i_deadline += (CLOCK_FREQ / 20);
-            if (i_return == AbstractStream::buffering_full)
+            else if(i_return == AbstractStream::buffering_full)
                 i_deadline += (CLOCK_FREQ / 10);
             else if(i_return == AbstractStream::buffering_end)
                 i_deadline += (CLOCK_FREQ);
