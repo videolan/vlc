@@ -764,7 +764,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     vlc_meta_t *p_meta;
     int64_t *pi64, i64;
     double *pf, f;
-    bool *pb_bool, b;
+    bool *pb_bool, b, acc;
 
     switch( i_query )
     {
@@ -793,6 +793,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
+            acc = va_arg( args, int );
             logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
             if ( !p_stream )
             {
@@ -803,8 +804,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, i64, b ) )
             {
                 Ogg_ResetStreamsHelper( p_sys );
-                es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                VLC_TS_0 + i64 );
+                if( acc )
+                    es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                                    VLC_TS_0 + i64 );
                 return VLC_SUCCESS;
             }
             else
@@ -861,6 +863,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
 
             f = va_arg( args, double );
+            acc = va_arg( args, int );
             if ( p_sys->i_length <= 0 || !b /* || ! STREAM_CAN_FASTSEEK */ )
             {
                 Ogg_ResetStreamsHelper( p_sys );
@@ -873,8 +876,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             Ogg_ResetStreamsHelper( p_sys );
             if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, i64 ) >= 0 )
             {
-                es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                VLC_TS_0 + i64 );
+                if( acc )
+                    es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                                    VLC_TS_0 + i64 );
                 return VLC_SUCCESS;
             }
 
