@@ -160,7 +160,7 @@ static int ViewpointMovedEvent( vlc_object_t *p_this, char const *psz_var,
 
     (void) p_this; (void) psz_var; (void) oldval;
 
-    input_UpdateViewpoint( p_sys->p_input, newval.p_address, false );
+    input_UpdateViewpoint( p_sys->p_input, newval.p_address, true );
 
     return VLC_SUCCESS;
 }
