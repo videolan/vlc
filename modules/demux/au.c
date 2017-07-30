@@ -312,7 +312,7 @@ static int Demux( demux_t *p_demux )
     block_t     *p_block;
 
     /* set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
+    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time );
 
     p_block = vlc_stream_Block( p_demux->s, p_sys->i_frame_size );
     if( p_block == NULL )

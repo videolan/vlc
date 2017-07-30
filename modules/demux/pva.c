@@ -217,7 +217,7 @@ static int Demux( demux_t *p_demux )
 
                     if( p_frame->i_pts > VLC_TS_INVALID && !p_sys->b_pcr_audio )
                     {
-                        es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_frame->i_pts);
+                        es_out_SetPCR( p_demux->out, p_frame->i_pts);
                     }
                     es_out_Send( p_demux->out, p_sys->p_video, p_frame );
 
@@ -446,7 +446,7 @@ static void ParsePES( demux_t *p_demux )
     /* Set PCR */
     if( p_pes->i_pts > 0 )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_pes->i_pts);
+        es_out_SetPCR( p_demux->out, p_pes->i_pts);
         p_sys->b_pcr_audio = true;
     }
     es_out_Send( p_demux->out, p_sys->p_audio, p_pes );

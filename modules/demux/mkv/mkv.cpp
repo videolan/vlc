@@ -784,7 +784,7 @@ static int Demux( demux_t *p_demux)
 
         if( i_pcr > VLC_TS_INVALID && i_pcr > p_sys->i_pcr )
         {
-            if( es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pcr ) )
+            if( es_out_SetPCR( p_demux->out, i_pcr ) )
             {
                 msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
                 return 0;

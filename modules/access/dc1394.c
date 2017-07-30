@@ -479,7 +479,7 @@ static int Demux( demux_t *p_demux )
 
     if( p_blockv )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_blockv->i_pts );
+        es_out_SetPCR( p_demux->out, p_blockv->i_pts );
         es_out_Send( p_demux->out, p_sys->p_es_video, p_blockv );
     }
     return 1;

@@ -347,7 +347,7 @@ static int Demux( demux_t *p_demux )
         if( p_block_out->i_dts > VLC_TS_INVALID )
         {
             p_block_out->i_dts += p_sys->i_time_offset;
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+            es_out_SetPCR( p_demux->out, p_block_out->i_dts );
         }
         /* Re-estimate bitrate */
         if( p_sys->b_estimate_bitrate && p_sys->i_pts > INT64_C(500000) )

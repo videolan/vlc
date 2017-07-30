@@ -174,7 +174,7 @@ static void stream_read_cb(pa_stream *s, size_t length, void *userdata)
     else
         pts -= latency;
 
-    es_out_Control(demux->out, ES_OUT_SET_PCR, pts);
+    es_out_SetPCR(demux->out, pts);
     if (unlikely(sys->es == NULL))
         goto race;
 

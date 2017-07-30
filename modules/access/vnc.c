@@ -367,7 +367,7 @@ static void *DemuxThread( void *p_data )
                 if ( p_block ) /* drop frame/content if no next block */
                 {
                     p_sys->p_block->i_dts = p_sys->p_block->i_pts = mdate();
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->p_block->i_pts );
+                    es_out_SetPCR( p_demux->out, p_sys->p_block->i_pts );
                     es_out_Send( p_demux->out, p_sys->es, p_sys->p_block );
                     p_sys->p_block = p_block;
                 }

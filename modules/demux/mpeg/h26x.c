@@ -472,7 +472,7 @@ static int Demux( demux_t *p_demux)
                     msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
                 }
 
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, date_Get( &p_sys->dts ) );
+                es_out_SetPCR( p_demux->out, date_Get( &p_sys->dts ) );
                 unsigned i_nb_fields;
                 if( i_frame_length > 0 )
                 {

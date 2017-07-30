@@ -1379,14 +1379,14 @@ static int Demux( demux_t *p_demux )
                 tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
             }
             if( p_sys->i_pcr != VLC_TS_INVALID )
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+                es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
         }
         else if( p_sys->i_pcr == VLC_TS_INVALID ||
                  i_minpcr > p_sys->i_pcr + CLOCK_FREQ / 4 )
         {
             p_sys->i_pcr = i_minpcr;
             if( p_sys->i_pcr != VLC_TS_INVALID )
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+                es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
         }
     }
 

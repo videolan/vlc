@@ -295,7 +295,7 @@ static int Demux( demux_t *p_demux )
     p_data->i_dts = p_data->i_pts =
             VLC_TS_0 + CLOCK_FREQ * p_sys->i_position / p_sys->info.sample_freq;
 
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_data->i_dts );
+    es_out_SetPCR( p_demux->out, p_data->i_dts );
 
     es_out_Send( p_demux->out, p_sys->p_es, p_data );
 

@@ -271,7 +271,7 @@ static int Demux( demux_t *p_demux )
             {
                 p_block = GrabAudio( p_demux );
                 if( p_block )
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+                    es_out_SetPCR( p_demux->out, p_block->i_pts );
             }
         }
     } while( p_block && p_sys->i_next_demux_date > 0 &&

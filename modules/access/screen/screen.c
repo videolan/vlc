@@ -288,7 +288,7 @@ static int Demux( demux_t *p_demux )
 
     p_block->i_dts = p_block->i_pts = p_sys->i_next_date;
 
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+    es_out_SetPCR( p_demux->out, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->es, p_block );
 
     p_sys->i_next_date += p_sys->i_incr;

@@ -385,7 +385,7 @@ static int Demux( demux_t *p_demux )
     mtime_t i_pcr = date_Get( &p_sys->pcr );
 
     /* Call the pace control */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_pcr );
+    es_out_SetPCR( p_demux->out, VLC_TS_0 + i_pcr );
 
     if( p_sys->b_y4m )
     {

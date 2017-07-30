@@ -1895,7 +1895,7 @@ static int Demux( demux_t *p_demux )
             p_block->i_pts = p_block->i_dts = i_pts;
 
             if( i_pts > VLC_TS_INVALID )
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pts );
+                es_out_SetPCR( p_demux->out, i_pts );
             es_out_Send( p_demux->out, p_stream->p_es, p_block );
 
             i_samples--;

@@ -229,7 +229,7 @@ static void *Thread (void *data)
         block->i_pts = pts;
         block->i_length = (CLOCK_FREQ * frames) / sys->rate;
 
-        es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+        es_out_SetPCR(demux->out, block->i_pts);
         es_out_Send (demux->out, sys->es, block);
     }
     return NULL;

@@ -207,7 +207,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
 
     /* Read video */
     i_size = ( header[0] >> 4 ) | ( header[1] << 4 ) | ( header[2] << 12 );

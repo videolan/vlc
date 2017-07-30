@@ -321,7 +321,7 @@ static int Demux( demux_t * p_demux )
             if( i_lastpcr > VLC_TS_INVALID )
             {
                 p_sys->i_nzpcr_offset = i_lastpcr - VLC_TS_0;
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_lastpcr );
+                es_out_SetPCR( p_demux->out, i_lastpcr );
             }
             p_sys->i_pcr = VLC_TS_INVALID;
         }
@@ -691,7 +691,7 @@ static int Demux( demux_t * p_demux )
         if( ! b_skipping && p_sys->b_preparsing_done )
         {
             p_sys->i_pcr = i_pcr_candidate;
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+            es_out_SetPCR( p_demux->out, p_sys->i_pcr );
         }
     }
 
@@ -1157,7 +1157,7 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                 if ( p_ogg->i_pcr < VLC_TS_0 && i_firstpts > VLC_TS_INVALID )
                 {
                     p_ogg->i_pcr = i_firstpts;
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_ogg->i_pcr );
+                    es_out_SetPCR( p_demux->out, p_ogg->i_pcr );
                 }
             }
             p_stream->p_preparse_block = NULL;

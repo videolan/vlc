@@ -354,7 +354,7 @@ static int Demux( demux_t *p_demux )
     if( i_pcr > VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
     {
         p_sys->i_pcr = i_pcr;
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+        es_out_SetPCR( p_demux->out, p_sys->i_pcr );
     }
     return 1;
 }
@@ -506,7 +506,7 @@ static void CheckPcr( demux_t *p_demux, real_track_t *tk, mtime_t i_dts )
         return;
 
     p_sys->i_pcr = i_dts;
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+    es_out_SetPCR( p_demux->out, p_sys->i_pcr );
 }
 
 static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsigned i_flags )

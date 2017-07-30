@@ -198,7 +198,7 @@ static int Demux(demux_t *demux)
         deadline = mdate();
         const mtime_t max_wait = CLOCK_FREQ / 50;
         if (deadline + max_wait < pts_first) {
-            es_out_Control(demux->out, ES_OUT_SET_PCR, deadline);
+            es_out_SetPCR(demux->out, deadline);
             /* That's ugly, but not yet easily fixable */
             mwait(deadline + max_wait);
             return 1;
@@ -221,7 +221,7 @@ static int Demux(demux_t *demux)
 
         data->i_dts =
         data->i_pts = VLC_TS_0 + pts;
-        es_out_Control(demux->out, ES_OUT_SET_PCR, data->i_pts);
+        es_out_SetPCR(demux->out, data->i_pts);
         es_out_Send(demux->out, sys->es, data);
 
         date_Increment(&sys->pts, 1);

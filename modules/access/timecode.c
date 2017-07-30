@@ -89,7 +89,7 @@ static int DemuxOnce (demux_t *demux, bool master)
     block->i_length = date_Increment (&sys->date, 1) - pts;
     es_out_Send (demux->out, sys->es, block);
     if (master)
-        es_out_Control (demux->out, ES_OUT_SET_PCR, pts);
+        es_out_SetPCR(demux->out, pts);
     return 1;
 }
 

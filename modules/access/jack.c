@@ -370,7 +370,7 @@ static int Demux( demux_t *p_demux )
 
     if( p_block )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+        es_out_SetPCR( p_demux->out, p_block->i_pts );
         es_out_Send( p_demux->out, p_es, p_block );
     }
 

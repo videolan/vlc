@@ -614,7 +614,7 @@ static int HandleVideo( demux_t *p_demux, const uint8_t *p_buffer )
     p_current_picture->i_dts = p_current_picture->i_pts = p_sys->i_next_vdate;
     es_out_Send( p_demux->out, p_sys->p_es_video, p_current_picture );
 
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_next_vdate );
+    es_out_SetPCR( p_demux->out, p_sys->i_next_vdate );
     p_sys->i_next_vdate += p_sys->i_incr;
     return VLC_SUCCESS;
 }

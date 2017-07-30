@@ -211,7 +211,7 @@ static int Demux( demux_t *p_demux )
 
     p_sys->i_currentframe++;
 
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_data->i_dts );
+    es_out_SetPCR( p_demux->out, p_data->i_dts );
     if( p_sys->p_es )
         es_out_Send( p_demux->out, p_sys->p_es, p_data );
 

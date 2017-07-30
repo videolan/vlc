@@ -155,6 +155,11 @@ static inline void es_out_Delete( es_out_t *p_out )
     p_out->pf_destroy( p_out );
 }
 
+static inline int es_out_SetPCR( es_out_t *out, int64_t pcr )
+{
+    return es_out_Control( out, ES_OUT_SET_PCR, pcr );
+}
+
 static inline int es_out_ControlSetMeta( es_out_t *out, const vlc_meta_t *p_meta )
 {
     return es_out_Control( out, ES_OUT_SET_META, p_meta );

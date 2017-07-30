@@ -714,7 +714,7 @@ static void *UserPtrThread (void *data)
         block->i_buffer = buf.length;
         block->i_pts = block->i_dts = GetBufferPTS (&buf);
         block->i_flags |= sys->block_flags;
-        es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+        es_out_SetPCR(demux->out, block->i_pts);
         es_out_Send (demux->out, sys->es, block);
     }
     vlc_restorecancel (canc); /* <- hmm, this is purely cosmetic */
@@ -758,7 +758,7 @@ static void *MmapThread (void *data)
             if (block != NULL)
             {
                 block->i_flags |= sys->block_flags;
-                es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+                es_out_SetPCR(demux->out, block->i_pts);
                 es_out_Send (demux->out, sys->es, block);
             }
             vlc_restorecancel (canc);
@@ -819,7 +819,7 @@ static void *ReadThread (void *data)
             if (val != -1)
             {
                 block->i_buffer = val;
-                es_out_Control (demux->out, ES_OUT_SET_PCR, block->i_pts);
+                es_out_SetPCR(demux->out, block->i_pts);
                 es_out_Send (demux->out, sys->es, block);
             }
             else

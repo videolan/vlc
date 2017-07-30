@@ -327,7 +327,7 @@ static unsigned __stdcall Thread(void *data)
 
         pts = mdate() - ((GetQPC() - qpc) / 10);
 
-        es_out_Control(demux->out, ES_OUT_SET_PCR, pts);
+        es_out_SetPCR(demux->out, pts);
 
         size_t bytes = frames * sys->frame_size;
         block_t *block = block_Alloc(bytes);

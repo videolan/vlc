@@ -993,7 +993,7 @@ static int DecodeFrame( demux_t *p_demux )
 
     DecodeVideo( p_demux );
 
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_next_date );
+    es_out_SetPCR( p_demux->out, p_sys->i_next_date );
     p_sys->i_next_date += p_sys->i_incr;
 
     if( NewFrame( p_demux ) != VLC_SUCCESS )

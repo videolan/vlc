@@ -247,7 +247,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time);
+    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time);
 
     /* we will read 100ms at once */
     i_read = p_sys->i_ssnd_fsize * ( p_sys->fmt.audio.i_rate / 10 );

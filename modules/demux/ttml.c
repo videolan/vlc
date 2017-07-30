@@ -351,7 +351,7 @@ static int Demux( demux_t* p_demux )
 
         if ( !p_sys->b_slave && p_sys->b_first_time )
         {
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_playbacktime );
+            es_out_SetPCR( p_demux->out, VLC_TS_0 + i_playbacktime );
             p_sys->b_first_time = false;
         }
 
@@ -381,7 +381,7 @@ static int Demux( demux_t* p_demux )
 
     if ( !p_sys->b_slave )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_next_demux_time );
+        es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_next_demux_time );
         p_sys->i_next_demux_time += CLOCK_FREQ / 8;
     }
 

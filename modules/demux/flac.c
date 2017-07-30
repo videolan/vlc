@@ -365,13 +365,13 @@ static int Demux( demux_t *p_demux )
 
             /* set PCR */
             if( unlikely(p_sys->i_pts == VLC_TS_INVALID) )
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, __MAX(p_block_out->i_dts - 1, VLC_TS_0) );
+                es_out_SetPCR( p_demux->out, __MAX(p_block_out->i_dts - 1, VLC_TS_0) );
 
             p_sys->i_pts = p_block_out->i_dts;
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
+            es_out_SetPCR( p_demux->out, p_sys->i_pts );
 
             p_block_out = p_next;
         }

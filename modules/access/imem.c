@@ -599,7 +599,7 @@ static int Demux(demux_t *demux)
                 block->i_pts = pts >= 0 ? (1 + pts) : VLC_TS_INVALID;
                 memcpy(block->p_buffer, buffer, buffer_size);
 
-                es_out_Control(demux->out, ES_OUT_SET_PCR, block->i_dts);
+                es_out_SetPCR(demux->out, block->i_dts);
                 es_out_Send(demux->out, sys->es, block);
             }
         }

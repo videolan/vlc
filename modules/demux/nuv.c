@@ -401,7 +401,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_pcr < 0 || p_sys->i_pcr < p_data->i_dts - VLC_TS_0 )
     {
         p_sys->i_pcr = p_data->i_dts - VLC_TS_0;
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+        es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
     }
 
     if( fh.i_type == 'A' && p_sys->p_es_audio )

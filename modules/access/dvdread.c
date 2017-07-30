@@ -606,7 +606,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
             int i_mux_rate;
             if( !ps_pkt_parse_pack( p_pkt, &i_scr, &i_mux_rate ) )
             {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_scr );
+                es_out_SetPCR( p_demux->out, i_scr );
                 if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
             }
             block_Release( p_pkt );

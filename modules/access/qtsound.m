@@ -521,7 +521,7 @@ static int Demux(demux_t *p_demux)
             return 1;
         }
 
-        es_out_Control(p_demux->out, ES_OUT_SET_PCR, p_blocka->i_pts);
+        es_out_SetPCR(p_demux->out, p_blocka->i_pts);
         es_out_Send(p_demux->out, p_sys->p_es_audio, p_blocka);
     }
 

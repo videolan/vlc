@@ -160,7 +160,7 @@ static int Demux(demux_t *demux)
     date_Increment(&sys->pts, block->i_nb_samples);
 
     es_out_Send(demux->out, sys->es, block);
-    es_out_Control(demux->out, ES_OUT_SET_PCR, VLC_TS_0 + date_Get(&sys->pts));
+    es_out_SetPCR(demux->out, VLC_TS_0 + date_Get(&sys->pts));
     return VLC_DEMUXER_SUCCESS;
 }
 

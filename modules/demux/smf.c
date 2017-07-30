@@ -452,7 +452,7 @@ static int Demux (demux_t *demux)
         tick->i_dts = tick->i_pts = sys->tick;
 
         es_out_Send (demux->out, sys->es, tick);
-        es_out_Control (demux->out, ES_OUT_SET_PCR, sys->tick);
+        es_out_SetPCR (demux->out, sys->tick);
 
         sys->tick += TICK;
         return 1;

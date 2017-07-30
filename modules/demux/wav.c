@@ -471,7 +471,7 @@ static int Demux( demux_t *p_demux )
     p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
 
     /* set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+    es_out_SetPCR( p_demux->out, p_block->i_pts );
 
     /* Do the channel reordering */
     if( p_sys->i_chans_to_reorder )

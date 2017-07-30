@@ -823,7 +823,7 @@ static int Demux( demux_t *p_demux )
     if( i_ts_min >= p_sys->i_pcr )
     {
         p_sys->i_pcr = i_ts_min;
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+        es_out_SetPCR( p_demux->out, p_sys->i_pcr );
         UpdateSeekPoint( p_demux, p_sys->i_pcr );
     }
 
