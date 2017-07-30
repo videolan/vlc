@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G16b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -122,7 +122,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="236" width="642" height="274"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="642" height="274"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -136,7 +136,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="48">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="48">
                                             <rect key="frame" x="8" y="13" width="310" height="166"/>
                                             <view key="contentView" id="wwn-Le-8VF">
                                                 <rect key="frame" x="1" y="1" width="308" height="164"/>
@@ -152,7 +152,7 @@
                                                             <action selector="adjustSliderChanged:" target="-2" id="9Ra-Ux-sYu"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="25">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="25">
                                                         <rect key="frame" x="15" y="138" width="26" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Hue" id="38" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -167,7 +167,7 @@
                                                             <action selector="adjustSliderChanged:" target="-2" id="ceo-WZ-Y3X"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="24">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="24">
                                                         <rect key="frame" x="15" y="116" width="50" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Contrast" id="39" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -182,7 +182,7 @@
                                                             <action selector="adjustSliderChanged:" target="-2" id="oSl-TZ-hTC"/>
                                                         </connections>
                                                     </slider>
-                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="46">
+                                                    <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="46">
                                                         <rect key="frame" x="116" y="73" width="135" height="18"/>
                                                         <buttonCell key="cell" type="check" title="Brightness Threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="47" customClass="VLCHUDCheckboxCell">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -192,7 +192,7 @@
                                                             <action selector="enableAdjustBrightnessThreshold:" target="-2" id="9OQ-2E-4Ii"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="23">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="23">
                                                         <rect key="frame" x="15" y="94" width="61" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Brightness" id="40" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -207,7 +207,7 @@
                                                             <action selector="adjustSliderChanged:" target="-2" id="8p1-yp-x16"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="22">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="22">
                                                         <rect key="frame" x="15" y="56" width="59" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Saturation" id="41" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -215,7 +215,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="21">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="21">
                                                         <rect key="frame" x="15" y="34" width="44" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Gamma" id="42" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -276,7 +276,7 @@
                                                 <constraint firstAttribute="width" constant="304" id="ySe-kw-WWO"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="49">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="49">
                                             <rect key="frame" x="8" y="178" width="91" height="18"/>
                                             <buttonCell key="cell" type="check" title="Image Adjust" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="50" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -286,7 +286,7 @@
                                                 <action selector="enableAdjust:" target="-2" id="O4d-VO-Xdt"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="58">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="58">
                                             <rect key="frame" x="320" y="178" width="66" height="18"/>
                                             <buttonCell key="cell" type="check" title="Sharpen" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="59" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -296,13 +296,13 @@
                                                 <action selector="enableSharpen:" target="-2" id="hMo-bi-uqx"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="57">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="57">
                                             <rect key="frame" x="320" y="137" width="316" height="42"/>
                                             <view key="contentView" id="XDn-1w-i62">
                                                 <rect key="frame" x="1" y="1" width="314" height="40"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="54">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="54">
                                                         <rect key="frame" x="15" y="13" width="37" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Sigma" id="55" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -329,7 +329,7 @@
                                                 <constraint firstAttribute="height" constant="36" id="4Kb-Xr-v5e"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="60">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="60">
                                             <rect key="frame" x="320" y="116" width="110" height="18"/>
                                             <buttonCell key="cell" type="check" title="Banding removal" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="66" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -339,13 +339,13 @@
                                                 <action selector="enableBanding:" target="-2" id="qkS-Sl-QqY"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="61">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="61">
                                             <rect key="frame" x="320" y="75" width="316" height="42"/>
                                             <view key="contentView" id="ppw-UH-GKm">
                                                 <rect key="frame" x="1" y="1" width="314" height="40"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="62">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="62">
                                                         <rect key="frame" x="15" y="13" width="40" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Radius" id="65" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -372,7 +372,7 @@
                                                 <constraint firstAttribute="height" constant="36" id="1La-5b-j1C"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="67">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="67">
                                             <rect key="frame" x="320" y="54" width="75" height="18"/>
                                             <buttonCell key="cell" type="check" title="Film Grain" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="73" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -382,13 +382,13 @@
                                                 <action selector="enableGrain:" target="-2" id="dLd-Zu-eFG"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="68">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="68">
                                             <rect key="frame" x="320" y="13" width="316" height="42"/>
                                             <view key="contentView" id="xSw-Z6-2rH">
                                                 <rect key="frame" x="1" y="1" width="314" height="40"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="70">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="94" translatesAutoresizingMaskIntoConstraints="NO" id="70">
                                                         <rect key="frame" x="15" y="13" width="50" height="14"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Variance" id="71" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -449,7 +449,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="74">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="74">
                                             <rect key="frame" x="274" y="169" width="96" height="19"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="96" id="xcv-U8-Q2H"/>
@@ -468,7 +468,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropTopValue" id="gHx-EW-7X8"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="76">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="76">
                                             <rect key="frame" x="245" y="172" width="24" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Top" id="77" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -486,7 +486,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropTopValue" id="A1r-VP-TjS"/>
                                             </connections>
                                         </stepper>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="83">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="83">
                                             <rect key="frame" x="274" y="92" width="96" height="19"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="88" customClass="VLCHUDTextFieldCell">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0 px" negativeFormat="0 px" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="89">
@@ -502,7 +502,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropBottomValue" id="ZxR-KD-4kJ"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="84">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="84">
                                             <rect key="frame" x="226" y="95" width="43" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Bottom" id="87" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -520,7 +520,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropBottomValue" id="y7g-lQ-DEN"/>
                                             </connections>
                                         </stepper>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="92">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92">
                                             <rect key="frame" x="510" y="131" width="96" height="19"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="97" customClass="VLCHUDTextFieldCell">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0 px" negativeFormat="0 px" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="98">
@@ -536,7 +536,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropRightValue" id="ne2-Wy-pCd"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="93">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="93">
                                             <rect key="frame" x="473" y="134" width="32" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Right" id="96" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -554,7 +554,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropRightValue" id="HIO-qZ-h1z"/>
                                             </connections>
                                         </stepper>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="101">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="101">
                                             <rect key="frame" x="48" y="131" width="96" height="19"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0 px" usesSingleLineMode="YES" id="106" customClass="VLCHUDTextFieldCell">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0 px" negativeFormat="0 px" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="107">
@@ -570,7 +570,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropLeftValue" id="Gwq-w1-DlE"/>
                                             </connections>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="102">
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="102">
                                             <rect key="frame" x="18" y="134" width="25" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Left" id="105" customClass="VLCHUDTextFieldCell">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -588,7 +588,7 @@
                                                 <binding destination="-2" name="value" keyPath="self.cropLeftValue" id="eFt-d6-b6y"/>
                                             </connections>
                                         </stepper>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="110">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="110">
                                             <rect key="frame" x="14" y="35" width="171" height="18"/>
                                             <buttonCell key="cell" type="check" title="Synchronize top and bottom" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="111" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -598,7 +598,7 @@
                                                 <action selector="cropObjectChanged:" target="-2" id="EAT-Iv-fbY"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="112">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="112">
                                             <rect key="frame" x="14" y="15" width="158" height="18"/>
                                             <buttonCell key="cell" type="check" title="Synchronize left and right" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="113" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -649,7 +649,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="116">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="116">
                                             <rect key="frame" x="8" y="178" width="76" height="18"/>
                                             <buttonCell key="cell" type="check" title="Transform" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="122" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -659,7 +659,7 @@
                                                 <action selector="enableTransform:" target="-2" id="lmV-kg-Ino"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="150">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="150">
                                             <rect key="frame" x="8" y="110" width="127" height="18"/>
                                             <buttonCell key="cell" type="check" title="Magnification/Zoom" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="151" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -669,7 +669,7 @@
                                                 <action selector="enableZoom:" target="-2" id="hEF-sf-KtP"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="117">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="117">
                                             <rect key="frame" x="8" y="134" width="310" height="46"/>
                                             <view key="contentView" id="3KQ-fd-kER">
                                                 <rect key="frame" x="1" y="1" width="308" height="44"/>
@@ -706,7 +706,7 @@
                                                 <constraint firstAttribute="height" constant="40" id="F6p-XO-4Va"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="123">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="123">
                                             <rect key="frame" x="326" y="178" width="89" height="18"/>
                                             <buttonCell key="cell" type="check" title="Puzzle game" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="129" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -716,13 +716,13 @@
                                                 <action selector="enablePuzzle:" target="-2" id="yT9-tI-VZc"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="124">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="124">
                                             <rect key="frame" x="326" y="106" width="310" height="74"/>
                                             <view key="contentView" id="HUd-nt-fzr">
                                                 <rect key="frame" x="1" y="1" width="308" height="72"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="138">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="138">
                                                         <rect key="frame" x="170" y="41" width="96" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="139" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="171">
@@ -749,7 +749,7 @@
                                                             <binding destination="-2" name="value" keyPath="self.puzzleRowsValue" id="p1K-CS-YuJ"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="142">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="142">
                                                         <rect key="frame" x="15" y="44" width="32" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rows" id="143" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -757,7 +757,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="144">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="144">
                                                         <rect key="frame" x="170" y="14" width="96" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="149" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="176">
@@ -784,7 +784,7 @@
                                                             <binding destination="-2" name="value" keyPath="self.puzzleColumnsValue" id="flo-or-cvr"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="146">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="146">
                                                         <rect key="frame" x="15" y="17" width="50" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Columns" id="147" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -814,7 +814,7 @@
                                                 <constraint firstAttribute="height" constant="68" id="Tye-1d-Cbu"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="754">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="754">
                                             <rect key="frame" x="8" y="84" width="44" height="18"/>
                                             <buttonCell key="cell" type="check" title="Wall" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="772" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -824,13 +824,13 @@
                                                 <action selector="enableWall:" target="-2" id="pHR-DP-Yje"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="755">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="755">
                                             <rect key="frame" x="8" y="12" width="310" height="74"/>
                                             <view key="contentView" id="ne3-lY-k8h">
                                                 <rect key="frame" x="1" y="1" width="308" height="72"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="761">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="761">
                                                         <rect key="frame" x="170" y="41" width="96" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="96" id="QKd-ku-QNM"/>
@@ -860,7 +860,7 @@
                                                             <binding destination="-2" name="value" keyPath="self.wallRowsValue" id="7jt-T0-dn8"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="759">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="759">
                                                         <rect key="frame" x="15" y="44" width="32" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rows" id="767" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -868,7 +868,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="758">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="758">
                                                         <rect key="frame" x="170" y="14" width="96" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="2" id="768" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="769">
@@ -895,7 +895,7 @@
                                                             <binding destination="-2" name="value" keyPath="self.wallColumnsValue" id="mfP-tC-7ac"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="756">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="756">
                                                         <rect key="frame" x="15" y="17" width="50" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Columns" id="771" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -926,7 +926,7 @@
                                                 <constraint firstAttribute="width" constant="304" id="VcI-cL-bdN"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="729">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="729">
                                             <rect key="frame" x="326" y="84" width="53" height="18"/>
                                             <buttonCell key="cell" type="check" title="Clone" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="747" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -936,13 +936,13 @@
                                                 <action selector="enableClone:" target="-2" id="S7F-h8-33g"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="730">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="730">
                                             <rect key="frame" x="326" y="39" width="310" height="47"/>
                                             <view key="contentView" id="uom-ff-xWb">
                                                 <rect key="frame" x="1" y="1" width="308" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="736">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="736">
                                                         <rect key="frame" x="170" y="13" width="96" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4" id="739" customClass="VLCHUDTextFieldCell">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0" negativeFormat="0" allowsFloats="NO" usesGroupingSeparator="NO" roundingMode="floor" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="740">
@@ -969,7 +969,7 @@
                                                             <binding destination="-2" name="value" keyPath="self.cloneValue" id="vFw-9n-Kb8"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="734">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="734">
                                                         <rect key="frame" x="15" y="16" width="97" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of clones" id="742" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1022,7 +1022,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="203">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="203">
                                             <rect key="frame" x="230" y="91" width="189" height="89"/>
                                             <view key="contentView" id="q62-YN-hEA">
                                                 <rect key="frame" x="1" y="1" width="187" height="87"/>
@@ -1045,7 +1045,7 @@
                                                             <action selector="gradientModifierChanged:" target="-2" id="Gha-nc-dYk"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="201">
+                                                    <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="201">
                                                         <rect key="frame" x="14" y="14" width="65" height="18"/>
                                                         <buttonCell key="cell" type="check" title="Cartoon" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="202" customClass="VLCHUDCheckboxCell">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1060,7 +1060,7 @@
                                                             <action selector="gradientModifierChanged:" target="-2" id="Vvs-60-cfG"/>
                                                         </connections>
                                                     </button>
-                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="199">
+                                                    <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="199">
                                                         <rect key="frame" x="14" y="34" width="51" height="18"/>
                                                         <buttonCell key="cell" type="check" title="Color" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="200" customClass="VLCHUDCheckboxCell">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1075,7 +1075,7 @@
                                                             <action selector="gradientModifierChanged:" target="-2" id="CZU-X9-qsr"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="185">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="185">
                                                         <rect key="frame" x="15" y="59" width="34" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Mode" id="186" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1101,7 +1101,7 @@
                                                 <constraint firstAttribute="width" constant="183" id="v9w-q1-Yf7"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="204">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="204">
                                             <rect key="frame" x="230" y="179" width="68" height="18"/>
                                             <buttonCell key="cell" type="check" title="Gradient" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="205" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1111,7 +1111,7 @@
                                                 <action selector="enableGradient:" target="-2" id="Lxe-qa-iOE"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="213">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="213">
                                             <rect key="frame" x="421" y="179" width="71" height="18"/>
                                             <buttonCell key="cell" type="check" title="Posterize" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="214" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1121,7 +1121,7 @@
                                                 <action selector="enablePosterize:" target="-2" id="1nY-6G-Qz1"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="254">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="254">
                                             <rect key="frame" x="419" y="51" width="97" height="18"/>
                                             <buttonCell key="cell" type="check" title="Motion Detect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="255" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1131,7 +1131,7 @@
                                                 <action selector="enableMotionDetect:" target="-2" id="KhE-5L-uU8"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="256">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="256">
                                             <rect key="frame" x="419" y="36" width="87" height="18"/>
                                             <buttonCell key="cell" type="check" title="Water effect" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="257" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1141,7 +1141,7 @@
                                                 <action selector="enableWaterEffect:" target="-2" id="emr-O5-DsD"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="258">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="258">
                                             <rect key="frame" x="419" y="21" width="57" height="18"/>
                                             <buttonCell key="cell" type="check" title="Waves" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="259" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1151,7 +1151,7 @@
                                                 <action selector="enableWaves:" target="-2" id="9No-MG-szZ"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="260">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="260">
                                             <rect key="frame" x="419" y="6" width="85" height="18"/>
                                             <buttonCell key="cell" type="check" title="Psychedelic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="261" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1161,7 +1161,7 @@
                                                 <action selector="enablePsychedelic:" target="-2" id="0oR-yp-Qnb"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="300">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="300">
                                             <rect key="frame" x="222" y="10" width="88" height="18"/>
                                             <buttonCell key="cell" type="check" title="Invert colors" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="301" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1171,13 +1171,13 @@
                                                 <action selector="enableInvert:" target="-2" id="vgK-qQ-wNe"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="207">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="207">
                                             <rect key="frame" x="421" y="133" width="214" height="47"/>
                                             <view key="contentView" id="s4h-VJ-0fi">
                                                 <rect key="frame" x="1" y="1" width="212" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="233">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="233">
                                                         <rect key="frame" x="101" y="13" width="75" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="Mmc-JB-TlB"/>
@@ -1207,7 +1207,7 @@
                                                             <binding destination="-2" name="value" keyPath="self.posterizeValue" id="zyN-cD-GaL"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="240">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="240">
                                                         <rect key="frame" x="15" y="15" width="81" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Posterize level" id="241" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1230,7 +1230,7 @@
                                                 <constraint firstAttribute="width" constant="208" id="sfX-DU-pzb"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="242">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="242">
                                             <rect key="frame" x="6" y="72" width="52" height="18"/>
                                             <buttonCell key="cell" type="check" title="Sepia" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="251" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1240,13 +1240,13 @@
                                                 <action selector="enableSepia:" target="-2" id="f8B-Kt-uqG"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="243">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="243">
                                             <rect key="frame" x="6" y="26" width="214" height="47"/>
                                             <view key="contentView" id="3iv-gg-bsG">
                                                 <rect key="frame" x="1" y="1" width="212" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="246">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="246">
                                                         <rect key="frame" x="101" y="13" width="75" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="Z1R-tI-76R"/>
@@ -1276,7 +1276,7 @@
                                                             <binding destination="-2" name="value" keyPath="self.sepiaValue" id="Uoe-tK-Ewl"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="244">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="244">
                                                         <rect key="frame" x="15" y="15" width="49" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Intensity" id="250" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1299,7 +1299,7 @@
                                                 <constraint firstAttribute="height" constant="41" id="di8-zg-IK1"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="278">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="278">
                                             <rect key="frame" x="222" y="72" width="106" height="18"/>
                                             <buttonCell key="cell" type="check" title="Color extraction" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="287" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1309,13 +1309,13 @@
                                                 <action selector="enableExtract:" target="-2" id="BTh-5r-NvI"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="279">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="279">
                                             <rect key="frame" x="222" y="26" width="189" height="47"/>
                                             <view key="contentView" id="hin-eg-GKX">
                                                 <rect key="frame" x="1" y="1" width="187" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="282">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="282">
                                                         <rect key="frame" x="15" y="15" width="33" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Color" id="283" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1323,7 +1323,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="290">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="290">
                                                         <rect key="frame" x="94" y="13" width="75" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="75" id="NhX-q8-iDm"/>
@@ -1350,7 +1350,7 @@
                                                 <constraint firstAttribute="height" constant="41" id="svh-jF-I7B"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="217">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="217">
                                             <rect key="frame" x="419" y="113" width="82" height="18"/>
                                             <buttonCell key="cell" type="check" title="Motion blur" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="223" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1360,7 +1360,7 @@
                                                 <action selector="enableBlur:" target="-2" id="ofo-zv-aYJ"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="218">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="218">
                                             <rect key="frame" x="419" y="68" width="214" height="47"/>
                                             <view key="contentView" id="zp9-ZY-iRy">
                                                 <rect key="frame" x="1" y="1" width="212" height="45"/>
@@ -1376,7 +1376,7 @@
                                                             <action selector="blurModifierChanged:" target="-2" id="gLG-Z8-DSC"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="219">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="219">
                                                         <rect key="frame" x="61" y="15" width="38" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Factor" id="222" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1393,7 +1393,7 @@
                                                 </constraints>
                                             </view>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="271">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="271">
                                             <rect key="frame" x="8" y="178" width="104" height="18"/>
                                             <buttonCell key="cell" type="check" title="Color threshold" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="277" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1403,7 +1403,7 @@
                                                 <action selector="enableThreshold:" target="-2" id="EXx-Au-HPF"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="272">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="272">
                                             <rect key="frame" x="8" y="90" width="214" height="90"/>
                                             <view key="contentView" id="VxL-14-NoR">
                                                 <rect key="frame" x="1" y="1" width="212" height="88"/>
@@ -1416,7 +1416,7 @@
                                                             <action selector="thresholdModifierChanged:" target="-2" id="DA5-ev-OYe"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="273">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="273">
                                                         <rect key="frame" x="15" y="35" width="59" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Saturation" id="276" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1431,7 +1431,7 @@
                                                             <action selector="thresholdModifierChanged:" target="-2" id="B6O-zi-366"/>
                                                         </connections>
                                                     </slider>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="297">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="297">
                                                         <rect key="frame" x="15" y="14" width="53" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Similarity" id="298" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1439,7 +1439,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="292">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="292">
                                                         <rect key="frame" x="15" y="59" width="33" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Color" id="295" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1447,7 +1447,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="293">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="293">
                                                         <rect key="frame" x="94" y="57" width="100" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="100" id="I8Q-NU-g5N"/>
@@ -1530,7 +1530,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="644" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="302">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="302">
                                             <rect key="frame" x="8" y="178" width="66" height="18"/>
                                             <buttonCell key="cell" type="check" title="Add text" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="320" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1540,13 +1540,13 @@
                                                 <action selector="enableAddText:" target="-2" id="9eK-f2-5u9"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="303">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="303">
                                             <rect key="frame" x="8" y="107" width="310" height="72"/>
                                             <view key="contentView" id="0S4-qU-SrJ">
                                                 <rect key="frame" x="1" y="1" width="308" height="70"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="307">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="307">
                                                         <rect key="frame" x="15" y="42" width="27" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Text" id="315" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1554,7 +1554,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="304">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="304">
                                                         <rect key="frame" x="15" y="15" width="46" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Position" id="319" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1579,7 +1579,7 @@
                                                             <action selector="addTextModifierChanged:" target="-2" id="UUt-fd-zqi"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="331">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="331">
                                                         <rect key="frame" x="106" y="39" width="184" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="184" id="fsZ-s4-l8b"/>
@@ -1611,7 +1611,7 @@
                                                 <constraint firstAttribute="height" constant="66" id="o0K-GI-7xh"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="643">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="643">
                                             <rect key="frame" x="320" y="178" width="69" height="18"/>
                                             <buttonCell key="cell" type="check" title="Add logo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="667" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1621,13 +1621,13 @@
                                                 <action selector="enableAddLogo:" target="-2" id="mbp-aI-eNo"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="644">
+                                        <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="644">
                                             <rect key="frame" x="320" y="85" width="312" height="95"/>
                                             <view key="contentView" id="4L0-QJ-InP">
                                                 <rect key="frame" x="1" y="1" width="310" height="93"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="652">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="652">
                                                         <rect key="frame" x="15" y="64" width="30" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Logo" id="658" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1635,7 +1635,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="651">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="651">
                                                         <rect key="frame" x="16" y="37" width="46" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Position" id="659" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1643,7 +1643,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="649">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="649">
                                                         <rect key="frame" x="16" y="12" width="76" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Transparency" id="661" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1651,7 +1651,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="646">
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="646">
                                                         <rect key="frame" x="106" y="62" width="184" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="665" customClass="VLCHUDTextFieldCell">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1709,7 +1709,7 @@
                                                 <constraint firstAttribute="height" constant="89" id="OSq-57-c2a"/>
                                             </constraints>
                                         </box>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="708">
+                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="708">
                                             <rect key="frame" x="8" y="65" width="90" height="18"/>
                                             <buttonCell key="cell" type="check" title="Anaglyph 3D" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="709" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1779,9 +1779,8 @@
                             <constraint firstAttribute="height" constant="1" id="La9-tY-5he"/>
                         </constraints>
                     </box>
-                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-av-fGB">
+                    <button fixedFrame="YES" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-av-fGB">
                         <rect key="frame" x="466" y="9" width="158" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="8uO-gi-iv5">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
