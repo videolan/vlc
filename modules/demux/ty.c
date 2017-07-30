@@ -1546,7 +1546,7 @@ static int ty_stream_seek_time(demux_t *p_demux, uint64_t l_seek_time)
     }
 
     /* determine which chunk has our seek_time */
-    for (unsigned i=0; i<p_sys->i_bits_per_seq_entry; i++) {
+    for (i=0; i<p_sys->i_bits_per_seq_entry; i++) {
         uint64_t l_chunk_nr = i_seq_entry * p_sys->i_bits_per_seq_entry + i;
         uint64_t l_chunk_offset = (l_chunk_nr + 1) * CHUNK_SIZE;
         msg_Dbg(p_demux, "testing part %d chunk %"PRIu64" mask 0x%02X bit %d",
