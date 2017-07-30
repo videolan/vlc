@@ -1649,15 +1649,15 @@ static void parse_master(demux_t *p_demux)
         p_sys->i_seq_table_size = 0;
         return;
     }
-    for (unsigned i=0; i<p_sys->i_seq_table_size; i++) {
+    for (unsigned j=0; j<p_sys->i_seq_table_size; j++) {
         vlc_stream_Read(p_demux->s, mst_buf, 8);
-        p_sys->seq_table[i].l_timestamp = U64_AT(&mst_buf[0]);
+        p_sys->seq_table[j].l_timestamp = U64_AT(&mst_buf[0]);
         if (i_map_size > 8) {
             msg_Err(p_demux, "Unsupported SEQ bitmap size in master chunk");
             vlc_stream_Read(p_demux->s, NULL, i_map_size);
         } else {
             vlc_stream_Read(p_demux->s, mst_buf + 8, i_map_size);
-            memcpy(p_sys->seq_table[i].chunk_bitmask, &mst_buf[8], i_map_size);
+            memcpy(p_sys->seq_table[j].chunk_bitmask, &mst_buf[8], i_map_size);
         }
     }
 
