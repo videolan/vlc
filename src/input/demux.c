@@ -610,9 +610,6 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
     if(!psz_parser)
         return NULL;
 
-    vlc_array_t name;
-    vlc_array_init(&name);
-
     /* parse chain */
     while(psz_parser)
     {
@@ -622,22 +619,13 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
         free( psz_parser );
         psz_parser = psz_rest_chain;
 
-        vlc_array_append(&name, psz_name);
+        demux_t *filter = demux_FilterNew(p_demux, psz_name);
+        if (filter != NULL)
+            p_demux = filter;
+
+        free(psz_name);
         config_ChainDestroy(p_cfg);
     }
-
-    size_t i = vlc_array_count(&name);
-    while(i--)
-    {
-        char *p_name = vlc_array_item_at_index(&name, i);
-        demux_t *p_next = demux_FilterNew( p_demux, p_name );
-
-        free( p_name );
-
-        p_demux = p_next;
-    }
-
-    vlc_array_clear(&name);
 
     return p_demux;
 }
