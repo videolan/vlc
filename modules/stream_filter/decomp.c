@@ -310,7 +310,7 @@ static int Open (stream_t *stream, const char *path)
                 case 0:
                     dup2 (comp[0], 0);
                     dup2 (uncomp[1], 1);
-                    execlp (path, path, (char *)NULL);
+                    execlp (path, path, (const char *)NULL);
                     exit (1); /* if we get, execlp() failed! */
                 default:
                     if (vlc_clone (&p_sys->thread, Thread, stream,
