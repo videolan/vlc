@@ -836,6 +836,28 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     }
 }
 
++ (BOOL)updateRightToLeftSettings
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *isoCode = [defaults stringForKey:@"language"];
+
+    if (!isoCode || [isoCode isEqualToString:@"auto"]) {
+        // Automatic handling of right to left
+        [defaults removeObjectForKey:@"NSForceRightToLeftWritingDirection"];
+        [defaults removeObjectForKey:@"AppleTextDirection"];
+    } else {
+        for(int i = 0; i < ARRAY_SIZE(language_map); i++) {
+            if (!strcmp(language_map[i].iso, [isoCode UTF8String])) {
+                [defaults setBool:language_map[i].isRightToLeft forKey:@"NSForceRightToLeftWritingDirection"];
+                [defaults setBool:language_map[i].isRightToLeft forKey:@"AppleTextDirection"];
+                return YES;
+            }
+        }
+    }
+
+    return NO;
+}
+
 - (void)saveChangedSettings
 {
     NSString *tmpString;
@@ -855,14 +877,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         NSUInteger index = [_intf_languagePopup indexOfSelectedItem];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:toNSStr(language_map[index].iso) forKey:@"language"];
-
-        if (index == 0) { // Automatic handling of right to left
-            [defaults removeObjectForKey:@"NSForceRightToLeftWritingDirection"];
-            [defaults removeObjectForKey:@"AppleTextDirection"];
-        } else {
-            [defaults setBool:language_map[index].isRightToLeft forKey:@"NSForceRightToLeftWritingDirection"];
-            [defaults setBool:language_map[index].isRightToLeft forKey:@"AppleTextDirection"];
-        }
+        [VLCSimplePrefsController updateRightToLeftSettings];
         [defaults synchronize];
 
         config_PutInt(p_intf, "metadata-network-access", [_intf_artCheckbox state]);

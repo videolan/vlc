@@ -239,4 +239,10 @@
 - (IBAction)hotkeySettingChanged:(id)sender;
 - (BOOL)changeHotkeyTo: (NSString *)theKey;
 
+/**
+ * Updates right to left UI setting according to currently set language code
+ * \return true if specific language was selected and RTL UI settings were updated
+ */
++ (BOOL)updateRightToLeftSettings;
+
 @end

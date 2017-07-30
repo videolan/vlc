@@ -25,13 +25,14 @@
 
 #import "VLCMain+OldPrefs.h"
 #import "VLCCoreInteraction.h"
+#import "VLCSimplePrefsController.h"
 
 #include <unistd.h> /* execl() */
 
 @implementation VLCMain(OldPrefs)
 
 static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
-static const int kCurrentPreferencesVersion = 3;
+static const int kCurrentPreferencesVersion = 4;
 
 + (void)initialize
 {
@@ -79,6 +80,17 @@ static const int kCurrentPreferencesVersion = 3;
         /* version 2 (used by VLC 2.0.x and early versions of 2.1) can lead to exceptions within 2.1 or later
          * so we reset the OS X specific prefs here - in practice, no user will notice */
         [self resetAndReinitializeUserDefaults];
+
+    } else if (version == 3) {
+        /* version 4 (introduced in 3.0.0) adds RTL settings depending on stored language */
+
+        [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+        BOOL hasUpdated = [VLCSimplePrefsController updateRightToLeftSettings];
+        [defaults synchronize];
+
+        // This migration only has effect rarely, therefore only restart then
+        if (!hasUpdated)
+            return;
 
     } else {
         NSArray *libraries = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
