@@ -1022,7 +1022,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         _hotkeyChanged = NO;
     }
 
-    [[VLCCoreInteraction sharedInstance] fixPreferences];
+    [[VLCCoreInteraction sharedInstance] fixIntfSettings];
 
     /* okay, let's save our changes to vlcrc */
     config_SaveConfigFile(p_intf);

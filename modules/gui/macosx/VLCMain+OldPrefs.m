@@ -53,7 +53,7 @@ static const int kCurrentPreferencesVersion = 3;
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (void)removeOldPreferences
+- (void)migrateOldPreferences
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     int version = [defaults integerForKey:kVLCPreferencesVersion];
@@ -71,7 +71,7 @@ static const int kCurrentPreferencesVersion = 3;
         [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
         [defaults synchronize];
 
-        if (![[VLCCoreInteraction sharedInstance] fixPreferences])
+        if (![[VLCCoreInteraction sharedInstance] fixIntfSettings])
             return;
         else
             config_SaveConfigFile(getIntf()); // we need to do manually, since we won't quit libvlc cleanly

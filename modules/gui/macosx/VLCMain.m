@@ -292,7 +292,7 @@ static VLCMain *sharedInstance = nil;
 
     [_coreinteraction updateCurrentlyUsedHotkeys];
 
-    [self removeOldPreferences];
+    [self migrateOldPreferences];
 
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)

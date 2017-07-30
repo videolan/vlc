@@ -674,7 +674,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 #pragma mark - uncommon stuff
 
-- (BOOL)fixPreferences
+- (BOOL)fixIntfSettings
 {
     NSMutableString * o_workString;
     NSRange returnedRange;

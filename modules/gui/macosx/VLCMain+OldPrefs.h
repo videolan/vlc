@@ -26,6 +26,6 @@
 @interface VLCMain (OldPrefs)
 
 - (void)resetAndReinitializeUserDefaults;
-- (void)removeOldPreferences;
+- (void)migrateOldPreferences;
 
 @end
