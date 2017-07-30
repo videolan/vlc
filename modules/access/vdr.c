@@ -226,8 +226,7 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_meta )
         vlc_meta_Delete( p_sys->p_meta );
 
-    size_t count = p_sys->p_marks->i_seekpoint;
-    TAB_CLEAN( count, p_sys->offsets );
+    free( p_sys->offsets );
     vlc_input_title_Delete( p_sys->p_marks );
 }
 
@@ -822,7 +821,6 @@ static void ImportMarks( stream_t *p_access )
     p_marks->i_length = i_frame_count * (int64_t)( CLOCK_FREQ / p_sys->fps );
 
     uint64_t *offsetv = NULL;
-    size_t offsetc = 0;
 
     /* offset for chapter positions */
     int i_chapter_offset = p_sys->fps / 1000 *
@@ -870,10 +868,12 @@ static void ImportMarks( stream_t *p_access )
         sp->psz_name = strdup( line );
 
         TAB_APPEND( p_marks->i_seekpoint, p_marks->seekpoint, sp );
-        TAB_APPEND( offsetc, offsetv, i_offset );
+        offsetv = xrealloc(offsetv, p_marks->i_seekpoint * sizeof (*offsetv));
 
         for( int i = 0; i + 1 < i_file_number; ++i )
-            offsetv[offsetc - 1] += FILE_SIZE( i );
+            i_offset += FILE_SIZE(i);
+
+        offsetv[p_marks->i_seekpoint - 1] = i_offset;
     }
 
     /* add a chapter at the beginning if missing */
@@ -885,7 +885,11 @@ static void ImportMarks( stream_t *p_access )
             sp->i_time_offset = 0;
             sp->psz_name = strdup( _("Start") );
             TAB_INSERT( p_marks->i_seekpoint, p_marks->seekpoint, sp, 0 );
-            TAB_INSERT( offsetc, offsetv, UINT64_C(0), 0 );
+            offsetv = xrealloc(offsetv,
+                               p_marks->i_seekpoint * sizeof (*offsetv));
+            memmove(offsetv + 1, offsetv,
+                    (p_marks->i_seekpoint - 1) * sizeof (*offsetv));
+            offsetv[0] = 0;
         }
     }
 
@@ -897,7 +901,7 @@ static void ImportMarks( stream_t *p_access )
     else
     {
         vlc_input_title_Delete( p_marks );
-        TAB_CLEAN( offsetc, offsetv );
+        free(offsetv);
     }
 
     fclose( marksfile );
