@@ -127,6 +127,31 @@
                 <rect key="frame" x="0.0" y="0.0" width="642" height="274"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PmS-HT-UdA">
+                        <rect key="frame" x="147" y="246" width="352" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="9aO-Gu-WkU"/>
+                        </constraints>
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="l7E-0O-cd7" customClass="VLCHUDSegmentedCell">
+                            <font key="font" metaFont="system"/>
+                            <segments>
+                                <segment label="Basic" selected="YES"/>
+                                <segment label="Crop" tag="1"/>
+                                <segment label="Geometry" tag="2"/>
+                                <segment label="Color" tag="3"/>
+                                <segment label="Miscellaneous" tag="4"/>
+                            </segments>
+                        </segmentedCell>
+                        <connections>
+                            <action selector="takeSelectedTabViewItemFromSender:" target="3" id="lDP-xP-F9v"/>
+                        </connections>
+                    </segmentedControl>
+                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="jys-n2-OlJ">
+                        <rect key="frame" x="0.0" y="238" width="642" height="5"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="1" id="La9-tY-5he"/>
+                        </constraints>
+                    </box>
                     <tabView drawsBackground="NO" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="3">
                         <rect key="frame" x="-1" y="35" width="644" height="197"/>
                         <font key="font" metaFont="system"/>
@@ -1738,13 +1763,13 @@
                         </tabViewItems>
                     </tabView>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="720">
-                        <rect key="frame" x="287" y="6" width="68" height="22"/>
-                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="723" id="721" customClass="VLCHUDPopUpButtonCell">
+                        <rect key="frame" x="234" y="6" width="175" height="22"/>
+                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" id="721" customClass="VLCHUDPopUpButtonCell">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                             <menu key="menu" title="OtherViews" id="722">
                                 <items>
-                                    <menuItem title="Item 1" state="on" id="723"/>
+                                    <menuItem title="Duplicate current profile ..." id="723"/>
                                     <menuItem title="Item 2" id="724"/>
                                     <menuItem title="Item 3" id="725"/>
                                 </items>
@@ -1754,36 +1779,11 @@
                             <action selector="profileSelectorAction:" target="-2" id="Kw0-Rg-y67"/>
                         </connections>
                     </popUpButton>
-                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PmS-HT-UdA">
-                        <rect key="frame" x="147" y="246" width="352" height="24"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="21" id="9aO-Gu-WkU"/>
-                        </constraints>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="l7E-0O-cd7" customClass="VLCHUDSegmentedCell">
-                            <font key="font" metaFont="system"/>
-                            <segments>
-                                <segment label="Basic" selected="YES"/>
-                                <segment label="Crop" tag="1"/>
-                                <segment label="Geometry" tag="2"/>
-                                <segment label="Color" tag="3"/>
-                                <segment label="Miscellaneous" tag="4"/>
-                            </segments>
-                        </segmentedCell>
-                        <connections>
-                            <action selector="takeSelectedTabViewItemFromSender:" target="3" id="lDP-xP-F9v"/>
-                        </connections>
-                    </segmentedControl>
-                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="jys-n2-OlJ">
-                        <rect key="frame" x="0.0" y="238" width="642" height="5"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="1" id="La9-tY-5he"/>
-                        </constraints>
-                    </box>
-                    <button fixedFrame="YES" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-av-fGB">
-                        <rect key="frame" x="466" y="9" width="158" height="18"/>
-                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="8uO-gi-iv5">
+                    <button horizontalHuggingPriority="200" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-av-fGB">
+                        <rect key="frame" x="414" y="8" width="210" height="18"/>
+                        <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" inset="2" id="8uO-gi-iv5" customClass="VLCHUDCheckboxCell">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
                         <connections>
                             <action selector="applyProfileCheckboxChanged:" target="-1" id="9PJ-xF-qBh"/>
@@ -1798,6 +1798,9 @@
                     <constraint firstItem="jys-n2-OlJ" firstAttribute="top" secondItem="PmS-HT-UdA" secondAttribute="bottom" constant="7" id="AUf-ez-t4g"/>
                     <constraint firstItem="3" firstAttribute="top" secondItem="2" secondAttribute="top" constant="42" id="CDC-fg-sWo"/>
                     <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="-1" id="CVD-Zn-f0c"/>
+                    <constraint firstItem="720" firstAttribute="baseline" secondItem="ABI-av-fGB" secondAttribute="baseline" id="ZKi-Ze-hg8"/>
+                    <constraint firstAttribute="trailing" secondItem="ABI-av-fGB" secondAttribute="trailing" constant="20" id="aSv-tb-7pU"/>
+                    <constraint firstItem="ABI-av-fGB" firstAttribute="leading" secondItem="720" secondAttribute="trailing" constant="10" id="ada-Cu-udF"/>
                     <constraint firstItem="jys-n2-OlJ" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="enn-VY-kt7"/>
                     <constraint firstAttribute="bottom" secondItem="720" secondAttribute="bottom" constant="9" id="kdJ-1Z-QDw"/>
                     <constraint firstItem="PmS-HT-UdA" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" constant="2" id="mLU-YV-qlE"/>
