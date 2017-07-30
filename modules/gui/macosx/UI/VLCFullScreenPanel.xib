@@ -191,7 +191,7 @@
                         </constraints>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="0:00" id="ebb-BZ-1l4">
                             <font key="font" metaFont="systemThin" size="11"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -203,7 +203,7 @@
                         </constraints>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" placeholderString="∞" id="PYh-Xz-irE">
                             <font key="font" metaFont="systemThin" size="11"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -214,7 +214,7 @@
                         </constraints>
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" placeholderString="Nothing Playing" usesSingleLineMode="YES" id="uA0-hc-yIU">
                             <font key="font" metaFont="systemThin" size="11"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -230,20 +230,20 @@
                     </slider>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="T3x-es-c7v" firstAttribute="leading" secondItem="Vd8-0f-Usz" secondAttribute="trailing" constant="5" id="1vL-HQ-doh"/>
+                    <constraint firstItem="T3x-es-c7v" firstAttribute="left" secondItem="Vd8-0f-Usz" secondAttribute="right" constant="5" id="1vL-HQ-doh"/>
                     <constraint firstItem="VLH-qy-cwr" firstAttribute="leading" secondItem="Npt-C5-K77" secondAttribute="leading" id="AXK-9N-Zst"/>
                     <constraint firstItem="VLH-qy-cwr" firstAttribute="top" secondItem="Npt-C5-K77" secondAttribute="top" priority="750" constant="38" id="FRE-MB-iBT"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="leading" secondItem="Npt-C5-K77" secondAttribute="leading" constant="20" id="Ibl-1I-f2u"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="top" secondItem="Npt-C5-K77" secondAttribute="top" constant="25" id="N8D-Lc-aKn"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="top" secondItem="nJc-M4-sMF" secondAttribute="bottom" constant="2" id="Pix-DL-2C0"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="top" secondItem="T3x-es-c7v" secondAttribute="bottom" constant="2" id="S1j-CH-Xvt"/>
-                    <constraint firstItem="Vd8-0f-Usz" firstAttribute="leading" secondItem="nJc-M4-sMF" secondAttribute="trailing" constant="5" id="SvX-6Y-TRg"/>
+                    <constraint firstItem="Vd8-0f-Usz" firstAttribute="left" secondItem="nJc-M4-sMF" secondAttribute="right" constant="5" id="SvX-6Y-TRg"/>
                     <constraint firstAttribute="trailing" secondItem="f9T-Kg-gn6" secondAttribute="trailing" constant="20" id="TIT-A8-rRx"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="top" secondItem="Vd8-0f-Usz" secondAttribute="bottom" constant="2" id="dwA-kL-5MW"/>
                     <constraint firstAttribute="bottom" secondItem="VLH-qy-cwr" secondAttribute="bottom" id="oFk-fv-UiZ"/>
-                    <constraint firstItem="nJc-M4-sMF" firstAttribute="leading" secondItem="Npt-C5-K77" secondAttribute="leading" constant="20" id="r2T-tn-CTU"/>
+                    <constraint firstItem="nJc-M4-sMF" firstAttribute="left" secondItem="Npt-C5-K77" secondAttribute="left" constant="20" id="r2T-tn-CTU"/>
                     <constraint firstAttribute="trailing" secondItem="VLH-qy-cwr" secondAttribute="trailing" id="rxJ-QQ-cyy"/>
-                    <constraint firstAttribute="trailing" secondItem="T3x-es-c7v" secondAttribute="trailing" constant="20" id="ykz-Sa-B1m"/>
+                    <constraint firstAttribute="right" secondItem="T3x-es-c7v" secondAttribute="right" constant="20" id="ykz-Sa-B1m"/>
                 </constraints>
             </view>
             <connections>
