@@ -634,21 +634,10 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
 
         free( p_name );
 
-        if( p_next == NULL )
-            goto error;
-
         p_demux = p_next;
     }
 
     vlc_array_clear(&name);
 
     return p_demux;
- error:
-    demux_Delete(p_demux);
-
-    while(i--)
-        free(vlc_array_item_at_index(&name, i));
-    vlc_array_clear(&name);
-
-    return NULL;
 }
