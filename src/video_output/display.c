@@ -333,7 +333,6 @@ void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, video_ori
 typedef struct {
     vout_thread_t   *vout;
     bool            is_wrapper;  /* Is the current display a wrapper */
-    vout_display_t  *wrapper; /* Vout display wrapper */
 
     /* */
     vout_display_cfg_t cfg;
@@ -1216,8 +1215,7 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
 static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const video_format_t *source,
                                   const vout_display_state_t *state,
-                                  const char *module,
-                                  bool is_wrapper, vout_display_t *wrapper,
+                                  const char *module, bool is_wrapper,
                                   mtime_t double_click_timeout,
                                   mtime_t hide_timeout,
                                   const vout_display_owner_t *owner_ptr)
@@ -1233,7 +1231,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
     osys->vout = vout;
     osys->is_wrapper = is_wrapper;
-    osys->wrapper = wrapper;
 
     vlc_mutex_init(&osys->lock);
 
@@ -1351,7 +1348,7 @@ vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                                 mtime_t double_click_timeout,
                                 mtime_t hide_timeout)
 {
-    return DisplayNew(vout, source, state, module, false, NULL,
+    return DisplayNew(vout, source, state, module, false,
                       double_click_timeout, hide_timeout, NULL);
 }
 
@@ -1542,7 +1539,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
     /* */
     vout_display_t *wrapper =
-        DisplayNew(vout, source, state, module, true, NULL,
+        DisplayNew(vout, source, state, module, true,
                     double_click_timeout, hide_timeout, NULL);
     if (!wrapper) {
         video_splitter_Delete(splitter);
@@ -1593,7 +1590,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
         vout_display_t *vd = DisplayNew(vout, &output->fmt, &ostate,
                                         output->psz_module ? output->psz_module : module,
-                                        false, wrapper,
+                                        false,
                                         double_click_timeout, hide_timeout, &vdo);
         if (!vd) {
             vout_DeleteDisplay(wrapper, NULL);
