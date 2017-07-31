@@ -266,20 +266,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow/previous-6btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/previous-6btns.png \
 	gui/macosx/Resources/mainwindow/previous-6btns@2x.png \
-	gui/macosx/Resources/mainwindow/progression-fill-left.png \
-	gui/macosx/Resources/mainwindow/progression-fill-left@2x.png \
-	gui/macosx/Resources/mainwindow/progression-fill-middle.png \
-	gui/macosx/Resources/mainwindow/progression-fill-middle@2x.png \
-	gui/macosx/Resources/mainwindow/progression-fill-right.png \
-	gui/macosx/Resources/mainwindow/progression-fill-right@2x.png \
-	gui/macosx/Resources/mainwindow/progression-knob.png \
-	gui/macosx/Resources/mainwindow/progression-knob@2x.png \
-	gui/macosx/Resources/mainwindow/progression-track-wrapper-left.png \
-	gui/macosx/Resources/mainwindow/progression-track-wrapper-left@2x.png \
-	gui/macosx/Resources/mainwindow/progression-track-wrapper-middle.png \
-	gui/macosx/Resources/mainwindow/progression-track-wrapper-middle@2x.png \
-	gui/macosx/Resources/mainwindow/progression-track-wrapper-right.png \
-	gui/macosx/Resources/mainwindow/progression-track-wrapper-right@2x.png \
 	gui/macosx/Resources/mainwindow/repeat-all-pressed.png \
 	gui/macosx/Resources/mainwindow/repeat-all-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/repeat-all.png \
@@ -371,20 +357,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_dark/previous-6btns-dark-pressed@2x.png \
 	gui/macosx/Resources/mainwindow_dark/previous-6btns-dark.png \
 	gui/macosx/Resources/mainwindow_dark/previous-6btns-dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/progressbar-fill-left_dark.png \
-	gui/macosx/Resources/mainwindow_dark/progressbar-fill-left_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/progressbar-fill-middle_dark.png \
-	gui/macosx/Resources/mainwindow_dark/progressbar-fill-middle_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/progressbar-fill-right_dark.png \
-	gui/macosx/Resources/mainwindow_dark/progressbar-fill-right_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/progression-knob_dark.png \
-	gui/macosx/Resources/mainwindow_dark/progression-knob_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/progression-track-wrapper-left_dark.png \
-	gui/macosx/Resources/mainwindow_dark/progression-track-wrapper-left_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/progression-track-wrapper-middle_dark.png \
-	gui/macosx/Resources/mainwindow_dark/progression-track-wrapper-middle_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/progression-track-wrapper-right_dark.png \
-	gui/macosx/Resources/mainwindow_dark/progression-track-wrapper-right_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark/repeat-all-blue-pressed_dark.png \
 	gui/macosx/Resources/mainwindow_dark/repeat-all-blue-pressed_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark/repeat-all-blue_dark.png \
