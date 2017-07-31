@@ -849,3 +849,14 @@ mkv_track_t::mkv_track_t(enum es_format_category_e es_cat) :
             break;
     }
 }
+
+mkv_track_t::~mkv_track_t()
+{
+    es_format_Clean( &fmt );
+    assert(p_es == NULL); // did we leak an ES ?
+
+    free(p_extra_data);
+
+    delete p_compression_data;
+    delete p_sys;
+}

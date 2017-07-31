@@ -65,16 +65,6 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
 
 matroska_segment_c::~matroska_segment_c()
 {
-    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it)
-    {
-        mkv_track_t & track = *it->second;
-
-        es_format_Clean( &track.fmt );
-        delete track.p_compression_data;
-        delete track.p_sys;
-        free( track.p_extra_data );
-    }
-
     free( psz_writing_application );
     free( psz_muxing_application );
     free( psz_segment_filename );

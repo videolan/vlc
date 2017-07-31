@@ -673,8 +673,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     if( p_track->i_number == 0 )
     {
         msg_Warn( &sys.demuxer, "Missing KaxTrackNumber, discarding track!" );
-        es_format_Clean( &p_track->fmt );
-        free(p_track->p_extra_data);
         delete p_track;
         return;
     }
@@ -688,8 +686,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             zlib_decompress_extra( &sys.demuxer, *p_track ) )
         {
             msg_Err(&sys.demuxer, "Couldn't handle the track %u compression", p_track->i_number );
-            es_format_Clean( &p_track->fmt );
-            free(p_track->p_extra_data);
             delete p_track;
             return;
         }
@@ -697,8 +693,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         if( !TrackInit( p_track ) )
         {
             msg_Err(&sys.demuxer, "Couldn't init track %u", p_track->i_number );
-            es_format_Clean( &p_track->fmt );
-            free(p_track->p_extra_data);
             delete p_track;
             return;
         }
@@ -708,8 +702,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     else
     {
         msg_Err( &sys.demuxer, "Track Entry %u not supported", p_track->i_number );
-        es_format_Clean( &p_track->fmt );
-        free(p_track->p_extra_data);
         delete p_track;
     }
 }

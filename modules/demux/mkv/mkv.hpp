@@ -184,6 +184,7 @@ class mkv_track_t
 {
     public:
         mkv_track_t(enum es_format_category_e es_cat);
+        ~mkv_track_t();
 
         typedef unsigned int track_id_t;
 
