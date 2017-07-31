@@ -1081,10 +1081,18 @@ static void UpdateSize(vout_display_t *vd)
 #endif
 }
 
+static inline bool RectEquals(const RECT *r1, const RECT *r2)
+{
+    return r1->bottom == r2->bottom && r1->top == r2->top &&
+           r1->left == r2->left && r1->right == r2->right;
+}
+
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    RECT size_before = sys->sys.rect_dest_clipped;
+    RECT before_src_clipped  = sys->sys.rect_src_clipped;
+    RECT before_dest_clipped = sys->sys.rect_dest_clipped;
+    RECT before_dest         = sys->sys.rect_dest;
 
     int res = CommonControl( vd, query, args );
 
@@ -1098,8 +1106,9 @@ static int Control(vout_display_t *vd, int query, va_list args)
         }
     }
 
-    if (RECTWidth(size_before)  != RECTWidth(sys->sys.rect_dest_clipped) ||
-        RECTHeight(size_before) != RECTHeight(sys->sys.rect_dest_clipped))
+    if (!RectEquals(&before_src_clipped,  &sys->sys.rect_src_clipped) ||
+        !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
+        !RectEquals(&before_dest,         &sys->sys.rect_dest) )
     {
         UpdateSize(vd);
     }
@@ -1110,12 +1119,15 @@ static int Control(vout_display_t *vd, int query, va_list args)
 static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    RECT size_before = sys->sys.rect_dest_clipped;
+    RECT before_src_clipped  = sys->sys.rect_src_clipped;
+    RECT before_dest_clipped = sys->sys.rect_dest_clipped;
+    RECT before_dest         = sys->sys.rect_dest;
 
     CommonManage(vd);
 
-    if (RECTWidth(size_before)  != RECTWidth(sys->sys.rect_dest_clipped) ||
-        RECTHeight(size_before) != RECTHeight(sys->sys.rect_dest_clipped))
+    if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
+        !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
+        !RectEquals(&before_dest, &sys->sys.rect_dest))
     {
         UpdateSize(vd);
     }
