@@ -100,7 +100,9 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCTimeField.h gui/macosx/VLCTimeField.m \
 	gui/macosx/VLCHexNumberFormatter.h gui/macosx/VLCHexNumberFormatter.m \
 	gui/macosx/VLCSlider.h gui/macosx/VLCSlider.m \
-	gui/macosx/VLCSliderCell.h gui/macosx/VLCSliderCell.m
+	gui/macosx/VLCSliderCell.h gui/macosx/VLCSliderCell.m \
+	gui/macosx/VLCVolumeSlider.h gui/macosx/VLCVolumeSlider.m \
+	gui/macosx/VLCVolumeSliderCell.h gui/macosx/VLCVolumeSliderCell.m
 
 # User interface compilation
 

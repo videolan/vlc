@@ -73,6 +73,8 @@
 		1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */; };
 		6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */; };
 		6B0AB0F11F1AC8B3003A1B4E /* VLCSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0EF1F1AC8B3003A1B4E /* VLCSliderCell.m */; };
+		6B2EFC601F2819F700F3C0EA /* VLCVolumeSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */; };
+		6B2EFC631F281A0900F3C0EA /* VLCVolumeSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B2EFC621F281A0900F3C0EA /* VLCVolumeSliderCell.m */; };
 		6B3BE42C1E6217CB008D098A /* VLCImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE42B1E6217CB008D098A /* VLCImageButton.m */; };
 		6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */; };
 		6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */; };
@@ -132,6 +134,10 @@
 		6B0AB0EF1F1AC8B3003A1B4E /* VLCSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSliderCell.m; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCScrollingClipView.m; sourceTree = "<group>"; };
+		6B2EFC5E1F2819F700F3C0EA /* VLCVolumeSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVolumeSlider.h; sourceTree = "<group>"; };
+		6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVolumeSlider.m; sourceTree = "<group>"; };
+		6B2EFC611F281A0900F3C0EA /* VLCVolumeSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVolumeSliderCell.h; sourceTree = "<group>"; };
+		6B2EFC621F281A0900F3C0EA /* VLCVolumeSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVolumeSliderCell.m; sourceTree = "<group>"; };
 		6B3BE42A1E6217CB008D098A /* VLCImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCImageButton.h; sourceTree = "<group>"; };
 		6B3BE42B1E6217CB008D098A /* VLCImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCImageButton.m; sourceTree = "<group>"; };
 		6B4D508E1E79781F004479B5 /* VLCHotkeyChangeWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHotkeyChangeWindow.h; sourceTree = "<group>"; };
@@ -873,6 +879,10 @@
 				6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */,
 				6B0AB0EE1F1AC8B3003A1B4E /* VLCSliderCell.h */,
 				6B0AB0EF1F1AC8B3003A1B4E /* VLCSliderCell.m */,
+				6B2EFC5E1F2819F700F3C0EA /* VLCVolumeSlider.h */,
+				6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */,
+				6B2EFC611F281A0900F3C0EA /* VLCVolumeSliderCell.h */,
+				6B2EFC621F281A0900F3C0EA /* VLCVolumeSliderCell.m */,
 				6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */,
 				6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */,
 				6B6A499C1DFD9B23009128AC /* VLCDefaultValueSliderCell.h */,
@@ -1892,6 +1902,7 @@
 				1C31139F1E508C6900D4DD76 /* VLCMainWindowControlsBar.m in Sources */,
 				1C3113A11E508C6900D4DD76 /* VLCConvertAndSaveWindowController.m in Sources */,
 				1C3113A31E508C6900D4DD76 /* VLCCoreDialogProvider.m in Sources */,
+				6B2EFC631F281A0900F3C0EA /* VLCVolumeSliderCell.m in Sources */,
 				1C3113A51E508C6900D4DD76 /* VLCCoreInteraction.m in Sources */,
 				1C3113A71E508C6900D4DD76 /* VLCDebugMessageWindowController.m in Sources */,
 				6BF5C5071EFE7E58008A9C12 /* VLCTintedImageButtonCell.m in Sources */,
@@ -1925,6 +1936,7 @@
 				1C3113D51E508C6900D4DD76 /* VLCTextfieldPanelController.m in Sources */,
 				1C3113D71E508C6900D4DD76 /* VLCPopupPanelController.m in Sources */,
 				1C3113D91E508C6900D4DD76 /* VLCSimplePrefsController.m in Sources */,
+				6B2EFC601F2819F700F3C0EA /* VLCVolumeSlider.m in Sources */,
 				1C3113DB1E508C6900D4DD76 /* VLCStringUtility.m in Sources */,
 				6B4D50A71E7AB52C004479B5 /* NSScreen+VLCAdditions.m in Sources */,
 				1C3113DD1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.m in Sources */,
