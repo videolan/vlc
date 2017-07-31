@@ -408,7 +408,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
     }
     else if( p_sys->b_frame_slice &&
-             (p_frag->p_buffer[3] == 0x00 || p_frag->p_buffer[3] > 0xaf) )
+             (p_frag->p_buffer[3] == 0x00 || (p_frag->p_buffer[3] > 0xaf && p_frag->p_buffer[3] != 0xb5) ) )
     {
         const bool b_eos = p_frag->p_buffer[3] == 0xb7;
 
