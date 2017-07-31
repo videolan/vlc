@@ -1024,9 +1024,8 @@ static void FilterPlanar( uint8_t *p_out, int i_out_pitch,
         if( b_attenuate_top || b_attenuate_bottom )
         {
             const int i_index = b_attenuate_top ? lambdah[0][y] : lambdah[1][y - (i_copy_lines - p_cfg->attenuate.i_bottom)];
-            uint8_t *p_dst = &p_out[0];
             for( int i = 0; i < i_out_width; i++)
-                p_dst[i] = p_lut[i_index][p_dst[i]];
+                p_out[i] = p_lut[i_index][p_out[i]];
         }
 
         /* */
