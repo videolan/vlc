@@ -431,7 +431,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 const matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
                 for( tracks_map_t::const_iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
                 {
-                    tracks_map_t::mapped_type const& track = it->second;
+                    const mkv_track_t &track = *it->second;
 
                     if( track.fmt.i_cat == VIDEO_ES && track.fmt.video.i_frame_rate_base > 0 )
                     {
@@ -511,7 +511,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         return;
     }
 
-    tracks_map_t::mapped_type& track = track_it->second;
+    mkv_track_t &track = *track_it->second;
 
     if( track.fmt.i_cat != NAV_ES && track.p_es == NULL )
     {
@@ -726,7 +726,7 @@ static int Demux( demux_t *p_demux)
             return 0;
         }
 
-        matroska_segment_c::tracks_map_t::mapped_type& track = track_it->second;
+        mkv_track_t &track = *track_it->second;
 
 
         if( track.i_skip_until_fpos != std::numeric_limits<uint64_t>::max() ) {
@@ -754,7 +754,7 @@ static int Demux( demux_t *p_demux)
 
         for( tracks_map_t::iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
         {
-            tracks_map_t::mapped_type& track = it->second;
+            mkv_track_t &track = *it->second;
 
             if( track.i_last_dts == VLC_TS_INVALID )
                 continue;

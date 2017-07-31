@@ -67,7 +67,7 @@ matroska_segment_c::~matroska_segment_c()
 {
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it)
     {
-        tracks_map_t::mapped_type& track = it->second;
+        mkv_track_t & track = *it->second;
 
         es_format_Clean( &track.fmt );
         delete track.p_compression_data;
@@ -819,7 +819,7 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        mkv_track_t& track = it->second;
+        mkv_track_t &track = *it->second;
 
         track.i_skip_until_fpos = -1;
         if( track.i_last_dts > VLC_TS_INVALID )
@@ -848,8 +848,8 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
             i_mk_seek_time  = it->second.pts;
         }
 
-        tracks.at( it->first ).i_skip_until_fpos = it->second.fpos;
-        tracks.at( it->first ).i_last_dts        = it->second.pts;
+        tracks.at( it->first )->i_skip_until_fpos = it->second.fpos;
+        tracks.at( it->first )->i_last_dts        = it->second.pts;
 
         msg_Dbg( &sys.demuxer, "seek: preroll{ track: %u, pts: %" PRId64 ", fpos: %" PRIu64 " } ",
           it->first, it->second.pts, it->second.fpos );
@@ -904,7 +904,7 @@ void matroska_segment_c::ComputeTrackPriority()
     for( tracks_map_t::const_iterator it = tracks.begin(); it != tracks.end();
          ++it )
     {
-        const tracks_map_t::mapped_type& track = it->second;
+        mkv_track_t &track = *it->second;
 
         bool flag = track.b_enabled && ( track.b_default || track.b_forced );
 
@@ -918,8 +918,8 @@ void matroska_segment_c::ComputeTrackPriority()
 
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        tracks_map_t::key_type     track_id = it->first;
-        tracks_map_t::mapped_type& track    = it->second;
+        tracks_map_t::key_type track_id = it->first;
+        mkv_track_t          & track    = *it->second;
 
         if( unlikely( track.fmt.i_cat == UNKNOWN_ES || track.codec.empty() ) )
         {
@@ -960,7 +960,7 @@ void matroska_segment_c::ComputeTrackPriority()
         {
             int track_score = -1;
 
-            switch( it->second.fmt.i_cat )
+            switch( it->second->fmt.i_cat )
             {
                 case VIDEO_ES: ++track_score;
                 case AUDIO_ES: ++track_score;
@@ -968,7 +968,7 @@ void matroska_segment_c::ComputeTrackPriority()
                 default:
                   if( score < track_score )
                   {
-                      es_type = it->second.fmt.i_cat;
+                      es_type = it->second->fmt.i_cat;
                       score   = track_score;
                   }
             }
@@ -976,7 +976,7 @@ void matroska_segment_c::ComputeTrackPriority()
 
         for( tracks_map_t::const_iterator it = this->tracks.begin(); it != this->tracks.end(); ++it )
         {
-            if( it->second.fmt.i_cat == es_type )
+            if( it->second->fmt.i_cat == es_type )
                 priority_tracks.push_back( it->first );
         }
     }
@@ -1085,8 +1085,8 @@ bool matroska_segment_c::ESCreate()
 
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        tracks_map_t::key_type     track_id = it->first;
-        tracks_map_t::mapped_type& track    = it->second;
+        tracks_map_t::key_type   track_id = it->first;
+        mkv_track_t            & track    = *it->second;
 
         if( unlikely( track.fmt.i_cat == UNKNOWN_ES || track.codec.empty() ) )
         {
@@ -1118,7 +1118,7 @@ void matroska_segment_c::ESDestroy( )
 
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        tracks_map_t::mapped_type& track = it->second;
+        mkv_track_t & track = *it->second;
 
         if( track.p_es != NULL )
         {
@@ -1229,7 +1229,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             vars.block->ReadData( vars.obj->es.I_O() );
             vars.block->SetParent( *vars.obj->cluster );
 
-            if( vars.obj->tracks.at( kblock.TrackNum() ).fmt.i_cat == SPU_ES )
+            if( vars.obj->tracks.at( kblock.TrackNum() )->fmt.i_cat == SPU_ES )
             {
                 vars.obj->_seeker.add_seekpoint( kblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 );
             }
@@ -1308,7 +1308,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             /* We have block group let's check if the picture is a keyframe */
             else if( *pb_key_picture )
             {
-                if( track_it->second.fmt.i_codec == VLC_CODEC_THEORA )
+                if( track_it->second->fmt.i_codec == VLC_CODEC_THEORA )
                 {
                     DataBuffer *    p_data = &pp_block->GetBuffer(0);
                     const uint8_t * p_buff = p_data->Buffer();

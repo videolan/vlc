@@ -230,7 +230,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     }
 
     /* Init the track */
-    mkv_track_t track( es_cat );
+    mkv_track_t *p_track = new mkv_track_t(es_cat);
 
     MkvTree( sys.demuxer, 2, "Track Entry" );
 
@@ -251,7 +251,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
       } track_video_info;
 
     } metadata_payload = {
-      this, &track, &sys.demuxer, bSupported, 3, { }
+      this, p_track, &sys.demuxer, bSupported, 3, { }
     };
 
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, MetaDataHandlers, MetaDataCapture )
@@ -670,43 +670,47 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 
     MetaDataHandlers::Dispatcher().iterate ( m->begin(), m->end(), MetaDataHandlers::Payload( metadata_payload ) );
 
-    if( track.i_number == 0 )
+    if( p_track->i_number == 0 )
     {
         msg_Warn( &sys.demuxer, "Missing KaxTrackNumber, discarding track!" );
-        es_format_Clean( &track.fmt );
-        free(track.p_extra_data);
+        es_format_Clean( &p_track->fmt );
+        free(p_track->p_extra_data);
+        delete p_track;
         return;
     }
 
     if ( bSupported )
     {
 #ifdef HAVE_ZLIB_H
-        if( track.i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
-            track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
-            track.i_extra_data && track.p_extra_data &&
-            zlib_decompress_extra( &sys.demuxer, track ) )
+        if( p_track->i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
+            p_track->i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
+            p_track->i_extra_data && p_track->p_extra_data &&
+            zlib_decompress_extra( &sys.demuxer, *p_track ) )
         {
-            msg_Err(&sys.demuxer, "Couldn't handle the track %u compression", track.i_number );
-            es_format_Clean( &track.fmt );
-            free(track.p_extra_data);
+            msg_Err(&sys.demuxer, "Couldn't handle the track %u compression", p_track->i_number );
+            es_format_Clean( &p_track->fmt );
+            free(p_track->p_extra_data);
+            delete p_track;
             return;
         }
 #endif
-        if( !TrackInit( &track ) )
+        if( !TrackInit( p_track ) )
         {
-            msg_Err(&sys.demuxer, "Couldn't init track %u", track.i_number );
-            es_format_Clean( &track.fmt );
-            free(track.p_extra_data);
+            msg_Err(&sys.demuxer, "Couldn't init track %u", p_track->i_number );
+            es_format_Clean( &p_track->fmt );
+            free(p_track->p_extra_data);
+            delete p_track;
             return;
         }
 
-        tracks.insert( std::make_pair( track.i_number, track ) ); // TODO: add warning if two tracks have the same key
+        tracks.insert( std::make_pair( p_track->i_number, std::unique_ptr<mkv_track_t>(p_track) ) ); // TODO: add warning if two tracks have the same key
     }
     else
     {
-        msg_Err( &sys.demuxer, "Track Entry %u not supported", track.i_number );
-        es_format_Clean( &track.fmt );
-        free(track.p_extra_data);
+        msg_Err( &sys.demuxer, "Track Entry %u not supported", p_track->i_number );
+        es_format_Clean( &p_track->fmt );
+        free(p_track->p_extra_data);
+        delete p_track;
     }
 }
 
