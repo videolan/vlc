@@ -535,19 +535,6 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         }
     }
 
-
-    /* First send init data */
-    if( !track.b_inited && track.i_data_init > 0 )
-    {
-        block_t *p_init;
-
-        msg_Dbg( p_demux, "sending header (%d bytes)", track.i_data_init );
-        p_init = MemToBlock( track.p_data_init, track.i_data_init, 0 );
-        if( p_init ) send_Block( p_demux, &track, p_init, 1, 0 );
-    }
-    track.b_inited = true;
-
-
     size_t frame_size = 0;
     size_t block_size = 0;
 

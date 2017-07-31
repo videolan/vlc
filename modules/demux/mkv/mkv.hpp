@@ -202,10 +202,7 @@ class mkv_track_t
           ,i_original_rate(0)
           ,i_chans_to_reorder(0)
           ,p_sys(NULL)
-          ,b_inited(false)
           ,b_discontinuity(false)
-          ,i_data_init(0)
-          ,p_data_init(NULL)
           ,i_compression_type(MATROSKA_COMPRESSION_NONE)
           ,i_encoding_scope(MATROSKA_ENCODING_SCOPE_ALL_FRAMES)
           ,p_compression_data(NULL)
@@ -249,11 +246,7 @@ class mkv_track_t
         /* Private track paramters */
         PrivateTrackData *p_sys;
 
-        bool            b_inited;
         bool            b_discontinuity;
-        /* data to be send first */
-        int             i_data_init;
-        uint8_t         *p_data_init;
 
         /* informative */
         std::string str_codec_name;
