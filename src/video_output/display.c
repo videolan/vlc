@@ -397,12 +397,11 @@ typedef struct {
     bool ch_fullscreen;
     bool is_fullscreen;
     bool window_fullscreen;
+    signed char fit_window;
 
     bool ch_display_size;
     int  display_width;
     int  display_height;
-
-    int  fit_window;
 
     struct {
         vlc_thread_t thread;
