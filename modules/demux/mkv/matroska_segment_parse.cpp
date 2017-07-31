@@ -204,9 +204,6 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 {
     bool bSupported = true;
 
-    /* Init the track */
-    mkv_track_t track;
-
     EbmlUInteger *pTrackType = static_cast<EbmlUInteger*>(m->FindElt(EBML_INFO(KaxTrackType)));
     uint8 ttype;
     if (likely(pTrackType != NULL))
@@ -214,27 +211,26 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     else
         ttype = 0;
 
+    enum es_format_category_e es_cat;
     switch( ttype )
     {
         case track_audio:
-            es_format_Init( &track.fmt, AUDIO_ES, 0);
-            track.fmt.audio.i_channels = 1;
-            track.fmt.audio.i_rate = 8000;
-            track.fmt.psz_language = strdup("English");
+            es_cat = AUDIO_ES;
             break;
         case track_video:
-            es_format_Init( &track.fmt, VIDEO_ES, 0);
-            track.fmt.psz_language = strdup("English");
+            es_cat = VIDEO_ES;
             break;
         case track_subtitle:
         case track_buttons:
-            es_format_Init( &track.fmt, SPU_ES, 0);
-            track.fmt.psz_language = strdup("English");
+            es_cat = SPU_ES;
             break;
         default:
-            es_format_Init( &track.fmt, UNKNOWN_ES, 0);
+            es_cat = UNKNOWN_ES;
             break;
     }
+
+    /* Init the track */
+    mkv_track_t track( es_cat );
 
     MkvTree( sys.demuxer, 2, "Track Entry" );
 
