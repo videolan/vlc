@@ -78,9 +78,4 @@
     return [(VLCDefaultValueSliderCell *)self.cell defaultValue];
 }
 
-- (void)setUsesBrightArtwork:(BOOL)brightArtwork
-{
-    // TODO!
-}
-
 @end
