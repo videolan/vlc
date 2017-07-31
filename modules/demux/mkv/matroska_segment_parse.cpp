@@ -684,9 +684,13 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         if( track.i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
             track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
             track.i_extra_data && track.p_extra_data &&
-            zlib_decompress_extra( &sys.demuxer, &track ) )
-            // zlib_decompress_extra will clean the track itself
+            zlib_decompress_extra( &sys.demuxer, track ) )
+        {
+            msg_Err(&sys.demuxer, "Couldn't handle the track %u compression", track.i_number );
+            es_format_Clean( &track.fmt );
+            free(track.p_extra_data);
             return;
+        }
 #endif
         if( TrackInit( &track ) )
         {
