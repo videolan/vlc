@@ -752,7 +752,7 @@ static int Demux( demux_t *p_demux)
 
         typedef matroska_segment_c::tracks_map_t tracks_map_t;
 
-        for( tracks_map_t::iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
+        for( tracks_map_t::const_iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
         {
             mkv_track_t &track = *it->second;
 
