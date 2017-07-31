@@ -332,7 +332,7 @@ void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, video_ori
 
 typedef struct {
     vout_thread_t   *vout;
-    bool            is_wrapper;  /* Is the current display a wrapper */
+    bool            is_splitter;  /* Is this a video splitter */
 
     /* */
     vout_display_cfg_t cfg;
@@ -1214,7 +1214,7 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
 static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const video_format_t *source,
                                   const vout_display_state_t *state,
-                                  const char *module, bool is_wrapper,
+                                  const char *module, bool is_splitter,
                                   mtime_t double_click_timeout,
                                   mtime_t hide_timeout,
                                   const vout_display_owner_t *owner_ptr)
@@ -1229,7 +1229,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                        source, cfg);
 
     osys->vout = vout;
-    osys->is_wrapper = is_wrapper;
+    osys->is_splitter = is_splitter;
 
     vlc_mutex_init(&osys->lock);
 
@@ -1286,7 +1286,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     owner.sys = osys;
 
     vout_display_t *p_display = vout_display_New(VLC_OBJECT(vout),
-                                                 module, !is_wrapper,
+                                                 module, !is_splitter,
                                                  source, cfg, &owner);
     if (!p_display)
         goto error;
@@ -1316,7 +1316,7 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
     if (state) {
-        if (!osys->is_wrapper )
+        if (!osys->is_splitter)
             state->cfg = osys->cfg;
 #if defined(_WIN32) || defined(__OS2__)
         state->wm_state = osys->wm_state;
@@ -1325,7 +1325,7 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     }
 
     VoutDisplayDestroyRender(vd);
-    if (osys->is_wrapper)
+    if (osys->is_splitter)
         SplitterClose(vd);
     vout_display_Delete(vd);
     if (osys->event.fifo) {
