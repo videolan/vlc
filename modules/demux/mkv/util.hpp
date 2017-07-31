@@ -89,7 +89,7 @@ public:
     size_t   i_subpacket;
 };
 
-block_t * packetize_wavpack( mkv_track_t *, uint8_t *, size_t);
+block_t * packetize_wavpack( const mkv_track_t &, uint8_t *, size_t);
 
 /* helper functions to print the mkv parse tree */
 void MkvTree_va( demux_t& demuxer, int i_level, const char* fmt, va_list args);

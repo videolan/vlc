@@ -312,7 +312,7 @@ static inline void fill_wvpk_block(uint16_t version, uint32_t block_samples, uin
     memcpy( dst + 32, src, srclen );
 }
 
-block_t * packetize_wavpack( mkv_track_t * p_tk, uint8_t * buffer, size_t  size)
+block_t * packetize_wavpack( const mkv_track_t & tk, uint8_t * buffer, size_t  size)
 {
     uint16_t version = 0x403;
     uint32_t block_samples;
@@ -320,8 +320,8 @@ block_t * packetize_wavpack( mkv_track_t * p_tk, uint8_t * buffer, size_t  size)
     uint32_t crc;
     block_t * p_block = NULL;
 
-    if( p_tk->i_extra_data >= 2 )
-        version = GetWLE( p_tk->p_extra_data );
+    if( tk.i_extra_data >= 2 )
+        version = GetWLE( tk.p_extra_data );
 
     if( size < 12 )
         return NULL;

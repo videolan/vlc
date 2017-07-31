@@ -569,7 +569,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
             p_block = MemToBlock( data->Buffer(), data->Size(), track.p_compression_data->GetSize() );
         else if( unlikely( track.fmt.i_codec == VLC_CODEC_WAVPACK ) )
-            p_block = packetize_wavpack( &track, data->Buffer(), data->Size() );
+            p_block = packetize_wavpack( track, data->Buffer(), data->Size() );
         else
             p_block = MemToBlock( data->Buffer(), data->Size(), 0 );
 
