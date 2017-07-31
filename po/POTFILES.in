@@ -581,6 +581,8 @@ modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
 modules/gui/macosx/VLCResumeDialogController.h
 modules/gui/macosx/VLCResumeDialogController.m
+modules/gui/macosx/VLCRendererMenuController.h
+modules/gui/macosx/VLCRendererMenuController.m
 modules/gui/macosx/VLCSimplePrefsController.h
 modules/gui/macosx/VLCSimplePrefsController.m
 modules/gui/macosx/VLCStringUtility.h
