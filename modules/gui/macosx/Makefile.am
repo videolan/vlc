@@ -309,10 +309,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow/volume-high@2x.png \
 	gui/macosx/Resources/mainwindow/volume-low.png \
 	gui/macosx/Resources/mainwindow/volume-low@2x.png \
-	gui/macosx/Resources/mainwindow/volume-slider-knob.png \
-	gui/macosx/Resources/mainwindow/volume-slider-knob@2x.png \
-	gui/macosx/Resources/mainwindow/volume-slider-track.png \
-	gui/macosx/Resources/mainwindow/volume-slider-track@2x.png \
 	gui/macosx/Resources/mainwindow_dark/backward-3btns-dark-pressed.png \
 	gui/macosx/Resources/mainwindow_dark/backward-3btns-dark-pressed@2x.png \
 	gui/macosx/Resources/mainwindow_dark/backward-3btns-dark.png \
@@ -513,10 +509,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_dark/volume-high_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark/volume-low_dark.png \
 	gui/macosx/Resources/mainwindow_dark/volume-low_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/volume-slider-knob_dark.png \
-	gui/macosx/Resources/mainwindow_dark/volume-slider-knob_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/volume-slider-track_dark.png \
-	gui/macosx/Resources/mainwindow_dark/volume-slider-track_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark/window-resize.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-backward-3btns-dark-pressed.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-backward-3btns-dark-pressed@2x.png \
@@ -614,10 +606,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-high_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-low_dark.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-low_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-slider-knob_dark.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-slider-knob_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-slider-track_dark.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-slider-track_dark@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-3btns-pressed.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-3btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-3btns.png \
@@ -706,10 +694,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_yosemite/ys-volume-high@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-volume-low.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-volume-low@2x.png \
-	gui/macosx/Resources/mainwindow_yosemite/ys-volume-slider-knob.png \
-	gui/macosx/Resources/mainwindow_yosemite/ys-volume-slider-knob@2x.png \
-	gui/macosx/Resources/mainwindow_yosemite/ys-volume-slider-track.png \
-	gui/macosx/Resources/mainwindow_yosemite/ys-volume-slider-track@2x.png \
 	gui/macosx/Resources/noart.png \
 	gui/macosx/Resources/Pref-Icons/VLCAudioCone.png \
 	gui/macosx/Resources/Pref-Icons/VLCHotkeysCone.png \
