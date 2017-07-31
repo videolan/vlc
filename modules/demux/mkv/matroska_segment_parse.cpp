@@ -692,7 +692,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             return;
         }
 #endif
-        if( TrackInit( &track ) )
+        if( !TrackInit( &track ) )
         {
             msg_Err(&sys.demuxer, "Couldn't init track %u", track.i_number );
             es_format_Clean( &track.fmt );
@@ -1286,13 +1286,13 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
 }
 
 
-int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
+bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 {
     if( p_tk->codec.empty() )
     {
         msg_Err( &sys.demuxer, "Empty codec id" );
         p_tk->fmt.i_codec = VLC_CODEC_UNKNOWN;
-        return 0;
+        return true;
     }
 
     struct HandlerPayload {
@@ -1891,7 +1891,8 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     {
         msg_Err( &sys.demuxer, "Error when trying to initiate track (codec: %s): %s",
           p_tk->codec.c_str(), e.what () );
+        return false;
     }
 
-    return 0;
+    return true;
 }
