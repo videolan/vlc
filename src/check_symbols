@@ -13,7 +13,8 @@ cat libvlccore.sym | grep -v \
 	-e '^vlc_' -e '^vlm_' -e '^libvlc_[A-Z]' -e '^VLC_' \
 	-e '^input_' -e '^access_' -e '^demux_' -e '^decoder_' \
 	-e '^image_' -e '^block_' -e '^picture_' -e '^subpicture_' \
-	-e '^es_format' -e '^[asv]out_' -e '^spu_' -e '^filter_' -e '^video_' \
+	-e '^es_format' -e '^[asv]out_' -e '^spu_' -e '^filter_' \
+	-e '^video_format_' \
 	-e '^playlist_' -e '^services_discovery_' -e '^intf_' \
 	-e '^dialog_' -e '^update_' -e '^addons\?_' -e '^fingerprinter_' \
 	-e '^text_style_' -e '^text_segment_' \
