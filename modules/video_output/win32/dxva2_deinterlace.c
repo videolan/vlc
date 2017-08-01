@@ -360,7 +360,8 @@ static int Open(vlc_object_t *obj)
     sys->context.settings = p_mode->settings;
     sys->context.settings.b_use_frame_history = best_caps.NumBackwardRefSamples != 0 ||
                                        best_caps.NumForwardRefSamples  != 0;
-    assert(sys->context.settings.b_use_frame_history == p_mode->settings.b_use_frame_history);
+    if (sys->context.settings.b_use_frame_history != p_mode->settings.b_use_frame_history)
+        msg_Dbg( filter, "deinterlacing not using frame history as requested");
     if (sys->context.settings.b_double_rate)
         sys->context.pf_render_ordered = RenderPic;
     else
