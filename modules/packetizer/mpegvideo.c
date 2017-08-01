@@ -80,6 +80,36 @@ vlc_module_begin ()
               SYNC_INTRAFRAME_LONGTEXT, true )
 vlc_module_end ()
 
+enum mpeg_startcode_e
+{
+    PICTURE_STARTCODE          = 0x00,
+    SLICE_STARTCODE_FIRST      = 0x01,
+    SLICE_STARTCODE_LAST       = 0xAF,
+    USER_DATA_STARTCODE        = 0xB2,
+    SEQUENCE_HEADER_STARTCODE  = 0xB3,
+    SEQUENCE_ERROR_STARTCODE   = 0xB4,
+    EXTENSION_STARTCODE        = 0xB5,
+    SEQUENCE_END_STARTCODE     = 0xB7,
+    GROUP_STARTCODE            = 0xB8,
+    SYSTEM_STARTCODE_FIRST     = 0xB9,
+    SYSTEM_STARTCODE_LAST      = 0xFF,
+};
+
+enum extension_start_code_identifier_e
+{
+    SEQUENCE_EXTENSION_ID                   = 0x01,
+    SEQUENCE_DISPLAY_EXTENSION_ID           = 0x02,
+    QUANT_MATRIX_EXTENSION_ID               = 0x03,
+    COPYRIGHT_EXTENSION_ID                  = 0x04,
+    SEQUENCE_SCALABLE_EXTENSION_ID          = 0x05,
+    PICTURE_DISPLAY_EXTENSION_ID            = 0x07,
+    PICTURE_CODING_EXTENSION_ID             = 0x08,
+    PICTURE_SPATIAL_SCALABLE_EXTENSION_ID   = 0x09,
+    PICTURE_TEMPORAL_SCALABLE_EXTENSION_ID  = 0x0A,
+    CAMERA_PARAMETERS_EXTENSION_ID          = 0x0B,
+    ITU_T_EXTENSION_ID                      = 0x0C,
+};
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -339,7 +369,7 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Check if we have a picture start code */
-    *pb_ts_used = p_block->p_buffer[3] == 0x00;
+    *pb_ts_used = p_block->p_buffer[3] == PICTURE_STARTCODE;
 
     p_block = ParseMPEGBlock( p_dec, p_block );
     if( p_block )
@@ -391,11 +421,12 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
+    const enum mpeg_startcode_e startcode = p_frag->p_buffer[3];
     /*
      * Check if previous picture is finished
      */
     if( ( p_sys->b_frame_slice &&
-          (p_frag->p_buffer[3] == 0x00 || p_frag->p_buffer[3] > 0xaf) ) &&
+          (startcode == PICTURE_STARTCODE || startcode >  SLICE_STARTCODE_LAST ) ) &&
           p_sys->p_seq == NULL )
     {
         /* We have a picture but without a sequence header we can't
@@ -408,9 +439,10 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
     }
     else if( p_sys->b_frame_slice &&
-             (p_frag->p_buffer[3] == 0x00 || (p_frag->p_buffer[3] > 0xaf && p_frag->p_buffer[3] != 0xb5) ) )
+             (startcode == PICTURE_STARTCODE ||
+             (startcode >  SLICE_STARTCODE_LAST && startcode != EXTENSION_STARTCODE )) )
     {
-        const bool b_eos = p_frag->p_buffer[3] == 0xb7;
+        const bool b_eos = startcode == SEQUENCE_END_STARTCODE;
 
         if( b_eos )
         {
@@ -625,7 +657,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     /*
      * Check info of current fragment
      */
-    if( p_frag->p_buffer[3] == 0xb8 )
+    if( startcode == GROUP_STARTCODE )
     {
         /* Group start code */
         if( p_sys->p_seq &&
@@ -641,7 +673,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->i_seq_old = 0;
         }
     }
-    else if( p_frag->p_buffer[3] == 0xb3 && p_frag->i_buffer >= 8 )
+    else if( startcode == SEQUENCE_HEADER_STARTCODE && p_frag->i_buffer >= 8 )
     {
         /* Sequence header code */
         static const int code_to_frame_rate[16][2] =
@@ -703,12 +735,13 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->b_inited = 1;
         }
     }
-    else if( p_frag->p_buffer[3] == 0xb5 )
+    else if( startcode == EXTENSION_STARTCODE && p_frag->i_buffer > 4 )
     {
-        int i_type = p_frag->p_buffer[4] >> 4;
+        /* extension_start_code_identifier */
+        const enum extension_start_code_identifier_e extid = p_frag->p_buffer[4] >> 4;
 
         /* Extension start code */
-        if( i_type == 0x01 )
+        if( extid == SEQUENCE_EXTENSION_ID )
         {
 #if 0
             static const int mpeg2_aspect[16][2] =
@@ -747,7 +780,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 #endif
 
         }
-        else if( i_type == 0x08 && p_frag->i_buffer > 8 )
+        else if( extid == PICTURE_CODING_EXTENSION_ID && p_frag->i_buffer > 8 )
         {
             /* picture extension */
             p_sys->i_picture_structure = p_frag->p_buffer[6]&0x03;
@@ -755,7 +788,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->i_repeat_first_field= (p_frag->p_buffer[7]>>1)&0x01;
             p_sys->i_progressive_frame = p_frag->p_buffer[8] >> 7;
         }
-        else if( i_type == 0x02 && p_frag->i_buffer > 8 )
+        else if( extid == SEQUENCE_DISPLAY_EXTENSION_ID && p_frag->i_buffer > 8 )
         {
             /* Sequence display extension */
             bool contains_color_description = (p_frag->p_buffer[4] & 0x01);
@@ -817,7 +850,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         }
     }
-    else if( p_frag->p_buffer[3] == 0xb2 && p_frag->i_buffer > 8 )
+    else if( startcode == USER_DATA_STARTCODE && p_frag->i_buffer > 8 )
     {
         /* Frame Packing extension identifier as H262 2012 Amd4 Annex L */
         if( !memcmp( &p_frag->p_buffer[4], "JP3D", 4 ) &&
@@ -841,7 +874,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         cc_ProbeAndExtract( &p_sys->cc, p_sys->i_top_field_first,
                     &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
     }
-    else if( p_frag->p_buffer[3] == 0x00 )
+    else if( startcode == PICTURE_STARTCODE )
     {
         /* Picture start code */
         p_sys->i_seq_old++;
@@ -856,7 +889,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_dts = p_frag->i_dts;
         p_sys->i_pts = p_frag->i_pts;
     }
-    else if( p_frag->p_buffer[3] >= 0x01 && p_frag->p_buffer[3] <= 0xaf )
+    else if( startcode >= SLICE_STARTCODE_FIRST &&
+             startcode <= SLICE_STARTCODE_LAST )
     {
         /* Slice start code */
         p_sys->b_frame_slice = true;
