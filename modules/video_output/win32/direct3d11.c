@@ -1054,6 +1054,15 @@ static inline bool RectEquals(const RECT *r1, const RECT *r2)
            r1->left == r2->left && r1->right == r2->right;
 }
 
+#define BEFORE_UPDATE_RECTS \
+    unsigned int i_outside_width  = vd->fmt.i_width; \
+    unsigned int i_outside_height = vd->fmt.i_height; \
+    vd->fmt.i_width  = vd->sys->picQuad.i_width; \
+    vd->fmt.i_height = vd->sys->picQuad.i_height;
+#define AFTER_UPDATE_RECTS \
+    vd->fmt.i_width  = i_outside_width; \
+    vd->fmt.i_height = i_outside_height;
+
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1061,7 +1070,9 @@ static int Control(vout_display_t *vd, int query, va_list args)
     RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
+    BEFORE_UPDATE_RECTS;
     int res = CommonControl( vd, query, args );
+    AFTER_UPDATE_RECTS;
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
@@ -1090,7 +1101,9 @@ static void Manage(vout_display_t *vd)
     RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
+    BEFORE_UPDATE_RECTS;
     CommonManage(vd);
+    AFTER_UPDATE_RECTS;
 
     if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
         !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
@@ -1146,14 +1159,17 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             assert(p_sys->resourceView[0]!=NULL);
         }
 
-        if ( vd->fmt.i_height != texDesc.Height ||
-             vd->fmt.i_width != texDesc.Width )
+        if ( sys->picQuad.i_height != texDesc.Height ||
+             sys->picQuad.i_width != texDesc.Width )
         {
             /* the decoder produced different sizes than the vout, we need to
              * adjust the vertex */
-            vd->fmt.i_height = texDesc.Height;
-            vd->fmt.i_width = texDesc.Width;
+            sys->picQuad.i_height = texDesc.Height;
+            sys->picQuad.i_width = texDesc.Width;
+
+            BEFORE_UPDATE_RECTS;
             UpdateRects(vd, NULL, NULL, true);
+            AFTER_UPDATE_RECTS;
             UpdateSize(vd);
         }
     }
@@ -1635,7 +1651,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
+    BEFORE_UPDATE_RECTS;
     UpdateRects(vd, NULL, NULL, true);
+    AFTER_UPDATE_RECTS;
 
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( sys->context_lock != INVALID_HANDLE_VALUE )
