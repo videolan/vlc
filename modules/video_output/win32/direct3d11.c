@@ -99,8 +99,6 @@ typedef struct
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader;
     D3D11_VIEWPORT            cropViewport;
-    unsigned int              i_x_offset;
-    unsigned int              i_y_offset;
     unsigned int              i_width;
     unsigned int              i_height;
 } d3d_quad_t;
@@ -750,8 +748,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures, true))
             goto error;
 
-        sys->picQuad.i_x_offset = staging_fmt.i_x_offset;
-        sys->picQuad.i_y_offset = staging_fmt.i_y_offset;
         sys->picQuad.i_width    = staging_fmt.i_width;
         sys->picQuad.i_height   = staging_fmt.i_height;
 
@@ -764,8 +760,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     } else
 #endif
     {
-        sys->picQuad.i_x_offset = surface_fmt.i_x_offset;
-        sys->picQuad.i_y_offset = surface_fmt.i_y_offset;
         sys->picQuad.i_width    = surface_fmt.i_width;
         sys->picQuad.i_height   = surface_fmt.i_height;
 
@@ -1066,8 +1060,6 @@ static void UpdateSize(vout_display_t *vd)
 
     UpdatePicQuadPosition(vd);
 
-    sys->picQuad.i_x_offset = sys->sys.rect_src.left;
-    sys->picQuad.i_y_offset = sys->sys.rect_src.top;
     sys->picQuad.i_width = RECTWidth(sys->sys.rect_src);
     sys->picQuad.i_height = RECTHeight(sys->sys.rect_src);
     UpdateQuadPosition(vd, &sys->picQuad, &sys->sys.rect_src_clipped,
@@ -2906,8 +2898,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 free(d3dquad);
                 continue;
             }
-            d3dquad->i_x_offset = r->fmt.i_x_offset;
-            d3dquad->i_y_offset = r->fmt.i_y_offset;
             d3dquad->i_width    = r->fmt.i_width;
             d3dquad->i_height   = r->fmt.i_height;
             RECT output;
