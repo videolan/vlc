@@ -673,18 +673,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         pool_size = 1;
 
     video_format_t surface_fmt = vd->fmt;
-    if (is_d3d11_opaque(surface_fmt.i_chroma))
-    {
-        /* worst case scenario we need 128 alignment for HEVC */
-        surface_fmt.i_width  = (surface_fmt.i_width  + 0x7F) & ~0x7F;
-        surface_fmt.i_height = (surface_fmt.i_height + 0x7F) & ~0x7F;
-    }
-    else if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-              sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-    {
-        surface_fmt.i_width  = (surface_fmt.i_width  + 0x01) & ~0x01;
-        surface_fmt.i_height = (surface_fmt.i_height + 0x01) & ~0x01;
-    }
+    surface_fmt.i_width  = sys->picQuad.i_width;
+    surface_fmt.i_height = sys->picQuad.i_height;
 
     if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, pool_size, textures,
                          true))
@@ -738,18 +728,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (!is_d3d11_opaque(surface_fmt.i_chroma) || sys->legacy_shader)
     {
         /* we need a staging texture */
-        video_format_t staging_fmt = surface_fmt;
-        if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-             sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-        {
-            staging_fmt.i_width  = (staging_fmt.i_width  + 0x01) & ~0x01;
-            staging_fmt.i_height = (staging_fmt.i_height + 0x01) & ~0x01;
-        }
-        if (AllocateTextures(vd, sys->picQuadConfig, &staging_fmt, 1, textures, true))
+        if (AllocateTextures(vd, sys->picQuadConfig, &surface_fmt, 1, textures, true))
             goto error;
-
-        sys->picQuad.i_width    = staging_fmt.i_width;
-        sys->picQuad.i_height   = staging_fmt.i_height;
 
         for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
             sys->stagingSys.texture[plane] = textures[plane];
@@ -760,9 +740,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     } else
 #endif
     {
-        sys->picQuad.i_width    = surface_fmt.i_width;
-        sys->picQuad.i_height   = surface_fmt.i_height;
-
         for (picture_count = 0; picture_count < pool_size; picture_count++) {
             if (AllocateShaderView(VLC_OBJECT(vd), sys->d3ddevice, sys->picQuadConfig,
                                    pictures[picture_count]->p_sys->texture, picture_count,
@@ -1060,8 +1037,6 @@ static void UpdateSize(vout_display_t *vd)
 
     UpdatePicQuadPosition(vd);
 
-    sys->picQuad.i_width = RECTWidth(sys->sys.rect_src);
-    sys->picQuad.i_height = RECTHeight(sys->sys.rect_src);
     UpdateQuadPosition(vd, &sys->picQuad, &sys->sys.rect_src_clipped,
                        vd->fmt.projection_mode, vd->fmt.orientation);
 
@@ -1644,6 +1619,21 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_RGBA);
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_BGRA);
+
+    sys->picQuad.i_width  = fmt->i_width;
+    sys->picQuad.i_height = fmt->i_height;
+    if (is_d3d11_opaque(fmt->i_chroma))
+    {
+        /* worst case scenario we need 128 alignment for HEVC */
+        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
+        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
+    }
+    else if ( sys->picQuadConfig->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+              sys->picQuadConfig->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    {
+        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
+        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
+    }
 
     UpdateRects(vd, NULL, NULL, true);
 
