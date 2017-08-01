@@ -744,12 +744,16 @@ static void SpuRenderRegion(spu_t *spu,
     if (force_palette) {
         video_palette_t *old_palette = region->fmt.p_palette;
         video_palette_t new_palette;
+        bool b_opaque = false;
 
         /* We suppose DVD palette here */
         new_palette.i_entries = 4;
         for (int i = 0; i < 4; i++)
+        {
             for (int j = 0; j < 4; j++)
                 new_palette.palette[i][j] = sys->palette[i][j];
+            b_opaque |= (new_palette.palette[i][3] > 0x00);
+        }
 
         if (old_palette->i_entries == new_palette.i_entries) {
             for (int i = 0; i < old_palette->i_entries; i++)
@@ -758,6 +762,15 @@ static void SpuRenderRegion(spu_t *spu,
         } else {
             changed_palette = true;
         }
+
+        /* Patch fully transparent broken palette for cropping */
+        if( !b_opaque )
+        {
+            new_palette.palette[1][3] = 0x0f;
+            new_palette.palette[2][3] = 0x0f;
+            new_palette.palette[3][3] = 0x0f;
+        }
+
         *old_palette = new_palette;
     }
 
