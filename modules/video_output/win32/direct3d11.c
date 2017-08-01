@@ -2361,9 +2361,9 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
      * will have decoder pixels not mean to be displayed but used for interpolation
      * So we lose the last line that will be partially green */
     if (src_width != dst_width)
-        dst_width -= 1;
+        src_width += 1;
     if (src_height != dst_height)
-        dst_height -= 1;
+        src_height += 1;
 
     float top, bottom, left, right;
     top    =  (float)MidY / (float)(MidY - 2*dst_y);
