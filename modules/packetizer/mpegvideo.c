@@ -301,7 +301,7 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_dep
         memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
         p_cc->i_dts = 
         p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
-        p_cc->i_flags = ( p_sys->cc.b_reorder ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & ( BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B);
+        p_cc->i_flags = p_sys->cc.b_reorder ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P;
     }
     cc_Flush( &p_sys->cc );
     return p_cc;
@@ -611,7 +611,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->b_cc_reset = true;
         p_sys->i_cc_pts = p_pic->i_pts;
         p_sys->i_cc_dts = p_pic->i_dts;
-        p_sys->i_cc_flags = p_pic->i_flags;
+        p_sys->i_cc_flags = p_pic->i_flags & BLOCK_FLAG_TYPE_MASK;
     }
 
     if( !p_pic && p_sys->b_cc_reset )
