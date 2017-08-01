@@ -101,6 +101,20 @@ static void FillSample( DXVA2_VideoSample *p_sample,
     p_sample->PlanarAlpha    = DXVA2_Fixed32OpaqueAlpha();
 }
 
+static void FillBlitParams( DXVA2_VideoProcessBltParams *params, const RECT *area,
+                            const DXVA2_VideoSample *samples, int order )
+{
+    memset(params, 0, sizeof(*params));
+    params->TargetFrame = (samples->End - samples->Start) * order / 2;
+    params->TargetRect  = *area;
+    params->DestData    = 0;
+    params->Alpha       = DXVA2_Fixed32OpaqueAlpha();
+    params->DestFormat.SampleFormat = DXVA2_SampleProgressiveFrame;
+    params->BackgroundColor.Alpha = 0xFFFF;
+    params->ConstrictionSize.cx = params->TargetRect.right;
+    params->ConstrictionSize.cy = params->TargetRect.bottom;
+}
+
 static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
                       int order, int i_field )
 {
@@ -108,7 +122,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
     const int i_samples = sys->decoder_caps.NumBackwardRefSamples + 1 +
                           sys->decoder_caps.NumForwardRefSamples;
     HRESULT hr;
-    DXVA2_VideoProcessBltParams params = {0};
+    DXVA2_VideoProcessBltParams params;
     DXVA2_VideoSample samples[i_samples];
     picture_t         *pictures[i_samples];
     D3DSURFACE_DESC srcDesc, dstDesc;
@@ -156,12 +170,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
         }
     }
 
-    params.TargetFrame = (samples[0].End - samples[0].Start) * order / 2;
-    params.TargetRect  = area;
-    params.DestData    = 0;
-    params.Alpha       = DXVA2_Fixed32OpaqueAlpha();
-    params.DestFormat.SampleFormat = DXVA2_SampleProgressiveFrame;
-    params.BackgroundColor.Alpha = 0xFFFF;
+    FillBlitParams( &params, &area, samples, order );
 
     hr = IDirectXVideoProcessor_VideoProcessBlt( sys->processor,
                                                  sys->hw_surface,
