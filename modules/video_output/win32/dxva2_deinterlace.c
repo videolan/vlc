@@ -351,10 +351,6 @@ static int Open(vlc_object_t *obj)
     if (FAILED(hr))
         goto error;
 
-    CoTaskMemFree(processorGUIDs);
-    picture_Release(dst);
-    IDirectXVideoProcessorService_Release(processor);
-
     sys->hdecoder_dll = hdecoder_dll;
     sys->d3d9_dll     = d3d9_dll;
     sys->decoder_caps = best_caps;
@@ -377,6 +373,10 @@ static int Open(vlc_object_t *obj)
     {
        goto error;
     }
+
+    CoTaskMemFree(processorGUIDs);
+    IDirectXVideoProcessorService_Release(processor);
+    picture_Release(dst);
 
     filter->fmt_out.video   = out_fmt;
     filter->pf_video_filter = Deinterlace;
