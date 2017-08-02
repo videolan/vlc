@@ -832,14 +832,18 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 
     for( SegmentSeeker::tracks_seekpoint_t::const_iterator it = seekpoints.begin(); it != seekpoints.end(); ++it )
     {
+        tracks_map_t::iterator trackit = tracks.find( it->first );
+        if ( trackit == tracks.end() )
+            continue; // there were blocks with unknown tracks
+
         if( i_seek_position > it->second.fpos )
         {
             i_seek_position = it->second.fpos;
             i_mk_seek_time  = it->second.pts;
         }
 
-        tracks.at( it->first )->i_skip_until_fpos = it->second.fpos;
-        tracks.at( it->first )->i_last_dts        = it->second.pts;
+        trackit->second->i_skip_until_fpos = it->second.fpos;
+        trackit->second->i_last_dts        = it->second.pts;
 
         msg_Dbg( &sys.demuxer, "seek: preroll{ track: %u, pts: %" PRId64 ", fpos: %" PRIu64 " } ",
           it->first, it->second.pts, it->second.fpos );
