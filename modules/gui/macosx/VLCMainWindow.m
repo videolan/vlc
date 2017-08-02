@@ -755,7 +755,7 @@ static const float f_min_window_height = 307.;
 - (void)setVideoplayEnabled
 {
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
-        
+
     if (!b_videoPlayback) {
         if (!self.nonembedded && (!self.nativeFullscreenMode || (self.nativeFullscreenMode && !self.fullscreen)) && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0) {
 
