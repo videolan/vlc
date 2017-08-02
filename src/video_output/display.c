@@ -945,30 +945,31 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 #endif
         /* */
         if (osys->ch_sar) {
-            video_format_t source = vd->source;
+            unsigned int i_sar_num = vd->source.i_sar_num;
+            unsigned int i_sar_den = vd->source.i_sar_den;
 
             if (osys->sar.num > 0 && osys->sar.den > 0) {
-                source.i_sar_num = osys->sar.num;
-                source.i_sar_den = osys->sar.den;
+                vd->source.i_sar_num = osys->sar.num;
+                vd->source.i_sar_den = osys->sar.den;
             } else {
-                source.i_sar_num = osys->source.i_sar_num;
-                source.i_sar_den = osys->source.i_sar_den;
+                vd->source.i_sar_num = osys->source.i_sar_num;
+                vd->source.i_sar_den = osys->source.i_sar_den;
             }
 
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, &source)) {
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, &vd->source)) {
                 /* There nothing much we can do. The only reason a vout display
                  * does not support it is because it need the core to add black border
                  * to the video for it.
                  * TODO add black borders ?
                  */
                 msg_Err(vd, "Failed to change source AR");
-                source = vd->source;
+                vd->source.i_sar_num = i_sar_num;
+                vd->source.i_sar_den = i_sar_den;
             } else if (!osys->fit_window) {
                 osys->fit_window = 1;
             }
-            vd->source = source;
-            osys->sar.num = source.i_sar_num;
-            osys->sar.den = source.i_sar_den;
+            osys->sar.num = vd->source.i_sar_num;
+            osys->sar.den = vd->source.i_sar_den;
             osys->ch_sar  = false;
 
             /* If a crop ratio is requested, recompute the parameters */
