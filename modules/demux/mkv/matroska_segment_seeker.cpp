@@ -311,7 +311,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
         bool     b_key_picture;
         bool     b_discardable_picture;
         int64_t  i_block_duration;
-
+        track_id_t track_id;
         matroska_segment_c::tracks_map_t::iterator i_track = ms.tracks.end();
 
         if( ms.BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
@@ -320,10 +320,12 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
         if( simpleblock ) {
             block_pos = simpleblock->GetElementPosition();
             block_pts = simpleblock->GlobalTimecode() / 1000;
+            track_id  = simpleblock->TrackNum();
         }
         else {
             block_pos = block->GetElementPosition();
             block_pts = block->GlobalTimecode() / 1000;
+            track_id  = block->TrackNum();
         }
 
         bool const b_valid_track = !ms.FindTrackByBlock( &i_track, block, simpleblock );
@@ -333,7 +335,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
         if( b_valid_track )
         {
             if( b_key_picture )
-                add_seekpoint( i_track->first, Seekpoint::TRUSTED, block_pos, block_pts );
+                add_seekpoint( track_id, Seekpoint::TRUSTED, block_pos, block_pts );
 
             if( max_pts < block_pts )
                 break;
