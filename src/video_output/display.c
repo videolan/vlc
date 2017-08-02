@@ -978,14 +978,12 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         }
         /* */
         if (osys->ch_crop) {
-            video_format_t source = vd->source;
-
             unsigned crop_num = osys->crop.num;
             unsigned crop_den = osys->crop.den;
             if (crop_num != 0 && crop_den != 0) {
                 video_format_t fmt = osys->source;
-                fmt.i_sar_num = source.i_sar_num;
-                fmt.i_sar_den = source.i_sar_den;
+                fmt.i_sar_num = vd->source.i_sar_num;
+                fmt.i_sar_den = vd->source.i_sar_den;
                 VoutDisplayCropRatio(&osys->crop.left,  &osys->crop.top,
                                      &osys->crop.right, &osys->crop.bottom,
                                      &fmt, crop_num, crop_den);
@@ -1008,16 +1006,24 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 bottom = (int)osys->source.i_y_offset + osys->crop.bottom;
             bottom = VLC_CLIP(bottom, top + 1, bottom_max);
 
-            source.i_x_offset       = left;
-            source.i_y_offset       = top;
-            source.i_visible_width  = right - left;
-            source.i_visible_height = bottom - top;
+            unsigned int i_x_offset       = vd->source.i_x_offset;
+            unsigned int i_y_offset       = vd->source.i_y_offset;
+            unsigned int i_visible_width  = vd->source.i_visible_width;
+            unsigned int i_visible_height = vd->source.i_visible_height;
+
+            vd->source.i_x_offset       = left;
+            vd->source.i_y_offset       = top;
+            vd->source.i_visible_width  = right - left;
+            vd->source.i_visible_height = bottom - top;
             video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
-            video_format_Print(VLC_OBJECT(vd), "CROPPED", &source);
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &source)) {
+            video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &vd->source)) {
                 msg_Err(vd, "Failed to change source crop TODO implement crop at core");
 
-                source = vd->source;
+                vd->source.i_x_offset       = i_x_offset;
+                vd->source.i_y_offset       = i_y_offset;
+                vd->source.i_visible_width  = i_visible_width;
+                vd->source.i_visible_height = i_visible_height;
                 crop_num = 0;
                 crop_den = 0;
                 /* FIXME implement cropping in the core if not supported by the
@@ -1026,13 +1032,12 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             } else if (!osys->fit_window) {
                 osys->fit_window = 1;
             }
-            vd->source = source;
-            osys->crop.left   = source.i_x_offset - osys->source.i_x_offset;
-            osys->crop.top    = source.i_y_offset - osys->source.i_y_offset;
+            osys->crop.left   = vd->source.i_x_offset - osys->source.i_x_offset;
+            osys->crop.top    = vd->source.i_y_offset - osys->source.i_y_offset;
             /* FIXME for right/bottom we should keep the 'type' border vs window */
-            osys->crop.right  = (source.i_x_offset + source.i_visible_width) -
+            osys->crop.right  = (vd->source.i_x_offset + vd->source.i_visible_width) -
                                 (osys->source.i_x_offset + osys->source.i_visible_width);
-            osys->crop.bottom = (source.i_y_offset + source.i_visible_height) -
+            osys->crop.bottom = (vd->source.i_y_offset + vd->source.i_visible_height) -
                                 (osys->source.i_y_offset + osys->source.i_visible_height);
             osys->crop.num    = crop_num;
             osys->crop.den    = crop_den;
