@@ -652,19 +652,17 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_ZOOM:           /* const vout_display_cfg_t *p_cfg */
-    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:  /* const video_format_t *p_source */
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {  /* const video_format_t *p_source */
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
         const vout_display_cfg_t *cfg;
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP ||
             query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT) {
-            const video_format_t *source = va_arg(args, const video_format_t *);
             cfg    = vd->cfg;
-            UpdateRects(vd, cfg, source, true);
         } else {
             cfg    = va_arg(args, const vout_display_cfg_t *);
-            UpdateRects(vd, cfg, NULL, true);
         }
+        UpdateRects(vd, cfg, NULL, true);
         return VLC_SUCCESS;
     }
 #if !VLC_WINSTORE_APP

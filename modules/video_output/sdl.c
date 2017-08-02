@@ -518,20 +518,17 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT: {
         const vout_display_cfg_t *cfg;
-        const video_format_t *source;
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT) {
-            source = va_arg(args, const video_format_t *);
             cfg = vd->cfg;
         } else {
-            source = &vd->source;
             cfg = va_arg(args, const vout_display_cfg_t *);
         }
         if (sys->overlay) {
             sys->display = SDL_SetVideoMode(cfg->display.width, cfg->display.height,
                                             sys->display_bpp, sys->display_flags);
 
-            vout_display_PlacePicture(&sys->place, source, cfg, !sys->overlay);
+            vout_display_PlacePicture(&sys->place, &vd->source, cfg, !sys->overlay);
         } else {
             vout_display_SendEventPicturesInvalid(vd);
         }

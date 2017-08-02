@@ -956,7 +956,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 vd->source.i_sar_den = osys->source.i_sar_den;
             }
 
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, &vd->source)) {
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT)) {
                 /* There nothing much we can do. The only reason a vout display
                  * does not support it is because it need the core to add black border
                  * to the video for it.
@@ -1017,7 +1017,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             vd->source.i_visible_height = bottom - top;
             video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
             video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &vd->source)) {
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP)) {
                 msg_Err(vd, "Failed to change source crop TODO implement crop at core");
 
                 vd->source.i_x_offset       = i_x_offset;

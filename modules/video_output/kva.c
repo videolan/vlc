@@ -466,12 +466,10 @@ static int Control( vout_display_t *vd, int query, va_list args )
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
-        const video_format_t *src = va_arg(args, const video_format_t *);
-
         if( query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT )
         {
             vout_display_place_t place;
-            vout_display_PlacePicture(&place, src, vd->cfg, false);
+            vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
 
             sys->kvas.ulAspectWidth  = place.width;
             sys->kvas.ulAspectHeight = place.height;
@@ -479,7 +477,7 @@ static int Control( vout_display_t *vd, int query, va_list args )
         else
         {
             video_format_t src_rot;
-            video_format_ApplyRotation(&src_rot, src);
+            video_format_ApplyRotation(&src_rot, &vd->source);
 
             sys->kvas.rclSrcRect.xLeft   = src_rot.i_x_offset;
             sys->kvas.rclSrcRect.yTop    = src_rot.i_y_offset;

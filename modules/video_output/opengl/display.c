@@ -234,10 +234,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
       {
         const vout_display_cfg_t *cfg = vd->cfg;
-        const video_format_t *src = va_arg (ap, const video_format_t *);
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, src, cfg, false);
+        vout_display_PlacePicture (&place, &vd->source, cfg, false);
         if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
             return VLC_EGENERIC;
         vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);

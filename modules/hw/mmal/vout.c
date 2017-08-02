@@ -610,7 +610,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
     vout_display_sys_t *sys = vd->sys;
     vout_display_cfg_t cfg;
     const vout_display_cfg_t *tmp_cfg;
-    const video_format_t *tmp_fmt;
     int ret = VLC_EGENERIC;
 
     switch (query) {
@@ -632,8 +631,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
 
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            tmp_fmt = va_arg(args, const video_format_t *);
-            if (configure_display(vd, NULL, tmp_fmt) >= 0)
+            if (configure_display(vd, NULL, &vd->source) >= 0)
                 ret = VLC_SUCCESS;
             break;
 

@@ -1185,13 +1185,12 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     {
         msg_Dbg(vd, "change source crop/aspect");
-        const video_format_t *source = va_arg(args, const video_format_t *);
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-            video_format_CopyCrop(&sys->p_window->fmt, source);
+            video_format_CopyCrop(&sys->p_window->fmt, &vd->source);
             AndroidWindow_UpdateCrop(sys, sys->p_window);
         } else
-            CopySourceAspect(&sys->p_window->fmt, source);
+            CopySourceAspect(&sys->p_window->fmt, &vd->source);
 
         UpdateVideoSize(sys, &sys->p_window->fmt, sys->p_window->b_use_priv);
         FixSubtitleFormat(sys);

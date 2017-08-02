@@ -724,22 +724,19 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
         const vout_display_cfg_t *cfg;
-        const video_format_t *source;
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
          || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
         {
-            source = va_arg(ap, const video_format_t *);
             cfg = vd->cfg;
         }
         else
         {
-            source = &vd->source;
             cfg = va_arg(ap, const vout_display_cfg_t *);
         }
 
         vout_display_place_t place;
-        vout_display_PlacePicture (&place, source, cfg, false);
+        vout_display_PlacePicture (&place, &vd->source, cfg, false);
         p_sys->width  = place.width;
         p_sys->height = place.height;
 
