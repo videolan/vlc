@@ -496,22 +496,19 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                   mtime_t i_pts, mtime_t i_duration, bool b_key_picture,
                   bool b_discardable_picture )
 {
-    typedef matroska_segment_c::tracks_map_t tracks_map_t;
-
     demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
 
     if( !p_segment ) return;
 
-    tracks_map_t::iterator track_it;
-
-    if( p_segment->FindTrackByBlock( &track_it, block, simpleblock ) )
+    mkv_track_t *p_track = p_segment->FindTrackByBlock( block, simpleblock );
+    if( p_track == NULL )
     {
         msg_Err( p_demux, "invalid track number" );
         return;
     }
 
-    mkv_track_t &track = *track_it->second;
+    mkv_track_t &track = *p_track;
 
     if( track.fmt.i_cat != NAV_ES && track.p_es == NULL )
     {
@@ -717,16 +714,16 @@ static int Demux( demux_t *p_demux)
     }
 
     {
-        matroska_segment_c::tracks_map_t::iterator track_it;
+        mkv_track_t *p_track = p_segment->FindTrackByBlock( block, simpleblock );
 
-        if( p_segment->FindTrackByBlock( &track_it, block, simpleblock ) )
+        if( p_track == NULL )
         {
             msg_Err( p_demux, "invalid track number" );
             delete block;
             return 0;
         }
 
-        mkv_track_t &track = *track_it->second;
+        mkv_track_t &track = *p_track;
 
 
         if( track.i_skip_until_fpos != std::numeric_limits<uint64_t>::max() ) {

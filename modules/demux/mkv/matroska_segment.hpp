@@ -144,7 +144,7 @@ public:
 
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 
-    int FindTrackByBlock(tracks_map_t::iterator* track_it, const KaxBlock *, const KaxSimpleBlock * );
+    mkv_track_t * FindTrackByBlock(const KaxBlock *, const KaxSimpleBlock * );
 
     bool ESCreate( );
     void ESDestroy( );

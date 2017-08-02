@@ -870,24 +870,22 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 }
 
 
-int matroska_segment_c::FindTrackByBlock(tracks_map_t::iterator* p_track_it,
+mkv_track_t * matroska_segment_c::FindTrackByBlock(
                                              const KaxBlock *p_block, const KaxSimpleBlock *p_simpleblock )
 {
-    *p_track_it = tracks.end();
-
-    if( p_block == NULL && p_simpleblock == NULL )
-        return VLC_EGENERIC;
+    tracks_map_t::iterator track_it;
 
     if (p_block != NULL)
-    {
-        *p_track_it = tracks.find( p_block->TrackNum() );
-    }
+        track_it = tracks.find( p_block->TrackNum() );
     else if( p_simpleblock != NULL)
-    {
-        *p_track_it = tracks.find( p_simpleblock->TrackNum() );
-    }
+        track_it = tracks.find( p_simpleblock->TrackNum() );
+    else
+        track_it = tracks.end();
 
-    return *p_track_it != tracks.end() ? VLC_SUCCESS : VLC_EGENERIC;
+    if (track_it == tracks.end())
+        return NULL;
+
+    return track_it->second.get();
 }
 
 void matroska_segment_c::ComputeTrackPriority()
@@ -1124,8 +1122,6 @@ void matroska_segment_c::ESDestroy( )
 
 int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock, bool *pb_key_picture, bool *pb_discardable_picture, int64_t *pi_duration )
 {
-    tracks_map_t::iterator track_it;
-
     pp_simpleblock = NULL;
     pp_block = NULL;
 
@@ -1208,8 +1204,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
             if( ksblock.IsKeyframe() )
             {
-                tracks_map_t::iterator track_it;
-                bool const b_valid_track = !vars.obj->FindTrackByBlock( &track_it, NULL, &ksblock );
+                bool const b_valid_track = vars.obj->FindTrackByBlock( NULL, &ksblock ) != NULL;
                 if (b_valid_track)
                     vars.obj->_seeker.add_seekpoint( ksblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, ksblock.GetElementPosition(), ksblock.GlobalTimecode() / 1000 );
             }
@@ -1226,9 +1221,8 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             vars.block->ReadData( vars.obj->es.I_O() );
             vars.block->SetParent( *vars.obj->cluster );
 
-            tracks_map_t::iterator track_it;
-            bool const b_valid_track = !vars.obj->FindTrackByBlock( &track_it, &kblock, NULL );
-            if( b_valid_track && track_it->second->fmt.i_cat == SPU_ES )
+            const mkv_track_t *p_track = vars.obj->FindTrackByBlock( &kblock, NULL );
+            if( p_track != NULL && p_track->fmt.i_cat == SPU_ES )
             {
                 vars.obj->_seeker.add_seekpoint( kblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 );
             }
@@ -1292,7 +1286,8 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         if( pp_simpleblock != NULL || ((el = ep->Get()) == NULL && pp_block != NULL) )
         {
             /* Check blocks validity to protect againts broken files */
-            if( FindTrackByBlock( &track_it, pp_block , pp_simpleblock ) )
+            const mkv_track_t *p_track = FindTrackByBlock( pp_block , pp_simpleblock );
+            if( p_track == NULL )
             {
                 ep->Unkeep();
                 pp_simpleblock = NULL;
@@ -1307,7 +1302,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             /* We have block group let's check if the picture is a keyframe */
             else if( *pb_key_picture )
             {
-                if( track_it->second->fmt.i_codec == VLC_CODEC_THEORA )
+                if( p_track->fmt.i_codec == VLC_CODEC_THEORA )
                 {
                     DataBuffer *    p_data = &pp_block->GetBuffer(0);
                     const uint8_t * p_buff = p_data->Buffer();
