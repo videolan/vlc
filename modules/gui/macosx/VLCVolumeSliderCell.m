@@ -24,6 +24,11 @@
 
 #import "VLCVolumeSliderCell.h"
 
+@interface VLCVolumeSliderCell () {
+    BOOL _isRTL;
+}
+@end
+
 @implementation VLCVolumeSliderCell
 
 - (instancetype)init
@@ -31,6 +36,7 @@
     self = [super init];
     if (self) {
         [self setSliderStyleLight];
+        _isRTL = ([self userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft);
     }
     return self;
 }
@@ -40,6 +46,7 @@
     self = [super initWithCoder:coder];
     if (self) {
         [self setSliderStyleLight];
+        _isRTL = ([self userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft);
     }
     return self;
 }
@@ -174,21 +181,38 @@
 
     // Empty Track Drawing
     NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:1 yRadius:1];
-    [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
 
     // Calculate filled track
-    NSRect filledTrackRect = rect;
+    NSRect leadingTrackRect = rect;
     NSRect knobRect = [self knobRectFlipped:NO];
-    filledTrackRect.size.width = knobRect.origin.x + (self.knobThickness / 2);
+    CGFloat sliderCenter = knobRect.origin.x  + (self.knobThickness / 2);
+
+    leadingTrackRect.size.width = sliderCenter;
 
     // Filled Track Drawing
-    CGFloat filledTrackCornerRadius = 2;
-    NSBezierPath* filledTrackPath = [NSBezierPath bezierPathWithRoundedRect:filledTrackRect
-                                                                    xRadius:filledTrackCornerRadius
-                                                                    yRadius:filledTrackCornerRadius];
+    CGFloat leadingTrackCornerRadius = 2;
+    NSBezierPath* leadingTrackPath = [NSBezierPath bezierPathWithRoundedRect:leadingTrackRect
+                                                                     xRadius:leadingTrackCornerRadius
+                                                                     yRadius:leadingTrackCornerRadius];
 
-    [_filledTrackColor setFill];
-    [filledTrackPath fill];
+    if (_isRTL) {
+        // In RTL mode, first fill the whole slider,
+        // then only redraw the empty part.
+
+        // Empty part drawing
+        [_filledTrackColor setFill];
+        [emptyTrackPath fill];
+
+        // Filled part drawing
+        [_trackGradient drawInBezierPath:leadingTrackPath angle:-90];
+    } else {
+        // Empty part drawing
+        [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
+
+        // Filled part drawing
+        [_filledTrackColor setFill];
+        [leadingTrackPath fill];
+    }
 
     [_trackStrokeColor setStroke];
     emptyTrackPath.lineWidth = 1;
