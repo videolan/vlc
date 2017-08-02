@@ -104,7 +104,6 @@ static const char *const ppsz_core_options[] = {
 };
 
 static ssize_t Write   ( sout_access_out_t *, block_t * );
-static int  Seek    ( sout_access_out_t *, off_t  );
 static int Control( sout_access_out_t *, int, va_list );
 
 static void* ThreadWrite( void * );
@@ -226,7 +225,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_access->pf_write = Write;
-    p_access->pf_seek = Seek;
     p_access->pf_control = Control;
 
     return VLC_SUCCESS;
@@ -349,16 +347,6 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     }
 
     return i_len;
-}
-
-/*****************************************************************************
- * Seek: seek to a specific location in a file
- *****************************************************************************/
-static int Seek( sout_access_out_t *p_access, off_t i_pos )
-{
-    (void) i_pos;
-    msg_Err( p_access, "UDP sout access cannot seek" );
-    return -1;
 }
 
 /*****************************************************************************

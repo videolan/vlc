@@ -55,7 +55,6 @@ vlc_module_end ()
  * Exported prototypes
  *****************************************************************************/
 static ssize_t Write( sout_access_out_t *, block_t * );
-static int     Seek ( sout_access_out_t *, off_t  );
 
 /*****************************************************************************
  * Open: open the file
@@ -66,7 +65,6 @@ static int Open( vlc_object_t *p_this )
 
     p_access->p_sys    = NULL;
     p_access->pf_write = Write;
-    p_access->pf_seek  = Seek;
 
     msg_Dbg( p_access, "dummy stream output access opened" );
     return VLC_SUCCESS;
@@ -101,14 +99,3 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     (void)p_access;
     return i_write;
 }
-
-/*****************************************************************************
- * Seek: seek to a specific location in a file
- *****************************************************************************/
-static int Seek( sout_access_out_t *p_access, off_t i_pos )
-{
-    (void)p_access; (void)i_pos;
-    return 0;
-}
-
-

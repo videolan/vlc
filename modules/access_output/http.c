@@ -90,7 +90,6 @@ static const char *const ppsz_sout_options[] = {
 };
 
 static ssize_t Write( sout_access_out_t *, block_t * );
-static int Seek ( sout_access_out_t *, off_t  );
 static int Control( sout_access_out_t *, int, va_list );
 
 struct sout_access_out_sys_t
@@ -295,7 +294,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_header_complete  = false;
 
     p_access->pf_write       = Write;
-    p_access->pf_seek        = Seek;
     p_access->pf_control     = Control;
 
     return VLC_SUCCESS;
@@ -461,14 +459,4 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     }
 
     return( i_err < 0 ? VLC_EGENERIC : i_len );
-}
-
-/*****************************************************************************
- * Seek: seek to a specific location in a file
- *****************************************************************************/
-static int Seek( sout_access_out_t *p_access, off_t i_pos )
-{
-    (void)i_pos;
-    msg_Warn( p_access, "HTTP sout access cannot seek" );
-    return VLC_EGENERIC;
 }

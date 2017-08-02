@@ -150,7 +150,6 @@ static const char *const ppsz_sout_options[] = {
  * Exported prototypes
  *****************************************************************************/
 static ssize_t Write( sout_access_out_t *, block_t * );
-static int Seek ( sout_access_out_t *, off_t  );
 static int Control( sout_access_out_t *, int, va_list );
 
 struct sout_access_out_sys_t
@@ -378,7 +377,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_access->pf_write = Write;
-    p_access->pf_seek  = Seek;
     p_access->pf_control = Control;
 
     msg_Dbg( p_access, "shout access output opened (%s@%s:%i/%s)",
@@ -482,14 +480,3 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
     return i_write;
 }
-
-/*****************************************************************************
- * Seek: seek to a specific location -- not supported
- *****************************************************************************/
-static int Seek( sout_access_out_t *p_access, off_t i_pos )
-{
-    VLC_UNUSED(i_pos);
-    msg_Err( p_access, "cannot seek on shout" );
-    return VLC_EGENERIC;
-}
-
