@@ -745,6 +745,7 @@ static void SpuRenderRegion(spu_t *spu,
         video_palette_t *old_palette = region->fmt.p_palette;
         video_palette_t new_palette;
         bool b_opaque = false;
+        bool b_old_opaque = false;
 
         /* We suppose DVD palette here */
         new_palette.i_entries = 4;
@@ -757,14 +758,29 @@ static void SpuRenderRegion(spu_t *spu,
 
         if (old_palette->i_entries == new_palette.i_entries) {
             for (int i = 0; i < old_palette->i_entries; i++)
+            {
                 for (int j = 0; j < 4; j++)
                     changed_palette |= old_palette->palette[i][j] != new_palette.palette[i][j];
+                b_old_opaque |= (old_palette->palette[i][3] > 0x00);
+            }
         } else {
             changed_palette = true;
+            b_old_opaque = true;
         }
 
-        /* Reject fully transparent broken palette for cropping */
-        changed_palette &= b_opaque;
+        /* Reject or patch fully transparent broken palette used for dvd menus */
+        if( !b_opaque )
+        {
+            if( !b_old_opaque )
+            {
+                /* replace with new one and fixed alpha */
+                old_palette->palette[1][3] = 0x80;
+                old_palette->palette[2][3] = 0x80;
+                old_palette->palette[3][3] = 0x80;
+            }
+            /* keep old visible palette */
+            else changed_palette = false;
+        }
 
         if( changed_palette )
             *old_palette = new_palette;
