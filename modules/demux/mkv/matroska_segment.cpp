@@ -1204,7 +1204,10 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
             if( ksblock.IsKeyframe() )
             {
-                vars.obj->_seeker.add_seekpoint( ksblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, ksblock.GetElementPosition(), ksblock.GlobalTimecode() / 1000 );
+                tracks_map_t::iterator track_it;
+                bool const b_valid_track = !vars.obj->FindTrackByBlock( &track_it, NULL, &ksblock );
+                if (b_valid_track)
+                    vars.obj->_seeker.add_seekpoint( ksblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, ksblock.GetElementPosition(), ksblock.GlobalTimecode() / 1000 );
             }
         }
     };
@@ -1219,7 +1222,9 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             vars.block->ReadData( vars.obj->es.I_O() );
             vars.block->SetParent( *vars.obj->cluster );
 
-            if( vars.obj->tracks.at( kblock.TrackNum() )->fmt.i_cat == SPU_ES )
+            tracks_map_t::iterator track_it;
+            bool const b_valid_track = !vars.obj->FindTrackByBlock( &track_it, &kblock, NULL );
+            if( b_valid_track && track_it->second->fmt.i_cat == SPU_ES )
             {
                 vars.obj->_seeker.add_seekpoint( kblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 );
             }
