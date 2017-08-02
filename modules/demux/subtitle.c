@@ -320,7 +320,10 @@ static int Open ( vlc_object_t *p_this )
     size_t i_peek;
     const uint8_t *p_peek;
     if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
+    {
+        free( p_sys );
         return VLC_EGENERIC;
+    }
 
     enum
     {
@@ -356,7 +359,10 @@ static int Open ( vlc_object_t *p_this )
 
     i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_peek );
     if( unlikely(i_peek < 16) )
+    {
+        free( p_sys );
         return VLC_EGENERIC;
+    }
 
     stream_t *p_probestream = NULL;
     if( e_bom != UTF8BOM && e_bom != NOBOM )
@@ -396,7 +402,10 @@ static int Open ( vlc_object_t *p_this )
     }
 
     if( p_probestream == NULL )
+    {
+        free( p_sys );
         return VLC_EGENERIC;
+    }
 
     /* Probe if unknown type */
     if( p_sys->props.i_type == SUB_TYPE_UNKNOWN )
