@@ -235,10 +235,12 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
 
                 if(ctx_extinf)
                 {
-                    if(ctx_extinf->getAttributeByName("DURATION"))
+                    const Attribute *attribute = ctx_extinf->getAttributeByName("DURATION");
+                    if(attribute)
                     {
-                        const mtime_t nzDuration = CLOCK_FREQ * ctx_extinf->getAttributeByName("DURATION")->floatingPoint();
-                        segment->duration.Set(ctx_extinf->getAttributeByName("DURATION")->floatingPoint() * (uint64_t) rep->getTimescale());
+                        const double duration = attribute->floatingPoint();
+                        const mtime_t nzDuration = CLOCK_FREQ * duration;
+                        segment->duration.Set(duration * (uint64_t) rep->getTimescale());
                         segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
                         nzStartTime += nzDuration;
                         totalduration += nzDuration;
