@@ -838,14 +838,15 @@ static void OutClose( vlc_object_t *p_this )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static int _Seek( vlc_object_t *p_access, access_sys_t *p_sys, uint64_t i_pos )
+static int SeekCommon( vlc_object_t *p_access, access_sys_t *p_sys,
+                       uint64_t i_pos )
 {
     msg_Dbg( p_access, "seeking to %"PRIu64, i_pos );
 
-    ftp_StopStream( (vlc_object_t *)p_access, p_sys );
-    if( ftp_StartStream( (vlc_object_t *)p_access, p_sys, i_pos, false ) < 0 )
-        return VLC_EGENERIC;
+    ftp_StopStream( p_access, p_sys );
 
+    if( ftp_StartStream( p_access, p_sys, i_pos, false ) < 0 )
+        return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
 
@@ -853,7 +854,7 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    int val = _Seek( (vlc_object_t *)p_access, p_sys, i_pos );
+    int val = SeekCommon( (vlc_object_t *)p_access, p_sys, i_pos );
     if( val )
         return val;
 
@@ -865,7 +866,7 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
 #ifdef ENABLE_SOUT
 static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
 {
-    return _Seek( (vlc_object_t *)p_access, GET_OUT_SYS( p_access ), i_pos);
+    return SeekCommon((vlc_object_t *)p_access, GET_OUT_SYS(p_access), i_pos);
 }
 #endif
 
