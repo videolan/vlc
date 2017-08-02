@@ -36,6 +36,7 @@
     BOOL _isRTL;
     BOOL _isFlipped;
     double _defaultValue;
+    double _normalizedDefaultValue;
     NSColor *_defaultTickMarkColor;
 }
 @end
@@ -76,6 +77,7 @@
         _snapsToDefault = NO;
     }
     _defaultValue = value;
+    _normalizedDefaultValue = (value == DBL_MAX) ? DBL_MAX : [self normalizedValue:_defaultValue];
     [[self controlView] setNeedsDisplay:YES];
 }
 
@@ -108,6 +110,7 @@
 - (void)setupSelf
 {
     _defaultValue = DBL_MAX;
+    _normalizedDefaultValue = DBL_MAX;
     _isRTL = ([self userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft);
     _isFlipped = [[self controlView] isFlipped];
     _defaultTickMarkColor = [NSColor grayColor];
@@ -206,11 +209,22 @@
 }
 #pragma clang diagnostic pop
 
+- (double)normalizedValue:(double)value
+{
+    double min = [self minValue];
+    double max = [self maxValue];
+
+    max -= min;
+    value -= min;
+
+    return (value / max) * 100;
+}
+
 - (BOOL)continueTracking:(NSPoint)lastPoint at:(NSPoint)currentPoint inView:(NSView *)controlView
 {
-    double oldValue = [self doubleValue];
+    double oldValue = [self normalizedValue:self.doubleValue];
     BOOL result = [super continueTracking:lastPoint at:currentPoint inView:controlView];
-    double newValue = [self doubleValue];
+    double newValue = [self normalizedValue:self.doubleValue];
 
     // If no change, nothing to do.
     if (newValue == oldValue)
@@ -219,15 +233,14 @@
     // Determine in which direction slider is moving
     BOOL sliderMovingForward = (oldValue > newValue) ? NO : YES;
 
-    // Calculate snap-threshhold
-    double range = self.maxValue - self.minValue;
-    double thresh = (range * 0.01) * 7;
+    // Claculate snap-threshhold
+    double thresh = 100 * (self.knobThickness/3) / _trackRect.size.width;
 
     // Snap to default value
-    if (ABS(newValue - _defaultValue) < thresh && _snapsToDefault) {
-        if (sliderMovingForward && newValue > _defaultValue) {
+    if (_snapsToDefault && ABS(newValue - _normalizedDefaultValue) < thresh) {
+        if (sliderMovingForward && newValue > _normalizedDefaultValue) {
             [self setDoubleValue:_defaultValue];
-        } else if (!sliderMovingForward && newValue < _defaultValue) {
+        } else if (!sliderMovingForward && newValue < _normalizedDefaultValue) {
             [self setDoubleValue:_defaultValue];
         }
     }
