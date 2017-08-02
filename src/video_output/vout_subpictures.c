@@ -763,15 +763,11 @@ static void SpuRenderRegion(spu_t *spu,
             changed_palette = true;
         }
 
-        /* Patch fully transparent broken palette for cropping */
-        if( !b_opaque )
-        {
-            new_palette.palette[1][3] = 0x0f;
-            new_palette.palette[2][3] = 0x0f;
-            new_palette.palette[3][3] = 0x0f;
-        }
+        /* Reject fully transparent broken palette for cropping */
+        changed_palette &= b_opaque;
 
-        *old_palette = new_palette;
+        if( changed_palette )
+            *old_palette = new_palette;
     }
 
     /* */
