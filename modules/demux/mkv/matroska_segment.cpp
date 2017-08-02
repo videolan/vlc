@@ -209,7 +209,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 
                 if( tracks.find( track_id ) != tracks.end() )
                 {
-                    int level = SegmentSeeker::Seekpoint::DISABLED;
+                    SegmentSeeker::Seekpoint::TrustLevel level = SegmentSeeker::Seekpoint::DISABLED;
 
                     if( ! b_invalid_cue )
                     {

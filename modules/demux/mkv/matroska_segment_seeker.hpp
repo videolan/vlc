@@ -55,16 +55,18 @@ class SegmentSeeker
 
         struct Seekpoint
         {
-            static int const      TRUSTED = +3;
-            static int const QUESTIONABLE = +2;
-            static int const     DISABLED = -1;
+            enum TrustLevel {
+                TRUSTED = +3,
+                QUESTIONABLE = +2,
+                DISABLED = -1,
+            };
 
-            Seekpoint( int trust_level, fptr_t fpos, mtime_t pts, mtime_t duration = -1 )
+            Seekpoint( TrustLevel trust_level, fptr_t fpos, mtime_t pts, mtime_t duration = -1 )
                 : fpos( fpos ), pts( pts ), duration( duration ), trust_level( trust_level )
             { }
 
             Seekpoint()
-                : fpos( std::numeric_limits<fptr_t>::max() ), pts( -1 ), duration( -1 ), trust_level( -1 )
+                : fpos( std::numeric_limits<fptr_t>::max() ), pts( -1 ), duration( -1 ), trust_level( DISABLED )
             { }
 
             bool operator<( Seekpoint const& rhs ) const
@@ -75,7 +77,7 @@ class SegmentSeeker
             fptr_t fpos;
             mtime_t pts;
             mtime_t duration;
-            int trust_level;
+            TrustLevel trust_level;
         };
 
         struct Cluster {
@@ -97,7 +99,7 @@ class SegmentSeeker
 
         typedef std::pair<Seekpoint, Seekpoint> seekpoint_pair_t;
 
-        void add_seekpoint( track_id_t track_id, int level, fptr_t fpos, mtime_t pts );
+        void add_seekpoint( track_id_t track_id, Seekpoint::TrustLevel level, fptr_t fpos, mtime_t pts );
 
         seekpoint_pair_t get_seekpoints_around( mtime_t, seekpoints_t const&, int = Seekpoint::DISABLED );
         seekpoint_pair_t get_seekpoints_around( mtime_t, track_ids_t const& );

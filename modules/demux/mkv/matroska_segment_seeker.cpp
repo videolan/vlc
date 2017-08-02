@@ -112,7 +112,7 @@ SegmentSeeker::add_cluster( KaxCluster * const p_cluster )
 }
 
 void
-SegmentSeeker::add_seekpoint( track_id_t track_id, int trust_level, fptr_t fpos, mtime_t pts )
+SegmentSeeker::add_seekpoint( track_id_t track_id, Seekpoint::TrustLevel trust_level, fptr_t fpos, mtime_t pts )
 {
     Seekpoint sp ( trust_level, fpos, pts );
 
