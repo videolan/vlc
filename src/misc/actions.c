@@ -419,7 +419,7 @@ static int vlc_key_to_action (vlc_object_t *obj, const char *varname,
 /**
  * Adds a mapping from a certain key code to a certain action.
  */
-static int vlc_AddMapping (void **map, uint32_t keycode, vlc_action_id_t action)
+static int add_mapping (void **map, uint32_t keycode, vlc_action_id_t action)
 {
     struct mapping *entry = malloc (sizeof (*entry));
     if (entry == NULL)
@@ -438,7 +438,7 @@ static int vlc_AddMapping (void **map, uint32_t keycode, vlc_action_id_t action)
     return 0;
 }
 
-static void vlc_AddWheelMapping (void **map, uint32_t kmore, uint32_t kless,
+static void add_wheel_mapping (void **map, uint32_t kmore, uint32_t kless,
                                  int mode)
 {
     vlc_action_id_t amore = ACTIONID_NONE, aless = ACTIONID_NONE;
@@ -460,9 +460,9 @@ static void vlc_AddWheelMapping (void **map, uint32_t kmore, uint32_t kless,
     }
 
     if (amore != ACTIONID_NONE)
-        vlc_AddMapping (map, kmore, amore);
+        add_mapping (map, kmore, amore);
     if (aless != ACTIONID_NONE)
-        vlc_AddMapping (map, kless, aless);
+        add_mapping (map, kless, aless);
 }
 
 
@@ -472,7 +472,7 @@ static void vlc_AddWheelMapping (void **map, uint32_t kmore, uint32_t kless,
  * \param confname VLC configuration item to read mappings from
  * \param action action ID
  */
-static void vlc_InitAction (vlc_object_t *obj, void **map,
+static void init_action (vlc_object_t *obj, void **map,
                             const char *confname, vlc_action_id_t action)
 {
     char *keys = var_InheritString (obj, confname);
@@ -490,7 +490,7 @@ static void vlc_InitAction (vlc_object_t *obj, void **map,
             continue;
         }
 
-        if (vlc_AddMapping (map, code, action) == EEXIST)
+        if (add_mapping (map, code, action) == EEXIST)
             msg_Warn (obj, "Key \"%s\" bound to multiple actions", key);
     }
     free (keys);
@@ -535,15 +535,15 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
         char name[12 + MAXACTION];
 
         snprintf (name, sizeof (name), "global-key-%s", s_names2actions[i].psz);
-        vlc_InitAction (obj, &as->map, name + 7, s_names2actions[i].id);
-        vlc_InitAction (obj, &as->global_map, name, s_names2actions[i].id);
+        init_action (obj, &as->map, name + 7, s_names2actions[i].id);
+        init_action (obj, &as->global_map, name, s_names2actions[i].id);
     }
     keys->psz_action = NULL;
 
     /* Initialize mouse wheel events */
-    vlc_AddWheelMapping (&as->map, KEY_MOUSEWHEELRIGHT, KEY_MOUSEWHEELLEFT,
+    add_wheel_mapping (&as->map, KEY_MOUSEWHEELRIGHT, KEY_MOUSEWHEELLEFT,
                          var_InheritInteger (obj, "hotkeys-x-wheel-mode"));
-    vlc_AddWheelMapping (&as->map, KEY_MOUSEWHEELUP, KEY_MOUSEWHEELDOWN,
+    add_wheel_mapping (&as->map, KEY_MOUSEWHEELUP, KEY_MOUSEWHEELDOWN,
                          var_InheritInteger (obj, "hotkeys-y-wheel-mode"));
 
     libvlc_priv(libvlc)->actions = as;
