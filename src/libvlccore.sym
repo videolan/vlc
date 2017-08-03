@@ -510,6 +510,7 @@ video_format_GetTransform
 video_format_IsSimilar
 video_format_Setup
 video_format_Print
+vlc_actions_get_id
 vlc_b64_decode
 vlc_b64_decode_binary
 vlc_b64_decode_binary_to_buffer
@@ -571,7 +572,6 @@ vlc_fourcc_IsYUV
 vlc_fourcc_GetRGBFallback
 vlc_fourcc_GetYUVFallback
 vlc_fourcc_AreUVPlanesSwapped
-vlc_GetActionId
 vlc_getaddrinfo
 vlc_getaddrinfo_i11e
 vlc_getnameinfo

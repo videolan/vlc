@@ -593,7 +593,8 @@ static int actcmp(const void *key, const void *ent)
  * Get the action ID from the action name in the configuration subsystem.
  * @return the action ID or ACTIONID_NONE on error.
  */
-vlc_action_id_t vlc_GetActionId (const char *name)
+vlc_action_id_t
+vlc_actions_get_id (const char *name)
 {
     const struct action *act;
 

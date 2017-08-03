@@ -715,7 +715,7 @@ static void *Run( void *data )
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
             var_SetInteger( p_intf->obj.libvlc, "key-action",
-                            vlc_GetActionId( psz_arg ) );
+                            vlc_actions_get_id( psz_arg ) );
         }
         else switch( psz_cmd[0] )
         {

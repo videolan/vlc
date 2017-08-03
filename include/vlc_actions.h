@@ -247,7 +247,12 @@ typedef enum vlc_action_id {
 
 } vlc_action_id_t;
 
-VLC_API vlc_action_id_t vlc_GetActionId(const char *psz_key) VLC_USED;
+/**
+ * Get the action ID from an action key name
+ * \return the action ID or ACTIONID_NONE on error.
+ */
+VLC_API vlc_action_id_t
+vlc_actions_get_id(const char *psz_key_name);
 
 struct hotkey
 {

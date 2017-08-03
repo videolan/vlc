@@ -308,7 +308,7 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                     return 0;
 
                 /* search for key associated with VLC */
-                vlc_action_id_t action = vlc_GetActionId( psz_atomName );
+                vlc_action_id_t action = vlc_actions_get_id( psz_atomName );
                 if( action != ACTIONID_NONE )
                 {
                     var_SetInteger( p_intf->obj.libvlc,
