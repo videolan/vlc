@@ -42,6 +42,7 @@ function print_playlist(item)
     if item.flags.disabled then return end
     if(item.children) then
         local name = vlc.strings.convert_xml_special_chars(item.name or "")
+        name = name or ""
         if(name ~= "Undefined") then
 			print('<item id="plid_' ..tostring(item.id).. '" name="' ..tostring(name).. '" ro="' ..(item.flags.ro and "ro" or "rw").. '"><content><name>' ..name.. '</name></content>')
 			for _, child in ipairs(item.children) do
@@ -55,6 +56,7 @@ function print_playlist(item)
 		end
     else
         local name, path = vlc.strings.convert_xml_special_chars(item.name or "", item.path or "")
+        name = name or ""
         local current_item_id = vlc.playlist.current()
         local current = ""
         -- Is the item the one currently played
