@@ -2295,7 +2295,7 @@ AS_IF([test "${enable_avcodec}" != "no"], [
   case "${avfork}" in
     libav) av_codec_ver="57.16.0" ;;
     ffmpeg) av_codec_ver="57.37.100" ;;
-    *) AC_MSG_ERROR([Missing libav or FFmpeg])
+    *) AC_MSG_ERROR([Missing libav or FFmpeg. Pass --disable-avcodec to ignore this error.])
   esac
   PKG_CHECK_MODULES(AVCODEC,[libavcodec >= ${av_codec_ver} libavutil >= 52.0.0], [
     VLC_SAVE_FLAGS
@@ -3503,7 +3503,7 @@ AS_IF([test "${enable_alsa}" != "no"], [
     have_alsa="yes"
   ], [
     AS_IF([test "x${enable_alsa}" != "x"], [
-      AC_MSG_ERROR([$ALSA_PKG_ERRORS. alsa-lib 1.0.24 or later required.])
+      AC_MSG_ERROR([$ALSA_PKG_ERRORS. alsa-lib 1.0.24 or later required. Pass --disable-alsa to ignore this error.])
     ])
   ])
 ])
