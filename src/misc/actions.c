@@ -29,10 +29,6 @@
  * This file defines functions and structures for hotkey handling in vlc
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #include <assert.h>
 #include <stdlib.h>
 #include <limits.h>
