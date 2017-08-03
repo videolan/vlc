@@ -801,8 +801,8 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 {
     SegmentSeeker::tracks_seekpoint_t seekpoints;
 
-    uint64_t i_seek_position = -1;
-    mtime_t i_mk_seek_time   = -1;
+    SegmentSeeker::fptr_t i_seek_position = std::numeric_limits<SegmentSeeker::fptr_t>::max();
+    mtime_t i_mk_seek_time = -1;
     mtime_t i_mk_date = i_absolute_mk_date - i_mk_time_offset;
 
     // reset information for all tracks //
