@@ -151,7 +151,8 @@ SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end
 }
 
 SegmentSeeker::seekpoint_pair_t
-SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoints, int trust_level )
+SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoints,
+                                      Seekpoint::TrustLevel trust_level )
 {
     if( seekpoints.empty() )
     {
