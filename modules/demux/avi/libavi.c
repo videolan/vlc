@@ -307,8 +307,10 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
     p_read += size \
 
 #define AVI_READCHUNK_EXIT( code ) \
-    free( p_buff ); \
-    return code
+    do { \
+        free( p_buff ); \
+        return code; \
+    } while(0)
 
 static inline uint8_t GetB( uint8_t *ptr )
 {
