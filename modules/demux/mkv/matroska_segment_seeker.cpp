@@ -179,8 +179,7 @@ SegmentSeeker::get_first_seekpoint_around( mtime_t pts, seekpoints_t const& seek
 }
 
 SegmentSeeker::seekpoint_pair_t
-SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoints,
-                                      Seekpoint::TrustLevel trust_level )
+SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoints )
 {
     if( seekpoints.empty() )
     {
@@ -195,22 +194,8 @@ SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoint
     iterator const it_end    = seekpoints.end();
     iterator const it_middle = greatest_lower_bound( it_begin, it_end, needle );
 
-    iterator it_before;
-    iterator it_after;
-
-    // rewrind to _previous_ seekpoint with appropriate trust
-    for( it_before = it_middle; it_before != it_begin; --it_before )
-    {
-        if( it_before->trust_level >= trust_level )
-            break;
-    }
-
-    // forward to following seekpoint with appropriate trust
-    for( it_after = next_( it_middle ); it_after != it_end; ++it_after )
-    {
-        if( it_after->trust_level >= trust_level )
-            break;
-    }
+    iterator it_before = it_middle;
+    iterator it_after = it_middle == it_end ? it_middle : next_( it_middle ) ;
 
     return seekpoint_pair_t( *it_before,
       it_after == it_end ? Seekpoint() : *it_after
