@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include "evt_input.hpp"
-#include "vlc_keys.h"
+#include "vlc_actions.h"
 
 const int
     EvtInput::kModNone=0,

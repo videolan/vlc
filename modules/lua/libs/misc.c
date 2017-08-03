@@ -40,7 +40,7 @@
 #include <vlc_plugin.h>
 #include <vlc_meta.h>
 #include <vlc_interface.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #include <vlc_interrupt.h>
 
 #include "../vlc.h"

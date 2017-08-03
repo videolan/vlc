@@ -1,7 +1,7 @@
 /*****************************************************************************
- * keys.c: keys configuration
+ * actions.c: handle vlc actions
  *****************************************************************************
- * Copyright (C) 2003-2009 VLC authors and VideoLAN
+ * Copyright (C) 2003-2016 VLC authors and VideoLAN
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *
@@ -41,9 +41,9 @@
 #include <errno.h>
 
 #include <vlc_common.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #include <vlc_charset.h>
-#include "configuration.h"
+#include "config/configuration.h"
 #include "libvlc.h"
 
 typedef struct key_descriptor_s

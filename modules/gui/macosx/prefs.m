@@ -59,7 +59,7 @@
 #import "VLCSimplePrefsController.h"
 #import "prefs_widgets.h"
 #import "VLCCoreInteraction.h"
-#import <vlc_keys.h>
+#import <vlc_actions.h>
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
 

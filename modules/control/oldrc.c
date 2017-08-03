@@ -43,7 +43,7 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 #include <sys/types.h>
 #include <unistd.h>

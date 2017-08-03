@@ -49,7 +49,7 @@ public:
     ActionType_t getKeyState() const { return m_action; }
 
 private:
-    /// The concerned key, stored according to the '#define's in vlc_keys.h
+    /// The concerned key, stored according to the '#define's in vlc_actions.h
     /// but without the modifiers (which are stored in EvtInput)
     int m_key;
     /// Type of action

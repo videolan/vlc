@@ -29,7 +29,7 @@
 #import "VLCMainMenu.h"
 #import "VLCControlsBarCommon.h"
 #import "VLCCoreInteraction.h"
-#import <vlc_keys.h>
+#import <vlc_actions.h>
 
 /*****************************************************************************
  * VLCDragDropView

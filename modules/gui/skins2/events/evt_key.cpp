@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include "evt_key.hpp"
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 
 const std::string EvtKey::getAsString() const

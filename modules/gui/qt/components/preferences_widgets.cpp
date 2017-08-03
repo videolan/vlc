@@ -35,7 +35,7 @@
 #include "util/customwidgets.hpp"
 #include "util/searchlineedit.hpp"
 #include "util/qt_dirs.hpp"
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>

@@ -41,7 +41,7 @@
 #include "../libvlc.h"
 #include <vlc_charset.h>
 #include <vlc_fs.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 

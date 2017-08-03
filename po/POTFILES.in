@@ -1,5 +1,6 @@
 # main sources
 include/vlc_access.h
+include/vlc_actions.h
 include/vlc_aout.h
 include/vlc_arrays.h
 include/vlc_bits.h
@@ -26,7 +27,6 @@ include/vlc_image.h
 include/vlc_input.h
 include/vlc_intf_strings.h
 include/vlc_iso_lang.h
-include/vlc_keys.h
 include/vlc/libvlc_events.h
 include/vlc/libvlc.h
 include/vlc/libvlc_media_list.h
@@ -70,7 +70,6 @@ src/config/core.c
 src/config/file.c
 src/config/help.c
 src/config/intf.c
-src/config/keys.c
 src/darwin/error.c
 src/extras/libc.c
 src/extras/tdestroy.c
@@ -100,6 +99,7 @@ src/interface/interface.c
 src/libvlc.c
 src/libvlc.h
 src/libvlc-module.c
+src/misc/actions.c
 src/misc/block.c
 src/misc/cpu.c
 src/misc/error.c

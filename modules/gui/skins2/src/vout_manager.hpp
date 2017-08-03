@@ -28,7 +28,7 @@
 
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #include "../utils/position.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_video.hpp"

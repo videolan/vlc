@@ -47,7 +47,7 @@
 #include "../utils/position.hpp"
 #include "../utils/ustring.hpp"
 
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #include <vlc_input.h>
 #include <vlc_url.h>
 #include <list>

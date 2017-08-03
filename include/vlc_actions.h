@@ -1,7 +1,7 @@
 /*****************************************************************************
- * vlc_keys.h: keycode defines
+ * vlc_actions.h: handle vlc actions
  *****************************************************************************
- * Copyright (C) 2003-2009 VLC authors and VideoLAN
+ * Copyright (C) 2003-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_KEYS_H
-#define VLC_KEYS_H 1
+#ifndef VLC_ACTIONS_H
+#define VLC_ACTIONS_H 1
 
 /**
  * \file

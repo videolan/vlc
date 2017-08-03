@@ -27,7 +27,7 @@
 
 #include "win32touch.h"
 
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 #include <assert.h>
 

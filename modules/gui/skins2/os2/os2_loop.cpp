@@ -34,7 +34,7 @@
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_refresh.hpp"
 #include "../events/evt_scroll.hpp"
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 
 #define GET_X_MP( mp ) ( SHORT1FROMMP( mp ))

@@ -48,7 +48,7 @@
 #import "VLCResumeDialogController.h"
 #import "VLCOpenWindowController.h"
 
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #import <vlc_interface.h>
 #include <vlc_url.h>
 

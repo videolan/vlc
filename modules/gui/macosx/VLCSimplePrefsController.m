@@ -27,7 +27,7 @@
 #import "CompatibilityFixes.h"
 #import "VLCSimplePrefsController.h"
 #import "prefs.h"
-#import <vlc_keys.h>
+#import <vlc_actions.h>
 #import <vlc_interface.h>
 #import <vlc_dialog.h>
 #import <vlc_modules.h>

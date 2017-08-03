@@ -30,7 +30,7 @@
 #include "os_window.hpp"
 #include "../events/evt_key.hpp"
 
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 
 VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,

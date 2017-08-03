@@ -27,7 +27,7 @@
 #include "stream_io_callback.hpp"
 #include "Ebml_parser.hpp"
 
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
 {

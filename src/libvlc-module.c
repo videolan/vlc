@@ -39,7 +39,7 @@
 #include "modules/modules.h"
 
 //#define Nothing here, this is just to prevent update-po from being stupid
-#include "vlc_keys.h"
+#include "vlc_actions.h"
 #include "vlc_meta.h"
 #include <vlc_aout.h>
 

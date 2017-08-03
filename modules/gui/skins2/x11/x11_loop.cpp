@@ -42,7 +42,7 @@
 #include "../events/evt_scroll.hpp"
 #include "../commands/async_queue.hpp"
 #include "../utils/var_bool.hpp"
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 
 // Maximum interval between clicks for a double-click (in microsec)

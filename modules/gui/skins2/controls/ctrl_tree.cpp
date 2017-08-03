@@ -39,7 +39,7 @@
 #include "../events/evt_scroll.hpp"
 #include "../events/evt_dragndrop.hpp"
 #include "../vars/playtree.hpp"
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 #define LINE_INTERVAL 1  // Number of pixels inserted between 2 lines
 

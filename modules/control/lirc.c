@@ -36,7 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 #ifdef HAVE_POLL
 # include <poll.h>

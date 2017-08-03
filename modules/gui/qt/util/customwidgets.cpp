@@ -37,7 +37,7 @@
 #include <QWheelEvent>
 #include <QPixmap>
 #include <QApplication>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 QFramelessButton::QFramelessButton( QWidget *parent )
                     : QPushButton( parent )

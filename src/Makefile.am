@@ -23,6 +23,7 @@ pluginsincludedir = $(pkgincludedir)/plugins
 
 pluginsinclude_HEADERS = \
 	../include/vlc_access.h \
+	../include/vlc_actions.h \
 	../include/vlc_addons.h \
 	../include/vlc_aout.h \
 	../include/vlc_aout_volume.h \
@@ -58,7 +59,6 @@ pluginsinclude_HEADERS = \
 	../include/vlc_input.h \
 	../include/vlc_input_item.h \
 	../include/vlc_interface.h \
-	../include/vlc_keys.h \
 	../include/vlc_keystore.h \
 	../include/vlc_main.h \
 	../include/vlc_md5.h \
@@ -195,7 +195,6 @@ libvlccore_la_SOURCES = \
 	config/file.c \
 	config/help.c \
 	config/intf.c \
-	config/keys.c \
 	config/cmdline.c \
 	config/getopt.c \
 	config/vlc_getopt.h \
@@ -310,6 +309,7 @@ libvlccore_la_SOURCES = \
 	text/filesystem.c \
 	text/iso_lang.c \
 	text/iso-639_def.h \
+	misc/actions.c \
 	misc/background_worker.c \
 	misc/background_worker.h \
 	misc/md5.c \

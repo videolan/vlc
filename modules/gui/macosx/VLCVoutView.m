@@ -39,7 +39,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-#import <vlc_keys.h>
+#import <vlc_actions.h>
 
 
 /*****************************************************************************

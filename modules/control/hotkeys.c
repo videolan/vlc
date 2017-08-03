@@ -39,7 +39,7 @@
 #include <vlc_viewpoint.h>
 #include <vlc_vout_osd.h>
 #include <vlc_playlist.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 #include "math.h"
 
 #include <assert.h>

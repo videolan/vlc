@@ -30,7 +30,7 @@
 #include "input_manager.hpp"
 #include "recents.hpp"
 
-#include <vlc_keys.h>           /* ACTION_ID */
+#include <vlc_actions.h>           /* ACTION_ID */
 #include <vlc_url.h>            /* vlc_uri_decode */
 #include <vlc_strings.h>        /* vlc_strfinput */
 #include <vlc_aout.h>           /* audio_output_t */

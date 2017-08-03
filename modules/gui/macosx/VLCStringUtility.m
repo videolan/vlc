@@ -43,7 +43,7 @@ NSString *const kVLCMediaVideoTSFolder = @"VIDEO_TS";
 NSString *const kVLCMediaBDMVFolder = @"BDMV";
 NSString *const kVLCMediaUnknown = @"Unknown";
 
-#import <vlc_keys.h>
+#import <vlc_actions.h>
 #import <vlc_strings.h>
 
 @implementation VLCStringUtility

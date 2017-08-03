@@ -35,7 +35,7 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
-#include <vlc_keys.h>
+#include <vlc_actions.h>
 
 #include "libvlc_internal.h"
 #include "media_internal.h" // libvlc_media_set_state()
