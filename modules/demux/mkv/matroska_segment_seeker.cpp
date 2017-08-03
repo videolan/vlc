@@ -161,7 +161,7 @@ SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoint
 
     typedef seekpoints_t::const_iterator iterator;
 
-    Seekpoint const needle ( Seekpoint::DISABLED, -1, pts );
+    Seekpoint const needle ( Seekpoint::DISABLED, std::numeric_limits<fptr_t>::max(), pts );
 
     iterator const it_begin  = seekpoints.begin();
     iterator const it_end    = seekpoints.end();
