@@ -302,7 +302,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
     search_area.start = ms.es.I_O().getFilePointer();
 
     fptr_t  block_pos = search_area.start;
-    mtime_t block_pts = std::numeric_limits<mtime_t>::max();
+    mtime_t block_pts;
 
     while( block_pos < search_area.end )
     {
