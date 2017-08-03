@@ -399,7 +399,7 @@ static int keycmp (const void *a, const void *b)
     return (ka->key < kb->key) ? -1 : (ka->key > kb->key) ? +1 : 0;
 }
 
-struct vlc_actions
+struct vlc_actions_t
 {
     void *map; /* Key map */
     void *global_map; /* Grabbed/global key map */
@@ -511,7 +511,7 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
 
     vlc_object_t *obj = VLC_OBJECT(libvlc);
     struct hotkey *keys;
-    struct vlc_actions *as = malloc (sizeof (*as) + ACTIONS_COUNT * sizeof (*keys));
+    vlc_actions_t *as = malloc (sizeof (*as) + ACTIONS_COUNT * sizeof (*keys));
 
     if (unlikely(as == NULL))
         return VLC_ENOMEM;
@@ -567,7 +567,7 @@ void libvlc_InternalActionsClean (libvlc_int_t *libvlc)
 {
     assert(libvlc != NULL);
 
-    struct vlc_actions *as = libvlc_priv(libvlc)->actions;
+    vlc_actions_t *as = libvlc_priv(libvlc)->actions;
     if (unlikely(as == NULL))
         return;
 
