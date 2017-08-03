@@ -50,7 +50,7 @@ package-win-common: package-win-install
 
 if BUILD_LUA
 	mkdir -p $(win32_destdir)/lua/
-	cp -r $(prefix)/lib/vlc/lua/* $(prefix)/share/vlc/lua/* $(win32_destdir)/lua/
+	cp -r $(prefix)/share/vlc/lua/* $(win32_destdir)/lua/
 endif
 
 if BUILD_SKINS
