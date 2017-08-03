@@ -61,12 +61,12 @@ class SegmentSeeker
                 DISABLED = -1,
             };
 
-            Seekpoint( TrustLevel trust_level, fptr_t fpos, mtime_t pts, mtime_t duration = -1 )
-                : fpos( fpos ), pts( pts ), duration( duration ), trust_level( trust_level )
+            Seekpoint( TrustLevel trust_level, fptr_t fpos, mtime_t pts )
+                : fpos( fpos ), pts( pts ), trust_level( trust_level )
             { }
 
             Seekpoint()
-                : fpos( std::numeric_limits<fptr_t>::max() ), pts( -1 ), duration( -1 ), trust_level( DISABLED )
+                : fpos( std::numeric_limits<fptr_t>::max() ), pts( -1 ), trust_level( DISABLED )
             { }
 
             bool operator<( Seekpoint const& rhs ) const
@@ -76,7 +76,6 @@ class SegmentSeeker
 
             fptr_t fpos;
             mtime_t pts;
-            mtime_t duration;
             TrustLevel trust_level;
         };
 
