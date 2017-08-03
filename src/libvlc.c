@@ -54,6 +54,7 @@
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
+#include <vlc_actions.h>
 #include <vlc_charset.h>
 #include <vlc_dialog.h>
 #include <vlc_keystore.h>
@@ -233,8 +234,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Initialize hotkey handling
      */
-    priv->actions = vlc_InitActions( p_libvlc );
-    if( !priv->actions )
+    if( libvlc_InternalActionsInit( p_libvlc ) != VLC_SUCCESS )
         goto error;
 
     /*
@@ -416,7 +416,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     if (priv->parser != NULL)
         playlist_preparser_Delete(priv->parser);
 
-    vlc_DeinitActions( p_libvlc, priv->actions );
+    libvlc_InternalActionsClean( p_libvlc );
 
     /* Save the configuration */
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )

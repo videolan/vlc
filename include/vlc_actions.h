@@ -24,6 +24,14 @@
 #ifndef VLC_ACTIONS_H
 #define VLC_ACTIONS_H 1
 
+/* Called from src/libvlc.c */
+int
+libvlc_InternalActionsInit(libvlc_int_t *p_libvlc);
+
+/* Called from src/libvlc.c */
+void
+libvlc_InternalActionsClean(libvlc_int_t *p_libvlc);
+
 /**
  * \file
  * This file defines keys and functions

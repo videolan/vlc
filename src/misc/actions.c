@@ -33,6 +33,7 @@
 # include <config.h>
 #endif
 
+#include <assert.h>
 #include <stdlib.h>
 #include <limits.h>
 #ifdef HAVE_SEARCH_H
@@ -504,14 +505,16 @@ static void vlc_InitAction (vlc_object_t *obj, void **map,
 /**
  * Initializes the key map from configuration.
  */
-struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
+int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
 {
+    assert(libvlc != NULL);
+
     vlc_object_t *obj = VLC_OBJECT(libvlc);
     struct hotkey *keys;
     struct vlc_actions *as = malloc (sizeof (*as) + ACTIONS_COUNT * sizeof (*keys));
 
     if (unlikely(as == NULL))
-        return NULL;
+        return VLC_ENOMEM;
     as->map = NULL;
     as->global_map = NULL;
     keys = as->keys;
@@ -549,18 +552,22 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
     vlc_AddWheelMapping (&as->map, KEY_MOUSEWHEELUP, KEY_MOUSEWHEELDOWN,
                          var_InheritInteger (obj, "hotkeys-y-wheel-mode"));
 
+    libvlc_priv(libvlc)->actions = as;
     libvlc->p_hotkeys = as->keys;
     var_AddCallback (obj, "key-pressed", vlc_key_to_action, &as->map);
     var_AddCallback (obj, "global-key-pressed", vlc_key_to_action,
                      &as->global_map);
-    return as;
+    return VLC_SUCCESS;
 }
 
 /**
  * Destroys the key map.
  */
-void vlc_DeinitActions (libvlc_int_t *libvlc, struct vlc_actions *as)
+void libvlc_InternalActionsClean (libvlc_int_t *libvlc)
 {
+    assert(libvlc != NULL);
+
+    struct vlc_actions *as = libvlc_priv(libvlc)->actions;
     if (unlikely(as == NULL))
         return;
 
@@ -571,6 +578,7 @@ void vlc_DeinitActions (libvlc_int_t *libvlc, struct vlc_actions *as)
     tdestroy (as->global_map, free);
     tdestroy (as->map, free);
     free (as);
+    libvlc_priv(libvlc)->actions = NULL;
     libvlc->p_hotkeys = NULL;
 }
 

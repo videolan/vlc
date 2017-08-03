@@ -31,8 +31,6 @@ typedef struct variable_t variable_t;
 
 /* Actions (hot keys) */
 struct vlc_actions;
-struct vlc_actions *vlc_InitActions (libvlc_int_t *);
-extern void vlc_DeinitActions (libvlc_int_t *, struct vlc_actions *);
 
 /*
  * OS-specific initialization
