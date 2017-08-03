@@ -259,13 +259,11 @@ found:
 /*** VLC key map ***/
 
 #define MAXACTION 26
-struct action
+static const struct name2action
 {
-    char name[MAXACTION];
-    vlc_action_id_t value;
-};
-
-static const struct action actions[] =
+    char psz[MAXACTION];
+    vlc_action_id_t id;
+} s_names2actions[] =
 {
     /* *MUST* be sorted (ASCII order) */
     { "aspect-ratio", ACTIONID_ASPECT_RATIO, },
@@ -380,7 +378,7 @@ static const struct action actions[] =
     { "zoom-original", ACTIONID_ZOOM_ORIGINAL, },
     { "zoom-quarter", ACTIONID_ZOOM_QUARTER, },
 };
-#define ACTIONS_COUNT (sizeof (actions) / sizeof (actions[0]))
+#define ACTIONS_COUNT (sizeof (s_names2actions) / sizeof (s_names2actions[0]))
 
 struct mapping
 {
@@ -524,21 +522,21 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
     {
 #ifndef NDEBUG
         if (i > 0
-         && strcmp (actions[i-1].name, actions[i].name) >= 0)
+         && strcmp (s_names2actions[i-1].psz, s_names2actions[i].psz) >= 0)
         {
             msg_Err (libvlc, "key-%s and key-%s are not ordered properly",
-                     actions[i-1].name, actions[i].name);
+                     s_names2actions[i-1].psz, s_names2actions[i].psz);
             abort ();
         }
 #endif
-        keys->psz_action = actions[i].name;
+        keys->psz_action = s_names2actions[i].psz;
         keys++;
 
         char name[12 + MAXACTION];
 
-        snprintf (name, sizeof (name), "global-key-%s", actions[i].name);
-        vlc_InitAction (obj, &as->map, name + 7, actions[i].value);
-        vlc_InitAction (obj, &as->global_map, name, actions[i].value);
+        snprintf (name, sizeof (name), "global-key-%s", s_names2actions[i].psz);
+        vlc_InitAction (obj, &as->map, name + 7, s_names2actions[i].id);
+        vlc_InitAction (obj, &as->global_map, name, s_names2actions[i].id);
     }
     keys->psz_action = NULL;
 
@@ -581,8 +579,8 @@ void libvlc_InternalActionsClean (libvlc_int_t *libvlc)
 
 static int actcmp(const void *key, const void *ent)
 {
-    const struct action *act = ent;
-    return strcmp(key, act->name);
+    const struct name2action *act = ent;
+    return strcmp(key, act->psz);
 }
 
 /**
@@ -592,12 +590,12 @@ static int actcmp(const void *key, const void *ent)
 vlc_action_id_t
 vlc_actions_get_id (const char *name)
 {
-    const struct action *act;
+    const struct name2action *act;
 
     if (strncmp (name, "key-", 4))
         return ACTIONID_NONE;
     name += 4;
 
-    act = bsearch(name, actions, ACTIONS_COUNT, sizeof(*act), actcmp);
-    return (act != NULL) ? act->value : ACTIONID_NONE;
+    act = bsearch(name, s_names2actions, ACTIONS_COUNT, sizeof(*act), actcmp);
+    return (act != NULL) ? act->id : ACTIONID_NONE;
 }
