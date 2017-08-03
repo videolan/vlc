@@ -102,6 +102,7 @@ class SegmentSeeker
         void add_seekpoint( track_id_t track_id, Seekpoint::TrustLevel level, fptr_t fpos, mtime_t pts );
 
         seekpoint_pair_t get_seekpoints_around( mtime_t, seekpoints_t const&, Seekpoint::TrustLevel = Seekpoint::DISABLED );
+        Seekpoint get_first_seekpoint_around( mtime_t, seekpoints_t const&, Seekpoint::TrustLevel = Seekpoint::TRUSTED );
         seekpoint_pair_t get_seekpoints_around( mtime_t, track_ids_t const& );
 
         tracks_seekpoint_t get_seekpoints( matroska_segment_c&, mtime_t, track_ids_t const& );

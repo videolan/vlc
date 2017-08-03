@@ -136,7 +136,7 @@ SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end
 
     for( tracks_seekpoints_t::const_iterator it = _tracks_seekpoints.begin(); it != _tracks_seekpoints.end(); ++it )
     {
-        Seekpoint sp = get_seekpoints_around( end_pts, it->second, Seekpoint::TRUSTED ).first;
+        Seekpoint sp = get_first_seekpoint_around( end_pts, it->second );
 
         if( sp.fpos < start_fpos )
             continue;
@@ -148,6 +148,34 @@ SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end
     }
 
     return tpoints;
+}
+
+SegmentSeeker::Seekpoint
+SegmentSeeker::get_first_seekpoint_around( mtime_t pts, seekpoints_t const& seekpoints,
+                                           Seekpoint::TrustLevel trust_level )
+{
+    if( seekpoints.empty() )
+    {
+        return Seekpoint();
+    }
+
+    typedef seekpoints_t::const_iterator iterator;
+
+    Seekpoint const needle ( Seekpoint::DISABLED, std::numeric_limits<fptr_t>::max(), pts );
+
+    iterator const it_begin  = seekpoints.begin();
+    iterator const it_end    = seekpoints.end();
+    iterator const it_middle = greatest_lower_bound( it_begin, it_end, needle );
+
+    iterator it_before;
+
+    // rewrind to _previous_ seekpoint with appropriate trust
+    for( it_before = it_middle; it_before != it_begin; --it_before )
+    {
+        if( it_before->trust_level >= trust_level )
+            return *it_before;
+    }
+    return *it_begin;
 }
 
 SegmentSeeker::seekpoint_pair_t
