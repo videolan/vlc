@@ -61,7 +61,7 @@ class SegmentSeeker
                 DISABLED = -1,
             };
 
-            Seekpoint( TrustLevel trust_level, fptr_t fpos, mtime_t pts )
+            Seekpoint( fptr_t fpos, mtime_t pts, TrustLevel trust_level = TrustLevel::TRUSTED )
                 : fpos( fpos ), pts( pts ), trust_level( trust_level )
             { }
 

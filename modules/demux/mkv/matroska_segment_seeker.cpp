@@ -159,7 +159,7 @@ SegmentSeeker::get_first_seekpoint_around( mtime_t pts, seekpoints_t const& seek
 
     typedef seekpoints_t::const_iterator iterator;
 
-    Seekpoint const needle ( Seekpoint::DISABLED, std::numeric_limits<fptr_t>::max(), pts );
+    Seekpoint const needle ( std::numeric_limits<fptr_t>::max(), pts );
 
     iterator const it_begin  = seekpoints.begin();
     iterator const it_end    = seekpoints.end();
@@ -186,7 +186,7 @@ SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoint
 
     typedef seekpoints_t::const_iterator iterator;
 
-    Seekpoint const needle ( Seekpoint::DISABLED, std::numeric_limits<fptr_t>::max(), pts );
+    Seekpoint const needle ( std::numeric_limits<fptr_t>::max(), pts );
 
     iterator const it_begin  = seekpoints.begin();
     iterator const it_end    = seekpoints.end();
@@ -346,7 +346,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
         if( b_valid_track )
         {
             if( b_key_picture )
-                add_seekpoint( track_id, Seekpoint( Seekpoint::TRUSTED, block_pos, block_pts ) );
+                add_seekpoint( track_id, Seekpoint( block_pos, block_pts ) );
 
             if( max_pts < block_pts )
                 break;

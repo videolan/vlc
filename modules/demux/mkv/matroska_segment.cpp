@@ -217,7 +217,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                     }
 
                     _seeker.add_seekpoint( track_id,
-                        SegmentSeeker::Seekpoint(level, cue_position, cue_mk_time) );
+                        SegmentSeeker::Seekpoint( cue_position, cue_mk_time, level ) );
                 }
                 else
                     msg_Warn( &sys.demuxer, "Found cue with invalid track id = %u", track_id );
@@ -639,8 +639,7 @@ bool matroska_segment_c::Preload( )
                  it != tracks.end(); ++it )
             {
                 _seeker.add_seekpoint( it->first,
-                    SegmentSeeker::Seekpoint( SegmentSeeker::Seekpoint::TRUSTED,
-                                              cluster->GetElementPosition(), 0 ) );
+                    SegmentSeeker::Seekpoint( cluster->GetElementPosition(), 0 ) );
             }
 
             ep->Down();
@@ -1209,8 +1208,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 bool const b_valid_track = vars.obj->FindTrackByBlock( NULL, &ksblock ) != NULL;
                 if (b_valid_track)
                     vars.obj->_seeker.add_seekpoint( ksblock.TrackNum(),
-                        SegmentSeeker::Seekpoint( SegmentSeeker::Seekpoint::TRUSTED,
-                                                  ksblock.GetElementPosition(), ksblock.GlobalTimecode() / 1000 ) );
+                        SegmentSeeker::Seekpoint( ksblock.GetElementPosition(), ksblock.GlobalTimecode() / 1000 ) );
             }
         }
     };
@@ -1229,8 +1227,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             if( p_track != NULL && p_track->fmt.i_cat == SPU_ES )
             {
                 vars.obj->_seeker.add_seekpoint( kblock.TrackNum(),
-                    SegmentSeeker::Seekpoint( SegmentSeeker::Seekpoint::TRUSTED,
-                                              kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 ) );
+                    SegmentSeeker::Seekpoint( kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 ) );
             }
 
             vars.obj->ep->Keep ();
