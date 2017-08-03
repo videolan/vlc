@@ -293,52 +293,49 @@ static bool Mapping( intf_thread_t *p_intf )
     for( const char* const* ppsz_keys = vlc_actions_get_key_names( p_intf );
          *ppsz_keys != NULL; ppsz_keys++ )
     {
-        char varname[12 + strlen( *ppsz_keys )];
-        sprintf( varname, "global-key-%s", *ppsz_keys );
+        uint_fast32_t *p_keys;
+        size_t i_nb_keys = vlc_actions_get_keycodes( p_intf, *ppsz_keys, true,
+                                                     &p_keys );
 
-        char *key = var_InheritString( p_intf, varname );
-        if( key == NULL )
-            continue;
-
-        uint_fast32_t i_vlc_key = vlc_str2keycode( key );
-        free( key );
-        if( i_vlc_key == KEY_UNSET )
-            continue;
-
-        const unsigned i_modifier = GetX11Modifier( p_sys->p_connection,
-                p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
-
-        const size_t max = sizeof(p_x11_modifier_ignored) /
-                sizeof(*p_x11_modifier_ignored);
-        for( unsigned int i = 0; i < max; i++ )
+        for( size_t i = 0; i < i_nb_keys; ++i )
         {
-            const unsigned i_ignored = GetModifier( p_sys->p_connection,
-                    p_sys->p_symbols, p_x11_modifier_ignored[i] );
-            if( i != 0 && i_ignored == 0)
-                continue;
+            uint_fast32_t i_vlc_key = p_keys[i];
+            const unsigned i_modifier = GetX11Modifier( p_sys->p_connection,
+                    p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
 
-            xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode(
-                p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
-
-            if( !p_keys )
-                break;
-
-            hotkey_mapping_t *p_map = realloc( p_sys->p_map,
-                              sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
-            if( !p_map )
+            const size_t max = sizeof(p_x11_modifier_ignored) /
+                    sizeof(*p_x11_modifier_ignored);
+            for( unsigned int i = 0; i < max; i++ )
             {
-                free( p_keys );
-                break;
-            }
-            p_sys->p_map = p_map;
-            p_map += p_sys->i_map;
-            p_sys->i_map++;
+                const unsigned i_ignored = GetModifier( p_sys->p_connection,
+                        p_sys->p_symbols, p_x11_modifier_ignored[i] );
+                if( i != 0 && i_ignored == 0)
+                    continue;
 
-            p_map->p_keys = p_keys;
-            p_map->i_modifier = i_modifier|i_ignored;
-            p_map->i_vlc = i_vlc_key;
-            active = true;
+                xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode(
+                    p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
+
+                if( !p_keys )
+                    break;
+
+                hotkey_mapping_t *p_map = realloc( p_sys->p_map,
+                                  sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
+                if( !p_map )
+                {
+                    free( p_keys );
+                    break;
+                }
+                p_sys->p_map = p_map;
+                p_map += p_sys->i_map;
+                p_sys->i_map++;
+
+                p_map->p_keys = p_keys;
+                p_map->i_modifier = i_modifier|i_ignored;
+                p_map->i_vlc = i_vlc_key;
+                active = true;
+            }
         }
+        free( p_keys );
     }
     return active;
 }

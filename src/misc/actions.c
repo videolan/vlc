@@ -594,6 +594,45 @@ vlc_actions_get_id (const char *name)
     return (act != NULL) ? act->id : ACTIONID_NONE;
 }
 
+#undef vlc_actions_get_keycodes
+size_t
+vlc_actions_get_keycodes(vlc_object_t *p_obj, const char *psz_key_name,
+                        bool b_global, uint_fast32_t **pp_keycodes)
+{
+    char varname[12 /* "global-key-" */ + strlen( psz_key_name )];
+    sprintf( varname, "%skey-%s", b_global ? "global-" : "", psz_key_name );
+
+    *pp_keycodes = NULL;
+
+    char *psz_keys = var_InheritString( p_obj, varname );
+    if( psz_keys == NULL )
+        return 0;
+
+    size_t i_nb_keycodes = 0;
+    for( const char* psz_it = psz_keys; *psz_it; ++psz_it )
+    {
+        if( *psz_it == '\t' )
+            ++i_nb_keycodes;
+    }
+    ++i_nb_keycodes;
+    *pp_keycodes = malloc( i_nb_keycodes * sizeof( **pp_keycodes ) );
+    if( unlikely( !*pp_keycodes ) )
+    {
+        free( psz_keys );
+        return 0;
+    }
+    size_t i = 0;
+    for( char *buf, *key = strtok_r( psz_keys, "\t", &buf );
+         key != NULL;
+         key = strtok_r( NULL, "\t", &buf ), ++i )
+    {
+        (*pp_keycodes)[i] = vlc_str2keycode( key );
+    }
+    assert( i == i_nb_keycodes );
+    free( psz_keys );
+    return i_nb_keycodes;
+}
+
 #undef vlc_actions_get_key_names
 const char* const*
 vlc_actions_get_key_names(vlc_object_t *p_obj)
