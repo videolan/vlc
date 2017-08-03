@@ -43,13 +43,11 @@
 #include "config/configuration.h"
 #include "libvlc.h"
 
-struct key_descriptor
+static const struct key_descriptor
 {
-    const char psz_key_string[20];
-    uint32_t i_key_code;
-};
-
-static const struct key_descriptor vlc_keys[] =
+    const char psz[20];
+    uint32_t i_code;
+} s_keys[] =
 {   /* Alphabetical order */
     { N_("Backspace"),         KEY_BACKSPACE         },
     { N_("Brightness Down"),   KEY_BRIGHTNESS_DOWN   },
@@ -119,7 +117,7 @@ static const struct key_descriptor vlc_keys[] =
     { N_("Zoom In"),           KEY_ZOOM_IN           },
     { N_("Zoom Out"),          KEY_ZOOM_OUT          },
 };
-#define KEYS_COUNT (sizeof(vlc_keys)/sizeof(vlc_keys[0]))
+#define KEYS_COUNT (sizeof(s_keys)/sizeof(s_keys[0]))
 
 static int keystrcmp (const void *key, const void *elem)
 {
@@ -199,10 +197,10 @@ uint_fast32_t vlc_str2keycode (const char *name)
         name += len + 1;
     }
 
-    struct key_descriptor *d = bsearch (name, vlc_keys, KEYS_COUNT,
-                                        sizeof (vlc_keys[0]), keystrcmp);
+    struct key_descriptor *d = bsearch (name, s_keys, KEYS_COUNT,
+                                        sizeof (s_keys[0]), keystrcmp);
     if (d != NULL)
-        code = d->i_key_code;
+        code = d->i_code;
     else
     if (vlc_towc (name, &code) <= 0)
         code = KEY_UNSET;
@@ -233,9 +231,9 @@ char *vlc_keycode2str (uint_fast32_t code, bool locale)
     uintptr_t key = code & ~KEY_MODIFIER;
 
     for (size_t i = 0; i < KEYS_COUNT; i++)
-        if (vlc_keys[i].i_key_code == key)
+        if (s_keys[i].i_code == key)
         {
-            name = vlc_keys[i].psz_key_string;
+            name = s_keys[i].psz;
             goto found;
         }
 
