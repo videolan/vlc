@@ -502,7 +502,10 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                     }
 
                     if ( unlikely( !p_server ) )
+                    {
+                        free( psz_satip_channellist );
                         break;
+                    }
 
                     p_server->satIpHost = url.psz_host;
                     p_server->isSatIp = true;
