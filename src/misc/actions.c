@@ -43,13 +43,13 @@
 #include "config/configuration.h"
 #include "libvlc.h"
 
-typedef struct key_descriptor_s
+struct key_descriptor
 {
     const char psz_key_string[20];
     uint32_t i_key_code;
-} key_descriptor_t;
+};
 
-static const struct key_descriptor_s vlc_keys[] =
+static const struct key_descriptor vlc_keys[] =
 {   /* Alphabetical order */
     { N_("Backspace"),         KEY_BACKSPACE         },
     { N_("Brightness Down"),   KEY_BRIGHTNESS_DOWN   },
@@ -199,8 +199,8 @@ uint_fast32_t vlc_str2keycode (const char *name)
         name += len + 1;
     }
 
-    key_descriptor_t *d = bsearch (name, vlc_keys, KEYS_COUNT,
-                                   sizeof (vlc_keys[0]), keystrcmp);
+    struct key_descriptor *d = bsearch (name, vlc_keys, KEYS_COUNT,
+                                        sizeof (vlc_keys[0]), keystrcmp);
     if (d != NULL)
         code = d->i_key_code;
     else
