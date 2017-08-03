@@ -7,6 +7,7 @@ root {
 body{
 	font: 11pt Helvetica, Arial, sans-serif;
 	background-color:#EEE;
+	margin: 0px;
 }
 
 #libraryTree{
@@ -81,12 +82,12 @@ body{
 #buttons{
 	margin:0 auto; 
 	position: relative; 
-	width:265px;
+	width: 288px;
 }
 .button48{
 	width: 48px;
 	height: 48px;
-	margin: 5px 0px 5px 15px;
+	margin: 5px 0px 5px 0px;
 	background: none;
 	border: none;
 	display: inline-block;
