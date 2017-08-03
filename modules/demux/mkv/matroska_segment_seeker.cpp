@@ -112,10 +112,8 @@ SegmentSeeker::add_cluster( KaxCluster * const p_cluster )
 }
 
 void
-SegmentSeeker::add_seekpoint( track_id_t track_id, Seekpoint::TrustLevel trust_level, fptr_t fpos, mtime_t pts )
+SegmentSeeker::add_seekpoint( track_id_t track_id, Seekpoint sp )
 {
-    Seekpoint sp ( trust_level, fpos, pts );
-
     seekpoints_t&  seekpoints = _tracks_seekpoints[ track_id ];
     seekpoints_t::iterator it = std::lower_bound( seekpoints.begin(), seekpoints.end(), sp );
 
@@ -348,7 +346,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
         if( b_valid_track )
         {
             if( b_key_picture )
-                add_seekpoint( track_id, Seekpoint::TRUSTED, block_pos, block_pts );
+                add_seekpoint( track_id, Seekpoint( Seekpoint::TRUSTED, block_pos, block_pts ) );
 
             if( max_pts < block_pts )
                 break;

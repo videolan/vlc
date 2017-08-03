@@ -98,7 +98,7 @@ class SegmentSeeker
 
         typedef std::pair<Seekpoint, Seekpoint> seekpoint_pair_t;
 
-        void add_seekpoint( track_id_t track_id, Seekpoint::TrustLevel level, fptr_t fpos, mtime_t pts );
+        void add_seekpoint( track_id_t, Seekpoint );
 
         seekpoint_pair_t get_seekpoints_around( mtime_t, seekpoints_t const& );
         Seekpoint get_first_seekpoint_around( mtime_t, seekpoints_t const&, Seekpoint::TrustLevel = Seekpoint::TRUSTED );
