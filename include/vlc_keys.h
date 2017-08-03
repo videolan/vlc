@@ -109,7 +109,7 @@
 VLC_API char *vlc_keycode2str(uint_fast32_t i_key, bool locale) VLC_USED;
 VLC_API uint_fast32_t vlc_str2keycode(const char *str) VLC_USED;
 
-typedef enum vlc_action {
+typedef enum vlc_action_id {
     ACTIONID_NONE = 0,
     ACTIONID_QUIT,
     ACTIONID_PLAY_PAUSE,
@@ -237,9 +237,9 @@ typedef enum vlc_action {
     ACTIONID_COMBO_VOL_FOV_UP,
     ACTIONID_COMBO_VOL_FOV_DOWN,
 
-} vlc_action_t;
+} vlc_action_id_t;
 
-VLC_API vlc_action_t vlc_GetActionId(const char *psz_key) VLC_USED;
+VLC_API vlc_action_id_t vlc_GetActionId(const char *psz_key) VLC_USED;
 
 struct hotkey
 {

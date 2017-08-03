@@ -265,7 +265,7 @@ found:
 struct action
 {
     char name[MAXACTION];
-    vlc_action_t value;
+    vlc_action_id_t value;
 };
 
 static const struct action actions[] =
@@ -388,7 +388,7 @@ static const struct action actions[] =
 struct mapping
 {
     uint32_t     key; ///< Key code
-    vlc_action_t action; ///< Action ID
+    vlc_action_id_t action; ///< Action ID
 };
 
 static int keycmp (const void *a, const void *b)
@@ -424,7 +424,7 @@ static int vlc_key_to_action (vlc_object_t *obj, const char *varname,
 /**
  * Adds a mapping from a certain key code to a certain action.
  */
-static int vlc_AddMapping (void **map, uint32_t keycode, vlc_action_t action)
+static int vlc_AddMapping (void **map, uint32_t keycode, vlc_action_id_t action)
 {
     struct mapping *entry = malloc (sizeof (*entry));
     if (entry == NULL)
@@ -446,7 +446,7 @@ static int vlc_AddMapping (void **map, uint32_t keycode, vlc_action_t action)
 static void vlc_AddWheelMapping (void **map, uint32_t kmore, uint32_t kless,
                                  int mode)
 {
-    vlc_action_t amore = ACTIONID_NONE, aless = ACTIONID_NONE;
+    vlc_action_id_t amore = ACTIONID_NONE, aless = ACTIONID_NONE;
 
     switch (mode)
     {
@@ -478,7 +478,7 @@ static void vlc_AddWheelMapping (void **map, uint32_t kmore, uint32_t kless,
  * \param action action ID
  */
 static void vlc_InitAction (vlc_object_t *obj, void **map,
-                            const char *confname, vlc_action_t action)
+                            const char *confname, vlc_action_id_t action)
 {
     char *keys = var_InheritString (obj, confname);
     if (keys == NULL)
@@ -585,7 +585,7 @@ static int actcmp(const void *key, const void *ent)
  * Get the action ID from the action name in the configuration subsystem.
  * @return the action ID or ACTIONID_NONE on error.
  */
-vlc_action_t vlc_GetActionId (const char *name)
+vlc_action_id_t vlc_GetActionId (const char *name)
 {
     const struct action *act;
 

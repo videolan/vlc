@@ -1756,7 +1756,7 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi )
 void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
                                    unsigned navigate )
 {
-    static const enum input_query_e map[] =
+    static const vlc_action_id_t map[] =
     {
         INPUT_NAV_ACTIVATE, INPUT_NAV_UP, INPUT_NAV_DOWN,
         INPUT_NAV_LEFT, INPUT_NAV_RIGHT, INPUT_NAV_POPUP,
