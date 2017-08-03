@@ -395,7 +395,7 @@ struct vlc_actions_t
 {
     void *map; /* Key map */
     void *global_map; /* Grabbed/global key map */
-    struct hotkey keys[1];
+    const char *ppsz_keys[];
 };
 
 static int vlc_key_to_action (vlc_object_t *obj, const char *varname,
@@ -502,14 +502,13 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
     assert(libvlc != NULL);
 
     vlc_object_t *obj = VLC_OBJECT(libvlc);
-    struct hotkey *keys;
-    vlc_actions_t *as = malloc (sizeof (*as) + ACTIONS_COUNT * sizeof (*keys));
+    vlc_actions_t *as = malloc (sizeof (*as) + (1 + ACTIONS_COUNT)
+                      * sizeof (*as->ppsz_keys));
 
     if (unlikely(as == NULL))
         return VLC_ENOMEM;
     as->map = NULL;
     as->global_map = NULL;
-    keys = as->keys;
 
     var_Create (obj, "key-pressed", VLC_VAR_INTEGER);
     var_Create (obj, "global-key-pressed", VLC_VAR_INTEGER);
@@ -527,8 +526,7 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
             abort ();
         }
 #endif
-        keys->psz_action = s_names2actions[i].psz;
-        keys++;
+        as->ppsz_keys[i] = s_names2actions[i].psz;
 
         char name[12 + MAXACTION];
 
@@ -536,7 +534,7 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
         init_action (obj, &as->map, name + 7, s_names2actions[i].id);
         init_action (obj, &as->global_map, name, s_names2actions[i].id);
     }
-    keys->psz_action = NULL;
+    as->ppsz_keys[ACTIONS_COUNT] = NULL;
 
     /* Initialize mouse wheel events */
     add_wheel_mapping (&as->map, KEY_MOUSEWHEELRIGHT, KEY_MOUSEWHEELLEFT,
@@ -545,7 +543,6 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
                          var_InheritInteger (obj, "hotkeys-y-wheel-mode"));
 
     libvlc_priv(libvlc)->actions = as;
-    libvlc->p_hotkeys = as->keys;
     var_AddCallback (obj, "key-pressed", vlc_key_to_action, &as->map);
     var_AddCallback (obj, "global-key-pressed", vlc_key_to_action,
                      &as->global_map);
@@ -571,7 +568,6 @@ void libvlc_InternalActionsClean (libvlc_int_t *libvlc)
     tdestroy (as->map, free);
     free (as);
     libvlc_priv(libvlc)->actions = NULL;
-    libvlc->p_hotkeys = NULL;
 }
 
 
@@ -596,4 +592,12 @@ vlc_actions_get_id (const char *name)
 
     act = bsearch(name, s_names2actions, ACTIONS_COUNT, sizeof(*act), actcmp);
     return (act != NULL) ? act->id : ACTIONID_NONE;
+}
+
+#undef vlc_actions_get_key_names
+const char* const*
+vlc_actions_get_key_names(vlc_object_t *p_obj)
+{
+    vlc_actions_t *as = libvlc_priv(p_obj->obj.libvlc)->actions;
+    return as->ppsz_keys;
 }

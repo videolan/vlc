@@ -254,9 +254,12 @@ typedef enum vlc_action_id {
 VLC_API vlc_action_id_t
 vlc_actions_get_id(const char *psz_key_name);
 
-struct hotkey
-{
-    const char *psz_action;
-};
+/**
+ * Get a list a key names
+ * \return A NULL terminated list of const char *
+ */
+VLC_API const char* const*
+vlc_actions_get_key_names(vlc_object_t *p_obj);
+#define vlc_actions_get_key_names(x) vlc_actions_get_key_names(VLC_OBJECT(x))
 
 #endif

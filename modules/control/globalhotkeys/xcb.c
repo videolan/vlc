@@ -290,12 +290,11 @@ static bool Mapping( intf_thread_t *p_intf )
     p_sys->p_map = NULL;
 
     /* Registering of Hotkeys */
-    for( const struct hotkey *p_hotkey = p_intf->obj.libvlc->p_hotkeys;
-            p_hotkey->psz_action != NULL;
-            p_hotkey++ )
+    for( const char* const* ppsz_keys = vlc_actions_get_key_names( p_intf );
+         *ppsz_keys != NULL; ppsz_keys++ )
     {
-        char varname[12 + strlen( p_hotkey->psz_action )];
-        sprintf( varname, "global-key-%s", p_hotkey->psz_action );
+        char varname[12 + strlen( *ppsz_keys )];
+        sprintf( varname, "global-key-%s", *ppsz_keys );
 
         char *key = var_InheritString( p_intf, varname );
         if( key == NULL )
