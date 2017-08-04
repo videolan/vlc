@@ -378,7 +378,7 @@ static const vlc_fourcc_t p_CVPX_VIDEO_I420_fallback[] = {
 };
 
 static const vlc_fourcc_t p_VAAPI_420_fallback[] = {
-    VLC_CODEC_VAAPI_420, VLC_CODEC_I420,
+    VLC_CODEC_VAAPI_420, VLC_CODEC_I420, 0,
 };
 
 static const vlc_fourcc_t p_I440_fallback[] = {
