@@ -119,6 +119,9 @@ SegmentSeeker::add_seekpoint( track_id_t track_id, Seekpoint sp )
 
     if( it != seekpoints.end() && it->pts == sp.pts )
     {
+        if (sp.trust_level <= it->trust_level)
+            return;
+
         *it = sp;
     }
     else
