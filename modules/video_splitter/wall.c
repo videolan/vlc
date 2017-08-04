@@ -254,8 +254,8 @@ static int Open( vlc_object_t *p_this )
         {
             i_height = i_target_height;
         }
-        else if( ( y + 1 ) * i_target_height < i_vstart ||
-                 ( y * i_target_height ) > i_vend )
+        else if( ( y + 1 ) * i_target_height <= i_vstart ||
+                 ( y * i_target_height ) >= i_vend )
         {
             i_height = 0;
         }
@@ -287,8 +287,8 @@ static int Open( vlc_object_t *p_this )
             {
                 i_width = i_target_width;
             }
-            else if( ( x + 1 ) * i_target_width < i_hstart ||
-                     ( x * i_target_width ) > i_hend )
+            else if( ( x + 1 ) * i_target_width <= i_hstart ||
+                     ( x * i_target_width ) >= i_hend )
             {
                 i_width = 0;
             }
