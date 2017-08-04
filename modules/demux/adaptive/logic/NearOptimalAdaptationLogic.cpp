@@ -52,9 +52,9 @@ NearOptimalContext::NearOptimalContext()
 
 NearOptimalAdaptationLogic::NearOptimalAdaptationLogic( vlc_object_t *p_obj )
     : AbstractAdaptationLogic()
-    , p_obj( p_obj )
-    , usedBps( 0 )
     , currentBps( 0 )
+    , usedBps( 0 )
+    , p_obj( p_obj )
 {
     vlc_mutex_init(&lock);
 }
