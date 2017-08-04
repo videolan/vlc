@@ -348,6 +348,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             cfg_tmp.display.width = bounds.size.width;
             cfg_tmp.display.height = bounds.size.height;
 
+            /* Reverse vertical alignment as the GL tex are Y inverted */
+            if (cfg_tmp.align.vertical == VOUT_DISPLAY_ALIGN_TOP)
+                cfg_tmp.align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
+            else if (cfg_tmp.align.vertical == VOUT_DISPLAY_ALIGN_BOTTOM)
+                cfg_tmp.align.vertical = VOUT_DISPLAY_ALIGN_TOP;
+
             vout_display_place_t place;
             vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
             if (OpenglLock(sys->gl))
