@@ -191,10 +191,10 @@ static int Open( vlc_object_t *p_this )
         i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
 
     /* Compute placements/size of the windows */
-    const unsigned w1 = ( p_splitter->fmt.i_width / p_sys->i_col ) & ~1;
+    const unsigned w1 = ( p_splitter->fmt.i_visible_width / p_sys->i_col ) & ~1;
     const unsigned h1 = ( w1 * VOUT_ASPECT_FACTOR / i_aspect ) & ~1;
 
-    const unsigned h2 = ( p_splitter->fmt.i_height / p_sys->i_row ) & ~1;
+    const unsigned h2 = ( p_splitter->fmt.i_visible_height / p_sys->i_row ) & ~1;
     const unsigned w2 = ( h2 * i_aspect / VOUT_ASPECT_FACTOR ) & ~1;
 
     unsigned i_target_width;
@@ -204,23 +204,23 @@ static int Open( vlc_object_t *p_this )
     bool b_vstart_rounded;
     bool b_hstart_rounded;
 
-    if( h1 * p_sys->i_row < p_splitter->fmt.i_height )
+    if( h1 * p_sys->i_row < p_splitter->fmt.i_visible_height )
     {
         i_target_width = w2;
         i_target_height = h2;
 
         i_vstart = 0;
         b_vstart_rounded = false;
-        i_vend = p_splitter->fmt.i_height;
+        i_vend = p_splitter->fmt.i_visible_height;
 
         unsigned i_tmp = i_target_width * p_sys->i_col;
         while( i_tmp < p_splitter->fmt.i_width )
             i_tmp += p_sys->i_col;
 
-        i_hstart = (( i_tmp - p_splitter->fmt.i_width ) / 2)&~1;
-        b_hstart_rounded  = ( ( i_tmp - p_splitter->fmt.i_width ) % 2 ) ||
-            ( ( ( i_tmp - p_splitter->fmt.i_width ) / 2 ) & 1 );
-        i_hend = i_hstart + p_splitter->fmt.i_width;
+        i_hstart = (( i_tmp - p_splitter->fmt.i_visible_width ) / 2)&~1;
+        b_hstart_rounded  = ( ( i_tmp - p_splitter->fmt.i_visible_width ) % 2 ) ||
+            ( ( ( i_tmp - p_splitter->fmt.i_visible_width ) / 2 ) & 1 );
+        i_hend = i_hstart + p_splitter->fmt.i_visible_width;
     }
     else
     {
@@ -229,16 +229,16 @@ static int Open( vlc_object_t *p_this )
 
         i_hstart = 0;
         b_hstart_rounded = false;
-        i_hend = p_splitter->fmt.i_width;
+        i_hend = p_splitter->fmt.i_visible_width;
 
         unsigned i_tmp = i_target_height * p_sys->i_row;
-        while( i_tmp < p_splitter->fmt.i_height )
+        while( i_tmp < p_splitter->fmt.i_visible_height )
             i_tmp += p_sys->i_row;
 
-        i_vstart = ( ( i_tmp - p_splitter->fmt.i_height ) / 2 ) & ~1;
-        b_vstart_rounded  = ( ( i_tmp - p_splitter->fmt.i_height ) % 2 ) ||
-            ( ( ( i_tmp - p_splitter->fmt.i_height ) / 2 ) & 1 );
-        i_vend = i_vstart + p_splitter->fmt.i_height;
+        i_vstart = ( ( i_tmp - p_splitter->fmt.i_visible_height ) / 2 ) & ~1;
+        b_vstart_rounded  = ( ( i_tmp - p_splitter->fmt.i_visible_height ) % 2 ) ||
+            ( ( ( i_tmp - p_splitter->fmt.i_visible_height ) / 2 ) & 1 );
+        i_vend = i_vstart + p_splitter->fmt.i_visible_height;
     }
     msg_Dbg( p_splitter, "target resolution %dx%d", i_target_width, i_target_height );
     msg_Dbg( p_splitter, "target window (%d,%d)-(%d,%d)", i_hstart,i_vstart,i_hend,i_vend );
