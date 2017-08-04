@@ -129,7 +129,6 @@ struct access_sys_t
     uint64_t size;
 
     bool b_reconnect;
-    bool b_continuous;
     bool b_has_size;
 };
 
@@ -281,7 +280,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->b_reconnect = var_InheritBool( p_access, "http-reconnect" );
-    p_sys->b_continuous = var_InheritBool( p_access, "http-continuous" );
 
     if( vlc_credential_get( &credential, p_access, NULL, NULL, NULL, NULL ) )
     {
