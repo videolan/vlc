@@ -213,11 +213,17 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
       case VOUT_DISPLAY_CHANGE_ZOOM:
       {
-        const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
+        vout_display_cfg_t c = *va_arg (ap, const vout_display_cfg_t *);
         const video_format_t *src = &vd->source;
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, src, c, false);
+        /* Reverse vertical alignment as the GL tex are Y inverted */
+        if (c.align.vertical == VOUT_DISPLAY_ALIGN_TOP)
+            c.align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
+        else if (c.align.vertical == VOUT_DISPLAY_ALIGN_BOTTOM)
+            c.align.vertical = VOUT_DISPLAY_ALIGN_TOP;
+
+        vout_display_PlacePicture (&place, src, &c, false);
         vlc_gl_Resize (sys->gl, place.width, place.height);
         if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
             return VLC_EGENERIC;
