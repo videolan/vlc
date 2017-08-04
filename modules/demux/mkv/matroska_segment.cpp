@@ -787,9 +787,9 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     return true;
 }
 
-bool matroska_segment_c::FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
+bool matroska_segment_c::FastSeek( demux_t &demuxer, mtime_t i_mk_date, mtime_t i_mk_time_offset )
 {
-    if( Seek( i_mk_date, i_mk_time_offset ) )
+    if( Seek( demuxer, i_mk_date, i_mk_time_offset ) )
     {
         sys.i_start_pts = sys.i_pts;
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
@@ -798,13 +798,15 @@ bool matroska_segment_c::FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
     return false;
 }
 
-bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset )
+bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset )
 {
     SegmentSeeker::tracks_seekpoint_t seekpoints;
 
     SegmentSeeker::fptr_t i_seek_position = std::numeric_limits<SegmentSeeker::fptr_t>::max();
     mtime_t i_mk_seek_time = -1;
     mtime_t i_mk_date = i_absolute_mk_date - i_mk_time_offset;
+    SegmentSeeker::track_ids_t selected_tracks;
+    SegmentSeeker::track_ids_t priority;
 
     // reset information for all tracks //
 
@@ -816,12 +818,31 @@ bool matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
         if( track.i_last_dts > VLC_TS_INVALID )
             track.b_discontinuity = true;
         track.i_last_dts        = VLC_TS_INVALID;
+
+        bool selected;
+        es_out_Control( demuxer.out, ES_OUT_GET_ES_STATE, track.p_es, &selected );
+        if ( selected )
+            selected_tracks.push_back( track.i_number );
+    }
+
+    if ( selected_tracks.empty() )
+    {
+        selected_tracks = priority_tracks;
+        priority = priority_tracks;
+    }
+    else
+    {
+        std::set_intersection(priority_tracks.begin(),priority_tracks.end(),
+                              selected_tracks.begin(),selected_tracks.end(),
+                              std::back_inserter(priority));
+        if (priority.empty()) // no video selected ?
+            priority = selected_tracks;
     }
 
     // find appropriate seekpoints //
 
     try {
-        seekpoints = _seeker.get_seekpoints( *this, i_mk_date, priority_tracks );
+        seekpoints = _seeker.get_seekpoints( *this, i_mk_date, priority, selected_tracks );
     }
     catch( std::exception const& e )
     {

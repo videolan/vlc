@@ -104,8 +104,8 @@ class SegmentSeeker
         Seekpoint get_first_seekpoint_around( mtime_t, seekpoints_t const&, Seekpoint::TrustLevel = Seekpoint::TRUSTED );
         seekpoint_pair_t get_seekpoints_around( mtime_t, track_ids_t const& );
 
-        tracks_seekpoint_t get_seekpoints( matroska_segment_c&, mtime_t, track_ids_t const& );
-        tracks_seekpoint_t find_greatest_seekpoints_in_range( fptr_t , mtime_t );
+        tracks_seekpoint_t get_seekpoints( matroska_segment_c&, mtime_t, track_ids_t const&, track_ids_t const& );
+        tracks_seekpoint_t find_greatest_seekpoints_in_range( fptr_t , mtime_t, track_ids_t const& filter_tracks );
 
         cluster_positions_t::iterator add_cluster_position( fptr_t pos );
         cluster_map_t      ::iterator add_cluster( KaxCluster * const );

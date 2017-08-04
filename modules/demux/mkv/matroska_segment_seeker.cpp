@@ -128,12 +128,15 @@ SegmentSeeker::add_seekpoint( track_id_t track_id, Seekpoint sp )
 }
 
 SegmentSeeker::tracks_seekpoint_t
-SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end_pts )
+SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end_pts, track_ids_t const& filter_tracks )
 {
     tracks_seekpoint_t tpoints;
 
     for( tracks_seekpoints_t::const_iterator it = _tracks_seekpoints.begin(); it != _tracks_seekpoints.end(); ++it )
     {
+        if ( std::find( filter_tracks.begin(), filter_tracks.end(), it->first ) == filter_tracks.end() )
+            continue;
+
         Seekpoint sp = get_first_seekpoint_around( end_pts, it->second );
 
         if( sp.fpos < start_fpos )
@@ -262,7 +265,8 @@ SegmentSeeker::get_seekpoints_around( mtime_t target_pts, track_ids_t const& pri
 }
 
 SegmentSeeker::tracks_seekpoint_t
-SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts, track_ids_t const& priority_tracks )
+SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts,
+                               track_ids_t const& priority_tracks, track_ids_t const& filter_tracks )
 {
     struct contains_all_of_t {
         bool operator()( tracks_seekpoint_t const& haystack, track_ids_t const& track_ids )
@@ -286,7 +290,7 @@ SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts, track
         index_range( ms, Range( start.fpos, end.fpos ), needle_pts );
 
         {
-            tracks_seekpoint_t tpoints = find_greatest_seekpoints_in_range( start.fpos, target_pts );
+            tracks_seekpoint_t tpoints = find_greatest_seekpoints_in_range( start.fpos, target_pts, filter_tracks );
 
             if( contains_all_of_t() ( tpoints, priority_tracks ) )
                 return tpoints;

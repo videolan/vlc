@@ -93,7 +93,7 @@ public:
 
     /* all tracks */
     tracks_map_t tracks;
-    std::vector<mkv_track_t::track_id_t> priority_tracks;
+    SegmentSeeker::track_ids_t priority_tracks;
 
     /* from seekhead */
     int                     i_seekhead_count;
@@ -139,8 +139,8 @@ public:
     bool PreloadClusters( uint64 i_cluster_position );
     void InformationCreate();
 
-    bool FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
-    bool Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
+    bool FastSeek( demux_t &, mtime_t i_mk_date, mtime_t i_mk_time_offset );
+    bool Seek( demux_t &, mtime_t i_mk_date, mtime_t i_mk_time_offset );
 
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 
