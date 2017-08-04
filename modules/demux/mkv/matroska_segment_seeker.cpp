@@ -224,10 +224,12 @@ SegmentSeeker::get_seekpoints_around( mtime_t target_pts, track_ids_t const& pri
                 continue;
             }
 
-            if( points.first.fpos > track_points.first.fpos )
+            if( track_points.first.trust_level > Seekpoint::DISABLED &&
+                points.first.fpos > track_points.first.fpos )
                 points.first = track_points.first;
 
-            if( points.second.fpos < track_points.second.fpos )
+            if( track_points.second.trust_level > Seekpoint::DISABLED &&
+                points.second.fpos < track_points.second.fpos )
                 points.second = track_points.second;
         }
     }
