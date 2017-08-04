@@ -168,15 +168,15 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 #if LIBMATROSKA_VERSION >= 0x010401
                             else if( MKV_IS_ID( el, KaxCueRelativePosition ) )
                             {
-                                b_invalid_cue = true; // since we do not support this type of cue: IGNORE
+                                // IGNORE
                             }
                             else if( MKV_IS_ID( el, KaxCueBlockNumber ) )
                             {
-                                b_invalid_cue = true; // since we do not support this type of cue: IGNORE
+                                // IGNORE
                             }
                             else if( MKV_IS_ID( el, KaxCueReference ) )
                             {
-                                b_invalid_cue = true; // since we do not support this type of cue: IGNORE
+                                // IGNORE
                             }
                             else if( MKV_IS_ID( el, KaxCueDuration ) )
                             {
