@@ -310,7 +310,7 @@ static int Open(vlc_object_t *obj)
         msg_Dbg(filter, "unknown mode %s, trying blend", psz_mode);
         p_mode = GetFilterMode("blend");
     }
-    if (strcmp(p_mode->psz_mode, p_mode))
+    if (strcmp(p_mode->psz_mode, psz_mode))
         msg_Dbg(filter, "using %s deinterlacing mode", p_mode->psz_mode);
 
     DXVA2_VideoProcessorCaps caps, best_caps;
