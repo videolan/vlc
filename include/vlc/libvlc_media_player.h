@@ -2041,6 +2041,35 @@ LIBVLC_API int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
                                               bool b_absolute);
 
 /**
+ * Video stereo modes
+ */
+typedef enum libvlc_video_stereo_mode_t {
+    libvlc_VideoStereoAuto = 0,
+    libvlc_VideoStereoStereo,
+    libvlc_VideoStereoLeftEye,
+    libvlc_VideoStereoRightEye,
+    libvlc_VideoStereoSideBySide,
+} libvlc_video_stereo_mode_t;
+
+/**
+ * Get current video stereo mode.
+ *
+ * \param p_mi the media player
+ * \return the video stereo mode.
+ */
+LIBVLC_API libvlc_video_stereo_mode_t libvlc_video_get_video_stereo_mode(
+                                              libvlc_media_player_t *p_mi );
+
+/**
+ * Set new video stereo mode.
+ *
+ * \param p_mi the media player
+ * \param i_mode new video stereo mode
+ */
+LIBVLC_API void libvlc_video_set_video_stereo_mode( libvlc_media_player_t *p_mi,
+                                      const libvlc_video_stereo_mode_t i_mode );
+
+/**
  * Get the current subtitle delay. Positive values means subtitles are being
  * displayed later, negative values earlier.
  *

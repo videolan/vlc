@@ -308,6 +308,35 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
     return 0;
 }
 
+libvlc_video_stereo_mode_t libvlc_video_get_video_stereo_mode(libvlc_media_player_t *p_mi)
+{
+    static_assert( libvlc_VideoStereoAuto       == VIDEO_STEREO_OUTPUT_AUTO &&
+                   libvlc_VideoStereoStereo     == VIDEO_STEREO_OUTPUT_STEREO &&
+                   libvlc_VideoStereoLeftEye    == VIDEO_STEREO_OUTPUT_LEFT_ONLY &&
+                   libvlc_VideoStereoRightEye   == VIDEO_STEREO_OUTPUT_RIGHT_ONLY &&
+                   libvlc_VideoStereoSideBySide == VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE,
+                   "stereo mode mismatch" );
+
+    return var_GetInteger(p_mi, "video-stereo-mode");
+}
+
+void libvlc_video_set_video_stereo_mode(libvlc_media_player_t *p_mi,
+                                       const libvlc_video_stereo_mode_t i_mode)
+{
+    /* This will work even if the video is not currently active */
+    var_SetInteger(p_mi, "video-stereo-mode", i_mode);
+
+    /* Apply to current video outputs (if any) */
+    size_t n;
+    vout_thread_t **pp_vouts = GetVouts (p_mi, &n);
+    for (size_t i = 0; i < n; i++)
+    {
+        var_SetInteger (pp_vouts[i], "video-stereo-mode", i_mode);
+        vout_Release(pp_vouts[i]);
+    }
+    free (pp_vouts);
+}
+
 int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi )
 {
     vlc_player_t *player = p_mi->player;
