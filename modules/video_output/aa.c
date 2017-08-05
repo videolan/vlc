@@ -43,6 +43,8 @@
 # include <vlc_xlib.h>
 #endif
 
+#include "event_thread.h"
+
 /* TODO
  * - what about RGB palette ?
  */
@@ -79,6 +81,7 @@ struct vout_display_sys_t {
     aa_palette          palette;
 
     picture_pool_t      *pool;
+    vout_display_event_thread_t *et;
 };
 
 /**
@@ -110,6 +113,8 @@ static int Open(vlc_object_t *object)
     }
     vout_display_DeleteWindow(vd, NULL);
 
+    sys->et = VoutDisplayEventCreateThread(vd);
+
     aa_autoinitkbd(sys->aa_context, 0);
     aa_autoinitmouse(sys->aa_context, AA_MOUSEALLMASK);
 
@@ -124,7 +129,6 @@ static int Open(vlc_object_t *object)
     /* Setup vout_display now that everything is fine */
     vd->fmt = fmt;
     vd->info.has_pictures_invalid = true;
-    vd->info.needs_event_thread = true;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
@@ -155,6 +159,7 @@ static void Close(vlc_object_t *object)
 
     if (sys->pool)
         picture_pool_Release(sys->pool);
+    VoutDisplayEventKillThread(sys->et);
     aa_close(sys->aa_context);
     free(sys);
 }
