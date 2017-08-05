@@ -298,6 +298,8 @@ Removed modules
  * Rar access and stream filter: use libarchive
  * VDA decoder: use VT
  * Audioqueue: use audiounit
+ * DirectFB video output module
+
 
 Changes between 2.2.5 and 2.2.5.1:
 --------------------------------

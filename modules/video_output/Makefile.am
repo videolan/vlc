@@ -399,13 +399,6 @@ endif
 
 ### FrameBuffer ###
 
-libdirectfb_plugin_la_SOURCES = video_output/directfb.c
-libdirectfb_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_directfb)
-libdirectfb_plugin_la_LIBADD = $(LIBS_directfb)
-libdirectfb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libdirectfb_plugin.la
-vout_LTLIBRARIES += $(LTLIBdirectfb)
-
 libfb_plugin_la_SOURCES = video_output/fb.c
 libfb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libfb_plugin.la
