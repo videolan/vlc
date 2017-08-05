@@ -1071,7 +1071,6 @@ static int OpenVideo(vlc_object_t *p_this)
     vd->prepare = PrepareVideo;
     vd->display = DisplayVideo;
     vd->control = ControlVideo;
-    vd->manage  = NULL;
 
     return VLC_SUCCESS;
 }

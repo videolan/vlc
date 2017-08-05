@@ -304,7 +304,6 @@ found_format:;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage = NULL;
 
     return VLC_SUCCESS;
 

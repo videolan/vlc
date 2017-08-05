@@ -129,7 +129,6 @@ static int Open (vlc_object_t *obj)
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
-    vd->manage = NULL;
     return VLC_SUCCESS;
 
 error:

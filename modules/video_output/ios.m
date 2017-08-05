@@ -212,7 +212,6 @@ static int Open(vlc_object_t *this)
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
-        vd->manage = NULL;
 
         /* forward our dimensions to the vout core */
         [sys->glESView performSelectorOnMainThread:@selector(propagateDimensionsToVoutCore) withObject:nil waitUntilDone:YES];

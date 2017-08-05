@@ -566,7 +566,6 @@ static int Open (vlc_object_t *obj)
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage = NULL;
 
     return VLC_SUCCESS;
 

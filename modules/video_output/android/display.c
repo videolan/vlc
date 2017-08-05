@@ -759,7 +759,6 @@ static int OpenCommon(vout_display_t *vd)
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = NULL;
     vd->info.is_slow = !sys->p_window->b_opaque;
 
     return VLC_SUCCESS;

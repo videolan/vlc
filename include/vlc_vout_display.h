@@ -329,7 +329,7 @@ struct vout_display_t {
     int        (*control)(vout_display_t *, int, va_list);
 
     /* Manage pending event (optional) */
-    void       (*manage)(vout_display_t *);
+    void       (*manage)(vout_display_t *) VLC_DEPRECATED;
 
     /* Private place holder for the vout_display_t module (optional)
      *
