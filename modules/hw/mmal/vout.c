@@ -637,7 +637,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
 
         case VOUT_DISPLAY_RESET_PICTURES:
             vlc_assert_unreachable();
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         case VOUT_DISPLAY_CHANGE_ZOOM:
             msg_Warn(vd, "Unsupported control query %d", query);
             break;

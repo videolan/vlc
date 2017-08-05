@@ -166,7 +166,9 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     if (vout->p->splitter_name == NULL) {
         vout_window_cfg_t wcfg = {
             .is_standalone = !var_InheritBool(vout, "embedded-video"),
+#if !defined(_WIN32) && !defined(__OS2__)
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
+#endif
             .type = VOUT_WINDOW_TYPE_INVALID,
             // TODO: take pixel A/R, crop and zoom into account
 #ifdef __APPLE__
@@ -560,9 +562,10 @@ void vout_ControlChangeViewpoint(vout_thread_t *vout,
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
 {
     /* Load configuration */
+#if defined(_WIN32) || defined(__OS2__)
     cfg->is_fullscreen = var_GetBool(vout, "fullscreen")
                          || var_GetBool(vout, "video-wallpaper");
-
+#endif
     cfg->viewpoint = vout->p->original.pose;
 
     cfg->display.title = title;
@@ -1270,12 +1273,18 @@ static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
 {
     vout_window_t *window = vout->p->window;
 
+#if !defined(_WIN32) && !defined(__OS2__)
+    if (window != NULL)
+        vout_window_SetFullScreen(window, fullscreen);
+#else
     bool window_fullscreen = false;
     if (window != NULL
      && vout_window_SetFullScreen(window, fullscreen) == VLC_SUCCESS)
         window_fullscreen = true;
+    /* FIXME: remove this event */
     if (vout->p->display.vd != NULL)
         vout_display_SendEventFullscreen(vout->p->display.vd, fullscreen, window_fullscreen);
+#endif
 }
 
 static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
@@ -1539,7 +1548,10 @@ static int ThreadReinit(vout_thread_t *vout,
 
     vout_ReinitInterlacingSupport(vout);
 
-    if (!state.cfg.is_fullscreen) {
+#if defined(_WIN32) || defined(__OS2__)
+    if (!state.cfg.is_fullscreen)
+#endif
+    {
         state.cfg.display.width  = 0;
         state.cfg.display.height = 0;
     }

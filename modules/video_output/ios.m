@@ -350,7 +350,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             vlc_assert_unreachable ();
         default:
             msg_Err(vd, "Unknown request %d", query);
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
             return VLC_EGENERIC;
     }
 }

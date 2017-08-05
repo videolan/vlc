@@ -339,16 +339,17 @@ typedef struct {
     vlc_rational_t sar_initial;
 
     /* */
-    unsigned width_saved;
-    unsigned height_saved;
-
-    /* */
     bool ch_display_filled;
     bool is_display_filled;
 
     bool ch_zoom;
     vlc_rational_t zoom;
 #if defined(_WIN32) || defined(__OS2__)
+    unsigned width_saved;
+    unsigned height_saved;
+    bool ch_fullscreen;
+    bool is_fullscreen;
+    bool window_fullscreen;
     bool ch_wm_state;
     unsigned wm_state;
     unsigned wm_state_initial;
@@ -394,9 +395,6 @@ typedef struct {
 
     bool reset_pictures;
 
-    bool ch_fullscreen;
-    bool is_fullscreen;
-    bool window_fullscreen;
     signed char fit_window;
 
     bool ch_display_size;
@@ -655,6 +653,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
                                      va_arg(args, const vlc_viewpoint_t *));
         break;
 
+#if defined(_WIN32) || defined(__OS2__)
     case VOUT_DISPLAY_EVENT_FULLSCREEN: {
         const int is_fullscreen = (int)va_arg(args, int);
         const bool window_fullscreen = va_arg(args, int);
@@ -670,7 +669,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vlc_mutex_unlock(&osys->lock);
         break;
     }
-#if defined(_WIN32) || defined(__OS2__)
+
     case VOUT_DISPLAY_EVENT_WINDOW_STATE: {
         const unsigned state = va_arg(args, unsigned);
 
@@ -815,12 +814,11 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     for (;;) {
 
         vlc_mutex_lock(&osys->lock);
-
+#if defined(_WIN32) || defined(__OS2__)
         bool ch_fullscreen  = osys->ch_fullscreen;
         bool is_fullscreen  = osys->is_fullscreen;
         osys->ch_fullscreen = false;
 
-#if defined(_WIN32) || defined(__OS2__)
         bool ch_wm_state  = osys->ch_wm_state;
         unsigned wm_state  = osys->wm_state;
         osys->ch_wm_state = false;
@@ -841,19 +839,19 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
         vlc_mutex_unlock(&osys->lock);
 
-        if (!ch_fullscreen &&
-            !ch_display_size &&
+        if (!ch_display_size &&
             !reset_pictures &&
             !osys->ch_display_filled &&
             !osys->ch_zoom &&
 #if defined(_WIN32) || defined(__OS2__)
+            !ch_fullscreen &&
             !ch_wm_state &&
 #endif
             !osys->ch_sar &&
             !osys->ch_crop &&
             !osys->ch_viewpoint) {
 
-            if (!osys->cfg.is_fullscreen && osys->fit_window != 0) {
+            if (osys->fit_window != 0) {
                 VoutDisplayFitWindow(vd, osys->fit_window == -1);
                 osys->fit_window = 0;
                 continue;
@@ -862,6 +860,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         }
 
         /* */
+#if defined(_WIN32) || defined(__OS2__)
         if (ch_fullscreen) {
             if (osys->window_fullscreen
              || vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
@@ -877,15 +876,17 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 msg_Err(vd, "Failed to set fullscreen");
             }
         }
+#endif
 
         /* */
         if (ch_display_size) {
             vout_display_cfg_t cfg = osys->cfg;
             cfg.display.width  = display_width;
             cfg.display.height = display_height;
-
+#if defined(_WIN32) || defined(__OS2__)
             osys->width_saved  = osys->cfg.display.width;
             osys->height_saved = osys->cfg.display.height;
+#endif
 
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg);
 
@@ -1242,13 +1243,17 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->mouse.last_moved = mdate();
     osys->mouse.double_click_timeout = double_click_timeout;
     osys->mouse.hide_timeout = hide_timeout;
-    osys->is_fullscreen  = cfg->is_fullscreen;
     osys->display_width  = cfg->display.width;
     osys->display_height = cfg->display.height;
     osys->is_display_filled = cfg->is_display_filled;
+    osys->viewpoint      = cfg->viewpoint;
+
+    osys->zoom.num = cfg->zoom.num;
+    osys->zoom.den = cfg->zoom.den;
+#if defined(_WIN32) || defined(__OS2__)
+    osys->is_fullscreen  = cfg->is_fullscreen;
     osys->width_saved    = cfg->display.width;
     osys->height_saved   = cfg->display.height;
-    osys->viewpoint      = cfg->viewpoint;
     if (osys->is_fullscreen) {
         vout_display_cfg_t cfg_windowed = *cfg;
         cfg_windowed.is_fullscreen  = false;
@@ -1259,9 +1264,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                            source, &cfg_windowed);
     }
 
-    osys->zoom.num = cfg->zoom.num;
-    osys->zoom.den = cfg->zoom.den;
-#if defined(_WIN32) || defined(__OS2__)
     osys->wm_state_initial = VOUT_WINDOW_STATE_NORMAL;
     osys->wm_state = state->wm_state;
     osys->ch_wm_state = true;
@@ -1414,7 +1416,6 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
     case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
     case VOUT_DISPLAY_EVENT_KEY:
     case VOUT_DISPLAY_EVENT_CLOSE:
-    case VOUT_DISPLAY_EVENT_FULLSCREEN:
     case VOUT_DISPLAY_EVENT_DISPLAY_SIZE:
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID:
         VoutDisplayEvent(vd, event, args);
@@ -1584,7 +1585,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         vout_display_state_t ostate;
 
         memset(&ostate, 0, sizeof(ostate));
-        ostate.cfg.is_fullscreen = false;
         ostate.cfg.display = state->cfg.display;
         ostate.cfg.align.horizontal = 0; /* TODO */
         ostate.cfg.align.vertical = 0; /* TODO */

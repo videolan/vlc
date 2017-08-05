@@ -765,8 +765,6 @@ Control( vout_display_t *vd, int i_query, va_list ap )
         }
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-        return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
         msg_Dbg( vd, "VOUT_DISPLAY_RESET_PICTURES" );
 
