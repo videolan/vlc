@@ -151,7 +151,7 @@ enum {
 #if defined(_WIN32) || defined(__OS2__)
     /* Ask the module to acknowledge/refuse the window management state change
      * after being requested externally or by VOUT_DISPLAY_WINDOW_STATE */
-    VOUT_DISPLAY_CHANGE_WINDOW_STATE,         /* unsigned state */
+    VOUT_DISPLAY_CHANGE_WINDOW_STATE VLC_DEPRECATED,   /* unsigned state */
 #endif
     /* Ask the module to acknowledge/refuse the display size change requested
      * (externally or by VOUT_DISPLAY_EVENT_DISPLAY_SIZE) */
