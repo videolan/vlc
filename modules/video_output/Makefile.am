@@ -454,3 +454,7 @@ vout_LTLIBRARIES += \
 	libvdummy_plugin.la \
 	libvmem_plugin.la \
 	libyuv_plugin.la
+
+libevent_thread_la_SOURCES = \
+	video_output/event_thread.c video_output/event_thread.h
+noinst_LTLIBRARIES += libevent_thread.la
