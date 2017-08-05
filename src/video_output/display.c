@@ -749,7 +749,6 @@ static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
     if (default_size) {
         cfg.display.height = 0;
     } else {
-        cfg.display.height = osys->height_saved;
         cfg.zoom.num = 1;
         cfg.zoom.den = 1;
     }
