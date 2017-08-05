@@ -1140,7 +1140,6 @@ modules/video_output/win32/directdraw.c
 modules/video_output/win32/events.c
 modules/video_output/win32/glwin32.c
 modules/video_output/win32/wingdi.c
-modules/video_output/sdl.c
 modules/video_output/vdummy.c
 modules/video_output/vmem.c
 modules/video_output/wayland/shell.c

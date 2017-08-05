@@ -298,6 +298,7 @@ Removed modules
  * Rar access and stream filter: use libarchive
  * VDA decoder: use VT
  * Audioqueue: use audiounit
+ * SDL video output module
  * DirectFB video output module
 
 

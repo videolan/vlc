@@ -405,21 +405,6 @@ EXTRA_LTLIBRARIES += libfb_plugin.la
 vout_LTLIBRARIES += $(LTLIBfb)
 
 
-### Simple DirectMedia Layer ###
-libvout_sdl_plugin_la_SOURCES = video_output/sdl.c
-libvout_sdl_plugin_la_CFLAGS = $(AM_CFLAGS) $(SDL_CFLAGS)
-libvout_sdl_plugin_la_LIBADD = $(SDL_LIBS)
-if !HAVE_WIN32
-if !HAVE_OS2
-libvout_sdl_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
-endif
-endif
-libvout_sdl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libvout_sdl_plugin.la
-vout_LTLIBRARIES += $(LTLIBvout_sdl)
-
-
-
 ### ASCII Art ###
 libaa_plugin_la_SOURCES = video_output/aa.c
 libaa_plugin_la_LIBADD = -laa

@@ -3118,31 +3118,17 @@ AM_CONDITIONAL([HAVE_WAYLAND_EGL], [test "${have_wayland_egl}" = "yes"])
 
 
 dnl
-dnl  SDL module
+dnl  SDL image decoder module
 dnl
-AC_ARG_ENABLE(sdl,
-  [  --enable-sdl            SDL support (default enabled)])
 AC_ARG_ENABLE(sdl-image,
   [  --enable-sdl-image      SDL image support (default enabled)])
-if test "${enable_sdl}" != "no"
-then
-   PKG_CHECK_MODULES(SDL, [sdl >= 1.2.10], [
-      # SDL on Darwin is heavily patched and can only run SDL_image
-      if test "${SYS}" != "darwin"; then
-        VLC_ADD_PLUGIN([vout_sdl])
-      fi
-
-      # SDL_image
-      AS_IF([ test "${enable_sdl_image}" != "no"],[
-        PKG_CHECK_MODULES(SDL_IMAGE, [SDL_image >= 1.2.10], [
-          VLC_ADD_PLUGIN([sdl_image])],
-          [ AC_MSG_WARN([${SDL_IMAGE_PKG_ERRORS}. You should install it alongside your SDL package.])
-          ])
-      ])
-   ],[
-     AC_MSG_WARN([${SDL_PKG_ERRORS}.])
-   ])
-fi
+AS_IF([test "${enable_sdl_image}" != "no"],[
+  PKG_CHECK_MODULES(SDL_IMAGE, [SDL_image >= 1.2.10], [
+    VLC_ADD_PLUGIN([sdl_image])
+  ], [
+    AC_MSG_WARN([${SDL_IMAGE_PKG_ERRORS}. You should install it alongside your SDL package.])
+  ])
+])
 
 dnl
 dnl  freetype module
