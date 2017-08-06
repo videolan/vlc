@@ -46,23 +46,23 @@ struct wl_surface;
 /**
  * Window handle type
  */
-enum {
-    VOUT_WINDOW_TYPE_INVALID=0,
-    VOUT_WINDOW_TYPE_XID,
-    VOUT_WINDOW_TYPE_HWND,
-    VOUT_WINDOW_TYPE_NSOBJECT,
-    VOUT_WINDOW_TYPE_ANDROID_NATIVE,
-    VOUT_WINDOW_TYPE_WAYLAND,
+enum vout_window_type {
+    VOUT_WINDOW_TYPE_INVALID=0 /**< Invalid or unspecified window type */,
+    VOUT_WINDOW_TYPE_XID /**< X11 window */,
+    VOUT_WINDOW_TYPE_HWND /**< Win32 or OS/2 window */,
+    VOUT_WINDOW_TYPE_NSOBJECT /**< MacOS X view */,
+    VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
+    VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
 };
 
 /**
  * Control query for vout_window_t
  */
-enum {
+enum vout_window_control {
     VOUT_WINDOW_SET_STATE, /* unsigned state */
     VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
     VOUT_WINDOW_SET_FULLSCREEN, /* int b_fullscreen */
-    VOUT_WINDOW_HIDE_MOUSE, /* bool b_hide */
+    VOUT_WINDOW_HIDE_MOUSE, /* int b_hide */
 };
 
 /**
@@ -115,35 +115,73 @@ typedef struct vout_window_owner {
 } vout_window_owner_t;
 
 /**
- * FIXME do we need an event system in the window too ?
- * or the window user will take care of it ?
+ * Graphical window
+ *
+ * This structure is an abstract interface to the windowing system.
+ * The window is normally used to draw video (and subpictures) into, but it
+ * can also be used for other purpose (e.g. OpenGL visualization).
+ *
+ * The window is responsible for providing a window handle, whose exact
+ * meaning depends on the windowing system. It also must report some events
+ * such as user input (keyboard, mouse) and window resize.
+ *
+ * Finally, it must support some control requests such as for fullscreen mode.
  */
 struct vout_window_t {
     VLC_COMMON_MEMBERS
 
-    unsigned type; /**< Window handle type */
+     /**
+      * Window handle type
+      *
+      * This identified the windowing system and protocol that the window
+      * needs to use. This also selects which member of the \ref handle union
+      * and the \ref display union are to be set.
+      *
+      * The possible values are defined in \ref vout_window_type.
+      *
+      * VOUT_WINDOW_TYPE_INVALID is a special placeholder type. It means that
+      * any windowing system is acceptable. In that case, the plugin must set
+      * its actual type during activation.
+      */
+    unsigned type;
 
-    /* window handle (mandatory)
+    /**
+     * Window handle (mandatory)
      *
-     * It must be filled in the open function.
+     * This must be filled by the plugin upon activation.
+     *
+     * Depending on the \ref type above, a different member of this union is
+     * used.
      */
     union {
-        void     *hwnd;          /* Win32 window handle */
-        uint32_t xid;            /* X11 windows ID */
-        void     *nsobject;      /* Mac OSX view object */
-        void     *anativewindow; /* Android native window. */
-        struct wl_surface *wl;   /* Wayland surface */
+        void     *hwnd;          /**< Win32 window handle */
+        uint32_t xid;            /**< X11 windows ID */
+        void     *nsobject;      /**< Mac OSX view object */
+        void     *anativewindow; /**< Android native window */
+        struct wl_surface *wl;   /**< Wayland surface (client pointer) */
     } handle;
 
-    /* display server (mandatory) */
+    /** Display server (mandatory)
+     *
+     * This must be filled by the plugin upon activation.
+     *
+     * The window handle is relative to the display server. The exact meaning
+     * of the display server depends on the window handle type. Not all window
+     * handle type provide a display server field.
+     */
     union {
-        char     *x11; /* X11 display (NULL = use default) */
-        struct wl_display *wl;   /* Wayland struct wl_display pointer */
+        char     *x11; /**< X11 display string (NULL = use default) */
+        struct wl_display *wl; /**< Wayland display (client pointer) */
     } display;
 
-    /* Control on the module (mandatory)
+    /**
+     * Control callback (mandatory)
      *
-     * Do not use it directly; use vout_window_Control instead.
+     * This callback handles some control request regarding the window.
+     * See \ref vout_window_control.
+     *
+     * This field should not be used directly when manipulating a window.
+     * vout_window_Control() should be used instead.
      */
     int (*control)(vout_window_t *, int query, va_list);
 
