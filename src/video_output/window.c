@@ -59,6 +59,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     vout_window_t *window = &w->wnd;
 
     memset(&window->handle, 0, sizeof(window->handle));
+    window->info.has_double_click = false;
     window->control = NULL;
     window->sys = NULL;
 

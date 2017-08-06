@@ -147,6 +147,11 @@ struct vout_window_t {
      */
     int (*control)(vout_window_t *, int query, va_list);
 
+    struct {
+        bool has_double_click; /**< Whether double click events are sent,
+                                    or need to be emulated */
+    } info;
+
     /* Private place holder for the vout_window_t module (optional)
      *
      * A module is free to use it as it wishes.
