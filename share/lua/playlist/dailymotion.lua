@@ -47,7 +47,7 @@ function parse()
 			_,_,arturl = string.find( line, "href=\"(.-)\"" )
 		end
 
-        if string.match( line, "var config = {" ) then
+        if string.match( line, "var __PLAYER_CONFIG__ = {" ) then
             artist = string.match( line, '"username":"([^"]+)"' )
 
             local streams = string.match( line, "\"qualities\":{(.-%])}" )
