@@ -196,7 +196,6 @@ static int Open(vlc_object_t *object)
     sys->layer = var_InheritInteger(vd, MMAL_LAYER_NAME);
     bcm_host_init();
 
-    vd->info.has_hide_mouse = true;
     sys->opaque = vd->fmt.i_chroma == VLC_CODEC_MMAL_OPAQUE;
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_RENDERER, &sys->component);

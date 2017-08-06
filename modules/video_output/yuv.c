@@ -154,12 +154,7 @@ static int Open(vlc_object_t *object)
     video_format_FixRgb(&fmt);
 
     /* */
-    vout_display_info_t info = vd->info;
-    info.has_hide_mouse = true;
-
-    /* */
     vd->fmt     = fmt;
-    vd->info    = info;
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;

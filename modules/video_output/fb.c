@@ -300,12 +300,7 @@ static int Open(vlc_object_t *object)
     fmt.i_visible_height = sys->height;
 
     /* */
-    vout_display_info_t info = vd->info;
-    info.has_hide_mouse = true;
-
-    /* */
     vd->fmt     = fmt;
-    vd->info    = info;
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;

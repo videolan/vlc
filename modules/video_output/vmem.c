@@ -208,13 +208,8 @@ static int Open(vlc_object_t *object)
     }
 
     /* */
-    vout_display_info_t info = vd->info;
-    info.has_hide_mouse = true;
-
-    /* */
     vd->sys     = sys;
     vd->fmt     = fmt;
-    vd->info    = info;
     vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;

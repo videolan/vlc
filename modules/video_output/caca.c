@@ -191,6 +191,7 @@ static int Open(vlc_object_t *object)
 
     /* Setup vout_display now that everything is fine */
     vd->fmt = fmt;
+    vd->info.has_hide_mouse = false;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;

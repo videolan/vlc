@@ -198,7 +198,6 @@ static int Open (vlc_object_t *p_this)
         /* setup vout display */
         vout_display_info_t info = vd->info;
         info.subpicture_chromas = subpicture_chromas;
-        info.has_hide_mouse = true;
         vd->info = info;
 
         vd->pool    = Pool;
