@@ -570,7 +570,6 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
         osys->mouse.last_moved = mdate();
 
     /* */
-    vout_SendEventMouseVisible(osys->vout);
     vout_SendDisplayEventMouse(osys->vout, &m);
     vlc_mutex_unlock(&osys->lock);
 }
@@ -758,7 +757,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         if (vout_HideWindowMouse(osys->vout, true) != VLC_SUCCESS
          && !vd->info.has_hide_mouse)
             vout_display_Control(vd, VOUT_DISPLAY_HIDE_MOUSE);
-        vout_SendEventMouseHidden(osys->vout);
     }
 
     bool reset_render = false;

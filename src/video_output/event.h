@@ -98,16 +98,6 @@ static inline void vout_SendEventMouseDoubleClick(vout_thread_t *vout)
     //vout_ControlSetFullscreen(vout, !var_GetBool(vout, "fullscreen"));
     var_ToggleBool(vout, "fullscreen");
 }
-static inline void vout_SendEventMouseVisible(vout_thread_t *vout)
-{
-    /* TODO */
-    VLC_UNUSED(vout);
-}
-static inline void vout_SendEventMouseHidden(vout_thread_t *vout)
-{
-    /* TODO */
-    VLC_UNUSED(vout);
-}
 static inline void vout_SendEventViewpointChangeable(vout_thread_t *vout,
                                                      bool b_can_change)
 {
