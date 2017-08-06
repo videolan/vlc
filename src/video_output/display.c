@@ -566,8 +566,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 
     /* */
     osys->mouse.ch_activity = true;
-    if (!vd->info.has_hide_mouse)
-        osys->mouse.last_moved = mdate();
+    osys->mouse.last_moved = mdate();
 
     /* */
     vout_SendDisplayEventMouse(osys->vout, &m);
