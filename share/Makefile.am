@@ -176,7 +176,7 @@ nobase_doc_DATA = \
 	lua/sd/icast.lua \
 	$(NULL)
 
-nobase_vlcdata_DATA += \
+nobase_dist_vlcdata_DATA = \
 	lua/http/view.html \
 	lua/http/mobile.html \
 	lua/http/dialogs/create_stream.html \
@@ -237,7 +237,7 @@ nobase_vlcdata_DATA += \
 	lua/http/js/jquery.jstree.js \
 	lua/http/js/controllers.js
 endif
-MOSTLYCLEANFILES += $(nobase_vlclib_DATA)
+MOSTLYCLEANFILES += $(nobase_vlcdata_DATA)
 
 EXTRA_DIST += \
 	lua/README.txt \
