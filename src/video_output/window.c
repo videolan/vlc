@@ -82,7 +82,6 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
         w->inhibit = vlc_inhibit_Create(VLC_OBJECT (window));
         if (w->inhibit != NULL)
             vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_VIDEO);
-            /* FIXME: ^ wait for vout activation, pause */
     }
     else
         w->inhibit = NULL;
@@ -111,6 +110,15 @@ void vout_window_Delete(vout_window_t *window)
 
     vlc_module_unload(window, w->module, vout_window_stop, window);
     vlc_object_release(window);
+}
+
+void vout_window_SetInhibition(vout_window_t *window, bool enabled)
+{
+    window_t *w = (window_t *)window;
+    unsigned flags = enabled ? VLC_INHIBIT_VIDEO : VLC_INHIBIT_NONE;
+
+    if (w->inhibit != NULL)
+        vlc_inhibit_Set(w->inhibit, flags);
 }
 
 /* Video output display integration */

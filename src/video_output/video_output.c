@@ -1225,6 +1225,10 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
     }
     vout->p->pause.is_on = is_paused;
     vout->p->pause.date  = date;
+
+    vout_window_t *window = vout->p->window;
+    if (window != NULL)
+        vout_window_SetInhibition(window, !is_paused);
 }
 
 static void ThreadFlush(vout_thread_t *vout, bool below, mtime_t date)
