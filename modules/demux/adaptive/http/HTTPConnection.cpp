@@ -196,7 +196,7 @@ ssize_t HTTPConnection::read(void *p_buffer, size_t len)
         bytesRead += ret;
 
     if(ret < 0 || (size_t)ret < len || /* set EOF */
-       contentLength == bytesRead )
+       (contentLength == bytesRead && connectionClose))
     {
         socket->disconnect();
         return ret;
