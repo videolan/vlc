@@ -358,10 +358,11 @@ static inline void vout_window_ReportMouseReleased(vout_window_t *window,
 /**
  * Send a mouse double click event
  */
-static inline void vout_window_ReportMouseDoubleClick(vout_window_t *window)
+static inline void vout_window_ReportMouseDoubleClick(vout_window_t *window,
+                                                      int button)
 {
     const vout_window_mouse_event_t mouse = {
-        VOUT_WINDOW_MOUSE_DOUBLE_CLICK, 0, 0, 0,
+        VOUT_WINDOW_MOUSE_DOUBLE_CLICK, 0, 0, button,
     };
     vout_window_SendMouseEvent(window, &mouse);
 }

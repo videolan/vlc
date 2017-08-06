@@ -349,9 +349,10 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
 
 void VideoWidget::mouseDoubleClickEvent( QMouseEvent *event )
 {
-    if( qtMouseButton2VLC( event->button() ) == 0 )
+    int vlc_button = qtMouseButton2VLC( event->button() );
+    if( vlc_button >= 0 )
     {
-        vout_window_ReportMouseDoubleClick( p_window );
+        vout_window_ReportMouseDoubleClick( p_window, vlc_button );
         event->accept();
     }
     else
