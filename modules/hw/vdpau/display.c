@@ -333,8 +333,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-    case VOUT_DISPLAY_HIDE_MOUSE:
-        return VLC_EGENERIC;
     case VOUT_DISPLAY_RESET_PICTURES:
     {
         msg_Dbg(vd, "resetting pictures");

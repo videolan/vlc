@@ -364,7 +364,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             return VLC_SUCCESS;
         }
 
-        case VOUT_DISPLAY_HIDE_MOUSE:
+        case VOUT_DISPLAY_HIDE_MOUSE: /* FIXME: dead code */
         {
             [NSCursor setHiddenUntilMouseMoves: YES];
             return VLC_SUCCESS;

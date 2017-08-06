@@ -1177,8 +1177,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
-    case VOUT_DISPLAY_HIDE_MOUSE:
-        return VLC_SUCCESS;
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     {

@@ -442,9 +442,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     VLC_UNUSED(args);
 
     switch (query) {
-    case VOUT_DISPLAY_HIDE_MOUSE:
-        return VLC_SUCCESS;
-
     default:
         msg_Err(vd, "Unknown request in omxil vout display");
 

@@ -283,9 +283,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
-        case VOUT_DISPLAY_HIDE_MOUSE:
-            return VLC_EGENERIC;
-
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:

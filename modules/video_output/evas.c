@@ -782,7 +782,6 @@ Control( vout_display_t *vd, int i_query, va_list ap )
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-    case VOUT_DISPLAY_HIDE_MOUSE:
         return VLC_EGENERIC;
     default:
         msg_Warn( vd, "Unknown request in evas_output" );

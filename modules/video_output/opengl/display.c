@@ -204,8 +204,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-      case VOUT_DISPLAY_HIDE_MOUSE: /* FIXME TODO */
-        break;
 #ifndef NDEBUG
       case VOUT_DISPLAY_RESET_PICTURES: // not needed
         vlc_assert_unreachable();

@@ -239,10 +239,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         return VLC_EGENERIC;
 
-    case VOUT_DISPLAY_HIDE_MOUSE:
-        /* not really working */
-        return VLC_SUCCESS;
-
     default:
         msg_Err(vd, "Unsupported query in vout display flaschen");
         return VLC_EGENERIC;

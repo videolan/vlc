@@ -612,10 +612,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
     int ret = VLC_EGENERIC;
 
     switch (query) {
-        case VOUT_DISPLAY_HIDE_MOUSE:
-            ret = VLC_SUCCESS;
-            break;
-
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
             tmp_cfg = va_arg(args, const vout_display_cfg_t *);
             if (tmp_cfg->display.width == sys->display_width &&

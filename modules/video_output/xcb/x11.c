@@ -504,9 +504,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         return VLC_SUCCESS;
     }
 
-    case VOUT_DISPLAY_HIDE_MOUSE:
-        return VLC_EGENERIC;
-
     default:
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;

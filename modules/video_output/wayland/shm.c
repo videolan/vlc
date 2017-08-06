@@ -259,10 +259,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-        case VOUT_DISPLAY_HIDE_MOUSE:
-            /* TODO */
-            return VLC_EGENERIC;
-
         case VOUT_DISPLAY_RESET_PICTURES:
         {
             vout_display_place_t place;
