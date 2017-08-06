@@ -271,7 +271,7 @@ static int Open(vlc_object_t *object)
     vout_display_info_t info = vd->info;
     info.is_slow = !is_d3d9_opaque(fmt.i_chroma);
     info.has_double_click = true;
-    info.has_hide_mouse = false;
+    info.needs_hide_mouse = true;
     info.has_pictures_invalid = !is_d3d9_opaque(fmt.i_chroma);
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
         sys->d3dregion_format != D3DFMT_UNKNOWN &&

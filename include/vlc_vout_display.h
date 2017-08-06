@@ -128,7 +128,7 @@ typedef struct {
 typedef struct {
     bool is_slow;                           /* The picture memory has slow read/write */
     bool has_double_click;                  /* Is double-click generated */
-    bool has_hide_mouse;                    /* Is mouse automatically hidden */
+    bool needs_hide_mouse;                  /* Needs VOUT_DISPLAY_HIDE_MOUSE */
     bool has_pictures_invalid;              /* Will VOUT_DISPLAY_EVENT_PICTURES_INVALID be used */
     const vlc_fourcc_t *subpicture_chromas; /* List of supported chromas for subpicture rendering. */
 } vout_display_info_t;
@@ -139,7 +139,7 @@ typedef struct {
 enum {
     /* Hide the mouse. It will be sent when
      * vout_display_t::info.b_hide_mouse is false */
-    VOUT_DISPLAY_HIDE_MOUSE,
+    VOUT_DISPLAY_HIDE_MOUSE VLC_DEPRECATED,
 
     /* Ask to reset the internal buffers after a VOUT_DISPLAY_EVENT_PICTURES_INVALID
      * request.

@@ -92,7 +92,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
 
     vd->info.is_slow = false;
     vd->info.has_double_click = false;
-    vd->info.has_hide_mouse = true;
+    vd->info.needs_hide_mouse = false;
     vd->info.has_pictures_invalid = false;
     vd->info.subpicture_chromas = NULL;
 
@@ -754,7 +754,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     if (hide_mouse) {
         msg_Dbg(vd, "auto hiding mouse cursor");
         if (vout_HideWindowMouse(osys->vout, true) != VLC_SUCCESS
-         && !vd->info.has_hide_mouse)
+         && vd->info.needs_hide_mouse)
             vout_display_Control(vd, VOUT_DISPLAY_HIDE_MOUSE);
     }
 

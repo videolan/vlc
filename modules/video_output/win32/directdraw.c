@@ -233,7 +233,7 @@ static int Open(vlc_object_t *object)
     vout_display_info_t info = vd->info;
     info.is_slow = true;
     info.has_double_click = true;
-    info.has_hide_mouse = false;
+    info.needs_hide_mouse = true;
     info.has_pictures_invalid = true;
 
     /* Interaction TODO support starting with wallpaper mode */
