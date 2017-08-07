@@ -51,6 +51,7 @@ struct filter_sys_t
     DXVA2_VideoProcessorCaps       decoder_caps;
 
     struct deinterlace_ctx         context;
+    picture_t *                    (*buffer_new)( filter_t * );
 };
 
 struct filter_mode_t
@@ -212,6 +213,46 @@ static const struct filter_mode_t *GetFilterMode(const char *mode)
     }
 
     return NULL;
+}
+
+static void d3d9_pic_context_destroy(struct picture_context_t *ctx)
+{
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)ctx;
+    ReleasePictureSys(&pic_ctx->picsys);
+    free(pic_ctx);
+}
+
+static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
+{
+    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
+    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    pic_ctx->s.destroy = d3d9_pic_context_destroy;
+    pic_ctx->s.copy    = d3d9_pic_context_copy;
+    pic_ctx->picsys = src_ctx->picsys;
+    AcquirePictureSys(&pic_ctx->picsys);
+    return &pic_ctx->s;
+}
+
+static picture_t *NewOutputPicture( filter_t *p_filter )
+{
+    picture_t *pic = p_filter->p_sys->buffer_new( p_filter );
+    if ( !pic->context )
+    {
+        /* the picture might be duplicated for snapshots so it needs a context */
+        assert( pic->p_sys != NULL ); /* this opaque picture is wrong */
+        struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+        if (likely(pic_ctx!=NULL))
+        {
+            pic_ctx->s.destroy = d3d9_pic_context_destroy;
+            pic_ctx->s.copy    = d3d9_pic_context_copy;
+            pic_ctx->picsys = *pic->p_sys;
+            AcquirePictureSys( &pic_ctx->picsys );
+            pic->context = &pic_ctx->s;
+        }
+    }
+    return pic;
 }
 
 static int Open(vlc_object_t *obj)
@@ -388,6 +429,8 @@ static int Open(vlc_object_t *obj)
     IDirectXVideoProcessorService_Release(processor);
     picture_Release(dst);
 
+    sys->buffer_new = filter->owner.video.buffer_new;
+    filter->owner.video.buffer_new = NewOutputPicture;
     filter->fmt_out.video   = out_fmt;
     filter->pf_video_filter = Deinterlace;
     filter->pf_flush        = Flush;
