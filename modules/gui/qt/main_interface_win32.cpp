@@ -157,7 +157,9 @@ void MainInterfaceWin32::createTaskBarButtons()
     p_taskbl = (ITaskbarList3 *)pv;
     p_taskbl->HrInit();
 
-    himl = ImageList_Create( 16 /*cx*/, 16 /*cy*/, ILC_COLOR32 /*flags*/,
+    int iconX = GetSystemMetrics(SM_CXSMICON);
+    int iconY = GetSystemMetrics(SM_CYSMICON);
+    himl = ImageList_Create( iconX /*cx*/, iconY /*cy*/, ILC_COLOR32 /*flags*/,
                              4 /*cInitial*/, 0 /*cGrow*/);
     if( himl == NULL )
     {
@@ -167,10 +169,10 @@ void MainInterfaceWin32::createTaskBarButtons()
         return;
     }
 
-    QPixmap img   = QPixmap(":/win7/prev");
-    QPixmap img2  = QPixmap(":/win7/pause");
-    QPixmap img3  = QPixmap(":/win7/play");
-    QPixmap img4  = QPixmap(":/win7/next");
+    QPixmap img   = QPixmap(":/win7/prev").scaled( iconX, iconY );
+    QPixmap img2  = QPixmap(":/win7/pause").scaled( iconX, iconY );
+    QPixmap img3  = QPixmap(":/win7/play").scaled( iconX, iconY );
+    QPixmap img4  = QPixmap(":/win7/next").scaled( iconX, iconY );
     QBitmap mask  = img.createMaskFromColor(Qt::transparent);
     QBitmap mask2 = img2.createMaskFromColor(Qt::transparent);
     QBitmap mask3 = img3.createMaskFromColor(Qt::transparent);
