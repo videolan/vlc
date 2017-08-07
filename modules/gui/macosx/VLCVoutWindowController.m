@@ -177,7 +177,7 @@ void WindowClose(vout_window_t *p_wnd)
 
         [voutController.lock lock];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [voutController removeVoutforDisplay:[NSValue valueWithPointer:p_wnd]];
+            [voutController removeVoutForDisplay:[NSValue valueWithPointer:p_wnd]];
         });
         [voutController.lock unlock];
     }
@@ -217,7 +217,7 @@ void WindowClose(vout_window_t *p_wnd)
 {
     NSArray *keys = [voutWindows allKeys];
     for (NSValue *key in keys)
-        [self removeVoutforDisplay:key];
+        [self removeVoutForDisplay:key];
 
     if (var_InheritBool(getIntf(), "macosx-dim-keyboard")) {
         [keyboardBacklight switchLightsInstantly:YES];
@@ -397,7 +397,7 @@ void WindowClose(vout_window_t *p_wnd)
     return voutView;
 }
 
-- (void)removeVoutforDisplay:(NSValue *)o_key
+- (void)removeVoutForDisplay:(NSValue *)o_key
 {
     VLCVideoWindowCommon *o_window = [voutWindows objectForKey:o_key];
     if (!o_window) {
