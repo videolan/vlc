@@ -191,7 +191,7 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
             *va_arg(args, double *) = (double)(sys->position)
                                       / (double)(sys->length);
             break;
- 
+
         case DEMUX_SET_POSITION:
             sys->position = lround(va_arg(args, double) * sys->length);
             break;
@@ -420,7 +420,7 @@ static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
 #ifdef HAVE_LIBCDDB
     if (sys->cddb != NULL)
     {
-        char *str = cddb_disc_get_title(sys->cddb);
+        const char *str = cddb_disc_get_title(sys->cddb);
         if (NONEMPTY(str))
             vlc_meta_SetTitle(meta, str);
 
