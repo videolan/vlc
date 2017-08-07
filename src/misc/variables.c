@@ -316,7 +316,7 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->choices_text.p_values = NULL;
 
     p_var->b_incallback = false;
-    p_var->value_callbacks = (callback_table_t){ 0 };
+    p_var->value_callbacks = (callback_table_t){ 0, NULL };
 
     /* Always initialize the variable, even if it is a list variable; this
      * will lead to errors if the variable is not initialized, but it will
