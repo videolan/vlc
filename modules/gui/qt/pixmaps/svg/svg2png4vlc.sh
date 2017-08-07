@@ -7,22 +7,17 @@
     inkscape pixmap_source.svg -a 192:0:240:48    -e ../go-next.png
     inkscape pixmap_source.svg -a 240:0:288:48    -e ../lock.png
     inkscape pixmap_source.svg -a 288:0:336:48    -e ../next.png
-    inkscape pixmap_source.svg -a 336:0:384:48    -e ../next_16px.png
-    inkscape pixmap_source.svg -a 384:0:432:48    -e ../pause.png
-    inkscape pixmap_source.svg -a 432:0:480:48    -e ../pause_16px.png
-    inkscape pixmap_source.svg -a 480:0:528:48    -e ../play.png
-    inkscape pixmap_source.svg -a 528:0:576:48    -e ../play_16px.png
-    inkscape pixmap_source.svg -a 576:0:624:48    -e ../previous.png
-    inkscape pixmap_source.svg -a 624:0:672:48    -e ../previous_16px.png
-    inkscape pixmap_source.svg -a 672:0:720:48    -e ../profile_new.png
-    inkscape pixmap_source.svg -a 720:0:768:48    -e ../search_clear.png
-    inkscape pixmap_source.svg -a 768:0:816:48    -e ../slower.png
-    inkscape pixmap_source.svg -a 816:0:864:48    -e ../slower2.png
-    inkscape pixmap_source.svg -a 864:0:912:48    -e ../space.png
-    inkscape pixmap_source.svg -a 912:0:960:48    -e ../stop.png
-    inkscape pixmap_source.svg -a 960:0:1008:48   -e ../stop_16px.png
-    inkscape pixmap_source.svg -a 1008:0:1056:48  -e ../update.png
-    inkscape pixmap_source.svg -a 1056:0:1104:48  -e ../valid.png
+    inkscape pixmap_source.svg -a 336:0:384:48    -e ../pause.png
+    inkscape pixmap_source.svg -a 384:0:432:48    -e ../play.png
+    inkscape pixmap_source.svg -a 432:0:480:48    -e ../previous.png
+    inkscape pixmap_source.svg -a 480:0:528:48    -e ../profile_new.png
+    inkscape pixmap_source.svg -a 528:0:576:48    -e ../search_clear.png
+    inkscape pixmap_source.svg -a 576:0:624:48    -e ../slower.png
+    inkscape pixmap_source.svg -a 624:0:672:48    -e ../slower2.png
+    inkscape pixmap_source.svg -a 672:0:720:48    -e ../space.png
+    inkscape pixmap_source.svg -a 720:0:768:48    -e ../stop.png
+    inkscape pixmap_source.svg -a 768:0:816:48    -e ../update.png
+    inkscape pixmap_source.svg -a 816:0:864:48    -e ../valid.png
 
     inkscape pixmap_source.svg -a 0:96:48:144     -e ../addons/addon.png
     inkscape pixmap_source.svg -a 48:96:96:144    -e ../addons/addon_broken.png
