@@ -138,7 +138,7 @@ typedef struct {
  */
 enum {
     /* Hide the mouse. It will be sent when
-     * vout_display_t::info.b_hide_mouse is false */
+     * vout_display_t::info.needs_hide_mouse is true */
     VOUT_DISPLAY_HIDE_MOUSE VLC_DEPRECATED_ENUM,
 
     /* Ask to reset the internal buffers after a VOUT_DISPLAY_EVENT_PICTURES_INVALID
