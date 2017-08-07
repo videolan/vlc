@@ -241,7 +241,7 @@ void WindowClose(vout_window_t *p_wnd)
 
 - (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
-    BOOL isNotEmbedded = NO;
+    BOOL isEmbedded = YES;
     BOOL isNativeFullscreen = [[VLCMain sharedInstance] nativeFullscreenMode];
     BOOL windowDecorations = var_InheritBool(getIntf(), "video-deco");
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper");
@@ -308,14 +308,14 @@ void WindowClose(vout_window_t *p_wnd)
             [newVideoWindow setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
         }
 
-        isNotEmbedded = YES;
+        isEmbedded = NO;
     } else {
         if ((var_InheritBool(getIntf(), "embedded-video") && !mainWindowHasVideo)) {
             // setup embedded video
             newVideoWindow = [[VLCMain sharedInstance] mainWindow] ;
             voutView = [newVideoWindow videoView];
-            isNotEmbedded = NO;
             mainWindowHasVideo = YES;
+            isEmbedded = YES;
         } else {
             // setup detached window with controls
             NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
@@ -330,7 +330,7 @@ void WindowClose(vout_window_t *p_wnd)
             [newVideoWindow setLevel:NSNormalWindowLevel];
             [newVideoWindow useOptimizedDrawing: YES];
             voutView = [newVideoWindow videoView];
-            isNotEmbedded = YES;
+            isEmbedded = NO;
         }
     }
 
@@ -341,7 +341,7 @@ void WindowClose(vout_window_t *p_wnd)
 
     if (!videoWallpaper) {
         // set (only!) window origin if specified
-        if (isNotEmbedded) {
+        if (!isEmbedded) {
             NSRect window_rect = [newVideoWindow frame];
             if (videoViewPosition.origin.x > 0.)
                 window_rect.origin.x = videoViewPosition.origin.x;
@@ -383,7 +383,7 @@ void WindowClose(vout_window_t *p_wnd)
     if ([newVideoWindow class] == [VLCMainWindow class])
         [[[VLCMain sharedInstance] mainWindow] changePlaylistState: psVideoStartedOrStoppedEvent];
 
-    if (isNotEmbedded) {
+    if (!isEmbedded) {
         // events might be posted before window is created, so call them again
         [[[VLCMain sharedInstance] mainWindow] updateName];
         [[[VLCMain sharedInstance] mainWindow] updateWindow]; // update controls bar
