@@ -249,12 +249,18 @@ void FileOpenPanel::removeFile()
 /* Show a fileBrowser to select a subtitle */
 void FileOpenPanel::browseFileSub()
 {
-    // TODO Handle selection of more than one subtitles file
     QStringList urls = THEDP->showSimpleOpen( qtr("Open subtitle file"),
                            EXT_FILTER_SUBTITLE, p_intf->p_sys->filepath );
 
     if( urls.isEmpty() ) return;
-    ui.subInput->setText( urls.join(" ") );
+
+    // TODO Handle selection of more than one subtitles file
+    char *path = vlc_uri2path( qtu(urls[0]) );
+    if( path == NULL )
+        return;
+
+    ui.subInput->setText( qfu(path) );
+    free( path );
     updateMRL();
 }
 
