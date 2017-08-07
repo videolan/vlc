@@ -117,14 +117,9 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 if (i_state & VOUT_WINDOW_STATE_ABOVE)
                     i_cooca_level = NSStatusWindowLevel;
 
-                SEL sel = @selector(setWindowLevel:forWindow:);
-                NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
-                [inv setTarget:voutController];
-                [inv setSelector:sel];
-                [inv setArgument:&i_cooca_level atIndex:2]; // starting at 2!
-                [inv setArgument:&p_wnd atIndex:3];
-                [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
-                                   waitUntilDone:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [voutController setWindowLevel:i_cooca_level forWindow:p_wnd];
+                });
 
                 break;
             }
@@ -133,15 +128,10 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 unsigned int i_width  = va_arg(args, unsigned int);
                 unsigned int i_height = va_arg(args, unsigned int);
 
-                NSSize newSize = NSMakeSize(i_width, i_height);
-                SEL sel = @selector(setNativeVideoSize:forWindow:);
-                NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
-                [inv setTarget:voutController];
-                [inv setSelector:sel];
-                [inv setArgument:&newSize atIndex:2]; // starting at 2!
-                [inv setArgument:&p_wnd atIndex:3];
-                [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
-                                   waitUntilDone:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [voutController setNativeVideoSize:NSMakeSize(i_width, i_height)
+                                             forWindow:p_wnd];
+                });
 
                 break;
             }
@@ -155,15 +145,11 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 int i_full = va_arg(args, int);
                 BOOL b_animation = YES;
 
-                SEL sel = @selector(setFullscreen:forWindow:withAnimation:);
-                NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
-                [inv setTarget:voutController];
-                [inv setSelector:sel];
-                [inv setArgument:&i_full atIndex:2]; // starting at 2!
-                [inv setArgument:&p_wnd atIndex:3];
-                [inv setArgument:&b_animation atIndex:4];
-                [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
-                                   waitUntilDone:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [voutController setFullscreen:i_full
+                                        forWindow:p_wnd
+                                    withAnimation:b_animation];
+                });
 
                 break;
             }
@@ -190,7 +176,9 @@ void WindowClose(vout_window_t *p_wnd)
         }
 
         [voutController.lock lock];
-        [voutController performSelectorOnMainThread:@selector(removeVoutforDisplay:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [voutController removeVoutforDisplay:[NSValue valueWithPointer:p_wnd]];
+        });
         [voutController.lock unlock];
     }
 }
