@@ -65,18 +65,12 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         }
         [voutController.lock lock];
 
-        SEL sel = @selector(setupVoutForWindow:withProposedVideoViewPosition:);
-        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
-        [inv setTarget:voutController];
-        [inv setSelector:sel];
-        [inv setArgument:&p_wnd atIndex:2]; // starting at 2!
-        [inv setArgument:&proposedVideoViewPosition atIndex:3];
+        __block VLCVoutView *videoView = nil;
 
-        [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
-                           waitUntilDone:YES];
-
-        VLCVoutView *videoView = nil;
-        [inv getReturnValue:&videoView];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            videoView = [voutController setupVoutForWindow:p_wnd
+                             withProposedVideoViewPosition:proposedVideoViewPosition];
+        });
 
         // this method is not supposed to fail
         assert(videoView != nil);
