@@ -42,7 +42,7 @@ static char *vlc_from_EIT (const void *buf, size_t length)
     }
     else if ((1 << c) & 0x0EFE) /* 1-7, 9-11 -> ISO 8859-(c+4) */
     {
-        snprintf (encbuf, sizeof (encbuf), "ISO_8859-%hhu", 4 + c);
+        snprintf (encbuf, sizeof (encbuf), "ISO_8859-%u", 4u + c);
     }
     else switch (c)
     {
