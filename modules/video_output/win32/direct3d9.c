@@ -937,7 +937,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    UpdateRects(vd, NULL, NULL, true);
+    UpdateRects(vd, NULL, true);
 
     if (Direct3D9CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
@@ -993,7 +993,7 @@ static int Direct3D9Reset(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
-    UpdateRects(vd, NULL, NULL, true);
+    UpdateRects(vd, NULL, true);
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, &vd->fmt)) {

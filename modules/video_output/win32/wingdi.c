@@ -314,7 +314,7 @@ static int Init(vout_display_t *vd,
     else
         sys->sys.pool = NULL;
 
-    UpdateRects(vd, NULL, NULL, true);
+    UpdateRects(vd, NULL, true);
 
     return VLC_SUCCESS;
 }

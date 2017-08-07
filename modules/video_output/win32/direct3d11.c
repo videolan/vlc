@@ -1168,7 +1168,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             sys->picQuad.i_width = texDesc.Width;
 
             BEFORE_UPDATE_RECTS;
-            UpdateRects(vd, NULL, NULL, true);
+            UpdateRects(vd, NULL, true);
             AFTER_UPDATE_RECTS;
             UpdateSize(vd);
         }
@@ -1652,7 +1652,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 
     BEFORE_UPDATE_RECTS;
-    UpdateRects(vd, NULL, NULL, true);
+    UpdateRects(vd, NULL, true);
     AFTER_UPDATE_RECTS;
 
 #if defined(HAVE_ID3D11VIDEODECODER)

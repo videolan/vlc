@@ -441,7 +441,7 @@ static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
         msg_Err(vd, "cannot initialize DirectX DirectDraw");
         return VLC_EGENERIC;
     }
-    UpdateRects(vd, NULL, NULL, true);
+    UpdateRects(vd, NULL, true);
 
     /* Create the picture pool */
     if (DirectXCreatePool(vd, &sys->sys.use_overlay, fmt)) {
