@@ -139,7 +139,7 @@ typedef struct {
 enum {
     /* Hide the mouse. It will be sent when
      * vout_display_t::info.b_hide_mouse is false */
-    VOUT_DISPLAY_HIDE_MOUSE VLC_DEPRECATED,
+    VOUT_DISPLAY_HIDE_MOUSE VLC_DEPRECATED_ENUM,
 
     /* Ask to reset the internal buffers after a VOUT_DISPLAY_EVENT_PICTURES_INVALID
      * request.
@@ -149,10 +149,10 @@ enum {
 #if defined(_WIN32) || defined(__OS2__)
     /* Ask the module to acknowledge/refuse the fullscreen state change after
      * being requested (externally or by VOUT_DISPLAY_EVENT_FULLSCREEN */
-    VOUT_DISPLAY_CHANGE_FULLSCREEN VLC_DEPRECATED,     /* bool fs */
+    VOUT_DISPLAY_CHANGE_FULLSCREEN VLC_DEPRECATED_ENUM,     /* bool fs */
     /* Ask the module to acknowledge/refuse the window management state change
      * after being requested externally or by VOUT_DISPLAY_WINDOW_STATE */
-    VOUT_DISPLAY_CHANGE_WINDOW_STATE VLC_DEPRECATED,   /* unsigned state */
+    VOUT_DISPLAY_CHANGE_WINDOW_STATE VLC_DEPRECATED_ENUM,   /* unsigned state */
 #endif
     /* Ask the module to acknowledge/refuse the display size change requested
      * (externally or by VOUT_DISPLAY_EVENT_DISPLAY_SIZE) */
