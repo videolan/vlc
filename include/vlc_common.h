@@ -83,6 +83,11 @@
 /* Function attributes for compiler warnings */
 #ifdef __GNUC__
 # define VLC_DEPRECATED __attribute__((deprecated))
+# if VLC_GCC_VERSION(6,0)
+#  define VLC_DEPRECATED_ENUM __attribute__((deprecated))
+# else
+#  define VLC_DEPRECATED_ENUM
+# endif
 
 # if defined( _WIN32 )
 #  define VLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
@@ -95,6 +100,7 @@
 
 #else
 # define VLC_DEPRECATED
+# define VLC_DEPRECATED_ENUM
 # define VLC_FORMAT(x,y)
 # define VLC_FORMAT_ARG(x)
 # define VLC_MALLOC
