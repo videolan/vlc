@@ -811,19 +811,19 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
         action = menu->addAction( qtr( "&Play" ),
                 ActionsManager::getInstance( p_intf ), SLOT( play() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-        action->setIcon( QIcon( ":/menu/play" ) );
+        action->setIcon( QIcon( ":/toolbar/play_b" ) );
 #endif
     }
     else
     {
         action = addMIMStaticEntry( p_intf, menu, qtr( "Pause" ),
-                ":/menu/pause", SLOT( togglePlayPause() ) );
+                ":/toolbar/pause_b", SLOT( togglePlayPause() ) );
     }
     action->setData( ACTION_DELETE_ON_REBUILD );
 
     /* Stop */
     action = addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ),
-            ":/menu/stop", SLOT( stop() ), true );
+            ":/toolbar/stop_b", SLOT( stop() ), true );
     if( !p_input )
         action->setEnabled( false );
     action->setData( ACTION_DELETE_ON_REBUILD );
@@ -831,13 +831,13 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
     /* Next / Previous */
     bool bPlaylistEmpty = THEMIM->hasEmptyPlaylist();
     action = addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
-            ":/menu/previous", SLOT( prev() ), true );
+            ":/toolbar/previous_b", SLOT( prev() ), true );
     action->setEnabled( !bPlaylistEmpty );
     action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
     CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
 
     action = addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
-            ":/menu/next", SLOT( next() ), true );
+            ":/toolbar/next_b", SLOT( next() ), true );
     action->setEnabled( !bPlaylistEmpty );
     action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
     CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );

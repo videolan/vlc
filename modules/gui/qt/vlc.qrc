@@ -15,11 +15,6 @@
         <file alias="settings">pixmaps/menus/settings_16px.png</file>
         <file alias="stream">pixmaps/menus/stream_16px.png</file>
         <file alias="playlist_menu">pixmaps/menus/playlist_16px.png</file>
-        <file alias="next">pixmaps/next_16px.png</file>
-        <file alias="previous">pixmaps/previous_16px.png</file>
-        <file alias="play">pixmaps/play_16px.png</file>
-        <file alias="pause">pixmaps/pause_16px.png</file>
-        <file alias="stop">pixmaps/stop_16px.png</file>
         <file alias="exit">pixmaps/menus/exit_16px.png</file>
     </qresource>
     <qresource prefix="/util">

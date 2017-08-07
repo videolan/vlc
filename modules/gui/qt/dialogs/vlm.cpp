@@ -535,7 +535,7 @@ VLMBroadcast::VLMBroadcast( VLMWrapper *vlm, const QString& _name,
     b_looped = _looped;
 
     playButton = new QToolButton;
-    playButton->setIcon( QIcon( ":/menu/play" ) );
+    playButton->setIcon( QIcon( ":/toolbar/play_b" ) );
     playButton->setToolTip( qtr("Play") );
     objLayout->addWidget( playButton, 1, 0 );
     b_playing = true;
@@ -570,12 +570,12 @@ void VLMBroadcast::togglePlayPause()
     if( b_playing )
     {
         vlm->ControlBroadcast( name, ControlBroadcastPause );
-        playButton->setIcon( QIcon( ":/menu/pause" ) );
+        playButton->setIcon( QIcon( ":/toolbar/pause_b" ) );
     }
     else
     {
         vlm->ControlBroadcast( name, ControlBroadcastPlay );
-        playButton->setIcon( QIcon( ":/menu/play" ) );
+        playButton->setIcon( QIcon( ":/toolbar/play_b" ) );
     }
     b_playing = !b_playing;
 }
