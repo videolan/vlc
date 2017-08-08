@@ -25,10 +25,11 @@ OPTIONS="
       --enable-vorbis
       --enable-png
       --enable-x264
+      --enable-libass
       --disable-xcb
       --disable-xvideo
       --enable-freetype
-      --disable-fribidi
+      --enable-fribidi
       --enable-fontconfig
       --enable-kva
       --enable-kai
