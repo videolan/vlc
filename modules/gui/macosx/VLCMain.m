@@ -350,10 +350,8 @@ static VLCMain *sharedInstance = nil;
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
-    [_voutController.lock lock];
     // closes all open vouts
     _voutController = nil;
-    [_voutController.lock unlock];
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];

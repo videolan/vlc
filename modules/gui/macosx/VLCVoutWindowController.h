@@ -33,8 +33,6 @@
 
 @interface VLCVoutWindowController : NSObject
 
-@property (readonly, atomic) NSLock *lock;
-
 @property (readonly, nonatomic) NSInteger currentStatusWindowLevel;
 
 - (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition;

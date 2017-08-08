@@ -63,7 +63,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         if (!voutController) {
             return VLC_EGENERIC;
         }
-        [voutController.lock lock];
 
         __block VLCVoutView *videoView = nil;
 
@@ -77,8 +76,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
         msg_Dbg(getIntf(), "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
         p_wnd->handle.nsobject = (void *)CFBridgingRetain(videoView);
-
-        [voutController.lock unlock];
 
         p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
         p_wnd->control = WindowControl;
@@ -94,7 +91,6 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         if (!voutController) {
             return VLC_EGENERIC;
         }
-        [voutController.lock lock];
 
         switch(i_query) {
             case VOUT_WINDOW_SET_STATE:
@@ -150,13 +146,11 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             default:
             {
                 msg_Warn(p_wnd, "unsupported control query: %i", i_query );
-                [voutController.lock unlock];
                 return VLC_EGENERIC;
             }
         }
 
         out:
-        [voutController.lock unlock];
         return VLC_SUCCESS;
     }
 }
@@ -169,11 +163,9 @@ void WindowClose(vout_window_t *p_wnd)
             return;
         }
 
-        [voutController.lock lock];
         dispatch_async(dispatch_get_main_queue(), ^{
             [voutController removeVoutForDisplay:[NSValue valueWithPointer:p_wnd]];
         });
-        [voutController.lock unlock];
     }
 }
 
