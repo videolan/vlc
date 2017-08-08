@@ -15,6 +15,9 @@ OSX_VERSION=`xcrun --show-sdk-version`
 OSX_KERNELVERSION=`uname -r | cut -d. -f1`
 SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
 
+CORE_COUNT=`sysctl -n machdep.cpu.core_count`
+let JOBS=$CORE_COUNT+1
+
 usage()
 {
 cat << EOF
@@ -25,6 +28,7 @@ Build vlc in the current directory
 OPTIONS:
    -h            Show some help
    -q            Be quiet
+   -j            Force number of cores to be used
    -r            Rebuild everything (tools, contribs, vlc)
    -c            Recompile contribs from sources
    -k <sdk>      Use the specified sdk (default: $SDKROOT)
@@ -43,7 +47,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "hvrck:a:" OPTION
+while getopts "hvrck:a:j:" OPTION
 do
      case $OPTION in
          h)
@@ -65,6 +69,9 @@ do
          ;;
          k)
              SDKROOT=$OPTARG
+         ;;
+         j)
+             JOBS=$OPTARG
          ;;
      esac
 done
@@ -142,9 +149,6 @@ fi
 make > $out
 spopd
 
-core_count=`sysctl -n machdep.cpu.core_count`
-let jobs=$core_count+1
-
 #
 # vlc/contribs
 #
@@ -169,8 +173,8 @@ if [ "$REBUILD" = "yes" ]; then
 fi
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     make fetch
-    make -j$jobs .gettext
-    make -j$jobs
+    make -j$JOBS .gettext
+    make -j$JOBS
 else
 if [ ! -e "../$TRIPLET" ]; then
     make prebuilt > $out
@@ -219,8 +223,8 @@ if [ "$REBUILD" = "yes" ]; then
     make clean
 fi
 
-info "Running make -j$jobs"
-make -j$jobs
+info "Running make -j$JOBS"
+make -j$JOBS
 
 info "Preparing VLC.app"
 make VLC.app
