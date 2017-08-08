@@ -186,9 +186,9 @@ static int UpdateAudioFormat( decoder_t *p_dec )
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 
     /* Date management */
-    if( p_dec->fmt_out.audio.i_rate != frame_info.rate )
+    if( p_dec->fmt_out.audio.i_rate != (unsigned int)frame_info.rate )
     {
-        p_dec->fmt_out.audio.i_rate = frame_info.rate;
+        p_dec->fmt_out.audio.i_rate = (unsigned int)frame_info.rate;
         date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
         date_Set( &p_sys->end_date, 0 );
     }
