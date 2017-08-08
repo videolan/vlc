@@ -128,7 +128,9 @@ typedef struct {
 typedef struct {
     bool is_slow;                           /* The picture memory has slow read/write */
     bool has_double_click;                  /* Is double-click generated */
-    bool needs_hide_mouse;                  /* Needs VOUT_DISPLAY_HIDE_MOUSE */
+    bool needs_hide_mouse;                  /* Needs VOUT_DISPLAY_HIDE_MOUSE,
+                                             * needs to call vout_display_SendEventMouseMoved()
+                                             * or vout_display_SendEventMouseState() */
     bool has_pictures_invalid;              /* Will VOUT_DISPLAY_EVENT_PICTURES_INVALID be used */
     const vlc_fourcc_t *subpicture_chromas; /* List of supported chromas for subpicture rendering. */
 } vout_display_info_t;
