@@ -626,6 +626,174 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 debug( vars, "Colour Space=%s", clrspc );
             }
         }
+#if LIBMATROSKA_VERSION >= 0x010405
+        E_CASE( KaxVideoColour, colours)
+        {
+            debug( vars, "Video Colors");
+            if (vars.tk->fmt.i_cat != VIDEO_ES ) {
+                msg_Err( vars.p_demuxer, "Video colors elements not allowed for this track" );
+            } else {
+            vars.level += 1;
+            dispatcher.iterate (colours.begin (), colours.end (), Payload( vars ) );
+            vars.level -= 1;
+            }
+        }
+        E_CASE( KaxVideoColourRange, range )
+        {
+            switch( static_cast<uint8>(range) )
+            {
+            case 1: // broadcast
+                vars.tk->fmt.video.b_color_range_full = 0;
+                break;
+            case 2: // full range
+                vars.tk->fmt.video.b_color_range_full = 1;
+                break;
+            case 3: // Matrix coefficients + Transfer characteristics
+            default:
+                debug( vars, "Unsupported Colour Range=%d", static_cast<uint8>(range) );
+            }
+        }
+        E_CASE( KaxVideoColourTransferCharacter, tranfer )
+        {
+            switch( static_cast<uint8>(tranfer) )
+            {
+            case 1: // BT-709
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_BT709;
+                break;
+            case 4: // Gamma 2.2
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SRGB;
+                break;
+            case 5: // Gamma 2.8
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_BT470_BG;
+                break;
+            case 6: // SMPTE 170
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_170;
+                break;
+            case 7: // SMPTE 240M
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_240;
+                break;
+            case 8: // Linear
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_LINEAR;
+                break;
+            case 16: // SMPTE ST-2084
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_ST2084;
+                break;
+            case 18: // ARIB STD-B67
+                vars.tk->fmt.video.transfer = TRANSFER_FUNC_ARIB_B67;
+                break;
+            case 9:  // Log
+            case 10: // Log SQRT
+            case 11: // IEC 61966-2-4
+            case 12: // ITU-R BT.1361 Extended Colour Gamut
+            case 13: // IEC 61966-2-1
+            case 14: // ITU-R BT.2020 10 bit
+            case 15: // ITU-R BT.2020 12 bit
+            case 17: // SMPTE ST 428-1
+            default:
+                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(tranfer) );
+            }
+        }
+        E_CASE( KaxVideoColourPrimaries, primaries )
+        {
+            switch( static_cast<uint8>(primaries) )
+            {
+            case 1: // ITU-R BT.709
+                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT709;
+                break;
+            case 4: // ITU-R BT.470M
+                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT470_M;
+                break;
+            case 5: // ITU-R BT.470BG
+                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT470_BG;
+                break;
+            case 6: // SMPTE 170M
+                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_SMTPE_170;
+                break;
+            case 7: // SMPTE 240M
+                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_SMTPE_240;
+                break;
+            case 9: // ITU-R BT.2020
+                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT2020;
+                break;
+            case 8:  // FILM
+            case 10: // SMPTE ST 428-1
+            case 22: // JEDEC P22 phosphors
+            default:
+                debug( vars, "Unsupported Colour Primaries=%d", static_cast<uint8>(primaries) );
+            }
+        }
+        E_CASE( KaxVideoColourMaxCLL, maxCLL )
+        {
+            debug( vars, "Video Max Pixel Brightness");
+            vars.tk->fmt.video.lighting.MaxCLL = static_cast<uint16_t>(maxCLL);
+        }
+        E_CASE( KaxVideoColourMaxFALL, maxFALL )
+        {
+            debug( vars, "Video Max Frame Brightness");
+            vars.tk->fmt.video.lighting.MaxFALL = static_cast<uint16_t>(maxFALL);
+        }
+        E_CASE( KaxVideoColourMasterMeta, mastering )
+        {
+            debug( vars, "Video Mastering Metadata");
+            if (vars.tk->fmt.i_cat != VIDEO_ES ) {
+                msg_Err( vars.p_demuxer, "Video metadata elements not allowed for this track" );
+            } else {
+            vars.level += 1;
+            dispatcher.iterate (mastering.begin (), mastering.end (), Payload( vars ) );
+            vars.level -= 1;
+            }
+        }
+        E_CASE( KaxVideoLuminanceMax, maxLum )
+        {
+            debug( vars, "Video Luminance Max");
+            vars.tk->fmt.video.mastering.max_luminance = static_cast<float>(maxLum) * 10000.f;
+        }
+        E_CASE( KaxVideoLuminanceMin, minLum )
+        {
+            debug( vars, "Video Luminance Min");
+            vars.tk->fmt.video.mastering.min_luminance = static_cast<float>(minLum) * 10000.f;
+        }
+        E_CASE( KaxVideoGChromaX, chroma )
+        {
+            debug( vars, "Video Red Chroma X");
+            vars.tk->fmt.video.mastering.primaries[0] = static_cast<float>(chroma) * 50000.f;
+        }
+        E_CASE( KaxVideoGChromaY, chroma )
+        {
+            debug( vars, "Video Red Chroma Y");
+            vars.tk->fmt.video.mastering.primaries[1] = static_cast<float>(chroma) * 50000.f;
+        }
+        E_CASE( KaxVideoBChromaX, chroma )
+        {
+            debug( vars, "Video Red Chroma X");
+            vars.tk->fmt.video.mastering.primaries[2] = static_cast<float>(chroma) * 50000.f;
+        }
+        E_CASE( KaxVideoBChromaY, chroma )
+        {
+            debug( vars, "Video Red Chroma Y");
+            vars.tk->fmt.video.mastering.primaries[3] = static_cast<float>(chroma) * 50000.f;
+        }
+        E_CASE( KaxVideoRChromaX, chroma )
+        {
+            debug( vars, "Video Red Chroma X");
+            vars.tk->fmt.video.mastering.primaries[4] = static_cast<float>(chroma) * 50000.f;
+        }
+        E_CASE( KaxVideoRChromaY, chroma )
+        {
+            debug( vars, "Video Red Chroma Y");
+            vars.tk->fmt.video.mastering.primaries[5] = static_cast<float>(chroma) * 50000.f;
+        }
+        E_CASE( KaxVideoWhitePointChromaX, white )
+        {
+            debug( vars, "Video Red Chroma X");
+            vars.tk->fmt.video.mastering.white_point[0] = static_cast<float>(white) * 50000.f;
+        }
+        E_CASE( KaxVideoWhitePointChromaY, white )
+        {
+            debug( vars, "Video Red Chroma Y");
+            vars.tk->fmt.video.mastering.white_point[1] = static_cast<float>(white) * 50000.f;
+        }
+#endif
         E_CASE( KaxTrackAudio, tka ) {
             debug( vars, "Track Audio");
             if (vars.tk->fmt.i_cat != AUDIO_ES ) {
