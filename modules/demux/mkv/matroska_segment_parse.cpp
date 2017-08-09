@@ -755,22 +755,22 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoGChromaX, chroma )
         {
-            debug( vars, "Video Red Chroma X");
+            debug( vars, "Video Green Chroma X");
             vars.tk->fmt.video.mastering.primaries[0] = static_cast<float>(chroma) * 50000.f;
         }
         E_CASE( KaxVideoGChromaY, chroma )
         {
-            debug( vars, "Video Red Chroma Y");
+            debug( vars, "Video Green Chroma Y");
             vars.tk->fmt.video.mastering.primaries[1] = static_cast<float>(chroma) * 50000.f;
         }
         E_CASE( KaxVideoBChromaX, chroma )
         {
-            debug( vars, "Video Red Chroma X");
+            debug( vars, "Video Blue Chroma X");
             vars.tk->fmt.video.mastering.primaries[2] = static_cast<float>(chroma) * 50000.f;
         }
         E_CASE( KaxVideoBChromaY, chroma )
         {
-            debug( vars, "Video Red Chroma Y");
+            debug( vars, "Video Blue Chroma Y");
             vars.tk->fmt.video.mastering.primaries[3] = static_cast<float>(chroma) * 50000.f;
         }
         E_CASE( KaxVideoRChromaX, chroma )
@@ -785,12 +785,12 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoWhitePointChromaX, white )
         {
-            debug( vars, "Video Red Chroma X");
+            debug( vars, "Video WhitePoint X");
             vars.tk->fmt.video.mastering.white_point[0] = static_cast<float>(white) * 50000.f;
         }
         E_CASE( KaxVideoWhitePointChromaY, white )
         {
-            debug( vars, "Video Red Chroma Y");
+            debug( vars, "Video WhitePoint Y");
             vars.tk->fmt.video.mastering.white_point[1] = static_cast<float>(white) * 50000.f;
         }
 #endif
