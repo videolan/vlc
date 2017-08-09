@@ -1,0 +1,20 @@
+--- gnutls/configure.ac	2016-07-05 18:34:43.000000000 +0200
++++ gnutls.new/configure.ac	2017-08-09 21:57:44.000000000 +0200
+@@ -175,6 +175,9 @@
+ 		   enable_getrandom=getrandom],
+ 		  [AC_MSG_RESULT(no)])
+ 
++if test "$have_macosx" = "yes"; then
++AC_MSG_CHECKING([for getentropy disabled for OSX])
++else
+ AC_MSG_CHECKING([for getentropy])
+ AC_LINK_IFELSE([AC_LANG_PROGRAM([
+ 	   #include <unistd.h>],[
+@@ -184,6 +187,7 @@
+ 		   AC_DEFINE([HAVE_GETENTROPY], 1, [Enable the OpenBSD getentropy function])
+ 		   enable_getrandom=getentropy],
+ 		  [AC_MSG_RESULT(no)])
++fi
+ 
+ dnl Try the hooks.m4
+ LIBGNUTLS_HOOKS
