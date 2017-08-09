@@ -580,10 +580,7 @@ static void UpdateCursor( event_thread_t *p_event, bool b_show )
     HWND hwnd = WindowFromPoint(p);
     if( hwnd == p_event->hvideownd || hwnd == p_event->hwnd )
     {
-        if( b_show )
-            SetCursor( cursor );
-        else
-            SetCursorPos( p.x, p.y );
+        SetCursor( cursor );
     }
 }
 
