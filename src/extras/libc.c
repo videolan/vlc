@@ -387,19 +387,25 @@ size_t vlc_iconv( vlc_iconv_t cd, const char **inbuf, size_t *inbytesleft,
 #ifndef __linux__
     if ( cd == (vlc_iconv_t)(-2) )
     {
-        unsigned char *out = (unsigned char *)*outbuf;
+        unsigned char *out = NULL;
+        if (outbuf != NULL)
+            out = (unsigned char *)*outbuf;
 
         ret = ISO6937toUTF8( inbuf, inbytesleft, &out, outbytesleft );
-        *outbuf = (char *)out;
+        if (outbuf != NULL)
+            *outbuf = (char *)out;
     }
     else
 #endif
 #if defined(HAVE_ICONV)
     {
-        ICONV_CONST char *cin = (ICONV_CONST char *)*inbuf;
+        ICONV_CONST char *cin = NULL;
+        if (inbuf != NULL)
+            cin = (ICONV_CONST char *)*inbuf;
 
         ret = iconv( cd, &cin, inbytesleft, outbuf, outbytesleft );
-        *inbuf = cin;
+        if (inbuf != NULL)
+            *inbuf = cin;
     }
 #else
         abort ();
