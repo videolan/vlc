@@ -72,6 +72,8 @@ struct event_thread_t
     HCURSOR cursor_arrow;
     HCURSOR cursor_empty;
     unsigned button_pressed;
+    mtime_t hide_timeout;
+    mtime_t last_moved;
 
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
@@ -118,6 +120,20 @@ static HCURSOR EmptyCursor( HINSTANCE instance );
 /* Mouse events sending functions */
 static void MouseReleased( event_thread_t *p_event, unsigned button );
 static void MousePressed( event_thread_t *p_event, HWND hwnd, unsigned button );
+
+static void CALLBACK HideMouse(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+    VLC_UNUSED(hwnd); VLC_UNUSED(uMsg); VLC_UNUSED(dwTime);
+    event_thread_t *p_event = (event_thread_t *)idEvent;
+    UpdateCursor( p_event, false );
+}
+
+static void UpdateCursorMoved( event_thread_t *p_event )
+{
+    UpdateCursor( p_event, true );
+    p_event->last_moved = mdate();
+    SetTimer( p_event->hwnd, (UINT_PTR)p_event, p_event->hide_timeout, HideMouse );
+}
 
 /* Local helpers */
 static inline bool isMouseEvent( WPARAM type )
@@ -211,12 +227,12 @@ static void *EventThread( void *p_this )
                 (abs(mouse_pos.y - old_mouse_pos.y)) > 2 ) )
             {
                 old_mouse_pos = mouse_pos;
-                UpdateCursor( p_event, true );
+                UpdateCursorMoved( p_event );
             }
         }
         else if( isMouseEvent( msg.message ) )
         {
-            UpdateCursor( p_event, true );
+            UpdateCursorMoved( p_event );
         }
         else if( msg.message == WM_VLC_HIDE_MOUSE )
         {
@@ -709,6 +725,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     {
         p_event->vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
     }
+    p_event->hide_timeout = var_InheritInteger( p_event->vd, "mouse-hide-timeout" );
+    UpdateCursorMoved( p_event );
 
     /* Fill in the window class structure */
     wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
