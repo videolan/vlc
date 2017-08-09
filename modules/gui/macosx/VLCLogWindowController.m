@@ -54,7 +54,6 @@
 static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap)
 {
     @autoreleasepool {
-        int state;
         char *msg;
         VLCLogWindowController *controller = (__bridge VLCLogWindowController*)data;
         static NSString *types[4] = { @"info", @"error", @"warning", @"debug" };
