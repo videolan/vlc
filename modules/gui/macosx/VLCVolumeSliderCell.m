@@ -155,25 +155,6 @@
     [NSGraphicsContext restoreGraphicsState];
 }
 
-- (double)myNormalizedDouble
-{
-    double min = [self minValue];
-    double max = [self maxValue];
-    double current = [self doubleValue];
-
-    max -= min;
-    current -= min;
-
-    return current / max;
-}
-
-- (NSRect)knobRectFlipped:(BOOL)flipped
-{
-    double val = [self myNormalizedDouble];
-    NSRect rect = NSMakeRect((NSWidth(_trackRect) - self.knobThickness) * val, -1, self.knobThickness, self.knobThickness);
-    return [[self controlView] backingAlignedRect:rect options:NSAlignAllEdgesNearest];
-}
-
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
 {
     // Inset rect

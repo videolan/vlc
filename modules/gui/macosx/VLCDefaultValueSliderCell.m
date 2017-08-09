@@ -117,45 +117,38 @@
 }
 
 /*
- * Adapted from GNUstep NSSliderCell
- * - (NSRect)knobRectFlipped:(BOOL)flipped
- *
  * Calculates the knobRect for a given position
  * This is later used to draw the default tick mark in the center of
  * where the knob would be, when it is at the default value.
  */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
+
 - (NSRect)knobRectFlipped:(BOOL)flipped forValue:(double)doubleValue
-{
-    NSRect superRect = [super knobRectFlipped:flipped];
-    NSPoint	origin = _trackRect.origin;
-    NSSize size = superRect.size;
+ {
+     NSRect resultRect;
+     double val = [self normalizedValue:doubleValue] / 100;
 
-    if ([self isVertical] && flipped) {
-        doubleValue = _maxValue + _minValue - doubleValue;
-    }
+     if (self.isVertical) {
+         resultRect.origin.x = -1;
+         resultRect.origin.y = (NSHeight(_trackRect) - self.knobThickness) * val;
+         if (_isRTL)
+             resultRect.origin.y = (NSHeight(_trackRect) - self.knobThickness) - resultRect.origin.y;
+     } else {
+         resultRect.origin.x = (NSWidth(_trackRect) - self.knobThickness) * val;
+         resultRect.origin.y = -1;
+         if (_isRTL)
+             resultRect.origin.x = (NSWidth(_trackRect) - self.knobThickness) - resultRect.origin.x;
+     }
 
-    doubleValue = (doubleValue - _minValue) / (_maxValue - _minValue);
+     resultRect.size.height = self.knobThickness;
+     resultRect.size.width = self.knobThickness;
 
-    if ([self isVertical] == YES) {
-        origin.x = superRect.origin.x;
-        origin.y += (_trackRect.size.height - size.height) * doubleValue;
-    } else {
-        origin.x += ((_trackRect.size.width - size.width) * doubleValue);
-        origin.y = superRect.origin.y;
-    }
-
-    return NSMakeRect(origin.x, origin.y, size.width, size.height);
-}
+     return [self.controlView backingAlignedRect:resultRect options:NSAlignAllEdgesNearest];
+ }
 
 #pragma mark -
 #pragma mark Overwritten super methods
-
-- (NSRect)knobRectFlipped:(BOOL)flipped
-{
-    return [self knobRectFlipped:flipped forValue:[self doubleValue]];
-}
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
