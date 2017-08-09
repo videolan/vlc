@@ -718,9 +718,6 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
 
-    case VOUT_DISPLAY_HIDE_MOUSE:
-        EventThreadMouseHide(sys->event);
-        return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
         vlc_assert_unreachable();
 #endif

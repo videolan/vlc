@@ -48,7 +48,6 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-#define WM_VLC_HIDE_MOUSE   (WM_APP + 0)
 #define WM_VLC_CHANGE_TEXT  (WM_APP + 1)
 
 struct event_thread_t
@@ -234,10 +233,6 @@ static void *EventThread( void *p_this )
         {
             UpdateCursorMoved( p_event );
         }
-        else if( msg.message == WM_VLC_HIDE_MOUSE )
-        {
-            UpdateCursor( p_event, false );
-        }
 
         /* */
         switch( msg.message )
@@ -264,9 +259,6 @@ static void *EventThread( void *p_this )
             }
             break;
         case WM_NCMOUSEMOVE:
-            break;
-
-        case WM_VLC_HIDE_MOUSE:
             break;
 
         case WM_LBUTTONDOWN:
@@ -405,11 +397,6 @@ static void *EventThread( void *p_this )
     Win32VoutCloseWindow( p_event );
     vlc_restorecancel(canc);
     return NULL;
-}
-
-void EventThreadMouseHide( event_thread_t *p_event )
-{
-    PostMessage( p_event->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
 }
 
 void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )

@@ -540,7 +540,6 @@ static int Open(vlc_object_t *object)
     vd->fmt = fmt;
 
     vd->info.has_double_click     = true;
-    vd->info.needs_hide_mouse     = true;
     vd->info.has_pictures_invalid = vd->info.is_slow;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
