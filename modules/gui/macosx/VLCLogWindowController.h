@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLogWindowController.h: Mac OS X interface crash reporter
+ * VLCLogWindowController.h: Log message window controller
  *****************************************************************************
  * Copyright (C) 2004-2013 VLC authors and VideoLAN
  * $Id$
