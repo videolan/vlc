@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCDebugMessageWindowController.m: Mac OS X interface crash reporter
+ * VLCLogWindowController.h: Mac OS X interface crash reporter
  *****************************************************************************
  * Copyright (C) 2004-2013 VLC authors and VideoLAN
  * $Id$
@@ -25,7 +25,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCDebugMessageWindowController : NSWindowController
+@interface VLCLogWindowController : NSWindowController
 
 @property (assign) IBOutlet NSTableView *messageTable;
 @property (assign) IBOutlet NSButton *saveButton;

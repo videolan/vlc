@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCDebugMessageWindowController.m: Mac OS X interface crash reporter
+ * VLCLogWindowController.m: Mac OS X interface crash reporter
  *****************************************************************************
  * Copyright (C) 2004-2013 VLC authors and VideoLAN
  * $Id$
@@ -23,11 +23,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCDebugMessageWindowController.h"
+#import "VLCLogWindowController.h"
 #import "VLCMain.h"
 #import <vlc_common.h>
 
-@interface VLCDebugMessageWindowController () <NSWindowDelegate>
+@interface VLCLogWindowController () <NSWindowDelegate>
 
 /* This array stores messages that are managed by the arrayController */
 @property (retain) NSMutableArray *messagesArray;
@@ -56,7 +56,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     @autoreleasepool {
         int state;
         char *msg;
-        VLCDebugMessageWindowController *controller = (__bridge VLCDebugMessageWindowController*)data;
+        VLCLogWindowController *controller = (__bridge VLCLogWindowController*)data;
         static NSString *types[4] = { @"info", @"error", @"warning", @"debug" };
 
         if (vasprintf(&msg, format, ap) == -1) {
@@ -82,7 +82,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     }
 }
 
-@implementation VLCDebugMessageWindowController
+@implementation VLCLogWindowController
 
 - (id)init
 {

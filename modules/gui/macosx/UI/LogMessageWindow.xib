@@ -5,7 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCDebugMessageWindowController">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLogWindowController">
             <connections>
                 <outlet property="arrayController" destination="0Or-bh-QJU" id="Wo9-Rk-Jkb"/>
                 <outlet property="detailView" destination="ESj-Mw-X94" id="YDo-hQ-k1t"/>

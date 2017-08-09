@@ -46,7 +46,7 @@
 #import "VLCMainWindowControlsBar.h"
 #import "VLCExtensionsManager.h"
 #import "VLCConvertAndSaveWindowController.h"
-#import "VLCDebugMessageWindowController.h"
+#import "VLCLogWindowController.h"
 #import "VLCAddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"
 #import "NSScreen+VLCAdditions.h"
