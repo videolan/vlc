@@ -47,6 +47,7 @@
 
 @property (readwrite, strong) IBOutlet VLCTimeField *timeField;
 @property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *fullscreenButtonWidthConstraint;
 
 @property (readwrite, strong) IBOutlet VLCThreePartImageView *bottomBarView;
 

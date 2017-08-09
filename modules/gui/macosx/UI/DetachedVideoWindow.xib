@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
@@ -15,7 +15,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="91" y="467" width="363" height="239"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="4">
                 <rect key="frame" x="0.0" y="0.0" width="363" height="239"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -78,7 +78,7 @@
                                     <action selector="buttonAction:" target="1" id="55"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="28" customClass="VLCWindowTitleTextField">
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28" customClass="VLCWindowTitleTextField">
                                 <rect key="frame" x="65" y="3" width="224" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="VLC media player" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" id="29">
                                     <font key="font" metaFont="system"/>
@@ -153,7 +153,7 @@
                                             <constraint firstItem="11" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="11i-jS-o5W"/>
                                             <constraint firstItem="10" firstAttribute="left" secondItem="11" secondAttribute="right" id="496-Ip-nTd"/>
                                             <constraint firstItem="10" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="9Kr-xx-Ssf"/>
-                                            <constraint firstAttribute="width" constant="85" id="Ykg-nF-M2h"/>
+                                            <constraint firstAttribute="right" secondItem="12" secondAttribute="right" id="KOc-oW-4iH"/>
                                             <constraint firstAttribute="height" constant="23" id="bN7-k9-7Iy"/>
                                             <constraint firstAttribute="bottom" secondItem="11" secondAttribute="bottom" id="fFe-7J-ver"/>
                                             <constraint firstItem="12" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="gwB-yN-SK0"/>
@@ -163,7 +163,19 @@
                                             <constraint firstAttribute="bottom" secondItem="10" secondAttribute="bottom" id="yGM-Jx-9fD"/>
                                         </constraints>
                                     </customView>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
+                                    <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="VLCSlider">
+                                        <rect key="frame" x="101" y="10" width="157" height="16"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="14" id="MYp-CS-yPe"/>
+                                        </constraints>
+                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" doubleValue="3260.3068524096384" tickMarkPosition="above" sliderType="linear" id="23" customClass="VLCSliderCell">
+                                            <font key="font" size="12" name="Helvetica"/>
+                                        </sliderCell>
+                                        <connections>
+                                            <action selector="timeSliderAction:" target="3" id="46"/>
+                                        </connections>
+                                    </slider>
+                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
                                         <rect key="frame" x="264" y="11" width="56" height="13"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="52" id="EvZ-Sy-m25"/>
@@ -178,10 +190,10 @@
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="8">
                                         <rect key="frame" x="326" y="6" width="29" height="23"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="23" id="EAo-Ez-asf"/>
+                                            <constraint firstAttribute="width" constant="29" id="VjW-79-ABX"/>
                                             <constraint firstAttribute="height" constant="23" id="fNg-pN-oQw"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="fullscreen-double-buttons" imagePosition="only" alignment="center" alternateImage="fullscreen-double-buttons-pressed" id="17">
+                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="fullscreen-one-button" imagePosition="only" alignment="center" alternateImage="fullscreen-one-button-pressed" id="17">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="label"/>
                                         </buttonCell>
@@ -189,18 +201,6 @@
                                             <action selector="fullscreen:" target="3" id="37"/>
                                         </connections>
                                     </button>
-                                    <slider hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="VLCSlider">
-                                        <rect key="frame" x="101" y="10" width="157" height="16"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="14" id="MYp-CS-yPe"/>
-                                        </constraints>
-                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" doubleValue="3260.3068524096384" tickMarkPosition="above" sliderType="linear" id="23" customClass="VLCSliderCell">
-                                            <font key="font" size="12" name="Helvetica"/>
-                                        </sliderCell>
-                                        <connections>
-                                            <action selector="timeSliderAction:" target="3" id="46"/>
-                                        </connections>
-                                    </slider>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="9" firstAttribute="leading" secondItem="20" secondAttribute="trailing" constant="8" id="7ak-Mt-KYW"/>
@@ -210,16 +210,6 @@
                                     <constraint firstItem="Vae-cT-EEI" firstAttribute="centerY" secondItem="65" secondAttribute="centerY" id="L8J-t8-eZg"/>
                                     <constraint firstItem="20" firstAttribute="centerY" secondItem="65" secondAttribute="centerY" id="QoR-o1-tfE"/>
                                     <constraint firstItem="20" firstAttribute="leading" secondItem="Vae-cT-EEI" secondAttribute="trailing" constant="8" id="T6G-xN-FkQ"/>
-                                    <constraint firstAttribute="trailing" secondItem="9" secondAttribute="trailing" priority="250" constant="7" id="fzk-WE-wjs">
-                                        <attributedString key="userComments">
-                                            <fragment content="optional constraint if fullscreen button is not there">
-                                                <attributes>
-                                                    <font key="NSFont" metaFont="smallSystem"/>
-                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                </attributes>
-                                            </fragment>
-                                        </attributedString>
-                                    </constraint>
                                     <constraint firstItem="Vae-cT-EEI" firstAttribute="leading" secondItem="65" secondAttribute="leading" constant="8" id="ju1-w7-CzH"/>
                                     <constraint firstItem="8" firstAttribute="leading" secondItem="9" secondAttribute="trailing" constant="8" symbolic="YES" id="qs6-O2-pGr"/>
                                 </constraints>
@@ -276,6 +266,7 @@
                 <outlet property="dropView" destination="65" id="9kL-XQ-Akn"/>
                 <outlet property="forwardButton" destination="12" id="f7L-YR-p1H"/>
                 <outlet property="fullscreenButton" destination="8" id="HTb-D0-BTG"/>
+                <outlet property="fullscreenButtonWidthConstraint" destination="VjW-79-ABX" id="D5Z-dr-RIN"/>
                 <outlet property="playButton" destination="10" id="Gsq-tx-qf3"/>
                 <outlet property="timeField" destination="9" id="uzI-2c-bs3"/>
                 <outlet property="timeSlider" destination="20" id="AFS-sq-vuw"/>
@@ -287,8 +278,8 @@
         <image name="backward-3btns-pressed" width="29" height="23"/>
         <image name="forward-3btns" width="29" height="23"/>
         <image name="forward-3btns-pressed" width="29" height="23"/>
-        <image name="fullscreen-double-buttons" width="29" height="23"/>
-        <image name="fullscreen-double-buttons-pressed" width="29" height="23"/>
+        <image name="fullscreen-one-button" width="29" height="23"/>
+        <image name="fullscreen-one-button-pressed" width="29" height="23"/>
         <image name="play" width="27" height="23"/>
         <image name="play-pressed" width="27" height="23"/>
     </resources>

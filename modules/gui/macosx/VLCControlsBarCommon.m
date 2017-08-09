@@ -129,7 +129,7 @@
 
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
-        [self.fullscreenButton removeFromSuperview];
+        self.fullscreenButtonWidthConstraint.constant = 0;
     }
 
     if (config_GetInt(getIntf(), "macosx-show-playback-buttons"))
