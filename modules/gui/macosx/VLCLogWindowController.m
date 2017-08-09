@@ -268,7 +268,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
     [pasteBoard clearContents];
     for (NSDictionary *line in [_arrayController selectedObjects]) {
-        NSString *message = [NSString stringWithFormat:@"%@ %@ %@",
+        NSString *message = [NSString stringWithFormat:@"%@ %@: %@",
                              [line objectForKey:@"component"],
                              [line objectForKey:@"type"],
                              [line objectForKey:@"message"]];
