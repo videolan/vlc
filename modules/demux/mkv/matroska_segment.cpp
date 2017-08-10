@@ -30,6 +30,7 @@
 #include "Ebml_dispatcher.hpp"
 
 #include <new>
+#include <iterator>
 
 matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream )
     :segment(NULL)
