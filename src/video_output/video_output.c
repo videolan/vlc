@@ -166,9 +166,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     if (vout->p->splitter_name == NULL) {
         vout_window_cfg_t wcfg = {
             .is_standalone = !var_InheritBool(vout, "embedded-video"),
-#if !defined(_WIN32) && !defined(__OS2__)
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
-#endif
             .type = VOUT_WINDOW_TYPE_INVALID,
             // TODO: take pixel A/R, crop and zoom into account
 #ifdef __APPLE__
