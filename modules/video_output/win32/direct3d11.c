@@ -80,7 +80,7 @@ vlc_module_begin ()
     add_integer("winrt-swapchain",     0x0, NULL, NULL, true); /* IDXGISwapChain1*     */
 #endif
 
-    set_capability("vout display", 240)
+    set_capability("vout display", 300)
     add_shortcut("direct3d11")
     set_callbacks(Open, Close)
 vlc_module_end ()
