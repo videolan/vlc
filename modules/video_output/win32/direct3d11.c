@@ -140,7 +140,7 @@ struct vout_display_sys_t
     HANDLE                   context_lock;     /* D3D11 Context lock necessary
                                                   for hw decoding */
 #endif
-    IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.1 swap chain */
+    IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
