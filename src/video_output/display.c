@@ -847,10 +847,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
             cfg.is_display_filled = osys->is_display_filled;
 
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, &cfg)) {
-                msg_Err(vd, "Failed to change display filled state");
-                osys->is_display_filled = osys->cfg.is_display_filled;
-            }
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, &cfg);
             osys->cfg.is_display_filled = osys->is_display_filled;
             osys->ch_display_filled = false;
         }
