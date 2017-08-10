@@ -869,14 +869,9 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 cfg.zoom.den = 1;
             }
 
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &cfg)) {
-                msg_Err(vd, "Failed to change zoom");
-                osys->zoom.num = osys->cfg.zoom.num;
-                osys->zoom.den = osys->cfg.zoom.den;
-            } else {
-                osys->fit_window = -1;
-            }
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &cfg);
 
+            osys->fit_window = -1;
             osys->cfg.zoom.num = osys->zoom.num;
             osys->cfg.zoom.den = osys->zoom.den;
             osys->ch_zoom = false;
