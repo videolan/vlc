@@ -338,7 +338,6 @@ typedef struct {
     vlc_rational_t sar_initial;
 
     /* */
-    bool ch_display_filled;
     bool is_display_filled;
 
     bool ch_zoom;
@@ -789,7 +788,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
         if (!ch_display_size &&
             !reset_pictures &&
-            !osys->ch_display_filled &&
+            osys->is_display_filled == osys->cfg.is_display_filled &&
             !osys->ch_zoom &&
 #if defined(_WIN32) || defined(__OS2__)
             !ch_fullscreen &&
@@ -842,14 +841,13 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->cfg.display.height = display_height;
         }
         /* */
-        if (osys->ch_display_filled) {
+        if (osys->is_display_filled != osys->cfg.is_display_filled) {
             vout_display_cfg_t cfg = osys->cfg;
 
             cfg.is_display_filled = osys->is_display_filled;
 
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, &cfg);
             osys->cfg.is_display_filled = osys->is_display_filled;
-            osys->ch_display_filled = false;
         }
         /* */
         if (osys->ch_zoom) {
@@ -1047,10 +1045,7 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (!osys->is_display_filled != !is_filled) {
-        osys->ch_display_filled = true;
-        osys->is_display_filled = is_filled;
-    }
+    osys->is_display_filled = is_filled;
 }
 
 void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
