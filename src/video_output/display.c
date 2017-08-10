@@ -885,9 +885,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 #endif
         /* */
         if (osys->ch_sar) {
-            unsigned int i_sar_num = vd->source.i_sar_num;
-            unsigned int i_sar_den = vd->source.i_sar_den;
-
             if (osys->sar.num > 0 && osys->sar.den > 0) {
                 vd->source.i_sar_num = osys->sar.num;
                 vd->source.i_sar_den = osys->sar.den;
@@ -896,18 +893,9 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 vd->source.i_sar_den = osys->source.i_sar_den;
             }
 
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT)) {
-                /* There nothing much we can do. The only reason a vout display
-                 * does not support it is because it need the core to add black border
-                 * to the video for it.
-                 * TODO add black borders ?
-                 */
-                msg_Err(vd, "Failed to change source AR");
-                vd->source.i_sar_num = i_sar_num;
-                vd->source.i_sar_den = i_sar_den;
-            } else if (!osys->fit_window) {
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
+            if (!osys->fit_window)
                 osys->fit_window = 1;
-            }
             osys->sar.num = vd->source.i_sar_num;
             osys->sar.den = vd->source.i_sar_den;
             osys->ch_sar  = false;
