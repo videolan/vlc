@@ -57,6 +57,8 @@ struct vout_display_sys_t
     int x;
     int y;
     bool use_buffer_transform;
+
+    video_format_t curr_aspect;
 };
 
 static void PictureDestroy(picture_t *pic)
@@ -280,6 +282,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             vd->fmt.i_y_offset = src.i_y_offset * place.height
                                                 / src.i_visible_height;
             ResetPictures(vd);
+            sys->curr_aspect = vd->source;
             break;
         }
 
@@ -303,7 +306,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
             vout_display_place_t place;
 
-            vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+            vout_display_PlacePicture(&place, &sys->curr_aspect, vd->cfg, false);
             sys->x += place.width / 2;
             sys->y += place.height / 2;
 
@@ -326,6 +329,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             }
             else
                 vout_display_SendEventPicturesInvalid(vd);
+            sys->curr_aspect = vd->source;
             break;
         }
         default:
@@ -459,6 +463,8 @@ static int Open(vlc_object_t *obj)
         video_format_t fmt = vd->fmt;
         video_format_ApplyRotation(&vd->fmt, &fmt);
     }
+
+    sys->curr_aspect = vd->source;
 
     vd->fmt.i_chroma = VLC_CODEC_RGB32;
 
