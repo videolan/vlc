@@ -695,6 +695,7 @@ static int OpenFromCPU( vlc_object_t *obj )
     if (!peek->p_sys)
     {
         msg_Dbg(p_filter, "D3D11 opaque without a texture");
+        picture_Release(peek);
         return VLC_EGENERIC;
     }
 

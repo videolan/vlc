@@ -290,6 +290,7 @@ static int Open(vlc_object_t *obj)
     if (!dst->p_sys)
     {
         msg_Dbg(filter, "D3D11 opaque without a texture");
+        picture_Release(dst);
         return VLC_EGENERIC;
     }
 
