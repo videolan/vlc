@@ -353,6 +353,8 @@ struct video_format_t
     video_chroma_location_t chroma_location;      /**< YCbCr chroma location */
 
     video_multiview_mode_t multiview_mode;        /** Multiview mode, 2D, 3D */
+    bool b_multiview_right_eye_first;   /** Multiview left or right eye first*/
+    bool b_multiview_left_eye;
 
     video_projection_mode_t projection_mode;            /**< projection mode */
     vlc_viewpoint_t pose;
