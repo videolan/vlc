@@ -240,7 +240,7 @@ void Close (vlc_object_t *this)
 
     @autoreleasepool {
         if (sys->tapRecognizer) {
-            [sys->tapRecognizer.view removeGestureRecognizer:sys->tapRecognizer];
+            [sys->tapRecognizer.view performSelectorOnMainThread:@selector(removeGestureRecognizer:) withObject:sys->tapRecognizer waitUntilDone:YES];
             [sys->tapRecognizer release];
         }
 
