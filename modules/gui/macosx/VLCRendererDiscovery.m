@@ -34,7 +34,7 @@
     vlc_renderer_discovery_t    *p_rd;
 }
 
-- (void)handleItemAdded:(const vlc_renderer_item_t *)item;
+- (void)handleItemAdded:(vlc_renderer_item_t *)item;
 - (void)handleItemRemoved:(const vlc_renderer_item_t *)item;
 @end
 
@@ -106,7 +106,7 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
     }
 }
 
-- (void)handleItemAdded:(const vlc_renderer_item_t *)base_item
+- (void)handleItemAdded:(vlc_renderer_item_t *)base_item
 {
     VLCRendererItem *item = [[VLCRendererItem alloc] initWithRendererItem:base_item];
     [_rendererItems addObject:item];
