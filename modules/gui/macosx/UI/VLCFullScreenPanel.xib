@@ -57,7 +57,7 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="qcW-zc-UJI"/>
                                 </constraints>
-                                <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="L1r-AD-Y0K"/>
+                                <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="L1r-AD-Y0K" customClass="VLCDefaultValueSliderCell"/>
                                 <connections>
                                     <action selector="volumeSliderUpdate:" target="-2" id="doI-qM-Pde"/>
                                 </connections>
