@@ -628,7 +628,7 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="48" id="XRa-UG-wuM"/>
                                         </constraints>
-                                        <sliderCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="4276"/>
+                                        <sliderCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="4276" customClass="VLCVolumeSliderCell"/>
                                         <connections>
                                             <action selector="volumeAction:" target="5339" id="5358"/>
                                         </connections>
