@@ -30,9 +30,8 @@
 {
     self = [super initWithCoder:coder];
     if (self) {
-        if (![self.cell isKindOfClass:[VLCDefaultValueSliderCell class]]) {
-            self.cell = [[VLCDefaultValueSliderCell alloc] init];
-        }
+        NSAssert([self.cell isKindOfClass:[VLCDefaultValueSliderCell class]],
+                 @"VLCDefaultSlider cell is not VLCDefaultValueSliderCell");
         _isScrollable = YES;
     }
     return self;

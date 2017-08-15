@@ -32,9 +32,8 @@
     self = [super initWithCoder:coder];
 
     if (self) {
-        if (![self.cell isKindOfClass:[VLCVolumeSliderCell class]]) {
-            self.cell = [[VLCVolumeSliderCell alloc] init];
-        }
+        NSAssert([self.cell isKindOfClass:[VLCVolumeSliderCell class]],
+                 @"VLCVolumeSlider cell is not VLCVolumeSliderCell");
     }
     return self;
 }

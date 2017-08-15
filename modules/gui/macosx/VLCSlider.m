@@ -31,9 +31,8 @@
     self = [super initWithCoder:coder];
 
     if (self) {
-        if (![self.cell isKindOfClass:[VLCSliderCell class]]) {
-            self.cell = [[VLCSliderCell alloc] init];
-        }
+        NSAssert([self.cell isKindOfClass:[VLCSliderCell class]],
+                 @"VLCSlider cell is not VLCSliderCell");
     }
     return self;
 }
@@ -47,14 +46,6 @@
 // http://stackoverflow.com/questions/3985816/custom-nsslidercell
 - (void)setNeedsDisplayInRect:(NSRect)invalidRect {
     [super setNeedsDisplayInRect:[self bounds]];
-}
-
-- (void)awakeFromNib {
-    [super awakeFromNib];
-
-    if(![self.cell isKindOfClass:[VLCSliderCell class]]) {
-        self.cell = [[VLCSliderCell alloc] init];
-    }
 }
 
 - (BOOL)getIndefinite
