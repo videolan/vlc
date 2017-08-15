@@ -102,7 +102,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCSlider.h gui/macosx/VLCSlider.m \
 	gui/macosx/VLCSliderCell.h gui/macosx/VLCSliderCell.m \
 	gui/macosx/VLCVolumeSlider.h gui/macosx/VLCVolumeSlider.m \
-	gui/macosx/VLCVolumeSliderCell.h gui/macosx/VLCVolumeSliderCell.m
+	gui/macosx/VLCVolumeSliderCell.h gui/macosx/VLCVolumeSliderCell.m \
+	gui/macosx/VLCBottomBarView.h gui/macosx/VLCBottomBarView.m
 
 # User interface compilation
 
