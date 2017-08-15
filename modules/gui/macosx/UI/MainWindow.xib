@@ -426,7 +426,7 @@
                             <constraint firstAttribute="trailing" secondItem="4680" secondAttribute="trailing" id="tFU-RQ-RnY"/>
                         </constraints>
                     </customView>
-                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="4756" customClass="VLCThreePartImageView">
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="4756" customClass="VLCBottomBarView">
                         <rect key="frame" x="0.0" y="0.0" width="716" height="36"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5608" customClass="VLCDragDropView">

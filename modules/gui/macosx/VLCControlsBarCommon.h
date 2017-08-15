@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "misc.h"
 
+#import "VLCBottomBarView.h"
 #import "VLCTimeField.h"
 #import "VLCSlider.h"
 
@@ -49,7 +50,7 @@
 @property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fullscreenButtonWidthConstraint;
 
-@property (readwrite, strong) IBOutlet VLCThreePartImageView *bottomBarView;
+@property (readwrite, strong) IBOutlet VLCBottomBarView *bottomBarView;
 
 @property (readonly) BOOL darkInterface;
 @property (readonly) BOOL nativeFullscreenMode;

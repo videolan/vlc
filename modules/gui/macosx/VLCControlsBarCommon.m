@@ -84,7 +84,7 @@
     [[self.fullscreenButton cell] accessibilitySetOverrideValue:[self.fullscreenButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
     if (!_darkInterface) {
-        [self.bottomBarView setImagesLeft: imageFromRes(@"bottom-background") middle: imageFromRes(@"bottom-background") right: imageFromRes(@"bottom-background")];
+        [self.bottomBarView setDark:NO];
 
         [self.backwardButton setImage: imageFromRes(@"backward-3btns")];
         [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
@@ -98,7 +98,7 @@
         [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button")];
         [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
     } else {
-        [self.bottomBarView setImagesLeft: imageFromRes(@"bottomdark-left") middle: imageFromRes(@"bottom-background_dark") right: imageFromRes(@"bottomdark-right")];
+        [self.bottomBarView setDark:YES];
 
         [self.backwardButton setImage: imageFromRes(@"backward-3btns-dark")];
         [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-dark-pressed")];

@@ -109,7 +109,7 @@
                             <outlet property="yellowButton" destination="25" id="RzQ-RH-CMN"/>
                         </connections>
                     </customView>
-                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCThreePartImageView">
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCBottomBarView">
                         <rect key="frame" x="0.0" y="0.0" width="363" height="36"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="65" customClass="VLCDragDropView">
