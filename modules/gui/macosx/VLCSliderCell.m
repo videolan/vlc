@@ -217,6 +217,8 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     // Inset rect
     rect = NSInsetRect(rect, 1.0, 1.0);
 
+    rect = [[self controlView] backingAlignedRect:rect options:NSAlignAllEdgesNearest];
+
     // Empty Track Drawing
     NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:3 yRadius:3];
     [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
