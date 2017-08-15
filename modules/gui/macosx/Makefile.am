@@ -214,8 +214,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow/backward-6btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/backward-6btns.png \
 	gui/macosx/Resources/mainwindow/backward-6btns@2x.png \
-	gui/macosx/Resources/mainwindow/bottom-background.png \
-	gui/macosx/Resources/mainwindow/bottom-background@2x.png \
 	gui/macosx/Resources/mainwindow/dropzone-background.png \
 	gui/macosx/Resources/mainwindow/dropzone.png \
 	gui/macosx/Resources/mainwindow/dropzone@2x.png \
@@ -304,12 +302,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_dark/backward-6btns-dark-pressed@2x.png \
 	gui/macosx/Resources/mainwindow_dark/backward-6btns-dark.png \
 	gui/macosx/Resources/mainwindow_dark/backward-6btns-dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
-	gui/macosx/Resources/mainwindow_dark/bottom-background_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark/bottomdark-left.png \
-	gui/macosx/Resources/mainwindow_dark/bottomdark-left@2x.png \
-	gui/macosx/Resources/mainwindow_dark/bottomdark-right.png \
-	gui/macosx/Resources/mainwindow_dark/bottomdark-right@2x.png \
 	gui/macosx/Resources/mainwindow_dark/effects-double-buttons-pressed_dark.png \
 	gui/macosx/Resources/mainwindow_dark/effects-double-buttons-pressed_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark/effects-double-buttons_dark.png \
@@ -491,12 +483,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-backward-6btns-dark-pressed@2x.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-backward-6btns-dark.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-backward-6btns-dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-bottom-background_dark.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-bottom-background_dark@2x.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-bottomdark-left.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-bottomdark-left@2x.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-bottomdark-right.png \
-	gui/macosx/Resources/mainwindow_dark_yosemite/ys-bottomdark-right@2x.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-effects-double-buttons-pressed_dark.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-effects-double-buttons-pressed_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-effects-double-buttons_dark.png \
@@ -587,8 +573,6 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-6btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-6btns.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-6btns@2x.png \
-	gui/macosx/Resources/mainwindow_yosemite/ys-bottom-background.png \
-	gui/macosx/Resources/mainwindow_yosemite/ys-bottom-background@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-dropzone.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-dropzone@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-effects-double-buttons-pressed.png \
