@@ -48,13 +48,13 @@ namespace adaptive
                 virtual ~BaseRepresentation ();
 
                 virtual StreamFormat getStreamFormat() const;
+                BaseAdaptationSet* getAdaptationSet();
                 /*
                  *  @return The bitrate required for this representation
                  *          in bits per seconds.
                  *          Will be a valid value, as the parser refuses Representation
                  *          without bandwidth.
                  */
-                BaseAdaptationSet*  getAdaptationSet        ();
                 uint64_t            getBandwidth            () const;
                 void                setBandwidth            ( uint64_t bandwidth );
                 const std::list<std::string> & getCodecs    () const;

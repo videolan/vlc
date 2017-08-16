@@ -1,5 +1,5 @@
 /*
- * Inheritables.hpp
+ * Properties.hpp
  *****************************************************************************
  * Copyright (C) 2014 - VideoLAN and VLC Authors
  *
