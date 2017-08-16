@@ -245,6 +245,8 @@ FunctionEnd
 
 !macro MacroUnassociatedExtensions _action
   !insertmacro ${_action} Other ".iso"
+  !insertmacro ${_action} Other ".zip"
+  !insertmacro ${_action} Other ".rar"
 !macroend
 
 !macro MacroSkinExtensions _action
