@@ -135,13 +135,6 @@ enum
     HTTPD_CLIENT_TLS_HS_OUT
 };
 
-/* mode */
-enum
-{
-    HTTPD_CLIENT_FILE,      /* default */
-    HTTPD_CLIENT_STREAM,    /* regulary get data from cb */
-};
-
 struct httpd_client_t
 {
     httpd_url_t *url;
