@@ -149,7 +149,6 @@ struct vout_display_sys_t
     const d3d_format_t       *picQuadConfig;
     ID3D11PixelShader        *picQuadPixelShader;
 
-    DXGI_FORMAT              decoderFormat;
     picture_sys_t            stagingSys;
 
     ID3D11RenderTargetView   *d3drenderTargetView;
@@ -442,7 +441,7 @@ static int Direct3D11LockDirectTexture(picture_t *picture)
 
 static void Direct3D11UnlockDirectTexture(picture_t *picture)
 {
-    picture_sys_t *p_sys = picture->p_sys;
+    picture_sys_t *p_sys = ActivePictureSys(picture);
     if (p_sys->mapped) {
         for (int i = 0; i < picture->i_planes; i++)
             ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[i], 0);
@@ -806,7 +805,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
         picsys->slice_index = picture_count;
         picsys->formatTexture = sys->picQuadConfig->formatTexture;
-        picsys->decoderFormat = sys->decoderFormat;
         picsys->context = sys->d3dcontext;
 
         picture_resource_t resource = {
@@ -1231,7 +1229,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
 #endif
     picture_sys_t *p_sys = ActivePictureSys(picture);
-    if (picture->p_sys->formatTexture == DXGI_FORMAT_UNKNOWN)
+    if (p_sys->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
         Direct3D11UnlockDirectTexture(picture);
         for (int plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
@@ -1773,9 +1771,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    /* we will need a converter from 420_OPAQUE to our display format */
-    if ( decoder_format )
-        sys->decoderFormat = decoder_format->formatTexture;
     fmt->i_chroma = sys->picQuadConfig->fourcc;
 
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuadConfig->name,
