@@ -209,6 +209,11 @@ static struct va_pic_context *CreatePicContext(
         goto done;
     pic_ctx->s.destroy = d3d11_pic_context_destroy;
     pic_ctx->s.copy    = d3d11_pic_context_copy;
+
+    D3D11_TEXTURE2D_DESC txDesc;
+    ID3D11Texture2D_GetDesc((ID3D11Texture2D*)p_resource, &txDesc);
+
+    pic_ctx->picsys.formatTexture = txDesc.Format;
     pic_ctx->picsys.context = context;
     pic_ctx->picsys.slice_index = slice;
     pic_ctx->picsys.decoder = decoderSurface;
