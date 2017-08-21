@@ -601,8 +601,9 @@ static inline void ps_parse_descriptors( const uint8_t *p_data, size_t i_data,
             default:
                 break;
         }
-        p_data += 2 + p_data[1];
-        i_data -= 2 + p_data[1];
+        uint8_t i_desc_size = p_data[1];
+        p_data += 2 + i_desc_size;
+        i_data -= 2 + i_desc_size;
     }
 }
 
