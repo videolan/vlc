@@ -127,7 +127,7 @@
 - (void)drawKnob:(NSRect)knobRect
 {
     // Draw knob
-    NSBezierPath* knobPath = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 5.0, 5.0)];
+    NSBezierPath* knobPath = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 1.0, 1.0)];
     if (self.isHighlighted) {
         if (_knobGradient) {
             [_knobGradient drawInBezierPath:knobPath angle:270];
