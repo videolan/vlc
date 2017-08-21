@@ -81,7 +81,10 @@ void filter_DelProxyCallbacks( vlc_object_t *obj, filter_t *filter,
     {
         char *name = *pname;
         if (!(var_Type(obj, name) & VLC_VAR_ISCOMMAND))
+        {
+            free(name);
             continue;
+        }
         int filter_var_type = var_Type(filter, name);
 
         if (filter_var_type & VLC_VAR_ISCOMMAND)
