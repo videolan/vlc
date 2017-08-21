@@ -75,7 +75,8 @@ static int Create( vlc_object_t *p_this )
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420_10L)
         return -1;
 
-    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
+    filter_sys_t *p_sys = vlc_malloc( VLC_OBJECT( p_filter ),
+                                      sizeof(filter_sys_t) );
     if (!p_sys)
          return VLC_ENOMEM;
 
