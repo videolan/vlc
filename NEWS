@@ -27,6 +27,9 @@ Core:
  * EPG reworked: table and single event updates, now using network time
  * Refactored and fixed subtitles es selection. Demuxers can now override
    es category single only or multiple es behavior
+ * Support for 360 video and audio
+ * Support for ambisonic audio and > 8 channels
+ * Support subtitles size live changing
 
 Access:
  * New NFS access module using libnfs
@@ -56,6 +59,7 @@ Access:
  * New SAT>IP access module, to receive DVB-S via IP networks
  * Improvements on DVB scanning
  * BluRay module can open ISO over network and has full BD-J support
+ * Support for DVD ISO over network
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
@@ -88,11 +92,12 @@ Decoder:
  * H264 packetizer can now generate timestamps
  * Packetizers have support for captions in SEI
  * DTS packetizer handle DTS extensions (like DTS-HD): decoders like avcodec
- * can now decode up to 8 channels
+   can now decode up to 8 channels
  * JPEG images correctly oriented using embedded orientation tag, if present
  * Support VPX high bit depth support
  * Extend MicroDVD support with color, fontname, size, position extensions
  * BluRay text subtitles are now decoded
+ * Improve Closed Captions detection
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
