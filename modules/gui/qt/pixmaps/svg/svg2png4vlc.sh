@@ -22,6 +22,12 @@
     inkscape pixmap_source.svg -a 0:96:48:144     -e ../addons/addon.png
     inkscape pixmap_source.svg -a 48:96:96:144    -e ../addons/addon_broken.png
     inkscape pixmap_source.svg -a 96:96:288:144   -e ../addons/score.png
+    inkscape pixmap_source.svg -a 288:96:336:144  -e ../addons/addon_cyan.png
+    inkscape pixmap_source.svg -a 336:96:384:144  -e ../addons/addon_green.png
+    inkscape pixmap_source.svg -a 384:96:432:144  -e ../addons/addon_red.png
+    inkscape pixmap_source.svg -a 432:96:480:144  -e ../addons/addon_blue.png
+    inkscape pixmap_source.svg -a 480:96:528:144  -e ../addons/addon_magenta.png
+    inkscape pixmap_source.svg -a 528:96:576:144  -e ../addons/addon_yellow.png
 
     inkscape pixmap_source.svg -a 0:192:48:240    -e ../menus/exit_16px.png
     inkscape pixmap_source.svg -a 48:192:96:240   -e ../menus/help_16px.png
