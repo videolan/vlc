@@ -281,7 +281,7 @@ static int OpenFilter( vlc_object_t *p_this )
     static const char *const options[] = {
         "channel-left", "channel-center", "channel-right", "channel-rearleft",
         "channel-rearcenter", "channel-rearright", "channel-middleleft",
-        "channel-middleright", "channel-lfe", "normalize",
+        "channel-middleright", "channel-lfe", "normalize", NULL
     };
     config_ChainParse(p_filter, REMAP_CFG, options, p_filter->p_cfg);
 
