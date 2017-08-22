@@ -19,7 +19,6 @@ OPTIONS="
       --enable-shout
       --enable-goom
       --enable-caca
-      --disable-sdl
       --enable-qt
       --enable-skins2
       --enable-sse --enable-mmx
