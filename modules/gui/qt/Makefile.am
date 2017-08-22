@@ -317,6 +317,12 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/go-next.png \
 	gui/qt/pixmaps/addons/addon.png \
 	gui/qt/pixmaps/addons/addon_broken.png \
+	gui/qt/pixmaps/addons/addon_blue.png \
+	gui/qt/pixmaps/addons/addon_cyan.png \
+	gui/qt/pixmaps/addons/addon_green.png \
+	gui/qt/pixmaps/addons/addon_magenta.png \
+	gui/qt/pixmaps/addons/addon_red.png \
+	gui/qt/pixmaps/addons/addon_yellow.png \
 	gui/qt/pixmaps/addons/score.png \
 	gui/qt/pixmaps/menus/exit_16px.png \
 	gui/qt/pixmaps/menus/help_16px.png \

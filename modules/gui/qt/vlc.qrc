@@ -147,5 +147,11 @@
         <file alias="default">pixmaps/addons/addon.png</file>
         <file alias="broken">pixmaps/addons/addon_broken.png</file>
         <file alias="score">pixmaps/addons/score.png</file>
+        <file alias="addon_blue">pixmaps/addons/addon_blue.png</file>
+        <file alias="addon_cyan">pixmaps/addons/addon_cyan.png</file>
+        <file alias="addon_green">pixmaps/addons/addon_green.png</file>
+        <file alias="addon_magenta">pixmaps/addons/addon_magenta.png</file>
+        <file alias="addon_red">pixmaps/addons/addon_red.png</file>
+        <file alias="addon_yellow">pixmaps/addons/addon_yellow.png</file>
     </qresource>
 </RCC>
