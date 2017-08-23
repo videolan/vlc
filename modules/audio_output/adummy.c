@@ -55,19 +55,32 @@ static void Flush(audio_output_t *aout, bool wait)
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
-    if (aout_FormatNbChannels(fmt) == 0)
-        return VLC_EGENERIC;
+    (void) aout;
 
-    if (AOUT_FMT_SPDIF(fmt) && var_InheritBool(aout, "spdif"))
+    switch (fmt->i_format)
     {
-        fmt->i_format = VLC_CODEC_SPDIFL;
-        fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        fmt->i_frame_length = A52_FRAME_NB;
+        case VLC_CODEC_A52:
+        case VLC_CODEC_EAC3:
+            fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_bytes_per_frame = 4;
+            fmt->i_frame_length = 1;
+            break;
+        case VLC_CODEC_DTS:
+        case VLC_CODEC_TRUEHD:
+        case VLC_CODEC_MLP:
+            fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_rate = 768000;
+            fmt->i_bytes_per_frame = 16;
+            fmt->i_frame_length = 1;
+            break;
+        default:
+            assert(AOUT_FMT_LINEAR(fmt));
+            assert(aout_FormatNbChannels(fmt) > 0);
+            fmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
+            fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+            break;
     }
-    else
-        fmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
 
-    fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     return VLC_SUCCESS;
 }
 
