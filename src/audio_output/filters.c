@@ -160,7 +160,11 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
     audio_sample_format_t input = *infmt;
     unsigned n = 0;
 
-    assert (AOUT_FMT_LINEAR(&input));
+    if (!AOUT_FMT_LINEAR(&input))
+    {
+        msg_Err(obj, "Can't convert non linear input");
+        return -1;
+    }
 
     /* Remix channels */
     if (infmt->i_physical_channels != outfmt->i_physical_channels
