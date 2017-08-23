@@ -498,11 +498,10 @@ static int Open(vlc_object_t *this)
             sys->params.mfx.CodecProfile, sys->params.mfx.CodecLevel);
     }
 
+    char *psz_rc = var_InheritString(enc, SOUT_CFG_PREFIX "rc-method");
+    msg_Dbg(enc, "Encoder using '%s' Rate Control method", psz_rc );
     sys->params.mfx.RateControlMethod = qsv_params_get_value(rc_method_text,
-        rc_method_list, sizeof(rc_method_list),
-        var_InheritString(enc, SOUT_CFG_PREFIX "rc-method"));
-    msg_Dbg(enc, "Encoder using '%s' Rate Control method",
-        var_InheritString(enc, SOUT_CFG_PREFIX "rc-method"));
+        rc_method_list, sizeof(rc_method_list), psz_rc );
 
     if (sys->params.mfx.RateControlMethod == MFX_RATECONTROL_CQP) {
         sys->params.mfx.QPI = sys->params.mfx.QPB = sys->params.mfx.QPP =
