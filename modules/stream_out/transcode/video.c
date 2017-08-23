@@ -224,6 +224,9 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
           ? id->p_encoder->fmt_out.video.i_visible_height
           : id->p_decoder->fmt_in.video.i_visible_height
             ? id->p_decoder->fmt_in.video.i_visible_height : id->p_encoder->fmt_in.video.i_height;
+    /* The same goes with frame rate. Some encoders need it to be initialized */
+    id->p_encoder->fmt_in.video.i_frame_rate = ENC_FRAMERATE;
+    id->p_encoder->fmt_in.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
 
     id->p_encoder->i_threads = p_sys->i_threads;
     id->p_encoder->p_cfg = p_sys->p_video_cfg;
