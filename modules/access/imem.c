@@ -257,7 +257,6 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
 
     if (!sys->source.get || !sys->source.release) {
         msg_Err(object, "Invalid get/release function pointers");
-        free(sys);
         return VLC_EGENERIC;
     }
 
