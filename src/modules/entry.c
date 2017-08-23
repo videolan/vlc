@@ -166,7 +166,7 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
     else if( IsConfigFloatType (type))
     {
         tab->max.f = FLT_MAX;
-        tab->min.f = FLT_MIN;
+        tab->min.f = -FLT_MAX;
     }
     tab->i_type = type;
 
