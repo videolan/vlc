@@ -261,11 +261,11 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
     for (int y = 0; y < ffregion->h; y++) {
         for (int x = 0; x < ffregion->w; x++) {
             /* I don't think don't have paletized RGB_A_ */
-            const uint8_t index = ffregion->pict.data[0][y * ffregion->w+x];
+            const uint8_t index = ffregion->data[0][y * ffregion->w+x];
             assert(index < ffregion->nb_colors);
 
             uint32_t color;
-            memcpy(&color, &ffregion->pict.data[1][4*index], 4);
+            memcpy(&color, &ffregion->data[1][4*index], 4);
 
             uint8_t *p_rgba = &p->p_pixels[y * p->i_pitch + x * p->i_pixel_pitch];
             p_rgba[0] = (color >> 16) & 0xff;
