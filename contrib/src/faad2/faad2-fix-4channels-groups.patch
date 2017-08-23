@@ -1,0 +1,25 @@
+diff -Naur faad2/libfaad/decoder.c faad2_patched/libfaad/decoder.c
+--- faad2/libfaad/decoder.c	2017-08-23 12:31:12.495650331 +0200
++++ faad2_patched/libfaad/decoder.c	2017-08-23 12:30:44.755816954 +0200
+@@ -600,6 +601,21 @@
+         hInfo->num_lfe_channels = hDecoder->pce.num_lfe_channels;
+         total += hInfo->num_lfe_channels;
+ 
++        /* Patch when channels are declared as 1 + 4 */
++	if(total <= 8)
++	{
++		if(hInfo->num_front_channels < 2 && hInfo->num_side_channels > 3)
++		{
++			hInfo->num_front_channels += 2;
++			hInfo->num_side_channels -= 2;
++		}
++		if(hInfo->num_side_channels < 2 && hInfo->num_back_channels > 3)
++		{
++			hInfo->num_side_channels += 2;
++			hInfo->num_back_channels -= 2;
++		}
++	}
++
+         chdir = hInfo->num_front_channels;
+         if (chdir & 1)
+         {
