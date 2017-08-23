@@ -1104,13 +1104,14 @@ static int Demux_Seekable( demux_t *p_demux )
             if( toread[i].i_toread >= 0 )
             {
                 b_done = false; /* not yet finished */
-            }
-            if( toread[i].i_posf > 0 )
-            {
-                if( i_pos == -1 || i_pos > toread[i].i_posf )
+
+                if( toread[i].i_posf > 0 )
                 {
-                    i_track = i;
-                    i_pos = toread[i].i_posf;
+                    if( i_pos == -1 || i_pos > toread[i].i_posf )
+                    {
+                        i_track = i;
+                        i_pos = toread[i].i_posf;
+                    }
                 }
             }
         }
