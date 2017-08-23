@@ -42,7 +42,7 @@ struct sout_stream_sys_t
     char            *psz_venc;
     config_chain_t  *p_video_cfg;
     int             i_vbitrate;
-    double          f_scale;
+    float           f_scale;
     unsigned int    i_width, i_maxwidth;
     unsigned int    i_height, i_maxheight;
     char            *psz_deinterlace;
