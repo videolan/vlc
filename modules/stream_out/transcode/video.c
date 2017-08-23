@@ -522,10 +522,13 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
       * Make sure its multiple of 2
       */
      /* width/height of output stream */
-     int i_dst_visible_width =  2 * lroundf(f_scale_width*i_src_visible_width/2);
-     int i_dst_visible_height = 2 * lroundf(f_scale_height*i_src_visible_height/2);
-     int i_dst_width =  2 * lroundf(f_scale_width*p_fmt_out->video.i_width/2);
-     int i_dst_height = 2 * lroundf(f_scale_height*p_fmt_out->video.i_height/2);
+     int i_dst_visible_width =  lroundf(f_scale_width*i_src_visible_width);
+     int i_dst_visible_height = lroundf(f_scale_height*i_src_visible_height);
+     int i_dst_width =  lroundf(f_scale_width*p_fmt_out->video.i_width);
+     int i_dst_height = lroundf(f_scale_height*p_fmt_out->video.i_height);
+
+     if( i_dst_width & 1 ) ++i_dst_width;
+     if( i_dst_height & 1 ) ++i_dst_height;
 
      /* Store calculated values */
      id->p_encoder->fmt_out.video.i_width = i_dst_width;
