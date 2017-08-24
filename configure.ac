@@ -1015,6 +1015,39 @@ AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "os2"], [
   AS_IF([test "${ac_cv_c_visibility_hidden}" = "no"], [VLC_RESTORE_FLAGS])
 ])
 
+dnl
+dnl Sanitizer flags
+dnl
+AC_ARG_WITH([sanitizer],
+    [AS_HELP_STRING([--with-sanitizer=(address/memory/undefined/thread)],
+        [build with sanitizer flags (default disabled)])],
+     [],
+     [with_sanitizer=no])
+
+AS_VAR_IF(with_sanitizer, no, [], [
+    AX_CHECK_COMPILE_FLAG([-fsanitize=${with_sanitizer}], [
+        AX_APPEND_FLAG([-fsanitize=${with_sanitizer}])
+        AX_APPEND_FLAG([-fsanitize=${with_sanitizer}], [CXXFLAGS])
+        AX_APPEND_FLAG([-fsanitize=${with_sanitizer}], [LDFLAGS])
+    ], [
+        AC_MSG_ERROR(["-fsanitize=${with_sanitizer} not supported!"])
+    ])
+    AX_APPEND_FLAG([-g])
+    AX_APPEND_FLAG([-g], [CXXFLAGS])
+
+    AS_IF([test -z "${with_sanitizer##*address*}" ], [
+       AX_APPEND_COMPILE_FLAGS([-fsanitize-address-use-after-scope -fno-omit-frame-pointer])
+       AX_APPEND_COMPILE_FLAGS([-fsanitize-address-use-after-scope -fno-omit-frame-pointer], [CXXFLAGS])
+    ])
+    AS_IF([test -z "${with_sanitizer##*memory*}" ], [
+        AX_APPEND_COMPILE_FLAGS([-fPIE -pie])
+        AX_APPEND_COMPILE_FLAGS([-fPIE -pie], [CXXFLAGS])
+    ])
+    AS_IF([test -z "${with_sanitizer##*thread*}" ], [
+        AX_APPEND_COMPILE_FLAGS([-fPIE -pie])
+        AX_APPEND_COMPILE_FLAGS([-fPIE -pie], [CXXFLAGS])
+    ])
+])
 
 dnl
 dnl  Enable/disable optimizations
@@ -1113,7 +1146,7 @@ AC_CACHE_CHECK([if linker supports -z,defs], [ac_cv_ld_z_defs], [
     ac_cv_ld_z_defs="no"
   ])
 ])
-AS_IF([test "${ac_cv_ld_z_defs}" = "no"], [VLC_RESTORE_FLAGS])
+AS_IF([test "${ac_cv_ld_z_defs}" = "no" -o "x$with_sanitizer" != xno], [VLC_RESTORE_FLAGS])
 
 dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
