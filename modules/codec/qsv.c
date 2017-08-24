@@ -621,9 +621,6 @@ static void qsv_set_block_flags(block_t *block, uint16_t frame_type)
  */
 static void qsv_set_block_ts(encoder_t *enc, encoder_sys_t *sys, block_t *block, mfxBitstream *bs)
 {
-    if (!bs->TimeStamp)
-        return;
-
     block->i_pts = qsv_timestamp_to_mtime(bs->TimeStamp) + sys->offset_pts;
     block->i_dts = qsv_timestamp_to_mtime(bs->DecodeTimeStamp) + sys->offset_pts;
 
