@@ -478,6 +478,37 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             }
         }
 #endif
+        /* Handle > 1 local pair 5.1 setups.
+           In case of more than 1 channel pair per area, faad will have repeats
+           in channels sequence. We need to remap to available surround channels.
+           Front > Middle > Rear:
+           In case of 4 middle, it maps to 2F 2M if no previous front.
+           In case of 4 rear, it maps to 2M 2R if no previous rear.
+        */
+        unsigned i_faadused = 0;
+        for( unsigned i=0; i<frame.channels; i++ )
+            if( frame.channel_position[i] > 0 )
+                i_faadused |= 1 << frame.channel_position[i];
+
+        for( size_t i=3; i<frame.channels; i++ )
+        {
+             if( frame.channel_position[i - 3] == frame.channel_position[i - 1] &&
+                 frame.channel_position[i - 2] == frame.channel_position[i] &&
+                 frame.channel_position[i - 1] >= SIDE_CHANNEL_LEFT &&
+                 frame.channel_position[i - 1] <= BACK_CHANNEL_CENTER &&
+                 frame.channel_position[i - 1] >= SIDE_CHANNEL_LEFT &&
+                 frame.channel_position[i - 1] <= BACK_CHANNEL_CENTER )
+             {
+                if( ( (1 << (frame.channel_position[i - 3] - 2)) & i_faadused ) == 0 &&
+                    ( (1 << (frame.channel_position[i - 2] - 2)) & i_faadused ) == 0 )
+                {
+                    frame.channel_position[i - 3] -= 2;
+                    frame.channel_position[i - 2] -= 2;
+                    i_faadused |= 1 << frame.channel_position[i - 3];
+                    i_faadused |= 1 << frame.channel_position[i - 2];
+                }
+             }
+        }
 
         /* Convert frame.channel_position to our own channel values */
         p_dec->fmt_out.audio.i_physical_channels = 0;
