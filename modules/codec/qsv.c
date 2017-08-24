@@ -341,9 +341,9 @@ static void qsv_frame_pool_Destroy(qsv_frame_pool_t *pool)
  * necessary associates the new picture with it and return the frame.
  * Returns 0 if there's an error.
  */
-static mfxFrameSurface1 *qsv_frame_pool_Get(qsv_frame_pool_t *pool,
-                                            picture_t *pic)
+static mfxFrameSurface1 *qsv_frame_pool_Get(encoder_sys_t *sys, picture_t *pic)
 {
+    qsv_frame_pool_t *pool = &sys->frames;
     for (size_t i = 0; i < pool->size; i++) {
         mfxFrameSurface1 *frame = &pool->frames[i];
         if (frame->Data.Locked)
@@ -355,7 +355,7 @@ static mfxFrameSurface1 *qsv_frame_pool_Get(qsv_frame_pool_t *pool,
         frame->Data.Y         = pic->p[0].p_pixels;
         frame->Data.U         = pic->p[1].p_pixels;
         frame->Data.V         = pic->p[1].p_pixels + 1;
-        frame->Data.TimeStamp = qsv_mtime_to_timestamp(pic->date);
+        frame->Data.TimeStamp = qsv_mtime_to_timestamp(pic->date - sys->offset_pts);
 
         // Specify picture structure at runtime.
         if (pic->b_progressive)
@@ -661,9 +661,8 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
            (Thanks to funman for the idea) */
         if (!sys->offset_pts) // First frame
             sys->offset_pts = pic->date;
-        pic->date -= sys->offset_pts;
 
-        frame = qsv_frame_pool_Get(&sys->frames, pic);
+        frame = qsv_frame_pool_Get(sys, pic);
         if (!frame) {
             msg_Warn(enc, "Unable to find an unlocked surface in the pool");
             return NULL;
