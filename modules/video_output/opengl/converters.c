@@ -204,23 +204,33 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     }
     else if (desc->plane_count == 1)
     {
+        /* Y1 U Y2 V fits in R G B A */
         tc->tex_count = 1;
         tc->texs[0] = (struct opengl_tex_cfg) {
-            { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE
+            { 1, 2 }, { 1, 2 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
         };
+
+        /*
+         * Set swizzling in Y1 U V order
+         * R  G  B  A
+         * U  Y1 V  Y2 => GRB
+         * Y1 U  Y2 V  => RGA
+         * V  Y1 U  Y2 => GBR
+         * Y1 V  Y2 U  => RAG
+         */
         switch (chroma)
         {
             case VLC_CODEC_UYVY:
-                swizzle_per_tex[0] = "gbr";
+                swizzle_per_tex[0] = "grb";
                 break;
             case VLC_CODEC_YUYV:
-                swizzle_per_tex[0] = "rgb";
+                swizzle_per_tex[0] = "rga";
                 break;
             case VLC_CODEC_VYUY:
-                swizzle_per_tex[0] = "bgr";
+                swizzle_per_tex[0] = "gbr";
                 break;
             case VLC_CODEC_YVYU:
-                swizzle_per_tex[0] = "rbg";
+                swizzle_per_tex[0] = "rag";
                 break;
             default:
                 assert(!"missing chroma");
