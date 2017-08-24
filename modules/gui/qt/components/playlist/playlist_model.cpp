@@ -647,11 +647,7 @@ void PLModel::processItemAppend( int i_pl_itemid, int i_pl_itemidparent )
     if ( newItem->inputItem() == THEMIM->currentInputItem() )
         emit currentIndexChanged( index( newItem, 0 ) );
 
-    if( latestSearch.isEmpty() )
-    {
-        rebuild();
-        return;
-    }
+    if( latestSearch.isEmpty() ) return;
     filter( latestSearch, index( rootItem, 0), false /*FIXME*/ );
 }
 
