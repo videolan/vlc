@@ -547,7 +547,7 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
          i_src_visible_width, i_src_visible_height,
          i_dst_visible_width, i_dst_visible_height
      );
-};
+}
 
 static void transcode_video_sar_init( sout_stream_t *p_stream,
                                      sout_stream_id_sys_t *id,
