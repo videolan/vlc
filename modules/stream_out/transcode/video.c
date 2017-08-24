@@ -38,6 +38,15 @@
 #define ENC_FRAMERATE (25 * 1000)
 #define ENC_FRAMERATE_BASE 1000
 
+static const es_format_t* video_output_format( sout_stream_id_sys_t *id )
+{
+    if( id->p_uf_chain )
+        return filter_chain_GetFmtOut( id->p_uf_chain );
+    else if( id->p_f_chain )
+        return filter_chain_GetFmtOut( id->p_f_chain );
+    return &id->p_decoder->fmt_out;
+}
+
 static int video_update_format_decoder( decoder_t *p_dec )
 {
     sout_stream_t        *stream = (sout_stream_t*) p_dec->p_owner;
@@ -363,14 +372,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 /* Take care of the scaling and chroma conversions. */
 static void conversion_video_filter_append( sout_stream_id_sys_t *id )
 {
-    const es_format_t *p_fmt_out;
-    if( id->p_uf_chain )
-        p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
-    else if( id->p_f_chain )
-        p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
-    else
-        p_fmt_out = &id->p_decoder->fmt_out;
-
+    const es_format_t *p_fmt_out = video_output_format( id );
 
     if( ( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma ) ||
         ( p_fmt_out->video.i_width != id->p_encoder->fmt_in.video.i_width ) ||
@@ -592,13 +594,7 @@ static void transcode_video_sar_init( sout_stream_t *p_stream,
 static void transcode_video_encoder_init( sout_stream_t *p_stream,
                                           sout_stream_id_sys_t *id )
 {
-    const es_format_t *p_fmt_out;
-    if( id->p_uf_chain )
-        p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
-    else if( id->p_f_chain )
-        p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
-    else
-        p_fmt_out = &id->p_decoder->fmt_out;
+    const es_format_t *p_fmt_out = video_output_format( id );
 
     id->p_encoder->fmt_in.video.orientation =
         id->p_encoder->fmt_out.video.orientation =
