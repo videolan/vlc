@@ -357,6 +357,74 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
 #endif
 }
 
+static int
+tc_xyz12_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
+{
+    tc->uloc.Texture[0] = tc->vt->GetUniformLocation(program, "Texture0");
+    return tc->uloc.Texture[0] != -1 ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static void
+tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
+                        const GLsizei *tex_width, const GLsizei *tex_height,
+                        float alpha)
+{
+    (void) tex_width; (void) tex_height; (void) alpha;
+    tc->vt->Uniform1i(tc->uloc.Texture[0], 0);
+}
+
+static GLuint
+xyz12_shader_init(opengl_tex_converter_t *tc)
+{
+    tc->tex_count = 1;
+    tc->tex_target = GL_TEXTURE_2D;
+    tc->texs[0] = (struct opengl_tex_cfg) {
+        { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT
+    };
+
+    tc->pf_fetch_locations = tc_xyz12_fetch_locations;
+    tc->pf_prepare_shader = tc_xyz12_prepare_shader;
+
+    /* Shader for XYZ to RGB correction
+     * 3 steps :
+     *  - XYZ gamma correction
+     *  - XYZ to RGB matrix conversion
+     *  - reverse RGB gamma correction
+     */
+    static const char *code =
+        "#version " GLSL_VERSION "\n"
+        PRECISION
+        "uniform sampler2D Texture0;"
+        "uniform vec4 xyz_gamma = vec4(2.6);"
+        "uniform vec4 rgb_gamma = vec4(1.0/2.2);"
+        /* WARN: matrix Is filled column by column (not row !) */
+        "uniform mat4 matrix_xyz_rgb = mat4("
+        "    3.240454 , -0.9692660, 0.0556434, 0.0,"
+        "   -1.5371385,  1.8760108, -0.2040259, 0.0,"
+        "    -0.4985314, 0.0415560, 1.0572252,  0.0,"
+        "    0.0,      0.0,         0.0,        1.0 "
+        " );"
+
+        "varying vec2 TexCoord0;"
+        "void main()"
+        "{ "
+        " vec4 v_in, v_out;"
+        " v_in  = texture2D(Texture0, TexCoord0);"
+        " v_in = pow(v_in, xyz_gamma);"
+        " v_out = matrix_xyz_rgb * v_in ;"
+        " v_out = pow(v_out, rgb_gamma) ;"
+        " v_out = clamp(v_out, 0.0, 1.0) ;"
+        " gl_FragColor = v_out;"
+        "}";
+
+    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
+    if (fragment_shader == 0)
+        return 0;
+    tc->vt->ShaderSource(fragment_shader, 1, &code, NULL);
+    tc->vt->CompileShader(fragment_shader);
+    return fragment_shader;
+}
+
 GLuint
 opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space)
@@ -365,6 +433,10 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
     const bool is_yuv = vlc_fourcc_IsYUV(chroma);
     bool yuv_swap_uv = false;
     int ret;
+
+    if (chroma == VLC_CODEC_XYZ12)
+        return xyz12_shader_init(tc);
+
     if (is_yuv)
         ret = tc_yuv_base_init(tc, tex_target, chroma, yuv_space,
                                &yuv_swap_uv, swizzle_per_tex);
@@ -979,74 +1051,6 @@ tc_common_release(const opengl_tex_converter_t *tc)
 }
 
 static int
-tc_xyz12_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
-{
-    tc->uloc.Texture[0] = tc->vt->GetUniformLocation(program, "Texture0");
-    return tc->uloc.Texture[0] != -1 ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
-static void
-tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
-                        const GLsizei *tex_width, const GLsizei *tex_height,
-                        float alpha)
-{
-    (void) tex_width; (void) tex_height; (void) alpha;
-    tc->vt->Uniform1i(tc->uloc.Texture[0], 0);
-}
-
-static GLuint
-xyz12_shader_init(opengl_tex_converter_t *tc)
-{
-    tc->tex_count = 1;
-    tc->tex_target = GL_TEXTURE_2D;
-    tc->texs[0] = (struct opengl_tex_cfg) {
-        { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT
-    };
-
-    tc->pf_fetch_locations = tc_xyz12_fetch_locations;
-    tc->pf_prepare_shader = tc_xyz12_prepare_shader;
-
-    /* Shader for XYZ to RGB correction
-     * 3 steps :
-     *  - XYZ gamma correction
-     *  - XYZ to RGB matrix conversion
-     *  - reverse RGB gamma correction
-     */
-    static const char *code =
-        "#version " GLSL_VERSION "\n"
-        PRECISION
-        "uniform sampler2D Texture0;"
-        "uniform vec4 xyz_gamma = vec4(2.6);"
-        "uniform vec4 rgb_gamma = vec4(1.0/2.2);"
-        /* WARN: matrix Is filled column by column (not row !) */
-        "uniform mat4 matrix_xyz_rgb = mat4("
-        "    3.240454 , -0.9692660, 0.0556434, 0.0,"
-        "   -1.5371385,  1.8760108, -0.2040259, 0.0,"
-        "    -0.4985314, 0.0415560, 1.0572252,  0.0,"
-        "    0.0,      0.0,         0.0,        1.0 "
-        " );"
-
-        "varying vec2 TexCoord0;"
-        "void main()"
-        "{ "
-        " vec4 v_in, v_out;"
-        " v_in  = texture2D(Texture0, TexCoord0);"
-        " v_in = pow(v_in, xyz_gamma);"
-        " v_out = matrix_xyz_rgb * v_in ;"
-        " v_out = pow(v_out, rgb_gamma) ;"
-        " v_out = clamp(v_out, 0.0, 1.0) ;"
-        " gl_FragColor = v_out;"
-        "}";
-
-    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
-    if (fragment_shader == 0)
-        return 0;
-    tc->vt->ShaderSource(fragment_shader, 1, &code, NULL);
-    tc->vt->CompileShader(fragment_shader);
-    return fragment_shader;
-}
-
-static int
 generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 {
     const vlc_chroma_description_t *desc =
@@ -1056,55 +1060,55 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         return VLC_EGENERIC;
 
     GLuint fragment_shader = 0;
-    if (tc->fmt.i_chroma == VLC_CODEC_XYZ12)
-        fragment_shader = xyz12_shader_init(tc);
+    video_color_space_t space;
+    const vlc_fourcc_t *list;
+
+    if (vlc_fourcc_IsYUV(tc->fmt.i_chroma))
+    {
+        GLint max_texture_units = 0;
+        tc->vt->GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+        if (max_texture_units < 3)
+            return VLC_EGENERIC;
+
+        list = vlc_fourcc_GetYUVFallback(tc->fmt.i_chroma);
+        space = tc->fmt.space;
+    }
+    else if (tc->fmt.i_chroma == VLC_CODEC_XYZ12)
+    {
+        static const vlc_fourcc_t xyz12_list[] = { VLC_CODEC_XYZ12, 0 };
+        list = xyz12_list;
+        space = COLOR_SPACE_UNDEF;
+    }
     else
     {
-        video_color_space_t space;
-        const vlc_fourcc_t *(*get_fallback)(vlc_fourcc_t i_fourcc);
+        list = vlc_fourcc_GetRGBFallback(tc->fmt.i_chroma);
+        space = COLOR_SPACE_UNDEF;
+    }
 
-        if (vlc_fourcc_IsYUV(tc->fmt.i_chroma))
+    while (*list)
+    {
+        fragment_shader =
+            opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list, space);
+        if (fragment_shader != 0)
         {
-            GLint max_texture_units = 0;
-            tc->vt->GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
-            if (max_texture_units < 3)
-                return VLC_EGENERIC;
+            tc->fmt.i_chroma = *list;
 
-            get_fallback = vlc_fourcc_GetYUVFallback;
-            space = tc->fmt.space;
-        }
-        else
-        {
-            get_fallback = vlc_fourcc_GetRGBFallback;
-            space = COLOR_SPACE_UNDEF;
-        }
-
-        const vlc_fourcc_t *list = get_fallback(tc->fmt.i_chroma);
-        while (*list)
-        {
-            fragment_shader =
-                opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list, space);
-            if (fragment_shader != 0)
+            if (tc->fmt.i_chroma == VLC_CODEC_RGB32)
             {
-                tc->fmt.i_chroma = *list;
-
-                if (tc->fmt.i_chroma == VLC_CODEC_RGB32)
-                {
 #if defined(WORDS_BIGENDIAN)
-                    tc->fmt.i_rmask  = 0xff000000;
-                    tc->fmt.i_gmask  = 0x00ff0000;
-                    tc->fmt.i_bmask  = 0x0000ff00;
+                tc->fmt.i_rmask  = 0xff000000;
+                tc->fmt.i_gmask  = 0x00ff0000;
+                tc->fmt.i_bmask  = 0x0000ff00;
 #else
-                    tc->fmt.i_rmask  = 0x000000ff;
-                    tc->fmt.i_gmask  = 0x0000ff00;
-                    tc->fmt.i_bmask  = 0x00ff0000;
+                tc->fmt.i_rmask  = 0x000000ff;
+                tc->fmt.i_gmask  = 0x0000ff00;
+                tc->fmt.i_bmask  = 0x00ff0000;
 #endif
-                    video_format_FixRgb(&tc->fmt);
-                }
-                break;
+                video_format_FixRgb(&tc->fmt);
             }
-            list++;
+            break;
         }
+        list++;
     }
     if (fragment_shader == 0)
         return VLC_EGENERIC;
