@@ -925,8 +925,31 @@ explicit_config_too_short:
 static void PMTSetupEs0x02( ts_es_t *p_es,
                             const dvbpsi_pmt_es_t *p_dvbpsies )
 {
+    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x02 );
+    if( p_dr )
+    {
+        /* sample: wcbs.ts */
+        const dvbpsi_vstream_dr_t *p_vdr = dvbpsi_DecodeVStreamDr( p_dr );
+        if( p_vdr )
+        {
+            if( p_vdr->i_frame_rate_code > 1 && p_vdr->i_frame_rate_code < 9 &&
+                !p_vdr->b_multiple_frame_rate )
+            {
+                static const int code_to_frame_rate[8][2] =
+                {
+                    { 24000, 1001 }, { 24, 1 }, { 25, 1 },       { 30000, 1001 },
+                    { 30, 1 },       { 50, 1 }, { 60000, 1001 }, { 60, 1 },
+                };
+                p_es->fmt.video.i_frame_rate = code_to_frame_rate[p_vdr->i_frame_rate_code - 1][0];
+                p_es->fmt.video.i_frame_rate_base = code_to_frame_rate[p_vdr->i_frame_rate_code - 1][1];
+            }
+            if( !p_vdr->b_mpeg2 && p_es->fmt.i_codec == VLC_CODEC_MPGV )
+                p_es->fmt.i_original_fourcc = VLC_CODEC_MP1V;
+        }
+    }
+
     /* MPEG2_stereoscopic_video_format_descriptor */
-    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x34 );
+    p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x34 );
     if( p_dr && p_dr->i_length > 0 && (p_dr->p_data[0] & 0x80) )
     {
         video_multiview_mode_t mode;
