@@ -392,7 +392,8 @@ bool video_format_IsSimilar( const video_format_t *f1,
         f1->i_visible_height != f2->i_visible_height ||
         f1->i_x_offset != f2->i_x_offset || f1->i_y_offset != f2->i_y_offset )
         return false;
-    if( f1->i_sar_num * f2->i_sar_den != f2->i_sar_num * f1->i_sar_den )
+    if( (int64_t)f1->i_sar_num * f2->i_sar_den !=
+        (int64_t)f2->i_sar_num * f1->i_sar_den )
         return false;
 
     if( f1->orientation != f2->orientation)
