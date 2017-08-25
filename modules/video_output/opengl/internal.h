@@ -123,22 +123,25 @@ typedef struct {
     PFNGLGETSHADERIVPROC   GetShaderiv;
     PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
 
+    /* Buffers commands */
     PFNGLGENBUFFERSPROC    GenBuffers;
     PFNGLBINDBUFFERPROC    BindBuffer;
     PFNGLBUFFERDATAPROC    BufferData;
+    PFNGLDELETEBUFFERSPROC DeleteBuffers;
+
+    /* Commands used for PBO and/or Persistent mapping */
 #ifdef VLCGL_HAS_PBO
-    PFNGLBUFFERSUBDATAPROC          BufferSubData;
+    PFNGLBUFFERSUBDATAPROC          BufferSubData; /* can be NULL */
 #endif
 #ifdef VLCGL_HAS_MAP_PERSISTENT
-    PFNGLBUFFERSTORAGEPROC          BufferStorage;
-    PFNGLMAPBUFFERRANGEPROC         MapBufferRange;
-    PFNGLFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange;
-    PFNGLUNMAPBUFFERPROC            UnmapBuffer;
-    PFNGLFENCESYNCPROC              FenceSync;
-    PFNGLDELETESYNCPROC             DeleteSync;
-    PFNGLCLIENTWAITSYNCPROC         ClientWaitSync;
+    PFNGLBUFFERSTORAGEPROC          BufferStorage; /* can be NULL */
+    PFNGLMAPBUFFERRANGEPROC         MapBufferRange; /* can be NULL */
+    PFNGLFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange; /* can be NULL */
+    PFNGLUNMAPBUFFERPROC            UnmapBuffer; /* can be NULL */
+    PFNGLFENCESYNCPROC              FenceSync; /* can be NULL */
+    PFNGLDELETESYNCPROC             DeleteSync; /* can be NULL */
+    PFNGLCLIENTWAITSYNCPROC         ClientWaitSync; /* can be NULL */
 #endif
-    PFNGLDELETEBUFFERSPROC DeleteBuffers;
 
 #if defined(_WIN32)
     PFNGLACTIVETEXTUREPROC  ActiveTexture;
