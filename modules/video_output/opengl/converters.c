@@ -81,8 +81,8 @@ struct priv
 };
 
 #if !defined(USE_OPENGL_ES2)
-static int GetTexFormatSize(int target, int tex_format, int tex_internal,
-                            int tex_type)
+static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
+                            int tex_format, int tex_internal, int tex_type)
 {
     GLint tex_param_size;
     switch (tex_format)
@@ -98,13 +98,13 @@ static int GetTexFormatSize(int target, int tex_format, int tex_internal,
     }
     GLuint texture;
 
-    glGenTextures(1, &texture);
-    glBindTexture(target, texture);
-    glTexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
+    tc->vt->GenTextures(1, &texture);
+    tc->vt->BindTexture(target, texture);
+    tc->vt->TexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
     GLint size = 0;
-    glGetTexLevelParameteriv(target, 0, tex_param_size, &size);
+    tc->vt->GetTexLevelParameteriv(target, 0, tex_param_size, &size);
 
-    glDeleteTextures(1, &texture);
+    tc->vt->DeleteTextures(1, &texture);
     return size;
 }
 #endif
@@ -150,8 +150,8 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         else if (desc->pixel_size == 2)
         {
             if (oneplane16_texfmt == 0
-             || GetTexFormatSize(tex_target, oneplane_texfmt, oneplane16_texfmt,
-                                 GL_UNSIGNED_SHORT) != 16)
+             || GetTexFormatSize(tc, tex_target, oneplane_texfmt,
+                                 oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
                 return VLC_EGENERIC;
 
             internal = oneplane16_texfmt;
@@ -561,7 +561,7 @@ pbo_data_alloc(const opengl_tex_converter_t *tc, picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
 
-    glGetError();
+    tc->vt->GetError();
     tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
 
     for (int i = 0; i < pic->i_planes; ++i)
@@ -570,7 +570,7 @@ pbo_data_alloc(const opengl_tex_converter_t *tc, picture_t *pic)
         tc->vt->BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
                             GL_DYNAMIC_DRAW);
 
-        if (glGetError() != GL_NO_ERROR)
+        if (tc->vt->GetError() != GL_NO_ERROR)
         {
             msg_Err(tc->gl, "could not alloc PBO buffers");
             tc->vt->DeleteBuffers(i, picsys->buffers);
@@ -636,14 +636,14 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
                             display_pic->p_sys->buffers[i]);
         tc->vt->BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
 
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(tc->tex_target, textures[i]);
+        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
 
-        glPixelStorei(GL_UNPACK_ROW_LENGTH,
-                      pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH,
+                            pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
 
-        glTexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
-                        tc->texs[i].format, tc->texs[i].type, NULL);
+        tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
+                              tc->texs[i].format, tc->texs[i].type, NULL);
     }
 
     /* turn off pbo */
@@ -751,14 +751,14 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
         if (picsys->fence == NULL)
             tc->vt->FlushMappedBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
                                             picsys->bytes[i]);
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(tc->tex_target, textures[i]);
+        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
 
-        glPixelStorei(GL_UNPACK_ROW_LENGTH,
-                      pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH,
+                            pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
 
-        glTexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
-                        tc->texs[i].format, tc->texs[i].type, NULL);
+        tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
+                              tc->texs[i].format, tc->texs[i].type, NULL);
     }
 
     bool hold;
@@ -880,10 +880,10 @@ tc_common_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
 {
     for (unsigned i = 0; i < tc->tex_count; i++)
     {
-        glBindTexture(tc->tex_target, textures[i]);
-        glTexImage2D(tc->tex_target, 0, tc->texs[i].internal,
-                     tex_width[i], tex_height[i], 0, tc->texs[i].format,
-                     tc->texs[i].type, NULL);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
+        tc->vt->TexImage2D(tc->tex_target, 0, tc->texs[i].internal,
+                           tex_width[i], tex_height[i], 0, tc->texs[i].format,
+                           tc->texs[i].type, NULL);
     }
     return VLC_SUCCESS;
 }
@@ -898,7 +898,7 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
     GLenum tex_type = tc->texs[tex_idx].type;
 
     /* This unpack alignment is the default, but setting it just in case. */
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    tc->vt->PixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
     if (!priv->has_unpack_subimage)
     {
@@ -929,21 +929,21 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
                 source += pitch;
                 destination += dst_pitch;
             }
-            glTexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
-                            tex_format, tex_type, priv->texture_temp_buf);
+            tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
+                                  tex_format, tex_type, priv->texture_temp_buf);
         }
         else
         {
-            glTexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
-                            tex_format, tex_type, pixels);
+            tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
+                                  tex_format, tex_type, pixels);
         }
 #undef ALIGN
     }
     else
     {
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch / pixel_pitch);
-        glTexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
-                        tex_format, tex_type, pixels);
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pitch / pixel_pitch);
+        tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
+                              tex_format, tex_type, pixels);
     }
     return VLC_SUCCESS;
 }
@@ -958,8 +958,8 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
     for (unsigned i = 0; i < tc->tex_count && ret == VLC_SUCCESS; i++)
     {
         assert(textures[i] != 0);
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(tc->tex_target, textures[i]);
+        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
         const void *pixels = plane_offset != NULL ?
                              &pic->p[i].p_pixels[plane_offset[i]] :
                              pic->p[i].p_pixels;
@@ -1066,7 +1066,7 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         if (vlc_fourcc_IsYUV(tc->fmt.i_chroma))
         {
             GLint max_texture_units = 0;
-            glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+            tc->vt->GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
             if (max_texture_units < 3)
                 return VLC_EGENERIC;
 
@@ -1136,7 +1136,7 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         /* Ensure we do direct rendering with OpenGL 3.0 or higher. Indeed,
          * persistent mapped buffers seems to be slow with OpenGL 2.1 drivers
          * and bellow. This may be caused by OpenGL compatibility layer. */
-        const unsigned char *ogl_version = glGetString(GL_VERSION);
+        const unsigned char *ogl_version = tc->vt->GetString(GL_VERSION);
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
         supports_map_persistent = glver_ok && has_pbo && has_bs && tc->vt->BufferStorage

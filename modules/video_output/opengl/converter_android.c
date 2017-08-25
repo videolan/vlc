@@ -154,8 +154,8 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
         return VLC_EGENERIC;
     }
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(tc->tex_target, textures[0]);
+    tc->vt->ActiveTexture(GL_TEXTURE0);
+    tc->vt->BindTexture(tc->tex_target, textures[0]);
 
     return VLC_SUCCESS;
 }

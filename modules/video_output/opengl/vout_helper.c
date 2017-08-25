@@ -399,7 +399,7 @@ GenTextures(const opengl_tex_converter_t *tc,
 
     for (unsigned i = 0; i < tc->tex_count; i++)
     {
-        glBindTexture(tc->tex_target, textures[i]);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
 
 #if !defined(USE_OPENGL_ES2)
         /* Set the texture parameters */
@@ -677,6 +677,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #define GET_PROC_ADDR_GL(name) GET_PROC_ADDR(name)
 #endif
 #define GET_PROC_ADDR_OPTIONAL(name) GET_PROC_ADDR_EXT(name, false) /* GL 3 or more */
+    GET_PROC_ADDR(GetError);
+    GET_PROC_ADDR(GetString);
+    GET_PROC_ADDR(GetIntegerv);
+
     GET_PROC_ADDR(CreateShader);
     GET_PROC_ADDR(ShaderSource);
     GET_PROC_ADDR(CompileShader);
@@ -704,6 +708,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(UseProgram);
     GET_PROC_ADDR(DeleteProgram);
 
+    GET_PROC_ADDR(ActiveTexture);
+    GET_PROC_ADDR(BindTexture);
+    GET_PROC_ADDR(TexParameteri);
+    GET_PROC_ADDR(TexParameterf);
+    GET_PROC_ADDR_GL(GetTexLevelParameteriv);
+    GET_PROC_ADDR(PixelStorei);
+    GET_PROC_ADDR(GenTextures);
+    GET_PROC_ADDR(DeleteTextures);
+    GET_PROC_ADDR(TexImage2D);
+    GET_PROC_ADDR(TexSubImage2D);
+
     GET_PROC_ADDR(GenBuffers);
     GET_PROC_ADDR(BindBuffer);
     GET_PROC_ADDR(BufferData);
@@ -720,12 +735,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_OPTIONAL(FenceSync);
     GET_PROC_ADDR_OPTIONAL(DeleteSync);
     GET_PROC_ADDR_OPTIONAL(ClientWaitSync);
-#endif
-
-#if defined(_WIN32)
-    GET_PROC_ADDR(ActiveTexture, true);
-#   undef glActiveTexture
-#   define glActiveTexture vgl->vt.ActiveTexture
 #endif
 #undef GET_PROC_ADDR
 
@@ -1415,8 +1424,8 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
 
     for (unsigned j = 0; j < vgl->prgm->tc.tex_count; j++) {
         assert(vgl->texture[j] != 0);
-        glActiveTexture(GL_TEXTURE0+j);
-        glBindTexture(tc->tex_target, vgl->texture[j]);
+        vgl->vt.ActiveTexture(GL_TEXTURE0+j);
+        vgl->vt.BindTexture(tc->tex_target, vgl->texture[j]);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
 
@@ -1529,7 +1538,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                            vgl->subpicture_buffer_object);
     }
 
-    glActiveTexture(GL_TEXTURE0 + 0);
+    vgl->vt.ActiveTexture(GL_TEXTURE0 + 0);
     for (int i = 0; i < vgl->region_count; i++) {
         gl_region_t *glr = &vgl->region[i];
         const GLfloat vertexCoord[] = {
@@ -1546,7 +1555,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         };
 
         assert(glr->texture != 0);
-        glBindTexture(tc->tex_target, glr->texture);
+        vgl->vt.BindTexture(tc->tex_target, glr->texture);
 
         tc->pf_prepare_shader(tc, &glr->width, &glr->height, glr->alpha);
 

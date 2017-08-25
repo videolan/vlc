@@ -63,7 +63,7 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
     {
-        glActiveTexture(GL_TEXTURE0 + i);
+        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
 
         CVOpenGLESTextureRef texture;
         CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(
@@ -79,11 +79,11 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
         }
 
         textures[i] = CVOpenGLESTextureGetName(texture);
-        glBindTexture(tc->tex_target, textures[i]);
-        glTexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
+        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         CFRelease(texture);
     }
 
@@ -113,8 +113,8 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
     {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(tc->tex_target, textures[i]);
+        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
 
         CGLError err =
             CGLTexImageIOSurface2D(glsys->locked_ctx, tc->tex_target,

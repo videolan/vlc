@@ -190,7 +190,7 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
         if (egl_images[i] == NULL)
             goto error;
 
-        glBindTexture(tc->tex_target, textures[i]);
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
 
         priv->glEGLImageTargetTexture2DOES(tc->tex_target, egl_images[i]);
     }

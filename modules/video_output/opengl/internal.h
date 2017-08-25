@@ -43,6 +43,25 @@
 #   endif
 #endif
 
+/* Core OpenGL/OpenGLES functions: the following functions pointers typedefs
+ * are not defined. */
+#if !defined(_WIN32) /* Already defined on Win32 */
+typedef void (*PFNGLACTIVETEXTUREPROC) (GLenum texture);
+#endif
+typedef GLenum (*PFNGLGETERRORPROC) (void);
+typedef const GLubyte *(*PFNGLGETSTRINGPROC) (GLenum name);
+typedef void (*PFNGLGETINTEGERVPROC) (GLenum pname, GLint *data);
+typedef void (*PFNGLBINDTEXTUREPROC) (GLenum target, GLuint texture);
+typedef void (*PFNGLTEXPARAMETERIPROC) (GLenum target, GLenum pname, GLint param);
+typedef void (*PFNGLTEXPARAMETERFPROC) (GLenum target, GLenum pname, GLfloat param);
+typedef void (*PFNGLGENTEXTURESPROC) (GLsizei n, GLuint *textures);
+typedef void (*PFNGLDELETETEXTURESPROC) (GLsizei n, const GLuint *textures);
+typedef void (*PFNGLTEXIMAGE2DPROC) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+typedef void (*PFNGLTEXSUBIMAGE2DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
+typedef void (*PFNGLGETTEXLEVELPARAMETERIVPROC) (GLenum target, GLint level, GLenum pname, GLint *params);
+typedef void (*PFNGLPIXELSTOREIPROC) (GLenum pname, GLint param);
+
+/* The following are defined in glext.h but not for GLES2 or on Apple systems */
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
 #   define PFNGLGETPROGRAMIVPROC             typeof(glGetProgramiv)*
 #   define PFNGLGETPROGRAMINFOLOGPROC        typeof(glGetProgramInfoLog)*
@@ -91,6 +110,11 @@
  * Structure containing function pointers to shaders commands
  */
 typedef struct {
+    /* Utils commands */
+    PFNGLGETERRORPROC       GetError;
+    PFNGLGETSTRINGPROC      GetString;
+    PFNGLGETINTEGERVPROC    GetIntegerv;
+
     /* Shader variables commands*/
     PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
     PFNGLGETATTRIBLOCATIONPROC       GetAttribLocation;
@@ -122,6 +146,18 @@ typedef struct {
     PFNGLGETSHADERIVPROC   GetShaderiv;
     PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
 
+    /* Texture commands */
+    PFNGLACTIVETEXTUREPROC          ActiveTexture;
+    PFNGLBINDTEXTUREPROC            BindTexture;
+    PFNGLTEXPARAMETERIPROC          TexParameteri;
+    PFNGLTEXPARAMETERFPROC          TexParameterf;
+    PFNGLGETTEXLEVELPARAMETERIVPROC GetTexLevelParameteriv; /* OpenGL only */
+    PFNGLPIXELSTOREIPROC            PixelStorei;
+    PFNGLGENTEXTURESPROC            GenTextures;
+    PFNGLDELETETEXTURESPROC         DeleteTextures;
+    PFNGLTEXIMAGE2DPROC             TexImage2D;
+    PFNGLTEXSUBIMAGE2DPROC          TexSubImage2D;
+
     /* Buffers commands */
     PFNGLGENBUFFERSPROC    GenBuffers;
     PFNGLBINDBUFFERPROC    BindBuffer;
@@ -141,13 +177,6 @@ typedef struct {
     PFNGLDELETESYNCPROC             DeleteSync; /* can be NULL */
     PFNGLCLIENTWAITSYNCPROC         ClientWaitSync; /* can be NULL */
 #endif
-
-#if defined(_WIN32)
-    PFNGLACTIVETEXTUREPROC  ActiveTexture;
-#   undef glActiveTexture
-#   define glActiveTexture tc->vt->ActiveTexture
-#endif
-
 } opengl_vtable_t;
 
 typedef struct opengl_tex_converter_t opengl_tex_converter_t;
@@ -172,7 +201,8 @@ struct opengl_tex_converter_t
 {
     /* Pointer to object gl, set by the caller of the init cb */
     vlc_gl_t *gl;
-    /* Function pointer to shaders commands, set by the caller of the init cb */
+
+    /* Function pointers to OpenGL functions, set by the caller */
     const opengl_vtable_t *vt;
     /* Available gl extensions (from GL_EXTENSIONS) */
     const char *glexts;
