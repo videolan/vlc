@@ -302,7 +302,7 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 {
     if (tc->yuv_color)
     {
-        tc->uloc.Coefficients = tc->api->GetUniformLocation(program,
+        tc->uloc.Coefficients = tc->vt->GetUniformLocation(program,
                                                             "Coefficients");
         if (tc->uloc.Coefficients == -1)
             return VLC_EGENERIC;
@@ -312,21 +312,21 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
     {
         char name[sizeof("TextureX")];
         snprintf(name, sizeof(name), "Texture%1u", i);
-        tc->uloc.Texture[i] = tc->api->GetUniformLocation(program, name);
+        tc->uloc.Texture[i] = tc->vt->GetUniformLocation(program, name);
         if (tc->uloc.Texture[i] == -1)
             return VLC_EGENERIC;
 #ifdef GL_TEXTURE_RECTANGLE
         if (tc->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
-            tc->uloc.TexSize[i] = tc->api->GetUniformLocation(program, name);
+            tc->uloc.TexSize[i] = tc->vt->GetUniformLocation(program, name);
             if (tc->uloc.TexSize[i] == -1)
                 return VLC_EGENERIC;
         }
 #endif
     }
 
-    tc->uloc.FillColor = tc->api->GetUniformLocation(program, "FillColor");
+    tc->uloc.FillColor = tc->vt->GetUniformLocation(program, "FillColor");
     if (tc->uloc.FillColor == -1)
         return VLC_EGENERIC;
     return VLC_SUCCESS;
@@ -340,18 +340,18 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
     (void) tex_width; (void) tex_height;
 
     if (tc->yuv_color)
-        tc->api->Uniform4fv(tc->uloc.Coefficients, 4, tc->yuv_coefficients);
+        tc->vt->Uniform4fv(tc->uloc.Coefficients, 4, tc->yuv_coefficients);
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
-        tc->api->Uniform1i(tc->uloc.Texture[i], i);
+        tc->vt->Uniform1i(tc->uloc.Texture[i], i);
 
-    tc->api->Uniform4f(tc->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
+    tc->vt->Uniform4f(tc->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
 
 #ifdef GL_TEXTURE_RECTANGLE
     if (tc->tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < tc->tex_count; ++i)
-            tc->api->Uniform2f(tc->uloc.TexSize[i], tex_width[i],
+            tc->vt->Uniform2f(tc->uloc.TexSize[i], tex_width[i],
                                tex_height[i]);
     }
 #endif
@@ -489,15 +489,15 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
     if (vlc_memstream_close(&ms) != 0)
         return 0;
 
-    GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
+    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
     if (fragment_shader == 0)
     {
         free(ms.ptr);
         return 0;
     }
     GLint length = ms.length;
-    tc->api->ShaderSource(fragment_shader, 1, (const char **)&ms.ptr, &length);
-    tc->api->CompileShader(fragment_shader);
+    tc->vt->ShaderSource(fragment_shader, 1, (const char **)&ms.ptr, &length);
+    tc->vt->CompileShader(fragment_shader);
     free(ms.ptr);
 
     tc->tex_target = tex_target;
@@ -562,18 +562,18 @@ pbo_data_alloc(const opengl_tex_converter_t *tc, picture_t *pic)
     picture_sys_t *picsys = pic->p_sys;
 
     glGetError();
-    tc->api->GenBuffers(pic->i_planes, picsys->buffers);
+    tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
 
     for (int i = 0; i < pic->i_planes; ++i)
     {
-        tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
-        tc->api->BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
+        tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
+        tc->vt->BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
                             GL_DYNAMIC_DRAW);
 
         if (glGetError() != GL_NO_ERROR)
         {
             msg_Err(tc->gl, "could not alloc PBO buffers");
-            tc->api->DeleteBuffers(i, picsys->buffers);
+            tc->vt->DeleteBuffers(i, picsys->buffers);
             return VLC_EGENERIC;
         }
     }
@@ -587,7 +587,7 @@ picture_pbo_destroy_cb(picture_t *pic)
     const opengl_tex_converter_t *tc = picsys->tc;
 
     if (picsys->buffers[0] != 0)
-        tc->api->DeleteBuffers(pic->i_planes, picsys->buffers);
+        tc->vt->DeleteBuffers(pic->i_planes, picsys->buffers);
     free(picsys);
     free(pic);
 }
@@ -608,7 +608,7 @@ pbo_pics_alloc(const opengl_tex_converter_t *tc)
     }
 
     /* turn off pbo */
-    tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return VLC_SUCCESS;
 error:
@@ -632,9 +632,9 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
     {
         GLsizeiptr size = pic->p[i].i_lines * pic->p[i].i_pitch;
         const GLvoid *data = pic->p[i].p_pixels;
-        tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
+        tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
                             display_pic->p_sys->buffers[i]);
-        tc->api->BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
+        tc->vt->BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
 
         glActiveTexture(GL_TEXTURE0 + i);
         glClientActiveTexture(GL_TEXTURE0 + i);
@@ -648,7 +648,7 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
     }
 
     /* turn off pbo */
-    tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return VLC_SUCCESS;
 }
@@ -668,18 +668,18 @@ persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
 
-    tc->api->GenBuffers(pic->i_planes, picsys->buffers);
+    tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
 
     const GLbitfield access = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT |
                               GL_MAP_PERSISTENT_BIT;
     for (int i = 0; i < pic->i_planes; ++i)
     {
-        tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
-        tc->api->BufferStorage(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
+        tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
+        tc->vt->BufferStorage(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
                                access | GL_CLIENT_STORAGE_BIT);
 
         pic->p[i].p_pixels =
-            tc->api->MapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, picsys->bytes[i],
+            tc->vt->MapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, picsys->bytes[i],
                                     access | GL_MAP_FLUSH_EXPLICIT_BIT);
 
         if (pic->p[i].p_pixels == NULL)
@@ -687,11 +687,11 @@ persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
             msg_Err(tc->gl, "could not map PBO buffers");
             for (i = i - 1; i >= 0; --i)
             {
-                tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
+                tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
                                     picsys->buffers[i]);
-                tc->api->UnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+                tc->vt->UnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
             }
-            tc->api->DeleteBuffers(pic->i_planes, picsys->buffers);
+            tc->vt->DeleteBuffers(pic->i_planes, picsys->buffers);
             memset(picsys->buffers, 0, PICTURE_PLANE_MAX * sizeof(GLuint));
             return VLC_EGENERIC;
         }
@@ -723,11 +723,11 @@ persistent_release_gpupics(const opengl_tex_converter_t *tc, bool force)
 
         assert(picsys->fence != NULL);
         GLenum wait = force ? GL_ALREADY_SIGNALED
-                            : tc->api->ClientWaitSync(picsys->fence, 0, 0);
+                            : tc->vt->ClientWaitSync(picsys->fence, 0, 0);
 
         if (wait == GL_ALREADY_SIGNALED || wait == GL_CONDITION_SATISFIED)
         {
-            tc->api->DeleteSync(picsys->fence);
+            tc->vt->DeleteSync(picsys->fence);
             picsys->fence = NULL;
 
             priv->persistent.list &= ~(1ULL << (i - 1));
@@ -748,9 +748,9 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     for (int i = 0; i < pic->i_planes; i++)
     {
-        tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
+        tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
         if (picsys->fence == NULL)
-            tc->api->FlushMappedBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
+            tc->vt->FlushMappedBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
                                             picsys->bytes[i]);
         glActiveTexture(GL_TEXTURE0 + i);
         glClientActiveTexture(GL_TEXTURE0 + i);
@@ -770,10 +770,10 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
     {
         /* The picture is already held */
         hold = false;
-        tc->api->DeleteSync(picsys->fence);
+        tc->vt->DeleteSync(picsys->fence);
     }
 
-    picsys->fence = tc->api->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    picsys->fence = tc->vt->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     if (pic->p_sys->fence == NULL)
     {
         /* Error (corner case): don't hold the picture */
@@ -794,7 +794,7 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
     }
 
     /* turn off pbo */
-    tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return VLC_SUCCESS;
 }
@@ -816,10 +816,10 @@ picture_persistent_destroy_cb(picture_t *pic)
     {
         for (int i = 0; i < pic->i_planes; ++i)
         {
-            tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
-            tc->api->UnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+            tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
+            tc->vt->UnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
         }
-        tc->api->DeleteBuffers(pic->i_planes, picsys->buffers);
+        tc->vt->DeleteBuffers(pic->i_planes, picsys->buffers);
     }
     free(picsys);
     free(pic);
@@ -859,7 +859,7 @@ tc_persistent_get_pool(const opengl_tex_converter_t *tc, unsigned requested_coun
         goto error;
 
     /* turn off pbo */
-    tc->api->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     /* Wrap the pictures into a pool */
     picture_pool_t *pool = picture_pool_New(count, pictures);
@@ -984,7 +984,7 @@ tc_common_release(const opengl_tex_converter_t *tc)
 static int
 tc_xyz12_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 {
-    tc->uloc.Texture[0] = tc->api->GetUniformLocation(program, "Texture0");
+    tc->uloc.Texture[0] = tc->vt->GetUniformLocation(program, "Texture0");
     return tc->uloc.Texture[0] != -1 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
@@ -994,7 +994,7 @@ tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
                         float alpha)
 {
     (void) tex_width; (void) tex_height; (void) alpha;
-    tc->api->Uniform1i(tc->uloc.Texture[0], 0);
+    tc->vt->Uniform1i(tc->uloc.Texture[0], 0);
 }
 
 static GLuint
@@ -1041,11 +1041,11 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
         " gl_FragColor = v_out;"
         "}";
 
-    GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
+    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
     if (fragment_shader == 0)
         return 0;
-    tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
-    tc->api->CompileShader(fragment_shader);
+    tc->vt->ShaderSource(fragment_shader, 1, &code, NULL);
+    tc->vt->CompileShader(fragment_shader);
     return fragment_shader;
 }
 
@@ -1115,7 +1115,7 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
     {
-        tc->api->DeleteShader(fragment_shader);
+        tc->vt->DeleteShader(fragment_shader);
         return VLC_ENOMEM;
     }
 
@@ -1142,10 +1142,10 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         const unsigned char *ogl_version = glGetString(GL_VERSION);
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
-        supports_map_persistent = glver_ok && has_pbo && has_bs && tc->api->BufferStorage
-            && tc->api->MapBufferRange && tc->api->FlushMappedBufferRange
-            && tc->api->UnmapBuffer && tc->api->FenceSync && tc->api->DeleteSync
-            && tc->api->ClientWaitSync;
+        supports_map_persistent = glver_ok && has_pbo && has_bs && tc->vt->BufferStorage
+            && tc->vt->MapBufferRange && tc->vt->FlushMappedBufferRange
+            && tc->vt->UnmapBuffer && tc->vt->FenceSync && tc->vt->DeleteSync
+            && tc->vt->ClientWaitSync;
         if (supports_map_persistent)
         {
             tc->pf_get_pool = tc_persistent_get_pool;
@@ -1157,8 +1157,8 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 #ifdef VLCGL_HAS_PBO
         if (!supports_map_persistent)
         {
-            const bool supports_pbo = has_pbo && tc->api->BufferData
-                && tc->api->BufferSubData;
+            const bool supports_pbo = has_pbo && tc->vt->BufferData
+                && tc->vt->BufferSubData;
             if (supports_pbo && pbo_pics_alloc(tc) == VLC_SUCCESS)
             {
                 tc->pf_update  = tc_pbo_update;

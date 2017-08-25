@@ -145,11 +145,11 @@ typedef struct {
     PFNGLCLIENTACTIVETEXTUREPROC  ClientActiveTexture;
 #   undef glClientActiveTexture
 #   undef glActiveTexture
-#   define glActiveTexture tc->api->ActiveTexture
-#   define glClientActiveTexture tc->api->ClientActiveTexture
+#   define glActiveTexture tc->vt->ActiveTexture
+#   define glClientActiveTexture tc->vt->ClientActiveTexture
 #endif
 
-} opengl_shaders_api_t;
+} opengl_vtable_t;
 
 typedef struct opengl_tex_converter_t opengl_tex_converter_t;
 
@@ -174,7 +174,7 @@ struct opengl_tex_converter_t
     /* Pointer to object gl, set by the caller of the init cb */
     vlc_gl_t *gl;
     /* Function pointer to shaders commands, set by the caller of the init cb */
-    const opengl_shaders_api_t *api;
+    const opengl_vtable_t *vt;
     /* Available gl extensions (from GL_EXTENSIONS) */
     const char *glexts;
 

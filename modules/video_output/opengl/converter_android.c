@@ -164,7 +164,7 @@ static int
 tc_anop_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 {
     struct priv *priv = tc->priv;
-    priv->uloc.uSTMatrix = tc->api->GetUniformLocation(program, "uSTMatrix");
+    priv->uloc.uSTMatrix = tc->vt->GetUniformLocation(program, "uSTMatrix");
     return priv->uloc.uSTMatrix != -1 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
@@ -176,7 +176,7 @@ tc_anop_prepare_shader(const opengl_tex_converter_t *tc,
     (void) tex_width; (void) tex_height; (void) alpha;
     struct priv *priv = tc->priv;
     if (priv->transform_mtx != NULL)
-        tc->api->UniformMatrix4fv(priv->uloc.uSTMatrix, 1, GL_FALSE,
+        tc->vt->UniformMatrix4fv(priv->uloc.uSTMatrix, 1, GL_FALSE,
                                   priv->transform_mtx);
 }
 
@@ -261,9 +261,9 @@ opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
         "{ "
         "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy);"
         "}";
-    GLuint fragment_shader = tc->api->CreateShader(GL_FRAGMENT_SHADER);
-    tc->api->ShaderSource(fragment_shader, 1, &code, NULL);
-    tc->api->CompileShader(fragment_shader);
+    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
+    tc->vt->ShaderSource(fragment_shader, 1, &code, NULL);
+    tc->vt->CompileShader(fragment_shader);
     tc->fshader = fragment_shader;
 
     return VLC_SUCCESS;
