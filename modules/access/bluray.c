@@ -1949,10 +1949,16 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         if (p_sys->i_attachments <= 0)
             return VLC_EGENERIC;
 
-        *pi_int = p_sys->i_attachments;
-        *ppp_attach = xmalloc(sizeof(input_attachment_t *) * p_sys->i_attachments);
+        *pi_int = 0;
+        *ppp_attach = malloc(sizeof(input_attachment_t *) * p_sys->i_attachments);
+        if(!*ppp_attach)
+            return VLC_EGENERIC;
         for (int i = 0; i < p_sys->i_attachments; i++)
-            (*ppp_attach)[i] = vlc_input_attachment_Duplicate(p_sys->attachments[i]);
+        {
+            input_attachment_t *p_dup = vlc_input_attachment_Duplicate(p_sys->attachments[i]);
+            if(p_dup)
+                (*ppp_attach)[(*pi_int)++] = p_dup;
+        }
         return VLC_SUCCESS;
     }
 
