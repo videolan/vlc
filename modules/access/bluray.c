@@ -1852,10 +1852,16 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         *pi_chapter_offset = 0;
 
         /* Duplicate local title infos */
-        *pi_int = p_sys->i_title;
+        *pi_int = 0;
         *ppp_title = malloc(p_sys->i_title * sizeof(input_title_t *));
+        if(!*ppp_title)
+            return VLC_EGENERIC;
         for (unsigned int i = 0; i < p_sys->i_title; i++)
-            (*ppp_title)[i] = vlc_input_title_Duplicate(p_sys->pp_title[i]);
+        {
+            input_title_t *p_dup = vlc_input_title_Duplicate(p_sys->pp_title[i]);
+            if(p_dup)
+                (*ppp_title)[(*pi_int)++] = p_dup;
+        }
 
         return VLC_SUCCESS;
     }
