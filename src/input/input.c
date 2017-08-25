@@ -2269,7 +2269,8 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
 
 static void UpdateTitleListfromDemux( input_thread_t *p_input )
 {
-    input_source_t *in = input_priv(p_input)->master;
+    input_thread_private_t *priv = input_priv(p_input);
+    input_source_t *in = priv->master;
 
     /* Delete the preexisting titles */
     if( in->i_title > 0 )
@@ -2277,6 +2278,8 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
         for( int i = 0; i < in->i_title; i++ )
             vlc_input_title_Delete( in->title[i] );
         TAB_CLEAN( in->i_title, in->title );
+        priv->i_title = 0;
+        priv->title = NULL;
         in->b_title_demux = false;
     }
 
