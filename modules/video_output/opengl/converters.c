@@ -637,7 +637,6 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
         tc->vt->BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
 
         glActiveTexture(GL_TEXTURE0 + i);
-        glClientActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(tc->tex_target, textures[i]);
 
         glPixelStorei(GL_UNPACK_ROW_LENGTH,
@@ -753,7 +752,6 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
             tc->vt->FlushMappedBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
                                             picsys->bytes[i]);
         glActiveTexture(GL_TEXTURE0 + i);
-        glClientActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(tc->tex_target, textures[i]);
 
         glPixelStorei(GL_UNPACK_ROW_LENGTH,
@@ -961,7 +959,6 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
     {
         assert(textures[i] != 0);
         glActiveTexture(GL_TEXTURE0 + i);
-        glClientActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(tc->tex_target, textures[i]);
         const void *pixels = plane_offset != NULL ?
                              &pic->p[i].p_pixels[plane_offset[i]] :

@@ -64,7 +64,6 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
     for (unsigned i = 0; i < tc->tex_count; ++i)
     {
         glActiveTexture(GL_TEXTURE0 + i);
-        glClientActiveTexture(GL_TEXTURE0 + i);
 
         CVOpenGLESTextureRef texture;
         CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(
@@ -115,7 +114,6 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
     for (unsigned i = 0; i < tc->tex_count; ++i)
     {
         glActiveTexture(GL_TEXTURE0 + i);
-        glClientActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(tc->tex_target, textures[i]);
 
         CGLError err =

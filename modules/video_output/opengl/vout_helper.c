@@ -720,11 +720,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
 #if defined(_WIN32)
     GET_PROC_ADDR(ActiveTexture, true);
-    GET_PROC_ADDR(ClientActiveTexture, true);
 #   undef glActiveTexture
-#   undef glClientActiveTexture
 #   define glActiveTexture vgl->vt.ActiveTexture
-#   define glClientActiveTexture vgl->vt.ClientActiveTexture
 #endif
 #undef GET_PROC_ADDR
 
@@ -1415,7 +1412,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
     for (unsigned j = 0; j < vgl->prgm->tc.tex_count; j++) {
         assert(vgl->texture[j] != 0);
         glActiveTexture(GL_TEXTURE0+j);
-        glClientActiveTexture(GL_TEXTURE0+j);
         glBindTexture(tc->tex_target, vgl->texture[j]);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
@@ -1530,7 +1526,6 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     }
 
     glActiveTexture(GL_TEXTURE0 + 0);
-    glClientActiveTexture(GL_TEXTURE0 + 0);
     for (int i = 0; i < vgl->region_count; i++) {
         gl_region_t *glr = &vgl->region[i];
         const GLfloat vertexCoord[] = {

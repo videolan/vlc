@@ -27,7 +27,6 @@
 #   define GLSL_VERSION "100"
 #   define PRECISION "precision highp float;"
 #   define VLCGL_PICTURE_MAX 128
-#   define glClientActiveTexture(x)
 #   define VLCGL_HAS_PBO /* PBO present as an OpenGlES 2 extension */
 #else
 #   define GLSL_VERSION "120"
@@ -145,11 +144,8 @@ typedef struct {
 
 #if defined(_WIN32)
     PFNGLACTIVETEXTUREPROC  ActiveTexture;
-    PFNGLCLIENTACTIVETEXTUREPROC  ClientActiveTexture;
-#   undef glClientActiveTexture
 #   undef glActiveTexture
 #   define glActiveTexture tc->vt->ActiveTexture
-#   define glClientActiveTexture tc->vt->ClientActiveTexture
 #endif
 
 } opengl_vtable_t;
