@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -21,16 +21,20 @@
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="446" height="160"/>
+            <rect key="contentRect" x="196" y="240" width="550" height="160"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="446" height="133"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="446" height="160"/>
+                <rect key="frame" x="0.0" y="0.0" width="550" height="160"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="560" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                        <rect key="frame" x="102" y="83" width="185" height="32"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Do you want to resume this file? This-is-a-file" id="4">
+                        <rect key="frame" x="102" y="83" width="430" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="32" id="YO6-yf-hXE"/>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="128" id="i6c-N2-KuS"/>
+                        </constraints>
+                        <textFieldCell key="cell" truncatesLastVisibleLine="YES" sendsActionOnEndEditing="YES" title="Do you want to resume this file? This-is-a-file" id="4">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -63,7 +67,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="21">
-                        <rect key="frame" x="337" y="13" width="95" height="32"/>
+                        <rect key="frame" x="441" y="13" width="95" height="32"/>
                         <buttonCell key="cell" type="push" title="Continue" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="22">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -76,7 +80,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9">
-                        <rect key="frame" x="253" y="13" width="84" height="32"/>
+                        <rect key="frame" x="357" y="13" width="84" height="32"/>
                         <buttonCell key="cell" type="push" title="Restart" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="10">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -94,14 +98,16 @@ DQ
                     <constraint firstItem="85X-TN-2Hu" firstAttribute="leading" secondItem="3" secondAttribute="leading" id="CfM-1U-Mbv"/>
                     <constraint firstItem="85X-TN-2Hu" firstAttribute="top" secondItem="3" secondAttribute="bottom" constant="8" id="Det-Ih-YSU"/>
                     <constraint firstItem="55" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" id="Iav-mD-8iG"/>
+                    <constraint firstAttribute="trailing" secondItem="3" secondAttribute="trailing" constant="20" id="JrA-lX-3sd"/>
                     <constraint firstAttribute="bottom" secondItem="9" secondAttribute="bottom" constant="20" id="SZk-pu-Lgd"/>
                     <constraint firstAttribute="bottom" secondItem="21" secondAttribute="bottom" constant="20" id="fiW-7M-G63"/>
                     <constraint firstItem="55" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="lQU-ef-GZw"/>
+                    <constraint firstItem="21" firstAttribute="top" secondItem="85X-TN-2Hu" secondAttribute="bottom" constant="20" id="p8X-Vs-WZx"/>
                     <constraint firstItem="21" firstAttribute="leading" secondItem="9" secondAttribute="trailing" constant="12" id="xrB-He-ihV"/>
                     <constraint firstItem="42" firstAttribute="leading" secondItem="55" secondAttribute="trailing" constant="19" id="yR0-JV-Hcv"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="358" y="388"/>
+            <point key="canvasLocation" x="410" y="388"/>
         </window>
     </objects>
     <resources>
