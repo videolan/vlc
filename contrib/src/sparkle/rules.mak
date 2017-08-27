@@ -1,6 +1,6 @@
 # Sparkle
 
-SPARKLE_VERSION := 1.13.1
+SPARKLE_VERSION := 1.18.1
 SPARKLE_URL := https://github.com/sparkle-project/Sparkle/archive/$(SPARKLE_VERSION).zip
 
 ifdef HAVE_MACOSX
