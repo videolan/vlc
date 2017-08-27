@@ -842,12 +842,10 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         }
         /* */
         if (osys->is_display_filled != osys->cfg.is_display_filled) {
-            vout_display_cfg_t cfg = osys->cfg;
-
-            cfg.is_display_filled = osys->is_display_filled;
-
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, &cfg);
             osys->cfg.is_display_filled = osys->is_display_filled;
+
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
+                                 &osys->cfg);
         }
         /* */
         if (osys->ch_zoom) {
