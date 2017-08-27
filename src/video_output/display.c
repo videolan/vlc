@@ -846,17 +846,12 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         }
         /* */
         if (osys->ch_zoom) {
-            vout_display_cfg_t cfg = osys->cfg;
-
-            cfg.zoom.num = osys->zoom.num;
-            cfg.zoom.den = osys->zoom.den;
-
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &cfg);
-
             osys->fit_window = -1;
-            osys->cfg.zoom.num = cfg.zoom.num;
-            osys->cfg.zoom.den = cfg.zoom.den;
+            osys->cfg.zoom.num = osys->zoom.num;
+            osys->cfg.zoom.den = osys->zoom.den;
             osys->ch_zoom = false;
+
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg);
         }
 #if defined(_WIN32) || defined(__OS2__)
         /* */
