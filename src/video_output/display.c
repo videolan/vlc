@@ -827,18 +827,15 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
         /* */
         if (ch_display_size) {
-            vout_display_cfg_t cfg = osys->cfg;
-            cfg.display.width  = display_width;
-            cfg.display.height = display_height;
 #if defined(_WIN32) || defined(__OS2__)
             osys->width_saved  = osys->cfg.display.width;
             osys->height_saved = osys->cfg.display.height;
 #endif
-
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg);
-
             osys->cfg.display.width  = display_width;
             osys->cfg.display.height = display_height;
+
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
+                                 &osys->cfg);
         }
         /* */
         if (osys->is_display_filled != osys->cfg.is_display_filled) {
