@@ -353,7 +353,6 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     /* Basic vertex shader */
     static const char *template =
         "#version " GLSL_VERSION "\n"
-        PRECISION
         "varying vec2 TexCoord0;attribute vec4 MultiTexCoord0;"
         "%s%s"
         "attribute vec3 VertexPosition;"
