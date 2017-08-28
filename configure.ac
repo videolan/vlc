@@ -924,19 +924,6 @@ PKG_CHECK_MODULES([SYSTEMD], [libsystemd], [
 AM_CONDITIONAL([HAVE_SYSTEMD], [test "${have_systemd}" = "yes"])
 
 
-dnl Check for ntohl, etc.
-VLC_SAVE_FLAGS
-CFLAGS="${CFLAGS} -Wall -Werror"
-AC_CACHE_CHECK([for ntohl in sys/param.h],
-    [ac_cv_c_ntohl_sys_param_h],
-    [     AC_TRY_COMPILE([#include <sys/param.h>],
-        [int meuh; ntohl(meuh);],
-        ac_cv_c_ntohl_sys_param_h=yes, ac_cv_c_ntohl_sys_param_h=no)])
-if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
-    AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
-fi
-VLC_RESTORE_FLAGS
-
 EXTEND_HELP_STRING([Optimization options:])
 dnl
 dnl  Compiler warnings
