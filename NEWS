@@ -129,6 +129,7 @@ Demuxers:
  * Support multi-channel WAV without channel-maps
  * Rewrite MKV seeking
  * Support for TTML and WebVTT in ISOBMF/MP4 and DASH
+ * Support for Scenarist Closed Caption
  * Fix Quicktime Mp4 inside MKV and unpacketized VC1
  * Support for isofLaC
  * Improved fLaC seeking
