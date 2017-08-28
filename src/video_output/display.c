@@ -851,14 +851,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             cfg.zoom.num = osys->zoom.num;
             cfg.zoom.den = osys->zoom.den;
 
-            if (10 * cfg.zoom.num <= cfg.zoom.den) {
-                cfg.zoom.num = 1;
-                cfg.zoom.den = 10;
-            } else if (cfg.zoom.num >= 10 * cfg.zoom.den) {
-                cfg.zoom.num = 10;
-                cfg.zoom.den = 1;
-            }
-
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &cfg);
 
             osys->fit_window = -1;
@@ -1051,6 +1043,14 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
         vlc_ureduce(&num, &den, num, den, 0);
     } else {
         num = 1;
+        den = 1;
+    }
+
+    if (10 * num <= den) {
+        num = 1;
+        den = 10;
+    } else if (num >= 10 * den) {
+        num = 10;
         den = 1;
     }
 
