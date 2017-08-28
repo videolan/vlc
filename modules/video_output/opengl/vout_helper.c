@@ -661,10 +661,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 #endif
 
-#if defined(USE_OPENGL_ES2)
-#define GET_PROC_ADDR(name, critical) vgl->vt.name = gl##name
-#else
-#define GET_PROC_ADDR(name, critical) do { \
+#define GET_PROC_ADDR_EXT(name, critical) do { \
     vgl->vt.name = vlc_gl_GetProcAddress(gl, "gl"#name); \
     if (vgl->vt.name == NULL && critical) { \
         msg_Err(gl, "gl"#name" symbol not found, bailing out\n"); \
@@ -672,50 +669,57 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL; \
     } \
 } while(0)
+#if defined(USE_OPENGL_ES2)
+#define GET_PROC_ADDR(name) vgl->vt.name = gl##name
+#define GET_PROC_ADDR_GL(name) vgl->vt.name = NULL /* GL only functions (not GLES) */
+#else
+#define GET_PROC_ADDR(name) GET_PROC_ADDR_EXT(name, true)
+#define GET_PROC_ADDR_GL(name) GET_PROC_ADDR(name)
 #endif
-    GET_PROC_ADDR(CreateShader, true);
-    GET_PROC_ADDR(ShaderSource, true);
-    GET_PROC_ADDR(CompileShader, true);
-    GET_PROC_ADDR(AttachShader, true);
+#define GET_PROC_ADDR_OPTIONAL(name) GET_PROC_ADDR_EXT(name, false) /* GL 3 or more */
+    GET_PROC_ADDR(CreateShader);
+    GET_PROC_ADDR(ShaderSource);
+    GET_PROC_ADDR(CompileShader);
+    GET_PROC_ADDR(AttachShader);
 
-    GET_PROC_ADDR(GetProgramiv, true);
-    GET_PROC_ADDR(GetShaderiv, true);
-    GET_PROC_ADDR(GetProgramInfoLog, true);
-    GET_PROC_ADDR(GetShaderInfoLog, true);
+    GET_PROC_ADDR(GetProgramiv);
+    GET_PROC_ADDR(GetShaderiv);
+    GET_PROC_ADDR(GetProgramInfoLog);
+    GET_PROC_ADDR(GetShaderInfoLog);
 
-    GET_PROC_ADDR(DeleteShader, true);
+    GET_PROC_ADDR(DeleteShader);
 
-    GET_PROC_ADDR(GetUniformLocation, true);
-    GET_PROC_ADDR(GetAttribLocation, true);
-    GET_PROC_ADDR(VertexAttribPointer, true);
-    GET_PROC_ADDR(EnableVertexAttribArray, true);
-    GET_PROC_ADDR(UniformMatrix4fv, true);
-    GET_PROC_ADDR(Uniform4fv, true);
-    GET_PROC_ADDR(Uniform4f, true);
-    GET_PROC_ADDR(Uniform2f, true);
-    GET_PROC_ADDR(Uniform1i, true);
+    GET_PROC_ADDR(GetUniformLocation);
+    GET_PROC_ADDR(GetAttribLocation);
+    GET_PROC_ADDR(VertexAttribPointer);
+    GET_PROC_ADDR(EnableVertexAttribArray);
+    GET_PROC_ADDR(UniformMatrix4fv);
+    GET_PROC_ADDR(Uniform4fv);
+    GET_PROC_ADDR(Uniform4f);
+    GET_PROC_ADDR(Uniform2f);
+    GET_PROC_ADDR(Uniform1i);
 
-    GET_PROC_ADDR(CreateProgram, true);
-    GET_PROC_ADDR(LinkProgram, true);
-    GET_PROC_ADDR(UseProgram, true);
-    GET_PROC_ADDR(DeleteProgram, true);
+    GET_PROC_ADDR(CreateProgram);
+    GET_PROC_ADDR(LinkProgram);
+    GET_PROC_ADDR(UseProgram);
+    GET_PROC_ADDR(DeleteProgram);
 
-    GET_PROC_ADDR(GenBuffers, true);
-    GET_PROC_ADDR(BindBuffer, true);
-    GET_PROC_ADDR(BufferData, true);
-    GET_PROC_ADDR(DeleteBuffers, true);
+    GET_PROC_ADDR(GenBuffers);
+    GET_PROC_ADDR(BindBuffer);
+    GET_PROC_ADDR(BufferData);
+    GET_PROC_ADDR(DeleteBuffers);
 
 #ifdef VLCGL_HAS_PBO
-    GET_PROC_ADDR(BufferSubData, false);
+    GET_PROC_ADDR_OPTIONAL(BufferSubData);
 #endif
 #ifdef VLCGL_HAS_MAP_PERSISTENT
-    GET_PROC_ADDR(BufferStorage, false);
-    GET_PROC_ADDR(MapBufferRange, false);
-    GET_PROC_ADDR(FlushMappedBufferRange, false);
-    GET_PROC_ADDR(UnmapBuffer, false);
-    GET_PROC_ADDR(FenceSync, false);
-    GET_PROC_ADDR(DeleteSync, false);
-    GET_PROC_ADDR(ClientWaitSync, false);
+    GET_PROC_ADDR_OPTIONAL(BufferStorage);
+    GET_PROC_ADDR_OPTIONAL(MapBufferRange);
+    GET_PROC_ADDR_OPTIONAL(FlushMappedBufferRange);
+    GET_PROC_ADDR_OPTIONAL(UnmapBuffer);
+    GET_PROC_ADDR_OPTIONAL(FenceSync);
+    GET_PROC_ADDR_OPTIONAL(DeleteSync);
+    GET_PROC_ADDR_OPTIONAL(ClientWaitSync);
 #endif
 
 #if defined(_WIN32)
