@@ -23,14 +23,14 @@
 
 #include "vout_helper.h"
 
+#define VLCGL_PICTURE_MAX 128
+
 #if defined(USE_OPENGL_ES2)
 #   define GLSL_VERSION "100"
 #   define PRECISION "precision highp float;"
-#   define VLCGL_PICTURE_MAX 128
 #   define VLCGL_HAS_PBO /* PBO present as an OpenGlES 2 extension */
 #else
 #   define GLSL_VERSION "120"
-#   define VLCGL_PICTURE_MAX 128
 #   ifdef GL_VERSION_2_0
 #       define VLCGL_HAS_PBO
 #   endif
