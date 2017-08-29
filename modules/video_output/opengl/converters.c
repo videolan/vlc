@@ -32,55 +32,87 @@
 #include "internal.h"
 
 #ifndef GL_RED
-#define GL_RED 0
+# define GL_RED 0x1903
+#endif
+#ifndef GL_RG
+# define GL_RG 0x8227
 #endif
 #ifndef GL_R16
-#define GL_R16 0
+# define GL_R16 0x822A
 #endif
-
 #ifndef GL_LUMINANCE16
-#define GL_LUMINANCE16 0
+# define GL_LUMINANCE16 0x8042
+#endif
+#ifndef GL_TEXTURE_RED_SIZE
+# define GL_TEXTURE_RED_SIZE 0x805C
+#endif
+#ifndef GL_TEXTURE_LUMINANCE_SIZE
+# define GL_TEXTURE_LUMINANCE_SIZE 0x8060
 #endif
 
 #ifndef GL_UNPACK_ROW_LENGTH
-#define GL_UNPACK_ROW_LENGTH 0x0CF2
-#define NEED_GL_EXT_unpack_subimage
+# define GL_UNPACK_ROW_LENGTH 0x0CF2
 #endif
 
-#ifdef VLCGL_HAS_PBO
+#ifndef GL_PIXEL_UNPACK_BUFFER
+# define GL_PIXEL_UNPACK_BUFFER 0x88EC
+#endif
+#ifndef GL_DYNAMIC_DRAW
+# define GL_DYNAMIC_DRAW 0x88E8
+#endif
+
+#ifndef GL_MAP_READ_BIT
+# define GL_MAP_READ_BIT 0x0001
+#endif
+#ifndef GL_MAP_WRITE_BIT
+# define GL_MAP_WRITE_BIT 0x0002
+#endif
+#ifndef GL_MAP_FLUSH_EXPLICIT_BIT
+#define GL_MAP_FLUSH_EXPLICIT_BIT 0x0010
+#endif
+#ifndef GL_MAP_PERSISTENT_BIT
+# define GL_MAP_PERSISTENT_BIT 0x0040
+#endif
+
+#ifndef GL_CLIENT_STORAGE_BIT
+# define GL_CLIENT_STORAGE_BIT 0x0200
+#endif
+
+#ifndef GL_ALREADY_SIGNALED
+# define GL_ALREADY_SIGNALED 0x911A
+#endif
+#ifndef GL_CONDITION_SATISFIED
+# define GL_CONDITION_SATISFIED 0x911C
+#endif
+#ifndef GL_SYNC_GPU_COMMANDS_COMPLETE
+# define GL_SYNC_GPU_COMMANDS_COMPLETE 0x9117
+#endif
+
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
 struct picture_sys_t
 {
     const opengl_tex_converter_t *tc;
     GLuint      buffers[PICTURE_PLANE_MAX];
     size_t      bytes[PICTURE_PLANE_MAX];
-#ifdef VLCGL_HAS_MAP_PERSISTENT
     GLsync      fence;
     unsigned    index;
-#endif
 };
-#endif
 
 struct priv
 {
     bool   has_unpack_subimage;
     void * texture_temp_buf;
     size_t texture_temp_buf_size;
-#ifdef VLCGL_HAS_PBO
     struct {
         picture_t *display_pics[PBO_DISPLAY_COUNT];
         size_t display_idx;
     } pbo;
-#ifdef VLCGL_HAS_MAP_PERSISTENT
     struct {
         picture_t *pics[VLCGL_PICTURE_MAX];
         unsigned long long list;
     } persistent;
-#endif
-#endif
 };
 
-#if !defined(USE_OPENGL_ES2)
 static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
                             int tex_format, int tex_internal, int tex_type)
 {
@@ -107,7 +139,6 @@ static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
     tc->vt->DeleteTextures(1, &texture);
     return size;
 }
-#endif
 
 static int
 tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
@@ -120,7 +151,6 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
     GLint oneplane_texfmt, oneplane16_texfmt, twoplanes_texfmt;
 
-#if !defined(USE_OPENGL_ES2)
     if (HasExtension(tc->glexts, "GL_ARB_texture_rg"))
     {
         oneplane_texfmt = GL_RED;
@@ -128,7 +158,6 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         twoplanes_texfmt = GL_RG;
     }
     else
-#endif
     {
         oneplane_texfmt = GL_LUMINANCE;
         oneplane16_texfmt = GL_LUMINANCE16;
@@ -146,7 +175,6 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             internal = oneplane_texfmt;
             type = GL_UNSIGNED_BYTE;
         }
-#if !defined(USE_OPENGL_ES2)
         else if (desc->pixel_size == 2)
         {
             if (oneplane16_texfmt == 0
@@ -159,7 +187,6 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             yuv_range_correction = (float)((1 << 16) - 1)
                                  / ((1 << desc->pixel_bits) - 1);
         }
-#endif
         else
             return VLC_EGENERIC;
 
@@ -315,7 +342,6 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
         tc->uloc.Texture[i] = tc->vt->GetUniformLocation(program, name);
         if (tc->uloc.Texture[i] == -1)
             return VLC_EGENERIC;
-#ifdef GL_TEXTURE_RECTANGLE
         if (tc->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
@@ -323,7 +349,6 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
             if (tc->uloc.TexSize[i] == -1)
                 return VLC_EGENERIC;
         }
-#endif
     }
 
     tc->uloc.FillColor = tc->vt->GetUniformLocation(program, "FillColor");
@@ -347,14 +372,12 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
 
     tc->vt->Uniform4f(tc->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
 
-#ifdef GL_TEXTURE_RECTANGLE
     if (tc->tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < tc->tex_count; ++i)
             tc->vt->Uniform2f(tc->uloc.TexSize[i], tex_width[i],
                                tex_height[i]);
     }
-#endif
 }
 
 static int
@@ -457,13 +480,11 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
             lookup  = "texture2D";
             coord_name = "TexCoord";
             break;
-#ifdef GL_TEXTURE_RECTANGLE
         case GL_TEXTURE_RECTANGLE:
             sampler = "sampler2DRect";
             lookup  = "texture2DRect";
             coord_name = "TexCoordRect";
             break;
-#endif
         default:
             vlc_assert_unreachable();
     }
@@ -481,13 +502,11 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
         ADDF("uniform %s Texture%u;"
              "varying vec2 TexCoord%u;", sampler, i, i);
 
-#ifdef GL_TEXTURE_RECTANGLE
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < tc->tex_count; ++i)
             ADDF("uniform vec2 TexSize%u;", i);
     }
-#endif
 
     if (is_yuv)
         ADD("uniform vec4 Coefficients[4];");
@@ -496,14 +515,12 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
         "void main(void) {"
         "float val;vec4 colors;");
 
-#ifdef GL_TEXTURE_RECTANGLE
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < tc->tex_count; ++i)
             ADDF("vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
                  "TexCoord%u.y * TexSize%u.y);", i, i, i, i, i);
     }
-#endif
 
     unsigned color_idx = 0;
     for (unsigned i = 0; i < tc->tex_count; ++i)
@@ -582,14 +599,6 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
     return fragment_shader;
 }
-
-#ifdef VLCGL_HAS_PBO
-# ifndef GL_PIXEL_UNPACK_BUFFER
-#  define GL_PIXEL_UNPACK_BUFFER 0x88EC
-# endif
-# ifndef GL_DYNAMIC_DRAW
-#  define GL_DYNAMIC_DRAW 0x88E8
-# endif
 
 static picture_t *
 pbo_picture_create(const opengl_tex_converter_t *tc,
@@ -736,7 +745,6 @@ tc_pbo_release(const opengl_tex_converter_t *tc)
     free(tc->priv);
 }
 
-#ifdef VLCGL_HAS_MAP_PERSISTENT
 static int
 persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 {
@@ -946,8 +954,6 @@ error:
 
     return NULL;
 }
-#endif /* VLCGL_HAS_MAP_PERSISTENT */
-#endif /* VLCGL_HAS_PBO */
 
 static int
 tc_common_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
@@ -1135,7 +1141,6 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
             HasExtension(tc->glexts, "GL_ARB_pixel_buffer_object") ||
             HasExtension(tc->glexts, "GL_EXT_pixel_buffer_object");
 
-#ifdef VLCGL_HAS_MAP_PERSISTENT
         const bool has_bs =
             HasExtension(tc->glexts, "GL_ARB_buffer_storage") ||
             HasExtension(tc->glexts, "GL_EXT_buffer_storage");
@@ -1157,8 +1162,6 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
             tc->pf_release  = tc_persistent_release;
             msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering) enabled");
         }
-#endif
-#ifdef VLCGL_HAS_PBO
         if (!supports_map_persistent)
         {
             const bool supports_pbo = has_pbo && tc->vt->BufferData
@@ -1170,16 +1173,11 @@ generic_init(opengl_tex_converter_t *tc, bool allow_dr)
                 msg_Dbg(tc->gl, "PBO support enabled");
             }
         }
-#endif
     }
 
-#ifdef NEED_GL_EXT_unpack_subimage
-    priv->has_unpack_subimage = HasExtension(tc->glexts,
-                                             "GL_EXT_unpack_subimage");
-#else
-    priv->has_unpack_subimage = true;
-#endif
-
+    /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
+    priv->has_unpack_subimage =
+        !tc->is_gles || HasExtension(tc->glexts, "GL_EXT_unpack_subimage");
     tc->fshader = fragment_shader;
 
     return VLC_SUCCESS;

@@ -25,18 +25,8 @@
 
 #define VLCGL_PICTURE_MAX 128
 
-#if defined(USE_OPENGL_ES2)
-#   define VLCGL_HAS_PBO /* PBO present as an OpenGlES 2 extension */
-#else
-#   ifdef GL_VERSION_2_0
-#       define VLCGL_HAS_PBO
-#   endif
-#   ifdef GL_VERSION_4_4
-#       define VLCGL_HAS_MAP_PERSISTENT
-#   endif
-#   if defined(__APPLE__)
-#       define GL_TEXTURE_RECTANGLE 0x84F5
-#   endif
+#ifndef GL_TEXTURE_RECTANGLE
+# define GL_TEXTURE_RECTANGLE 0x84F5
 #endif
 
 /* Core OpenGL/OpenGLES functions: the following functions pointers typedefs
@@ -56,6 +46,7 @@ typedef void (*PFNGLTEXIMAGE2DPROC) (GLenum target, GLint level, GLint internalf
 typedef void (*PFNGLTEXSUBIMAGE2DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 typedef void (*PFNGLGETTEXLEVELPARAMETERIVPROC) (GLenum target, GLint level, GLenum pname, GLint *params);
 typedef void (*PFNGLPIXELSTOREIPROC) (GLenum pname, GLint param);
+typedef void (*PFNGLBUFFERSTORAGEPROC) (GLenum target, GLsizeiptr size, const void *data, GLbitfield flags);
 
 /* The following are defined in glext.h but not for GLES2 or on Apple systems */
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
@@ -84,22 +75,23 @@ typedef void (*PFNGLPIXELSTOREIPROC) (GLenum pname, GLint param);
 #   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
 #   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
-#   ifdef VLCGL_HAS_PBO
-#    define PFNGLBUFFERSUBDATAPROC           typeof(glBufferSubData)*
-#   endif
-#   ifdef VLCGL_HAS_MAP_PERSISTENT
-#    define PFNGLBUFFERSTORAGEPROC           typeof(glBufferStorage)*
-#    define PFNGLMAPBUFFERRANGEPROC          typeof(glMapBufferRange)*
-#    define PFNGLFLUSHMAPPEDBUFFERRANGEPROC  typeof(glFlushMappedBufferRange)*
-#    define PFNGLUNMAPBUFFERPROC             typeof(glUnmapBuffer)*
-#    define PFNGLFENCESYNCPROC               typeof(glFenceSync)*
-#    define PFNGLDELETESYNCPROC              typeof(glDeleteSync)*
-#    define PFNGLCLIENTWAITSYNCPROC          typeof(glClientWaitSync)*
-#   endif
+#   define PFNGLBUFFERSUBDATAPROC            typeof(glBufferSubData)*
 #   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
 #if defined(__APPLE__)
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
+#endif
+
+/* The following are defined in glext.h but doesn't exist in GLES2 */
+#if defined(USE_OPENGL_ES2) || defined(__APPLE__)
+typedef struct __GLsync *GLsync;
+typedef uint64_t GLuint64;
+typedef void *(*PFNGLMAPBUFFERRANGEPROC) (GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+typedef void (*PFNGLFLUSHMAPPEDBUFFERRANGEPROC) (GLenum target, GLintptr offset, GLsizeiptr length);
+typedef GLboolean (*PFNGLUNMAPBUFFERPROC) (GLenum target);
+typedef GLsync (*PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flags);
+typedef void (*PFNGLDELETESYNCPROC) (GLsync sync);
+typedef GLenum (*PFNGLCLIENTWAITSYNCPROC) (GLsync sync, GLbitfield flags, GLuint64 timeout);
 #endif
 
 /**
@@ -161,10 +153,7 @@ typedef struct {
     PFNGLDELETEBUFFERSPROC DeleteBuffers;
 
     /* Commands used for PBO and/or Persistent mapping */
-#ifdef VLCGL_HAS_PBO
     PFNGLBUFFERSUBDATAPROC          BufferSubData; /* can be NULL */
-#endif
-#ifdef VLCGL_HAS_MAP_PERSISTENT
     PFNGLBUFFERSTORAGEPROC          BufferStorage; /* can be NULL */
     PFNGLMAPBUFFERRANGEPROC         MapBufferRange; /* can be NULL */
     PFNGLFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange; /* can be NULL */
@@ -172,7 +161,6 @@ typedef struct {
     PFNGLFENCESYNCPROC              FenceSync; /* can be NULL */
     PFNGLDELETESYNCPROC             DeleteSync; /* can be NULL */
     PFNGLCLIENTWAITSYNCPROC         ClientWaitSync; /* can be NULL */
-#endif
 } opengl_vtable_t;
 
 typedef struct opengl_tex_converter_t opengl_tex_converter_t;

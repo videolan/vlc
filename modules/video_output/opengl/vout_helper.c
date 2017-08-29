@@ -732,10 +732,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(BufferData);
     GET_PROC_ADDR(DeleteBuffers);
 
-#ifdef VLCGL_HAS_PBO
     GET_PROC_ADDR_OPTIONAL(BufferSubData);
-#endif
-#ifdef VLCGL_HAS_MAP_PERSISTENT
     GET_PROC_ADDR_OPTIONAL(BufferStorage);
     GET_PROC_ADDR_OPTIONAL(MapBufferRange);
     GET_PROC_ADDR_OPTIONAL(FlushMappedBufferRange);
@@ -743,7 +740,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_OPTIONAL(FenceSync);
     GET_PROC_ADDR_OPTIONAL(DeleteSync);
     GET_PROC_ADDR_OPTIONAL(ClientWaitSync);
-#endif
 #undef GET_PROC_ADDR
 
     /* Resize the format if it is greater than the maximum texture size
