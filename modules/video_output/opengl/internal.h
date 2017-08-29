@@ -26,18 +26,14 @@
 #define VLCGL_PICTURE_MAX 128
 
 #if defined(USE_OPENGL_ES2)
-#   define GLSL_VERSION "100"
-#   define PRECISION "precision highp float;"
 #   define VLCGL_HAS_PBO /* PBO present as an OpenGlES 2 extension */
 #else
-#   define GLSL_VERSION "120"
 #   ifdef GL_VERSION_2_0
 #       define VLCGL_HAS_PBO
 #   endif
 #   ifdef GL_VERSION_4_4
 #       define VLCGL_HAS_MAP_PERSISTENT
 #   endif
-#   define PRECISION ""
 #   if defined(__APPLE__)
 #       define GL_TEXTURE_RECTANGLE 0x84F5
 #   endif
@@ -204,8 +200,15 @@ struct opengl_tex_converter_t
 
     /* Function pointers to OpenGL functions, set by the caller */
     const opengl_vtable_t *vt;
+
     /* Available gl extensions (from GL_EXTENSIONS) */
     const char *glexts;
+
+    /* GLSL version, set by the caller. 100 for GLSL ES, 120 for desktop GLSL */
+    unsigned glsl_version;
+    /* Precision header, set by the caller. In OpenGLES, the fragment language
+     * has no default precision qualifier for floating point types. */
+    const char *glsl_precision_header;
 
     /* Can only be changed from the module open function */
     video_format_t fmt;

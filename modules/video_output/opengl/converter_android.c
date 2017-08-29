@@ -250,10 +250,10 @@ opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
             break;
     }
 
-    static const char *code =
-        "#version " GLSL_VERSION "\n"
+    static const char *template =
+        "#version %u\n"
         "#extension GL_OES_EGL_image_external : require\n"
-        PRECISION
+        "%s" /* precision */
         "varying vec2 TexCoord0;"
         "uniform samplerExternalOES sTexture;"
         "uniform mat4 uSTMatrix;"
@@ -261,10 +261,15 @@ opengl_tex_converter_anop_init(opengl_tex_converter_t *tc)
         "{ "
         "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy);"
         "}";
+
+    char *code;
+    if (asprintf(&code, template, tc->glsl_version, tc->glsl_precision_header) < 0)
+        return 0;
     GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
-    tc->vt->ShaderSource(fragment_shader, 1, &code, NULL);
+    tc->vt->ShaderSource(fragment_shader, 1, (const char **) &code, NULL);
     tc->vt->CompileShader(fragment_shader);
     tc->fshader = fragment_shader;
+    free(code);
 
     return VLC_SUCCESS;
 }

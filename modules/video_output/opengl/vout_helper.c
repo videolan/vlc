@@ -352,7 +352,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
 {
     /* Basic vertex shader */
     static const char *template =
-        "#version " GLSL_VERSION "\n"
+        "#version %u\n"
         "varying vec2 TexCoord0;attribute vec4 MultiTexCoord0;"
         "%s%s"
         "attribute vec3 VertexPosition;"
@@ -378,7 +378,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         " TexCoord2 = vec4(OrientationMatrix * MultiTexCoord2).st;" : "";
 
     char *code;
-    if (asprintf(&code, template, coord1_header, coord2_header,
+    if (asprintf(&code, template, tc->glsl_version, coord1_header, coord2_header,
                  coord1_code, coord2_code) < 0)
         return 0;
 
@@ -557,6 +557,13 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
         .gl = vgl->gl,
         .vt = &vgl->vt,
         .glexts = glexts,
+#if defined(USE_OPENGL_ES2)
+        .glsl_version = 100,
+        .glsl_precision_header = "precision highp float;\n",
+#else
+        .glsl_version = 120,
+        .glsl_precision_header = "",
+#endif
         .fmt = *fmt,
     };
 

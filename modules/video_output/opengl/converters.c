@@ -391,9 +391,9 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
      *  - XYZ to RGB matrix conversion
      *  - reverse RGB gamma correction
      */
-    static const char *code =
-        "#version " GLSL_VERSION "\n"
-        PRECISION
+    static const char *template =
+        "#version %u\n"
+        "%s"
         "uniform sampler2D Texture0;"
         "uniform vec4 xyz_gamma = vec4(2.6);"
         "uniform vec4 rgb_gamma = vec4(1.0/2.2);"
@@ -417,11 +417,14 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
         " gl_FragColor = v_out;"
         "}";
 
-    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
-    if (fragment_shader == 0)
+    char *code;
+    if (asprintf(&code, template, tc->glsl_version, tc->glsl_precision_header) < 0)
         return 0;
-    tc->vt->ShaderSource(fragment_shader, 1, &code, NULL);
+
+    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
+    tc->vt->ShaderSource(fragment_shader, 1, (const char **) &code, NULL);
     tc->vt->CompileShader(fragment_shader);
+    free(code);
     return fragment_shader;
 }
 
@@ -472,7 +475,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
-    ADD("#version " GLSL_VERSION "\n" PRECISION);
+    ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
         ADDF("uniform %s Texture%u;"
