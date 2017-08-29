@@ -614,11 +614,11 @@ int OpenDemux( vlc_object_t *p_this )
             es = es_out_Add( p_demux->out, &es_fmt );
             if( s->disposition & AV_DISPOSITION_DEFAULT )
                 es_out_Control( p_demux->out, ES_OUT_SET_ES_DEFAULT, es );
-            es_format_Clean( &es_fmt );
 
             msg_Dbg( p_demux, "adding es: %s codec = %4.4s (%d)",
                      psz_type, (char*)&fcc, cp->codec_id  );
         }
+        es_format_Clean( &es_fmt );
         TAB_APPEND( p_sys->i_tk, p_sys->tk, es );
     }
     p_sys->tk_pcr = xcalloc( p_sys->i_tk, sizeof(*p_sys->tk_pcr) );
