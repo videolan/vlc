@@ -38,6 +38,30 @@
 #include <set>
 #include <string>
 
+#if UPNP_VERSION < 10800
+/*
+ * Compat functions and typedefs for libupnp prior to 1.8
+ */
+
+typedef Upnp_Discovery UpnpDiscovery;
+typedef Upnp_Action_Complete UpnpActionComplete;
+
+static const char* UpnpDiscovery_get_Location_cstr( const UpnpDiscovery* p_discovery )
+{
+  return p_discovery->Location;
+}
+
+static const char* UpnpDiscovery_get_DeviceID_cstr( const UpnpDiscovery* p_discovery )
+{
+  return p_discovery->DeviceId;
+}
+
+static IXML_Document* UpnpActionComplete_get_ActionResult( const UpnpActionComplete* p_result )
+{
+  return p_result->ActionResult;
+}
+#endif
+
 /*
  * Constants
 */
@@ -679,19 +703,19 @@ void MediaServerList::removeServer( const std::string& udn )
 /*
  * Handles servers listing UPnP events
  */
-int MediaServerList::Callback( Upnp_EventType event_type, void* p_event )
+int MediaServerList::Callback( Upnp_EventType event_type, UpnpEventPtr p_event )
 {
     switch( event_type )
     {
     case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
     case UPNP_DISCOVERY_SEARCH_RESULT:
     {
-        struct Upnp_Discovery* p_discovery = ( struct Upnp_Discovery* )p_event;
+        const UpnpDiscovery* p_discovery = ( const UpnpDiscovery* )p_event;
 
         IXML_Document *p_description_doc = NULL;
 
         int i_res;
-        i_res = UpnpDownloadXmlDoc( p_discovery->Location, &p_description_doc );
+        i_res = UpnpDownloadXmlDoc( UpnpDiscovery_get_Location_cstr( p_discovery ), &p_description_doc );
 
         MediaServerList *self = UpnpInstanceWrapper::lockMediaServerList();
         if ( !self )
@@ -704,11 +728,11 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event )
         {
             msg_Warn( self->m_sd, "Could not download device description! "
                             "Fetching data from %s failed: %s",
-                            p_discovery->Location, UpnpGetErrorMessage( i_res ) );
+                            UpnpDiscovery_get_Location_cstr( p_discovery ), UpnpGetErrorMessage( i_res ) );
             UpnpInstanceWrapper::unlockMediaServerList();
             return i_res;
         }
-        self->parseNewServer( p_description_doc, p_discovery->Location );
+        self->parseNewServer( p_description_doc, UpnpDiscovery_get_Location_cstr( p_discovery ) );
         UpnpInstanceWrapper::unlockMediaServerList();
         ixmlDocument_free( p_description_doc );
     }
@@ -716,11 +740,11 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event )
 
     case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
     {
-        struct Upnp_Discovery* p_discovery = ( struct Upnp_Discovery* )p_event;
+        const UpnpDiscovery* p_discovery = ( const UpnpDiscovery* )p_event;
 
         MediaServerList *self = UpnpInstanceWrapper::lockMediaServerList();
         if ( self )
-            self->removeServer( p_discovery->DeviceId );
+            self->removeServer( UpnpDiscovery_get_DeviceID_cstr( p_discovery ) );
         UpnpInstanceWrapper::unlockMediaServerList();
     }
     break;
@@ -953,7 +977,7 @@ void Upnp_i11e_cb::waitAndRelease( void )
     }
 }
 
-int Upnp_i11e_cb::run( Upnp_EventType eventType, void *p_event, void *p_cookie )
+int Upnp_i11e_cb::run( Upnp_EventType eventType, UpnpEventPtr p_event, void *p_cookie )
 {
     Upnp_i11e_cb *self = static_cast<Upnp_i11e_cb*>( p_cookie );
 
@@ -1082,15 +1106,15 @@ bool MediaServer::addItem( IXML_Element* itemElement )
 }
 
 int MediaServer::sendActionCb( Upnp_EventType eventType,
-                               void *p_event, void *p_cookie )
+                               UpnpEventPtr p_event, void *p_cookie )
 {
     if( eventType != UPNP_CONTROL_ACTION_COMPLETE )
         return 0;
     IXML_Document** pp_sendActionResult = (IXML_Document** )p_cookie;
-    Upnp_Action_Complete *p_result = (Upnp_Action_Complete *)p_event;
+    const UpnpActionComplete *p_result = (const UpnpActionComplete *)p_event;
 
     /* The only way to dup the result is to print it and parse it again */
-    DOMString tmpStr = ixmlPrintNode( ( IXML_Node * ) p_result->ActionResult );
+    DOMString tmpStr = ixmlPrintNode( ( IXML_Node * ) UpnpActionComplete_get_ActionResult( p_result ) );
     if (tmpStr == NULL)
         return 0;
 
@@ -1616,7 +1640,7 @@ UpnpClient_Handle UpnpInstanceWrapper::handle() const
     return m_handle;
 }
 
-int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, void *p_event, void *p_user_data)
+int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, UpnpEventPtr p_event, void *p_user_data)
 {
     VLC_UNUSED(p_user_data);
     vlc_mutex_lock( &s_lock );

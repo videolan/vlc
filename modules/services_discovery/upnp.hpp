@@ -37,6 +37,12 @@
 #include <vlc_common.h>
 #include <vlc_url.h>
 
+#if UPNP_VERSION < 10800
+typedef void* UpnpEventPtr;
+#else
+typedef const void* UpnpEventPtr;
+#endif
+
 namespace SD
 {
     class MediaServerList;
@@ -63,7 +69,7 @@ public:
     static void unlockMediaServerList();
 
 private:
-    static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data );
+    static int Callback( Upnp_EventType event_type, UpnpEventPtr p_event, void* p_user_data );
 
     UpnpInstanceWrapper();
     ~UpnpInstanceWrapper();
@@ -104,7 +110,7 @@ public:
     bool addServer(MediaServerDesc *desc );
     void removeServer(const std::string &udn );
     MediaServerDesc* getServer( const std::string& udn );
-    static int Callback( Upnp_EventType event_type, void* p_event );
+    static int Callback( Upnp_EventType event_type, UpnpEventPtr p_event );
 
 private:
     void parseNewServer( IXML_Document* doc, const std::string& location );
@@ -126,7 +132,7 @@ public:
     Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie );
     ~Upnp_i11e_cb();
     void waitAndRelease( void );
-    static int run( Upnp_EventType, void *, void *);
+    static int run( Upnp_EventType, UpnpEventPtr, void *);
 
 private:
     vlc_sem_t       m_sem;
@@ -152,7 +158,7 @@ private:
 
     IXML_Document* _browseAction(const char*, const char*,
             const char*, const char*, const char* );
-    static int sendActionCb( Upnp_EventType, void *, void *);
+    static int sendActionCb( Upnp_EventType, UpnpEventPtr, void *);
 
 private:
     char* m_psz_root;
