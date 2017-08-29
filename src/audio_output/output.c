@@ -336,6 +336,8 @@ audio_output_t *aout_New (vlc_object_t *parent)
 
     /* Stereo mode */
     var_Create (aout, "stereo-mode", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    owner->initial_stereo_mode = var_GetInteger (aout, "stereo-mode");
+
     var_AddCallback (aout, "stereo-mode", StereoModeCallback, NULL);
     vlc_value_t txt;
     txt.psz_string = _("Stereo audio mode");
