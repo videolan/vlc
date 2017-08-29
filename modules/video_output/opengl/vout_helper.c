@@ -558,9 +558,11 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
         .vt = &vgl->vt,
         .glexts = glexts,
 #if defined(USE_OPENGL_ES2)
+        .is_gles = true,
         .glsl_version = 100,
         .glsl_precision_header = "precision highp float;\n",
 #else
+        .is_gles = false,
         .glsl_version = 120,
         .glsl_precision_header = "",
 #endif

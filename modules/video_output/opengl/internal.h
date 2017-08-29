@@ -204,6 +204,8 @@ struct opengl_tex_converter_t
     /* Available gl extensions (from GL_EXTENSIONS) */
     const char *glexts;
 
+    /* True if the current API is OpenGL ES, set by the caller */
+    bool is_gles;
     /* GLSL version, set by the caller. 100 for GLSL ES, 120 for desktop GLSL */
     unsigned glsl_version;
     /* Precision header, set by the caller. In OpenGLES, the fragment language
