@@ -403,6 +403,7 @@ static int Open(vlc_object_t *obj)
          p_mode->i_mode != D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS_DEINTERLACE_BOB )
     {
         msg_Dbg(filter, "mode %s not available, trying bob", psz_mode);
+        p_mode = GetFilterMode("bob");
         for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
         {
             ID3D11VideoProcessorEnumerator_GetVideoProcessorRateConversionCaps(processorEnumerator, type, &rateCaps);
