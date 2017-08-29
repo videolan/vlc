@@ -453,8 +453,10 @@ static int Open(vlc_object_t *p_this)
         p_sys->mode = filter_sys_t::AMBISONICS_DECODER;
 
         unsigned i_nbChannels = aout_FormatNbChannels(&p_filter->fmt_out.audio);
-        if (!p_sys->speakerDecoder.Configure(p_sys->i_order, true,
-            kAmblib_CustomSpeakerSetUp, i_nbChannels))
+        if (i_nbChannels == 1
+         || !p_sys->speakerDecoder.Configure(p_sys->i_order, true,
+                                             kAmblib_CustomSpeakerSetUp,
+                                             i_nbChannels))
         {
             msg_Err(p_filter, "Error creating the Ambisonics decoder.");
             delete p_sys;
