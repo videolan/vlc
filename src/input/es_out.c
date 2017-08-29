@@ -1484,7 +1484,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta, const vlc_meta
     vlc_mutex_unlock( &p_item->lock );
 
     /* Check program meta to not override GROUP_META values */
-    if( (!p_program_meta || vlc_meta_Get( p_program_meta, vlc_meta_Title ) == NULL) &&
+    if( p_meta && (!p_program_meta || vlc_meta_Get( p_program_meta, vlc_meta_Title ) == NULL) &&
          vlc_meta_Get( p_meta, vlc_meta_Title ) != NULL )
         input_item_SetName( p_item, vlc_meta_Get( p_meta, vlc_meta_Title ) );
 
