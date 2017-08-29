@@ -27,7 +27,6 @@
  * and rewritten */
 
 /* TODO:
- *  On discontinuity reset the decoder state
  *  Check parity
  *  708 decoding
  */
