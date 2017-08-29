@@ -27,7 +27,7 @@
 #endif
 
 #include <GLES2/gl2ext.h>
-#include "internal.h"
+#include "converter.h"
 #include "../android/display.h"
 #include "../android/utils.h"
 

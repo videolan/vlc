@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include "internal.h"
+#include "converter.h"
 #include "../../codec/vt_utils.h"
 
 #if TARGET_OS_IPHONE

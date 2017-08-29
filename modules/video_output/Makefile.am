@@ -7,7 +7,7 @@ OPENGL_COMMONCFLAGS =
 OPENGL_COMMONLDFLAGS =
 OPENGL_COMMONLIBS =
 OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
-	video_output/opengl/vout_helper.h video_output/opengl/internal.h \
+	video_output/opengl/vout_helper.h video_output/opengl/converter.h \
 	video_output/opengl/converters.c
 if HAVE_ANDROID
 OPENGL_COMMONSOURCES += video_output/opengl/converter_android.c

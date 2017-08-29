@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include "internal.h"
+#include "converter.h"
 #include "../../hw/vaapi/vlc_vaapi.h"
 #include <vlc_vout_window.h>
 

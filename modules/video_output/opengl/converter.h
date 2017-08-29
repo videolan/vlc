@@ -1,5 +1,5 @@
 /*****************************************************************************
- * opengl_internal.h: OpenGL internal header
+ * converter.h: OpenGL internal header
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  *
@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_OPENGL_INTERNAL_H
-#define VLC_OPENGL_INTERNAL_H
+#ifndef VLC_OPENGL_CONVERTER_H
+#define VLC_OPENGL_CONVERTER_H
 
 #include "vout_helper.h"
 
