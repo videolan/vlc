@@ -386,9 +386,9 @@ static int Open(vlc_object_t *obj)
     if (strcmp(p_mode->psz_mode, psz_mode))
         msg_Dbg(filter, "using %s deinterlacing mode", p_mode->psz_mode);
 
+    D3D11_VIDEO_PROCESSOR_RATE_CONVERSION_CAPS rateCaps;
     for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
     {
-        D3D11_VIDEO_PROCESSOR_RATE_CONVERSION_CAPS rateCaps;
         ID3D11VideoProcessorEnumerator_GetVideoProcessorRateConversionCaps(processorEnumerator, type, &rateCaps);
         if (!(rateCaps.ProcessorCaps & p_mode->i_mode))
             continue;
@@ -405,7 +405,6 @@ static int Open(vlc_object_t *obj)
         msg_Dbg(filter, "mode %s not available, trying bob", psz_mode);
         for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
         {
-            D3D11_VIDEO_PROCESSOR_RATE_CONVERSION_CAPS rateCaps;
             ID3D11VideoProcessorEnumerator_GetVideoProcessorRateConversionCaps(processorEnumerator, type, &rateCaps);
             if (!(rateCaps.ProcessorCaps & D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS_DEINTERLACE_BOB))
                 continue;
@@ -466,6 +465,10 @@ static int Open(vlc_object_t *obj)
     InitDeinterlacingContext( &sys->context );
 
     sys->context.settings = p_mode->settings;
+    sys->context.settings.b_use_frame_history = rateCaps.PastFrames != 0 ||
+        rateCaps.FutureFrames != 0;
+    if (sys->context.settings.b_use_frame_history != p_mode->settings.b_use_frame_history)
+        msg_Dbg(filter, "deinterlacing not using frame history as requested");
     if (sys->context.settings.b_double_rate)
         sys->context.pf_render_ordered = RenderPic;
     else
