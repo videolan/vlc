@@ -1053,6 +1053,12 @@ static void vlc_av_packet_Release(block_t *block)
 
 static block_t *vlc_av_packet_Wrap(AVPacket *packet, mtime_t i_length, AVCodecContext *context )
 {
+    if ( packet->data == NULL &&
+         packet->flags == 0 &&
+         packet->pts == AV_NOPTS_VALUE &&
+         packet->dts == AV_NOPTS_VALUE )
+        return NULL; /* totally empty AVPacket */
+
     vlc_av_packet_t *b = malloc( sizeof( *b ) );
     if( unlikely(b == NULL) )
         return NULL;
