@@ -634,6 +634,38 @@ static void qsv_set_block_ts(encoder_t *enc, encoder_sys_t *sys, block_t *block,
                      " and that you have the last version of Intel's drivers installed.");
 }
 
+static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
+{
+    encoder_sys_t *sys = enc->p_sys;
+
+    /* Synchronize and fill block_t. If the SyncOperation fails we leak :-/ (or we can segfault, ur choice) */
+    if (MFXVideoCORE_SyncOperation(sys->session, task->syncp, QSV_SYNCPOINT_WAIT) != MFX_ERR_NONE) {
+        msg_Err(enc, "SyncOperation failed, outputting garbage data. "
+                "Updating your drivers and/or changing the encoding settings might resolve this");
+        return NULL;
+    }
+    block_t *block = task->block;
+    block->i_buffer = task->bs.DataLength;
+    block->p_buffer += task->bs.DataOffset;
+
+    qsv_set_block_ts(enc, sys, block, &task->bs);
+    qsv_set_block_flags(block, task->bs.FrameType);
+
+    /* msg_Dbg(enc, "block->i_pts = %lld, block->i_dts = %lld", block->i_pts, block->i_dts); */
+    /* msg_Dbg(enc, "FrameType = %#.4x, TimeStamp (pts) = %lld, DecodeTimeStamp = %lld", */
+    /*         task->bs.FrameType, task->bs.TimeStamp, task->bs.DecodeTimeStamp); */
+
+    /* Copied from x264.c: This isn't really valid for streams with B-frames */
+    block->i_length = CLOCK_FREQ *
+        enc->fmt_in.video.i_frame_rate_base /
+        enc->fmt_in.video.i_frame_rate;
+
+    // Buggy DTS (value comes from experiments)
+    if (task->bs.DecodeTimeStamp < -10000)
+        block->i_dts = sys->last_dts + block->i_length;
+    sys->last_dts = block->i_dts;
+    return block;
+}
 
 /*
  * The Encode function has 3 encoding phases :
@@ -679,31 +711,7 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
     if (!task) {
         task = sys->tasks + sys->first_task;
 
-        /* Synchronize and fill block_t. If the SyncOperation fails we leak :-/ (or we can segfault, ur choice) */
-        if (MFXVideoCORE_SyncOperation(sys->session, task->syncp, QSV_SYNCPOINT_WAIT) == MFX_ERR_NONE) {
-            block = task->block;
-            block->i_buffer = task->bs.DataLength;
-            block->p_buffer += task->bs.DataOffset;
-
-            qsv_set_block_ts(enc, sys, block, &task->bs);
-            qsv_set_block_flags(block, task->bs.FrameType);
-
-            /* msg_Dbg(enc, "block->i_pts = %lld, block->i_dts = %lld", block->i_pts, block->i_dts); */
-            /* msg_Dbg(enc, "FrameType = %#.4x, TimeStamp (pts) = %lld, DecodeTimeStamp = %lld", */
-            /*         task->bs.FrameType, task->bs.TimeStamp, task->bs.DecodeTimeStamp); */
-
-            /* Copied from x264.c: This isn't really valid for streams with B-frames */
-            block->i_length = CLOCK_FREQ *
-                enc->fmt_in.video.i_frame_rate_base /
-                enc->fmt_in.video.i_frame_rate;
-
-            // Buggy DTS (value comes from experiments)
-            if (task->bs.DecodeTimeStamp < -10000)
-                block->i_dts = sys->last_dts + block->i_length;
-            sys->last_dts = block->i_dts;
-        } else // Only happens on buggy drivers
-            msg_Err(enc, "SyncOperation failed, outputting garbage data. "
-                    "Updating your drivers and/or changing the encoding settings might resolve this");
+        block = qsv_synchronize_block( enc, task );
 
         /* Reset the task now it has been synchronized and advances first_task pointer */
         task->syncp = 0;
