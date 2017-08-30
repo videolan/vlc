@@ -367,7 +367,7 @@ void EStoPES ( block_t **pp_pes,
             offset++;
         }
         offset++;
-        if( offset <= p_es->i_buffer-4 &&
+        if( offset+4 <= p_es->i_buffer &&
             ((p_es->p_buffer[offset] & 0x1f) != 9) ) /* Not AUD */
         {
             /* Make similar AUD as libavformat does */
