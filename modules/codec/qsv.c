@@ -667,22 +667,12 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     return block;
 }
 
-/*
- * The Encode function has 3 encoding phases :
- *   - Feed : We feed the encoder until it stops to return MFX_MORE_DATA_NEEDED
- *     and the async_tasks are all in use (honouring the AsyncDepth)
- *   - Main encoding phase : synchronizing the oldest task each call.
- *   - Empty : pic = 0, we empty the decoder. Synchronizing the remaining tasks.
- */
-static block_t *Encode(encoder_t *this, picture_t *pic)
+static void qsv_queue_encode_picture(encoder_t *enc, async_task_t *task,
+                                     picture_t *pic)
 {
-    encoder_t     *enc = (encoder_t *)this;
     encoder_sys_t *sys = enc->p_sys;
-    async_task_t  *task = NULL;
-    block_t       *block = NULL;
-
+    mfxStatus sts;
     mfxFrameSurface1 *frame = NULL;
-    mfxStatus        sts;
 
     if (pic) {
         /* To avoid qsv -> vlc timestamp conversion overflow, we use timestamp relative
@@ -694,34 +684,14 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
         frame = qsv_frame_pool_Get(sys, pic);
         if (!frame) {
             msg_Warn(enc, "Unable to find an unlocked surface in the pool");
-            return NULL;
+            return;
         }
-
-        /* Finds an available SyncPoint */
-        for (size_t i = 0; i < sys->async_depth; i++)
-            if ((sys->tasks + (i + sys->first_task) % sys->async_depth)->syncp == 0) {
-                task = sys->tasks + (i + sys->first_task) % sys->async_depth;
-                break;
-            }
-    } else
-        /* If !pic, we are emptying encoder and tasks, so we force the SyncOperation */
-        msg_Dbg(enc, "Emptying encoder");
-
-    /* There is no available task, we need to synchronize */
-    if (!task) {
-        task = sys->tasks + sys->first_task;
-
-        block = qsv_synchronize_block( enc, task );
-
-        /* Reset the task now it has been synchronized and advances first_task pointer */
-        task->syncp = 0;
-        sys->first_task = (sys->first_task + 1) % sys->async_depth;
     }
 
     /* Allocate block_t and prepare mfxBitstream for encoder */
     if (!(task->block = block_Alloc(sys->params.mfx.BufferSizeInKB * 1000))) {
         msg_Err(enc, "Unable to allocate block for encoder output");
-        return NULL;
+        return;
     }
     memset(&task->bs, 0, sizeof(task->bs));
     task->bs.MaxLength = sys->params.mfx.BufferSizeInKB * 1000;
@@ -747,6 +717,45 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
         msg_Err(enc, "Encoder not ready or error (%d), trying a reset...", sts);
         MFXVideoENCODE_Reset(sys->session, &sys->params);
     }
+}
+
+/*
+ * The Encode function has 3 encoding phases :
+ *   - Feed : We feed the encoder until it stops to return MFX_MORE_DATA_NEEDED
+ *     and the async_tasks are all in use (honouring the AsyncDepth)
+ *   - Main encoding phase : synchronizing the oldest task each call.
+ *   - Empty : pic = 0, we empty the decoder. Synchronizing the remaining tasks.
+ */
+static block_t *Encode(encoder_t *this, picture_t *pic)
+{
+    encoder_t     *enc = (encoder_t *)this;
+    encoder_sys_t *sys = enc->p_sys;
+    async_task_t  *task = NULL;
+    block_t       *block = NULL;
+
+    if (pic) {
+        /* Finds an available SyncPoint */
+        for (size_t i = 0; i < sys->async_depth; i++)
+            if ((sys->tasks + (i + sys->first_task) % sys->async_depth)->syncp == 0) {
+                task = sys->tasks + (i + sys->first_task) % sys->async_depth;
+                break;
+            }
+    } else
+        /* If !pic, we are emptying encoder and tasks, so we force the SyncOperation */
+        msg_Dbg(enc, "Emptying encoder");
+
+    /* There is no available task, we need to synchronize */
+    if (!task) {
+        task = sys->tasks + sys->first_task;
+
+        block = qsv_synchronize_block( enc, task );
+
+        /* Reset the task now it has been synchronized and advances first_task pointer */
+        task->syncp = 0;
+        sys->first_task = (sys->first_task + 1) % sys->async_depth;
+    }
+
+    qsv_queue_encode_picture( enc, task, pic );
 
     return block;
 }
