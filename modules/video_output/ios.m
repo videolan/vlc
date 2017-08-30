@@ -633,22 +633,19 @@ static void OpenglESSwap(vlc_gl_t *gl)
     [EAGLContext setCurrentContext:_eaglContext];
 
     CGSize viewSize = [self bounds].size;
-
+    CGFloat scaleFactor = self.contentScaleFactor;
     vout_display_place_t place;
 
-    @synchronized (self) {
-        if (_voutDisplay) {
-            vout_display_cfg_t cfg_tmp = *(_voutDisplay->cfg);
-            CGFloat scaleFactor = self.contentScaleFactor;
+    if (_voutDisplay) {
+        vout_display_cfg_t cfg_tmp = *(_voutDisplay->cfg);
 
-            cfg_tmp.display.width  = viewSize.width * scaleFactor;
-            cfg_tmp.display.height = viewSize.height * scaleFactor;
+        cfg_tmp.display.width  = viewSize.width * scaleFactor;
+        cfg_tmp.display.height = viewSize.height * scaleFactor;
 
-            vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
-            _voutDisplay->sys->place = place;
-            vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
-                                              viewSize.height * scaleFactor);
-        }
+        vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
+        _voutDisplay->sys->place = place;
+        vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
+                                          viewSize.height * scaleFactor);
     }
 
     // x / y are top left corner, but we need the lower left one
