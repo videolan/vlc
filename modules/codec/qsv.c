@@ -154,7 +154,7 @@ static void     Close(vlc_object_t *);
      "MPEG2 needs at least 1 here.")
 
 static const int const profile_h264_list[] =
-      { 0, MFX_PROFILE_AVC_BASELINE, MFX_PROFILE_AVC_MAIN,
+      { 0, MFX_PROFILE_AVC_CONSTRAINED_BASELINE, MFX_PROFILE_AVC_MAIN,
       MFX_PROFILE_AVC_EXTENDED, MFX_PROFILE_AVC_HIGH };
 static const char *const profile_h264_text[] =
     { "decide", "baseline", "main", "extended", "high" };
