@@ -132,7 +132,8 @@ class AudioFilterControlWidget : public QWidget
     Q_OBJECT
 
 public:
-    AudioFilterControlWidget( intf_thread_t *, QWidget *, const char *name );
+    AudioFilterControlWidget( intf_thread_t *, QWidget *, const char *shortcut,
+                              const char *name /* = NULL */ );
 
 protected:
     virtual void build();
@@ -141,6 +142,7 @@ protected:
     QVector<FilterSliderData *> sliderDatas;
     QGroupBox *slidersBox;
     intf_thread_t *p_intf;
+    QString shortcut; // filter's module shorcut name
     QString name; // filter's module name
     int i_smallfont;
 
