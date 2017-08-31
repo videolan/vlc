@@ -679,6 +679,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 #endif
 
+#define GET_PROC_ADDR_CORE(name) vgl->vt.name = gl##name
 #define GET_PROC_ADDR_EXT(name, critical) do { \
     vgl->vt.name = vlc_gl_GetProcAddress(gl, "gl"#name); \
     if (vgl->vt.name == NULL && critical) { \
@@ -688,28 +689,38 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     } \
 } while(0)
 #if defined(USE_OPENGL_ES2)
-#define GET_PROC_ADDR(name) vgl->vt.name = gl##name
-#define GET_PROC_ADDR_GL(name) vgl->vt.name = NULL /* GL only functions (not GLES) */
+#define GET_PROC_ADDR(name) GET_PROC_ADDR_CORE(name)
+#define GET_PROC_ADDR_CORE_GL(name) vgl->vt.name = NULL /* GL only functions (not GLES) */
 #else
 #define GET_PROC_ADDR(name) GET_PROC_ADDR_EXT(name, true)
-#define GET_PROC_ADDR_GL(name) GET_PROC_ADDR(name)
+#define GET_PROC_ADDR_CORE_GL(name) GET_PROC_ADDR_CORE(name)
 #endif
 #define GET_PROC_ADDR_OPTIONAL(name) GET_PROC_ADDR_EXT(name, false) /* GL 3 or more */
-    GET_PROC_ADDR(GetError);
-    GET_PROC_ADDR(GetString);
-    GET_PROC_ADDR(GetIntegerv);
+
+    GET_PROC_ADDR_CORE(GetError);
+    GET_PROC_ADDR_CORE(GetString);
+    GET_PROC_ADDR_CORE(GetIntegerv);
+    GET_PROC_ADDR_CORE(BindTexture);
+    GET_PROC_ADDR_CORE(TexParameteri);
+    GET_PROC_ADDR_CORE(TexParameterf);
+    GET_PROC_ADDR_CORE(PixelStorei);
+    GET_PROC_ADDR_CORE(GenTextures);
+    GET_PROC_ADDR_CORE(DeleteTextures);
+    GET_PROC_ADDR_CORE(TexImage2D);
+    GET_PROC_ADDR_CORE(TexSubImage2D);
+
+    GET_PROC_ADDR_CORE_GL(GetTexLevelParameteriv);
 
     GET_PROC_ADDR(CreateShader);
     GET_PROC_ADDR(ShaderSource);
     GET_PROC_ADDR(CompileShader);
     GET_PROC_ADDR(AttachShader);
+    GET_PROC_ADDR(DeleteShader);
 
     GET_PROC_ADDR(GetProgramiv);
     GET_PROC_ADDR(GetShaderiv);
     GET_PROC_ADDR(GetProgramInfoLog);
     GET_PROC_ADDR(GetShaderInfoLog);
-
-    GET_PROC_ADDR(DeleteShader);
 
     GET_PROC_ADDR(GetUniformLocation);
     GET_PROC_ADDR(GetAttribLocation);
@@ -727,15 +738,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(DeleteProgram);
 
     GET_PROC_ADDR(ActiveTexture);
-    GET_PROC_ADDR(BindTexture);
-    GET_PROC_ADDR(TexParameteri);
-    GET_PROC_ADDR(TexParameterf);
-    GET_PROC_ADDR_GL(GetTexLevelParameteriv);
-    GET_PROC_ADDR(PixelStorei);
-    GET_PROC_ADDR(GenTextures);
-    GET_PROC_ADDR(DeleteTextures);
-    GET_PROC_ADDR(TexImage2D);
-    GET_PROC_ADDR(TexSubImage2D);
 
     GET_PROC_ADDR(GenBuffers);
     GET_PROC_ADDR(BindBuffer);

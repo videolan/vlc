@@ -99,53 +99,60 @@ typedef GLenum (*PFNGLCLIENTWAITSYNCPROC) (GLsync sync, GLbitfield flags, GLuint
  * Structure containing function pointers to shaders commands
  */
 typedef struct {
-    /* Utils commands */
+    /*
+     * GL / GLES core functions
+     */
     PFNGLGETERRORPROC       GetError;
     PFNGLGETSTRINGPROC      GetString;
     PFNGLGETINTEGERVPROC    GetIntegerv;
+    PFNGLBINDTEXTUREPROC    BindTexture;
+    PFNGLTEXPARAMETERIPROC  TexParameteri;
+    PFNGLTEXPARAMETERFPROC  TexParameterf;
+    PFNGLPIXELSTOREIPROC    PixelStorei;
+    PFNGLGENTEXTURESPROC    GenTextures;
+    PFNGLDELETETEXTURESPROC DeleteTextures;
+    PFNGLTEXIMAGE2DPROC     TexImage2D;
+    PFNGLTEXSUBIMAGE2DPROC  TexSubImage2D;
 
-    /* Shader variables commands*/
+    /* GL only core functions: NULL for GLES2 */
+    PFNGLGETTEXLEVELPARAMETERIVPROC GetTexLevelParameteriv; /* Can be NULL */
+
+    /*
+     * GL / GLES extensions
+     */
+
+    /* Shader commands */
+    PFNGLCREATESHADERPROC   CreateShader;
+    PFNGLSHADERSOURCEPROC   ShaderSource;
+    PFNGLCOMPILESHADERPROC  CompileShader;
+    PFNGLATTACHSHADERPROC   AttachShader;
+    PFNGLDELETESHADERPROC   DeleteShader;
+
+    /* Shader log commands */
+    PFNGLGETPROGRAMIVPROC       GetProgramiv;
+    PFNGLGETSHADERIVPROC        GetShaderiv;
+    PFNGLGETPROGRAMINFOLOGPROC  GetProgramInfoLog;
+    PFNGLGETSHADERINFOLOGPROC   GetShaderInfoLog;
+
+    /* Shader variables commands */
     PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
     PFNGLGETATTRIBLOCATIONPROC       GetAttribLocation;
     PFNGLVERTEXATTRIBPOINTERPROC     VertexAttribPointer;
     PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray;
+    PFNGLUNIFORMMATRIX4FVPROC        UniformMatrix4fv;
+    PFNGLUNIFORM4FVPROC              Uniform4fv;
+    PFNGLUNIFORM4FPROC               Uniform4f;
+    PFNGLUNIFORM2FPROC               Uniform2f;
+    PFNGLUNIFORM1IPROC               Uniform1i;
 
-    PFNGLUNIFORMMATRIX4FVPROC   UniformMatrix4fv;
-    PFNGLUNIFORM4FVPROC         Uniform4fv;
-    PFNGLUNIFORM4FPROC          Uniform4f;
-    PFNGLUNIFORM2FPROC          Uniform2f;
-    PFNGLUNIFORM1IPROC          Uniform1i;
-
-    /* Shader command */
-    PFNGLCREATESHADERPROC CreateShader;
-    PFNGLSHADERSOURCEPROC ShaderSource;
-    PFNGLCOMPILESHADERPROC CompileShader;
-    PFNGLDELETESHADERPROC   DeleteShader;
-
+    /* Program commands */
     PFNGLCREATEPROGRAMPROC CreateProgram;
     PFNGLLINKPROGRAMPROC   LinkProgram;
     PFNGLUSEPROGRAMPROC    UseProgram;
     PFNGLDELETEPROGRAMPROC DeleteProgram;
 
-    PFNGLATTACHSHADERPROC  AttachShader;
-
-    /* Shader log commands */
-    PFNGLGETPROGRAMIVPROC  GetProgramiv;
-    PFNGLGETPROGRAMINFOLOGPROC GetProgramInfoLog;
-    PFNGLGETSHADERIVPROC   GetShaderiv;
-    PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
-
     /* Texture commands */
-    PFNGLACTIVETEXTUREPROC          ActiveTexture;
-    PFNGLBINDTEXTUREPROC            BindTexture;
-    PFNGLTEXPARAMETERIPROC          TexParameteri;
-    PFNGLTEXPARAMETERFPROC          TexParameterf;
-    PFNGLGETTEXLEVELPARAMETERIVPROC GetTexLevelParameteriv; /* OpenGL only */
-    PFNGLPIXELSTOREIPROC            PixelStorei;
-    PFNGLGENTEXTURESPROC            GenTextures;
-    PFNGLDELETETEXTURESPROC         DeleteTextures;
-    PFNGLTEXIMAGE2DPROC             TexImage2D;
-    PFNGLTEXSUBIMAGE2DPROC          TexSubImage2D;
+    PFNGLACTIVETEXTUREPROC ActiveTexture;
 
     /* Buffers commands */
     PFNGLGENBUFFERSPROC    GenBuffers;
