@@ -37,6 +37,8 @@
 
 #define SOUT_CFG_PREFIX     "sout-qsv-"
 
+#define QSV_HAVE_CO2 (MFX_VERSION_MAJOR > 1 || (MFX_VERSION_MAJOR == 1 && MFX_VERSION_MINOR >= 6))
+
 /* Default wait on Intel Media SDK SyncOperation. Almost useless when async-depth >= 2 */
 #define QSV_SYNCPOINT_WAIT  (420)
 /* Encoder input synchronization busy wait loop time */
@@ -406,6 +408,24 @@ static int Open(vlc_object_t *this)
     uint8_t pps_buf[128];
     mfxExtCodingOptionSPSPPS headers;
     mfxExtBuffer *extended_params[1] = {(mfxExtBuffer *)&headers};
+    mfxExtCodingOption co = {
+        .Header.BufferId = MFX_EXTBUFF_CODING_OPTION,
+        .Header.BufferSz = sizeof(co),
+        .PicTimingSEI = MFX_CODINGOPTION_ON,
+    };
+#if QSV_HAVE_CO2
+    mfxExtCodingOption2 co2 = {
+        .Header.BufferId = MFX_EXTBUFF_CODING_OPTION2,
+        .Header.BufferSz = sizeof(co2),
+    };
+#endif
+    mfxExtBuffer *init_params[] =
+    {
+        (mfxExtBuffer*)&co,
+#if QSV_HAVE_CO2
+        (mfxExtBuffer*)&co2,
+#endif
+    };
     mfxVersion ver = { { MFX_VERSION_MINOR, MFX_VERSION_MAJOR } };
 
     uint8_t *p_extra;
@@ -535,6 +555,14 @@ static int Open(vlc_object_t *this)
     if (qsv_frame_pool_Init(&sys->frames, &alloc_request, sys->async_depth) != VLC_SUCCESS)
         goto nomem;
     msg_Dbg(enc, "Requested %d surfaces for work", alloc_request.NumFrameSuggested);
+
+    sys->params.ExtParam    = (mfxExtBuffer**)&init_params;
+    sys->params.NumExtParam =
+#if QSV_HAVE_CO2
+            2;
+#else
+            1;
+#endif
 
     /* Initializing MFX_Encoder */
     sts = MFXVideoENCODE_Init(sys->session, &sys->params);
