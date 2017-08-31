@@ -30,24 +30,28 @@
 # define GL_TEXTURE_RECTANGLE 0x84F5
 #endif
 
+#ifndef APIENTRY
+# define APIENTRY
+#endif
+
 /* Core OpenGL/OpenGLES functions: the following functions pointers typedefs
  * are not defined. */
 #if !defined(_WIN32) /* Already defined on Win32 */
 typedef void (*PFNGLACTIVETEXTUREPROC) (GLenum texture);
 #endif
-typedef GLenum (*PFNGLGETERRORPROC) (void);
-typedef const GLubyte *(*PFNGLGETSTRINGPROC) (GLenum name);
-typedef void (*PFNGLGETINTEGERVPROC) (GLenum pname, GLint *data);
-typedef void (*PFNGLBINDTEXTUREPROC) (GLenum target, GLuint texture);
-typedef void (*PFNGLTEXPARAMETERIPROC) (GLenum target, GLenum pname, GLint param);
-typedef void (*PFNGLTEXPARAMETERFPROC) (GLenum target, GLenum pname, GLfloat param);
-typedef void (*PFNGLGENTEXTURESPROC) (GLsizei n, GLuint *textures);
-typedef void (*PFNGLDELETETEXTURESPROC) (GLsizei n, const GLuint *textures);
-typedef void (*PFNGLTEXIMAGE2DPROC) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
-typedef void (*PFNGLTEXSUBIMAGE2DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
-typedef void (*PFNGLGETTEXLEVELPARAMETERIVPROC) (GLenum target, GLint level, GLenum pname, GLint *params);
-typedef void (*PFNGLPIXELSTOREIPROC) (GLenum pname, GLint param);
-typedef void (*PFNGLBUFFERSTORAGEPROC) (GLenum target, GLsizeiptr size, const void *data, GLbitfield flags);
+typedef GLenum (APIENTRY *PFNGLGETERRORPROC) (void);
+typedef const GLubyte *(APIENTRY *PFNGLGETSTRINGPROC) (GLenum name);
+typedef void (APIENTRY *PFNGLGETINTEGERVPROC) (GLenum pname, GLint *data);
+typedef void (APIENTRY *PFNGLBINDTEXTUREPROC) (GLenum target, GLuint texture);
+typedef void (APIENTRY *PFNGLTEXPARAMETERIPROC) (GLenum target, GLenum pname, GLint param);
+typedef void (APIENTRY *PFNGLTEXPARAMETERFPROC) (GLenum target, GLenum pname, GLfloat param);
+typedef void (APIENTRY *PFNGLGENTEXTURESPROC) (GLsizei n, GLuint *textures);
+typedef void (APIENTRY *PFNGLDELETETEXTURESPROC) (GLsizei n, const GLuint *textures);
+typedef void (APIENTRY *PFNGLTEXIMAGE2DPROC) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+typedef void (APIENTRY *PFNGLTEXSUBIMAGE2DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
+typedef void (APIENTRY *PFNGLGETTEXLEVELPARAMETERIVPROC) (GLenum target, GLint level, GLenum pname, GLint *params);
+typedef void (APIENTRY *PFNGLPIXELSTOREIPROC) (GLenum pname, GLint param);
+typedef void (APIENTRY *PFNGLBUFFERSTORAGEPROC) (GLenum target, GLsizeiptr size, const void *data, GLbitfield flags);
 
 /* The following are defined in glext.h but not for GLES2 or on Apple systems */
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
@@ -87,12 +91,12 @@ typedef void (*PFNGLBUFFERSTORAGEPROC) (GLenum target, GLsizeiptr size, const vo
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
 typedef struct __GLsync *GLsync;
 typedef uint64_t GLuint64;
-typedef void *(*PFNGLMAPBUFFERRANGEPROC) (GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
-typedef void (*PFNGLFLUSHMAPPEDBUFFERRANGEPROC) (GLenum target, GLintptr offset, GLsizeiptr length);
-typedef GLboolean (*PFNGLUNMAPBUFFERPROC) (GLenum target);
-typedef GLsync (*PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flags);
-typedef void (*PFNGLDELETESYNCPROC) (GLsync sync);
-typedef GLenum (*PFNGLCLIENTWAITSYNCPROC) (GLsync sync, GLbitfield flags, GLuint64 timeout);
+typedef void *(APIENTRY *PFNGLMAPBUFFERRANGEPROC) (GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+typedef void (APIENTRY *PFNGLFLUSHMAPPEDBUFFERRANGEPROC) (GLenum target, GLintptr offset, GLsizeiptr length);
+typedef GLboolean (APIENTRY *PFNGLUNMAPBUFFERPROC) (GLenum target);
+typedef GLsync (APIENTRY *PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flags);
+typedef void (APIENTRY *PFNGLDELETESYNCPROC) (GLsync sync);
+typedef GLenum (APIENTRY *PFNGLCLIENTWAITSYNCPROC) (GLsync sync, GLbitfield flags, GLuint64 timeout);
 #endif
 
 /**
