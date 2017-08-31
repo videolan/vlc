@@ -879,7 +879,6 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     opengl_tex_converter_t *tc = vgl->prgm->tc;
     if (!tc->handle_texs_gen)
         DelTextures(tc, vgl->texture);
-    opengl_deinit_program(vgl, vgl->prgm);
 
     tc = vgl->sub_prgm->tc;
     for (int i = 0; i < vgl->region_count; i++)
@@ -888,18 +887,21 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
             DelTextures(tc, &vgl->region[i].texture);
     }
     free(vgl->region);
-    opengl_deinit_program(vgl, vgl->sub_prgm);
 
     vgl->vt.DeleteBuffers(1, &vgl->vertex_buffer_object);
     vgl->vt.DeleteBuffers(1, &vgl->index_buffer_object);
-
     vgl->vt.DeleteBuffers(vgl->prgm->tc->tex_count, vgl->texture_buffer_object);
+
     if (vgl->subpicture_buffer_object_count > 0)
-        vgl->vt.DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+        vgl->vt.DeleteBuffers(vgl->subpicture_buffer_object_count,
+                              vgl->subpicture_buffer_object);
     free(vgl->subpicture_buffer_object);
 
     if (vgl->pool)
         picture_pool_Release(vgl->pool);
+    opengl_deinit_program(vgl, vgl->prgm);
+    opengl_deinit_program(vgl, vgl->sub_prgm);
+
     free(vgl);
 }
 
