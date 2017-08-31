@@ -402,12 +402,14 @@ static int Open(vlc_object_t *this)
 
     mfxStatus sts = MFX_ERR_NONE;
     mfxFrameAllocRequest alloc_request;
+    uint8_t sps_buf[128];
+    uint8_t pps_buf[128];
     mfxExtCodingOptionSPSPPS headers;
     mfxExtBuffer *extended_params[1] = {(mfxExtBuffer *)&headers};
+    mfxVersion ver = { { MFX_VERSION_MINOR, MFX_VERSION_MAJOR } };
 
     uint8_t *p_extra;
     size_t i_extra;
-    uint8_t nals[128];
 
     if (enc->fmt_out.i_codec != VLC_CODEC_H264 &&
         enc->fmt_out.i_codec != VLC_CODEC_MPGV && !enc->obj.force)
@@ -425,7 +427,7 @@ static int Open(vlc_object_t *this)
         return VLC_ENOMEM;
 
     /* Initialize dispatcher, it will loads the actual SW/HW Implementation */
-    sts = MFXInit(MFX_IMPL_AUTO, 0, &sys->session);
+    sts = MFXInit(MFX_IMPL_AUTO_ANY, &ver, &sys->session);
 
     if (sts != MFX_ERR_NONE) {
         msg_Err(enc, "Unable to find an Intel Media SDK implementation.");
@@ -524,6 +526,16 @@ static int Open(vlc_object_t *this)
             sys->params.mfx.MaxKbps = var_InheritInteger(enc, SOUT_CFG_PREFIX "bitrate-max");
     }
 
+    /* Request number of surface needed and creating frame pool */
+    if (MFXVideoENCODE_QueryIOSurf(sys->session, &sys->params, &alloc_request)!= MFX_ERR_NONE)
+    {
+        msg_Err(enc, "Failed to query for allocation");
+        goto error;
+    }
+    if (qsv_frame_pool_Init(&sys->frames, &alloc_request, sys->async_depth) != VLC_SUCCESS)
+        goto nomem;
+    msg_Dbg(enc, "Requested %d surfaces for work", alloc_request.NumFrameSuggested);
+
     /* Initializing MFX_Encoder */
     sts = MFXVideoENCODE_Init(sys->session, &sys->params);
     if (sts == MFX_ERR_NONE)
@@ -537,12 +549,12 @@ static int Open(vlc_object_t *this)
 
     /* Querying PPS/SPS Headers, BufferSizeInKB, ... */
     memset(&headers, 0, sizeof(headers));
-    memset(&nals, 0, sizeof(nals));
     headers.Header.BufferId = MFX_EXTBUFF_CODING_OPTION_SPSPPS;
     headers.Header.BufferSz = sizeof(headers);
-    headers.SPSBufSize      = headers.PPSBufSize = 64;
-    headers.SPSBuffer       = nals;
-    headers.PPSBuffer       = nals + 64;
+    headers.PPSBufSize      = sizeof(pps_buf);
+    headers.SPSBufSize      = sizeof(sps_buf);
+    headers.SPSBuffer       = sps_buf;
+    headers.PPSBuffer       = pps_buf;
     sys->params.ExtParam    = (mfxExtBuffer **)&extended_params;
     sys->params.NumExtParam = 1;
 
@@ -565,13 +577,6 @@ static int Open(vlc_object_t *this)
     sys->tasks = calloc(sys->async_depth, sizeof(async_task_t));
     if (unlikely(!sys->tasks))
         goto nomem;
-
-    /* Request number of surface needed and creating frame pool */
-    if (MFXVideoENCODE_QueryIOSurf(sys->session, &sys->params, &alloc_request)!= MFX_ERR_NONE)
-        goto error;
-    if (qsv_frame_pool_Init(&sys->frames, &alloc_request, sys->async_depth) != VLC_SUCCESS)
-        goto nomem;
-    msg_Dbg(enc, "Requested %d surfaces for work", alloc_request.NumFrameSuggested);
 
     enc->pf_encode_video = Encode;
 
