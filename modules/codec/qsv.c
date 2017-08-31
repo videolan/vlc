@@ -727,7 +727,7 @@ static void qsv_queue_encode_picture(encoder_t *enc, async_task_t *task,
         return;
     }
     memset(&task->bs, 0, sizeof(task->bs));
-    task->bs.MaxLength = sys->params.mfx.BufferSizeInKB * 1000;
+    task->bs.MaxLength = task->block->i_buffer;
     task->bs.Data = task->block->p_buffer;
 
     for (;;) {
