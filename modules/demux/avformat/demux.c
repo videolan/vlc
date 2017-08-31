@@ -819,7 +819,7 @@ static int Demux( demux_t *p_demux )
         if( p_sys->tk_pcr[i] > VLC_TS_INVALID && p_sys->tk_pcr[i] + 10 * CLOCK_FREQ >= i_ts_max )
             i_ts_min = __MIN( i_ts_min, p_sys->tk_pcr[i] );
     }
-    if( i_ts_min >= p_sys->i_pcr )
+    if( i_ts_min >= p_sys->i_pcr && likely(i_ts_min != INT64_MAX) )
     {
         p_sys->i_pcr = i_ts_min;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
