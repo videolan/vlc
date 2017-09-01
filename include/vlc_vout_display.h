@@ -154,6 +154,9 @@ enum {
     /* Ask the module to acknowledge/refuse VR/360° viewing direction after
      * being requested externally */
     VOUT_DISPLAY_CHANGE_VIEWPOINT,   /* const vout_display_cfg_t *p_cfg */
+
+    /* Ask the module to acknowledge/refuse HMD controller change */
+    VOUT_DISPLAY_CHANGE_HMD_CONTROLLER, /* const picture_t *p_hmd_cont */
 };
 
 /**

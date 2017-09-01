@@ -20,6 +20,11 @@ libminimal_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' -Wl,-fram
 EXTRA_LTLIBRARIES += libminimal_macosx_plugin.la
 gui_LTLIBRARIES += $(LTLIBminimal_macosx)
 
+libhmdcontroller_plugin_la_SOURCES = gui/hmd.cpp
+libhmdcontroller_plugin_la_CXXFLAGS = $(AM_CXXFLAGS)
+libhmdcontroller_plugin_la_LIBADD = $(LIBM)
+gui_LTLIBRARIES += libhmdcontroller_plugin.la
+
 include gui/macosx/Makefile.am
 include gui/qt/Makefile.am
 include gui/skins2/Makefile.am

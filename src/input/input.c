@@ -55,6 +55,7 @@
 #include <vlc_stream.h>
 #include <vlc_stream_extractor.h>
 #include <vlc_renderer_discovery.h>
+#include <vlc_hmd_controller.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -1675,6 +1676,9 @@ static void ControlRelease( int i_type, const input_control_param_t *p_param )
         if( p_param->val.p_address )
             input_item_slave_Delete( p_param->val.p_address );
         break;
+    case INPUT_CONTROL_UPDATE_HMD_CONTROLLER:
+        vlc_hmd_controller_Release( p_param->val.p_address );
+        break;
     case INPUT_CONTROL_SET_RENDERER:
         if( p_param->val.p_address )
             vlc_renderer_item_release( p_param->val.p_address );
@@ -2139,6 +2143,32 @@ static bool Control( input_thread_t *p_input,
 
             ViewpointApply( p_input );
             break;
+
+        case INPUT_CONTROL_UPDATE_HMD_CONTROLLER:
+        {
+            input_thread_private_t *priv = input_priv(p_input);
+            const vlc_hmd_controller_t *p_src = val.p_address;
+
+            priv->hmd_controller = *p_src;
+            picture_Hold(priv->hmd_controller.p_pic);
+
+            vout_thread_t **pp_vout;
+            size_t i_vout;
+            input_resource_HoldVouts( priv->p_resource, &pp_vout, &i_vout );
+
+            for (size_t i = 0; i < i_vout; ++i)
+            {
+                var_SetAddress(pp_vout[i], "hmd-controller", &priv->hmd_controller);
+                /* This variable can only be read from callbacks */
+                var_Change(pp_vout[i], "hmd-controller", VLC_VAR_SETVALUE,
+                           &(vlc_value_t) { .p_address = NULL }, NULL);
+                vlc_object_release(pp_vout[i]);
+            }
+            free(pp_vout);
+
+            picture_Release(priv->hmd_controller.p_pic);
+            break;
+        }
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
             if( param.delay.b_absolute )

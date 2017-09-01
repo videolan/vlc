@@ -76,6 +76,8 @@ static int SubMarginCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int ViewpointCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
+static int HMDControllerCallback(vlc_object_t *, char const *,
+                                 vlc_value_t , vlc_value_t, void *);
 
 /*****************************************************************************
  * vout_IntfInit: called during the vout creation to initialise misc things.
@@ -298,6 +300,13 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  );
     var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
     var_Create( p_vout, "viewpoint-changeable", VLC_VAR_BOOL );
+
+    /* HMD */
+    var_Create( p_vout, "hmd-controller", VLC_VAR_ADDRESS );
+    var_AddCallback( p_vout, "hmd-controller", HMDControllerCallback, NULL );
+
+    var_Create( p_vout, "hmd-screen-number",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     vout_IntfReinit( p_vout );
 }
@@ -607,5 +616,20 @@ static int ViewpointCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( newval.p_address != NULL )
         vout_ControlChangeViewpoint( p_vout, newval.p_address );
+    return VLC_SUCCESS;
+}
+
+static int HMDControllerCallback(
+        vlc_object_t *p_this, char const *psz_cmd,
+        vlc_value_t oldval, vlc_value_t newval, void *p_data)
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    if (newval.p_address != NULL)
+    {
+        vlc_hmd_controller_t *p_ctl = (vlc_hmd_controller_t *)newval.p_address;
+        vout_ControlChangeHMDController(p_vout, p_ctl);
+    }
     return VLC_SUCCESS;
 }

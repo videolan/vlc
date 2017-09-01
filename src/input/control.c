@@ -27,6 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_renderer_discovery.h>
+#include <vlc_hmd_controller.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -288,6 +289,31 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 input_ControlPush( p_input, INPUT_CONTROL_SET_VIEWPOINT, &param);
             else
                 input_ControlPush( p_input, INPUT_CONTROL_UPDATE_VIEWPOINT, &param );
+            return VLC_SUCCESS;
+        }
+
+        case INPUT_UPDATE_HMD_CONTROLLER:
+        {
+            vlc_hmd_controller_t *p_dst = vlc_hmd_controller_New();
+            if (unlikely(p_dst == NULL))
+                return VLC_ENOMEM;
+
+            vlc_hmd_controller_t *p_src = va_arg(args, const vlc_hmd_controller_t*);
+            *p_dst = *p_src;
+
+            picture_t *p_srcPic = p_src->p_pic;
+            p_dst->p_pic = picture_New(p_srcPic->format.i_chroma, p_srcPic->format.i_width,
+                                       p_srcPic->format.i_height, p_srcPic->format.i_sar_num,
+                                       p_srcPic->format.i_sar_den);
+            if (unlikely(p_dst->p_pic == NULL))
+                return VLC_ENOMEM;
+
+            picture_Copy(p_dst->p_pic, p_srcPic);
+
+            val.p_address = p_dst;
+
+            input_ControlPush(p_input, INPUT_CONTROL_UPDATE_HMD_CONTROLLER, &val);
+
             return VLC_SUCCESS;
         }
 

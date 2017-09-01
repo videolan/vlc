@@ -25,6 +25,7 @@
 #define LIBVLC_VOUT_INTERNAL_CONTROL_H
 
 #include <vlc_viewpoint.h>
+#include <vlc_hmd_controller.h>
 
 /* */
 enum {
@@ -56,6 +57,7 @@ enum {
     VOUT_CONTROL_CROP_RATIO,            /* pair */
     VOUT_CONTROL_CROP_WINDOW,           /* window */
     VOUT_CONTROL_VIEWPOINT,             /* viewpoint */
+    VOUT_CONTROL_HMD_CONTROLLER         /* HMD controller */
 };
 
 typedef struct {
@@ -91,6 +93,7 @@ typedef struct {
         const vout_configuration_t *cfg;
         subpicture_t *subpicture;
         vlc_viewpoint_t viewpoint;
+        vlc_hmd_controller_t hmd_controller;
     };
 } vout_control_cmd_t;
 

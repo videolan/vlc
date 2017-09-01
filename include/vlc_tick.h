@@ -32,6 +32,8 @@
 #ifndef __VLC_MTIME_H
 # define __VLC_MTIME_H 1
 
+#include <stdint.h>
+
 /**
  * High precision date or time interval
  *

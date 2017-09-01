@@ -585,6 +585,9 @@ enum input_query_e
     INPUT_UPDATE_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*), arg2=bool b_absolute */
     INPUT_SET_INITIAL_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*) */
 
+    /* HMD controller picture */
+    INPUT_UPDATE_HMD_CONTROLLER, /* arg1=(const vlc_hmd_controller_t*) */
+
     /* Input ressources
      * XXX You must call vlc_object_release as soon as possible */
     INPUT_GET_AOUT,         /* arg1=audio_output_t **              res=can fail */
@@ -708,6 +711,20 @@ static inline int input_UpdateViewpoint( input_thread_t *p_input,
 {
     return input_Control( p_input, INPUT_UPDATE_VIEWPOINT, p_viewpoint,
                           b_absolute );
+}
+
+/**
+ * Update the hmd controller picture of the input thread.
+ * The hmd controller picture will be sent to all vouts.
+ *
+ * @param p_input an input thread
+ * @param p_pic the picture
+ * @return VLC_SUCCESS or a VLC error code
+ */
+static inline int input_UpdateHMDController(
+        input_thread_t *p_input, const vlc_hmd_controller_t *p_ctl)
+{
+    return input_Control(p_input, INPUT_UPDATE_HMD_CONTROLLER, p_ctl);
 }
 
 /**

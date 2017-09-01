@@ -31,6 +31,7 @@
 #include <vlc_demux.h>
 #include <vlc_input.h>
 #include <vlc_viewpoint.h>
+#include <vlc_hmd_controller.h>
 #include <libvlc.h>
 #include "input_interface.h"
 #include "misc/interrupt.h"
@@ -152,6 +153,7 @@ typedef struct input_thread_private_t
     vlc_viewpoint_t viewpoint;
     bool            viewpoint_changed;
     vlc_renderer_item_t *p_renderer;
+    vlc_hmd_controller_t hmd_controller;
 
     /* Title infos FIXME multi-input (not easy) ? */
     int          i_title;
@@ -253,6 +255,8 @@ enum input_control_e
     INPUT_CONTROL_SET_VIEWPOINT,    // new absolute viewpoint
     INPUT_CONTROL_SET_INITIAL_VIEWPOINT, // set initial viewpoint (generally from video)
     INPUT_CONTROL_UPDATE_VIEWPOINT, // update viewpoint relative to current
+
+    INPUT_CONTROL_UPDATE_HMD_CONTROLLER, // New HMD controller interface
 
     INPUT_CONTROL_SET_AUDIO_DELAY,
     INPUT_CONTROL_SET_SPU_DELAY,
