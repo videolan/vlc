@@ -278,7 +278,6 @@ struct encoder_sys_t
 {
     mfxSession       session;             // Intel Media SDK Session.
     mfxVideoParam    params;              // Encoding parameters.
-    mfxIMPL          impl;                // Actual implementation (hw/sw).
     qsv_frame_pool_t frames;              // IntelMediaSDK's frame pool.
     uint64_t         dts_warn_counter;    // DTS warning counter for rate-limiting of msg;
     uint64_t         busy_warn_counter;   // Device Bussy warning counter for rate-limiting of msg;
@@ -431,6 +430,7 @@ static int Open(vlc_object_t *this)
 #endif
     };
     mfxVersion ver = { { MFX_VERSION_MINOR, MFX_VERSION_MAJOR } };
+    mfxIMPL impl;
 
     uint8_t *p_extra;
     size_t i_extra;
@@ -462,15 +462,15 @@ static int Open(vlc_object_t *this)
     config_ChainParse(enc, SOUT_CFG_PREFIX, sout_options, enc->p_cfg);
 
     /* Checking if we are on software and are allowing it */
-    MFXQueryIMPL(sys->session, &sys->impl);
-    if (!var_InheritBool(enc, SOUT_CFG_PREFIX "software") && (sys->impl & MFX_IMPL_SOFTWARE)) {
+    MFXQueryIMPL(sys->session, &impl);
+    if (!var_InheritBool(enc, SOUT_CFG_PREFIX "software") && (impl & MFX_IMPL_SOFTWARE)) {
         msg_Err(enc, "No hardware implementation found and software mode disabled");
         free(sys);
         return VLC_EGENERIC;
     }
 
     msg_Dbg(enc, "Using Intel QuickSync Video %s implementation",
-        sys->impl & MFX_IMPL_HARDWARE ? "hardware" : "software");
+        impl & MFX_IMPL_HARDWARE ? "hardware" : "software");
 
     /* Vlc module configuration */
     enc->p_sys                         = sys;
