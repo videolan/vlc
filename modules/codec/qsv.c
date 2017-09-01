@@ -487,7 +487,7 @@ static int Open(vlc_object_t *this)
     sys->params.mfx.FrameInfo.Height        = QSV_ALIGN(32, enc->fmt_in.video.i_height);
     sys->params.mfx.FrameInfo.CropW         = enc->fmt_in.video.i_visible_width;
     sys->params.mfx.FrameInfo.CropH         = enc->fmt_in.video.i_visible_height;
-    sys->params.mfx.FrameInfo.PicStruct     = MFX_PICSTRUCT_UNKNOWN;
+    sys->params.mfx.FrameInfo.PicStruct     = MFX_PICSTRUCT_PROGRESSIVE;
 
     /* Parsing options common to all RC methods and codecs */
     sys->params.IOPattern       = MFX_IOPATTERN_IN_SYSTEM_MEMORY;
