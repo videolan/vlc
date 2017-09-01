@@ -356,10 +356,12 @@ static mfxFrameSurface1 *qsv_frame_pool_Get(encoder_sys_t *sys, picture_t *pic)
             picture_Release((picture_t *)frame->Data.MemId);
 
         frame->Data.MemId     = pic;
+        frame->Data.PitchLow  = pic->p[0].i_pitch;
         frame->Data.Y         = pic->p[0].p_pixels;
-        frame->Data.U         = pic->p[1].p_pixels;
-        frame->Data.V         = pic->p[1].p_pixels + 1;
+        frame->Data.UV        = pic->p[1].p_pixels;
         frame->Data.TimeStamp = qsv_mtime_to_timestamp(pic->date - sys->offset_pts);
+
+        frame->Info = sys->params.mfx.FrameInfo;
 
         // Specify picture structure at runtime.
         if (pic->b_progressive)
