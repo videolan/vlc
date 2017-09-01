@@ -488,10 +488,15 @@ static int Open(vlc_object_t *this)
     sys->params.mfx.FrameInfo.CropW         = enc->fmt_in.video.i_visible_width;
     sys->params.mfx.FrameInfo.CropH         = enc->fmt_in.video.i_visible_height;
     sys->params.mfx.FrameInfo.PicStruct     = MFX_PICSTRUCT_PROGRESSIVE;
+    sys->params.mfx.FrameInfo.AspectRatioH  = enc->fmt_in.video.i_sar_num;
+    sys->params.mfx.FrameInfo.AspectRatioW  = enc->fmt_in.video.i_sar_den;
+    sys->params.mfx.FrameInfo.BitDepthChroma = 8; /* for VLC_CODEC_NV12 */
+    sys->params.mfx.FrameInfo.BitDepthLuma   = 8; /* for VLC_CODEC_NV12 */
 
     /* Parsing options common to all RC methods and codecs */
     sys->params.IOPattern       = MFX_IOPATTERN_IN_SYSTEM_MEMORY;
     sys->params.AsyncDepth      = var_InheritInteger(enc, SOUT_CFG_PREFIX "async-depth");
+    sys->params.mfx.GopOptFlag  = 1; /* TODO */
     sys->params.mfx.GopPicSize  = var_InheritInteger(enc, SOUT_CFG_PREFIX "gop-size");
     sys->params.mfx.GopRefDist  = var_InheritInteger(enc, SOUT_CFG_PREFIX "gop-refdist");
     sys->params.mfx.IdrInterval = var_InheritInteger(enc, SOUT_CFG_PREFIX "idr-interval");
