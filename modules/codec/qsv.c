@@ -263,7 +263,6 @@ static const char *const sout_options[] = {
 // Frame pool for QuickSync video encoder with Intel Media SDK's format frames.
 typedef struct qsv_frame_pool_t
 {
-    mfxFrameInfo          fmt;            // IntelMediaSDK format info.
     mfxFrameSurface1      *frames;        // An allocated array of 'size' frames.
     size_t                size;           // The number of frame in the pool.
 } qsv_frame_pool_t;
@@ -317,7 +316,6 @@ static int qsv_frame_pool_Init(qsv_frame_pool_t *pool,
         return VLC_ENOMEM;
 
     pool->size = size;
-    memcpy(&pool->fmt, &request->Info, sizeof(request->Info));
 
     for (size_t i = 0; i < size; i++) {
         memcpy(&pool->frames[i].Info, &request->Info, sizeof(request->Info));
