@@ -73,7 +73,10 @@ static int DeinterlaceCallback(vlc_object_t *object, char const *cmd,
     char       *mode             = var_GetString(vout,  "deinterlace-mode");
     const bool is_needed         = var_GetBool(vout,    "deinterlace-needed");
     if (!mode || !DeinterlaceIsModeValid(mode))
+    {
+        free(mode);
         return VLC_EGENERIC;
+    }
 
     /* */
     char *old = var_CreateGetString(vout, "sout-deinterlace-mode");
