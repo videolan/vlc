@@ -51,7 +51,6 @@ endif
 
 EXTRA_DIST += \
 	$(skins2_default_vlt_FILES) \
-	$(DIST_skins2) \
 	$(DIST_icons) \
 	$(DIST_http_lua) \
 	$(DIST_solid)
@@ -59,7 +58,7 @@ EXTRA_DIST += \
 nobase_vlcdata_DATA =
 if BUILD_SKINS
 nobase_vlcdata_DATA += skins2/default.vlt
-nobase_vlcdata_DATA += $(DIST_skins2)
+nobase_dist_vlcdata_DATA = $(DIST_skins2)
 endif
 if KDE_SOLID
 soliddata_DATA = $(DIST_solid)
