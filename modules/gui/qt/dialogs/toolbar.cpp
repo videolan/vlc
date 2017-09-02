@@ -440,7 +440,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     for( int i = SPLITTER; i < SPECIAL_MAX; i++ )
     {
         QWidget *widget = NULL;
-        QListWidgetItem *widgetItem = new QListWidgetItem( this );
+        QListWidgetItem *widgetItem = new QListWidgetItem;
         widgetItem->setSizeHint( QSize( widgetItem->sizeHint().width(), 32 ) );
         switch( i )
         {
