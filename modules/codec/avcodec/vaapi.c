@@ -34,10 +34,6 @@
 #include <vlc_picture.h>
 #include <vlc_picture_pool.h>
 
-#ifdef VLC_VA_BACKEND_XLIB
-# include <vlc_xlib.h>
-# include <va/va_x11.h>
-#endif
 #ifdef VLC_VA_BACKEND_DRM
 # include <sys/types.h>
 # include <sys/stat.h>
@@ -57,7 +53,7 @@ struct vlc_va_sys_t
     struct vlc_vaapi_instance *va_inst;
     struct vaapi_context hw_ctx;
 
-#ifndef VLC_VA_BACKEND_DR /* XLIB or DRM */
+#ifdef VLC_VA_BACKEND_DRM
     picture_pool_t *pool;
 #endif
 };
@@ -221,7 +217,7 @@ error:
     return ret;
 }
 
-#else /* XLIB or DRM */
+#else /* DRM */
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
@@ -254,12 +250,6 @@ static void Delete(vlc_va_t *va, void **hwctx)
     free(sys);
 }
 
-#ifdef VLC_VA_BACKEND_XLIB
-static void X11NativeDestroy(VANativeDisplay native)
-{
-    XCloseDisplay(native);
-}
-#endif
 #ifdef VLC_VA_BACKEND_DRM
 static void DRMNativeDestroy(VANativeDisplay native)
 {
@@ -276,14 +266,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     (void) fmt;
     (void) p_sys;
     vlc_object_t *o = VLC_OBJECT(va);
-
-#ifdef VLC_VA_BACKEND_XLIB
-    if (!vlc_xlib_init(o))
-    {
-        msg_Warn(va, "Ignoring VA-X11 API");
-        return VLC_EGENERIC;
-    }
-#endif
 
     VAProfile i_profile;
     unsigned count;
@@ -307,19 +289,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     /* Create a VA display */
     VANativeDisplay native = NULL;
     vlc_vaapi_native_destroy_cb native_destroy_cb = NULL;
-#ifdef VLC_VA_BACKEND_XLIB
-    Display *p_display_x11 = XOpenDisplay(NULL);
-    if (!p_display_x11)
-    {
-        msg_Err(va, "Could not connect to X server");
-        goto error;
-    }
 
-    native = p_display_x11;
-    native_destroy_cb = X11NativeDestroy;
-    sys->hw_ctx.display = vaGetDisplay(p_display_x11);
-#endif
-#ifdef VLC_VA_BACKEND_DRM
     int drm_fd = -1;
     static const char drm_device_paths[][20] = {
         "/dev/dri/renderD128",
@@ -343,7 +313,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         vlc_close(drm_fd);
         drm_fd = -1;
     }
-#endif
+
     if (sys->hw_ctx.display == NULL)
     {
         msg_Err(va, "Could not get a VAAPI device");
@@ -404,11 +374,7 @@ error:
 #endif
 
 vlc_module_begin ()
-#if defined (VLC_VA_BACKEND_XLIB)
-    set_description( N_("VA-API video decoder via X11") )
-    set_capability( "hw decoder", 0 )
-    set_callbacks( Create, Delete )
-#elif defined (VLC_VA_BACKEND_DRM)
+#if defined (VLC_VA_BACKEND_DRM)
     set_description( N_("VA-API video decoder via DRM") )
     set_capability( "hw decoder", 0 )
     set_callbacks( Create, Delete )
