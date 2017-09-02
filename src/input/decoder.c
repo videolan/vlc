@@ -171,7 +171,7 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
     /* Find a suitable decoder/packetizer module */
     if( !b_packetizer )
     {
-        const char caps[ES_CATEGORY_COUNT][16] = {
+        static const char caps[ES_CATEGORY_COUNT][16] = {
             [VIDEO_ES] = "video decoder",
             [AUDIO_ES] = "audio decoder",
             [SPU_ES] = "spu decoder",
