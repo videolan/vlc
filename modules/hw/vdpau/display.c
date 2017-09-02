@@ -46,7 +46,7 @@ vlc_module_begin()
     set_description(N_("VDPAU output"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_capability("vout display", 300)
+    set_capability("vout display", 0)
     set_callbacks(Open, Close)
 
     add_shortcut("vdpau", "xid")
