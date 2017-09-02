@@ -560,8 +560,15 @@ static void Flush(audio_output_t *aout, bool wait)
     pa_threaded_mainloop_lock(sys->mainloop);
 
     if (wait)
+    {
         op = pa_stream_drain(s, NULL, NULL);
-        /* TODO: wait for drain completion*/
+
+        /* XXX: Loosy drain emulation.
+         * See #18141: drain callback is never received */
+        mtime_t delay;
+        if (TimeGet(aout, &delay) == 0 && delay <= INT64_C(5000000))
+            msleep(delay);
+    }
     else
         op = pa_stream_flush(s, NULL, NULL);
     if (op != NULL)
