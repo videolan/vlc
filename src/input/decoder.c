@@ -1005,7 +1005,6 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     {
         msg_Warn( p_dec, "non-dated video buffer received" );
         goto discard;
-        return 0;
     }
 
     /* */
