@@ -159,9 +159,9 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
     else
     {
         assert(sys->cookie != 0);
-        if (!dbus_message_append_args(msg, DBUS_TYPE_UINT32, &sys->cookie,
+        if (dbus_message_append_args(msg, DBUS_TYPE_UINT32, &sys->cookie,
                                            DBUS_TYPE_INVALID)
-         || !dbus_connection_send (sys->conn, msg, NULL))
+         && dbus_connection_send (sys->conn, msg, NULL))
             sys->cookie = 0;
     }
     dbus_connection_flush(sys->conn);
