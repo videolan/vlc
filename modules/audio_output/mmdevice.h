@@ -78,7 +78,8 @@ static inline HRESULT aout_stream_Flush(aout_stream_t *s, bool wait)
     {   /* Loosy drain emulation */
         mtime_t delay;
 
-        if (SUCCEEDED(aout_stream_TimeGet(s, &delay)))
+        if (SUCCEEDED(aout_stream_TimeGet(s, &delay))
+         && delay <= INT64_C(5000000))
             Sleep((delay / (CLOCK_FREQ / 1000)) + 1);
         return S_OK;
     }
