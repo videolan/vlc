@@ -380,16 +380,16 @@ libvaapi_drm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_VA_BACKEND_DRM
 libvaapi_drm_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(LIBVA_DRM_CFLAGS) $(AVCODEC_CFLAGS)
 libvaapi_drm_plugin_la_LIBADD = $(LIBVA_DRM_LIBS)
-libvaapi_dr_plugin_la_SOURCES = \
+libvaapi_plugin_la_SOURCES = \
 	codec/avcodec/vaapi.c hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
-libvaapi_dr_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_VA_BACKEND_DR
-libvaapi_dr_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
-libvaapi_dr_plugin_la_LIBADD = $(LIBVA_LIBS)
+libvaapi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
+libvaapi_plugin_la_LIBADD = $(LIBVA_LIBS)
 if HAVE_AVCODEC_VAAPI
 if HAVE_VAAPI_DRM
 codec_LTLIBRARIES += libvaapi_drm_plugin.la
 endif
-codec_LTLIBRARIES += libvaapi_dr_plugin.la
+codec_LTLIBRARIES += libvaapi_plugin.la
 endif
 
 libdxva2_plugin_la_SOURCES = \

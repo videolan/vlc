@@ -117,9 +117,9 @@ static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
     return VLC_SUCCESS;
 }
 
-#ifdef VLC_VA_BACKEND_DR
+#ifndef VLC_VA_BACKEND_DRM
 
-static int GetDR(vlc_va_t *va, picture_t *pic, uint8_t **data)
+static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     (void) va;
 
@@ -129,7 +129,7 @@ static int GetDR(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void DeleteDR(vlc_va_t *va, void *hwctx)
+static void Delete(vlc_va_t *va, void *hwctx)
 {
     vlc_va_sys_t *sys = va->sys;
     vlc_object_t *o = VLC_OBJECT(va);
@@ -142,8 +142,8 @@ static void DeleteDR(vlc_va_t *va, void *hwctx)
     free(sys);
 }
 
-static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                    const es_format_t *fmt, picture_sys_t *p_sys)
+static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
+                  const es_format_t *fmt, picture_sys_t *p_sys)
 {
     if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys == NULL)
         return VLC_EGENERIC;
@@ -201,7 +201,7 @@ static int CreateDR(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
     va->description = vaQueryVendorString(sys->hw_ctx.display);
-    va->get = GetDR;
+    va->get = Get;
     return VLC_SUCCESS;
 
 error:
@@ -219,7 +219,7 @@ error:
 
 #else /* DRM */
 
-static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
+static int GetDRM(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     vlc_va_sys_t *sys = va->sys;
 
@@ -237,7 +237,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void Delete(vlc_va_t *va, void **hwctx)
+static void DeleteDRM(vlc_va_t *va, void **hwctx)
 {
     vlc_va_sys_t *sys = va->sys;
     vlc_object_t *o = VLC_OBJECT(va);
@@ -250,15 +250,13 @@ static void Delete(vlc_va_t *va, void **hwctx)
     free(sys);
 }
 
-#ifdef VLC_VA_BACKEND_DRM
 static void DRMNativeDestroy(VANativeDisplay native)
 {
     vlc_close((intptr_t) native);
 }
-#endif
 
-static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                  const es_format_t *fmt, picture_sys_t *p_sys)
+static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
+                     const es_format_t *fmt, picture_sys_t *p_sys)
 {
     if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys)
         return VLC_EGENERIC;
@@ -356,7 +354,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
     va->description = vaQueryVendorString(sys->hw_ctx.display);
-    va->get = Get;
+    va->get = GetDRM;
     return VLC_SUCCESS;
 
 error:
@@ -374,16 +372,17 @@ error:
 #endif
 
 vlc_module_begin ()
-#if defined (VLC_VA_BACKEND_DRM)
+#ifdef VLC_VA_BACKEND_DRM
     set_description( N_("VA-API video decoder via DRM") )
     set_capability( "hw decoder", 0 )
-    set_callbacks( Create, Delete )
-#elif defined (VLC_VA_BACKEND_DR)
-    set_description( N_("VA-API direct video decoder") )
+    set_callbacks( CreateDRM, DeleteDRM )
+    add_shortcut( "vaapi", "vaapi_drm" )
+#else
+    set_description( N_("VA-API video decoder") )
     set_capability( "hw decoder", 100 )
-    set_callbacks( CreateDR, DeleteDR )
+    set_callbacks( Create, Delete )
+    add_shortcut( "vaapi" )
 #endif
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
-    add_shortcut( "vaapi" )
 vlc_module_end ()
