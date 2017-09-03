@@ -258,6 +258,12 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playbackStatusUpdated
 {
+    // On shutdown, input might not be dead yet. Cleanup actions like inhibit, itunes playback
+    // and playback positon are done in different code paths (dealloc and appWillTerminate:).
+    if ([[VLCMain sharedInstance] isTerminating]) {
+        return;
+    }
+
     intf_thread_t *p_intf = getIntf();
     int state = -1;
     if (p_current_input) {
