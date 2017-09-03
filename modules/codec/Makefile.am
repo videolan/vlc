@@ -180,7 +180,8 @@ endif
 EXTRA_LTLIBRARIES += liblibass_plugin.la
 codec_LTLIBRARIES += $(LTLIBlibass)
 
-libcc_plugin_la_SOURCES = codec/cc.c codec/cc.h codec/substext.h
+libcc_plugin_la_SOURCES = codec/cc.c codec/cc.h codec/substext.h \
+                          codec/cea708.h codec/cea708.c
 codec_LTLIBRARIES += libcc_plugin.la
 
 libcvdsub_plugin_la_SOURCES = codec/cvdsub.c

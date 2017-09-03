@@ -1,7 +1,9 @@
 /*****************************************************************************
  * cc.c : CC 608/708 subtitles decoder
  *****************************************************************************
- * Copyright © 2007-2010 Laurent Aimar, 2011 VLC authors and VideoLAN
+ * Copyright © 2007-2011 Laurent Aimar, VLC authors and VideoLAN
+ *             2011-2016 VLC authors and VideoLAN
+ *             2016-2017 VideoLabs, VLC authors and VideoLAN
  *
  * Authors: Laurent Aimar < fenrir # via.ecp.fr>
  *
@@ -26,11 +28,6 @@
 /* The EIA 608 decoder part has been initialy based on ccextractor (GPL)
  * and rewritten */
 
-/* TODO:
- *  Check parity
- *  708 decoding
- */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -43,6 +40,7 @@
 #include <vlc_charset.h>
 
 #include "substext.h"
+#include "cea708.h"
 
 /*****************************************************************************
  * Module descriptor.
@@ -223,12 +221,25 @@ struct decoder_sys_t
 
     int i_reorder_depth;
 
-    eia608_t eia608;
+    cea708_demux_t *p_dtvcc;
+
+    cea708_t *p_cea708;
+    eia608_t *p_eia608;
     bool b_opaque;
 };
 
 static int Decode( decoder_t *, block_t * );
 static void Flush( decoder_t * );
+
+static void DTVCC_ServiceData_Handler( void *priv, uint8_t i_sid, mtime_t i_time,
+                                       const uint8_t *p_data, size_t i_data )
+{
+    decoder_t *p_dec = priv;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    //msg_Err( p_dec, "DTVCC_ServiceData_Handler sid %d bytes %ld", i_sid, i_data );
+    if( i_sid == 1 )
+        CEA708_Decoder_Push( p_sys->p_cea708, i_time, p_data, i_data );
+}
 
 /*****************************************************************************
  * Open: probe the decoder and return score
@@ -241,17 +252,11 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_CEA608 ||
-        p_dec->fmt_in.subs.cc.i_channel > 3 )
+    if( ( p_dec->fmt_in.i_codec != VLC_CODEC_CEA608 ||
+          p_dec->fmt_in.subs.cc.i_channel > 3 ) &&
+        ( p_dec->fmt_in.i_codec != VLC_CODEC_CEA708 ||
+          p_dec->fmt_in.subs.cc.i_channel > 63 ) )
         return VLC_EGENERIC;
-
-    /*  0 -> i_field = 0; i_channel = 1;
-        1 -> i_field = 0; i_channel = 2;
-        2 -> i_field = 1; i_channel = 1;
-        3 -> i_field = 1; i_channel = 2; */
-
-    const int i_field = p_dec->fmt_in.subs.cc.i_channel >> 1;
-    const int i_channel = 1 + (p_dec->fmt_in.subs.cc.i_channel & 1);
 
     p_dec->pf_decode = Decode;
     p_dec->pf_flush  = Flush;
@@ -261,11 +266,43 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    /* init of p_sys */
-    p_sys->i_field = i_field;
-    p_sys->i_channel = i_channel;
+    if( p_dec->fmt_in.i_codec == VLC_CODEC_CEA608 )
+    {
+        /*  0 -> i_field = 0; i_channel = 1;
+            1 -> i_field = 0; i_channel = 2;
+            2 -> i_field = 1; i_channel = 1;
+            3 -> i_field = 1; i_channel = 2; */
+        p_sys->i_field = p_dec->fmt_in.subs.cc.i_channel >> 1;
+        p_sys->i_channel = 1 + (p_dec->fmt_in.subs.cc.i_channel & 1);
 
-    Eia608Init( &p_sys->eia608 );
+        p_sys->p_eia608 = malloc(sizeof(*p_sys->p_eia608));
+        if( !p_sys->p_eia608 )
+        {
+            free( p_sys );
+            return VLC_ENOMEM;
+        }
+        Eia608Init( p_sys->p_eia608 );
+    }
+    else
+    {
+        p_sys->p_dtvcc = CEA708_DTVCC_Demuxer_New( p_dec, DTVCC_ServiceData_Handler );
+        if( !p_sys->p_dtvcc )
+        {
+            free( p_sys );
+            return VLC_ENOMEM;
+        }
+
+        p_sys->p_cea708 = CEA708_Decoder_New( p_dec );
+        if( !p_sys->p_cea708 )
+        {
+            CEA708_DTVCC_Demuxer_Release( p_sys->p_dtvcc );
+            free( p_sys );
+            return VLC_ENOMEM;
+        }
+
+         p_sys->i_channel = p_dec->fmt_in.subs.cc.i_channel;
+    }
+
     p_sys->b_opaque = var_InheritBool( p_dec, "cc-opaque" );
     p_sys->i_reorder_depth = p_dec->fmt_in.subs.cc.i_reorder_depth;
 
@@ -281,7 +318,15 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    Eia608Init( &p_sys->eia608 );
+    if( p_sys->p_eia608 )
+    {
+        Eia608Init( p_sys->p_eia608 );
+    }
+    else
+    {
+        CEA708_DTVCC_Demuxer_Flush( p_sys->p_dtvcc );
+        CEA708_Decoder_Flush( p_sys->p_cea708 );
+    }
 
     block_ChainRelease( p_sys->p_queue );
     p_sys->p_queue = NULL;
@@ -320,7 +365,15 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         {
             /* Drain */
             for( ; DoDecode( p_dec, true ) ; );
-            Eia608Init( &p_sys->eia608 );
+            if( p_sys->p_eia608 )
+            {
+                Eia608Init( p_sys->p_eia608 );
+            }
+            else
+            {
+                CEA708_DTVCC_Demuxer_Flush( p_sys->p_dtvcc );
+                CEA708_Decoder_Flush( p_sys->p_cea708 );
+            }
 
             if( (p_block->i_flags & BLOCK_FLAG_CORRUPTED) || p_block->i_buffer < 1 )
             {
@@ -358,6 +411,13 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
+
+    free( p_sys->p_eia608 );
+    if( p_sys->p_cea708 )
+    {
+        CEA708_Decoder_Release( p_sys->p_cea708 );
+        CEA708_DTVCC_Demuxer_Release( p_sys->p_dtvcc );
+    }
 
     block_ChainRelease( p_sys->p_queue );
     free( p_sys );
@@ -475,29 +535,39 @@ static void Convert( decoder_t *p_dec, mtime_t i_pts,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    size_t i_ticks = 0;
+    unsigned i_ticks = 0;
     while( i_buffer >= 3 )
     {
-        /* Mask off the specific i_field bit, else some sequences can be lost. */
-        if ( (p_buffer[0] & 0x03) == p_sys->i_field &&
-             (p_buffer[0] & 0x04) /* Valid bit */ )
+        if( (p_buffer[0] & 0x04) /* Valid bit */ )
         {
-            eia608_status_t i_status =
-                    Eia608Parse( &p_sys->eia608, p_sys->i_channel, &p_buffer[1] );
-
-            /* a caption is ready or removed, process its screen */
-            /*
-             * In case of rollup/painton with 1 packet/frame, we need to update on Changed status.
-             * Batch decoding might be incorrect if those in large number of commands (mp4, ...) then.
-             * see CEAv1.2zero.trp tests
-             */
-            if( i_status & (EIA608_STATUS_DISPLAY | EIA608_STATUS_CHANGED) )
+            const mtime_t i_spupts = i_pts + i_ticks * CLOCK_FREQ / 30;
+            /* Mask off the specific i_field bit, else some sequences can be lost. */
+            if ( p_sys->p_eia608 &&
+                (p_buffer[0] & 0x03) == p_sys->i_field )
             {
-                subpicture_t *p_spu = Subtitle( p_dec, &p_sys->eia608, i_pts + i_ticks * CLOCK_FREQ / 30 );
-                if( p_spu )
-                    decoder_QueueSub( p_dec, p_spu );
+                eia608_status_t i_status = Eia608Parse( p_sys->p_eia608,
+                                                        p_sys->i_channel, &p_buffer[1] );
+
+                /* a caption is ready or removed, process its screen */
+                /*
+                 * In case of rollup/painton with 1 packet/frame, we need
+                 * to update on Changed status.
+                 * Batch decoding might be incorrect if those in
+                 * large number of commands (mp4, ...) then.
+                 * see CEAv1.2zero.trp tests */
+                if( i_status & (EIA608_STATUS_DISPLAY | EIA608_STATUS_CHANGED) )
+                {
+                    subpicture_t *p_spu = Subtitle( p_dec, p_sys->p_eia608, i_spupts );
+                    if( p_spu )
+                        decoder_QueueSub( p_dec, p_spu );
+                }
+            }
+            else if( p_sys->p_cea708 && (p_buffer[0] & 0x03) >= 2 )
+            {
+                CEA708_DTVCC_Demuxer_Push( p_sys->p_dtvcc, i_spupts, p_buffer );
             }
         }
+
         i_ticks++;
 
         i_buffer -= 3;
