@@ -31,6 +31,7 @@ OPTIONS:
    -j            Force number of cores to be used
    -r            Rebuild everything (tools, contribs, vlc)
    -c            Recompile contribs from sources
+   -p            Build packages for all artifacts
    -k <sdk>      Use the specified sdk (default: $SDKROOT)
    -a <arch>     Use the specified arch (default: $ARCH)
 EOF
@@ -47,7 +48,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "hvrck:a:j:" OPTION
+while getopts "hvrcpk:a:j:" OPTION
 do
      case $OPTION in
          h)
@@ -63,6 +64,9 @@ do
          ;;
          c)
              CONTRIBFROMSOURCE="yes"
+         ;;
+         p)
+             PACKAGE="yes"
          ;;
          a)
              ARCH=$OPTARG
@@ -175,6 +179,11 @@ if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     make fetch
     make -j$JOBS .gettext
     make -j$JOBS
+
+    if [ "$PACKAGE" = "yes" ]; then
+        make package
+    fi
+
 else
 if [ ! -e "../$TRIPLET" ]; then
     make prebuilt > $out
@@ -217,7 +226,6 @@ fi
 # make
 #
 
-
 if [ "$REBUILD" = "yes" ]; then
     info "Running make clean"
     make clean
@@ -228,3 +236,9 @@ make -j$JOBS
 
 info "Preparing VLC.app"
 make VLC.app
+
+
+if [ "$PACKAGE" = "yes" ]; then
+    info "Building VLC dmg package"
+    make package-macosx
+fi
