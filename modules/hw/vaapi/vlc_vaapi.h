@@ -173,15 +173,14 @@ vlc_vaapi_EndPicture(vlc_object_t *o, VADisplay dpy, VAContextID ctx);
 VAConfigID
 vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
                               VAProfile i_profile, VAEntrypoint entrypoint,
-                              int va_force_fourcc);
+                              int i_force_vlc_chroma);
 
 /* Create a pool backed by VASurfaceID. render_targets will destroyed once
  * the pool and every pictures are released. */
 picture_pool_t *
 vlc_vaapi_PoolNew(vlc_object_t *o, struct vlc_vaapi_instance *vainst,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
-                  const video_format_t *restrict fmt,
-                  unsigned va_rt_format, int va_force_fourcc);
+                  const video_format_t *restrict fmt, bool b_force_fourcc);
 
 /* Get render targets from a pic_sys allocated by the vaapi pool (see
  * vlc_vaapi_PoolNew()) */

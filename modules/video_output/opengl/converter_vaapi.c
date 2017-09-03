@@ -231,7 +231,7 @@ tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     picture_pool_t *pool =
         vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), priv->vainst, priv->vadpy,
                           requested_count, &priv->va_surface_ids, &tc->fmt,
-                          VA_RT_FORMAT_YUV420, VA_FOURCC_NV12);
+                          true);
     if (!pool)
         return NULL;
 

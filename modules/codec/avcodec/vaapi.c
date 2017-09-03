@@ -334,9 +334,10 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
         .i_visible_width = ctx->coded_width,
         .i_visible_height = ctx->coded_height
     };
+
     VASurfaceID *surfaces;
     sys->pool = vlc_vaapi_PoolNew(o, sys->va_inst, sys->hw_ctx.display, count,
-                                  &surfaces, &vfmt, VA_RT_FORMAT_YUV420, 0);
+                                  &surfaces, &vfmt, false);
 
     if (!sys->pool)
         goto error;

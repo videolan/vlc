@@ -304,8 +304,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
         filter_sys->dest_pics =
             vlc_vaapi_PoolNew(obj, filter_sys->va_inst, filter_sys->dpy,
                               DEST_PICS_POOL_SZ, &filter_sys->va_surface_ids,
-                              &filter->fmt_out.video, VA_RT_FORMAT_YUV420,
-                              VA_FOURCC_NV12);
+                              &filter->fmt_out.video, true);
         if (!filter_sys->dest_pics)
         {
             vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va_inst);

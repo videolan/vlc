@@ -383,14 +383,14 @@ Open(filter_t * filter,
         vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter_sys->va.inst,
                           filter_sys->va.dpy, DEST_PICS_POOL_SZ,
                           &filter_sys->va.surface_ids, &filter->fmt_out.video,
-                          VA_RT_FORMAT_YUV420, VA_FOURCC_NV12);
+                          true);
     if (!filter_sys->dest_pics)
         goto error;
 
     filter_sys->va.conf =
         vlc_vaapi_CreateConfigChecked(VLC_OBJECT(filter), filter_sys->va.dpy,
                                       VAProfileNone, VAEntrypointVideoProc,
-                                      VA_FOURCC_NV12);
+                                      filter->fmt_out.video.i_chroma);
     if (filter_sys->va.conf == VA_INVALID_ID)
         goto error;
 

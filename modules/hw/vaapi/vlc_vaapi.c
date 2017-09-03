@@ -55,6 +55,20 @@
         }                                               \
     } while (0)
 
+static void
+vlc_chroma_to_vaapi(int i_vlc_chroma, unsigned *va_rt_format, int *va_fourcc)
+{
+    switch (i_vlc_chroma)
+    {
+        case VLC_CODEC_VAAPI_420:
+            *va_rt_format = VA_RT_FORMAT_YUV420;
+            *va_fourcc = VA_FOURCC_NV12;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 /**************************
  * VA instance management *
  **************************/
@@ -369,8 +383,15 @@ error:
 VAConfigID
 vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
                               VAProfile i_profile, VAEntrypoint entrypoint,
-                              int va_force_fourcc)
+                              int i_force_vlc_chroma)
 {
+    int va_force_fourcc = 0;
+    if (i_force_vlc_chroma != 0)
+    {
+        unsigned unused;
+        vlc_chroma_to_vaapi(i_force_vlc_chroma, &unused, &va_force_fourcc);
+    }
+
     if (!IsVaProfileSupported(dpy, i_profile))
     {
         msg_Err(o, "profile(%d) is not supported", i_profile);
@@ -514,9 +535,12 @@ pic_sys_ctx_destroy_cb(struct picture_context_t *opaque)
 picture_pool_t *
 vlc_vaapi_PoolNew(vlc_object_t *o, struct vlc_vaapi_instance *va_inst,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
-                  const video_format_t *restrict fmt,
-                  unsigned va_rt_format, int va_force_fourcc)
+                  const video_format_t *restrict fmt, bool b_force_fourcc)
 {
+    unsigned va_rt_format;
+    int va_fourcc;
+    vlc_chroma_to_vaapi(fmt->i_chroma, &va_rt_format, &va_fourcc);
+
     struct pic_sys_vaapi_instance *instance =
         malloc(sizeof(*instance) + count * sizeof(VASurfaceID));
     if (!instance)
@@ -531,10 +555,10 @@ vlc_vaapi_PoolNew(vlc_object_t *o, struct vlc_vaapi_instance *va_inst,
             .type = VASurfaceAttribPixelFormat,
             .flags = VA_SURFACE_ATTRIB_SETTABLE,
             .value.type    = VAGenericValueTypeInteger,
-            .value.value.i = va_force_fourcc,
+            .value.value.i = b_force_fourcc ? va_fourcc : 0,
         }
     };
-    if (va_force_fourcc != 0)
+    if (b_force_fourcc)
     {
         attribs = fourcc_attribs;
         num_attribs = 1;
