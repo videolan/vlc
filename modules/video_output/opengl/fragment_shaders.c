@@ -51,6 +51,9 @@
 static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
                             int tex_format, int tex_internal, int tex_type)
 {
+    if (!tc->vt->GetTexLevelParameteriv)
+        return -1;
+
     GLint tex_param_size;
     switch (tex_format)
     {
