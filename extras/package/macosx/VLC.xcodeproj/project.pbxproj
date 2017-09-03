@@ -69,6 +69,7 @@
 		1C3114071E508C8800D4DD76 /* PXSourceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */; };
 		1C31140B1E508C8800D4DD76 /* SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */; };
 		1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
+		1C5716AC1F5B142200678627 /* coreaudio_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C5716AB1F5B142200678627 /* coreaudio_common.c */; };
 		1C69FDF61EAB30C7007724ED /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
 		1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */; };
 		6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0292E51F43256300A50082 /* VLCBottomBarView.m */; };
@@ -106,6 +107,7 @@
 		1C18BE461F2926700053D329 /* keychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = keychain.m; path = ../../../modules/keystore/keychain.m; sourceTree = "<group>"; };
 		1C39ABBC1DA9AB9B00FE052A /* VLCDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDocumentController.h; sourceTree = "<group>"; };
 		1C39ABBD1DA9AB9B00FE052A /* VLCDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCDocumentController.m; sourceTree = "<group>"; };
+		1C5716AB1F5B142200678627 /* coreaudio_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = coreaudio_common.c; path = ../../../modules/audio_output/coreaudio_common.c; sourceTree = "<group>"; };
 		1C67C8A31D58C0980079E1C1 /* VLCHelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHelpWindowController.h; sourceTree = "<group>"; };
 		1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHelpWindowController.m; sourceTree = "<group>"; };
 		1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCAboutWindowController.h; sourceTree = "<group>"; };
@@ -1594,6 +1596,7 @@
 				CCDDF1AE172FF4CE007729A1 /* vout */,
 				CCDDF1AF172FF4D6007729A1 /* core */,
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
+				1C5716AB1F5B142200678627 /* coreaudio_common.c */,
 				1C18BE461F2926700053D329 /* keychain.m */,
 				1C06F2A21F08F1250068846F /* osx_notifications.m */,
 				CCDDF1B0172FF4E2007729A1 /* access */,
@@ -1696,7 +1699,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1791,6 +1794,7 @@
 				1C3113CF1E508C6900D4DD76 /* prefs_widgets.m in Sources */,
 				1C3113D11E508C6900D4DD76 /* prefs.m in Sources */,
 				1C3113D31E508C6900D4DD76 /* VLCResumeDialogController.m in Sources */,
+				1C5716AC1F5B142200678627 /* coreaudio_common.c in Sources */,
 				1C3113D51E508C6900D4DD76 /* VLCTextfieldPanelController.m in Sources */,
 				1C3113D71E508C6900D4DD76 /* VLCPopupPanelController.m in Sources */,
 				1C3113D91E508C6900D4DD76 /* VLCSimplePrefsController.m in Sources */,
@@ -2014,7 +2018,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,
