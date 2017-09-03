@@ -306,8 +306,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->i_start = 0;
     priv->i_time  = 0;
     priv->i_stop  = 0;
-    priv->i_title = 0;
-    priv->title = NULL;
     priv->i_title_offset = input_priv(p_input)->i_seekpoint_offset = 0;
     priv->i_state = INIT_S;
     priv->is_running = false;
@@ -875,11 +873,9 @@ static void InitTitle( input_thread_t * p_input )
 
     vlc_mutex_lock( &priv->p_item->lock );
     /* Create global title (from master) */
-    priv->i_title = p_master->i_title;
-    priv->title   = p_master->title;
     priv->i_title_offset = p_master->i_title_offset;
     priv->i_seekpoint_offset = p_master->i_seekpoint_offset;
-    if( priv->i_title > 0 )
+    if( p_master->i_title > 0 )
     {
         /* Setup variables */
         input_ControlVarNavigation( p_input );
@@ -1448,8 +1444,6 @@ static void End( input_thread_t * p_input )
 
     /* Clean up master */
     InputSourceDestroy( priv->master );
-    priv->i_title = 0;
-    priv->title = NULL;
     priv->i_title_offset = 0;
     priv->i_seekpoint_offset = 0;
 
@@ -2278,8 +2272,8 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
         for( int i = 0; i < in->i_title; i++ )
             vlc_input_title_Delete( in->title[i] );
         TAB_CLEAN( in->i_title, in->title );
-        priv->i_title = 0;
-        priv->title = NULL;
+        in->i_title = 0;
+        in->title = NULL;
         in->b_title_demux = false;
     }
 
