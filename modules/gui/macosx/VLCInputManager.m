@@ -295,24 +295,16 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if (systemSleepAssertionID > 0) {
             msg_Dbg(getIntf(), "releasing old sleep blocker (%i)" , systemSleepAssertionID);
             IOPMAssertionRelease(systemSleepAssertionID);
+            systemSleepAssertionID = 0;
         }
 
         IOReturn success;
-        /* work-around a bug for OSX Lion, 10.7.4 and 10.7.5 only */
-        if (NSAppKitVersionNumber >= 1138.45  && !OSX_MOUNTAIN_LION_AND_HIGHER) {
-            /* fall-back on the 10.5 mode, which also works on 10.7.4 and 10.7.5 */
-            if ([o_main activeVideoPlayback] && shouldDisableScreensaver)
-                success = IOPMAssertionCreate(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
-            else
-                success = IOPMAssertionCreate(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, &systemSleepAssertionID);
-        } else {
-            CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-            if ([o_main activeVideoPlayback] && shouldDisableScreensaver)
-                success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-            else
-                success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-            CFRelease(reasonForActivity);
-        }
+        CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+        if ([o_main activeVideoPlayback] && shouldDisableScreensaver)
+            success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+        else
+            success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+        CFRelease(reasonForActivity);
 
         if (success == kIOReturnSuccess)
             msg_Dbg(getIntf(), "prevented sleep through IOKit (%i)", systemSleepAssertionID);
@@ -330,6 +322,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if (systemSleepAssertionID > 0) {
             msg_Dbg(getIntf(), "releasing sleep blocker (%i)" , systemSleepAssertionID);
             IOPMAssertionRelease(systemSleepAssertionID);
+            systemSleepAssertionID = 0;
         }
 
         if (state == END_S || state == -1) {
