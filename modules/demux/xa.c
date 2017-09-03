@@ -96,7 +96,8 @@ static int Open( vlc_object_t * p_this )
     /* XA file heuristic */
     if( vlc_stream_Peek( p_demux->s, &peek, 10 ) < 10 )
         return VLC_EGENERIC;
-    if( memcmp( peek, "XAI", 4 ) && memcmp( peek, "XAJ", 4 ) )
+    if( memcmp( peek, "XAI", 4 ) && memcmp( peek, "XAJ", 4 ) &&
+            memcmp( peek, "XA\0", 4 ) )
         return VLC_EGENERIC;
     if( GetWLE( peek + 8 ) != 1 ) /* format tag */
         return VLC_EGENERIC;
