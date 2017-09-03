@@ -84,6 +84,13 @@
     return self;
 }
 
+- (void)drawRect:(NSRect)rect
+{
+    // Draw black area in case first frame is not drawn yet
+    [[NSColor blackColor] setFill];
+    NSRectFill(rect);
+}
+
 - (void)addVoutLayer:(CALayer *)aLayer
 {
     if (self.layer == nil) {

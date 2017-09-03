@@ -365,22 +365,6 @@
 
 
 /*****************************************************************************
- * VLCColorView
- *
- * since we are using a clear window color when using the black window
- * style, some filling is needed behind the video and some other elements
- *****************************************************************************/
-
-@implementation VLCColorView
-
-- (void)drawRect:(NSRect)rect {
-    [[NSColor blackColor] setFill];
-    NSRectFill(rect);
-}
-
-@end
-
-/*****************************************************************************
  * custom window buttons to support the accessibility stuff
  *****************************************************************************/
 

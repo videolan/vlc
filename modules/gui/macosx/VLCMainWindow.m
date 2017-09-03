@@ -71,8 +71,6 @@
 
     BOOL b_podcastView_displayed;
 
-    VLCColorView * o_color_backdrop;
-
     NSRect frameBeforePlayback;
 }
 - (void)makeSplitViewVisible;
@@ -250,10 +248,6 @@ static const float f_min_window_height = 307.;
         [self setHasShadow:YES];
 
         self.previousSavedFrame = [self frame];
-
-        o_color_backdrop = [[VLCColorView alloc] initWithFrame:_splitView.frame];
-        [[self contentView] addSubview:o_color_backdrop positioned:NSWindowBelow relativeTo:_splitView];
-        [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     } else {
         [_playlistScrollView setBorderType:NSNoBorder];
         [_sidebarScrollView setBorderType:NSNoBorder];
@@ -1256,9 +1250,6 @@ static const float f_min_window_height = 307.;
 @end
 
 @interface VLCDetachedVideoWindow ()
-{
-    VLCColorView * o_color_backdrop;
-}
 @end
 
 @implementation VLCDetachedVideoWindow
@@ -1280,15 +1271,6 @@ static const float f_min_window_height = 307.;
         [self setHasShadow:YES];
 
         [self setTitle: _NS("VLC media player")];
-
-    } else {
-        [self setBackgroundColor: [NSColor blackColor]];
-    }
-
-    if (darkInterface) {
-        o_color_backdrop = [[VLCColorView alloc] initWithFrame: [self.videoView frame]];
-        [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: self.videoView];
-        [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
         [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height] + [self.titlebarView frame].size.height)];
     } else {
