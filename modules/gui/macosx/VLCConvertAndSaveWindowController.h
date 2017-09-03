@@ -52,12 +52,12 @@
 @property (weak) IBOutlet NSView *dropinView;
 @property (weak) IBOutlet VLCDropDisabledImageView *dropinIcon;
 @property (weak) IBOutlet NSTextField *dropinMediaLabel;
-@property (weak) IBOutlet NSView *fileDestinationView;
+@property (strong) IBOutlet NSView *fileDestinationView;
 @property (weak) IBOutlet NSImageView *fileDestinationIcon;
 @property (weak) IBOutlet NSTextField *fileDestinationFileName;
 @property (weak) IBOutlet NSTextField *fileDestinationFileNameStub;
 @property (weak) IBOutlet NSButton *fileDestinationBrowseButton;
-@property (weak) IBOutlet NSView *streamDestinationView;
+@property (strong) IBOutlet NSView *streamDestinationView;
 @property (weak) IBOutlet NSTextField *streamDestinationURLLabel;
 @property (weak) IBOutlet NSButton *streamDestinationButton;
 

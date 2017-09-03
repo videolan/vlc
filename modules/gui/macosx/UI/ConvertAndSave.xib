@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
@@ -99,7 +100,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="20" width="663" height="490"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="663" height="490"/>
             <value key="maxSize" type="size" width="663" height="490"/>
             <view key="contentView" id="2">
@@ -169,50 +170,63 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                                    <rect key="frame" x="15" y="56" width="123" height="22"/>
+                                    <rect key="frame" x="10" y="59" width="123" height="22"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose Profile" id="12">
                                         <font key="font" metaFont="system" size="18"/>
                                         <color key="textColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
-                                    <rect key="frame" x="150" y="19" width="223" height="26"/>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="aLk-M5-CXz" userLabel="Profile layout guide">
+                                    <rect key="frame" x="149" y="25" width="330" height="21"/>
+                                    <subviews>
+                                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
+                                            <rect key="frame" x="-2" y="-3" width="223" height="26"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="218" id="CVO-zt-Bx6"/>
+                                            </constraints>
+                                            <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="16" id="14">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="OtherViews" id="15">
+                                                    <items>
+                                                        <menuItem title="Item 1" state="on" id="16"/>
+                                                        <menuItem title="Item 2" id="17"/>
+                                                        <menuItem title="Item 3" id="18"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="switchProfile:" target="-2" id="628"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="19">
+                                            <rect key="frame" x="220" y="-7" width="116" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Customize..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="20">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="customizeProfile:" target="-2" id="629"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="width" constant="218" id="CVO-zt-Bx6"/>
+                                        <constraint firstItem="19" firstAttribute="leading" secondItem="13" secondAttribute="trailing" constant="8" symbolic="YES" id="0bR-fY-vgy"/>
+                                        <constraint firstItem="19" firstAttribute="top" secondItem="aLk-M5-CXz" secondAttribute="top" id="3yL-gw-ttb"/>
+                                        <constraint firstAttribute="trailing" secondItem="19" secondAttribute="trailing" id="4CP-Wn-qWR"/>
+                                        <constraint firstItem="13" firstAttribute="top" secondItem="aLk-M5-CXz" secondAttribute="top" id="PM6-Jt-QVM"/>
+                                        <constraint firstItem="13" firstAttribute="leading" secondItem="aLk-M5-CXz" secondAttribute="leading" id="VO6-zu-e27"/>
+                                        <constraint firstAttribute="bottom" secondItem="19" secondAttribute="bottom" id="g6z-eq-qEn"/>
+                                        <constraint firstAttribute="bottom" secondItem="13" secondAttribute="bottom" id="srf-uj-lEZ"/>
                                     </constraints>
-                                    <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="16" id="14">
-                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="menu"/>
-                                        <menu key="menu" title="OtherViews" id="15">
-                                            <items>
-                                                <menuItem title="Item 1" state="on" id="16"/>
-                                                <menuItem title="Item 2" id="17"/>
-                                                <menuItem title="Item 3" id="18"/>
-                                            </items>
-                                        </menu>
-                                    </popUpButtonCell>
-                                    <connections>
-                                        <action selector="switchProfile:" target="-2" id="628"/>
-                                    </connections>
-                                </popUpButton>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="19">
-                                    <rect key="frame" x="372" y="15" width="116" height="32"/>
-                                    <buttonCell key="cell" type="push" title="Customize..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="20">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="customizeProfile:" target="-2" id="629"/>
-                                    </connections>
-                                </button>
+                                </customView>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="11" firstAttribute="leading" secondItem="CvM-Oi-SCn" secondAttribute="leading" constant="17" id="1ay-f5-jrJ"/>
-                                <constraint firstAttribute="bottom" secondItem="13" secondAttribute="bottom" constant="22" id="AxG-jq-w4h"/>
-                                <constraint firstItem="13" firstAttribute="centerY" secondItem="19" secondAttribute="centerY" id="Heo-Bn-zdZ"/>
-                                <constraint firstItem="19" firstAttribute="leading" secondItem="13" secondAttribute="trailing" constant="8" id="Ig5-Jd-TTX"/>
-                                <constraint firstItem="11" firstAttribute="top" secondItem="CvM-Oi-SCn" secondAttribute="top" constant="12" id="aGV-0s-ZiL"/>
+                                <constraint firstItem="aLk-M5-CXz" firstAttribute="centerY" secondItem="CvM-Oi-SCn" secondAttribute="centerY" constant="10" id="DkE-zl-Kqv"/>
+                                <constraint firstItem="11" firstAttribute="leading" secondItem="CvM-Oi-SCn" secondAttribute="leading" constant="12" id="FoQ-Ct-NDi"/>
+                                <constraint firstItem="aLk-M5-CXz" firstAttribute="centerX" secondItem="CvM-Oi-SCn" secondAttribute="centerX" id="ktb-bq-07c"/>
+                                <constraint firstItem="11" firstAttribute="top" secondItem="CvM-Oi-SCn" secondAttribute="top" constant="9" id="q41-Ai-snr"/>
                             </constraints>
                         </view>
                         <constraints>
@@ -237,7 +251,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="389">
-                                    <rect key="frame" x="230" y="17" width="84" height="32"/>
+                                    <rect key="frame" x="230" y="22" width="84" height="32"/>
                                     <buttonCell key="cell" type="push" title="Stream" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="390">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -247,7 +261,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="392">
-                                    <rect key="frame" x="314" y="17" width="112" height="32"/>
+                                    <rect key="frame" x="314" y="22" width="112" height="32"/>
                                     <buttonCell key="cell" type="push" title="Save as File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="393">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -257,7 +271,7 @@
                                     </connections>
                                 </button>
                                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="404">
-                                    <rect key="frame" x="11" y="17" width="32" height="32"/>
+                                    <rect key="frame" x="11" y="22" width="32" height="32"/>
                                     <buttonCell key="cell" type="round" title="x" bezelStyle="circular" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" id="405">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -266,8 +280,8 @@
                                         <action selector="cancelDestination:" target="-2" id="630"/>
                                     </connections>
                                 </button>
-                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="QZC-Ij-ExL">
-                                    <rect key="frame" x="305" y="24" width="17" height="21"/>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="QZC-Ij-ExL" userLabel="Middle centered helper view">
+                                    <rect key="frame" x="305" y="29" width="17" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="17" id="rtm-Xf-9D8"/>
                                     </constraints>
@@ -280,9 +294,9 @@
                                 <constraint firstItem="404" firstAttribute="centerY" secondItem="389" secondAttribute="centerY" id="Elm-ny-3z0"/>
                                 <constraint firstItem="35" firstAttribute="top" secondItem="AhF-YR-JeB" secondAttribute="top" constant="12" id="Ksl-Kb-LMW"/>
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="leading" secondItem="389" secondAttribute="trailing" constant="-3" id="WbW-cJ-1IX"/>
+                                <constraint firstItem="QZC-Ij-ExL" firstAttribute="centerY" secondItem="AhF-YR-JeB" secondAttribute="centerY" constant="10" id="ZSO-2c-zCe"/>
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="height" secondItem="392" secondAttribute="height" id="cox-aD-z4G"/>
                                 <constraint firstItem="35" firstAttribute="leading" secondItem="AhF-YR-JeB" secondAttribute="leading" constant="17" id="cwo-xq-mtI"/>
-                                <constraint firstAttribute="bottom" secondItem="404" secondAttribute="bottom" constant="24" id="svG-qy-TqZ"/>
                                 <constraint firstItem="389" firstAttribute="centerY" secondItem="392" secondAttribute="centerY" id="wML-B4-jxu"/>
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="centerY" secondItem="392" secondAttribute="centerY" id="x9n-V7-R5B"/>
                             </constraints>
@@ -311,7 +325,6 @@ DQ
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="21" secondAttribute="trailing" constant="20" id="91H-56-94D"/>
                     <constraint firstItem="3" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="D8S-Yb-Z4O"/>
-                    <constraint firstItem="13" firstAttribute="trailing" secondItem="4" secondAttribute="trailing" id="G2e-pX-jRS"/>
                     <constraint firstItem="537" firstAttribute="top" secondItem="2" secondAttribute="top" constant="22" id="IVr-QH-vRP"/>
                     <constraint firstItem="32" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="T3g-f0-fmy"/>
                     <constraint firstItem="32" firstAttribute="top" secondItem="10" secondAttribute="bottom" constant="9" id="bGy-Nj-s2Q"/>
@@ -355,7 +368,7 @@ DQ
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="255" width="558" height="382"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="132">
                 <rect key="frame" x="0.0" y="0.0" width="558" height="382"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1049,7 +1062,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="60" width="532" height="368"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="309">
                 <rect key="frame" x="0.0" y="0.0" width="532" height="368"/>
                 <autoresizingMask key="autoresizingMask"/>
