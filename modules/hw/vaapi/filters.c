@@ -56,7 +56,7 @@ vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy)
     if (!pic)
         return NULL;
 
-    if (pic->format.i_chroma != VLC_CODEC_VAAPI_420)
+    if (!vlc_vaapi_IsChromaOpaque(pic->format.i_chroma))
     {
         picture_Release(pic);
         return NULL;
@@ -360,7 +360,7 @@ Open(filter_t * filter,
 {
     filter_sys_t *      filter_sys;
 
-    if (filter->fmt_out.video.i_chroma != VLC_CODEC_VAAPI_420 ||
+    if (!vlc_vaapi_IsChromaOpaque(filter->fmt_out.video.i_chroma) ||
         !video_format_IsSimilar(&filter->fmt_out.video, &filter->fmt_in.video))
         return VLC_EGENERIC;
 

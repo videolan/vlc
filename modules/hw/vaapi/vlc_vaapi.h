@@ -205,4 +205,10 @@ vlc_vaapi_PicGetSurface(picture_t *pic);
 VADisplay
 vlc_vaapi_PicGetDisplay(picture_t *pic);
 
+static inline bool
+vlc_vaapi_IsChromaOpaque(int i_vlc_chroma)
+{
+    return i_vlc_chroma == VLC_CODEC_VAAPI_420;
+}
+
 #endif /* VLC_VAAPI_H */

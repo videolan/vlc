@@ -638,7 +638,7 @@ vlc_vaapi_PicSysHoldInstance(picture_sys_t *sys, VADisplay *dpy)
 }
 
 #define ASSERT_VAAPI_CHROMA(pic) do { \
-    assert(pic->format.i_chroma == VLC_CODEC_VAAPI_420); \
+    assert(vlc_vaapi_IsChromaOpaque(pic->format.i_chroma)); \
 } while(0)
 
 void
