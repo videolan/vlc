@@ -273,43 +273,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     if (state == PLAYING_S) {
         [self stopItunesPlayback];
 
-        BOOL shouldDisableScreensaver = var_InheritBool(p_intf, "disable-screensaver");
-
-        /* Declare user activity.
-         This wakes the display if it is off, and postpones display sleep according to the users system preferences
-         Available from 10.7.3 */
-        if ([o_main activeVideoPlayback] && &IOPMAssertionDeclareUserActivity && shouldDisableScreensaver)
-        {
-            CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-            IOReturn success = IOPMAssertionDeclareUserActivity(reasonForActivity,
-                                             kIOPMUserActiveLocal,
-                                             &userActivityAssertionID);
-            CFRelease(reasonForActivity);
-
-            if (success != kIOReturnSuccess)
-                msg_Warn(getIntf(), "failed to declare user activity");
-
-        }
-
-        /* prevent the system from sleeping */
-        if (systemSleepAssertionID > 0) {
-            msg_Dbg(getIntf(), "releasing old sleep blocker (%i)" , systemSleepAssertionID);
-            IOPMAssertionRelease(systemSleepAssertionID);
-            systemSleepAssertionID = 0;
-        }
-
-        IOReturn success;
-        CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-        if ([o_main activeVideoPlayback] && shouldDisableScreensaver)
-            success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-        else
-            success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
-        CFRelease(reasonForActivity);
-
-        if (success == kIOReturnSuccess)
-            msg_Dbg(getIntf(), "prevented sleep through IOKit (%i)", systemSleepAssertionID);
-        else
-            msg_Warn(getIntf(), "failed to prevent system sleep through IOKit");
+        [self inhibitSleep];
 
         [[o_main mainMenu] setPause];
         [[o_main mainWindow] setPause];
@@ -318,12 +282,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         [[o_main mainMenu] setPlay];
         [[o_main mainWindow] setPlay];
 
-        /* allow the system to sleep again */
-        if (systemSleepAssertionID > 0) {
-            msg_Dbg(getIntf(), "releasing sleep blocker (%i)" , systemSleepAssertionID);
-            IOPMAssertionRelease(systemSleepAssertionID);
-            systemSleepAssertionID = 0;
-        }
+        [self releaseSleepBlockers];
 
         if (state == END_S || state == -1) {
             /* continue playback where you left off */
@@ -412,6 +371,57 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     b_has_itunes_paused = NO;
     b_has_spotify_paused = NO;
     o_itunes_play_timer = nil;
+}
+
+- (void)inhibitSleep
+{
+    BOOL shouldDisableScreensaver = var_InheritBool(getIntf(), "disable-screensaver");
+
+    /* Declare user activity.
+     This wakes the display if it is off, and postpones display sleep according to the users system preferences
+     Available from 10.7.3 */
+    if ([o_main activeVideoPlayback] && &IOPMAssertionDeclareUserActivity && shouldDisableScreensaver)
+    {
+        CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+        IOReturn success = IOPMAssertionDeclareUserActivity(reasonForActivity,
+                                                            kIOPMUserActiveLocal,
+                                                            &userActivityAssertionID);
+        CFRelease(reasonForActivity);
+
+        if (success != kIOReturnSuccess)
+            msg_Warn(getIntf(), "failed to declare user activity");
+
+    }
+
+    /* prevent the system from sleeping */
+    if (systemSleepAssertionID > 0) {
+        msg_Dbg(getIntf(), "releasing old sleep blocker (%i)" , systemSleepAssertionID);
+        IOPMAssertionRelease(systemSleepAssertionID);
+        systemSleepAssertionID = 0;
+    }
+
+    IOReturn success;
+    CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
+    if ([o_main activeVideoPlayback] && shouldDisableScreensaver)
+        success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+    else
+        success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
+    CFRelease(reasonForActivity);
+
+    if (success == kIOReturnSuccess)
+        msg_Dbg(getIntf(), "prevented sleep through IOKit (%i)", systemSleepAssertionID);
+    else
+        msg_Warn(getIntf(), "failed to prevent system sleep through IOKit");
+}
+
+- (void)releaseSleepBlockers
+{
+    /* allow the system to sleep again */
+    if (systemSleepAssertionID > 0) {
+        msg_Dbg(getIntf(), "Pausing: releasing sleep blocker (%i)" , systemSleepAssertionID);
+        IOPMAssertionRelease(systemSleepAssertionID);
+        systemSleepAssertionID = 0;
+    }
 }
 
 - (void)updateMetaAndInfo
