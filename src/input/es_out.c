@@ -413,12 +413,14 @@ static mtime_t EsOutGetWakeup( es_out_t *out )
     return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
 }
 
+static es_out_id_t es_cat[DATA_ES];
+
 static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
 {
     if( i_id < 0 )
     {
         /* Special HACK, -i_id is the cat of the stream */
-        return (es_out_id_t*)((uint8_t*)NULL-i_id);
+        return es_cat - i_id;
     }
 
     for( int i = 0; i < out->p_sys->i_es; i++ )
@@ -2288,11 +2290,11 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         enum es_format_category_e i_cat;
         if( es == NULL )
             i_cat = UNKNOWN_ES;
-        else if( es == (es_out_id_t*)((uint8_t*)NULL+AUDIO_ES) )
+        else if( es == es_cat + AUDIO_ES )
             i_cat = AUDIO_ES;
-        else if( es == (es_out_id_t*)((uint8_t*)NULL+VIDEO_ES) )
+        else if( es == es_cat + VIDEO_ES )
             i_cat = VIDEO_ES;
-        else if( es == (es_out_id_t*)((uint8_t*)NULL+SPU_ES) )
+        else if( es == es_cat + SPU_ES )
             i_cat = SPU_ES;
         else
             i_cat = IGNORE_ES;
@@ -2351,15 +2353,15 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             /*p_sys->i_default_audio_id = -1;*/
             p_sys->sub.i_demux_id = -1;
         }
-        else if( es == (es_out_id_t*)((uint8_t*)NULL+AUDIO_ES) )
+        else if( es == es_cat + AUDIO_ES )
         {
             /*p_sys->i_default_video_id = -1;*/
         }
-        else if( es == (es_out_id_t*)((uint8_t*)NULL+VIDEO_ES) )
+        else if( es == es_cat + VIDEO_ES )
         {
             /*p_sys->i_default_audio_id = -1;*/
         }
-        else if( es == (es_out_id_t*)((uint8_t*)NULL+SPU_ES) )
+        else if( es == es_cat + SPU_ES )
         {
             p_sys->sub.i_demux_id = -1;
         }
