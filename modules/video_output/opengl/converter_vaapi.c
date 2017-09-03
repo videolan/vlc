@@ -119,6 +119,10 @@ vaegl_init_fourcc(const opengl_tex_converter_t *tc, struct priv *priv,
             priv->drm_fourccs[0] = VLC_FOURCC('R', '8', ' ', ' ');
             priv->drm_fourccs[1] = VLC_FOURCC('G', 'R', '8', '8');
             break;
+        case VA_FOURCC_P010:
+            priv->drm_fourccs[0] = VLC_FOURCC('R', '1', '6', ' ');
+            priv->drm_fourccs[1] = VLC_FOURCC('G', 'R', '3', '2');
+            break;
 #if 0
         /* TODO: the following fourcc are not handled for now */
         case VA_FOURCC_RGBA:
@@ -355,7 +359,23 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
     priv->vadpy = vadpy;
     priv->fourcc = 0;
 
-    if (vaegl_init_fourcc(tc, priv, VA_FOURCC_NV12))
+    int va_fourcc;
+    int vlc_sw_chroma;
+    switch (tc->fmt.i_chroma)
+    {
+        case VLC_CODEC_VAAPI_420:
+            va_fourcc = VA_FOURCC_NV12;
+            vlc_sw_chroma = VLC_CODEC_NV12;
+            break;
+        case VLC_CODEC_VAAPI_420_10BPP:
+            va_fourcc = VA_FOURCC_P010;
+            vlc_sw_chroma = VLC_CODEC_P010;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    if (vaegl_init_fourcc(tc, priv, va_fourcc))
         goto error;
 
     priv->glEGLImageTargetTexture2DOES =
@@ -379,10 +399,14 @@ tc_vaegl_init(opengl_tex_converter_t *tc, VADisplay *vadpy,
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
         goto error;
 
-    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_NV12,
+    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, vlc_sw_chroma,
                                               tc->fmt.space);
     if (tc->fshader == 0)
         goto error;
+
+    /* Fix the UV plane texture scale factor for GR32 */
+    if (vlc_sw_chroma == VLC_CODEC_P010)
+        tc->texs[1].h = (vlc_rational_t) { 1, 2 };
 
     return VLC_SUCCESS;
 
@@ -420,7 +444,8 @@ Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
 
-    if (tc->fmt.i_chroma != VLC_CODEC_VAAPI_420 || tc->gl->ext != VLC_GL_EXT_EGL
+    if (!vlc_vaapi_IsChromaOpaque(tc->fmt.i_chroma)
+     || tc->gl->ext != VLC_GL_EXT_EGL
      || tc->gl->egl.createImageKHR == NULL
      || tc->gl->egl.destroyImageKHR == NULL)
         return VLC_EGENERIC;
