@@ -271,34 +271,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     }
 
     if (state == PLAYING_S) {
-        if (i_control_itunes > 0) {
-            // pause iTunes
-            if (!b_has_itunes_paused) {
-                iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-                if (iTunesApp && [iTunesApp isRunning]) {
-                    if ([iTunesApp playerState] == iTunesEPlSPlaying) {
-                        msg_Dbg(p_intf, "pausing iTunes");
-                        [iTunesApp pause];
-                        b_has_itunes_paused = YES;
-                    }
-                }
-            }
-
-            // pause Spotify
-            if (!b_has_spotify_paused) {
-                SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
-
-                if (spotifyApp) {
-                    if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
-                        if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
-                            msg_Dbg(p_intf, "pausing Spotify");
-                            [spotifyApp pause];
-                            b_has_spotify_paused = YES;
-                        }
-                    }
-                }
-            }
-        }
+        [self stopItunesPlayback];
 
         BOOL shouldDisableScreensaver = var_InheritBool(p_intf, "disable-screensaver");
 
@@ -381,6 +354,40 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     [self sendDistributedNotificationWithUpdatedPlaybackStatus];
 }
 
+- (void)stopItunesPlayback
+{
+    intf_thread_t *p_intf = getIntf();
+    int controlItunes = var_InheritInteger(p_intf, "macosx-control-itunes");
+    if (controlItunes <= 0)
+        return;
+
+    // pause iTunes
+    if (!b_has_itunes_paused) {
+        iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+        if (iTunesApp && [iTunesApp isRunning]) {
+            if ([iTunesApp playerState] == iTunesEPlSPlaying) {
+                msg_Dbg(p_intf, "pausing iTunes");
+                [iTunesApp pause];
+                b_has_itunes_paused = YES;
+            }
+        }
+    }
+
+    // pause Spotify
+    if (!b_has_spotify_paused) {
+        SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+
+        if (spotifyApp) {
+            if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
+                if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
+                    msg_Dbg(p_intf, "pausing Spotify");
+                    [spotifyApp pause];
+                    b_has_spotify_paused = YES;
+                }
+            }
+        }
+    }
+}
 
 - (void)resumeItunesPlayback:(id)sender
 {
