@@ -288,7 +288,6 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
     VANativeDisplay native = NULL;
     vlc_vaapi_native_destroy_cb native_destroy_cb = NULL;
 
-    int drm_fd = -1;
     static const char drm_device_paths[][20] = {
         "/dev/dri/renderD128",
         "/dev/dri/card0"
@@ -296,7 +295,7 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
 
     for (int i = 0; ARRAY_SIZE(drm_device_paths); i++)
     {
-        drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
+        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
         if (drm_fd < 0)
             continue;
 
@@ -309,7 +308,6 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
         }
 
         vlc_close(drm_fd);
-        drm_fd = -1;
     }
 
     if (sys->hw_ctx.display == NULL)
