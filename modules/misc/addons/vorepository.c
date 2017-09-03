@@ -26,6 +26,9 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+#include <fcntl.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
@@ -35,8 +38,6 @@
 #include <vlc_fs.h>
 #include <vlc_url.h>
 #include "xmlreading.h"
-
-#include "assert.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -420,8 +421,9 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
         return VLC_EGENERIC;
     }
 
-    FILE *p_destfile = vlc_fopen( p_finder->p_sys->psz_tempfile, "w" );
-    if( !p_destfile )
+    int fd = vlc_open( p_finder->p_sys->psz_tempfile,
+                       O_WRONLY | O_CREAT | O_EXCL, 0600 );
+    if( fd == -1 )
     {
         msg_Err( p_finder, "Failed to open addon temp storage file" );
         FREENULL(p_finder->p_sys->psz_tempfile);
@@ -430,19 +432,24 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
     }
 
     char buffer[1<<10];
-    int i_read = 0;
+    ssize_t i_read = 0;
+    int i_ret = VLC_SUCCESS;
+
     while ( ( i_read = vlc_stream_Read( p_stream, &buffer, 1<<10 ) ) > 0 )
     {
-        if ( fwrite( &buffer, i_read, 1, p_destfile ) < 1 )
+        if ( write( fd, buffer, i_read ) != i_read )
         {
             msg_Err( p_finder, "Failed to write to Addon file" );
-            fclose( p_destfile );
-            vlc_stream_Delete( p_stream );
-            return VLC_EGENERIC;
+            i_ret = VLC_EGENERIC;
+            break;
         }
     }
-    fclose( p_destfile );
+
+    vlc_close( fd );
     vlc_stream_Delete( p_stream );
+
+    if (i_ret)
+        return i_ret;
 
     msg_Dbg( p_finder, "Reading manifest from %s", p_finder->p_sys->psz_tempfile );
 
@@ -466,7 +473,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
     }
 
     vlc_mutex_lock( &p_entry->lock );
-    int i_ret = ( ParseManifest( p_finder, p_entry, psz_tempfileuri, p_stream ) > 0 )
+    i_ret = ( ParseManifest( p_finder, p_entry, psz_tempfileuri, p_stream ) > 0 )
                     ? VLC_SUCCESS : VLC_EGENERIC;
     vlc_mutex_unlock( &p_entry->lock );
     free( psz_tempfileuri );
