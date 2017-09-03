@@ -42,10 +42,8 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
             {
                 case AV_PIX_FMT_YUV420P:
                     return VLC_CODEC_VAAPI_420;
-                /* TODO: add 10 bits support
-                 * case AV_PIX_FMT_YUV420P10LE:
-                 *    return VLC_CODEC_VAAPI_420_10B;
-                 */
+                case AV_PIX_FMT_YUV420P10LE:
+                    return VLC_CODEC_VAAPI_420_10BPP;
                 default:
                     return 0;
             }

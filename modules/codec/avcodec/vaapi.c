@@ -59,10 +59,12 @@ struct vlc_va_sys_t
 };
 
 static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
-                        VAProfile *va_profile, unsigned *pic_count)
+                        VAProfile *va_profile, int *vlc_chroma,
+                        unsigned *pic_count)
 {
     VAProfile i_profile;
     unsigned count = 3;
+    int i_vlc_chroma = VLC_CODEC_VAAPI_420;
 
     switch(ctx->codec_id)
     {
@@ -88,7 +90,10 @@ static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
         if (fmt->i_profile == FF_PROFILE_HEVC_MAIN)
             i_profile = VAProfileHEVCMain;
         else if (fmt->i_profile == FF_PROFILE_HEVC_MAIN_10)
+        {
             i_profile = VAProfileHEVCMain10;
+            i_vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
+        }
         else
             return VLC_EGENERIC;
         count = 18;
@@ -114,6 +119,7 @@ static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
 
     *va_profile = i_profile;
     *pic_count = count + ctx->thread_count;
+    *vlc_chroma = i_vlc_chroma;
     return VLC_SUCCESS;
 }
 
@@ -167,7 +173,8 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     VAProfile i_profile;
     unsigned count;
-    if (GetVaProfile(ctx, fmt, &i_profile, &count) != VLC_SUCCESS)
+    int i_vlc_chroma;
+    if (GetVaProfile(ctx, fmt, &i_profile, &i_vlc_chroma, &count) != VLC_SUCCESS)
         goto error;
 
     sys = malloc(sizeof *sys);
@@ -186,7 +193,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     sys->hw_ctx.config_id =
         vlc_vaapi_CreateConfigChecked(o, sys->hw_ctx.display, i_profile,
-                                      VAEntrypointVLD, VA_FOURCC_NV12);
+                                      VAEntrypointVLD, i_vlc_chroma);
     if (sys->hw_ctx.config_id == VA_INVALID_ID)
         goto error;
 
@@ -267,7 +274,8 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
 
     VAProfile i_profile;
     unsigned count;
-    if (GetVaProfile(ctx, fmt, &i_profile, &count) != VLC_SUCCESS)
+    int i_vlc_chroma;
+    if (GetVaProfile(ctx, fmt, &i_profile, &i_vlc_chroma, &count) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     vlc_va_sys_t *sys;
@@ -330,7 +338,7 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
     /* Create surfaces */
     assert(ctx->coded_width > 0 && ctx->coded_height > 0);
     video_format_t vfmt = {
-        .i_chroma = VLC_CODEC_VAAPI_420,
+        .i_chroma = i_vlc_chroma,
         .i_width = ctx->coded_width,
         .i_height = ctx->coded_height,
         .i_visible_width = ctx->coded_width,
