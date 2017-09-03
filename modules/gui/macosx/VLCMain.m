@@ -327,7 +327,7 @@ static VLCMain *sharedInstance = nil;
         return;
     b_intf_terminating = true;
 
-    [_input_manager resumeItunesPlayback:nil];
+    [_input_manager onPlaybackHasEnded:nil];
 
     if (notification == nil)
         [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];

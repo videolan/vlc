@@ -38,7 +38,7 @@
 - (void)playbackStatusUpdated;
 - (void)playbackPositionUpdated;
 
-- (void)resumeItunesPlayback:(id)sender;
+- (void)onPlaybackHasEnded:(id)sender;
 
 - (BOOL)hasInput;
 
