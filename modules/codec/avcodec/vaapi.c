@@ -324,6 +324,8 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
     sys->hw_ctx.config_id =
         vlc_vaapi_CreateConfigChecked(o, sys->hw_ctx.display, i_profile,
                                       VAEntrypointVLD, 0);
+    if (sys->hw_ctx.config_id == VA_INVALID_ID)
+        goto error;
 
     /* Create surfaces */
     assert(ctx->coded_width > 0 && ctx->coded_height > 0);
