@@ -46,6 +46,9 @@
 #ifndef GL_BGRA
 # define GL_BGRA 0x80E1
 #endif
+#ifndef GL_RG16
+# define GL_RG16 0x822C
+#endif
 #ifndef GL_LUMINANCE16
 # define GL_LUMINANCE16 0x8042
 #endif
@@ -74,6 +77,7 @@ static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
             mul = 4;
             /* fall through */
         case GL_RED:
+        case GL_RG:
             tex_param_size = GL_TEXTURE_RED_SIZE;
             break;
         case GL_LUMINANCE:
@@ -103,22 +107,39 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     if (desc == NULL)
         return VLC_EGENERIC;
 
-    GLint oneplane_texfmt, oneplane16_texfmt, twoplanes_texfmt;
+    GLint oneplane_texfmt, oneplane16_texfmt,
+          twoplanes_texfmt, twoplanes16_texfmt;
 
     if (HasExtension(tc->glexts, "GL_ARB_texture_rg"))
     {
         oneplane_texfmt = GL_RED;
         oneplane16_texfmt = GL_R16;
         twoplanes_texfmt = GL_RG;
+        twoplanes16_texfmt = GL_RG16;
     }
     else
     {
         oneplane_texfmt = GL_LUMINANCE;
         oneplane16_texfmt = GL_LUMINANCE16;
         twoplanes_texfmt = GL_LUMINANCE_ALPHA;
+        twoplanes16_texfmt = 0;
     }
 
     float yuv_range_correction = 1.0;
+    if (desc->pixel_size == 2)
+    {
+        if (GetTexFormatSize(tc, tex_target, oneplane_texfmt,
+                             oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
+            return VLC_EGENERIC;
+
+        /* Do a bit shift if samples are stored on LSB */
+        /* This is a hackish way to detect endianness. FIXME: Add bit order
+         * in vlc_chroma_description_t */
+        if ((chroma >> 24) == 'L')
+            yuv_range_correction = (float)((1 << 16) - 1)
+                                 / ((1 << desc->pixel_bits) - 1);
+    }
+
     if (desc->plane_count == 3)
     {
         GLint internal = 0;
@@ -131,15 +152,8 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         }
         else if (desc->pixel_size == 2)
         {
-            if (oneplane16_texfmt == 0
-             || GetTexFormatSize(tc, tex_target, oneplane_texfmt,
-                                 oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
-                return VLC_EGENERIC;
-
             internal = oneplane16_texfmt;
             type = GL_UNSIGNED_SHORT;
-            yuv_range_correction = (float)((1 << 16) - 1)
-                                 / ((1 << desc->pixel_bits) - 1);
         }
         else
             return VLC_EGENERIC;
@@ -161,16 +175,36 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     }
     else if (desc->plane_count == 2)
     {
-        if (desc->pixel_size != 1)
-            return VLC_EGENERIC;
-
         tc->tex_count = 2;
-        tc->texs[0] = (struct opengl_tex_cfg) {
-            { 1, 1 }, { 1, 1 }, oneplane_texfmt, oneplane_texfmt, GL_UNSIGNED_BYTE
-        };
-        tc->texs[1] = (struct opengl_tex_cfg) {
-            { 1, 2 }, { 1, 2 }, twoplanes_texfmt, twoplanes_texfmt, GL_UNSIGNED_BYTE
-        };
+
+        if (desc->pixel_size == 1)
+        {
+            tc->texs[0] = (struct opengl_tex_cfg) {
+                { 1, 1 }, { 1, 1 }, oneplane_texfmt, oneplane_texfmt,
+                GL_UNSIGNED_BYTE
+            };
+            tc->texs[1] = (struct opengl_tex_cfg) {
+                { 1, 2 }, { 1, 2 }, twoplanes_texfmt, twoplanes_texfmt,
+                GL_UNSIGNED_BYTE
+            };
+        }
+        else if (desc->pixel_size == 2)
+        {
+            if (twoplanes16_texfmt == 0
+             || GetTexFormatSize(tc, tex_target, twoplanes_texfmt,
+                                 twoplanes16_texfmt, GL_UNSIGNED_SHORT) != 16)
+                return VLC_EGENERIC;
+            tc->texs[0] = (struct opengl_tex_cfg) {
+                { 1, 1 }, { 1, 1 }, oneplane16_texfmt, oneplane_texfmt,
+                GL_UNSIGNED_SHORT
+            };
+            tc->texs[1] = (struct opengl_tex_cfg) {
+                { 1, 2 }, { 1, 4 }, twoplanes16_texfmt, twoplanes_texfmt,
+                GL_UNSIGNED_SHORT
+            };
+        }
+        else
+            return VLC_EGENERIC;
 
         if (oneplane_texfmt == GL_RED)
         {
