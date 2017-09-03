@@ -232,6 +232,8 @@ struct demux_sys_t
     /* Length, if available. */
     int64_t i_length;
 
+    bool b_slave;
+
 };
 
 
