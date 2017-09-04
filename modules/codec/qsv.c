@@ -555,6 +555,12 @@ static int Open(vlc_object_t *this)
             sys->params.mfx.MaxKbps = var_InheritInteger(enc, SOUT_CFG_PREFIX "bitrate-max");
     }
 
+    if (MFXVideoENCODE_Query(sys->session, &sys->params, &sys->params) < 0)
+    {
+        msg_Err(enc, "Error querying encoder params");
+        goto error;
+    }
+
     /* Request number of surface needed and creating frame pool */
     if (MFXVideoENCODE_QueryIOSurf(sys->session, &sys->params, &alloc_request)!= MFX_ERR_NONE)
     {
