@@ -16,6 +16,7 @@ libgain_plugin_la_SOURCES = audio_filter/gain.c
 libparam_eq_plugin_la_SOURCES = audio_filter/param_eq.c
 libparam_eq_plugin_la_LIBADD = $(LIBM)
 libscaletempo_plugin_la_SOURCES = audio_filter/scaletempo.c
+libscaletempo_plugin_la_LIBADD = $(LIBM)
 libstereo_widen_plugin_la_SOURCES = audio_filter/stereo_widen.c
 libspatializer_plugin_la_SOURCES = \
 	audio_filter/spatializer/allpass.cpp \

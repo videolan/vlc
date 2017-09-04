@@ -339,7 +339,7 @@ $Id$
  * sapi: Windows Text to Speech Synthetizer using the SAPI 5.1 API
  * satip: SES Astra SAT>IP access module
  * scale: Images rescaler
- * scaletempo: Scale audio tempo in sync with playback rate
+ * scaletempo: Scale audio tempo in sync with playback rate, or adjust pitch without changing tempo
  * scene: scene video filter
  * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
