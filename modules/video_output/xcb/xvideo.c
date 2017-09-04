@@ -254,7 +254,7 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
             const xcb_xv_adaptor_info_t *a, uint32_t *idp)
 {
     /* Order chromas by preference */
-    vlc_fourcc_t tab[6];
+    vlc_fourcc_t tab[7];
     const vlc_fourcc_t *chromav = tab;
 
     vlc_fourcc_t chroma = var_InheritInteger (obj, "xvideo-format-id");
@@ -274,7 +274,8 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
         tab[2] = VLC_CODEC_RGB24;
         tab[3] = VLC_CODEC_RGB16;
         tab[4] = VLC_CODEC_RGB15;
-        tab[5] = 0;
+        tab[5] = (obj->obj.force) ? VLC_CODEC_YUYV : 0;
+        tab[6] = 0;
     }
 
     /* Get available image formats */
