@@ -1737,6 +1737,38 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
     es_out_SetPauseState( input_priv(p_input)->p_es_out, false, false, i_control_date );
 }
 
+static void ViewpointApply( input_thread_t *p_input )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+
+    vlc_viewpoint_clip( &priv->viewpoint );
+
+    vout_thread_t **pp_vout;
+    size_t i_vout;
+    input_resource_HoldVouts( priv->p_resource, &pp_vout, &i_vout );
+
+    for( size_t i = 0; i < i_vout; ++i )
+    {
+        var_SetAddress( pp_vout[i], "viewpoint", &priv->viewpoint );
+        /* This variable can only be read from callbacks */
+        var_Change( pp_vout[i], "viewpoint", VLC_VAR_SETVALUE,
+                    &(vlc_value_t) { .p_address = NULL }, NULL );
+        vlc_object_release( pp_vout[i] );
+    }
+    free( pp_vout );
+
+    audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
+    if( p_aout )
+    {
+
+        var_SetAddress( p_aout, "viewpoint", &priv->viewpoint );
+        /* This variable can only be read from callbacks */
+        var_Change( p_aout, "viewpoint", VLC_VAR_SETVALUE,
+                    &(vlc_value_t) { .p_address = NULL }, NULL );
+        vlc_object_release( p_aout );
+    }
+}
+
 static bool Control( input_thread_t *p_input,
                      int i_type, vlc_value_t val )
 {
@@ -1977,32 +2009,7 @@ static bool Control( input_thread_t *p_input,
                 priv->viewpoint.fov   += p_vp->fov;
             }
 
-            vlc_viewpoint_clip( &priv->viewpoint );
-
-            vout_thread_t **pp_vout;
-            size_t i_vout;
-            input_resource_HoldVouts( priv->p_resource, &pp_vout, &i_vout );
-
-            for( size_t i = 0; i < i_vout; ++i )
-            {
-                var_SetAddress( pp_vout[i], "viewpoint", &priv->viewpoint );
-                /* This variable can only be read from callbacks */
-                var_Change( pp_vout[i], "viewpoint", VLC_VAR_SETVALUE,
-                            &(vlc_value_t) { .p_address = NULL }, NULL );
-                vlc_object_release( pp_vout[i] );
-            }
-            free( pp_vout );
-
-            audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
-            if( p_aout )
-            {
-
-                var_SetAddress( p_aout, "viewpoint", &priv->viewpoint );
-                /* This variable can only be read from callbacks */
-                var_Change( p_aout, "viewpoint", VLC_VAR_SETVALUE,
-                            &(vlc_value_t) { .p_address = NULL }, NULL );
-                vlc_object_release( p_aout );
-            }
+            ViewpointApply( p_input );
             break;
         }
 
