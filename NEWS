@@ -266,6 +266,7 @@ libVLC:
  * Add libvlc_media_player_add_slave to replace libvlc_video_set_subtitle_file,
    working with MRL and supporting also audio slaves
  * Add vlc_epg_event_(New|Delete|Duplicate), vlc_epg_AddEvent, vlc_epg_Duplicate
+   and removes vlc_epg_Merge
 
 Logging
  * Support for the SystemD Journal

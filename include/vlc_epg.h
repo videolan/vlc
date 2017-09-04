@@ -111,12 +111,6 @@ VLC_API bool vlc_epg_AddEvent(vlc_epg_t *p_epg, vlc_epg_event_t *p_evt);
 VLC_API void vlc_epg_SetCurrent(vlc_epg_t *p_epg, int64_t i_start);
 
 /**
- * It merges all the event of \p p_src and \p p_dst into \p p_dst.
- *
- */
-VLC_API void vlc_epg_Merge(vlc_epg_t *p_dst, const vlc_epg_t *p_src);
-
-/**
  * Returns a duplicated \p p_src and its associated events.
  *
  */

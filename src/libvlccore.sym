@@ -678,7 +678,6 @@ vlc_epg_Delete
 vlc_epg_Duplicate
 vlc_epg_AddEvent
 vlc_epg_SetCurrent
-vlc_epg_Merge
 vlc_fifo_Lock
 vlc_fifo_Unlock
 vlc_fifo_Signal
