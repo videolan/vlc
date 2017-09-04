@@ -1779,18 +1779,24 @@ static void ControlNav( input_thread_t *p_input, int i_type )
 
     /* Handle Up/Down/Left/Right if the demux can't navigate */
     vlc_viewpoint_t vp = {};
+    int vol_direction = 0;
+    int seek_direction = 0;
     switch( i_type )
     {
         case INPUT_CONTROL_NAV_UP:
+            vol_direction = 1;
             vp.pitch = -1.f;
             break;
         case INPUT_CONTROL_NAV_DOWN:
+            vol_direction = -1;
             vp.pitch = 1.f;
             break;
         case INPUT_CONTROL_NAV_LEFT:
+            seek_direction = -1;
             vp.yaw = -1.f;
             break;
         case INPUT_CONTROL_NAV_RIGHT:
+            seek_direction = 1;
             vp.yaw = 1.f;
             break;
         case INPUT_CONTROL_NAV_ACTIVATE:
@@ -1824,6 +1830,23 @@ static void ControlNav( input_thread_t *p_input, int i_type )
         priv->viewpoint.fov   += vp.fov;
         ViewpointApply( p_input );
         return;
+    }
+
+    /* Seek or change volume if the input doesn't have navigation or viewpoint */
+    if( seek_direction != 0 )
+    {
+        mtime_t it = var_InheritInteger( p_input, "short-jump-size" );
+        var_SetInteger( p_input, "time-offset", it * seek_direction * CLOCK_FREQ );
+    }
+    else
+    {
+        assert( vol_direction != 0 );
+        audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
+        if( p_aout )
+        {
+            aout_VolumeUpdate( p_aout, vol_direction, NULL );
+            vlc_object_release( p_aout );
+        }
     }
 }
 
