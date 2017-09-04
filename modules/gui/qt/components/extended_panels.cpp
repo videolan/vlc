@@ -1310,6 +1310,19 @@ StereoWidener::StereoWidener( intf_thread_t *p_intf, QWidget *parent )
     build();
 }
 
+/**********************************************************************
+ * Advanced
+ **********************************************************************/
+
+PitchShifter::PitchShifter( intf_thread_t *p_intf, QWidget *parent )
+    : AudioFilterControlWidget( p_intf, parent, "pitch", "scaletempo" )
+{
+    i_smallfont = -1;
+    controls.append( { "pitch-shift", N_("Adjust pitch"), "semitones",
+                        -12.0, 12.0, 0.0, 0.25, 1.0 } );
+    build();
+}
+
 #include <QToolButton>
 #include <QGridLayout>
 

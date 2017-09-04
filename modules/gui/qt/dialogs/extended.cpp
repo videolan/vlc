@@ -80,6 +80,19 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     audioTab->addTab( stereowiden, qtr( "Stereo Widener" ) );
     audioLayout->addWidget( audioTab );
 
+    QWidget *advancedTab = new QWidget;
+    QGridLayout *advancedTabLayout = new QGridLayout;
+
+    PitchShifter *pitchshifter = new PitchShifter( p_intf, audioTab );
+    CONNECT( pitchshifter, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
+
+    advancedTabLayout->setColumnStretch( 1, 10 );
+    advancedTabLayout->addWidget( pitchshifter );
+
+    advancedTab->setLayout( advancedTabLayout );
+    audioTab->addTab( advancedTab, qtr( "Advanced" ) );
+    audioLayout->addWidget( audioTab );
+
     mainTabW->insertTab( AUDIO_TAB, audioWidget, qtr( "Audio Effects" ) );
 
     /* Video Effects */
