@@ -33,6 +33,8 @@
 #include <vlc_picture.h>
 #include <vlc_codec.h>
 
+#include <vlc_fifo_helper.h>
+
 #include <mfx/mfxvideo.h>
 
 #define SOUT_CFG_PREFIX     "sout-qsv-"
@@ -269,10 +271,13 @@ typedef struct qsv_frame_pool_t
 
 typedef struct async_task_t
 {
+    fifo_item_t      fifo;
     mfxBitstream     bs;                  // Intel's bitstream structure.
     mfxSyncPoint     *syncp;              // Async Task Sync Point.
     block_t          *block;              // VLC's block structure to be returned by Encode.
 } async_task_t;
+
+TYPED_FIFO(async_task_t, async_task_t)
 
 struct encoder_sys_t
 {
@@ -282,8 +287,7 @@ struct encoder_sys_t
     uint64_t         dts_warn_counter;    // DTS warning counter for rate-limiting of msg;
     uint64_t         busy_warn_counter;   // Device Busy warning counter for rate-limiting of msg;
     uint64_t         async_depth;         // Number of parallel encoding operations.
-    uint64_t         first_task;          // The next sync point to be synchronized.
-    async_task_t     *tasks;              // The async encoding tasks.
+    fifo_t           packets;             // FIFO of queued packets
     mtime_t          offset_pts;          // The pts of the first frame, to avoid conversion overflow.
     mtime_t          last_dts;            // The dts of the last frame, to interpolate over buggy dts
 };
@@ -636,9 +640,7 @@ static int Open(vlc_object_t *this)
     enc->fmt_out.i_extra = i_extra;
 
     sys->async_depth = sys->params.AsyncDepth;
-    sys->tasks = calloc(sys->async_depth, sizeof(async_task_t));
-    if (unlikely(!sys->tasks))
-        goto nomem;
+    async_task_t_fifo_Init(&sys->packets);
 
     /* Vlc module configuration */
     enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
@@ -670,8 +672,7 @@ static void Close(vlc_object_t *this)
     /*     free(enc->fmt_out.p_extra); */
     if (sys->frames.size)
         qsv_frame_pool_Destroy(&sys->frames);
-    if (sys->tasks)
-        free(sys->tasks);
+    async_task_t_fifo_Release(&sys->packets);
     free(sys);
 }
 
@@ -808,6 +809,8 @@ static void qsv_queue_encode_picture(encoder_t *enc, async_task_t *task,
             msg_Dbg(enc, "Encoder feeding phase, more data is needed.");
         else
             msg_Dbg(enc, "Encoder is empty");
+    else if (sts == MFX_ERR_NONE)
+        async_task_t_fifo_Put(&sys->packets, task);
     else if (sts < MFX_ERR_NONE) {
         msg_Err(enc, "Encoder not ready or error (%d), trying a reset...", sts);
         MFXVideoENCODE_Reset(sys->session, &sys->params);
@@ -828,29 +831,20 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
     async_task_t  *task = NULL;
     block_t       *block = NULL;
 
-    if (pic) {
-        /* Finds an available SyncPoint */
-        for (size_t i = 0; i < sys->async_depth; i++)
-            if ((sys->tasks + (i + sys->first_task) % sys->async_depth)->syncp == 0) {
-                task = sys->tasks + (i + sys->first_task) % sys->async_depth;
-                break;
-            }
-    } else
-        /* If !pic, we are emptying encoder and tasks, so we force the SyncOperation */
-        msg_Dbg(enc, "Emptying encoder");
+    task = calloc(1, sizeof(*task));
+    if (likely(task != NULL))
+    {
+        qsv_queue_encode_picture( enc, task, pic );
 
-    /* There is no available task, we need to synchronize */
-    if (!task) {
-        task = sys->tasks + sys->first_task;
-
-        block = qsv_synchronize_block( enc, task );
-
-        /* Reset the task now it has been synchronized and advances first_task pointer */
-        task->syncp = 0;
-        sys->first_task = (sys->first_task + 1) % sys->async_depth;
+        if ( async_task_t_fifo_GetCount(&sys->packets) == sys->async_depth ||
+             (!pic && async_task_t_fifo_GetCount(&sys->packets)))
+        {
+            assert(async_task_t_fifo_Show(&sys->packets)->syncp != 0);
+            task = async_task_t_fifo_Get(&sys->packets);
+            block = qsv_synchronize_block( enc, task );
+            free(task);
+        }
     }
-
-    qsv_queue_encode_picture( enc, task, pic );
 
     return block;
 }
