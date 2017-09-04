@@ -410,7 +410,6 @@ static int Open(vlc_object_t *this)
     uint8_t sps_buf[128];
     uint8_t pps_buf[128];
     mfxExtCodingOptionSPSPPS headers;
-    mfxExtBuffer *extended_params[1] = {(mfxExtBuffer *)&headers};
     mfxExtCodingOption co = {
         .Header.BufferId = MFX_EXTBUFF_CODING_OPTION,
         .Header.BufferSz = sizeof(co),
@@ -424,6 +423,13 @@ static int Open(vlc_object_t *this)
 #endif
     mfxExtBuffer *init_params[] =
     {
+        (mfxExtBuffer*)&co,
+#if QSV_HAVE_CO2
+        (mfxExtBuffer*)&co2,
+#endif
+    };
+    mfxExtBuffer *extended_params[] = {
+        (mfxExtBuffer*)&headers,
         (mfxExtBuffer*)&co,
 #if QSV_HAVE_CO2
         (mfxExtBuffer*)&co2,
@@ -599,11 +605,14 @@ static int Open(vlc_object_t *this)
     headers.SPSBuffer       = sps_buf;
     headers.PPSBuffer       = pps_buf;
     sys->params.ExtParam    = (mfxExtBuffer **)&extended_params;
-    sys->params.NumExtParam = 1;
+    sys->params.NumExtParam =
+#if QSV_HAVE_CO2
+            3;
+#else
+            2;
+#endif
 
     MFXVideoENCODE_GetVideoParam(sys->session, &sys->params);
-    sys->params.NumExtParam = 0;
-    sys->params.ExtParam = NULL;
 
     i_extra = headers.SPSBufSize + headers.PPSBufSize;
     p_extra = malloc(i_extra);
