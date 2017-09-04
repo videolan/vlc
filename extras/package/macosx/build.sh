@@ -195,6 +195,10 @@ unset CFLAGS
 unset CXXFLAGS
 unset OBJCFLAGS
 
+# Enable debug symbols by default
+export CFLAGS="-g"
+export CXXFLAGS="-g"
+export OBJCFLAGS="-g"
 
 #
 # vlc/bootstrap
