@@ -685,9 +685,13 @@ static void qsv_set_block_ts(encoder_t *enc, encoder_sys_t *sys, block_t *block,
 static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
 {
     encoder_sys_t *sys = enc->p_sys;
+    mfxStatus sts;
 
     /* Synchronize and fill block_t. If the SyncOperation fails we leak :-/ (or we can segfault, ur choice) */
-    if (MFXVideoCORE_SyncOperation(sys->session, task->syncp, QSV_SYNCPOINT_WAIT) != MFX_ERR_NONE) {
+    do {
+        sts = MFXVideoCORE_SyncOperation(sys->session, task->syncp, QSV_SYNCPOINT_WAIT);
+    } while (sts == MFX_WRN_IN_EXECUTION);
+    if (sts != MFX_ERR_NONE) {
         msg_Err(enc, "SyncOperation failed, outputting garbage data. "
                 "Updating your drivers and/or changing the encoding settings might resolve this");
         return NULL;
