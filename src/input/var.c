@@ -239,10 +239,10 @@ void input_ControlVarStop( input_thread_t *p_input )
     if( !input_priv(p_input)->b_preparsing )
         InputDelCallbacks( p_input, p_input_callbacks );
 
-    if( input_priv(p_input)->master->i_title > 1 )
+    if( input_priv(p_input)->i_title > 1 )
         InputDelCallbacks( p_input, p_input_title_navigation_callbacks );
 
-    for( int i = 0; i < input_priv(p_input)->master->i_title; i++ )
+    for( int i = 0; i < input_priv(p_input)->i_title; i++ )
     {
         char name[sizeof("title ") + 3 * sizeof (int)];
 
@@ -252,7 +252,7 @@ void input_ControlVarStop( input_thread_t *p_input )
 
     if( !demux_Control( p_demux, DEMUX_GET_TITLE, &i_cur_title ) )
     {
-        const input_title_t* t = input_priv(p_input)->master->title[ i_cur_title ];
+        const input_title_t* t = input_priv(p_input)->title[ i_cur_title ];
 
         if( t->i_seekpoint > 1 )
             InputDelCallbacks( p_input, p_input_seekpoint_navigation_callbacks );
@@ -268,7 +268,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
     vlc_value_t text;
 
     /* Create more command variables */
-    if( input_priv(p_input)->master->i_title > 1 )
+    if( input_priv(p_input)->i_title > 1 )
     {
         if( var_Type( p_input, "next-title" ) == 0 ) {
             var_Create( p_input, "next-title", VLC_VAR_VOID );
@@ -302,7 +302,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
     /* Create titles and chapters */
     var_Change( p_input, "title", VLC_VAR_CLEARCHOICES, NULL, NULL );
 
-    for( int i = 0; i < input_priv(p_input)->master->i_title; i++ )
+    for( int i = 0; i < input_priv(p_input)->i_title; i++ )
     {
         vlc_value_t val2, text2;
         char title[sizeof("title ") + 3 * sizeof (int)];
@@ -315,18 +315,17 @@ void input_ControlVarNavigation( input_thread_t *p_input )
                          NavigationCallback, (void *)(intptr_t)i );
 
         char psz_length[MSTRTIME_MAX_SIZE + sizeof(" []")];
-        if( input_priv(p_input)->master->title[i]->i_length > 0 )
+        if( input_priv(p_input)->title[i]->i_length > 0 )
         {
             strcpy( psz_length, " [" );
-            secstotimestr( &psz_length[2],
-                    input_priv(p_input)->master->title[i]->i_length / CLOCK_FREQ );
+            secstotimestr( &psz_length[2], input_priv(p_input)->title[i]->i_length / CLOCK_FREQ );
             strcat( psz_length, "]" );
         }
         else
             psz_length[0] = '\0';
 
-        if( input_priv(p_input)->master->title[i]->psz_name == NULL ||
-            *input_priv(p_input)->master->title[i]->psz_name == '\0' )
+        if( input_priv(p_input)->title[i]->psz_name == NULL ||
+            *input_priv(p_input)->title[i]->psz_name == '\0' )
         {
             if( asprintf( &text.psz_string, _("Title %i%s"),
                           i + input_priv(p_input)->i_title_offset, psz_length ) == -1 )
@@ -335,7 +334,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         else
         {
             if( asprintf( &text.psz_string, "%s%s",
-                          input_priv(p_input)->master->title[i]->psz_name, psz_length ) == -1 )
+                          input_priv(p_input)->title[i]->psz_name, psz_length ) == -1 )
                 continue;
         }
 
@@ -345,12 +344,12 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 
         free( text.psz_string );
 
-        for( int j = 0; j < input_priv(p_input)->master->title[i]->i_seekpoint; j++ )
+        for( int j = 0; j < input_priv(p_input)->title[i]->i_seekpoint; j++ )
         {
             val2.i_int = j;
 
-            if( input_priv(p_input)->master->title[i]->seekpoint[j]->psz_name == NULL ||
-                *input_priv(p_input)->master->title[i]->seekpoint[j]->psz_name == '\0' )
+            if( input_priv(p_input)->title[i]->seekpoint[j]->psz_name == NULL ||
+                *input_priv(p_input)->title[i]->seekpoint[j]->psz_name == '\0' )
             {
                 /* Default value */
                 if( asprintf( &text2.psz_string, _("Chapter %i"),
@@ -360,7 +359,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
             else
             {
                 text2.psz_string =
-                    strdup( input_priv(p_input)->master->title[i]->seekpoint[j]->psz_name );
+                    strdup( input_priv(p_input)->title[i]->seekpoint[j]->psz_name );
             }
 
             var_Change( p_input, title, VLC_VAR_ADDCHOICE, &val2, &text2 );
@@ -376,7 +375,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarTitle( input_thread_t *p_input, int i_title )
 {
-    const input_title_t *t = input_priv(p_input)->master->title[i_title];
+    const input_title_t *t = input_priv(p_input)->title[i_title];
     vlc_value_t text;
     int  i;
 

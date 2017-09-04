@@ -327,9 +327,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if ( *pi_req_title_offset < 0 ) /* return current title if -1 */
                 *pi_req_title_offset = i_current_title;
 
-            if( priv->master->i_title && priv->master->i_title > *pi_req_title_offset )
+            if( priv->i_title && priv->i_title > *pi_req_title_offset )
             {
-                *p_title = vlc_input_title_Duplicate( priv->master->title[*pi_req_title_offset] );
+                *p_title = vlc_input_title_Duplicate( priv->title[*pi_req_title_offset] );
                 vlc_mutex_unlock( &priv->p_item->lock );
                 return VLC_SUCCESS;
             }
@@ -343,7 +343,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         case INPUT_GET_FULL_TITLE_INFO:
         {
             vlc_mutex_lock( &priv->p_item->lock );
-            unsigned count = priv->master->i_title;
+            unsigned count = priv->i_title;
             input_title_t **array = malloc( count * sizeof (*array) );
 
             if( count > 0 && unlikely(array == NULL) )
@@ -353,7 +353,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             }
 
             for( unsigned i = 0; i < count; i++ )
-                array[i] = vlc_input_title_Duplicate( priv->master->title[i] );
+                array[i] = vlc_input_title_Duplicate( priv->title[i] );
 
             vlc_mutex_unlock( &priv->p_item->lock );
 
@@ -372,13 +372,13 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if ( *pi_title_to_fetch < 0 ) /* query current title if -1 */
                 *pi_title_to_fetch = var_GetInteger( p_input, "title" );
 
-            if( priv->master->i_title == 0 || priv->master->i_title <= *pi_title_to_fetch )
+            if( priv->i_title == 0 || priv->i_title <= *pi_title_to_fetch )
             {
                 vlc_mutex_unlock( &priv->p_item->lock );
                 return VLC_EGENERIC;
             }
 
-            const input_title_t *p_title = priv->master->title[*pi_title_to_fetch];
+            const input_title_t *p_title = priv->title[*pi_title_to_fetch];
 
             /* set arg2 to the number of seekpoints we found */
             const int i_chapters = p_title->i_seekpoint;
