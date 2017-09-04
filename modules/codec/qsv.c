@@ -753,19 +753,23 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     return block;
 }
 
-static void qsv_queue_encode_picture(encoder_t *enc, picture_t *pic)
+static async_task_t *qsv_encode_picture(encoder_t *enc, picture_t *pic)
 {
     encoder_sys_t *sys = enc->p_sys;
-    mfxStatus sts;
+    mfxStatus sts = MFX_ERR_MEMORY_ALLOC;
     mfxFrameSurface1 *frame = NULL;
     async_task_t *task = calloc(1, sizeof(*task));
     if (unlikely(task == NULL))
-        return;
+        goto done;
 
-    if (!(task->syncp = calloc(1, sizeof(*task->syncp)))) {
-        msg_Err(enc, "Unable to allocate syncpoint for encoder output");
-        return;
+    /* Allocate block_t and prepare mfxBitstream for encoder */
+    if (!(task->block = block_Alloc(sys->params.mfx.BufferSizeInKB * 1000))) {
+        msg_Err(enc, "Unable to allocate block for encoder output");
+        goto done;
     }
+    memset(&task->bs, 0, sizeof(task->bs));
+    task->bs.MaxLength = task->block->i_buffer;
+    task->bs.Data = task->block->p_buffer;
 
     if (pic) {
         /* To avoid qsv -> vlc timestamp conversion overflow, we use timestamp relative
@@ -777,22 +781,9 @@ static void qsv_queue_encode_picture(encoder_t *enc, picture_t *pic)
         frame = qsv_frame_pool_Get(sys, pic);
         if (!frame) {
             msg_Warn(enc, "Unable to find an unlocked surface in the pool");
-            free(task->syncp);
-            task->syncp = NULL;
-            return;
+            goto done;
         }
     }
-
-    /* Allocate block_t and prepare mfxBitstream for encoder */
-    if (!(task->block = block_Alloc(sys->params.mfx.BufferSizeInKB * 1000))) {
-        msg_Err(enc, "Unable to allocate block for encoder output");
-        free(task->syncp);
-        task->syncp = NULL;
-        return;
-    }
-    memset(&task->bs, 0, sizeof(task->bs));
-    task->bs.MaxLength = task->block->i_buffer;
-    task->bs.Data = task->block->p_buffer;
 
     if (!(task->syncp = calloc(1, sizeof(*task->syncp)))) {
         msg_Err(enc, "Unable to allocate syncpoint for encoder output");
@@ -820,12 +811,19 @@ static void qsv_queue_encode_picture(encoder_t *enc, picture_t *pic)
             msg_Dbg(enc, "Encoder feeding phase, more data is needed.");
         else
             msg_Dbg(enc, "Encoder is empty");
-    else if (sts == MFX_ERR_NONE)
-        async_task_t_fifo_Put(&sys->packets, task);
     else if (sts < MFX_ERR_NONE) {
         msg_Err(enc, "Encoder not ready or error (%d), trying a reset...", sts);
         MFXVideoENCODE_Reset(sys->session, &sys->params);
     }
+
+done:
+    if (sts < MFX_ERR_NONE || (task != NULL && !task->syncp)) {
+        if (task->block != NULL)
+            block_Release(task->block);
+        free(task);
+        task = NULL;
+    }
+    return task;
 }
 
 /*
@@ -839,9 +837,12 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
 {
     encoder_t     *enc = (encoder_t *)this;
     encoder_sys_t *sys = enc->p_sys;
+    async_task_t     *task;
     block_t       *block = NULL;
 
-    qsv_queue_encode_picture( enc, pic );
+    task = qsv_encode_picture( enc, pic );
+    if (likely(task != NULL))
+        async_task_t_fifo_Put(&sys->packets, task);
 
     if ( async_task_t_fifo_GetCount(&sys->packets) == sys->async_depth ||
          (!pic && async_task_t_fifo_GetCount(&sys->packets)))
