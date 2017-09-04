@@ -753,23 +753,14 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     return block;
 }
 
-static async_task_t *qsv_encode_picture(encoder_t *enc, picture_t *pic)
+static async_task_t *encode_frame(encoder_t *enc, picture_t *pic)
 {
     encoder_sys_t *sys = enc->p_sys;
     mfxStatus sts = MFX_ERR_MEMORY_ALLOC;
-    mfxFrameSurface1 *frame = NULL;
+    mfxFrameSurface1 *surf = NULL;
     async_task_t *task = calloc(1, sizeof(*task));
     if (unlikely(task == NULL))
         goto done;
-
-    /* Allocate block_t and prepare mfxBitstream for encoder */
-    if (!(task->block = block_Alloc(sys->params.mfx.BufferSizeInKB * 1000))) {
-        msg_Err(enc, "Unable to allocate block for encoder output");
-        goto done;
-    }
-    memset(&task->bs, 0, sizeof(task->bs));
-    task->bs.MaxLength = task->block->i_buffer;
-    task->bs.Data = task->block->p_buffer;
 
     if (pic) {
         /* To avoid qsv -> vlc timestamp conversion overflow, we use timestamp relative
@@ -778,8 +769,8 @@ static async_task_t *qsv_encode_picture(encoder_t *enc, picture_t *pic)
         if (!sys->offset_pts) // First frame
             sys->offset_pts = pic->date;
 
-        frame = qsv_frame_pool_Get(sys, pic);
-        if (!frame) {
+        surf = qsv_frame_pool_Get(sys, pic);
+        if (!surf) {
             msg_Warn(enc, "Unable to find an unlocked surface in the pool");
             goto done;
         }
@@ -790,12 +781,17 @@ static async_task_t *qsv_encode_picture(encoder_t *enc, picture_t *pic)
         goto done;
     }
 
-    if (qsv_frame) {
-        surf = &qsv_frame->surface;
+    /* Allocate block_t and prepare mfxBitstream for encoder */
+    if (!(task->block = block_Alloc(sys->params.mfx.BufferSizeInKB * 1000))) {
+        msg_Err(enc, "Unable to allocate block for encoder output");
+        goto done;
     }
+    memset(&task->bs, 0, sizeof(task->bs));
+    task->bs.MaxLength = task->block->i_buffer;
+    task->bs.Data = task->block->p_buffer;
 
     for (;;) {
-        sts = MFXVideoENCODE_EncodeFrameAsync(sys->session, 0, frame, &task->bs, task->syncp);
+        sts = MFXVideoENCODE_EncodeFrameAsync(sys->session, 0, surf, &task->bs, task->syncp);
         if (sts != MFX_WRN_DEVICE_BUSY && sts != MFX_WRN_IN_EXECUTION)
             break;
         if (sys->busy_warn_counter++ % 16 == 0)
@@ -840,7 +836,7 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
     async_task_t     *task;
     block_t       *block = NULL;
 
-    task = qsv_encode_picture( enc, pic );
+    task = encode_frame( enc, pic );
     if (likely(task != NULL))
         async_task_t_fifo_Put(&sys->packets, task);
 
