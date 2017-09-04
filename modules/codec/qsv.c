@@ -263,11 +263,14 @@ static const char *const sout_options[] = {
 };
 
 // Frame pool for QuickSync video encoder with Intel Media SDK's format frames.
-typedef struct qsv_frame_pool_t
+typedef struct _QSVFrame
 {
-    mfxFrameSurface1      *frames;        // An allocated array of 'size' frames.
-    size_t                size;           // The number of frame in the pool.
-} qsv_frame_pool_t;
+    struct _QSVFrame  *next;
+    picture_t         *pic;
+    mfxFrameSurface1  surface;
+    mfxEncodeCtrl     enc_ctrl;
+    int               used;
+} QSVFrame;
 
 typedef struct async_task_t
 {
@@ -283,7 +286,7 @@ struct encoder_sys_t
 {
     mfxSession       session;             // Intel Media SDK Session.
     mfxVideoParam    params;              // Encoding parameters.
-    qsv_frame_pool_t frames;              // IntelMediaSDK's frame pool.
+    QSVFrame         *work_frames;        // IntelMediaSDK's frame pool.
     uint64_t         dts_warn_counter;    // DTS warning counter for rate-limiting of msg;
     uint64_t         busy_warn_counter;   // Device Busy warning counter for rate-limiting of msg;
     uint64_t         async_depth;         // Number of parallel encoding operations.
@@ -305,42 +308,16 @@ static inline uint64_t qsv_mtime_to_timestamp(mtime_t vlc_ts)
     return vlc_ts / UINT64_C(100) * UINT64_C(9);
 }
 
-/*
- * Create a new frame pool with 'size' frames in it. Pools cannot be resized.
- */
-static int qsv_frame_pool_Init(qsv_frame_pool_t *pool,
-                               mfxFrameAllocRequest *request,
-                               uint64_t async_depth)
+static void clear_unused_frames(encoder_sys_t *sys)
 {
-    size_t size = request->NumFrameSuggested + async_depth;
-
-    pool->frames = calloc(size, sizeof(mfxFrameSurface1));
-    if (unlikely(!pool->frames))
-        return VLC_ENOMEM;
-
-    pool->size = size;
-
-    for (size_t i = 0; i < size; i++) {
-        memcpy(&pool->frames[i].Info, &request->Info, sizeof(request->Info));
-        pool->frames[i].Data.Pitch = QSV_ALIGN(32, request->Info.Width);
+    QSVFrame *cur = sys->work_frames;
+    while (cur) {
+        if (cur->used && !cur->surface.Data.Locked) {
+            picture_Release(cur->pic);
+            cur->used = 0;
+        }
+        cur = cur->next;
     }
-
-    return VLC_SUCCESS;
-}
-
-/*
- * Destroys a pool frame. Only call this function after a MFXClose
- * call since we doesn't check for Locked frames.
- */
-static void qsv_frame_pool_Destroy(qsv_frame_pool_t *pool)
-{
-    for (size_t i = 0; i < pool->size; i++) {
-        picture_t *pic = (picture_t *) pool->frames[i].Data.MemId;
-        if (pic)
-            picture_Release(pic);
-    }
-
-    free(pool->frames);
 }
 
 /*
@@ -348,38 +325,34 @@ static void qsv_frame_pool_Destroy(qsv_frame_pool_t *pool)
  * necessary associates the new picture with it and return the frame.
  * Returns 0 if there's an error.
  */
-static mfxFrameSurface1 *qsv_frame_pool_Get(encoder_sys_t *sys, picture_t *pic)
+static int get_free_frame(encoder_sys_t *sys, QSVFrame **out)
 {
-    qsv_frame_pool_t *pool = &sys->frames;
-    for (size_t i = 0; i < pool->size; i++) {
-        mfxFrameSurface1 *frame = &pool->frames[i];
-        if (frame->Data.Locked)
-            continue;
-        if (frame->Data.MemId)
-            picture_Release((picture_t *)frame->Data.MemId);
+    QSVFrame *frame, **last;
 
-        frame->Data.MemId     = pic;
-        frame->Data.PitchLow  = pic->p[0].i_pitch;
-        frame->Data.Y         = pic->p[0].p_pixels;
-        frame->Data.UV        = pic->p[1].p_pixels;
-        frame->Data.TimeStamp = qsv_mtime_to_timestamp(pic->date - sys->offset_pts);
+    clear_unused_frames(sys);
 
-        frame->Info = sys->params.mfx.FrameInfo;
+    frame = sys->work_frames;
+    last  = &sys->work_frames;
+    while (frame) {
+        if (!frame->used) {
+            *out = frame;
+            frame->used = 1;
+            return VLC_SUCCESS;
+        }
 
-        // Specify picture structure at runtime.
-        if (pic->b_progressive)
-            frame->Info.PicStruct = MFX_PICSTRUCT_PROGRESSIVE;
-        else if (pic->b_top_field_first)
-            frame->Info.PicStruct = MFX_PICSTRUCT_FIELD_TFF;
-        else
-            frame->Info.PicStruct = MFX_PICSTRUCT_FIELD_BFF;
-
-        picture_Hold(pic);
-
-        return frame;
+        last  = &frame->next;
+        frame = frame->next;
     }
 
-    return NULL;
+    frame = calloc(1,sizeof(QSVFrame));
+    if (unlikely(frame==NULL))
+        return VLC_ENOMEM;
+    *last = frame;
+
+    *out = frame;
+    frame->used = 1;
+
+    return VLC_SUCCESS;
 }
 
 static uint64_t qsv_params_get_value(const char *const *text,
@@ -587,9 +560,6 @@ static int Open(vlc_object_t *this)
         msg_Err(enc, "Failed to query for allocation");
         goto error;
     }
-    if (qsv_frame_pool_Init(&sys->frames, &alloc_request, sys->async_depth) != VLC_SUCCESS)
-        goto nomem;
-    msg_Dbg(enc, "Requested %d surfaces for work", alloc_request.NumFrameSuggested);
 
     sys->params.ExtParam    = (mfxExtBuffer**)&init_params;
     sys->params.NumExtParam =
@@ -670,8 +640,6 @@ static void Close(vlc_object_t *this)
     MFXClose(sys->session);
     /* if (enc->fmt_out.p_extra) */
     /*     free(enc->fmt_out.p_extra); */
-    if (sys->frames.size)
-        qsv_frame_pool_Destroy(&sys->frames);
     async_task_t_fifo_Release(&sys->packets);
     free(sys);
 }
@@ -753,10 +721,46 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     return block;
 }
 
+static int submit_frame(encoder_t *enc, picture_t *pic, QSVFrame **new_frame)
+{
+    encoder_sys_t *sys = enc->p_sys;
+    QSVFrame *qf = NULL;
+    int ret = get_free_frame(sys, &qf);
+    if (ret != VLC_SUCCESS) {
+        msg_Warn(enc, "Unable to find an unlocked surface in the pool");
+        return ret;
+    }
+
+    qf->pic = picture_Hold(pic);
+
+    qf->surface.Info = sys->params.mfx.FrameInfo;
+
+    // Specify picture structure at runtime.
+    if (pic->b_progressive)
+        qf->surface.Info.PicStruct = MFX_PICSTRUCT_PROGRESSIVE;
+    else if (pic->b_top_field_first)
+        qf->surface.Info.PicStruct = MFX_PICSTRUCT_FIELD_TFF;
+    else
+        qf->surface.Info.PicStruct = MFX_PICSTRUCT_FIELD_BFF;
+
+    //qf->surface.Data.Pitch = QSV_ALIGN(16, qf->surface.Info.Width);
+
+    qf->surface.Data.PitchLow  = pic->p[0].i_pitch;
+    qf->surface.Data.Y         = pic->p[0].p_pixels;
+    qf->surface.Data.UV        = pic->p[1].p_pixels;
+
+    qf->surface.Data.TimeStamp = qsv_mtime_to_timestamp(pic->date - sys->offset_pts);
+
+    *new_frame = qf;
+
+    return VLC_SUCCESS;
+}
+
 static async_task_t *encode_frame(encoder_t *enc, picture_t *pic)
 {
     encoder_sys_t *sys = enc->p_sys;
     mfxStatus sts = MFX_ERR_MEMORY_ALLOC;
+    QSVFrame *qsv_frame = NULL;
     mfxFrameSurface1 *surf = NULL;
     async_task_t *task = calloc(1, sizeof(*task));
     if (unlikely(task == NULL))
@@ -769,8 +773,8 @@ static async_task_t *encode_frame(encoder_t *enc, picture_t *pic)
         if (!sys->offset_pts) // First frame
             sys->offset_pts = pic->date;
 
-        surf = qsv_frame_pool_Get(sys, pic);
-        if (!surf) {
+        if (submit_frame(enc, pic, &qsv_frame) != VLC_SUCCESS)
+        {
             msg_Warn(enc, "Unable to find an unlocked surface in the pool");
             goto done;
         }
@@ -789,6 +793,10 @@ static async_task_t *encode_frame(encoder_t *enc, picture_t *pic)
     memset(&task->bs, 0, sizeof(task->bs));
     task->bs.MaxLength = task->block->i_buffer;
     task->bs.Data = task->block->p_buffer;
+
+    if (qsv_frame) {
+        surf = &qsv_frame->surface;
+    }
 
     for (;;) {
         sts = MFXVideoENCODE_EncodeFrameAsync(sys->session, 0, surf, &task->bs, task->syncp);
