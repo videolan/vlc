@@ -290,8 +290,12 @@ VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
 #define aout_FormatPrint(o, t, f) aout_FormatPrint(VLC_OBJECT(o), t, f)
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
+#define AOUT_VOLUME_DEFAULT             256
+#define AOUT_VOLUME_MAX                 512
+
 VLC_API float aout_VolumeGet (audio_output_t *);
 VLC_API int aout_VolumeSet (audio_output_t *, float);
+VLC_API int aout_VolumeUpdate (audio_output_t *, int, float *);
 VLC_API int aout_MuteGet (audio_output_t *);
 VLC_API int aout_MuteSet (audio_output_t *, bool);
 VLC_API char *aout_DeviceGet (audio_output_t *);

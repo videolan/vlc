@@ -17,6 +17,7 @@ aout_FormatPrint
 aout_FormatPrintChannels
 aout_VolumeGet
 aout_VolumeSet
+aout_VolumeUpdate
 aout_MuteSet
 aout_MuteGet
 aout_DeviceGet

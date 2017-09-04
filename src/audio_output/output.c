@@ -739,6 +739,33 @@ int aout_VolumeSet (audio_output_t *aout, float vol)
 }
 
 /**
+ * Raises the volume.
+ * \param value how much to increase (> 0) or decrease (< 0) the volume
+ * \param volp if non-NULL, will contain contain the resulting volume
+ */
+int aout_VolumeUpdate (audio_output_t *aout, int value, float *volp)
+{
+    int ret = -1;
+    float stepSize = var_InheritFloat (aout, "volume-step") / (float)AOUT_VOLUME_DEFAULT;
+    float delta = value * stepSize;
+    float vol = aout_VolumeGet (aout);
+
+    if (vol >= 0.f)
+    {
+        vol += delta;
+        if (vol < 0.f)
+            vol = 0.f;
+        if (vol > 2.f)
+            vol = 2.f;
+        vol = (roundf (vol / stepSize)) * stepSize;
+        if (volp != NULL)
+            *volp = vol;
+        ret = aout_VolumeSet (aout, vol);
+    }
+    return ret;
+}
+
+/**
  * Gets the audio output stream mute flag.
  * \return 0 if not muted, 1 if muted, -1 if undefined.
  */

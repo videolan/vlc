@@ -29,6 +29,7 @@ extern "C" {
 # endif
 
 #include <vlc_events.h>
+#include <vlc_aout.h>
 
 TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
 
@@ -391,9 +392,6 @@ VLC_API void playlist_NodeDelete( playlist_t *, playlist_item_t * );
  **************************/
 
 VLC_API audio_output_t *playlist_GetAout( playlist_t * );
-
-#define AOUT_VOLUME_DEFAULT             256
-#define AOUT_VOLUME_MAX                 512
 
 VLC_API float playlist_VolumeGet( playlist_t * );
 VLC_API int playlist_VolumeSet( playlist_t *, float );
