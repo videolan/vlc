@@ -285,6 +285,16 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_CHANGE_VIEWPOINT:
         return vout_display_opengl_SetViewpoint (sys->vgl,
             &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
+    case VOUT_DISPLAY_CHANGE_HMD_CONTROLLER:
+    {
+      if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
+          return VLC_EGENERIC;
+      if (vout_display_opengl_UpdateHMDControllerPicture(sys->vgl,
+          va_arg(ap, vlc_hmd_controller_t *)) != VLC_SUCCESS)
+          return VLC_EGENERIC;
+      vlc_gl_ReleaseCurrent (sys->gl);
+      return VLC_SUCCESS;
+    }
       default:
         msg_Err (vd, "Unknown request %d", query);
     }

@@ -97,4 +97,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 void vout_display_opengl_UpdateHMD(vout_display_opengl_t *vgl,
                                    vlc_hmd_device_t *device);
 
+int vout_display_opengl_UpdateHMDControllerPicture(vout_display_opengl_t *vgl,
+                                                   vlc_hmd_controller_t *p_ctl);
+
 #endif
