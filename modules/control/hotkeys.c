@@ -977,34 +977,18 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 input_Control( p_input, INPUT_NAV_ACTIVATE, NULL );
             break;
         case ACTIONID_NAV_UP:
-            if( p_vout )
-                input_UpdateViewpoint( p_input,
-                                       &(vlc_viewpoint_t) { .pitch = -1.f },
-                                       false );
             if( p_input )
                 input_Control( p_input, INPUT_NAV_UP, NULL );
             break;
         case ACTIONID_NAV_DOWN:
-            if( p_vout )
-                input_UpdateViewpoint( p_input,
-                                       &(vlc_viewpoint_t) { .pitch = 1.f },
-                                       false );
             if( p_input )
                 input_Control( p_input, INPUT_NAV_DOWN, NULL );
             break;
         case ACTIONID_NAV_LEFT:
-            if( p_vout )
-                input_UpdateViewpoint( p_input,
-                                       &(vlc_viewpoint_t) { .yaw = -1.f },
-                                       false );
             if( p_input )
                 input_Control( p_input, INPUT_NAV_LEFT, NULL );
             break;
         case ACTIONID_NAV_RIGHT:
-            if( p_vout )
-                input_UpdateViewpoint( p_input,
-                                       &(vlc_viewpoint_t) { .yaw = 1.f },
-                                       false );
             if( p_input )
                 input_Control( p_input, INPUT_NAV_RIGHT, NULL );
             break;
