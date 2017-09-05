@@ -483,14 +483,14 @@ static void OpenglESSwap(vlc_gl_t *gl)
             return;
         }
 
+        if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)])) {
+            msg_Err(_voutDisplay, "void pointer not an ObjC object");
+            return;
+        }
+
         [viewContainer retain];
 
         @synchronized(viewContainer) {
-            if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)])) {
-                msg_Err(_voutDisplay, "void pointer not an ObjC object");
-                return;
-            }
-
             if (![viewContainer isKindOfClass:[UIView class]]) {
                 msg_Err(_voutDisplay, "passed ObjC object not of class UIView");
                 return;
