@@ -45,7 +45,8 @@
 #define COMPLEX_INTERFACE (stream_t           *p_demux,\
                            input_item_node_t  *p_input_node,\
                            xml_reader_t       *p_xml_reader,\
-                           const char         *psz_element)
+                           const char         *psz_element,\
+                           bool                b_empty_node)
 
 /* prototypes */
 static bool parse_playlist_node COMPLEX_INTERFACE;
@@ -149,8 +150,11 @@ static int ReadDir(stream_t *p_demux, input_item_node_t *p_subitems)
         goto end;
     }
 
+    if(xml_ReaderIsEmptyElement(p_xml_reader))
+        goto end;
+
     i_ret = parse_playlist_node(p_demux, p_subitems,
-                                 p_xml_reader, "playlist") ? 0 : -1;
+                                 p_xml_reader, "playlist", false ) ? 0 : -1;
 
     for (int i = 0 ; i < sys->i_tracklist_entries ; i++)
     {
@@ -192,6 +196,9 @@ static bool parse_playlist_node COMPLEX_INTERFACE
     int i_node;
     bool b_ret = false;
     const xml_elem_hnd_t *p_handler = NULL;
+
+    if(b_empty_node)
+        return true;
 
     static const xml_elem_hnd_t pl_elements[] =
         { {"title",        {.smpl = set_item_info}, false },
@@ -235,58 +242,65 @@ static bool parse_playlist_node COMPLEX_INTERFACE
 
     psz_value = NULL;
     while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
-        switch (i_node)
     {
-    case XML_READER_STARTELEM:
-        FREENULL(psz_value);
+        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
+        switch (i_node)
+        {
+            case XML_READER_STARTELEM:
+                FREENULL(psz_value);
+                if (!*name)
+                {
+                    msg_Err(p_demux, "invalid XML stream");
+                    goto end;
+                }
+                p_handler = get_handler(pl_elements, name);
+                if (!p_handler)
+                {
+                    msg_Err(p_demux, "unexpected element <%s>", name);
+                    goto end;
+                }
 
-        if (!*name)
-        {
-            msg_Err(p_demux, "invalid XML stream");
-            goto end;
-        }
-        p_handler = get_handler(pl_elements, name);
-        if (!p_handler)
-        {
-            msg_Err(p_demux, "unexpected element <%s>", name);
-            goto end;
-        }
-        /* complex content is parsed in a separate function */
-        if (p_handler->cmplx)
-        {
-            if (!p_handler->pf_handler.cmplx(p_demux, p_input_node,
-                        p_xml_reader, p_handler->name))
-                return false;
-            p_handler = NULL;
-        }
-        break;
+                /* complex content is parsed in a separate function */
+                if (p_handler->cmplx)
+                {
+                    if (!p_handler->pf_handler.cmplx(p_demux, p_input_node,
+                                                     p_xml_reader, p_handler->name,
+                                                     b_empty))
+                        return false;
+                    p_handler = NULL;
+                }
+                break;
 
-    case XML_READER_TEXT:
-        FREENULL(psz_value);
-        psz_value = strdup(name);
-        if (unlikely(!psz_value))
-            goto end;
-        break;
+            case XML_READER_TEXT:
+                FREENULL(psz_value);
+                if(p_handler)
+                {
+                    psz_value = strdup(name);
+                    if (unlikely(!psz_value))
+                        goto end;
+                }
+                break;
 
-    case XML_READER_ENDELEM:
-        /* leave if the current parent node <playlist> is terminated */
-        if (!strcmp(name, psz_element))
-        {
-            b_ret = true;
-            goto end;
-        }
-        /* there MUST have been a start tag for that element name */
-        if (!p_handler || !p_handler->name || strcmp(p_handler->name, name))
-        {
-            msg_Err(p_demux, "there's no open element left for <%s>", name);
-            goto end;
-        }
+            case XML_READER_ENDELEM:
+                /* leave if the current parent node <playlist> is terminated */
+                if (!strcmp(name, psz_element))
+                {
+                    b_ret = true;
+                    goto end;
+                }
+                /* there MUST have been a start tag for that element name */
+                if (!p_handler || !p_handler->name || strcmp(p_handler->name, name))
+                {
+                    msg_Err(p_demux, "there's no open element left for <%s>", name);
+                    goto end;
+                }
 
-        if (p_handler->pf_handler.smpl)
-            p_handler->pf_handler.smpl(p_input_item, p_handler->name, psz_value);
-        FREENULL(psz_value);
-        p_handler = NULL;
-        break;
+                if (p_handler->pf_handler.smpl)
+                    p_handler->pf_handler.smpl(p_input_item, p_handler->name, psz_value);
+                FREENULL(psz_value);
+                p_handler = NULL;
+                break;
+        }
     }
 
 end:
@@ -304,9 +318,13 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
     unsigned i_ntracks = 0;
     int i_node;
 
+    if(b_empty_node)
+        return true;
+
     /* now parse the <track>s */
     while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
     {
+        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
         if (i_node == XML_READER_STARTELEM)
         {
             if (strcmp(name, "track"))
@@ -317,7 +335,7 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
             }
 
             /* parse the track data in a separate function */
-            if (parse_track_node(p_demux, p_input_node, p_xml_reader, "track"))
+            if (parse_track_node(p_demux, p_input_node, p_xml_reader, "track", b_empty))
                 i_ntracks++;
         }
         else if (i_node == XML_READER_ENDELEM)
@@ -353,6 +371,9 @@ static bool parse_track_node COMPLEX_INTERFACE
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_node;
 
+    if(b_empty_node)
+        return true;
+
     static const xml_elem_hnd_t track_elements[] =
         { {"location",     {NULL}, false },
           {"identifier",   {NULL}, false },
@@ -378,129 +399,136 @@ static bool parse_track_node COMPLEX_INTERFACE
     p_sys->i_track_id = -1;
 
     while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
-        switch (i_node)
     {
-    case XML_READER_STARTELEM:
-        FREENULL(psz_value);
-
-        if (!*name)
+        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
+        switch (i_node)
         {
-            msg_Err(p_demux, "invalid XML stream");
-            goto end;
-        }
-        p_handler = get_handler(track_elements, name);
-        if (!p_handler)
-        {
-            msg_Err(p_demux, "unexpected element <%s>", name);
-            goto end;
-        }
-        /* complex content is parsed in a separate function */
-        if (p_handler->cmplx)
-        {
-            if (!p_handler->pf_handler.cmplx(p_demux, p_new_node,
-                                             p_xml_reader, p_handler->name)) {
-                input_item_node_Delete(p_new_node);
-                input_item_Release(p_new_input);
-                return false;
-            }
+            case XML_READER_STARTELEM:
+                FREENULL(psz_value);
 
-            p_handler = NULL;
-        }
-        break;
-
-    case XML_READER_TEXT:
-        free(psz_value);
-        psz_value = strdup(name);
-        if (unlikely(!psz_value))
-            goto end;
-        break;
-
-    case XML_READER_ENDELEM:
-        /* leave if the current parent node <track> is terminated */
-        if (!strcmp(name, psz_element))
-        {
-            free(psz_value);
-
-            /* Make sure we have a URI */
-            char *psz_uri = input_item_GetURI(p_new_input);
-            if (!psz_uri)
-                input_item_SetURI(p_new_input, "vlc://nop");
-            else
-                free(psz_uri);
-
-            if (p_sys->i_track_id < 0
-             || (size_t)p_sys->i_track_id >= (SIZE_MAX / sizeof(p_new_input)))
-            {
-                input_item_node_AppendNode(p_input_node, p_new_node);
-                input_item_Release(p_new_input);
-                return true;
-            }
-
-            if (p_sys->i_track_id >= p_sys->i_tracklist_entries)
-            {
-                input_item_t **pp;
-                pp = realloc(p_sys->pp_tracklist,
-                    (p_sys->i_track_id + 1) * sizeof(*pp));
-                if (!pp)
+                if (!*name)
                 {
-                    input_item_Release(p_new_input);
-                    input_item_node_Delete(p_new_node);
-                    return false;
+                    msg_Err(p_demux, "invalid XML stream");
+                    goto end;
                 }
-                p_sys->pp_tracklist = pp;
-                while (p_sys->i_track_id >= p_sys->i_tracklist_entries)
-                    pp[p_sys->i_tracklist_entries++] = NULL;
-            }
-            else if (p_sys->pp_tracklist[p_sys->i_track_id] != NULL)
-            {
-                msg_Err(p_demux, "track ID %d collision", p_sys->i_track_id);
-                input_item_Release(p_new_input);
-                input_item_node_Delete(p_new_node);
-                return false;
-            }
-
-            p_sys->pp_tracklist[ p_sys->i_track_id ] = p_new_input;
-            input_item_node_Delete(p_new_node);
-            return true;
-        }
-        /* there MUST have been a start tag for that element name */
-        if (!p_handler || !p_handler->name || strcmp(p_handler->name, name))
-        {
-            msg_Err(p_demux, "there's no open element left for <%s>", name);
-            goto end;
-        }
-
-        /* special case: location */
-        if (!strcmp(p_handler->name, "location"))
-        {
-            if (psz_value == NULL)
-                input_item_SetURI(p_new_input, "vlc://nop");
-            else
-            {
-                char* psz_uri = ProcessMRL( psz_value, p_sys->psz_base );
-
-                if( !psz_uri )
+                p_handler = get_handler(track_elements, name);
+                if (!p_handler)
                 {
-                    msg_Warn( p_demux, "unable to process MRL: %s", psz_value );
+                    msg_Err(p_demux, "unexpected element <%s>", name);
+                    goto end;
+                }
+                /* complex content is parsed in a separate function */
+                if (p_handler->cmplx)
+                {
+                    if (!p_handler->pf_handler.cmplx(p_demux, p_new_node,
+                                                     p_xml_reader, p_handler->name,
+                                                     b_empty)) {
+                        input_item_node_Delete(p_new_node);
+                        input_item_Release(p_new_input);
+                        return false;
+                    }
+
+                    p_handler = NULL;
+                }
+                break;
+
+            case XML_READER_TEXT:
+                FREENULL(psz_value);
+                if(p_handler)
+                {
+                    psz_value = strdup(name);
+                    if (unlikely(!psz_value))
+                        goto end;
+                }
+                break;
+
+            case XML_READER_ENDELEM:
+                /* leave if the current parent node <track> is terminated */
+                if (!strcmp(name, psz_element))
+                {
+                    free(psz_value);
+
+                    /* Make sure we have a URI */
+                    char *psz_uri = input_item_GetURI(p_new_input);
+                    if (!psz_uri)
+                        input_item_SetURI(p_new_input, "vlc://nop");
+                    else
+                        free(psz_uri);
+
+                    if (p_sys->i_track_id < 0
+                            || (size_t)p_sys->i_track_id >= (SIZE_MAX / sizeof(p_new_input)))
+                    {
+                        input_item_node_AppendNode(p_input_node, p_new_node);
+                        input_item_Release(p_new_input);
+                        return true;
+                    }
+
+                    if (p_sys->i_track_id >= p_sys->i_tracklist_entries)
+                    {
+                        input_item_t **pp;
+                        pp = realloc(p_sys->pp_tracklist,
+                                     (p_sys->i_track_id + 1) * sizeof(*pp));
+                        if (!pp)
+                        {
+                            input_item_Release(p_new_input);
+                            input_item_node_Delete(p_new_node);
+                            return false;
+                        }
+                        p_sys->pp_tracklist = pp;
+                        while (p_sys->i_track_id >= p_sys->i_tracklist_entries)
+                            pp[p_sys->i_tracklist_entries++] = NULL;
+                    }
+                    else if (p_sys->pp_tracklist[p_sys->i_track_id] != NULL)
+                    {
+                        msg_Err(p_demux, "track ID %d collision", p_sys->i_track_id);
+                        input_item_Release(p_new_input);
+                        input_item_node_Delete(p_new_node);
+                        return false;
+                    }
+
+                    p_sys->pp_tracklist[ p_sys->i_track_id ] = p_new_input;
+                    input_item_node_Delete(p_new_node);
+                    return true;
+                }
+                /* there MUST have been a start tag for that element name */
+                if (!p_handler || !p_handler->name || strcmp(p_handler->name, name))
+                {
+                    msg_Err(p_demux, "there's no open element left for <%s>", name);
                     goto end;
                 }
 
-                input_item_SetURI(p_new_input, psz_uri);
-                free(psz_uri);
-            }
+                /* special case: location */
+                if (!strcmp(p_handler->name, "location"))
+                {
+                    if (psz_value == NULL)
+                        input_item_SetURI(p_new_input, "vlc://nop");
+                    else
+                    {
+                        char* psz_uri = ProcessMRL( psz_value, p_sys->psz_base );
 
-            input_item_CopyOptions(p_new_input, p_input_item);
+                        if( !psz_uri )
+                        {
+                            msg_Warn( p_demux, "unable to process MRL: %s", psz_value );
+                            goto end;
+                        }
+
+                        input_item_SetURI(p_new_input, psz_uri);
+                        free(psz_uri);
+                    }
+
+                    input_item_CopyOptions(p_new_input, p_input_item);
+                }
+                else
+                {
+                    /* there MUST be an item */
+                    if (p_handler->pf_handler.smpl)
+                        p_handler->pf_handler.smpl(p_new_input, p_handler->name,
+                                                   psz_value);
+                }
+                FREENULL(psz_value);
+                p_handler = NULL;
+                break;
         }
-        else
-        {
-            /* there MUST be an item */
-            if (p_handler->pf_handler.smpl)
-                p_handler->pf_handler.smpl(p_new_input, p_handler->name,
-                                            psz_value);
-        }
-        FREENULL(psz_value);
-        p_handler = NULL;
-        break;
     }
     msg_Err(p_demux, "unexpected end of xml data");
 
@@ -573,6 +601,9 @@ static bool parse_extension_node COMPLEX_INTERFACE
     const xml_elem_hnd_t *p_handler = NULL;
     input_item_t *p_new_input = NULL;
 
+    if(b_empty_node)
+        return true;
+
     static const xml_elem_hnd_t pl_elements[] =
         { {"vlc:node",   {.cmplx = parse_extension_node}, true },
           {"vlc:item",   {.cmplx = parse_extitem_node}, true },
@@ -630,7 +661,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
         else if (strcmp(psz_application, "http://www.videolan.org/vlc/playlist/0"))
         {
             msg_Dbg(p_demux, "Skipping \"%s\" extension tag", psz_application);
-            skip_element( NULL, NULL, p_xml_reader, NULL );
+            skip_element( NULL, NULL, p_xml_reader, NULL, b_empty_node );
             goto success;
         }
     }
@@ -638,6 +669,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
     /* parse the child elements */
     while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
     {
+        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
         switch (i_node)
         {
             case XML_READER_STARTELEM:
@@ -657,10 +689,9 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 /* complex content is parsed in a separate function */
                 if (p_handler->cmplx)
                 {
-                    if (p_handler->pf_handler.cmplx(p_demux,
-                                                     p_input_node,
-                                                     p_xml_reader,
-                                                     p_handler->name))
+                    if (p_handler->pf_handler.cmplx(p_demux, p_input_node,
+                                                     p_xml_reader, p_handler->name,
+                                                     b_empty))
                     {
                         p_handler = NULL;
                     }
@@ -671,9 +702,12 @@ static bool parse_extension_node COMPLEX_INTERFACE
 
             case XML_READER_TEXT:
                 FREENULL(psz_value);
-                psz_value = strdup(name);
-                if (unlikely(!psz_value))
-                    goto error;
+                if(p_handler)
+                {
+                    psz_value = strdup(name);
+                    if (unlikely(!psz_value))
+                        goto error;
+                }
                 break;
 
             case XML_READER_ENDELEM:
@@ -730,6 +764,9 @@ static bool parse_extitem_node COMPLEX_INTERFACE
     input_item_t *p_new_input = NULL;
     int i_tid = -1;
 
+    if(!b_empty_node)
+        return false;
+
     /* read all extension item attributes */
     const char *name, *value;
     while ((name = xml_ReaderNextAttr(p_xml_reader, &value)) != NULL)
@@ -773,6 +810,9 @@ static bool skip_element COMPLEX_INTERFACE
 {
     VLC_UNUSED(p_demux); VLC_UNUSED(p_input_node);
     VLC_UNUSED(psz_element);
+
+    if(b_empty_node)
+        return true;
 
     for (unsigned lvl = 1; lvl;)
         switch (xml_ReaderNextNode(p_xml_reader, NULL))
