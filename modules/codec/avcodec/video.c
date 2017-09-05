@@ -399,6 +399,8 @@ static int OpenVideoCodec( decoder_t *p_dec )
     p_sys->level = -1;
     cc_Init( &p_sys->cc );
 
+    set_video_color_settings( &p_dec->fmt_in.video, ctx );
+
     post_mt( p_sys );
     ret = ffmpeg_OpenCodec( p_dec, ctx, codec );
     wait_mt( p_sys );
