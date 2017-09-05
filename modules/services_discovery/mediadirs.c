@@ -199,10 +199,10 @@ static void *Run( void *data )
         input_item_t* p_root = input_item_New( psz_uri, NULL );
         if( p_sys->i_type == Picture )
             input_item_AddOption( p_root, "ignore-filetypes=ini,db,lnk,txt",
-                                  VLC_INPUT_OPTION_TRUSTED );
+                                  VLC_INPUT_OPTION_TRUSTED|VLC_INPUT_OPTION_UNIQUE );
 
         input_item_AddOption( p_root, "recursive=collapse",
-                              VLC_INPUT_OPTION_TRUSTED );
+                              VLC_INPUT_OPTION_TRUSTED|VLC_INPUT_OPTION_UNIQUE );
 
 
         vlc_event_manager_t *p_em = &p_root->event_manager;
