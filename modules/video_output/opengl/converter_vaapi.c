@@ -422,6 +422,8 @@ Open(vlc_object_t *obj)
         {
             ret = tc_vaegl_init(tc, dpy, (VANativeDisplay) (intptr_t) drm_fd,
                                 drm_native_destroy_cb);
+            if (ret == VLC_SUCCESS)
+                break;
         }
         else
             vlc_close(drm_fd);
