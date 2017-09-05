@@ -679,8 +679,7 @@ static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_
     if( current_time - p_sys->i_late_frames_start > (5*CLOCK_FREQ))
     {
         date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
-        if( block )
-            block_Release( block );
+        block_Release( block );
         p_sys->i_late_frames--;
         return true;
     }
