@@ -227,7 +227,7 @@ static bool parse_dict( stream_t *p_demux, input_item_node_t *p_input_node,
             /* call the simple handler */
             else if( p_handler->pf_handler.smpl )
             {
-                p_handler->pf_handler.smpl( p_track, psz_key, psz_value );
+                p_handler->pf_handler.smpl( p_track, psz_key, psz_value, p_demux->p_sys );
             }
             FREENULL(psz_value);
             p_handler = NULL;
@@ -364,8 +364,9 @@ static void free_track( track_elem_t *p_track )
 }
 
 static bool save_data( track_elem_t *p_track, const char *psz_name,
-                       char *psz_value)
+                       char *psz_value, void *opaque )
 {
+    VLC_UNUSED(opaque);
     /* exit if setting is impossible */
     if( !psz_name || !psz_value || !p_track )
         return false;

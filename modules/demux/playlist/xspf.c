@@ -1,8 +1,7 @@
 /*******************************************************************************
  * xspf.c : XSPF playlist import functions
  *******************************************************************************
- * Copyright (C) 2006-2011 VLC authors and VideoLAN
- * $Id$
+ * Copyright (C) 2006-2017 VLC authors and VideoLAN
  *
  * Authors: Daniel Stränger <vlc at schmaller dot de>
  *          Yoann Peronneau <yoann@videolan.org>
@@ -39,10 +38,13 @@
 #include <vlc_url.h>
 #include "playlist.h"
 
+#include <limits.h>
+
 #define SIMPLE_INTERFACE  (input_item_t    *p_input,\
                            const char      *psz_name,\
-                           char            *psz_value)
-#define COMPLEX_INTERFACE (stream_t           *p_demux,\
+                           char            *psz_value,\
+                           void            *opaque)
+#define COMPLEX_INTERFACE (stream_t           *p_stream,\
                            input_item_node_t  *p_input_node,\
                            xml_reader_t       *p_xml_reader,\
                            const char         *psz_element,\
@@ -69,13 +71,14 @@ typedef struct
     } pf_handler;
     bool cmplx;
 } xml_elem_hnd_t;
-struct demux_sys_t
+
+typedef struct
 {
     input_item_t **pp_tracklist;
     int i_tracklist_entries;
     int i_track_id;
     char * psz_base;
-};
+} xspf_sys_t;
 
 static int ReadDir(stream_t *, input_item_node_t *);
 
@@ -84,30 +87,30 @@ static int ReadDir(stream_t *, input_item_node_t *);
  */
 int Import_xspf(vlc_object_t *p_this)
 {
-    stream_t *p_demux = (stream_t *)p_this;
+    stream_t *p_stream = (stream_t *)p_this;
 
-    CHECK_FILE(p_demux);
+    CHECK_FILE(p_stream);
 
-    if( !stream_HasExtension( p_demux, ".xspf" )
-     && !stream_IsMimeType( p_demux->p_source, "application/xspf+xml" ) )
+    if( !stream_HasExtension( p_stream, ".xspf" )
+     && !stream_IsMimeType( p_stream->p_source, "application/xspf+xml" ) )
         return VLC_EGENERIC;
 
-    demux_sys_t *sys = calloc(1, sizeof (*sys));
+    xspf_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    msg_Dbg(p_demux, "using XSPF playlist reader");
-    p_demux->p_sys = sys;
-    p_demux->pf_readdir = ReadDir;
-    p_demux->pf_control = access_vaDirectoryControlHelper;
+    msg_Dbg(p_stream, "using XSPF playlist reader");
+    p_stream->p_sys = sys;
+    p_stream->pf_readdir = ReadDir;
+    p_stream->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
 }
 
 void Close_xspf(vlc_object_t *p_this)
 {
-    stream_t *p_demux = (stream_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
+    stream_t *p_stream = (stream_t *)p_this;
+    xspf_sys_t *p_sys = p_stream->p_sys;
     for (int i = 0; i < p_sys->i_tracklist_entries; i++)
         if (p_sys->pp_tracklist[i])
             input_item_Release(p_sys->pp_tracklist[i]);
@@ -119,9 +122,9 @@ void Close_xspf(vlc_object_t *p_this)
 /**
  * \brief demuxer function for XSPF parsing
  */
-static int ReadDir(stream_t *p_demux, input_item_node_t *p_subitems)
+static int ReadDir(stream_t *p_stream, input_item_node_t *p_subitems)
 {
-    demux_sys_t *sys = p_demux->p_sys;
+    xspf_sys_t *sys = p_stream->p_sys;
     int i_ret = -1;
     xml_reader_t *p_xml_reader = NULL;
     const char *name = NULL;
@@ -129,31 +132,31 @@ static int ReadDir(stream_t *p_demux, input_item_node_t *p_subitems)
     sys->pp_tracklist = NULL;
     sys->i_tracklist_entries = 0;
     sys->i_track_id = -1;
-    sys->psz_base = strdup(p_demux->psz_url);
+    sys->psz_base = strdup(p_stream->psz_url);
 
     /* create new xml parser from stream */
-    p_xml_reader = xml_ReaderCreate(p_demux, p_demux->p_source);
+    p_xml_reader = xml_ReaderCreate(p_stream, p_stream->p_source);
     if (!p_xml_reader)
         goto end;
 
     /* locating the root node */
     if (xml_ReaderNextNode(p_xml_reader, &name) != XML_READER_STARTELEM)
     {
-        msg_Err(p_demux, "can't read xml stream");
+        msg_Err(p_stream, "can't read xml stream");
         goto end;
     }
 
     /* checking root node name */
     if (strcmp(name, "playlist"))
     {
-        msg_Err(p_demux, "invalid root node name <%s>", name);
+        msg_Err(p_stream, "invalid root node name <%s>", name);
         goto end;
     }
 
     if(xml_ReaderIsEmptyElement(p_xml_reader))
         goto end;
 
-    i_ret = parse_playlist_node(p_demux, p_subitems,
+    i_ret = parse_playlist_node(p_stream, p_subitems,
                                  p_xml_reader, "playlist", false ) ? 0 : -1;
 
     for (int i = 0 ; i < sys->i_tracklist_entries ; i++)
@@ -178,27 +181,157 @@ static const xml_elem_hnd_t *get_handler(const xml_elem_hnd_t *tab, size_t n, co
             return &tab[i];
     return NULL;
 }
-#define get_handler(tab, name) get_handler(tab, ARRAY_SIZE(tab), name)
+
+static const char *get_node_attribute(xml_reader_t *p_xml_reader, const char *psz_name)
+{
+    const char *name, *value;
+    while ((name = xml_ReaderNextAttr(p_xml_reader, &value)) != NULL)
+    {
+        if (!strcmp(name, psz_name))
+            return value;
+    }
+    return NULL;
+}
+
+/**
+ * \brief generic node parsing of a XSPF playlist
+ * \param p_stream stream instance
+ * \param input_item_node_t current input node
+ * \param p_input_item current input item
+ * \param p_xml_reader xml reader instance
+ * \param psz_root_node current node name to parse
+ * \param pl_elements xml_elem_hnd_t handlers array
+ * \param i_pl_elements xml_elem_hnd_t array count
+ */
+static bool parse_node(stream_t *p_stream,
+                       input_item_node_t *p_input_node, input_item_t *p_input_item,
+                       xml_reader_t *p_xml_reader, const char *psz_root_node,
+                       const xml_elem_hnd_t *pl_elements, size_t i_pl_elements)
+{
+    bool b_ret = false;
+
+    char *psz_value = NULL;
+    const char *name;
+    int i_node;
+    const xml_elem_hnd_t *p_handler = NULL;
+
+    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
+    {
+        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
+
+        switch (i_node)
+        {
+            case XML_READER_STARTELEM:
+                FREENULL(psz_value);
+                if (!*name)
+                {
+                    msg_Err(p_stream, "invalid XML stream");
+                    goto end;
+                }
+
+                p_handler = get_handler(pl_elements, i_pl_elements, name);
+                if (!p_handler)
+                {
+                    msg_Warn(p_stream, "skipping unexpected element <%s>", name);
+                    if(!skip_element(NULL, NULL, p_xml_reader, name, b_empty))
+                        return false;
+                }
+                else
+                {
+                    /* complex content is parsed in a separate function */
+                    if (p_handler->cmplx)
+                    {
+                        if (!p_handler->pf_handler.cmplx(p_stream, p_input_node,
+                                                         p_xml_reader, p_handler->name,
+                                                         b_empty))
+                            return false;
+                        /* Complex reader does read the named end element */
+                        p_handler = NULL;
+                    }
+                }
+                break;
+
+            case XML_READER_TEXT:
+                free(psz_value);
+                if(!p_handler)
+                {
+                    psz_value = NULL;
+                }
+                else
+                {
+                    psz_value = strdup(name);
+                    if (unlikely(!psz_value))
+                        goto end;
+                }
+                break;
+
+            case XML_READER_ENDELEM:
+                /* leave if the current parent node is terminated */
+                if (!strcmp(name, psz_root_node))
+                {
+                    b_ret = true;
+                    goto end;
+                }
+
+                if(p_handler)
+                {
+                    /* there MUST have been a start tag for that element name */
+                    if (strcmp(p_handler->name, name))
+                    {
+                        msg_Err(p_stream, "there's no open element left for <%s>", name);
+                        goto end;
+                    }
+
+                    if (p_handler->pf_handler.smpl)
+                        p_handler->pf_handler.smpl(p_input_item, p_handler->name,
+                                                   psz_value, p_stream->p_sys);
+
+                    free(psz_value);
+                    psz_value = NULL;
+                    p_handler = NULL;
+                }
+                break;
+        }
+    }
+
+end:
+    free(psz_value);
+
+    return b_ret;
+}
 
 /**
  * \brief parse the root node of a XSPF playlist
- * \param p_demux demuxer instance
+ * \param p_stream stream instance
  * \param p_input_item current input item
  * \param p_xml_reader xml reader instance
  * \param psz_element name of element to parse
  */
 static bool parse_playlist_node COMPLEX_INTERFACE
 {
-    demux_sys_t *sys = p_demux->p_sys;
-    input_item_t *p_input_item = p_input_node->p_item;
-    char *psz_value = NULL;
-    bool b_version_found = false;
-    int i_node;
-    bool b_ret = false;
-    const xml_elem_hnd_t *p_handler = NULL;
+    xspf_sys_t *sys = p_stream->p_sys;
 
     if(b_empty_node)
-        return true;
+        return false;
+
+    /* read all playlist attributes */
+    const char *psz_version = get_node_attribute(p_xml_reader, "version");
+    if(!psz_version || (strcmp(psz_version, "0") && strcmp(psz_version, "1")))
+    {
+        /* attribute version is mandatory !!! */
+        if(!psz_version)
+            msg_Warn(p_stream, "<playlist> requires \"version\" attribute");
+        else
+            msg_Warn(p_stream, "unsupported XSPF version %s", psz_version);
+        return false;
+    }
+
+    const char *psz_base = get_node_attribute(p_xml_reader, "xml:base");
+    if(psz_base)
+    {
+        free(sys->psz_base);
+        sys->psz_base = strdup(psz_base);
+    }
 
     static const xml_elem_hnd_t pl_elements[] =
         { {"title",        {.smpl = set_item_info}, false },
@@ -216,96 +349,10 @@ static bool parse_playlist_node COMPLEX_INTERFACE
           {"extension",    {.cmplx = parse_extension_node}, true },
           {"trackList",    {.cmplx = parse_tracklist_node}, true },
         };
-/* read all playlist attributes */
-    const char *name, *value;
-    while ((name = xml_ReaderNextAttr(p_xml_reader, &value)) != NULL)
-    {
-        if (!strcmp(name, "version"))
-        {
-            b_version_found = true;
-            if (strcmp(value, "0") && strcmp(value, "1"))
-                msg_Warn(p_demux, "unsupported XSPF version %s", value);
-        }
-        else if (!strcmp(name, "xmlns") || !strcmp(name, "xmlns:vlc"))
-            ;
-        else if (!strcmp(name, "xml:base"))
-        {
-            free(sys->psz_base);
-            sys->psz_base = strdup(value);
-        }
-        else
-            msg_Warn(p_demux, "invalid <playlist> attribute: \"%s\"", name);
-    }
-    /* attribute version is mandatory !!! */
-    if (!b_version_found)
-        msg_Warn(p_demux, "<playlist> requires \"version\" attribute");
 
-    psz_value = NULL;
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
-    {
-        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
-        switch (i_node)
-        {
-            case XML_READER_STARTELEM:
-                FREENULL(psz_value);
-                if (!*name)
-                {
-                    msg_Err(p_demux, "invalid XML stream");
-                    goto end;
-                }
-                p_handler = get_handler(pl_elements, name);
-                if (!p_handler)
-                {
-                    msg_Err(p_demux, "unexpected element <%s>", name);
-                    goto end;
-                }
-
-                /* complex content is parsed in a separate function */
-                if (p_handler->cmplx)
-                {
-                    if (!p_handler->pf_handler.cmplx(p_demux, p_input_node,
-                                                     p_xml_reader, p_handler->name,
-                                                     b_empty))
-                        return false;
-                    p_handler = NULL;
-                }
-                break;
-
-            case XML_READER_TEXT:
-                FREENULL(psz_value);
-                if(p_handler)
-                {
-                    psz_value = strdup(name);
-                    if (unlikely(!psz_value))
-                        goto end;
-                }
-                break;
-
-            case XML_READER_ENDELEM:
-                /* leave if the current parent node <playlist> is terminated */
-                if (!strcmp(name, psz_element))
-                {
-                    b_ret = true;
-                    goto end;
-                }
-                /* there MUST have been a start tag for that element name */
-                if (!p_handler || !p_handler->name || strcmp(p_handler->name, name))
-                {
-                    msg_Err(p_demux, "there's no open element left for <%s>", name);
-                    goto end;
-                }
-
-                if (p_handler->pf_handler.smpl)
-                    p_handler->pf_handler.smpl(p_input_item, p_handler->name, psz_value);
-                FREENULL(psz_value);
-                p_handler = NULL;
-                break;
-        }
-    }
-
-end:
-    free(psz_value);
-    return b_ret;
+    return parse_node(p_stream, p_input_node, p_input_node->p_item,
+                      p_xml_reader, psz_element,
+                      pl_elements, ARRAY_SIZE(pl_elements));
 }
 
 /**
@@ -314,48 +361,34 @@ end:
 static bool parse_tracklist_node COMPLEX_INTERFACE
 {
     VLC_UNUSED(psz_element);
-    const char *name;
-    unsigned i_ntracks = 0;
-    int i_node;
 
     if(b_empty_node)
         return true;
 
-    /* now parse the <track>s */
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
-    {
-        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
-        if (i_node == XML_READER_STARTELEM)
-        {
-            if (strcmp(name, "track"))
-            {
-                msg_Err(p_demux, "unexpected child of <trackList>: <%s>",
-                         name);
-                return false;
-            }
+    /* parse the child elements */
+    static const xml_elem_hnd_t pl_elements[] =
+        { {"track",   {.cmplx = parse_track_node}, true },
+        };
 
-            /* parse the track data in a separate function */
-            if (parse_track_node(p_demux, p_input_node, p_xml_reader, "track", b_empty))
-                i_ntracks++;
-        }
-        else if (i_node == XML_READER_ENDELEM)
-            break;
-    }
+    return parse_node(p_stream, p_input_node, p_input_node->p_item,
+                      p_xml_reader, psz_element,
+                      pl_elements, ARRAY_SIZE(pl_elements));
+}
 
-    /* the <trackList> has to be terminated */
-    if (i_node != XML_READER_ENDELEM)
+/**
+ * \brief handles the <location> elements
+ */
+static bool parse_location SIMPLE_INTERFACE
+{
+    VLC_UNUSED(psz_name);
+    xspf_sys_t *p_sys = (xspf_sys_t *) opaque;
+    char* psz_uri = ProcessMRL( psz_value, p_sys->psz_base );
+    if(psz_uri)
     {
-        msg_Err(p_demux, "there's a missing </trackList>");
-        return false;
+        input_item_SetURI(p_input, psz_uri);
+        free(psz_uri);
     }
-    if (strcmp(name, "trackList"))
-    {
-        msg_Err(p_demux, "expected: </trackList>, found: </%s>", name);
-        return false;
-    }
-
-    msg_Dbg(p_demux, "parsed %u tracks successfully", i_ntracks);
-    return true;
+    return psz_uri != NULL;
 }
 
 /**
@@ -364,18 +397,28 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
  */
 static bool parse_track_node COMPLEX_INTERFACE
 {
-    input_item_t *p_input_item = p_input_node->p_item;
-    const char *name;
-    char *psz_value = NULL;
-    const xml_elem_hnd_t *p_handler = NULL;
-    demux_sys_t *p_sys = p_demux->p_sys;
-    int i_node;
+    xspf_sys_t *p_sys = p_stream->p_sys;
 
     if(b_empty_node)
         return true;
 
+    input_item_t *p_new_input = input_item_New(NULL, NULL);
+    if (!p_new_input)
+        return false;
+
+    /* increfs p_new_input */
+    input_item_node_t *p_new_node = input_item_node_Create(p_new_input);
+    if(!p_new_node)
+    {
+        input_item_Release(p_new_input);
+        return false;
+    }
+
+    /* reset i_track_id */
+    p_sys->i_track_id = -1;
+
     static const xml_elem_hnd_t track_elements[] =
-        { {"location",     {NULL}, false },
+        { {"location",     {.smpl = parse_location}, false },
           {"identifier",   {NULL}, false },
           {"title",        {.smpl = set_item_info}, false },
           {"creator",      {.smpl = set_item_info}, false },
@@ -390,154 +433,68 @@ static bool parse_track_node COMPLEX_INTERFACE
           {"extension",    {.cmplx = parse_extension_node}, true },
         };
 
-    input_item_t *p_new_input = input_item_New(NULL, NULL);
-    if (!p_new_input)
-        return false;
-    input_item_node_t *p_new_node = input_item_node_Create(p_new_input);
-
-    /* reset i_track_id */
-    p_sys->i_track_id = -1;
-
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
+    bool b_ret = parse_node(p_stream, p_new_node, p_new_input,
+                            p_xml_reader, psz_element,
+                            track_elements, ARRAY_SIZE(track_elements));
+    if(b_ret)
     {
-        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
-        switch (i_node)
+        input_item_CopyOptions(p_new_input, p_input_node->p_item);
+
+        /* Make sure we have a URI */
+        char *psz_uri = input_item_GetURI(p_new_input);
+        if (!psz_uri)
+            input_item_SetURI(p_new_input, "vlc://nop");
+        else
+            free(psz_uri);
+
+        if (p_sys->i_track_id < 0 ||
+            p_sys->i_track_id == INT_MAX ||
+            (size_t)p_sys->i_track_id >= (SIZE_MAX / sizeof(p_new_input)))
         {
-            case XML_READER_STARTELEM:
-                FREENULL(psz_value);
-
-                if (!*name)
+            input_item_node_AppendNode(p_input_node, p_new_node);
+            p_new_node = NULL;
+        }
+        else
+        {
+            /* Extend array as needed */
+            if (p_sys->i_track_id >= p_sys->i_tracklist_entries)
+            {
+                input_item_t **pp;
+                pp = realloc(p_sys->pp_tracklist,
+                             (p_sys->i_track_id + 1) * sizeof(*pp));
+                if (pp)
                 {
-                    msg_Err(p_demux, "invalid XML stream");
-                    goto end;
+                    p_sys->pp_tracklist = pp;
+                    while (p_sys->i_track_id >= p_sys->i_tracklist_entries)
+                        pp[p_sys->i_tracklist_entries++] = NULL;
                 }
-                p_handler = get_handler(track_elements, name);
-                if (!p_handler)
+            }
+
+            if (p_sys->i_track_id < p_sys->i_tracklist_entries)
+            {
+                input_item_t **pp_insert = &p_sys->pp_tracklist[p_sys->i_track_id];
+
+                if (*pp_insert != NULL)
                 {
-                    msg_Err(p_demux, "unexpected element <%s>", name);
-                    goto end;
-                }
-                /* complex content is parsed in a separate function */
-                if (p_handler->cmplx)
-                {
-                    if (!p_handler->pf_handler.cmplx(p_demux, p_new_node,
-                                                     p_xml_reader, p_handler->name,
-                                                     b_empty)) {
-                        input_item_node_Delete(p_new_node);
-                        input_item_Release(p_new_input);
-                        return false;
-                    }
-
-                    p_handler = NULL;
-                }
-                break;
-
-            case XML_READER_TEXT:
-                FREENULL(psz_value);
-                if(p_handler)
-                {
-                    psz_value = strdup(name);
-                    if (unlikely(!psz_value))
-                        goto end;
-                }
-                break;
-
-            case XML_READER_ENDELEM:
-                /* leave if the current parent node <track> is terminated */
-                if (!strcmp(name, psz_element))
-                {
-                    free(psz_value);
-
-                    /* Make sure we have a URI */
-                    char *psz_uri = input_item_GetURI(p_new_input);
-                    if (!psz_uri)
-                        input_item_SetURI(p_new_input, "vlc://nop");
-                    else
-                        free(psz_uri);
-
-                    if (p_sys->i_track_id < 0
-                            || (size_t)p_sys->i_track_id >= (SIZE_MAX / sizeof(p_new_input)))
-                    {
-                        input_item_node_AppendNode(p_input_node, p_new_node);
-                        input_item_Release(p_new_input);
-                        return true;
-                    }
-
-                    if (p_sys->i_track_id >= p_sys->i_tracklist_entries)
-                    {
-                        input_item_t **pp;
-                        pp = realloc(p_sys->pp_tracklist,
-                                     (p_sys->i_track_id + 1) * sizeof(*pp));
-                        if (!pp)
-                        {
-                            input_item_Release(p_new_input);
-                            input_item_node_Delete(p_new_node);
-                            return false;
-                        }
-                        p_sys->pp_tracklist = pp;
-                        while (p_sys->i_track_id >= p_sys->i_tracklist_entries)
-                            pp[p_sys->i_tracklist_entries++] = NULL;
-                    }
-                    else if (p_sys->pp_tracklist[p_sys->i_track_id] != NULL)
-                    {
-                        msg_Err(p_demux, "track ID %d collision", p_sys->i_track_id);
-                        input_item_Release(p_new_input);
-                        input_item_node_Delete(p_new_node);
-                        return false;
-                    }
-
-                    p_sys->pp_tracklist[ p_sys->i_track_id ] = p_new_input;
-                    input_item_node_Delete(p_new_node);
-                    return true;
-                }
-                /* there MUST have been a start tag for that element name */
-                if (!p_handler || !p_handler->name || strcmp(p_handler->name, name))
-                {
-                    msg_Err(p_demux, "there's no open element left for <%s>", name);
-                    goto end;
-                }
-
-                /* special case: location */
-                if (!strcmp(p_handler->name, "location"))
-                {
-                    if (psz_value == NULL)
-                        input_item_SetURI(p_new_input, "vlc://nop");
-                    else
-                    {
-                        char* psz_uri = ProcessMRL( psz_value, p_sys->psz_base );
-
-                        if( !psz_uri )
-                        {
-                            msg_Warn( p_demux, "unable to process MRL: %s", psz_value );
-                            goto end;
-                        }
-
-                        input_item_SetURI(p_new_input, psz_uri);
-                        free(psz_uri);
-                    }
-
-                    input_item_CopyOptions(p_new_input, p_input_item);
+                    msg_Warn(p_stream, "track ID %d collision", p_sys->i_track_id);
+                    input_item_node_AppendItem(p_input_node, p_new_input);
                 }
                 else
                 {
-                    /* there MUST be an item */
-                    if (p_handler->pf_handler.smpl)
-                        p_handler->pf_handler.smpl(p_new_input, p_handler->name,
-                                                   psz_value);
+                    *pp_insert = p_new_input;
+                    p_new_input = NULL;
                 }
-                FREENULL(psz_value);
-                p_handler = NULL;
-                break;
+            }
+            else b_ret = false;
         }
     }
-    msg_Err(p_demux, "unexpected end of xml data");
 
-end:
+    if(p_new_node)
+        input_item_node_Delete(p_new_node); /* decrefs p_new_input */
+    if(p_new_input)
+        input_item_Release(p_new_input);
 
-    input_item_Release(p_new_input);
-    input_item_node_Delete(p_new_node);
-    free(psz_value);
-    return false;
+    return b_ret;
 }
 
 /**
@@ -545,6 +502,7 @@ end:
  */
 static bool set_item_info SIMPLE_INTERFACE
 {
+    VLC_UNUSED(opaque);
     /* exit if setting is impossible */
     if (!psz_name || !psz_value || !p_input)
         return false;
@@ -576,6 +534,7 @@ static bool set_item_info SIMPLE_INTERFACE
  */
 static bool set_option SIMPLE_INTERFACE
 {
+    VLC_UNUSED(opaque);
     /* exit if setting is impossible */
     if (!psz_name || !psz_value || !p_input)
         return false;
@@ -588,217 +547,141 @@ static bool set_option SIMPLE_INTERFACE
 }
 
 /**
- * \brief parse the extension node of a XSPF playlist
+ * \brief handles the <vlc:id> elements
  */
-static bool parse_extension_node COMPLEX_INTERFACE
+static bool parse_vlcid SIMPLE_INTERFACE
 {
-    demux_sys_t *sys = p_demux->p_sys;
+    VLC_UNUSED(p_input); VLC_UNUSED(psz_name);
+    xspf_sys_t *sys = (xspf_sys_t *) opaque;
+    if(psz_value)
+        sys->i_track_id = atoi(psz_value);
+    return true;
+}
+
+/**
+ * \brief parse the vlc:node of a XSPF playlist
+ */
+static bool parse_vlcnode_node COMPLEX_INTERFACE
+{
     input_item_t *p_input_item = p_input_node->p_item;
-    char *psz_value = NULL;
     char *psz_title = NULL;
-    char *psz_application = NULL;
-    int i_node;
-    const xml_elem_hnd_t *p_handler = NULL;
-    input_item_t *p_new_input = NULL;
 
     if(b_empty_node)
         return true;
 
-    static const xml_elem_hnd_t pl_elements[] =
-        { {"vlc:node",   {.cmplx = parse_extension_node}, true },
-          {"vlc:item",   {.cmplx = parse_extitem_node}, true },
-          {"vlc:id",     {NULL}, false },
-          {"vlc:option", {.smpl = set_option}, false },
-        };
-
     /* read all extension node attributes */
-    const char *name, *value;
-    while ((name = xml_ReaderNextAttr(p_xml_reader, &value)) != NULL)
+    const char *psz_attr = get_node_attribute(p_xml_reader, "title");
+    if(psz_attr)
     {
-        if (!strcmp(name, "title"))
-        {
-            free(psz_title);
-            psz_title = strdup(value);
-            if (likely(psz_title != NULL))
-                vlc_xml_decode(psz_title);
-        }
-        else if (!strcmp(name, "application"))
-        {
-            free(psz_application);
-            psz_application = strdup(value);
-        }
-        else
-            msg_Warn(p_demux, "invalid <%s> attribute:\"%s\"", psz_element,
-                      name);
+        psz_title = strdup(psz_attr);
+        if (likely(psz_title != NULL))
+            vlc_xml_decode(psz_title);
     }
 
-    /* attribute title is mandatory except for <extension> */
-    if (!strcmp(psz_element, "vlc:node"))
+    /* attribute title is mandatory */
+    if (!psz_title)
     {
-        if (!psz_title)
-        {
-            msg_Warn(p_demux, "<vlc:node> requires \"title\" attribute");
-            goto error;
-        }
-        p_new_input = input_item_NewDirectory("vlc://nop", psz_title,
-                                              ITEM_NET_UNKNOWN);
-        if (p_new_input)
-        {
-            p_input_node =
-                input_item_node_AppendItem(p_input_node, p_new_input);
-            p_input_item = p_new_input;
-        }
+        msg_Warn(p_stream, "<vlc:node> requires \"title\" attribute");
+        return false;
     }
-    else if (!strcmp(psz_element, "extension"))
+    input_item_t *p_new_input =
+        input_item_NewDirectory("vlc://nop", psz_title, ITEM_NET_UNKNOWN);
+    free(psz_title);
+    if (p_new_input)
     {
-        if (!psz_application)
-        {
-            msg_Warn(p_demux, "<extension> requires \"application\" attribute");
-            goto error;
-        }
-        /* Skip the extension if the application is not vlc
-           This will skip all children of the current node */
-        else if (strcmp(psz_application, "http://www.videolan.org/vlc/playlist/0"))
-        {
-            msg_Dbg(p_demux, "Skipping \"%s\" extension tag", psz_application);
-            skip_element( NULL, NULL, p_xml_reader, NULL, b_empty_node );
-            goto success;
-        }
+        p_input_node =
+                input_item_node_AppendItem(p_input_node, p_new_input);
+        p_input_item = p_new_input;
     }
 
     /* parse the child elements */
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
-    {
-        const bool b_empty = xml_ReaderIsEmptyElement(p_xml_reader);
-        switch (i_node)
-        {
-            case XML_READER_STARTELEM:
-                FREENULL(psz_value);
+    static const xml_elem_hnd_t pl_elements[] =
+        { {"vlc:node",   {.cmplx = parse_vlcnode_node}, true },
+          {"vlc:item",   {.cmplx = parse_extitem_node}, true },
+          {"vlc:id",     {.smpl = parse_vlcid}, false },
+          {"vlc:option", {.smpl = set_option}, false },
+        };
 
-                if (!*name)
-                {
-                    msg_Err(p_demux, "invalid xml stream");
-                    goto error;
-                }
-                p_handler = get_handler(pl_elements, name);
-                if (!p_handler)
-                {
-                    msg_Err(p_demux, "unexpected element <%s>", name);
-                    goto error;
-                }
-                /* complex content is parsed in a separate function */
-                if (p_handler->cmplx)
-                {
-                    if (p_handler->pf_handler.cmplx(p_demux, p_input_node,
-                                                     p_xml_reader, p_handler->name,
-                                                     b_empty))
-                    {
-                        p_handler = NULL;
-                    }
-                    else
-                        goto error;
-                }
-                break;
+    bool b_ret = parse_node(p_stream, p_input_node, p_input_item,
+                            p_xml_reader, psz_element,
+                            pl_elements, ARRAY_SIZE(pl_elements));
 
-            case XML_READER_TEXT:
-                FREENULL(psz_value);
-                if(p_handler)
-                {
-                    psz_value = strdup(name);
-                    if (unlikely(!psz_value))
-                        goto error;
-                }
-                break;
-
-            case XML_READER_ENDELEM:
-                /* leave if the current parent node is terminated */
-                if (!strcmp(name, psz_element))
-                    goto success;
-
-                /* there MUST have been a start tag for that element name */
-                if (!p_handler || !p_handler->name
-                    || strcmp(p_handler->name, name))
-                {
-                    msg_Err(p_demux, "there's no open element left for <%s>",
-                             name);
-                    goto error;
-                }
-
-                /* special tag <vlc:id> */
-                if (!strcmp(p_handler->name, "vlc:id") && psz_value )
-                {
-                    sys->i_track_id = atoi(psz_value);
-                }
-                else if (p_handler->pf_handler.smpl)
-                {
-                    p_handler->pf_handler.smpl(p_input_item, p_handler->name,
-                                                psz_value);
-                }
-                FREENULL(psz_value);
-                p_handler = NULL;
-                break;
-        }
-    }
-
-success: ;
-    bool b_success = true;
-out:
     if (p_new_input)
         input_item_Release(p_new_input);
-    free(psz_application);
-    free(psz_title);
-    free(psz_value);
-    return b_success;
-error:
-    b_success = false;
-    goto out;
+
+    return b_ret;
+}
+
+/**
+ * \brief parse the extension node of a XSPF playlist
+ */
+static bool parse_extension_node COMPLEX_INTERFACE
+{
+    if(b_empty_node)
+        return false;
+
+    const char *psz_application = get_node_attribute(p_xml_reader, "application");
+    if (!psz_application)
+    {
+        msg_Warn(p_stream, "<extension> requires \"application\" attribute");
+        return false;
+    }
+
+    /* Skip the extension if the application is not vlc
+           This will skip all children of the current node */
+    if (strcmp(psz_application, "http://www.videolan.org/vlc/playlist/0"))
+    {
+        msg_Dbg(p_stream, "Skipping \"%s\" extension tag", psz_application);
+        return skip_element( NULL, NULL, p_xml_reader, psz_element, b_empty_node );
+    }
+
+    /* parse the child elements */
+    static const xml_elem_hnd_t pl_elements[] =
+        { {"vlc:node",   {.cmplx = parse_vlcnode_node}, true },
+          {"vlc:id",     {.smpl = parse_vlcid}, false },
+          {"vlc:option", {.smpl = set_option}, false },
+        };
+
+    return parse_node(p_stream, p_input_node, p_input_node->p_item,
+                      p_xml_reader, psz_element,
+                      pl_elements, ARRAY_SIZE(pl_elements));
 }
 
 /**
  * \brief parse the extension item node of a XSPF playlist
  */
+
 static bool parse_extitem_node COMPLEX_INTERFACE
 {
     VLC_UNUSED(psz_element);
-    demux_sys_t *sys = p_demux->p_sys;
+    xspf_sys_t *sys = p_stream->p_sys;
     input_item_t *p_new_input = NULL;
     int i_tid = -1;
 
     if(!b_empty_node)
         return false;
 
-    /* read all extension item attributes */
-    const char *name, *value;
-    while ((name = xml_ReaderNextAttr(p_xml_reader, &value)) != NULL)
-    {
-        /* attribute: href */
-        if (!strcmp(name, "tid"))
-            i_tid = atoi(value);
-        /* unknown attribute */
-        else
-            msg_Warn(p_demux, "invalid <vlc:item> attribute: \"%s\"", name);
-    }
+    const char *psz_tid = get_node_attribute(p_xml_reader, "tid");
+    if(psz_tid)
+        i_tid = atoi(psz_tid);
 
     /* attribute href is mandatory */
-    if (i_tid < 0)
+    if (!psz_tid || i_tid < 0)
     {
-        msg_Warn(p_demux, "<vlc:item> requires \"tid\" attribute");
+        msg_Warn(p_stream, "<vlc:item> requires valid \"tid\" attribute");
         return false;
     }
 
-    if (i_tid >= sys->i_tracklist_entries)
+    if (i_tid >= sys->i_tracklist_entries ||
+        !(p_new_input = sys->pp_tracklist[ i_tid ]) )
     {
-        msg_Warn(p_demux, "invalid \"tid\" attribute");
-        return false;
+        msg_Warn(p_stream, "non existing \"tid\" %d referenced", i_tid);
+        return true;
     }
 
-    p_new_input = sys->pp_tracklist[ i_tid ];
-    if (p_new_input)
-    {
-        input_item_node_AppendItem(p_input_node, p_new_input);
-        input_item_Release(p_new_input);
-        sys->pp_tracklist[i_tid] = NULL;
-    }
+    input_item_node_AppendItem(p_input_node, p_new_input);
+    input_item_Release(p_new_input);
+    sys->pp_tracklist[i_tid] = NULL;
 
     return true;
 }
@@ -808,7 +691,7 @@ static bool parse_extitem_node COMPLEX_INTERFACE
  */
 static bool skip_element COMPLEX_INTERFACE
 {
-    VLC_UNUSED(p_demux); VLC_UNUSED(p_input_node);
+    VLC_UNUSED(p_stream); VLC_UNUSED(p_input_node);
 
     if(b_empty_node)
         return true;
