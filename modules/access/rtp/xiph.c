@@ -143,9 +143,10 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
 }
 
 
-void xiph_decode (demux_t *demux, void *data, block_t *block)
+bool xiph_decode (demux_t *demux, void *data, block_t *block)
 {
     rtp_xiph_t *self = data;
+    bool ret = false;
 
     if (!data || block->i_buffer < 4)
         goto drop;
@@ -205,14 +206,14 @@ void xiph_decode (demux_t *demux, void *data, block_t *block)
             if (!self->block)
             {
                 block_Release (block);
-                return;
+                return ret;
             }
             memcpy (self->block->p_buffer + len, block->p_buffer + 2,
                     fraglen);
             block_Release (block);
         }
         if (fragtype < 3)
-            return; /* Non-last fragment */
+            return ret; /* Non-last fragment */
 
         /* Last fragment reached, process it */
         block = self->block;
@@ -247,7 +248,8 @@ void xiph_decode (demux_t *demux, void *data, block_t *block)
                 block_t *raw = block_Alloc (len);
                 memcpy (raw->p_buffer, block->p_buffer, len);
                 raw->i_pts = block->i_pts; /* FIXME: what about pkts > 1 */
-                codec_decode (demux, self->id, raw);
+                raw->i_flags |= (block->i_flags & BLOCK_FLAG_DISCONTINUITY);
+                ret |= codec_decode (demux, self->id, raw);
                 break;
             }
 
@@ -274,6 +276,7 @@ void xiph_decode (demux_t *demux, void *data, block_t *block)
                          ident);
                 self->ident = ident;
                 self->id = codec_init (demux, &fmt);
+                ret = true;
                 break;
             }
         }
@@ -285,4 +288,5 @@ void xiph_decode (demux_t *demux, void *data, block_t *block)
 
 drop:
     block_Release (block);
+    return ret;
 }

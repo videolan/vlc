@@ -96,10 +96,11 @@ static void no_destroy (demux_t *demux, void *opaque)
     (void)demux; (void)opaque;
 }
 
-static void no_decode (demux_t *demux, void *opaque, block_t *block)
+static bool no_decode (demux_t *demux, void *opaque, block_t *block)
 {
     (void)demux; (void)opaque;
     block_Release (block);
+    return true;
 }
 
 /**
@@ -149,6 +150,8 @@ struct rtp_source_t
 
     uint16_t last_seq; /* sequence of the next dequeued packet */
     block_t *blocks; /* re-ordered blocks queue */
+    bool     discontinuity;
+
     void    *opaque[]; /* Per-source private payload data */
 };
 
@@ -173,6 +176,7 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
     source->max_seq = source->bad_seq = init_seq;
     source->last_seq = init_seq - 1;
     source->blocks = NULL;
+    source->discontinuity = false;
 
     /* Initializes all payload */
     for (unsigned i = 0; i < session->ptc; i++)
@@ -493,6 +497,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     uint16_t delta_seq = rtp_seq (block) - (src->last_seq + 1);
     if (delta_seq != 0)
     {
+        src->discontinuity = true;
         if (delta_seq >= 0x8000)
         {   /* Trash too late packets (and PIM Assert duplicates) */
             msg_Dbg (demux, "ignoring late packet (sequence: %"PRIu16")",
@@ -500,7 +505,6 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
             goto drop;
         }
         msg_Warn (demux, "%"PRIu16" packet(s) lost", delta_seq);
-        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
     src->last_seq = rtp_seq (block);
 
@@ -544,7 +548,12 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     block->p_buffer += skip;
     block->i_buffer -= skip;
 
-    pt->decode (demux, pt_data, block);
+    if(src->discontinuity)
+        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+
+    if (pt->decode (demux, pt_data, block))
+        src->discontinuity = false;
+
     return;
 
 drop:
