@@ -37,6 +37,8 @@ if BUILD_LUA
 endif
 	## HRTFs
 	cp -r $(srcdir)/share/hrtfs $@/Contents/MacOS/share/
+	## HMD controller
+	cp -r $(srcdir)/share/hmd $@/Contents/MacOS/share/
 	## Copy some other stuff (?)
 	mkdir -p $@/Contents/MacOS/include/
 	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/

@@ -2207,9 +2207,13 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                  prgm->var.ZoomMatrix);
 
-        getSbSParams(vgl, prgm, eye);
-        vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
-        vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, prgm->var.SbSOffsets);
+        float *SbSCoefs = prgm->var.SbSCoefs;
+        float *SbSOffsets = prgm->var.SbSOffsets;
+        SbSCoefs[0] = 1.f; SbSCoefs[1] = 1.f;
+        SbSOffsets[0] = 0.f; SbSOffsets[1] = 0.f;
+
+        vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, SbSCoefs);
+        vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, SbSOffsets);
 
         vgl->vt.DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
