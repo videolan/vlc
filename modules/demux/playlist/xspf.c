@@ -234,7 +234,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         msg_Warn(p_demux, "<playlist> requires \"version\" attribute");
 
     psz_value = NULL;
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > 0)
+    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
         switch (i_node)
     {
     case XML_READER_STARTELEM:
@@ -305,7 +305,7 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
     int i_node;
 
     /* now parse the <track>s */
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > 0)
+    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
     {
         if (i_node == XML_READER_STARTELEM)
         {
@@ -377,7 +377,7 @@ static bool parse_track_node COMPLEX_INTERFACE
     /* reset i_track_id */
     p_sys->i_track_id = -1;
 
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > 0)
+    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
         switch (i_node)
     {
     case XML_READER_STARTELEM:
@@ -636,7 +636,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
     }
 
     /* parse the child elements */
-    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > 0)
+    while ((i_node = xml_ReaderNextNode(p_xml_reader, &name)) > XML_READER_NONE)
     {
         switch (i_node)
         {
@@ -783,8 +783,12 @@ static bool skip_element COMPLEX_INTERFACE
                     ++lvl;
                 break;
             }
-            case XML_READER_ENDELEM: lvl--; break;
-            case 0: case -1: return false;
+            case XML_READER_ENDELEM:
+                lvl--;
+                break;
+            case XML_READER_NONE:
+            case XML_READER_ERROR:
+                return false;
         }
 
     return true;
