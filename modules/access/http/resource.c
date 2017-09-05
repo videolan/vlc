@@ -298,10 +298,13 @@ char *vlc_http_res_get_redirect(struct vlc_http_resource *restrict res)
     free(fixed);
     free(base);
 
-    /* NOTE: The anchor is discarded if it is present as VLC does not support
-     * HTML anchors so far. */
-    size_t len = strcspn(abs, "#");
-    abs[len] = '\0';
+    if (likely(abs != NULL))
+    {
+        /* NOTE: The anchor is discarded if it is present as VLC does not support
+         * HTML anchors so far. */
+        size_t len = strcspn(abs, "#");
+        abs[len] = '\0';
+    }
     return abs;
 }
 
