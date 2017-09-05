@@ -699,8 +699,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
+            if( dvdnav_button_activate( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
+                return VLC_EGENERIC;
             ButtonUpdate( p_demux, true );
-            dvdnav_button_activate( p_sys->dvdnav, pci );
             break;
         }
 
@@ -708,7 +709,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            dvdnav_upper_button_select( p_sys->dvdnav, pci );
+            if( dvdnav_upper_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
+                return VLC_EGENERIC;
             break;
         }
 
@@ -716,7 +718,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            dvdnav_lower_button_select( p_sys->dvdnav, pci );
+            if( dvdnav_lower_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
+                return VLC_EGENERIC;
             break;
         }
 
@@ -724,7 +727,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            dvdnav_left_button_select( p_sys->dvdnav, pci );
+            if( dvdnav_left_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
+                return VLC_EGENERIC;
             break;
         }
 
@@ -732,7 +736,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
-            dvdnav_right_button_select( p_sys->dvdnav, pci );
+            if( dvdnav_right_button_select( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
+                return VLC_EGENERIC;
             break;
         }
 
