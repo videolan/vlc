@@ -31,6 +31,7 @@
 #include <vlc_avcodec.h>
 #include <vlc_configuration.h>
 #include <vlc_variables.h>
+#include <vlc_es.h>
 
 #include <limits.h>
 
@@ -118,6 +119,77 @@ static inline void vlc_init_avcodec(vlc_object_t *obj)
 static inline vlc_rational_t FromAVRational(const AVRational rat)
 {
     return (vlc_rational_t){.num = rat.num, .den = rat.den};
+}
+
+static inline void set_video_color_settings( const video_format_t *p_fmt, AVCodecContext *p_context )
+{
+    if( p_fmt->b_color_range_full )
+        p_context->color_range = AVCOL_RANGE_JPEG;
+
+    switch( p_fmt->space )
+    {
+        case COLOR_SPACE_BT709:
+            p_context->colorspace = AVCOL_SPC_BT709;
+            break;
+        case COLOR_SPACE_BT601:
+            p_context->colorspace = AVCOL_SPC_BT470BG;
+            break;
+        case COLOR_SPACE_BT2020:
+            p_context->colorspace = AVCOL_SPC_BT2020_CL;
+            break;
+        default:
+            p_context->colorspace = AVCOL_SPC_UNSPECIFIED;
+            break;
+    }
+
+    switch( p_fmt->transfer )
+    {
+        case TRANSFER_FUNC_LINEAR:
+            p_context->color_trc = AVCOL_TRC_LINEAR;
+            break;
+        case TRANSFER_FUNC_SRGB:
+            p_context->color_trc = AVCOL_TRC_GAMMA22;
+            break;
+        case TRANSFER_FUNC_BT470_BG:
+            p_context->color_trc = AVCOL_TRC_GAMMA28;
+            break;
+        case TRANSFER_FUNC_BT470_M:
+            p_context->color_trc = AVCOL_TRC_GAMMA22;
+            break;
+        case TRANSFER_FUNC_BT709:
+            p_context->color_trc = AVCOL_TRC_BT709;
+            break;
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            p_context->color_trc = AVCOL_TRC_SMPTEST2084;
+            break;
+        case TRANSFER_FUNC_SMPTE_240:
+            p_context->color_trc = AVCOL_TRC_SMPTE240M;
+            break;
+        default:
+            p_context->color_trc = AVCOL_TRC_UNSPECIFIED;
+            break;
+    }
+    switch( p_fmt->primaries )
+    {
+        case COLOR_PRIMARIES_BT601_525:
+            p_context->color_primaries = AVCOL_PRI_SMPTE170M;
+            break;
+        case COLOR_PRIMARIES_BT601_625:
+            p_context->color_primaries = AVCOL_PRI_BT470BG;
+            break;
+        case COLOR_PRIMARIES_BT709:
+            p_context->color_primaries = AVCOL_PRI_BT709;
+            break;
+        case COLOR_PRIMARIES_BT2020:
+            p_context->color_primaries = AVCOL_PRI_BT2020;
+            break;
+        case COLOR_PRIMARIES_FCC1953:
+            p_context->color_primaries = AVCOL_PRI_BT470M;
+            break;
+        default:
+            p_context->color_primaries = AVCOL_PRI_UNSPECIFIED;
+            break;
+    }
 }
 
 #endif
