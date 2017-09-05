@@ -239,12 +239,24 @@ static const struct {
     const char *key;
     int target_type; /* 0 is valid for all target_type */
 } metadata_map[] = {
+                     {vlc_meta_ShowName,    "TITLE",         70},
                      {vlc_meta_Album,       "TITLE",         50},
-                     {vlc_meta_Title,       "TITLE",         0},
+                     {vlc_meta_Title,       "TITLE",         30},
+                     {vlc_meta_DiscNumber,  "PART_NUMBER",   60},
+                     {vlc_meta_Season,      "PART_NUMBER",   60},
+                     {vlc_meta_Episode,     "PART_NUMBER",   50},
+                     {vlc_meta_TrackNumber, "PART_NUMBER",   30},
+                     {vlc_meta_DiscTotal,   "TOTAL_PARTS",   70},
+                     {vlc_meta_TrackTotal,  "TOTAL_PARTS",   30},
+                     {vlc_meta_Setting,     "ENCODER_SETTINGS", 0},
+                     /* TODO read TagLanguage {vlc_meta_Language} */
+                     /* TODO read tags targeting attachments {vlc_meta_ArtworkURL, */
+                     {vlc_meta_AlbumArtist, "ARTIST",        50},
                      {vlc_meta_Artist,      "ARTIST",        0},
+                     {vlc_meta_Director,    "DIRECTOR",      0},
+                     {vlc_meta_Actors,      "ACTOR",         0},
                      {vlc_meta_Genre,       "GENRE",         0},
                      {vlc_meta_Copyright,   "COPYRIGHT",     0},
-                     {vlc_meta_TrackNumber, "PART_NUMBER",   0},
                      {vlc_meta_Description, "DESCRIPTION",   0},
                      {vlc_meta_Description, "COMMENT",       0},
                      {vlc_meta_Rating,      "RATING",        0},
@@ -254,8 +266,7 @@ static const struct {
                      {vlc_meta_URL,         "URL",           0},
                      {vlc_meta_Publisher,   "PUBLISHER",     0},
                      {vlc_meta_EncodedBy,   "ENCODED_BY",    0},
-                     {vlc_meta_TrackTotal,  "TOTAL_PARTS",   0},
-                     {vlc_meta_Album,       "ALBUM",         0},
+                     {vlc_meta_Album,       "ALBUM",         0}, /* invalid tag */
                      {vlc_meta_Title,       NULL,            0},
 };
 
