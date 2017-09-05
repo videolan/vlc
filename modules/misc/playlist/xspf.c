@@ -177,9 +177,10 @@ xspfexportitem_end:
  * \param p_item playlist item to export
  * \param p_file file to write xml-converted item to
  * \param p_i_count counter for track identifiers
+ * \param i_depth identation depth
  */
 static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
-                                 int *p_i_count )
+                                 int *p_i_count, int i_depth )
 {
     if( !p_item ) return;
 
@@ -190,22 +191,27 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
         char *psz_temp = NULL;
         if( p_item->p_input->psz_name )
             psz_temp = vlc_xml_encode( p_item->p_input->psz_name );
-        fprintf( p_file, "\t\t<vlc:node title=\"%s\">\n",
+        for(int j=0;j<i_depth;j++)
+            fprintf( p_file, "\t" );
+        fprintf( p_file, "<vlc:node title=\"%s\">\n",
                  psz_temp ? psz_temp : "" );
         free( psz_temp );
 
         for( i = 0; i < p_item->i_children; i++ )
         {
-            xspf_extension_item( p_item->pp_children[i], p_file, p_i_count );
+            xspf_extension_item( p_item->pp_children[i], p_file, p_i_count, i_depth + 1 );
         }
 
-        fprintf( p_file, "\t\t</vlc:node>\n" );
+        for(int j=0;j<i_depth;j++)
+            fprintf( p_file, "\t" );
+        fprintf( p_file, "</vlc:node>\n" );
         return;
     }
 
-
     /* print leaf and increase the counter */
-    fprintf( p_file, "\t\t\t<vlc:item tid=\"%i\"/>\n", *p_i_count );
+    for(int j=0;j<i_depth;j++)
+        fprintf( p_file, "\t" );
+    fprintf( p_file, "<vlc:item tid=\"%i\"/>\n", *p_i_count );
     ( *p_i_count )++;
 
     return;
@@ -258,7 +264,7 @@ int xspf_export_playlist( vlc_object_t *p_this )
     for( i = 0; i < p_node->i_children; i++ )
     {
         xspf_extension_item( p_node->pp_children[i], p_export->p_file,
-                             &i_count );
+                             &i_count, 2 );
     }
     fprintf( p_export->p_file, "\t</extension>\n" );
 
