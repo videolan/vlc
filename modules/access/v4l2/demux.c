@@ -392,6 +392,7 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     es_format_t es_fmt;
 
     es_format_Init (&es_fmt, VIDEO_ES, selected->vlc);
+    es_fmt.video.i_chroma = selected->vlc;
     es_fmt.video.i_rmask = selected->red;
     es_fmt.video.i_gmask = selected->green;
     es_fmt.video.i_bmask = selected->blue;
