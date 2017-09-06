@@ -438,7 +438,7 @@ void codec_destroy (demux_t *demux, void *data)
 }
 
 /* Send a packet to decoder */
-bool codec_decode (demux_t *demux, void *data, block_t *block)
+void codec_decode (demux_t *demux, void *data, block_t *block)
 {
     if (data)
     {
@@ -448,7 +448,6 @@ bool codec_decode (demux_t *demux, void *data, block_t *block)
     }
     else
         block_Release (block);
-    return !!data;
 }
 
 static void *stream_init (demux_t *demux, const char *name)
@@ -484,14 +483,13 @@ static void stream_header (demux_t *demux, void *data, block_t *block)
 }
 
 /* Send a packet to a chained demuxer */
-static bool stream_decode (demux_t *demux, void *data, block_t *block)
+static void stream_decode (demux_t *demux, void *data, block_t *block)
 {
-    VLC_UNUSED(demux);
     if (data)
         vlc_demux_chained_Send(data, block);
     else
         block_Release (block);
-    return !!data;
+    (void)demux;
 }
 
 static void *demux_init (demux_t *demux)
@@ -591,18 +589,18 @@ static void *mpa_init (demux_t *demux)
     return codec_init (demux, &fmt);
 }
 
-static bool mpa_decode (demux_t *demux, void *data, block_t *block)
+static void mpa_decode (demux_t *demux, void *data, block_t *block)
 {
     if (block->i_buffer < 4)
     {
         block_Release (block);
-        return false;
+        return;
     }
 
     block->i_buffer -= 4; /* 32-bits RTP/MPA header */
     block->p_buffer += 4;
 
-    return codec_decode (demux, data, block);
+    codec_decode (demux, data, block);
 }
 
 
@@ -618,12 +616,12 @@ static void *mpv_init (demux_t *demux)
     return codec_init (demux, &fmt);
 }
 
-static bool mpv_decode (demux_t *demux, void *data, block_t *block)
+static void mpv_decode (demux_t *demux, void *data, block_t *block)
 {
     if (block->i_buffer < 4)
     {
         block_Release (block);
-        return false;
+        return;
     }
 
     block->i_buffer -= 4; /* 32-bits RTP/MPV header */
@@ -635,7 +633,7 @@ static bool mpv_decode (demux_t *demux, void *data, block_t *block)
         /* TODO: shouldn't we skip this too ? */
     }
 #endif
-    return codec_decode (demux, data, block);
+    codec_decode (demux, data, block);
 }
 
 
