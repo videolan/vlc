@@ -562,26 +562,31 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
                 vdp_get_error_string(sys->vdp, err));
 
     /* Check video orientation, allocate intermediate surface if needed */
-    bool swap = ORIENT_IS_SWAP(filter->fmt_in.video.orientation);
+    bool swap = false;
     bool hflip = false, vflip = false;
 
-    switch (filter->fmt_in.video.orientation)
+    if (filter->fmt_in.video.orientation != filter->fmt_out.video.orientation)
     {
-        case ORIENT_TOP_LEFT:
-        case ORIENT_RIGHT_TOP:
-            break;
-        case ORIENT_TOP_RIGHT:
-        case ORIENT_RIGHT_BOTTOM:
-            hflip = true;
-            break;
-        case ORIENT_BOTTOM_LEFT:
-        case ORIENT_LEFT_TOP:
-            vflip = true;
-            break;
-        case ORIENT_BOTTOM_RIGHT:
-        case ORIENT_LEFT_BOTTOM:
-            vflip = hflip = true;
-            break;
+        assert(filter->fmt_out.video.orientation == ORIENT_TOP_LEFT);
+        swap = ORIENT_IS_SWAP(filter->fmt_in.video.orientation);
+        switch (filter->fmt_in.video.orientation)
+        {
+            case ORIENT_TOP_LEFT:
+            case ORIENT_RIGHT_TOP:
+                break;
+            case ORIENT_TOP_RIGHT:
+            case ORIENT_RIGHT_BOTTOM:
+                hflip = true;
+                break;
+            case ORIENT_BOTTOM_LEFT:
+            case ORIENT_LEFT_TOP:
+                vflip = true;
+                break;
+            case ORIENT_BOTTOM_RIGHT:
+            case ORIENT_LEFT_BOTTOM:
+                vflip = hflip = true;
+                break;
+        }
     }
 
     VdpOutputSurface output = dst->p_sys->surface;
@@ -709,7 +714,8 @@ static int OutputOpen(vlc_object_t *obj)
     if (filter->fmt_out.video.i_chroma != VLC_CODEC_VDPAU_OUTPUT)
         return VLC_EGENERIC;
 
-    assert(filter->fmt_out.video.orientation == ORIENT_TOP_LEFT);
+    assert(filter->fmt_out.video.orientation == ORIENT_TOP_LEFT
+        || filter->fmt_in.video.orientation == filter->fmt_out.video.orientation);
 
     filter_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
