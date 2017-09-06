@@ -94,6 +94,10 @@ AS_IF([test -n "${with_binary_version}"],[
          [Binary specific version])
 ])
 
+dnl Prevent clang from accepting unknown flags with a mere warning
+AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CFLAGS])
+AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CXXFLAGS])
+
 dnl
 dnl  Check the operating system
 dnl
