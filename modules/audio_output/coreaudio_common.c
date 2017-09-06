@@ -48,6 +48,14 @@ ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
+    bool expected = true;
+    if (atomic_compare_exchange_weak(&p_sys->b_do_flush, &expected, false))
+    {
+        TPCircularBufferClear(&p_sys->circular_buffer);
+        /* Signal that the renderer is flushed */
+        vlc_sem_post(&p_sys->flush_sem);
+    }
+
     if (atomic_load_explicit(&p_sys->b_paused, memory_order_relaxed))
     {
         memset(p_output, 0, i_requested);
@@ -112,8 +120,10 @@ ca_Flush(audio_output_t *p_aout, bool wait)
     }
     else
     {
-        /* flush circular buffer if data is left */
-        TPCircularBufferClear(&p_sys->circular_buffer);
+        /* Request the renderer to flush, and wait for an ACK */
+        assert(!atomic_load(&p_sys->b_do_flush));
+        atomic_store_explicit(&p_sys->b_do_flush, true, memory_order_release);
+        vlc_sem_wait(&p_sys->flush_sem);
     }
 }
 
@@ -183,6 +193,8 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
     atomic_init(&p_sys->i_underrun_size, 0);
     atomic_init(&p_sys->b_paused, false);
+    atomic_init(&p_sys->b_do_flush, false);
+    vlc_sem_init(&p_sys->flush_sem, 0);
 
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
@@ -232,6 +244,7 @@ ca_Uninitialize(audio_output_t *p_aout)
 
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
+    vlc_sem_destroy(&p_sys->flush_sem);
 }
 
 AudioUnit
