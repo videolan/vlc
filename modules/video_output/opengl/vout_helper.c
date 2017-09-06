@@ -797,7 +797,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Update the fmt to main program one */
     vgl->fmt = vgl->prgm->tc->fmt;
     /* The orientation is handled by the orientation matrix */
-    vgl->fmt.orientation = ORIENT_NORMAL;
+    vgl->fmt.orientation = fmt->orientation;
 
     /* Texture size */
     const opengl_tex_converter_t *tc = vgl->prgm->tc;
