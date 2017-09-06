@@ -809,13 +809,13 @@ static bool parse_extitem_node COMPLEX_INTERFACE
 static bool skip_element COMPLEX_INTERFACE
 {
     VLC_UNUSED(p_demux); VLC_UNUSED(p_input_node);
-    VLC_UNUSED(psz_element);
 
     if(b_empty_node)
         return true;
 
+    const char *name;
     for (unsigned lvl = 1; lvl;)
-        switch (xml_ReaderNextNode(p_xml_reader, NULL))
+        switch (xml_ReaderNextNode(p_xml_reader, &name))
         {
             case XML_READER_STARTELEM:
             {
@@ -824,6 +824,13 @@ static bool skip_element COMPLEX_INTERFACE
                 break;
             }
             case XML_READER_ENDELEM:
+                if(lvl == 0)
+                {
+                    if(name && psz_element && strcmp(psz_element, name))
+                        return false;
+                    else
+                        return true;
+                }
                 lvl--;
                 break;
             case XML_READER_NONE:
