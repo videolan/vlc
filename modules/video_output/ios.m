@@ -529,7 +529,6 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)dealloc
 {
-
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_eaglContext release];
     [super dealloc];
@@ -548,6 +547,10 @@ static void OpenglESSwap(vlc_gl_t *gl)
         [self performSelectorOnMainThread:@selector(createBuffers)
                                                  withObject:nil
                                               waitUntilDone:YES];
+        return;
+    }
+
+    if (unlikely(!_appActive)) {
         return;
     }
 
