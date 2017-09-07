@@ -91,7 +91,7 @@ vlc_module_end()
 
 static int ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static int avcCFromAnnexBCreate(decoder_t *);
-static int ExtradataInfoCreate(decoder_t *, CFStringRef, void *, size_t);
+static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef, void *, size_t);
 static int HandleVTStatus(decoder_t *, OSStatus);
 static int DecodeBlock(decoder_t *, block_t *);
 static void Flush(decoder_t *);
@@ -808,11 +808,11 @@ static int SetupDecoderExtradata(decoder_t *p_dec)
 
         if (p_dec->fmt_in.p_extra)
         {
-            int i_ret = ExtradataInfoCreate(p_dec, CFSTR("avcC"),
+            p_sys->extradataInfo = ExtradataInfoCreate(CFSTR("avcC"),
                                             p_dec->fmt_in.p_extra,
                                             p_dec->fmt_in.i_extra);
-            if (i_ret != VLC_SUCCESS)
-                return i_ret;
+            if (p_sys->extradataInfo == nil)
+                return VLC_EGENERIC;
         }
         /* else: AnnexB case, we'll get extradata from first input blocks */
     }
@@ -826,9 +826,9 @@ static int SetupDecoderExtradata(decoder_t *p_dec)
     }
     else
     {
-        int i_ret = ExtradataInfoCreate(p_dec, NULL, NULL, 0);
-        if (i_ret != VLC_SUCCESS)
-            return i_ret;
+        p_sys->extradataInfo = ExtradataInfoCreate(NULL, NULL, 0);
+        if (p_sys->extradataInfo == nil)
+            return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
@@ -1016,6 +1016,8 @@ static inline void bo_add_mp4_tag_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
 
 static int ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     int full_size = 3 + 5 +13 + 5 + i_buf_size + 3;
     int config_size = 13 + 5 + i_buf_size;
     int padding = 12;
@@ -1050,10 +1052,11 @@ static int ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
     bo_add_8(&bo, 0x01);    // length
     bo_add_8(&bo, 0x02);    // no SL
 
-    int i_ret = ExtradataInfoCreate(p_dec, CFSTR("esds"), bo.b->p_buffer,
-                                    bo.b->i_buffer);
+    p_sys->extradataInfo = ExtradataInfoCreate(CFSTR("esds"),
+                                               bo.b->p_buffer, bo.b->i_buffer);
     bo_deinit(&bo);
-    return i_ret;
+
+    return (p_sys->extradataInfo == nil) ? VLC_EGENERIC: VLC_SUCCESS;
 }
 
 static int avcCFromAnnexBCreate(decoder_t *p_dec)
@@ -1085,34 +1088,31 @@ static int avcCFromAnnexBCreate(decoder_t *p_dec)
     if (!p_avcC)
         return VLC_EGENERIC;
 
-    i_ret = ExtradataInfoCreate(p_dec, CFSTR("avcC"), p_avcC->p_buffer,
-                                p_avcC->i_buffer);
+    p_sys->extradataInfo = ExtradataInfoCreate(CFSTR("avcC"),
+                                               p_avcC->p_buffer, p_avcC->i_buffer);
     block_Release(p_avcC);
-    return i_ret;
+    return (p_sys->extradataInfo == nil) ? VLC_EGENERIC: VLC_SUCCESS;
 }
 
-static int ExtradataInfoCreate(decoder_t *p_dec, CFStringRef name, void *p_data,
-                               size_t i_data)
+static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef name,
+                                                  void *p_data, size_t i_data)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    p_sys->extradataInfo = cfdict_create(1);
-    if (p_sys->extradataInfo == nil)
-        return VLC_EGENERIC;
+    CFMutableDictionaryRef extradataInfo = cfdict_create(1);
+    if (extradataInfo == nil)
+        return nil;
 
     if (p_data == NULL)
-        return VLC_SUCCESS;
+        return nil;
 
     CFDataRef extradata = CFDataCreate(kCFAllocatorDefault, p_data, i_data);
     if (extradata == nil)
     {
-        CFRelease(p_sys->extradataInfo);
-        p_sys->extradataInfo = nil;
-        return VLC_EGENERIC;
+        CFRelease(extradataInfo);
+        return nil;
     }
-    CFDictionarySetValue(p_sys->extradataInfo, name, extradata);
+    CFDictionarySetValue(extradataInfo, name, extradata);
     CFRelease(extradata);
-    return VLC_SUCCESS;
+    return extradataInfo;
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
