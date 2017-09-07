@@ -14,6 +14,7 @@ MINIMAL_OSX_VERSION="10.7"
 OSX_VERSION=`xcrun --show-sdk-version`
 OSX_KERNELVERSION=`uname -r | cut -d. -f1`
 SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
+VLCBUILDDIR=""
 
 CORE_COUNT=`sysctl -n machdep.cpu.core_count`
 let JOBS=$CORE_COUNT+1
@@ -34,6 +35,7 @@ OPTIONS:
    -p            Build packages for all artifacts
    -k <sdk>      Use the specified sdk (default: $SDKROOT)
    -a <arch>     Use the specified arch (default: $ARCH)
+   -C            Use the specified VLC build dir
 EOF
 
 }
@@ -48,7 +50,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "hvrcpk:a:j:" OPTION
+while getopts "hvrcpk:a:j:C:" OPTION
 do
      case $OPTION in
          h)
@@ -76,6 +78,9 @@ do
          ;;
          j)
              JOBS=$OPTARG
+         ;;
+         C)
+             VLCBUILDDIR=$OPTARG
          ;;
      esac
 done
@@ -212,6 +217,10 @@ fi
 spopd
 
 
+if [ ! -z "$VLCBUILDDIR" ];then
+    mkdir -p $VLCBUILDDIR
+    pushd $VLCBUILDDIR
+fi
 #
 # vlc/configure
 #
@@ -246,4 +255,8 @@ make VLC.app
 if [ "$PACKAGE" = "yes" ]; then
     info "Building VLC dmg package"
     make package-macosx
+fi
+
+if [ ! -z "$VLCBUILDDIR" ];then
+    popd
 fi
