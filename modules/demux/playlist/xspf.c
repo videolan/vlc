@@ -707,13 +707,9 @@ static bool skip_element COMPLEX_INTERFACE
                 break;
             }
             case XML_READER_ENDELEM:
-                if(lvl == 0)
-                {
-                    if(name && psz_element && strcmp(psz_element, name))
+                if(lvl == 1 &&
+                    name && psz_element && strcmp(psz_element, name))
                         return false;
-                    else
-                        return true;
-                }
                 lvl--;
                 break;
             case XML_READER_NONE:
