@@ -327,7 +327,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Decode all data */
-    if( p_sys->p_block && p_sys->p_block->i_buffer > 1 )
+    while( p_sys->p_block && p_sys->p_block->i_buffer > 0 )
     {
         void *samples;
         NeAACDecFrameInfo frame;
@@ -387,25 +387,23 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             Flush( p_dec );
             p_sys->b_discontinuity = true;
 
-            return VLCDEC_SUCCESS;
+            continue;
         }
 
         if( frame.channels == 0 || frame.channels >= 64 )
         {
             msg_Warn( p_dec, "invalid channels count: %i", frame.channels );
-            FlushBuffer( p_sys, frame.bytesconsumed );
             if( frame.channels == 0 )
-            {
                 p_sys->b_discontinuity = true;
-                return VLCDEC_SUCCESS;
-            }
+            FlushBuffer( p_sys, frame.bytesconsumed ? frame.bytesconsumed : SIZE_MAX );
+            continue;
         }
 
         if( frame.samples == 0 )
         {
             msg_Warn( p_dec, "decoded zero sample" );
-            FlushBuffer( p_sys, frame.bytesconsumed );
-            return VLCDEC_SUCCESS;
+            FlushBuffer( p_sys, frame.bytesconsumed ? frame.bytesconsumed : SIZE_MAX );
+            continue;
         }
 
         /* We decoded a valid frame */
@@ -563,14 +561,15 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             date_Increment( &p_sys->date, frame.samples / frame.channels );
         }
 
-        FlushBuffer( p_sys, frame.bytesconsumed );
+        FlushBuffer( p_sys, frame.bytesconsumed ? frame.bytesconsumed : SIZE_MAX );
 
-        return VLCDEC_SUCCESS;
-    }
-    else
-    {
-        /* Drop byte of padding */
-        FlushBuffer( p_sys, 0 );
+        if( p_sys->p_block && p_sys->p_block->i_buffer == 1 )
+        {
+            /* Drop byte of padding */
+            FlushBuffer( p_sys, 0 );
+        }
+
+        continue;
     }
 
     return VLCDEC_SUCCESS;
