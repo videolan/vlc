@@ -1305,8 +1305,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     if (b_config_changed && p_info->b_flush)
     {
-        /* decoding didn't start yet, which is ok for H264, let's see
-         * if we can use this block to get going */
         assert(p_sys->codec == kCMVideoCodecType_H264);
         if (p_sys->session)
         {
@@ -1315,6 +1313,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             msg_Dbg(p_dec, "SPS/PPS changed: restarting H264 decoder");
             StopVideoToolbox(p_dec, true);
         }
+        /* else decoding didn't start yet, which is ok for H264, let's see
+         * if we can use this block to get going */
 
         int i_ret = SetH264DecoderInfo(p_dec, nil);
         if (i_ret == VLC_SUCCESS)
