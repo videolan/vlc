@@ -32,15 +32,18 @@
 /* This array stores messages that are managed by the arrayController */
 @property (retain) NSMutableArray *messagesArray;
 
-/* This array stores messages before they are added to the messagesArray on refresh */
-@property (retain) NSMutableArray *messageBuffer;
-
 /* We do not want to refresh the table for every message, as that would be very frequent when
- * there are a lot of messages, therefore we use a timer to refresh the table with new data
- * from the messageBuffer every now and then, which is much more efficient and still fast
- * enough for a good user experience
+ * there are a lot of messages, therefore we use a timer to refresh the table every now and
+ * then, which is much more efficient and still fast enough for a good user experience.
  */
 @property (retain) NSTimer        *refreshTimer;
+
+/*
+ * Indicates if an update is needed, which is the case when new messages were added
+ * after the last firing of the update timer. It is used to prevent unnecessary
+ * rearranging of the NSArrayController content.
+ */
+@property (atomic) BOOL           needsUpdate;
 
 - (void)addMessage:(NSDictionary *)message;
 
@@ -87,8 +90,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 {
     self = [super initWithWindowNibName:@"LogMessageWindow"];
     if (self) {
-        _messagesArray = [[NSMutableArray alloc] initWithCapacity:500];
-        _messageBuffer = [[NSMutableArray alloc] initWithCapacity:100];
+        _messagesArray = [[NSMutableArray alloc] initWithCapacity:1000];
     }
     return self;
 }
@@ -140,7 +142,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     vlc_LogSet(getIntf()->obj.libvlc, MsgCallback, (__bridge void*)self);
     _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.3
                                                      target:self
-                                                   selector:@selector(appendMessageBuffer)
+                                                   selector:@selector(updateArrayController:)
                                                    userInfo:nil
                                                     repeats:YES];
     return [super showWindow:sender];
@@ -152,12 +154,22 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     vlc_LogSet( getIntf()->obj.libvlc, NULL, NULL );
 
     // Remove all messages
-    [self clearMessageBuffer];
-    [self clearMessageTable];
+    [self removeAllMessages];
 
     // Invalidate timer
     [_refreshTimer invalidate];
     _refreshTimer = nil;
+}
+
+/**
+ Called by the timer to re-sync the array controller with the backing array
+ */
+- (void)updateArrayController:(NSTimer *)timer
+{
+    if (_needsUpdate)
+        [_arrayController rearrangeObjects];
+
+    _needsUpdate = NO;
 }
 
 #pragma mark -
@@ -236,8 +248,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     vlc_LogSet(getIntf()->obj.libvlc, NULL, NULL);
 
     // Remove all messages
-    [self clearMessageBuffer];
-    [self clearMessageTable];
+    [self removeAllMessages];
 
     // Reregister handler, to write new header to log
     vlc_LogSet(getIntf()->obj.libvlc, MsgCallback, (__bridge void*)self);
@@ -247,7 +258,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
  */
 - (IBAction)refreshLog:(id)sender
 {
-    [self appendMessageBuffer];
+    [_arrayController rearrangeObjects];
     [_messageTable scrollToEndOfDocument:self];
 }
 
@@ -264,7 +275,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 /* Called when the user hits CMD + C or copy is clicked in the edit menu
  */
-- (void) copy:(id)sender {
+- (void)copy:(id)sender {
     NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
     [pasteBoard clearContents];
     for (NSDictionary *line in [_arrayController selectedObjects]) {
@@ -301,47 +312,30 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 #pragma mark Data handling
 
 /** 
- Adds a message to the messageBuffer, it does not has to be called from the main thread, as
- items are only added to the messageArray on refresh.
+ Adds a message, it is only added visibly to the table on the next firing
+ of the update timer.
  */
 - (void)addMessage:(NSDictionary *)messageDict
 {
-    @synchronized (_messageBuffer) {
-        [_messageBuffer addObject:messageDict];
+    @synchronized (_messagesArray) {
+        if ([_messagesArray count] > 1000000) {
+            [_messagesArray removeObjectsInRange:NSMakeRange(0, 2)];
+        }
+        [_messagesArray addObject:messageDict];
+
+        _needsUpdate = YES;
     }
+    
 }
 
 /**
- Clears the message buffer
+ Clears all messages in the message table by removing all items from the array and
+ calling `rearrangeObjects` on the array controller.
  */
-- (void)clearMessageBuffer
+- (void)removeAllMessages
 {
-    @synchronized (_messageBuffer) {
-        [_messageBuffer removeAllObjects];
-    }
-}
-
-/**
- Clears all messages in the message table by removing all items from the arrayController
- */
-- (void)clearMessageTable
-{
-    NSRange range = NSMakeRange(0, [[_arrayController arrangedObjects] count]);
-    [_arrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
-}
-
-/**
- Appends all messages from the buffer to the arrayController and clears the buffer
- */
-- (void)appendMessageBuffer
-{
-    if ([_messagesArray count] > 1000000) {
-        [_messagesArray removeObjectsInRange:NSMakeRange(0, 2)];
-    }
-    @synchronized (_messageBuffer) {
-        [_arrayController addObjects:_messageBuffer];
-        [_messageBuffer removeAllObjects];
-    }
+    [_messagesArray removeAllObjects];
+    [_arrayController rearrangeObjects];
 }
 
 @end
