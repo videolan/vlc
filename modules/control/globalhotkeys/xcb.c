@@ -305,31 +305,31 @@ static bool Mapping( intf_thread_t *p_intf )
 
             const size_t max = sizeof(p_x11_modifier_ignored) /
                     sizeof(*p_x11_modifier_ignored);
-            for( unsigned int i = 0; i < max; i++ )
+            for( unsigned int j = 0; j < max; j++ )
             {
                 const unsigned i_ignored = GetModifier( p_sys->p_connection,
-                        p_sys->p_symbols, p_x11_modifier_ignored[i] );
-                if( i != 0 && i_ignored == 0)
+                        p_sys->p_symbols, p_x11_modifier_ignored[j] );
+                if( j != 0 && i_ignored == 0)
                     continue;
 
-                xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode(
+                xcb_keycode_t *keycodes = xcb_key_symbols_get_keycode(
                     p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
 
-                if( !p_keys )
+                if( keycodes == NULL )
                     break;
 
                 hotkey_mapping_t *p_map = realloc( p_sys->p_map,
                                   sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
                 if( !p_map )
                 {
-                    free( p_keys );
+                    free( keycodes );
                     break;
                 }
                 p_sys->p_map = p_map;
                 p_map += p_sys->i_map;
                 p_sys->i_map++;
 
-                p_map->p_keys = p_keys;
+                p_map->p_keys = keycodes;
                 p_map->i_modifier = i_modifier|i_ignored;
                 p_map->i_vlc = i_vlc_key;
                 active = true;
