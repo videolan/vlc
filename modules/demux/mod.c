@@ -57,7 +57,7 @@ static void Close  ( vlc_object_t * );
 #define REVERB_LEVEL_LONGTEXT N_( "Reverberation level (from 0 " \
                 "to 100, default value is 0)." )
 #define REVERB_DELAY_LONGTEXT N_("Reverberation delay, in ms." \
-                " Usual values are from to 40 to 200ms." )
+                " Usual values are from 40 to 200ms." )
 #define MEGABASS_LONGTEXT N_( "Enable megabass mode" )
 #define MEGABASS_LEVEL_LONGTEXT N_("Megabass mode level (from 0 to 100, " \
                 "default value is 0)." )
