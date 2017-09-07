@@ -803,7 +803,8 @@ static void InitStatistics( input_thread_t *p_input )
     if( priv->b_preparsing ) return;
 
     /* Prepare statistics */
-#define INIT_COUNTER( c, compute ) priv->counters.p_##c = \
+#define INIT_COUNTER( c, compute ) free( priv->counters.p_##c ); \
+    priv->counters.p_##c = \
  stats_CounterCreate( STATS_##compute);
     if( libvlc_stats( p_input ) )
     {
