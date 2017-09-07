@@ -222,7 +222,8 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
       --build=$TRIPLET \
       --host=$TRIPLET \
       --with-macosx-version-min=$MINIMAL_OSX_VERSION \
-      --with-macosx-sdk=$SDKROOT > $out
+      --with-macosx-sdk=$SDKROOT \
+      $VLC_CONFIGURE_ARGS > $out
 fi
 
 
