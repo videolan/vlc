@@ -129,10 +129,12 @@ int OpenAvio(vlc_object_t *object)
     }
     free(url);
 
-    int64_t size = avio_size(sys->context);
+    sys->size = avio_size(sys->context);
+
     bool seekable;
     seekable = sys->context->seekable;
-    msg_Dbg(access, "%sseekable, size=%"PRIi64, seekable ? "" : "not ", size);
+    msg_Dbg(access, "%sseekable, size=%"PRIi64, seekable ? "" : "not ",
+            sys->size);
 
     /* */
     access->pf_read = Read;
