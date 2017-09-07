@@ -321,20 +321,28 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                     sys->place = place;
                 }
 
-                if (sys->gl != NULL)
+                if (sys->gl != NULL) {
+                    vlc_gl_MakeCurrent(sys->gl);
                     vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+                }
 
                 // x / y are top left corner, but we need the lower left one
-                if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
+                if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE) {
                     glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
+                    vlc_gl_ReleaseCurrent(sys->gl);
+                }
             }
             return VLC_SUCCESS;
         }
 
         case VOUT_DISPLAY_CHANGE_VIEWPOINT:
-            if (sys->gl != NULL)
-                return vout_display_opengl_SetViewpoint(sys->vgl,
+            if (sys->gl != NULL) {
+                vlc_gl_MakeCurrent(sys->gl);
+                int viewport = vout_display_opengl_SetViewpoint(sys->vgl,
                     &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
+                vlc_gl_ReleaseCurrent(sys->gl);
+                return viewport;
+            }
             else
                 return VLC_EGENERIC;
 
