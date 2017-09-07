@@ -276,38 +276,40 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
     /* !Warn: do not use p_block beyond this point */
 
-    if( p_dec->fmt_out.audio.i_rate == 0 && p_dec->fmt_in.i_extra > 0 )
+    if( p_dec->fmt_out.audio.i_rate == 0 )
     {
-        /* We have a decoder config so init the handle */
-        unsigned long i_rate;
+        unsigned long i_rate = 0;
         unsigned char i_channels;
 
-        if( NeAACDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
-                           p_dec->fmt_in.i_extra,
-                           &i_rate, &i_channels ) >= 0 )
+        /* Init from DecoderConfig */
+        if( p_dec->fmt_in.i_extra > 0 &&
+            NeAACDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
+                           p_dec->fmt_in.i_extra, &i_rate, &i_channels ) != 0 )
         {
-            p_dec->fmt_out.audio.i_rate = i_rate;
-            p_dec->fmt_out.audio.i_channels = i_channels;
-            p_dec->fmt_out.audio.i_physical_channels
-                = mpeg4_asc_channelsbyindex[i_channels];
-
-            date_Init( &p_sys->date, i_rate, 1 );
+            /* Failed, will try from data */
+            i_rate = 0;
         }
-    }
 
-    if( p_dec->fmt_out.audio.i_rate == 0 && p_sys->p_block && p_sys->p_block->i_buffer )
-    {
-        unsigned long i_rate;
-        unsigned char i_channels;
-
-        /* Init faad with the first frame */
-        if( NeAACDecInit( p_sys->hfaad,
-                          p_sys->p_block->p_buffer, p_sys->p_block->i_buffer,
-                          &i_rate, &i_channels ) < 0 )
+        if( i_rate == 0 && p_sys->p_block && p_sys->p_block->i_buffer )
         {
+            /* Init faad with the first frame */
+            long i_read = NeAACDecInit( p_sys->hfaad,
+                                        p_sys->p_block->p_buffer, p_sys->p_block->i_buffer,
+                                        &i_rate, &i_channels );
+            if( i_read < 0 || (size_t) i_read > p_sys->p_block->i_buffer )
+                i_rate = 0;
+            else
+                FlushBuffer( p_sys, i_read );
+        }
+
+        if( i_rate == 0 )
+        {
+            /* Can not init decoder at all for now */
+            FlushBuffer( p_sys, SIZE_MAX );
             return VLCDEC_SUCCESS;
         }
 
+        /* Decoder Initialized */
         p_dec->fmt_out.audio.i_rate = i_rate;
         p_dec->fmt_out.audio.i_channels = i_channels;
         p_dec->fmt_out.audio.i_physical_channels
