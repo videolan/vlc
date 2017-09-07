@@ -357,6 +357,8 @@ Stop(audio_output_t *p_aout)
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus err;
 
+    [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
+
     err = AudioOutputUnitStop(p_sys->au_unit);
     if (err != noErr)
         ca_LogWarn("AudioOutputUnitStop failed");
