@@ -90,8 +90,9 @@ vlc_module_end()
 #pragma mark - local prototypes
 
 static int ESDSCreate(decoder_t *, uint8_t *, uint32_t);
-static int avcCFromAnnexBCreate(decoder_t *);
+static int SetH264DecoderInfo(decoder_t *, CFMutableDictionaryRef);
 static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef, void *, size_t);
+static CFMutableDictionaryRef GetH264ExtradataInfo(const struct hxxx_helper *hh);
 static int HandleVTStatus(decoder_t *, OSStatus);
 static int DecodeBlock(decoder_t *, block_t *);
 static void Flush(decoder_t *);
@@ -1059,7 +1060,20 @@ static int ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
     return (p_sys->extradataInfo == nil) ? VLC_EGENERIC: VLC_SUCCESS;
 }
 
-static int avcCFromAnnexBCreate(decoder_t *p_dec)
+static CFMutableDictionaryRef GetH264ExtradataInfo(const struct hxxx_helper *hh)
+{
+    CFMutableDictionaryRef extradataInfo = nil;
+    block_t *p_avcC = h264_helper_get_avcc_config(hh);
+    if (p_avcC)
+    {
+        extradataInfo = ExtradataInfoCreate(CFSTR("avcC"),
+                                            p_avcC->p_buffer, p_avcC->i_buffer);
+        block_Release(p_avcC);
+    }
+    return extradataInfo;
+}
+
+static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradataInfo)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1084,13 +1098,11 @@ static int avcCFromAnnexBCreate(decoder_t *p_dec)
     p_dec->fmt_out.video.i_sar_num = i_sar_num;
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
 
-    block_t *p_avcC = h264_helper_get_avcc_config(&p_sys->hh);
-    if (!p_avcC)
-        return VLC_EGENERIC;
+    if(extradataInfo == nil)
+        extradataInfo = GetH264ExtradataInfo(&p_sys->hh);
 
-    p_sys->extradataInfo = ExtradataInfoCreate(CFSTR("avcC"),
-                                               p_avcC->p_buffer, p_avcC->i_buffer);
-    block_Release(p_avcC);
+    p_sys->extradataInfo = extradataInfo;
+
     return (p_sys->extradataInfo == nil) ? VLC_EGENERIC: VLC_SUCCESS;
 }
 
@@ -1304,7 +1316,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             StopVideoToolbox(p_dec, true);
         }
 
-        int i_ret = avcCFromAnnexBCreate(p_dec);
+        int i_ret = SetH264DecoderInfo(p_dec, nil);
         if (i_ret == VLC_SUCCESS)
         {
             msg_Dbg(p_dec, "Got SPS/PPS: late opening of H264 decoder");
