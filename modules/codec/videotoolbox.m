@@ -598,42 +598,36 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
     return codec;
 }
 
-static int StartVideoToolbox(decoder_t *p_dec)
+
+static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
+                                                             unsigned i_sar_num,
+                                                             unsigned i_sar_den,
+                                                             CFMutableDictionaryRef extradataInfo)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    OSStatus status;
+    assert(extradataInfo != nil);
 
-    assert(p_sys->extradataInfo != nil);
+    CFMutableDictionaryRef decoderConfiguration = cfdict_create(2);
+    if (decoderConfiguration == NULL)
+        return nil;
 
-    p_sys->decoderConfiguration = cfdict_create(2);
-    if (p_sys->decoderConfiguration == NULL)
-        return VLC_ENOMEM;
-
-    CFDictionarySetValue(p_sys->decoderConfiguration,
+    CFDictionarySetValue(decoderConfiguration,
                          kCVImageBufferChromaLocationBottomFieldKey,
                          kCVImageBufferChromaLocation_Left);
-    CFDictionarySetValue(p_sys->decoderConfiguration,
+    CFDictionarySetValue(decoderConfiguration,
                          kCVImageBufferChromaLocationTopFieldKey,
                          kCVImageBufferChromaLocation_Left);
 
-    CFDictionarySetValue(p_sys->decoderConfiguration,
+    CFDictionarySetValue(decoderConfiguration,
                          kCMFormatDescriptionExtension_SampleDescriptionExtensionAtoms,
-                         p_sys->extradataInfo);
+                         extradataInfo);
 
     /* pixel aspect ratio */
     CFMutableDictionaryRef pixelaspectratio = cfdict_create(2);
-
-    const unsigned i_video_width = p_dec->fmt_out.video.i_width;
-    const unsigned i_video_height = p_dec->fmt_out.video.i_height;
-    const unsigned i_sar_num = p_dec->fmt_out.video.i_sar_num;
-    const unsigned i_sar_den = p_dec->fmt_out.video.i_sar_den;
-
-    if( p_dec->fmt_in.video.i_frame_rate_base && p_dec->fmt_in.video.i_frame_rate )
+    if(pixelaspectratio == NULL)
     {
-        date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
-                                p_dec->fmt_in.video.i_frame_rate_base );
+        CFRelease(decoderConfiguration);
+        return nil;
     }
-    else date_Init( &p_sys->pts, 2 * 30000, 1001 );
 
     cfdict_set_int32(pixelaspectratio,
                      kCVImageBufferPixelAspectRatioHorizontalSpacingKey,
@@ -641,7 +635,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
     cfdict_set_int32(pixelaspectratio,
                      kCVImageBufferPixelAspectRatioVerticalSpacingKey,
                      i_sar_den);
-    CFDictionarySetValue(p_sys->decoderConfiguration,
+    CFDictionarySetValue(decoderConfiguration,
                          kCVImageBufferPixelAspectRatioKey,
                          pixelaspectratio);
     CFRelease(pixelaspectratio);
@@ -649,33 +643,50 @@ static int StartVideoToolbox(decoder_t *p_dec)
     /* enable HW accelerated playback, since this is optional on OS X
      * note that the backend may still fallback on software mode if no
      * suitable hardware is available */
-    CFDictionarySetValue(p_sys->decoderConfiguration,
+    CFDictionarySetValue(decoderConfiguration,
                          kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder,
                          kCFBooleanTrue);
 
     /* on OS X, we can force VT to fail if no suitable HW decoder is available,
      * preventing the aforementioned SW fallback */
     if (var_InheritInteger(p_dec, "videotoolbox-hw-decoder-only"))
-        CFDictionarySetValue(p_sys->decoderConfiguration,
+        CFDictionarySetValue(decoderConfiguration,
                              kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
                              kCFBooleanTrue);
 
-    CFDictionarySetValue(p_sys->decoderConfiguration,
+    CFDictionarySetValue(decoderConfiguration,
                          kVTDecompressionPropertyKey_FieldMode,
                          kVTDecompressionProperty_FieldMode_DeinterlaceFields);
-    CFDictionarySetValue(p_sys->decoderConfiguration,
+    CFDictionarySetValue(decoderConfiguration,
                          kVTDecompressionPropertyKey_DeinterlaceMode,
                          kVTDecompressionProperty_DeinterlaceMode_Temporal);
 
+    return decoderConfiguration;
+}
+
+static int StartVideoToolbox(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->decoderConfiguration = CreateSessionDescriptionFormat(p_dec,
+                                                                 p_dec->fmt_out.video.i_sar_num,
+                                                                 p_dec->fmt_out.video.i_sar_den,
+                                                                 p_sys->extradataInfo);
+    if(p_sys->decoderConfiguration == nil)
+        return VLC_EGENERIC;
+
     /* create video format description */
-    status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
+    OSStatus status = CMVideoFormatDescriptionCreate(
+                                            kCFAllocatorDefault,
                                             p_sys->codec,
-                                            i_video_width,
-                                            i_video_height,
+                                            p_dec->fmt_out.video.i_width,
+                                            p_dec->fmt_out.video.i_height,
                                             p_sys->decoderConfiguration,
                                             &p_sys->videoFormatDescription);
-    if (status) {
+    if (status)
+    {
         CFRelease(p_sys->decoderConfiguration);
+        p_sys->decoderConfiguration = nil;
         msg_Err(p_dec, "video format description creation failed (%i)", (int)status);
         return VLC_EGENERIC;
     }
@@ -694,9 +705,9 @@ static int StartVideoToolbox(decoder_t *p_dec)
 #endif
 
     cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
-                     kCVPixelBufferWidthKey, i_video_width);
+                     kCVPixelBufferWidthKey, p_dec->fmt_out.video.i_width);
     cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
-                     kCVPixelBufferHeightKey, i_video_height);
+                     kCVPixelBufferHeightKey, p_dec->fmt_out.video.i_height);
 
     if (p_sys->i_forced_cvpx_format != 0)
     {
@@ -709,7 +720,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
 
     cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
                      kCVPixelBufferBytesPerRowAlignmentKey,
-                     i_video_width * 2);
+                     p_dec->fmt_out.video.i_width * 2);
 
     /* setup decoder callback record */
     VTDecompressionOutputCallbackRecord decoderCallbackRecord;
@@ -742,6 +753,13 @@ static int StartVideoToolbox(decoder_t *p_dec)
 
     if (status == noErr)
         CFRelease(supportedProps);
+
+    if( p_dec->fmt_in.video.i_frame_rate_base && p_dec->fmt_in.video.i_frame_rate )
+    {
+        date_Init( &p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
+                   p_dec->fmt_in.video.i_frame_rate_base );
+    }
+    else date_Init( &p_sys->pts, 2 * 30000, 1001 );
 
     return VLC_SUCCESS;
 }
