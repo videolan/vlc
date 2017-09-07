@@ -288,6 +288,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             msg_Dbg( p_mux, "Muxing video bitrate will be %d", fmt->i_bitrate );
         break;
 
+    default:
+        vlc_assert_unreachable();
     }
 
     codec->bit_rate = i_bitrate;
