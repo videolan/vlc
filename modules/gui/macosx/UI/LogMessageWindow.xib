@@ -442,7 +442,7 @@ IA
             </toolbar>
             <point key="canvasLocation" x="139" y="192"/>
         </window>
-        <arrayController editable="NO" selectsInsertedObjects="NO" clearsFilterPredicateOnInsertion="NO" id="0Or-bh-QJU">
+        <arrayController editable="NO" selectsInsertedObjects="NO" id="0Or-bh-QJU">
             <declaredKeys>
                 <string>component</string>
                 <string>message</string>
