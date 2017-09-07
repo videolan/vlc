@@ -382,26 +382,20 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
     {                                                           \
         for( int x = 1; x < i_src_visible - 1; x++ )            \
         {                                                       \
-            const uint32_t a =                                  \
-            (                                                   \
-              abs(                                              \
-                 ( p_smooth[(y-1)*i_src_visible+x-1]            \
-                   - p_smooth[(y+1)*i_src_visible+x-1] )        \
-               + ( ( p_smooth[(y-1)*i_src_visible+x]            \
-                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )   \
-               + ( p_smooth[(y-1)*i_src_visible+x+1]            \
-                   - p_smooth[(y+1)*i_src_visible+x+1] )        \
-              )                                                 \
-            +                                                   \
-              abs(                                              \
-                 ( p_smooth[(y-1)*i_src_visible+x-1]            \
-                   - p_smooth[(y-1)*i_src_visible+x+1] )        \
-               + ( ( p_smooth[y*i_src_visible+x-1]              \
-                    - p_smooth[y*i_src_visible+x+1] ) <<1 )     \
-               + ( p_smooth[(y+1)*i_src_visible+x-1]            \
-                   - p_smooth[(y+1)*i_src_visible+x+1] )        \
-              )                                                 \
-            );
+            const uint32_t a = \
+                  abs(((int)p_smooth[(y - 1) * i_src_visible + x - 1] \
+                     - (int)p_smooth[(y + 1) * i_src_visible + x - 1]) \
+                   + (((int)p_smooth[(y - 1) * i_src_visible + x] \
+                     - (int)p_smooth[(y + 1) * i_src_visible + x]) * 2) \
+                    + ((int)p_smooth[(y - 1) * i_src_visible + x + 1] \
+                     - (int)p_smooth[(y + 1) * i_src_visible + x + 1])) \
+                + abs(((int)p_smooth[(y - 1) * i_src_visible + x - 1] \
+                     - (int)p_smooth[(y - 1) * i_src_visible + x + 1]) \
+                   + (((int)p_smooth[y       * i_src_visible + x - 1] \
+                     - (int)p_smooth[y       * i_src_visible + x + 1]) * 2) \
+                    + ((int)p_smooth[(y + 1) * i_src_visible + x - 1] \
+                     - (int)p_smooth[(y + 1) * i_src_visible + x + 1]));
+
     if( p_filter->p_sys->i_gradient_type )
     {
         if( p_filter->p_sys->b_cartoon )
@@ -694,25 +688,18 @@ static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
         for( int x = 4; x < i_src_visible - 4; x++ )
         {
             uint32_t a =
-            (
-              abs(
-                ( ( p_smooth[(y-1)*i_src_visible+x]
-                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
-               + ( p_smooth[(y-1)*i_src_visible+x-1]
-                   - p_smooth[(y+1)*i_src_visible+x-1] )
-               + ( p_smooth[(y-1)*i_src_visible+x+1]
-                   - p_smooth[(y+1)*i_src_visible+x+1] )
-              )
-            +
-              abs(
-                ( ( p_smooth[y*i_src_visible+x-1]
-                    - p_smooth[y*i_src_visible+x+1] ) <<1 )
-               + ( p_smooth[(y-1)*i_src_visible+x-1]
-                   - p_smooth[(y-1)*i_src_visible+x+1] )
-               + ( p_smooth[(y+1)*i_src_visible+x-1]
-                   - p_smooth[(y+1)*i_src_visible+x+1] )
-              )
-            );
+                  abs((((int)p_smooth[(y - 1) * i_src_visible + x]
+                      - (int)p_smooth[(y + 1) * i_src_visible + x]) * 2)
+                     + ((int)p_smooth[(y - 1) * i_src_visible + x - 1]
+                      - (int)p_smooth[(y + 1) * i_src_visible + x - 1])
+                     + ((int)p_smooth[(y - 1) * i_src_visible + x + 1]
+                      - (int)p_smooth[(y + 1) * i_src_visible + x + 1]))
+                + abs((((int)p_smooth[y * i_src_visible + x - 1]
+                      - (int)p_smooth[y * i_src_visible + x + 1]) * 2)
+                     + ((int)p_smooth[(y - 1) * i_src_visible + x - 1]
+                      - (int)p_smooth[(y - 1) * i_src_visible + x + 1])
+                     + ((int)p_smooth[(y + 1) * i_src_visible + x - 1]
+                      - (int)p_smooth[(y + 1) * i_src_visible + x + 1]));
             if( a>>8 )
             {
                 for( int i = 0; i < i_nb_steps; i++ )
