@@ -310,6 +310,7 @@ int OpenDemux( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "Could not open %s: %s", psz_url,
                  vlc_strerror_c(AVUNERROR(error)) );
+        av_free( pb->buffer );
         av_free( pb );
         p_sys->ic = NULL;
         free( psz_url );
