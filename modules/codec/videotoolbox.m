@@ -71,6 +71,9 @@ const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDe
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
 #define VT_TEMPO_DEINTERLACE N_("Deinterlacing")
 #define VT_TEMPO_DEINTERLACE_LONG N_("If interlaced content is detected, temporal deinterlacing is enabled at the expense of a pipeline delay.")
+#define VT_FORCE_CVPX_CHROMA "Force the VT decoder CVPX chroma"
+#define VT_FORCE_CVPX_CHROMA_LONG "Values can be 'BGRA', 'y420', '420f', '420v', '2vuy'. \
+    By Default, the best chroma is choosen by the VT decoder."
 
 vlc_module_begin()
 set_category(CAT_INPUT)
@@ -81,6 +84,7 @@ set_callbacks(OpenDecoder, CloseDecoder)
 
 add_bool("videotoolbox-temporal-deinterlacing", true, VT_TEMPO_DEINTERLACE, VT_TEMPO_DEINTERLACE_LONG, false)
 add_bool("videotoolbox-hw-decoder-only", false, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
+add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG, true);
 vlc_module_end()
 
 #pragma mark - local prototypes
@@ -141,6 +145,7 @@ struct decoder_sys_t
 
     bool                        b_format_propagated;
     bool                        b_abort;
+    int                         i_forced_cvpx_format;
 
     poc_context_t               pocctx;
     date_t                      pts;
@@ -691,6 +696,16 @@ static int StartVideoToolbox(decoder_t *p_dec)
                      kCVPixelBufferWidthKey, i_video_width);
     cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
                      kCVPixelBufferHeightKey, i_video_height);
+
+    if (p_sys->i_forced_cvpx_format != 0)
+    {
+        msg_Warn(p_dec, "forcing CVPX format: %4.4s",
+                 (const char *) &p_sys->i_forced_cvpx_format);
+        cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+                         kCVPixelBufferPixelFormatTypeKey,
+                         ntohl(p_sys->i_forced_cvpx_format));
+    }
+
     cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
                      kCVPixelBufferBytesPerRowAlignmentKey,
                      i_video_width * 2);
@@ -864,6 +879,21 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->b_abort = false;
     p_sys->b_enable_temporal_processing =
         var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing");
+
+    p_sys->i_forced_cvpx_format = 0;
+    char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
+    if (cvpx_chroma != NULL)
+    {
+        if (strlen(cvpx_chroma) != 4)
+        {
+            msg_Err(p_dec, "invalid videotoolbox-cvpx-chroma option");
+            free(cvpx_chroma);
+            free(p_sys);
+            return VLC_EGENERIC;
+        }
+        memcpy(&p_sys->i_forced_cvpx_format, cvpx_chroma, 4);
+        free(cvpx_chroma);
+    }
     h264_poc_context_init( &p_sys->pocctx );
     vlc_mutex_init(&p_sys->lock);
 
@@ -1422,6 +1452,8 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
     }
 
     uint32_t cvfmt = CVPixelBufferGetPixelFormatType(imageBuffer);
+    msg_Info(p_dec, "vt cvpx chroma: %4.4s",
+             (const char *)&(uint32_t) { htonl(cvfmt) });
     switch (cvfmt)
     {
         case kCVPixelFormatType_422YpCbCr8:
