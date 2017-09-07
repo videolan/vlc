@@ -273,7 +273,7 @@ static int Seek(stream_t *access, uint64_t position)
     if (ret < 0) {
         msg_Err(access, "Seek to %"PRIu64" failed: %s", position,
                 vlc_strerror_c(AVUNERROR(ret)));
-        if (sys->size < 0 || position != sys->size)
+        if (sys->size < 0 || position != (uint64_t)sys->size)
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
