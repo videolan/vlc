@@ -194,14 +194,14 @@ libvlc_demux_run_la_CPPFLAGS += -DHAVE_DVBPSI
 libvlc_demux_run_la_LIBADD += ../modules/libts_plugin.la
 endif
 endif
-noinst_LTLIBRARIES = libvlc_demux_run.la
+EXTRA_LTLIBRARIES = libvlc_demux_run.la
 
 #
 # Fuzzers
 #
 vlc_demux_run_LDFLAGS = -no-install -static
 vlc_demux_run_LDADD = libvlc_demux_run.la
-noinst_PROGRAMS = vlc-demux-run
+EXTRA_PROGRAMS += vlc-demux-run
 
 vlc_demux_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
 vlc_demux_libfuzzer_LDADD = -lFuzzer libvlc_demux_run.la
