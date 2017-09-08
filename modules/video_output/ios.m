@@ -146,7 +146,7 @@ static int Open(vlc_object_t *this)
     if (vout_display_IsWindowed(vd))
         return VLC_EGENERIC;
 
-    vout_display_sys_t *sys = calloc (1, sizeof(*sys));
+    vout_display_sys_t *sys = vlc_calloc (this, 1, sizeof(*sys));
 
     if (!sys)
         return VLC_ENOMEM;
@@ -181,7 +181,7 @@ static int Open(vlc_object_t *this)
             goto bailout;
 
         struct gl_sys *glsys = sys->gl->sys =
-            vlc_malloc(sys->gl, sizeof(struct gl_sys));
+            vlc_malloc(this, sizeof(struct gl_sys));
         if (unlikely(!sys->gl->sys))
             goto bailout;
         glsys->locked_ctx = NULL;
@@ -269,8 +269,6 @@ static void Close (vlc_object_t *this)
         }
 
         [sys->glESView release];
-
-        free(sys);
     }
 }
 
