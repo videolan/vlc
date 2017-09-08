@@ -409,6 +409,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                     sys->place = place;
                 }
 
+                if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
+                    return VLC_EGENERIC;
                 vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
 
                 /* For resize, we call glViewport in reshape and not here.
@@ -416,6 +418,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
                     // x / y are top left corner, but we need the lower left one
                     glViewport (place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
+                vlc_gl_ReleaseCurrent (sys->gl);
 
                 return VLC_SUCCESS;
             }
