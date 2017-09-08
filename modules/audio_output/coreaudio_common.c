@@ -42,6 +42,30 @@ FramesToUs(struct aout_sys_common *p_sys, uint64_t i_nb_frames)
     return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
 }
 
+void
+ca_Open(audio_output_t *p_aout)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    atomic_init(&p_sys->i_underrun_size, 0);
+    atomic_init(&p_sys->b_paused, false);
+    atomic_init(&p_sys->b_do_flush, false);
+    vlc_sem_init(&p_sys->flush_sem, 0);
+
+    p_aout->play = ca_Play;
+    p_aout->pause = ca_Pause;
+    p_aout->flush = ca_Flush;
+    p_aout->time_get = ca_TimeGet;
+}
+
+void
+ca_Close(audio_output_t *p_aout)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    vlc_sem_destroy(&p_sys->flush_sem);
+}
+
 /* Called from render callbacks. No lock, wait, and IO here */
 void
 ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested)
@@ -191,11 +215,8 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    atomic_init(&p_sys->i_underrun_size, 0);
-    atomic_init(&p_sys->b_paused, false);
-    atomic_init(&p_sys->b_do_flush, false);
-    vlc_sem_init(&p_sys->flush_sem, 0);
-
+    atomic_store(&p_sys->i_underrun_size, 0);
+    atomic_store(&p_sys->b_paused, false);
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
@@ -230,10 +251,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     if (!TPCircularBufferInit(&p_sys->circular_buffer, i_audiobuffer_size))
         return VLC_EGENERIC;
 
-    p_aout->play = ca_Play;
-    p_aout->pause = ca_Pause;
-    p_aout->flush = ca_Flush;
-    p_aout->time_get = ca_TimeGet;
     return VLC_SUCCESS;
 }
 
@@ -244,7 +261,6 @@ ca_Uninitialize(audio_output_t *p_aout)
 
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
-    vlc_sem_destroy(&p_sys->flush_sem);
 }
 
 AudioUnit

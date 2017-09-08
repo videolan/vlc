@@ -65,6 +65,10 @@ struct aout_sys_common
     mtime_t             i_dev_latency_us;
 };
 
+void ca_Open(audio_output_t *p_aout);
+
+void ca_Close(audio_output_t *p_aout);
+
 void ca_Render(audio_output_t *p_aout, uint8_t *p_output, size_t i_requested);
 
 int  ca_TimeGet(audio_output_t *p_aout, mtime_t *delay);

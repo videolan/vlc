@@ -499,6 +499,7 @@ Close(vlc_object_t *obj)
 
     [sys->aoutWrapper release];
 
+    ca_Close(aout);
     free(sys);
 }
 
@@ -532,5 +533,6 @@ Open(vlc_object_t *obj)
     for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
         aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
 
+    ca_Open(aout);
     return VLC_SUCCESS;
 }

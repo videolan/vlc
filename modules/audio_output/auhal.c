@@ -1592,6 +1592,7 @@ static void Close(vlc_object_t *obj)
     vlc_mutex_destroy(&p_sys->selected_device_lock);
     vlc_mutex_destroy(&p_sys->device_list_lock);
 
+    ca_Close(p_aout);
     free(p_sys);
 }
 
@@ -1655,5 +1656,6 @@ static int Open(vlc_object_t *obj)
     SwitchAudioDevice(p_aout, psz_audio_device);
     free(psz_audio_device);
 
+    ca_Open(p_aout);
     return VLC_SUCCESS;
 }
