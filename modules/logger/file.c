@@ -212,7 +212,7 @@ static const char *const verbosity_text[] = { N_("Default"), N_("Info"), N_("Err
 #define LOGMODE_LONGTEXT N_("Specify the logging format.")
 
 #define LOGVERBOSE_TEXT N_("Verbosity")
-#define LOGVERBOSE_LONGTEXT N_("Select the verbosity to use for log or " \
+#define LOGVERBOSE_LONGTEXT N_("Select the logging verbosity or " \
 "default to use the same verbosity given by --verbose.")
 
 vlc_module_begin()
