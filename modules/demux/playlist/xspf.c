@@ -696,26 +696,35 @@ static bool skip_element COMPLEX_INTERFACE
     if(b_empty_node)
         return true;
 
+    /* Const reference changes if we read again */
+    char *psz_end = psz_element ? strdup(psz_element) : NULL;
     const char *name;
-    for (unsigned lvl = 1; lvl;)
+    unsigned lvl = 1;
+    bool b_ret = true;
+    while(lvl > 0 && b_ret)
+    {
         switch (xml_ReaderNextNode(p_xml_reader, &name))
         {
             case XML_READER_STARTELEM:
-            {
                 if( !xml_ReaderIsEmptyElement( p_xml_reader ) )
                     ++lvl;
                 break;
-            }
             case XML_READER_ENDELEM:
-                if(lvl == 1 &&
-                    name && psz_element && strcmp(psz_element, name))
-                        return false;
                 lvl--;
                 break;
             case XML_READER_NONE:
             case XML_READER_ERROR:
-                return false;
+                b_ret = false;
+                break;
+            default:
+                break;
         }
+    }
 
-    return true;
+    if(b_ret) /* Ensure we end on same node type */
+        b_ret &= (!name || !psz_end || !strcmp(psz_end, name));
+
+    free(psz_end);
+
+    return b_ret;
 }
