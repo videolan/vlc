@@ -180,7 +180,8 @@ static int Open(vlc_object_t *this)
         if (!sys->gl)
             goto bailout;
 
-        struct gl_sys *glsys = sys->gl->sys = malloc(sizeof(struct gl_sys));
+        struct gl_sys *glsys = sys->gl->sys =
+            vlc_malloc(sys->gl, sizeof(struct gl_sys));
         if (unlikely(!sys->gl->sys))
             goto bailout;
         glsys->locked_ctx = NULL;
