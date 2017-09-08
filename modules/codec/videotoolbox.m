@@ -132,7 +132,6 @@ struct decoder_sys_t
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
     CFMutableDictionaryRef      decoderConfiguration;
-    CFMutableDictionaryRef      destinationPixelBufferAttributes;
     CFMutableDictionaryRef      extradataInfo;
 
     vlc_mutex_t                 lock;
@@ -668,12 +667,20 @@ static int StartVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    /* destination pixel buffer attributes */
+    CFMutableDictionaryRef destinationPixelBufferAttributes = cfdict_create(2);
+    if(destinationPixelBufferAttributes == nil)
+        return VLC_EGENERIC;
+
     p_sys->decoderConfiguration = CreateSessionDescriptionFormat(p_dec,
                                                                  p_dec->fmt_out.video.i_sar_num,
                                                                  p_dec->fmt_out.video.i_sar_den,
                                                                  p_sys->extradataInfo);
     if(p_sys->decoderConfiguration == nil)
+    {
+        CFRelease(destinationPixelBufferAttributes);
         return VLC_EGENERIC;
+    }
 
     /* create video format description */
     OSStatus status = CMVideoFormatDescriptionCreate(
@@ -685,40 +692,38 @@ static int StartVideoToolbox(decoder_t *p_dec)
                                             &p_sys->videoFormatDescription);
     if (status)
     {
+        CFRelease(destinationPixelBufferAttributes);
         CFRelease(p_sys->decoderConfiguration);
         p_sys->decoderConfiguration = nil;
         msg_Err(p_dec, "video format description creation failed (%i)", (int)status);
         return VLC_EGENERIC;
     }
 
-    /* destination pixel buffer attributes */
-    p_sys->destinationPixelBufferAttributes = cfdict_create(2);
-
 #if !TARGET_OS_IPHONE
-    CFDictionarySetValue(p_sys->destinationPixelBufferAttributes,
+    CFDictionarySetValue(destinationPixelBufferAttributes,
                          kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey,
                          kCFBooleanTrue);
 #else
-    CFDictionarySetValue(p_sys->destinationPixelBufferAttributes,
+    CFDictionarySetValue(destinationPixelBufferAttributes,
                          kCVPixelBufferOpenGLESCompatibilityKey,
                          kCFBooleanTrue);
 #endif
 
-    cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+    cfdict_set_int32(destinationPixelBufferAttributes,
                      kCVPixelBufferWidthKey, p_dec->fmt_out.video.i_width);
-    cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+    cfdict_set_int32(destinationPixelBufferAttributes,
                      kCVPixelBufferHeightKey, p_dec->fmt_out.video.i_height);
 
     if (p_sys->i_forced_cvpx_format != 0)
     {
         msg_Warn(p_dec, "forcing CVPX format: %4.4s",
                  (const char *) &p_sys->i_forced_cvpx_format);
-        cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+        cfdict_set_int32(destinationPixelBufferAttributes,
                          kCVPixelBufferPixelFormatTypeKey,
                          ntohl(p_sys->i_forced_cvpx_format));
     }
 
-    cfdict_set_int32(p_sys->destinationPixelBufferAttributes,
+    cfdict_set_int32(destinationPixelBufferAttributes,
                      kCVPixelBufferBytesPerRowAlignmentKey,
                      p_dec->fmt_out.video.i_width * 2);
 
@@ -731,8 +736,10 @@ static int StartVideoToolbox(decoder_t *p_dec)
     status = VTDecompressionSessionCreate(kCFAllocatorDefault,
                                           p_sys->videoFormatDescription,
                                           p_sys->decoderConfiguration,
-                                          p_sys->destinationPixelBufferAttributes,
+                                          destinationPixelBufferAttributes,
                                           &decoderCallbackRecord, &p_sys->session);
+
+    CFRelease(destinationPixelBufferAttributes);
 
     if (HandleVTStatus(p_dec, status) != VLC_SUCCESS)
         return VLC_EGENERIC;
@@ -786,13 +793,10 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
         CFRelease(p_sys->videoFormatDescription);
         p_sys->videoFormatDescription = nil;
     }
+
     if (p_sys->decoderConfiguration != nil) {
         CFRelease(p_sys->decoderConfiguration);
         p_sys->decoderConfiguration = nil;
-    }
-    if (p_sys->destinationPixelBufferAttributes != nil) {
-        CFRelease(p_sys->destinationPixelBufferAttributes);
-        p_sys->destinationPixelBufferAttributes = nil;
     }
 }
 
@@ -887,7 +891,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->codec = codec;
     p_sys->videoFormatDescription = nil;
     p_sys->decoderConfiguration = nil;
-    p_sys->destinationPixelBufferAttributes = nil;
     p_sys->extradataInfo = nil;
     p_sys->p_pic_reorder = NULL;
     p_sys->i_pic_reorder = 0;
