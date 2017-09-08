@@ -233,7 +233,7 @@ static int Open(vlc_object_t *this)
     }
 }
 
-void Close (vlc_object_t *this)
+static void Close (vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
