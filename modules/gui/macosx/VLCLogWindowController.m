@@ -322,26 +322,31 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 }
 
 /**
- Clears all messages in the message table by removing all items from the arrayController
+ Clears all messages in the message table by removing all items from the messagesArray
  */
 - (void)clearMessageTable
 {
-    NSRange range = NSMakeRange(0, [[_arrayController arrangedObjects] count]);
-    [_arrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
-}
+    [self willChangeValueForKey:@"messagesArray"];
+    [_messagesArray removeAllObjects];
+    [self didChangeValueForKey:@"messagesArray"];}
 
 /**
- Appends all messages from the buffer to the arrayController and clears the buffer
+ Appends all messages from the buffer to the messagesArray and clears the buffer
  */
 - (void)appendMessageBuffer
 {
-    if ([_messagesArray count] > 1000000) {
-        [_messagesArray removeObjectsInRange:NSMakeRange(0, 2)];
-    }
+    static const NSUInteger limit = 1000000;
+
+    [self willChangeValueForKey:@"messagesArray"];
     @synchronized (_messageBuffer) {
-        [_arrayController addObjects:_messageBuffer];
+        [_messagesArray addObjectsFromArray:_messageBuffer];
         [_messageBuffer removeAllObjects];
     }
+
+    if ([_messagesArray count] > limit) {
+        [_messagesArray removeObjectsInRange:NSMakeRange(0, _messagesArray.count - limit)];
+    }
+    [self didChangeValueForKey:@"messagesArray"];
 }
 
 @end
