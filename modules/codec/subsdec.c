@@ -513,7 +513,10 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** ppsz_attribute
     while ( *psz_subtitle && *psz_subtitle != '=' )
         psz_subtitle++;
     if ( !*psz_subtitle )
+    {
+        *ppsz_subtitle = psz_subtitle;
         return psz_attribute_name;
+    }
     // Skip the '=' sign
     psz_subtitle++;
 
@@ -542,7 +545,10 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** ppsz_attribute
         attr_len++;
     }
     if ( attr_len == 0 )
+    {
+        *ppsz_subtitle = psz_subtitle;
         return psz_attribute_name;
+    }
     if ( unlikely( !( *ppsz_attribute_value = malloc( attr_len + 1 ) ) ) )
     {
         free( psz_attribute_name );
