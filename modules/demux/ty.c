@@ -761,12 +761,6 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
     /* Register the CC decoders when needed */
     for( i = 0; i < 4; i++ )
     {
-        static const vlc_fourcc_t fcc[4] = {
-            VLC_CODEC_EIA608_1,
-            VLC_CODEC_EIA608_2,
-            VLC_CODEC_EIA608_3,
-            VLC_CODEC_EIA608_4,
-        };
         static const char *ppsz_description[4] = {
             N_("Closed captions 1"),
             N_("Closed captions 2"),
@@ -779,7 +773,8 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         if( !p_sys->cc.pb_present[i] || p_sys->p_cc[i] )
             continue;
 
-        es_format_Init( &fmt, SPU_ES, fcc[i] );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_CEA608 );
+        fmt.subs.cc.i_channel = i;
         fmt.psz_description = strdup( vlc_gettext(ppsz_description[i]) );
         fmt.i_group = TY_ES_GROUP;
         p_sys->p_cc[i] = es_out_Add( p_demux->out, &fmt );

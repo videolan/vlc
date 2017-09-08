@@ -2142,16 +2142,11 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
 
     if( b_decode )
     {
-        static const vlc_fourcc_t fcc[4] = {
-            VLC_CODEC_EIA608_1,
-            VLC_CODEC_EIA608_2,
-            VLC_CODEC_EIA608_3,
-            VLC_CODEC_EIA608_4,
-        };
         decoder_t *p_cc;
         es_format_t fmt;
 
-        es_format_Init( &fmt, SPU_ES, fcc[i_channel] );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_CEA608 );
+        fmt.subs.cc.i_channel = i_channel;
         fmt.subs.cc.i_reorder_depth = p_owner->cc.i_reorder_depth;
         p_cc = input_DecoderNew( p_owner->p_input, &fmt,
                               p_dec->p_owner->p_clock, p_owner->p_sout );

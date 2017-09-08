@@ -536,6 +536,7 @@ struct subs_format_t
     } teletext;
     struct
     {
+        uint8_t i_channel;
         uint8_t i_reorder_depth; /* Reorder depth or transport video */
     } cc;
 

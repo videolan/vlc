@@ -204,21 +204,14 @@ static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang );
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
 static char *EsInfoCategoryName( es_out_id_t* es );
 
-static const vlc_fourcc_t EsOutFourccClosedCaptions[4] = {
-    VLC_CODEC_EIA608_1,
-    VLC_CODEC_EIA608_2,
-    VLC_CODEC_EIA608_3,
-    VLC_CODEC_EIA608_4,
-};
-static inline int EsOutGetClosedCaptionsChannel( vlc_fourcc_t fcc )
+static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
 {
-    int i;
-    for( i = 0; i < 4; i++ )
-    {
-        if( fcc == EsOutFourccClosedCaptions[i] )
-            return i;
-    }
-    return -1;
+    int i_channel;
+    if( p_fmt->i_codec == VLC_CODEC_CEA608 && p_fmt->subs.cc.i_channel < 4 )
+        i_channel = p_fmt->subs.cc.i_channel;
+    else
+        i_channel = -1;
+    return i_channel;
 }
 static inline bool EsFmtIsTeletext( const es_format_t *p_fmt )
 {
@@ -1666,7 +1659,7 @@ static bool EsIsSelected( es_out_id_t *es )
         bool b_decode = false;
         if( es->p_master->p_dec )
         {
-            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_original_fourcc );
+            int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
             if( i_channel != -1 )
                 input_DecoderGetCcState( es->p_master->p_dec, &b_decode, i_channel );
         }
@@ -1732,7 +1725,8 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         if( !es->p_master->p_dec )
             return;
 
-        i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_original_fourcc );
+        i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
+
         if( i_channel == -1 || input_DecoderSetCcState( es->p_master->p_dec, true, i_channel ) )
             return;
     }
@@ -1793,7 +1787,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
     {
         if( es->p_master->p_dec )
         {
-            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_original_fourcc );
+            int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
             if( i_channel != -1 )
                 input_DecoderSetCcState( es->p_master->p_dec, false, i_channel );
         }
@@ -2077,7 +2071,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             continue;
         msg_Dbg( p_input, "Adding CC track %d for es[%d]", 1+i, es->i_id );
 
-        es_format_Init( &fmt, SPU_ES, EsOutFourccClosedCaptions[i] );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_CEA608 );
+        fmt.subs.cc.i_channel = i;
         fmt.i_group = es->fmt.i_group;
         if( asprintf( &fmt.psz_description,
                       _("Closed captions %u"), 1 + i ) == -1 )

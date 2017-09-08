@@ -1247,7 +1247,7 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         case ATOM_c608: /* EIA608 closed captions */
         //case ATOM_c708: /* EIA708 closed captions */
-            p_track->fmt.i_codec = VLC_CODEC_EIA608_1;
+            p_track->fmt.i_codec = VLC_CODEC_CEA608;
             break;
 
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):

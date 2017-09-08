@@ -1602,11 +1602,7 @@ static const staticentry_t p_list_spu[] = {
     B(VLC_CODEC_SCTE_27, "SCTE-27 subtitles"),
         A("SC27"),
 
-    B(VLC_CODEC_EIA608_1, "EIA-608 subtitles"),
-        A("cc1 "),
-        A("cc2 "),
-        A("cc3 "),
-        A("cc4 "),
+    B(VLC_CODEC_CEA608,  "EIA-608 subtitles"),
 
     B(VLC_CODEC_TTML, "TTML subtitles"),
         A("ttml"),

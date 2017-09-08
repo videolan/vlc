@@ -720,7 +720,7 @@ static int Open ( vlc_object_t *p_this )
     }
     else if( p_sys->props.i_type == SUB_TYPE_SCC )
     {
-        es_format_Init( &fmt, SPU_ES, VLC_CODEC_EIA608_1 );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_CEA608 );
     }
     else
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );

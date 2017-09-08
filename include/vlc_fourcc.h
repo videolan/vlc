@@ -539,11 +539,8 @@
 #define VLC_CODEC_EBU_STL   VLC_FOURCC('S','T','L',' ')
 #define VLC_CODEC_SCTE_18   VLC_FOURCC('S','C','1','8')
 #define VLC_CODEC_SCTE_27   VLC_FOURCC('S','C','2','7')
-/* EIA-608 */
-#define VLC_CODEC_EIA608_1  VLC_FOURCC('c','c','1',' ')
-#define VLC_CODEC_EIA608_2  VLC_FOURCC('c','c','2',' ')
-#define VLC_CODEC_EIA608_3  VLC_FOURCC('c','c','3',' ')
-#define VLC_CODEC_EIA608_4  VLC_FOURCC('c','c','4',' ')
+/* EIA/CEA-608 */
+#define VLC_CODEC_CEA608    VLC_FOURCC('c','6','0','8')
 #define VLC_CODEC_TTML      VLC_FOURCC('T','T','M','L')
 
 /* XYZ colorspace 12 bits packed in 16 bits, organisation |XXX0|YYY0|ZZZ0| */

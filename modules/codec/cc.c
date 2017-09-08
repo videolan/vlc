@@ -236,27 +236,18 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    int i_field;
-    int i_channel;
 
-    switch( p_dec->fmt_in.i_codec )
-    {
-        case VLC_CODEC_EIA608_1:
-            i_field = 0; i_channel = 1;
-            break;
-        case VLC_CODEC_EIA608_2:
-            i_field = 0; i_channel = 2;
-            break;
-        case VLC_CODEC_EIA608_3:
-            i_field = 1; i_channel = 1;
-            break;
-        case VLC_CODEC_EIA608_4:
-            i_field = 1; i_channel = 2;
-            break;
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_CEA608 ||
+        p_dec->fmt_in.subs.cc.i_channel > 3 )
+        return VLC_EGENERIC;
 
-        default:
-            return VLC_EGENERIC;
-    }
+    /*  0 -> i_field = 0; i_channel = 1;
+        1 -> i_field = 0; i_channel = 2;
+        2 -> i_field = 1; i_channel = 1;
+        3 -> i_field = 1; i_channel = 2; */
+
+    const int i_field = p_dec->fmt_in.subs.cc.i_channel >> 1;
+    const int i_channel = 1 + (p_dec->fmt_in.subs.cc.i_channel & 1);
 
     p_dec->pf_decode = Decode;
     p_dec->pf_flush  = Flush;
