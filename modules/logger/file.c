@@ -205,6 +205,9 @@ static const char *const verbosity_text[] = { N_("Default"), N_("Info"), N_("Err
 #define FILE_LOG_TEXT N_("Log to file")
 #define FILE_LOG_LONGTEXT N_("Log all VLC messages to a text file.")
 
+#define LOGFILE_NAME_TEXT N_("Log filename")
+#define LOGFILE_NAME_LONGTEXT N_("Specify the log filename.")
+
 #define LOGMODE_TEXT N_("Log format")
 #define LOGMODE_LONGTEXT N_("Specify the logging format.")
 
@@ -222,7 +225,7 @@ vlc_module_begin()
 
     add_bool("file-logging", false, FILE_LOG_TEXT, FILE_LOG_LONGTEXT, false)
     add_savefile("logfile", NULL,
-                 N_("Log filename"), N_("Specify the log filename."), false)
+                 LOGFILE_NAME_TEXT, LOGFILE_NAME_LONGTEXT, false)
     add_string("logmode", "text", LOGMODE_TEXT, LOGMODE_LONGTEXT, false)
         change_string_list(mode_list, mode_list_text)
     add_integer("log-verbose", -1, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT, false)
