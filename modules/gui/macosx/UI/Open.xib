@@ -158,6 +158,7 @@
                         <rect key="frame" x="13" y="142" width="548" height="278"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="262" id="XDQ-Ya-06b"/>
+                            <constraint firstAttribute="width" constant="534" id="rqv-N4-u9s"/>
                         </constraints>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
@@ -451,9 +452,9 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="730" customClass="VLCOpenTextField">
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="456" translatesAutoresizingMaskIntoConstraints="NO" id="730" customClass="VLCOpenTextField">
                                             <rect key="frame" x="52" y="190" width="456" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="2886">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" usesSingleLineMode="YES" id="2886">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -505,7 +506,12 @@
                                                 <font key="font" metaFont="menu"/>
                                                 <menu key="menu" title="OtherViews" id="2328">
                                                     <items>
-                                                        <menuItem title="Screen" state="on" id="2330"/>
+                                                        <menuItem title="Screen" state="on" id="2330">
+                                                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
                                                         <menuItem title="iSight Capture" id="2331"/>
                                                     </items>
                                                 </menu>
@@ -528,7 +534,7 @@
                     </tabView>
                     <button identifier="mrl button" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2836">
                         <rect key="frame" x="20" y="131" width="13" height="13"/>
-                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="AEB5B160-3B29-47A7-B703-010BA862920E" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
+                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="14BAC51D-6570-4E0C-A9FB-D0421B48957E" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -547,6 +553,9 @@
                                     <subviews>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2840">
                                             <rect key="frame" x="16" y="11" width="474" height="19"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="474" id="pdj-kx-cSy"/>
+                                            </constraints>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="2990">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -1950,7 +1959,7 @@ To open a stream using a different protocol, just press Cancel to close this she
         <userDefaultsController representsSharedInstance="YES" id="3521"/>
     </objects>
     <resources>
-        <image name="AEB5B160-3B29-47A7-B703-010BA862920E" width="1" height="1">
+        <image name="14BAC51D-6570-4E0C-A9FB-D0421B48957E" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
