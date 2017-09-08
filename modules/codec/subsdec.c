@@ -539,7 +539,7 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** ppsz_attribute
 
     attr_len = 0;
     while ( *psz_subtitle && ( ( delimiter != 0 && *psz_subtitle != delimiter ) ||
-                               ( delimiter == 0 && ( isalnum( *psz_subtitle ) || *psz_subtitle == '#' ) ) ) )
+                               ( delimiter == 0 && ( !isspace(*psz_subtitle) && *psz_subtitle != '>' ) ) ) )
     {
         psz_subtitle++;
         attr_len++;
