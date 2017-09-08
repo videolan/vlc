@@ -87,6 +87,7 @@ struct aout_sys_t
     /* The AudioUnit we use */
     AudioUnit au_unit;
     bool      b_muted;
+    bool      b_paused;
     bool      b_preferred_channels_set;
     enum au_dev au_dev;
 };
@@ -319,7 +320,24 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
             }
         }
     }
+    p_sys->b_paused = pause;
     ca_Pause(p_aout, pause, date);
+}
+
+static void
+Flush(audio_output_t *p_aout, bool wait)
+{
+    struct aout_sys_t * p_sys = p_aout->sys;
+
+    if (!p_sys->b_paused)
+        ca_Flush(p_aout, wait);
+    else
+    {
+        /* ca_Flush() can't work while paused since the AudioUnit is Stopped
+         * and the render callback won't be called. But it's safe to clear the
+         * circular buffer from this thread since AU is stopped. */
+        TPCircularBufferClear(&p_sys->c.circular_buffer);
+    }
 }
 
 static int
@@ -449,6 +467,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
+    p_aout->flush = Flush;
     msg_Dbg(p_aout, "analog AudioUnit output successfully opened for %4.4s %s",
             (const char *)&fmt->i_format, aout_FormatPrintChannels(fmt));
     return VLC_SUCCESS;
