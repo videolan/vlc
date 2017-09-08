@@ -49,6 +49,36 @@
 
 #define SPHERE_RADIUS 1.f
 
+#ifndef NDEBUG
+# define HAVE_GL_ASSERT_NOERROR
+#endif
+
+#ifdef __APPLE__
+/* FIXME: GL_ASSERT_NOERROR disabled for now because:
+ * glClear(GL_COLOR_BUFFER_BIT) throws a GL_INVALID_FRAMEBUFFER_OPERATION on macOS
+ * assert fails on vout_display_opengl_Delete on iOS
+ */
+# undef HAVE_GL_ASSERT_NOERROR
+#endif
+
+#ifdef HAVE_GL_ASSERT_NOERROR
+# define GL_ASSERT_NOERROR() do { \
+    GLenum glError = glGetError(); \
+    switch (glError) \
+    { \
+        case GL_NO_ERROR: break; \
+        case GL_INVALID_ENUM: assert(!"GL_INVALID_ENUM"); \
+        case GL_INVALID_VALUE: assert(!"GL_INVALID_VALUE"); \
+        case GL_INVALID_OPERATION: assert(!"GL_INVALID_OPERATION"); \
+        case GL_INVALID_FRAMEBUFFER_OPERATION: assert(!"GL_INVALID_FRAMEBUFFER_OPERATION"); \
+        case GL_OUT_OF_MEMORY: assert(!"GL_OUT_OF_MEMORY"); \
+        default: assert(!"GL_UNKNOWN_ERROR"); \
+    } \
+} while(0)
+#else
+# define GL_ASSERT_NOERROR()
+#endif
+
 typedef struct {
     GLuint   texture;
     GLsizei  width;
@@ -659,6 +689,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!vgl)
         return NULL;
 
+    GL_ASSERT_NOERROR();
     vgl->gl = gl;
 
     if (gl->getProcAddress == NULL) {
@@ -775,6 +806,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->prgm = &vgl->prgms[0];
     vgl->sub_prgm = &vgl->prgms[1];
 
+    GL_ASSERT_NOERROR();
     int ret;
     ret = opengl_init_program(vgl, vgl->prgm, extensions, fmt, false);
     if (ret != VLC_SUCCESS)
@@ -785,6 +817,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
+    GL_ASSERT_NOERROR();
     ret = opengl_init_program(vgl, vgl->sub_prgm, extensions, fmt, true);
     if (ret != VLC_SUCCESS)
     {
@@ -794,6 +827,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         free(vgl);
         return NULL;
     }
+    GL_ASSERT_NOERROR();
     /* Update the fmt to main program one */
     vgl->fmt = vgl->prgm->tc->fmt;
     /* The orientation is handled by the orientation matrix */
@@ -867,11 +901,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (subpicture_chromas) {
         *subpicture_chromas = gl_subpicture_chromas;
     }
+
+    GL_ASSERT_NOERROR();
     return vgl;
 }
 
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 {
+    GL_ASSERT_NOERROR();
+
     /* */
     glFinish();
     glFlush();
@@ -903,6 +941,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     opengl_deinit_program(vgl, vgl->sub_prgm);
 
     free(vgl);
+
+    GL_ASSERT_NOERROR();
 }
 
 static void UpdateZ(vout_display_opengl_t *vgl)
@@ -976,6 +1016,8 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
 {
+    GL_ASSERT_NOERROR();
+
     if (vgl->pool)
         return vgl->pool;
 
@@ -1011,6 +1053,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         goto error;
     }
 
+    GL_ASSERT_NOERROR();
     return vgl->pool;
 
 error:
@@ -1021,6 +1064,8 @@ error:
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {
+    GL_ASSERT_NOERROR();
+
     opengl_tex_converter_t *tc = vgl->prgm->tc;
 
     /* Update the texture */
@@ -1101,6 +1146,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     free(last);
 
     VLC_UNUSED(subpicture);
+
+    GL_ASSERT_NOERROR();
     return ret;
 }
 
@@ -1477,6 +1524,8 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
 {
+    GL_ASSERT_NOERROR();
+
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.
        Currently, the OS X provider uses it to get a smooth window resizing */
@@ -1608,6 +1657,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     /* Display */
     vlc_gl_Swap(vgl->gl);
+
+    GL_ASSERT_NOERROR();
 
     return VLC_SUCCESS;
 }
