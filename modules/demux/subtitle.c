@@ -1373,22 +1373,22 @@ static int ParseVplayer( vlc_object_t *p_obj, subs_properties_t *p_props,
 
 /* ParseSami
  */
-static char *ParseSamiSearch( text_t *txt,
-                              char *psz_start, const char *psz_str )
+static const char *ParseSamiSearch( text_t *txt,
+                                    const char *psz_start, const char *psz_str )
 {
     if( psz_start && strcasestr( psz_start, psz_str ) )
     {
-        char *s = strcasestr( psz_start, psz_str );
+        const char *s = strcasestr( psz_start, psz_str );
         return &s[strlen( psz_str )];
     }
 
     for( ;; )
     {
-        char *p = TextGetLine( txt );
+        const char *p = TextGetLine( txt );
         if( !p )
             return NULL;
 
-        char *s = strcasestr( p, psz_str );
+        const char *s = strcasestr( p, psz_str );
         if( s != NULL )
             return &s[strlen( psz_str )];
     }
@@ -1399,7 +1399,7 @@ static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
     VLC_UNUSED(p_obj);
     VLC_UNUSED(p_props);
     VLC_UNUSED( i_idx );
-    char *s;
+    const char *s;
     int64_t i_start;
 
     unsigned int i_text;
@@ -1410,7 +1410,9 @@ static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
         return VLC_EGENERIC;
 
     /* get start value */
-    i_start = strtol( s, &s, 0 );
+    char *psz_end;
+    i_start = strtol( s, &psz_end, 0 );
+    s = psz_end;
 
     /* search <P */
     if( !( s = ParseSamiSearch( txt, s, "<P" ) ) )
