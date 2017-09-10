@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G24b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
+        <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
     </dependencies>
@@ -30,7 +31,7 @@
                     <splitView arrangesAllSubviews="NO" autosaveName="LogWindowSplitView" dividerStyle="thin" translatesAutoresizingMaskIntoConstraints="NO" id="5ZT-Oc-K6D">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="330"/>
                         <subviews>
-                            <customView id="dx0-3n-J3G">
+                            <customView wantsLayer="YES" id="dx0-3n-J3G">
                                 <rect key="frame" x="0.0" y="0.0" width="480" height="231"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
@@ -60,7 +61,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <tableCellView id="9bi-ti-5pD">
+                                                                <tableCellView wantsLayer="YES" id="9bi-ti-5pD">
                                                                     <rect key="frame" x="1" y="1" width="60" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -100,7 +101,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <tableCellView id="0rr-qZ-Zvp">
+                                                                <tableCellView wantsLayer="YES" id="0rr-qZ-Zvp">
                                                                     <rect key="frame" x="64" y="1" width="90" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -140,7 +141,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                             <prototypeCellViews>
-                                                                <tableCellView id="mKk-vl-YgV">
+                                                                <tableCellView wantsLayer="YES" id="mKk-vl-YgV">
                                                                     <rect key="frame" x="157" y="1" width="321" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
