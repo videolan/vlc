@@ -161,6 +161,11 @@ typedef struct
         float f_factor;
     } mpsub;
 
+    struct
+    {
+        const char *psz_start;
+    } sami;
+
 } subs_properties_t;
 
 struct demux_sys_t
@@ -330,6 +335,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->props.i_microsecperframe = 40000;
     p_sys->props.jss.b_inited       = false;
     p_sys->props.mpsub.b_inited     = false;
+    p_sys->props.sami.psz_start     = NULL;
 
     /* Get the FPS */
     f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" ); /* FIXME */
@@ -1406,7 +1412,9 @@ static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
     char text[8192]; /* Arbitrary but should be long enough */
 
     /* search "Start=" */
-    if( !( s = ParseSamiSearch( txt, NULL, "Start=" ) ) )
+    s = ParseSamiSearch( txt, p_props->sami.psz_start, "Start=" );
+    p_props->sami.psz_start = NULL;
+    if( !s )
         return VLC_EGENERIC;
 
     /* get start value */
@@ -1424,7 +1432,6 @@ static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
 
     i_text = 0;
     text[0] = '\0';
-    const char *psz_startline = s;
     /* now get all txt until  a "Start=" line */
     for( ;; )
     {
@@ -1441,10 +1448,9 @@ static int ParseSami( vlc_object_t *p_obj, subs_properties_t *p_props,
             {
                 c = '\n';
             }
-            else if( strcasestr( s, "Start=" ) &&
-                     psz_startline != s )
+            else if( strcasestr( s, "Start=" ) )
             {
-                TextPreviousLine( txt );
+                p_props->sami.psz_start = s;
                 break;
             }
             s = ParseSamiSearch( txt, s, ">" );
