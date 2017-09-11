@@ -455,8 +455,9 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
     InsertIntoDPB(p_sys, p_info);
 }
 
-static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
+static CMVideoCodecType CodecPrecheck(decoder_t *p_dec, int *p_cvpx_chroma)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t i_profile = 0xFF, i_level = 0xFF;
     bool b_ret = false;
     CMVideoCodecType codec;
@@ -483,7 +484,15 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
                 case PROFILE_H264_HIGH_10:
                 {
                     if (deviceSupportsAdvancedProfiles())
+                    {
+                        /* FIXME: There is no YUV420 10bits chroma. The
+                         * decoder seems to output RGBA when decoding 10bits
+                         * content, but there is an unknown crash when
+                         * displaying such output, so force NV12 for now. */
+                        *p_cvpx_chroma =
+                                kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
                         break;
+                    }
                 }
 
                 default:
@@ -761,11 +770,11 @@ static int StartVideoToolbox(decoder_t *p_dec)
 
     if (p_sys->i_forced_cvpx_format != 0)
     {
-        msg_Warn(p_dec, "forcing CVPX format: %4.4s",
-                 (const char *) &p_sys->i_forced_cvpx_format);
+        int chroma = htonl(p_sys->i_forced_cvpx_format);
+        msg_Warn(p_dec, "forcing CVPX format: %4.4s", (const char *) &chroma);
         cfdict_set_int32(destinationPixelBufferAttributes,
                          kCVPixelBufferPixelFormatTypeKey,
-                         ntohl(p_sys->i_forced_cvpx_format));
+                         p_sys->i_forced_cvpx_format);
     }
 
     /* setup decoder callback record */
@@ -911,7 +920,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     /* check quickly if we can digest the offered data */
     CMVideoCodecType codec;
-    codec = CodecPrecheck(p_dec);
+    int codec_cvpx_chroma = 0;
+    codec = CodecPrecheck(p_dec, &codec_cvpx_chroma);
     if (codec == -1)
         return VLC_EGENERIC;
 
@@ -938,7 +948,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->b_enable_temporal_processing =
         var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing");
 
-    p_sys->i_forced_cvpx_format = 0;
     char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
     if (cvpx_chroma != NULL)
     {
@@ -950,8 +959,12 @@ static int OpenDecoder(vlc_object_t *p_this)
             return VLC_EGENERIC;
         }
         memcpy(&p_sys->i_forced_cvpx_format, cvpx_chroma, 4);
+        p_sys->i_forced_cvpx_format = ntohl(p_sys->i_forced_cvpx_format);
         free(cvpx_chroma);
     }
+    else
+        p_sys->i_forced_cvpx_format = codec_cvpx_chroma;
+
     h264_poc_context_init( &p_sys->pocctx );
     vlc_mutex_init(&p_sys->lock);
 
