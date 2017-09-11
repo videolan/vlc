@@ -356,7 +356,7 @@ static picture_t * RemoveOneFrameFromDPB(decoder_sys_t *p_sys)
     return p_ret;
 }
 
-static void DrainDPB(decoder_t *p_dec)
+static void DrainDPB(decoder_t *p_dec, bool flush)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     for( ;; )
@@ -368,7 +368,10 @@ static void DrainDPB(decoder_t *p_dec)
         {
             picture_t *p_next = p_fields->p_next;
             p_fields->p_next = NULL;
-            decoder_QueueVideo(p_dec, p_fields);
+            if (flush)
+                picture_Release(p_fields);
+            else
+                decoder_QueueVideo(p_dec, p_fields);
             p_fields = p_next;
         } while(p_fields != NULL);
     }
@@ -828,7 +831,7 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
             p_sys->b_format_propagated = false;
             p_dec->fmt_out.i_codec = 0;
         }
-        DrainDPB( p_dec );
+        DrainDPB(p_dec, true);
     }
 
     if (p_sys->videoFormatDescription != nil) {
@@ -1310,7 +1313,7 @@ static void Drain(decoder_t *p_dec)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
-    DrainDPB( p_dec );
+    DrainDPB(p_dec, false);
     vlc_mutex_unlock(&p_sys->lock);
 }
 
