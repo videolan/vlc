@@ -131,7 +131,6 @@ struct decoder_sys_t
     bool                        b_vt_flush;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
-    CFMutableDictionaryRef      decoderConfiguration;
     CFMutableDictionaryRef      extradataInfo;
 
     vlc_mutex_t                 lock;
@@ -672,11 +671,12 @@ static int StartVideoToolbox(decoder_t *p_dec)
     if(destinationPixelBufferAttributes == nil)
         return VLC_EGENERIC;
 
-    p_sys->decoderConfiguration = CreateSessionDescriptionFormat(p_dec,
-                                                                 p_dec->fmt_out.video.i_sar_num,
-                                                                 p_dec->fmt_out.video.i_sar_den,
-                                                                 p_sys->extradataInfo);
-    if(p_sys->decoderConfiguration == nil)
+    CFMutableDictionaryRef decoderConfiguration =
+        CreateSessionDescriptionFormat(p_dec,
+                                       p_dec->fmt_out.video.i_sar_num,
+                                       p_dec->fmt_out.video.i_sar_den,
+                                       p_sys->extradataInfo);
+    if(decoderConfiguration == nil)
     {
         CFRelease(destinationPixelBufferAttributes);
         return VLC_EGENERIC;
@@ -688,13 +688,12 @@ static int StartVideoToolbox(decoder_t *p_dec)
                                             p_sys->codec,
                                             p_dec->fmt_out.video.i_width,
                                             p_dec->fmt_out.video.i_height,
-                                            p_sys->decoderConfiguration,
+                                            decoderConfiguration,
                                             &p_sys->videoFormatDescription);
     if (status)
     {
         CFRelease(destinationPixelBufferAttributes);
-        CFRelease(p_sys->decoderConfiguration);
-        p_sys->decoderConfiguration = nil;
+        CFRelease(decoderConfiguration);
         msg_Err(p_dec, "video format description creation failed (%i)", (int)status);
         return VLC_EGENERIC;
     }
@@ -735,10 +734,10 @@ static int StartVideoToolbox(decoder_t *p_dec)
     /* create decompression session */
     status = VTDecompressionSessionCreate(kCFAllocatorDefault,
                                           p_sys->videoFormatDescription,
-                                          p_sys->decoderConfiguration,
+                                          decoderConfiguration,
                                           destinationPixelBufferAttributes,
                                           &decoderCallbackRecord, &p_sys->session);
-
+    CFRelease(decoderConfiguration);
     CFRelease(destinationPixelBufferAttributes);
 
     if (HandleVTStatus(p_dec, status) != VLC_SUCCESS)
@@ -792,11 +791,6 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
     if (p_sys->videoFormatDescription != nil) {
         CFRelease(p_sys->videoFormatDescription);
         p_sys->videoFormatDescription = nil;
-    }
-
-    if (p_sys->decoderConfiguration != nil) {
-        CFRelease(p_sys->decoderConfiguration);
-        p_sys->decoderConfiguration = nil;
     }
 }
 
@@ -890,7 +884,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->b_vt_flush = false;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = nil;
-    p_sys->decoderConfiguration = nil;
     p_sys->extradataInfo = nil;
     p_sys->p_pic_reorder = NULL;
     p_sys->i_pic_reorder = 0;
