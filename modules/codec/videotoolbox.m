@@ -662,6 +662,49 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
     return decoderConfiguration;
 }
 
+static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
+                                           VTDecompressionSessionRef session,
+                                           const struct hxxx_helper *hh)
+{
+    unsigned w, h, vw, vh;
+    int sarn, sard;
+
+    if (h264_helper_get_current_picture_size(hh, &w, &h, &vw, &vh) != VLC_SUCCESS)
+        return true;
+
+    if (h264_helper_get_current_sar(hh, &sarn, &sard) != VLC_SUCCESS)
+        return true;
+
+    CFMutableDictionaryRef extradataInfo = GetH264ExtradataInfo(hh);
+    if(extradataInfo == nil)
+        return true;
+
+    bool b_ret = true;
+
+    CFMutableDictionaryRef decoderConfiguration =
+            CreateSessionDescriptionFormat(p_dec, sarn, sard, extradataInfo);
+    if (decoderConfiguration != nil)
+    {
+        CMFormatDescriptionRef newvideoFormatDesc;
+        /* create new video format description */
+        OSStatus status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
+                                                         kCMVideoCodecType_H264,
+                                                         vw, vh,
+                                                         decoderConfiguration,
+                                                         &newvideoFormatDesc);
+        if (!status)
+        {
+            b_ret = !VTDecompressionSessionCanAcceptFormatDescription(session,
+                                                                      newvideoFormatDesc);
+            CFRelease(newvideoFormatDesc);
+        }
+        CFRelease(decoderConfiguration);
+    }
+    CFRelease(extradataInfo);
+
+    return b_ret;
+}
+
 static int StartVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1320,22 +1363,27 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     if (b_config_changed && p_info->b_flush)
     {
         assert(p_sys->codec == kCMVideoCodecType_H264);
-        if (p_sys->session)
+        if (!p_sys->session ||
+            VideoToolboxNeedsToRestartH264(p_dec,p_sys->session, &p_sys->hh))
         {
-            msg_Dbg(p_dec, "SPS/PPS changed: draining H264 decoder");
-            Drain(p_dec);
-            msg_Dbg(p_dec, "SPS/PPS changed: restarting H264 decoder");
-            StopVideoToolbox(p_dec, true);
-        }
-        /* else decoding didn't start yet, which is ok for H264, let's see
-         * if we can use this block to get going */
+            if(p_sys->session)
+            {
+                msg_Dbg(p_dec, "SPS/PPS changed: draining H264 decoder");
+                Drain(p_dec);
+                msg_Dbg(p_dec, "SPS/PPS changed: restarting H264 decoder");
+                StopVideoToolbox(p_dec, true);
+            }
+            /* else decoding didn't start yet, which is ok for H264, let's see
+             * if we can use this block to get going */
 
-        int i_ret = SetH264DecoderInfo(p_dec, nil);
-        if (i_ret == VLC_SUCCESS)
-        {
-            msg_Dbg(p_dec, "Got SPS/PPS: late opening of H264 decoder");
-            StartVideoToolbox(p_dec);
+            int i_ret = SetH264DecoderInfo(p_dec, nil);
+            if (i_ret == VLC_SUCCESS)
+            {
+                msg_Dbg(p_dec, "Got SPS/PPS: late opening of H264 decoder");
+                StartVideoToolbox(p_dec);
+            }
         }
+
         if (!p_sys->session)
         {
             free(p_info);
