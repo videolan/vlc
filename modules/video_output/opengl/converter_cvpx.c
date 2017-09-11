@@ -63,8 +63,6 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
     {
-        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
-
         CVOpenGLESTextureRef texture;
         CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(
             kCFAllocatorDefault, priv->cache, pixelBuffer, NULL,
