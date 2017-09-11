@@ -835,6 +835,7 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
         CFRelease(p_sys->videoFormatDescription);
         p_sys->videoFormatDescription = nil;
     }
+    p_sys->b_vt_feed = false;
 }
 
 static int RestartVideoToolbox(decoder_t *p_dec, bool b_reset_format)
