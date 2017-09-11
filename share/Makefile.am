@@ -149,6 +149,7 @@ nobase_vlcdata_DATA += \
 	lua/playlist/vimeo.luac \
 	lua/playlist/vocaroo.luac \
 	lua/playlist/youtube.luac \
+	lua/playlist/twitch.luac \
 	lua/sd/fmc.luac \
 	lua/sd/icecast.luac \
 	lua/sd/icast.luac \
@@ -290,6 +291,7 @@ EXTRA_DIST += \
 	lua/playlist/vimeo.lua \
 	lua/playlist/vocaroo.lua \
 	lua/playlist/youtube.lua \
+	lua/playlist/twitch.lua \
 	lua/playlist/zapiks.lua \
 	lua/sd/README.txt \
 	lua/sd/fmc.lua \
