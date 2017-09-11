@@ -173,6 +173,8 @@ private:
     mtime_t getPlaybackTimestamp() const;
 
     double getPlaybackPosition() const;
+
+    void setInitialTime( mtime_t time );
     // Sets the current state and signal the associated wait cond.
     // This must be called with the lock held
     void setState( States state );
@@ -190,6 +192,7 @@ private:
     static void set_length(void*, mtime_t length);
     static mtime_t get_time(void*);
     static double get_position(void*);
+    static void set_initial_time( void*, mtime_t time );
 
     static void wait_app_started(void*);
 

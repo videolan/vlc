@@ -45,6 +45,7 @@ struct demux_sys_t
         ,demuxReady(false)
         ,m_seektime( VLC_TS_INVALID )
         ,m_enabled( true )
+        ,m_startTime( VLC_TS_INVALID )
     {
         vlc_meta_t *p_meta = vlc_meta_New();
         if( likely(p_meta != NULL) )
@@ -133,6 +134,13 @@ struct demux_sys_t
             p_renderer->pf_wait_app_started( p_renderer->p_opaque );
             demuxReady = true;
             msg_Dbg(p_demux, "ready to demux");
+        }
+        if( m_startTime == VLC_TS_INVALID )
+        {
+            if( demux_Control( p_demux->p_next, DEMUX_GET_TIME,
+                               &m_startTime ) == VLC_SUCCESS )
+                p_renderer->pf_set_initial_time( p_renderer->p_opaque,
+                                                 m_startTime );
         }
 
         /* hold the data while seeking */
@@ -250,6 +258,7 @@ struct demux_sys_t
         case DEMUX_FILTER_DISABLE:
             m_enabled = false;
             p_renderer = NULL;
+            m_startTime = VLC_TS_INVALID;
             return VLC_SUCCESS;
         }
 
@@ -265,6 +274,7 @@ protected:
     /* seek time kept while waiting for the chromecast to "seek" */
     mtime_t       m_seektime;
     bool          m_enabled;
+    mtime_t       m_startTime;
 };
 
 static int Demux( demux_t *p_demux_filter )

@@ -95,6 +95,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     m_common.pf_get_position     = get_position;
     m_common.pf_get_time         = get_time;
     m_common.pf_set_length       = set_length;
+    m_common.pf_set_initial_time = set_initial_time;
     m_common.pf_wait_app_started = wait_app_started;
     m_common.pf_request_seek     = request_seek;
     m_common.pf_wait_seek_done   = wait_seek_done;
@@ -164,7 +165,6 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     // We should now be in the ready state, and therefor have a valid transportId
     assert( m_state == Ready && m_appTransportId.empty() == false );
     // we cannot start a new load when the last one is still processing
-    m_ts_local_start = VLC_TS_0;
     m_communication.msgPlayerLoad( m_appTransportId, m_streaming_port, m_title, m_artwork, mime_type );
     setState( Loading );
 }
@@ -730,6 +730,12 @@ double intf_sys_t::getPlaybackPosition() const
     return 0.0;
 }
 
+void intf_sys_t::setInitialTime(mtime_t time)
+{
+    if( time )
+        m_ts_local_start = time;
+}
+
 void intf_sys_t::setState( States state )
 {
     if ( m_state != state )
@@ -754,6 +760,13 @@ double intf_sys_t::get_position(void *pt)
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     vlc_mutex_locker locker( &p_this->m_lock );
     return p_this->getPlaybackPosition();
+}
+
+void intf_sys_t::set_initial_time(void *pt, mtime_t time )
+{
+    intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
+    vlc_mutex_locker locker( &p_this->m_lock );
+    return p_this->setInitialTime( time );
 }
 
 void intf_sys_t::set_length(void *pt, mtime_t length)
