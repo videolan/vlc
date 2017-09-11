@@ -185,7 +185,7 @@ cvpxpic_unmap(picture_t *mapped_pic)
         return NULL;
     }
 
-    cvpxpic_attach(hw_pic, CVPixelBufferRetain((void *)mapped_pic->p_sys));
+    cvpxpic_attach(hw_pic, (void *)mapped_pic->p_sys);
     picture_CopyProperties(hw_pic, mapped_pic);
     picture_Release(mapped_pic);
     return hw_pic;
