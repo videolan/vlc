@@ -1585,11 +1585,16 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     {
         if (status == kVTVideoDecoderBadDataErr || status == -8969 )
             p_info = NULL;
+        if (status == kVTVideoDecoderMalfunctionErr)
+            p_dec->p_sys->b_abort = true;
         msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", (int)status,
                  (unsigned int) infoFlags);
         goto end;
     }
     assert(imageBuffer);
+
+    if (p_dec->p_sys->b_abort)
+        goto end;
 
     if (unlikely(!p_sys->b_format_propagated)) {
         p_sys->b_format_propagated =
