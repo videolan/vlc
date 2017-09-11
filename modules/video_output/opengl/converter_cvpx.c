@@ -46,6 +46,7 @@ struct priv
     picture_t *last_pic;
 #if TARGET_OS_IPHONE
     CVOpenGLESTextureCacheRef cache;
+    CVOpenGLESTextureRef last_cvtexs[PICTURE_PLANE_MAX];
 #endif
 };
 
@@ -61,13 +62,15 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     CVPixelBufferRef pixelBuffer = cvpxpic_get_ref(pic);
 
+    CVOpenGLESTextureCacheFlush(priv->cache, 0);
+
     for (unsigned i = 0; i < tc->tex_count; ++i)
     {
-        CVOpenGLESTextureRef texture;
+        CVOpenGLESTextureRef cvtex;
         CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(
             kCFAllocatorDefault, priv->cache, pixelBuffer, NULL,
             tc->tex_target, tc->texs[i].internal, tex_width[i], tex_height[i],
-            tc->texs[i].format, tc->texs[i].type, i, &texture);
+            tc->texs[i].format, tc->texs[i].type, i, &cvtex);
         if (err != noErr)
         {
             msg_Err(tc->gl,
@@ -76,13 +79,15 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
             return VLC_EGENERIC;
         }
 
-        textures[i] = CVOpenGLESTextureGetName(texture);
+        textures[i] = CVOpenGLESTextureGetName(cvtex);
         tc->vt->BindTexture(tc->tex_target, textures[i]);
         tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        CFRelease(texture);
+        if (likely(priv->last_cvtexs[i]))
+            CFRelease(priv->last_cvtexs[i]);
+        priv->last_cvtexs[i] = cvtex;
     }
 
     if (priv->last_pic != pic)
