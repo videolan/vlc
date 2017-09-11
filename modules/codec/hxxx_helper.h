@@ -74,15 +74,15 @@ void hxxx_helper_clean(struct hxxx_helper *hh);
 int hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                           size_t i_extra);
 
-block_t *h264_helper_get_annexb_config(struct hxxx_helper *hh);
+block_t *h264_helper_get_annexb_config(const struct hxxx_helper *hh);
 
-block_t *h264_helper_get_avcc_config(struct hxxx_helper *hh);
+block_t *h264_helper_get_avcc_config(const struct hxxx_helper *hh);
 
-int h264_helper_get_current_picture_size(struct hxxx_helper *hh,
+int h264_helper_get_current_picture_size(const struct hxxx_helper *hh,
                                          unsigned *p_w, unsigned *p_h,
                                          unsigned *p_vw, unsigned *p_vh);
 
-int h264_helper_get_current_sar(struct hxxx_helper *hh, int *p_num, int *p_den);
+int h264_helper_get_current_sar(const struct hxxx_helper *hh, int *p_num, int *p_den);
 
-int h264_helper_get_current_dpb_values(struct hxxx_helper *hh,
+int h264_helper_get_current_dpb_values(const struct hxxx_helper *hh,
                                        uint8_t *p_depth, unsigned *pi_delay);

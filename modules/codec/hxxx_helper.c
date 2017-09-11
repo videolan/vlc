@@ -477,7 +477,7 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
 
 
 block_t *
-h264_helper_get_annexb_config(struct hxxx_helper *hh)
+h264_helper_get_annexb_config(const struct hxxx_helper *hh)
 {
     static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x00, 0x01 };
 
@@ -527,7 +527,7 @@ h264_helper_get_annexb_config(struct hxxx_helper *hh)
 }
 
 block_t *
-h264_helper_get_avcc_config(struct hxxx_helper *hh)
+h264_helper_get_avcc_config(const struct hxxx_helper *hh)
 {
     const struct hxxx_helper_nal *p_nal;
     size_t i = 0;
@@ -556,7 +556,7 @@ h264_helper_get_avcc_config(struct hxxx_helper *hh)
 }
 
 static const struct hxxx_helper_nal *
-h264_helper_get_current_sps(struct hxxx_helper *hh)
+h264_helper_get_current_sps(const struct hxxx_helper *hh)
 {
     if (hh->h264.i_sps_count == 0)
         return NULL;
@@ -568,7 +568,7 @@ h264_helper_get_current_sps(struct hxxx_helper *hh)
 }
 
 int
-h264_helper_get_current_picture_size(struct hxxx_helper *hh,
+h264_helper_get_current_picture_size(const struct hxxx_helper *hh,
                                      unsigned *p_w, unsigned *p_h,
                                      unsigned *p_vw, unsigned *p_vh)
 {
@@ -580,7 +580,7 @@ h264_helper_get_current_picture_size(struct hxxx_helper *hh,
 }
 
 int
-h264_helper_get_current_sar(struct hxxx_helper *hh, int *p_num, int *p_den)
+h264_helper_get_current_sar(const struct hxxx_helper *hh, int *p_num, int *p_den)
 {
     const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
     if (hsps == NULL)
@@ -591,8 +591,8 @@ h264_helper_get_current_sar(struct hxxx_helper *hh, int *p_num, int *p_den)
 }
 
 int
-h264_helper_get_current_dpb_values(struct hxxx_helper *hh,
-                                       uint8_t *p_depth, unsigned *p_delay)
+h264_helper_get_current_dpb_values(const struct hxxx_helper *hh,
+                                   uint8_t *p_depth, unsigned *p_delay)
 {
     const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
     if (hsps == NULL)
