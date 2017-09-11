@@ -1579,25 +1579,24 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     decoder_sys_t *p_sys = p_dec->p_sys;
     frame_info_t *p_info = (frame_info_t *) sourceFrameRefCon;
 
-    if (status != noErr) {
-        msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", (int)status, (unsigned int) infoFlags);
-        if( status != kVTVideoDecoderBadDataErr && status != -8969 )
-            free(p_info);
-        return;
+    vlc_mutex_lock(&p_sys->lock);
+
+    if (HandleVTStatus(p_dec, status) != VLC_SUCCESS)
+    {
+        if (status == kVTVideoDecoderBadDataErr || status == -8969 )
+            p_info = NULL;
+        msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", (int)status,
+                 (unsigned int) infoFlags);
+        goto end;
     }
     assert(imageBuffer);
 
     if (unlikely(!p_sys->b_format_propagated)) {
-        vlc_mutex_lock(&p_sys->lock);
         p_sys->b_format_propagated =
             UpdateVideoFormat(p_dec, imageBuffer) == VLC_SUCCESS;
-        vlc_mutex_unlock(&p_sys->lock);
 
         if (!p_sys->b_format_propagated)
-        {
-            free(p_info);
-            return;
-        }
+            goto end;
         assert(p_dec->fmt_out.i_codec != 0);
     }
 
@@ -1608,31 +1607,19 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     }
 
     if (!CMTIME_IS_VALID(pts))
-    {
-        free(p_info);
-        return;
-    }
+        goto end;
 
     if (CVPixelBufferGetDataSize(imageBuffer) == 0)
-    {
-        free(p_info);
-        return;
-    }
+        goto end;
 
     if(likely(p_info))
     {
         picture_t *p_pic = decoder_NewPicture(p_dec);
         if (!p_pic)
-        {
-            free(p_info);
-            return;
-        }
+            goto end;
 
         if (cvpxpic_attach(p_pic, imageBuffer) != VLC_SUCCESS)
-        {
-            free(p_info);
-            return;
-        }
+            goto end;
 
         p_info->p_picture = p_pic;
 
@@ -1645,10 +1632,12 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             p_pic->b_top_field_first = p_info->b_top_field_first;
         }
 
-        vlc_mutex_lock(&p_sys->lock);
         OnDecodedFrame( p_dec, p_info );
-        vlc_mutex_unlock(&p_sys->lock);
+        p_info = NULL;
     }
 
+end:
+    free(p_info);
+    vlc_mutex_unlock(&p_sys->lock);
     return;
 }
