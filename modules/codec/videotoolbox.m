@@ -768,10 +768,6 @@ static int StartVideoToolbox(decoder_t *p_dec)
                          ntohl(p_sys->i_forced_cvpx_format));
     }
 
-    cfdict_set_int32(destinationPixelBufferAttributes,
-                     kCVPixelBufferBytesPerRowAlignmentKey,
-                     p_dec->fmt_out.video.i_width * 2);
-
     /* setup decoder callback record */
     VTDecompressionOutputCallbackRecord decoderCallbackRecord;
     decoderCallbackRecord.decompressionOutputCallback = DecoderCallback;
