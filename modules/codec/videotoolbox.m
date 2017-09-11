@@ -1310,7 +1310,14 @@ static void Drain(decoder_t *p_dec)
 
     /* draining: return last pictures of the reordered queue */
     if (p_sys->session)
-        VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
+    {
+        OSStatus status =
+            VTDecompressionSessionFinishDelayedFrames(p_sys->session);
+        if (status == noErr)
+            VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
+        else
+            msg_Warn(p_dec, "VTDecompressionSessionFinishDelayedFrames failed");
+    }
 
     vlc_mutex_lock(&p_sys->lock);
     DrainDPB(p_dec, false);
