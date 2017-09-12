@@ -98,6 +98,7 @@ cvpxpic_destroy_mapped_ro_cb(picture_t *pic)
     CVPixelBufferRef cvpx = (void *) pic->p_sys;
     CVPixelBufferUnlockBaseAddress(cvpx, kCVPixelBufferLock_ReadOnly);
     CFRelease(cvpx);
+    free(pic);
 }
 
 static void
@@ -106,6 +107,7 @@ cvpxpic_destroy_mapped_rw_cb(picture_t *pic)
     CVPixelBufferRef cvpx = (void *) pic->p_sys;
     CVPixelBufferUnlockBaseAddress(cvpx, 0);
     CFRelease(cvpx);
+    free(pic);
 }
 
 picture_t *
