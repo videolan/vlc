@@ -154,7 +154,6 @@ cvpxpic_create_mapped(const video_format_t *fmt, CVPixelBufferRef cvpx,
     if (pic == NULL)
     {
         CVPixelBufferUnlockBaseAddress(cvpx, lock);
-        CFRelease(cvpx);
         return NULL;
     }
     CVPixelBufferRetain(cvpx);
