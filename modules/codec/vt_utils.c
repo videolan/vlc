@@ -224,7 +224,6 @@ cvpxpool_create(const video_format_t *fmt, unsigned count)
         return NULL;
     }
 
-#if !TARGET_OS_IPHONE
     CFMutableDictionaryRef io_dict = cfdict_create(0);
     if (unlikely(io_dict == NULL))
     {
@@ -235,10 +234,6 @@ cvpxpool_create(const video_format_t *fmt, unsigned count)
     CFDictionarySetValue(cvpx_attrs_dict,
                          kCVPixelBufferIOSurfacePropertiesKey, io_dict);
     CFRelease(io_dict);
-#else
-    CFDictionarySetValue(cvpx_attrs_dict,
-                         kCVPixelBufferOpenGLESCompatibilityKey, kCFBooleanTrue);
-#endif
 
     cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferBytesPerRowAlignmentKey,
                      fmt->i_width);
@@ -246,6 +241,8 @@ cvpxpool_create(const video_format_t *fmt, unsigned count)
                      cvpx_format);
     cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferWidthKey, fmt->i_width);
     cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferHeightKey, fmt->i_height);
+    /* Required by CIFilter to render IOSurface */
+    cfdict_set_int32(cvpx_attrs_dict, kCVPixelBufferBytesPerRowAlignmentKey, 16);
 
     cfdict_set_int32(pool_dict, kCVPixelBufferPoolMinimumBufferCountKey, count);
     cfdict_set_int32(pool_dict, kCVPixelBufferPoolMaximumBufferAgeKey, 0);
