@@ -313,6 +313,7 @@ Filter(filter_t *filter, picture_t *src)
     }
     CFRelease(cvpx);
 
+    @autoreleasepool {
     CIImage *ci_img = [CIImage imageWithCVImageBuffer: cvpxpic_get_ref(src)];
     if (!ci_img)
         goto error;
@@ -341,6 +342,7 @@ Filter(filter_t *filter, picture_t *src)
             toIOSurface: CVPixelBufferGetIOSurface(cvpx)
                  bounds: [ci_img extent]
              colorSpace: ctx->color_space];
+    }
 
     CopyInfoAndRelease(dst, src);
 
