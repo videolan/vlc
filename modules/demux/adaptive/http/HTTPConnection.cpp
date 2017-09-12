@@ -217,26 +217,25 @@ bool HTTPConnection::send(const void *buf, size_t size)
 
 int HTTPConnection::parseReply()
 {
-    std::string line = readLine();
+    std::string statusline = readLine();
 
-    if(line.empty())
+    if(statusline.empty())
         return VLC_EGENERIC;
 
-    if (line.compare(0, 9, "HTTP/1.1 ")!=0)
+    if (statusline.compare(0, 9, "HTTP/1.1 ")!=0)
     {
-        if(line.compare(0, 9, "HTTP/1.0 ")!=0)
+        if(statusline.compare(0, 9, "HTTP/1.0 ")!=0)
             return VLC_ENOOBJ;
         else
             connectionClose = true;
     }
 
-    std::istringstream ss(line.substr(9));
+    std::istringstream ss(statusline.substr(9));
     ss.imbue(std::locale("C"));
     int replycode;
     ss >> replycode;
 
-
-    line = readLine();
+    std::string line = readLine();
 
     while(!line.empty() && line.compare("\r\n"))
     {
@@ -258,7 +257,7 @@ int HTTPConnection::parseReply()
     }
     else if (replycode != 200 && replycode != 206)
     {
-        msg_Err(p_object, "Failed reading %s: %s", params.getUrl().c_str(), line.c_str());
+        msg_Err(p_object, "Failed reading %s: %s", params.getUrl().c_str(), statusline.c_str());
         return VLC_ENOOBJ;
     }
 
