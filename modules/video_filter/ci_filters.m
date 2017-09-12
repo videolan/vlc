@@ -314,39 +314,39 @@ Filter(filter_t *filter, picture_t *src)
     CFRelease(cvpx);
 
     @autoreleasepool {
-    CIImage *ci_img = [CIImage imageWithCVImageBuffer: cvpxpic_get_ref(src)];
-    if (!ci_img)
-        goto error;
+        CIImage *ci_img = [CIImage imageWithCVImageBuffer: cvpxpic_get_ref(src)];
+        if (!ci_img)
+            goto error;
 
-    for (struct filter_chain *fchain = ctx->fchain;
-         fchain; fchain = fchain->next)
-    {
-        [fchain->ci_filter setValue: ci_img
-                             forKey: kCIInputImageKey];
-
-        for (unsigned int i = 0; i < NUM_FILTER_PARAM_MAX &&
-                 filter_desc_table[fchain->filter].param_descs[i].vlc; ++i)
+        for (struct filter_chain *fchain = ctx->fchain;
+             fchain; fchain = fchain->next)
         {
-            NSString *ci_param_name =
-                filter_desc_table[fchain->filter].param_descs[i].ci;
-            float ci_value = vlc_atomic_load_float(fchain->ci_params + i);
+            [fchain->ci_filter setValue: ci_img
+                                 forKey: kCIInputImageKey];
 
-            [fchain->ci_filter setValue: [NSNumber numberWithFloat: ci_value]
-                                 forKey: ci_param_name];
+            for (unsigned int i = 0; i < NUM_FILTER_PARAM_MAX &&
+                     filter_desc_table[fchain->filter].param_descs[i].vlc; ++i)
+            {
+                NSString *ci_param_name =
+                    filter_desc_table[fchain->filter].param_descs[i].ci;
+                float ci_value = vlc_atomic_load_float(fchain->ci_params + i);
+
+                [fchain->ci_filter setValue: [NSNumber numberWithFloat: ci_value]
+                                     forKey: ci_param_name];
+            }
+
+            ci_img = [fchain->ci_filter valueForKey: kCIOutputImageKey];
         }
 
-        ci_img = [fchain->ci_filter valueForKey: kCIOutputImageKey];
-    }
-
-    [ctx->ci_ctx render: ci_img
+        [ctx->ci_ctx render: ci_img
 #if !TARGET_OS_IPHONE
-            toIOSurface: CVPixelBufferGetIOSurface(cvpx)
+                toIOSurface: CVPixelBufferGetIOSurface(cvpx)
 #else
-        toCVPixelBuffer: cvpx
+            toCVPixelBuffer: cvpx
 #endif
-                 bounds: [ci_img extent]
-             colorSpace: ctx->color_space];
-    }
+                     bounds: [ci_img extent]
+                 colorSpace: ctx->color_space];
+    } /* autoreleasepool */
 
     CopyInfoAndRelease(dst, src);
 
