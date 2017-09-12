@@ -89,10 +89,10 @@ vlc_module_end()
 
 #pragma mark - local prototypes
 
-static int ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static int SetH264DecoderInfo(decoder_t *, CFMutableDictionaryRef);
+static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *, uint8_t *, uint32_t);
 static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef, void *, size_t);
-static CFMutableDictionaryRef GetH264ExtradataInfo(const struct hxxx_helper *hh);
+static CFMutableDictionaryRef H264ExtradataInfoCreate(const struct hxxx_helper *hh);
 static int HandleVTStatus(decoder_t *, OSStatus);
 static int DecodeBlock(decoder_t *, block_t *);
 static void Flush(decoder_t *);
@@ -687,7 +687,7 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     if (h264_helper_get_current_sar(hh, &sarn, &sard) != VLC_SUCCESS)
         return true;
 
-    CFMutableDictionaryRef extradataInfo = GetH264ExtradataInfo(hh);
+    CFMutableDictionaryRef extradataInfo = H264ExtradataInfoCreate(hh);
     if(extradataInfo == nil)
         return true;
 
@@ -865,6 +865,7 @@ static int SetupDecoderExtradata(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     CFMutableDictionaryRef extradata_info = NULL;
 
+    assert(p_sys->extradataInfo == nil);
     if (p_sys->codec == kCMVideoCodecType_H264)
     {
         hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
@@ -876,31 +877,26 @@ static int SetupDecoderExtradata(decoder_t *p_dec)
         assert(p_sys->hh.pf_process_block != NULL);
 
         if (p_dec->fmt_in.p_extra)
-        {
             p_sys->extradataInfo = ExtradataInfoCreate(CFSTR("avcC"),
                                             p_dec->fmt_in.p_extra,
                                             p_dec->fmt_in.i_extra);
-            if (p_sys->extradataInfo == nil)
-                return VLC_EGENERIC;
+        else
+        {
+            /* AnnexB case, we'll get extradata from first input blocks */
+            return VLC_SUCCESS;
         }
-        /* else: AnnexB case, we'll get extradata from first input blocks */
     }
     else if (p_sys->codec == kCMVideoCodecType_MPEG4Video)
     {
         if (!p_dec->fmt_in.i_extra)
             return VLC_EGENERIC;
-        int i_ret = ESDSCreate(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
-        if (i_ret != VLC_SUCCESS)
-            return i_ret;
+        p_sys->extradataInfo = ESDSExtradataInfoCreate(p_dec, p_dec->fmt_in.p_extra,
+                                                       p_dec->fmt_in.i_extra);
     }
     else
-    {
         p_sys->extradataInfo = ExtradataInfoCreate(NULL, NULL, 0);
-        if (p_sys->extradataInfo == nil)
-            return VLC_EGENERIC;
-    }
 
-    return VLC_SUCCESS;
+    return p_sys->extradataInfo != nil ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static int OpenDecoder(vlc_object_t *p_this)
@@ -1087,7 +1083,9 @@ static inline void bo_add_mp4_tag_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
     bo_add_8(p_bo, size & 0x7F);
 }
 
-static int ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
+static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *p_dec,
+                                                      uint8_t *p_buf,
+                                                      uint32_t i_buf_size)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1098,7 +1096,7 @@ static int ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
     bo_t bo;
     bool status = bo_init(&bo, 1024);
     if (status != true)
-        return VLC_EGENERIC;
+        return nil;
 
     bo_add_8(&bo, 0);       // Version
     bo_add_24be(&bo, 0);    // Flags
@@ -1125,14 +1123,13 @@ static int ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
     bo_add_8(&bo, 0x01);    // length
     bo_add_8(&bo, 0x02);    // no SL
 
-    p_sys->extradataInfo = ExtradataInfoCreate(CFSTR("esds"),
-                                               bo.b->p_buffer, bo.b->i_buffer);
+    CFMutableDictionaryRef extradataInfo =
+        ExtradataInfoCreate(CFSTR("esds"), bo.b->p_buffer, bo.b->i_buffer);
     bo_deinit(&bo);
-
-    return (p_sys->extradataInfo == nil) ? VLC_EGENERIC: VLC_SUCCESS;
+    return extradataInfo;
 }
 
-static CFMutableDictionaryRef GetH264ExtradataInfo(const struct hxxx_helper *hh)
+static CFMutableDictionaryRef H264ExtradataInfoCreate(const struct hxxx_helper *hh)
 {
     CFMutableDictionaryRef extradataInfo = nil;
     block_t *p_avcC = h264_helper_get_avcc_config(hh);
@@ -1170,8 +1167,8 @@ static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradata
     p_dec->fmt_out.video.i_sar_num = i_sar_num;
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
 
-    if(extradataInfo == nil)
-        extradataInfo = GetH264ExtradataInfo(&p_sys->hh);
+    if (extradataInfo == nil)
+        extradataInfo = H264ExtradataInfoCreate(&p_sys->hh);
 
     if (p_sys->extradataInfo != nil)
         CFRelease(p_sys->extradataInfo);
