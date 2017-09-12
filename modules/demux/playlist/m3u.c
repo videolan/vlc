@@ -150,33 +150,62 @@ int Import_M3U( vlc_object_t *p_this )
 
 static bool ContainsURL(const uint8_t *p_peek, size_t i_peek)
 {
-    const uint8_t *p_peek_end = p_peek + i_peek;
-    if( i_peek < 7 )
+    const char *ps = (const char *)p_peek;
+    const char *ps_end = (const char *) p_peek + i_peek;
+    const size_t i_max = sizeof( "https://" );
+    if( i_peek < i_max + 1 )
         return false;
 
-    while( p_peek + sizeof( "https://" ) < p_peek_end )
+    bool b_newline = true;
+    while( ps + i_max + 1 < ps_end )
     {
-        /* One line starting with a URL is enough */
-        if( !strncasecmp( (const char *)p_peek, "http://", 7 ) ||
-            !strncasecmp( (const char *)p_peek, "mms://", 6 ) ||
-            !strncasecmp( (const char *)p_peek, "rtsp://", 7 ) ||
-            !strncasecmp( (const char *)p_peek, "https://", 8 ) ||
-            !strncasecmp( (const char *)p_peek, "ftp://", 6 ) ||
-            !strncasecmp( (const char *)p_peek, "ftps://", 7 ) ||
-            !strncasecmp( (const char *)p_peek, "ftpes://", 8 ) )
-        {
-            return true;
-        }
-        /* Comments and blank lines are ignored */
-        else if( *p_peek != '#' && *p_peek != '\n' && *p_peek != '\r')
-        {
+        if( *ps <= 0 )
             return false;
+
+        /* Goto next line */
+        if( *ps == '\n' )
+        {
+            ps++;
+            b_newline = true;
+            continue;
         }
 
-        while( p_peek < p_peek_end && *p_peek != '\n' )
-            p_peek++;
-        if ( *p_peek == '\n' )
-            p_peek++;
+        /* One line starting with a URL is enough */
+        if( b_newline )
+        {
+            const char *ps_match = strnstr( ps, "://", i_max );
+            if(ps_match)
+            {
+                switch(ps_match - ps)
+                {
+                    case 3:
+                        if( !strncasecmp( ps, "mms", 3 ) ||
+                            !strncasecmp( ps, "ftp", 3 ) )
+                            return true;
+                        break;
+                    case 4:
+                        if( !strncasecmp( ps, "http", 4 ) ||
+                            !strncasecmp( ps, "rtsp", 4 ) ||
+                            !strncasecmp( ps, "ftps", 4 ) )
+                            return true;
+                        break;
+                    case 5:
+                        if( !strncasecmp( ps, "https", 5 ) ||
+                            !strncasecmp( ps, "ftpes", 5 ) )
+                            return true;
+                    default:
+                        break;
+                }
+            }
+
+            /* Comments and blank lines are ignored */
+            if( *ps != '#' && *ps != '\n' && *ps != '\r')
+                return false;
+
+            b_newline = false;
+        }
+
+        ps++;
     }
     return false;
 }
