@@ -152,6 +152,8 @@ static int Open (vlc_object_t *this)
         sys->vgl = NULL;
         sys->gl = NULL;
 
+        var_Create(vd->obj.parent, "macosx-glcontext", VLC_VAR_ADDRESS);
+
         /* Get the drawable object */
         id container = var_CreateGetAddress (vd, "drawable-nsobject");
         if (container)
@@ -221,8 +223,8 @@ static int Open (vlc_object_t *this)
         sys->gl->swap = OpenglSwap;
         sys->gl->getProcAddress = OurGetProcAddress;
 
-        var_Create(vd->obj.parent, "macosx-ns-opengl-context", VLC_VAR_ADDRESS);
-        var_SetAddress(vd->obj.parent, "macosx-ns-opengl-context", [sys->glView openGLContext]);
+        var_SetAddress(vd->obj.parent, "macosx-glcontext",
+                       [[sys->glView openGLContext] CGLContextObj]);
 
         const vlc_fourcc_t *subpicture_chromas;
 
@@ -286,7 +288,7 @@ void Close (vlc_object_t *this)
                                       withObject:nil
                                    waitUntilDone:NO];
 
-        var_Destroy(vd->obj.parent, "macosx-ns-opengl-context");
+        var_Destroy(vd->obj.parent, "macosx-glcontext");
         if (sys->vgl != NULL)
         {
             vlc_gl_MakeCurrent(sys->gl);

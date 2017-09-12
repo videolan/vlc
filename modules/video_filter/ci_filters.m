@@ -35,7 +35,6 @@
 #include "filter_picture.h"
 #include "vt_utils.h"
 
-#include <AppKit/NSOpenGL.h>
 #include <CoreImage/CIContext.h>
 #include <CoreImage/CIImage.h>
 #include <CoreImage/CIFilter.h>
@@ -532,11 +531,13 @@ Open(vlc_object_t *obj, char const *psz_filter)
                 goto error;
         }
 
-        NSOpenGLContext *context =
-            var_InheritAddress(filter, "macosx-ns-opengl-context");
-        assert(context);
-
-        ctx->ci_ctx = [CIContext contextWithCGLContext: [context CGLContextObj]
+        CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
+        if (!glctx)
+        {
+            msg_Err(filter, "can't find 'macosx-glcontext' var");
+            goto error;
+        }
+        ctx->ci_ctx = [CIContext contextWithCGLContext: glctx
                                            pixelFormat: nil
                                             colorSpace: nil
                                                options: nil];
