@@ -312,6 +312,7 @@ Filter(filter_t *filter, picture_t *src)
         CFRelease(cvpx);
         goto error;
     }
+    CFRelease(cvpx);
 
     CIImage *ci_img = [CIImage imageWithCVImageBuffer: cvpxpic_get_ref(src)];
     if (!ci_img)
@@ -427,6 +428,7 @@ CVPX_buffer_new(filter_t *converter)
         CFRelease(cvpx);
         return NULL;
     }
+    CFRelease(cvpx);
 
     return pic;
 }
