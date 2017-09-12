@@ -1021,6 +1021,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     StopVideoToolbox(p_dec, true);
+    if (p_sys->extradataInfo)
+        CFRelease(p_sys->extradataInfo);
 
     if (p_sys->codec == kCMVideoCodecType_H264)
         hxxx_helper_clean(&p_sys->hh);
@@ -1171,6 +1173,8 @@ static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradata
     if(extradataInfo == nil)
         extradataInfo = GetH264ExtradataInfo(&p_sys->hh);
 
+    if (p_sys->extradataInfo != nil)
+        CFRelease(p_sys->extradataInfo);
     p_sys->extradataInfo = extradataInfo;
 
     return (p_sys->extradataInfo == nil) ? VLC_EGENERIC: VLC_SUCCESS;
