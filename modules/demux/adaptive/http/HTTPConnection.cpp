@@ -363,9 +363,17 @@ void HTTPConnection::onHeader(const std::string &key,
 std::string HTTPConnection::buildRequestHeader(const std::string &path) const
 {
     std::stringstream req;
-    req << "GET " << path << " HTTP/1.1\r\n" <<
-           "Host: " << params.getHostname() << "\r\n" <<
-           "Cache-Control: no-cache" << "\r\n" <<
+    req << "GET " << path << " HTTP/1.1\r\n";
+    if((params.getScheme() == "http" && params.getPort() != 80) ||
+            (params.getScheme() == "https" && params.getPort() != 443))
+    {
+        req << "Host: " << params.getHostname() << ":" << params.getPort() << "\r\n";
+    }
+    else
+    {
+        req << "Host: " << params.getHostname() << "\r\n";
+    }
+    req << "Cache-Control: no-cache" << "\r\n" <<
            "User-Agent: " << std::string(psz_useragent) << "\r\n";
     req << extraRequestHeaders();
     return req.str();
