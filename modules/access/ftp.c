@@ -370,7 +370,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         msg_Err( p_access, "connection failed" );
         vlc_dialog_display_error( p_access, _("Network interaction failed"), "%s",
             _("VLC could not connect with the given server.") );
-        return -1;
+        goto error;
     }
 
     if ( p_sys->tlsmode == IMPLICIT ) /* FTPS Mode */
@@ -386,7 +386,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         msg_Err( p_access, "connection rejected" );
         vlc_dialog_display_error( p_access, _("Network interaction failed"), "%s",
             _("VLC's connection to the given server was rejected.") );
-        return -1;
+        goto error;
     }
 
     msg_Dbg( p_access, "connection accepted (%d)", i_answer );
@@ -397,7 +397,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                         FeaturesCheck, &p_sys->features ) < 0 )
     {
          msg_Err( p_access, "cannot get server features" );
-         return -1;
+         goto error;
     }
 
     /* Create TLS Session */
@@ -406,7 +406,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         if ( ! p_sys->features.b_authtls )
         {
             msg_Err( p_access, "Server does not support TLS" );
-            return -1;
+            goto error;
         }
 
         if( ftp_SendCommand( p_access, p_sys, "AUTH TLS" ) < 0
@@ -415,7 +415,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         {
              msg_Err( p_access, "cannot switch to TLS: server replied with code %d",
                       i_answer );
-             return -1;
+             goto error;
         }
 
         if( createCmdTLS( p_access, p_sys, "ftpes") < 0 )
