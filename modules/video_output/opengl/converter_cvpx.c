@@ -35,10 +35,6 @@ struct gl_sys
 };
 #else
 #include <IOSurface/IOSurface.h>
-struct gl_sys
-{
-    CGLContextObj locked_ctx;
-};
 #endif
 
 struct priv
@@ -47,6 +43,8 @@ struct priv
 #if TARGET_OS_IPHONE
     CVOpenGLESTextureCacheRef cache;
     CVOpenGLESTextureRef last_cvtexs[PICTURE_PLANE_MAX];
+#else
+    CGLContextObj gl_ctx;
 #endif
 };
 
@@ -108,7 +106,6 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 {
     (void) plane_offset;
     struct priv *priv = tc->priv;
-    struct gl_sys *glsys = tc->gl->sys;
 
     CVPixelBufferRef pixelBuffer = cvpxpic_get_ref(pic);
 
@@ -120,7 +117,7 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
         tc->vt->BindTexture(tc->tex_target, textures[i]);
 
         CGLError err =
-            CGLTexImageIOSurface2D(glsys->locked_ctx, tc->tex_target,
+            CGLTexImageIOSurface2D(priv->gl_ctx, tc->tex_target,
                                    tc->texs[i].internal,
                                    tex_width[i], tex_height[i],
                                    tc->texs[i].format,
@@ -191,6 +188,15 @@ Open(vlc_object_t *obj)
     tc->handle_texs_gen = true;
 #else
     const GLenum tex_target = GL_TEXTURE_RECTANGLE;
+    {
+        priv->gl_ctx = var_InheritAddress(tc->gl, "macosx-glcontext");
+        if (!priv->gl_ctx)
+        {
+            msg_Err(tc->gl, "can't find macosx-glcontext\n");
+            free(priv);
+            return VLC_EGENERIC;
+        }
+    }
 #endif
 
     GLuint fragment_shader;
