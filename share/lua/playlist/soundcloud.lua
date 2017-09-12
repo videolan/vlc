@@ -83,10 +83,10 @@ function parse()
 
     if track then
         -- API magic
-        local client_id = "2t9loNQH90kzJcsFCODdigxfp325aq4z"
+        local client_id = "WKcQQdEZw7Oi01KqtHWxeVSxNyRzgT8M"
         -- app_version is not required by the API but we send it anyway
         -- to remain unconspicuous
-        local app_version = "1489155300"
+        local app_version = "1505226596"
 
         local api = vlc.stream( vlc.access.."://api.soundcloud.com/i1/tracks/"..track.."/streams?client_id="..client_id.."&app_version="..app_version..( secret and "&secret_token="..secret or "" ) )
 
