@@ -432,6 +432,23 @@ CVPX_buffer_new(filter_t *converter)
     return pic;
 }
 
+static void
+Close_RemoveConverters(filter_t *filter, struct ci_filters_ctx *ctx)
+{
+    VLC_UNUSED(filter);
+    if (ctx->dst_converter)
+    {
+        module_unneed(ctx->dst_converter, ctx->dst_converter->p_module);
+        vlc_object_release(ctx->dst_converter);
+        CVPixelBufferPoolRelease(ctx->outconv_cvpx_pool);
+    }
+    if (ctx->src_converter)
+    {
+        module_unneed(ctx->src_converter, ctx->src_converter->p_module);
+        vlc_object_release(ctx->src_converter);
+    }
+}
+
 static int
 Open_AddConverters(filter_t *filter, struct ci_filters_ctx *ctx)
 {
@@ -573,6 +590,7 @@ error:
     {
         if (ctx->color_space)
             CGColorSpaceRelease(ctx->color_space);
+        Close_RemoveConverters(filter, ctx);
         if (ctx->cvpx_pool)
             CVPixelBufferPoolRelease(ctx->cvpx_pool);
         free(ctx);
@@ -626,20 +644,11 @@ Close(vlc_object_t *obj)
 
     if (!ctx->fchain)
     {
-        if (ctx->dst_converter)
-        {
-            module_unneed(ctx->dst_converter, ctx->dst_converter->p_module);
-            vlc_object_release(ctx->dst_converter);
-            CVPixelBufferPoolRelease(ctx->outconv_cvpx_pool);
-        }
-        if (ctx->src_converter)
-        {
-            module_unneed(ctx->src_converter, ctx->src_converter->p_module);
-            vlc_object_release(ctx->src_converter);
-        }
+        Close_RemoveConverters(filter, ctx);
+        if (ctx->cvpx_pool)
+            CVPixelBufferPoolRelease(ctx->cvpx_pool);
         if (ctx->color_space)
             CGColorSpaceRelease(ctx->color_space);
-        CVPixelBufferPoolRelease(ctx->cvpx_pool);
         free(ctx);
         var_Destroy(filter->obj.parent, "ci-filters-ctx");
     }
