@@ -128,7 +128,6 @@ struct vout_display_sys_t
 
 struct gl_sys
 {
-    CVEAGLContext locked_ctx;
     VLCOpenGLES2VideoView *glESView;
 };
 
@@ -154,6 +153,8 @@ static int Open(vlc_object_t *this)
     vd->sys = sys;
     sys->picturePool = NULL;
     sys->gl = NULL;
+
+    var_Create(vd->obj.parent, "ios-eaglcontext", VLC_VAR_ADDRESS);
 
     @autoreleasepool {
         /* setup the actual OpenGL ES view */
@@ -184,7 +185,6 @@ static int Open(vlc_object_t *this)
             vlc_malloc(this, sizeof(struct gl_sys));
         if (unlikely(!sys->gl->sys))
             goto bailout;
-        glsys->locked_ctx = NULL;
         glsys->glESView = sys->glESView;
         /* Initialize common OpenGL video display */
         sys->gl->makeCurrent = OpenglESLock;
@@ -194,6 +194,9 @@ static int Open(vlc_object_t *this)
 
         if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
             goto bailout;
+
+        var_SetAddress(vd->obj.parent, "ios-eaglcontext", [sys->glESView eaglContext]);
+
         sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
                                            sys->gl, &vd->cfg->viewpoint);
         vlc_gl_ReleaseCurrent(sys->gl);
@@ -270,6 +273,7 @@ static void Close (vlc_object_t *this)
 
         [sys->glESView release];
     }
+    var_Destroy(vd->obj.parent, "ios-eaglcontext");
 }
 
 /*****************************************************************************
@@ -396,7 +400,6 @@ static int OpenglESLock(vlc_gl_t *gl)
 
     [sys->glESView lock];
     [sys->glESView resetBuffers];
-    sys->locked_ctx = (__bridge CVEAGLContext) ((__bridge void *) [sys->glESView eaglContext]);
     return VLC_SUCCESS;
 }
 

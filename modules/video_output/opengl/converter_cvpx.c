@@ -29,10 +29,6 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #include <CoreVideo/CVOpenGLESTextureCache.h>
-struct gl_sys
-{
-    CVEAGLContext locked_ctx;
-};
 #else
 #include <IOSurface/IOSurface.h>
 #endif
@@ -174,10 +170,16 @@ Open(vlc_object_t *obj)
     const GLenum tex_target = GL_TEXTURE_2D;
 
     {
-        struct gl_sys *glsys = tc->gl->sys;
+        CVEAGLContext eagl_ctx = var_InheritAddress(tc->gl, "ios-eaglcontext");
+        if (!eagl_ctx)
+        {
+            msg_Err(tc->gl, "can't find ios-eaglcontext\n");
+            free(priv);
+            return VLC_EGENERIC;
+        }
         CVReturn err =
             CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL,
-                                         glsys->locked_ctx, NULL, &priv->cache);
+                                         eagl_ctx, NULL, &priv->cache);
         if (err != noErr)
         {
             msg_Err(tc->gl, "CVOpenGLESTextureCacheCreate failed: %d", err);
