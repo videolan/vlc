@@ -281,6 +281,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     NSURL *o_url;
     o_url = [NSURL URLWithString:toNSStr(psz_uri)];
+    free(psz_uri);
     vlc_object_release(p_input);
 
     return o_url;
