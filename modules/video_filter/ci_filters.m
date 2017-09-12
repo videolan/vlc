@@ -339,7 +339,11 @@ Filter(filter_t *filter, picture_t *src)
     }
 
     [ctx->ci_ctx render: ci_img
+#if !TARGET_OS_IPHONE
             toIOSurface: CVPixelBufferGetIOSurface(cvpx)
+#else
+        toCVPixelBuffer: cvpx
+#endif
                  bounds: [ci_img extent]
              colorSpace: ctx->color_space];
     }
@@ -550,6 +554,7 @@ Open(vlc_object_t *obj, char const *psz_filter)
                 goto error;
         }
 
+#if !TARGET_OS_IPHONE
         CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
         if (!glctx)
         {
@@ -560,6 +565,15 @@ Open(vlc_object_t *obj, char const *psz_filter)
                                            pixelFormat: nil
                                             colorSpace: nil
                                                options: nil];
+#else
+        CVEAGLContext eaglctx = var_InheritAddress(filter, "ios-eaglcontext");
+        if (!eaglctx)
+        {
+            msg_Err(filter, "can't find 'ios-eaglcontext' var");
+            goto error;
+        }
+        ctx->ci_ctx = [CIContext contextWithEAGLContext: eaglctx];
+#endif
         if (!ctx->ci_ctx)
             goto error;
 
