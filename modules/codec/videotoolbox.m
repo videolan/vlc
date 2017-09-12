@@ -1311,7 +1311,9 @@ static void Flush(decoder_t *p_dec)
     /* There is no Flush in VT api, ask to restart VT from next DecodeBlock if
      * we already feed some input blocks (it's better to not restart here in
      * order to avoid useless restart just before a close). */
+    vlc_mutex_lock(&p_sys->lock);
     p_sys->b_vt_flush = p_sys->b_vt_feed;
+    vlc_mutex_unlock(&p_sys->lock);
 }
 
 static void Drain(decoder_t *p_dec)
@@ -1338,10 +1340,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->b_vt_flush) {
+    if (p_sys->b_vt_flush)
         RestartVideoToolbox(p_dec, false);
-        p_sys->b_vt_flush = false;
-    }
 
     if (p_block == NULL)
     {
@@ -1350,6 +1350,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
 
     vlc_mutex_lock(&p_sys->lock);
+    p_sys->b_vt_flush = false;
+
     if (p_sys->b_abort) { /* abort from output thread (DecoderCallback) */
         vlc_mutex_unlock(&p_sys->lock);
         /* Add an empty variable so that videotoolbox won't be loaded again for
@@ -1590,6 +1592,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     frame_info_t *p_info = (frame_info_t *) sourceFrameRefCon;
 
     vlc_mutex_lock(&p_sys->lock);
+    if (p_sys->b_vt_flush)
+        goto end;
 
     if (HandleVTStatus(p_dec, status) != VLC_SUCCESS)
     {
