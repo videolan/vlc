@@ -301,6 +301,14 @@ static int ftp_RecvCommand( vlc_object_t *obj, access_sys_t *sys,
     return ftp_RecvAnswer( obj, sys, codep, strp, DummyLine, NULL );
 }
 
+static int ftp_RecvCommandInit( vlc_object_t *obj, access_sys_t *sys )
+{
+    int val = ftp_RecvReply( obj, sys, NULL, DummyLine, NULL );
+    if( val >= 0 )
+        val /= 100;
+    return val;
+}
+
 static int ftp_StartStream( vlc_object_t *, access_sys_t *, uint64_t, bool );
 static int ftp_StopStream ( vlc_object_t *, access_sys_t * );
 
@@ -1124,13 +1132,13 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     {
         if( p_sys->features.b_mlst &&
             ftp_SendCommand( p_access, p_sys, "MLSD" ) >= 0 &&
-            ftp_RecvCommand( p_access, p_sys, NULL, NULL ) <= 2 )
+            ftp_RecvCommandInit( p_access, p_sys ) == 1 )
         {
             msg_Dbg( p_access, "Using MLST extension to list" );
         }
         else
         if( ftp_SendCommand( p_access, p_sys, "NLST" ) < 0 ||
-            ftp_RecvCommand( p_access, p_sys, NULL, NULL ) > 2 )
+            ftp_RecvCommandInit( p_access, p_sys ) == 1 )
         {
             msg_Err( p_access, "cannot list directory contents" );
             return VLC_EGENERIC;
@@ -1143,7 +1151,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         if( ftp_SendCommand( p_access, p_sys, "%s %s",
                              p_sys->out ? "STOR" : "RETR",
                              p_sys->url.psz_path ) < 0
-         || ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
+         || ftp_RecvCommandInit( p_access, p_sys ) != 1 )
         {
             msg_Err( p_access, "cannot retrieve file" );
             return VLC_EGENERIC;
