@@ -2199,6 +2199,7 @@ static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
         if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey) != ERROR_SUCCESS )
             return NULL;
 
+        len = sizeof(szData);
         if( RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
             if (_tcscmp(lookup, szData) == 0)
                 return hKey;
@@ -2246,8 +2247,8 @@ static bool CanUseTextureArray(vout_display_t *vd)
         int wddm, d3d_features, revision, build;
         /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
         if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) == 4)
-            /* it should be OK starting from driver 22.19.128.xxx */
-            return wddm > 22 || (wddm == 22 && (d3d_features > 19 || (d3d_features == 19 && revision >= 128)));
+            /* it should be OK starting from driver 22.19.162.xxx */
+            return wddm > 22 || (wddm == 22 && (d3d_features > 19 || (d3d_features == 19 && revision >= 162)));
     }
 #endif
     msg_Dbg(vd, "fallback to legacy shader mode for old AMD drivers");
