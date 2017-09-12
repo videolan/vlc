@@ -302,7 +302,7 @@ Filter(filter_t *filter, picture_t *src)
     if (!dst)
         goto error;
 
-    CVPixelBufferRef cvpx = cvpxpool_get_cvpx(ctx->cvpx_pool);
+    CVPixelBufferRef cvpx = cvpxpool_new_cvpx(ctx->cvpx_pool);
     if (!cvpx)
         goto error;
 
@@ -417,7 +417,7 @@ static picture_t *
 CVPX_buffer_new(filter_t *converter)
 {
     CVPixelBufferPoolRef pool = converter->owner.sys;
-    CVPixelBufferRef cvpx = cvpxpool_get_cvpx(pool);
+    CVPixelBufferRef cvpx = cvpxpool_new_cvpx(pool);
     if (!cvpx)
         return NULL;
 

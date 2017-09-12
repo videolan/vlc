@@ -73,6 +73,6 @@ CVPixelBufferPoolRef cvpxpool_create(const video_format_t *fmt, unsigned count);
 /*
  * Get a cvpx buffer from a pool
  */
-CVPixelBufferRef cvpxpool_get_cvpx(CVPixelBufferPoolRef pool);
+CVPixelBufferRef cvpxpool_new_cvpx(CVPixelBufferPoolRef pool);
 
 #endif

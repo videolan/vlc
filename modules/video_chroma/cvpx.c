@@ -113,7 +113,7 @@ static picture_t *CVPX_buffer_new(filter_t *p_sw_filter)
     filter_t *p_filter = p_sw_filter->owner.sys;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    CVPixelBufferRef cvpx = cvpxpool_get_cvpx(p_sys->pool);
+    CVPixelBufferRef cvpx = cvpxpool_new_cvpx(p_sys->pool);
     if (cvpx == NULL)
         return NULL;
 

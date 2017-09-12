@@ -277,7 +277,7 @@ cvpxpool_create(const video_format_t *fmt, unsigned count)
 }
 
 CVPixelBufferRef
-cvpxpool_get_cvpx(CVPixelBufferPoolRef pool)
+cvpxpool_new_cvpx(CVPixelBufferPoolRef pool)
 {
     CVPixelBufferRef cvpx;
     CVReturn err = CVPixelBufferPoolCreatePixelBuffer(NULL, pool, &cvpx);
