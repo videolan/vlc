@@ -1159,10 +1159,15 @@ static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradata
                                                  &i_video_width, &i_video_height);
     if (i_ret != VLC_SUCCESS)
         return i_ret;
+
     i_ret = h264_helper_get_current_sar(&p_sys->hh, &i_sar_num, &i_sar_den);
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
+    hxxx_helper_get_colorimetry(&p_sys->hh, &p_dec->fmt_out.video.primaries,
+                                &p_dec->fmt_out.video.transfer,
+                                &p_dec->fmt_out.video.space,
+                                &p_dec->fmt_out.video.b_color_range_full);
     p_dec->fmt_out.video.i_visible_width =
     p_dec->fmt_out.video.i_width = i_video_width;
     p_dec->fmt_out.video.i_visible_height =
