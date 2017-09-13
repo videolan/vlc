@@ -21,6 +21,7 @@
 # define H264_NAL_H
 
 # include <vlc_common.h>
+# include <vlc_es.h>
 
 #define PROFILE_H264_BASELINE             66
 #define PROFILE_H264_MAIN                 77
@@ -187,6 +188,11 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *, unsigned *p_w
                             unsigned *p_vw, unsigned *p_vh );
 bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *, uint8_t *pi_chroma_format,
                            uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma );
+bool h264_get_colorimetry( const h264_sequence_parameter_set_t *p_sps,
+                           video_color_primaries_t *p_primaries,
+                           video_transfer_func_t *p_transfer,
+                           video_color_space_t *p_colorspace,
+                           bool *p_full_range );
 
 /* Get level and Profile from DecoderConfigurationRecord */
 bool h264_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,

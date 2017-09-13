@@ -794,6 +794,24 @@ bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *p_sps, uint8_t *
     *pi_depth_chroma = p_sps->i_bit_depth_chroma;
     return true;
 }
+bool h264_get_colorimetry( const h264_sequence_parameter_set_t *p_sps,
+                           video_color_primaries_t *p_primaries,
+                           video_transfer_func_t *p_transfer,
+                           video_color_space_t *p_colorspace,
+                           bool *p_full_range )
+{
+    if( !p_sps->vui.b_valid )
+        return false;
+    *p_primaries =
+        hxxx_colour_primaries_to_vlc( p_sps->vui.colour.i_colour_primaries );
+    *p_transfer =
+        hxxx_transfer_characteristics_to_vlc( p_sps->vui.colour.i_transfer_characteristics );
+    *p_colorspace =
+        hxxx_matrix_coeffs_to_vlc( p_sps->vui.colour.i_matrix_coefficients );
+    *p_full_range = p_sps->vui.colour.b_full_range;
+    return true;
+}
+
 
 bool h264_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
                             uint8_t *pi_level, uint8_t *pi_nal_length_size)
