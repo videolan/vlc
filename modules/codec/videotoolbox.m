@@ -1168,11 +1168,11 @@ static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradata
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
 
     if (extradataInfo == nil)
-        extradataInfo = H264ExtradataInfoCreate(&p_sys->hh);
-
-    if (p_sys->extradataInfo != nil)
-        CFRelease(p_sys->extradataInfo);
-    p_sys->extradataInfo = extradataInfo;
+    {
+        if (p_sys->extradataInfo != nil)
+            CFRelease(p_sys->extradataInfo);
+        p_sys->extradataInfo = H264ExtradataInfoCreate(&p_sys->hh);
+    }
 
     return (p_sys->extradataInfo == nil) ? VLC_EGENERIC: VLC_SUCCESS;
 }
