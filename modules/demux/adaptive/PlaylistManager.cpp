@@ -633,10 +633,12 @@ void PlaylistManager::Run()
 
         if(needsUpdate())
         {
+            int canc = vlc_savecancel();
             if(updatePlaylist())
                 scheduleNextUpdate();
             else
                 failedupdates++;
+            vlc_restorecancel(canc);
         }
 
         vlc_mutex_lock(&demux.lock);
