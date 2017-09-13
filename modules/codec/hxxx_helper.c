@@ -475,7 +475,6 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
     return VLC_SUCCESS;;
 }
 
-
 block_t *
 h264_helper_get_annexb_config(const struct hxxx_helper *hh)
 {
@@ -599,4 +598,30 @@ h264_helper_get_current_dpb_values(const struct hxxx_helper *hh,
         return VLC_EGENERIC;
     return h264_get_dpb_values(hsps->h264_sps, p_depth, p_delay) ?
            VLC_SUCCESS : VLC_EGENERIC;
+}
+
+int
+hxxx_helper_get_colorimetry(const struct hxxx_helper *hh,
+                            video_color_primaries_t *p_primaries,
+                            video_transfer_func_t *p_transfer,
+                            video_color_space_t *p_colorspace,
+                            bool *p_full_range)
+{
+    switch (hh->i_codec)
+    {
+        case VLC_CODEC_H264:
+        {
+            const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
+            if (hsps == NULL)
+                return VLC_EGENERIC;
+            return h264_get_colorimetry(hsps->h264_sps, p_primaries, p_transfer,
+                                        p_colorspace, p_full_range)
+                == true ? VLC_SUCCESS : VLC_EGENERIC;
+        }
+        case VLC_CODEC_HEVC:
+            /* FIXME */
+            return VLC_EGENERIC;
+        default:
+            vlc_assert_unreachable();
+    }
 }
