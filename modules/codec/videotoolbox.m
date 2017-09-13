@@ -1164,10 +1164,21 @@ static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradata
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
-    hxxx_helper_get_colorimetry(&p_sys->hh, &p_dec->fmt_out.video.primaries,
-                                &p_dec->fmt_out.video.transfer,
-                                &p_dec->fmt_out.video.space,
-                                &p_dec->fmt_out.video.b_color_range_full);
+    video_color_primaries_t primaries;
+    video_transfer_func_t transfer;
+    video_color_space_t colorspace;
+    bool full_range;
+    if (hxxx_helper_get_colorimetry(&p_sys->hh, &primaries, &transfer,
+                                    &colorspace, &full_range) == VLC_SUCCESS
+      && primaries != COLOR_PRIMARIES_UNDEF && transfer != TRANSFER_FUNC_UNDEF
+      && colorspace != COLOR_SPACE_UNDEF)
+    {
+        p_dec->fmt_out.video.primaries = primaries;
+        p_dec->fmt_out.video.transfer = transfer;
+        p_dec->fmt_out.video.space = colorspace;
+        p_dec->fmt_out.video.b_color_range_full = full_range;
+    }
+
     p_dec->fmt_out.video.i_visible_width =
     p_dec->fmt_out.video.i_width = i_video_width;
     p_dec->fmt_out.video.i_visible_height =
