@@ -213,7 +213,7 @@ Open(vlc_object_t *obj)
 
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_VYUY,
-                                            COLOR_SPACE_UNDEF);
+                                            tc->fmt.space);
             tc->texs[0].internal = GL_RGB;
             tc->texs[0].format = GL_RGB_422_APPLE;
             tc->texs[0].type = GL_UNSIGNED_SHORT_8_8_APPLE;
@@ -223,13 +223,13 @@ Open(vlc_object_t *obj)
         {
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_NV12,
-                                            COLOR_SPACE_UNDEF);
+                                            tc->fmt.space);
             break;
         }
         case VLC_CODEC_CVPX_I420:
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_I420,
-                                            COLOR_SPACE_UNDEF);
+                                            tc->fmt.space);
             break;
         case VLC_CODEC_CVPX_BGRA:
             fragment_shader =
