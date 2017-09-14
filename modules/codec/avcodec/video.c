@@ -886,7 +886,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
 
     block_t *p_block;
-    mtime_t current_time = VLC_TS_INVALID;
+    mtime_t current_time;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
