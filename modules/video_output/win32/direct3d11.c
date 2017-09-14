@@ -1131,18 +1131,19 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 static void UpdateSize(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-#if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock != INVALID_HANDLE_VALUE )
-    {
-        WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
-    }
-#endif
     msg_Dbg(vd, "Detected size change %dx%d", RECTWidth(sys->sys.rect_dest_clipped),
             RECTHeight(sys->sys.rect_dest_clipped));
 
     UpdateBackBuffer(vd);
 
     UpdatePicQuadPosition(vd);
+
+#if defined(HAVE_ID3D11VIDEODECODER)
+    if( sys->context_lock != INVALID_HANDLE_VALUE )
+    {
+        WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
+    }
+#endif
 
     UpdateQuadPosition(vd, &sys->picQuad, &sys->sys.rect_src_clipped,
                        vd->fmt.projection_mode, vd->fmt.orientation);
@@ -1791,29 +1792,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     UpdateRects(vd, NULL, true);
     AFTER_UPDATE_RECTS;
 
-#if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock != INVALID_HANDLE_VALUE )
-    {
-        WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
-    }
-#endif
     if (Direct3D11CreateResources(vd, fmt)) {
-#if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock != INVALID_HANDLE_VALUE )
-        {
-            ReleaseMutex( sys->context_lock );
-        }
-#endif
         msg_Err(vd, "Failed to allocate resources");
         Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
     }
-#if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock != INVALID_HANDLE_VALUE )
-    {
-        ReleaseMutex( sys->context_lock );
-    }
-#endif
 
 #if !VLC_WINSTORE_APP
     EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
