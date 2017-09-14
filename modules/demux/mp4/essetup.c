@@ -634,7 +634,6 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     memcpy( p_track->fmt.p_extra, p_hvcC->data.p_binary->p_blob,
                             p_hvcC->data.p_binary->i_blob );
                 }
-                p_track->fmt.i_codec = VLC_CODEC_HEVC;
             }
             else
             {
