@@ -122,12 +122,12 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                         }
                     }
                     else if( p_t35[1] == 0x00 && p_t35[2] == 0x2f && /* US provider code for DirecTV */
-                             p_t35[3] == 0x03 )
+                             p_t35[3] == 0x03 && i_t35 > 5 )
                     {
                         /* DirecTV does not use GA94 user_data identifier */
                         sei_data.itu_t35.type = HXXX_ITU_T35_TYPE_CC;
-                        sei_data.itu_t35.u.cc.i_data = i_t35 - 4;
-                        sei_data.itu_t35.u.cc.p_data = &p_t35[4];
+                        sei_data.itu_t35.u.cc.i_data = i_t35 - 5;
+                        sei_data.itu_t35.u.cc.p_data = &p_t35[5];
                         b_continue = pf_callback( &sei_data, cbdata );
                     }
                 }
