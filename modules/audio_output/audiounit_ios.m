@@ -298,6 +298,9 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
      * multi-tasking, the multi-tasking view would still show a playing state
      * despite we are paused, same for lock screen */
 
+    if (pause == p_sys->b_paused)
+        return;
+
     OSStatus err;
     if (pause)
     {
@@ -314,6 +317,7 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
             if (err != noErr)
             {
                 ca_LogErr("AudioOutputUnitStart failed");
+                avas_SetActive(p_aout, false, 0);
                 /* Do not un-pause, the Render Callback won't run, and next call
                  * of ca_Play will deadlock */
                 return;
@@ -377,9 +381,12 @@ Stop(audio_output_t *p_aout)
 
     [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
 
-    err = AudioOutputUnitStop(p_sys->au_unit);
-    if (err != noErr)
-        ca_LogWarn("AudioOutputUnitStop failed");
+    if (!p_sys->b_paused)
+    {
+        err = AudioOutputUnitStop(p_sys->au_unit);
+        if (err != noErr)
+            ca_LogWarn("AudioOutputUnitStop failed");
+    }
 
     au_Uninitialize(p_aout, p_sys->au_unit);
 
