@@ -4466,6 +4466,7 @@ static const struct
     { ATOM_0xa9alb, MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_0xa9cmt, MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_0xa9com, MP4_ReadBox_Metadata,    ATOM_ilst },
+    { ATOM_0xa9cpy, MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_0xa9day, MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_0xa9des, MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_0xa9enc, MP4_ReadBox_Metadata,    ATOM_ilst },
@@ -4480,6 +4481,7 @@ static const struct
     { ATOM_atID,    MP4_ReadBox_Metadata,    ATOM_ilst }, /* iTunes */
     { ATOM_cnID,    MP4_ReadBox_Metadata,    ATOM_ilst }, /* iTunes */
     { ATOM_covr,    MP4_ReadBoxContainer,    ATOM_ilst },
+    { ATOM_desc,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_disk,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_flvr,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_gnre,    MP4_ReadBox_Metadata,    ATOM_ilst },

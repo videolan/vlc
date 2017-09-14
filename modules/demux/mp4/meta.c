@@ -55,6 +55,7 @@ static const struct
     { ATOM_0xa9enc, vlc_meta_EncodedBy }, /* Encoded By */
     { ATOM_0xa9pub, vlc_meta_Publisher },
     { ATOM_0xa9dir, vlc_meta_Director },
+    { ATOM_desc,    vlc_meta_Description },
     { ATOM_MCPS,    vlc_meta_EncodedBy }, /* Cleaner Pro */
     { ATOM_aART,    vlc_meta_AlbumArtist },
 };
