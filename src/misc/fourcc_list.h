@@ -233,6 +233,8 @@ static const staticentry_t p_list_video[] = {
         A("hev1"),
         A("hvc1"),
         A("HM10"),
+        E("dvhe", "Dolby Vision HEVC (H.265)"),
+        /* E("dvh1", "Dolby Vision HEVC (H.265)"), Collides with DV */
 
     /* h264 */
     B(VLC_CODEC_H264, "H264 - MPEG-4 AVC (part 10)"),
@@ -258,6 +260,8 @@ static const staticentry_t p_list_video[] = {
         E("ai13", "AVC-Intra 100M 1080p24/30/60"),
         E("ai15", "AVC-Intra 100M 1080i50"),
         E("ai16", "AVC-Intra 100M 1080i60"),
+        E("dvav", "Dolby Vision H264"),
+        E("dva1", "Dolby Vision H264"),
         E("VSSH", "Vanguard VSS H264"),
         E("VSSW", "Vanguard VSS H264"),
         E("vssh", "Vanguard VSS H264"),
