@@ -601,6 +601,8 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         /* avc1: send avcC (h264 without annexe B, ie without start code)*/
         case VLC_FOURCC( 'a', 'v', 'c', '3' ):
         case VLC_FOURCC( 'a', 'v', 'c', '1' ):
+        case VLC_FOURCC( 'd', 'v', 'a', '1' ): /* DolbyVision */
+        case VLC_FOURCC( 'd', 'v', 'a', 'v' ): /* DolbyVision */
         {
             MP4_Box_t *p_avcC = MP4_BoxGet( p_sample, "avcC" );
 
@@ -622,8 +624,14 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         }
         case VLC_FOURCC( 'h', 'v', 'c', '1' ):
         case VLC_FOURCC( 'h', 'e', 'v', '1' ):
+        case VLC_FOURCC( 'd', 'v', 'h', 'e' ): /* DolbyVision */
+        case VLC_FOURCC( 'd', 'v', 'h', '1' ): /* DolbyVision */
         {
             MP4_Box_t *p_hvcC = MP4_BoxGet( p_sample, "hvcC" );
+
+            /* Handle DV fourcc collision at demux level */
+            if( p_sample->i_type == VLC_FOURCC( 'd', 'v', 'h', '1' ) )
+                p_track->fmt.i_codec = VLC_FOURCC( 'd', 'v', 'h', 'e' );
 
             if( p_hvcC && p_hvcC->data.p_binary && p_hvcC->data.p_binary->i_blob )
             {
