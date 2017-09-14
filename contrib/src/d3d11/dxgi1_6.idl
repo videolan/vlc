@@ -1,0 +1,72 @@
+/*
+ * Copyright 2017 Steve Lhomme
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+ */
+
+import "dxgi1_4.idl";
+
+cpp_quote("/* HACK as widl segfaults with too many imports */")
+cpp_quote("#include <dxgi1_5.h>")
+cpp_quote("#ifndef __dxgi1_5_h__")
+
+[
+    object,
+    local,
+    uuid(80A07424-AB52-42EB-833C-0C42FD282D98)
+]
+interface IDXGIOutput5 : IDXGIOutput4
+{
+    HRESULT DuplicateOutput1(
+        [in]        IUnknown               *pDevice,
+                    UINT                   Flags,
+        [in]        UINT                   SupportedFormatsCount,
+        [in]  const DXGI_FORMAT            *pSupportedFormats,
+        [out]       IDXGIOutputDuplication **ppOutputDuplication
+    );
+}
+
+cpp_quote("#endif /* __dxgi1_5_h__ */")
+
+typedef struct DXGI_OUTPUT_DESC1
+{
+    WCHAR                 DeviceName[32];
+    RECT                  DesktopCoordinates;
+    BOOL                  AttachedToDesktop;
+    DXGI_MODE_ROTATION    Rotation;
+    HMONITOR              Monitor;
+    UINT                  BitsPerColor;
+    DXGI_COLOR_SPACE_TYPE ColorSpace;
+    FLOAT                 RedPrimary[2];
+    FLOAT                 GreenPrimary[2];
+    FLOAT                 BluePrimary[2];
+    FLOAT                 WhitePoint[2];
+    FLOAT                 MinLuminance;
+    FLOAT                 MaxLuminance;
+    FLOAT                 MaxFullFrameLuminance;
+    BOOL                  InternalOutput;
+} DXGI_OUTPUT_DESC1;
+
+[
+    object,
+    local,
+    uuid(068346e8-aaec-4b84-add7-137f513f77a1)
+]
+interface IDXGIOutput6 : IDXGIOutput5
+{
+    HRESULT GetDesc1(
+        [out] DXGI_OUTPUT_DESC1 *pDesc
+    );
+}
