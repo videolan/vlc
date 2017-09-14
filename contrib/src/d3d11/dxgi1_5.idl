@@ -49,3 +49,19 @@ interface IDXGISwapChain4 : IDXGISwapChain3
         [in] void* pMetaData
     );
 };
+
+[
+    object,
+    local,
+    uuid(80A07424-AB52-42EB-833C-0C42FD282D98)
+]
+interface IDXGIOutput5 : IDXGIOutput4
+{
+    HRESULT DuplicateOutput1(
+        [in]        IUnknown               *pDevice,
+                    UINT                   Flags,
+        [in]        UINT                   SupportedFormatsCount,
+        [in]  const DXGI_FORMAT            *pSupportedFormats,
+        [out]       IDXGIOutputDuplication **ppOutputDuplication
+    );
+}

@@ -92,3 +92,18 @@ interface IDXGIFactory4 : IDXGIFactory3
         [out] void     **ppvAdapter
     );
 }
+
+[
+    object,
+    local,
+    uuid(dc7dca35-2196-414d-9F53-617884032a60)
+]
+interface IDXGIOutput4 : IDXGIOutput3
+{
+    HRESULT CheckOverlayColorSpaceSupport(
+        [in]  DXGI_FORMAT           Format,
+        [in]  DXGI_COLOR_SPACE_TYPE ColorSpace,
+        [in]  IUnknown              *pConcernedDevice,
+        [out] UINT                  *pFlags
+    );
+}
