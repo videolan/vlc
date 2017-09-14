@@ -74,3 +74,21 @@ typedef enum DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG
     DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT         = 0x01,
     DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_OVERLAY_PRESENT = 0x02,
 } DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG;
+
+[
+    object,
+    local,
+    uuid(1bc6ea02-ef36-464f-bf0c-21ca39e5168a)
+]
+interface IDXGIFactory4 : IDXGIFactory3
+{
+    HRESULT EnumAdapterByLuid(
+        [in]  LUID     AdapterLuid,
+        [in]  REFIID   riid,
+        [out] void     **ppvAdapter
+    );
+    HRESULT EnumWarpAdapter(
+        [in]  REFIID   riid,
+        [out] void     **ppvAdapter
+    );
+}
