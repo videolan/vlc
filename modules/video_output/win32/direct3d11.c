@@ -1507,7 +1507,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     IDXGISwapChain3 *dxgiswapChain3 = NULL;
     sys->display.colorspace = &color_spaces[0];
 
-    hr = ID3D11Device_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
+    hr = IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
     if (FAILED(hr)) {
         msg_Warn(vd, "could not get a IDXGISwapChain3");
         goto done;
@@ -1717,7 +1717,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 #endif
 
-    ID3D11Device_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
+    IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
 
     D3D11SetColorSpace(vd);
 
