@@ -39,7 +39,6 @@
 
 #define QSV_HAVE_CO2 (MFX_VERSION_MAJOR > 1 || (MFX_VERSION_MAJOR == 1 && MFX_VERSION_MINOR >= 6))
 
-/* Default wait on Intel Media SDK SyncOperation. Almost useless when async-depth >= 2 */
 /* Default wait on libavcodec */
 #define QSV_SYNCPOINT_WAIT  (1000)
 /* Encoder input synchronization busy wait loop time */
@@ -407,7 +406,7 @@ static int Open(vlc_object_t *this)
     encoder_sys_t *sys = NULL;
 
     mfxStatus sts = MFX_ERR_NONE;
-    mfxFrameAllocRequest alloc_request;
+    mfxFrameAllocRequest alloc_request = { 0 };
     uint8_t sps_buf[128];
     uint8_t pps_buf[128];
     mfxExtCodingOptionSPSPPS headers;
@@ -438,6 +437,7 @@ static int Open(vlc_object_t *this)
     };
     mfxVersion    ver = { { 1, 1 } };
     mfxIMPL       impl;
+    mfxVideoParam param_out = { 0 };
 
     uint8_t *p_extra;
     size_t i_extra;
@@ -530,6 +530,7 @@ static int Open(vlc_object_t *this)
         msg_Dbg(enc, "Encoder in MPEG2 mode, with profile %d and level %d",
             sys->params.mfx.CodecProfile, sys->params.mfx.CodecLevel);
     }
+    param_out.mfx.CodecId = sys->params.mfx.CodecId;
 
     char *psz_rc = var_InheritString(enc, SOUT_CFG_PREFIX "rc-method");
     msg_Dbg(enc, "Encoder using '%s' Rate Control method", psz_rc );
@@ -555,6 +556,13 @@ static int Open(vlc_object_t *this)
             sys->params.mfx.Convergence = var_InheritInteger(enc, SOUT_CFG_PREFIX "convergence");
         } else if (sys->params.mfx.RateControlMethod == MFX_RATECONTROL_VBR)
             sys->params.mfx.MaxKbps = var_InheritInteger(enc, SOUT_CFG_PREFIX "bitrate-max");
+    }
+
+    if ( MFXVideoENCODE_Query(sys->session, &sys->params, &param_out) < 0 ||
+         sys->params.mfx.RateControlMethod != param_out.mfx.RateControlMethod )
+    {
+        msg_Err(enc, "Unsupported control method");
+        goto error;
     }
 
     if (MFXVideoENCODE_Query(sys->session, &sys->params, &sys->params) < 0)
