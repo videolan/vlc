@@ -1510,7 +1510,7 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                 /* TODO Mhh, handle the case where the client only
                  * sends a request and closes the connection to
                  * mark the end of the body (probably only RTSP) */
-                if (cl->query.i_body >= 65536)
+                if (cl->query.i_body < 65536)
                     cl->query.p_body = malloc(cl->query.i_body);
                 else
                     cl->query.p_body = NULL;
