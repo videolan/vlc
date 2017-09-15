@@ -703,8 +703,8 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
         sts = MFXVideoCORE_SyncOperation(sys->session, *task->syncp, QSV_SYNCPOINT_WAIT);
     } while (sts == MFX_WRN_IN_EXECUTION);
     if (sts != MFX_ERR_NONE) {
-        msg_Err(enc, "SyncOperation failed, outputting garbage data. "
-                "Updating your drivers and/or changing the encoding settings might resolve this");
+        msg_Err(enc, "SyncOperation failed (%d), outputting garbage data. "
+                "Updating your drivers and/or changing the encoding settings might resolve this", sts);
         return NULL;
     }
     block_t *block = task->block;
