@@ -435,8 +435,8 @@ static int Open(vlc_object_t *this)
         (mfxExtBuffer*)&co2,
 #endif
     };
-    mfxVersion ver = { { MFX_VERSION_MINOR, MFX_VERSION_MAJOR } };
-    mfxIMPL impl;
+    mfxVersion    ver = { { 1, 1 } };
+    mfxIMPL       impl;
 
     uint8_t *p_extra;
     size_t i_extra;
