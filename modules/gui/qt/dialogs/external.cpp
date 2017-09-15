@@ -400,10 +400,8 @@ ProgressDialogWrapper::ProgressDialogWrapper(DialogHandler *p_handler,
 
 void ProgressDialogWrapper::updateProgress(float f_position, const QString &text)
 {
+    QProgressDialog *progress = static_cast<QProgressDialog *>(p_dialog);
+    progress->setLabelText(text);
     if (!b_indeterminate)
-    {
-        QProgressDialog *progress = static_cast<QProgressDialog *>(p_dialog);
-        progress->setLabelText(text);
         progress->setValue(f_position * 1000);
-    }
 }
