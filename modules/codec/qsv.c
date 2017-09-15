@@ -465,24 +465,19 @@ static int Open(vlc_object_t *this)
         return VLC_EGENERIC;
     }
 
+    enc->p_sys = sys;
+
     config_ChainParse(enc, SOUT_CFG_PREFIX, sout_options, enc->p_cfg);
 
     /* Checking if we are on software and are allowing it */
     MFXQueryIMPL(sys->session, &impl);
     if (!var_InheritBool(enc, SOUT_CFG_PREFIX "software") && (impl & MFX_IMPL_SOFTWARE)) {
         msg_Err(enc, "No hardware implementation found and software mode disabled");
-        free(sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     msg_Dbg(enc, "Using Intel QuickSync Video %s implementation",
         impl & MFX_IMPL_HARDWARE ? "hardware" : "software");
-
-    /* Vlc module configuration */
-    enc->p_sys                         = sys;
-    enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
-    enc->fmt_in.video.i_chroma         = VLC_CODEC_NV12;
-    enc->fmt_in.video.i_bits_per_pixel = 12;
 
     /* Input picture format description */
     sys->params.mfx.FrameInfo.FrameRateExtN = enc->fmt_in.video.i_frame_rate;
@@ -630,15 +625,22 @@ static int Open(vlc_object_t *this)
     if (unlikely(!sys->tasks))
         goto nomem;
 
+    /* Vlc module configuration */
+    enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
+    enc->fmt_in.video.i_chroma         = VLC_CODEC_NV12;
+    enc->fmt_in.video.i_bits_per_pixel = 12;
+
     enc->pf_encode_video = Encode;
 
     return VLC_SUCCESS;
 
  error:
     Close(this);
+    enc->p_sys = NULL;
     return VLC_EGENERIC;
  nomem:
     Close(this);
+    enc->p_sys = NULL;
     return VLC_ENOMEM;
 }
 
