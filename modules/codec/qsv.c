@@ -843,7 +843,7 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
             async_task_t_fifo_Put(&sys->packets, task);
     }
 
-    if ( async_task_t_fifo_GetCount(&sys->packets) == sys->async_depth ||
+    if ( async_task_t_fifo_GetCount(&sys->packets) == (sys->async_depth + 1) ||
          (!pic && async_task_t_fifo_GetCount(&sys->packets)))
     {
         assert(async_task_t_fifo_Show(&sys->packets)->syncp != 0);
