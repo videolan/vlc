@@ -645,11 +645,8 @@ dialog_update_progress(vlc_object_t *p_obj, vlc_dialog_id *p_id, float f_value,
     }
 
     if (p_id->b_progress_indeterminate)
-    {
-        vlc_mutex_unlock(&p_provider->lock);
-        free(psz_text);
-        return VLC_EGENERIC;
-    }
+        f_value = 0.0f;
+
     if (psz_text != NULL)
     {
         free(p_id->psz_progress_text);
