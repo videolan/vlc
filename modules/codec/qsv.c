@@ -40,7 +40,8 @@
 #define QSV_HAVE_CO2 (MFX_VERSION_MAJOR > 1 || (MFX_VERSION_MAJOR == 1 && MFX_VERSION_MINOR >= 6))
 
 /* Default wait on Intel Media SDK SyncOperation. Almost useless when async-depth >= 2 */
-#define QSV_SYNCPOINT_WAIT  (420)
+/* Default wait on libavcodec */
+#define QSV_SYNCPOINT_WAIT  (1000)
 /* Encoder input synchronization busy wait loop time */
 #define QSV_BUSYWAIT_TIME   (10000)
 /* The SDK doesn't have a default bitrate, so here's one. */
