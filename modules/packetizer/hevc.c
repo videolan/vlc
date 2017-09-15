@@ -306,7 +306,7 @@ static void PacketizeFlush( decoder_t *p_dec )
  *****************************************************************************/
 static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_depth )
 {
-    *pi_reorder_depth = 0;
+    *pi_reorder_depth = 4;
     return cc_storage_get_current( p_dec->p_sys->p_ccs, pb_present );
 }
 

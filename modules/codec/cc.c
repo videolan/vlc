@@ -400,7 +400,15 @@ static void Push( decoder_t *p_dec, block_t *p_block )
         if( p_block->i_pts == VLC_TS_INVALID || (*pp_block)->i_pts == VLC_TS_INVALID )
             continue;
         if( p_block->i_pts < (*pp_block)->i_pts )
+        {
+            if( p_sys->i_reorder_depth > 0 &&
+                p_sys->i_queue < p_sys->i_reorder_depth &&
+                pp_block == &p_sys->p_queue )
+            {
+                msg_Info( p_dec, "Increasing reorder depth to %d", ++p_sys->i_reorder_depth );
+            }
             break;
+        }
     }
     /* Insert, keeping a pts and/or fifo ordered list */
     p_block->p_next = *pp_block ? *pp_block : NULL;
