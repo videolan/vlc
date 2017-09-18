@@ -553,6 +553,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="interfaceSettingChanged:" target="-2" id="BSM-KK-Wd3"/>
+                                    <outlet property="delegate" destination="-2" id="CTK-cN-vZp"/>
                                 </connections>
                             </textField>
                         </subviews>
@@ -624,6 +625,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="audioSettingChanged:" target="-2" id="1zO-td-xhB"/>
+                                    <outlet property="delegate" destination="-2" id="IOH-XB-w90"/>
                                     <outlet property="nextKeyView" destination="2369" id="3427"/>
                                 </connections>
                             </textField>
@@ -647,6 +649,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="audioSettingChanged:" target="-2" id="fU0-6F-6SL"/>
+                                    <outlet property="delegate" destination="-2" id="bkG-be-eZ8"/>
                                     <outlet property="nextKeyView" destination="2336" id="3428"/>
                                 </connections>
                             </textField>
@@ -766,6 +769,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="audioSettingChanged:" target="-2" id="rF2-dg-N45"/>
+                                    <outlet property="delegate" destination="-2" id="cm0-Yd-jTj"/>
                                     <outlet property="nextKeyView" destination="2346" id="3424"/>
                                 </connections>
                             </textField>
@@ -817,6 +821,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="audioSettingChanged:" target="-2" id="wGl-6M-AMK"/>
+                                    <outlet property="delegate" destination="-2" id="FRM-Dz-Top"/>
                                 </connections>
                             </textField>
                             <matrix verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="always" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3664">
@@ -1160,6 +1165,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="videoSettingChanged:" target="-2" id="4cS-5o-8CH"/>
+                                    <outlet property="delegate" destination="-2" id="yKI-r3-dSa"/>
                                     <outlet property="nextKeyView" destination="2474" id="3429"/>
                                 </connections>
                             </textField>
@@ -1193,6 +1199,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="videoSettingChanged:" target="-2" id="l7G-BO-EWd"/>
+                                    <outlet property="delegate" destination="-2" id="X0B-No-shf"/>
                                     <outlet property="nextKeyView" destination="2468" id="3430"/>
                                 </connections>
                             </textField>
@@ -1418,6 +1425,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="inputSettingChanged:" target="-2" id="fuW-fz-oS1"/>
+                                    <outlet property="delegate" destination="-2" id="4id-7Y-fF5"/>
                                     <outlet property="nextKeyView" destination="3614" id="3628"/>
                                 </connections>
                             </textField>
@@ -1530,6 +1538,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="inputSettingChanged:" target="-2" id="sVP-nU-25F"/>
+                                    <outlet property="delegate" destination="-2" id="PfN-d7-gla"/>
                                 </connections>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3616">
@@ -1592,6 +1601,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="osdSettingChanged:" target="-2" id="wAT-B8-EeZ"/>
+                                    <outlet property="delegate" destination="-2" id="yRU-e8-r5Z"/>
                                     <outlet property="nextKeyView" destination="3594" id="3599"/>
                                 </connections>
                             </textField>
@@ -1759,6 +1769,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="osdSettingChanged:" target="-2" id="0LP-DQ-jcB"/>
+                                    <outlet property="delegate" destination="-2" id="xLc-5J-AVL"/>
                                     <outlet property="nextKeyView" destination="3584" id="3598"/>
                                 </connections>
                             </textField>
@@ -1867,6 +1878,7 @@ Gw
                                 </textFieldCell>
                                 <connections>
                                     <action selector="osdSettingChanged:" target="-2" id="GCz-TH-5ck"/>
+                                    <outlet property="delegate" destination="-2" id="AOP-2P-emL"/>
                                 </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2531">
@@ -1937,7 +1949,7 @@ Gw
                     <rect key="frame" x="20" y="60" width="530" height="310"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
                         <rect key="frame" x="1" y="0.0" width="528" height="309"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="286"/>
