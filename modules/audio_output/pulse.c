@@ -816,7 +816,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         /* Setup low latency in order to quickly react to ambisonics
          * filters viewpoint changes. */
         flags |= PA_STREAM_ADJUST_LATENCY;
-        attr.tlength = pa_usec_to_bytes(2 * AOUT_MIN_PREPARE_TIME, &ss);
+        attr.tlength = pa_usec_to_bytes(3 * AOUT_MIN_PREPARE_TIME, &ss);
     }
 
     if (encoding != PA_ENCODING_PCM)
