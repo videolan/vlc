@@ -762,14 +762,18 @@ static void DeleteEncoder( encoder_t * p_enc )
     p_enc = NULL;
 }
 
+static picture_t *filter_new_picture( filter_t *p_filter )
+{
+    return picture_NewFromFormat( &p_filter->fmt_out.video );
+}
+
 static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
                                const video_format_t *p_fmt_out )
 {
     filter_t *p_filter;
 
     p_filter = vlc_custom_create( p_this, sizeof(filter_t), "filter" );
-    p_filter->owner.video.buffer_new =
-        (picture_t *(*)(filter_t *))video_new_buffer;
+    p_filter->owner.video.buffer_new = filter_new_picture;
 
     es_format_Copy( &p_filter->fmt_in, p_fmt_in );
     es_format_Copy( &p_filter->fmt_out, p_fmt_in );
