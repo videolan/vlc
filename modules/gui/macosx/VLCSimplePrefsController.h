@@ -114,6 +114,7 @@
 
 // intf pane - http interface box
 @property (readwrite, weak) IBOutlet NSBox *intf_luahttpBox;
+@property (readwrite, weak) IBOutlet NSButton *intf_enableluahttpCheckbox;
 @property (readwrite, weak) IBOutlet NSTextField *intf_luahttppwdLabel;
 @property (readwrite, weak) IBOutlet NSTextField *intf_luahttppwdTextField;
 @property (readwrite, weak) IBOutlet NSView *intfView;

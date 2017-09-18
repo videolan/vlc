@@ -324,6 +324,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_intf_last_updateLabel setStringValue: @""];
 
     [_intf_luahttpBox setTitle:_NS("HTTP web interface")];
+    [_intf_enableluahttpCheckbox setTitle: _NS("Enable HTTP web interface")];
     [_intf_luahttppwdLabel setStringValue:_NS("Password")];
 
     /* Subtitles and OSD */
@@ -490,6 +491,36 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     free(psz_tmp);
 }
 
+- (BOOL)hasModule:(NSString *)moduleName inConfig:(NSString *)config
+{
+    char *value = config_GetPsz(p_intf, [config UTF8String]);
+    NSString *modules = toNSStr(value);
+    free(value);
+
+    return [[modules componentsSeparatedByString:@":"] containsObject:moduleName];
+}
+
+- (void)changeModule:(NSString *)moduleName inConfig:(NSString *)config enable:(BOOL)enable
+{
+    char *value = config_GetPsz(p_intf, [config UTF8String]);
+    NSString *modules = toNSStr(value);
+    free(value);
+
+    NSMutableArray *components = [[modules componentsSeparatedByString:@":"] mutableCopy];
+    if (enable) {
+        if (![components containsObject:moduleName]) {
+            [components addObject:moduleName];
+        }
+    } else {
+        [components removeObject:moduleName];
+    }
+
+    // trim empty entries
+    [components removeObject:@""];
+
+    config_PutPsz(p_intf, [config UTF8String], [[components componentsJoinedByString:@":"] UTF8String]);
+}
+
 - (void)resetControls
 {
     module_config_t *p_item;
@@ -539,12 +570,9 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [_intf_last_updateLabel setStringValue: _NS("No check was performed yet.")];
 #endif
 
-    psz_tmp = config_GetPsz(p_intf, "control");
-    if (psz_tmp) {
-        [_intf_enableNotificationsCheckbox setState: (NSInteger)strstr(psz_tmp, "growl")];
-        free(psz_tmp);
-    } else
-        [_intf_enableNotificationsCheckbox setState: NSOffState];
+    BOOL growlEnabled = [self hasModule:@"growl" inConfig:@"control"];
+    [_intf_enableNotificationsCheckbox setState: growlEnabled ? NSOnState : NSOffState];
+
     if (config_GetInt(p_intf, "macosx-interfacestyle")) {
         [_intf_style_darkButtonCell setState: YES];
         [_intf_style_brightButtonCell setState: NO];
@@ -552,6 +580,10 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [_intf_style_darkButtonCell setState: NO];
         [_intf_style_brightButtonCell setState: YES];
     }
+
+    BOOL httpEnabled = [self hasModule:@"http" inConfig:@"extraintf"];
+    [_intf_enableluahttpCheckbox setState: httpEnabled ? NSOnState : NSOffState];
+    _intf_luahttppwdTextField.enabled = httpEnabled;
 
     [self setupField:_intf_luahttppwdTextField forOption: "http-password"];
 
@@ -859,15 +891,10 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (void)saveChangedSettings
 {
-    NSString *tmpString;
-    NSRange tmpRange;
-
 #define SaveIntList(object, name) save_int_list(p_intf, object, name)
 
 #define SaveStringList(object, name) save_string_list(p_intf, object, name)
 #define SaveModuleList(object, name) SaveStringList(object, name)
-
-#define getString(name) [NSString stringWithFormat:@"%s", config_GetPsz(p_intf, name)]
 
     /**********************
      * interface settings *
@@ -887,26 +914,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt(p_intf, "macosx-mediakeys", [_intf_mediakeysCheckbox state]);
         config_PutInt(p_intf, "macosx-interfacestyle", [_intf_style_darkButtonCell state]);
 
-        if ([_intf_enableNotificationsCheckbox state] == NSOnState) {
-            tmpString = getString("control");
-            tmpRange = [tmpString rangeOfString:@"growl"];
-            if ([tmpString length] > 0 && tmpRange.location == NSNotFound)
-            {
-                tmpString = [tmpString stringByAppendingString: @":growl"];
-                config_PutPsz(p_intf, "control", [tmpString UTF8String]);
-            }
-            else
-                config_PutPsz(p_intf, "control", "growl");
-        } else {
-            tmpString = getString("control");
-            if (! [tmpString isEqualToString:@""])
-            {
-                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":growl"]];
-                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl:"]];
-                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl"]];
-                config_PutPsz(p_intf, "control", [tmpString UTF8String]);
-            }
-        }
+        [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
+
+        [self changeModule:@"http" inConfig:@"extraintf" enable:[_intf_enableluahttpCheckbox state] == NSOnState];
         config_PutPsz(p_intf, "http-password", [[_intf_luahttppwdTextField stringValue] UTF8String]);
 
         SaveIntList(_intf_pauseitunesPopup, "macosx-control-itunes");
@@ -1109,6 +1119,10 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (IBAction)interfaceSettingChanged:(id)sender
 {
+    if (sender == _intf_enableluahttpCheckbox) {
+        _intf_luahttppwdTextField.enabled = [sender state] == NSOnState;
+    }
+
     _intfSettingChanged = YES;
 }
 
