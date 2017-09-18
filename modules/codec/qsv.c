@@ -42,7 +42,7 @@
 /* Default wait on libavcodec */
 #define QSV_SYNCPOINT_WAIT  (1000)
 /* Encoder input synchronization busy wait loop time */
-#define QSV_BUSYWAIT_TIME   (10000)
+#define QSV_BUSYWAIT_TIME   VLC_HARD_MIN_SLEEP
 /* The SDK doesn't have a default bitrate, so here's one. */
 #define QSV_BITRATE_DEFAULT (842)
 
