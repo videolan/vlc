@@ -186,7 +186,7 @@ static block_t *Mix( filter_t *p_filter, block_t *p_buf )
     else
         p_out_buf->i_pts = p_sys->i_inputPTS;
     p_out_buf->i_dts = p_out_buf->i_pts;
-    p_out_buf->i_length = p_out_buf->i_nb_samples * 1000000 / p_sys->i_rate;
+    p_out_buf->i_length = p_out_buf->i_nb_samples * INT64_C(1000000) / p_sys->i_rate;
 
     float *p_dest = (float *)p_out_buf->p_buffer;
     const float *p_src = (float *)p_sys->inputSamples.data();
