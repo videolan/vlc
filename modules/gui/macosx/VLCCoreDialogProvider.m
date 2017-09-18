@@ -126,7 +126,9 @@ static void cancelCallback(void *p_data,
                            vlc_dialog_id *p_id)
 {
     @autoreleasepool {
-        [NSApp stopModalWithCode: 0];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSApp stopModalWithCode: 0];
+        });
     }
 }
 
