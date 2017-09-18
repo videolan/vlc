@@ -286,8 +286,10 @@ static void updateProgressCallback(void *p_data,
 
     if ([[dialogData objectAtIndex:5] length] > 0) {
         progressCancelButton.title = [dialogData objectAtIndex:5];
+        progressCancelButton.enabled = YES;
     } else {
         progressCancelButton.title = _NS("Cancel");
+        progressCancelButton.enabled = NO;
     }
 
     [progressIndicator startAnimation:self];
@@ -298,8 +300,7 @@ static void updateProgressCallback(void *p_data,
 
     [progressIndicator stopAnimation:self];
 
-    if (returnValue == -1)
-        vlc_dialog_id_dismiss([[dialogData objectAtIndex:0] pointerValue]);
+    vlc_dialog_id_dismiss([[dialogData objectAtIndex:0] pointerValue]);
 }
 
 - (void)updateDisplayedProgressDialog:(NSArray *)dialogData
