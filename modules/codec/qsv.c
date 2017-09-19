@@ -836,9 +836,12 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
     async_task_t     *task;
     block_t       *block = NULL;
 
-    task = encode_frame( enc, pic );
-    if (likely(task != NULL))
-        async_task_t_fifo_Put(&sys->packets, task);
+    if (likely(pic != NULL))
+    {
+        task = encode_frame( enc, pic );
+        if (likely(task != NULL))
+            async_task_t_fifo_Put(&sys->packets, task);
+    }
 
     if ( async_task_t_fifo_GetCount(&sys->packets) == sys->async_depth ||
          (!pic && async_task_t_fifo_GetCount(&sys->packets)))
