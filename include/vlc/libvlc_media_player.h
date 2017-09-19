@@ -2052,7 +2052,7 @@ typedef enum libvlc_media_player_role {
     libvlc_role_Video, /**< Video playback */
     libvlc_role_Communication, /**< Speech, real-time communication */
     libvlc_role_Game, /**< Video game */
-    liblvc_role_Notification, /**< User interaction feedback */
+    libvlc_role_Notification, /**< User interaction feedback */
     libvlc_role_Animation, /**< Embedded animation (e.g. in web page) */
     libvlc_role_Production, /**< Audio editting/production */
     libvlc_role_Accessibility, /**< Accessibility */
