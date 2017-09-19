@@ -48,6 +48,8 @@
 #import <sys/sysctl.h>
 #import <mach/machine.h>
 
+#define ALIGN_16( x ) ( ( ( x ) + 15 ) / 16 * 16 )
+
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
 
@@ -741,8 +743,8 @@ static int StartVideoToolbox(decoder_t *p_dec)
     OSStatus status = CMVideoFormatDescriptionCreate(
                                             kCFAllocatorDefault,
                                             p_sys->codec,
-                                            p_dec->fmt_out.video.i_width,
-                                            p_dec->fmt_out.video.i_height,
+                                            p_dec->fmt_out.video.i_visible_width,
+                                            p_dec->fmt_out.video.i_visible_height,
                                             decoderConfiguration,
                                             &p_sys->videoFormatDescription);
     if (status)
@@ -764,9 +766,9 @@ static int StartVideoToolbox(decoder_t *p_dec)
 #endif
 
     cfdict_set_int32(destinationPixelBufferAttributes,
-                     kCVPixelBufferWidthKey, p_dec->fmt_out.video.i_width);
+                     kCVPixelBufferWidthKey, p_dec->fmt_out.video.i_visible_width);
     cfdict_set_int32(destinationPixelBufferAttributes,
-                     kCVPixelBufferHeightKey, p_dec->fmt_out.video.i_height);
+                     kCVPixelBufferHeightKey, p_dec->fmt_out.video.i_visible_height);
 
     if (p_sys->i_forced_cvpx_format != 0)
     {
@@ -776,6 +778,9 @@ static int StartVideoToolbox(decoder_t *p_dec)
                          kCVPixelBufferPixelFormatTypeKey,
                          p_sys->i_forced_cvpx_format);
     }
+
+    cfdict_set_int32(destinationPixelBufferAttributes,
+                     kCVPixelBufferBytesPerRowAlignmentKey, 16);
 
     /* setup decoder callback record */
     VTDecompressionOutputCallbackRecord decoderCallbackRecord;
@@ -980,11 +985,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
     }
-    else
-    {
-        p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_visible_width;
-        p_dec->fmt_out.video.i_height = p_dec->fmt_out.video.i_visible_height;
-    }
+    p_dec->fmt_out.video.i_width = ALIGN_16( p_dec->fmt_out.video.i_visible_width );
+    p_dec->fmt_out.video.i_height = ALIGN_16( p_dec->fmt_out.video.i_visible_height );
 
     p_dec->fmt_out.i_codec = 0;
 
@@ -1179,10 +1181,10 @@ static int SetH264DecoderInfo(decoder_t *p_dec, CFMutableDictionaryRef extradata
         p_dec->fmt_out.video.b_color_range_full = full_range;
     }
 
-    p_dec->fmt_out.video.i_visible_width =
-    p_dec->fmt_out.video.i_width = i_video_width;
-    p_dec->fmt_out.video.i_visible_height =
-    p_dec->fmt_out.video.i_height = i_video_height;
+    p_dec->fmt_out.video.i_visible_width = i_video_width;
+    p_dec->fmt_out.video.i_width = ALIGN_16( i_video_width );
+    p_dec->fmt_out.video.i_visible_height = i_video_height;
+    p_dec->fmt_out.video.i_height = ALIGN_16( i_video_height );
     p_dec->fmt_out.video.i_sar_num = i_sar_num;
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
 
