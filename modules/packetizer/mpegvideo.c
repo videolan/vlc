@@ -317,7 +317,7 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_dep
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_cc;
     int i;
-    *pi_reorder_depth = 0;
+    *pi_reorder_depth = p_sys->cc.b_reorder ? 0 : -1;
 
     for( i = 0; i < 4; i++ )
         pb_present[i] = p_sys->cc.pb_present[i];
@@ -331,7 +331,7 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_dep
         memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
         p_cc->i_dts = 
         p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
-        p_cc->i_flags = p_sys->cc.b_reorder ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P;
+        p_cc->i_flags = p_sys->i_cc_flags & BLOCK_FLAG_TYPE_MASK;
     }
     cc_Flush( &p_sys->cc );
     return p_cc;

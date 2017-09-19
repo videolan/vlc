@@ -721,6 +721,7 @@ static int Open ( vlc_object_t *p_this )
     else if( p_sys->props.i_type == SUB_TYPE_SCC )
     {
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_CEA608 );
+        fmt.subs.cc.i_reorder_depth = -1;
     }
     else
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );

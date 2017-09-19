@@ -537,7 +537,8 @@ struct subs_format_t
     struct
     {
         uint8_t i_channel;
-        uint8_t i_reorder_depth; /* Reorder depth or transport video */
+        /* Reorder depth of transport video, -1 for no reordering */
+        int i_reorder_depth;
     } cc;
 
     text_style_t *p_style; /* Default styles to use */

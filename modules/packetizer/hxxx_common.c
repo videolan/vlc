@@ -80,9 +80,12 @@ void cc_storage_commit( cc_storage_t *p_ccs, block_t *p_pic )
     cc_Flush( &p_ccs->next );
 }
 
-block_t * cc_storage_get_current( cc_storage_t *p_ccs, bool pb_present[4] )
+block_t * cc_storage_get_current( cc_storage_t *p_ccs, bool pb_present[4],
+                                  int *pi_reorder_depth )
 {
     block_t *p_block;
+
+    *pi_reorder_depth = p_ccs->current.b_reorder ? 4 : -1;
 
     for( int i = 0; i < 4; i++ )
         pb_present[i] = p_ccs->current.pb_present[i];
@@ -96,7 +99,7 @@ block_t * cc_storage_get_current( cc_storage_t *p_ccs, bool pb_present[4] )
         memcpy( p_block->p_buffer, p_ccs->current.p_data, p_ccs->current.i_data );
         p_block->i_dts =
         p_block->i_pts = p_ccs->current.b_reorder ? p_ccs->i_pts : p_ccs->i_dts;
-        p_block->i_flags = ( p_ccs->current.b_reorder  ? p_ccs->i_flags : BLOCK_FLAG_TYPE_P ) & BLOCK_FLAG_TYPE_MASK;
+        p_block->i_flags = p_ccs->i_flags & BLOCK_FLAG_TYPE_MASK;
     }
     cc_Flush( &p_ccs->current );
 

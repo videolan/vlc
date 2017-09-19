@@ -341,7 +341,8 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         Push( p_dec, p_block );
     }
 
-    for( ; DoDecode( p_dec, (p_block == NULL) ); );
+    const bool b_no_reorder = (p_dec->fmt_in.subs.cc.i_reorder_depth < 0);
+    for( ; DoDecode( p_dec, (p_block == NULL) || b_no_reorder ); );
 
     return VLCDEC_SUCCESS;
 }
