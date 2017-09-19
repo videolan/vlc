@@ -4,8 +4,6 @@
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
-        <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
-        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -516,7 +514,7 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="248">
-                                                    <rect key="frame" x="25" y="20" width="48" height="11"/>
+                                                    <rect key="frame" x="25" y="9" width="48" height="22"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="RMS/peak" id="261" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -649,7 +647,7 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="253">
-                                                    <rect key="frame" x="284" y="20" width="50" height="11"/>
+                                                    <rect key="frame" x="284" y="9" width="50" height="22"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Knee radius" id="256" customClass="VLCHUDTextFieldCell">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -694,7 +692,7 @@
                                                 </textField>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="621">
                                                     <rect key="frame" x="359" y="151" width="39" height="17"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="BA3BEF7B-F847-4332-9E83-A40C1C2F2E41" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="BF7F2034-BC78-4CF5-A875-76B52866447D" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -719,12 +717,12 @@
                                                 <constraint firstItem="229" firstAttribute="centerX" secondItem="228" secondAttribute="centerX" id="DbZ-66-PZJ"/>
                                                 <constraint firstItem="251" firstAttribute="baseline" secondItem="252" secondAttribute="baseline" id="Dnm-lq-dHs"/>
                                                 <constraint firstItem="237" firstAttribute="leading" secondItem="233" secondAttribute="trailing" constant="34" id="FFl-za-aa9"/>
-                                                <constraint firstItem="248" firstAttribute="baseline" secondItem="253" secondAttribute="firstBaseline" id="Hbm-CG-Sd9"/>
+                                                <constraint firstItem="248" firstAttribute="baseline" secondItem="253" secondAttribute="baseline" id="Hbm-CG-Sd9"/>
                                                 <constraint firstItem="233" firstAttribute="centerX" secondItem="723" secondAttribute="centerX" id="IQQ-eg-z7W"/>
                                                 <constraint firstItem="229" firstAttribute="leading" secondItem="225" secondAttribute="trailing" constant="33" id="KQL-pU-8Sx"/>
                                                 <constraint firstItem="244" firstAttribute="top" secondItem="245" secondAttribute="bottom" constant="4" id="LsW-86-RIh"/>
                                                 <constraint firstItem="621" firstAttribute="top" secondItem="723" secondAttribute="top" constant="3" id="MX3-tE-CV0"/>
-                                                <constraint firstItem="254" firstAttribute="firstBaseline" secondItem="253" secondAttribute="baseline" id="MZD-za-gAM"/>
+                                                <constraint firstItem="254" firstAttribute="baseline" secondItem="253" secondAttribute="baseline" id="MZD-za-gAM"/>
                                                 <constraint firstItem="252" firstAttribute="top" secondItem="237" secondAttribute="bottom" constant="25" id="Mhl-Qv-6de"/>
                                                 <constraint firstItem="251" firstAttribute="centerY" secondItem="254" secondAttribute="centerY" id="N4X-QM-wNo"/>
                                                 <constraint firstItem="236" firstAttribute="leading" secondItem="232" secondAttribute="trailing" constant="6" id="NRc-Gi-g8z"/>
@@ -800,7 +798,7 @@
                                             <subviews>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="618">
                                                     <rect key="frame" x="351" y="145" width="39" height="17"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="E0A1FE01-C40F-412F-A937-7F99CF85B282" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="CE751589-913C-4FB0-9060-58E84FF3F582" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -1150,7 +1148,7 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="BA3BEF7B-F847-4332-9E83-A40C1C2F2E41" width="1" height="1">
+        <image name="BF7F2034-BC78-4CF5-A875-76B52866447D" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -1191,7 +1189,7 @@ B04HVwdcB2QHZwdsB3sHfweGB44HmwegB6IHpAepB7EHtAe5B8EHxAfWB9kH3gAAAAAAAAIBAAAAAAAA
 AEEAAAAAAAAAAAAAAAAAAAfgA
 </mutableData>
         </image>
-        <image name="E0A1FE01-C40F-412F-A937-7F99CF85B282" width="1" height="1">
+        <image name="CE751589-913C-4FB0-9060-58E84FF3F582" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
