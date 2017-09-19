@@ -534,7 +534,7 @@ Gw
                     </tabView>
                     <button identifier="mrl button" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2836">
                         <rect key="frame" x="20" y="131" width="13" height="13"/>
-                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="C810A817-1217-4117-804B-141B82C80BF4" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
+                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="03DB12E1-9518-49E5-9F7A-38F9B0BB0B07" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -936,13 +936,10 @@ DQ
                     <constraints>
                         <constraint firstAttribute="width" constant="43" id="HO8-k1-06b"/>
                     </constraints>
-                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="5,0" drawsBackground="YES" id="2960">
-                        <numberFormatter key="formatter" formatterBehavior="10_0" positiveFormat="#,##0.0" negativeFormat="-#,##0.0" thousandSeparator="." id="2364">
-                            <attributedString key="attributedStringForZero">
-                                <fragment content="0,0"/>
-                            </attributedString>
-                            <decimal key="minimum" value="1"/>
-                            <decimal key="maximum" value="30"/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="5.0" drawsBackground="YES" id="2960">
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#,##0.0" negativeFormat="-#,##0.0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" minimumFractionDigits="1" maximumFractionDigits="1" id="2364">
+                            <real key="minimum" value="1"/>
+                            <real key="maximum" value="60"/>
                         </numberFormatter>
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -963,7 +960,7 @@ DQ
                 </textField>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2352">
                     <rect key="frame" x="236" y="144" width="15" height="22"/>
-                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="30" doubleValue="5" valueWraps="YES" id="2962"/>
+                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="60" doubleValue="5" id="2962"/>
                     <connections>
                         <action selector="takeIntValueFrom:" target="2349" id="3471"/>
                     </connections>
@@ -1330,12 +1327,13 @@ DQ
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2794">
-                        <rect key="frame" x="168" y="155" width="92" height="48"/>
+                        <rect key="frame" x="168" y="155" width="120" height="48"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="48" id="Yd6-Rr-hgY"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="d4I-AJ-V0j"/>
                         </constraints>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        <size key="cellSize" width="92" height="18"/>
+                        <size key="cellSize" width="112" height="18"/>
                         <size key="intercellSpacing" width="4" height="12"/>
                         <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="2993">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1358,7 +1356,7 @@ DQ
                         </connections>
                     </matrix>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="2797">
-                        <rect key="frame" x="387" y="184" width="30" height="17"/>
+                        <rect key="frame" x="377" y="185" width="30" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Port" usesSingleLineMode="YES" id="2976">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1366,7 +1364,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="2798">
-                        <rect key="frame" x="348" y="157" width="69" height="17"/>
+                        <rect key="frame" x="338" y="156" width="69" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="IP Address" usesSingleLineMode="YES" id="2977">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1374,7 +1372,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2799" customClass="VLCOpenTextField">
-                        <rect key="frame" x="422" y="182" width="78" height="22"/>
+                        <rect key="frame" x="412" y="183" width="78" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="78" id="pW6-zg-Iah"/>
                         </constraints>
@@ -1388,14 +1386,14 @@ DQ
                         </connections>
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2800">
-                        <rect key="frame" x="505" y="179" width="19" height="27"/>
+                        <rect key="frame" x="495" y="180" width="19" height="27"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2979"/>
                         <connections>
                             <action selector="openNetStepperChanged:" target="-2" id="cOb-FE-uz7"/>
                         </connections>
                     </stepper>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2801" customClass="VLCOpenTextField">
-                        <rect key="frame" x="422" y="155" width="119" height="22"/>
+                        <rect key="frame" x="412" y="154" width="119" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="119" id="5hI-l9-myn"/>
                         </constraints>
@@ -1405,10 +1403,10 @@ DQ
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="760" mirrorLayoutDirectionWhenInternationalizing="always" preferredMaxLayoutWidth="35" translatesAutoresizingMaskIntoConstraints="NO" id="2802">
-                        <rect key="frame" x="553" y="157" width="39" height="17"/>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="760" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2802">
+                        <rect key="frame" x="543" y="156" width="49" height="17"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="35" id="DDD-Jw-3lI"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="45" id="DDD-Jw-3lI"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Port" usesSingleLineMode="YES" id="2981">
                             <font key="font" metaFont="system"/>
@@ -1417,7 +1415,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2803" customClass="VLCOpenTextField">
-                        <rect key="frame" x="597" y="155" width="58" height="22"/>
+                        <rect key="frame" x="597" y="154" width="58" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="58" id="LHb-P2-YuL"/>
                         </constraints>
@@ -1431,7 +1429,7 @@ DQ
                         </connections>
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="2804">
-                        <rect key="frame" x="660" y="152" width="19" height="27"/>
+                        <rect key="frame" x="660" y="151" width="19" height="27"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" tag="1" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2983"/>
                         <connections>
                             <action selector="openNetStepperChanged:" target="-2" id="TlS-ML-UbZ"/>
@@ -1484,7 +1482,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2853">
-                        <rect key="frame" x="166" y="213" width="39" height="17"/>
+                        <rect key="frame" x="166" y="213" width="124" height="17"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Mode" id="2988">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -1492,7 +1490,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2854">
-                        <rect key="frame" x="363" y="213" width="54" height="17"/>
+                        <rect key="frame" x="353" y="213" width="54" height="17"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Address" id="2989">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -1536,7 +1534,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraint firstItem="2794" firstAttribute="top" secondItem="2853" secondAttribute="bottom" constant="10" id="Igp-RM-1Y5"/>
                     <constraint firstItem="2808" firstAttribute="centerY" secondItem="2807" secondAttribute="centerY" id="Iy4-pX-L4Z"/>
                     <constraint firstItem="2799" firstAttribute="leading" secondItem="2797" secondAttribute="trailing" constant="7" id="IzJ-pc-zkX"/>
-                    <constraint firstItem="2798" firstAttribute="top" secondItem="2797" secondAttribute="bottom" constant="10" id="KQO-xx-Ve3"/>
+                    <constraint firstItem="2798" firstAttribute="top" secondItem="2797" secondAttribute="bottom" constant="12" id="KQO-xx-Ve3"/>
                     <constraint firstItem="2802" firstAttribute="leading" secondItem="2801" secondAttribute="trailing" constant="14" id="KlG-zf-e8N"/>
                     <constraint firstItem="2854" firstAttribute="trailing" secondItem="2797" secondAttribute="trailing" id="MFx-SX-oQW"/>
                     <constraint firstItem="2853" firstAttribute="baseline" secondItem="2854" secondAttribute="baseline" id="NKe-ju-tza"/>
@@ -1548,10 +1546,11 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraint firstItem="2811" firstAttribute="centerX" secondItem="2793" secondAttribute="centerX" id="TgD-Vr-drz"/>
                     <constraint firstItem="2854" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2853" secondAttribute="trailing" constant="17" placeholder="YES" id="Uu3-Q5-9fi"/>
                     <constraint firstItem="2801" firstAttribute="centerY" secondItem="2798" secondAttribute="centerY" id="Vf8-Vl-OQ3"/>
-                    <constraint firstItem="2797" firstAttribute="top" secondItem="2854" secondAttribute="bottom" constant="12" id="VhZ-kk-edE"/>
+                    <constraint firstItem="2797" firstAttribute="top" secondItem="2854" secondAttribute="bottom" constant="11" id="VhZ-kk-edE"/>
                     <constraint firstItem="2852" firstAttribute="baseline" secondItem="2853" secondAttribute="baseline" id="Wh2-oh-ueo"/>
                     <constraint firstItem="2807" firstAttribute="leading" secondItem="2808" secondAttribute="trailing" constant="12" id="XON-7u-D1l"/>
                     <constraint firstItem="2801" firstAttribute="leading" secondItem="2798" secondAttribute="trailing" constant="7" id="ZVf-ez-JB8"/>
+                    <constraint firstItem="2853" firstAttribute="trailing" secondItem="2794" secondAttribute="trailing" id="ayK-Zv-071"/>
                     <constraint firstItem="2853" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2852" secondAttribute="trailing" constant="17" id="dyz-J7-929"/>
                     <constraint firstItem="2852" firstAttribute="leading" secondItem="2860" secondAttribute="leading" id="eWW-Cl-s2C"/>
                     <constraint firstAttribute="trailing" secondItem="2807" secondAttribute="trailing" constant="20" id="eqK-2H-3qB"/>
@@ -1565,7 +1564,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraint firstItem="2804" firstAttribute="leading" secondItem="2803" secondAttribute="trailing" constant="8" id="y1j-kM-eXP"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="561" y="757.5"/>
+            <point key="canvasLocation" x="561" y="757"/>
         </window>
         <customView id="3080" userLabel="Audio CD">
             <rect key="frame" x="0.0" y="0.0" width="295" height="205"/>
@@ -1968,7 +1967,7 @@ To open a stream using a different protocol, just press Cancel to close this she
         <userDefaultsController representsSharedInstance="YES" id="3521"/>
     </objects>
     <resources>
-        <image name="C810A817-1217-4117-804B-141B82C80BF4" width="1" height="1">
+        <image name="03DB12E1-9518-49E5-9F7A-38F9B0BB0B07" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
