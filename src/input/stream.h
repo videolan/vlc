@@ -37,21 +37,50 @@ void stream_CommonDelete( stream_t *s );
 stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, bool, const char *);
 
 /**
- * Automatically wraps a stream with any applicable stream filter.
- * @return the (outermost/downstream) stream filter; if no filters were added,
- * then the function return the source parameter.
- * @note The function never returns NULL.
+ * Probes stream filters automatically.
+ *
+ * This function automatically and repeatedly probes for applicable stream
+ * filters to append downstream of an existing stream. Any such filter will
+ * convert the stream into another stream, e.g. decompressing it or extracting
+ * the list of contained files (playlist).
+ *
+ * This function transfers ownership of the supplied stream to the following
+ * stream filter, of the first stream filter to the second stream filter, and
+ * so on. Any attempt to access the original stream filter directly is
+ * explicitly undefined.
+ *
+ * If, and only if, no filters were probed succesfully, a pointer to the
+ * unchanged source stream will be returned. Otherwise, this returns a stream
+ * filter. The return value is thus guaranteed to be non-NULL.
+ *
+ * @param source input stream around which to build a filter chain
+ *
+ * @return the last, most downstream stream object.
+ *
+ * @note The return value must be freed with vlc_stream_Delete() after use.
+ * This will automatically free the whole chain and the underlying stream.
  */
 stream_t *stream_FilterAutoNew( stream_t *source ) VLC_USED;
 
 /**
- * This function creates a chain of filters according to the colon-separated
- * list.
+ * Builds an explicit chain of stream filters.
  *
- * You must release the returned value using vlc_stream_Delete unless it is
- * used as a source to another filter.
+ * This function creates a chain of filters according to a supplied list.
+ *
+ * See also stream_FilterAutoNew(). Those two functions have identical
+ * semantics; the only difference lies in how the list of probed filters is
+ * determined (manually versus automatically).
+ *
+ * If the list is empty, or if probing each of the requested filters failed,
+ * this function will return a pointer to the supplied source stream.
+ *
+ * @param source input stream around which to build a filter chain
+ * @param list colon-separated list of stream filters (upstream first)
+ *
+ * @return The last stream (filter) in the chain.
+ * The return value is always a valid (non-NULL) stream pointer.
  */
-stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain );
+stream_t *stream_FilterChainNew( stream_t *source, const char *list ) VLC_USED;
 
 /**
  * Attach \ref stream_extractor%s according to specified data

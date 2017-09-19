@@ -45,7 +45,7 @@ typedef struct
 {
     VLC_COMMON_MEMBERS
 
-    demux_t  *p_demux; /**< Demux plugin instance */
+    demux_t  *p_demux; /**< Demux object (most downstream) */
 
     /* Title infos for that input */
     bool         b_title_demux; /* Titles/Seekpoints provided by demux */
