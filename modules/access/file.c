@@ -57,7 +57,6 @@
 #include "fs.h"
 #include <vlc_input.h>
 #include <vlc_access.h>
-#include <vlc_dialog.h>
 #ifdef _WIN32
 # include <vlc_charset.h>
 #endif
@@ -174,11 +173,6 @@ int FileOpen( vlc_object_t *p_this )
                  p_access->psz_filepath ? p_access->psz_filepath
                                         : p_access->psz_location,
                  vlc_strerror_c(errno));
-        vlc_dialog_display_error (p_access, _("File reading failed"),
-            _("VLC could not open the file \"%s\" (%s)."),
-            p_access->psz_filepath ? p_access->psz_filepath
-                                   : p_access->psz_location,
-            vlc_strerror(errno));
         return VLC_EGENERIC;
     }
 
@@ -287,9 +281,6 @@ static ssize_t Read (stream_t *p_access, void *p_buffer, size_t i_len)
         }
 
         msg_Err (p_access, "read error: %s", vlc_strerror_c(errno));
-        vlc_dialog_display_error (p_access, _("File reading failed"),
-            _("VLC could not read the file (%s)."),
-            vlc_strerror(errno));
         val = 0;
     }
 
