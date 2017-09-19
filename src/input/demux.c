@@ -636,16 +636,13 @@ static bool demux_filter_enable_disable( demux_t *p_demux_chain,
                                           const char* psz_demux, bool b_enable )
 {
     demux_t *p_demux = p_demux_chain;
-    while ( p_demux )
-    {
-        if( strcmp( module_get_name( p_demux->p_module, false ), psz_demux) == 0 ||
-            strcmp( module_get_name( p_demux->p_module, true ), psz_demux ) == 0 )
-        {
-            demux_Control( p_demux,
-                           b_enable ? DEMUX_FILTER_ENABLE : DEMUX_FILTER_DISABLE );
-            return true;
-        }
-        p_demux = p_demux->p_next;
+
+     if( strcmp( module_get_name( p_demux->p_module, false ), psz_demux) == 0 ||
+         strcmp( module_get_name( p_demux->p_module, true ), psz_demux ) == 0 )
+     {
+        demux_Control( p_demux,
+                       b_enable ? DEMUX_FILTER_ENABLE : DEMUX_FILTER_DISABLE );
+        return true;
     }
     return false;
 }
