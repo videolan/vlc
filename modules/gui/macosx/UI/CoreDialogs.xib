@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -30,10 +30,10 @@
         <window title="Authentication" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="248" userLabel="Authentication" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="332" y="446" width="426" height="278"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="contentRect" x="332" y="446" width="460" height="278"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="249">
-                <rect key="frame" x="0.0" y="0.0" width="426" height="278"/>
+                <rect key="frame" x="0.0" y="0.0" width="460" height="278"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="256">
@@ -45,7 +45,10 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="257">
-                        <rect key="frame" x="94" y="177" width="314" height="56"/>
+                        <rect key="frame" x="94" y="177" width="348" height="56"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="310" id="nRC-DT-eDC"/>
+                        </constraints>
                         <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" id="324">
                             <font key="font" metaFont="smallSystem"/>
                             <string key="title">Small System Font Text Small System Font Text Small System Font Text Small System Font Text Small System Font Text Small System Font Text Small System Text System Font Text Small System</string>
@@ -54,10 +57,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="250">
-                        <rect key="frame" x="96" y="114" width="310" height="22"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="310" id="Z4D-cl-K9y"/>
-                        </constraints>
+                        <rect key="frame" x="96" y="114" width="344" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="317">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -73,11 +73,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="253" customClass="NSSecureTextField">
-                        <rect key="frame" x="96" y="60" width="310" height="22"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="310" id="Fy2-Af-NzE"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="310" id="kUe-WK-LGf"/>
-                        </constraints>
+                        <rect key="frame" x="96" y="60" width="344" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="320">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -93,7 +89,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="252">
-                        <rect key="frame" x="353" y="12" width="59" height="32"/>
+                        <rect key="frame" x="387" y="12" width="59" height="32"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="319">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -106,7 +102,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="254">
-                        <rect key="frame" x="271" y="12" width="82" height="32"/>
+                        <rect key="frame" x="305" y="12" width="82" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="321">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -126,8 +122,8 @@ Gw
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="topLeft" imageScaling="proportionallyDown" image="NSApplicationIcon" id="325"/>
                     </imageView>
-                    <button translatesAutoresizingMaskIntoConstraints="NO" id="7LA-vc-QPm">
-                        <rect key="frame" x="94" y="21" width="88" height="18"/>
+                    <button horizontalHuggingPriority="240" translatesAutoresizingMaskIntoConstraints="NO" id="7LA-vc-QPm">
+                        <rect key="frame" x="94" y="21" width="207" height="18"/>
                         <buttonCell key="cell" type="check" title="Remember" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5El-9y-n4Y">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -144,6 +140,7 @@ Gw
                     <constraint firstItem="314" firstAttribute="top" secondItem="249" secondAttribute="top" constant="20" id="MEF-Bx-zoA"/>
                     <constraint firstAttribute="trailing" secondItem="252" secondAttribute="trailing" constant="20" id="Nx3-CN-3ss"/>
                     <constraint firstItem="252" firstAttribute="leading" secondItem="254" secondAttribute="trailing" constant="12" id="QQl-3g-Bp8"/>
+                    <constraint firstItem="254" firstAttribute="leading" secondItem="7LA-vc-QPm" secondAttribute="trailing" constant="12" id="S4F-nQ-z9M"/>
                     <constraint firstItem="255" firstAttribute="top" secondItem="257" secondAttribute="bottom" constant="19" id="WCv-OK-gjQ"/>
                     <constraint firstItem="254" firstAttribute="centerY" secondItem="252" secondAttribute="centerY" id="Yd8-Jc-1YW"/>
                     <constraint firstItem="256" firstAttribute="top" secondItem="314" secondAttribute="top" id="dB9-JK-2Lo"/>
@@ -161,13 +158,13 @@ Gw
                     <constraint firstItem="250" firstAttribute="width" secondItem="257" secondAttribute="width" id="ykG-m0-lzg"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="340" y="410.5"/>
+            <point key="canvasLocation" x="357" y="410"/>
         </window>
         <window title="Progress" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="301" userLabel="Progress">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="319" y="460" width="522" height="182"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="302">
                 <rect key="frame" x="0.0" y="0.0" width="522" height="182"/>
                 <autoresizingMask key="autoresizingMask"/>
