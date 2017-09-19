@@ -534,7 +534,7 @@ Gw
                     </tabView>
                     <button identifier="mrl button" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2836">
                         <rect key="frame" x="20" y="131" width="13" height="13"/>
-                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="14BAC51D-6570-4E0C-A9FB-D0421B48957E" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
+                        <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" image="C810A817-1217-4117-804B-141B82C80BF4" imagePosition="above" alignment="center" borderStyle="border" inset="2" id="2893">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -1322,15 +1322,18 @@ DQ
         <window title="Open UDP/RTP Streams" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="2792" userLabel="Open RTP/UDP" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="246" y="437" width="656" height="249"/>
+            <rect key="contentRect" x="246" y="437" width="696" height="250"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="2793">
-                <rect key="frame" x="0.0" y="0.0" width="656" height="249"/>
+                <rect key="frame" x="0.0" y="0.0" width="696" height="250"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2794">
-                        <rect key="frame" x="168" y="154" width="92" height="48"/>
+                        <rect key="frame" x="168" y="155" width="92" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="48" id="Yd6-Rr-hgY"/>
+                        </constraints>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         <size key="cellSize" width="92" height="18"/>
                         <size key="intercellSpacing" width="4" height="12"/>
@@ -1354,24 +1357,24 @@ DQ
                             <action selector="openNetModeChanged:" target="-2" id="Mp3-t0-2g5"/>
                         </connections>
                     </matrix>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2797">
-                        <rect key="frame" x="363" y="182" width="30" height="17"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Port" id="2976">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="2797">
+                        <rect key="frame" x="387" y="184" width="30" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Port" usesSingleLineMode="YES" id="2976">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2798">
-                        <rect key="frame" x="324" y="152" width="69" height="17"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="IP Address" id="2977">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="2798">
+                        <rect key="frame" x="348" y="157" width="69" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="IP Address" usesSingleLineMode="YES" id="2977">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2799" customClass="VLCOpenTextField">
-                        <rect key="frame" x="398" y="180" width="78" height="22"/>
+                        <rect key="frame" x="422" y="182" width="78" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="78" id="pW6-zg-Iah"/>
                         </constraints>
@@ -1385,14 +1388,14 @@ DQ
                         </connections>
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2800">
-                        <rect key="frame" x="481" y="177" width="19" height="27"/>
+                        <rect key="frame" x="505" y="179" width="19" height="27"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2979"/>
                         <connections>
                             <action selector="openNetStepperChanged:" target="-2" id="cOb-FE-uz7"/>
                         </connections>
                     </stepper>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2801" customClass="VLCOpenTextField">
-                        <rect key="frame" x="398" y="150" width="119" height="22"/>
+                        <rect key="frame" x="422" y="155" width="119" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="119" id="5hI-l9-myn"/>
                         </constraints>
@@ -1402,16 +1405,19 @@ DQ
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="35" translatesAutoresizingMaskIntoConstraints="NO" id="2802">
-                        <rect key="frame" x="522" y="152" width="30" height="17"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Port" id="2981">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="760" mirrorLayoutDirectionWhenInternationalizing="always" preferredMaxLayoutWidth="35" translatesAutoresizingMaskIntoConstraints="NO" id="2802">
+                        <rect key="frame" x="553" y="157" width="39" height="17"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="35" id="DDD-Jw-3lI"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Port" usesSingleLineMode="YES" id="2981">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2803" customClass="VLCOpenTextField">
-                        <rect key="frame" x="557" y="150" width="58" height="22"/>
+                        <rect key="frame" x="597" y="155" width="58" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="58" id="LHb-P2-YuL"/>
                         </constraints>
@@ -1425,14 +1431,14 @@ DQ
                         </connections>
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="2804">
-                        <rect key="frame" x="620" y="147" width="19" height="27"/>
+                        <rect key="frame" x="660" y="152" width="19" height="27"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" tag="1" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2983"/>
                         <connections>
                             <action selector="openNetStepperChanged:" target="-2" id="TlS-ML-UbZ"/>
                         </connections>
                     </stepper>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2807">
-                        <rect key="frame" x="569" y="12" width="73" height="32"/>
+                        <rect key="frame" x="609" y="12" width="73" height="32"/>
                         <buttonCell key="cell" type="push" title="Open" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2984">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -1445,7 +1451,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2808">
-                        <rect key="frame" x="487" y="12" width="82" height="32"/>
+                        <rect key="frame" x="527" y="12" width="82" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2985">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -1458,7 +1464,7 @@ Gw
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2811">
-                        <rect key="frame" x="33" y="57" width="591" height="70"/>
+                        <rect key="frame" x="22" y="57" width="652" height="70"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2986">
                             <font key="font" metaFont="smallSystem"/>
                             <string key="title">If you want to open a multicast stream, enter the respective IP address given by the stream provider. In unicast mode, VLC uses your machine's IP automatically.
@@ -1470,7 +1476,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2852">
-                        <rect key="frame" x="34" y="212" width="55" height="17"/>
+                        <rect key="frame" x="34" y="213" width="55" height="17"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Protocol" id="2987">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -1478,7 +1484,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2853">
-                        <rect key="frame" x="166" y="212" width="39" height="17"/>
+                        <rect key="frame" x="166" y="213" width="39" height="17"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Mode" id="2988">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -1486,7 +1492,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2854">
-                        <rect key="frame" x="339" y="209" width="54" height="17"/>
+                        <rect key="frame" x="363" y="213" width="54" height="17"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Address" id="2989">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -1494,7 +1500,10 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2860">
-                        <rect key="frame" x="36" y="154" width="92" height="48"/>
+                        <rect key="frame" x="36" y="155" width="92" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="48" id="sOX-j9-zbu"/>
+                        </constraints>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         <size key="cellSize" width="92" height="18"/>
                         <size key="intercellSpacing" width="4" height="12"/>
@@ -1520,43 +1529,43 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <constraint firstItem="2802" firstAttribute="centerY" secondItem="2803" secondAttribute="centerY" id="3QI-CU-RXa"/>
                     <constraint firstItem="2804" firstAttribute="trailing" secondItem="2807" secondAttribute="trailing" id="9b3-Eg-IeU"/>
                     <constraint firstItem="2860" firstAttribute="top" secondItem="2852" secondAttribute="bottom" constant="10" id="A44-Pb-RLR"/>
+                    <constraint firstItem="2852" firstAttribute="leading" secondItem="2793" secondAttribute="leading" constant="36" id="AFT-te-FAa"/>
                     <constraint firstItem="2808" firstAttribute="top" secondItem="2811" secondAttribute="bottom" constant="17" id="CBv-Rs-fOh"/>
                     <constraint firstItem="2811" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2801" secondAttribute="bottom" constant="17" id="EV8-jG-FKj"/>
                     <constraint firstItem="2853" firstAttribute="leading" secondItem="2794" secondAttribute="leading" id="Flk-xE-dCg"/>
                     <constraint firstItem="2794" firstAttribute="top" secondItem="2853" secondAttribute="bottom" constant="10" id="Igp-RM-1Y5"/>
                     <constraint firstItem="2808" firstAttribute="centerY" secondItem="2807" secondAttribute="centerY" id="Iy4-pX-L4Z"/>
                     <constraint firstItem="2799" firstAttribute="leading" secondItem="2797" secondAttribute="trailing" constant="7" id="IzJ-pc-zkX"/>
-                    <constraint firstItem="2802" firstAttribute="leading" secondItem="2801" secondAttribute="trailing" constant="7" id="KlG-zf-e8N"/>
-                    <constraint firstItem="2799" firstAttribute="leading" secondItem="2801" secondAttribute="leading" id="LGr-IS-hko"/>
+                    <constraint firstItem="2798" firstAttribute="top" secondItem="2797" secondAttribute="bottom" constant="10" id="KQO-xx-Ve3"/>
+                    <constraint firstItem="2802" firstAttribute="leading" secondItem="2801" secondAttribute="trailing" constant="14" id="KlG-zf-e8N"/>
                     <constraint firstItem="2854" firstAttribute="trailing" secondItem="2797" secondAttribute="trailing" id="MFx-SX-oQW"/>
+                    <constraint firstItem="2853" firstAttribute="baseline" secondItem="2854" secondAttribute="baseline" id="NKe-ju-tza"/>
+                    <constraint firstItem="2798" firstAttribute="trailing" secondItem="2797" secondAttribute="trailing" id="NsH-mx-36x"/>
                     <constraint firstItem="2801" firstAttribute="centerY" secondItem="2802" secondAttribute="centerY" id="PvR-Zc-BmI"/>
                     <constraint firstAttribute="bottom" secondItem="2807" secondAttribute="bottom" constant="19" id="QhV-Oj-y5a"/>
-                    <constraint firstItem="2799" firstAttribute="top" secondItem="2794" secondAttribute="top" id="QtG-QB-P2F"/>
                     <constraint firstItem="2803" firstAttribute="centerY" secondItem="2804" secondAttribute="centerY" id="TUP-sC-HQd"/>
                     <constraint firstItem="2799" firstAttribute="centerY" secondItem="2800" secondAttribute="centerY" id="TX5-95-yCI"/>
                     <constraint firstItem="2811" firstAttribute="centerX" secondItem="2793" secondAttribute="centerX" id="TgD-Vr-drz"/>
-                    <constraint firstItem="2794" firstAttribute="leading" secondItem="2793" secondAttribute="leading" constant="168" id="ThE-wO-qsN"/>
-                    <constraint firstItem="2854" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2853" secondAttribute="trailing" constant="17" id="Uu3-Q5-9fi"/>
+                    <constraint firstItem="2854" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2853" secondAttribute="trailing" constant="17" placeholder="YES" id="Uu3-Q5-9fi"/>
                     <constraint firstItem="2801" firstAttribute="centerY" secondItem="2798" secondAttribute="centerY" id="Vf8-Vl-OQ3"/>
-                    <constraint firstItem="2797" firstAttribute="top" secondItem="2854" secondAttribute="bottom" constant="10" id="VhZ-kk-edE"/>
+                    <constraint firstItem="2797" firstAttribute="top" secondItem="2854" secondAttribute="bottom" constant="12" id="VhZ-kk-edE"/>
+                    <constraint firstItem="2852" firstAttribute="baseline" secondItem="2853" secondAttribute="baseline" id="Wh2-oh-ueo"/>
                     <constraint firstItem="2807" firstAttribute="leading" secondItem="2808" secondAttribute="trailing" constant="12" id="XON-7u-D1l"/>
                     <constraint firstItem="2801" firstAttribute="leading" secondItem="2798" secondAttribute="trailing" constant="7" id="ZVf-ez-JB8"/>
                     <constraint firstItem="2853" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2852" secondAttribute="trailing" constant="17" id="dyz-J7-929"/>
                     <constraint firstItem="2852" firstAttribute="leading" secondItem="2860" secondAttribute="leading" id="eWW-Cl-s2C"/>
                     <constraint firstAttribute="trailing" secondItem="2807" secondAttribute="trailing" constant="20" id="eqK-2H-3qB"/>
                     <constraint firstItem="2803" firstAttribute="leading" secondItem="2802" secondAttribute="trailing" constant="7" id="feT-zt-W1v"/>
-                    <constraint firstItem="2860" firstAttribute="top" secondItem="2793" secondAttribute="top" constant="47" id="j4c-90-EDK"/>
+                    <constraint firstItem="2794" firstAttribute="leading" secondItem="2860" secondAttribute="trailing" constant="40" id="hU5-Mn-ivi"/>
                     <constraint firstItem="2800" firstAttribute="leading" secondItem="2799" secondAttribute="trailing" constant="8" id="kzG-8t-8V9"/>
                     <constraint firstItem="2811" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2793" secondAttribute="leading" constant="19" id="mSq-9N-Q0E"/>
                     <constraint firstItem="2797" firstAttribute="centerY" secondItem="2799" secondAttribute="centerY" id="o23-eX-HGr"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2811" secondAttribute="trailing" constant="19" id="o8m-te-c2O"/>
-                    <constraint firstItem="2860" firstAttribute="leading" secondItem="2793" secondAttribute="leading" constant="36" id="pRC-WA-otd"/>
-                    <constraint firstItem="2801" firstAttribute="top" secondItem="2799" secondAttribute="bottom" constant="8" id="u9M-ZR-Pqn"/>
+                    <constraint firstItem="2852" firstAttribute="top" secondItem="2793" secondAttribute="top" constant="20" id="rQ9-ZJ-SGa"/>
                     <constraint firstItem="2804" firstAttribute="leading" secondItem="2803" secondAttribute="trailing" constant="8" id="y1j-kM-eXP"/>
-                    <constraint firstItem="2794" firstAttribute="top" secondItem="2793" secondAttribute="top" constant="47" id="z3m-Eq-adt"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="537" y="757.5"/>
+            <point key="canvasLocation" x="561" y="757.5"/>
         </window>
         <customView id="3080" userLabel="Audio CD">
             <rect key="frame" x="0.0" y="0.0" width="295" height="205"/>
@@ -1959,7 +1968,7 @@ To open a stream using a different protocol, just press Cancel to close this she
         <userDefaultsController representsSharedInstance="YES" id="3521"/>
     </objects>
     <resources>
-        <image name="14BAC51D-6570-4E0C-A9FB-D0421B48957E" width="1" height="1">
+        <image name="C810A817-1217-4117-804B-141B82C80BF4" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
