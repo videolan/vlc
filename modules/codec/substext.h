@@ -66,6 +66,7 @@ struct subpicture_updater_sys_t {
 
     /* styling */
     text_style_t *p_default_style; /* decoder (full or partial) defaults */
+    float margin_ratio;
 };
 
 static inline void SubpictureUpdaterSysRegionClean(subpicture_updater_sys_region_t *p_updtregion)
@@ -178,7 +179,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
         if (!(p_updtregion->flags & UPDT_REGION_FIX_DONE))
         {
-            const float margin_ratio = ( r->b_gridmode ) ? 0.10 : 0.04;
+            const float margin_ratio = sys->margin_ratio;
             const int   margin_h     = margin_ratio * (( r->b_gridmode ) ? (unsigned) subpic->i_original_picture_width
                                                                          : fmt_dst->i_visible_width );
             const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
@@ -216,17 +217,10 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                 p_segment->style = text_style_Duplicate( sys->p_default_style );
             /* Update all segments font sizes in pixels, *** metric used by renderers *** */
             /* We only do this when a fixed font size isn't set */
-            if( r->b_gridmode )
-            {
-                /* Ensure font size is correct for grid layout */
-                p_segment->style->f_font_relsize = 0; /* Force to unset */
-                p_segment->style->i_font_size = EIA608_VISIBLE * subpic->i_original_picture_height /
-                                                EIA608_ROWS / FONT_TO_LINE_HEIGHT_RATIO;
-            }
-            else if( p_segment->style && p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
+            if( p_segment->style && p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
             {
                 p_segment->style->i_font_size = p_segment->style->f_font_relsize *
-                        subpic->i_original_picture_height / 100;
+                                                subpic->i_original_picture_height / 100;
             }
         }
 
@@ -258,6 +252,7 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
         .p_sys       = sys,
     };
     SubpictureUpdaterSysRegionInit( &sys->region );
+    sys->margin_ratio = 0.04;
     sys->p_default_style = text_style_Create( STYLE_NO_DEFAULTS );
     if(unlikely(!sys->p_default_style))
     {

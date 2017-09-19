@@ -452,9 +452,11 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
         p_spu_sys->p_default_style->i_features |= STYLE_HAS_BACKGROUND_ALPHA;
         p_spu_sys->p_default_style->i_style_flags |= STYLE_BACKGROUND;
     }
+    p_spu_sys->margin_ratio = 0.10;
     p_spu_sys->p_default_style->i_font_color = rgi_eia608_colors[EIA608_COLOR_DEFAULT];
     /* FCC defined "safe area" for EIA-608 captions is 80% of the height of the display */
-    p_spu_sys->p_default_style->f_font_relsize = 100 * 8 / 10 / EIA608_SCREEN_ROWS;
+    p_spu_sys->p_default_style->f_font_relsize = EIA608_VISIBLE * 100 / EIA608_SCREEN_ROWS /
+                                                 FONT_TO_LINE_HEIGHT_RATIO;
     p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FLAGS);
 
     Eia608FillUpdaterRegions( p_spu_sys, h );
