@@ -1868,6 +1868,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
     }
 }
 
+#ifdef ENABLE_SOUT
 static void ControlUpdateSout( input_thread_t *p_input, const char* psz_chain )
 {
     var_SetString( p_input, "sout", psz_chain );
@@ -1887,6 +1888,7 @@ static void ControlUpdateSout( input_thread_t *p_input, const char* psz_chain )
     }
     es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESTART_ALL_ES );
 }
+#endif
 
 static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_demux_chain )
 {
@@ -2319,6 +2321,7 @@ static bool Control( input_thread_t *p_input,
         }
         case INPUT_CONTROL_SET_RENDERER:
         {
+#ifdef ENABLE_SOUT
             vlc_renderer_item_t *p_item = val.p_address;
             input_thread_private_t *p_priv = input_priv( p_input );
             // We do not support switching from a renderer to another for now
@@ -2345,6 +2348,7 @@ static bool Control( input_thread_t *p_input,
                 }
                 input_resource_TerminateVout( p_priv->p_resource );
             }
+#endif
             break;
         }
 
