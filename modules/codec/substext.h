@@ -118,6 +118,8 @@ static int SubpictureTextValidate(subpicture_t *subpic,
         p_updtregion->origin.y = subpic->p_region->i_y;
         p_updtregion->extent.x = subpic->i_original_picture_width;
         p_updtregion->extent.y = subpic->i_original_picture_height;
+        p_updtregion->flags &= ~(UPDT_REGION_ORIGIN_X_IS_PERCENTILE|UPDT_REGION_ORIGIN_Y_IS_PERCENTILE|
+                                 UPDT_REGION_EXTENT_X_IS_PERCENTILE|UPDT_REGION_EXTENT_Y_IS_PERCENTILE);
     }
 
     return VLC_EGENERIC;
