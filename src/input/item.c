@@ -1665,6 +1665,8 @@ int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
     input_item_CopyOptions(p_item, p_rdh->p_node->p_item);
     p_node = input_item_node_AppendItem(p_rdh->p_node, p_item);
     input_item_Release(p_item);
+    if (p_node == NULL)
+        return VLC_ENOMEM;
 
     /* A slave can also be an item. If there is a match, this item will be
      * removed from the parent node. This is not a common case, since most
