@@ -1351,18 +1351,9 @@ static void rdh_sort(input_item_node_t *p_node)
     if (p_node->i_children <= 0)
         return;
 
-    /* Lock first all children. This avoids to lock/unlock them from each
-     * compar callback call */
-    for (int i = 0; i < p_node->i_children; i++)
-        vlc_mutex_lock(&p_node->pp_children[i]->p_item->lock);
-
     /* Sort current node */
     qsort(p_node->pp_children, p_node->i_children,
           sizeof(input_item_node_t *), rdh_compar_filename);
-
-    /* Unlock all children */
-    for (int i = 0; i < p_node->i_children; i++)
-        vlc_mutex_unlock(&p_node->pp_children[i]->p_item->lock);
 
     /* Sort all children */
     for (int i = 0; i < p_node->i_children; i++)
