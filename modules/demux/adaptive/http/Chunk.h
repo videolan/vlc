@@ -133,7 +133,7 @@ namespace adaptive
                 bool                done;
                 bool                eof;
                 mtime_t             downloadstart;
-                vlc_mutex_t         lock;
+                mutable vlc_mutex_t lock;
                 vlc_cond_t          avail;
                 bool                held;
         };
