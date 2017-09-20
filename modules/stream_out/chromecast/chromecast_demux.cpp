@@ -60,9 +60,9 @@ struct demux_sys_t
                     p_renderer->pf_set_artwork( p_renderer->p_opaque, meta );
             }
             vlc_meta_Delete(p_meta);
-            if (demux_Control( demux->p_next, DEMUX_CAN_SEEK, &canSeek ) != VLC_SUCCESS)
-                canSeek = false;
         }
+        if (demux_Control( demux->p_next, DEMUX_CAN_SEEK, &canSeek ) != VLC_SUCCESS)
+            canSeek = false;
     }
 
     ~demux_sys_t()
