@@ -537,9 +537,6 @@ dnl Check for broken versions of mingw-runtime compatability library
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
 
-    dnl Add WinMainCRTStartup entry point to show it's a WinMain application
-    VLC_ADD_LDFLAGS([vlc],[-mwindows])
-
     dnl Check for the need to include the mingwex lib for mingw32
     VLC_SAVE_FLAGS
     AC_CHECK_LIB(mingwex,opendir,

@@ -7,9 +7,8 @@ else
 bin_PROGRAMS = vlc
 noinst_PROGRAMS = vlc-static
 endif
-noinst_DATA =
-vlclib_PROGRAMS = vlc-cache-gen
 EXTRA_DIST = vlc_win32_rc.rc.in
+CLEANFILES = vlc_win32_rc.rc
 
 SUFFIXES = .rc.in .rc
 
@@ -19,16 +18,18 @@ if HAVE_DBUS
 AM_CPPFLAGS += -DHAVE_DBUS
 endif
 
+#
+# Main VLC executable
+#
+vlc_LDADD = ../lib/libvlc.la $(LIBPTHREAD)
 if !HAVE_WIN32
-if !HAVE_OS2
-bin_PROGRAMS += vlc-wrapper
-endif
 vlc_SOURCES = vlc.c override.c
-endif
-
-if HAVE_WIN32
+vlc_LDADD += $(LIBDL)
+else
 vlc_SOURCES = winvlc.c
-noinst_DATA += vlc_win32_rc.rc
+vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
+vlc_LDFLAGS = -mwindows
+vlc_LDADD += -lpsapi vlc_win32_rc.$(OBJEXT)
 endif
 
 vlc_osx_SOURCES = darwinvlc.m
@@ -55,12 +56,10 @@ vlc_osx_static_LDFLAGS += -Wl,-framework,Breakpad
 vlc_osx_static_OBJCFLAGS += -F$(CONTRIB_DIR)/Frameworks
 endif
 
-vlc_wrapper_SOURCES = rootwrap.c
-vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
-vlc_LDFLAGS = $(LDFLAGS_vlc)
-vlc_LDADD = ../lib/libvlc.la $(LIBPTHREAD)
-
+#
+# Static (debug) VLC executable
+#
 vlc_static_SOURCES = $(vlc_SOURCES)
 vlc_static_CFLAGS = $(AM_CFLAGS) \
 	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
@@ -68,15 +67,18 @@ vlc_static_CFLAGS = $(AM_CFLAGS) \
 	$(NULL)
 vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
 vlc_static_LDADD = $(vlc_LDADD)
-vlc_static_LDFLAGS = $(vlc_LDFLAGS)
+vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
 
-if HAVE_WIN32
-vlc_LDADD += -lpsapi vlc_win32_rc.$(OBJEXT)
-vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
-else
-vlc_LDADD += $(LIBDL)
-vlc_static_LDFLAGS += -no-install -static
+#
+# Root wrapper
+#
+if !HAVE_WIN32
+if !HAVE_OS2
+bin_PROGRAMS += vlc-wrapper
 endif
+endif
+vlc_wrapper_SOURCES = rootwrap.c
+vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_win32_rc.rc: $(top_builddir)/config.status vlc_win32_rc.rc.in
 	cd "$(top_builddir)" && \
@@ -85,6 +87,10 @@ vlc_win32_rc.rc: $(top_builddir)/config.status vlc_win32_rc.rc.in
 vlc_win32_rc.$(OBJEXT): vlc_win32_rc.rc $(top_srcdir)/extras/package/win32/vlc.exe.manifest
 	$(WINDRES) --include-dir $(top_srcdir)/share/icons --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
 
+#
+# Plug-ins cache generator
+#
+vlclib_PROGRAMS = vlc-cache-gen
 vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \
 	$(GNUGETOPT_LIBS) \
@@ -98,7 +104,7 @@ endif
 #
 # Plug-ins cache
 #
-noinst_DATA += ../modules/plugins.dat
+noinst_DATA = ../modules/plugins.dat
 MOSTLYCLEANFILES = $(noinst_DATA)
 
 if HAVE_DARWIN
