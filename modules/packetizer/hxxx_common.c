@@ -90,7 +90,7 @@ block_t * cc_storage_get_current( cc_storage_t *p_ccs, bool pb_present[4],
     for( int i = 0; i < 4; i++ )
         pb_present[i] = p_ccs->current.pb_present[i];
 
-    if( p_ccs->current.i_data <= 0 )
+    if( !p_ccs->current.b_reorder && p_ccs->current.i_data <= 0 )
         return NULL;
 
     p_block = block_Alloc( p_ccs->current.i_data);

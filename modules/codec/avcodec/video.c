@@ -854,7 +854,7 @@ static void DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p
     if( p_avcc )
     {
         cc_Extract( &p_sys->cc, CC_PAYLOAD_RAW, true, p_avcc->data, p_avcc->size );
-        if( p_sys->cc.i_data )
+        if( p_sys->cc.b_reorder || p_sys->cc.i_data )
         {
             block_t *p_cc = block_Alloc( p_sys->cc.i_data );
             if( p_cc )

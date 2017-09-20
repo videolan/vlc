@@ -322,7 +322,7 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_dep
     for( i = 0; i < 4; i++ )
         pb_present[i] = p_sys->cc.pb_present[i];
 
-    if( p_sys->cc.i_data <= 0 )
+    if( !p_sys->cc.b_reorder && p_sys->cc.i_data <= 0 )
         return NULL;
 
     p_cc = block_Alloc( p_sys->cc.i_data );
