@@ -280,7 +280,7 @@ struct encoder_sys_t
     mfxVideoParam    params;              // Encoding parameters.
     qsv_frame_pool_t frames;              // IntelMediaSDK's frame pool.
     uint64_t         dts_warn_counter;    // DTS warning counter for rate-limiting of msg;
-    uint64_t         busy_warn_counter;   // Device Bussy warning counter for rate-limiting of msg;
+    uint64_t         busy_warn_counter;   // Device Busy warning counter for rate-limiting of msg;
     uint64_t         async_depth;         // Number of parallel encoding operations.
     uint64_t         first_task;          // The next sync point to be synchronized.
     async_task_t     *tasks;              // The async encoding tasks.
