@@ -1500,7 +1500,7 @@ static int rdh_should_match_idx(struct vlc_readdir_helper *p_rdh,
     if (strcasecmp(psz_ext, "sub") != 0)
         return false;
 
-    for (unsigned int i = 0; i < p_rdh->i_slaves; i++)
+    for (size_t i = 0; i < p_rdh->i_slaves; i++)
     {
         struct rdh_slave *p_rdh_slave = p_rdh->pp_slaves[i];
 
@@ -1539,7 +1539,7 @@ static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh)
         input_item_node_t *p_node = p_rdh->p_node->pp_children[i];
         input_item_t *p_item = p_node->p_item;
 
-        for (unsigned int j = 0; j < p_rdh->i_slaves; j++)
+        for (size_t j = 0; j < p_rdh->i_slaves; j++)
         {
             struct rdh_slave *p_rdh_slave = p_rdh->pp_slaves[j];
 
@@ -1612,7 +1612,7 @@ void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
     free(p_rdh->psz_ignored_exts);
 
     /* Remove unmatched slaves */
-    for (unsigned int i = 0; i < p_rdh->i_slaves; i++)
+    for (size_t i = 0; i < p_rdh->i_slaves; i++)
     {
         struct rdh_slave *p_rdh_slave = p_rdh->pp_slaves[i];
         if (p_rdh_slave != NULL)

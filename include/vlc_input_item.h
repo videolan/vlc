@@ -420,7 +420,7 @@ struct vlc_readdir_helper
 {
     input_item_node_t *p_node;
     void **pp_slaves;
-    unsigned int i_slaves;
+    size_t i_slaves;
     int i_sub_autodetect_fuzzy;
     bool b_show_hiddenfiles;
     char *psz_ignored_exts;
