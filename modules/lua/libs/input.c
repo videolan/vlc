@@ -272,8 +272,6 @@ static int vlclua_input_item_delete( lua_State *L )
     return 1;
 }
 
-static int vlclua_input_item_get( lua_State *L, input_item_t *p_item );
-
 static int vlclua_input_item_get_current( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
@@ -416,7 +414,7 @@ static const luaL_Reg vlclua_input_item_reg[] = {
     { NULL, NULL }
 };
 
-static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
+int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
 {
     input_item_Hold( p_item );
     input_item_t **pp = lua_newuserdata( L, sizeof( input_item_t* ) );
