@@ -1534,15 +1534,16 @@ static int rdh_should_match_idx(struct vlc_readdir_helper *p_rdh,
     return false;
 }
 
-static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh)
+static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh,
+                              input_item_node_t *p_parent_node)
 {
     if (p_rdh->i_sub_autodetect_fuzzy == 0)
         return;
 
     /* Try to match slaves for each items of the node */
-    for (int i = 0; i < p_rdh->p_node->i_children; i++)
+    for (int i = 0; i < p_parent_node->i_children; i++)
     {
-        input_item_node_t *p_node = p_rdh->p_node->pp_children[i];
+        input_item_node_t *p_node = p_parent_node->pp_children[i];
         input_item_t *p_item = p_node->p_item;
 
         for (size_t j = 0; j < p_rdh->i_slaves; j++)
@@ -1584,8 +1585,7 @@ static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh)
              * added in the parent node */
             if (p_rdh_slave->p_node != NULL)
             {
-                input_item_node_RemoveNode(p_rdh->p_node,
-                                           p_rdh_slave->p_node);
+                input_item_node_RemoveNode(p_parent_node, p_rdh_slave->p_node);
                 input_item_node_Delete(p_rdh_slave->p_node);
                 p_rdh_slave->p_node = NULL;
             }
@@ -1593,6 +1593,10 @@ static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh)
             p_rdh_slave->p_slave->i_priority = i_priority;
         }
     }
+
+    /* Attach all children */
+    for (int i = 0; i < p_parent_node->i_children; i++)
+        rdh_attach_slaves(p_rdh, p_parent_node->pp_children[i]);
 }
 
 static int rdh_unflatten(struct vlc_readdir_helper *p_rdh,
@@ -1679,7 +1683,7 @@ void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
 {
     if (b_success)
     {
-        rdh_attach_slaves(p_rdh);
+        rdh_attach_slaves(p_rdh, p_rdh->p_node);
         rdh_sort(p_rdh->p_node);
     }
     free(p_rdh->psz_ignored_exts);
