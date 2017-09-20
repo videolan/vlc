@@ -36,3 +36,12 @@
     [[[VLCMain sharedInstance] simplePreferences] changeFont: sender];
 }
 @end
+
+@implementation VLCSimplePrefsClipView
+
+- (BOOL)isFlipped
+{
+    return YES;
+}
+
+@end

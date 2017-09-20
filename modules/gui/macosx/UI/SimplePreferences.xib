@@ -31,7 +31,7 @@
                 <outlet property="audio_volSlider" destination="2335" id="uaQ-MT-Ra9"/>
                 <outlet property="audio_volTextField" destination="2336" id="Nl0-aK-ahI"/>
                 <outlet property="cancelButton" destination="2276" id="sME-3c-gc4"/>
-                <outlet property="controlsBox" destination="2410" id="Trr-t0-Weq"/>
+                <outlet property="contentView" destination="HOX-DS-Fgr" id="Gcx-RH-0il"/>
                 <outlet property="hotkeysLabel" destination="2673" id="uXG-oU-1G0"/>
                 <outlet property="hotkeysView" destination="2668" id="0q1-GK-Zyd"/>
                 <outlet property="hotkeys_changeButton" destination="2675" id="836-wB-D98"/>
@@ -112,6 +112,7 @@
                 <outlet property="osd_outline_thicknessPopup" destination="3682" id="GQN-oD-XkB"/>
                 <outlet property="resetButton" destination="2277" id="CQQ-49-4Gq"/>
                 <outlet property="saveButton" destination="2275" id="WsL-HB-mfJ"/>
+                <outlet property="scrollView" destination="b28-nA-RR5" id="EGK-oO-Okf"/>
                 <outlet property="showAllButton" destination="3636" id="4zi-j8-1Px"/>
                 <outlet property="urlhandler_cancelButton" destination="3769" id="slp-XG-uk8"/>
                 <outlet property="urlhandler_ftpPopup" destination="3789" id="Bgt-7w-OTt"/>
@@ -158,18 +159,47 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="sprefs" animationBehavior="default" id="2265" userLabel="Simple Preferences" customClass="VLCSimplePrefsWindow">
-            <windowStyleMask key="styleMask" titled="YES"/>
+            <windowStyleMask key="styleMask" titled="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="105" y="903" width="570" height="38"/>
+            <rect key="contentRect" x="105" y="903" width="570" height="600"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="2266">
-                <rect key="frame" x="0.0" y="0.0" width="570" height="38"/>
+                <rect key="frame" x="0.0" y="0.0" width="570" height="600"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b28-nA-RR5">
+                        <rect key="frame" x="0.0" y="45" width="570" height="555"/>
+                        <clipView key="contentView" copiesOnScroll="NO" id="ecH-Hh-jJF" customClass="VLCSimplePrefsClipView">
+                            <rect key="frame" x="1" y="1" width="568" height="553"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <view translatesAutoresizingMaskIntoConstraints="NO" id="HOX-DS-Fgr">
+                                    <rect key="frame" x="0.0" y="0.0" width="568" height="553"/>
+                                </view>
+                            </subviews>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="HOX-DS-Fgr" secondAttribute="bottom" priority="50" id="K7G-L9-E1u"/>
+                                <constraint firstItem="HOX-DS-Fgr" firstAttribute="leading" secondItem="ecH-Hh-jJF" secondAttribute="leading" id="SGZ-aS-bLe"/>
+                                <constraint firstItem="HOX-DS-Fgr" firstAttribute="top" secondItem="ecH-Hh-jJF" secondAttribute="top" id="d18-94-8pD"/>
+                                <constraint firstAttribute="trailing" secondItem="HOX-DS-Fgr" secondAttribute="trailing" id="nkd-2f-qUW"/>
+                            </constraints>
+                        </clipView>
+                        <constraints>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="LBG-ZW-rzc"/>
+                        </constraints>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="09p-uc-Z8j">
+                            <rect key="frame" x="-100" y="-100" width="568" height="16"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="5eR-1v-88a">
+                            <rect key="frame" x="553" y="1" width="16" height="298"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                     <box title="Title" boxType="oldStyle" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="2410">
-                        <rect key="frame" x="0.0" y="-2" width="570" height="40"/>
+                        <rect key="frame" x="0.0" y="0.0" width="570" height="45"/>
                         <view key="contentView" id="uTV-TS-NBc">
-                            <rect key="frame" x="0.0" y="0.0" width="570" height="40"/>
+                            <rect key="frame" x="0.0" y="0.0" width="570" height="45"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2275">
@@ -234,17 +264,21 @@ Gw
                             </constraints>
                         </view>
                         <constraints>
-                            <constraint firstAttribute="height" constant="40" id="FeC-YL-hWD"/>
+                            <constraint firstAttribute="height" constant="45" id="FeC-YL-hWD"/>
                         </constraints>
                     </box>
                 </subviews>
                 <constraints>
                     <constraint firstItem="2410" firstAttribute="leading" secondItem="2266" secondAttribute="leading" id="5aq-6C-R23"/>
-                    <constraint firstAttribute="bottom" secondItem="2410" secondAttribute="bottom" constant="-2" id="9wr-cv-O4F"/>
+                    <constraint firstAttribute="trailing" secondItem="b28-nA-RR5" secondAttribute="trailing" id="7Dd-iv-TMn"/>
+                    <constraint firstAttribute="bottom" secondItem="2410" secondAttribute="bottom" id="9wr-cv-O4F"/>
+                    <constraint firstItem="b28-nA-RR5" firstAttribute="top" secondItem="2266" secondAttribute="top" id="HVe-zO-qQu"/>
                     <constraint firstAttribute="trailing" secondItem="2410" secondAttribute="trailing" id="Kpv-q7-teO"/>
+                    <constraint firstItem="b28-nA-RR5" firstAttribute="leading" secondItem="2266" secondAttribute="leading" id="Wx9-AT-Fm2"/>
+                    <constraint firstItem="2410" firstAttribute="top" secondItem="b28-nA-RR5" secondAttribute="bottom" id="lqI-oa-BT3"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="256" y="-162"/>
+            <point key="canvasLocation" x="256" y="-243"/>
         </window>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="2311" userLabel="Interface">
@@ -349,7 +383,6 @@ Gw
                         </constraints>
                     </view>
                     <constraints>
-                        <constraint firstAttribute="width" constant="530" id="BqS-Ab-rri"/>
                         <constraint firstAttribute="height" constant="113" id="Gbi-aT-8VK"/>
                     </constraints>
                 </box>
@@ -580,7 +613,6 @@ Gw
                     </view>
                     <constraints>
                         <constraint firstAttribute="height" constant="85" id="Hpz-Ev-sCZ"/>
-                        <constraint firstAttribute="width" constant="530" id="yQf-88-Z0F"/>
                     </constraints>
                 </box>
             </subviews>
@@ -591,10 +623,13 @@ Gw
                 <constraint firstItem="2318" firstAttribute="top" secondItem="EKZ-iB-CMo" secondAttribute="bottom" constant="8" id="9hm-PK-wnp"/>
                 <constraint firstItem="3875" firstAttribute="leading" secondItem="3910" secondAttribute="leading" id="AjB-QO-2HE"/>
                 <constraint firstItem="2318" firstAttribute="leading" secondItem="EKZ-iB-CMo" secondAttribute="leading" id="C2v-Vz-tFm"/>
+                <constraint firstAttribute="bottom" secondItem="drh-ot-Vyn" secondAttribute="bottom" constant="20" id="CYV-KF-Cb4"/>
                 <constraint firstItem="3884" firstAttribute="leading" secondItem="3911" secondAttribute="leading" id="HYO-kS-Hu7"/>
                 <constraint firstItem="3900" firstAttribute="width" secondItem="3920" secondAttribute="width" id="MTr-Fo-ceM"/>
+                <constraint firstItem="drh-ot-Vyn" firstAttribute="width" secondItem="nnH-Tj-ON7" secondAttribute="width" id="Rhv-8h-won"/>
                 <constraint firstItem="CZP-ZN-k6p" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="bottom" constant="5" id="Yef-Et-tln"/>
                 <constraint firstItem="3605" firstAttribute="leading" secondItem="3919" secondAttribute="leading" id="Z2S-1r-W1t"/>
+                <constraint firstAttribute="trailing" secondItem="kup-aY-Wqq" secondAttribute="trailing" constant="19" id="Zzz-GQ-G45"/>
                 <constraint firstItem="2318" firstAttribute="width" secondItem="EKZ-iB-CMo" secondAttribute="width" id="a3R-SI-UDB"/>
                 <constraint firstItem="EKZ-iB-CMo" firstAttribute="width" secondItem="CZP-ZN-k6p" secondAttribute="width" id="aXx-RF-saK"/>
                 <constraint firstItem="CZP-ZN-k6p" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="2" id="ai4-HU-V0z"/>
@@ -613,9 +648,9 @@ Gw
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <box title="Last.fm" translatesAutoresizingMaskIntoConstraints="NO" id="2363">
-                    <rect key="frame" x="17" y="16" width="535" height="117"/>
+                    <rect key="frame" x="17" y="16" width="539" height="117"/>
                     <view key="contentView" id="7U2-xM-E1M">
-                        <rect key="frame" x="2" y="2" width="531" height="100"/>
+                        <rect key="frame" x="2" y="2" width="535" height="100"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2365">
@@ -692,14 +727,13 @@ Gw
                         </constraints>
                     </view>
                     <constraints>
-                        <constraint firstAttribute="width" constant="529" id="WQm-75-tFY"/>
                         <constraint firstAttribute="height" constant="113" id="zt6-pF-b6b"/>
                     </constraints>
                 </box>
                 <box title="Effects" translatesAutoresizingMaskIntoConstraints="NO" id="2347">
-                    <rect key="frame" x="17" y="139" width="535" height="60"/>
+                    <rect key="frame" x="17" y="139" width="537" height="60"/>
                     <view key="contentView" id="N65-iQ-8gY">
-                        <rect key="frame" x="2" y="2" width="531" height="43"/>
+                        <rect key="frame" x="2" y="2" width="533" height="43"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2357">
@@ -739,7 +773,6 @@ Gw
                         </constraints>
                     </view>
                     <constraints>
-                        <constraint firstAttribute="width" constant="529" id="Opg-eP-4p5"/>
                         <constraint firstAttribute="height" constant="56" id="XaP-RX-Jwx"/>
                     </constraints>
                 </box>
@@ -901,7 +934,6 @@ Gw
                     </view>
                     <constraints>
                         <constraint firstAttribute="height" constant="180" id="Jpc-Wz-hA7"/>
-                        <constraint firstAttribute="width" constant="529" id="LEg-Z7-F1m"/>
                     </constraints>
                 </box>
                 <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2331">
@@ -919,15 +951,19 @@ Gw
                 <constraint firstItem="2332" firstAttribute="leading" secondItem="2347" secondAttribute="leading" id="4EU-Eq-62g"/>
                 <constraint firstItem="2347" firstAttribute="top" secondItem="sX1-um-Nbr" secondAttribute="bottom" constant="8" id="4R0-Xw-p8K"/>
                 <constraint firstItem="2332" firstAttribute="top" secondItem="2330" secondAttribute="top" constant="43" id="97l-4Y-rDJ"/>
+                <constraint firstAttribute="bottom" secondItem="2363" secondAttribute="bottom" constant="20" id="FEY-8l-LsQ"/>
+                <constraint firstItem="2347" firstAttribute="width" secondItem="sX1-um-Nbr" secondAttribute="width" id="ISp-2G-pZq"/>
                 <constraint firstItem="2331" firstAttribute="top" secondItem="2330" secondAttribute="top" constant="20" id="Jcr-Mc-d5D"/>
+                <constraint firstAttribute="trailing" secondItem="2332" secondAttribute="trailing" constant="20" id="LtM-8O-6Vh"/>
                 <constraint firstItem="2363" firstAttribute="top" secondItem="N65-iQ-8gY" secondAttribute="bottom" constant="8" id="Mw8-bF-X3e"/>
                 <constraint firstItem="2331" firstAttribute="leading" secondItem="2330" secondAttribute="leading" constant="20" id="QAN-X3-PVf"/>
+                <constraint firstItem="2363" firstAttribute="width" secondItem="N65-iQ-8gY" secondAttribute="width" id="QrB-eJ-9BG"/>
                 <constraint firstItem="2347" firstAttribute="leading" secondItem="2363" secondAttribute="leading" id="q5E-ZR-B0r"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2331" secondAttribute="trailing" constant="17" id="sFX-b0-sp5"/>
                 <constraint firstItem="2358" firstAttribute="leading" secondItem="2346" secondAttribute="leading" id="y6F-Dr-2A9"/>
                 <constraint firstItem="2332" firstAttribute="leading" secondItem="2330" secondAttribute="leading" constant="20" id="yCl-al-Jh8"/>
             </constraints>
-            <point key="canvasLocation" x="244.5" y="823"/>
+            <point key="canvasLocation" x="418" y="834.5"/>
         </customView>
         <customView id="2440" userLabel="Video">
             <rect key="frame" x="0.0" y="0.0" width="570" height="497"/>
@@ -1948,6 +1984,7 @@ Gw
             <constraints>
                 <constraint firstItem="2524" firstAttribute="top" secondItem="2523" secondAttribute="top" constant="20" id="4qg-so-xqk"/>
                 <constraint firstItem="2537" firstAttribute="top" secondItem="clp-fm-5xs" secondAttribute="bottom" constant="8" id="H4g-wr-WPK"/>
+                <constraint firstAttribute="trailing" secondItem="2524" secondAttribute="trailing" constant="20" id="RQ7-jW-ceF"/>
                 <constraint firstItem="2524" firstAttribute="leading" secondItem="2523" secondAttribute="leading" constant="20" id="TCX-8r-ecQ"/>
                 <constraint firstItem="2537" firstAttribute="width" secondItem="2524" secondAttribute="width" id="a6z-6X-tWv"/>
                 <constraint firstItem="2524" firstAttribute="leading" secondItem="YRd-Qa-GBI" secondAttribute="leading" id="dQG-N8-Zil"/>
@@ -1964,7 +2001,7 @@ Gw
                     <rect key="frame" x="20" y="60" width="530" height="310"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
                         <rect key="frame" x="1" y="0.0" width="528" height="309"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="286"/>

@@ -27,6 +27,14 @@
 
 @interface VLCSimplePrefsController : NSWindowController
 
+// Overall window
+@property (readwrite, weak) IBOutlet NSButton *showAllButton;
+@property (readwrite, weak) IBOutlet NSButton *cancelButton;
+@property (readwrite, weak) IBOutlet NSView *contentView;
+@property (readwrite, weak) IBOutlet NSScrollView *scrollView;
+@property (readwrite, weak) IBOutlet NSButton *resetButton;
+@property (readwrite, weak) IBOutlet NSButton *saveButton;
+
 // Audio pane
 @property (readwrite, weak) IBOutlet NSPopUpButton *audio_dolbyPopup;
 @property (readwrite, weak) IBOutlet NSTextField *audio_dolbyLabel;
@@ -144,12 +152,6 @@
 @property (readwrite, weak) IBOutlet NSBox *osd_osdBox;
 @property (readwrite, weak) IBOutlet NSButton *osd_osdCheckbox;
 @property (readwrite, weak) IBOutlet NSView *osdView;
-
-@property (readwrite, weak) IBOutlet NSButton *showAllButton;
-@property (readwrite, weak) IBOutlet NSButton *cancelButton;
-@property (readwrite, weak) IBOutlet NSBox *controlsBox;
-@property (readwrite, weak) IBOutlet NSButton *resetButton;
-@property (readwrite, weak) IBOutlet NSButton *saveButton;
 
 // video pane
 @property (readwrite, weak) IBOutlet NSButton *video_enableCheckbox;

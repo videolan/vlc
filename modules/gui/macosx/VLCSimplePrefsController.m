@@ -129,7 +129,6 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
     BOOL _osdSettingChanged;
     BOOL _inputSettingChanged;
     BOOL _hotkeyChanged;
-    id _currentlyShownCategoryView;
 
     NSOpenPanel *_selectFolderPanel;
     NSArray *_hotkeyDescriptions;
@@ -1055,39 +1054,19 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     [[NSNotificationCenter defaultCenter] postNotificationName:VLCConfigurationChangedNotification object:nil];
 }
 
-- (void)showSettingsForCategory:(id)new_categoryView
+- (void)showSettingsForCategory:(NSView *)categoryView
 {
-    NSRect win_rect, view_rect, oldView_rect;
-    win_rect = [self.window frame];
-    view_rect = [new_categoryView frame];
+    [_contentView setSubviews:[NSArray array]];
+    [_contentView addSubview:categoryView];
 
-    if (_currentlyShownCategoryView == new_categoryView)
-        return;
+    NSDictionary *views = @{ @"view": categoryView };
+    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[view]|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:views];
+    [_contentView addConstraints:constraints];
+    constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:views];
+    [_contentView addConstraints:constraints];
 
-    if (_currentlyShownCategoryView != nil) {
-        /* restore our window's height, if we've shown another category previously */
-        oldView_rect = [_currentlyShownCategoryView frame];
-        win_rect.size.height = win_rect.size.height - oldView_rect.size.height;
-        win_rect.origin.y = (win_rect.origin.y + oldView_rect.size.height) - view_rect.size.height;
-    }
-
-    win_rect.size.height = win_rect.size.height + view_rect.size.height;
-
-    [new_categoryView setFrame: NSMakeRect(0,
-                                           [_controlsBox frame].size.height,
-                                           view_rect.size.width,
-                                           view_rect.size.height)];
-    [new_categoryView setAutoresizesSubviews: YES];
-    if (_currentlyShownCategoryView) {
-        [[[self.window contentView] animator] replaceSubview:_currentlyShownCategoryView with:new_categoryView];
-        [[self.window animator] setFrame:win_rect display:YES];
-    } else {
-        [[self.window contentView] addSubview:new_categoryView];
-        [self.window setFrame:win_rect display:YES animate:NO];
-    }
-
-    /* keep our current category for further reference */
-    _currentlyShownCategoryView = new_categoryView;
+    [_scrollView layoutSubtreeIfNeeded];
+    [_scrollView flashScrollers];
 }
 
 #pragma mark -
