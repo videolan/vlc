@@ -36,6 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_meta.h>
+#include <vlc_stream_extractor.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -84,7 +85,7 @@ static int vlclua_stream_new( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
     const char * psz_url = luaL_checkstring( L, 1 );
-    stream_t *p_stream = vlc_stream_NewURL( p_this, psz_url );
+    stream_t *p_stream = vlc_stream_NewMRL( p_this, psz_url );
     return vlclua_stream_new_inner( L, p_stream );
 }
 
