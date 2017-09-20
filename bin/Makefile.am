@@ -9,7 +9,6 @@ noinst_PROGRAMS = vlc-static
 endif
 noinst_DATA =
 vlclib_PROGRAMS = vlc-cache-gen
-EXTRA_PROGRAMS = vlc-wrapper
 EXTRA_DIST = vlc_win32_rc.rc.in
 
 SUFFIXES = .rc.in .rc
@@ -27,7 +26,6 @@ endif
 vlc_SOURCES = vlc.c override.c
 endif
 
-EXTRA_vlc_SOURCES = vlc.c winvlc.c
 if HAVE_WIN32
 vlc_SOURCES = winvlc.c
 noinst_DATA += vlc_win32_rc.rc
