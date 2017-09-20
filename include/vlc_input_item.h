@@ -421,6 +421,8 @@ struct vlc_readdir_helper
     input_item_node_t *p_node;
     void **pp_slaves;
     size_t i_slaves;
+    void **pp_dirs;
+    size_t i_dirs;
     int i_sub_autodetect_fuzzy;
     bool b_show_hiddenfiles;
     char *psz_ignored_exts;
@@ -449,12 +451,19 @@ VLC_API void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_
  *
  * \param p_rdh previously inited vlc_readdir_helper struct
  * \param psz_uri uri of the new item
- * \param psz_filename file name of the new item
+ * \param psz_flatpath flattened path of the new item. If not NULL, this
+ *        function will create an input item for each sub folders (separated
+ *        by '/') of psz_flatpath (so, this will un-flatten the folder
+ *        hierarchy). Either psz_flatpath or psz_filename must be valid.
+ * \param psz_filename file name of the new item. If NULL, the file part of path
+ *        will be used as a filename. Either psz_flatpath or psz_filename must
+ *        be valid.
  * \param i_type see \ref input_item_type_e
  * \param i_net see \ref input_item_net_type
  */
 VLC_API int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
-                                       const char *psz_uri, const char *psz_filename,
+                                       const char *psz_uri, const char *psz_flatpath,
+                                       const char *psz_filename,
                                        int i_type, int i_net);
 
 #endif

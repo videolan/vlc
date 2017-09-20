@@ -361,7 +361,7 @@ DirRead(stream_t *p_access, input_item_node_t *p_node)
         default:
             i_type = ITEM_TYPE_UNKNOWN;
         }
-        i_ret = vlc_readdir_helper_additem(&rdh, psz_url, p_nfsdirent->name,
+        i_ret = vlc_readdir_helper_additem(&rdh, psz_url, NULL, p_nfsdirent->name,
                                            i_type, ITEM_NET);
         free(psz_url);
     }
@@ -391,7 +391,7 @@ MountRead(stream_t *p_access, input_item_node_t *p_node)
             i_ret = VLC_ENOMEM;
             break;
         }
-        i_ret = vlc_readdir_helper_additem(&rdh, psz_url, psz_name,
+        i_ret = vlc_readdir_helper_additem(&rdh, psz_url, NULL, psz_name,
                                             ITEM_TYPE_DIRECTORY, ITEM_NET);
         free(psz_url);
     }

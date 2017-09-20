@@ -1408,6 +1408,12 @@ struct rdh_slave
     input_item_node_t *p_node;
 };
 
+struct rdh_dir
+{
+    input_item_node_t *p_node;
+    char psz_path[];
+};
+
 static char *rdh_name_from_filename(const char *psz_filename)
 {
     /* remove leading white spaces */
@@ -1589,6 +1595,72 @@ static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh)
     }
 }
 
+static int rdh_unflatten(struct vlc_readdir_helper *p_rdh,
+                         input_item_node_t **pp_node, const char *psz_path,
+                         int i_net)
+{
+    /* Create an input input for each sub folders that is contained in the full
+     * path. Update pp_node to point to the direct parent of the future item to
+     * add. */
+
+    assert(psz_path != NULL);
+    const char *psz_subpaths = psz_path;
+
+    while ((psz_subpaths = strchr(psz_subpaths, '/')))
+    {
+        input_item_node_t *p_subnode = NULL;
+
+        /* Check if this sub folder item was already added */
+        for (size_t i = 0; i < p_rdh->i_dirs && p_subnode == NULL; i++)
+        {
+            struct rdh_dir *rdh_dir = p_rdh->pp_dirs[i];
+            if (!strncmp(rdh_dir->psz_path, psz_path, psz_subpaths - psz_path))
+                p_subnode = rdh_dir->p_node;
+        }
+
+        /* The sub folder item doesn't exist, so create it */
+        if (p_subnode == NULL)
+        {
+            size_t i_sub_path_len = psz_subpaths - psz_path;
+            struct rdh_dir *p_rdh_dir =
+                malloc(sizeof(struct rdh_dir) + 1 + i_sub_path_len);
+            if (p_rdh_dir == NULL)
+                return VLC_ENOMEM;
+            strncpy(p_rdh_dir->psz_path, psz_path, i_sub_path_len);
+            p_rdh_dir->psz_path[i_sub_path_len] = 0;
+
+            const char *psz_subpathname = strrchr(p_rdh_dir->psz_path, '/');
+            if (psz_subpathname != NULL)
+                ++psz_subpathname;
+            else
+                psz_subpathname = p_rdh_dir->psz_path;
+
+            input_item_t *p_item =
+                input_item_NewExt("vlc://nop", psz_subpathname, -1,
+                                  ITEM_TYPE_DIRECTORY, i_net);
+            if (p_item == NULL)
+            {
+                free(p_rdh_dir);
+                return VLC_ENOMEM;
+            }
+            input_item_CopyOptions(p_item, (*pp_node)->p_item);
+            *pp_node = input_item_node_AppendItem(*pp_node, p_item);
+            input_item_Release(p_item);
+            if (*pp_node == NULL)
+            {
+                free(p_rdh_dir);
+                return VLC_ENOMEM;
+            }
+            p_rdh_dir->p_node = *pp_node;
+            TAB_APPEND(p_rdh->i_dirs, p_rdh->pp_dirs, p_rdh_dir);
+        }
+        else
+            *pp_node = p_subnode;
+        psz_subpaths++;
+    }
+    return VLC_SUCCESS;
+}
+
 #undef vlc_readdir_helper_init
 void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
                              vlc_object_t *p_obj, input_item_node_t *p_node)
@@ -1600,6 +1672,7 @@ void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
     p_rdh->i_sub_autodetect_fuzzy = !b_autodetect ? 0 :
         var_InheritInteger(p_obj, "sub-autodetect-fuzzy");
     TAB_INIT(p_rdh->i_slaves, p_rdh->pp_slaves);
+    TAB_INIT(p_rdh->i_dirs, p_rdh->pp_dirs);
 }
 
 void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
@@ -1623,15 +1696,28 @@ void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
         }
     }
     TAB_CLEAN(p_rdh->i_slaves, p_rdh->pp_slaves);
+
+    for (size_t i = 0; i < p_rdh->i_dirs; i++)
+        free(p_rdh->pp_dirs[i]);
+    TAB_CLEAN(p_rdh->i_dirs, p_rdh->pp_dirs);
 }
 
 int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
-                               const char *psz_uri, const char *psz_filename,
-                               int i_type, int i_net)
+                               const char *psz_uri, const char *psz_flatpath,
+                               const char *psz_filename, int i_type, int i_net)
 {
     enum slave_type i_slave_type;
     struct rdh_slave *p_rdh_slave = NULL;
-    input_item_node_t *p_node;
+    assert(psz_flatpath || psz_filename);
+
+    if (psz_filename == NULL)
+    {
+        psz_filename = strrchr(psz_flatpath, '/');
+        if (psz_filename != NULL)
+            ++psz_filename;
+        else
+            psz_filename = psz_flatpath;
+    }
 
     if (p_rdh->i_sub_autodetect_fuzzy != 0
      && input_item_slave_GetType(psz_filename, &i_slave_type))
@@ -1657,13 +1743,22 @@ int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
     if (rdh_file_is_ignored(p_rdh, psz_filename))
         return VLC_SUCCESS;
 
-    input_item_t *p_item = input_item_NewExt(psz_uri, psz_filename, -1,
-                                             i_type, i_net);
+    input_item_node_t *p_node = p_rdh->p_node;
+
+    if (psz_flatpath != NULL)
+    {
+        int i_ret = rdh_unflatten(p_rdh, &p_node, psz_flatpath, i_net);
+        if (i_ret != VLC_SUCCESS)
+            return i_ret;
+    }
+
+    input_item_t *p_item = input_item_NewExt(psz_uri, psz_filename, -1, i_type,
+                                             i_net);
     if (p_item == NULL)
         return VLC_ENOMEM;
 
-    input_item_CopyOptions(p_item, p_rdh->p_node->p_item);
-    p_node = input_item_node_AppendItem(p_rdh->p_node, p_item);
+    input_item_CopyOptions(p_item, p_node->p_item);
+    p_node = input_item_node_AppendItem(p_node, p_item);
     input_item_Release(p_item);
     if (p_node == NULL)
         return VLC_ENOMEM;

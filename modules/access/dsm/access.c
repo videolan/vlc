@@ -529,7 +529,7 @@ static int add_item( stream_t *p_access, struct vlc_readdir_helper *p_rdh,
     if( i_ret == -1 )
         return VLC_ENOMEM;
 
-    return vlc_readdir_helper_additem( p_rdh, psz_uri, psz_name, i_type,
+    return vlc_readdir_helper_additem( p_rdh, psz_uri, NULL, psz_name, i_type,
                                        ITEM_NET );
 }
 

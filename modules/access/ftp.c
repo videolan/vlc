@@ -956,7 +956,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
                       p_sys->url.psz_path ? p_sys->url.psz_path : "",
                       psz_filename ) != -1 )
         {
-            i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, psz_file,
+            i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, NULL, psz_file,
                                                 type, ITEM_NET );
             free( psz_uri );
         }
