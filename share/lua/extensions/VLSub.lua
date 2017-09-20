@@ -1655,6 +1655,21 @@ function get_first_sel(list)
   return 0
 end
 
+function find_subtitle_in_archive(archivePath, subfileExt)
+  local archive = vlc.directory_stream("file://" .. archivePath)
+  local items = archive:readdir()
+  if not items then
+    return nil
+  end
+  subfileExt = "." .. subfileExt
+  for _, item in pairs(items) do
+    if string.sub(item:uri(), -string.len(subfileExt)) == subfileExt then
+      return item:uri()
+    end
+  end
+  return nil
+end
+
 function download_subtitles()
   local index = get_first_sel(input_table["mainlist"])
   
@@ -1708,12 +1723,19 @@ function download_subtitles()
     return false
   end
   
-  local tmpFileURI, tmpFileName = dump_zip(
+  local tmpFileName = dump_zip(
     item.ZipDownloadLink, 
     tmp_dir, 
     item.SubFileName)
   
   vlc.msg.dbg("[VLsub] tmpFileName: "..tmpFileName)
+
+  local subtitleMrl = find_subtitle_in_archive(tmpFileName, item.SubFormat)
+
+  if not subtitleMrl then
+    vlc.msg.err( "Failed to extract subtitle" )
+    return false
+  end
   
   -- Determine if the path to the video file is accessible for writing
   
@@ -1739,7 +1761,7 @@ function download_subtitles()
   
   -- Unzipped data into file target 
     
-  local stream = vlc.stream(tmpFileURI)
+  local stream = vlc.stream(subtitleMrl)
   local data = ""
   local subfile = io.open(target, "wb")
   
@@ -1789,8 +1811,8 @@ function dump_zip(url, dir, subfileName)
   tmpFile:close()
   tmpFile = nil
   collectgarbage()
-  return "zip://"..make_uri(tmpFileName)
-    .."!/"..subfileName, tmpFileName
+
+  return tmpFileName
 end
 
 function add_sub(subPath)
