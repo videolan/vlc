@@ -1,11 +1,13 @@
 # Building vlc
 #
+if BUILD_VLC
 if HAVE_DARWIN
 bin_PROGRAMS = vlc-osx
 noinst_PROGRAMS = vlc-osx-static
 else
 bin_PROGRAMS = vlc
 noinst_PROGRAMS = vlc-static
+endif
 endif
 EXTRA_DIST = vlc_win32_rc.rc.in
 CLEANFILES = vlc_win32_rc.rc
@@ -72,9 +74,11 @@ vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
 #
 # Root wrapper
 #
+if BUILD_VLC
 if !HAVE_WIN32
 if !HAVE_OS2
 bin_PROGRAMS += vlc-wrapper
+endif
 endif
 endif
 vlc_wrapper_SOURCES = rootwrap.c
@@ -90,7 +94,9 @@ vlc_win32_rc.$(OBJEXT): vlc_win32_rc.rc $(top_srcdir)/extras/package/win32/vlc.e
 #
 # Plug-ins cache generator
 #
+if HAVE_DYNAMIC_PLUGINS
 vlclib_PROGRAMS = vlc-cache-gen
+endif
 vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \
 	$(GNUGETOPT_LIBS) \
@@ -104,7 +110,9 @@ endif
 #
 # Plug-ins cache
 #
+if HAVE_DYNAMIC_PLUGINS
 noinst_DATA = ../modules/plugins.dat
+endif
 MOSTLYCLEANFILES = $(noinst_DATA)
 
 if HAVE_DARWIN
