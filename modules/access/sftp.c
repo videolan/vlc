@@ -547,8 +547,8 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
     if( !psz_file )
         return VLC_ENOMEM;
 
-    struct access_fsdir fsdir;
-    access_fsdir_init( &fsdir, p_access, p_current_node );
+    struct vlc_readdir_helper rdh;
+    vlc_readdir_helper_init( &rdh, p_access, p_current_node );
 
     while( i_ret == VLC_SUCCESS
         && 0 != ( err = libssh2_sftp_readdir( p_sys->file, psz_file, i_size, &attrs ) ) )
@@ -589,12 +589,12 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         free( psz_uri );
 
         int i_type = LIBSSH2_SFTP_S_ISDIR( attrs.permissions ) ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        i_ret = access_fsdir_additem( &fsdir, psz_full_uri, psz_file, i_type,
-                                      ITEM_NET );
+        i_ret = vlc_readdir_helper_additem( &rdh, psz_full_uri, psz_file, i_type,
+                                            ITEM_NET );
         free( psz_full_uri );
     }
 
-    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
+    vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
     free( psz_file );
     return i_ret;
 }

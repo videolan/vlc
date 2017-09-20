@@ -340,8 +340,8 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
     struct smbc_dirent *p_entry;
     int i_ret = VLC_SUCCESS;
 
-    struct access_fsdir fsdir;
-    access_fsdir_init( &fsdir, p_access, p_node );
+    struct vlc_readdir_helper rdh;
+    vlc_readdir_helper_init( &rdh, p_access, p_node );
 
     while( i_ret == VLC_SUCCESS && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
     {
@@ -388,12 +388,12 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
             break;
         }
         free(psz_encoded_name);
-        i_ret = access_fsdir_additem( &fsdir, psz_uri, p_entry->name,
-                                      i_type, ITEM_NET );
+        i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, p_entry->name,
+                                            i_type, ITEM_NET );
         free( psz_uri );
     }
 
-    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
+    vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
 
     return i_ret;
 }

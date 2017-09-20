@@ -117,8 +117,8 @@ int DirRead (stream_t *access, input_item_node_t *node)
 
     bool special_files = var_InheritBool(access, "list-special-files");
 
-    struct access_fsdir fsdir;
-    access_fsdir_init(&fsdir, access, node);
+    struct vlc_readdir_helper rdh;
+    vlc_readdir_helper_init(&rdh, access, node);
 
     while (ret == VLC_SUCCESS && (entry = vlc_readdir(sys->dir)) != NULL)
     {
@@ -181,11 +181,12 @@ int DirRead (stream_t *access, input_item_node_t *node)
             ret = VLC_ENOMEM;
             break;
         }
-        ret = access_fsdir_additem(&fsdir, uri, entry, type, ITEM_NET_UNKNOWN);
+        ret = vlc_readdir_helper_additem(&rdh, uri, entry, type,
+                                         ITEM_NET_UNKNOWN);
         free(uri);
     }
 
-    access_fsdir_finish(&fsdir, ret == VLC_SUCCESS);
+    vlc_readdir_helper_finish(&rdh, ret == VLC_SUCCESS);
 
     return ret;
 }

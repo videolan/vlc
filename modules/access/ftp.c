@@ -911,8 +911,8 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
     assert( p_sys->data != NULL );
     assert( !p_sys->out );
 
-    struct access_fsdir fsdir;
-    access_fsdir_init( &fsdir, p_access, p_current_node );
+    struct vlc_readdir_helper rdh;
+    vlc_readdir_helper_init( &rdh, p_access, p_current_node );
 
     while (i_ret == VLC_SUCCESS)
     {
@@ -956,15 +956,15 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
                       p_sys->url.psz_path ? p_sys->url.psz_path : "",
                       psz_filename ) != -1 )
         {
-            i_ret = access_fsdir_additem( &fsdir, psz_uri, psz_file,
-                                          type, ITEM_NET );
+            i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, psz_file,
+                                                type, ITEM_NET );
             free( psz_uri );
         }
         free( psz_filename );
         free( psz_line );
     }
 
-    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
+    vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
     return i_ret;
 }
 

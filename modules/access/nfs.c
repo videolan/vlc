@@ -329,8 +329,8 @@ DirRead(stream_t *p_access, input_item_node_t *p_node)
     int i_ret = VLC_SUCCESS;
     assert(p_sys->p_nfsdir);
 
-    struct access_fsdir fsdir;
-    access_fsdir_init(&fsdir, p_access, p_node);
+    struct vlc_readdir_helper rdh;
+    vlc_readdir_helper_init(&rdh, p_access, p_node);
 
     while (i_ret == VLC_SUCCESS
         && (p_nfsdirent = nfs_readdir(p_sys->p_nfs, p_sys->p_nfsdir)) != NULL)
@@ -361,12 +361,12 @@ DirRead(stream_t *p_access, input_item_node_t *p_node)
         default:
             i_type = ITEM_TYPE_UNKNOWN;
         }
-        i_ret = access_fsdir_additem(&fsdir, psz_url, p_nfsdirent->name,
-                                     i_type, ITEM_NET);
+        i_ret = vlc_readdir_helper_additem(&rdh, psz_url, p_nfsdirent->name,
+                                           i_type, ITEM_NET);
         free(psz_url);
     }
 
-    access_fsdir_finish(&fsdir, i_ret == VLC_SUCCESS);
+    vlc_readdir_helper_finish(&rdh, i_ret == VLC_SUCCESS);
 
     return i_ret;
 }
@@ -378,8 +378,8 @@ MountRead(stream_t *p_access, input_item_node_t *p_node)
     assert(p_sys->p_mount != NULL && p_sys->res.exports.i_count >= 0);
     int i_ret = VLC_SUCCESS;
 
-    struct access_fsdir fsdir;
-    access_fsdir_init(&fsdir, p_access, p_node);
+    struct vlc_readdir_helper rdh;
+    vlc_readdir_helper_init(&rdh, p_access, p_node);
 
     for (int i = 0; i < p_sys->res.exports.i_count && i_ret == VLC_SUCCESS; ++i)
     {
@@ -391,12 +391,12 @@ MountRead(stream_t *p_access, input_item_node_t *p_node)
             i_ret = VLC_ENOMEM;
             break;
         }
-        i_ret = access_fsdir_additem(&fsdir, psz_url, psz_name,
-                                     ITEM_TYPE_DIRECTORY, ITEM_NET);
+        i_ret = vlc_readdir_helper_additem(&rdh, psz_url, psz_name,
+                                            ITEM_TYPE_DIRECTORY, ITEM_NET);
         free(psz_url);
     }
 
-    access_fsdir_finish(&fsdir, i_ret == VLC_SUCCESS);
+    vlc_readdir_helper_finish(&rdh, i_ret == VLC_SUCCESS);
 
     return i_ret;
 }

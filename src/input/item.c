@@ -1322,7 +1322,7 @@ void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt)
     vlc_mutex_unlock( &item->lock );
 }
 
-static int compar_type(input_item_t *p1, input_item_t *p2)
+static int rdh_compar_type(input_item_t *p1, input_item_t *p2)
 {
     if (p1->i_type != p2->i_type)
     {
@@ -1334,19 +1334,19 @@ static int compar_type(input_item_t *p1, input_item_t *p2)
     return 0;
 }
 
-static int compar_filename(const void *a, const void *b)
+static int rdh_compar_filename(const void *a, const void *b)
 {
     input_item_node_t *const *na = a, *const *nb = b;
     input_item_t *ia = (*na)->p_item, *ib = (*nb)->p_item;
 
-    int i_ret = compar_type(ia, ib);
+    int i_ret = rdh_compar_type(ia, ib);
     if (i_ret != 0)
         return i_ret;
 
     return vlc_filenamecmp(ia->psz_name, ib->psz_name);
 }
 
-static void fsdir_sort(input_item_node_t *p_node)
+static void rdh_sort(input_item_node_t *p_node)
 {
     if (p_node->i_children <= 0)
         return;
@@ -1358,7 +1358,7 @@ static void fsdir_sort(input_item_node_t *p_node)
 
     /* Sort current node */
     qsort(p_node->pp_children, p_node->i_children,
-          sizeof(input_item_node_t *), compar_filename);
+          sizeof(input_item_node_t *), rdh_compar_filename);
 
     /* Unlock all children */
     for (int i = 0; i < p_node->i_children; i++)
@@ -1366,14 +1366,14 @@ static void fsdir_sort(input_item_node_t *p_node)
 
     /* Sort all children */
     for (int i = 0; i < p_node->i_children; i++)
-        fsdir_sort(p_node->pp_children[i]);
+        rdh_sort(p_node->pp_children[i]);
 }
 
 /**
  * Does the provided file name has one of the extension provided ?
  */
-static bool fsdir_has_ext(const char *psz_filename,
-                          const char *psz_ignored_exts)
+static bool rdh_file_has_ext(const char *psz_filename,
+                             const char *psz_ignored_exts)
 {
     if (psz_ignored_exts == NULL)
         return false;
@@ -1400,24 +1400,24 @@ static bool fsdir_has_ext(const char *psz_filename,
     return false;
 }
 
-static bool fsdir_is_ignored(struct access_fsdir *p_fsdir,
-                             const char *psz_filename)
+static bool rdh_file_is_ignored(struct vlc_readdir_helper *p_rdh,
+                                const char *psz_filename)
 {
     return (psz_filename[0] == '\0'
          || strcmp(psz_filename, ".") == 0
          || strcmp(psz_filename, "..") == 0
-         || (!p_fsdir->b_show_hiddenfiles && psz_filename[0] == '.')
-         || fsdir_has_ext(psz_filename, p_fsdir->psz_ignored_exts));
+         || (!p_rdh->b_show_hiddenfiles && psz_filename[0] == '.')
+         || rdh_file_has_ext(psz_filename, p_rdh->psz_ignored_exts));
 }
 
-struct fsdir_slave
+struct rdh_slave
 {
     input_item_slave_t *p_slave;
     char *psz_filename;
     input_item_node_t *p_node;
 };
 
-static char *fsdir_name_from_filename(const char *psz_filename)
+static char *rdh_name_from_filename(const char *psz_filename)
 {
     /* remove leading white spaces */
     while (*psz_filename != '\0' && *psz_filename == ' ')
@@ -1448,13 +1448,13 @@ static char *fsdir_name_from_filename(const char *psz_filename)
     return psz_name;
 }
 
-static uint8_t fsdir_get_slave_priority(input_item_t *p_item,
-                                        input_item_slave_t *p_slave,
-                                        const char *psz_slave_filename)
+static uint8_t rdh_get_slave_priority(input_item_t *p_item,
+                                      input_item_slave_t *p_slave,
+                                      const char *psz_slave_filename)
 {
     uint8_t i_priority = SLAVE_PRIORITY_MATCH_NONE;
-    char *psz_item_name = fsdir_name_from_filename(p_item->psz_name);
-    char *psz_slave_name = fsdir_name_from_filename(psz_slave_filename);
+    char *psz_item_name = rdh_name_from_filename(p_item->psz_name);
+    char *psz_slave_name = rdh_name_from_filename(psz_slave_filename);
 
     if (!psz_item_name || !psz_slave_name)
         goto done;
@@ -1498,10 +1498,10 @@ done:
     return i_priority;
 }
 
-static int fsdir_should_match_idx(struct access_fsdir *p_fsdir,
-                                  struct fsdir_slave *p_fsdir_sub)
+static int rdh_should_match_idx(struct vlc_readdir_helper *p_rdh,
+                                struct rdh_slave *p_rdh_sub)
 {
-    char *psz_ext = strrchr(p_fsdir_sub->psz_filename, '.');
+    char *psz_ext = strrchr(p_rdh_sub->psz_filename, '.');
     if (!psz_ext)
         return false;
     psz_ext++;
@@ -1509,25 +1509,25 @@ static int fsdir_should_match_idx(struct access_fsdir *p_fsdir,
     if (strcasecmp(psz_ext, "sub") != 0)
         return false;
 
-    for (unsigned int i = 0; i < p_fsdir->i_slaves; i++)
+    for (unsigned int i = 0; i < p_rdh->i_slaves; i++)
     {
-        struct fsdir_slave *p_fsdir_slave = p_fsdir->pp_slaves[i];
+        struct rdh_slave *p_rdh_slave = p_rdh->pp_slaves[i];
 
-        if (p_fsdir_slave == NULL || p_fsdir_slave == p_fsdir_sub)
+        if (p_rdh_slave == NULL || p_rdh_slave == p_rdh_sub)
             continue;
 
         /* check that priorities match */
-        if (p_fsdir_slave->p_slave->i_priority !=
-            p_fsdir_sub->p_slave->i_priority)
+        if (p_rdh_slave->p_slave->i_priority !=
+            p_rdh_sub->p_slave->i_priority)
             continue;
 
         /* check that the filenames without extension match */
-        if (strncasecmp(p_fsdir_sub->psz_filename, p_fsdir_slave->psz_filename,
-                        strlen(p_fsdir_sub->psz_filename) - 3 ) != 0)
+        if (strncasecmp(p_rdh_sub->psz_filename, p_rdh_slave->psz_filename,
+                        strlen(p_rdh_sub->psz_filename) - 3 ) != 0)
             continue;
 
         /* check that we have an idx file */
-        char *psz_ext_idx = strrchr(p_fsdir_slave->psz_filename, '.');
+        char *psz_ext_idx = strrchr(p_rdh_slave->psz_filename, '.');
         if (psz_ext_idx == NULL)
             continue;
         psz_ext_idx++;
@@ -1537,42 +1537,42 @@ static int fsdir_should_match_idx(struct access_fsdir *p_fsdir,
     return false;
 }
 
-static void fsdir_attach_slaves(struct access_fsdir *p_fsdir)
+static void rdh_attach_slaves(struct vlc_readdir_helper *p_rdh)
 {
-    if (p_fsdir->i_sub_autodetect_fuzzy == 0)
+    if (p_rdh->i_sub_autodetect_fuzzy == 0)
         return;
 
     /* Try to match slaves for each items of the node */
-    for (int i = 0; i < p_fsdir->p_node->i_children; i++)
+    for (int i = 0; i < p_rdh->p_node->i_children; i++)
     {
-        input_item_node_t *p_node = p_fsdir->p_node->pp_children[i];
+        input_item_node_t *p_node = p_rdh->p_node->pp_children[i];
         input_item_t *p_item = p_node->p_item;
 
-        for (unsigned int j = 0; j < p_fsdir->i_slaves; j++)
+        for (unsigned int j = 0; j < p_rdh->i_slaves; j++)
         {
-            struct fsdir_slave *p_fsdir_slave = p_fsdir->pp_slaves[j];
+            struct rdh_slave *p_rdh_slave = p_rdh->pp_slaves[j];
 
             /* Don't try to match slaves with themselves or slaves already
              * attached with the higher priority */
-            if (p_fsdir_slave->p_node == p_node
-             || p_fsdir_slave->p_slave->i_priority == SLAVE_PRIORITY_MATCH_ALL)
+            if (p_rdh_slave->p_node == p_node
+             || p_rdh_slave->p_slave->i_priority == SLAVE_PRIORITY_MATCH_ALL)
                 continue;
 
             uint8_t i_priority =
-                fsdir_get_slave_priority(p_item, p_fsdir_slave->p_slave,
-                                         p_fsdir_slave->psz_filename);
+                rdh_get_slave_priority(p_item, p_rdh_slave->p_slave,
+                                         p_rdh_slave->psz_filename);
 
-            if (i_priority < p_fsdir->i_sub_autodetect_fuzzy)
+            if (i_priority < p_rdh->i_sub_autodetect_fuzzy)
                 continue;
 
             /* Drop the ".sub" slave if a ".idx" slave matches */
-            if (p_fsdir_slave->p_slave->i_type == SLAVE_TYPE_SPU
-             && fsdir_should_match_idx(p_fsdir, p_fsdir_slave))
+            if (p_rdh_slave->p_slave->i_type == SLAVE_TYPE_SPU
+             && rdh_should_match_idx(p_rdh, p_rdh_slave))
                 continue;
 
             input_item_slave_t *p_slave =
-                input_item_slave_New(p_fsdir_slave->p_slave->psz_uri,
-                                     p_fsdir_slave->p_slave->i_type,
+                input_item_slave_New(p_rdh_slave->p_slave->psz_uri,
+                                     p_rdh_slave->p_slave->i_type,
                                      i_priority);
             if (p_slave == NULL)
                 break;
@@ -1585,84 +1585,85 @@ static void fsdir_attach_slaves(struct access_fsdir *p_fsdir)
 
             /* Remove the corresponding node if any: This slave won't be
              * added in the parent node */
-            if (p_fsdir_slave->p_node != NULL)
+            if (p_rdh_slave->p_node != NULL)
             {
-                input_item_node_RemoveNode(p_fsdir->p_node,
-                                           p_fsdir_slave->p_node);
-                input_item_node_Delete(p_fsdir_slave->p_node);
-                p_fsdir_slave->p_node = NULL;
+                input_item_node_RemoveNode(p_rdh->p_node,
+                                           p_rdh_slave->p_node);
+                input_item_node_Delete(p_rdh_slave->p_node);
+                p_rdh_slave->p_node = NULL;
             }
 
-            p_fsdir_slave->p_slave->i_priority = i_priority;
+            p_rdh_slave->p_slave->i_priority = i_priority;
         }
     }
 }
 
-void access_fsdir_init(struct access_fsdir *p_fsdir,
-                       stream_t *p_access, input_item_node_t *p_node)
+#undef vlc_readdir_helper_init
+void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
+                             vlc_object_t *p_obj, input_item_node_t *p_node)
 {
-    p_fsdir->p_node = p_node;
-    p_fsdir->b_show_hiddenfiles = var_InheritBool(p_access, "show-hiddenfiles");
-    p_fsdir->psz_ignored_exts = var_InheritString(p_access, "ignore-filetypes");
-    bool b_autodetect = var_InheritBool(p_access, "sub-autodetect-file");
-    p_fsdir->i_sub_autodetect_fuzzy = !b_autodetect ? 0 :
-        var_InheritInteger(p_access, "sub-autodetect-fuzzy");
-    TAB_INIT(p_fsdir->i_slaves, p_fsdir->pp_slaves);
+    p_rdh->p_node = p_node;
+    p_rdh->b_show_hiddenfiles = var_InheritBool(p_obj, "show-hiddenfiles");
+    p_rdh->psz_ignored_exts = var_InheritString(p_obj, "ignore-filetypes");
+    bool b_autodetect = var_InheritBool(p_obj, "sub-autodetect-file");
+    p_rdh->i_sub_autodetect_fuzzy = !b_autodetect ? 0 :
+        var_InheritInteger(p_obj, "sub-autodetect-fuzzy");
+    TAB_INIT(p_rdh->i_slaves, p_rdh->pp_slaves);
 }
 
-void access_fsdir_finish(struct access_fsdir *p_fsdir, bool b_success)
+void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
 {
     if (b_success)
     {
-        fsdir_attach_slaves(p_fsdir);
-        fsdir_sort(p_fsdir->p_node);
+        rdh_attach_slaves(p_rdh);
+        rdh_sort(p_rdh->p_node);
     }
-    free(p_fsdir->psz_ignored_exts);
+    free(p_rdh->psz_ignored_exts);
 
     /* Remove unmatched slaves */
-    for (unsigned int i = 0; i < p_fsdir->i_slaves; i++)
+    for (unsigned int i = 0; i < p_rdh->i_slaves; i++)
     {
-        struct fsdir_slave *p_fsdir_slave = p_fsdir->pp_slaves[i];
-        if (p_fsdir_slave != NULL)
+        struct rdh_slave *p_rdh_slave = p_rdh->pp_slaves[i];
+        if (p_rdh_slave != NULL)
         {
-            input_item_slave_Delete(p_fsdir_slave->p_slave);
-            free(p_fsdir_slave->psz_filename);
-            free(p_fsdir_slave);
+            input_item_slave_Delete(p_rdh_slave->p_slave);
+            free(p_rdh_slave->psz_filename);
+            free(p_rdh_slave);
         }
     }
-    TAB_CLEAN(p_fsdir->i_slaves, p_fsdir->pp_slaves);
+    TAB_CLEAN(p_rdh->i_slaves, p_rdh->pp_slaves);
 }
 
-int access_fsdir_additem(struct access_fsdir *p_fsdir,
-                         const char *psz_uri, const char *psz_filename,
-                         int i_type, int i_net)
+int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
+                               const char *psz_uri, const char *psz_filename,
+                               int i_type, int i_net)
 {
     enum slave_type i_slave_type;
-    struct fsdir_slave *p_fsdir_slave = NULL;
+    struct rdh_slave *p_rdh_slave = NULL;
     input_item_node_t *p_node;
 
-    if (p_fsdir->i_sub_autodetect_fuzzy != 0
+    if (p_rdh->i_sub_autodetect_fuzzy != 0
      && input_item_slave_GetType(psz_filename, &i_slave_type))
     {
-        p_fsdir_slave = malloc(sizeof(*p_fsdir_slave));
-        if (!p_fsdir_slave)
+        p_rdh_slave = malloc(sizeof(*p_rdh_slave));
+        if (!p_rdh_slave)
             return VLC_ENOMEM;
 
-        p_fsdir_slave->p_node = NULL;
-        p_fsdir_slave->psz_filename = strdup(psz_filename);
-        p_fsdir_slave->p_slave = input_item_slave_New(psz_uri, i_slave_type,
+        p_rdh_slave->p_node = NULL;
+        p_rdh_slave->psz_filename = strdup(psz_filename);
+        p_rdh_slave->p_slave = input_item_slave_New(psz_uri, i_slave_type,
                                                       SLAVE_PRIORITY_MATCH_NONE);
-        if (!p_fsdir_slave->p_slave || !p_fsdir_slave->psz_filename)
+        if (!p_rdh_slave->p_slave || !p_rdh_slave->psz_filename)
         {
-            free(p_fsdir_slave->psz_filename);
-            free(p_fsdir_slave);
+            free(p_rdh_slave->psz_filename);
+            free(p_rdh_slave);
             return VLC_ENOMEM;
         }
 
-        TAB_APPEND(p_fsdir->i_slaves, p_fsdir->pp_slaves, p_fsdir_slave);
+        TAB_APPEND(p_rdh->i_slaves, p_rdh->pp_slaves, p_rdh_slave);
     }
 
-    if (fsdir_is_ignored(p_fsdir, psz_filename))
+    if (rdh_file_is_ignored(p_rdh, psz_filename))
         return VLC_SUCCESS;
 
     input_item_t *p_item = input_item_NewExt(psz_uri, psz_filename, -1,
@@ -1670,14 +1671,14 @@ int access_fsdir_additem(struct access_fsdir *p_fsdir,
     if (p_item == NULL)
         return VLC_ENOMEM;
 
-    input_item_CopyOptions(p_item, p_fsdir->p_node->p_item);
-    p_node = input_item_node_AppendItem(p_fsdir->p_node, p_item);
+    input_item_CopyOptions(p_item, p_rdh->p_node->p_item);
+    p_node = input_item_node_AppendItem(p_rdh->p_node, p_item);
     input_item_Release(p_item);
 
     /* A slave can also be an item. If there is a match, this item will be
      * removed from the parent node. This is not a common case, since most
-     * slaves will be ignored by fsdir_is_ignored() */
-    if (p_fsdir_slave != NULL)
-        p_fsdir_slave->p_node = p_node;
+     * slaves will be ignored by rdh_file_is_ignored() */
+    if (p_rdh_slave != NULL)
+        p_rdh_slave->p_node = p_node;
     return VLC_SUCCESS;
 }
