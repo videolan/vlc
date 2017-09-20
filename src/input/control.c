@@ -567,7 +567,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_renderer_item_t* p_item = va_arg( args, vlc_renderer_item_t* );
             val.p_address = p_item;
             input_ControlPush( p_input, INPUT_CONTROL_SET_RENDERER, &val );
-            break;
+            return VLC_SUCCESS;
         }
 
         default:
