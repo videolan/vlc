@@ -224,7 +224,7 @@ static int vlclua_input_item_stats( lua_State *L )
     return 1;
 }
 
-static int vlclua_input_add_subtitle( lua_State *L )
+static int vlclua_input_add_subtitle( lua_State *L, bool b_path )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
     bool b_autoselect = false;
@@ -234,15 +234,30 @@ static int vlclua_input_add_subtitle( lua_State *L )
         return luaL_error( L, "vlc.input.add_subtitle() usage: (path)" );
     if( lua_gettop( L ) >= 2 )
         b_autoselect = lua_toboolean( L, 2 );
-    const char *psz_path = luaL_checkstring( L, 1 );
-    char* psz_mrl = vlc_path2uri( psz_path, NULL );
-    if( psz_mrl )
+    const char *psz_sub = luaL_checkstring( L, 1 );
+    if( !b_path )
+        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_sub, b_autoselect, true );
+    else
     {
-        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, b_autoselect, true );
-        free( psz_mrl );
+        char* psz_mrl = vlc_path2uri( psz_sub, NULL );
+        if ( psz_mrl )
+        {
+            input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, b_autoselect, true );
+            free( psz_mrl );
+        }
     }
     vlc_object_release( p_input );
     return 1;
+}
+
+static int vlclua_input_add_subtitle_path( lua_State *L )
+{
+    return vlclua_input_add_subtitle( L, true );
+}
+
+static int vlclua_input_add_subtitle_mrl( lua_State *L )
+{
+    return vlclua_input_add_subtitle( L, false );
 }
 
 /*****************************************************************************
@@ -394,7 +409,8 @@ static int vlclua_input_item_set_meta( lua_State *L )
 static const luaL_Reg vlclua_input_reg[] = {
     { "is_playing", vlclua_input_is_playing },
     { "item", vlclua_input_item_get_current },
-    { "add_subtitle", vlclua_input_add_subtitle },
+    { "add_subtitle", vlclua_input_add_subtitle_path },
+    { "add_subtitle_mrl", vlclua_input_add_subtitle_mrl },
     { NULL, NULL }
 };
 
