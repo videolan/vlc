@@ -227,15 +227,18 @@ static int vlclua_input_item_stats( lua_State *L )
 static int vlclua_input_add_subtitle( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
+    bool b_autoselect = false;
     if( !p_input )
         return luaL_error( L, "can't add subtitle: no current input" );
     if( !lua_isstring( L, 1 ) )
         return luaL_error( L, "vlc.input.add_subtitle() usage: (path)" );
+    if( lua_gettop( L ) >= 2 )
+        b_autoselect = lua_toboolean( L, 2 );
     const char *psz_path = luaL_checkstring( L, 1 );
     char* psz_mrl = vlc_path2uri( psz_path, NULL );
     if( psz_mrl )
     {
-        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, false, false );
+        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, b_autoselect, true );
         free( psz_mrl );
     }
     vlc_object_release( p_input );
