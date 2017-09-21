@@ -606,15 +606,12 @@
 {
     input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (isSubtitle && array.count == 1 && p_input) {
-        char *path = vlc_uri2path([[[array firstObject] objectForKey:@"ITEM_URL"] UTF8String]);
-
-        if (path) {
-            int i_result = input_AddSubtitleOSD(p_input, path, true, true);
-            free(path);
-            if (i_result == VLC_SUCCESS) {
-                vlc_object_release(p_input);
-                return;
-            }
+        int i_result = input_AddSlave(p_input, SLAVE_TYPE_SPU,
+                    [[[array firstObject] objectForKey:@"ITEM_URL"] UTF8String],
+                    true, true);
+        if (i_result == VLC_SUCCESS) {
+            vlc_object_release(p_input);
+            return;
         }
     }
 

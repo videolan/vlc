@@ -232,7 +232,12 @@ static int vlclua_input_add_subtitle( lua_State *L )
     if( !lua_isstring( L, 1 ) )
         return luaL_error( L, "vlc.input.add_subtitle() usage: (path)" );
     const char *psz_path = luaL_checkstring( L, 1 );
-    input_AddSubtitle( p_input, psz_path, false );
+    char* psz_mrl = vlc_path2uri( psz_path, NULL );
+    if( psz_mrl )
+    {
+        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, false, false );
+        free( psz_mrl );
+    }
     vlc_object_release( p_input );
     return 1;
 }

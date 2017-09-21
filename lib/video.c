@@ -38,6 +38,7 @@
 #include <vlc_modules.h>
 #include <vlc_input.h>
 #include <vlc_vout.h>
+#include <vlc_url.h>
 
 #include "libvlc_internal.h"
 #include "media_player_internal.h"
@@ -402,8 +403,14 @@ int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
 
     if( p_input_thread )
     {
-        if( !input_AddSubtitle( p_input_thread, psz_subtitle, true ) )
-            b_ret = true;
+        char* psz_mrl = vlc_path2uri( psz_subtitle, NULL );
+        if( psz_mrl )
+        {
+            if( !input_AddSlave( p_input_thread, SLAVE_TYPE_SPU, psz_mrl,
+                                 true, false ) )
+                b_ret = true;
+            free( psz_mrl );
+        }
         vlc_object_release( p_input_thread );
     }
     return b_ret;

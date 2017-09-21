@@ -264,12 +264,8 @@ void TopWindow::processEvent( EvtDragDrop &rEvtDragDrop )
         if( files.size() == 1 && pInput != NULL )
         {
             std::list<std::string>::const_iterator it = files.begin();
-            char* psz_file = vlc_uri2path( it->c_str() );
-            if( psz_file )
-            {
-                is_subtitle = !input_AddSubtitleOSD( pInput, psz_file, true, true );
-                free( psz_file );
-            }
+            is_subtitle = !input_AddSlave( pInput, SLAVE_TYPE_SPU,
+                                           it->c_str(), true, true );
         }
         if( !is_subtitle )
         {

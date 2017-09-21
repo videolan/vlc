@@ -608,12 +608,15 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     NSUInteger count = [paths count];
 
     for (int i = 0; i < count ; i++) {
-        const char *path = [[[paths objectAtIndex:i] path] UTF8String];
-        msg_Dbg(getIntf(), "loading subs from %s", path);
+        char *mrl = vlc_path2uri([[[paths objectAtIndex:i] path] UTF8String], NULL);
+        if (!mrl)
+            continue;
+        msg_Dbg(getIntf(), "loading subs from %s", mrl);
 
-        int i_result = input_AddSubtitleOSD(p_input, path, true, true);
+        int i_result = input_AddSlave(p_input, SLAVE_TYPE_SPU, mrl, true, true);
         if (i_result != VLC_SUCCESS)
-            msg_Warn(getIntf(), "unable to load subtitles from '%s'", path);
+            msg_Warn(getIntf(), "unable to load subtitles from '%s'", mrl);
+        free(mrl);
     }
     vlc_object_release(p_input);
 }
