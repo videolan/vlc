@@ -231,7 +231,10 @@ static int vlclua_input_add_subtitle( lua_State *L, bool b_path )
     if( !p_input )
         return luaL_error( L, "can't add subtitle: no current input" );
     if( !lua_isstring( L, 1 ) )
+    {
+        vlc_object_release( p_input );
         return luaL_error( L, "vlc.input.add_subtitle() usage: (path)" );
+    }
     if( lua_gettop( L ) >= 2 )
         b_autoselect = lua_toboolean( L, 2 );
     const char *psz_sub = luaL_checkstring( L, 1 );
