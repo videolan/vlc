@@ -1112,6 +1112,29 @@ static const char *const ppsz_prefres[] = {
 
 #define METADATA_NETWORK_TEXT N_( "Allow metadata network access" )
 
+static const char *const psz_recursive_list[] = {
+    "none", "collapse", "expand" };
+static const char *const psz_recursive_list_text[] = {
+    N_("None"), N_("Collapse"), N_("Expand") };
+
+#define RECURSIVE_TEXT N_("Subdirectory behavior")
+#define RECURSIVE_LONGTEXT N_( \
+        "Select whether subdirectories must be expanded.\n" \
+        "none: subdirectories do not appear in the playlist.\n" \
+        "collapse: subdirectories appear but are expanded on first play.\n" \
+        "expand: all subdirectories are expanded.\n" )
+
+#define IGNORE_TEXT N_("Ignored extensions")
+#define IGNORE_LONGTEXT N_( \
+        "Files with these extensions will not be added to playlist when " \
+        "opening a directory.\n" \
+        "This is useful if you add directories that contain playlist files " \
+        "for instance. Use a comma-separated list of extensions." )
+
+#define SHOW_HIDDENFILES_TEXT N_("Show hidden files")
+#define SHOW_HIDDENFILES_LONGTEXT N_( \
+        "Ignore files starting with '.'" )
+
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
      "Specifies the services discovery modules to preload, separated by " \
@@ -2061,6 +2084,16 @@ vlc_module_begin ()
     add_obsolete_integer( "album-art" )
     add_bool( "metadata-network-access", false, METADATA_NETWORK_TEXT,
                  METADATA_NETWORK_TEXT, false )
+
+    add_string( "recursive", "collapse" , RECURSIVE_TEXT,
+                RECURSIVE_LONGTEXT, false )
+        change_string_list( psz_recursive_list, psz_recursive_list_text )
+    add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,"
+                "pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,"
+                "sub,idx,srt,cue,ssa",
+                IGNORE_TEXT, IGNORE_LONGTEXT, false )
+    add_bool( "show-hiddenfiles", false,
+              SHOW_HIDDENFILES_TEXT, SHOW_HIDDENFILES_LONGTEXT, false )
 
     set_subcategory( SUBCAT_PLAYLIST_SD )
     add_string( "services-discovery", "", SD_TEXT, SD_LONGTEXT, true )
