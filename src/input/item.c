@@ -1669,6 +1669,10 @@ static int rdh_unflatten(struct vlc_readdir_helper *p_rdh,
 void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
                              vlc_object_t *p_obj, input_item_node_t *p_node)
 {
+    /* Read options from the parent item. This allows vlc_stream_ReadDir()
+     * users to specify options whitout touching any vlc_object_t. */
+    input_item_ApplyOptions(p_obj, p_node->p_item);
+
     p_rdh->p_node = p_node;
     p_rdh->b_show_hiddenfiles = var_InheritBool(p_obj, "show-hiddenfiles");
     p_rdh->psz_ignored_exts = var_InheritString(p_obj, "ignore-filetypes");
