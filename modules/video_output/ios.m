@@ -558,6 +558,8 @@ static void OpenglESSwap(vlc_gl_t *gl)
         return;
     }
 
+    [self lock];
+
     glDisable(GL_DEPTH_TEST);
 
     glGenFramebuffers(1, &_frameBuffer);
@@ -573,6 +575,8 @@ static void OpenglESSwap(vlc_gl_t *gl)
         if (_voutDisplay)
             msg_Err(_voutDisplay, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
+
+    [self unlock];
 }
 
 - (void)destroyBuffers
@@ -585,9 +589,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
         return;
     }
 
-    /* re-set current context */
-    EAGLContext *previousContext = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_eaglContext];
+    [self lock];
 
     /* clear frame buffer */
     glDeleteFramebuffers(1, &_frameBuffer);
@@ -596,7 +598,8 @@ static void OpenglESSwap(vlc_gl_t *gl)
     /* clear render buffer */
     glDeleteRenderbuffers(1, &_renderBuffer);
     _renderBuffer = 0;
-    [EAGLContext setCurrentContext:previousContext];
+
+    [self unlock];
 }
 
 - (void)resetBuffers
