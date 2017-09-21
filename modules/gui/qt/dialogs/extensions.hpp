@@ -135,8 +135,8 @@ class WidgetMapper : public QObject
 private:
     extension_widget_t *p_widget;
 public:
-    WidgetMapper( extension_widget_t *_p_widget ) :
-            QObject(NULL), p_widget(_p_widget) {}
+    WidgetMapper( QObject* parent, extension_widget_t *_p_widget ) :
+            QObject(parent), p_widget(_p_widget) {}
     extension_widget_t* getWidget() { return p_widget; }
 };
 

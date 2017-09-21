@@ -217,7 +217,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
 
         case EXTENSION_WIDGET_BUTTON:
             button = new QPushButton( qfu( p_widget->psz_text ), this );
-            clickMapper->setMapping( button, new WidgetMapper( p_widget ) );
+            clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
             CONNECT( button, clicked(), clickMapper, map() );
             p_widget->p_sys_intf = button;
             return button;
@@ -245,7 +245,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             textInput->setText( qfu( p_widget->psz_text ) );
             textInput->setReadOnly( false );
             textInput->setEchoMode( QLineEdit::Normal );
-            inputMapper->setMapping( textInput, new WidgetMapper( p_widget ) );
+            inputMapper->setMapping( textInput, new WidgetMapper( textInput, p_widget ) );
             /// @note: maybe it would be wiser to use textEdited here?
             CONNECT( textInput, textChanged(const QString &),
                      inputMapper, map() );
@@ -257,7 +257,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             textInput->setText( qfu( p_widget->psz_text ) );
             textInput->setReadOnly( false );
             textInput->setEchoMode( QLineEdit::Password );
-            inputMapper->setMapping( textInput, new WidgetMapper( p_widget ) );
+            inputMapper->setMapping( textInput, new WidgetMapper( textInput, p_widget ) );
             /// @note: maybe it would be wiser to use textEdited here?
             CONNECT( textInput, textChanged(const QString &),
                      inputMapper, map() );
@@ -268,7 +268,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             checkBox = new QCheckBox( this );
             checkBox->setText( qfu( p_widget->psz_text ) );
             checkBox->setChecked( p_widget->b_checked );
-            clickMapper->setMapping( checkBox, new WidgetMapper( p_widget ) );
+            clickMapper->setMapping( checkBox, new WidgetMapper( checkBox, p_widget ) );
             CONNECT( checkBox, stateChanged( int ), clickMapper, map() );
             p_widget->p_sys_intf = checkBox;
             return checkBox;
@@ -289,7 +289,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                 if( idx >= 0 )
                     comboBox->setCurrentIndex( idx );
             }
-            selectMapper->setMapping( comboBox, new WidgetMapper( p_widget ) );
+            selectMapper->setMapping( comboBox, new WidgetMapper( comboBox, p_widget ) );
             CONNECT( comboBox, currentIndexChanged( const QString& ),
                      selectMapper, map() );
             return comboBox;
@@ -306,7 +306,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                 item->setData( Qt::UserRole, p_value->i_id );
                 list->addItem( item );
             }
-            selectMapper->setMapping( list, new WidgetMapper( p_widget ) );
+            selectMapper->setMapping( list, new WidgetMapper( list, p_widget ) );
             CONNECT( list, itemSelectionChanged(),
                      selectMapper, map() );
             return list;
@@ -568,7 +568,7 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
             button = static_cast< QPushButton* >( p_widget->p_sys_intf );
             button->setText( qfu( p_widget->psz_text ) );
             clickMapper->removeMappings( button );
-            clickMapper->setMapping( button, new WidgetMapper( p_widget ) );
+            clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
             CONNECT( button, clicked(), clickMapper, map() );
             return button;
 
