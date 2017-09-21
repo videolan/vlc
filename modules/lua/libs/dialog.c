@@ -291,6 +291,7 @@ static int vlclua_dialog_delete( lua_State *L )
     /* Note: At this point, the UI must not use these resources */
     vlc_mutex_destroy( &p_dlg->lock );
     vlc_cond_destroy( &p_dlg->cond );
+    free( p_dlg );
 
     return 1;
 }
