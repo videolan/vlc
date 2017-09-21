@@ -575,28 +575,6 @@ static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
      return p_vout;
 }
 
-/**
- * It will add a new subtitle source to the input.
- * Provided for convenience.
- */
-static inline int input_AddSubtitleOSD( input_thread_t *p_input, const char *psz_path,
-        bool b_check_extension, bool b_osd )
-{
-    int i_result = input_Control( p_input, INPUT_ADD_SUBTITLE, psz_path, b_check_extension );
-    if( i_result != VLC_SUCCESS || !b_osd )
-        return i_result;
-
-    vout_thread_t *p_vout = input_GetVout( p_input );
-    if( p_vout )
-    {
-        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s",
-                        vlc_gettext("Subtitle track added") );
-        vlc_object_release( (vlc_object_t *)p_vout );
-    }
-    return i_result;
-}
-#define input_AddSubtitle(a, b, c) input_AddSubtitleOSD(a, b, c, false)
-
 static inline int input_AddSlave( input_thread_t *p_input, enum slave_type type,
                                   const char *psz_uri, bool b_forced, bool b_notify )
 {
