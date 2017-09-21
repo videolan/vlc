@@ -411,6 +411,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             enum slave_type type =  (enum slave_type) va_arg( args, enum slave_type );
             psz = va_arg( args, char * );
             b_bool = va_arg( args, int );
+            bool b_notify = va_arg( args, int );
 
             if( !psz || ( type != SLAVE_TYPE_SPU && type != SLAVE_TYPE_AUDIO ) )
                 return VLC_EGENERIC;
@@ -423,6 +424,25 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             val.p_address = p_slave;
             input_ControlPush( p_input, INPUT_CONTROL_ADD_SLAVE, &val );
+            if( b_notify )
+            {
+                vout_thread_t *p_vout = input_GetVout( p_input );
+                if( p_vout )
+                {
+                    switch( type )
+                    {
+                        case SLAVE_TYPE_AUDIO:
+                            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s",
+                                            vlc_gettext("Audio track added"));
+                            break;
+                        case SLAVE_TYPE_SPU:
+                            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s",
+                                            vlc_gettext("Subtitle track added"));
+                            break;
+                    }
+                    vlc_object_release( (vlc_object_t *)p_vout );
+                }
+            }
             return VLC_SUCCESS;
         }
 
