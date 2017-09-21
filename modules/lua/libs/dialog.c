@@ -282,6 +282,7 @@ static int vlclua_dialog_delete( lua_State *L )
             free( p_value->psz_text );
             free( p_value );
         }
+        free( p_widget );
     }
     FOREACH_END()
 
