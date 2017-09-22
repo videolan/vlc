@@ -1415,10 +1415,14 @@ static bool MuxStreams(sout_mux_t *p_mux )
             p_data->i_pts = p_data->i_dts;
         }
 
-        if( p_input->p_fmt->i_codec == VLC_CODEC_DIRAC )
+        if( (p_input->p_fmt->i_codec == VLC_CODEC_DIRAC) ||
+            (p_input->p_fmt->i_codec == VLC_CODEC_H264) ||
+            (p_input->p_fmt->i_codec == VLC_CODEC_HEVC) ||
+            (p_input->p_fmt->i_codec == VLC_CODEC_MP2V)
+          )
         {
             b_data_alignment = 1;
-            /* dirac pes packets should be unbounded in
+            /* dirac and mpeg video pes packets should be unbounded in
              * length, specify a suitibly large max size */
             i_max_pes_size = INT_MAX;
         }
