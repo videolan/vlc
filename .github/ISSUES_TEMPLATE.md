@@ -1,1 +1,1 @@
-**All pull requests are ignored, please follow https://wiki.videolan.org/Sending_Patches_VLC/**
+**All issues are ignored, please follow https://www.videolan.org/support/**
