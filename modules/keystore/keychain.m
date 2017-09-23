@@ -207,6 +207,8 @@ static NSString * ErrorForStatus(OSStatus status)
 #define OSX_MAVERICKS (NSAppKitVersionNumber >= 1265)
 extern const CFStringRef kSecAttrAccessible;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 static void SetAccessibilityForQuery(vlc_keystore *p_keystore,
                                      NSMutableDictionary *query)
 {
@@ -240,6 +242,7 @@ static void SetAccessibilityForQuery(vlc_keystore *p_keystore,
             break;
     }
 }
+#pragma clang diagnostic pop
 
 static void SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutableDictionary *query, const char *psz_label)
 {
