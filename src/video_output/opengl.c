@@ -26,10 +26,16 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_opengl.h>
 #include "libvlc.h"
 #include <vlc_modules.h>
 
+struct vlc_gl_priv_t
+{
+    vlc_gl_t gl;
+    atomic_uint ref_count;
+};
 #undef vlc_gl_Create
 /**
  * Creates an OpenGL context (and its underlying surface).
@@ -45,7 +51,7 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
                         const char *name)
 {
     vlc_object_t *parent = (vlc_object_t *)wnd;
-    vlc_gl_t *gl;
+    struct vlc_gl_priv_t *glpriv;
     const char *type;
 
     switch (flags /*& VLC_OPENGL_API_MASK*/)
@@ -60,23 +66,33 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
             return NULL;
     }
 
-    gl = vlc_custom_create(parent, sizeof (*gl), "gl");
-    if (unlikely(gl == NULL))
+    glpriv = vlc_custom_create(parent, sizeof (*glpriv), "gl");
+    if (unlikely(glpriv == NULL))
         return NULL;
 
-    gl->surface = wnd;
-    gl->module = module_need(gl, type, name, true);
-    if (gl->module == NULL)
+    glpriv->gl.surface = wnd;
+    glpriv->gl.module = module_need(&glpriv->gl, type, name, true);
+    if (glpriv->gl.module == NULL)
     {
-        vlc_object_release(gl);
+        vlc_object_release(&glpriv->gl);
         return NULL;
     }
+    atomic_init(&glpriv->ref_count, 1);
 
-    return gl;
+    return &glpriv->gl;
+}
+
+void vlc_gl_Hold(vlc_gl_t *gl)
+{
+    struct vlc_gl_priv_t *glpriv = (struct vlc_gl_priv_t *)gl;
+    atomic_fetch_add(&glpriv->ref_count, 1);
 }
 
 void vlc_gl_Destroy(vlc_gl_t *gl)
 {
+    struct vlc_gl_priv_t *glpriv = (struct vlc_gl_priv_t *)gl;
+    if (atomic_fetch_sub(&glpriv->ref_count, 1) != 1)
+        return;
     module_unneed(gl, gl->module);
     vlc_object_release(gl);
 }
