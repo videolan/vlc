@@ -652,6 +652,9 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
                          pixelaspectratio);
     CFRelease(pixelaspectratio);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+
     /* enable HW accelerated playback, since this is optional on OS X
      * note that the backend may still fallback on software mode if no
      * suitable hardware is available */
@@ -665,6 +668,8 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
         CFDictionarySetValue(decoderConfiguration,
                              kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
                              kCFBooleanTrue);
+
+#pragma clang diagnostic pop
 
     CFDictionarySetValue(decoderConfiguration,
                          kVTDecompressionPropertyKey_FieldMode,
