@@ -296,6 +296,14 @@ void picture_pool_Cancel(picture_pool_t *pool, bool canceled)
     vlc_mutex_unlock(&pool->lock);
 }
 
+bool picture_pool_OwnsPic(picture_pool_t *pool, picture_t *pic)
+{
+    picture_priv_t *priv = (picture_priv_t *)pic;
+    uintptr_t sys = (uintptr_t)priv->gc.opaque;
+    picture_pool_t *picpool = (void *)(sys & ~(POOL_MAX - 1));
+    return pool == picpool;
+}
+
 unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;

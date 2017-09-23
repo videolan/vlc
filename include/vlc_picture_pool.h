@@ -155,6 +155,13 @@ VLC_API void picture_pool_Enum( picture_pool_t *,
 void picture_pool_Cancel( picture_pool_t *, bool canceled );
 
 /**
+ * Test if a picture belongs to the picture pool
+ *
+ * FIXME: remove this function when the vout_PutPicture() hack is fixed.
+ */
+bool picture_pool_OwnsPic( picture_pool_t *, picture_t *);
+
+/**
  * Reserves pictures from a pool and creates a new pool with those.
  *
  * When the new pool is released, pictures are returned to the master pool.

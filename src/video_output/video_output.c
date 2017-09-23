@@ -425,9 +425,19 @@ picture_t *vout_GetPicture(vout_thread_t *vout)
 void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
 {
     picture->p_next = NULL;
-    picture_fifo_Push(vout->p->decoder_fifo, picture);
+    if (picture_pool_OwnsPic(vout->p->decoder_pool, picture))
+    {
+        picture_fifo_Push(vout->p->decoder_fifo, picture);
 
-    vout_control_Wake(&vout->p->control);
+        vout_control_Wake(&vout->p->control);
+    }
+    else
+    {
+        /* FIXME: HACK: Drop this picture because the vout changed. The old
+         * picture pool need to be kept by the new vout. This requires a major
+         * "vout display" API change. */
+        picture_Release(picture);
+    }
 }
 
 /* */
