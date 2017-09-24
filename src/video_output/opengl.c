@@ -88,7 +88,7 @@ void vlc_gl_Hold(vlc_gl_t *gl)
     atomic_fetch_add(&glpriv->ref_count, 1);
 }
 
-void vlc_gl_Destroy(vlc_gl_t *gl)
+void vlc_gl_Release(vlc_gl_t *gl)
 {
     struct vlc_gl_priv_t *glpriv = (struct vlc_gl_priv_t *)gl;
     if (atomic_fetch_sub(&glpriv->ref_count, 1) != 1)
@@ -193,7 +193,7 @@ void vlc_gl_surface_Destroy(vlc_gl_t *gl)
     vout_window_t *surface = gl->surface;
     vlc_gl_surface_t *sys = surface->owner.sys;
 
-    vlc_gl_Destroy(gl);
+    vlc_gl_Release(gl);
     vout_window_Delete(surface);
     vlc_mutex_destroy(&sys->lock);
     free(sys);

@@ -165,7 +165,7 @@ static int Open (vlc_object_t *obj)
 
 error:
     if (sys->gl != NULL)
-        vlc_gl_Destroy (sys->gl);
+        vlc_gl_Release (sys->gl);
     if (surface != NULL)
         vout_display_DeleteWindow (vd, surface);
     free (sys);
@@ -186,7 +186,7 @@ static void Close (vlc_object_t *obj)
     vout_display_opengl_Delete (sys->vgl);
     vlc_gl_ReleaseCurrent (gl);
 
-    vlc_gl_Destroy (gl);
+    vlc_gl_Release (gl);
     vout_display_DeleteWindow (vd, surface);
     free (sys);
 }

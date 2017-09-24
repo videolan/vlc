@@ -690,7 +690,7 @@ vlc_fifo_DequeueAllUnlocked
 vlc_fifo_GetCount
 vlc_fifo_GetBytes
 vlc_gl_Create
-vlc_gl_Destroy
+vlc_gl_Release
 vlc_gl_Hold
 vlc_gl_surface_Create
 vlc_gl_surface_CheckSize
