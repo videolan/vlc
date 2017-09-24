@@ -1,7 +1,7 @@
 # Building vlc
 #
 if BUILD_VLC
-if HAVE_DARWIN
+if HAVE_OSX
 bin_PROGRAMS = vlc-osx
 noinst_PROGRAMS = vlc-osx-static
 else
@@ -115,7 +115,7 @@ noinst_DATA = ../modules/plugins.dat
 endif
 MOSTLYCLEANFILES = $(noinst_DATA)
 
-if HAVE_DARWIN
+if HAVE_OSX
 install-data-local:
 	cd $(bindir); mv vlc-osx vlc
 
