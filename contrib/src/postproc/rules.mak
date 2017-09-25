@@ -121,6 +121,7 @@ postproc: postproc-$(POSTPROC_VERSION).tar.xz .sum-postproc
 	$(MOVE)
 
 .postproc: postproc
+	$(REQUIRE_GPL)
 	cd $< && $(HOSTVARS) ./configure \
 		--extra-cflags="$(EXTRA_CFLAGS)"  \
 		--extra-ldflags="$(LDFLAGS)" $(POSTPROCCONF) \

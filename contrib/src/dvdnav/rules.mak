@@ -25,6 +25,7 @@ dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 DEPS_dvdnav = dvdcss dvdread
 
 .dvdnav: dvdnav .dvdcss .dvdread
+	$(REQUIRE_GPL)
 	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-examples
 	cd $< && $(MAKE) install

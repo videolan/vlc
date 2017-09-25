@@ -28,6 +28,7 @@ endif
 	$(MOVE)
 
 .faad2: faad2
+	$(REQUIRE_GPL)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure --without-drm $(HOSTCONF)
 	cd $< && sed -i.orig "s/shrext_cmds/shrext/g" libtool

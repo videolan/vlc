@@ -24,6 +24,7 @@ libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz .sum-libmpeg2
 	$(MOVE)
 
 .libmpeg2: libmpeg2
+	$(REQUIRE_GPL)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-x --disable-sdl
 	cd $</libmpeg2 && $(MAKE) && $(MAKE) install

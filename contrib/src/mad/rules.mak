@@ -34,6 +34,7 @@ endif
 	$(MOVE)
 
 .mad: libmad
+	$(REQUIRE_GPL)
 	$(RECONF)
 ifdef HAVE_IOS
 	cd $< && $(HOSTVARS) CCAS="$(AS)" CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(MAD_CONF)

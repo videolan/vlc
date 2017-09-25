@@ -79,11 +79,13 @@ x262: x262-git.tar.gz .sum-x262
 
 
 .x264: x264
+	$(REQUIRE_GPL)
 	cd $< && $(HOSTVARS) ./configure $(X264CONF)
 	cd $< && $(MAKE) install
 	touch $@
 
 .x26410b: x26410b
+	$(REQUIRE_GPL)
 	cd $< && $(HOSTVARS) ./configure $(X264CONF) --bit-depth=10
 	cd $< && sed -i -e 's/libx264/libx26410b/g' Makefile config.mak
 	cd $< && sed -i -e 's/x264/x26410b/g' x264.pc
@@ -93,6 +95,7 @@ x262: x262-git.tar.gz .sum-x262
 	touch $@
 
 .x262: x262
+	$(REQUIRE_GPL)
 	cd $< && sed -i -e 's/x264/x262/g' configure
 	cd $< && sed -i -e 's/x264_config/x262_config/g' *.h Makefile *.c
 	cd $< && $(HOSTVARS) ./configure $(X264CONF)

@@ -20,6 +20,7 @@ samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 	$(MOVE)
 
 .samplerate: samplerate
+	$(REQUIRE_GPL)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C src install && $(MAKE) install-data
 	touch $@

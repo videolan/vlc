@@ -353,6 +353,12 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR)
 
+ifdef GPL
+REQUIRE_GPL =
+else
+REQUIRE_GPL = @echo "Package \"$<\" requires the GPL license." >&2; exit 1
+endif
+
 #
 # Per-package build rules
 #
