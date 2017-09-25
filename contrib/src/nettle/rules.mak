@@ -19,7 +19,11 @@ nettle: nettle-$(NETTLE_VERSION).tar.gz .sum-nettle
 
 DEPS_nettle = gmp $(DEPS_gmp)
 
+# GMP requires either GPLv2 or LGPLv3
 .nettle: nettle
+ifndef GPL
+	$(REQUIRE_GNUV3)
+endif
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
