@@ -5,7 +5,9 @@ LIVE555_FILE := live.$(LIVE555_VERSION).tar.gz
 LIVEDOTCOM_URL := http://live555.com/liveMedia/public/$(LIVE555_FILE)
 
 ifdef BUILD_NETWORK
+ifdef GNUV3
 PKGS += live555
+endif
 endif
 
 $(TARBALLS)/$(LIVE555_FILE):
@@ -38,6 +40,7 @@ endif
 LIVE_EXTRA_CFLAGS := $(EXTRA_CFLAGS) -fexceptions $(CFLAGS)
 
 live555: $(LIVE555_FILE) .sum-live555
+	$(REQUIRE_GNUV3)
 	rm -Rf live && $(UNPACK)
 
 	# Change permissions to patch and sed the source
