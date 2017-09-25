@@ -358,6 +358,13 @@ REQUIRE_GPL =
 else
 REQUIRE_GPL = @echo "Package \"$<\" requires the GPL license." >&2; exit 1
 endif
+ifdef GNUV3
+REQUIRE_GNUV3 =
+else
+REQUIRE_GNUV3 = \
+	@echo "Package \"$<\" requires the version 3 of GNU licenses." >&2; \
+	exit 1
+endif
 
 #
 # Per-package build rules

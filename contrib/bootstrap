@@ -31,6 +31,7 @@ usage()
 	echo "  --disable-sout   configure to not build stream output packages"
 	echo "  --enable-small   optimize libraries for size with slight speed decrease [DANGEROUS]"
 	echo "  --disable-gpl    configure to not build viral GPL code"
+	echo "  --disable-gnuv3  configure to not build version 3 (L)GPL code"
 	echo "  --disable-optim  disable optimization in libraries"
 }
 
@@ -43,6 +44,7 @@ BUILD_ENCODERS="1"
 BUILD_NETWORK="1"
 BUILD_DISCS="1"
 GPL="1"
+GNUV3="1"
 WITH_OPTIMIZATION="1"
 
 if test ! -f "../../contrib/src/main.mak"
@@ -84,6 +86,9 @@ do
 			;;
 		--disable-gpl)
 			GPL=
+			;;
+		--disable-gnuv3)
+			GNUV3=
 			;;
 		--disable-*)
 			PKGS_DISABLE="${PKGS_DISABLE} ${1#--disable-}"
@@ -246,6 +251,7 @@ test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
 test -z "$BUILD_NETWORK" || add_make_enabled "BUILD_NETWORK"
 test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
 test -z "$GPL" || add_make_enabled "GPL"
+test -z "$GNUV3" || add_make_enabled "GNUV3"
 test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
 test "`uname -o`" != "Msys" || add_make "CMAKE_GENERATOR := -G \"MSYS Makefiles\""
 
