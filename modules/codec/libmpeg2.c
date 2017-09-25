@@ -717,7 +717,10 @@ static void SendCc( decoder_t *p_dec )
         p_cc->i_dts =
         p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
         p_cc->i_flags = p_sys->i_cc_flags & BLOCK_FLAG_TYPE_MASK;
-        decoder_QueueCc( p_dec, p_cc, p_sys->cc.pb_present, p_sys->cc.b_reorder ? 0 : -1 );
+        decoder_cc_desc_t desc;
+        desc.i_608_channels = p_sys->cc.i_608channels;
+        desc.i_reorder_depth = p_sys->cc.b_reorder ? 0 : -1;
+        decoder_QueueCc( p_dec, p_cc, &desc );
     }
     cc_Flush( &p_sys->cc );
     return;

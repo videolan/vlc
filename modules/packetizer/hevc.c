@@ -71,7 +71,7 @@ static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *);
 static block_t *ParseNALBlock(decoder_t *, bool *pb_ts_used, block_t *);
 static int PacketizeValidate(void *p_private, block_t *);
 static bool ParseSEICallback( const hxxx_sei_data_t *, void * );
-static block_t *GetCc( decoder_t *, bool pb_present[4], int * );
+static block_t *GetCc( decoder_t *, decoder_cc_desc_t * );
 
 struct decoder_sys_t
 {
@@ -304,9 +304,9 @@ static void PacketizeFlush( decoder_t *p_dec )
 /*****************************************************************************
  * GetCc:
  *****************************************************************************/
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_depth )
+static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t *p_desc )
 {
-    return cc_storage_get_current( p_dec->p_sys->p_ccs, pb_present, pi_reorder_depth );
+    return cc_storage_get_current( p_dec->p_sys->p_ccs, p_desc );
 }
 
 /****************************************************************************

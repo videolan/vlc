@@ -135,7 +135,7 @@ struct decoder_sys_t
 
 static block_t *Packetize( decoder_t *, block_t ** );
 static block_t *PacketizeAVC1( decoder_t *, block_t ** );
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int * );
+static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t * );
 static void PacketizeFlush( decoder_t * );
 
 static void PacketizeReset( void *p_private, bool b_broken );
@@ -486,9 +486,9 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  * GetCc:
  *****************************************************************************/
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4], int *pi_reorder_depth )
+static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t *p_desc )
 {
-    return cc_storage_get_current( p_dec->p_sys->p_ccs, pb_present, pi_reorder_depth );
+    return cc_storage_get_current( p_dec->p_sys->p_ccs, p_desc );
 }
 
 /****************************************************************************

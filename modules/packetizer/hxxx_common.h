@@ -33,8 +33,7 @@ void cc_storage_append( cc_storage_t *p_ccs, bool b_top_field_first,
                                       const uint8_t *p_buf, size_t i_buf );
 void cc_storage_commit( cc_storage_t *p_ccs, block_t *p_pic );
 
-block_t * cc_storage_get_current( cc_storage_t *p_ccs, bool pb_present[4],
-                                  int *pi_reorder_depth );
+block_t * cc_storage_get_current( cc_storage_t *p_ccs, decoder_cc_desc_t * );
 
 /* */
 

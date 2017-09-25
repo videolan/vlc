@@ -21,10 +21,11 @@
 # include "config.h"
 #endif
 
-#include "hxxx_common.h"
-
+#include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_codec.h>
+
+#include "hxxx_common.h"
 #include "../codec/cc.h"
 
 /****************************************************************************
@@ -80,15 +81,9 @@ void cc_storage_commit( cc_storage_t *p_ccs, block_t *p_pic )
     cc_Flush( &p_ccs->next );
 }
 
-block_t * cc_storage_get_current( cc_storage_t *p_ccs, bool pb_present[4],
-                                  int *pi_reorder_depth )
+block_t * cc_storage_get_current( cc_storage_t *p_ccs, decoder_cc_desc_t *p_desc )
 {
     block_t *p_block;
-
-    *pi_reorder_depth = p_ccs->current.b_reorder ? 4 : -1;
-
-    for( int i = 0; i < 4; i++ )
-        pb_present[i] = p_ccs->current.pb_present[i];
 
     if( !p_ccs->current.b_reorder && p_ccs->current.i_data <= 0 )
         return NULL;
@@ -100,6 +95,9 @@ block_t * cc_storage_get_current( cc_storage_t *p_ccs, bool pb_present[4],
         p_block->i_dts =
         p_block->i_pts = p_ccs->current.b_reorder ? p_ccs->i_pts : p_ccs->i_dts;
         p_block->i_flags = p_ccs->i_flags & BLOCK_FLAG_TYPE_MASK;
+
+        p_desc->i_608_channels = p_ccs->current.i_608channels;
+        p_desc->i_reorder_depth = p_ccs->current.b_reorder ? 4 : -1;
     }
     cc_Flush( &p_ccs->current );
 

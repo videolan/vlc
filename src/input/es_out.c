@@ -93,8 +93,12 @@ struct es_out_id_t
     decoder_t   *p_dec_record;
 
     /* Fields for Video with CC */
-    bool  pb_cc_present[4];
-    es_out_id_t  *pp_cc_es[4];
+    struct
+    {
+        vlc_fourcc_t type;
+        uint64_t     i_bitmap;    /* channels bitmap */
+        es_out_id_t  *pp_es[64]; /* a max of 64 chans for CEA708 */
+    } cc;
 
     /* Field for CC track from a master video */
     es_out_id_t *p_master;
@@ -1624,8 +1628,8 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     es->psz_language_code = LanguageGetCode( es->fmt.psz_language );
     es->p_dec = NULL;
     es->p_dec_record = NULL;
-    for( i = 0; i < 4; i++ )
-        es->pb_cc_present[i] = false;
+    es->cc.type = 0;
+    es->cc.i_bitmap = 0;
     es->p_master = p_master;
 
     TAB_APPEND( p_sys->i_es, p_sys->es, es );
@@ -1660,8 +1664,8 @@ static bool EsIsSelected( es_out_id_t *es )
         if( es->p_master->p_dec )
         {
             int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
-            if( i_channel != -1 )
-                input_DecoderGetCcState( es->p_master->p_dec, &b_decode, i_channel );
+            input_DecoderGetCcState( es->p_master->p_dec, es->fmt.i_codec,
+                                     i_channel, &b_decode );
         }
         return b_decode;
     }
@@ -1727,7 +1731,9 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
 
         i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
 
-        if( i_channel == -1 || input_DecoderSetCcState( es->p_master->p_dec, true, i_channel ) )
+        if( i_channel == -1 ||
+            input_DecoderSetCcState( es->p_master->p_dec, es->fmt.i_codec,
+                                     i_channel, true ) )
             return;
     }
     else
@@ -1772,6 +1778,34 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     input_SendEventTeletextSelect( p_input, EsFmtIsTeletext( &es->fmt ) ? es->i_id : -1 );
 }
 
+static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
+{
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+
+    if( parent->cc.type == 0 )
+        return;
+
+    const int i_spu_id = var_GetInteger( p_input, "spu-es");
+
+    uint64_t i_bitmap = parent->cc.i_bitmap;
+    for( int i = 0; i_bitmap > 0; i++, i_bitmap >>= 1 )
+    {
+        if( (i_bitmap & 1) == 0 || !parent->cc.pp_es[i] )
+            continue;
+
+        if( i_spu_id == parent->cc.pp_es[i]->i_id )
+        {
+            /* Force unselection of the CC */
+            input_SendEventEsSelect( p_input, SPU_ES, -1 );
+        }
+        EsOutDel( out, parent->cc.pp_es[i] );
+    }
+
+    parent->cc.i_bitmap = 0;
+    parent->cc.type = 0;
+}
+
 static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
 {
     es_out_sys_t   *p_sys = out->p_sys;
@@ -1789,27 +1823,13 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
         {
             int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
             if( i_channel != -1 )
-                input_DecoderSetCcState( es->p_master->p_dec, false, i_channel );
+                input_DecoderSetCcState( es->p_master->p_dec, es->fmt.i_codec,
+                                         i_channel, false );
         }
     }
     else
     {
-        const int i_spu_id = var_GetInteger( p_input, "spu-es");
-        int i;
-        for( i = 0; i < 4; i++ )
-        {
-            if( !es->pb_cc_present[i] || !es->pp_cc_es[i] )
-                continue;
-
-            if( i_spu_id == es->pp_cc_es[i]->i_id )
-            {
-                /* Force unselection of the CC */
-                input_SendEventEsSelect( p_input, SPU_ES, -1 );
-            }
-            EsOutDel( out, es->pp_cc_es[i] );
-
-            es->pb_cc_present[i] = false;
-        }
+        EsDeleteCCChannels( out, es );
         EsDestroyDecoder( out, es );
     }
 
@@ -1965,6 +1985,46 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     }
 }
 
+static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i_bitmap,
+                                   const char *psz_descfmt, es_out_id_t *parent )
+{
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+
+    /* Only one type of captions is allowed ! */
+    if( parent->cc.type && parent->cc.type != codec )
+        return;
+
+    uint64_t i_existingbitmap = parent->cc.i_bitmap;
+    for( int i = 0; i_bitmap > 0; i++, i_bitmap >>= 1, i_existingbitmap >>= 1 )
+    {
+        es_format_t fmt;
+
+        if( (i_bitmap & 1) == 0 || (i_existingbitmap & 1) )
+            continue;
+
+        msg_Dbg( p_input, "Adding CC track %d for es[%d]", 1+i, parent->i_id );
+
+        es_format_Init( &fmt, SPU_ES, codec );
+        fmt.subs.cc.i_channel = i;
+        fmt.i_group = parent->fmt.i_group;
+        if( asprintf( &fmt.psz_description, psz_descfmt, 1 + i ) == -1 )
+            fmt.psz_description = NULL;
+
+        es_out_id_t **pp_es = &parent->cc.pp_es[i];
+        *pp_es = EsOutAddSlave( out, &fmt, parent );
+        es_format_Clean( &fmt );
+
+        /* */
+        parent->cc.i_bitmap |= (1ULL << i);
+        parent->cc.type = codec;
+
+        /* Enable if user specified on command line */
+        if (p_sys->sub.i_channel == i)
+            EsOutSelect(out, *pp_es, true);
+    }
+}
+
 /**
  * Send a block for the given es_out
  *
@@ -2060,33 +2120,11 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     /* Check CC status */
-    bool pb_cc[4];
+    decoder_cc_desc_t desc;
 
-    input_DecoderIsCcPresent( es->p_dec, pb_cc );
-    for( int i = 0; i < 4; i++ )
-    {
-        es_format_t fmt;
-
-        if(  es->pb_cc_present[i] || !pb_cc[i] )
-            continue;
-        msg_Dbg( p_input, "Adding CC track %d for es[%d]", 1+i, es->i_id );
-
-        es_format_Init( &fmt, SPU_ES, VLC_CODEC_CEA608 );
-        fmt.subs.cc.i_channel = i;
-        fmt.i_group = es->fmt.i_group;
-        if( asprintf( &fmt.psz_description,
-                      _("Closed captions %u"), 1 + i ) == -1 )
-            fmt.psz_description = NULL;
-        es->pp_cc_es[i] = EsOutAddSlave( out, &fmt, es );
-        es_format_Clean( &fmt );
-
-        /* */
-        es->pb_cc_present[i] = true;
-
-        /* Enable if user specified on command line */
-        if (p_sys->sub.i_channel == i)
-            EsOutSelect(out, es->pp_cc_es[i], true);
-    }
+    input_DecoderGetCcDesc( es->p_dec, &desc );
+    EsOutCreateCCChannels( out, VLC_CODEC_CEA608, desc.i_608_channels,
+                           _("Closed captions %u"), es );
 
     vlc_mutex_unlock( &p_sys->lock );
 
