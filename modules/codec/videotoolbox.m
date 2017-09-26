@@ -1477,18 +1477,20 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             case kVTVideoDecoderBadDataErr:
                 if (RestartVideoToolbox(p_dec, true) == VLC_SUCCESS)
                 {
-                    status = VTDecompressionSessionDecodeFrame(p_sys->session,
-                                    sampleBuffer, decoderFlags, p_info, &flagOut);
+                    /* Duplicate p_info since it is or will be freed by the
+                     * Decoder Callback */
+                    p_info = CreateReorderInfo(p_dec, p_block);
+                    if (likely(p_info))
+                        status = VTDecompressionSessionDecodeFrame(p_sys->session,
+                                        sampleBuffer, decoderFlags, p_info, &flagOut);
 
-                    if (status != 0)
-                    {
-                        free( p_info );
-                        b_abort = true;
-                    }
                 }
+                if (status != 0)
+                    b_abort = true;
                 break;
             case kVTInvalidSessionErr:
-                RestartVideoToolbox(p_dec, true);
+                if (RestartVideoToolbox(p_dec, true) != VLC_SUCCESS)
+                    b_abort = true;
                 break;
         }
         if (b_abort)
@@ -1590,8 +1592,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
     if (HandleVTStatus(p_dec, status) != VLC_SUCCESS)
     {
-        if (status == kVTVideoDecoderBadDataErr || status == -8969 )
-            p_info = NULL;
         if (status == kVTVideoDecoderMalfunctionErr)
             p_dec->p_sys->b_abort = true;
         msg_Warn(p_dec, "decoding of a frame failed (%i, %u)", (int)status,
