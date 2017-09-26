@@ -538,7 +538,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     }
     if (aout_FormatNbChannels(outfmt) == 0)
     {
-        msg_Warn (obj, "No ouput channel mask, cannot setup filters");
+        msg_Warn (obj, "No output channel mask, cannot setup filters");
         goto error;
     }
 
