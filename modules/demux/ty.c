@@ -166,7 +166,7 @@ typedef enum
 typedef struct
 {
     bool b_started;
-    int        i_data;
+    size_t     i_data;
     uint8_t    p_data[XDS_MAX_DATA_SIZE];
     int        i_sum;
 } xds_packet_t;
@@ -1116,10 +1116,10 @@ static void XdsExit( xds_t *h )
     free( h->meta.future.psz_name );
     free( h->meta.future.psz_rating );
 }
-static void XdsStringUtf8( char dst[2*32+1], const uint8_t *p_src, int i_src )
+static void XdsStringUtf8( char dst[2*32+1], const uint8_t *p_src, size_t i_src )
 {
-    int i_dst = 0;
-    for( int i = 0; i < i_src; i++ )
+    size_t i_dst = 0;
+    for( size_t i = 0; i < i_src; i++ )
     {
         switch( p_src[i] )
         {

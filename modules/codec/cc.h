@@ -56,7 +56,7 @@ typedef struct
      *  byte[x+1]: cc data 1
      *  byte[x+2]: cc data 2
      */
-    int     i_data;
+    size_t  i_data;
     uint8_t p_data[CC_MAX_DATA_SIZE];
 } cc_data_t;
 
