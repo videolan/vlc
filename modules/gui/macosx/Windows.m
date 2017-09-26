@@ -215,8 +215,6 @@
 
     BOOL b_video_view_was_hidden;
 
-    NSTimer *t_hide_mouse_timer;
-
     NSRect frameBeforeLionFullscreen;
 }
 
@@ -542,46 +540,6 @@
 }
 
 #pragma mark -
-#pragma mark Mouse cursor handling
-
-//  NSTimer selectors require this function signature as per Apple's docs
-- (void)hideMouseCursor:(NSTimer *)timer
-{
-    [NSCursor setHiddenUntilMouseMoves: YES];
-}
-
-- (void)recreateHideMouseTimer
-{
-    if (t_hide_mouse_timer != nil) {
-        [t_hide_mouse_timer invalidate];
-    }
-
-    t_hide_mouse_timer = [NSTimer scheduledTimerWithTimeInterval:2
-                                                          target:self
-                                                        selector:@selector(hideMouseCursor:)
-                                                        userInfo:nil
-                                                         repeats:NO];
-}
-
-//  Called automatically if window's acceptsMouseMovedEvents property is true
-- (void)mouseMoved:(NSEvent *)theEvent
-{
-    if (self.fullscreen)
-        [self recreateHideMouseTimer];
-    if (self.hasActiveVideo && [self isKeyWindow]) {
-        if (NSPointInRect([theEvent locationInWindow],
-                          [[self videoView] convertRect:[[self videoView] bounds]
-                                                 toView:nil])) {
-            [self recreateHideMouseTimer];
-        } else {
-            [t_hide_mouse_timer invalidate];
-        }
-    }
-
-    [super mouseMoved: theEvent];
-}
-
-#pragma mark -
 #pragma mark Key events
 
 - (void)flagsChanged:(NSEvent *)theEvent
@@ -690,9 +648,6 @@
             vlc_object_release(p_vout);
         }
     }
-
-    if ([self hasActiveVideo])
-        [[[VLCMain sharedInstance] mainWindow] recreateHideMouseTimer];
 
     if (_darkInterface) {
         [self.titlebarView setHidden:YES];
@@ -807,8 +762,6 @@
     if (self.controlsBar)
         [self.controlsBar setFullscreenState:YES];
     [[[[VLCMain sharedInstance] mainWindow] controlsBar] setFullscreenState:YES];
-
-    [[[VLCMain sharedInstance] mainWindow] recreateHideMouseTimer];
 
     if (blackout_other_displays)
         [screen blackoutOtherScreens];
