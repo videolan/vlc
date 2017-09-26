@@ -527,6 +527,8 @@ error:
 const CFStringRef kCGColorSpaceITUR_709 = CFSTR("kCGColorSpaceITUR_709");
 #endif
 
+#define OSX_EL_CAPITAN_AND_HIGHER (NSFoundationVersionNumber >= 1252)
+
 static int
 Open(vlc_object_t *obj, char const *psz_filter)
 {
@@ -549,8 +551,15 @@ Open(vlc_object_t *obj, char const *psz_filter)
         if (filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12
          && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA)
         {
+            if (!OSX_EL_CAPITAN_AND_HIGHER)
+                goto error;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
             ctx->color_space =
                 CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+#pragma clang diagnostic pop
+
             if (Open_AddConverters(filter, ctx))
                 goto error;
         }
