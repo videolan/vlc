@@ -878,6 +878,8 @@ static int DemuxInit( demux_t *p_demux )
         p_esp = NULL;
 
         tk = p_sys->track[p_sp->i_stream_number] = malloc( sizeof( asf_track_t ) );
+        if (!tk)
+            goto error;
         memset( tk, 0, sizeof( asf_track_t ) );
 
         tk->i_time = -1;
