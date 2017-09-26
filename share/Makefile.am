@@ -6,7 +6,7 @@ desktopdir = $(datadir)/applications
 if !HAVE_WIN32
 if !HAVE_DARWIN
 desktop_DATA = vlc.desktop
-appdatadir = $(datarootdir)/appdata
+appdatadir = $(datarootdir)/metainfo
 appdata_DATA = $(appdata_in_files:.xml.in=.xml)
 appdata_in_files = vlc.appdata.xml.in
 endif
