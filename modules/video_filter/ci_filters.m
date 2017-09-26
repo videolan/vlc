@@ -546,7 +546,8 @@ Open(vlc_object_t *obj, char const *psz_filter)
         if (!ctx)
             goto error;
 
-        if (filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12)
+        if (filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12
+         && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA)
         {
             ctx->color_space =
                 CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
