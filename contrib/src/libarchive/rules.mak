@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.3.1
+LIBARCHIVE_VERSION := 3.3.2
 LIBARCHIVE_URL := http://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
@@ -31,7 +31,7 @@ endif
 .libarchive: libarchive
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
 		--disable-bsdcpio --disable-bsdtar --disable-bsdcat \
-		--without-nettle \
+		--without-nettle --without-cng \
 		--without-xml2 --without-lzma --without-iconv --without-expat
 	cd $< && $(MAKE) install
 	touch $@
