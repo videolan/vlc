@@ -541,7 +541,7 @@ static int process_options( demux_t *p_demux )
                     */
                 msg_Err( p_demux,
                     "video size of 160x120 is actually disabled for lack of"
-                    "chroma support. It will relased ASAP, until then try "
+                    "chroma support. It will be released ASAP, until then try "
                     "an higher size (320x240 and 640x480 are fully supported)" );
                 free(psz_dup);
                 return VLC_EGENERIC;
