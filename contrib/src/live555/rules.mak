@@ -40,7 +40,6 @@ endif
 LIVE_EXTRA_CFLAGS := $(EXTRA_CFLAGS) -fexceptions $(CFLAGS)
 
 live555: $(LIVE555_FILE) .sum-live555
-	$(REQUIRE_GNUV3)
 	rm -Rf live && $(UNPACK)
 
 	# Change permissions to patch and sed the source
@@ -75,6 +74,7 @@ endif
 SUBDIRS=groupsock liveMedia UsageEnvironment BasicUsageEnvironment
 
 .live555: live555
+	$(REQUIRE_GNUV3)
 	cd $< && for subdir in $(SUBDIRS); do \
 		echo "PREFIX = $(PREFIX)" >> $$subdir/Makefile.head && \
 		echo "LIBDIR = $(PREFIX)/lib" >> $$subdir/Makefile.head ; done
