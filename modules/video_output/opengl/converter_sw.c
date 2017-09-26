@@ -605,8 +605,8 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         const unsigned char *ogl_version = tc->vt->GetString(GL_VERSION);
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
-        supports_map_persistent = glver_ok && has_pbo && has_bs && tc->vt->BufferStorage
-            && tc->vt->MapBufferRange && tc->vt->FlushMappedBufferRange
+        supports_map_persistent = glver_ok && has_pbo && has_bs && tc->gl->module
+            && tc->vt->BufferStorage && tc->vt->MapBufferRange && tc->vt->FlushMappedBufferRange
             && tc->vt->UnmapBuffer && tc->vt->FenceSync && tc->vt->DeleteSync
             && tc->vt->ClientWaitSync;
         if (supports_map_persistent)
