@@ -239,8 +239,9 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                               / p_sys->i_frame_length;
     if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
     {
-        /* low latency: 40 ms of buffering */
-        i_audiobuffer_size = i_audiobuffer_size / 25;
+        /* lower latency: 200 ms of buffering. XXX: Decrease when VLC's core
+         * can handle lower audio latency */
+        i_audiobuffer_size = i_audiobuffer_size / 5;
     }
     else
     {
