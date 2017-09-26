@@ -1668,7 +1668,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     static const D3D_DRIVER_TYPE driverAttempts[] = {
         D3D_DRIVER_TYPE_HARDWARE,
         D3D_DRIVER_TYPE_WARP,
-#ifndef NDEBUG
+#if 0 /* ifndef NDEBUG */
         D3D_DRIVER_TYPE_REFERENCE,
 #endif
     };
