@@ -398,7 +398,7 @@ static int Restart( stream_t *p_access )
     p_sys->i_start = p_sys->i_position;
 
     /* */
-    msg_Dbg( p_access, "stoping the stream" );
+    msg_Dbg( p_access, "stopping the stream" );
     Stop( p_access );
 
     /* */
