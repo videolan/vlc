@@ -436,7 +436,7 @@ static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
     uint16_t i_program_number;
     if ( !ATSC_TranslateVChannelToProgram( p_basectx->p_vct, p_eit->i_source_id, &i_program_number ) )
     {
-        msg_Warn( p_demux, "Received EIT for unkown channel %d", p_eit->i_source_id );
+        msg_Warn( p_demux, "Received EIT for unknown channel %d", p_eit->i_source_id );
         dvbpsi_atsc_DeleteEIT( p_eit );
         return;
     }
@@ -533,7 +533,7 @@ static void ATSC_ETT_Callback( void *p_pid, dvbpsi_atsc_ett_t *p_ett )
         uint16_t i_program_number;
         if ( !ATSC_TranslateVChannelToProgram( p_basectx->p_vct, i_vchannel_id, &i_program_number ) )
         {
-            msg_Warn( p_demux, "Received EIT for unkown channel %d", i_vchannel_id );
+            msg_Warn( p_demux, "Received EIT for unknown channel %d", i_vchannel_id );
             dvbpsi_atsc_DeleteETT( p_ett );
             return;
         }
