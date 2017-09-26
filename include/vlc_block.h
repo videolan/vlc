@@ -158,9 +158,9 @@ VLC_API block_t *block_TryRealloc(block_t *, ssize_t pre, size_t body) VLC_USED;
  *
  * @return the reallocated block on succes, NULL on error.
  *
- * @note Skipping leading bytes can be achieved directly by substracting from
+ * @note Skipping leading bytes can be achieved directly by subtracting from
  * block_t.i_buffer and adding block_t.p_buffer.
- * @note Discard trailing bytes can be achieved directly by substracting from
+ * @note Discard trailing bytes can be achieved directly by subtracting from
  * block_t.i_buffer.
  * @note On error, the block is discarded.
  * To avoid that, use block_TryRealloc() instead.
