@@ -135,6 +135,26 @@ then
 	echo "$HOST"
 fi
 
+echo -n "Packages licensing...    "
+if test -n "$GPL"
+then
+	if test -n "$GNUV3"
+	then
+		LICENSE="GPL version 3"
+	else
+		LICENSE="GPL version 2"
+	fi
+else
+	if test -n "$GNUV3"
+	then
+		LICENSE="Lesser GPL version 3"
+	else
+		LICENSE="Lesser GPL version 2.1"
+	fi
+fi
+test -z "$AD_CLAUSES" || LICENSE="$LICENSE, with advertisement clauses"
+echo "$LICENSE"
+
 if test "$PREFIX"
 then
 	# strip trailing slash
