@@ -487,6 +487,9 @@ error:
     if (sys->playerObject) {
         Destroy(sys->playerObject);
         sys->playerObject = NULL;
+        sys->playerBufferQueue = NULL;
+        sys->volumeItf = NULL;
+        sys->playerPlay = NULL;
     }
 
     return VLC_EGENERIC;
