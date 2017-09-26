@@ -145,7 +145,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             }
             case VOUT_WINDOW_HIDE_MOUSE:
             {
-                [NSCursor setHiddenUntilMouseMoves:YES];
+                [voutController hideMouseForWindow:p_wnd];
                 break;
             }
             default:
@@ -212,6 +212,25 @@ void WindowClose(vout_window_t *p_wnd)
 
     if (var_InheritBool(getIntf(), "macosx-dim-keyboard")) {
         [keyboardBacklight switchLightsInstantly:YES];
+    }
+}
+
+#pragma mark -
+#pragma mark Mouse hiding
+
+- (void)hideMouseForWindow:(vout_window_t *)p_wnd
+{
+    VLCVideoWindowCommon *o_current_window = nil;
+    if (p_wnd)
+        o_current_window = [voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
+    
+    if (o_current_window == nil)
+        return;
+    
+    if (NSPointInRect([o_current_window mouseLocationOutsideOfEventStream],
+                      [[o_current_window videoView] convertRect:[[o_current_window videoView] bounds]
+                                                         toView:nil])) {
+        [NSCursor setHiddenUntilMouseMoves:YES];
     }
 }
 
