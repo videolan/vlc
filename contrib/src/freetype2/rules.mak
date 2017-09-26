@@ -3,9 +3,7 @@
 FREETYPE2_VERSION := 2.7.1
 FREETYPE2_URL := $(SF)/freetype/freetype2/$(FREETYPE2_VERSION)/freetype-$(FREETYPE2_VERSION).tar.gz
 
-ifdef GPL
 PKGS += freetype2
-endif
 ifeq ($(call need_pkg,"freetype2"),)
 PKGS_FOUND += freetype2
 endif
@@ -23,7 +21,9 @@ freetype: freetype-$(FREETYPE2_VERSION).tar.gz .sum-freetype2
 DEPS_freetype2 = zlib $(DEPS_zlib)
 
 .freetype2: freetype
+ifndef AD_CLAUSES
 	$(REQUIRE_GPL)
+endif
 	cd $< && cp builds/unix/install-sh .
 	sed -i.orig s/-ansi// $</builds/unix/configure
 	cd $< && GNUMAKE=$(MAKE) $(HOSTVARS) ./configure --with-harfbuzz=no --with-zlib=yes --without-png --with-bzip2=no $(HOSTCONF)
