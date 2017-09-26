@@ -482,13 +482,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 for( int j = 0; j < MAX_ASF_TRACKS ; j++ )
                 {
                     tk = p_sys->track[j];
-                    if( !tk->p_fmt || tk->i_cat != -1 * i )
+                    if( !tk || !tk->p_fmt || tk->i_cat != -1 * i )
                         continue;
-                    if( tk )
-                    {
-                        FlushQueue( tk );
-                        tk->i_time = -1;
-                    }
+                    FlushQueue( tk );
+                    tk->i_time = -1;
                 }
             }
 
