@@ -124,6 +124,11 @@ export USE_FFMPEG=1
 
 # The following symbols do not exist on the minimal macOS version (10.7), so they are disabled
 # here. This allows compilation also with newer macOS SDKs.
+# Added symbols in 10.13
+export ac_cv_func_open_wmemstream=no
+export ac_cv_func_fmemopen=no
+export ac_cv_func_open_memstream=no
+
 # Added symbols between 10.11 and 10.12
 export ac_cv_func_basename_r=no
 export ac_cv_func_clock_getres=no
