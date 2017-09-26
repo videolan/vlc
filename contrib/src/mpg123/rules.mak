@@ -1,5 +1,5 @@
 # mpg123
-MPG123_VERSION := 1.23.8
+MPG123_VERSION := 1.25.7
 MPG123_URL := $(SF)/mpg123/mpg123/$(MPG123_VERSION)/mpg123-$(MPG123_VERSION).tar.bz2
 
 PKGS += mpg123
@@ -8,7 +8,7 @@ PKGS_FOUND += mpg123
 endif
 
 MPG123CONF = $(HOSTCONF)
-MPG123CONF += --with-default-audio=dummy --enable-buffer=no
+MPG123CONF += --with-default-audio=dummy --enable-buffer=no --enable-modules=no
 
 ifdef HAVE_ANDROID
 ifeq ($(ANDROID_ABI), armeabi-v7a)
