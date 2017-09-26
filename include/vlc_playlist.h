@@ -302,7 +302,7 @@ VLC_API void playlist_Deactivate( playlist_t * );
  * \param b_locked TRUE if playlist is locked when entering this function
  * \param variable number of arguments
  */
-VLC_API void playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked, ...  );
+VLC_API void playlist_Control( playlist_t *p_playlist, int i_query, int b_locked, ...  );
 
 static inline void playlist_ViewPlay(playlist_t *pl, playlist_item_t *node,
                                      playlist_item_t *item)

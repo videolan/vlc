@@ -138,11 +138,11 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query,
     PL_UNLOCK_IF( !locked );
 }
 
-void playlist_Control( playlist_t *p_playlist, int query, bool locked, ... )
+void playlist_Control( playlist_t *p_playlist, int query, int locked, ... )
 {
     va_list args;
 
     va_start( args, locked );
-    playlist_vaControl( p_playlist, query, locked, args );
+    playlist_vaControl( p_playlist, query, (bool)locked, args );
     va_end( args );
 }
