@@ -418,12 +418,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 return VLC_SUCCESS;
             }
 
-            case VOUT_DISPLAY_HIDE_MOUSE: /* FIXME: dead code */
-            {
-                [NSCursor setHiddenUntilMouseMoves: YES];
-                return VLC_SUCCESS;
-            }
-
             case VOUT_DISPLAY_CHANGE_VIEWPOINT:
                 return vout_display_opengl_SetViewpoint (sys->vgl,
                     &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
