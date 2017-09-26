@@ -593,7 +593,7 @@ bool intf_sys_t::handleMessages()
             i_payloadSize = U32_AT( p_packet );
             if ( i_payloadSize > PACKET_MAX_LEN - PACKET_HEADER_LEN )
             {
-                msg_Err( m_module, "Payload size is too long: dropping conection" );
+                msg_Err( m_module, "Payload size is too long: dropping connection" );
                 vlc_mutex_locker locker(&m_lock);
                 m_state = Dead;
                 return false;
