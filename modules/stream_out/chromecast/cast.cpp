@@ -447,7 +447,7 @@ static int Open(vlc_object_t *p_this)
     }
     catch (const std::runtime_error& err )
     {
-        msg_Err( p_this, "cannot load the Chromecast controler (%s)", err.what() );
+        msg_Err( p_this, "cannot load the Chromecast controller (%s)", err.what() );
         goto error;
     }
     catch (const std::bad_alloc& )
