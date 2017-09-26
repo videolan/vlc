@@ -72,6 +72,7 @@
 struct picture_sys_t
 {
     vlc_gl_t    *gl;
+    PFNGLDELETEBUFFERSPROC DeleteBuffers;
     GLuint      buffers[PICTURE_PLANE_MAX];
     size_t      bytes[PICTURE_PLANE_MAX];
     GLsync      fence;
@@ -98,34 +99,47 @@ pbo_picture_destroy(picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
 
-    /* Don't call glDeleteBuffers() here, since a picture can be destroyed from
-     * any threads after the vout is destroyed. Instead, release the reference
-     * to the GL context. All buffers will be destroyed when it reaches 0. */
-    vlc_gl_Release(picsys->gl);
+    if (picsys->gl)
+    {
+        /* Don't call glDeleteBuffers() here, since a picture can be destroyed
+         * from any threads after the vout is destroyed. Instead, release the
+         * reference to the GL context. All buffers will be destroyed when it
+         * reaches 0. */
+        vlc_gl_Release(picsys->gl);
+    }
+    else
+        picsys->DeleteBuffers(pic->i_planes, picsys->buffers);
+
     free(picsys);
     free(pic);
 }
 
 static picture_t *
-pbo_picture_create(const opengl_tex_converter_t *tc)
+pbo_picture_create(const opengl_tex_converter_t *tc, bool direct_rendering)
 {
     picture_sys_t *picsys = calloc(1, sizeof(*picsys));
     if (unlikely(picsys == NULL))
         return NULL;
-    picsys->gl = tc->gl;
 
     picture_resource_t rsc = {
         .p_sys = picsys,
         .pf_destroy = pbo_picture_destroy,
     };
-
     picture_t *pic = picture_NewFromResource(&tc->fmt, &rsc);
     if (pic == NULL)
     {
         free(picsys);
         return NULL;
     }
-    vlc_gl_Hold(picsys->gl);
+
+    tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
+    picsys->DeleteBuffers = tc->vt->DeleteBuffers;
+
+    if (direct_rendering)
+    {
+        picsys->gl = tc->gl;
+        vlc_gl_Hold(picsys->gl);
+    }
     if (picture_Setup(pic, &tc->fmt))
     {
         picture_Release(pic);
@@ -153,7 +167,6 @@ pbo_data_alloc(const opengl_tex_converter_t *tc, picture_t *pic)
     picture_sys_t *picsys = pic->p_sys;
 
     tc->vt->GetError();
-    tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
 
     for (int i = 0; i < pic->i_planes; ++i)
     {
@@ -177,7 +190,7 @@ pbo_pics_alloc(const opengl_tex_converter_t *tc)
     struct priv *priv = tc->priv;
     for (size_t i = 0; i < PBO_DISPLAY_COUNT; ++i)
     {
-        picture_t *pic = priv->pbo.display_pics[i] = pbo_picture_create(tc);
+        picture_t *pic = priv->pbo.display_pics[i] = pbo_picture_create(tc, false);
         if (pic == NULL)
             goto error;
 
@@ -234,8 +247,6 @@ static int
 persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
-
-    tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
 
     const GLbitfield access = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT |
                               GL_MAP_PERSISTENT_BIT;
@@ -377,8 +388,7 @@ tc_persistent_get_pool(const opengl_tex_converter_t *tc, unsigned requested_coun
 
     for (count = 0; count < requested_count; count++)
     {
-        picture_t *pic = pictures[count] =
-            pbo_picture_create(tc);
+        picture_t *pic = pictures[count] = pbo_picture_create(tc, true);
         if (pic == NULL)
             break;
 #ifndef NDEBUG
