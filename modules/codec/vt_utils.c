@@ -209,6 +209,7 @@ cvpxpool_create(const video_format_t *fmt, unsigned count)
             break;
         case VLC_CODEC_CVPX_BGRA:
             cvpx_format = kCVPixelFormatType_32BGRA;
+            break;
         default:
             return NULL;
     }
