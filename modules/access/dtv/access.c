@@ -183,7 +183,7 @@ static const char *const polarization_user[] = { N_("Unspecified (0V)"),
 #define LNB_LOW_TEXT N_("Local oscillator low frequency (kHz)")
 #define LNB_HIGH_TEXT N_("Local oscillator high frequency (kHz)")
 #define LNB_LONGTEXT N_( \
-    "The downconverter (LNB) will substract the local oscillator frequency " \
+    "The downconverter (LNB) will subtract the local oscillator frequency " \
     "from the satellite transmission frequency. " \
     "The intermediate frequency (IF) on the RF cable is the result.")
 #define LNB_SWITCH_TEXT N_("Universal LNB switch frequency (kHz)")
