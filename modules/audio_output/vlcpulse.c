@@ -256,7 +256,7 @@ mtime_t vlc_pa_get_latency(vlc_object_t *obj, pa_context *ctx, pa_stream *s)
      * when the write index of a playback stream is behind its read index.
      * playback streams. So use the lower-level pa_stream_get_timing_info()
      * directly to obtain the correct write index and convert it to a time,
-     * and compute the correct latency value by substracting the stream (read)
+     * and compute the correct latency value by subtracting the stream (read)
      * time.
      *
      * On the read side, pa_stream_get_time() is used instead of
