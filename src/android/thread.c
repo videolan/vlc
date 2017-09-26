@@ -159,7 +159,7 @@ struct vlc_thread
     bool killable;
 };
 
-static __thread struct vlc_thread *thread = NULL;
+static thread_local struct vlc_thread *thread = NULL;
 
 vlc_thread_t vlc_thread_self (void)
 {
