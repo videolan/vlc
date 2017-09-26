@@ -3,7 +3,11 @@
 ARIBB24_VERSION := 1.0.3
 ARIBB24_URL := https://github.com/nkoriyama/aribb24/archive/v$(ARIBB24_VERSION).tar.gz
 
+ifdef GPL
+ifdef GNUV3
 PKGS += aribb24
+endif
+endif
 ifeq ($(call need_pkg,"aribb24"),)
 PKGS_FOUND += aribb24
 endif
@@ -22,6 +26,8 @@ aribb24: aribb24-$(ARIBB24_VERSION).tar.gz .sum-aribb24
 DEPS_aribb24 = png
 
 .aribb24: aribb24
+	$(REQUIRE_GPL)
+	$(REQUIRE_GNUV3)
 	cd $< && $(SHELL) ./bootstrap
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) && $(MAKE) install
