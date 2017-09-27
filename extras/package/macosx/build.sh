@@ -128,6 +128,8 @@ export USE_FFMPEG=1
 export ac_cv_func_open_wmemstream=no
 export ac_cv_func_fmemopen=no
 export ac_cv_func_open_memstream=no
+export ac_cv_func_futimens=no
+export ac_cv_func_utimensat=no
 
 # Added symbols between 10.11 and 10.12
 export ac_cv_func_basename_r=no
