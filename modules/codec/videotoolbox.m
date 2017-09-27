@@ -105,7 +105,8 @@ static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef, void *, size_t);
 static CFMutableDictionaryRef H264ExtradataInfoCreate(const struct hxxx_helper *hh);
 static int HandleVTStatus(decoder_t *, OSStatus, enum vtsession_status *);
 static int DecodeBlock(decoder_t *, block_t *);
-static void Flush(decoder_t *);
+static void RequestFlush(decoder_t *);
+static void Drain(decoder_t *p_dec, bool flush);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
 static BOOL deviceSupportsAdvancedProfiles();
@@ -847,6 +848,8 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
 
     if (p_sys->session != nil)
     {
+        Drain(p_dec, true);
+
         VTDecompressionSessionInvalidate(p_sys->session);
         CFRelease(p_sys->session);
         p_sys->session = nil;
@@ -856,7 +859,6 @@ static void StopVideoToolbox(decoder_t *p_dec, bool b_reset_format)
             p_sys->b_format_propagated = false;
             p_dec->fmt_out.i_codec = 0;
         }
-        DrainDPB(p_dec, true);
     }
 
     if (p_sys->videoFormatDescription != nil) {
@@ -1020,7 +1022,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     } /* else: late opening */
 
     p_dec->pf_decode = DecodeBlock;
-    p_dec->pf_flush  = Flush;
+    p_dec->pf_flush  = RequestFlush;
 
     msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'", (char *)&p_dec->fmt_in.i_codec);
 
@@ -1363,7 +1365,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
 
 #pragma mark - actual decoding
 
-static void Flush(decoder_t *p_dec)
+static void RequestFlush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1375,7 +1377,7 @@ static void Flush(decoder_t *p_dec)
     vlc_mutex_unlock(&p_sys->lock);
 }
 
-static void Drain(decoder_t *p_dec)
+static void Drain(decoder_t *p_dec, bool flush)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1384,7 +1386,8 @@ static void Drain(decoder_t *p_dec)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
-    DrainDPB(p_dec, false);
+    DrainDPB(p_dec, flush);
+    p_sys->b_vt_flush = false;
     vlc_mutex_unlock(&p_sys->lock);
 }
 
@@ -1397,12 +1400,11 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     if (p_block == NULL)
     {
-        Drain(p_dec);
+        Drain(p_dec, false);
         return VLCDEC_SUCCESS;
     }
 
     vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_vt_flush = false;
 
     if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART)
     {
@@ -1430,7 +1432,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     {
         if (p_sys->b_vt_feed)
         {
-            Drain(p_dec);
+            Drain(p_dec, false);
             RestartVideoToolbox(p_dec, false);
         }
         goto skip;
@@ -1457,7 +1459,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             if (p_sys->session)
             {
                 msg_Dbg(p_dec, "SPS/PPS changed: draining H264 decoder");
-                Drain(p_dec);
+                Drain(p_dec, false);
                 msg_Dbg(p_dec, "SPS/PPS changed: restarting H264 decoder");
                 StopVideoToolbox(p_dec, true);
             }
@@ -1502,7 +1504,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     {
         p_sys->b_vt_feed = true;
         if( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE )
-            Drain( p_dec );
+            Drain( p_dec, false );
     }
     else
     {
