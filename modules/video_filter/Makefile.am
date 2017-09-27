@@ -110,6 +110,7 @@ video_filter_LTLIBRARIES = \
 # macOS / iOS hardware video filters
 libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
 if HAVE_OSX
+libci_filters_plugin_la_OBJCFLAGS = $(AM_CFLAGS) -mmacosx-version-min=10.11
 libci_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)' \
 	-Wl,-framework,Foundation -Wl,-framework,CoreGraphics -Wl,-framework,CoreImage -Wl,-framework,CoreVideo
 video_filter_LTLIBRARIES += libci_filters_plugin.la
