@@ -534,6 +534,17 @@ Open(vlc_object_t *obj, char const *psz_filter)
 {
     filter_t *filter = (filter_t *)obj;
 
+    switch (filter->fmt_in.video.i_chroma)
+    {
+        case VLC_CODEC_CVPX_NV12:
+        case VLC_CODEC_CVPX_UYVY:
+        case VLC_CODEC_CVPX_I420:
+        case VLC_CODEC_CVPX_BGRA:
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+
     filter->p_sys = calloc(1, sizeof(filter_sys_t));
     if (!filter->p_sys)
         return VLC_ENOMEM;
