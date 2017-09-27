@@ -213,7 +213,7 @@ void PredictiveAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
                     streams.erase(it);
             }
             vlc_mutex_unlock(&lock);
-            BwDebug(msg_Info(p_obj, "Stream %s is now known %sactive",
+            BwDebug(msg_Info(p_obj, "Stream %s is now known %sactive", id.str().c_str(),
                              (event.u.buffering.enabled) ? "" : "in"));
         }
         break;
