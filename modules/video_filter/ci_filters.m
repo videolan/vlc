@@ -527,7 +527,11 @@ error:
 const CFStringRef kCGColorSpaceITUR_709 = CFSTR("kCGColorSpaceITUR_709");
 #endif
 
-#define OSX_EL_CAPITAN_AND_HIGHER (NSFoundationVersionNumber >= 1252)
+#if TARGET_OS_IPHONE
+# define CI_HANDLE_COLORSPACES (NSFoundationVersionNumber >= 1240)
+#else
+# define CI_HANDLE_COLORSPACES (NSFoundationVersionNumber >= 1252)
+#endif
 
 static int
 Open(vlc_object_t *obj, char const *psz_filter)
@@ -540,6 +544,11 @@ Open(vlc_object_t *obj, char const *psz_filter)
         case VLC_CODEC_CVPX_UYVY:
         case VLC_CODEC_CVPX_I420:
         case VLC_CODEC_CVPX_BGRA:
+            if (!CI_HANDLE_COLORSPACES)
+            {
+                msg_Warn(obj, "iOS/macOS version is too old, aborting...");
+                return VLC_EGENERIC;
+            }
             break;
         default:
             return VLC_EGENERIC;
@@ -560,20 +569,14 @@ Open(vlc_object_t *obj, char const *psz_filter)
             goto error;
 
         if (filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12
-         && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA)
-        {
-            if (!OSX_EL_CAPITAN_AND_HIGHER)
-                goto error;
+         && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA
+         && Open_AddConverters(filter, ctx))
+            goto error;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-            ctx->color_space =
-                CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+        ctx->color_space = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
 #pragma clang diagnostic pop
-
-            if (Open_AddConverters(filter, ctx))
-                goto error;
-        }
 
 #if !TARGET_OS_IPHONE
         CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
