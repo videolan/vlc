@@ -1599,6 +1599,12 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         goto end;
     }
     assert(imageBuffer);
+    if (unlikely(!imageBuffer))
+    {
+        msg_Err(p_dec, "critical: null imageBuffer with a valid status");
+        p_dec->p_sys->b_abort = true;
+        goto end;
+    }
 
     if (p_dec->p_sys->b_abort)
         goto end;
