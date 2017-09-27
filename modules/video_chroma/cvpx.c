@@ -196,6 +196,8 @@ static int Open(vlc_object_t *obj)
             break;
         CASE_CVPX_INPUT(I420)
             break;
+        CASE_CVPX_INPUT(BGRA)
+            break;
         default:
             switch (p_filter->fmt_out.video.i_chroma)
             {
@@ -204,6 +206,8 @@ static int Open(vlc_object_t *obj)
                 CASE_CVPX_OUTPUT(UYVY)
                     break;
                 CASE_CVPX_OUTPUT(I420)
+                    break;
+                CASE_CVPX_OUTPUT(BGRA)
                     break;
                 default:
                     return VLC_EGENERIC;
