@@ -1,0 +1,9 @@
+--- mpg123/libmpg123.pc.in	2017-09-27 09:52:17.532298223 +0200
++++ mpg123/libmpg123.pc.in.new	2017-09-27 09:53:18.236300149 +0200
+@@ -7,5 +7,5 @@
+ Description: An optimised MPEG Audio decoder
+ Requires: 
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lmpg123 @LIBM@
++Libs: -L${libdir} -lmpg123 @LIBM@ -lshlwapi
+ Cflags: -I${includedir} 
