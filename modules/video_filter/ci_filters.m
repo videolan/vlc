@@ -338,7 +338,14 @@ Filter(filter_t *filter, picture_t *src)
             ci_img = [fchain->ci_filter valueForKey: kCIOutputImageKey];
         }
 
-        [ctx->ci_ctx render: ci_img toCVPixelBuffer: cvpx];
+        [ctx->ci_ctx render: ci_img
+#if !TARGET_OS_IPHONE
+                toIOSurface: CVPixelBufferGetIOSurface(cvpx)
+#else
+            toCVPixelBuffer: cvpx
+#endif
+                     bounds: [ci_img extent]
+                 colorSpace: ctx->color_space];
     } /* autoreleasepool */
 
     CopyInfoAndRelease(dst, src);
@@ -516,6 +523,12 @@ error:
     return VLC_EGENERIC;
 }
 
+#if MAC_OS_X_VERSION_MIN_ALLOWED <= MAC_OS_X_VERSION_10_11
+const CFStringRef kCGColorSpaceITUR_709 = CFSTR("kCGColorSpaceITUR_709");
+#endif
+
+#define OSX_EL_CAPITAN_AND_HIGHER (NSFoundationVersionNumber >= 1252)
+
 static int
 Open(vlc_object_t *obj, char const *psz_filter)
 {
@@ -547,9 +560,20 @@ Open(vlc_object_t *obj, char const *psz_filter)
             goto error;
 
         if (filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12
-         && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA
-         && Open_AddConverters(filter, ctx))
+         && filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_BGRA)
+        {
+            if (!OSX_EL_CAPITAN_AND_HIGHER)
                 goto error;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+            ctx->color_space =
+                CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+#pragma clang diagnostic pop
+
+            if (Open_AddConverters(filter, ctx))
+                goto error;
+        }
 
 #if !TARGET_OS_IPHONE
         CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
