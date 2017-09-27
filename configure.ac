@@ -3884,6 +3884,11 @@ AS_IF([test "${enable_lirc}" = "yes"], [
 ])
 AM_CONDITIONAL([HAVE_LIRC], [test "${have_lirc}" = "yes"])
 
+dnl
+dnl  SRT plugin
+dnl
+PKG_ENABLE_MODULES_VLC([SRT], [access_srt], [srt >= 1.2.0], [SRT input plugin], [auto])
+
 EXTEND_HELP_STRING([Visualisations and Video filter plugins:])
 dnl
 dnl  goom visualization plugin

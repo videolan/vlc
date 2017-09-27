@@ -60,6 +60,7 @@ Access:
  * Improvements on DVB scanning
  * BluRay module can open ISO over network and has full BD-J support
  * Support for DVD ISO over network
+ * New SRT access module using libsrt
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL

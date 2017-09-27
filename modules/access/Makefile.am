@@ -417,3 +417,12 @@ libaccess_mtp_plugin_la_LIBADD = $(MTP_LIBS)
 libaccess_mtp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_mtp)
 EXTRA_LTLIBRARIES += libaccess_mtp_plugin.la
+
+### SRT ###
+
+libaccess_srt_plugin_la_SOURCES = access/srt.c
+libaccess_srt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SRT_CPPFLAGS)
+libaccess_srt_plugin_la_LIBADD = $(SRT_LIBS)
+libaccess_srt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
+access_LTLIBRARIES += $(LTLIBaccess_srt)
+EXTRA_LTLIBRARIES += libaccess_srt_plugin.la
