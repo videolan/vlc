@@ -6,6 +6,7 @@ libstream_out_delay_plugin_la_SOURCES = stream_out/delay.c
 libstream_out_stats_plugin_la_SOURCES = stream_out/stats.c
 libstream_out_description_plugin_la_SOURCES = stream_out/description.c
 libstream_out_standard_plugin_la_SOURCES = stream_out/standard.c
+libstream_out_standard_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_access_output_srt)
 libstream_out_standard_plugin_la_LIBADD = $(SOCKET_LIBS)
 libstream_out_duplicate_plugin_la_SOURCES = stream_out/duplicate.c
 libstream_out_es_plugin_la_SOURCES = stream_out/es.c
