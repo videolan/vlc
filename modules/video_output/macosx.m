@@ -78,6 +78,7 @@ vlc_module_begin ()
     set_capability ("vout display", 300)
     set_callbacks (Open, Close)
     add_shortcut ("macosx", "vout_macosx")
+    add_glconv ()
 vlc_module_end ()
 
 /**
