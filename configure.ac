@@ -3887,7 +3887,7 @@ AM_CONDITIONAL([HAVE_LIRC], [test "${have_lirc}" = "yes"])
 dnl
 dnl  SRT plugin
 dnl
-PKG_ENABLE_MODULES_VLC([SRT], [access_srt], [srt >= 1.2.0], [SRT input plugin], [auto])
+PKG_ENABLE_MODULES_VLC([SRT], [access_srt access_output_srt], [srt >= 1.2.0], [SRT input/output plugin], [auto])
 
 EXTEND_HELP_STRING([Visualisations and Video filter plugins:])
 dnl
