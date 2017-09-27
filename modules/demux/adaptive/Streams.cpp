@@ -306,7 +306,8 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
         setDisabled(true);
         segmentTracker->reset();
         commandsqueue->Abort(false);
-        msg_Dbg(p_realdemux, "deactivating stream %s", format.str().c_str());
+        msg_Dbg(p_realdemux, "deactivating %s stream %s",
+                format.str().c_str(), description.c_str());
         vlc_mutex_unlock(&lock);
         return AbstractStream::buffering_end;
     }
