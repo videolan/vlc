@@ -214,7 +214,7 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
         info->setTimescale(Integer<uint64_t>(node->getAttributeValue("timescale")));
 
     if(node->hasAttribute("id"))
-        info->setID(node->getAttributeValue("id"));
+        info->setID(ID(node->getAttributeValue("id")));
     else
         info->setID(ID((*nextid)++));
 

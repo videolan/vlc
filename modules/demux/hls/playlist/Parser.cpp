@@ -443,6 +443,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
         }
 
         /* Finally add all groups */
+        unsigned set_id = 1;
         std::map<std::string, AttributesTag *>::const_iterator groupsit;
         for(groupsit = groupsmap.begin(); groupsit != groupsmap.end(); ++groupsit)
         {
@@ -456,8 +457,22 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                     altAdaptSet->addRepresentation(rep);
                 }
 
+                std::string desc;
+                if(pair.second->getAttributeByName("GROUP-ID"))
+                    desc = pair.second->getAttributeByName("GROUP-ID")->quotedString();
                 if(pair.second->getAttributeByName("NAME"))
-                   altAdaptSet->description.Set(pair.second->getAttributeByName("NAME")->quotedString());
+                {
+                    if(!desc.empty())
+                        desc += " ";
+                    desc += pair.second->getAttributeByName("NAME")->quotedString();
+                }
+
+                if(!desc.empty())
+                {
+                    altAdaptSet->description.Set(desc);
+                    altAdaptSet->setID(ID(desc));
+                }
+                else altAdaptSet->setID(ID(set_id++));
 
                 /* Subtitles unsupported for now */
                 if(pair.second->getAttributeByName("TYPE")->value != "AUDIO" &&
