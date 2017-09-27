@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G24b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="17A365" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -48,7 +48,7 @@
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
-                                                        <tableColumn width="60" minWidth="40" maxWidth="1000" id="1UD-vH-uqq">
+                                                        <tableColumn identifier="" width="60" minWidth="40" maxWidth="1000" id="1UD-vH-uqq">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Type">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -73,7 +73,7 @@
                                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                             <connections>
-                                                                                <binding destination="9bi-ti-5pD" name="value" keyPath="objectValue.type" id="K3E-xf-XY7"/>
+                                                                                <binding destination="9bi-ti-5pD" name="value" keyPath="objectValue.typeName" id="jag-ra-88G"/>
                                                                             </connections>
                                                                         </textField>
                                                                     </subviews>
@@ -88,7 +88,7 @@
                                                                 </tableCellView>
                                                             </prototypeCellViews>
                                                         </tableColumn>
-                                                        <tableColumn width="90" minWidth="40" maxWidth="1000" id="ybR-8n-0YS">
+                                                        <tableColumn identifier="" width="90" minWidth="40" maxWidth="1000" id="ybR-8n-0YS">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Component">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -145,7 +145,7 @@
                                                                     <rect key="frame" x="157" y="1" width="321" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hdT-qU-xRy">
+                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" allowsExpansionToolTips="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hdT-qU-xRy">
                                                                             <rect key="frame" x="0.0" y="-9" width="321" height="35"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" placeholderString="" usesSingleLineMode="YES" id="ed5-yc-Kp5">
                                                                                 <font key="font" metaFont="system"/>
@@ -212,7 +212,7 @@ It can even span multiple lines</string>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
-                                            <binding destination="0Or-bh-QJU" name="value" keyPath="selection.type" id="qUO-gT-OT1">
+                                            <binding destination="0Or-bh-QJU" name="value" keyPath="selection.typeName" id="gwS-Dq-GX6">
                                                 <dictionary key="options">
                                                     <string key="NSNoSelectionPlaceholder" base64-UTF8="YES">
 IA
@@ -229,7 +229,7 @@ IA
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
-                                            <binding destination="0Or-bh-QJU" name="value" keyPath="selection.position" id="l9O-cX-idn">
+                                            <binding destination="0Or-bh-QJU" name="value" keyPath="selection.location" id="vqO-9x-c2s">
                                                 <dictionary key="options">
                                                     <string key="NSNoSelectionPlaceholder" base64-UTF8="YES">
 IA
@@ -295,7 +295,7 @@ IA
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
-                                            <binding destination="0Or-bh-QJU" name="value" keyPath="selection.func" id="7hC-0w-bVD">
+                                            <binding destination="0Or-bh-QJU" name="value" keyPath="selection.function" id="ENe-8J-RIM">
                                                 <dictionary key="options">
                                                     <string key="NSNoSelectionPlaceholder" base64-UTF8="YES">
 IA
@@ -443,13 +443,7 @@ IA
             </toolbar>
             <point key="canvasLocation" x="139" y="192"/>
         </window>
-        <arrayController editable="NO" selectsInsertedObjects="NO" id="0Or-bh-QJU">
-            <declaredKeys>
-                <string>component</string>
-                <string>message</string>
-                <string>type</string>
-                <string>image</string>
-            </declaredKeys>
+        <arrayController objectClassName="VLCLogMessage" editable="NO" selectsInsertedObjects="NO" id="0Or-bh-QJU">
             <connections>
                 <binding destination="-2" name="contentArray" keyPath="self.messagesArray" id="nWK-kZ-4HF"/>
             </connections>

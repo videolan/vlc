@@ -71,6 +71,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCAudioEffectsWindowController.h gui/macosx/VLCAudioEffectsWindowController.m \
 	gui/macosx/VLCBookmarksWindowController.h gui/macosx/VLCBookmarksWindowController.m \
 	gui/macosx/VLCCoreDialogProvider.h gui/macosx/VLCCoreDialogProvider.m \
+	gui/macosx/VLCLogMessage.h gui/macosx/VLCLogMessage.m \
 	gui/macosx/VLCLogWindowController.h gui/macosx/VLCLogWindowController.m \
 	gui/macosx/VLCHUDSliderCell.h gui/macosx/VLCHUDSliderCell.m \
 	gui/macosx/VLCHUDButtonCell.h gui/macosx/VLCHUDButtonCell.m \

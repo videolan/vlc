@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #import "VLCLogWindowController.h"
+#import "VLCLogMessage.h"
 #import "VLCMain.h"
 #import <vlc_common.h>
 
@@ -42,7 +43,7 @@
  */
 @property (retain) NSTimer        *refreshTimer;
 
-- (void)addMessage:(NSDictionary *)message;
+- (void)addMessage:(VLCLogMessage *)message;
 
 @end
 
@@ -56,27 +57,14 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     @autoreleasepool {
         char *msg;
         VLCLogWindowController *controller = (__bridge VLCLogWindowController*)data;
-        static NSString *types[4] = { @"info", @"error", @"warning", @"debug" };
 
         if (vasprintf(&msg, format, ap) == -1) {
             return;
         }
-
-        if (!item->psz_module || !msg) {
-            free(msg);
-            return;
-        }
-
-        NSString *position = [NSString stringWithFormat:@"%s:%i", item->file, item->line];
-
-        NSDictionary *messageDict = @{
-                                      @"type"       : types[type],
-                                      @"message"    : toNSStr(msg),
-                                      @"component"  : toNSStr(item->psz_module),
-                                      @"position"   : position,
-                                      @"func"       : toNSStr(item->func)
-                                      };
-        [controller addMessage:messageDict];
+        
+        [controller addMessage:[VLCLogMessage logMessage:msg
+                                                    type:type
+                                                    info:item]];
         free(msg);
     }
 }
@@ -175,16 +163,16 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         colors = @{
-                   @"info"     : [NSColor colorWithCalibratedRed:0.65 green:0.91 blue:1.0 alpha:0.7],
-                   @"error"    : [NSColor colorWithCalibratedRed:1.0 green:0.49 blue:0.45 alpha:0.5],
-                   @"warning"  : [NSColor colorWithCalibratedRed:1.0 green:0.88 blue:0.45 alpha:0.7],
-                   @"debug"    : [NSColor colorWithCalibratedRed:0.96 green:0.96 blue:0.96 alpha:0.5]
+                   @(VLC_MSG_INFO): [NSColor colorWithCalibratedRed:0.65 green:0.91 blue:1.0 alpha:0.7],
+                   @(VLC_MSG_ERR) : [NSColor colorWithCalibratedRed:1.0 green:0.49 blue:0.45 alpha:0.5],
+                   @(VLC_MSG_WARN): [NSColor colorWithCalibratedRed:1.0 green:0.88 blue:0.45 alpha:0.7],
+                   @(VLC_MSG_DBG) : [NSColor colorWithCalibratedRed:0.96 green:0.96 blue:0.96 alpha:0.5]
                    };
     });
 
     // Lookup color for message type
-    NSDictionary *message = [[_arrayController arrangedObjects] objectAtIndex:row];
-    rowView.backgroundColor = [colors objectForKey:[message objectForKey:@"type"]];
+    VLCLogMessage *message = [[_arrayController arrangedObjects] objectAtIndex:row];
+    rowView.backgroundColor = [colors objectForKey:@(message.type)];
 }
 
 - (void)splitViewDidResizeSubviews:(NSNotification *)notification
@@ -215,15 +203,11 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
         }
         NSMutableString *string = [[NSMutableString alloc] init];
 
-        for (NSDictionary *line in _messagesArray) {
-            NSString *message = [NSString stringWithFormat:@"%@ %@ %@\n",
-                                 [line objectForKey:@"component"],
-                                 [line objectForKey:@"type"],
-                                 [line objectForKey:@"message"]];
-            [string appendString:message];
+        for (VLCLogMessage *message in _messagesArray) {
+            [string appendFormat:@"%@\r\n", message.fullMessage];
         }
         NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
-        if ([data writeToFile: [[saveFolderPanel URL] path] atomically: YES] == NO)
+        if ([data writeToFile:[[saveFolderPanel URL] path] atomically:YES] == NO)
             msg_Warn(getIntf(), "Error while saving the debug log");
     }];
 }
@@ -267,12 +251,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 - (void) copy:(id)sender {
     NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
     [pasteBoard clearContents];
-    for (NSDictionary *line in [_arrayController selectedObjects]) {
-        NSString *message = [NSString stringWithFormat:@"%@ %@: %@",
-                             [line objectForKey:@"component"],
-                             [line objectForKey:@"type"],
-                             [line objectForKey:@"message"]];
-        [pasteBoard writeObjects:@[message]];
+    for (VLCLogMessage *message in [_arrayController selectedObjects]) {
+        [pasteBoard writeObjects:@[message.fullMessage]];
     }
 }
 
@@ -304,10 +284,13 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
  Adds a message to the messageBuffer, it does not has to be called from the main thread, as
  items are only added to the messageArray on refresh.
  */
-- (void)addMessage:(NSDictionary *)messageDict
+- (void)addMessage:(VLCLogMessage *)message
 {
+    if (!message)
+        return;
+
     @synchronized (_messageBuffer) {
-        [_messageBuffer addObject:messageDict];
+        [_messageBuffer addObject:message];
     }
 }
 
