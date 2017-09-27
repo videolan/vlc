@@ -1406,6 +1406,15 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     vlc_mutex_lock(&p_sys->lock);
 
+#if TARGET_OS_IPHONE
+    if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK)
+    {
+        msg_Warn(p_dec, "VT decoder doesn't handle deinterlacing on iOS, "
+                 "aborting...");
+        p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+    }
+#endif
+
     if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART)
     {
         msg_Warn(p_dec, "restarting vt session (dec callback failed)");
