@@ -471,17 +471,14 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 static CMVideoCodecType CodecPrecheck(decoder_t *p_dec, int *p_cvpx_chroma)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t i_profile = 0xFF, i_level = 0xFF;
-    bool b_ret = false;
-    CMVideoCodecType codec;
 
     /* check for the codec we can and want to decode */
     switch (p_dec->fmt_in.i_codec) {
         case VLC_CODEC_H264:
-            codec = kCMVideoCodecType_H264;
-
-            b_ret = h264_get_profile_level(&p_dec->fmt_in, &i_profile, &i_level, NULL);
-            if (!b_ret) {
+        {
+            uint8_t i_profile, i_level;
+            if (!h264_get_profile_level(&p_dec->fmt_in, &i_profile, &i_level, NULL))
+            {
                 msg_Warn(p_dec, "H264 profile and level parsing failed because it didn't arrive yet");
                 return kCMVideoCodecType_H264;
             }
@@ -532,8 +529,9 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec, int *p_cvpx_chroma)
                 }
             }
 #endif
+            return kCMVideoCodecType_H264;
+        }
 
-            break;
         case VLC_CODEC_MP4V:
         {
             if (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'X','V','I','D' )) {
@@ -542,14 +540,11 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec, int *p_cvpx_chroma)
             }
 
             msg_Dbg(p_dec, "Will decode MP4V with original FourCC '%4.4s'", (char *)&p_dec->fmt_in.i_original_fourcc);
-            codec = kCMVideoCodecType_MPEG4Video;
-
-            break;
+            return kCMVideoCodecType_MPEG4Video;
         }
 #if !TARGET_OS_IPHONE
         case VLC_CODEC_H263:
-            codec = kCMVideoCodecType_H263;
-            break;
+            return kCMVideoCodecType_H263;
 
             /* there are no DV or ProRes decoders on iOS, so bailout early */
         case VLC_CODEC_PRORES:
@@ -557,27 +552,20 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec, int *p_cvpx_chroma)
             switch (p_dec->fmt_in.i_original_fourcc) {
                 case VLC_FOURCC( 'a','p','4','c' ):
                 case VLC_FOURCC( 'a','p','4','h' ):
-                    codec = kCMVideoCodecType_AppleProRes4444;
-                    break;
+                    return kCMVideoCodecType_AppleProRes4444;
 
                 case VLC_FOURCC( 'a','p','c','h' ):
-                    codec = kCMVideoCodecType_AppleProRes422HQ;
-                    break;
+                    return kCMVideoCodecType_AppleProRes422HQ;
 
                 case VLC_FOURCC( 'a','p','c','s' ):
-                    codec = kCMVideoCodecType_AppleProRes422LT;
-                    break;
+                    return kCMVideoCodecType_AppleProRes422LT;
 
                 case VLC_FOURCC( 'a','p','c','o' ):
-                    codec = kCMVideoCodecType_AppleProRes422Proxy;
-                    break;
+                    return kCMVideoCodecType_AppleProRes422Proxy;
 
                 default:
-                    codec = kCMVideoCodecType_AppleProRes422;
-                    break;
+                    return kCMVideoCodecType_AppleProRes422;
             }
-            if (codec != 0)
-                break;
 
         case VLC_CODEC_DV:
             /* the VT decoder can't differenciate between PAL and NTSC, so we need to do it */
@@ -585,30 +573,23 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec, int *p_cvpx_chroma)
                 case VLC_FOURCC( 'd', 'v', 'c', ' '):
                 case VLC_FOURCC( 'd', 'v', ' ', ' '):
                     msg_Dbg(p_dec, "Decoding DV NTSC");
-                    codec = kCMVideoCodecType_DVCNTSC;
-                    break;
+                    return kCMVideoCodecType_DVCNTSC;
 
                 case VLC_FOURCC( 'd', 'v', 's', 'd'):
                 case VLC_FOURCC( 'd', 'v', 'c', 'p'):
                 case VLC_FOURCC( 'D', 'V', 'S', 'D'):
                     msg_Dbg(p_dec, "Decoding DV PAL");
-                    codec = kCMVideoCodecType_DVCPAL;
-                    break;
-
+                    return kCMVideoCodecType_DVCPAL;
                 default:
-                    break;
+                    return -1;
             }
-            if (codec != 0)
-                break;
 #endif
             /* mpgv / mp2v needs fixing, so disable it for now */
 #if 0
         case VLC_CODEC_MPGV:
-            codec = kCMVideoCodecType_MPEG1Video;
-            break;
+            return kCMVideoCodecType_MPEG1Video;
         case VLC_CODEC_MP2V:
-            codec = kCMVideoCodecType_MPEG2Video;
-            break;
+            return kCMVideoCodecType_MPEG2Video;
 #endif
 
         default:
@@ -618,7 +599,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec, int *p_cvpx_chroma)
             return -1;
     }
 
-    return codec;
+    vlc_assert_unreachable();
 }
 
 
