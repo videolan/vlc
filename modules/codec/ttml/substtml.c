@@ -328,7 +328,10 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
 
         p_region->updt.origin.x = atoi( psz_token );
         if( psz_percent_sign != NULL && psz_percent_sign < psz_separator )
-            p_region->updt.flags |= UPDT_REGION_EXTENT_X_IS_PERCENTILE;
+        {
+            p_region->updt.origin.x /= 100.0;
+            p_region->updt.flags |= UPDT_REGION_ORIGIN_X_IS_PERCENTILE;
+        }
 
         while( isspace( *psz_separator ) )
             psz_separator++;
@@ -337,7 +340,11 @@ static void FillRegionStyle( const char *psz_attr, const char *psz_val,
 
         p_region->updt.origin.y = atoi( psz_token );
         if( psz_percent_sign != NULL )
-            p_region->updt.flags |= UPDT_REGION_EXTENT_Y_IS_PERCENTILE;
+        {
+            p_region->updt.origin.y /= 100.0;
+            p_region->updt.flags |= UPDT_REGION_ORIGIN_Y_IS_PERCENTILE;
+        }
+        p_region->updt.align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
     }
 }
 
