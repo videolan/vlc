@@ -159,7 +159,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 {
     intf_thread_t *p_intf;
     BOOL launched;
-    int items_at_launch;
 
     BOOL b_active_videoplayback;
 
@@ -272,11 +271,6 @@ static VLCMain *sharedInstance = nil;
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
     _coreinteraction = [VLCCoreInteraction sharedInstance];
-
-    playlist_t * p_playlist = pl_Get(getIntf());
-    PL_LOCK;
-    items_at_launch = p_playlist->p_playing->i_children;
-    PL_UNLOCK;
 
 #ifdef HAVE_SPARKLE
     [[SUUpdater sharedUpdater] setDelegate:self];
@@ -413,18 +407,19 @@ static VLCMain *sharedInstance = nil;
     // or are given at startup. If a file is passed via command line, libvlccore
     // will add the item, but cocoa also calls this function. In this case, the
     // invocation is ignored here.
+    NSArray *resultItems = o_names;
     if (launched == NO) {
-        if (items_at_launch) {
-            int items = [o_names count];
-            if (items > items_at_launch)
-                items_at_launch = 0;
-            else
-                items_at_launch -= items;
-            return;
+        NSArray *launchArgs = [[NSProcessInfo processInfo] arguments];
+
+        if (launchArgs) {
+            NSSet *launchArgsSet = [NSSet setWithArray:launchArgs];
+            NSMutableSet *itemSet = [NSMutableSet setWithArray:o_names];
+            [itemSet minusSet:launchArgsSet];
+            resultItems = [itemSet allObjects];
         }
     }
 
-    NSArray *o_sorted_names = [o_names sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
+    NSArray *o_sorted_names = [resultItems sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_sorted_names count]];
     for (NSUInteger i = 0; i < [o_sorted_names count]; i++) {
         char *psz_uri = vlc_path2uri([[o_sorted_names objectAtIndex:i] UTF8String], "file");
