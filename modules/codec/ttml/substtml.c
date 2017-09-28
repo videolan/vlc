@@ -627,20 +627,26 @@ static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, const char *psz_regi
     {
         if( psz_region_id && strcmp( psz_region_id, "" ) ) /* not default region */
         {
-            /* Create if missing and exists as node */
-            const tt_node_t *p_node = FindNode( p_ctx->p_rootnode, "region", -1, psz_region_id );
-            if( p_node && (p_region = ttml_region_New()) )
+            /* Create region if if missing */
+
+            vlc_dictionary_t merged;
+            vlc_dictionary_init( &merged, 0 );
+            /* Get all attributes, including region > style */
+            DictMergeWithRegionID( p_ctx, psz_region_id, &merged );
+            if( (p_region = ttml_region_New()) )
             {
                 /* Fill from its own attributes */
-                for( int i = 0; i < p_node->attr_dict.i_size; ++i )
+                for( int i = 0; i < merged.i_size; ++i )
                 {
-                    for ( vlc_dictionary_entry_t* p_entry = p_node->attr_dict.p_entries[i];
+                    for ( vlc_dictionary_entry_t* p_entry = merged.p_entries[i];
                           p_entry != NULL; p_entry = p_entry->p_next )
                     {
                         FillRegionStyle( p_entry->psz_key, p_entry->p_value, p_region );
                     }
                 }
             }
+            vlc_dictionary_clear( &merged, NULL, NULL );
+
             vlc_dictionary_insert( &p_ctx->regions, psz_region_id, p_region );
         }
         else if( (p_region = ttml_region_New()) ) /* create default */
