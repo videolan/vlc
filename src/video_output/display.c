@@ -1381,7 +1381,7 @@ static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
             /* TODO use a pool ? */
             picture[i] = picture_NewFromFormat(&wsys->display[i]->source);
         } else {
-            picture_pool_t *pool = vout_display_Pool(wsys->display[i], 1);
+            picture_pool_t *pool = vout_display_Pool(wsys->display[i], 3);
             picture[i] = pool ? picture_pool_Get(pool) : NULL;
         }
         if (!picture[i]) {
