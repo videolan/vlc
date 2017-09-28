@@ -445,7 +445,7 @@ Close_RemoveConverters(filter_t *filter, struct ci_filters_ctx *ctx)
 static int
 Open_AddConverter(filter_t *filter, struct ci_filters_ctx *ctx)
 {
-    video_format_Copy(&ctx->cvpx_pool_fmt, &filter->fmt_in.video);
+    ctx->cvpx_pool_fmt = filter->fmt_in.video;
     ctx->cvpx_pool_fmt.i_chroma = VLC_CODEC_CVPX_NV12;
     ctx->cvpx_pool = cvpxpool_create(&ctx->cvpx_pool_fmt, 3);
     if (!ctx->cvpx_pool)
