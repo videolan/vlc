@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="skip_back.svg">
+  <defs
+     id="defs8">
+    <inkscape:path-effect
+       is_visible="true"
+       id="path-effect6553-2-5"
+       effect="spiro" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="956"
+     inkscape:window-height="1021"
+     id="namedview6"
+     showgrid="true"
+     inkscape:zoom="9.8333333"
+     inkscape:cx="24.828754"
+     inkscape:cy="26.864615"
+     inkscape:window-x="2560"
+     inkscape:window-y="30"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="0,24.017661"
+       orientation="1,0"
+       id="guide2390"
+       inkscape:locked="false" />
+    <inkscape:grid
+       type="xygrid"
+       id="grid4492" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Master"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-384,-1004.3622)"
+     style="display:inline">
+    <path
+       style="display:inline;opacity:1;fill:#747474;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:35.43307114;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 24 8 A 16 16 0 0 0 8 24 L 3 24 L 11 32 L 19 24 L 14 24 A 10 9.9999962 0 0 1 24 14 A 10 9.9999962 0 0 1 34 24 L 34 28 L 40 28 L 40 24 A 16 16 0 0 0 24 8 z M 8 34 L 8 40 L 14 40 L 14 34 L 8 34 z M 16.666016 34 L 16.666016 40 L 22.666016 40 L 22.666016 34 L 16.666016 34 z M 25.333984 34 L 25.333984 40 L 31.333984 40 L 31.333984 34 L 25.333984 34 z M 34 34 L 34 40 L 40 40 L 40 34 L 34 34 z "
+       transform="translate(384,1004.3622)"
+       id="path6659-8" />
+  </g>
+</svg>

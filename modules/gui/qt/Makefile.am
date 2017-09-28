@@ -310,60 +310,60 @@ EXTRA_DIST += $(libqt_plugin_la_UI)
 # Resources
 
 libqt_plugin_la_RES = \
-	gui/qt/pixmaps/clear.png \
-	gui/qt/pixmaps/eject.png \
-	gui/qt/pixmaps/faster.png \
-	gui/qt/pixmaps/faster2.png \
-	gui/qt/pixmaps/go-next.png \
-	gui/qt/pixmaps/addons/addon.png \
-	gui/qt/pixmaps/addons/addon_broken.png \
-	gui/qt/pixmaps/addons/addon_blue.png \
-	gui/qt/pixmaps/addons/addon_cyan.png \
-	gui/qt/pixmaps/addons/addon_green.png \
-	gui/qt/pixmaps/addons/addon_magenta.png \
-	gui/qt/pixmaps/addons/addon_red.png \
-	gui/qt/pixmaps/addons/addon_yellow.png \
-	gui/qt/pixmaps/addons/score.png \
-	gui/qt/pixmaps/menus/exit_16px.png \
-	gui/qt/pixmaps/menus/help_16px.png \
-	gui/qt/pixmaps/menus/info_16px.png \
-	gui/qt/pixmaps/menus/messages_16px.png \
-	gui/qt/pixmaps/menus/playlist_16px.png \
-	gui/qt/pixmaps/menus/preferences_16px.png \
-	gui/qt/pixmaps/menus/settings_16px.png \
-	gui/qt/pixmaps/menus/stream_16px.png \
-	gui/qt/pixmaps/next.png \
+	gui/qt/pixmaps/clear.svg \
+	gui/qt/pixmaps/eject.svg \
+	gui/qt/pixmaps/faster.svg \
+	gui/qt/pixmaps/faster2.svg \
+	gui/qt/pixmaps/go-next.svg \
+	gui/qt/pixmaps/addons/addon.svg \
+	gui/qt/pixmaps/addons/addon_broken.svg \
+	gui/qt/pixmaps/addons/addon_blue.svg \
+	gui/qt/pixmaps/addons/addon_cyan.svg \
+	gui/qt/pixmaps/addons/addon_green.svg \
+	gui/qt/pixmaps/addons/addon_magenta.svg \
+	gui/qt/pixmaps/addons/addon_red.svg \
+	gui/qt/pixmaps/addons/addon_yellow.svg \
+	gui/qt/pixmaps/addons/score.svg \
+	gui/qt/pixmaps/menus/exit_16px.svg \
+	gui/qt/pixmaps/menus/help_16px.svg \
+	gui/qt/pixmaps/menus/info_16px.svg \
+	gui/qt/pixmaps/menus/messages_16px.svg \
+	gui/qt/pixmaps/menus/playlist_16px.svg \
+	gui/qt/pixmaps/menus/preferences_16px.svg \
+	gui/qt/pixmaps/menus/settings_16px.svg \
+	gui/qt/pixmaps/menus/stream_16px.svg \
+	gui/qt/pixmaps/next.svg \
 	gui/qt/pixmaps/noart-64.png \
 	gui/qt/pixmaps/noart.png \
-	gui/qt/pixmaps/pause.png \
-	gui/qt/pixmaps/play.png \
-	gui/qt/pixmaps/playlist/add.png \
-	gui/qt/pixmaps/playlist/playlist.png \
-	gui/qt/pixmaps/playlist/remove.png \
-	gui/qt/pixmaps/playlist/repeat_all.png \
-	gui/qt/pixmaps/playlist/repeat_off.png \
-	gui/qt/pixmaps/playlist/repeat_one.png \
-	gui/qt/pixmaps/playlist/shuffle_on.png \
-	gui/qt/pixmaps/playlist/dropzone.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/capture.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/pictures.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/disc.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/playlist.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/lan.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/podcast.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/library.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/screen.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/movie.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/mtp.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/music.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/network.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/appletrailers.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/icecast.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/katsomo.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/fmc.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/frenchtv.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/jamendo.png \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/assembleenationale.png \
+	gui/qt/pixmaps/pause.svg \
+	gui/qt/pixmaps/play.svg \
+	gui/qt/pixmaps/playlist/add.svg \
+	gui/qt/pixmaps/playlist/playlist.svg \
+	gui/qt/pixmaps/playlist/remove.svg \
+	gui/qt/pixmaps/playlist/repeat_all.svg \
+	gui/qt/pixmaps/playlist/repeat_off.svg \
+	gui/qt/pixmaps/playlist/repeat_one.svg \
+	gui/qt/pixmaps/playlist/shuffle_on.svg \
+	gui/qt/pixmaps/playlist/dropzone.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/capture.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/pictures.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/disc.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/playlist.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/lan.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/podcast.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/library.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/screen.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/movie.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/mtp.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/music.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/network.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/appletrailers.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/icecast.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/katsomo.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/fmc.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/frenchtv.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/jamendo.svg \
+	gui/qt/pixmaps/playlist/sidebar-icons/sd/assembleenationale.svg \
 	gui/qt/pixmaps/prefs/advprefs_audio.png \
 	gui/qt/pixmaps/prefs/advprefs_codec.png \
 	gui/qt/pixmaps/prefs/advprefs_extended.png \
@@ -377,69 +377,69 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/prefs/spref_cone_Interface_64.png \
 	gui/qt/pixmaps/prefs/spref_cone_Subtitles_64.png \
 	gui/qt/pixmaps/prefs/spref_cone_Video_64.png \
-	gui/qt/pixmaps/previous.png \
-	gui/qt/pixmaps/profile_new.png \
+	gui/qt/pixmaps/previous.svg \
+	gui/qt/pixmaps/profile_new.svg \
 	gui/qt/pixmaps/sample_complete.png \
 	gui/qt/pixmaps/sample_minimal.png \
 	gui/qt/pixmaps/sample_skins.png \
-	gui/qt/pixmaps/slower.png \
-	gui/qt/pixmaps/slower2.png \
-	gui/qt/pixmaps/space.png \
-	gui/qt/pixmaps/stop.png \
-	gui/qt/pixmaps/toolbar/arrows.png \
-	gui/qt/pixmaps/toolbar/aspect-ratio.png \
-	gui/qt/pixmaps/toolbar/atob.png \
-	gui/qt/pixmaps/toolbar/atob_noa.png \
-	gui/qt/pixmaps/toolbar/atob_nob.png \
-	gui/qt/pixmaps/toolbar/renderer.png \
-	gui/qt/pixmaps/toolbar/defullscreen.png \
-	gui/qt/pixmaps/toolbar/dvd_menu.png \
-	gui/qt/pixmaps/toolbar/dvd_next.png \
-	gui/qt/pixmaps/toolbar/dvd_prev.png \
-	gui/qt/pixmaps/toolbar/extended_16px.png \
-	gui/qt/pixmaps/toolbar/frame-by-frame.png \
-	gui/qt/pixmaps/toolbar/fullscreen.png \
-	gui/qt/pixmaps/toolbar/play_reverse.png \
-	gui/qt/pixmaps/toolbar/record_16px.png \
-	gui/qt/pixmaps/toolbar/snapshot.png \
-	gui/qt/pixmaps/toolbar/skip_for.png \
-	gui/qt/pixmaps/toolbar/skip_back.png \
-	gui/qt/pixmaps/toolbar/tv.png \
-	gui/qt/pixmaps/toolbar/tvtelx.png \
-	gui/qt/pixmaps/toolbar/visu.png \
-	gui/qt/pixmaps/toolbar/volume-high.png \
-	gui/qt/pixmaps/toolbar/volume-low.png \
-	gui/qt/pixmaps/toolbar/volume-medium.png \
-	gui/qt/pixmaps/toolbar/volume-muted.png \
-	gui/qt/pixmaps/toolbar/volume-slider-inside.png \
-	gui/qt/pixmaps/toolbar/volume-slider-outside.png \
-	gui/qt/pixmaps/types/capture-card_16px.png \
-	gui/qt/pixmaps/types/disc_16px.png \
-	gui/qt/pixmaps/types/file-asym_16px.png \
-	gui/qt/pixmaps/types/file-wide_16px.png \
-	gui/qt/pixmaps/types/folder-blue_16px.png \
-	gui/qt/pixmaps/types/folder-grey_16px.png \
-	gui/qt/pixmaps/types/harddisk_16px.png \
-	gui/qt/pixmaps/types/network_16px.png \
-	gui/qt/pixmaps/types/tape_16px.png \
-	gui/qt/pixmaps/types/type_directory.png \
-	gui/qt/pixmaps/types/type_file.png \
-	gui/qt/pixmaps/types/type_stream.png \
-	gui/qt/pixmaps/types/type_node.png \
-	gui/qt/pixmaps/types/type_playlist.png \
+	gui/qt/pixmaps/slower.svg \
+	gui/qt/pixmaps/slower2.svg \
+	gui/qt/pixmaps/space.svg \
+	gui/qt/pixmaps/stop.svg \
+	gui/qt/pixmaps/toolbar/arrows.svg \
+	gui/qt/pixmaps/toolbar/aspect-ratio.svg \
+	gui/qt/pixmaps/toolbar/atob.svg \
+	gui/qt/pixmaps/toolbar/atob_noa.svg \
+	gui/qt/pixmaps/toolbar/atob_nob.svg \
+	gui/qt/pixmaps/toolbar/renderer.svg \
+	gui/qt/pixmaps/toolbar/defullscreen.svg \
+	gui/qt/pixmaps/toolbar/dvd_menu.svg \
+	gui/qt/pixmaps/toolbar/dvd_next.svg \
+	gui/qt/pixmaps/toolbar/dvd_prev.svg \
+	gui/qt/pixmaps/toolbar/extended_16px.svg \
+	gui/qt/pixmaps/toolbar/frame-by-frame.svg \
+	gui/qt/pixmaps/toolbar/fullscreen.svg \
+	gui/qt/pixmaps/toolbar/play_reverse.svg \
+	gui/qt/pixmaps/toolbar/record_16px.svg \
+	gui/qt/pixmaps/toolbar/snapshot.svg \
+	gui/qt/pixmaps/toolbar/skip_for.svg \
+	gui/qt/pixmaps/toolbar/skip_back.svg \
+	gui/qt/pixmaps/toolbar/tv.svg \
+	gui/qt/pixmaps/toolbar/tvtelx.svg \
+	gui/qt/pixmaps/toolbar/visu.svg \
+	gui/qt/pixmaps/toolbar/volume-high.svg \
+	gui/qt/pixmaps/toolbar/volume-low.svg \
+	gui/qt/pixmaps/toolbar/volume-medium.svg \
+	gui/qt/pixmaps/toolbar/volume-muted.svg \
+	gui/qt/pixmaps/toolbar/volume-slider-inside.svg \
+	gui/qt/pixmaps/toolbar/volume-slider-outside.svg \
+	gui/qt/pixmaps/types/capture-card_16px.svg \
+	gui/qt/pixmaps/types/disc_16px.svg \
+	gui/qt/pixmaps/types/file-asym_16px.svg \
+	gui/qt/pixmaps/types/file-wide_16px.svg \
+	gui/qt/pixmaps/types/folder-blue_16px.svg \
+	gui/qt/pixmaps/types/folder-grey_16px.svg \
+	gui/qt/pixmaps/types/harddisk_16px.svg \
+	gui/qt/pixmaps/types/network_16px.svg \
+	gui/qt/pixmaps/types/tape_16px.svg \
+	gui/qt/pixmaps/types/type_directory.svg \
+	gui/qt/pixmaps/types/type_file.svg \
+	gui/qt/pixmaps/types/type_stream.svg \
+	gui/qt/pixmaps/types/type_node.svg \
+	gui/qt/pixmaps/types/type_playlist.svg \
 	gui/qt/pixmaps/types/type_unknown.xpm \
-	gui/qt/pixmaps/util/wait1.png \
-	gui/qt/pixmaps/util/wait2.png \
-	gui/qt/pixmaps/util/wait3.png \
-	gui/qt/pixmaps/util/wait4.png \
+	gui/qt/pixmaps/util/wait1.svg \
+	gui/qt/pixmaps/util/wait2.svg \
+	gui/qt/pixmaps/util/wait3.svg \
+	gui/qt/pixmaps/util/wait4.svg \
 	gui/qt/pixmaps/win7/win7thumbnail_pause.png \
 	gui/qt/pixmaps/win7/win7thumbnail_prev.png \
 	gui/qt/pixmaps/win7/win7thumbnail_next.png \
 	gui/qt/pixmaps/win7/win7thumbnail_play.png \
-	gui/qt/pixmaps/update.png \
-	gui/qt/pixmaps/valid.png \
-	gui/qt/pixmaps/search_clear.png \
-	gui/qt/pixmaps/lock.png
+	gui/qt/pixmaps/update.svg \
+	gui/qt/pixmaps/valid.svg \
+	gui/qt/pixmaps/search_clear.svg \
+	gui/qt/pixmaps/lock.svg
 EXTRA_DIST += gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 
 nodist_libqt_plugin_la_SOURCES += gui/qt/resources.cpp

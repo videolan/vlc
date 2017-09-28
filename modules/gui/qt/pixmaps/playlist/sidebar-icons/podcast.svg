@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48"
+   height="48"
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   id="svg5502"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="podcast.svg">
+  <defs
+     id="defs5496" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="16"
+     inkscape:cx="-2.9213732"
+     inkscape:cy="18.446422"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     units="px">
+    <inkscape:grid
+       type="xygrid"
+       id="grid6077" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5499">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-96.459526,-120.56071)">
+    <path
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.79374999;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 103.28226,121.61904 -0.26466,0.7564 a 4.8108904,4.8108904 0 0 1 3.22344,4.53527 4.8108904,4.8108904 0 0 1 -3.22344,4.53579 l 0.26466,0.75588 a 5.6127055,5.6127055 0 0 0 3.7606,-5.29167 5.6127055,5.6127055 0 0 0 -3.7606,-5.29167 z m -0.52932,1.51176 -0.26467,0.75588 a 3.2072609,3.2072601 0 0 1 2.14914,3.02403 3.2072609,3.2072601 0 0 1 -2.14914,3.02351 l 0.26467,0.7564 a 4.0090754,4.0090741 0 0 0 2.68629,-3.77991 4.0090754,4.0090741 0 0 0 -2.68629,-3.77991 z m -0.5288,1.51175 -0.26466,0.7564 a 1.6036292,1.6036301 0 0 1 1.0743,1.51176 1.6036292,1.6036301 0 0 1 -1.0743,1.51175 l 0.26413,0.75588 a 2.4054459,2.4054452 0 0 0 1.61199,-2.26763 2.4054459,2.4054452 0 0 0 -1.61146,-2.26816 z"
+       id="ellipse9978"
+       inkscape:connector-curvature="0" />
+    <path
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#757575;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.79374999;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 100.16369,125.32321 a 1.5875009,1.5875 0 0 0 -1.587499,1.5875 1.5875009,1.5875 0 0 0 0.83199,1.39578 c -0.259599,0.8268 -0.535781,2.09164 -0.83199,3.89589 h 3.174999 c -0.26048,-1.57913 -0.52941,-2.9671 -0.81597,-3.90623 a 1.5875009,1.5875 0 0 0 0.81597,-1.38544 1.5875009,1.5875 0 0 0 -1.5875,-1.5875 z"
+       id="path9967"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>
