@@ -145,7 +145,7 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
     {
         realid = es_out_Add( real_es_out, es_id->getFmt() );
         if( b_select )
-            es_out_Control( real_es_out, ES_OUT_SET_ES_STATE, realid, b_select );
+            es_out_Control( real_es_out, ES_OUT_SET_ES, realid );
     }
 
     es_id->setRealESID( realid );
