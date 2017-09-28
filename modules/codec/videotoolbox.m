@@ -884,7 +884,8 @@ static int SetupDecoderExtradata(decoder_t *p_dec)
             p_sys->extradataInfo = ExtradataInfoCreate(CFSTR("avcC"),
                                             p_dec->fmt_in.p_extra,
                                             p_dec->fmt_in.i_extra);
-            SetH264DecoderInfo(p_dec, p_sys->extradataInfo);
+            if (SetH264DecoderInfo(p_dec, p_sys->extradataInfo) != VLC_SUCCESS)
+                return VLC_EGENERIC;
         }
         else
         {
