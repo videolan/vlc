@@ -129,7 +129,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     shine_set_config_mpeg_defaults(&cfg.mpeg);
     cfg.mpeg.bitr = p_enc->fmt_out.i_bitrate / 1000;
- 
+
     if (shine_check_config(cfg.wave.samplerate, cfg.mpeg.bitr) == -1) {
         msg_Err(p_enc, "Invalid bitrate %d\n", cfg.mpeg.bitr);
         free(p_sys);
