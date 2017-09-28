@@ -446,7 +446,7 @@ static int
 Open_AddConverter(filter_t *filter, struct ci_filters_ctx *ctx)
 {
     ctx->cvpx_pool_fmt = filter->fmt_in.video;
-    ctx->cvpx_pool_fmt.i_chroma = VLC_CODEC_CVPX_NV12;
+    ctx->cvpx_pool_fmt.i_chroma = VLC_CODEC_CVPX_BGRA;
     ctx->cvpx_pool = cvpxpool_create(&ctx->cvpx_pool_fmt, 3);
     if (!ctx->cvpx_pool)
         goto error;
@@ -457,8 +457,8 @@ Open_AddConverter(filter_t *filter, struct ci_filters_ctx *ctx)
 
     ctx->dst_converter->fmt_in = filter->fmt_out;
     ctx->dst_converter->fmt_out = filter->fmt_out;
-    ctx->dst_converter->fmt_in.i_codec = VLC_CODEC_CVPX_NV12;
-    ctx->dst_converter->fmt_in.video.i_chroma = VLC_CODEC_CVPX_NV12;
+    ctx->dst_converter->fmt_in.video.i_chroma =
+    ctx->dst_converter->fmt_in.i_codec = VLC_CODEC_CVPX_BGRA;
 
     ctx->outconv_cvpx_pool =
         cvpxpool_create(&filter->fmt_out.video, 2);
