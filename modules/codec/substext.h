@@ -164,13 +164,6 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->b_noregionbg = p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND;
         r->b_gridmode = p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES;
 
-        if( r->b_gridmode )
-        {
-            /* Ensure correct flags are set */
-            r->i_align &= ~(SUBPICTURE_ALIGN_RIGHT | SUBPICTURE_ALIGN_BOTTOM);
-            r->i_align |= (SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP);
-        }
-
         if (!(p_updtregion->flags & UPDT_REGION_FIX_DONE))
         {
             const float margin_ratio = sys->margin_ratio;

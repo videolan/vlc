@@ -443,11 +443,13 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
 
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
+    /* Set first region defaults */
     /* The "leavetext" alignment is a special mode where the subpicture
        region itself gets aligned, but the text inside it does not */
-    p_spu_sys->region.align = SUBPICTURE_ALIGN_TOP;
+    p_spu_sys->region.align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
     p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_LEAVETEXT;
     p_spu_sys->region.flags = UPDT_REGION_IGNORE_BACKGROUND | UPDT_REGION_USES_GRID_COORDINATES;
+
     /* Set style defaults (will be added to segments if none set) */
     p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
     if( p_dec->p_sys->b_opaque )
@@ -1155,6 +1157,10 @@ static void Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia60
                     text_segment_ChainDelete( p_segments );
                     return;
                 }
+                /* Copy defaults */
+                p_newregion->align = p_region->align;
+                p_newregion->inner_align = p_region->inner_align;
+                p_newregion->flags = p_region->flags;
                 SubpictureUpdaterSysRegionAdd( p_region, p_newregion );
                 p_region = p_newregion;
                 pp_last = &p_region->p_segments;
