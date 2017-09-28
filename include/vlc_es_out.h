@@ -35,7 +35,7 @@
 
 enum es_out_query_e
 {
-    /* set ES selected for the es category (audio/video/spu) */
+    /* set or change the selected ES in its category (audio/video/spu) */
     ES_OUT_SET_ES,      /* arg1= es_out_id_t*                   */
     ES_OUT_RESTART_ES,  /* arg1= es_out_id_t*                   */
     /* Restart all ES, destroying and recreating decoder/sout and potential
@@ -45,7 +45,8 @@ enum es_out_query_e
     /* set 'default' tag on ES (copied across from container) */
     ES_OUT_SET_ES_DEFAULT, /* arg1= es_out_id_t*                */
 
-    /* force selection/unselection of the ES (bypass current mode) */
+    /* force (un)selection of the ES (bypass current mode)
+       XXX: this will not change the state of any other ES ! (see SET_ES) */
     ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=bool   */
     ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=bool*  */
 
