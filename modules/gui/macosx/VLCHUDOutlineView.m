@@ -50,7 +50,6 @@
 
     if (self) {
         _tableBackgroundColor = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0];
-        _cellHighlightColor = [NSColor colorWithDeviceRed:0.549f green:0.561f blue:0.588f alpha:1];
         _cellEditingFillColor = [NSColor colorWithDeviceRed:0.141f green:0.141f blue:0.141f alpha:0.5f];
         _cellAlternatingRowColors = @[[NSColor colorWithCalibratedWhite:0.16f alpha:0.86f],
                                       [NSColor colorWithCalibratedWhite:0.15f alpha:0.8f]];
@@ -72,10 +71,6 @@
 
 - (id)_alternatingRowBackgroundColors {
     return _cellAlternatingRowColors;
-}
-
-- (id)_highlightColorForCell:(id)cell {
-    return _cellHighlightColor;
 }
 
 - (void)_sendDelegateWillDisplayCell:(id)cell forColumn:(id)column row:(NSInteger)row {
