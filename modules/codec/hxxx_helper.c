@@ -601,6 +601,18 @@ h264_helper_get_current_dpb_values(const struct hxxx_helper *hh,
 }
 
 int
+h264_helper_get_current_profile_level(const struct hxxx_helper *hh,
+                                      uint8_t *p_profile, uint8_t *p_level)
+{
+    const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
+    if (hsps == NULL)
+        return VLC_EGENERIC;
+    *p_profile = hsps->h264_sps->i_profile;
+    *p_level = hsps->h264_sps->i_level;
+    return VLC_SUCCESS;
+}
+
+int
 hxxx_helper_get_colorimetry(const struct hxxx_helper *hh,
                             video_color_primaries_t *p_primaries,
                             video_transfer_func_t *p_transfer,
