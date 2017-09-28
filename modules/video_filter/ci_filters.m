@@ -359,13 +359,20 @@ error:
 }
 
 static void
-Open_FilterInit(vlc_object_t *obj, struct filter_chain *filter)
+Open_FilterInit(filter_t *filter, struct filter_chain *fchain)
 {
     struct filter_param_desc const *filter_param_descs =
-        filter_desc_table[filter->filter].param_descs;
-    NSString *ci_filter_name = filter_desc_table_GetFilterName(filter->filter);
+        filter_desc_table[fchain->filter].param_descs;
+    NSString *ci_filter_name = filter_desc_table_GetFilterName(fchain->filter);
+    if (ci_filter_name == nil)
+    {
+        char *psz_filter_name = var_InheritString(filter, "ci-filter");
+        if (psz_filter_name)
+            ci_filter_name = [NSString stringWithUTF8String:psz_filter_name];
+        free(psz_filter_name);
+    }
 
-    filter->ci_filter = [CIFilter filterWithName: ci_filter_name];
+    fchain->ci_filter = [CIFilter filterWithName: ci_filter_name];
 
     for (int i = 0; i < NUM_FILTER_PARAM_MAX && filter_param_descs[i].vlc; ++i)
     {
@@ -374,26 +381,25 @@ Open_FilterInit(vlc_object_t *obj, struct filter_chain *filter)
 
         float vlc_param_val;
         if (filter_param_descs[i].vlc_type == VLC_VAR_FLOAT)
-            vlc_param_val = var_CreateGetFloatCommand(obj, vlc_param_name);
+            vlc_param_val = var_CreateGetFloatCommand(filter, vlc_param_name);
         else if (filter_param_descs[i].vlc_type == VLC_VAR_INTEGER)
             vlc_param_val =
-                (float)var_CreateGetIntegerCommand(obj, vlc_param_name);
+                (float)var_CreateGetIntegerCommand(filter, vlc_param_name);
         else
             vlc_assert_unreachable();
 
-        vlc_atomic_init_float(filter->ci_params + i,
+        vlc_atomic_init_float(fchain->ci_params + i,
                               filter_ConvertParam(vlc_param_val,
                                                   filter_param_descs + i));
 
-        var_AddCallback(obj, filter_param_descs[i].vlc,
-                        ParamsCallback, filter);
+        var_AddCallback(filter, filter_param_descs[i].vlc,
+                        ParamsCallback, fchain);
     }
 }
 
 static int
-Open_CreateFilters
-(vlc_object_t *obj, struct filter_chain **p_last_filter,
- enum filter_type filter_types[NUM_MAX_EQUIVALENT_VLC_FILTERS])
+Open_CreateFilters(filter_t *filter, struct filter_chain **p_last_filter,
+                   enum filter_type filter_types[NUM_MAX_EQUIVALENT_VLC_FILTERS])
 {
     struct filter_chain *new_filter;
 
@@ -405,7 +411,7 @@ Open_CreateFilters
         if (!new_filter)
             return VLC_EGENERIC;
         p_last_filter = &new_filter;
-        Open_FilterInit(obj, new_filter);
+        Open_FilterInit(filter, new_filter);
     }
 
     return VLC_SUCCESS;
@@ -573,13 +579,13 @@ Open(vlc_object_t *obj, char const *psz_filter)
                 goto error;
         }
 
-        if (Open_CreateFilters(obj, &ctx->fchain, filter_types))
+        if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
             goto error;
 
         var_Create(filter->obj.parent, "ci-filters-ctx", VLC_VAR_ADDRESS);
         var_SetAddress(filter->obj.parent, "ci-filters-ctx", ctx);
     }
-    else if (Open_CreateFilters(obj, &ctx->fchain, filter_types))
+    else if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
         goto error;
 
     filter->p_sys->psz_filter = psz_filter;
