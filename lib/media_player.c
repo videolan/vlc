@@ -1007,21 +1007,16 @@ void libvlc_media_player_set_pause( libvlc_media_player_t *p_mi, int paused )
     if( !p_input_thread )
         return;
 
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi );
-    if( state == libvlc_Playing )
+    if( paused )
     {
-        if( paused )
-        {
-            if( libvlc_media_player_can_pause( p_mi ) )
-                input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
-            else
-                input_Stop( p_input_thread );
-        }
+        if( libvlc_media_player_can_pause( p_mi ) )
+            input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
+        else
+            input_Stop( p_input_thread );
     }
     else
     {
-        if( !paused )
-            input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
+        input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
     }
 
     vlc_object_release( p_input_thread );
