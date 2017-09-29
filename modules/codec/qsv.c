@@ -741,6 +741,8 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     if (task->bs.DecodeTimeStamp < -10000)
         block->i_dts = sys->last_dts + block->i_length;
     sys->last_dts = block->i_dts;
+
+    task->bs.DataLength = task->bs.DataOffset = 0;
     return block;
 }
 
