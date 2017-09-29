@@ -488,19 +488,6 @@ static int DxCreateVideoService(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &va->sys->dx_sys;
-
-    HRESULT (WINAPI *CreateVideoService)(IDirect3DDevice9 *,
-                                         REFIID riid,
-                                         void **ppService);
-    CreateVideoService =
-      (void *)GetProcAddress(dx_sys->hdecoder_dll, "DXVA2CreateVideoService");
-
-    if (!CreateVideoService) {
-        msg_Err(va, "cannot load function");
-        return 4;
-    }
-    msg_Info(va, "DXVA2CreateVideoService Success!");
-
     HRESULT hr;
 
     HANDLE device;
