@@ -115,7 +115,7 @@
 #else
     compiler = [NSString stringWithFormat:@"llvm-gcc %s", __VERSION__];
 #endif
-    [o_revision_field setStringValue: [NSString stringWithFormat: _NS("Compiled by %s with %@"), VLC_CompileBy(), compiler]];
+    [o_revision_field setStringValue: [NSString stringWithFormat:@"Compiled by %s with %@ (%s %s)", VLC_CompileBy(), compiler, __DATE__, __TIME__]];
 
     /* Setup the nameversion field */
     [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
