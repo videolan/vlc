@@ -330,7 +330,6 @@ static int D3dCreateDevice(vlc_va_t *va)
 
     if (sys->dx_sys.d3ddev) {
         msg_Dbg(va, "Reusing Direct3D9 device");
-        IDirect3DDevice9_AddRef(sys->dx_sys.d3ddev);
         return VLC_SUCCESS;
     }
 
