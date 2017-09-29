@@ -52,6 +52,7 @@ enum    filter_type
     FILTER_SEPIA,
     FILTER_SHARPEN,
     FILTER_PSYCHEDELIC,
+    FILTER_CUSTOM,
     NUM_FILTERS,
     NUM_MAX_EQUIVALENT_VLC_FILTERS = 3
 };
@@ -181,6 +182,12 @@ static struct filter_desc       filter_desc_table[] =
     [FILTER_PSYCHEDELIC] =
     {
         { "psychedelic", @"CIKaleidoscope" }, { { } },
+        filter_PsychedelicInit,
+        filter_PsychedelicControl
+    },
+    [FILTER_CUSTOM] =
+    {
+        { "custom" }, { { } },
         filter_PsychedelicInit,
         filter_PsychedelicControl
     },
@@ -740,6 +747,12 @@ OpenPsychedelic(vlc_object_t *obj)
     return Open(obj, "psychedelic");
 }
 
+static int
+OpenCustom(vlc_object_t *obj)
+{
+    return Open(obj, "custom");
+}
+
 static void
 Close(vlc_object_t *obj)
 {
@@ -765,6 +778,10 @@ Close(vlc_object_t *obj)
     }
     free(filter->p_sys);
 }
+
+#define CI_CUSTOM_FILTER_TEXT N_("Use a specific Core Image Filter")
+#define CI_CUSTOM_FILTER_LONGTEXT N_( \
+    "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'")
 
 vlc_module_begin()
     set_capability("video filter", 0)
@@ -795,4 +812,9 @@ vlc_module_begin()
     add_submodule()
     set_callbacks(OpenPsychedelic, Close)
     add_shortcut("psychedelic")
+
+    add_submodule()
+    set_callbacks(OpenCustom, Close)
+    add_shortcut("ci")
+    add_string("ci-filter", "CIComicEffect", CI_CUSTOM_FILTER_TEXT, CI_CUSTOM_FILTER_LONGTEXT, true);
 vlc_module_end()
