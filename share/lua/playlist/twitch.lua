@@ -25,7 +25,9 @@ Resolve Twitch channel and video URLs to the actual stream URL
 function probe()
     return (vlc.access == "http" or vlc.access == "https")
         and ( vlc.path:match("^www%.twitch%.tv/videos/.+") or
-              vlc.path:match("^www%.twitch%.tv/.+") )
+              vlc.path:match("^www%.twitch%.tv/.+") or
+              vlc.path:match("^go%.twitch%.tv/.+") or 
+              vlc.path:match("^go%.twitch%.tv/videos/.+") )
 end
 
 -- Download and parse a JSON document from the specified URL
