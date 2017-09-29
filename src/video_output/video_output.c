@@ -1259,6 +1259,7 @@ static void ThreadFlush(vout_thread_t *vout, bool below, mtime_t date)
     }
 
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
+    vout_FilterFlush(vout->p->display.vd);
 }
 
 static void ThreadStep(vout_thread_t *vout, mtime_t *duration)

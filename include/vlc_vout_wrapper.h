@@ -80,6 +80,7 @@ vout_display_t *vout_NewDisplay( vout_thread_t *, const video_format_t *,
 void vout_DeleteDisplay(vout_display_t *, vout_display_state_t *);
 bool vout_IsDisplayFiltered(vout_display_t *);
 picture_t * vout_FilterDisplay(vout_display_t *, picture_t *);
+void vout_FilterFlush(vout_display_t *);
 bool vout_AreDisplayPicturesInvalid(vout_display_t *);
 
 bool vout_ManageDisplay(vout_display_t *, bool allow_reset_pictures);
