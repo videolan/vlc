@@ -40,6 +40,7 @@
 #include "dialogs/playlist.hpp"                   /* Playlist Dialog */
 #include "dialogs/mediainfo.hpp"                  /* MediaInfoDialog */
 #include "util/qt_dirs.hpp"
+#include "util/imagehelper.hpp"
 
 #include <vlc_services_discovery.h>               /* SD_CMD_SEARCH */
 #include <vlc_intf_strings.h>                     /* POP_ */
@@ -70,6 +71,8 @@
 #include <QFont>
 
 #include <assert.h>
+
+#define DROPZONE_SIZE 112
 
 /* local helper */
 inline QModelIndex popupIndex( QAbstractItemView *view );
@@ -554,14 +557,15 @@ bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
         {
             QWidget *viewport = qobject_cast<QWidget *>( obj );
             QStylePainter painter( viewport );
-            QPixmap dropzone(":/dropzone");
+            QPixmap dropzone = ImageHelper::loadSvgToPixmap(":/dropzone", DROPZONE_SIZE, DROPZONE_SIZE);
+            qreal scale = dropzone.devicePixelRatio();
             QRect rect = viewport->geometry();
-            QSize size = rect.size() / 2 - dropzone.size() / 2;
+            QSize size = rect.size()  / 2 - dropzone.size() / (2 * scale);
             rect.adjust( 0, size.height(), 0 , 0 );
             painter.drawItemPixmap( rect, Qt::AlignHCenter, dropzone );
             /* now select the zone just below the drop zone and let Qt center
                the text by itself */
-            rect.adjust( 0, dropzone.size().height() + 10, 0, 0 );
+            rect.adjust( 0, dropzone.height() / scale + 10, 0, 0 );
             rect.setRight( viewport->geometry().width() );
             rect.setLeft( 0 );
             painter.drawItemText( rect,

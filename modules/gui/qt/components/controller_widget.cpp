@@ -30,6 +30,7 @@
 
 #include "input_manager.hpp"         /* Get notification of Volume Change */
 #include "util/input_slider.hpp"     /* SoundSlider */
+#include "util/imagehelper.hpp"
 
 #include <math.h>
 
@@ -52,7 +53,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 
     /* We need a Label for the pix */
     volMuteLabel = new QLabel;
-    volMuteLabel->setPixmap( QIcon( ":/toolbar/volume-medium" ).pixmap( 16, 16 ) );
+    volMuteLabel->setPixmap( ImageHelper::loadSvgToPixmap( ":/toolbar/volume-medium", 16, 16 ) );
 
     /* We might need a subLayout too */
     QVBoxLayout *subLayout;
@@ -131,7 +132,7 @@ void SoundWidget::refreshLabels()
 
     if( b_is_muted )
     {
-        volMuteLabel->setPixmap( QIcon( psz_icon ).pixmap( 16, 16 ) );
+        volMuteLabel->setPixmap( ImageHelper::loadSvgToPixmap( psz_icon, 16, 16 ) );
         volMuteLabel->setToolTip(qfu(vlc_pgettext("Tooltip|Unmute", "Unmute")));
         return;
     }
@@ -143,7 +144,7 @@ void SoundWidget::refreshLabels()
     else
         psz_icon = ":/toolbar/volume-medium";
 
-    volMuteLabel->setPixmap( QIcon( psz_icon ).pixmap( 16, 16 ) );
+    volMuteLabel->setPixmap( ImageHelper::loadSvgToPixmap( psz_icon, 16, 16 ) );
     volMuteLabel->setToolTip( qfu(vlc_pgettext("Tooltip|Mute", "Mute")) );
 }
 

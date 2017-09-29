@@ -34,6 +34,7 @@
 #include "util/buttons/DeckButtonsLayout.hpp"
 #include "util/buttons/BrowseButton.hpp"
 #include "util/buttons/RoundButton.hpp"
+#include "util/imagehelper.hpp"
 
 #include "qt.hpp"
 #include "input_manager.hpp"
@@ -668,7 +669,7 @@ void DroppingController::createAndAddWidget( QBoxLayout *newControlLayout,
     if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
     {
         QLabel *label = new QLabel( this );
-        label->setPixmap( QPixmap( ":/toolbar/space" ) );
+        label->setPixmap( ImageHelper::loadSvgToPixmap( ":/toolbar/space", height(), height() ) );
         if( i_type == WIDGET_SPACER_EXTEND )
         {
             label->setSizePolicy( QSizePolicy::MinimumExpanding,

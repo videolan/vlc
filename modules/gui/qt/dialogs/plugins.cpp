@@ -32,6 +32,7 @@
 #include "extensions_manager.hpp"
 #include "managers/addons_manager.hpp"
 #include "util/animators.hpp"
+#include "util/imagehelper.hpp"
 
 #include <assert.h>
 
@@ -65,6 +66,9 @@
 #include <QSplitter>
 #include <QToolButton>
 #include <QStackedWidget>
+
+//match the image source (width/height)
+#define SCORE_ICON_WIDTH_SCALE 4
 
 static QPixmap *loadPixmapFromData( char *, int size );
 
@@ -1209,9 +1213,11 @@ void AddonItemDelegate::paint( QPainter *painter,
     QPixmap scoreicon;
     if ( i_score )
     {
-        scoreicon = QPixmap( ":/addons/score" ).scaledToHeight(
-                    newopt.fontMetrics.height(), Qt::SmoothTransformation );
-        int i_width = ( (float) i_score / ADDON_MAX_SCORE ) * scoreicon.width();
+        int i_scoreicon_height = newopt.fontMetrics.height();
+        int i_scoreicon_width = i_scoreicon_height * SCORE_ICON_WIDTH_SCALE;
+        scoreicon = ImageHelper::loadSvgToPixmap( ":/addons/score",
+                    i_scoreicon_width, i_scoreicon_height );
+        int i_width = ( (float) i_score / ADDON_MAX_SCORE ) * i_scoreicon_width;
         /* Erase the end (value) of our pixmap with a shadow */
         QPainter erasepainter( &scoreicon );
         erasepainter.setCompositionMode( QPainter::CompositionMode_SourceIn );
