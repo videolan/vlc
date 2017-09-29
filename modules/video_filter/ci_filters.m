@@ -51,6 +51,7 @@ enum    filter_type
     FILTER_POSTERIZE,
     FILTER_SEPIA,
     FILTER_SHARPEN,
+    FILTER_PSYCHEDELIC,
     NUM_FILTERS,
     NUM_MAX_EQUIVALENT_VLC_FILTERS = 3
 };
@@ -63,6 +64,16 @@ struct  filter_chain
     CIFilter *                  ci_filter;
     vlc_atomic_float            ci_params[NUM_FILTER_PARAM_MAX];
     struct filter_chain *       next;
+    union {
+        struct
+        {
+#define PSYCHEDELIC_COUNT_DEFAULT 5
+#define PSYCHEDELIC_COUNT_MIN 3
+#define PSYCHEDELIC_COUNT_MAX 40
+            int x, y;
+            unsigned count;
+        } psychedelic;
+    } ctx;
 };
 
 struct  ci_filters_ctx
@@ -114,6 +125,9 @@ struct  filter_desc
     void (*pf_control)(filter_t *filter, struct filter_chain *fchain);
 };
 
+static void filter_PsychedelicInit(filter_t *filter, struct filter_chain *fchain);
+static void filter_PsychedelicControl(filter_t *filter, struct filter_chain *fchain);
+
 static struct filter_desc       filter_desc_table[] =
 {
     [FILTER_ADJUST_HUE] =
@@ -163,7 +177,13 @@ static struct filter_desc       filter_desc_table[] =
         {
             { "sharpen-sigma", @"inputSharpness", {{{.0f, 2.f}, {.0f, 5.f}}}, VLC_VAR_FLOAT }
         }
-    }
+    },
+    [FILTER_PSYCHEDELIC] =
+    {
+        { "psychedelic", @"CIKaleidoscope" }, { { } },
+        filter_PsychedelicInit,
+        filter_PsychedelicControl
+    },
 };
 
 #define GET_CI_VALUE(vlc_value, vlc_range, ci_range)               \
@@ -284,6 +304,43 @@ ParamsCallback(vlc_object_t *obj,
                                                filter_param_descs + i));
 
     return VLC_SUCCESS;
+}
+
+static void filter_PsychedelicInit(filter_t *filter, struct filter_chain *fchain)
+{
+    filter_sys_t *sys = filter->p_sys;
+    fchain->ctx.psychedelic.x = filter->fmt_in.video.i_width / 2;
+    fchain->ctx.psychedelic.y = filter->fmt_in.video.i_height / 2;
+    fchain->ctx.psychedelic.count = PSYCHEDELIC_COUNT_DEFAULT;
+}
+
+static void filter_PsychedelicControl(filter_t *filter, struct filter_chain *fchain)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    if (sys->mouse_moved)
+    {
+        fchain->ctx.psychedelic.x = sys->mouse.i_x;
+        fchain->ctx.psychedelic.y = filter->fmt_in.video.i_height
+                                            - sys->mouse.i_y - 1;
+
+        if (sys->mouse.i_pressed)
+        {
+            fchain->ctx.psychedelic.count++;
+            if (fchain->ctx.psychedelic.count > PSYCHEDELIC_COUNT_MAX)
+                fchain->ctx.psychedelic.count = PSYCHEDELIC_COUNT_MIN;
+        }
+    }
+    CIVector *ci_vector =
+        [CIVector vectorWithX: (float)fchain->ctx.psychedelic.x
+                            Y: (float)fchain->ctx.psychedelic.y];
+    @try {
+        [fchain->ci_filter setValue: ci_vector
+                             forKey: @"inputCenter"];
+        [fchain->ci_filter setValue: [NSNumber numberWithFloat: fchain->ctx.psychedelic.count]
+                             forKey: @"inputCount"];
+    }
+    @catch (NSException * e) { /* inputCenter key doesn't exist */ }
 }
 
 static picture_t *
@@ -677,6 +734,12 @@ OpenSharpen(vlc_object_t *obj)
     return Open(obj, "sharpen");
 }
 
+static int
+OpenPsychedelic(vlc_object_t *obj)
+{
+    return Open(obj, "psychedelic");
+}
+
 static void
 Close(vlc_object_t *obj)
 {
@@ -728,4 +791,8 @@ vlc_module_begin()
     add_submodule()
     set_callbacks(OpenSharpen, Close)
     add_shortcut("sharpen")
+
+    add_submodule()
+    set_callbacks(OpenPsychedelic, Close)
+    add_shortcut("psychedelic")
 vlc_module_end()
