@@ -37,6 +37,7 @@
 #include <QSpinBox>
 #include <QUrl>
 #include <QListWidgetItem>
+#include <QFontMetrics>
 
 #include <assert.h>
 #include <vlc_modules.h>
@@ -618,16 +619,20 @@ void VLCProfileEditor::muxSelected()
     SETYESNOSTATE( capsubs, "capsubs" );
     SETYESNOSTATE( capstream, "capstream" );
     SETYESNOSTATE( capchaps, "capchaps" );
+
+    int textsize = QFontMetrics(ui.muxerwarning->font()).ascent();
     if( current->property("module").toString() == "avformat" )
         ui.muxerwarning->setText(
-                    QString( "<img src=\":/menu/info\"/> %1" )
+                    QString( "<img src=\":/menu/info\" width=%2 height=%2/> %1" )
                     .arg( qtr( "This muxer is not provided directly by VLC: It could be missing." ) )
+                    .arg(textsize)
                     );
     else if ( !caps["muxers"].contains( current->property("module").toString() ) &&
               !caps["muxers"].contains( "mux_" + current->property("module").toString() ) )
         ui.muxerwarning->setText(
-                    QString( "<img src=\":/pixmaps/clear\"/> %1" )
+                    QString( "<img src=\":/toobar/clear\" width=%2 height=%2/> %1" )
                     .arg( qtr( "This muxer is missing. Using this profile will fail" ) )
+                    .arg(textsize)
                     );
     else
         ui.muxerwarning->setText("");

@@ -397,16 +397,16 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     setViewMode( QListView::ListMode );
     setTextElideMode( Qt::ElideNone );
     setDragEnabled( true );
-    setIconSize( QSize( 64, 32 ) );
-
+    int icon_size = fontMetrics().height();
+    setIconSize( QSize( icon_size * 2, icon_size ) );
     /* All the buttons do not need a special rendering */
     for( int i = 0; i < BUTTON_MAX; i++ )
     {
         QListWidgetItem *widgetItem = new QListWidgetItem( this );
         widgetItem->setText( qtr( nameL[i] ) );
         widgetItem->setSizeHint( QSize( widgetItem->sizeHint().width(), 32 ) );
-        QPixmap pix( iconL[i] );
-        widgetItem->setIcon( pix.scaled( 16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+
+        widgetItem->setIcon( QIcon( iconL[i] ) );
         widgetItem->setData( Qt::UserRole, QVariant( i ) );
         widgetItem->setToolTip( widgetItem->text() );
         addItem( widgetItem );

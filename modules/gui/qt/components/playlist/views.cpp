@@ -34,6 +34,7 @@
 #include <QDragMoveEvent>
 #include <QMetaType>
 #include <QHeaderView>
+#include <QSvgRenderer>
 
 #include <assert.h>
 
@@ -132,10 +133,8 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
             painter->fillPath( nodeRectPath, option.palette.color( QPalette::Highlight ) );
             painter->setOpacity( 1.0 );
         }
-        QPixmap dirPix( ":/type/node" );
-        QRect r2( dirPix.rect() );
-        r2.moveCenter( r.center() );
-        painter->drawPixmap( r2, dirPix );
+        QSvgRenderer renderer( QString(":/type/node") );
+        renderer.render(painter, r);
     }
 
     // Draw title
@@ -233,10 +232,12 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     //Draw children indicator
     if( !index.data( VLCModel::LEAF_NODE_ROLE ).toBool() )
     {
-        QPixmap dirPix = QPixmap( ":/type/node" );
-        painter->drawPixmap( QPoint( textRect.x(), textRect.center().y() - dirPix.height() / 2 ),
-                             dirPix );
-        textRect.setLeft( textRect.x() + dirPix.width() + 5 );
+        qreal pixsize = fm.height();
+        QSvgRenderer renderer( QString( ":/type/node" ) );
+        renderer.render(painter, QRect(
+                            textRect.x(), textRect.center().y() - pixsize / 2,
+                            pixsize, pixsize ) );
+        textRect.setLeft( textRect.x() + pixsize + 5 );
     }
 
     painter->drawText( textRect,
