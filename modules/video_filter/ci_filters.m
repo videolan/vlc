@@ -358,7 +358,7 @@ error:
     return NULL;
 }
 
-static void
+static int
 Open_FilterInit(filter_t *filter, struct filter_chain *fchain)
 {
     struct filter_param_desc const *filter_param_descs =
@@ -373,6 +373,12 @@ Open_FilterInit(filter_t *filter, struct filter_chain *fchain)
     }
 
     fchain->ci_filter = [CIFilter filterWithName: ci_filter_name];
+    if (!fchain->ci_filter)
+    {
+        msg_Warn(filter, "filter '%s' could not be created",
+                 [ci_filter_name UTF8String]);
+        return VLC_EGENERIC;
+    }
 
     for (int i = 0; i < NUM_FILTER_PARAM_MAX && filter_param_descs[i].vlc; ++i)
     {
@@ -395,6 +401,8 @@ Open_FilterInit(filter_t *filter, struct filter_chain *fchain)
         var_AddCallback(filter, filter_param_descs[i].vlc,
                         ParamsCallback, fchain);
     }
+
+    return VLC_SUCCESS;
 }
 
 static int
@@ -411,7 +419,12 @@ Open_CreateFilters(filter_t *filter, struct filter_chain **p_last_filter,
         if (!new_filter)
             return VLC_EGENERIC;
         p_last_filter = &new_filter;
-        Open_FilterInit(filter, new_filter);
+        if (Open_FilterInit(filter, new_filter) != VLC_SUCCESS)
+        {
+            for (unsigned int j = 0; j < i ; ++j)
+                filter_chain_RemoveFilter(p_last_filter, filter_types[i]);
+            return VLC_EGENERIC;
+        }
     }
 
     return VLC_SUCCESS;
