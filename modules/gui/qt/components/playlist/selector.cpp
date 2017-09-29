@@ -93,7 +93,9 @@ void PLSelItem::addAction( ItemAction act, const QString& tooltip )
 
     lblAction = new SelectorActionButton();
     lblAction->setIcon( icon );
-    lblAction->setMinimumWidth( lblAction->sizeHint().width() + 6 );
+    int icon_size = fontMetrics().height();
+    lblAction->setIconSize( QSize( icon_size, icon_size ) );
+    lblAction->setMinimumWidth( lblAction->sizeHint().width() + icon_size );
 
     if( !tooltip.isEmpty() ) lblAction->setToolTip( tooltip );
 

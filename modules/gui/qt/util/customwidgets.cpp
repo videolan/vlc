@@ -50,9 +50,8 @@ QFramelessButton::QFramelessButton( QWidget *parent )
 void QFramelessButton::paintEvent( QPaintEvent * )
 {
     QPainter painter( this );
-    QPixmap pix = icon().pixmap( size() );
-    QPoint pos( (width() - pix.width()) / 2, (height() - pix.height()) / 2 );
-    painter.drawPixmap( QRect( pos.x(), pos.y(), pix.width(), pix.height() ), pix );
+    icon().paint(&painter, QRect( 0, 0, width(), height()));
+
 }
 
 QElidingLabel::QElidingLabel( const QString &s, Qt::TextElideMode mode, QWidget * parent )
