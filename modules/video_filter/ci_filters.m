@@ -441,7 +441,8 @@ Mouse(filter_t *filter, struct vlc_mouse_t *mouse,
     sys->old_mouse = *old;
     sys->mouse = *new;
     sys->mouse_moved = true;
-    return VLC_EGENERIC;
+    *mouse = *new;
+    return VLC_SUCCESS;
 }
 
 static int
