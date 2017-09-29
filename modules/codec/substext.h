@@ -23,6 +23,7 @@
 
 #include <vlc_strings.h>
 #include <vlc_text_style.h>
+#include <vlc_subpicture.h>
 
 typedef struct subpicture_updater_sys_region_t subpicture_updater_sys_region_t;
 
@@ -61,6 +62,8 @@ struct subpicture_updater_sys_t {
     /* styling */
     text_style_t *p_default_style; /* decoder (full or partial) defaults */
     float margin_ratio;
+    mtime_t i_next_update;
+    bool b_blink_even;
 };
 
 static inline void SubpictureUpdaterSysRegionClean(subpicture_updater_sys_region_t *p_updtregion)
@@ -96,9 +99,10 @@ static int SubpictureTextValidate(subpicture_t *subpic,
                                   mtime_t ts)
 {
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
+    VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst);
 
-    if (!has_src_changed && !has_dst_changed)
+    if (!has_src_changed && !has_dst_changed &&
+        (sys->i_next_update == VLC_TS_INVALID || sys->i_next_update > ts))
         return VLC_SUCCESS;
 
     subpicture_updater_sys_region_t *p_updtregion = &sys->region;
@@ -126,7 +130,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                                  mtime_t ts)
 {
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+    VLC_UNUSED(fmt_src);
 
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
         return;
@@ -149,6 +153,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         fmt.i_sar_den = 1;
     }
 
+    bool b_schedule_blink_update = false;
     subpicture_region_t **pp_last_region = &subpic->p_region;
 
     for( subpicture_updater_sys_region_t *p_updtregion = &sys->region;
@@ -212,15 +217,39 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                 text_style_Merge( p_segment->style, sys->p_default_style, false );
             else
                 p_segment->style = text_style_Duplicate( sys->p_default_style );
-            /* Update all segments font sizes in pixels, *** metric used by renderers *** */
-            /* We only do this when a fixed font size isn't set */
-            if( p_segment->style && p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
+
+            if( p_segment->style )
             {
-                p_segment->style->i_font_size = p_segment->style->f_font_relsize *
-                                                subpic->i_original_picture_height / 100;
+                /* Update all segments font sizes in pixels, *** metric used by renderers *** */
+                /* We only do this when a fixed font size isn't set */
+                if( p_segment->style && p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
+                {
+                    p_segment->style->i_font_size = p_segment->style->f_font_relsize *
+                                                    subpic->i_original_picture_height / 100;
+                }
+
+                if( p_segment->style->i_style_flags & (STYLE_BLINK_BACKGROUND|STYLE_BLINK_FOREGROUND) )
+                {
+                    if( sys->b_blink_even ) /* do nothing at first */
+                    {
+                        if( p_segment->style->i_style_flags & STYLE_BLINK_BACKGROUND )
+                            p_segment->style->i_background_alpha =
+                                    (~p_segment->style->i_background_alpha) & 0xFF;
+                        if( p_segment->style->i_style_flags & STYLE_BLINK_FOREGROUND )
+                            p_segment->style->i_font_alpha =
+                                    (~p_segment->style->i_font_alpha) & 0xFF;
+                    }
+                    b_schedule_blink_update = true;
+                }
             }
         }
+    }
 
+    if( b_schedule_blink_update &&
+        (sys->i_next_update == VLC_TS_INVALID || sys->i_next_update < ts) )
+    {
+        sys->i_next_update = ts + CLOCK_FREQ;
+        sys->b_blink_even = !sys->b_blink_even;
     }
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)
