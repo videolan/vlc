@@ -1344,6 +1344,11 @@ uint8_t hevc_get_num_clock_ts( const hevc_sequence_parameter_set_t *p_sps,
         if( p_sps->vui.field_seq_flag )
             return 1; /* D.3.27 */
     }
+    else if( p_sps->profile_tier_level.general.interlaced_source_flag &&
+            !p_sps->profile_tier_level.general.progressive_source_flag )
+    {
+        return 1;
+    }
 
     return 2;
 }
