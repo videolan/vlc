@@ -32,6 +32,7 @@
 #include <vlc_picture.h>
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
+#include <vlc_mouse.h>
 #include "filter_picture.h"
 #include "vt_utils.h"
 
@@ -78,6 +79,9 @@ struct  ci_filters_ctx
 struct filter_sys_t
 {
     char const *                psz_filter;
+    bool                        mouse_moved;
+    vlc_mouse_t                 old_mouse;
+    vlc_mouse_t                 mouse;
     struct ci_filters_ctx *     ctx;
 };
 
@@ -349,13 +353,27 @@ Filter(filter_t *filter, picture_t *src)
             return NULL;
     }
 
+    filter->p_sys->mouse_moved = false;
     return dst;
 
 error:
     if (dst)
         picture_Release(dst);
     picture_Release(src);
+    filter->p_sys->mouse_moved = false;
     return NULL;
+}
+
+static int
+Mouse(filter_t *filter, struct vlc_mouse_t *mouse,
+      const struct vlc_mouse_t *old, const struct vlc_mouse_t *new)
+{
+    VLC_UNUSED(mouse);
+    filter_sys_t *sys = filter->p_sys;
+    sys->old_mouse = *old;
+    sys->mouse = *new;
+    sys->mouse_moved = true;
+    return VLC_EGENERIC;
 }
 
 static int
@@ -605,6 +623,7 @@ Open(vlc_object_t *obj, char const *psz_filter)
     filter->p_sys->ctx = ctx;
 
     filter->pf_video_filter = Filter;
+    filter->pf_video_mouse = Mouse;
 
     return VLC_SUCCESS;
 
