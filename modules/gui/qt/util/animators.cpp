@@ -20,6 +20,7 @@
 
 #include "animators.hpp"
 #include "qt.hpp"
+#include "util/imagehelper.hpp"
 
 #include <QWidget>
 #include <QPixmap>
@@ -43,18 +44,17 @@ void BasicAnimator::updateCurrentTime( int msecs )
     }
 }
 
-PixmapAnimator::PixmapAnimator( QWidget *parent, QList<QString> frames )
+PixmapAnimator::PixmapAnimator(QWidget *parent, QList<QString> frames, int width , int height)
     : BasicAnimator( parent )
 {
     foreach( QString name, frames )
-        pixmaps.append( new QPixmap( name ) );
+        pixmaps.append( ImageHelper::loadSvgToPixmap( name, width, height ) );
     currentPixmap = pixmaps.at( 0 );
     setFps( frames.count() ); /* default to 1 sec loop */
 }
 
 PixmapAnimator::~PixmapAnimator()
 {
-    qDeleteAll( pixmaps );
 }
 
 void PixmapAnimator::updateCurrentTime( int msecs )
@@ -65,7 +65,7 @@ void PixmapAnimator::updateCurrentTime( int msecs )
     {
         current_frame = i;
         currentPixmap = pixmaps.at( current_frame );
-        emit pixmapReady( *currentPixmap );
+        emit pixmapReady( currentPixmap );
     }
 }
 

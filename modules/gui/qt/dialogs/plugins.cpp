@@ -69,6 +69,7 @@
 
 //match the image source (width/height)
 #define SCORE_ICON_WIDTH_SCALE 4
+#define SPINNER_SIZE 32
 
 static QPixmap *loadPixmapFromData( char *, int size );
 
@@ -484,7 +485,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     frames << ":/util/wait2";
     frames << ":/util/wait3";
     frames << ":/util/wait4";
-    spinnerAnimation = new PixmapAnimator( this, frames );
+    spinnerAnimation = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
     CONNECT( spinnerAnimation, pixmapReady( const QPixmap & ),
              addonsView->viewport(), update() );
     addonsView->viewport()->installEventFilter( this );
@@ -519,14 +520,14 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
             QWidget *viewport = qobject_cast<QWidget *>( obj );
             if ( !viewport ) break;
             QStylePainter painter( viewport );
-            QPixmap *spinner = spinnerAnimation->getPixmap();
+            const QPixmap& spinner = spinnerAnimation->getPixmap();
             QPoint point = viewport->geometry().center();
-            point -= QPoint( spinner->size().width() / 2, spinner->size().height() / 2 );
-            painter.drawPixmap( point, *spinner );
+            point -= QPoint( spinner.width() / 2, spinner.height() / 2 );
+            painter.drawPixmap( point, spinner );
             QString text = qtr("Retrieving addons...");
             QSize textsize = fontMetrics().size( 0, text );
             point = viewport->geometry().center();
-            point -= QPoint( textsize.width() / 2, -spinner->size().height() );
+            point -= QPoint( textsize.width() / 2, -spinner.height() );
             painter.drawText( point, text );
         }
         else if ( addonsModel->rowCount() == 0 )

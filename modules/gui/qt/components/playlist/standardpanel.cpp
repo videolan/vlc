@@ -45,6 +45,7 @@
 #include <vlc_services_discovery.h>               /* SD_CMD_SEARCH */
 #include <vlc_intf_strings.h>                     /* POP_ */
 
+#define SPINNER_SIZE 32
 #define I_NEW_DIR \
     I_DIR_OR_FOLDER( N_("Create Directory"), N_( "Create Folder" ) )
 #define I_NEW_DIR_NAME \
@@ -104,7 +105,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     frames << ":/util/wait2";
     frames << ":/util/wait3";
     frames << ":/util/wait4";
-    spinnerAnimation = new PixmapAnimator( this, frames );
+    spinnerAnimation = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
     CONNECT( spinnerAnimation, pixmapReady( const QPixmap & ), this, updateViewport() );
 
     /* Saved Settings */
@@ -585,10 +586,10 @@ bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
             {
                 QWidget *viewport = qobject_cast<QWidget *>( obj );
                 QStylePainter painter( viewport );
-                QPixmap *spinner = spinnerAnimation->getPixmap();
+                const QPixmap& spinner = spinnerAnimation->getPixmap();
                 QPoint point = viewport->geometry().center();
-                point -= QPoint( spinner->size().width() / 2, spinner->size().height() / 2 );
-                painter.drawPixmap( point, *spinner );
+                point -= QPoint( spinner.width() / 2, spinner.height() / 2 );
+                painter.drawPixmap( point, spinner );
             }
         }
     }

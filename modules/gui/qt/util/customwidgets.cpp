@@ -39,6 +39,8 @@
 #include <QApplication>
 #include <vlc_actions.h>
 
+#define SPINNER_SIZE 32
+
 QFramelessButton::QFramelessButton( QWidget *parent )
                     : QPushButton( parent )
 {
@@ -326,7 +328,7 @@ SpinningIcon::SpinningIcon( QWidget *parent ) : QLabel( parent )
     frames << ":/util/wait2";
     frames << ":/util/wait3";
     frames << ":/util/wait4";
-    animator = new PixmapAnimator( this, frames );
+    animator = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
     CONNECT( animator, pixmapReady( const QPixmap & ), this, setPixmap( const QPixmap & ) );
     CONNECT( animator, pixmapReady( const QPixmap & ), this, repaint() );
     setScaledContents( true );

@@ -27,6 +27,7 @@
 #include <QList>
 #include <QString>
 #include <QAbstractAnimation>
+#include <QPixmap>
 #include <QPersistentModelIndex>
 
 class QWidget;
@@ -63,14 +64,14 @@ class PixmapAnimator : public BasicAnimator
     Q_OBJECT
 
 public:
-    PixmapAnimator( QWidget *parent, QList<QString> _frames );
+    PixmapAnimator(QWidget *parent, QList<QString> _frames , int width, int height);
     int duration() const Q_DECL_OVERRIDE { return interval * pixmaps.count(); }
     virtual ~PixmapAnimator();
-    QPixmap *getPixmap() { return currentPixmap; }
+    const QPixmap& getPixmap() { return currentPixmap; }
 protected:
     void updateCurrentTime ( int msecs ) Q_DECL_OVERRIDE;
-    QList<QPixmap *> pixmaps;
-    QPixmap *currentPixmap;
+    QList<QPixmap> pixmaps;
+    QPixmap currentPixmap;
 signals:
     void pixmapReady( const QPixmap & );
 };
