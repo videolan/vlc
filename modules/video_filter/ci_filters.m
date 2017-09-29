@@ -110,6 +110,8 @@ struct  filter_desc
         }                       ranges[2];
         int                     vlc_type;
     } const             param_descs[NUM_FILTER_PARAM_MAX];
+    void (*pf_init)(filter_t *filter, struct filter_chain *fchain);
+    void (*pf_control)(filter_t *filter, struct filter_chain *fchain);
 };
 
 static struct filter_desc       filter_desc_table[] =
@@ -331,6 +333,8 @@ Filter(filter_t *filter, picture_t *src)
                                      forKey: ci_param_name];
             }
 
+            if (filter_desc_table[fchain->filter].pf_control)
+                filter_desc_table[fchain->filter].pf_control(filter, fchain);
             ci_img = [fchain->ci_filter valueForKey: kCIOutputImageKey];
         }
 
@@ -419,6 +423,8 @@ Open_FilterInit(filter_t *filter, struct filter_chain *fchain)
         var_AddCallback(filter, filter_param_descs[i].vlc,
                         ParamsCallback, fchain);
     }
+    if (filter_desc_table[fchain->filter].pf_init)
+        filter_desc_table[fchain->filter].pf_init(filter, fchain);
 
     return VLC_SUCCESS;
 }
