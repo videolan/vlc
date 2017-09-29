@@ -376,6 +376,9 @@ static const vlc_fourcc_t p_CVPX_VIDEO_UYVY_fallback[] = {
 static const vlc_fourcc_t p_CVPX_VIDEO_I420_fallback[] = {
     VLC_CODEC_CVPX_I420, VLC_CODEC_I420, 0,
 };
+static const vlc_fourcc_t p_CVPX_VIDEO_BGRA_fallback[] = {
+    VLC_CODEC_CVPX_BGRA, VLC_CODEC_BGRA, 0,
+};
 
 static const vlc_fourcc_t p_VAAPI_420_fallback[] = {
     VLC_CODEC_VAAPI_420, VLC_CODEC_I420, 0,
@@ -537,6 +540,7 @@ static const vlc_fourcc_t *pp_RGB_fallback[] = {
     p_RGB16_fallback,
     p_RGB15_fallback,
     p_RGB8_fallback,
+    p_CVPX_VIDEO_BGRA_fallback,
 
     NULL,
 };
