@@ -1,0 +1,29 @@
+From ed55cab9836d8ed9a4738c795855b0b2af6fa6b9 Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre@videolabs.io>
+Date: Thu, 21 Sep 2017 12:05:15 +0200
+Subject: [PATCH] Force the usage of QtZlib header
+
+  qmake adds -I$(PREFIX)/include before adding
+  -I$(PREFIX)/include/QtZlib in its path while cross
+  compiling which ends up using the definition from the
+  system zlib while linking to QtZlib
+---
+ src/svg/qsvgtinydocument.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/svg/qsvgtinydocument.cpp b/src/svg/qsvgtinydocument.cpp
+index cc0fd5d..450c2d1 100644
+--- a/src/svg/qsvgtinydocument.cpp
++++ b/src/svg/qsvgtinydocument.cpp
+@@ -45,7 +45,7 @@
+ #include "qdebug.h"
+ 
+ #ifndef QT_NO_COMPRESS
+-#include <zlib.h>
++#include <QtZlib/zlib.h>
+ #endif
+ 
+ QT_BEGIN_NAMESPACE
+-- 
+2.14.1
+
