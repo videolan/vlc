@@ -101,10 +101,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     lastActivatedPLItemId     = -1;
 
     QList<QString> frames;
-    frames << ":/util/wait1";
-    frames << ":/util/wait2";
-    frames << ":/util/wait3";
-    frames << ":/util/wait4";
+    frames << ":/util/wait1.svg";
+    frames << ":/util/wait2.svg";
+    frames << ":/util/wait3.svg";
+    frames << ":/util/wait4.svg";
     spinnerAnimation = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
     CONNECT( spinnerAnimation, pixmapReady( const QPixmap & ), this, updateViewport() );
 
@@ -190,27 +190,27 @@ bool StandardPLPanel::popup( const QPoint &point )
 
     /* Play/Stream/Info static actions */
 
-    ADD_MENU_ENTRY( QIcon( ":/toolbar/play_b" ), qtr(I_POP_PLAY),
+    ADD_MENU_ENTRY( QIcon( ":/toolbar/play_b.svg" ), qtr(I_POP_PLAY),
                     VLCModelSubInterface::ACTION_PLAY )
 
-    ADD_MENU_ENTRY( QIcon( ":/toolbar/pause_b" ), qtr("Pause"),
+    ADD_MENU_ENTRY( QIcon( ":/toolbar/pause_b.svg" ), qtr("Pause"),
                     VLCModelSubInterface::ACTION_PAUSE )
 
-    ADD_MENU_ENTRY( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
+    ADD_MENU_ENTRY( QIcon( ":/menu/stream.svg" ), qtr(I_POP_STREAM),
                     VLCModelSubInterface::ACTION_STREAM )
 
     ADD_MENU_ENTRY( QIcon(), qtr(I_POP_SAVE),
                     VLCModelSubInterface::ACTION_SAVE );
 
-    ADD_MENU_ENTRY( QIcon( ":/menu/info" ), qtr(I_POP_INFO),
+    ADD_MENU_ENTRY( QIcon( ":/menu/info.svg" ), qtr(I_POP_INFO),
                     VLCModelSubInterface::ACTION_INFO );
 
     menu.addSeparator();
 
-    ADD_MENU_ENTRY( QIcon( ":/type/folder-grey" ), qtr(I_POP_EXPLORE),
+    ADD_MENU_ENTRY( QIcon( ":/type/folder-grey.svg" ), qtr(I_POP_EXPLORE),
                     VLCModelSubInterface::ACTION_EXPLORE );
 
-    QIcon addIcon( ":/buttons/playlist/playlist_add" );
+    QIcon addIcon( ":/buttons/playlist/playlist_add.svg" );
 
     ADD_MENU_ENTRY( addIcon, qtr(I_POP_NEWFOLDER),
                     VLCModelSubInterface::ACTION_CREATENODE )
@@ -240,10 +240,10 @@ bool StandardPLPanel::popup( const QPoint &point )
 
     /* Item removal */
 
-    ADD_MENU_ENTRY( QIcon( ":/buttons/playlist/playlist_remove" ), qtr(I_POP_DEL),
+    ADD_MENU_ENTRY( QIcon( ":/buttons/playlist/playlist_remove.svg" ), qtr(I_POP_DEL),
                     VLCModelSubInterface::ACTION_REMOVE );
 
-    ADD_MENU_ENTRY( QIcon( ":/toolbar/clear" ), qtr("Clear the playlist"),
+    ADD_MENU_ENTRY( QIcon( ":/toolbar/clear.svg" ), qtr("Clear the playlist"),
                     VLCModelSubInterface::ACTION_CLEAR );
 
     menu.addSeparator();
@@ -558,7 +558,8 @@ bool StandardPLPanel::eventFilter ( QObject *obj, QEvent * event )
         {
             QWidget *viewport = qobject_cast<QWidget *>( obj );
             QStylePainter painter( viewport );
-            QPixmap dropzone = ImageHelper::loadSvgToPixmap(":/dropzone", DROPZONE_SIZE, DROPZONE_SIZE);
+
+            QPixmap dropzone = ImageHelper::loadSvgToPixmap(":/dropzone.svg", DROPZONE_SIZE, DROPZONE_SIZE);
             qreal scale = dropzone.devicePixelRatio();
             QRect rect = viewport->geometry();
             QSize size = rect.size()  / 2 - dropzone.size() / (2 * scale);

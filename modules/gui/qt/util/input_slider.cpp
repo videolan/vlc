@@ -595,9 +595,9 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
 
     setFixedSize( WLENGTH, WHEIGHT );
 
-    pixOutside = ImageHelper::loadSvgToPixmap(":/toolbar/volslide-outside", width(), height() );
+    pixOutside = ImageHelper::loadSvgToPixmap(":/toolbar/volslide-outside.svg", width(), height() );
 
-    const QPixmap temp = ImageHelper::loadSvgToPixmap(":/toolbar/volslide-inside", width(), height() );
+    const QPixmap temp = ImageHelper::loadSvgToPixmap(":/toolbar/volslide-inside.svg", width(), height() );
     const QBitmap mask( temp.createHeuristicMask() );
 
     pixGradient = QPixmap( pixOutside.size() );

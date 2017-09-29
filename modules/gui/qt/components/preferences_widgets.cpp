@@ -175,19 +175,19 @@ void InterfacePreviewWidget::setNormalPreview( bool b_minimal )
 
 void InterfacePreviewWidget::setPreview( enum_style e_style )
 {
-    QString pixmapLocationString(":/prefsmenu/");
+    QString pixmapLocationString;
 
     switch( e_style )
     {
     default:
     case COMPLETE:
-        pixmapLocationString += "sample_complete";
+        pixmapLocationString = ":/prefsmenu/sample_complete.png";
         break;
     case MINIMAL:
-        pixmapLocationString += "sample_minimal";
+        pixmapLocationString = ":/prefsmenu/sample_minimal.png";
         break;
     case SKINS:
-        pixmapLocationString += "sample_skins";
+        pixmapLocationString = ":/prefsmenu/sample_skins.png";
         break;
     }
 

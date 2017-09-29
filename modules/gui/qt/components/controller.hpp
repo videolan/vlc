@@ -126,15 +126,15 @@ static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_("Open subtitle file"),
     N_("Dock/undock fullscreen controller to/from bottom of screen"),
 };
-static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b", ":/toolbar/stop_b",
-    ":/toolbar/eject", ":/toolbar/previous_b", ":/toolbar/next_b",
-    ":/toolbar/slower", ":/toolbar/faster", ":/toolbar/fullscreen",
-    ":/toolbar/defullscreen", ":/toolbar/extended", ":/toolbar/playlist",
-    ":/toolbar/snapshot", ":/toolbar/record", ":/toolbar/atob_nob",
-    ":/toolbar/frame", ":/toolbar/reverse", ":/toolbar/skip_back",
-    ":/toolbar/skip_fw", ":/toolbar/clear", ":/buttons/playlist/shuffle_on",
-    ":/buttons/playlist/repeat_all", ":/menu/info",
-    ":/toolbar/previous_b", ":/toolbar/next_b", ":/toolbar/eject", ":/toolbar/space"
+static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b.svg", ":/toolbar/stop_b.svg",
+    ":/toolbar/eject.svg", ":/toolbar/previous_b.svg", ":/toolbar/next_b.svg",
+    ":/toolbar/slower.svg", ":/toolbar/faster.svg", ":/toolbar/fullscreen.svg",
+    ":/toolbar/defullscreen.svg", ":/toolbar/extended.svg", ":/toolbar/playlist.svg",
+    ":/toolbar/snapshot.svg", ":/toolbar/record.svg", ":/toolbar/atob_nob.svg",
+    ":/toolbar/frame.svg", ":/toolbar/reverse.svg", ":/toolbar/skip_back.svg",
+    ":/toolbar/skip_fw.svg", ":/toolbar/clear.svg", ":/buttons/playlist/shuffle_on.svg",
+    ":/buttons/playlist/repeat_all.svg", ":/menu/info.svg",
+    ":/toolbar/previous_b.svg", ":/toolbar/next_b.svg", ":/toolbar/eject.svg", ":/toolbar/space.svg"
 };
 
 enum

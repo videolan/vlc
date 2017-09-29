@@ -133,7 +133,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
             painter->fillPath( nodeRectPath, option.palette.color( QPalette::Highlight ) );
             painter->setOpacity( 1.0 );
         }
-        QSvgRenderer renderer( QString(":/type/node") );
+        QSvgRenderer renderer( QString(":/type/node.svg") );
         renderer.render(painter, r);
     }
 
@@ -233,7 +233,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     if( !index.data( VLCModel::LEAF_NODE_ROLE ).toBool() )
     {
         qreal pixsize = fm.height();
-        QSvgRenderer renderer( QString( ":/type/node" ) );
+        QSvgRenderer renderer( QString( ":/type/node.svg" ) );
         renderer.render(painter, QRect(
                             textRect.x(), textRect.center().y() - pixsize / 2,
                             pixsize, pixsize ) );
@@ -296,7 +296,7 @@ void CellPixmapDelegate::paint( QPainter * painter, const QStyleOptionViewItem &
 static inline void plViewStartDrag( QAbstractItemView *view, const Qt::DropActions & supportedActions )
 {
     QDrag *drag = new QDrag( view );
-    drag->setPixmap( QPixmap( ":/noart64" ) );
+    drag->setPixmap( QPixmap( ":/noart64.png" ) );
     drag->setMimeData( view->model()->mimeData(
         view->selectionModel()->selectedIndexes() ) );
     drag->exec( supportedActions );

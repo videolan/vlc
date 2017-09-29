@@ -84,9 +84,9 @@ void PLSelItem::addAction( ItemAction act, const QString& tooltip )
     switch( act )
     {
     case ADD_ACTION:
-        icon = QIcon( ":/buttons/playlist/playlist_add" ); break;
+        icon = QIcon( ":/buttons/playlist/playlist_add.svg" ); break;
     case RM_ACTION:
-        icon = QIcon( ":/buttons/playlist/playlist_remove" ); break;
+        icon = QIcon( ":/buttons/playlist/playlist_remove.svg" ); break;
     default:
         return;
     }
@@ -233,7 +233,7 @@ void PLSelector::createItems()
     playlistItem = putPLData( addItem( PL_ITEM_TYPE, N_("Playlist"), true ),
                               THEPL->p_playing );
     playlistItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
-    playlistItem->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/playlist" ) );
+    playlistItem->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/playlist.svg" ) );
     setCurrentItem( playlistItem->treeItem() );
 
     /* ML */
@@ -242,7 +242,7 @@ void PLSelector::createItems()
         PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
           THEPL->p_media_library );
         ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
-        ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library" ) );
+        ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library.svg" ) );
     }
 
     /* SD nodes */
@@ -285,16 +285,16 @@ void PLSelector::createItems()
                 selItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
                 CONNECT( selItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
                 podcastsParent = selItem->treeItem();
-                icon = QIcon( ":/sidebar/podcast" );
+                icon = QIcon( ":/sidebar/podcast.svg" );
             }
             else if ( name.startsWith( "lua{" ) )
             {
                 int i_head = name.indexOf( "sd='" ) + 4;
                 int i_tail = name.indexOf( '\'', i_head );
-                QString iconname = QString( ":/sidebar/sd/%1" ).arg( name.mid( i_head, i_tail - i_head ) );
+                QString iconname = QString( ":/sidebar/sd/%1.svg" ).arg( name.mid( i_head, i_tail - i_head ) );
                 QResource resource( iconname );
                 if ( !resource.isValid() )
-                    icon = QIcon( ":/sidebar/network" );
+                    icon = QIcon( ":/sidebar/network.svg" );
                 else
                     icon = QIcon( iconname );
             }
@@ -304,29 +304,29 @@ void PLSelector::createItems()
             name = name.mid( 0, name.indexOf( '{' ) );
             selItem = addItem( SD_TYPE, *ppsz_longname, false, false, devices );
             if ( name == "xcb_apps" )
-                icon = QIcon( ":/sidebar/screen" );
+                icon = QIcon( ":/sidebar/screen.svg" );
             else if ( name == "mtp" )
-                icon = QIcon( ":/sidebar/mtp" );
+                icon = QIcon( ":/sidebar/mtp.svg" );
             else if ( name == "disc" )
-                icon = QIcon( ":/sidebar/disc" );
+                icon = QIcon( ":/sidebar/disc.svg" );
             else
-                icon = QIcon( ":/sidebar/capture" );
+                icon = QIcon( ":/sidebar/capture.svg" );
             break;
         case SD_CAT_LAN:
             selItem = addItem( SD_TYPE, *ppsz_longname, false, false, lan );
-            icon = QIcon( ":/sidebar/lan" );
+            icon = QIcon( ":/sidebar/lan.svg" );
             break;
         case SD_CAT_MYCOMPUTER:
             name = name.mid( 0, name.indexOf( '{' ) );
             selItem = addItem( SD_TYPE, *ppsz_longname, false, false, mycomp );
             if ( name == "video_dir" )
-                icon = QIcon( ":/sidebar/movie" );
+                icon = QIcon( ":/sidebar/movie.svg" );
             else if ( name == "audio_dir" )
-                icon = QIcon( ":/sidebar/music" );
+                icon = QIcon( ":/sidebar/music.svg" );
             else if ( name == "picture_dir" )
-                icon = QIcon( ":/sidebar/pictures" );
+                icon = QIcon( ":/sidebar/pictures.svg" );
             else
-                icon = QIcon( ":/sidebar/movie" );
+                icon = QIcon( ":/sidebar/movie.svg" );
             break;
         default:
             selItem = addItem( SD_TYPE, *ppsz_longname );

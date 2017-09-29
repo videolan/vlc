@@ -251,7 +251,7 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
     QDialogButtonBox *buttonsBox = new QDialogButtonBox;
 
     // More information button
-    butMoreInfo = new QPushButton( QIcon( ":/menu/info" ),
+    butMoreInfo = new QPushButton( QIcon( ":/menu/info.svg" ),
                                    qtr( "More information..." ),
                                    this );
     CONNECT( butMoreInfo, clicked(), this, moreInformation() );
@@ -259,7 +259,7 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
 
     // Reload button
     ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
-    QPushButton *reload = new QPushButton( QIcon( ":/update" ),
+    QPushButton *reload = new QPushButton( QIcon( ":/update.svg" ),
                                            qtr( "Reload extensions" ),
                                            this );
     CONNECT( reload, clicked(), EM, reloadExtensions() );
@@ -310,19 +310,19 @@ static QIcon iconFromCategory( int type )
     switch( type )
     {
         case ADDON_EXTENSION:
-            return QIcon( ":/addons/addon_yellow" );
+            return QIcon( ":/addons/addon_yellow.svg" );
         case ADDON_PLAYLIST_PARSER:
-            return QIcon( ":/addons/addon_green" );
+            return QIcon( ":/addons/addon_green.svg" );
         case ADDON_SERVICE_DISCOVERY:
-            return QIcon( ":/addons/addon_red" );
+            return QIcon( ":/addons/addon_red.svg" );
         case ADDON_SKIN2:
-            return QIcon( ":/addons/addon_cyan" );
+            return QIcon( ":/addons/addon_cyan.svg" );
         case ADDON_INTERFACE:
-            return QIcon( ":/addons/addon_blue" );
+            return QIcon( ":/addons/addon_blue.svg" );
         case ADDON_META:
-            return QIcon( ":/addons/addon_magenta" );
+            return QIcon( ":/addons/addon_magenta.svg" );
         default:
-            return QIcon( ":/addons/default" );
+            return QIcon( ":/addons/default.svg" );
     }
     vlc_assert_unreachable();
 }
@@ -423,7 +423,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     switchStack->insertWidget( WITHONLINEADDONS, installedOnlyBox );
     CONNECT( installedOnlyBox, stateChanged(int), this, installChecked(int) );
 
-    QPushButton *reposyncButton = new QPushButton( QIcon( ":/update" ),
+    QPushButton *reposyncButton = new QPushButton( QIcon( ":/update.svg" ),
                                               qtr("Find more addons online") );
     reposyncButton->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     switchStack->insertWidget( ONLYLOCALADDONS, reposyncButton );
@@ -481,10 +481,10 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
              model, addonChanged( const addon_entry_t * ) );
 
     QList<QString> frames;
-    frames << ":/util/wait1";
-    frames << ":/util/wait2";
-    frames << ":/util/wait3";
-    frames << ":/util/wait4";
+    frames << ":/util/wait1.svg";
+    frames << ":/util/wait2.svg";
+    frames << ":/util/wait3.svg";
+    frames << ":/util/wait4.svg";
     spinnerAnimation = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
     CONNECT( spinnerAnimation, pixmapReady( const QPixmap & ),
              addonsView->viewport(), update() );
@@ -806,9 +806,9 @@ QVariant AddonsListModel::Addon::data( int role ) const
             returnval = pixmap;
         }
         else if ( p_entry->e_flags & ADDON_BROKEN )
-            returnval = QPixmap( ":/addons/broken" );
+            returnval = QPixmap( ":/addons/broken.svg" );
         else
-            returnval = QPixmap( ":/addons/default" );
+            returnval = QPixmap( ":/addons/default.svg" );
         break;
     case Qt::ToolTipRole:
     {
@@ -1216,7 +1216,7 @@ void AddonItemDelegate::paint( QPainter *painter,
     {
         int i_scoreicon_height = newopt.fontMetrics.height();
         int i_scoreicon_width = i_scoreicon_height * SCORE_ICON_WIDTH_SCALE;
-        scoreicon = ImageHelper::loadSvgToPixmap( ":/addons/score",
+        scoreicon = ImageHelper::loadSvgToPixmap( ":/addons/score.svg",
                     i_scoreicon_width, i_scoreicon_height );
         int i_width = ( (float) i_score / ADDON_MAX_SCORE ) * i_scoreicon_width;
         /* Erase the end (value) of our pixmap with a shadow */
@@ -1298,7 +1298,7 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
     editorWidget->setLayout( new QHBoxLayout() );
     editorWidget->layout()->setMargin( 0 );
 
-    infoButton = new QPushButton( QIcon( ":/menu/info" ),
+    infoButton = new QPushButton( QIcon( ":/menu/info.svg" ),
                                   qtr( "More information..." ) );
     connect( infoButton, SIGNAL(clicked()), this, SIGNAL(showInfo()) );
     editorWidget->layout()->addWidget( infoButton );
@@ -1307,10 +1307,10 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
          index.data( AddonsListModel::FlagsRole ).toInt() )
     {
         if ( index.data( AddonsListModel::StateRole ).toInt() == ADDON_INSTALLED )
-            installButton = new QPushButton( QIcon( ":/buttons/playlist/playlist_remove" ),
+            installButton = new QPushButton( QIcon( ":/buttons/playlist/playlist_remove.svg" ),
                                              qtr("&Uninstall"), parent );
         else
-            installButton = new QPushButton( QIcon( ":/buttons/playlist/playlist_add" ),
+            installButton = new QPushButton( QIcon( ":/buttons/playlist/playlist_add.svg" ),
                                              qtr("&Install"), parent );
         CONNECT( installButton, clicked(), this, editButtonClicked() );
         editorWidget->layout()->addWidget( installButton );

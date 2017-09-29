@@ -62,7 +62,7 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf)
     timeEdit->setAlignment( Qt::AlignRight );
     timeEdit->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );
 
-    QPushButton *resetButton = new QPushButton( QIcon(":/update"), "" );
+    QPushButton *resetButton = new QPushButton( QIcon(":/update.svg"), "" );
     resetButton->setToolTip( qtr("Reset") );
 
     mainLayout->addWidget( timeIntro, 0, 0, 1, 1 );

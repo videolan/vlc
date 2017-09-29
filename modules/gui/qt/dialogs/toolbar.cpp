@@ -143,10 +143,10 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     profileCombo = new QComboBox;
 
     QToolButton *newButton = new QToolButton;
-    newButton->setIcon( QIcon( ":/new" ) );
+    newButton->setIcon( QIcon( ":/new.svg" ) );
     newButton->setToolTip( qtr("New profile") );
     QToolButton *deleteButton = new QToolButton;
-    deleteButton->setIcon( QIcon( ":/toolbar/clear" ) );
+    deleteButton->setIcon( QIcon( ":/toolbar/clear.svg" ) );
     deleteButton->setToolTip( qtr( "Delete the current profile" ) );
 
     profileBoxLayout->addWidget( new QLabel( qtr( "Select profile:" ) ), 0, 0 );
@@ -413,14 +413,14 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     }
 
     /* Spacers are yet again a different thing */
-    QListWidgetItem *widgetItem = new QListWidgetItem( QIcon( ":/toolbar/space" ),
+    QListWidgetItem *widgetItem = new QListWidgetItem( QIcon( ":/toolbar/space.svg" ),
             qtr( "Spacer" ), this );
     widgetItem->setData( Qt::UserRole, WIDGET_SPACER );
     widgetItem->setToolTip( widgetItem->text() );
     widgetItem->setSizeHint( QSize( widgetItem->sizeHint().width(), 32 ) );
     addItem( widgetItem );
 
-    widgetItem = new QListWidgetItem( QIcon( ":/toolbar/space" ),
+    widgetItem = new QListWidgetItem( QIcon( ":/toolbar/space.svg" ),
             qtr( "Expanding Spacer" ), this );
     widgetItem->setData( Qt::UserRole, WIDGET_SPACER_EXTEND );
     widgetItem->setToolTip( widgetItem->text() );
@@ -474,7 +474,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             {
                 QListWidgetItem *widgetItem = new QListWidgetItem( this );
                 widgetItem->setText( qtr("Small Volume") );
-                widgetItem->setIcon( QIcon( ":/toolbar/volume-medium" ) );
+                widgetItem->setIcon( QIcon( ":/toolbar/volume-medium.svg" ) );
                 widgetItem->setData( Qt::UserRole, QVariant( i ) );
                 addItem( widgetItem );
             }
@@ -494,17 +494,17 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 discLayout->setSpacing( 0 ); discLayout->setMargin( 0 );
 
                 QToolButton *prevSectionButton = new QToolButton( discFrame );
-                prevSectionButton->setIcon( QIcon( ":/toolbar/dvd_prev" ) );
+                prevSectionButton->setIcon( QIcon( ":/toolbar/dvd_prev.svg" ) );
                 prevSectionButton->setToolTip( qtr("Previous chapter") );
                 discLayout->addWidget( prevSectionButton );
 
                 QToolButton *menuButton = new QToolButton( discFrame );
-                menuButton->setIcon( QIcon( ":/toolbar/dvd_menu" ) );
+                menuButton->setIcon( QIcon( ":/toolbar/dvd_menu.svg" ) );
                 menuButton->setToolTip( qtr("Go to the DVD menu") );
                 discLayout->addWidget( menuButton );
 
                 QToolButton *nextButton = new QToolButton( discFrame );
-                nextButton->setIcon( QIcon( ":/toolbar/dvd_next" ) );
+                nextButton->setIcon( QIcon( ":/toolbar/dvd_next.svg" ) );
                 nextButton->setToolTip( qtr("Next chapter") );
                 discLayout->addWidget( nextButton );
 
@@ -519,11 +519,11 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 telexLayout->setSpacing( 0 ); telexLayout->setMargin( 0 );
 
                 QToolButton *telexOn = new QToolButton( telexFrame );
-                telexOn->setIcon( QIcon( ":/toolbar/tv" ) );
+                telexOn->setIcon( QIcon( ":/toolbar/tv.svg" ) );
                 telexLayout->addWidget( telexOn );
 
                 QToolButton *telexTransparent = new QToolButton;
-                telexTransparent->setIcon( QIcon( ":/toolbar/tvtelx" ) );
+                telexTransparent->setIcon( QIcon( ":/toolbar/tvtelx.svg" ) );
                 telexTransparent->setToolTip( qtr("Teletext transparency") );
                 telexLayout->addWidget( telexTransparent );
 
@@ -669,7 +669,7 @@ void DroppingController::createAndAddWidget( QBoxLayout *newControlLayout,
     if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
     {
         QLabel *label = new QLabel( this );
-        label->setPixmap( ImageHelper::loadSvgToPixmap( ":/toolbar/space", height(), height() ) );
+        label->setPixmap( ImageHelper::loadSvgToPixmap( ":/toolbar/space.svg", height(), height() ) );
         if( i_type == WIDGET_SPACER_EXTEND )
         {
             label->setSizePolicy( QSizePolicy::MinimumExpanding,

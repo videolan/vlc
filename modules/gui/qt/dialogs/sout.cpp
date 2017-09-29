@@ -64,7 +64,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     QTabBar* tb = ui.destTab->findChild<QTabBar*>();
     if( tb != NULL ) tb->tabButton(0, QTabBar::RightSide)->hide();
     CONNECT( ui.destTab, tabCloseRequested( int ), this, closeTab( int ) );
-    ui.destTab->setTabIcon( 0, QIcon( ":/buttons/playlist/playlist_add" ) );
+    ui.destTab->setTabIcon( 0, QIcon( ":/buttons/playlist/playlist_add.svg" ) );
 
     ui.destBox->addItem( qtr( "File" ) );
     ui.destBox->addItem( "HTTP" );

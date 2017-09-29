@@ -98,7 +98,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     ui.filterEdit->setText( getSettings()->value( "messages-filter" ).toString() );
     getSettings()->endGroup();
 
-    updateButton = new QPushButton( QIcon(":/update"), "" );
+    updateButton = new QPushButton( QIcon(":/update.svg"), "" );
     updateButton->setFlat( true );
     ui.mainTab->setCornerWidget( updateButton );
 
@@ -330,7 +330,7 @@ void MessagesDialog::updateOrClear()
 
 void MessagesDialog::tabChanged( int i )
 {
-    updateButton->setIcon( i != 0 ? QIcon(":/update") : QIcon(":/toolbar/clear") );
+    updateButton->setIcon( i != 0 ? QIcon(":/update.svg") : QIcon(":/toolbar/clear.svg") );
     updateButton->setToolTip( i != 0 ? qtr("Update the tree")
                                      : qtr("Clear the messages") );
 }

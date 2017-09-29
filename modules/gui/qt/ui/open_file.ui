@@ -109,7 +109,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/playlist_add</normaloff>:/playlist_add</iconset>
+          <normaloff>:/buttons/playlist/playlist_add.svg</normaloff>:/buttons/playlist/playlist_add.svg</iconset>
         </property>
        </widget>
       </item>
@@ -129,7 +129,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/playlist_remove</normaloff>:/playlist_remove</iconset>
+          <normaloff>:/buttons/playlist/playlist_remove.svg</normaloff>:/buttons/playlist/playlist_remove.svg</iconset>
         </property>
        </widget>
       </item>

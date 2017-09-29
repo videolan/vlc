@@ -86,14 +86,14 @@ OpenDialog::OpenDialog( QWidget *parent,
     captureOpenPanel = new CaptureOpenPanel( this, p_intf );
 
     /* Insert the tabs */
-    ui.Tab->insertTab( OPEN_FILE_TAB, fileOpenPanel, QIcon( ":/type/file-asym" ),
+    ui.Tab->insertTab( OPEN_FILE_TAB, fileOpenPanel, QIcon( ":/type/file-asym.svg" ),
                        qtr( "&File" ) );
-    ui.Tab->insertTab( OPEN_DISC_TAB, discOpenPanel, QIcon( ":/type/disc" ),
+    ui.Tab->insertTab( OPEN_DISC_TAB, discOpenPanel, QIcon( ":/type/disc.svg" ),
                        qtr( "&Disc" ) );
-    ui.Tab->insertTab( OPEN_NETWORK_TAB, netOpenPanel, QIcon( ":/type/network" ),
+    ui.Tab->insertTab( OPEN_NETWORK_TAB, netOpenPanel, QIcon( ":/type/network.svg" ),
                        qtr( "&Network" ) );
     ui.Tab->insertTab( OPEN_CAPTURE_TAB, captureOpenPanel,
-                       QIcon( ":/type/capture-card" ), qtr( "Capture &Device" ) );
+                       QIcon( ":/type/capture-card.svg" ), qtr( "Capture &Device" ) );
 
     /* Hide the Slave input widgets */
     ui.slaveLabel->hide();

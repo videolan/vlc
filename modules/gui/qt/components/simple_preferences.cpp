@@ -194,7 +194,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
 
 #define ADD_CATEGORY( button, label, ltooltip, icon, numb )                 \
     QToolButton * button = new QToolButton( this );                         \
-    button->setIcon( QIcon( ":/prefsmenu/" #icon ) );                       \
+    button->setIcon( QIcon( ":/prefsmenu/" #icon ".png" ) );                \
     button->setText( label );                                               \
     button->setToolTip( ltooltip );                                         \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \

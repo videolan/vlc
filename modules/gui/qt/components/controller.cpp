@@ -209,7 +209,7 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout_,
     a_button->setIcon( QIcon( iconL[button] ) );
 #define BUTTON_SET_BAR2( button, image, tooltip ) \
     button->setToolTip( tooltip );          \
-    button->setIcon( QIcon( ":/"#image ) );
+    button->setIcon( QIcon( ":/"#image ".svg" ) );
 
 #define ENABLE_ON_VIDEO( a ) \
     CONNECT( THEMIM->getIM(), voutChanged( bool ), a, setEnabled( bool ) ); \
