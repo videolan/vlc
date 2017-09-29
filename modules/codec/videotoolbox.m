@@ -159,7 +159,7 @@ struct decoder_sys_t
 
     int                         i_forced_cvpx_format;
 
-    poc_context_t               pocctx;
+    h264_poc_context_t          pocctx;
     date_t                      pts;
 };
 

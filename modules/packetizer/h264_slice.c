@@ -215,7 +215,7 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
 
 
 void h264_compute_poc( const h264_sequence_parameter_set_t *p_sps,
-                       const h264_slice_t *p_slice, poc_context_t *p_ctx,
+                       const h264_slice_t *p_slice, h264_poc_context_t *p_ctx,
                        int *p_PictureOrderCount, int *p_tFOC, int *p_bFOC )
 {
     *p_tFOC = *p_bFOC = 0;

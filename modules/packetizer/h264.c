@@ -114,7 +114,7 @@ struct decoder_sys_t
     unsigned i_recoveryfnum;
 
     /* POC */
-    poc_context_t pocctx;
+    h264_poc_context_t pocctx;
     struct
     {
         mtime_t pts;
