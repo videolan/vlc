@@ -145,9 +145,6 @@ public:
     void setMuted( bool ); /* Set Mute status */
 
 protected:
-    const static int paddingL = 3;
-    const static int paddingR = 2;
-
     void paintEvent( QPaintEvent *) Q_DECL_OVERRIDE;
     void wheelEvent( QWheelEvent *event ) Q_DECL_OVERRIDE;
     void mousePressEvent( QMouseEvent * ) Q_DECL_OVERRIDE;
