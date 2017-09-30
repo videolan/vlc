@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCBookmarksWindowController">
@@ -19,7 +18,6 @@
                 <outlet property="editOKButton" destination="141" id="172"/>
                 <outlet property="editTimeLabel" destination="147" id="176"/>
                 <outlet property="editTimeTextField" destination="137" id="174"/>
-                <outlet property="extractButton" destination="96" id="168"/>
                 <outlet property="removeButton" destination="92" id="169"/>
                 <outlet property="window" destination="84" id="184"/>
             </connections>
@@ -30,7 +28,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="330" width="540" height="307"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="85">
                 <rect key="frame" x="0.0" y="0.0" width="540" height="307"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -73,16 +71,6 @@
                         </buttonCell>
                         <connections>
                             <action selector="clear:" target="-2" id="178"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="96">
-                        <rect key="frame" x="20" y="133" width="98" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Extract" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="97" customClass="VLCHUDButtonCell">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="cellTitle"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="extract:" target="-2" id="182"/>
                         </connections>
                     </button>
                     <scrollView borderType="line" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="107">
@@ -144,7 +132,6 @@
                     </scrollView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="107" firstAttribute="leading" secondItem="96" secondAttribute="trailing" constant="8" id="6g9-RT-DuR"/>
                     <constraint firstItem="107" firstAttribute="leading" secondItem="90" secondAttribute="trailing" constant="8" id="9X9-yE-SIP"/>
                     <constraint firstItem="92" firstAttribute="top" secondItem="90" secondAttribute="bottom" constant="7" id="A88-z3-fCb"/>
                     <constraint firstAttribute="bottom" secondItem="107" secondAttribute="bottom" constant="20" id="BRp-2T-87k"/>
@@ -156,11 +143,9 @@
                     <constraint firstItem="107" firstAttribute="leading" secondItem="94" secondAttribute="trailing" constant="8" id="N3T-ZA-ej2"/>
                     <constraint firstItem="88" firstAttribute="top" secondItem="85" secondAttribute="top" constant="20" id="WP1-gk-lha"/>
                     <constraint firstItem="92" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="epp-d9-CZ3"/>
-                    <constraint firstItem="96" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="fl1-Eg-POd"/>
                     <constraint firstItem="94" firstAttribute="top" secondItem="92" secondAttribute="bottom" constant="7" id="hSm-2D-FnN"/>
                     <constraint firstItem="107" firstAttribute="leading" secondItem="92" secondAttribute="trailing" constant="8" id="nMK-MO-8IJ"/>
                     <constraint firstItem="90" firstAttribute="top" secondItem="88" secondAttribute="bottom" constant="7" id="qG7-2g-FtJ"/>
-                    <constraint firstItem="96" firstAttribute="top" secondItem="94" secondAttribute="bottom" constant="42" id="tPx-97-iRX"/>
                     <constraint firstItem="88" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="uNA-di-0LF"/>
                     <constraint firstItem="107" firstAttribute="top" secondItem="85" secondAttribute="top" constant="11" id="xmY-ER-h97"/>
                 </constraints>
@@ -170,12 +155,12 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="401" width="298" height="125"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="134">
                 <rect key="frame" x="0.0" y="0.0" width="298" height="125"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="135">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="135">
                         <rect key="frame" x="74" y="83" width="204" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="204" id="bLc-El-nRp"/>
@@ -186,7 +171,7 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="137">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="137">
                         <rect key="frame" x="74" y="51" width="204" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="138" customClass="VLCHUDTextFieldCell">
                             <font key="font" metaFont="system"/>
@@ -220,7 +205,7 @@ Gw
                             <action selector="edit_cancel:" target="-2" id="180"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="145">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="145">
                         <rect key="frame" x="25" y="85" width="44" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Name:" id="146" customClass="VLCHUDTextFieldCell">
                             <font key="font" metaFont="system"/>
@@ -228,7 +213,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="147">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="147">
                         <rect key="frame" x="31" y="53" width="38" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time:" id="148" customClass="VLCHUDTextFieldCell">
                             <font key="font" metaFont="system"/>

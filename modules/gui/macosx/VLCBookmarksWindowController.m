@@ -78,7 +78,6 @@
     [_addButton setTitle: _NS("Add")];
     [_clearButton setTitle: _NS("Clear")];
     [_editButton setTitle: _NS("Edit")];
-    [_extractButton setTitle: _NS("Extract")];
     [_removeButton setTitle: _NS("Remove")];
     [[[_dataTable tableColumnWithIdentifier:@"description"] headerCell]
      setStringValue: _NS("Description")];
@@ -258,54 +257,6 @@ clear:
     free(pp_bookmarks);
 }
 
-- (IBAction)extract:(id)sender
-{
-#warning this does not work anymore
-#if 0
-    if ([_dataTable numberOfSelectedRows] < 2) {
-        NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("Two bookmarks have to be selected."));
-        return;
-    }
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    if (!p_input) {
-        NSBeginCriticalAlertSheet(_NS("No input found"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("The stream must be playing or paused for bookmarks to work."));
-        return;
-    }
-
-    seekpoint_t **pp_bookmarks;
-    int i_bookmarks ;
-    int i_first = -1;
-    int i_second = -1;
-    int c = 0;
-    for (NSUInteger x = 0; c != 2; x++) {
-        if ([_dataTable isRowSelected:x]) {
-            if (i_first == -1) {
-                i_first = x;
-                c = 1;
-            } else if (i_second == -1) {
-                i_second = x;
-                c = 2;
-            }
-        }
-    }
-
-    if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
-        vlc_object_release(p_input);
-        msg_Err(getIntf(), "already defined bookmarks couldn't be retrieved");
-        return;
-    }
-
-    char *psz_uri = input_item_GetURI(input_GetItem(p_input));
-    [[[VLCMain sharedInstance] wizard] initWithExtractValuesFrom: [NSString stringWithFormat:@"%lli", pp_bookmarks[i_first]->i_time_offset/1000000] to: [NSString stringWithFormat:@"%lli", pp_bookmarks[i_second]->i_time_offset/1000000] ofItem: toNSStr(psz_uri)];
-    free(psz_uri);
-    vlc_object_release(p_input);
-
-    // Clear the bookmark list
-    for (int i = 0; i < i_bookmarks; i++)
-        vlc_seekpoint_Delete(pp_bookmarks[i]);
-    free(pp_bookmarks);
-#endif
-}
 
 - (IBAction)goToBookmark:(id)sender
 {
@@ -417,13 +368,10 @@ clear:
         /* no row is selected */
         [_editButton setEnabled: NO];
         [_removeButton setEnabled: NO];
-        [_extractButton setEnabled: NO];
     } else {
         /* a row is selected */
         [_editButton setEnabled: YES];
         [_removeButton setEnabled: YES];
-        if ([_dataTable numberOfSelectedRows] == 2)
-            [_extractButton setEnabled: YES];
     }
 }
 

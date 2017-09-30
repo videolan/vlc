@@ -31,7 +31,6 @@
 @property (readwrite, weak) IBOutlet NSButton *addButton;
 @property (readwrite, weak) IBOutlet NSButton *clearButton;
 @property (readwrite, weak) IBOutlet NSButton *editButton;
-@property (readwrite, weak) IBOutlet NSButton *extractButton;
 @property (readwrite, weak) IBOutlet NSButton *removeButton;
 @property (readwrite, weak) IBOutlet NSTableView *dataTable;
 
@@ -49,7 +48,6 @@
 - (IBAction)add:(id)sender;
 - (IBAction)clear:(id)sender;
 - (IBAction)edit:(id)sender;
-- (IBAction)extract:(id)sender;
 - (IBAction)remove:(id)sender;
 - (IBAction)goToBookmark:(id)sender;
 
